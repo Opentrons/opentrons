@@ -13,7 +13,7 @@ The *frame* of the Opentrons Flex robot provides rigidity and structural support
 
 The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
 
-White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can photograph the deck and working area for recording and tracking protocol execution.
+White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2.1-megapixel camera can [photograph the deck](../opentrons-app.md#camera-features-and-controls) and working area for recording and tracking protocol execution.
 
 ## Deck and working area
 
