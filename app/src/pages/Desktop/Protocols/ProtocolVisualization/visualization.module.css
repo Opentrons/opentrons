@@ -122,15 +122,6 @@
   pointer-events: auto;
 }
 
-.deck_view_container {
-  width: 100%;
-  height: 100%;
-  padding: 28px 32px;
-  border-radius: var(--border-radius-8);
-  background-color: var(--white);
-  gap: var(--spacing-20);
-}
-
 .detail_container {
   display: flex;
   height: 100%;
