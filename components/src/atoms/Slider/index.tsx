@@ -2,13 +2,13 @@ import { StyledText } from '../StyledText'
 import styles from './slider.module.css'
 
 interface SliderProps {
-  /** Title of slider */ 
+  /** Title of slider */
   title: string
-  /** Subtext of slider */ 
+  /** Subtext of slider */
   subtext: string
-  /** Default value of slider */ 
+  /** Default value of slider */
   value: number
-  /** Function to do something with the value of the slider */ 
+  /** Function to do something with the value of the slider */
   adjustValue: (value: number) => void
 }
 
