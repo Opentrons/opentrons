@@ -17,7 +17,6 @@ import type {
   ContentsByWell,
   WellContentsByLabware,
 } from '../../labware-ingred/types'
-import type { Selector } from '../../types'
 
 const _getWellContents = (
   labwareDef: LabwareDefinition2,
