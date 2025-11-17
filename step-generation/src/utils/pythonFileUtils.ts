@@ -37,6 +37,7 @@ import type {
   LabwareEntities,
   LabwareEntity,
   LabwareLiquidState,
+  LabwareTemporalProperties,
   LiquidEntities,
   ModuleEntities,
   PipetteEntities,
@@ -299,29 +300,6 @@ export function getLoadLabware(
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
         parentName = moduleEntities[labwareSlot].pythonName
-        if (moduleEntities[labwareSlot].type === FLEX_STACKER_MODULE_TYPE) {
-          const largestStack = getLargestStackInSlot(
-            labwareRobotState,
-            labwareSlot
-          )
-          // Count only labware items (excluding slot, module, and adapters)
-          const labwareCount = largestStack.filter(
-            itemId =>
-              itemId in allLabwareEntities &&
-              !allLabwareEntities[itemId].def.allowedRoles?.includes(
-                'adapter'
-              ) &&
-              !allLabwareEntities[itemId].def.allowedRoles?.includes('lid')
-          ).length
-          // should I extract this to a function? all the logic will be the same
-          const setStoredLabwareArgs = [
-            `loadName=${formatPyStr(labware.def.parameters.loadName)}`,
-            `namespace=${formatPyStr(namespace)}`,
-            `version=${labware.def.version}`,
-            `count=${labwareCount}`,
-          ].join(',\n')
-          pythonFlexStackerSetStoredLabware = `${pythonName} = ${parentName}.set_stored_labware(${indentPyLines(setStoredLabwareArgs)})`
-        }
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
         locationArg = `location=${
@@ -582,6 +560,7 @@ export function pythonDefRun(
     trashBinEntities,
   } = invariantContext
   const { modules, labware, pipettes } = robotState
+  console.log('robotStateTimeline: ', robotStateTimeline)
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
@@ -602,6 +581,7 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
+    getSetStoredLabware(moduleEntities, labwareEntities, labware),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -647,4 +627,46 @@ export const formatChangeTipArg = (changeTip: ChangeTipOptions): string => {
       return changeTip
     }
   }
+}
+export const getSetStoredLabware = (
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities,
+  labware: { [labwareId: string]: LabwareTemporalProperties }
+): string => {
+  const pythonSetStoredLabware = Object.values(moduleEntities).map(module => {
+    const { id, type, pythonName } = module
+
+    if (type === FLEX_STACKER_MODULE_TYPE) {
+      const labwareOnModule = Object.entries(labware).find(([_, labware]) =>
+        labware.stack?.includes(id)
+      )
+      if (labwareOnModule == null) {
+        return ''
+      } else {
+        // Count only labware items (excluding slot, module, and adapters)
+        const labwareCount = labwareOnModule[1].stack.filter(
+          itemId =>
+            itemId in labwareEntities &&
+            !labwareEntities[itemId].def.allowedRoles?.includes('adapter') &&
+            !labwareEntities[itemId].def.allowedRoles?.includes('lid')
+        ).length
+        const labwareEntity = labwareEntities[labwareOnModule[0]]
+        const setStoredLabwareArgs = [
+          `loadName=${formatPyStr(labwareEntity.def.parameters.loadName)}`,
+          `namespace=${formatPyStr(labwareEntity.def.namespace)}`,
+          `version=${labwareEntity.def.version}`,
+          `count=${labwareCount}`,
+        ].join(',\n')
+        console.log('setStoredLabwareArgs: ', setStoredLabwareArgs)
+        console.log(
+          'set stored labware command: ',
+          `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware(${indentPyLines(setStoredLabwareArgs)})`
+        )
+        return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware(${indentPyLines(setStoredLabwareArgs)})`
+      }
+    }
+  })
+  return pythonSetStoredLabware.length > 0
+    ? `# Set Stored Labware:\n${pythonSetStoredLabware}`
+    : ''
 }

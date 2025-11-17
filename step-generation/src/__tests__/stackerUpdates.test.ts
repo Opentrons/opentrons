@@ -178,21 +178,28 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
   })
 
   it('should raise an error if there is no labware in the stacker', () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {}) // Mock to prevent actual console output
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareIdsInStacker: [],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
     } as any)
-    expect(() => {
-      forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
-        robotState,
-        warnings: [],
-      })
-    }).toThrow('Cannot retrieve labware bc there is no labware in the stacker')
+    forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Cannot retrieve labware bc there is no labware in the stacker'
+    )
   })
 
   it('should raise an error if there is labware on the shuttle', () => {
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {}) // Mock to prevent actual console output
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
       labwareIdsInStacker: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
@@ -200,21 +207,24 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       labwareStored: LABWARE_ID,
       shuttlePosition: 'retrieved',
     } as any)
-    expect(() => {
-      forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
-        robotState,
-        warnings: [],
-      })
-    }).toThrow('Cannot retrieve labware bc there is labware on the shuttle')
+    forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Cannot retrieve labware bc there is labware on the shuttle'
+    )
   })
 
   it('should raise an error if there is no stored labware details or primary labware', () => {
-    expect(() => {
-      forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
-        robotState,
-        warnings: [],
-      })
-    }).toThrow(
+    const consoleErrorSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {}) // Mock to prevent actual console output
+    forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
+      robotState,
+      warnings: [],
+    })
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
       'Cannot retrieve labware bc there is no stored labware details or primary labware'
     )
   })
