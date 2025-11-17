@@ -178,10 +178,8 @@ describe('getUserVisibleStepNumbers() and getNextUserVisibleStepNumber()', () =>
       ],
     }
 
-    // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
     const stepNumbersResult = getUserVisibleStepNumbers.resultFunc(input)
     const nextStepNumberResult =
-      // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
       getNextUserVisibleStepNumber.resultFunc(stepNumbersResult)
 
     expect(stepNumbersResult).toStrictEqual({
@@ -199,10 +197,8 @@ describe('getUserVisibleStepNumbers() and getNextUserVisibleStepNumber()', () =>
       topLevelItems: [],
     }
 
-    // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
     const stepNumbersResult = getUserVisibleStepNumbers.resultFunc(input)
     const nextStepNumberResult =
-      // @ts-expect-error(mm, 2025-11-14): resultFunc (from reselect) is not part of their Selector interface
       getNextUserVisibleStepNumber.resultFunc(stepNumbersResult)
 
     expect(stepNumbersResult).toStrictEqual({})

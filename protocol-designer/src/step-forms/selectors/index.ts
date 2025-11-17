@@ -494,27 +494,28 @@ export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
  *
  * Hidden steps get a step number of `null`.
  */
-export const getUserVisibleStepNumbers: Selector<
-  BaseState,
-  Record<StepIdType, number | null>
-> = createSelector(getSavedStepHierarchy, stepHierarchy => {
-  const visibilities = getStepVisibilities(stepHierarchy)
-  const allStepIdsAsFlatArray = convertStepHierarchyToArray(stepHierarchy)
+export const getUserVisibleStepNumbers = createSelector(
+  getSavedStepHierarchy,
+  (stepHierarchy): Record<StepIdType, number | null> => {
+    const visibilities = getStepVisibilities(stepHierarchy)
+    const allStepIdsAsFlatArray = convertStepHierarchyToArray(stepHierarchy)
 
-  const result: Record<StepIdType, number | null> = {}
-  let nextStepNumber = 1
-  for (const stepId of allStepIdsAsFlatArray) {
-    result[stepId] = visibilities[stepId].isVisibleToUser
-      ? nextStepNumber++
-      : null
+    const result: Record<StepIdType, number | null> = {}
+    let nextStepNumber = 1
+    for (const stepId of allStepIdsAsFlatArray) {
+      result[stepId] = visibilities[stepId].isVisibleToUser
+        ? nextStepNumber++
+        : null
+    }
+
+    return result
   }
-
-  return result
-})
+) satisfies Selector<BaseState, Record<StepIdType, number | null>>
 
 /** If a step is added to the end of the timeline, it will have this number. */
-export const getNextUserVisibleStepNumber: Selector<BaseState, number> =
-  createSelector(getUserVisibleStepNumbers, userVisibleStepNumbers => {
+export const getNextUserVisibleStepNumber = createSelector(
+  getUserVisibleStepNumbers,
+  (userVisibleStepNumbers): number => {
     const isNonNull = (stepNumber: number | null): stepNumber is number =>
       stepNumber !== null
     const stepNumbers = Object.values(userVisibleStepNumbers)
@@ -524,7 +525,8 @@ export const getNextUserVisibleStepNumber: Selector<BaseState, number> =
         ...stepNumbers.filter(isNonNull)
       ) + 1
     )
-  })
+  }
+) satisfies Selector<BaseState, number>
 
 export const getCurrentFormHasUnsavedChanges: Selector<BaseState, boolean> =
   createSelector(
