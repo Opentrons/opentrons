@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { isMonday } from 'date-fns'
 
 import {
   DIRECTION_COLUMN,
@@ -24,21 +25,6 @@ import type { Meta, Story } from '@storybook/react'
 export default {
   title: 'App/Atoms/Buttons',
 } as Meta
-
-const TouchControlButtonTemplate: Story<
-  React.ComponentProps<typeof TouchControlButton>
-> = args => {
-  return (
-    <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
-      <TouchControlButton {...args} />
-    </Flex>
-  )
-}
-
-export const TouchControl = TouchControlButtonTemplate.bind({})
-TouchControl.args = {
-  children: 'touch control button',
-}
 
 const TertiaryButtonTemplate: Story<
   React.ComponentProps<typeof TertiaryButton>
@@ -91,6 +77,28 @@ SubmitPrimary.args = {
   },
   disabled: false,
 }
+
+const TouchControlButtonTemplate: Story<
+  React.ComponentProps<typeof TouchControlButton>
+> = args => {
+  return (
+    <Flex>
+      <TouchControlButton {...args} />
+    </Flex>
+  )
+}
+
+export const TouchControl = TouchControlButtonTemplate.bind({})
+TouchControl.args = {
+  title: 'touch control button',
+  subText: 'touch control subtext',
+  isActive: true,
+  isOnDevice: false,
+  onClick: () => {
+    console.log('touch control button clicked')
+  },
+}
+
 const ToggleButtonTemplate: Story<
   React.ComponentProps<typeof ToggleButton>
 > = args => {

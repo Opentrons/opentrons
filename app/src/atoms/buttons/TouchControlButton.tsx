@@ -1,4 +1,3 @@
-import { useSelector } from 'react-redux'
 import styled from 'styled-components'
 
 import {
@@ -10,35 +9,39 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getIsOnDevice } from '/app/redux/config'
-
 interface TouchControlProps {
   title: string
   isActive: boolean
   onClick: () => void
+  isOnDevice: boolean
   subText?: string
 }
 
-const StyledTouchButton = styled(Btn)<{ isActive: boolean; isOnOdd: boolean }>`
-  background-color: ${({ isActive, isOnOdd }) =>
-    !isOnOdd ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
-  border: ${({ isActive, isOnOdd }) =>
-    !isOnOdd
+const StyledTouchButton = styled(Btn)<{
+  isActive: boolean
+  isOnDevice: boolean
+}>`
+  background-color: ${({ isActive, isOnDevice }) =>
+    !isOnDevice ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
+
+  border: ${({ isActive, isOnDevice }) =>
+    !isOnDevice
       ? isActive
         ? `1px ${COLORS.blue50} solid`
         : `1px ${COLORS.grey30} solid`
       : `1px ${COLORS.grey30} solid`};
+
   cursor: ${CURSOR_DEFAULT};
-  border-radius: ${({ isOnOdd }) =>
-    isOnOdd ? BORDERS.borderRadius16 : BORDERS.borderRadius8};
+  border-radius: ${({ isOnDevice }) =>
+    isOnDevice ? BORDERS.borderRadius16 : BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing20};
-  text-align: ${({ isOnOdd }) => (isOnOdd ? 'left' : 'center')};
+  text-align: ${({ isOnDevice }) => (isOnDevice ? 'left' : 'center')};
 
   &:focus {
-    background-color: ${({ isActive, isOnOdd }) =>
-      !isOnOdd ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
-    border: ${({ isActive, isOnOdd }) =>
-      !isOnOdd
+    background-color: ${({ isActive, isOnDevice }) =>
+      !isOnDevice ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
+    border: ${({ isActive, isOnDevice }) =>
+      !isOnDevice
         ? isActive
           ? `1px ${COLORS.blue50} solid`
           : `1px ${COLORS.grey30} solid`
@@ -46,15 +49,15 @@ const StyledTouchButton = styled(Btn)<{ isActive: boolean; isOnOdd: boolean }>`
   }
 
   &:active {
-    background-color: ${({ isActive, isOnOdd }) =>
-      !isOnOdd ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
+    background-color: ${({ isActive, isOnDevice }) =>
+      !isOnDevice ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
     color: ${COLORS.blue50};
     border: 1px ${COLORS.blue50} solid;
   }
 
   &:focus-visible {
-    ${({ isOnOdd }) =>
-      !isOnOdd &&
+    ${({ isOnDevice }) =>
+      !isOnDevice &&
       `
         color: ${COLORS.blue50};
         background-color: ${COLORS.white};
@@ -69,32 +72,37 @@ const StyledTouchButton = styled(Btn)<{ isActive: boolean; isOnOdd: boolean }>`
     color: ${COLORS.grey40};
   }
 `
-
-export function TouchControlButton(props: TouchControlProps): JSX.Element {
-  const { title, subText, isActive, onClick } = props
-  const isOnOdd = useSelector(getIsOnDevice)
+export const TouchControlButton = (props: TouchControlProps): JSX.Element => {
+  const { title, isActive, onClick, subText, isOnDevice } = props
   return (
-    <StyledTouchButton isActive={isActive} onClick={onClick} isOnOdd={isOnOdd}>
+    <StyledTouchButton
+      isActive={isActive}
+      isOnDevice={isOnDevice}
+      onClick={onClick}
+    >
       <StyledText
-        oddStyle={'bodyTextSemiBold'}
-        desktopStyle={'bodyDefaultSemiBold'}
+        oddStyle="bodyTextSemiBold"
+        desktopStyle="bodyDefaultSemiBold"
         color={
-          isActive && !isOnOdd
+          isActive && !isOnDevice
             ? COLORS.blue50
-            : isOnOdd && isActive
+            : isOnDevice && isActive
               ? COLORS.white
               : COLORS.black90
         }
       >
         {title}
       </StyledText>
-      <StyledText
-        oddStyle={'bodyTextRegular'}
-        desktopStyle={'captionRegular'}
-        color={isActive && isOnOdd ? COLORS.white : COLORS.grey60}
-      >
-        {subText}
-      </StyledText>
+
+      {subText && (
+        <StyledText
+          oddStyle="bodyTextRegular"
+          desktopStyle="captionRegular"
+          color={isActive && isOnDevice ? COLORS.white : COLORS.grey60}
+        >
+          {subText}
+        </StyledText>
+      )}
     </StyledTouchButton>
   )
 }
