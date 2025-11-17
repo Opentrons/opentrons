@@ -67,16 +67,10 @@ interface HandlerSet {
 // Handler caching using window ID as key
 const handlerSets = new Map<string, HandlerSet>()
 
-// prepended listener is important here to work around Electron issue
-// https://github.com/electron/electron/issues/19468#issuecomment-623529556
-// app.prependOnceListener('ready', startUp)
-// // eslint-disable-next-line @typescript-eslint/no-misused-promises
-// if (config.devtools) app.once('ready', installDevtools)
-
 app
   .whenReady()
   .then(async () => {
-    await startUp()
+    startUp()
 
     if (config.devtools) {
       await installDevtools()
