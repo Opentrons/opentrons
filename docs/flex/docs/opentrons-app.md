@@ -118,7 +118,7 @@ This fixed location gives you a wide-angle field of view of attached instruments
 <!-- request to jackson for some photo-manipulation, might be too complicated, see jira comment -->
 ![Default camera view](./images/camer-default.png) 
 
-### Controlling the camera
+### Controls
 
 The camera is turned off by default. To turn on the camera and access its features:
 
@@ -137,7 +137,7 @@ You can also see the camera's status, and turn it on and off, from the Periphera
   ![Details page showing enabled camera](./images/robot-details.png)
 </figure>
 
-### Image download
+### Downloading images
 
 All protocol images are available for download in the Recent Protocol Runs section of the robot details page.
 
