@@ -71,3 +71,9 @@ packages = ['opentrons_hardware']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons_hardware/LICENSE'
+
+# uv: global settings and dependency tweaks
+[tool.uv]
+
+[tool.uv.sources]
+"opentrons-shared-data" = { path = "../shared-data", editable = true }

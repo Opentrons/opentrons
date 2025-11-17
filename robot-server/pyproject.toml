@@ -1,6 +1,6 @@
 [project]
 name = "robot_server"
-dynamic = ["version"]
+dynamic = ["version", "hatch-dependency-coversion"]
 requires-python = ">=3.10,<3.11"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
@@ -17,6 +17,7 @@ classifiers = [
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "A server providing access to the Opentrons API"
 
+
 dependencies = [
     "opentrons==0.0.0",
     "opentrons-shared-data==0.0.0",
@@ -27,7 +28,7 @@ dependencies = [
     "python-multipart==0.0.6",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
-    "typing-extensions>=4.0.0,<5",
+    "typing-extensions==4.15.0",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
     "systemd-python==234; sys_platform == 'linux'",
@@ -69,7 +70,7 @@ dev = [
     "types-paho-mqtt==1.6.0.20240106",
     "types-requests~=2.27.1",
     "zipp==3.21.0",
-    "opentrons-hardware[FLEX]",
+    "opentrons-hardware[FLEX]==0.0.0",
 ]
 
 # uv: global settings and dependency tweaks
@@ -101,7 +102,13 @@ build-backend = "hatchling.build"
 
 # --- hatch-dependency-coversion: exact co-versioning of specific deps ---
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of = ["opentrons-shared-data", "opentrons", "server-utils"]
+override-versions-of = [
+    "opentrons-shared-data",
+    "opentrons",
+    "server-utils",
+    "opentrons-hardware",
+    "opentrons-hardware[FLEX]",
+]
 
 # --- hatch-vcs-tunable: VCS-derived version with env-tunable settings ---
 [tool.hatch.build.hooks.vcs-tunable]
