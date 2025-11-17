@@ -62,11 +62,19 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_state(cls, response: str) -> PressureState:
         """Parse the get pressure state."""
-        _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} T:(?P<T>\d) C:(?P<C>\d)$")
+        _RE = re.compile(
+            rf"^{GCODE.GET_PRESSURE_STATE} T:(?P<T>\d) C:(?P<C>\d) A:(?P<A>\d) B:(?P<B>\d) H:(?P<H>\d)$"
+        )
         match = _RE.match(response)
         if not match:
             raise ValueError(f"Incorrect Response for get pressure state: {response}")
-        return PressureState(float(match.group("T")), float(match.group("C")))
+        return PressureState(
+            float(match.group("T")),
+            float(match.group("C")),
+            float(match.group("A")),
+            float(match.group("B")),
+            float(match.group("H")),
+        )
 
     @classmethod
     def parse_get_pump_state(cls, response: str) -> PumpState:

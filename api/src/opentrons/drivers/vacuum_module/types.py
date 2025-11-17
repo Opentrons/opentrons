@@ -87,8 +87,11 @@ class LEDPattern(Enum):
 class PressureState:
     """Get the pressure state."""
 
-    target_pressure: float
-    current_pressure: float
+    target_guage_pressure: float
+    current_guage_pressure: float
+    pressure_abs_a: float
+    pressure_abs_b: float
+    pressure_atm: float
 
 
 @dataclass
