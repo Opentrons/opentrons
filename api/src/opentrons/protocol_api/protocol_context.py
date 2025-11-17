@@ -135,7 +135,7 @@ class ProtocolContext(CommandPublisher):
     See the [Tutorial](../tutorial.md#the-run-function) for more information.
 
     Use [`get_protocol_api()`][opentrons.execute.get_protocol_api] to instantiate a `ProtocolContext` when
-    using Jupyter Notebook. See [Advanced Control](../advanced-control.md).
+    using Jupyter Notebook. See [Advanced Control](../advanced-control/index.md).
 
     *New in version 2.0*
     """
@@ -300,8 +300,6 @@ class ProtocolContext(CommandPublisher):
         of maximum speeds in mm/s. To change a speed, set that axis's value. To
         reset an axis's speed to default, delete the entry for that axis
         or assign it to `None`.
-
-        See [Axis Speed Limits][axis-speed-limits] for examples.
 
         !!! note
             This property is not yet supported in API version 2.14 or higher.
@@ -1108,7 +1106,7 @@ class ProtocolContext(CommandPublisher):
                 [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip]
                 without arguments.
             replace (bool): If `True`, replace the currently loaded instrument in
-                `mount`, if any. This is intended for [advanced control](../advanced-control.md)
+                `mount`, if any. This is intended for [advanced control](../advanced-control/index.md)
                 applications. You cannot replace an instrument in the middle of a
                 protocol being run from the Opentrons App or touchscreen.
             liquid_presence_detection (bool): If `True`, enable automatic
@@ -1371,7 +1369,7 @@ class ProtocolContext(CommandPublisher):
         a dict of labwares and [`loaded_modules`][opentrons.protocol_api.ProtocolContext.loaded_modules]
         to get a dict of modules.
 
-        For [advanced control](../advanced-control.md) *only*, you can delete an element
+        For [advanced control](../advanced-control/index.md) *only*, you can delete an element
         of the `deck` dict. This only works for deck slots that contain labware objects.
         For example, if slot 1 contains a labware, `del protocol.deck["1"]` will free the
         slot so you can load another labware there.

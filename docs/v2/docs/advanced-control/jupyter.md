@@ -1,12 +1,12 @@
 ---
-title: "Python API: Advanced Control"
+title: "Python API: Jupyter Notebook"
 ---
 
-As its name implies, the Python Protocol API is primarily designed for creating protocols that you upload via the Opentrons App and execute on the robot as a unit. But sometimes it's more convenient to control the robot outside of the app. For example, you might want to have variables in your code that change based on user input or the contents of a CSV file. Or you might want to only execute part of your protocol at a time, especially when developing or debugging a new protocol.
+Sometimes it’s more convenient to control your robot outside of the app. For example, you might want to have variables in your code that change based on user input or the contents of a CSV file. Or you might want to only execute part of your protocol at a time, especially when developing or debugging a new protocol.
 
-The Python API offers two ways of issuing commands to the robot outside of the app: through Jupyter Notebook or on the command line with `opentrons_execute`.
+The Python API lets you issue commands to the robot outside of the app by using Jupyter Notebook.
 
-## Jupyter Notebook {#jupyter-notebook-api}
+## Accessing Jupyter Notebook
 
 The Flex and OT-2 run [Jupyter Notebook](https://jupyter.org) servers on port 48888, which you can connect to with your web browser. This is a convenient environment for writing and debugging protocols, since you can define different parts of your protocol in different notebook cells and run a single cell at a time.
 
@@ -17,11 +17,11 @@ Access your robot’s Jupyter Notebook by either:
 
 Once you've launched Jupyter Notebook, you can create a notebook file or edit an existing one. These notebook files are stored on the robot. If you want to save code from a notebook to your computer, go to **File > Download As** in the notebook interface.
 
-### Protocol Structure
+## Protocol Structure
 
-Jupyter Notebook is structured around *cells*: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single `run` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol.
+Jupyter Notebook is structured around *cells*: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single `run()` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol.
 
-Rather than writing a `run` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](versioning.md) as its argument. Then you can call [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
+Rather than writing a `run()` function and embedding commands within it, start your notebook by importing `opentrons.execute` and calling [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api]. This function also replaces the `metadata` block of a standalone protocol by taking the minimum [API version](../versioning.md) as its argument. Then you can call [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] methods in subsequent lines or cells:
 
 ```python
 import opentrons.execute
@@ -31,7 +31,7 @@ protocol.home()
 
 The first command you execute should always be [`home()`][opentrons.protocol_api.ProtocolContext.home]. If you try to execute other commands first, you will get a `MustHomeError`. (When running protocols through the Opentrons App, the robot homes automatically.)
 
-You should use the same `ProtocolContext` throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call [`get_protocol_api()`][opentrons.execute.get_protocol_api] again to get a new `ProtocolContext`.
+You should use the same [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call [`get_protocol_api()`][opentrons.execute.get_protocol_api] again to get a new `ProtocolContext`.
 
 ### Running a Previously Written Protocol
 
@@ -66,7 +66,7 @@ For advanced control applications, do the following to calculate and apply labwa
 
 Creating the dummy protocol requires you to:
 
-- Use the `metadata` or `requirements` dictionary to specify the API version. (See [Versioning](versioning.md) for details.) Use the same API version as you did in [`get_protocol_api()`][opentrons.execute.get_protocol_api].
+- Use the `metadata` or `requirements` dictionary to specify the API version. (See [Versioning](../versioning.md) for details.) Use the same API version as you did in [`get_protocol_api()`][opentrons.execute.get_protocol_api].
 - Define a `run()` function.
 - Load all of your labware in their initial locations.
 - Load your smallest capacity pipette and specify its `tip_racks`.
@@ -159,21 +159,9 @@ If you have custom labware definitions you want to use with Jupyter, make a new 
 
 ## Using Modules
 
-If your protocol uses [modules](modules/index.md), you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
+If your protocol uses [modules](../modules/index.md), you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
 
 To disable the robot server, open a Jupyter terminal session by going to **New > Terminal** and run `systemctl stop opentrons-robot-server`. Then you can run code from cells in your notebook as usual. When you are done using Jupyter Notebook, you should restart the robot server with `systemctl start opentrons-robot-server`.
 
 !!! note
     While the robot server is stopped, the robot will display as unavailable in the Opentrons App. If you need to control the robot or its attached modules through the app, you need to restart the robot server and wait for the robot to appear as available in the app.
-
-## Command Line
-
-The robot's command line is accessible either by going to **New > Terminal** in Jupyter or [via SSH](../flex/advanced-operation/command-line.md).
-
-To execute a protocol from the robot's command line, copy the protocol file to the robot with `scp` and then run the protocol with `opentrons_execute`:
-
-```bash
-opentrons_execute /data/my_protocol.py
-```
-
-By default, `opentrons_execute` will print out the same run log shown in the Opentrons App, as the protocol executes. It also prints out internal logs at the level `warning` or above. Both of these behaviors can be changed. Run `opentrons_execute --help` for more information.
