@@ -10,6 +10,7 @@ import {
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import {
   SOURCE_RUN_RECORD,
@@ -32,6 +33,7 @@ import {
   isRunAgainStatus,
   isStartRunStatus,
 } from '../../../utils'
+import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
 
 import type { IconName } from '@opentrons/components'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -59,8 +61,12 @@ export function useActionButtonProperties({
   robotName,
   runId,
   currentRunId,
+  isOtherRunCurrent,
+  isRobotOnWrongVersionOfSoftware,
   confirmAttachment,
   confirmMissingSteps,
+  makeHandleJumpToStep,
+  runRecord,
   robotAnalyticsData,
   robotSerialNumber,
   protocolRunControls,
@@ -69,6 +75,8 @@ export function useActionButtonProperties({
   isResetRunLoadingRef,
   isClosingCurrentRun,
   areCameraPreferencesConfirmed,
+  isValidRunAgain,
+  protocolRunHeaderRef,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -116,6 +124,30 @@ export function useActionButtonProperties({
       recoveryCaptureEnabled: recoveryEnabled,
     })
   }
+  const isSetupComplete = !missingSetupSteps || missingSetupSteps.length === 0
+  const { makeSnackbar } = useToaster()
+  const isCameraReadyToRun =
+    missingSetupSteps.length === 0 ||
+    !missingSetupSteps.includes('camera_setup_step')
+  const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
+    robotName,
+    runId,
+    isValidRunAgain,
+    isSetupComplete,
+    isOtherRunCurrent,
+    isProtocolNotReady,
+    isRobotOnWrongVersionOfSoftware,
+    isClosingCurrentRun,
+    isCameraReadyToRun,
+    makeHandleJumpToStep,
+    runRecord,
+    runStatus,
+    isResetRunLoadingRef,
+    protocolRunHeaderRef,
+    attachedModules,
+    protocolRunControls,
+    runHeaderModalContainerUtils,
+  })
 
   if (isProtocolNotReady) {
     buttonIconName = 'ot-spinner'
@@ -138,6 +170,10 @@ export function useActionButtonProperties({
     buttonText =
       runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
     handleButtonClick = () => {
+      if (isDisabled) {
+        makeSnackbar(disabledReason)
+        return
+      }
       if (isHeaterShakerShaking && isHeaterShakerInProtocol) {
         runHeaderModalContainerUtils.HSRunningModalUtils.toggleModal?.()
       } else if (

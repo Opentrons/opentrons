@@ -2,6 +2,13 @@ import { useTranslation } from 'react-i18next'
 
 import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
+import {
+  useCurrentRunId,
+  useModuleCalibrationStatus,
+  useRunCalibrationStatus,
+  useUnmatchedModulesForProtocol,
+} from '/app/resources/runs'
+
 import { useIsDoorOpen } from '../../../hooks'
 import {
   isCancellableStatus,
@@ -14,7 +21,8 @@ import type { BaseActionButtonProps } from '..'
 import type { DoorResult } from '../../../../../../../DoorOpenControl/useIsDoorOpen'
 
 interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
-  isCurrentRun: boolean
+  robotName: string
+  runId: string
   isValidRunAgain: boolean
   isSetupComplete: boolean
   isOtherRunCurrent: boolean
@@ -25,7 +33,7 @@ interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
 }
 
 type UseActionButtonDisabledUtilsResult =
-  | { isDisabled: true; disabledReason: string | null }
+  | { isDisabled: true; disabledReason: string }
   | { isDisabled: false; disabledReason: null }
 
 // Manages the various reasons the ActionButton may be disabled, returning the disabled state and user-facing disabled
@@ -34,7 +42,6 @@ export function useActionBtnDisabledUtils(
   props: UseActionButtonDisabledUtilsProps
 ): UseActionButtonDisabledUtilsResult {
   const {
-    isCurrentRun,
     isSetupComplete,
     isOtherRunCurrent,
     isProtocolNotReady,
@@ -52,9 +59,21 @@ export function useActionBtnDisabledUtils(
   const doorStatus = useIsDoorOpen(robotName)
   const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
   const isResetRunLoading = isResetRunLoadingRef.current
+  const isCurrentRun = useCurrentRunId() === runId
+  const isCalibrationComplete = !useRunCalibrationStatus(robotName, runId)
+    .complete
+  const isModuleCalibrationComplete = !useModuleCalibrationStatus(
+    robotName,
+    runId
+  ).complete
+  const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
 
+  const isMissingModules = missingModuleIds.length > 0
   const isDisabled =
     (isCurrentRun && !isSetupComplete) ||
+    isMissingModules ||
+    isModuleCalibrationComplete ||
+    isCalibrationComplete ||
     isPlayRunActionLoading ||
     isPauseRunActionLoading ||
     isResetRunLoading ||
@@ -69,10 +88,13 @@ export function useActionBtnDisabledUtils(
       isCancellableStatus(runStatus))
 
   const disabledReason = useDisabledReason({
-    ...props,
-    doorStatus,
     isFixtureMismatch,
+    doorStatus,
     isResetRunLoading,
+    isMissingModules,
+    isModuleCalibrationComplete,
+    isCalibrationComplete,
+    ...props,
   })
 
   return isDisabled
@@ -85,12 +107,13 @@ type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
   isFixtureMismatch: boolean
   isResetRunLoading: boolean
   isClosingCurrentRun: boolean
+  isModuleCalibrationComplete: boolean
+  isMissingModules: boolean
+  isCalibrationComplete: boolean
 }
 
 // The user-facing disabled explanation for why the ActionButton is disabled, if any.
 function useDisabledReason({
-  isCurrentRun,
-  isSetupComplete,
   isFixtureMismatch,
   isValidRunAgain,
   isOtherRunCurrent,
@@ -100,17 +123,23 @@ function useDisabledReason({
   isResetRunLoading,
   isClosingCurrentRun,
   isCameraReadyToRun,
-}: UseDisabledReasonProps): string | null {
+  isMissingModules,
+  isModuleCalibrationComplete,
+  isCalibrationComplete,
+}: UseDisabledReasonProps): string {
   const { t } = useTranslation(['run_details', 'shared'])
-
   if (!isCameraReadyToRun) {
     return t('enable_camera')
-  } else if (
-    isCurrentRun &&
-    (!isSetupComplete || isFixtureMismatch) &&
-    !isValidRunAgain
-  ) {
-    return t('setup_incomplete')
+  } else if (isCalibrationComplete) {
+    return t('instrument_calibration_incomplete')
+  } else if (isModuleCalibrationComplete) {
+    return t('module_calibration_incomplete')
+  } else if (isMissingModules) {
+    return t('modules_missing')
+  } else if (isFixtureMismatch) {
+    return t('fixture_mismatch')
+  } else if (isValidRunAgain) {
+    return t('run_again_disabled')
   } else if (isOtherRunCurrent && !isResetRunLoading) {
     return t('shared:robot_is_busy')
   } else if (isRobotOnWrongVersionOfSoftware) {
@@ -126,6 +155,6 @@ function useDisabledReason({
   } else if (isClosingCurrentRun) {
     return t('shared:robot_is_busy')
   } else {
-    return null
+    return t('run_cta_disabled')
   }
 }

@@ -12,8 +12,6 @@ import {
   SIZE_1,
   SPACING,
   StyledText,
-  Tooltip,
-  useHoverTooltip,
 } from '@opentrons/components'
 
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
@@ -37,7 +35,7 @@ import {
 } from '../../utils'
 import { useActionBtnDisabledUtils, useActionButtonProperties } from './hooks'
 
-import type { MutableRefObject } from 'react'
+import type { MutableRefObject, RefObject } from 'react'
 import type { State } from '/app/redux/types'
 import type { RunHeaderContentProps } from '..'
 
@@ -46,6 +44,7 @@ export type BaseActionButtonProps = RunHeaderContentProps
 interface ActionButtonProps extends BaseActionButtonProps {
   isResetRunLoadingRef: MutableRefObject<boolean>
   isClosingCurrentRun: boolean
+  protocolRunHeaderRef: RefObject<HTMLDivElement> | null
 }
 
 export function ActionButton(props: ActionButtonProps): JSX.Element {
@@ -60,9 +59,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   } = props
   const { missingStepsModalUtils, HSConfirmationModalUtils } =
     runHeaderModalContainerUtils
-
   const isFlex = useIsFlex(robotName)
-  const [targetProps, tooltipProps] = useHoverTooltip()
   const { isProtocolAnalyzing, protocolData } = useProtocolDetailsForRun(runId)
   const { missingModuleIds } = useUnmatchedModulesForProtocol(robotName, runId)
   const { complete: isCalibrationComplete } = useRunCalibrationStatus(
@@ -99,13 +96,10 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
     ? isSetupComplete && !isRequiredOffsetMissing
     : isSetupComplete
 
-  const isCurrentRun = currentRunId === runId
   const isOtherRunCurrent = currentRunId != null && currentRunId !== runId
   const isProtocolNotReady = protocolData == null || !!isProtocolAnalyzing
   const isValidRunAgain = isValidRunAgainStatus(runStatus, isClosingCurrentRun)
-
-  const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
-    isCurrentRun,
+  useActionBtnDisabledUtils({
     isSetupComplete: isRobotTypeSetupComplete,
     isOtherRunCurrent,
     isProtocolNotReady,
@@ -118,9 +112,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
   const robot = useRobot(robotName)
   const robotSerialNumber = getFallbackRobotSerialNumber(robot)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
-
-  const validRunAgainButRequiresSetup =
-    isValidRunAgain && !isRobotTypeSetupComplete
 
   const { buttonText, handleButtonClick, buttonIconName } =
     useActionButtonProperties({
@@ -138,7 +129,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       areCameraPreferencesConfirmed,
       ...props,
     })
-
   return (
     <>
       <PrimaryButton
@@ -146,14 +136,9 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
         alignItems={ALIGN_CENTER}
         boxShadow="none"
         display={DISPLAY_FLEX}
-        // TODO(jh, 05-05-25): These boolean checks should live in useActionBtnDisabledUtils as a part of the singular disabled check.
-        disabled={
-          isDisabled && (!validRunAgainButRequiresSetup || isClosingCurrentRun)
-        }
         onClick={handleButtonClick}
         id="ProtocolRunHeader_runControlButton"
         borderRadius={BORDERS.borderRadiusFull}
-        {...targetProps}
       >
         {buttonIconName != null ? (
           <Icon
@@ -172,11 +157,6 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
           {buttonText}
         </StyledText>
       </PrimaryButton>
-      {disabledReason && (
-        <Tooltip tooltipProps={tooltipProps} width="auto" maxWidth="8rem">
-          {disabledReason}
-        </Tooltip>
-      )}
     </>
   )
 }
