@@ -69,7 +69,7 @@ plate["A1"].center() # the vertical and horizontal center of the well
 
 #### Meniscus
 
-Let's look at the [`Well.meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the `.Well.top` and `.Well.bottom` methods, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` values move the position up, and negative ones move it down. 
+Let's look at the [`Well.meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method. It returns a position at the surface of liquid, or meniscus, inside a well. Similar to the `.Well.top()` and `.Well.bottom()` methods, you can adjust the height of this position with the optional argument `z`, which is measured in mm. Positive `z` values move the position up, and negative ones move it down. 
 
 ```python
 plate["A1"].meniscus(
@@ -146,13 +146,13 @@ trash.top(y=10)  # 10 mm towards back, default height
 
 *New in version 2.18*
 
-Another difference between the trash container `top()` methods and `Well.top()` is that they return an object of the same type, not a [`Location`][opentrons.protocol_api.labware.Location]. This helps prevent performing undesired actions in trash containers. For example, you can [`aspirate`][opentrons.protocol_api.InstrumentContext.aspirate] at a location or from a well, but not from a trash container. On the other hand, you can [`blow_out`][opentrons.protocol_api.InstrumentContext.blow_out] at a location, well, trash bin, or waste chute.
+Another difference between the trash container `top()` methods and `Well.top()` is that they return an object of the same type, not a [`Location`][opentrons.protocol_api.labware.Location]. This helps prevent performing undesired actions in trash containers. For example, you can aspirate at a location or from a well, but not from a trash container. On the other hand, you can blow out at a location, well, trash bin, or waste chute.
 
 ## Position Relative to the Deck
 
 The robot's base coordinate system is known as *deck coordinates*. Many API functions use this coordinate system, and you can also reference it directly. It is a right-handed coordinate system always specified in mm, with the origin `(0, 0, 0)` at the front left of the robot. The positive `x` direction is to the right, the positive `y` direction is to the back, and the positive `z` direction is up. 
 
-You can identify a point in this coordinate system with a [`Location`][opentrons.types.Location] object, either as a standard Python [`tuple`](https://docs.python.org/3/tutorial/datastructures.html#tuples) of three floats, or as an instance of the [`namedtuple`](https://docs.python.org/3/library/collections.html#collections.namedtuple) [`Point`][opentrons.types.Point].
+You can identify a point in this coordinate system with a [`Location`][opentrons.types.Location] object, either as a standard Python [`tuple`](https://docs.python.org/3/library/stdtypes.html#tuple) of three floats, or as an instance of the [`namedtuple`](https://docs.python.org/3/library/collections.html#collections.namedtuple) [`Point`][opentrons.types.Point].
 
 !!! note
     There are technically multiple vertical axes. For example, `z` is the axis of the left pipette mount and `a` is the axis of the right pipette mount. There are also pipette plunger axes: `b` (left) and `c` (right). You usually don't have to refer to these axes directly, since most motion commands are issued to a particular pipette and the robot automatically selects the correct axis to move. Similarly, [`Location`][opentrons.types.Location] only deals with `x`, `y`, and `z` values. 
@@ -251,20 +251,5 @@ pipette.move_to(plate["D6"].top())  # move to the last well at the slower speed
 
 !!! warning
     These default speeds were chosen because they're the maximum speeds that Opentrons knows will work with the gantry. Your robot may be able to move faster, but you shouldn't increase this value unless instructed by Opentrons Support.
-
-*New in version 2.0*
-
-### Axis Speed Limits
-
-In addition to controlling the overall gantry speed, you can set speed limits for each of the individual axes: `x` (gantry left/right motion), `y` (gantry forward/back motion), `z` (left pipette up/down motion), and `a` (right pipette up/down motion). Unlike `default_speed`, which is a pipette property, axis speed limits are stored in a protocol property [`ProtocolContext.max_speeds`][opentrons.protocol_api.ProtocolContext.max_speeds]; therefore the `x` and `y` values affect all movements by both pipettes. This property works like a dictionary, where the keys are axes, assigning a value to a key sets a max speed, and deleting a key or setting it to `None` resets that axis's limit to the default:
-
-```python
-protocol.max_speeds["x"] = 50    # limit x-axis to 50 mm/s
-del protocol.max_speeds["x"]     # reset x-axis limit
-protocol.max_speeds["a"] = 10    # limit a-axis to 10 mm/s
-protocol.max_speeds["a"] = None  # reset a-axis limit
-```
-
-Note that `max_speeds` can't set limits for the pipette plunger axes (`b` and `c`); instead, set the flow rates or plunger speeds as described in [Pipette Flow Rates][pipette-flow-rates].
 
 *New in version 2.0*
