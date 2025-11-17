@@ -93,13 +93,6 @@ export interface SelectMultipleStepsAction {
   }
 }
 
-export interface SelectMultipleStepsForGroupAction {
-  type: 'SELECT_MULTIPLE_STEPS_FOR_GROUP'
-  payload: {
-    stepIds: StepIdType[]
-    lastSelected: StepIdType
-  }
-}
 export type ViewSubstep = StepIdType | null
 export interface ToggleViewSubstepAction {
   type: 'TOGGLE_VIEW_SUBSTEP'
