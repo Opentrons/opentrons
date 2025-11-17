@@ -69,7 +69,7 @@ The Thermocycler can control its block temperature, including holding at a tempe
 Temperature
 -----------
 
-To set the block temperature inside the Thermocycler, you can use either a blocking or non-blocking method. At minimum, boht require a ``temperature`` in degrees Celsius. 
+To set the block temperature inside the Thermocycler, you can use either a blocking or non-blocking method. At minimum, both require a ``temperature`` in degrees Celsius. 
 
 .. tabs::
 
@@ -127,7 +127,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 
 You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together) for the non-blocking :py:meth:`~.ThermocyclerContext.set_block_temperature`. Your protocol won't proceed to further commands while holding at a temperature. If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
 
-The non-blocking :py:meth:`~.ThermocyclerContext.start_set_block_temperature` doesn't accept these arguemnts. Instead, use :py:meth:`.ProtocolContext.create_timer` to proceed to the next steps in your protocol. Here, the robot will perform the pipetting actions while the block reaches its target temperature. Once the protocol reaches the :py:meth:`.ProtocolContext.wait_for_tasks` command, the robot pauses and waits for the remainder of the timer. 
+The non-blocking :py:meth:`~.ThermocyclerContext.start_set_block_temperature` doesn't accept these arguments. Instead, use :py:meth:`.ProtocolContext.create_timer` to proceed to the next steps in your protocol. Here, the robot will perform the pipetting actions while the block reaches its target temperature. Once the protocol reaches the :py:meth:`.ProtocolContext.wait_for_tasks` command, the robot pauses and waits for the remainder of the timer. 
 
 
 Block Max Volume
@@ -155,7 +155,7 @@ It is especially important to specify ``block_max_volume`` when holding at a tem
         block_timer = create_timer(seconds=20)
         tc_mod.start_set_block_temperature(
             temperature=4,
-            block_max_voume=80)
+            block_max_volume=80)
         protocol.wait_for_tasks(block_timer)
 
 

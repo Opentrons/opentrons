@@ -117,7 +117,7 @@ This command loads the same physical adapter and labware as the example in the S
 Temperature Control
 ===================
 
-The primary function of the module is to control the temperature of its deck. As with the Heater-Shaker Module, you can use either a blocking or non-blocking command to control how your protocol proceeds. 
+The primary function of the module is to control the temperature of its deck. As of API version 2.27, it provides both blocking and concurrent temperature commands to control how your protocol proceeds. 
 
 Both examples below set the target temperature to 4 °C. Each takes one parameter: ``celsius``.  
 

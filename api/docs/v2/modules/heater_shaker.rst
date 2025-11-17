@@ -153,28 +153,32 @@ Heating and Shaking
 
 The API treats heating and shaking as separate, independent activities due to the amount of time they take. Increasing or reducing shaking speed takes a few seconds, while heating or letting the module passively cool takes more time.
 
-In both cases, the API lets you choose whether to perform other protocol steps while heating and shaking. To do this, you can design your protocol to run in a *blocking* or non-blocking manner. When you use a blocking module command, the robot won't perform other commands until the module reaches the required temperature or shaking speed. Non-blocking commands let the robot perform other pipetting and some other module actions while heating and shaking. 
+In both cases, the API lets you choose whether to perform other protocol steps while heating and shaking. To do this, you can design your protocol to run in a blocking or concurrent manner:
+
+- **Blocking commands**: The robot will pause and wait, performing no other actions until the module reaches the required temperature or shake speed.
+- **Concurrent commands**: The robot continues to perform other pipetting and some other module actions while heating and shaking. 
 
 .. list-table::
     :header-rows: 1
 
-    * - **Command**
-      - **API version**
-      - **Module action**
-    * - 
-        - ``set_and_wait_for_temperature()``
-        - ``wait_for_temperature()``
-        - ``set_and_wait_for_shake_speed()``
-      - Added in API 2.13
+    * - **Action**
+      - **Method**
+      - **Type**
+    * - Heating
+      - :py:meth:`~.HeaterShakerContext.set_and_wait_for_temperature`
       - Blocking
-    * - ``set_target_temperature()``
-      - 
-        - Added in API 2.13
-        - Updated in API 2.27; returns a ``task``
-      - Non-blocking
-    * - ``set_shake_speed``
-      - Added in API 2.27
-      - Non-blocking
+    * - Heating
+      - :py:meth:`~.HeaterShakerContext.wait_for_temperature`
+      - Blocking
+    * - Heating
+      - :py:meth:`~.HeaterShakerContext.set_target_temperature`
+      - Concurrent
+    * - Shaking
+      - :py:meth:`~.HeaterShakerContext.set_and_wait_for_shake_speed`
+      - Blocking
+    * - Shaking
+      - :py:meth:`~.HeaterShakerContext.set_shake_speed`
+      - Concurrent 
 
 The sections below cover heating and shaking samples using the Heater-Shaker Module's blocking and non-blocking commands. 
 
@@ -246,7 +250,7 @@ The first example uses the blocking command :py:meth:`.HeaterShakerContext.set_a
 
 When you use a non-blocking command like :py:meth:`.HeaterShakerContext.set_shake_speed`, the robot continues to perform pipetting and some other module actions while the module reaches the target shake speed. 
 
-You can also use non-blocking commands to heat and shake simultaneously. The amount of time it takes for the Heater-Shaker Module to reach either the target temperature or shake speed won't affect other steps in your protocol. The non-blocking ``set_target_temperature()`` and ``set_shake_speed()`` methods also allow some other simulatenous module actions. For more, see the :ref:`concurrent-module` section. 
+You can also use non-blocking commands to heat and shake simultaneously. The amount of time it takes for the Heater-Shaker Module to reach either the target temperature or shake speed won't affect other steps in your protocol. The non-blocking ``set_target_temperature()`` and ``set_shake_speed()`` methods also allow some other simultaneous module actions. For more, see the :ref:`concurrent-module` section. 
 
 
 Deactivating
@@ -256,4 +260,4 @@ Deactivating the heater and shaker are done separately using the :py:meth:`~.Hea
 
 .. note:: 
 
-    The robot will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App or run these methods in Jupyter notebook.
+    The robot will not automatically deactivate the Heater-Shaker at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Heater-Shaker module controls on the device detail page in the Opentrons App.
