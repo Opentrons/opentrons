@@ -29,7 +29,7 @@ import type { BaseState, Selector } from '../../types'
 export const getLabwareLiquidState = createSelector(
     labwareIngredSelectors.getLiquidsByLabwareId,
     stepFormSelectors.getLabwareEntities,
-    (ingredLocations, labwareEntities) => {
+    (ingredLocations, labwareEntities): StepGeneration.LabwareLiquidState => {
       const allLabwareIds: string[] = Object.keys(labwareEntities)
       return allLabwareIds.reduce(
         (

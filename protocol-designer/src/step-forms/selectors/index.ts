@@ -371,7 +371,7 @@ function _getPipettesSame(
 
 export const getEquippedPipetteOptions = createSelector(
   getInitialDeckSetup,
-  initialDeckSetup => {
+  (initialDeckSetup): DropdownOption[] => {
     const pipettes = initialDeckSetup.pipettes
 
     const pipettesSame = _getPipettesSame(pipettes)
@@ -524,7 +524,7 @@ export const getBatchEditFieldChanges: Selector<
 > = createSelector(rootSelector, state => state.batchEditFormChanges)
 export const getBatchEditFormHasUnsavedChanges = createSelector(
   getBatchEditFieldChanges,
-  changes => !isEmpty(changes)
+  (changes): boolean => !isEmpty(changes)
 ) satisfies Selector<BaseState, boolean>
 
 const _formLevelErrors = (
@@ -772,7 +772,7 @@ export const getArgsAndErrorsByStepId: Selector<
 export const getUnsavedFormIsPristineSetTempForm = createSelector(
   getUnsavedForm,
   getCurrentFormIsPresaved,
-  (unsavedForm, isPresaved) => {
+  (unsavedForm, isPresaved): boolean => {
     const isSetTempForm =
       unsavedForm?.stepType === 'temperature' &&
       unsavedForm?.targetTemperature != null
@@ -783,7 +783,7 @@ export const getUnsavedFormIsPristineSetTempForm = createSelector(
 export const getUnsavedFormIsPristineHeaterShakerForm = createSelector(
   getUnsavedForm,
   getCurrentFormIsPresaved,
-  (unsavedForm, isPresaved) => {
+  (unsavedForm, isPresaved): boolean => {
     const isSetHsTempForm =
       unsavedForm?.stepType === 'heaterShaker' &&
       unsavedForm?.targetHeaterShakerTemperature != null

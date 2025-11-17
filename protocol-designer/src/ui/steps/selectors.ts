@@ -85,7 +85,7 @@ export const getMultiSelectItemIds: Selector<StepIdType[] | null> =
 
 export const getMultiSelectLastSelected = createSelector(
   getSelectedItem,
-  item => {
+  (item): StepIdType | null => {
     if (item.selectionType === MULTI_STEP_SELECTION_TYPE) {
       return item.lastSelected
     }
@@ -192,7 +192,7 @@ export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
 export const getActiveItem = createSelector(
   getSelectedItem,
   getHoveredItem,
-  (selected, hovered) => {
+  (selected, hovered): HoverableItem | null => {
     if (hovered != null) {
       return hovered
     } else if (selected.selectionType === MULTI_STEP_SELECTION_TYPE) {
@@ -223,7 +223,7 @@ const getUniqueValues = (key: string, forms: FormData[]): string[] =>
 export const _getSavedMultiSelectFieldValues = createSelector(
     stepFormSelectors.getSavedStepForms,
     getMultiSelectItemIds,
-    (savedStepForms, multiSelectItemIds) => {
+    (savedStepForms, multiSelectItemIds): MultiselectFieldValues | null => {
       if (!multiSelectItemIds) return null
       const forms = multiSelectItemIds.map(id => savedStepForms[id])
       const stepTypes = uniq(forms.map(form => form.stepType))
@@ -280,7 +280,7 @@ export const _getSavedMultiSelectFieldValues = createSelector(
 export const getMultiSelectFieldValues = createSelector(
     _getSavedMultiSelectFieldValues,
     stepFormSelectors.getBatchEditFieldChanges,
-    (savedValues, changes) => {
+    (savedValues, changes): MultiselectFieldValues | null => {
       if (savedValues === null) {
         // multi-selection has an invalid combination of stepTypes
         return null
@@ -307,7 +307,7 @@ export type DisabledFields = Record<string, TooltipText>
 export const getMultiSelectDisabledFields = createSelector(
     stepFormSelectors.getSavedStepForms,
     getMultiSelectItemIds,
-    (savedStepForms, multiSelectItemIds) => {
+    (savedStepForms, multiSelectItemIds): DisabledFields | null => {
       if (!multiSelectItemIds) return null
       const forms: FormData[] = multiSelectItemIds.map(id => savedStepForms[id])
 
@@ -324,7 +324,7 @@ export const getMultiSelectDisabledFields = createSelector(
 export const getCountPerStepType = createSelector(
   getMultiSelectItemIds,
   stepFormSelectors.getSavedStepForms,
-  (stepIds, allSteps) => {
+  (stepIds, allSteps): CountPerStepType => {
     if (stepIds === null) return {}
     const steps = stepIds.map(id => allSteps[id])
     const countPerStepType = steps.reduce<CountPerStepType>((acc, step) => {
@@ -340,7 +340,7 @@ export const getCountPerStepType = createSelector(
 
 export const getBatchEditSelectedStepTypes = createSelector(
   getCountPerStepType,
-  countPerStepType => {
+  (countPerStepType): StepType[] => {
     return uniq(
       (Object.keys(countPerStepType) as StepType[]).filter(
         // @ts-expect-error(sa, 2021-6-15): TS thinks countPerStepType[stepType] might be undefined because CountPerStepType is a partial record

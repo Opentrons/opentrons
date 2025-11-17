@@ -96,7 +96,7 @@ export const createFile = createSelector(
     orderedStepIds,
     labwareNicknamesById,
     invariantContext
-  ) => {
+  ): PDPythonFile => {
     const { pipetteEntities, moduleEntities, labwareEntities, liquidEntities } =
       invariantContext
 

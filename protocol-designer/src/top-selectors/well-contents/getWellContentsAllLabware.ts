@@ -66,7 +66,7 @@ export const getWellContentsAllLabware = createSelector(
       selectedLabwareId,
       selectedWells,
       highlightedWells
-    ) => {
+    ): WellContentsByLabware => {
       const allLabwareIds: string[] = Object.keys(labwareEntities)
       return allLabwareIds.reduce(
         (
@@ -105,7 +105,7 @@ export const getWellContentsForLabwareStack = createSelector(
       selectedLabwareId,
       selectedWells,
       highlightedWells
-    ) => {
+    ): WellContentsByLabware => {
       const selectedLabwareStack = selectedLabwareId
         ? initialRobotState.labware[selectedLabwareId].stack
         : []

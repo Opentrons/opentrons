@@ -82,7 +82,7 @@ export const getSelectedWellsCommonValues = createSelector(
     getSelectedWells,
     labwareIngredSelectors.getSelectedLabwareId,
     labwareIngredSelectors.getLiquidsByLabwareId,
-    (selectedWells, labwareId, allIngreds) => {
+    (selectedWells, labwareId, allIngreds): CommonWellValues => {
       if (!labwareId)
         return {
           ingredientId: null,
