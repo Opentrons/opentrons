@@ -84,7 +84,7 @@ export const getDisposalOptions = createSelector(
       ? ([...trashBins, wasteChuteOption] as DropdownOption[])
       : trashBins
   }
-) satisfies Selector<DropdownOption[]>
+)
 
 export const getTiprackOptions: Selector<DropdownOption[]> = createSelector(
   stepFormSelectors.getLabwareEntities,

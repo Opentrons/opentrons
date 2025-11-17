@@ -92,7 +92,7 @@ export const getMultiSelectLastSelected = createSelector(
 
     return null
   }
-) satisfies Selector<StepIdType | null>
+)
 
 export const getHoveredItem: Selector<HoverableItem | null> = createSelector(
   rootSelector,
@@ -201,7 +201,7 @@ export const getActiveItem = createSelector(
       return selected
     }
   }
-) satisfies Selector<HoverableItem | null>
+)
 
 export const getWellSelectionLabwareKey: Selector<string | null> =
   createSelector(
@@ -275,7 +275,7 @@ export const _getSavedMultiSelectFieldValues = createSelector(
       {}
     )
   }
-) satisfies Selector<MultiselectFieldValues | null>
+)
 
 export const getMultiSelectFieldValues = createSelector(
   _getSavedMultiSelectFieldValues,
@@ -297,7 +297,7 @@ export const getMultiSelectFieldValues = createSelector(
     }, {})
     return { ...savedValues, ...multiselectChanges }
   }
-) satisfies Selector<MultiselectFieldValues | null>
+)
 
 // NOTE: the value is the tooltip text explaining why the field is disabled
 type TooltipText = string
@@ -319,7 +319,7 @@ export const getMultiSelectDisabledFields = createSelector(
       return null
     }
   }
-) satisfies Selector<DisabledFields | null>
+)
 
 export const getCountPerStepType = createSelector(
   getMultiSelectItemIds,
@@ -336,7 +336,7 @@ export const getCountPerStepType = createSelector(
     }, {})
     return countPerStepType
   }
-) satisfies Selector<CountPerStepType>
+)
 
 export const getBatchEditSelectedStepTypes = createSelector(
   getCountPerStepType,
@@ -348,7 +348,7 @@ export const getBatchEditSelectedStepTypes = createSelector(
       )
     ).sort()
   }
-) satisfies Selector<StepType[]>
+)
 
 function getMoveLiquidMultiSelectDisabledFields(
   forms: FormData[]

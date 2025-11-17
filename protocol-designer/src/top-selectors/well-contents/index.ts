@@ -129,7 +129,7 @@ export const getSelectedWellsCommonValues = createSelector(
       }
     }
   }
-) satisfies Selector<CommonWellValues>
+)
 export const getSelectedWellsCommonIngredId: Selector<
   string | null | undefined
 > = createSelector(

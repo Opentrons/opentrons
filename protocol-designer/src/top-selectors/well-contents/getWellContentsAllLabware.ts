@@ -89,7 +89,7 @@ export const getWellContentsAllLabware = createSelector(
       {}
     )
   }
-) satisfies Selector<WellContentsByLabware>
+)
 
 export const getWellContentsForLabwareStack = createSelector(
   stepFormSelectors.getLabwareEntities,
@@ -133,4 +133,4 @@ export const getWellContentsForLabwareStack = createSelector(
       {}
     )
   }
-) satisfies Selector<WellContentsByLabware>
+)

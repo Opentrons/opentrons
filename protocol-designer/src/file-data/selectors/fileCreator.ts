@@ -180,4 +180,4 @@ export const createFile = createSelector(
 
     return { pythonProtocol, designerApplication }
   }
-) satisfies Selector<PDPythonFile>
+)

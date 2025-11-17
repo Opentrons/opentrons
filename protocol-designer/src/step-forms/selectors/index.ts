@@ -395,7 +395,7 @@ export const getEquippedPipetteOptions = createSelector(
       []
     )
   }
-) satisfies Selector<BaseState, DropdownOption[]>
+)
 export const getPipettesForEditPipetteForm: Selector<
   BaseState,
   FormPipettesByMount
@@ -510,7 +510,7 @@ export const getUserVisibleStepNumbers = createSelector(
 
     return result
   }
-) satisfies Selector<BaseState, Record<StepIdType, number | null>>
+)
 
 /** If a step is added to the end of the timeline, it will have this number. */
 export const getNextUserVisibleStepNumber = createSelector(
@@ -526,7 +526,7 @@ export const getNextUserVisibleStepNumber = createSelector(
       ) + 1
     )
   }
-) satisfies Selector<BaseState, number>
+)
 
 export const getCurrentFormHasUnsavedChanges: Selector<BaseState, boolean> =
   createSelector(
@@ -570,7 +570,7 @@ export const getBatchEditFieldChanges: Selector<
 export const getBatchEditFormHasUnsavedChanges = createSelector(
   getBatchEditFieldChanges,
   (changes): boolean => !isEmpty(changes)
-) satisfies Selector<BaseState, boolean>
+)
 
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
@@ -823,7 +823,7 @@ export const getUnsavedFormIsPristineSetTempForm = createSelector(
       unsavedForm?.targetTemperature != null
     return isPresaved && isSetTempForm
   }
-) satisfies Selector<BaseState, boolean>
+)
 
 export const getUnsavedFormIsPristineHeaterShakerForm = createSelector(
   getUnsavedForm,
@@ -835,7 +835,7 @@ export const getUnsavedFormIsPristineHeaterShakerForm = createSelector(
 
     return isPresaved && isSetHsTempForm
   }
-) satisfies Selector<BaseState, boolean>
+)
 export const getFormLevelWarningsForUnsavedForm: Selector<
   BaseState,
   FormWarning[]

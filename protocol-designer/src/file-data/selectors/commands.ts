@@ -55,7 +55,7 @@ export const getLabwareLiquidState = createSelector(
       {}
     )
   }
-) satisfies Selector<StepGeneration.LabwareLiquidState>
+)
 export const getInitialRobotState: (
   arg0: BaseState
 ) => StepGeneration.RobotState = createSelector(
