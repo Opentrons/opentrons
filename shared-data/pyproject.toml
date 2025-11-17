@@ -26,16 +26,18 @@ dependencies = [
 ]
 dynamic = ['version']
 
-[project.optional-dependencies]
-# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+[dependency-groups]
+# Robot dependencies for robot deployment
 robot = [
-    "jsonschema==4.21.1",
+    "jsonschema==4.17.3",
     "pydantic==2.11.7",
     "numpy==1.22.3",
     "zipp==3.21.0",
 ]
-# Dev dependencies - from Pipfile [dev-packages]
+# Dev dependencies
+# Robot group is always included in dev to ensure dev environment matches robot
 dev = [
+    {include-group = "robot"},
     "mypy==1.11.0",
     "flake8~=7.0.0",
     "flake8-annotations~=3.0.1",

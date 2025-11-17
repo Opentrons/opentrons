@@ -1,7 +1,7 @@
 # hardware makefile
 
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 
@@ -55,14 +55,19 @@ clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean wheel
 
+
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip list
+
+.PHONY: setup-py
+setup-py: setup
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(SHX) rm -rf .venv
 
 .PHONY: clean
 clean:
@@ -77,21 +82,27 @@ dist/opentrons_hardware-%-py3-none-any.whl: $(ot_sources)
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
-# todo(mm, 2025-05-12): Evaluating $(wheel_file) here means we'll call pipenv and create
-# a virtualenv whenever this Makefile is read--even if you're just doing something
-# like `make teardown`.
-wheel: $(wheel_file)
+# Only resolve the wheel filename when we actually build it so `make teardown`
+# (and similar targets) do not spin up a uv environment unnecessarily. Reinvoking
+# `$(MAKE)` with `$(wheel_file)` defers the python_get_wheelname call until the
+# recipe runs, keeping parse-time side effects away from unrelated targets.
+.PHONY: wheel
+wheel:
+	$(MAKE) $(wheel_file)
 
-$(sdist_file): export OPENTRONS_PROJECT=$(project_rs_default)
-$(sdist_file): export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
-$(sdist_file): export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
-$(sdist_file): $(ot_sources)
+dist/opentrons_hardware-%.tar.gz: export OPENTRONS_PROJECT=$(project_rs_default)
+dist/opentrons_hardware-%.tar.gz: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(PROJECT))
+dist/opentrons_hardware-%.tar.gz: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
+dist/opentrons_hardware-%.tar.gz: $(ot_sources)
 	$(python) -m build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
+# Same lazy trick for sdist so python_get_sdistname only runs when we actually
+# ask for the source distribution (avoids uv spins during unrelated targets).
 .PHONY: sdist
-sdist: $(sdist_file)
+sdist:
+	$(MAKE) $(sdist_file)
 
 .PHONY: test
 test:
@@ -135,7 +146,7 @@ push: push-no-restart
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: wheel Pipfile.lock
+push-no-restart-ot3: wheel
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3
