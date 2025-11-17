@@ -47,13 +47,7 @@ clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean sdist wheel
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --extra dev; \
-	else \
-		uv sync --extra dev; \
-	fi
-endef
+
 
 .PHONY: setup
 setup: setup-py
@@ -61,14 +55,14 @@ setup: setup-py
 .PHONY: setup-py
 setup-py:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: teardown
 teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	rm -rf .venv
+	$(SHX) rm -rf .venv
 
 
 .PHONY: clean
@@ -126,7 +120,7 @@ deploy: wheel sdist
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
+	$(pytest) --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
 
 
 .PHONY: generate-schema
