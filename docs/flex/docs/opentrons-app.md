@@ -99,23 +99,23 @@ Click the three-dot menu (⋮) on the module card to choose from available comma
 
 ## Camera features and controls
 
-Every Flex comes equipped with a built-in 2.1 megapixel camera that can capture full HD still images and provides video of the deck and working area. However, the camera has been disabled until the release of robot software version 8.8. With this release, you can now control and use the camera in the Opentrons App and from the touchscreen. When enabled, the built-in camera provides:
+Every Flex comes equipped with a built-in 2.1 megapixel camera that can capture full HD still images and provides video of the deck and working area. Disabled until the release of robot software version 8.8, the camera is now enabled for control and  use in the Opentrons App and from the touchscreen. When on, the camera provides:
 
-- Live, in-app video monitoring during protocol runs.
-- Automatic image capture at intervals you set in a protocol.
-- Automatic image capture during a crash or in response to a runtime error.
-- The ability to download compressed image files (`.zip` format) after a protocol run ends.
+- Live, in-app monitoring during protocol runs.
+- Automatic image capture at protocol-defined intervals.
+- Automatic image capture in response to a crash or runtime error.
+- The ability to download all still images in a single, compressed file (`.zip` format) after a protocol run.
 
-### Location and default image
+### Location
 
 The camera is mounted on the interior frame of the robot, in the upper corner of the enclosure near the front door.
 
 ![Image showing robot front and interior camera](./images/camera-location.png)
 
-This fixed location gives you a high, wide-angle view of attached instruments, deck-mounted modules, and labware.
+This fixed location gives you a wide-angle field of view of attached instruments, deck-mounted modules, and labware.
 
-<!-- too potato quality? dizzying perspective? -->
-<!-- request to jackson for some photo-manipulation, see comment in jira -->
+<!-- too potato quality? dizzying perspective? I don't think we should do this -->
+<!-- request to jackson for some photo-manipulation, might be too complicated, see jira comment -->
 ![Default camera view](./images/camer-default.png) 
 
 ### Controlling the camera
@@ -139,7 +139,7 @@ You can also see the camera's status, and turn it on and off, from the Periphera
 
 ### Image download
 
-All protocol images are available for download in the recent protocol run section of the robot details page.
+All protocol images are available for download in the Recent Protocol Runs section of the robot details page.
 
 ## Recent protocol runs
 
@@ -158,7 +158,7 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 !!! note
     If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
 
-- **Download image files:** Save to your computer a ZIP file containing all the images taken during a protocol run, if the camera was enabled.
+- **Download image files:** Save to your computer a ZIP file containing all the still images taken during a protocol run, if the camera was enabled.
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.
 
