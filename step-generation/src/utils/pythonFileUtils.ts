@@ -657,11 +657,6 @@ export const getSetStoredLabware = (
           `version=${labwareEntity.def.version}`,
           `count=${labwareCount}`,
         ].join(',\n')
-        console.log('setStoredLabwareArgs: ', setStoredLabwareArgs)
-        console.log(
-          'set stored labware command: ',
-          `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware(${indentPyLines(setStoredLabwareArgs)})`
-        )
         return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware(${indentPyLines(setStoredLabwareArgs)})`
       }
     }
