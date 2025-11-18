@@ -12,7 +12,7 @@ hs_mod = protocol.load_module(
 ```
 *New in version 2.13*
 
-## Deck slots {#deck-slots-heater-shaker-api}
+## Deck slots { #deck-slots-heater-shaker-api }
 
 The supported deck slot positions for the Heater-Shaker depend on the robot you’re using.
 

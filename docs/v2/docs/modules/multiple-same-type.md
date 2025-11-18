@@ -14,7 +14,7 @@ In this example, `temperature_module_1` loads first because it's connected to US
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
   # Load Temperature Module 1 in deck slot D1 on USB port 2
@@ -39,7 +39,7 @@ In this example, `temperature_module_1` loads first because it's connected to US
 ```python
 from opentrons import protocol_api
 
-metadata = {"apiLevel": "|apiLevel|"}
+metadata = {"apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Load Temperature Module 1 in deck slot C1 on USB port 1

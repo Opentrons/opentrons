@@ -38,7 +38,7 @@ To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     # Load a tiprack for 1000 µL tips

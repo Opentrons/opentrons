@@ -49,7 +49,7 @@ This code only loads the instruments and labware listed above, and performs no o
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         # load tip rack in deck slot D3
@@ -79,7 +79,7 @@ This code only loads the instruments and labware listed above, and performs no o
     ```python
     from opentrons import protocol_api
     
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         # load tip rack in deck slot 3
@@ -115,7 +115,7 @@ This protocol uses some [building block commands](building-block-commands/index.
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -143,7 +143,7 @@ This protocol uses some [building block commands](building-block-commands/index.
     ```python
     from opentrons import protocol_api
     
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -174,7 +174,7 @@ These protocols accomplish the same thing as the previous example, but a little 
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -203,7 +203,7 @@ These protocols accomplish the same thing as the previous example, but a little 
     ```python
     from opentrons import protocol_api
     
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -235,7 +235,7 @@ Opentrons-verified liquid class definitions are based on Flex pipette and tip co
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -272,7 +272,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -309,7 +309,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
     ```python
     from opentrons import protocol_api
     
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -351,7 +351,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -389,7 +389,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
     ```python
     from opentrons import protocol_api
     
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -431,7 +431,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -490,7 +490,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
     ```python
     from opentrons import protocol_api
     
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
     
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -554,7 +554,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
     ```python
     from opentrons import protocol_api
     
-    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
         
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
@@ -607,7 +607,7 @@ This protocol dispenses different volumes of liquids to a well plate and automat
     ```python
     from opentrons import protocol_api
 
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
         
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(

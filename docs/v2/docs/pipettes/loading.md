@@ -94,7 +94,7 @@ This code sample loads a Flex 1-Channel Pipette in the left mount and a Flex 8-C
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel":"|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel":"{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     tiprack1 = protocol.load_labware(
@@ -136,7 +136,7 @@ This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and
 ```python
 from opentrons import protocol_api
 
-metadata = {"apiLevel": "|apiLevel|"}
+metadata = {"apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     tiprack1 = protocol.load_labware(

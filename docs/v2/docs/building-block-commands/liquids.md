@@ -5,7 +5,7 @@ description: Basic commands for working with liquids.
 
 After attaching a tip, your robot is ready to aspirate, dispense, and perform other liquid handling tasks. The API includes methods that help you perform these actions and the following sections show how to use them. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
-## Aspirate {#aspirate-building-block}
+## Aspirate { #aspirate-building-block }
 
 To draw liquid up into a pipette tip, call the [`InstrumentContext.aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] method. Using this method, you can specify the aspiration volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to aspirate 200 µL from well location A1.
 
@@ -94,7 +94,7 @@ pipette.aspirate(200, plate["A1"], flow_rate=50)
 
 The `rate` and `flow_rate` parameters are mutually exclusive. If you specify both in the same command, the API will raise an error.
 
-## Dispense {#dispense-building-block}
+## Dispense { #dispense-building-block }
 
 To dispense liquid from a pipette tip, call the [`InstrumentContext.dispense()`][opentrons.protocol_api.InstrumentContext.dispense] method. Using this method, you can specify the dispense volume in µL, the well location, and pipette flow rate. Other parameters let you position the pipette within a well. For example, this snippet tells the robot to dispense 200 µL into well location B1.
 
@@ -252,7 +252,7 @@ To disable `push_out` during any dispense action, set `push_out=0`. You can use 
 
 *New in version 2.15*
 
-## Blow out {#blow-out-building-block}
+## Blow out { #blow-out-building-block }
 
 To blow an extra amount of air through the pipette's tip, call the [`InstrumentContext.blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out] method. You can use a specific well in a well plate or reservoir as the blowout location. If no location is specified, the pipette will blowout from its current well position:
 
@@ -276,7 +276,7 @@ pipette.blow_out(pipette.trash_container)
 
 *Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` locations.
 
-## Touch tip {#touch-tip-building-block}
+## Touch tip { #touch-tip-building-block }
 
 The [`InstrumentContext.touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps knock off any droplets that might cling to the pipette's tip. This method includes optional arguments that allow you to control where the tip will touch the inner walls of a well and the touch speed. Calling `touch_tip()` without arguments causes the pipette to touch the well walls from its current location:
 
@@ -394,7 +394,7 @@ pipette.mix(repetitions=3, volume=100, final_push_out=10)
 
 <!-- ## Dynamic Mix TK -->
 
-## Air gap {#air-gap-building-block}
+## Air gap { #air-gap-building-block }
 
 The [`InstrumentContext.air_gap()`][opentrons.protocol_api.InstrumentContext.air_gap] method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that give you control over the amount of air to aspirate and the position at the target well to add the air gap. By default, the pipette moves 5 mm above the center of a well before aspirating air. Calling `air_gap()` with no arguments uses the entire remaining volume in the pipette.
 

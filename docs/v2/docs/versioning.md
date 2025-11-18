@@ -21,7 +21,7 @@ You must specify the API version you are targeting in your Python protocol. In a
 from opentrons import protocol_api
 
 metadata = {
-    "apiLevel": "|apiLevel|",
+    "apiLevel": "{{ apiLevel }}",
     "author": "A. Biologist"
 }
 
@@ -35,7 +35,7 @@ From version 2.15 onward, you can specify `apiLevel` in the `requirements` dicti
 from opentrons import protocol_api
 
 metadata = {"author": "A. Biologist"}
-requirements = {"apiLevel": "|apiLevel|", "robotType": "Flex"}
+requirements = {"apiLevel": "{{ apiLevel }}", "robotType": "Flex"}
 
 def run(protocol: protocol_api.ProtocolContext):
     protocol.comment("Hello, Flex!")
@@ -57,10 +57,10 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (8.5.0) support the following version ranges: 
+Opentrons robots running the latest software ({{ robot_stack_version }}) support the following version ranges: 
 
-- **Flex:** version 2.15–|apiLevel|.
-- **OT-2:** versions 2.0–|apiLevel|.
+- **Flex:** version 2.15–{{ apiLevel }}.
+- **OT-2:** versions 2.0–{{ apiLevel }}.
 
 ## API and robot software versions
 

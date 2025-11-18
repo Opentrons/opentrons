@@ -90,7 +90,7 @@ The entire start of the `run()` function, including a pipette and fixed labware 
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 def add_parameters(parameters):
     parameters.add_csv_file(

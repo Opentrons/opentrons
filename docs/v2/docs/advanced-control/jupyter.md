@@ -25,7 +25,7 @@ Rather than writing a `run()` function and embedding commands within it, start y
 
 ```python
 import opentrons.execute
-protocol = opentrons.execute.get_protocol_api("|apiLevel|")
+protocol = opentrons.execute.get_protocol_api("{{ apiLevel }}")
 protocol.home()
 ```
 
@@ -47,7 +47,7 @@ def run(protocol: protocol_api.ProtocolContext):
 Since a typical protocol only *defines* the `run()` function but doesn't call it, this won't immediately cause the robot to move. To begin the run, instantiate a `ProtocolContext` and pass it to the `run()` function you just defined:
 
 ```python
-protocol = opentrons.execute.get_protocol_api("|apiLevel|")
+protocol = opentrons.execute.get_protocol_api("{{ apiLevel }}")
 run(protocol)  # your protocol will now run
 ```
 

@@ -24,7 +24,7 @@ You also need to specify `"robotType": "Flex"`. If you omit `robotType` in the `
     metadata = {
         "protocolName": "My Protocol",
         "description": "This protocol uses the OT-2",
-        "apiLevel": "|apiLevel|"
+        "apiLevel": "{{ apiLevel }}"
     }
     ```
 
@@ -37,7 +37,7 @@ You also need to specify `"robotType": "Flex"`. If you omit `robotType` in the `
         "description": "This protocol uses the Flex",
     }
 
-    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
     ```
 
 ## Pipettes and tip-rack load names
