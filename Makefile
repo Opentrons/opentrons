@@ -54,6 +54,14 @@ usb_host=$(shell yarn -s discovery find -i 169.254)
 setup: setup-js setup-py
 
 # front-end dependencies handled by yarn
+# Both the python and JS setup targets depend on a minimal python setup so they can create
+# virtual envs using pipenv.
+.PHONY: setup-py-toolchain
+setup-py-toolchain:
+	$(OT_PYTHON) -m pip install --upgrade pip
+	$(OT_PYTHON) -m pip install pipenv==2025.0.4
+
+# front-end dependecies handled by yarn
 .PHONY: setup-js
 setup-js:
 	yarn config set network-timeout 60000
