@@ -525,7 +525,9 @@ def _get_tips_for_test_single_multi(
                 return wells
             else:
                 for rack_slot in partially_used:
-                    rack = loaded_labwares[DeckSlotName.from_primitive(rack_slot).as_int()]
+                    rack = loaded_labwares[
+                        DeckSlotName.from_primitive(rack_slot).as_int()
+                    ]
                     for col in range(1, 13):  # H->A
                         for row in range(72, 64, -1):  # 1->12
                             next_tip = rack[f"{chr(row)}{col}"]
@@ -1329,7 +1331,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 channel_aspriate_dict: Dict[int, List[float]]
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
-                print_info(tips)
+                print_info(str(tips))
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
 
