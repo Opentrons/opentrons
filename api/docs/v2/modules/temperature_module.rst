@@ -128,8 +128,16 @@ Both examples below set the target temperature to 4 °C. Each takes one paramete
       .. code-block:: python
       
         temp_mod.set_temperature(celsius=4)
+        pipette.pick_up_tip()   
+        pipette.aspirate(50, plate["A1"])
+        pipette.dispense(50, plate["B1"])
+        pipette.drop_tip()
+      
+    When you use the blocking :py:meth:`~.TemperatureModuleContext.start_set_temperature` command, the robot won't begin performing other protocol steps until the Temperature Module reaches the target temperature. You can pipette to and from the module only when it is holding at a temperature or idle. 
 
-    .. tab:: Non-blocking 
+    .. versionadded:: 2.0
+
+    .. tab:: Concurrent 
 
       .. code-block:: python
       
@@ -138,20 +146,16 @@ Both examples below set the target temperature to 4 °C. Each takes one paramete
         pipette.aspirate(50, plate["A1"])
         pipette.dispense(50, plate["B1"])
         pipette.drop_tip()
+      
+      Beginning with API version 2.27, you can use the concurrent :py:meth:`~.TemperatureModuleContext.start_set_temperature` method to move on to further commands while the Temperature Module reaches its target temperature. The method also allows some other simultaneous module actions. For more, see the :ref:`concurrent-module` section.
 
-.. versionadded:: 2.0
-.. versionchanged:: 2.27
-  Choose to use the non-blocking :py:meth:`.TemperatureModuleContext.start_set_temperature` method to perform other protocol steps while the Temperature Module reaches its target temperature. 
-
-When you use the blocking :py:meth:`.TemperatureModuleContext.set_temperature` command, the robot won't perform other protocol steps until the Temperature Module reaches the required temperature. You can pipette to or from the module only when it is holding at a temperature or idle. 
-
-Beginning with API version 2.27, you can use the non-blocking :py:meth:`~.TemperatureModuleContext.start_set_temperature` method to move onto further commands while the module reaches the target temperature. The method also allows some other simultaneous module actions. For more, see the :ref:`concurrent-module` section. 
+      .. versionadded:: 2.27
 
 Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call :py:meth:`~.TemperatureModuleContext.deactivate`, which will stop heating or cooling and will turn off the fan.
 
 .. note::
 
-    Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run ``deactivate()`` in Jupyter notebook.
+    Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App.
 
 
 
