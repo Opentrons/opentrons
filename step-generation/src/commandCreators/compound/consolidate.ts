@@ -370,6 +370,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const trashPipetteName =
     trashBinEntities[dropTipLocation]?.pythonName ??
     wasteChuteEntities[dropTipLocation]?.pythonName
+  const blowoutTrashPythonName =
+    blowoutLocation == null
+      ? null
+      : (trashBinEntities[blowoutLocation]?.pythonName ??
+        wasteChuteEntities[blowoutLocation]?.pythonName)
   const sourceLabwarePythonName = labwareEntities[sourceLabware].pythonName
   const destLabwarePythonName = labwareEntities[destLabware]?.pythonName
   const pythonSourceWells = sourceWells
@@ -433,8 +438,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     ...(isReturnTip
-      ? [`return_tip=True`]
-      : [`trash_location=${trashPipetteName}`, `keep_last_tip=True`]),
+      ? [
+          'return_tip=True',
+          ...(blowoutTrashPythonName != null
+            ? [`trash_location=${blowoutTrashPythonName}`]
+            : []),
+        ]
+      : [`trash_location=${trashPipetteName}`, 'keep_last_tip=True']),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [
