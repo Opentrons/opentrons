@@ -72,14 +72,10 @@ export interface MagneticBlockState {
 
 export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  latchOpen: boolean | null
   maxPoolCount: number
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
-  shuttlePosition: 'home' | 'retrieved' | 'stored'
-  labwareInStacker: string[] | null
-  labwareInShuttle: number | null
-  labwareRetrieved: number | null
-  labwareStored: number | null
+  labwareInHopper: string[] | null
+  labwareInShuttle: string | null
 }
 export type InitializationMode = 'single' | 'multi'
 export interface Initialization {
