@@ -12,7 +12,7 @@ title: "Python API: Deck Slots"
 
 Deck slots are where you place hardware items on the deck surface of your Opentrons robot. In the API, you load the corresponding items into your protocol with methods like [`ProtocolContext.load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware], [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module], or [`ProtocolContext.load_trash_bin()`][opentrons.protocol_api.ProtocolContext.load_trash_bin]. When you call these methods, you need to specify which slot to load the item in.
 
-## Physical Deck Labels
+## Physical deck labels
 
 Flex uses a coordinate labeling system for slots A1 (back left) through D4 (front right). Columns 1 through 3 are in the *working area* and are accessible by pipettes and the gripper. Column 4 is in the *staging area* and is only accessible by the gripper. For more information on staging area slots, see [Deck Configuration](#deck-configuration) below.
 
@@ -22,7 +22,7 @@ OT-2 uses a numeric labeling system for slots 1 (front left) through 11 (back ce
 
 ![OT-2 Deck](img/OT-2-deck.svg)
 
-## API Deck Labels
+## API deck labels
 
 The API accepts values that correspond to the physical deck slot labels on a Flex or OT-2 robot. Specify a slot in either format:
 
@@ -81,7 +81,7 @@ The correspondence between deck labels is based on the relative locations of the
 </table>
 Slots A4, B4, C4, and D4 on Flex have no equivalent on OT-2.
 
-## Deck Configuration
+## Deck configuration
 
 A Flex running robot system version 7.1.0 or higher lets you specify its deck configuration on the touchscreen or in the Opentrons App. This tells the robot the positions of unpowered *deck fixtures*: items that replace standard deck slots. The following table lists currently supported deck fixtures and their allowed deck locations.
 
@@ -93,7 +93,7 @@ A Flex running robot system version 7.1.0 or higher lets you specify its deck co
 
 Which fixtures you need to configure depend on both load methods and the effects of other methods called in your protocol. The following sections explain how to configure each type of fixture.
 
-### Staging Area Slots
+### Staging area slots
 
 Slots A4 through D4 are the staging area slots. Pipettes can't reach the staging area, but these slots are always available in the API for loading and moving labware. Using a slot in column 4 as the `location` argument of [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware] or the `new_location` argument of [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] will require the corresponding staging area slot in the robot's deck configuration:
 
@@ -124,7 +124,7 @@ staging_plate = protocol.load_labware(
 
 It is possible to use slot D4 along with the waste chute. See the [Waste Chute](#waste-chute-api) section below for details.
 
-### Trash Bin { #trash-bin-api }
+### Trash bin { #trash-bin-api }
 
 In version 2.15 of the API, Flex can only have a single trash bin in slot A3. You do not have to (and cannot) load the trash in version 2.15 protocols.
 
@@ -137,7 +137,7 @@ default_trash = protocol.load_trash_bin(location = "A3")
 
 Call `load_trash_bin()` multiple times to add more than one bin. See [Adding Trash Containers][adding-trash-containers] for more information on using pipettes with multiple trash bins.
 
-### Waste Chute { #waste-chute-api }
+### Waste chute { #waste-chute-api }
 
 The waste chute accepts various materials from Flex pipettes or the Flex Gripper and uses gravity to transport them outside of the robot for disposal. Pipettes can dispose of liquid or drop tips into the chute. The gripper can drop tip racks and other labware into the chute.
 
@@ -166,7 +166,7 @@ In total, there are four possible deck configurations for the waste chute:
 - Waste chute with staging area slot
 - Waste chute with staging area slot and cover
 
-## Deck Conflicts
+## Deck conflicts
 
 A deck conflict check occurs when preparing to run a Python protocol on a Flex running robot system version 7.1.0 or higher. The Opentrons App and touchscreen will prevent you from starting the protocol run until any conflicts are resolved. You can resolve them one of two ways:
 

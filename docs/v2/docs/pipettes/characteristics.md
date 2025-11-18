@@ -10,7 +10,7 @@ Each Opentrons pipette has different capabilities, which you'll want to take adv
 
 Finally, the volume ranges of pipettes affect what you can do with them. The volume ranges for current pipettes are listed on the [Loading Pipettes](loading.md) page. The [OT-2 Pipette Generations](#ot-2-pipette-generations) section of this page describes how the API behaves when running protocols that specify older OT-2 pipettes.
 
-## Multi-Channel Movement
+## Multi-channel movement
 
 All [building block](../building-block-commands/index.md) and [complex commands](../complex-commands/index.md) work with single- and multi-channel pipettes.
 
@@ -31,7 +31,7 @@ Also, you should apply any location offset, such as [`Well.top()`][opentrons.pro
 
 Finally, because each multi-channel pipette has only one motor, they always aspirate and dispense on all channels simultaneously.
 
-### 8-Channel, 96-Well Plate Example
+### 8-channel, 96-well plate example
 
 To demonstrate these concepts, let's write a protocol that uses a Flex 8-Channel Pipette and a 96-well plate. We'll then aspirate and dispense a liquid to different locations on the same well plate. To start, let's load a pipette in the right mount and add our labware.
 
@@ -78,7 +78,7 @@ right.dispense(volume=300, location=plate["A3"].top())
 
 With the backmost pipette tip above location A3, all eight channels are above the eight wells in column 3. The pipette will dispense liquid into all the wells simultaneously.
 
-### 8-Channel, 384-Well Plate Example
+### 8-channel, 384-well plate example
 
 In general, you should specify wells in the first row of a well plate when using multi-channel pipettes. An exception to this rule is when using 384-well plates. The greater well density means the nozzles of a multi-channel pipette can only access every other well in a column. Specifying well A1 accesses every other well starting with the first (rows A, C, E, G, I, K, M, and O). Similarly, specifying well B1 also accesses every other well, but starts with the second (rows B, D, F, H, J, L, N, and P).
 
@@ -122,7 +122,7 @@ right.dispense(volume=100, location=plate["B1"])
 
 The eight pipette channels will only dispense into every other well in the column: B1, D1, F1, H1, J1, L1, N1, and P1.
 
-## Pipette Flow Rates
+## Pipette flow rates
 
 Measured in µL/s, the flow rate determines how much liquid a pipette can aspirate, dispense, and blow out. Opentrons pipettes have their own default flow rates. The API lets you change the flow rate on a loaded [`InstrumentContext`][opentrons.protocol_api.InstrumentContext] by altering the [`InstrumentContext.flow_rate`][opentrons.protocol_api.InstrumentContext.flow_rate] properties listed below.
 
@@ -171,7 +171,7 @@ These flow rates will remain in effect until you change the `flow_rate` attribut
 
 *New in version 2.0*
 
-### Flex Pipette Flow Rates
+### Flex pipette flow rates
 
 The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for Flex pipettes. Default flow rates for each pipette-tip combination are the same across all three actions.
 
@@ -223,7 +223,7 @@ Additionally:
 - When using a 50 µL pipette, you should only use 50 µL tips.
 - All Flex pipettes have a well bottom clearance of 1 mm for aspirate and dispense actions.
 
-### OT-2 Pipette Flow Rates
+### OT-2 pipette flow rates
 
 The following table provides data on the default aspirate, dispense, and blowout flow rates (in µL/s) for OT-2 GEN2 pipettes. Default flow rates are the same across all three actions.
 
@@ -281,7 +281,7 @@ The following table provides data on the default aspirate, dispense, and blowout
 
 Additionally, all OT-2 GEN2 pipettes have a default head speed of 400 mm/s and a well bottom clearance of 1 mm for aspirate and dispense actions.
 
-## OT-2 Pipette Generations
+## OT-2 pipette generations
 
 The OT-2 works with the GEN1 and GEN2 pipette models. The newer GEN2 pipettes have different volume ranges than the older GEN1 pipettes. With some exceptions, the volume ranges for GEN2 pipettes overlap those used by the GEN1 models. If your protocol specifies a GEN1 pipette, but you have a GEN2 pipette with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette. The following table lists the volume compatibility between the GEN2 and GEN1 pipettes.
 

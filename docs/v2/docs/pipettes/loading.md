@@ -6,7 +6,7 @@ When writing a protocol, you must inform the Protocol API about the pipettes you
 
 As noted above, you call the [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] method to load a pipette. This method also requires the pipette's API load name, its left or right mount position, and (optionally) a list of associated tip racks. Even if you don't use the pipette anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all pipettes loaded by `load_instrument()` are attached properly.
 
-## API Load Names
+## API load names
 
 The pipette's API load name (`instrument_name`) is the first parameter of the `load_instrument()` method. It tells your robot which attached pipette you're going to use in a protocol. The tables below list the API load names for the currently available Flex and OT-2 pipettes.
 
@@ -129,7 +129,7 @@ In protocols specifying API version 2.15, also include `mount="left"` as a param
 
 *Changed in version 2.16:* The `mount` parameter is optional.
 
-## Loading OT-2 Pipettes
+## Loading OT-2 pipettes
 
 This code sample loads a P1000 Single-Channel GEN2 pipette in the left mount and a P300 Single-Channel GEN2 pipette in the right mount. Each pipette uses its own 1000 µL tip rack.
 
@@ -155,7 +155,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
 *New in version 2.0*
 
-## Adding Tip Racks
+## Adding tip racks
 
 The `load_instrument()` method includes the optional argument `tip_racks`. This parameter accepts a list of tip rack labware objects, which lets you to specify as many tip racks as you want. You can also edit a pipette's tip racks after loading it by setting its [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] property.
 
@@ -214,7 +214,7 @@ right_pipette.drop_tip()
 
 See also [Building Block Commands](../building-block-commands/index.md) and [Complex Commands](../complex-commands/index.md).
 
-## Adding Trash Containers
+## Adding trash containers
 
 The API automatically assigns a [`trash_container`][opentrons.protocol_api.InstrumentContext.trash_container] to pipettes, if one is available in your protocol. The `trash_container` is where the pipette will dispose tips when you call [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] with no arguments. You can change the trash container, if you don't want to use the default.
 
@@ -249,7 +249,7 @@ pipette.trash_container = trash  # overrides default
 
 *Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` objects.
 
-## Liquid Presence Detection
+## Liquid presence detection
 
 Liquid presence detection is a pressure-based feature that allows Opentrons Flex pipettes to detect the presence or absence of liquids in a well, reservoir, tube, or other container. It gives you the ability to identify, avoid, and recover from liquid-related protocol errors.
 
@@ -257,11 +257,11 @@ When detecting liquid, the pipette slowly moves a fresh, empty tip downward from
 
 You can enable this feature for an entire protocol run or toggle it on and off as required. Consider the amount of time automatic detection will add to your protocol. If you only need to detect liquid infrequently, use the [corresponding building block commands][detect-liquids] instead. Automatic liquid presence detection is disabled by default.
 
-### Pipette Compatibility
+### Pipette compatibility
 
 Liquid presence detection works with Flex 1-, 8-, and 96-channel pipettes only. 1-channel pipettes have one pressure sensor. The 8-channel pipette pressure sensors are on channels 1 and 8 (positions A1 and H1). The 96-channel pipette pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
 
-### Enabling Globally
+### Enabling globally
 
 To automatically use liquid presence detection, add the optional Boolean argument  `liquid_presence_detection=True` to [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument] in your protocol. The robot will check for liquid on every aspiration. You can also turn this feature off and back on again later in a protocol. This example enables liquid presence detection on the 8-channel pipette used in the sample protocol at the top of the page.
 
@@ -293,7 +293,7 @@ However, aspiration isn't required for liquid level detection. Three standalone 
 
 *New in version 2.20*
 
-### Activating and Deactivating
+### Activating and deactivating
 
 You can turn liquid presence detection off and on throughout a protocol. To turn it off, set `pipette.liquid_presence_detection=False` at the point in a protocol where it needs to be disabled, usually between picking up a new tip and aspirating a liquid. This overrides the global argument, `liquid_presence_detection=True` that we set on [`load_instrument()`][opentrons.protocol_api.ProtocolContext.load_instrument]. Let's try this after picking up a new tip.
 

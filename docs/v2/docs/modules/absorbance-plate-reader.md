@@ -15,7 +15,7 @@ This page explains the actions necessary for using the Absorbance Plate Reader. 
 5. Close the lid
 6. Read the plate
 
-## Loading and Deck Slots
+## Loading and deck slots
 
 The Absorbance Plate Reader can only be loaded in slots A3–D3. If you try to load it in any other slot, the API will raise an error. The module's caddy is designed such that the detection unit is in deck column 3 and the special staging area for the lid/illumination unit is in deck column 4. You can't load or move other labware on the Absorbance Plate Reader caddy in deck column 4, even while the lid is in the closed position (on top of the detection unit in deck column 3).
 
@@ -29,7 +29,7 @@ pr_mod = protocol.load_module(
 ```
 *New in version 2.21*
 
-## Lid Control
+## Lid control
 
 Flex uses the gripper to move the lid between its two positions.
 
@@ -74,7 +74,7 @@ pr_mod.initialize(mode="multi", wavelengths=[450, 562, 600])
 ```
 You can't use a reference wavelength when performing multiple measurements.
 
-## Reading a Plate
+## Reading a plate
 
 Use [`AbsorbanceReaderContext.read()`][opentrons.protocol_api.AbsorbanceReaderContext.read] to have the module read the plate, using the parameters that you specified during initialization:
 ```python
@@ -90,7 +90,7 @@ pr_data = pr_mod.read(export_filename="plate_data")
 ```
 In the above example, the API both saves the data to a variable and outputs a CSV file. If you only need the data post-run, you can omit the variable assignment.
 
-## Using Plate Reader Data
+## Using plate reader data
 
 There are two ways to use output data from the Absorbance Plate Reader:
 
@@ -99,7 +99,7 @@ There are two ways to use output data from the Absorbance Plate Reader:
 
 The two formats are structured differently, even though they contain the same measurement data.
 
-### Dictionary Data
+### Dictionary data
 
 The dictionary object returned by `read()` has two nested levels. The keys at the top level are the wavelengths you provided to `initialize()`. The keys at the second level are string names of each of the 96 wells, `"A1"` through `"H12"`. The values at the second level are the measured values for each well. These values are floating point numbers, representing the optical density (OD) of the samples in each well. OD ranges from 0.0 (low sample concentration) to 4.0 (high sample concentration).
 
@@ -122,7 +122,7 @@ You can write additional code to transform this data in any way that you need. F
 [pr_data[450][w.well_name] for w in plate.columns()[0]]
 ```
 
-### CSV Data
+### CSV data
 
 The CSV exported when specifying `export_filename` consists of tabular data followed by additional information. Each measurement produces 9 rows in the CSV file, representing the layout of the well plate that has been read. These rows form a table with numeric labels in the first row and alphabetic labels in the first column, as you would see on physical labware. Each "cell" of the table contains the measured OD value for the well (0.0–4.0) in the corresponding position on the plate.
 

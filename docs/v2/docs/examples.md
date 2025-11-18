@@ -4,7 +4,7 @@ title: "Python API: Protocol Examples"
 
 This page provides simple, ready-made protocols for Flex and OT-2. Feel free to copy and modify these examples to create unique protocols that help automate your laboratory workflows. Also, experimenting with these protocols is another way to build upon the skills you've learned from working through the [tutorial](tutorial.md). Try adding different hardware, labware, and commands to a sample protocol and test its validity after importing it into the Opentrons App.
 
-## Using These Protocols
+## Using these protocols
 
 These sample protocols are designed for anyone using an Opentrons Flex or OT-2 liquid handling robot. For our users with little to no Python experience, we’ve taken some liberties with the syntax and structure of the code to make it easier to understand. For example, we’ve formatted the samples with line breaks to show method arguments clearly and to avoid horizontal scrolling. Additionally, the methods use [named arguments](https://en.wikipedia.org/wiki/Named_parameter) instead of positional arguments. For example:
 
@@ -23,7 +23,7 @@ Both examples instantiate the variable `tiprack_1` with a Flex tip rack, but the
 
 Python developers with more experience should feel free to ignore the code styling used here and work with these examples as you like.
 
-## Instruments and Labware
+## Instruments and labware
 
 The sample protocols all use the following pipettes:
 
@@ -41,7 +41,7 @@ They also use the labware listed below:
 
 ---
 
-## Protocol Template
+## Protocol template
 
 This code only loads the instruments and labware listed above, and performs no other actions. Many code snippets from elsewhere in the documentation will run without modification when added at the bottom of this template. You can also use it to start writing and testing your own code.
 
@@ -103,11 +103,11 @@ This code only loads the instruments and labware listed above, and performs no o
         # Put protocol commands here
     ```
 
-## Transferring Liquids
+## Transferring liquids
 
 These protocols demonstrate how to move 100 µL of liquid from one well to another.
 
-### Basic Method
+### Basic method
 
 This protocol uses some [building block commands](building-block-commands/index.md) to tell the robot, explicitly, where to go to aspirate and dispense liquid. These commands include the [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip], [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate], and [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] methods.
 
@@ -166,7 +166,7 @@ This protocol uses some [building block commands](building-block-commands/index.
         pipette.drop_tip()
     ```
 
-### Advanced Method
+### Advanced method
 
 These protocols accomplish the same thing as the previous example, but a little more efficiently. Notice how they use the [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] or [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] methods to move liquid between well plates. Because each is a complex command, you don't need separate calls to `aspirate()` or `dispense()` here.
 
@@ -343,7 +343,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
 
 Notice here how Python’s [`range`](https://docs.python.org/3/library/stdtypes.html#range) class (e.g., `range(8)`) determines how many times the code loops. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
 
-## Multiple Air Gaps
+## Multiple air gaps
 
 Opentrons electronic pipettes can do some things that a human cannot do with a pipette, like accurately alternate between liquid and air aspirations that create gaps within the same tip. The protocol shown below shows you how to aspirate from the first five wells in the reservoir and create an air gap between each sample.
 
@@ -546,7 +546,7 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
 
 Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see the Loops and Air Gaps examples above. See also the [Commands](tutorial.md#commands) section of the Tutorial.
 
-## Plate Mapping
+## Plate mapping
 
 This protocol dispenses different volumes of liquids to a well plate and automatically refills the pipette when empty.
 

@@ -4,7 +4,7 @@ title: "Python API: Using Runtime Parameters"
 
 Once you've [defined parameters](defining.md), their values are accessible anywhere within the `run()` function of your protocol.
 
-## The `params` Object
+## The `params` object
 
 Protocols with parameters have a [`ProtocolContext.params`][opentrons.protocol_api.ProtocolContext.params] object, which contains the values of all parameters as set during run setup. Each attribute of `params` corresponds to the `variable_name` of a parameter.
 
@@ -23,7 +23,7 @@ if protocol.params.dry_run is False:
 
 You can also save parameter values to variables with names of your choosing.
 
-## Parameter Types
+## Parameter types
 
 Each attribute of `params` has the type corresponding to its parameter definition (except CSV parameters; see [Manipulating CSV Data][manipulating-csv-data] below). Keep in mind the parameter's type when using its value in different contexts.
 
@@ -37,7 +37,7 @@ protocol.comment(
 
 Also be careful with `int` types when performing calculations: dividing an `int` by an `int` with the `/` operator always produces a `float`, even if there is no remainder. The [sample count use case](use-case-sample-count.md) converts a sample count to a column count by dividing by 8—but it uses the `//` integer division operator, so the result can be used for creating ranges, slicing lists, and as `int` argument values without having to cast it in those contexts.
 
-## Manipulating CSV Data
+## Manipulating CSV data
 
 CSV parameters have their own [`CSVParameter`][opentrons.protocol_api.CSVParameter] type, since they don't correspond to a built-in Python type. This class has properties and methods that let you access the CSV data in one of three ways: as a file handler, as a string, or as nested lists.
 

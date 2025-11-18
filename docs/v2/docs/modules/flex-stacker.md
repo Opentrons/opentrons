@@ -7,7 +7,7 @@ The Flex Stacker is an external module that provides automated storage and dispe
 
 The Stacker is represented in code by a [`FlexStackerContext`][opentrons.protocol_api.FlexStackerContext] object that includes methods for retrieving and storing labware. You can also use helper commands in your protocol to calculate how many labware the Stacker can store at once.
 
-## Loading and Deck Slots
+## Loading and deck slots
 
 Up to four Stacker Modules can be attached to the right side of your Flex. Each Stacker's attached shuttle occupies a column 4 deck slot.
 
@@ -30,7 +30,7 @@ Fixtures and modules that are placed below the Flex deck can't be loaded in colu
 
 *New in version 2.25*
 
-## Adding Labware to the Stacker
+## Adding labware to the Stacker
 
 Next, you'll need to define the type and amount of labware the Stacker will store. Throughout your protocol, the Flex automatically moves labware, like well plates or tip racks, from inside the Stacker to the deck. Only one type of labware can be stored in each Stacker at one time.
 
@@ -58,7 +58,7 @@ In this example, `stacker_1` is configured to hold 5 Flex tip racks, each with a
 
 [`set_stored_labware()`][opentrons.protocol_api.FlexStackerContext.set_stored_labware] assigns a labware stack to the Stacker in this deck slot. You can use the Stacker and shuttle as a normal deck slot earlier in your protocol with [`load_labware()`][opentrons.protocol_api.FlexStackerContext.load_labware]. You'll need to move this labware elsewhere on the deck before configuring and using the Stacker for storage.
 
-### Stacker Capacity
+### Stacker capacity
 
 Different labware have varying `z` heights. One well plate might be 2 mm taller than another, affecting the number of plates the Stacker can store at once. The API includes helper commands to calculate how many labware the Stacker can hold:
 
@@ -69,7 +69,7 @@ Use `get_max_storable_labware()` or `get_current_storable_labware()` to calculat
 
 Like other hardware modules, the Stacker doesn't verify the labware you place inside it. If your Stacker is configured correctly, you can use `get_stored_labware()` throughout your protocol to check an updated list of labware stored inside.
 
-## Using Stacker Labware
+## Using Stacker labware
 
 During a protocol, use [`retrieve()`][opentrons.protocol_api.FlexStackerContext.retrieve] to automatically access a single piece of labware to use on the Flex deck.
 

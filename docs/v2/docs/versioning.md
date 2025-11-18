@@ -5,7 +5,7 @@ description: How to choose the right Python API version for your protocol.
 
 The Python Protocol API has its own versioning system, which is separate from the versioning system used for the robot software and the Opentrons App. This allows protocols to run on newer robot software versions without modification.
 
-## Major and Minor Versions
+## Major and minor versions
 
 The API uses a major and minor version number and does not use patch version numbers. For instance, major version 2 and minor version 0 is written as `2.0`. Versions are not decimal numbers, so `2.10` indicates major version 2 and minor version 10. The Python Protocol API version will only increase based on changes that affect protocol behavior.
 
@@ -13,7 +13,7 @@ The major version of the API increases whenever there are significant structural
 
 The minor version of the API increases whenever there is new functionality that might change the way a protocol is written, or when a behavior changes in one aspect of the API but does not affect all protocols. For instance, adding support for a new hardware module, adding new parameters for a function, or deprecating a feature would increase the minor version of the API.
 
-## Specifying Versions
+## Specifying versions
 
 You must specify the API version you are targeting in your Python protocol. In all minor versions, you can do this with the `apiLevel` key in the `metadata` dictionary, alongside any other metadata elements:
 
@@ -51,7 +51,7 @@ When choosing an API level, consider what features you need and how widely you p
 
 On the one hand, using the highest available version will give your protocol access to all the latest [features and fixes](#changes-in-api-versions). On the other hand, using the lowest possible version lets the protocol work on a wider range of robot software versions. For example, a protocol that uses the Heater-Shaker and specifies version 2.13 of the API should work equally well on a robot running version 6.1.0 or 6.2.0 of the robot software. Specifying version 2.14 would limit the protocol to robots running 6.2.0 or higher.
 
-## Maximum Supported Versions
+## Maximum supported versions
 
 The maximum supported API version for your robot is listed in the Opentrons App under **Robots** > your robot > **Robot Settings** > **Advanced**. Before version 6.0.0 of the app, the same information was listed on your robot's **Information** card.
 
@@ -62,7 +62,7 @@ Opentrons robots running the latest software (8.5.0) support the following versi
 - **Flex:** version 2.15–|apiLevel|.
 - **OT-2:** versions 2.0–|apiLevel|.
 
-## API and Robot Software Versions
+## API and robot software versions
 
 This table lists the correspondence between Protocol API versions and robot software versions.
 
@@ -97,7 +97,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 | 2.0         | 3.14.0                       |
 | 1.0         | 3.0.0                        |
 
-## Changes in API Versions
+## Changes in API versions
 
 ### Version 2.26
 

@@ -6,11 +6,11 @@ title: "Python API: Tutorial"
 
 This tutorial will guide you through creating a Python protocol file from scratch. At the end of this process you'll have a complete protocol that can run on a Flex or an OT-2 robot. If you don’t have a Flex or an OT-2 (or if you’re away from your lab, or if your robot is in use), you can use the same file to simulate the protocol on your computer instead.
 
-### What You'll Automate
+### What you'll automate
 
 The lab task that you'll automate in this tutorial is *serial dilution*: taking a solution and progressively diluting it by transferring it stepwise across a plate from column 1 to column 12. With just a dozen or so lines of code, you can instruct your robot to perform the hundreds of individual pipetting actions necessary to fill an entire 96-well plate. And all of those liquid transfers will be done automatically, so you’ll have more time to do other work in your lab.
 
-## Before You Begin
+## Before you begin
 
 You're going to write some Python code, but you don't need to be a Python expert to get started writing Opentrons protocols. You should know some basic Python syntax, like how it uses [indentation](https://docs.python.org/3/reference/lexical_analysis.html#indentation) to group blocks of code, dot notation for [calling methods](https://docs.python.org/3/tutorial/classes.html#method-objects), and the format of [lists](https://docs.python.org/3/tutorial/introduction.html#lists) and [dictionaries](https://docs.python.org/3/tutorial/datastructures.html#dictionaries). You’ll also be using [common control structures](https://docs.python.org/3/tutorial/controlflow.html#if-statements) like `if` statements and `for` loops.
 
@@ -18,7 +18,7 @@ You should write your code in your favorite plaintext editor or development envi
 
 To simulate your code, you'll need [Python 3.10](https://www.python.org/downloads/) and the [pip package installer](https://pip.pypa.io/en/stable/getting-started/). Newer versions of Python aren't yet supported by the Python Protocol API. If you don't use Python 3.10 as your system Python, we recommend using [pyenv](https://github.com/pyenv/pyenv) to manage multiple Python versions.
 
-## Hardware and Labware
+## Hardware and labware
 
 Before running a protocol, you’ll want to have the right kind of hardware and labware ready for your Flex or OT-2.
 
@@ -38,7 +38,7 @@ The Flex and OT-2 use similar labware for serial dilution. The tutorial code wil
 
 For the liquids, you can use plain water as the diluent and water dyed with food coloring as the solution.
 
-## Create a Protocol File
+## Create a protocol file
 
 Let’s start from scratch to create your serial dilution protocol. Open up a new file in your editor and start with:
 ```python
@@ -132,7 +132,7 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 
 You may notice that these deck maps don't show where the liquids will be at the start of the protocol. Liquid definitions aren’t required in Python protocols, unlike protocols made in [Protocol Designer](https://designer.opentrons.com/). If you want to identify liquids, see [Labeling Liquids in Labware][labeling-liquids-in-labware]. (Sneak peek: you’ll put the diluent in column 1 of the reservoir and the solution in column 2 of the reservoir.)
 
-### Trash Bin
+### Trash bin
 Flex and OT-2 both come with a trash bin for disposing used tips.
 
 The OT-2 trash bin is fixed in slot 12. Since it can't go anywhere else on the deck, you don't need to write any code to tell the API where it is.
@@ -214,7 +214,7 @@ All that remains is for the loop to repeat these steps, filling each row down th
 
 That’s it! If you’re using a single-channel pipette, you’re ready to try out your protocol.
 
-### 8-Channel Pipette
+### 8-channel pipette
 If you’re using an 8-channel pipette, you’ll need to make a couple tweaks to the single-channel code from above. Most importantly, whenever you target a well in row A of a plate with an 8-channel pipette, it will move its topmost tip to row A, lining itself up over the entire column.
 
 Thus, when adding the diluent, instead of targeting every well on the plate, you should only target the top row:
@@ -229,7 +229,7 @@ left_pipette.transfer(100, row[:11], row[1:], mix_after=(3, 50))
 ```
 Instead of tracking the current row in the `row` variable, this code sets it to always be row A (index 0).
 
-## Try Your Protocol
+## Try your protocol
 There are two ways to try out your protocol: simulation on your computer, or a live run on a Flex or OT-2. Even if you plan to run your protocol on a robot, it’s a good idea to check the simulation output first.
 
 If you get any errors in simulation, or you don't get the outcome you expected when running your protocol, you can check your code against these reference protocols on GitHub:
@@ -239,7 +239,7 @@ If you get any errors in simulation, or you don't get the outcome you expected w
 - [OT-2: Single-channel serial dilution](https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial.py)
 - [OT-2: 8-channel serial dilution](https://github.com/Opentrons/opentrons/blob/edge/api/docs/v2/example_protocols/dilution_tutorial_multi.py)
 
-### In Simulation
+### In simulation
 Simulation doesn’t require having a robot connected to your computer. You just need to install the [Opentrons Python module](https://pypi.org/project/opentrons/) using pip (`pip install opentrons`). This will give you access to the `opentrons_simulate` command-line utility (`opentrons_simulate.exe` on Windows).
 
 To see a text preview of the steps your Flex or OT-2 will take, use the change directory (`cd`) command to navigate to the location of your saved protocol file and run:
@@ -250,7 +250,7 @@ This should generate a lot of output! As written, the protocol has about 1000 st
 
 If that’s too long, you can always cancel your run partway through or modify `for i in range(8)` to loop through fewer rows.
 
-### On a Robot
+### On a robot
 To run your protocol on a Flex or OT-2, use the [Opentrons App](https://opentrons.com/ot-app). When you first launch the Opentrons App, you will see the Protocols screen. (Click **Protocols** in the left sidebar to access it at any other time.) Click **Import** in the top right corner to reveal the Import a Protocol pane. Then click **Choose File** and find your protocol in the system file picker, or drag and drop your protocol file into the well.
 
 You should see “Protocol - Serial Dilution Tutorial” (or whatever `protocolName` you entered in the metadata) in the list of protocols. Click the three-dot menu (⋮) for your protocol and choose **Start setup**.
@@ -263,5 +263,5 @@ When it’s all done, check the results of your serial dilution procedure — yo
 
 ![Result of Serial Dilution](img/tutorial/serial-dilution-result.jpg)
 
-## Next Steps
+## Next steps
 This tutorial has relied heavily on the `transfer()` method, but there's much more that the Python Protocol API can do. Many advanced applications use [building block commands](building-block-commands/index.md) for finer control over the robot. These commands let you aspirate and dispense separately, add air gaps, blow out excess liquid, move the pipette to any location, and more. For protocols that use [Opentrons hardware modules](modules/index.md), there are methods to control their behavior. And all of the API's classes and methods are catalogued in the [API Reference](api-reference/protocols.md).

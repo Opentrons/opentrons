@@ -13,13 +13,13 @@ temp_mod = protocol.load_module(
 ```
 *New in version 2.3*
 
-## Loading Labware
+## Loading labware
 
 Use the Temperature Module’s [`load_adapter()`][opentrons.protocol_api.TemperatureModuleContext.load_adapter] and [`load_labware()`][opentrons.protocol_api.TemperatureModuleContext.load_labware] methods to specify what you will place on the module. You may use one or both of the methods, depending on the labware you're using. See [Loading Labware on Adapters][loading-labware-on-adapters] for examples.
 
 The [Opentrons Labware Library](https://labware.opentrons.com/) includes definitions for both standalone adapters and adapter–labware combinations. These labware definitions help make the Temperature Module ready to use right out of the box.
 
-### Standalone Adapters
+### Standalone adapters
 
 You can use these standalone adapter definitions to load Opentrons verified or custom labware on top of the Temperature Module.
 
@@ -84,7 +84,7 @@ temp_combo = temp_mod.load_labware(
 ```
 *New in version 2.0*
 
-## Temperature Control
+## Temperature control
 
 The primary function of the module is to control the temperature of its deck, using [`set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.set_temperature], which takes one parameter: `celsius`. For example, to set the Temperature Module to 4 °C:
 ```python
@@ -97,7 +97,7 @@ When using `set_temperature()`, your protocol will wait until the target tempera
 
 *New in version 2.0*
 
-## Temperature Status
+## Temperature status
 
 If you need to confirm in software whether the Temperature Module is holding at a temperature or is idle, use the [`status`][opentrons.protocol_api.TemperatureModuleContext.status] property:
 ```python

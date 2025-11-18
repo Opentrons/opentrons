@@ -12,7 +12,7 @@ The code examples will show how this single value can control:
 
 To keep things as simple as possible, this use case only focuses on setting up and using the value of the dry run parameter, which could be just one of many parameters in a complete protocol.
 
-## Dry Run Definition
+## Dry run definition
 
 First, we need to set up the dry run parameter. We want to set up a simple yes/no choice for the technician running the protocol, so we’ll use a Boolean parameter:
 
@@ -33,7 +33,7 @@ This parameter is set to `False` by default, assuming that most runs will be liv
 
 Additionally, since "dry run" can have different meanings in different contexts, it's important to include a `description` that indicates exactly what the parameter will control — in this case, three things. The following sections show how to accomplish each of those when the dry run parameter is set to `True`.
 
-## Skipping Delays
+## Skipping delays
 
 Many protocols have built-in delays, either for a module to work or to let a reaction happen passively. Lengthy delays just get in the way when verifying a protocol with a dry run. So wherever the protocol calls for a delay, check the value of `protocol.params.dry_run` and make the protocol behave accordingly.
 
@@ -60,7 +60,7 @@ if protocol.params.dry_run is False:
 tc_mod.open_lid()
 ```
 
-## Shortening Mix Steps
+## Shortening mix steps
 
 Similar to delays, mix steps can take a long time because they are inherently repetitive actions. Mixing ten times takes ten times as long as mixing once! To save time, set a mix repetitions variable based on the value of `protocol.params.dry_run` and pass that to [`mix()`][opentrons.protocol_api.InstrumentContext.mix]:
 
@@ -81,7 +81,7 @@ else:
     mix_reps = 1
 ```
 
-## Returning Tips
+## Returning tips
 
 Tips used in a dry run should be reusable — for another dry run, if nothing else. It doesn't make sense to dispose of them in a trash container, unless you specifically need to test movement to the trash. You can choose whether to use [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] or [`return_tip()`][opentrons.protocol_api.InstrumentContext.return_tip] based on the value of `protocol.params.dry_run`. If the protocol doesn't have too many tip drop actions, you can use an `if` statement each time:
 

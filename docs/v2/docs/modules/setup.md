@@ -2,7 +2,7 @@
 title: "Python API: Module Setup"
 ---
 
-## Loading Modules onto the Deck
+## Loading modules onto the deck
 
 Similar to labware and pipettes, you must inform the API about the modules you want to use in your protocol. Even if you don't use the module anywhere else in your protocol, the Opentrons App and the robot won't let you start the protocol run until all loaded modules that use power are connected via USB and turned on.
 
@@ -44,7 +44,7 @@ Use [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.loa
 
 *New in version 2.0*
 
-## Available Modules
+## Available modules
 
 The first parameter of [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module] is the module's *API load name*. The load name tells your robot which module you're going to use in a protocol. The table below lists the API load names for the currently available modules.
 
@@ -63,7 +63,7 @@ The first parameter of [`ProtocolContext.load_module()`][opentrons.protocol_api.
 
 Some modules were added to our Python API later than others, and others span multiple hardware generations. When writing a protocol that requires a module, make sure your `requirements` or `metadata` code block specifies an [API version](../versioning.md) high enough to support all the module generations you want to use.
 
-## Loading Labware onto a Module
+## Loading labware onto a module
 
 Use the `load_labware()` method on the module context to load labware on a module. For example, to load the Opentrons 24 Well Aluminum Block on top of a Temperature Module:
 ```python
@@ -83,10 +83,10 @@ Any [custom labware](../labware.md#custom-labware) added to your Opentrons App i
 
 *New in version 2.1*
 
-### Module and Labware Compatibility
+### Module and labware compatibility
 
 It's your responsibility to ensure the labware and module combinations you load together work together. The API generally won't raise a warning or error if you load an unusual combination, like placing a tube rack on a Thermocycler. The API will raise an error if you try to load a labware on an unsupported adapter. When working with custom labware and module adapters, be sure to add stacking offsets for the adapter to your custom labware definition.
 
-### Additional Labware Parameters
+### Additional labware parameters
 
 In addition to the mandatory `load_name` argument, you can also specify additional parameters. For example, if you specify a `label`, this name will appear in the Opentrons App and the run log instead of the load name. For labware that has multiple definitions, you can specify `version` and `namespace` (though most of the time you won't have to). The `load_labware()` methods of all module contexts accept these additional parameters.

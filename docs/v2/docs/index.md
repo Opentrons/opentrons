@@ -8,7 +8,7 @@ As a bench scientist, you should be able to code your protocols in a way that re
 
 As a programmer, you can leverage the full power of Python for advanced automation in your protocols. Perform calculations, manage external data, use built-in and imported Python modules, and more to implement your custom lab workflow.
 
-## Getting Started
+## Getting started
 
 **New to Python protocols?** Check out the [tutorial](tutorial.md) to learn about the different parts of a protocol file and build a working protocol from scratch.
 
@@ -16,7 +16,7 @@ If you want to **dive right into code**, take a look at our [examples](examples.
 
 When you're ready to **try out a protocol**, download the [Opentrons App](https://www.opentrons.com/ot-app), import the protocol file, and run it on your robot.
 
-## How the API Works
+## How the API works
 
 The design goal of this API is to make code readable and easy to understand. A protocol, in its most basic form:
 
@@ -132,7 +132,7 @@ For example, if we wanted to transfer liquid from well A1 to well B1 on a plate,
 
 There is much more that Opentrons robots and the API can do! The [Building Block Commands](building-block-commands/index.md), [Complex Commands](complex-commands/index.md), and [Modules](modules/index.md) pages cover many of these functions.
 
-## More Resources
+## More resources
 
 ### Opentrons App
 
@@ -142,7 +142,7 @@ The [Opentrons App](https://opentrons.com/ot-app/) is the easiest way to run you
 
 Questions about setting up your robot, using Opentrons software, or troubleshooting? Check out [our other documentation](/) or [contact Opentrons Support directly](mailto:support@opentrons.com).
 
-### Custom Protocol Service
+### Custom protocol service
 
 Don't have the time or resources to write your own protocols? Our [custom protocol development service](https://opentrons.com/instrument-services/) can get you set up in two weeks.
 

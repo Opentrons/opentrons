@@ -7,7 +7,7 @@ Complex commands perform a series of [building block commands](../building-block
 
 This page describes what steps you should expect the robot to perform when using different complex commands with different required and [optional parameters](parameters.md).
 
-## Step Sequence
+## Step sequence
 
 The order of steps is fixed within complex commands, but legacy and liquid class complex commands handle transfer steps and changes to actions differently.
 
@@ -62,7 +62,7 @@ To **dispense:**
 
 Each command may repeat some or all of these steps in order to move liquid as requested. [`transfer()`][opentrons.protocol_api.InstrumentContext.transfer] repeats as many times as there are wells in the longer of its `source` or `dest` arguments. Both legacy and liquid class distribute and consolidate methods try to repeat as few times as possible. See [Tip Refilling](#tip-refilling) below for how they behave when they do need to repeat.
 
-## Example Orders
+## Example orders
 
 The smallest possible number of steps in a complex command like `transfer()` is just two: aspirating and dispensing. This is possible by omitting the tip pickup and drop steps:
 
@@ -116,7 +116,7 @@ Since dispensing and touching the tip are both associated with the destination w
 
 If you use `distribute_with_liquid_class()` to perform the same transfer, the liquid class definition automatically determines transfer behaviors like touch tip and blowout. For more information on automatic changes to transfer steps, see the [liquid class definitions](../liquid-class-definitions.md).
 
-## Tip Refilling
+## Tip refilling
 
 One factor that affects the exact order of steps for a complex command is whether the amount of liquid being moved can fit in the tip at once. If it won't fit, you don't have to adjust your command. The API will handle it for you by including additional steps to refill the tip when needed.
 
@@ -161,7 +161,7 @@ Dropping tip into A1 of Opentrons Fixed Trash on 12
 
 This command will blow out 200 total µL of liquid in the trash. If you need to conserve liquid, use [complex liquid handling parameters](parameters.md) to reduce or eliminate the [disposal volume](parameters.md#disposal-volume), or to [blow out][blow-out-complex] in a location other than the trash.
 
-## List of Volumes
+## List of volumes
 
 Legacy complex commands like `transfer()` can aspirate or dispense different amounts for different wells, rather than the same amount across all wells. Liquid class complex commands, like `transfer_with_liquid_class()`, only accept a single volume argument, and aspirate or dispense the same amount across wells.
 

@@ -25,7 +25,7 @@ pipette.aspirate(100)     # aspirate 100 µL at current position
 
 Now our pipette holds 300 µL.
 
-### Aspirate by Well or Location
+### Aspirate by well or location
 
 The `aspirate()` method includes a `location` parameter that accepts either a `Well` or a `Location`.
 
@@ -74,7 +74,7 @@ See also:
 - [Position Relative to Labware][position-relative-to-labware] for information about controlling pipette height from within a well.
 - [Move To][move-to] for information about moving a pipette to any reachable deck location.
 
-### Aspiration Flow Rates
+### Aspiration flow rates
 
 Flex and OT-2 pipettes aspirate at [flow rates][pipette-flow-rates] measured in µL/s. Specifying the `rate` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to aspirate at twice its normal rate:
 
@@ -117,7 +117,7 @@ protocol.delay(seconds=5) # pause for 5 seconds
 pipette.dispense(100)     # dispense 100 µL at current position
 ```
 
-### Dispense by Well or Location
+### Dispense by well or location
 
 The `dispense()` method includes a `location` parameter that accepts either a `Well` or a `Location`.
 
@@ -163,7 +163,7 @@ See also:
 - [Position Relative to Labware][position-relative-to-labware] for information about controlling pipette height from within a well.
 - [Move To][move-to] for information about moving a pipette to any reachable deck location.
 
-### Dispense Flow Rates
+### Dispense flow rates
 
 Flex and OT-2 pipettes dispense at default [flow rates][pipette-flow-rates] measured in µL/s. Specifying the `rate` parameter multiplies the flow rate by that value. As a best practice, don't set the flow rate higher than 3x the default. For example, this code causes the pipette to dispense at twice its normal rate:
 
@@ -183,7 +183,7 @@ pipette.dispense(200, plate["B1"], flow_rate=50)
 
 The `rate` and `flow_rate` parameters are mutually exclusive. If you specify both in the same command, the API will raise an error.
 
-## Push Out After Dispense
+## Push out after dispense
 
 Dispensing all liquid from the tip usually requires an additional volume of air to ensure no droplets remain. In a push out after dispense, the pipette dispenses all liquid by returning the plunger to its aspirate start position. Then, without stopping, the plunger moves further down to dispense the additional push out volume.
 
@@ -252,7 +252,7 @@ To disable `push_out` during any dispense action, set `push_out=0`. You can use 
 
 *New in version 2.15*
 
-## Blow Out {#blow-out-building-block}
+## Blow out {#blow-out-building-block}
 
 To blow an extra amount of air through the pipette's tip, call the [`InstrumentContext.blow_out()`][opentrons.protocol_api.InstrumentContext.blow_out] method. You can use a specific well in a well plate or reservoir as the blowout location. If no location is specified, the pipette will blowout from its current well position:
 
@@ -276,7 +276,7 @@ pipette.blow_out(pipette.trash_container)
 
 *Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` locations.
 
-## Touch Tip {#touch-tip-building-block}
+## Touch tip {#touch-tip-building-block}
 
 The [`InstrumentContext.touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] method moves the pipette so the tip touches each wall of a well. A touch tip procedure helps knock off any droplets that might cling to the pipette's tip. This method includes optional arguments that allow you to control where the tip will touch the inner walls of a well and the touch speed. Calling `touch_tip()` without arguments causes the pipette to touch the well walls from its current location:
 
@@ -284,7 +284,7 @@ The [`InstrumentContext.touch_tip()`][opentrons.protocol_api.InstrumentContext.t
 pipette.touch_tip()
 ```
 
-### Touch Location
+### Touch location
 
 These optional location arguments give you control over where the tip will touch the side of a well.
 
@@ -323,7 +323,7 @@ The `radius` and `mm_from_edge` arguments are mutually exclusive. If you specify
 !!! warning
     *Do not* set the `radius` value greater than `1.0` or a negative `mm_from_edge` value. When `radius` is > `1.0` or `mm_from_edge` is < `0.0`, the robot will forcibly move the pipette tip across a well wall or edge. This type of aggressive movement can damage the pipette tip and the pipette.
 
-### Touch Speed
+### Touch speed
 
 Touch speed controls how fast the pipette moves in mm/s during a touch tip step. The default movement speed is 60 mm/s, the minimum is 1 mm/s, and the maximum is 80 mm/s. Calling `touch_tip` without any arguments moves a tip at the default speed in the current well:
 
@@ -394,7 +394,7 @@ pipette.mix(repetitions=3, volume=100, final_push_out=10)
 
 <!-- ## Dynamic Mix TK -->
 
-## Air Gap {#air-gap-building-block}
+## Air gap {#air-gap-building-block}
 
 The [`InstrumentContext.air_gap()`][opentrons.protocol_api.InstrumentContext.air_gap] method tells the pipette to draw in air before or after a liquid. Creating an air gap helps keep liquids from seeping out of a pipette after drawing it from a well. This method includes arguments that give you control over the amount of air to aspirate and the position at the target well to add the air gap. By default, the pipette moves 5 mm above the center of a well before aspirating air. Calling `air_gap()` with no arguments uses the entire remaining volume in the pipette.
 
@@ -442,7 +442,7 @@ The `rate` and `flow_rate` parameters are mutually exclusive. If you choose to c
 
 *Changed in version 2.24:* Add the `in_place` and `flow_rate` parameters.
 
-## Detect Liquids
+## Detect liquids
 
 The [`InstrumentContext.detect_liquid_presence()`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence] method tells a Flex pipette to check for liquid in a well. It returns `True` if the pressure sensors in the pipette detect a liquid and `False` if the sensors do not. When `detect_liquid_presence()` finds an empty well it won't raise an error or stop your protocol.
 
@@ -460,7 +460,7 @@ else:
 
 *New in version 2.20*
 
-## Require Liquids
+## Require liquids
 
 The [`InstrumentContext.require_liquid_presence()`][opentrons.protocol_api.InstrumentContext.require_liquid_presence] method tells a Flex pipette to check for and require liquid in a well. When `require_liquid_presence()` finds an empty well, it raises an error and pauses the protocol to let you resolve the problem.
 
@@ -476,7 +476,7 @@ You can also require liquid presence for all aspirations performed with a given 
 
 *New in version 2.20*
 
-## Measure Liquids
+## Measure liquids
 
 The [`InstrumentContext.measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height] method tells a Flex pipette to measure the height of liquid relative to the bottom of a well. When `measure_liquid_height()` finds an empty well, it raises and error and pauses the protocol to let you resolve the problem.
 

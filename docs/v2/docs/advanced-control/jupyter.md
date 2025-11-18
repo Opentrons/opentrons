@@ -17,7 +17,7 @@ Access your robot’s Jupyter Notebook by either:
 
 Once you've launched Jupyter Notebook, you can create a notebook file or edit an existing one. These notebook files are stored on the robot. If you want to save code from a notebook to your computer, go to **File > Download As** in the notebook interface.
 
-## Protocol Structure
+## Protocol structure
 
 Jupyter Notebook is structured around *cells*: discrete chunks of code that can be run individually. This is nearly the opposite of Opentrons protocols, which bundle all commands into a single `run()` function. Therefore, to take full advantage of Jupyter Notebook, you have to restructure your protocol.
 
@@ -33,7 +33,7 @@ The first command you execute should always be [`home()`][opentrons.protocol_api
 
 You should use the same [`ProtocolContext`][opentrons.protocol_api.ProtocolContext] throughout your notebook, unless you need to start over from the beginning of your protocol logic. In that case, call [`get_protocol_api()`][opentrons.execute.get_protocol_api] again to get a new `ProtocolContext`.
 
-### Running a Previously Written Protocol
+### Running a previously written protocol
 
 You can also use Jupyter to run a protocol that you have already written. To do so, first copy the entire text of the protocol into a cell and run that cell:
 
@@ -51,11 +51,11 @@ protocol = opentrons.execute.get_protocol_api("|apiLevel|")
 run(protocol)  # your protocol will now run
 ```
 
-## Setting Labware Offsets
+## Setting labware offsets
 
 All positions relative to labware are adjusted automatically based on labware offset data. When you're running your code in Jupyter Notebook or with `opentrons_execute`, you need to set your own offsets because you can't perform run setup and Labware Position Check in the Opentrons App or on the Flex touchscreen.
 
-### Creating a Dummy Protocol
+### Creating a dummy protocol
 
 For advanced control applications, do the following to calculate and apply labware offsets:
 
@@ -113,7 +113,7 @@ Keep in mind that `set_offset()` commands will override any labware offsets set 
 !!! warning
     Improperly reusing offset data may cause your robot to move to an unexpected position or crash against labware, which can lead to incorrect protocol execution or damage your equipment. When in doubt: run Labware Position Check again and update your code!
 
-## Labware Offset Behavior
+## Labware offset behavior
 
 How the API applies labware offsets varies depending on the API level of your protocol. This section describes the latest behavior. For details on how offsets work in earlier API versions, see the API reference entry for [`set_offset()`][opentrons.protocol_api.labware.Labware.set_offset].
 
@@ -153,11 +153,11 @@ plate.set_offset(
 )  # plate again has offset -0.1, -0.2, -0.3
 ```
 
-## Using Custom Labware
+## Using custom labware
 
 If you have custom labware definitions you want to use with Jupyter, make a new directory called `labware` in Jupyter and put the definitions there. These definitions will be available when you call [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware].
 
-## Using Modules
+## Using modules
 
 If your protocol uses [modules](../modules/index.md), you need to take additional steps to make sure that Jupyter Notebook doesn't send commands that conflict with the robot server. Sending commands to modules while the robot server is running will likely cause errors, and the module commands may not execute as expected.
 

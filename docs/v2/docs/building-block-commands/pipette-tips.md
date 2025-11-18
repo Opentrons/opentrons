@@ -7,7 +7,7 @@ Your robot needs to attach a disposable tip to the pipette before it can aspirat
 
 The following sections demonstrate how to use each method and include sample code. The examples used here assume that you've loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
-## Picking Up a Tip
+## Picking up a tip
 
 To pick up a tip, call the [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] method without any arguments:
 
@@ -36,7 +36,7 @@ In most cases, it's best to associate tip racks with a pipette and let the API a
 
 *New in version 2.0*
 
-## Automating Tip Pick Up
+## Automating tip pickup
 
 When used with Python's [`range`](https://docs.python.org/3/library/stdtypes.html#range) class, a `for` loop brings automation to the tip pickup and tracking process. It also eliminates the need to call `pick_up_tip()` multiple times. For example, this snippet tells the robot to sequentially use all the tips in a 96-tip rack:
 
@@ -79,7 +79,7 @@ for i in range(192):
 
 For a more advanced "real-world" example, review the [off-deck location protocol][the-off-deck-location] on the [Moving Labware](../moving-labware.md) page. This example also uses a `for` loop to iterate through a tip rack, but it includes other commands that pause the protocol and let you replace an on-deck tip rack with another rack stored in an off-deck location.
 
-## Dropping a Tip
+## Dropping a tip
 
 To drop a tip in the pipette's trash container, call the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method with no arguments:
 
@@ -109,7 +109,7 @@ pipette.drop_tip(chute)  # drops tip in waste chute
 
 *New in version 2.16*
 
-## Returning a Tip
+## Returning a tip
 
 To return a tip to its original location, call the [`return_tip()`][opentrons.protocol_api.InstrumentContext.return_tip] method with no arguments:
 
@@ -124,7 +124,7 @@ pipette.return_tip()
 
     If you call `return_tip()` while using partial tip pickup, the API will raise an error. Use `drop_tip()` to dispose the tips instead.
 
-## Working With Used Tips
+## Working with used tips
 
 Currently, the API considers tips as "used" after being picked up. For example, if the robot picked up a tip from rack location A1 and then returned it to the same location, it will not attempt to pick up this tip again, unless explicitly specified. Instead, the robot will pick up a tip starting from rack location B1. For example:
 

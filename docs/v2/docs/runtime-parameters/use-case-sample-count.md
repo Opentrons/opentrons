@@ -13,7 +13,7 @@ At first glance, it might seem like sample count would primarily affect liquid t
 
 To keep things as simple as possible, this use case only focuses on setting up and using the value of the sample count parameter, which is just one of several parameters present in the full protocol.
 
-## From Samples to Columns
+## From samples to columns
 
 First of all, we need to set up the sample count parameter so it’s both easy for technicians to understand during protocol setup and easy for us to use in the protocol’s `run()` function.
 
@@ -41,7 +41,7 @@ def run(protocol):
 ```
 Most examples below will use `column_count`, rather than redoing (and retyping!) this calculation multiple times.
 
-## Loading Tip Racks
+## Loading tip racks
 
 Tip racks come first in most protocols. To ensure that the protocol runs to completion, we need to load enough tip racks to avoid running out of tips.
 
@@ -126,7 +126,7 @@ pipette_1000 = protocol.load_instrument(
 ```
 This code will load as few as 3 tip racks and as many as 7, and associate them with the correct pipettes — all based on a single choice from a dropdown menu at run setup.
 
-## Loading Liquids
+## Loading liquids
 
 Next come the reagents, samples, and the labware that holds them.
 
@@ -205,7 +205,7 @@ for w in range(protocol.params.sample_count):
     sample_plate.wells()[w].load_liquid(liquid=sample_liquid, volume=40)
 ```
 
-## Processing Samples
+## Processing samples
 
 When it comes time to process the samples, we'll return to working by column, since the protocol uses an 8-channel pipette. There are many pipetting stages in the full protocol, but this section examines just the stage for adding the Tagmentation Stop liquid. The same techniques would apply to similar stages.
 
@@ -238,7 +238,7 @@ for initial, intermediate in zip(
 
 This will transfer from column 1 to 5, 2 to 6, and so on — depending on the number of samples chosen during run setup.
 
-## Replenishing Tips
+## Replenishing tips
 
 For the higher values of `protocol.params.sample_count`, the protocol will load tip racks in the staging area slots (column 4). Since pipettes can't reach these slots, move these tip racks into the working area (columns 1–3) before issuing a pipetting command that targets them, or the API will raise an error.
 

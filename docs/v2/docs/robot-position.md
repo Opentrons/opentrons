@@ -5,11 +5,11 @@ description: How to define positions within an Opentrons robot and alter its spe
 
 The API automatically determines how the robot needs to move when working with the instruments and labware in your protocol. But sometimes you need direct control over these activities. The API lets you do just that. Specifically, you can control movements relative to labware and deck locations. You can also manage the gantry’s speed and trajectory as it traverses the working area. This document explains how to use API commands to take direct control of the robot and position it exactly where you need it.
 
-## Position Relative to Labware
+## Position relative to labware
 
 When the robot positions itself relative to a piece of labware, where it moves is determined by the labware definition, the actions you want it to perform, and the labware offsets for a specific deck slot. This section describes how these positional components are calculated and how to change them.
 
-### Well Positions
+### Well positions
 
 Every well on every piece of labware has four addressable positions: top, bottom, center, and meniscus. 
 
@@ -90,7 +90,7 @@ The liquid meniscus in a well changes during aspirating or dispensing, so you'll
 
 *New in version 2.23*
 
-### Default Positions
+### Default positions
 
 By default, your robot will aspirate and dispense 1 mm above the bottom of wells. This default clearance may not be suitable for some labware geometries, liquids, or protocols. You can change this value based on your labware with the [`Well.bottom()`][opentrons.protocol_api.labware.Well.bottom] method and the `z` argument, though it can be cumbersome to do so repeatedly.
 
@@ -126,7 +126,7 @@ All positions relative to labware are adjusted automatically based on labware of
 
 You should only adjust labware offsets in your Python code if you plan to run your protocol in Jupyter Notebook or from the command line. See [Setting Labware Offsets][setting-labware-offsets] in the Advanced Control section for information.
 
-## Position Relative to Trash Containers
+## Position relative to trash containers
 
 Movement to [`TrashBin`][opentrons.protocol_api.TrashBin] or [`WasteChute`][opentrons.protocol_api.WasteChute] objects is based on the horizontal *center* of the pipette. This is different than movement to labware, which is based on the primary channel (the back channel on 8-channel pipettes, and the back-left channel on 96-channel pipettes in default configuration). Using the center of the pipette ensures that all attached tips are over the trash container for blowing out, dropping tips, or other disposal operations.
 
@@ -148,7 +148,7 @@ trash.top(y=10)  # 10 mm towards back, default height
 
 Another difference between the trash container `top()` methods and `Well.top()` is that they return an object of the same type, not a [`Location`][opentrons.protocol_api.labware.Location]. This helps prevent performing undesired actions in trash containers. For example, you can aspirate at a location or from a well, but not from a trash container. On the other hand, you can blow out at a location, well, trash bin, or waste chute.
 
-## Position Relative to the Deck
+## Position relative to the deck
 
 The robot's base coordinate system is known as *deck coordinates*. Many API functions use this coordinate system, and you can also reference it directly. It is a right-handed coordinate system always specified in mm, with the origin `(0, 0, 0)` at the front left of the robot. The positive `x` direction is to the right, the positive `y` direction is to the back, and the positive `z` direction is up. 
 
@@ -157,11 +157,11 @@ You can identify a point in this coordinate system with a [`Location`][opentrons
 !!! note
     There are technically multiple vertical axes. For example, `z` is the axis of the left pipette mount and `a` is the axis of the right pipette mount. There are also pipette plunger axes: `b` (left) and `c` (right). You usually don't have to refer to these axes directly, since most motion commands are issued to a particular pipette and the robot automatically selects the correct axis to move. Similarly, [`Location`][opentrons.types.Location] only deals with `x`, `y`, and `z` values. 
 
-## Independent Movement
+## Independent movement
 
 For convenience, many methods have location arguments and incorporate movement automatically. This section will focus on moving the pipette independently, without performing other actions like `aspirate()` or `dispense()`.
 
-### Move To
+### Move to
 
 The [`InstrumentContext.move_to()`][opentrons.protocol_api.InstrumentContext.move_to] method moves a pipette to any reachable location on the deck. If the pipette has picked up a tip, it will move the end of the tip to that position; if it hasn't, it will move the pipette nozzle to that position.
 
@@ -195,7 +195,7 @@ pipette.move_to(plate["A2"].top())
 
 *New in version 2.0*
 
-### Points and Locations
+### Points and locations
 
 When instructing the robot to move, it's important to consider the difference between the [`Point`][opentrons.types.Point] and [`Location`][opentrons.types.Location] types.
 
@@ -232,14 +232,14 @@ pipette.dispense(50, center_location.move(types.Point(x=1, y=1, z=1)))
 
 *New in version 2.0*
 
-## Movement Speeds
+## Movement speeds
 
 In addition to instructing the robot where to move a pipette, you can also control the speed at which it moves. Speed controls can be applied either to all pipette motions or to movement along a particular axis.
 
 !!! note
     Like all mechanical systems, Opentrons robots have resonant frequencies that depend on their construction and current configuration. It's possible to set a speed that causes your robot to resonate, producing louder sounds than typical operation. This is safe, but if you find it annoying, increase or decrease the speed slightly.
 
-### Gantry Speed
+### Gantry speed
 
 The robot's gantry usually moves as fast as it can given its construction. The default speed for Flex varies between 300 and 350 mm/s. The OT-2 default is 400 mm/s. However, some experiments or liquids may require slower movements. In this case, you can reduce the gantry speed for a specific pipette by setting [`InstrumentContext.default_speed`][opentrons.protocol_api.InstrumentContext.default_speed] like this:
 

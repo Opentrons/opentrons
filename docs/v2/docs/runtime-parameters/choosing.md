@@ -10,7 +10,7 @@ The first decision you need to make when adding parameters to your protocol is "
 
 The trick to choosing good parameters is reasoning through the choices the protocol's users may make. If any of them lead to nonsensical outcomes or errors, adjust the parameters—or how your protocol [uses parameter values](using-values.md)—to avoid those situations.
 
-## Build on a Task
+## Build on a task
 
 Consider what scientific task is at the heart of your protocol, and build parameters that contribute to, rather than diverge from it.
 
@@ -18,7 +18,7 @@ For example, it makes sense to add a parameter for number of samples to a DNA pr
 
 Also consider how a small number of parameters can combine to produce many useful outputs. Take the serial dilution task from the [tutorial](../tutorial.md) as an example. We could add just three parameters to it: number of dilutions, dilution factor, and number of rows. Now that single protocol can produce a whole plate that gradually dilutes, a 2×4 grid that rapidly dilutes, and *thousands* of other combinations.
 
-## Consider Contradictions
+## Consider contradictions
 
 Here's a common time-saving use of parameters: your protocol requires a 1-channel pipette and an 8-channel pipette, but it doesn't matter which mount they're attached to. Without parameters, you would have to assign the mounts in your protocol. Then if the robot is set up in the reverse configuration, you'd have to either physically swap the pipettes or modify your protocol.
 
@@ -31,7 +31,7 @@ The best way to avoid these contradictions is to collapse the two questions into
 - It only requires answering one question instead of two.
 - The [phrasing of the question and answer](style.md) makes it clear that the protocol requires exactly one of each pipette type.
 
-## Set Boundaries
+## Set boundaries
 
 Numerical parameters support minimum and maximum values, which you should set to avoid incorrect inputs that are outside of your protocol's possible actions.
 

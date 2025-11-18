@@ -21,7 +21,7 @@ def run(protocol: protocol_api.ProtocolContext):
 ```
 *New in version 2.3*
 
-## Loading Labware
+## Loading labware
 
 Like with all modules, use the Magnetic Module’s [`load_labware()`][opentrons.protocol_api.MagneticModuleContext.load_labware] method to specify what you will place on the module. The Magnetic Module supports 96-well PCR plates and deep well plates. For the best compatibility, use a labware definition that specifies how far the magnets should move when engaging with the labware. The following plates in the [Opentrons Labware Library](https://labware.opentrons.com/) include this measurement:
 
@@ -36,7 +36,7 @@ Like with all modules, use the Magnetic Module’s [`load_labware()`][opentrons.
 
 To check whether a custom labware definition specifies this measurement, load the labware and query its [`magdeck_engage_height`][opentrons.protocol_api.Labware.magdeck_engage_height] property. If it has a numerical value, the labware is ready for use with the Magnetic Module.
 
-## Engaging and Disengaging
+## Engaging and disengaging
 
 Raise and lower the module's magnets with the [`engage()`][opentrons.protocol_api.MagneticModuleContext.engage] and [`disengage()`][opentrons.protocol_api.MagneticModuleContext.disengage] functions, respectively.
 

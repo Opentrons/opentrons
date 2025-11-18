@@ -4,7 +4,7 @@ title: "Python API: Moving Labware"
 
 You can move an entire labware (and all of its contents) from one deck slot to another at any point during your protocol. On Flex, you can either use the gripper or move the labware manually. On OT-2, you can only move labware manually, since it doesn't have a gripper instrument.
 
-## Basic Movement
+## Basic movement
 
 Use the [`ProtocolContext.move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] method to initiate a move, regardless of whether it uses the gripper.
 
@@ -27,7 +27,7 @@ protocol.move_labware(labware=plate, new_location="D3")
 
 For the first move, the API knows to find the plate in its initial load location, slot D1. For the second move, the API knows to find the plate in D2.
 
-## Automatic vs Manual Moves
+## Automatic vs manual moves
 
 There are two ways to move labware:
 
@@ -59,7 +59,7 @@ The above example is a complete and valid `run()` function. You don't have to lo
 
 If you attempt to use the gripper to move labware in an OT-2 protocol, the API will raise an error.
 
-## Supported Labware
+## Supported labware
 
 <table>
     <thead>
@@ -117,7 +117,7 @@ You can move compatible Opentrons lids manually or with the Flex Gripper, but so
 !!! note
     The labware definitions listed above include information about the position and force that the gripper uses to pick up the labware. The gripper uses default values for labware definitions that don't include position and force information. The Python Protocol API won't raise a warning or error if you try to grip and move other types of labware.
 
-## Movement with Modules
+## Movement with modules
 
 Moving labware on and off of modules lets you precisely control when the labware is in contact with the hot, cold, or magnetic surfaces of the modules.
 
@@ -145,7 +145,7 @@ Also note the `hs_mod.open_labware_latch()` command in the above example. To mov
 
 If the labware is inaccessible, the API will raise an error.
 
-## Movement into the Waste Chute
+## Movement into the waste chute
 
 Move used tip racks and well plates to the waste chute to dispose of them. This requires you to first [configure the waste chute](deck-slots.md#waste-chute-api) in your protocol. Then use the loaded [`WasteChute`][opentrons.protocol_api.WasteChute] object as the value of `new_location`:
 
@@ -160,7 +160,7 @@ protocol.move_labware(
 
 Always specify `use_gripper=True` when moving labware into the waste chute. The chute is not designed for manual movement. You can still manually move labware to other locations, including off-deck, with the chute installed.
 
-## Moving Lids
+## Moving lids
 
 You can use [`ProtocolContext.move_lid()`][opentrons.protocol_api.ProtocolContext.move_lid] to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough Universal Lid, the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler), and the Opentrons Flex Tip Rack Lid.
 
@@ -200,7 +200,7 @@ To work with tip rack lids, first [load the tip rack lid][loading-lids] using th
 
 *New in version 2.23*
 
-## The Off-Deck Location
+## The off-deck location
 
 In addition to moving labware around the deck, [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] can also prompt you to move labware off of or onto the deck.
 

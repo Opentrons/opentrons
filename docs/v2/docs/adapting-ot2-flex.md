@@ -8,7 +8,7 @@ Adapting a protocol for Flex lets you have parity across different Opentrons rob
 
 Examples on this page are in tabs so you can quickly move back and forth to see the differences between OT-2 and Flex code.
 
-## Metadata and Requirements
+## Metadata and requirements
 
 Flex requires you to specify an `apiLevel` of 2.15 or higher. If your OT-2 protocol specified `apiLevel` in the `metadata` dictionary, it's best to move it to the `requirements` dictionary. You can't specify it in both places, or the API will raise an error.
 
@@ -40,7 +40,7 @@ You also need to specify `"robotType": "Flex"`. If you omit `robotType` in the `
     requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
     ```
 
-## Pipettes and Tip-rack Load Names
+## Pipettes and tip-rack load names
 
 Flex uses different types of pipettes and tip racks than OT-2, which have their own load names in the API. If possible, load Flex pipettes of the same capacity or larger than the OT-2 pipettes. See the [list of pipette API load names](pipettes/loading.md#api-load-names) for the valid values of `instrument_name` in Flex protocols. And check [Labware Library](https://labware.opentrons.com) or the Opentrons App for the load names of Flex tip racks.
 
@@ -67,7 +67,7 @@ This example converts OT-2 code that uses a P300 Single-Channel GEN2 pipette and
         )
     ```
 
-## Trash Container
+## Trash container
 
 OT-2 protocols always have a [`fixed_trash`][opentrons.protocol_api.ProtocolContext.fixed_trash] in slot 12. In Flex protocols specifying API version 2.16 or later, you need to [load a trash bin](deck-slots.md#trash-bin-api). Put it in slot A3 to match the physical position of the OT-2 fixed trash:
 
@@ -75,13 +75,13 @@ OT-2 protocols always have a [`fixed_trash`][opentrons.protocol_api.ProtocolCont
 trash = protocol.load_trash_bin("A3")
 ```
 
-## Deck Slot Labels
+## Deck slot labels
 
 It's good practice to update numeric labels for [deck slots](deck-slots.md) (which match the labels on an OT-2) to coordinate ones (which match the labels on Flex). This is an optional step, since the two formats are interchangeable.
 
 For example, the code in the previous section changed the location of the tip rack from `1` to `"D1"`.
 
-## Module Load Names
+## Module load names
 
 If your OT-2 protocol uses older generations of the Temperature Module or Thermocycler Module, update the load names you pass to [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module] to ones compatible with Flex:
 
