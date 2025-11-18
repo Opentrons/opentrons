@@ -166,7 +166,7 @@ Start by defining the tips, trash, pipette, and labware used in your transfers. 
 ```python
 from opentrons import protocol_api
 
-requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 # define tips, trash, and pipette
 def run(protocol: protocol_api.ProtocolContext):

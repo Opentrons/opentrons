@@ -10,11 +10,12 @@ dependencies = [
     "mkdocs-material>=9.6.14",
     "mkdocs-monorepo-plugin>=1.1.2",
     "mkdocstrings[python]>=0.29.1",
+    "mkdocs-macros-plugin>=1.3.9",
     "mkdocs-parent-css-plugin",
     "mkdocs-print-site-plugin>=2.8",
     "opentrons",
     "opentrons-shared-data",
-    "playwright>=1.55"
+    "playwright>=1.55",
 ]
 
 [tool.uv.sources]

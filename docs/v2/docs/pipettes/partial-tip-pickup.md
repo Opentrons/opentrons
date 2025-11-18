@@ -43,7 +43,7 @@ Here is the start of a protocol that imports the `COLUMN` and `ALL` layout const
 from opentrons import protocol_api
 from opentrons.protocol_api import COLUMN, ALL
 
-requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(
@@ -92,7 +92,7 @@ Here is the start of a protocol that imports the `ROW` and `ALL` layout constant
 from opentrons import protocol_api
 from opentrons.protocol_api import ROW, ALL
 
-requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(
@@ -152,7 +152,7 @@ Here is the start of a protocol that imports the `SINGLE` and `ALL` layout const
 from opentrons import protocol_api
 from opentrons.protocol_api import SINGLE, ALL
 
-requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(
@@ -232,7 +232,7 @@ Here is the start of a protocol that imports the `PARTIAL_COLUMN` and `ALL` layo
 from opentrons import protocol_api
 from opentrons.protocol_api import PARTIAL_COLUMN, ALL
 
-requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
 def run(protocol: protocol_api.ProtocolContext):
     partial_rack = protocol.load_labware(

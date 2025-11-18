@@ -137,7 +137,7 @@ Liquid class definitions automatically include a disposal volume for liquid clas
    
     `consolidate()` ignores `disposal_volume` completely.
 
-## Touch tip {#touch-tip-complex}
+## Touch tip { #touch-tip-complex }
 
 The `touch_tip` parameter accepts a Boolean value. When `True`, a touch tip step occurs after every aspirate and dispense.
 
@@ -163,7 +163,7 @@ This parameter always uses default motion behavior for touch tip. Use the [touch
 
 Liquid class definitions determine tip-touching behavior in liquid class complex commands like `transfer_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
 
-## Air gap {#air-gap-complex}
+## Air gap { #air-gap-complex }
 
 The `air_gap` parameter controls how much air to aspirate and hold in the bottom of the tip when it contains liquid. The parameter's value is the amount of air to aspirate in µL.
 
@@ -264,7 +264,7 @@ Liquid class definitions determine mix behavior in liquid class complex commands
 !!! note
     `distribute()` ignores any value of `mix_after`. Mixing after dispensing would combine (and potentially contaminate) the remaining source liquid with liquid present at the destination.
 
-## Blow out {#blow-out-complex}
+## Blow out { #blow-out-complex }
 
 There are two parameters that control whether and where the pipette blows out liquid. The `blow_out` parameter accepts a Boolean value. When `True`, the pipette blows out remaining liquid when the tip is empty or only contains the disposal volume. The `blowout_location` parameter controls in which of three locations these blowout actions occur.
 

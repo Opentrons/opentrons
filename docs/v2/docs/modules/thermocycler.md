@@ -79,7 +79,7 @@ If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 
 
 *New in version 2.0*
 
-## Thermocycler profiles {#thermocycler-profiles-api}
+## Thermocycler profiles { #thermocycler-profiles-api }
 In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dictionaries. Each dictionary within the profile should have a `temperature` key, which specifies the temperature of the step, and either or both of `hold_time_seconds` and `hold_time_minutes`, which specify the duration of the step.
 
 For example, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:

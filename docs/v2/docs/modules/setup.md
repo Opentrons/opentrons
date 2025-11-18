@@ -12,7 +12,7 @@ Use [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.loa
     ```python
     from opentrons import protocol_api
 
-    requirements = {"robotType": "Flex", "apiLevel": "|apiLevel|"}
+    requirements = {"robotType": "Flex", "apiLevel": "{{ apiLevel }}"}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a Heater-Shaker Module GEN1 in deck slot D1.
@@ -29,7 +29,7 @@ Use [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.loa
     ```python
     from opentrons import protocol_api
 
-    metadata = {"apiLevel": "|apiLevel|"}
+    metadata = {"apiLevel": "{{ apiLevel }}"}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a Magnetic Module GEN2 in deck slot 1.
