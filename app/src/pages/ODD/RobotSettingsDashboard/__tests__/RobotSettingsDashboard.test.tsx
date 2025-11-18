@@ -188,7 +188,7 @@ describe('RobotSettingsDashboard', () => {
   it('should render disable stacker sensors copy, and calls toggleSensors', () => {
     render()
     screen.getByText(
-      'Disable Stacker sensors for labware detection in z-axis and x-axis'
+      'Disable Stacker sensors for Labware Detection'
     )
 
     const toggle = screen.getByTestId(
