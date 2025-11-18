@@ -110,8 +110,8 @@ export interface FlexStackerModuleState {
   maxPoolCount: number
   latchOpen: boolean | null
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
-  shuttlePosition: 'home' | 'retrieved' | 'stored'
-  labwareIdsInStacker: string[] | null
+  labwareInHopper: string[] | null
+  labwareInShuttle: string | null
 }
 
 export type ModuleState =

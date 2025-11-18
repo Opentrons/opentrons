@@ -61,7 +61,7 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareIdsInStacker).toEqual(['labware2', 'labware3'])
+    expect(moduleState?.labwareInHopper).toEqual(['labware2', 'labware3'])
   })
 
   it('should remove all items from the stored stacker list if count is null', () => {
@@ -78,7 +78,7 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareIdsInStacker).toBeNull()
+    expect(moduleState?.labwareInHopper).toBeNull()
   })
 
   it('should remove all items from the stored stacker list if count is null', () => {
@@ -95,7 +95,7 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareIdsInStacker).toBeNull()
+    expect(moduleState?.labwareInHopper).toBeNull()
   })
 })
 
@@ -129,7 +129,7 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareIdsInStacker).toHaveLength(4)
+    expect(moduleState?.labwareInHopper).toHaveLength(4)
   })
 
   it('should not add labware to the list if count is null', () => {
@@ -146,7 +146,7 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareIdsInStacker).toHaveLength(3)
+    expect(moduleState?.labwareInHopper).toHaveLength(3)
   })
 
   it('should not add labware to the list if count is greater than maxPoolCount', () => {
@@ -161,7 +161,7 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareIdsInStacker).toHaveLength(3)
+    expect(moduleState?.labwareInHopper).toHaveLength(3)
   })
 })
 
@@ -250,8 +250,8 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.shuttlePosition).toBe('retrieved')
-    expect(moduleState?.labwareIdsInStacker).toHaveLength(2)
+    expect(moduleState?.labwareInShuttle).toBe('retrieved')
+    expect(moduleState?.labwareInHopper).toHaveLength(2)
     expect(robotState.labware.tiprack1Id?.stack).toHaveLength(1)
   })
 })
@@ -302,7 +302,7 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.shuttlePosition).toBe('stored')
-    expect(moduleState?.labwareIdsInStacker).toHaveLength(4)
+    expect(moduleState?.labwareInShuttle).toBeNull()
+    expect(moduleState?.labwareInHopper).toHaveLength(4)
   })
 })

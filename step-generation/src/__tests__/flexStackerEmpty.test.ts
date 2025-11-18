@@ -46,8 +46,8 @@ describe('flexStackerEmpty', () => {
         maxPoolCount: 6,
         latchOpen: false,
         storedLabwareDetails: null,
-        shuttlePosition: 'home',
-        labwareIdsInStacker: null,
+        labwareInShuttle: null,
+        labwareInHopper: null,
       },
     }
     vi.mocked(flexStackerStateGetter).mockReturnValue(
