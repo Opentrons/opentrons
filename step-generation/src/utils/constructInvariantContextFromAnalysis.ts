@@ -29,23 +29,19 @@ export function constructInvariantContextFromAnalysis(
   const { labware, modules, pipettes, commands } = analysis
   const labwareDefinitions = getLabwareDefinitionsByURIForProtocol(commands)
 
-  const moduleEntities = modules.reduce<ModuleEntities>(
-    (acc, module) => {
-      const { id, model } = module
+  const moduleEntities = modules.reduce<ModuleEntities>((acc, module) => {
+    const { id, model } = module
 
-      return {
-        ...acc,
-        [id]: {
-          id,
-          type: getModuleType(model),
-          model,
-          pythonName: 'n/a',
-        }
-
-      }
-    },
-    {}
-  )
+    return {
+      ...acc,
+      [id]: {
+        id,
+        type: getModuleType(model),
+        model,
+        pythonName: 'n/a',
+      },
+    }
+  }, {})
 
   const labwareEntities = labware.reduce<LabwareEntities>(
     (acc, loadedLabware) => {
@@ -67,40 +63,37 @@ export function constructInvariantContextFromAnalysis(
     {}
   )
 
-  const pipetteEntities = pipettes.reduce<PipetteEntities>(
-    (acc, pipette) => {
-      const { id, pipetteName } = pipette
-      const spec = getPipetteSpecsV2(pipetteName)
-      const tiprackIdsAssosciatedWithPipette = commands.filter(
-        (command): command is PickUpTipRunTimeCommand =>
-          command.commandType === 'pickUpTip' && command.params.pipetteId === id
-      )
-      const matchingLabwareEntities = tiprackIdsAssosciatedWithPipette.map(
-        pickUpTipCommand => labwareEntities[pickUpTipCommand.params.labwareId]
-      )
-      const tiprackDefURIs = Array.from(
-        new Set(matchingLabwareEntities.map(entity => entity.labwareDefURI))
-      )
-      const tiprackLabwareDefs = Array.from(
-        new Set(matchingLabwareEntities.map(entity => entity.def))
-      )
-      if (spec == null) {
-        return acc
-      }
-
-      acc[id] = {
-        name: pipetteName,
-        id,
-        tiprackLabwareDef: tiprackLabwareDefs,
-        tiprackDefURI: tiprackDefURIs,
-        spec,
-        pythonName: 'n/a',
-      }
-
+  const pipetteEntities = pipettes.reduce<PipetteEntities>((acc, pipette) => {
+    const { id, pipetteName } = pipette
+    const spec = getPipetteSpecsV2(pipetteName)
+    const tiprackIdsAssosciatedWithPipette = commands.filter(
+      (command): command is PickUpTipRunTimeCommand =>
+        command.commandType === 'pickUpTip' && command.params.pipetteId === id
+    )
+    const matchingLabwareEntities = tiprackIdsAssosciatedWithPipette.map(
+      pickUpTipCommand => labwareEntities[pickUpTipCommand.params.labwareId]
+    )
+    const tiprackDefURIs = Array.from(
+      new Set(matchingLabwareEntities.map(entity => entity.labwareDefURI))
+    )
+    const tiprackLabwareDefs = Array.from(
+      new Set(matchingLabwareEntities.map(entity => entity.def))
+    )
+    if (spec == null) {
       return acc
-    },
-    {}
-  )
+    }
+
+    acc[id] = {
+      name: pipetteName,
+      id,
+      tiprackLabwareDef: tiprackLabwareDefs,
+      tiprackDefURI: tiprackDefURIs,
+      spec,
+      pythonName: 'n/a',
+    }
+
+    return acc
+  }, {})
   const otherEntities = commands.reduce(
     (
       acc: Omit<
