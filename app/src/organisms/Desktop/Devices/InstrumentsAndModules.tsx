@@ -11,7 +11,7 @@ import {
   LegacyStyledText,
   SIZE_3,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -124,14 +124,12 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
     >
-      <LegacyStyledText
-        as="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      <StyledText
+        desktopStyle="bodyLargeSemiBold"
         marginBottom={SPACING.spacing16}
-        id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}

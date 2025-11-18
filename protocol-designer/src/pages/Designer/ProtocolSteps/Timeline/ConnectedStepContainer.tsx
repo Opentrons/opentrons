@@ -59,6 +59,8 @@ export interface ConnectedStepContainerProps {
   isStepAfterError?: boolean
 }
 
+// todo(mm, 2025-11-14): I've made a mess of ConnectedStepInfo and ConnectedStepContainer.
+// We should try to either merge them, or clarify each one's responsibilities.
 export function ConnectedStepContainer(
   props: ConnectedStepContainerProps
 ): JSX.Element {

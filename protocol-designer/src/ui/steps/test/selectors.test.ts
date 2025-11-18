@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getMockMixStep, getMockMoveLiquidStep } from '../__fixtures__'
+import { START_TERMINAL_ITEM_ID } from '../../../steplist/types'
 import * as utils from '../../modules/utils'
 import {
   MULTI_STEP_SELECTION_TYPE,
@@ -218,6 +219,7 @@ describe('getActiveItem', () => {
       selected: {
         selectionType: MULTI_STEP_SELECTION_TYPE,
         ids: ['notTheseSteps', 'nope'],
+        lastSelected: 'nope',
       },
       hovered: {
         selectionType: SINGLE_STEP_SELECTION_TYPE,
@@ -234,6 +236,7 @@ describe('getActiveItem', () => {
       selected: {
         selectionType: MULTI_STEP_SELECTION_TYPE,
         ids: ['notTheseSteps', 'nope'],
+        lastSelected: 'nope',
       },
       hovered: null,
       expected: null,
@@ -255,19 +258,18 @@ describe('getActiveItem', () => {
         'should show the single-selected terminal item, if nothing is hovered',
       selected: {
         selectionType: TERMINAL_ITEM_SELECTION_TYPE,
-        id: 'someItem',
+        id: START_TERMINAL_ITEM_ID,
       },
       hovered: null,
       expected: {
         selectionType: TERMINAL_ITEM_SELECTION_TYPE,
-        id: 'someItem',
+        id: START_TERMINAL_ITEM_ID,
       },
     },
   ]
 
   testCases.forEach(({ title, selected, hovered, expected }) => {
     it(title, () => {
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       const result = getActiveItem.resultFunc(selected, hovered)
       expect(result).toEqual(expected)
     })
@@ -276,7 +278,6 @@ describe('getActiveItem', () => {
 
 describe('getMultiSelectLastSelected', () => {
   it('should return null if the selected item is a single step', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getMultiSelectLastSelected.resultFunc({
       selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: 'foo',
@@ -284,15 +285,13 @@ describe('getMultiSelectLastSelected', () => {
     expect(result).toEqual(null)
   })
   it('should return null if the selected item is a terminal item', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getMultiSelectLastSelected.resultFunc({
       selectionType: TERMINAL_ITEM_SELECTION_TYPE,
-      id: 'foo',
+      id: START_TERMINAL_ITEM_ID,
     })
     expect(result).toEqual(null)
   })
   it('should return the lastSelected step Id if the selected item is a multi-selection', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getMultiSelectLastSelected.resultFunc({
       selectionType: MULTI_STEP_SELECTION_TYPE,
       ids: ['foo', 'spam', 'bar'],
@@ -330,9 +329,8 @@ describe('_getSavedMultiSelectFieldValues', () => {
       },
     }
     expect(
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       _getSavedMultiSelectFieldValues.resultFunc(
-        savedStepForms,
+        savedStepForms as any,
         mockmultiSelectItemIds
       )
     ).toBe(null)
@@ -344,8 +342,7 @@ describe('_getSavedMultiSelectFieldValues', () => {
       ...getMockMixStep(),
     }
     expect(
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
-      _getSavedMultiSelectFieldValues.resultFunc(savedStepForms, [
+      _getSavedMultiSelectFieldValues.resultFunc(savedStepForms as any, [
         'move_liquid_step_id',
         'mix_step_id',
       ])
@@ -355,9 +352,8 @@ describe('_getSavedMultiSelectFieldValues', () => {
   describe('moveLiquid: when fields are NOT indeterminate', () => {
     it('should return the fields with the indeterminate boolean', () => {
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
         _getSavedMultiSelectFieldValues.resultFunc(
-          mockSavedStepForms,
+          mockSavedStepForms as any,
           mockmultiSelectItemIds
         )
       ).toEqual({
@@ -769,7 +765,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
     })
     it('should return the fields with the indeterminate boolean', () => {
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
         _getSavedMultiSelectFieldValues.resultFunc(
           mockSavedStepFormsIndeterminate,
           mockmultiSelectItemIds
@@ -1126,7 +1121,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
     })
     it('should return the fields with the indeterminate boolean', () => {
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
         _getSavedMultiSelectFieldValues.resultFunc(
           mockMixSavedStepForms,
           mockMixMultiSelectItemIds
@@ -1247,7 +1241,6 @@ describe('_getSavedMultiSelectFieldValues', () => {
     })
     it('should return the fields with the indeterminate boolean', () => {
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
         _getSavedMultiSelectFieldValues.resultFunc(
           mockMixSavedStepFormsIndeterminate,
           mockMixMultiSelectItemIds
@@ -1335,7 +1328,6 @@ describe('getMultiSelectFieldValues', () => {
   it('should pass through saved changes when there are no saved', () => {
     const savedValues = { a: { value: 'blah', isIndeterminate: true } }
     const changes = {}
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
     expect(result).toEqual(savedValues)
   })
@@ -1343,7 +1335,6 @@ describe('getMultiSelectFieldValues', () => {
   it('should apply unsaved changes to override saved changes', () => {
     const savedValues = { a: { value: 'blah', isIndeterminate: true } }
     const changes = { a: '123' }
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
     expect(result).toEqual({ a: { value: '123', isIndeterminate: false } })
   })
@@ -1351,7 +1342,6 @@ describe('getMultiSelectFieldValues', () => {
   it('should return null when savedValues is null (signifying invalid combination of stepTypes)', () => {
     const savedValues = null
     const changes = { a: '123' }
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getMultiSelectFieldValues.resultFunc(savedValues, changes)
     expect(result).toBe(null)
   })
@@ -1377,7 +1367,6 @@ describe('getMultiSelectDisabledFields', () => {
     })
     it('should return an empty object when no fields are different and path is single', () => {
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
         getMultiSelectDisabledFields.resultFunc(
           mockSavedStepForms,
           mockmultiSelectItemIds
@@ -1398,7 +1387,6 @@ describe('getMultiSelectDisabledFields', () => {
       })
       it('should return fields being disabled with associated reasons', () => {
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1434,7 +1422,6 @@ describe('getMultiSelectDisabledFields', () => {
         const aspirateLabwareDifferentText = 'Incompatible with current path'
 
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1464,7 +1451,6 @@ describe('getMultiSelectDisabledFields', () => {
         const dispenseLabwareDifferentText = 'Incompatible with current path'
 
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1492,7 +1478,6 @@ describe('getMultiSelectDisabledFields', () => {
       })
       it('should return fields being disabled with associated reasons', () => {
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1517,7 +1502,6 @@ describe('getMultiSelectDisabledFields', () => {
       })
       it('should return fields being disabled with associated reasons', () => {
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1545,7 +1529,6 @@ describe('getMultiSelectDisabledFields', () => {
       })
       it('should return aspirate mix being disabled for both reasons', () => {
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1573,7 +1556,6 @@ describe('getMultiSelectDisabledFields', () => {
       })
       it('should return aspirate mix being disabled for both reasons', () => {
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1605,7 +1587,6 @@ describe('getMultiSelectDisabledFields', () => {
     })
     it('should return an empty object when no fields are different', () => {
       expect(
-        // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
         getMultiSelectDisabledFields.resultFunc(
           mockSavedStepForms,
           mockmultiSelectItemIds
@@ -1625,7 +1606,6 @@ describe('getMultiSelectDisabledFields', () => {
       })
       it('should return flow rate fields being disabled with associated reasons', () => {
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1651,7 +1631,6 @@ describe('getMultiSelectDisabledFields', () => {
         const labwareDifferentText = 'Incompatible with current path'
 
         expect(
-          // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
           getMultiSelectDisabledFields.resultFunc(
             savedStepForms,
             mockmultiSelectItemIds
@@ -1677,7 +1656,6 @@ describe('getMultiSelectDisabledFields', () => {
 
     const multiSelectItemIds = ['move_liquid_step_id', 'mix_step_id']
     expect(
-      // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
       getMultiSelectDisabledFields.resultFunc(
         savedStepForms,
         multiSelectItemIds
@@ -1695,22 +1673,19 @@ describe('getCountPerStepType', () => {
       c: { stepType: 'mix' }, // not selected! 'mix' should not show in result
       d: { stepType: 'moveLiquid' },
     }
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getCountPerStepType.resultFunc(
       multiSelectItemIds,
-      savedStepForms
+      savedStepForms as any
     )
     expect(result).toEqual({ magnet: 2, moveLiquid: 1 })
   })
 
   it('should return an empty object when not in multi-select mode', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getCountPerStepType.resultFunc(null, {})
     expect(result).toEqual({})
   })
 
   it('should return an empty object when no steps are multi-selected', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getCountPerStepType.resultFunc([], {})
     expect(result).toEqual({})
   })
@@ -1718,7 +1693,6 @@ describe('getCountPerStepType', () => {
 
 describe('getBatchEditSelectedStepTypes', () => {
   it('should return a sorted array of selected step types that are in the multi-selection', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getBatchEditSelectedStepTypes.resultFunc({
       magnet: 1,
       mix: 3,
@@ -1728,7 +1702,6 @@ describe('getBatchEditSelectedStepTypes', () => {
   })
 
   it('should return an empty array when no steps are multi-selected', () => {
-    // @ts-expect-error(sa, 2021-6-15): resultFunc not part of Selector type
     const result = getBatchEditSelectedStepTypes.resultFunc({})
     expect(result).toEqual([])
   })

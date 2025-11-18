@@ -101,7 +101,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
             >
               {showCommandSummary ? null : (
                 <StyledText desktopStyle="captionRegular" color={COLORS.white}>
-                  {labwareEntitiesExtended[id].nickName ??
+                  {labwareEntitiesExtended[id]?.nickName ??
                     labwareEntitiesExtended[id].def.metadata.displayName}
                 </StyledText>
               )}

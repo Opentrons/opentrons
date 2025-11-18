@@ -25,10 +25,11 @@ import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 2000
 const INITIAL_WIDTH_PX = 230
-const MIN_CENTER_WIDTH_PX = 200
-const MIN_COLUMN_WIDTH_PX = 100
-const MAX_COLUMN_WIDTH_PX = 400
-const CONTAINER_PADDING_PX = 32 // 16px * 2
+const MIN_CENTER_WIDTH_PX = 148
+const MIN_LEFT_COLUMN_WIDTH_PX = 148
+const MIN_RIGHT_COLUMN_WIDTH_PX = 172
+const MAX_COLUMN_WIDTH_PX = 600
+const GUTTER_WIDTH_PX = 16 // left and right gutters
 
 type ResizableColumn = 'left' | 'right'
 
@@ -38,6 +39,7 @@ interface VisualizerContainerProps {
   protocolKey: string
   srcFileNames: string[]
 }
+
 export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
@@ -49,10 +51,12 @@ export function VisualizerContainer(
   const [milliSecondsPerFrame, setMilliSecondsPerFrame] = useState<number>(
     INITIAL_MILLISECONDS_PER_FRAME
   )
+  const [isDragging, setIsDragging] = useState<boolean>(false)
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
   )
+
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
   const [rightWidth, setRightWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -62,6 +66,7 @@ export function VisualizerContainer(
   const startWidthRef = useRef<number>(0)
   const leftWidthRef = useRef<number>(leftWidth)
   const rightWidthRef = useRef<number>(rightWidth)
+
   useEffect(() => {
     leftWidthRef.current = leftWidth
   }, [leftWidth])
@@ -153,6 +158,7 @@ export function VisualizerContainer(
     column: ResizableColumn
   ): void => {
     e.preventDefault()
+    setIsDragging(true)
     resizingRef.current = column
     startXRef.current = e.clientX
     startWidthRef.current = column === 'left' ? leftWidth : rightWidth
@@ -173,10 +179,10 @@ export function VisualizerContainer(
       const newWidth = startWidthRef.current + deltaX
       // calculate the remaining width of the center column
       const centerWidth =
-        containerWidth - newWidth - rightWidthRef.current - CONTAINER_PADDING_PX
+        containerWidth - newWidth - rightWidthRef.current - 2 * GUTTER_WIDTH_PX
 
       if (
-        newWidth >= MIN_COLUMN_WIDTH_PX &&
+        newWidth >= MIN_LEFT_COLUMN_WIDTH_PX &&
         newWidth <= MAX_COLUMN_WIDTH_PX &&
         centerWidth >= MIN_CENTER_WIDTH_PX
       ) {
@@ -185,10 +191,10 @@ export function VisualizerContainer(
     } else if (resizingRef.current === 'right') {
       const newWidth = startWidthRef.current - deltaX
       const centerWidth =
-        containerWidth - leftWidthRef.current - newWidth - CONTAINER_PADDING_PX
+        containerWidth - leftWidthRef.current - newWidth - 2 * GUTTER_WIDTH_PX
 
       if (
-        newWidth >= MIN_COLUMN_WIDTH_PX &&
+        newWidth >= MIN_RIGHT_COLUMN_WIDTH_PX &&
         newWidth <= MAX_COLUMN_WIDTH_PX &&
         centerWidth >= MIN_CENTER_WIDTH_PX
       ) {
@@ -197,7 +203,8 @@ export function VisualizerContainer(
     }
   }, [])
 
-  const handleMouseUp = useCallback(() => {
+  const handleMouseUp = useCallback((): void => {
+    setIsDragging(false)
     resizingRef.current = null
     window.removeEventListener('mousemove', handleMouseMove)
     window.removeEventListener('mouseup', handleMouseUp)
@@ -232,16 +239,14 @@ export function VisualizerContainer(
             setIsPlaying(false)
           }}
         />
-        {/* Left column resizer */}
-        <div
-          className={`${styles.resizer} ${styles.resizer_right}`}
-          onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
-            handleMouseDown(e, 'left')
-          }}
-        />
       </div>
-
-      {/* Center Column is not resizable the width will be changed by the left and right column */}
+      {/* Gutter between left & center */}
+      <div
+        className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
+        onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
+          handleMouseDown(e, 'left')
+        }}
+      />
       <div className={styles.center_column}>
         <Controls
           protocolName={protocolDisplayName}
@@ -272,7 +277,6 @@ export function VisualizerContainer(
           invariantContext={invariantContext}
           robotState={robotState}
           robotType={robotType ?? FLEX_ROBOT_TYPE}
-          selectedSlot={selectedSlot}
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
             if (selectedRunTimeCommand != null && selectedSlot != null) {
@@ -292,15 +296,15 @@ export function VisualizerContainer(
           selectedRunTimeCommand={selectedRunTimeCommand}
         />
       </div>
+      {/* Gutter between center & right */}
+      <div
+        className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
+        onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
+          handleMouseDown(e, 'right')
+        }}
+      />
       {/* Right Column is resizable */}
       <div className={styles.right_column} style={{ width: `${rightWidth}px` }}>
-        {/* Right column resizer */}
-        <div
-          className={`${styles.resizer} ${styles.resizer_left}`}
-          onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
-            handleMouseDown(e, 'right')
-          }}
-        />
         {selectedRunTimeCommand != null ? (
           <StepDetailContainer
             protocolKey={protocolKey}
