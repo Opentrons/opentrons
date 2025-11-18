@@ -71,7 +71,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
               values={{
                 slot: mount === 'left' ? '3' : '1',
                 side: pipetteModelName === 'p20_mutli_gen2' ? 'short' : 'tall',
-                direction: mount,
+                direction: 'right',
               }}
               components={{
                 strong: (
