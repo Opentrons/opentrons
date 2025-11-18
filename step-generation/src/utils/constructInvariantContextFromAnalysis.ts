@@ -29,43 +29,46 @@ export function constructInvariantContextFromAnalysis(
   const { labware, modules, pipettes, commands } = analysis
   const labwareDefinitions = getLabwareDefinitionsByURIForProtocol(commands)
 
-  const moduleEntities: ModuleEntities = modules.reduce(
-    (acc: ModuleEntities, module) => {
+  const moduleEntities = modules.reduce<ModuleEntities>(
+    (acc, module) => {
       const { id, model } = module
-      acc[id] = {
-        id,
-        type: getModuleType(model),
-        model,
-        pythonName: 'n/a',
-      }
 
-      return acc
+      return {
+        ...acc,
+        [id]: {
+          id,
+          type: getModuleType(model),
+          model,
+          pythonName: 'n/a',
+        }
+
+      }
     },
     {}
   )
 
-  const labwareEntities: LabwareEntities = labware.reduce(
-    (acc: LabwareEntities, loadedLabware) => {
+  const labwareEntities = labware.reduce<LabwareEntities>(
+    (acc, loadedLabware) => {
       const { id, definitionUri } = loadedLabware
       const def = labwareDefinitions[definitionUri]
       if (def.schemaVersion === 3) {
         return acc
       }
-
-      acc[id] = {
-        id,
-        labwareDefURI: definitionUri,
-        def,
-        pythonName: 'n/a',
+      return {
+        ...acc,
+        [id]: {
+          id,
+          labwareDefURI: definitionUri,
+          def,
+          pythonName: 'n/a',
+        },
       }
-
-      return acc
     },
     {}
   )
 
-  const pipetteEntities: PipetteEntities = pipettes.reduce(
-    (acc: PipetteEntities, pipette) => {
+  const pipetteEntities = pipettes.reduce<PipetteEntities>(
+    (acc, pipette) => {
       const { id, pipetteName } = pipette
       const spec = getPipetteSpecsV2(pipetteName)
       const tiprackIdsAssosciatedWithPipette = commands.filter(
