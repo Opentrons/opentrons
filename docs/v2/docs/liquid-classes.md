@@ -6,7 +6,7 @@ Accounting for properties of liquids in your protocol can increase pipetting acc
 
 This page covers the properties of Opentrons-verified liquid classes, how to use a verified liquid class in your protocol, and how to customize a liquid class.
 
-## Opentrons-verified Liquid Classes
+## Opentrons-verified liquid classes
 
 Opentrons-verified liquid classes are based on the properties of common liquids: water, ethanol, and glycerol.
 
@@ -18,7 +18,7 @@ Opentrons-verified liquid classes are based on the properties of common liquids:
 
 Use an Opentrons-verified liquid class in your transfers to automatically apply optimized behavior. For example, choosing the `glycerol_50` liquid class changes properties, like flow rate, to accurately transfer viscous liquid.
 
-## Liquid Class Properties
+## Liquid class properties
 
 When you select a liquid class to use in transfers on the Flex, properties like submerge speed, flow rate, touch tip, and air gap are automatically applied. These changes might help prevent splashing or dripping of a volatile liquid, or reduce air bubbles forming in a viscous liquid.
 
@@ -155,7 +155,7 @@ Each Opentrons-verified liquid class is defined by a set of properties:
 
 A [liquid class definition](liquid-class-definitions.md) specifies values for each property. When your Flex protocol includes a liquid class, these property values automatically define transfer behavior. For example, if you use `transfer_with_liquid_class()` to transfer a viscous liquid, the pipette submerges into the liquid and aspirates more slowly to prevent air bubbles from forming.
 
-## Using Liquid Classes
+## Using liquid classes
 
 You'll use a [liquid class definition](liquid-class-definitions.md) in your protocol to optimize transfer behavior based on liquid properties, along with your chosen Flex pipettes and tips.
 
@@ -238,7 +238,7 @@ In many cases, the liquid class definition represents fine-tuned changes optimiz
 
 Not all transfer behavior is easily visible. See [Liquid Class Definitions](liquid-class-definitions.md) for a full list of changes based on liquid class, pipette, and tip combination. For more detail on individual transfer settings, see [Liquid Control](building-block-commands/liquids.md).
 
-## Customizing Liquid Classes
+## Customizing liquid classes
 
 You can create your own liquid class to customize transfer behavior for any liquid in a Flex protocol. To make changes, you can edit individual properties of an existing liquid class, or add properties to a new liquid class.
 
@@ -272,7 +272,7 @@ Then, complete your transfers with the modified `custom_water` liquid class.
 
 All Opentrons-verified liquid classes position the pipette relative to the well. To customize your liquid class to use [meniscus-relative](robot-position.md#meniscus) locations, set the `positionReference` to `"liquid-meniscus"` for actions like an aspirate or dispense.
 
-## Defining New Liquid Classes
+## Defining new liquid classes
 
 You can also create a new liquid class for your Flex protocols. Instead of using an Opentrons-verified liquid class, you'll start from scratch, providing a value for every required property in your liquid class.
 

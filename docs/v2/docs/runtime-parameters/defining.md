@@ -85,7 +85,7 @@ Depending on the [type of parameter][types-of-parameters], you'll need to specif
     </tbody>
 </table>
 
-## The `add_parameters()` Function
+## The `add_parameters()` function
 
 All parameter definitions are contained in a Python function, which must be named `add_parameters` and takes a single argument. Define `add_parameters()` before the `run()` function that contains protocol commands.
 
@@ -96,13 +96,13 @@ def add_parameters(parameters: protocol_api.ParameterContext):
 ```
 Within this function definition, call methods on `parameters` to define parameters. Each type of parameter has its own method.
 
-## Types of Parameters
+## Types of parameters
 
 The API supports four types of parameters that correspond to Python built-in types: Boolean ([`bool`](https://docs.python.org/3/library/functions.html#bool)), integer ([`int`](https://docs.python.org/3/library/functions.html#int)), floating point number ([`float`](https://docs.python.org/3/library/functions.html#float)), and string ([`str`](https://docs.python.org/3/library/stdtypes.html#str)). It is not possible to mix types within a single parameter.
 
 Starting in version 2.20, the API supports CSV files as parameters. All data contained in CSV parameters, including numeric data, is initially interpreted as strings. See [Manipulating CSV Data][manipulating-csv-data] for more information.
 
-### Boolean Parameters
+### Boolean parameters
 Boolean parameters are `True` or `False` only.
 ```python
 parameters.add_bool(
@@ -117,7 +117,7 @@ During run setup, the technician can toggle between the two values. In the Opent
 
 *New in version 2.18.*
 
-### Integer Parameters
+### Integer parameters
 Integer parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't create an open-ended prompt that accepts any integer.
 
 To specify a range, include `minimum` and `maximum`:
@@ -154,7 +154,7 @@ During run setup, the technician can choose from a menu of the provided choices.
 
 *New in version 2.18.*
 
-### Float Parameters
+### Float parameters
 Float parameters either accept a range of numbers or a list of numbers. You must specify one or the other; you can't create an open-ended prompt that accepts any floating point number.
 
 Specifying a range or list is done exactly the same as in the integer examples above. The only difference is that all values must be floating point numbers.
@@ -175,7 +175,7 @@ parameters.add_float(
 
 *New in version 2.18.*
 
-### String Parameters
+### String parameters
 String parameters only accept a list of values. You can't currently prompt for free text entry of a string value.
 
 To specify a list of strings, include `choices`. Each choice is a dictionary with entries for display name and value. Only the display name will appear during run setup.
@@ -198,7 +198,7 @@ During run setup, the technician can choose from a menu of the provided choices.
 
 *New in version 2.18.*
 
-### CSV Parameters
+### CSV parameters
 CSV parameters accept any valid comma-separated file. You don't need to specify the format of the data. Due to this flexibility, CSV parameters do not have default values. Separately provide standard operating procedures or template files to the scientists and technicians who will create the tabular data your protocol relies on.
 
 Briefly describe the purpose of your CSV parameter when defining it.

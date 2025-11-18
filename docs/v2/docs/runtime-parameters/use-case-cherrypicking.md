@@ -52,7 +52,7 @@ def run(protocol):
 ```
 Now `well_data` is a list with four elements, one for each row in the file. We'll use the rows in a `for` loop later in the protocol, when it's time to transfer liquid.
 
-## Loading Source Labware
+## Loading source labware
 
 We'll use the data from the `source slot` column as part of loading the source labware. Let's assume that we always use Opentrons Tough PCR plates for both source and destination plates. Then we need to determine the locations for loading source plates from the first column of the CSV. This will have three steps:
 
@@ -133,7 +133,7 @@ def run(protocol: protocol_api.ProtocolContext):
         )
 ```
 
-## Picking the Cherries
+## Picking the cherries
 
 Now it's time to transfer liquid based on the data in each row of the CSV. 
 

@@ -9,7 +9,7 @@ This page describes the accepted values and behavior of each parameter for diffe
 
 The API reference entries for [`InstrumentContext.transfer()`][opentrons.protocol_api.InstrumentContext.transfer] and [`InstrumentContext.transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] also list the available parameters and have more information on their implementation as keyword arguments.
 
-## Tip Handling
+## Tip handling
 
 The `new_tip` parameter controls if and when complex commands pick up new tips from the pipette's tip racks. There are five possible values:
 
@@ -23,7 +23,7 @@ The `new_tip` parameter controls if and when complex commands pick up new tips f
 
 `"once"` is the default behavior for all complex commands.
 
-### Tip Handling Requirements
+### Tip handling requirements
 
 `"once"` and `"always"` require that the pipette has an [associated tip rack][adding-tip-racks], or the API will raise an error (because it doesn't know where to pick up a tip from). If the pipette already has a tip attached, the API will also raise an error when it tries to pick up a tip.
 
@@ -39,7 +39,7 @@ pipette.transfer(
 
 Conversely, `"never"` requires that the pipette has picked up a tip, or the API will raise an error (because it will attempt to aspirate without a tip attached).
 
-### Avoiding Cross-Contamination
+### Avoiding cross-contamination
 
 One reason to set `new_tip="always"` is to avoid cross-contamination between wells. However, you should always do a dry run of your protocol to test that the pipette is picking up and dropping tips in the way that your application requires.
 
@@ -76,7 +76,7 @@ If this poses a contamination risk, you can work around it in a few ways:
 - [Customize your liquid class][customizing-liquid-classes] to change dispense heights or add touch tip behavior.
 - Use [building block commands](../building-block-commands/liquids.md) instead of complex commands.
 
-## Mix Before
+## Mix before
 
 The `mix_before` parameter controls mixing in source wells before each aspiration. Its value must be a [`tuple`](https://docs.python.org/3/library/stdtypes.html#tuple) with two numeric values. The first value is the number of repetitions, and the second value is the amount of liquid to mix in µL.
 
@@ -100,7 +100,7 @@ Liquid class definitions determine mix behavior in liquid class complex commands
 !!! note
     `consolidate()` ignores any value of `mix_before`. Mixing on the second and subsequent aspirations of a consolidate command would defeat its purpose: to aspirate multiple times in a row, from different wells, *before* dispensing.
 
-## Disposal Volume
+## Disposal volume
 
 The `disposal_volume` parameter controls how much extra liquid is aspirated as part of a `distribute()` command. Including a disposal volume can improve the accuracy of each dispense. The pipette blows out the disposal volume of liquid after dispensing. To skip aspirating and blowing out extra liquid, set `disposal_volume=0`.
 
@@ -137,7 +137,7 @@ Liquid class definitions automatically include a disposal volume for liquid clas
    
     `consolidate()` ignores `disposal_volume` completely.
 
-## Touch Tip {#touch-tip-complex}
+## Touch tip {#touch-tip-complex}
 
 The `touch_tip` parameter accepts a Boolean value. When `True`, a touch tip step occurs after every aspirate and dispense.
 
@@ -163,7 +163,7 @@ This parameter always uses default motion behavior for touch tip. Use the [touch
 
 Liquid class definitions determine tip-touching behavior in liquid class complex commands like `transfer_with_liquid_class()`. For more information, see the [Opentrons-verified liquid class definitions](../liquid-class-definitions.md).
 
-## Air Gap {#air-gap-complex}
+## Air gap {#air-gap-complex}
 
 The `air_gap` parameter controls how much air to aspirate and hold in the bottom of the tip when it contains liquid. The parameter's value is the amount of air to aspirate in µL.
 
@@ -242,7 +242,7 @@ Dispensing 170.0 uL into B1 of well plate on 2 at 92.86 uL/sec
 Dropping tip into A1 of Opentrons Fixed Trash on 12
 ```
 
-## Mix After
+## Mix after
 
 The `mix_after` parameter controls mixing in source wells after each dispense. Its value must be a [`tuple`](https://docs.python.org/3/library/stdtypes.html#tuple) with two numeric values. The first value is the number of repetitions, and the second value is the amount of liquid to mix in µL.
 
@@ -264,7 +264,7 @@ Liquid class definitions determine mix behavior in liquid class complex commands
 !!! note
     `distribute()` ignores any value of `mix_after`. Mixing after dispensing would combine (and potentially contaminate) the remaining source liquid with liquid present at the destination.
 
-## Blow Out {#blow-out-complex}
+## Blow out {#blow-out-complex}
 
 There are two parameters that control whether and where the pipette blows out liquid. The `blow_out` parameter accepts a Boolean value. When `True`, the pipette blows out remaining liquid when the tip is empty or only contains the disposal volume. The `blowout_location` parameter controls in which of three locations these blowout actions occur.
 
@@ -345,7 +345,7 @@ With `distribute()`, the pipette will still blow out if you only set `blowout_lo
     
     This only occurs when you aspirate and then perform a complex command with `new_tip="never"` and `blow_out=True`.
 
-## Trash Tips
+## Trash tips
 
 The `trash` parameter controls what the pipette does with tips at the end of complex commands.
 

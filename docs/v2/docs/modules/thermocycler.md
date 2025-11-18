@@ -14,7 +14,7 @@ plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
 ```
 *New in version 2.13*
 
-## Lid Control
+## Lid control
 
 The Thermocycler can control the position and temperature of its lid.
 
@@ -35,7 +35,7 @@ You can turn off the lid heater at any time with [`deactivate_lid()`][opentrons.
 
 *New in version 2.0*
 
-## Block Control
+## Block control
 
 The Thermocycler can control its block temperature, including holding at a temperature and adjusting for the volume of liquid held in its loaded plate.
 
@@ -48,7 +48,7 @@ If you don't specify any other parameters, the Thermocycler will hold this tempe
 
 *New in version 2.0*
 
-### Hold Time
+### Hold time
 You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. You can specify `hold_time_minutes`, `hold_time_seconds`, or both (they will be added together). For example, this will set the block to 4 °C for 4 minutes and 15 seconds:
 
 ```python
@@ -63,7 +63,7 @@ tc_mod.set_block_temperature(
 
 *New in version 2.0*
 
-### Block Max Volume
+### Block max volume
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the `block_max_volume` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.
 
 It is especially important to specify `block_max_volume` when holding at a temperature. For example, say you want to hold larger samples at a temperature for a short time:
@@ -79,7 +79,7 @@ If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 
 
 *New in version 2.0*
 
-## Thermocycler Profiles {#thermocycler-profiles-api}
+## Thermocycler profiles {#thermocycler-profiles-api}
 In addition to executing individual temperature commands, the Thermocycler can automatically cycle through a sequence of block temperatures to perform heat-sensitive reactions. These sequences are called *profiles*, which are defined in the Protocol API as lists of dictionaries. Each dictionary within the profile should have a `temperature` key, which specifies the temperature of the step, and either or both of `hold_time_seconds` and `hold_time_minutes`, which specify the duration of the step.
 
 For example, this profile commands the Thermocycler to reach 10 °C and hold for 30 seconds, and then to reach 60 °C and hold for 45 seconds:
@@ -119,7 +119,7 @@ However, this code would generate 60 lines in the protocol’s run log, while ex
 
 *New in version 2.0*
 
-## Auto-sealing Lids
+## Auto-sealing lids
 Starting in robot software version 8.2.0, you can use the Opentrons Tough PCR Auto-sealing Lid to reduce evaporation on the Thermocycler. The auto-sealing lids are designed for automated use with the Flex Gripper, although you can move them manually if needed. They also work with the Opentrons Flex Deck Riser adapter, which keeps lids away from the unsterilized deck and provides better access for the gripper.
 
 Use the following API load names for the auto-sealing lid and deck riser:

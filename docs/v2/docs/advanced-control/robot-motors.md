@@ -5,7 +5,7 @@ description: How to control individual robot components in a protocol using robo
 
 In a typical protocol, you use commands like [`transfer_with_liquid_class()`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class] or [`move_labware()`][opentrons.protocol_api.ProtocolContext.move_labware] to interact with and move hardware attached to the robot, like pipettes or the Flex Gripper. Robot motor control is an advanced feature that allows you to control individual robot components, like the gantry, pipette plunger, and gripper jaws. We'll take a look at robot motor commands in three categories: movement, gripper, and helper commands.
 
-## Movement Commands
+## Movement commands
 
 Movement commands provided by the [`RobotContext`][opentrons.protocol_api.RobotContext] class allow you to move individual robot motors to specific deck positions:
 
@@ -67,13 +67,13 @@ Robot motor control commands won't track changes to liquids, labware, and instru
 !!! warning
     As in the example above, be sure to home (or return to their previous position) any pipettes, the gantry, and other instruments that you’ve moved with a motor control command. Use caution to avoid collisions, especially when moving mounts with a pipette or Flex Gripper lowered towards the deck.
 
-## Gripper Commands
+## Gripper commands
 
 The [`open_gripper_jaw()`][opentrons.protocol_api.RobotContext.open_gripper_jaw] and [`close_gripper_jaw()`][opentrons.protocol_api.RobotContext.close_gripper_jaw] methods let you control the Flex Gripper jaws to handle custom labware or hardware on the deck.
 
 You can also control the Gripper while other commands run. For example, use a mixture of move and gripper commands to pick up labware while pipetting liquids.
 
-## Axis and Plunger Coordinates
+## Axis and plunger coordinates
 
 To move a robot axis, you'll need to provide a position in the form of an axis coordinate map. Helper commands return axis or plunger coordinates you can use in a movement command.
 

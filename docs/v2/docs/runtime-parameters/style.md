@@ -6,7 +6,7 @@ It's important to write clear names and descriptions when you [define parameters
 
 Adopting the advice of this guide will help make your protocols clear, consistent, and ultimately easy to use. It also aligns them with protocols in the [Opentrons Protocol Library](https://library.opentrons.com), which can help others access and replicate your science.
 
-## General Guidance
+## General guidance
 
 **Parameter names are nouns.** Parameters should be discrete enough that you can describe them in a single word or short noun phrase. `display_name` is limited to 30 characters, and you can add more context in the description. 
 
@@ -80,7 +80,7 @@ String choices may have an intrinsic ordering. If they don't, fall back to alpha
 | Liquid color | ✅ Red, Orange, Yellow, Green, Blue, Violet<br>❌ Blue, Green, Orange, Red, Violet, Yellow |
 | Tube brand | ✅ Eppendorf, Falcon, Generic, NEST<br>❌ Falcon, NEST, Eppendorf, Generic |
 
-## Type-Specific Guidance
+## Type-specific guidance
 
 ### Booleans
 The `True` value of a Boolean corresponds to the word *On* and the `False` value corresponds to the word *Off*.
@@ -89,7 +89,7 @@ The `True` value of a Boolean corresponds to the word *On* and the `False` value
 
 **When in doubt, clarify in the description.** If you feel like you need to add extra clarity to your Boolean choices, use the phrase "When on" or "When off" at the beginning of your description. For example, a parameter named "Dry run" could have the description "When on, skip protocol delays and return tips instead of trashing them."
 
-### Number Choices
+### Number choices
 **Don't repeat text in choices.** Rely on the name and description to indicate what the number refers to. It's OK to add units to the display names of numeric choices, because the `unit` attribute is ignored when you specify `choices`.
 
 | Parameter name | Parameter description |

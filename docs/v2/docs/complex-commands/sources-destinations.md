@@ -35,7 +35,7 @@ This time, the `glycerol_50` liquid class definition automatically applies trans
 
 This page covers the restrictions on sources and destinations for complex commands, their different patterns of aspirating and dispensing, and how to optimize them for different use cases.
 
-## Source and Destination Arguments
+## Source and destination arguments
 
 As noted above, each complex liquid handling command requires `source` and `dest` (destination) arguments to aspirate and dispense liquid. However, each method handles liquid sources and destinations differently. Understanding how complex commands work with source and destination wells is essential to using these methods effectively.
 
@@ -68,11 +68,11 @@ pipette.distribute(
 
 On the other hand, a `transfer()` command with the same arguments would aspirate from both A1 and A2. The next section examines the exact order of aspiration and dispensing for all six methods.
 
-## Transfer Patterns
+## Transfer patterns
 
 Each complex command uses a different pattern of aspiration and dispensing. In addition, when you provide multiple wells as both the source and destination for a `transfer()`, it maps the source list onto the destination list in a certain way.
 
-### Aspirating and Dispensing
+### Aspirating and dispensing
 
 `transfer()` and `transfer_with_liquid_class()` always alternate between aspirating and dispensing, regardless of how many wells are in the source and destination. Their overall pattern is:
 
@@ -122,7 +122,7 @@ In addition, all liquid class commands automatically include changes like flow r
 !!! note
     By default, all complex commands begin by picking up a tip and conclude by dropping a tip. In general, don't call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] just before a complex command, or the API will raise an error. You can override this behavior with the [tip handling complex parameter](parameters.md#tip-handling), by setting `new_tip="never"`. For liquid class commands, you can also override whether the pipette drops the last tip used in the command by setting `keep_last_tip` to `True` or `False`.
 
-### Many-to-Many
+### Many-to-many
 
 Both `transfer()` and `transfer_with_liquid_class()` let you specify both `source` and `dest` arguments that contain multiple wells. This section covers how these methods determine which wells to aspirate from and dispense to in these cases.
 
@@ -301,7 +301,7 @@ Here the repeat index `i` picks out:
 - The individual well in the first row, for the source.
 - The corresponding column, which is sliced to form the destination.
 
-### Optimizing Patterns
+### Optimizing patterns
 
 Choosing the right complex command optimizes gantry movement and helps save time in your protocol. For example, say you want to take liquid from a reservoir and put 50 µL in each well of the first row of a plate. You could use `transfer_with_liquid_class()`, like this:
 

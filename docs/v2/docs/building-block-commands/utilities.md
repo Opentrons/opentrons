@@ -5,7 +5,7 @@ description: Basic commands for working with robot utility features.
 
 With utility commands, you can control various robot functions such as pausing or delaying a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to use these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
-## Delay and Resume
+## Delay and resume
 
 Call the [`ProtocolContext.delay()`][opentrons.protocol_api.ProtocolContext.delay] method to insert a timed delay into your protocol. This method accepts time increments in seconds, minutes, or combinations of both. Your protocol resumes automatically after the specified time expires.
 
@@ -27,7 +27,7 @@ This example delays a protocol for 5 minutes and 10 seconds:
 protocol.delay(minutes=5, seconds=10)
 ```
 
-## Pause Until Resumed
+## Pause until resumed
 
 Call the [`ProtocolContext.pause()`][opentrons.protocol_api.ProtocolContext.pause] method to stop a protocol at a specific step. Unlike a delay, `pause()` does not restart your protocol automatically. To resume, you'll respond to a prompt on the touchscreen or in the Opentrons App. This method also lets you specify an optional message that provides on-screen or in-app instructions on how to proceed. This example inserts a pause and includes a brief message:
 
@@ -73,7 +73,7 @@ protocol.comment("Hello, world!")
 
 *New in version 2.0*
 
-## Rail Lights
+## Rail lights
 
 Call the [`ProtocolContext.set_rail_lights()`][opentrons.protocol_api.ProtocolContext.set_rail_lights] method to turn the robot's rail lights on or off during a protocol. This method accepts Boolean `True` (lights on) or `False` (lights off) arguments. Rail lights are off by default.
 
@@ -95,7 +95,7 @@ You can also check whether the rail lights are on or off in the protocol by usin
 
 *New in version 2.5*
 
-## OT-2 Door Safety Switch
+## OT-2 door safety switch
 
 Introduced with [robot software version](../versioning.md#api-and-robot-software-versions) 3.19, the safety switch feature prevents the OT-2, and your protocol, from running if the door is open. To operate properly, the front door and top window of your OT-2 must be closed. You can toggle the door safety switch on or off from **Robot Settings > Advanced > Usage Settings**.
 
