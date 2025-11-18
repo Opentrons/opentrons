@@ -652,7 +652,7 @@ export const getSetStoredLabware = (
         ).length
         const labwareEntity = labwareEntities[labwareOnModule[0]]
         const setStoredLabwareArgs = [
-          `\nloadName=${formatPyStr(labwareEntity.def.parameters.loadName)}`,
+          `loadName=${formatPyStr(labwareEntity.def.parameters.loadName)}`,
           `namespace=${formatPyStr(labwareEntity.def.namespace)}`,
           `version=${labwareEntity.def.version}`,
           `count=${labwareCount}`,
