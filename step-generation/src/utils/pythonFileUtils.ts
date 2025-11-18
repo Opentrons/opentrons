@@ -13,7 +13,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getLiquidClassName } from './liquidClassUtils'
-import { getLargestStackInSlot, getSlotInLocationStack } from './misc'
+import { getSlotInLocationStack } from './misc'
 import {
   CUSTOM_LABWARE_DICT_NAME,
   formatPyDict,
@@ -556,7 +556,6 @@ export function pythonDefRun(
     trashBinEntities,
   } = invariantContext
   const { modules, labware, pipettes } = robotState
-  console.log('robotStateTimeline: ', robotStateTimeline)
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
@@ -657,7 +656,10 @@ export const getSetStoredLabware = (
       }
     }
   })
-  return pythonSetStoredLabware.length > 0
-    ? `# Set Stored Labware:\n${pythonSetStoredLabware}`
+  //  filter any empty strings
+  const pythonLines = pythonSetStoredLabware.filter(Boolean)
+
+  return pythonLines.length > 0
+    ? `# Set Stored Labware:\n${pythonLines.join('\n').trimStart()}`
     : ''
 }

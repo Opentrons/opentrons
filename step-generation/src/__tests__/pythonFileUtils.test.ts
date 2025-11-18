@@ -464,8 +464,8 @@ well_plate_3 = protocol.load_labware_from_definition(
 
     expect(setStoredLabware).toBe(
       `# Set Stored Labware:
-  flex_stacker_1 = protocol.set_stored_labware(
-    loadName=fixture_96_plate,
+flex_stacker_1 = protocol.set_stored_labware(
+    loadName="fixture_96_plate",
     namespace="opentrons",
     version=1,
     count=1)`.trimStart()
