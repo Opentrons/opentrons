@@ -854,8 +854,8 @@ class Labware:
         """
         Set the labware's position offset.
 
-        The offset is an x, y, z vector in deck coordinates
-        (see [Position Relative to the Deck][position-relative-to-the-deck]).
+        An offset of `(x=0, y=0, z=0)` means the labware's uncalibrated position before
+        any offset from Labware Position Check is applied.
 
         How the motion system applies the offset depends on the API level of the protocol.
 
@@ -925,6 +925,9 @@ class Labware:
     @requires_version(2, 0)
     def calibrated_offset(self) -> Point:
         """The front-left-bottom corner of the labware, including its labware offset.
+
+        The offset is an x, y, z vector in deck coordinates
+        (see :ref:`protocol-api-deck-coords`).
 
         When running a protocol in the Opentrons App or on the touchscreen, Labware
         Position Check sets the labware offset.

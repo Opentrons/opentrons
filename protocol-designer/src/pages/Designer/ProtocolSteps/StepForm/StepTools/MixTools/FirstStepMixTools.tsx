@@ -20,23 +20,19 @@ import type { FieldPropsByName } from '../../types'
 interface FirstStepMixToolsProps {
   propsForFields: FieldPropsByName
   formData: FormData
-  enablePartialTip: boolean
   pipettes: PipetteEntities
 }
 
 export function FirstStepMixTools({
   propsForFields,
   formData,
-  enablePartialTip,
   pipettes,
 }: FirstStepMixToolsProps): JSX.Element {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
-  const is96Channel =
-    propsForFields.pipette.value != null &&
-    pipettes[String(propsForFields.pipette.value)].spec.channels === 96
-  const is8Channel =
-    propsForFields.pipette.value != null &&
-    pipettes[String(propsForFields.pipette.value)].spec.channels === 8
+  const channels =
+    propsForFields.pipette.value != null
+      ? pipettes[String(propsForFields.pipette.value)].spec.channels
+      : null
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -44,8 +40,7 @@ export function FirstStepMixTools({
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
-      {propsForFields.pipette.value != null &&
-      (is96Channel || (is8Channel && enablePartialTip)) ? (
+      {channels != null && channels !== 1 ? (
         <PartialTipField
           {...propsForFields.nozzles}
           pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}

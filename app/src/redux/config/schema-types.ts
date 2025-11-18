@@ -294,4 +294,11 @@ export type ConfigV27 = Omit<ConfigV26, 'version'> & {
   version: 27
 }
 
-export type Config = ConfigV27
+export type ConfigV28 = Omit<ConfigV27, 'version'> & {
+  version: 28
+  ui: ConfigV27['ui'] & {
+    minHeight: number
+  }
+}
+
+export type Config = ConfigV28

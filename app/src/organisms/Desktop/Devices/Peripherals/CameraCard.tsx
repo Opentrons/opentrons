@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import {
   Chip,
   Divider,
+  Flex,
+  Icon,
   MenuItem,
   OverflowBtn,
   StyledText,
@@ -97,15 +99,21 @@ export function CameraCard({
             >
               {t('on_deck')}
             </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('camera')}
-            </StyledText>
+            <div className={styles.card_photo_content_container}>
+              <Icon className={styles.icon_container} name="camera" />
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {isFlex ? t('branded:flex_camera') : t('ot2_camera')}
+              </StyledText>
+            </div>
           </div>
-          {isCameraEnabled ? (
-            <Chip type="success" hasIcon={false} text={t('enabled')} />
-          ) : (
-            <Chip type="neutral" hasIcon={false} text={t('disabled')} />
-          )}
+          <Flex width="fit-content">
+            <Chip
+              type={isCameraEnabled ? 'success' : 'neutral'}
+              hasIcon={false}
+              text={isCameraEnabled ? t('enabled') : t('disabled')}
+              chipSize="small"
+            />
+          </Flex>
         </div>
       </div>
       <div className={styles.card_overflow_btn}>

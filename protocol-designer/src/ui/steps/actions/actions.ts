@@ -281,22 +281,24 @@ export const selectAllSteps =
     getState: GetState
   ) => {
     const allStepIds = stepFormSelectors.getOrderedStepIds(getState())
-    const selectStepAction: SelectMultipleStepsAction = {
-      type: 'SELECT_MULTIPLE_STEPS',
-      payload: {
-        stepIds: allStepIds,
-        // @ts-expect-error(sa, 2021-6-15): find could return undefined, need to null check PipetteSpecsV2
-        lastSelected: last(allStepIds),
-      },
+    if (allStepIds.length > 0) {
+      const lastStepId = last(allStepIds)!
+      const selectStepAction: SelectMultipleStepsAction = {
+        type: 'SELECT_MULTIPLE_STEPS',
+        payload: {
+          stepIds: allStepIds,
+          lastSelected: lastStepId,
+        },
+      }
+      dispatch(selectStepAction)
+      // dispatch an analytics event to indicate all steps have been selected
+      // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
+      const selectAllStepsEvent: AnalyticsEvent = {
+        name: SELECT_ALL_STEPS_EVENT,
+        properties: {},
+      }
+      dispatch(analyticsEvent(selectAllStepsEvent))
     }
-    dispatch(selectStepAction)
-    // dispatch an analytics event to indicate all steps have been selected
-    // because there is no 'SELECT_ALL_STEPS' action that middleware can catch
-    const selectAllStepsEvent: AnalyticsEvent = {
-      name: SELECT_ALL_STEPS_EVENT,
-      properties: {},
-    }
-    dispatch(analyticsEvent(selectAllStepsEvent))
   }
 export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
   'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'

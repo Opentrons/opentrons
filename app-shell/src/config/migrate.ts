@@ -32,6 +32,7 @@ import type {
   ConfigV25,
   ConfigV26,
   ConfigV27,
+  ConfigV28,
 } from '@opentrons/app/src/redux/config/types'
 
 // format
@@ -39,7 +40,7 @@ import type {
 // any default values for later config versions are specified in the migration
 // functions for those version below
 
-const CONFIG_VERSION_LATEST = 27
+const CONFIG_VERSION_LATEST = 28
 
 export const DEFAULTS_V0: ConfigV0 = {
   version: 0,
@@ -465,6 +466,18 @@ const toVersion27 = (prevConfig: ConfigV26): ConfigV27 => {
   return nextConfig
 }
 
+const toVersion28 = (prevConfig: ConfigV27): ConfigV28 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 28 as const,
+    ui: {
+      ...prevConfig.ui,
+      minHeight: 600,
+    },
+  }
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prevConfig: ConfigV0) => ConfigV1,
   (prevConfig: ConfigV1) => ConfigV2,
@@ -493,6 +506,7 @@ const MIGRATIONS: [
   (prevConfig: ConfigV24) => ConfigV25,
   (prevConfig: ConfigV25) => ConfigV26,
   (prevConfig: ConfigV26) => ConfigV27,
+  (prevConfig: ConfigV27) => ConfigV28,
 ] = [
   toVersion1,
   toVersion2,
@@ -521,6 +535,7 @@ const MIGRATIONS: [
   toVersion25,
   toVersion26,
   toVersion27,
+  toVersion28,
 ]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
@@ -555,6 +570,7 @@ export function migrate(
     | ConfigV25
     | ConfigV26
     | ConfigV27
+    | ConfigV28
 ): Config {
   const prevVersion = prevConfig.version
   let result = prevConfig

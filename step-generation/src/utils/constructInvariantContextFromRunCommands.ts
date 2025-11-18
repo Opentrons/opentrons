@@ -201,7 +201,6 @@ export function constructInvariantContextFromRunCommands(
         }
 
         const wasteChuteEntities: WasteChuteEntities = {
-          ...acc.wasteChuteEntities,
           [id]: {
             pythonName: 'waste_chute',
             id,
