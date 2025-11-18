@@ -130,20 +130,20 @@ export const forFlexStackerRetrieve = (
       )
       return
     }
-    const retrievedLabware = moduleState?.labwareInHopper?.shift() ?? null
-    moduleState.labwareInShuttle = retrievedLabware
+    const labwareToRetrieve = moduleState?.labwareInHopper?.shift() ?? null
+    moduleState.labwareInShuttle = labwareToRetrieve
 
-    if (retrievedLabware == null) {
+    if (labwareToRetrieve == null) {
       console.error(
         'Cannot retrieve labware bc there is no labware in the stacker'
       )
+      return
     }
-    // make sure this is shuttle slot
     // create labware entity for retrieved labware
-    robotState.labware[retrievedLabware ?? ''] = {
-      ...robotState.labware[retrievedLabware ?? ''],
+    robotState.labware[labwareToRetrieve ?? ''] = {
+      ...robotState.labware[labwareToRetrieve ?? ''],
       stack:
-        robotState.labware[retrievedLabware ?? '']?.stack?.slice(0, -1) ?? [],
+        robotState.labware[labwareToRetrieve ?? '']?.stack?.slice(0, -1) ?? [],
     }
   }
 }
@@ -177,7 +177,6 @@ export const forFlexStackerStore = (
     // TODO: use the labware id on the module from the move labware command
     const newLabwareId = uuid()
     const moduleOnSlot = robotState.modules[moduleId].slot
-    // move labware should update the labware id on the shuttle
     const labwareToStore = Object.entries(robotState.labware).find(
       ([_, labware]) => labware.stack.includes(moduleOnSlot)
     )?.[0]

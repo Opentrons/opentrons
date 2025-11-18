@@ -295,7 +295,6 @@ export function getLoadLabware(
 
       let parentName: string
       let locationArg: string | undefined
-      let pythonFlexStackerSetStoredLabware: string | undefined
       if (onAdapter) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
@@ -325,9 +324,6 @@ export function getLoadLabware(
           `${pythonName} = ${parentName}.load_labware(\n` +
             `${indentPyLines(loadLabwareArgs)},\n` +
             `)`,
-          ...(pythonFlexStackerSetStoredLabware != null
-            ? [pythonFlexStackerSetStoredLabware]
-            : []),
         ]
       } else {
         // custom labware
