@@ -278,7 +278,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
 
   if (
     // We stop users from selecting the consolidate path if we can't fit > 1 chunk into
-    //  the tip, but older protocols can have consolidate selected and trigger this error
+    // the tip, but older protocols can have consolidate selected and trigger this error
     !multiWellHandling.isSupported ||
     numWellsToFitInTip == null ||
     numWellsToFitInTip === 1

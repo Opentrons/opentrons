@@ -300,7 +300,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
 
   if (
     // We stop users from selecting the distribute path if we can't fit > 1 chunk into
-    //  the tip, but older protocols can have distributed selected and trigger this error
+    // the tip, but older protocols can have distributed selected and trigger this error
     !multiWellHandling.isSupported ||
     numWellsToFitInTip == null ||
     numWellsToFitInTip === 1
