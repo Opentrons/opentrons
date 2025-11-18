@@ -1347,7 +1347,7 @@ dev = [
     { name = "wheel", specifier = "==0.37.1" },
 ]
 robot = [
-    { name = "jsonschema", specifier = "==4.21.1" },
+    { name = "jsonschema", specifier = "==4.17.3" },
     { name = "numpy", specifier = "==1.22.3" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "zipp", specifier = "==3.21.0" },

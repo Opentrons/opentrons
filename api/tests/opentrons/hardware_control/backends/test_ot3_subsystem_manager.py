@@ -77,9 +77,9 @@ async def _instant_update(
 
 def default_subidentifier_for(target: FirmwareTarget) -> int:
     if target in (NodeId.pipette_left, NodeId.pipette_left_bootloader):
-        return cast(int, PipetteName.p1000_single.value)
+        return PipetteName.p1000_single.value
     if target in (NodeId.pipette_right, NodeId.pipette_right_bootloader):
-        return cast(int, PipetteName.p50_multi.value)
+        return PipetteName.p50_multi.value
     return 0
 
 
