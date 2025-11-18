@@ -144,13 +144,10 @@ jobs:
           git checkout ${{ github.ref }}
       - name: Install UV
         uses: astral-sh/setup-uv@v7
+        # setup-uv automatically caches based on pyproject.toml and uv.lock files
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.10'
-      - name: Cache UV packages
-        uses: ./.github/actions/python/cache-uv
-        with:
-          lockfile-path: package-testing/uv.lock
       - name: Set up package-testing
         id: setup
         if: ${{ matrix.os != 'windows-2022' }}
