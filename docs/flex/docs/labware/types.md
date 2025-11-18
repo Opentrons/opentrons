@@ -59,7 +59,7 @@ Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in
 
 ### Tip sterility
 
-Sealed, unopened packages of Opentrons pipette tips are certified to be free of contaminants and sterilized based on ANSI/AAMI/ISO 11137 standards with irradiation at a Sterility Assurance Level (SAL) of 10<sup>-6</sup>. Each package of tips ships with a letter describing our test procedures and certifies that each lot of tips are free of common contaminants such as DNase/RNase, endotoxins (Pyrogens), human DNA, PCR inhibitors, and protease.
+Sealed, unopened packages of Opentrons pipette tips are certified to be free of contaminants. Tips are sterilized based on ANSI/AAMI/ISO 11137 standard with irradiation at a Sterility Assurance Level (SAL) of 10<sup>-6</sup>. Each package includes a letter describing our test procedures and certifies that every lot is free of common contaminants such as DNase/RNase, endotoxins (Pyrogens), human DNA, PCR inhibitors, and protease.
 
 ### Tip racks 
 
