@@ -50,8 +50,9 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isValidRunAgain: boolean
   isOtherRunCurrent: boolean
   isRobotOnWrongVersionOfSoftware: boolean
-  isClosingCurrentRun: boolean
   areCameraPreferencesConfirmed: boolean
+  isClosingCurrentRun: boolean
+  isCameraReadyToRun: boolean
 }
 
 // Returns ActionButton properties.
@@ -77,6 +78,7 @@ export function useActionButtonProperties({
   areCameraPreferencesConfirmed,
   isValidRunAgain,
   protocolRunHeaderRef,
+  isCameraReadyToRun,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -126,9 +128,6 @@ export function useActionButtonProperties({
   }
   const isSetupComplete = !missingSetupSteps || missingSetupSteps.length === 0
   const { makeSnackbar } = useToaster()
-  const isCameraReadyToRun =
-    missingSetupSteps.length === 0 ||
-    !missingSetupSteps.includes('camera_setup_step')
   const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
     robotName,
     runId,
@@ -138,7 +137,6 @@ export function useActionButtonProperties({
     isProtocolNotReady,
     isRobotOnWrongVersionOfSoftware,
     isClosingCurrentRun,
-    isCameraReadyToRun,
     makeHandleJumpToStep,
     runRecord,
     runStatus,
@@ -147,6 +145,7 @@ export function useActionButtonProperties({
     attachedModules,
     protocolRunControls,
     runHeaderModalContainerUtils,
+    isCameraReadyToRun,
   })
 
   if (isProtocolNotReady) {
@@ -170,7 +169,7 @@ export function useActionButtonProperties({
     buttonText =
       runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
     handleButtonClick = () => {
-      if (isDisabled) {
+      if (isDisabled && disabledReason) {
         makeSnackbar(disabledReason)
         return
       }

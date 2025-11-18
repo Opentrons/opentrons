@@ -33,7 +33,7 @@ interface UseActionButtonDisabledUtilsProps extends BaseActionButtonProps {
 }
 
 type UseActionButtonDisabledUtilsResult =
-  | { isDisabled: true; disabledReason: string }
+  | { isDisabled: true; disabledReason: string | null }
   | { isDisabled: false; disabledReason: null }
 
 // Manages the various reasons the ActionButton may be disabled, returning the disabled state and user-facing disabled
@@ -52,6 +52,7 @@ export function useActionBtnDisabledUtils(
     runId,
     isResetRunLoadingRef,
     isClosingCurrentRun,
+    isCameraReadyToRun,
   } = props
 
   const { isPlayRunActionLoading, isPauseRunActionLoading } =
@@ -82,6 +83,7 @@ export function useActionBtnDisabledUtils(
     isProtocolNotReady ||
     isFixtureMismatch ||
     isDisabledStatus(runStatus) ||
+    !isCameraReadyToRun ||
     isRobotOnWrongVersionOfSoftware ||
     (doorStatus.isDoorOpen &&
       runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
@@ -110,6 +112,7 @@ type UseDisabledReasonProps = UseActionButtonDisabledUtilsProps & {
   isModuleCalibrationComplete: boolean
   isMissingModules: boolean
   isCalibrationComplete: boolean
+  isCameraReadyToRun: boolean
 }
 
 // The user-facing disabled explanation for why the ActionButton is disabled, if any.
@@ -122,20 +125,18 @@ function useDisabledReason({
   runStatus,
   isResetRunLoading,
   isClosingCurrentRun,
-  isCameraReadyToRun,
   isMissingModules,
   isModuleCalibrationComplete,
   isCalibrationComplete,
-}: UseDisabledReasonProps): string {
+  isCameraReadyToRun,
+}: UseDisabledReasonProps): string | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  if (!isCameraReadyToRun) {
-    return t('enable_camera')
-  } else if (isCalibrationComplete) {
+  if (isCalibrationComplete) {
     return t('instrument_calibration_incomplete')
-  } else if (isModuleCalibrationComplete) {
-    return t('module_calibration_incomplete')
   } else if (isMissingModules) {
     return t('modules_missing')
+  } else if (isModuleCalibrationComplete) {
+    return t('module_calibration_incomplete')
   } else if (isFixtureMismatch) {
     return t('fixture_mismatch')
   } else if (isValidRunAgain) {
@@ -154,7 +155,9 @@ function useDisabledReason({
     return t('close_door')
   } else if (isClosingCurrentRun) {
     return t('shared:robot_is_busy')
+  } else if (!isCameraReadyToRun) {
+    return t('enable_camera')
   } else {
-    return t('run_cta_disabled')
+    return null
   }
 }

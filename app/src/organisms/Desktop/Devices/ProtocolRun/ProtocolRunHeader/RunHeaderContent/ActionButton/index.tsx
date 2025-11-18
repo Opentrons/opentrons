@@ -127,6 +127,7 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       isOtherRunCurrent,
       isRobotOnWrongVersionOfSoftware,
       areCameraPreferencesConfirmed,
+      isCameraReadyToRun,
       ...props,
     })
   return (
