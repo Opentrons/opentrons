@@ -73,5 +73,3 @@ export const getHeightOfLabwareStackFromDefinitions = (
   }
   return total_height + getSchema2Dimensions(upper_def).zDimension
 }
-// export const getModuleMaxRetrievableHeight = (model: ModuleModel): number =>
-//   getModuleDef(model).dimensions.maxStackerRetrievableHeight ?? 0
