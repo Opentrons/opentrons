@@ -117,12 +117,12 @@ class Location:
     A location to target as a motion.
 
     The location contains a [`Point`][opentrons.types.Point]and possibly an associated
-    [`Labware`][opentrons.protocol_api.labware.Labware] or 
+    [`Labware`][opentrons.protocol_api.labware.Labware] or
     [`Well`][opentrons.protocol_api.labware.Well] instance.
 
     It should rarely be constructed directly by the user; rather, it is the
-    return type of most [`Well`][opentrons.protocol_api.labware.Well] accessors like 
-    [`Well.top()`][opentrons.protocol_api.labware.Well.top] and is passed directly into 
+    return type of most [`Well`][opentrons.protocol_api.labware.Well] accessors like
+    [`Well.top()`][opentrons.protocol_api.labware.Well.top] and is passed directly into
     a method like `InstrumentContext.aspirate()`.
 
     !!! warning
@@ -203,10 +203,10 @@ class Location:
         ```python
             loc = Location(Point(1, 1, 1), None)
             new_loc = loc.move(Point(1, 1, 1))
-            
+
             # The new point is the old one plus the given offset.
             assert new_loc.point == Point(2, 2, 2)  # True
-            
+
             # The old point hasn't changed.
             assert loc.point == Point(1, 1, 1)  # True
         ```

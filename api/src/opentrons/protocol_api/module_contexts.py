@@ -699,7 +699,7 @@ class ThermocyclerContext(ModuleContext):
             block_max_volume: The greatest volume of liquid contained in any
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
-                
+
                 *Changed in version 2.27:* After API
                 version 2.27 it will attempt to use the liquid tracking of the
                 labware first and then fall back to the 25 if there is no
@@ -782,7 +782,7 @@ class ThermocyclerContext(ModuleContext):
     @publish(command=cmds.thermocycler_start_set_lid_temperature)
     @requires_version(2, 27)
     def start_set_lid_temperature(self, temperature: float) -> Task:
-        """Sets a target temperature to heat the Thermocycler Module's lid, in °C. Returns a :py:class:`Task` object that represents concurrent heating.
+        """Set the target temperature for the heated lid, in °C.
 
         Returns a task object that represents concurrent preheating.
         Pass the task object to [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
