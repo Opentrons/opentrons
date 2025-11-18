@@ -341,7 +341,7 @@ When used in a protocol, loops automate repetitive steps such as aspirating and 
             )
     ```
 
-Notice here how Python’s [`range`](https://docs.python.org/3/library/stdtypes.html#range) class (e.g., `range(8)`) determines how many times the code loops. Also, in Python, a range of numbers is exclusive of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
+Notice here how Python’s [`range`](https://docs.python.org/3/library/stdtypes.html#range) class (e.g., `range(8)`) determines how many times the code loops. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the Corning 96-well plate used here, this means well A1=0, B1=1, C1=2, and so on to the last well in the row, which is H1=7.
 
 ## Multiple Air Gaps
 
@@ -356,18 +356,22 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location="D1")
+            location="D1"
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_1000ul",
-            location="D2")
+            location="D2"
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location="D3")
+            location="D3"
+        )
         trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000", 
             mount="left",
-            tip_racks=[tiprack_1])
+            tip_racks=[tiprack_1]
+        )
     
         pipette.pick_up_tip()
     
@@ -390,13 +394,16 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location=1)
+            location=1
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
-            location=2)
+            location=2
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location=3)
+            location=3
+        )
         pipette = protocol.load_instrument(
             instrument_name="p300_single", 
             mount="left",
@@ -414,7 +421,7 @@ Opentrons electronic pipettes can do some things that a human cannot do with a p
         pipette.return_tip()
     ```
 
-Notice here how Python’s [`slice`](https://docs.python.org/3/library/functions.html#slice) functionality (in the code sample as `[:5]`) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is exclusive of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also the [Commands](tutorial.md#commands) section of the Tutorial.
+Notice here how Python’s [`slice`](https://docs.python.org/3/library/functions.html#slice) functionality (in the code sample as `[:5]`) lets us select the first five wells of the well plate only. Also, in Python, a range of numbers is *exclusive* of the end value and counting starts at 0, not 1. For the USA Scientific 12-well reservoir used here, this means well A1=0, A2=1, A3=2, and so on to the last well used, which is A5=4. See also the [Commands](tutorial.md#commands) section of the Tutorial.
 
 ## Dilution
 
@@ -429,23 +436,32 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location="D1")
+            location="D1"
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
-            location="D2")
+            location="D2"
+        )
         tiprack_2 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
-            location="D3")
+            location="D3"
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location="C1")
+            location="C1"
+        )
         trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="left",
-            tip_racks=[tiprack_1, tiprack_2])
+            tip_racks=[tiprack_1, tiprack_2]
+        )
         # Dispense diluent
-        pipette.distribute(50, reservoir["A12"], plate.wells())
+        pipette.distribute(
+            volume=50,
+            source=reservoir["A12"],
+            dest=plate.wells()
+        )
     
         # loop through each row
         for i in range(8):
@@ -454,12 +470,20 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             row = plate.rows()[i]
     
             # transfer 30 µL of source to first well in column
-            pipette.transfer(30, source, row[0], mix_after=(3, 25))
+            pipette.transfer(
+                volume=30, 
+                source=source,
+                dest=row[0],
+                mix_after=(3, 25)
+            )
     
             # dilute the sample down the column
             pipette.transfer(
-                30, row[:11], row[1:],
-                mix_after=(3, 25))
+                volume=30,
+                source=row[:11],
+                source=row[1:],
+                mix_after=(3, 25)
+            )
     ```
 
 === "OT-2"
@@ -471,22 +495,31 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location=1)
+            location=1
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
-            location=2)
+            location=2
+        )
         tiprack_2 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
-            location=3)
+            location=3
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location=4)
+            location=4
+        )
         pipette = protocol.load_instrument(
             instrument_name="p300_single",
             mount="left",
-            tip_racks=[tiprack_1, tiprack_2])
+            tip_racks=[tiprack_1, tiprack_2]
+        )
         # Dispense diluent
-        pipette.distribute(50, reservoir["A12"], plate.wells())
+        pipette.distribute(
+            volume=50,
+            source=reservoir["A12"],
+            dest=plate.wells()
+        )
     
         # loop through each row
         for i in range(8):
@@ -495,12 +528,20 @@ This protocol dispenses diluent to all wells of a Corning 96-well plate. Next, i
             row = plate.rows()[i]
     
             # transfer 30 µL of source to first well in column
-            pipette.transfer(30, source, row[0], mix_after=(3, 25))
+            pipette.transfer(
+                volume=30,
+                source=source,
+                dest=row[0],
+                mix_after=(3, 25)
+            )
     
             # dilute the sample down the column
             pipette.transfer(
-                30, row[:11], row[1:],
-                mix_after=(3, 25))
+                volume=30,
+                source=row[:11],
+                dest=row[1:],
+                mix_after=(3, 25)
+            )
     ```
 
 Notice here how the code sample loops through the rows and uses slicing to distribute the diluent. For information about these features, see the Loops and Air Gaps examples above. See also the [Commands](tutorial.md#commands) section of the Tutorial.
@@ -518,21 +559,26 @@ This protocol dispenses different volumes of liquids to a well plate and automat
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location="D1")
+            location="D1"
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
-            location="D2")
+            location="D2"
+        )
         tiprack_2 = protocol.load_labware(
             load_name="opentrons_flex_96_tiprack_200ul",
-            location="D3")
+            location="D3"
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location="C1")
+            location="C1"
+        )
         trash = protocol.load_trash_bin("A3")
         pipette = protocol.load_instrument(
             instrument_name="flex_1channel_1000",
             mount="right",
-        tip_racks=[tiprack_1, tiprack_2])
+            tip_racks=[tiprack_1, tiprack_2]
+        )
     
         # Volume amounts are for demonstration purposes only
         water_volumes = [
@@ -548,9 +594,13 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             73, 74, 75, 76, 77, 78, 79, 80,
             81, 82, 83, 84, 85, 86, 87, 88,
             89, 90, 91, 92, 93, 94, 95, 96
-            ]
+        ]
     
-        pipette.distribute(water_volumes, reservoir["A12"], plate.wells())
+        pipette.distribute(
+            volume=water_volumes,
+            source=reservoir["A12"],
+            dest=plate.wells()
+        )
     ```
 
 === "OT-2"
@@ -562,20 +612,25 @@ This protocol dispenses different volumes of liquids to a well plate and automat
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware(
             load_name="corning_96_wellplate_360ul_flat",
-            location=1)
+            location=1
+        )
         tiprack_1 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
-            location=2)
+            location=2
+        )
         tiprack_2 = protocol.load_labware(
             load_name="opentrons_96_tiprack_300ul",
-            location=3)
+            location=3
+        )
         reservoir = protocol.load_labware(
             load_name="usascientific_12_reservoir_22ml",
-            location=4)
+            location=4
+        )
         pipette = protocol.load_instrument(
             instrument_name="p300_single", 
             mount="right",
-            tip_racks=[tiprack_1, tiprack_2])
+            tip_racks=[tiprack_1, tiprack_2]
+        )
     
         # Volume amounts are for demonstration purposes only
         water_volumes = [
@@ -591,7 +646,11 @@ This protocol dispenses different volumes of liquids to a well plate and automat
             73, 74, 75, 76, 77, 78, 79, 80,
             81, 82, 83, 84, 85, 86, 87, 88,
             89, 90, 91, 92, 93, 94, 95, 96
-            ]
+        ]
     
-        pipette.distribute(water_volumes, reservoir["A12"], plate.wells())
+        pipette.distribute(
+            volume=water_volumes,
+            source=reservoir["A12"],
+            dest=plate.wells()
+        )
     ```
