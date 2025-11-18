@@ -32,7 +32,7 @@ describe('EnableErrorRecoveryMode', () => {
 
   it('should render text and toggle button', () => {
     render(props)
-    screen.getByText('Recovery mode')
+    screen.getByText('Recovery Mode')
     screen.getByText('Pause on protocol errors instead of canceling the run.')
     expect(
       screen.getByLabelText('enable_error_recovery_mode')
