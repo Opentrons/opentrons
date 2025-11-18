@@ -1,0 +1,78 @@
+name: 'UV Python Setup'
+description: 'Set up the environment for a UV-managed Python project'
+inputs:
+  project:
+    description: 'Which project (by subdirectory) to set up'
+    required: true
+  python-version:
+    description: "What Python version to use to create the project's virtual environment"
+    required: false
+    default: "false"
+  install-system-deps:
+    description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
+    required: false
+    default: 'true'
+  install-dev-deps:
+    description: 'Whether to install dev dependency group (--group dev)'
+    required: false
+    default: 'true'
+runs:
+  using: 'composite'
+  steps:
+    - shell: bash
+      if: inputs.install-system-deps == 'true'
+      run: |
+        if [[ "${OSTYPE}" =~ "linux" ]]; then
+          # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
+          sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsystemd-dev
+        fi
+    - shell: bash
+      run: npm install --global shx@0.3.3
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
+    - name: Install UV
+      uses: astral-sh/setup-uv@v7
+      # setup-uv automatically caches based on pyproject.toml and uv.lock files
+    - name: Setup Python Environment
+      id: setup-env
+      shell: bash
+      run: |
+        START_TIME=$(date +%s)
+        echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
+        echo "::notice::Using UV for dependency management"
+        # Add dev group if requested and if it exists in pyproject.toml
+        DEV_GROUP=""
+        if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
+          # Check if dev group exists in dependency-groups
+          if grep -q '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" && \
+             grep -A 20 '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" | grep -q '^dev ='; then
+            DEV_GROUP="--group dev"
+          else
+            echo "::notice::No 'dev' dependency group found, skipping dev dependencies"
+          fi
+        fi
+        if [ -f "${{ inputs.project }}/uv.lock" ]; then
+          # Use --frozen to ensure exact versions from lockfile
+          cd ${{ inputs.project }} && uv sync --frozen $DEV_GROUP
+          # Verify dev dependencies are installed if dev group was used
+          if [ -n "$DEV_GROUP" ]; then
+            echo "::notice::Verifying dev dependencies are installed..."
+            uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
+          fi
+        else
+          cd ${{ inputs.project }} && uv sync $DEV_GROUP
+          # Verify dev dependencies are installed if dev group was used
+          if [ -n "$DEV_GROUP" ]; then
+            echo "::notice::Verifying dev dependencies are installed..."
+            uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
+          fi
+        fi
+        END_TIME=$(date +%s)
+        DURATION=$((END_TIME - START_TIME))
+        echo "duration=$DURATION" >> $GITHUB_OUTPUT
+        echo "::notice::Setup completed in ${DURATION} seconds"
+

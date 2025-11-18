@@ -62,7 +62,7 @@ jobs:
         with:
           python-version: '3.10'
 
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
       - name: Lint with opentrons_hardware
@@ -104,7 +104,7 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
           python-version: ${{ matrix.python }}
@@ -215,7 +215,7 @@ jobs:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
           install-dev-deps: 'false'

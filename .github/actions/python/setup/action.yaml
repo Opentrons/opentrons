@@ -13,7 +13,7 @@ inputs:
     required: false
     default: 'true'
   install-dev-deps:
-    description: 'Whether to install dev optional dependencies (UV projects only: --group dev)'
+    description: 'Whether to install dev optional dependencies'
     required: false
     default: 'true'
 outputs:
@@ -41,70 +41,20 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
-    - name: Check project type
-      id: project-type
-      shell: bash
-      run: |
-        # Only api and shared-data use UV for now
-        if [ "${{ inputs.project }}" == "api" ] || [ "${{ inputs.project }}" == "shared-data" ]; then
-          echo "type=uv" >> $GITHUB_OUTPUT
-        elif [ -f "${{ inputs.project }}/Pipfile" ]; then
-          echo "type=pipenv" >> $GITHUB_OUTPUT
-        else
-          echo "type=make" >> $GITHUB_OUTPUT
-        fi
-    - name: Install pipenv and virtualenv (original behavior - always installed)
-      if: steps.project-type.outputs.type != 'uv'
+    - name: Install pipenv and virtualenv
       shell: bash
       run: |
         python -m pip install --upgrade pip
         python -m pip install --user pipenv==2023.12.1
         python -m pip install --user virtualenv==20.30.0
-    - name: Install UV
-      if: steps.project-type.outputs.type == 'uv'
-      uses: astral-sh/setup-uv@v7
-      # setup-uv automatically caches based on pyproject.toml and uv.lock files
     - name: Setup Python Environment
       id: setup-env
       shell: bash
       run: |
         START_TIME=$(date +%s)
         echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
-        # Use the project type determined earlier
-        PROJECT_TYPE="${{ steps.project-type.outputs.type }}"
-        if [ "$PROJECT_TYPE" == "uv" ]; then
-          echo "::notice::Using UV for dependency management"
-          # Add dev group if requested and if it exists in pyproject.toml
-          DEV_GROUP=""
-          if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
-            # Check if dev group exists in dependency-groups
-            if grep -q '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" && \
-               grep -A 20 '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" | grep -q '^dev ='; then
-              DEV_GROUP="--group dev"
-            else
-              echo "::notice::No 'dev' dependency group found, skipping dev dependencies"
-            fi
-          fi
-          if [ -f "${{ inputs.project }}/uv.lock" ]; then
-            # Use --frozen to ensure exact versions from lockfile
-            cd ${{ inputs.project }} && uv sync --frozen $DEV_GROUP
-            # Verify dev dependencies are installed if dev group was used
-            if [ -n "$DEV_GROUP" ]; then
-              echo "::notice::Verifying dev dependencies are installed..."
-              uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
-            fi
-          else
-            cd ${{ inputs.project }} && uv sync $DEV_GROUP
-            # Verify dev dependencies are installed if dev group was used
-            if [ -n "$DEV_GROUP" ]; then
-              echo "::notice::Verifying dev dependencies are installed..."
-              uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
-            fi
-          fi
-        else
-          # For pipenv or make projects, just call make setup
-          make -C ${{ inputs.project }} setup
-        fi
+        # For pipenv or make projects, just call make setup
+        make -C ${{ inputs.project }} setup
         END_TIME=$(date +%s)
         DURATION=$((END_TIME - START_TIME))
         echo "duration=$DURATION" >> $GITHUB_OUTPUT
