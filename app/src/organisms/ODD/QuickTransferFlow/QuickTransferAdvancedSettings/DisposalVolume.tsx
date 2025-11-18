@@ -14,6 +14,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
   getTipTypeFromTipRackDefinition,
   LOW_VOLUME_PIPETTES,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -65,7 +66,17 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
     if (typeof blowOut.location === 'string') {
       return blowOut.location
     }
-    return `trashBin:${blowOut.location.cutoutId}`
+    if (
+      'cutoutFixtureId' in blowOut.location &&
+      typeof blowOut.location.cutoutFixtureId === 'string' &&
+      WASTE_CHUTE_FIXTURES.includes(blowOut.location.cutoutFixtureId)
+    ) {
+      return `wasteChute:${blowOut.location.cutoutId}`
+    }
+    if ('cutoutId' in blowOut.location) {
+      return `trashBin:${blowOut.location.cutoutId}`
+    }
+    return ''
   }
 
   const [selectedBlowoutLocation, setSelectedBlowoutLocation] =
@@ -74,8 +85,9 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const fixtureLocationOptions = deckConfig.filter(
     cutoutConfig =>
-      WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId) ||
-      TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
+      (typeof cutoutConfig.cutoutFixtureId === 'string' &&
+        WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId)) ||
+      cutoutConfig.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
   )
 
   const trashBinCutoutId = fixtureLocationOptions.find(
@@ -90,16 +102,33 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
         }
       : undefined
 
+  const wasteChuteOptions = fixtureLocationOptions
+    .filter(
+      option =>
+        typeof option.cutoutFixtureId === 'string' &&
+        WASTE_CHUTE_FIXTURES.includes(option.cutoutFixtureId)
+    )
+    .map(option => ({
+      option,
+      value: `wasteChute:${option.cutoutId}`,
+      description: t('wasteChute_location', {
+        slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[option.cutoutId],
+      }),
+    }))
+
   const blowoutLocationOptions = [
     ...(trashBinOption != null
       ? [
           {
             option: trashBinOption,
             value: `trashBin:${trashBinOption.cutoutId}`,
-            description: t('trashBin'),
+            description: t('trashBin_location', {
+              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[trashBinOption.cutoutId],
+            }),
           },
         ]
       : []),
+    ...wasteChuteOptions,
     {
       option: SOURCE_WELL_BLOWOUT_DESTINATION,
       value: SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -113,11 +142,14 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const flowRatesForSupportedTip: SupportedTip | undefined =
     state.volume < 5 &&
     `lowVolumeDefault` in liquidSpecs &&
+    typeof pipetteName === 'string' &&
     LOW_VOLUME_PIPETTES.includes(pipetteName)
       ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
       : liquidSpecs.default.supportedTips[tipType]
   const minFlowRate = 0.1
-  const maxFlowRate = Math.floor(flowRatesForSupportedTip?.uiMaxFlowRate ?? 0)
+  const maxFlowRate = Math.floor(
+    (flowRatesForSupportedTip?.uiMaxFlowRate ?? 0) as number
+  )
 
   const flowRateError =
     flowRate != null && (flowRate < minFlowRate || flowRate > maxFlowRate)
@@ -145,11 +177,17 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
         return
       }
 
+      const selectedOption = blowoutLocationOptions.find(
+        opt => opt.value === selectedBlowoutLocation
+      )
+      const blowOutLocation: BlowOutLocation =
+        selectedOption?.option ?? (selectedBlowoutLocation as BlowOutLocation)
+
       dispatch({
         type: ACTIONS.SET_DISPOSAL_VOLUME_DISPENSE,
         disposalVolumeDispenseSettings: {
           volume,
-          blowOutLocation: selectedBlowoutLocation as BlowOutLocation,
+          blowOutLocation,
           flowRate,
         },
       })
@@ -257,7 +295,8 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
                 key={option.value}
                 isSelected={selectedBlowoutLocation === option.value}
                 onChange={() => {
-                  setSelectedBlowoutLocation(option.value)
+                  const value = String(option.value)
+                  setSelectedBlowoutLocation(value)
                 }}
                 buttonValue={option.value}
                 buttonLabel={option.description}
