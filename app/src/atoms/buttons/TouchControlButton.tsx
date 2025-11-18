@@ -17,19 +17,52 @@ interface TouchControlProps {
   subText?: string
 }
 
+const getBgColor = (isActive: boolean, isOnDevice: boolean): string => {
+  if (!isOnDevice) {
+    return COLORS.white
+  }
+
+  if (isActive) {
+    return COLORS.blue50
+  }
+
+  return COLORS.blue35
+}
+
+const getBorderColor = (isActive: boolean, isOnDevice: boolean): string => {
+  if (!isOnDevice) {
+    if (isActive) {
+      return COLORS.blue50
+    }
+    return COLORS.grey30
+  }
+
+  return COLORS.grey30
+}
+
+const getFocusBorderColor = (
+  isActive: boolean,
+  isOnDevice: boolean
+): string => {
+  if (!isOnDevice) {
+    if (isActive) {
+      return COLORS.blue50
+    }
+    return COLORS.grey30
+  }
+
+  return COLORS.white
+}
+
 const StyledTouchButton = styled(Btn)<{
   isActive: boolean
   isOnDevice: boolean
 }>`
   background-color: ${({ isActive, isOnDevice }) =>
-    !isOnDevice ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
+    getBgColor(isActive, isOnDevice)};
 
   border: ${({ isActive, isOnDevice }) =>
-    !isOnDevice
-      ? isActive
-        ? `1px ${COLORS.blue50} solid`
-        : `1px ${COLORS.grey30} solid`
-      : `1px ${COLORS.grey30} solid`};
+    `1px ${getBorderColor(isActive, isOnDevice)} solid`};
 
   cursor: ${CURSOR_DEFAULT};
   border-radius: ${({ isOnDevice }) =>
@@ -39,18 +72,16 @@ const StyledTouchButton = styled(Btn)<{
 
   &:focus {
     background-color: ${({ isActive, isOnDevice }) =>
-      !isOnDevice ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
+      getBgColor(isActive, isOnDevice)};
+
     border: ${({ isActive, isOnDevice }) =>
-      !isOnDevice
-        ? isActive
-          ? `1px ${COLORS.blue50} solid`
-          : `1px ${COLORS.grey30} solid`
-        : `1px ${COLORS.white} solid`};
+      `1px ${getFocusBorderColor(isActive, isOnDevice)} solid`};
   }
 
   &:active {
     background-color: ${({ isActive, isOnDevice }) =>
-      !isOnDevice ? COLORS.white : isActive ? COLORS.blue50 : COLORS.blue35};
+      getBgColor(isActive, isOnDevice)};
+
     color: ${COLORS.blue50};
     border: 1px ${COLORS.blue50} solid;
   }
@@ -72,7 +103,8 @@ const StyledTouchButton = styled(Btn)<{
     color: ${COLORS.grey40};
   }
 `
-export const TouchControlButton = (props: TouchControlProps): JSX.Element => {
+
+export function TouchControlButton(props: TouchControlProps): JSX.Element {
   const { title, isActive, onClick, subText, isOnDevice } = props
   return (
     <StyledTouchButton

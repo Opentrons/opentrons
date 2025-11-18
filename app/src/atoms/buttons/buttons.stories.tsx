@@ -20,13 +20,14 @@ import {
 } from './index'
 
 import type { Meta, Story } from '@storybook/react'
+import type { ComponentProps } from 'react'
 
 export default {
   title: 'App/Atoms/Buttons',
 } as Meta
 
 const TertiaryButtonTemplate: Story<
-  React.ComponentProps<typeof TertiaryButton>
+  ComponentProps<typeof TertiaryButton>
 > = args => {
   const { children } = args
   return (
@@ -42,7 +43,7 @@ Tertiary.args = {
 }
 
 const QuaternaryButtonTemplate: Story<
-  React.ComponentProps<typeof QuaternaryButton>
+  ComponentProps<typeof QuaternaryButton>
 > = args => {
   const { children } = args
   return (
@@ -58,7 +59,7 @@ Quaternary.args = {
 }
 
 const SubmitPrimaryButtonTemplate: Story<
-  React.ComponentProps<typeof SubmitPrimaryButton>
+  ComponentProps<typeof SubmitPrimaryButton>
 > = args => {
   return (
     <Flex flexDirection={DIRECTION_ROW} width="15rem">
@@ -78,7 +79,7 @@ SubmitPrimary.args = {
 }
 
 const TouchControlButtonTemplate: Story<
-  React.ComponentProps<typeof TouchControlButton>
+  ComponentProps<typeof TouchControlButton>
 > = args => {
   return (
     <Flex>
@@ -99,7 +100,7 @@ TouchControl.args = {
 }
 
 const ToggleButtonTemplate: Story<
-  React.ComponentProps<typeof ToggleButton>
+  ComponentProps<typeof ToggleButton>
 > = args => {
   const { onClick, ...rest } = args
   const [isToggled, setIsToggled] = React.useState<boolean>(false)
@@ -120,7 +121,7 @@ Toggle.args = {
 }
 
 const LongPressButtonTemplate: Story<
-  React.ComponentProps<typeof PrimaryButton>
+  ComponentProps<typeof PrimaryButton>
 > = args => {
   const { children } = args
   const longPress = useLongPress()
@@ -161,7 +162,7 @@ LongPress.args = {
 }
 
 const TextOnlyButtonTemplate: Story<
-  React.ComponentProps<typeof TextOnlyButton>
+  ComponentProps<typeof TextOnlyButton>
 > = () => {
   const [count, setCount] = React.useState<number>(0)
   return (
