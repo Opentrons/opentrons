@@ -74,7 +74,7 @@ def _handle_package_import() -> typing.Type["SupportsTracking"]:
     try:
         from performance_metrics import RobotActivityTracker
 
-        return typing.cast(typing.Type[typing.Any], RobotActivityTracker)
+        return RobotActivityTracker
     except ImportError:
         return _StubbedTracker
 
@@ -124,7 +124,7 @@ def _track_a_function(
         **kwargs: _UnderlyingFunctionParameters.kwargs
     ) -> _UnderlyingFunctionReturn:
         try:
-            return typing.cast(_UnderlyingFunctionReturn, wrapped(*args, **kwargs))
+            return wrapped(*args, **kwargs)
         finally:
             # TODO: derek maggio (06-18-2024): After investigation, it appears on startup
             # that the first call to tracker.store() will not actually store the data.
