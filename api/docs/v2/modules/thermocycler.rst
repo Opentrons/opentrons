@@ -37,7 +37,7 @@ For each module action, the API lets you choose whether to perform other protoco
       - :py:meth:`~.ThermocyclerContext.execute_profile`
       - Blocking
     * - Profiles
-      - :py:meth:`~ThermocyclerContext.start_execute_profile`
+      - :py:meth:`~.ThermocyclerContext.start_execute_profile`
       - Concurrent  
  
 This section covers using the Thermocycler Module, including its blocking and concurrent commands. The examples in this section will use a Thermocycler Module GEN2 loaded as follows:
@@ -68,7 +68,7 @@ You can also control the temperature of the lid. Acceptable target temperatures 
 
       When you use a blocking method like :py:meth:`~.ThermocyclerContext.set_lid_temperature`, your protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool).
 
-      .. versionadded:: 2.13
+      .. versionadded:: 2.0
 
     .. tab:: Concurrent 
 
@@ -107,7 +107,7 @@ To set the block temperature inside the Thermocycler, you can use either a block
 
       When you use a blocking method like :py:meth:`~.ThermocyclerContext.set_block_temperature`, your protocol will only proceed once the block temperature reaches 4 °C. 
 
-      .. versionadded:: 2.13
+      .. versionadded:: 2.0
 
     .. tab:: Concurrent
 
@@ -143,7 +143,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
         pipette.dispense(50, plate["B1"])
         pipette.drop_tip()
       
-      When you use the blocking :py:meth:`~.TemperatureModuleContext.set_block_temperature` command, you can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). Here, the Temperature Module reaches the target temperature and the robot holds for 4 minutes and 15 seconds. Your protocol won't proceed to further commands until the target temperature is reached and the hold is completed. 
+      When you use the blocking :py:meth:`~.ThermocyclerContext.set_block_temperature` command, you can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). Here, the Temperature Module reaches the target temperature and the robot holds for 4 minutes and 15 seconds. Your protocol won't proceed to further commands until the target temperature is reached and the hold is completed. 
 
       If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
     
