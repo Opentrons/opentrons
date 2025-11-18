@@ -35,7 +35,9 @@ robot = [
     "zipp==3.21.0",
 ]
 # Dev dependencies - from Pipfile [dev-packages]
+# Robot group is always included in dev to ensure dev environment matches robot
 dev = [
+    {include-group = "robot"},
     "mypy==1.11.0",
     "flake8~=7.0.0",
     "flake8-annotations~=3.0.1",

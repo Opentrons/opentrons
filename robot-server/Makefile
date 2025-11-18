@@ -1,7 +1,7 @@
 # opentrons robot server makefile
 
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 REDOC := npx @redocly/cli
@@ -69,16 +69,24 @@ run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) 
 .PHONY: all
 all: clean wheel
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --group dev; \
+	else \
+		uv sync --group dev; \
+	fi
+endef
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: setup-ot2
 setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y python-can
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip uninstall python-can
+	@uv pip list
 
 .PHONY: clean
 clean:
@@ -87,7 +95,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(UV) venv --remove
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -123,7 +131,7 @@ format:
 
 .PHONY: _dev
 _dev:
-	$(pipenv) run $(run_dev)
+	$(UV) run $(run_dev)
 
 .PHONY: dev
 dev: dev-ot2
@@ -140,18 +148,18 @@ dev-ot2: _dev
 .PHONY: dev-with-emulator
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
-	$(pipenv) run $(run_dev)
+	$(UV) run $(run_dev)
 
 
 .PHONY: dev-with-ot3-emulator
 dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
 dev-with-ot3-emulator:
-	$(pipenv) run $(run_dev)
+	$(UV) run $(run_dev)
 
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv) shell
+	$(UV) shell
 
 .PHONY: push
 push: wheel

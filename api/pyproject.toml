@@ -50,7 +50,9 @@ robot = [
     "opentrons-hardware[FLEX]==0.0.0",
 ]
 # Dev dependencies - from Pipfile [dev-packages]
+# Robot group is always included in dev to ensure dev environment matches robot
 dev = [
+    {include-group = "robot"},
     "atomicwrites==1.4.0; sys_platform == 'win32'",
     "colorama==0.4.4; sys_platform == 'win32'",
     "coverage==7.4.1",
@@ -82,8 +84,6 @@ dev = [
     "hypothesis>=6.96.1,<7",
     "pytest-lazy-fixtures>=1.1.4,<2",
     "build~=1.2.0",
-    # opentrons-hardware is needed for tests but not for package installation
-    "opentrons-hardware[FLEX]==0.0.0",
     # performance_metrics is needed for type checking (used in TYPE_CHECKING blocks)
     # even though it's optional at runtime
     "performance_metrics==0.0.0",
