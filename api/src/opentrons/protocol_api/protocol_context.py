@@ -1516,9 +1516,9 @@ class ProtocolContext(CommandPublisher):
         Args:
             name: Name of an Opentrons-verified liquid class. Must be one of:
 
-                - ``"water"``: an Opentrons-verified liquid class based on deionized water.
-                - ``"glycerol_50"``: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
-                - ``"ethanol_80"``: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
+                - `"water"`: an Opentrons-verified liquid class based on deionized water.
+                - `"glycerol_50"`: an Opentrons-verified liquid class for viscous liquid. Based on 50% glycerol.
+                - `"ethanol_80"`: an Opentrons-verified liquid class for volatile liquid. Based on 80% ethanol.
             version: Version of the liquid class to retrieve. If left unspecified, defaults to the latest version for the
                 protocol's API level.
 
@@ -1588,7 +1588,7 @@ class ProtocolContext(CommandPublisher):
     @property
     @requires_version(2, 5)
     def door_closed(self) -> bool:
-        """Returns `True`` if the front door of the robot is closed."""
+        """Returns `True` if the front door of the robot is closed."""
         return self._core.door_closed()
 
     @requires_version(2, 23)
