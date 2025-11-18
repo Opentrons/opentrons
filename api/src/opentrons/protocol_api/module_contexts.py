@@ -456,7 +456,7 @@ class TemperatureModuleContext(ModuleContext):
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
     def start_set_temperature(self, celsius: float) -> Task:
-        """Sets the Temperature Module's target temperature and returns immediately without waiting for the module to reach the target. Allows the protocol to proceed while the Temperature Module heats. 
+        """Sets the Temperature Module's target temperature and returns immediately without waiting for the module to reach the target. Allows the protocol to proceed while the Temperature Module heats.
 
         .. versionchanged:: 2.27
             Returns a :py:class:`Task` object that represents concurrent heating.
@@ -1148,7 +1148,7 @@ class HeaterShakerContext(ModuleContext):
     @requires_version(2, 27)
     @publish(command=cmds.heater_shaker_set_shake_speed)
     def set_shake_speed(self, rpm: int) -> Task:
-        """Sets the Heater-Shaker's shake speed in RPM and returns a :py:class:`Task` that represents concurrent shaking. 
+        """Sets the Heater-Shaker's shake speed in RPM and returns a :py:class:`Task` that represents concurrent shaking.
 
         .. note::
 
