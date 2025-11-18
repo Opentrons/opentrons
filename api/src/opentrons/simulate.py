@@ -603,7 +603,7 @@ def simulate(
 
 def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
     """
-    Format a run log (return value of [`simulate()`][opentrons.simulate.simulate]) 
+    Format a run log (return value of [`simulate()`][opentrons.simulate.simulate])
     into a human-readable string.
 
     Args:

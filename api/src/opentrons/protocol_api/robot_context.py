@@ -200,8 +200,7 @@ class RobotContext(publisher.CommandPublisher):
             self._core.close_gripper(force)
 
     def open_gripper_jaw(self) -> None:
-        """Fully opens the Flex Gripper jaws.
-        """
+        """Fully opens the Flex Gripper jaws."""
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.open_gripper(),
@@ -316,7 +315,7 @@ class RobotContext(publisher.CommandPublisher):
         Take in a [`StringAxisMap`][opentrons.types.StringAxisMap] and
         output an axis map.
 
-        The `StringAxisMap` is allowed to contain any of the following strings: 
+        The `StringAxisMap` is allowed to contain any of the following strings:
         `"x"`, `"y"`, `"z_l"`, `"z_r"`, `"z_g"`, `"q"`.
 
         An example of a valid axis map could be:
