@@ -138,27 +138,37 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
             temperature=4,
             hold_time_minutes=4,
             hold_time_seconds=15)
+        pipette.pick_up_tip()
+        pipette.aspirate(50, plate["A1"])
+        pipette.dispense(50, plate["B1"])
+        pipette.drop_tip()
+      
+      When you use the blocking :py:meth:`~.TemperatureModuleContext.set_block_temperature` command, you can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together). Here, the Temperature Module reaches the target temperature and the robot holds for 4 minutes and 15 seconds. Your protocol won't proceed to further commands until the target temperature is reached and the hold is completed. 
+
+      If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
+    
+    .. versionadded:: 2.0
 
     .. tab:: Concurrent 
 
       .. code-block:: python
     
-        block_timer = create_timer(seconds=255)
-        tc_mod.start_set_block_temperature(celsius=4)
-        pipette.pick_up_tip()   
+        # set block temperature 
+        cool = tc_mod.start_set_block_temperature(celsius=4)
+        # complete pipetting actions while the block cools
+        pipette..pick_up_tip()   
         pipette.aspirate(50, plate["A1"])
         pipette.dispense(50, plate["B1"])
         pipette.drop_tip()
+        # wait for the block to reach the target temperature
+        protocol.wait_for_tasks(cool)
+        # hold samples on the block at target temperature 
+        block_timer = create_timer(seconds=255)
         protocol.wait_for_tasks(block_timer)
 
-.. versionadded:: 2.0
-.. versionchanged:: 2.27
-    Choose to use the non-blocking :py:meth:`.ThermocyclerContext.start_set_block_temperature` method to perform other protocol steps while the block reaches its target temperature. 
+    The concurrent :py:meth:`~.ThermocyclerContext.start_set_block_temperature` command doesn't accept the same time arguments. Instead, use :py:meth:`.ProtocolContext.create_timer` to proceed to the next steps in the protocol. Here, the robot will perform the pipetting actions while the block reaches its target temperature. Once the protocol reaches the :py:meth:`.ProtocolContext.wait_for_tasks` commands, the robot pauses and waits for the block to finish cooling or holds for the remainder of the timer. 
 
-You can specify ``hold_time_minutes``, ``hold_time_seconds``, or both (in which case they will be added together) for the non-blocking :py:meth:`~.ThermocyclerContext.set_block_temperature`. Your protocol won't proceed to further commands while holding at a temperature. If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
-
-The non-blocking :py:meth:`~.ThermocyclerContext.start_set_block_temperature` doesn't accept these arguments. Instead, use :py:meth:`.ProtocolContext.create_timer` to proceed to the next steps in your protocol. Here, the robot will perform the pipetting actions while the block reaches its target temperature. Once the protocol reaches the :py:meth:`.ProtocolContext.wait_for_tasks` command, the robot pauses and waits for the remainder of the timer. 
-
+    .. versionadded:: 2.27
 
 Block Max Volume
 ----------------
@@ -177,23 +187,26 @@ It is especially important to specify ``block_max_volume`` when holding at a tem
             temperature=4,
             hold_time_seconds=20,
             block_max_volume=80)
+          
+      .. versionadded:: 2.0
 
-    .. tab:: Non-blocking 
+    .. tab:: Concurrent 
 
       .. code-block:: python
     
-        block_timer = create_timer(seconds=20)
-        tc_mod.start_set_block_temperature(
+        # set block temperature and max volume
+        cool = tc_mod.start_set_block_temperature(
             temperature=4,
             block_max_volume=80)
-        protocol.wait_for_tasks(block_timer)
+        # set time to hold the block at temperature 
+        block_timer = protocol.create_timer(seconds=20)
+        # wait for the block to reach and hold at temperature 
+        protocol.wait_for_tasks(cool, block_timer)
+      
+      .. versionadded:: 2.27
 
 
-If the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
-
-.. versionadded:: 2.0
-.. versionadded:: 2.27
-    The non-blocking :py:meth:`.ThermocyclerContext.start_set_block_temperature` command also accepts the ``block_max_volume`` parameter. 
+In both examples, if the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
 
 .. _thermocycler-profiles:
@@ -212,7 +225,7 @@ For example, this profile commands the Thermocycler to reach 10 °C and hold for
             {"temperature":60, "hold_time_seconds":45}
         ]
 
-Once you have written the steps of your profile, choose a blocking or non-blocking command to execute it with. Both execute your profile steps multiple times depending on the ``repetitions`` parameter. Each also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`~.ThermocyclerContext.set_block_temperature` and :py:meth:`~.ThermocyclerContext.start_set_block_temperature` functions. 
+Once you have written the steps of your profile, choose a blocking or concurrent command to execute it with. Both execute your profile steps multiple times depending on the ``repetitions`` parameter. Each also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`~.ThermocyclerContext.set_block_temperature` and :py:meth:`~.ThermocyclerContext.start_set_block_temperature` functions. 
 
 For instance, a PCR prep protocol might define and execute a profile like this:
 
@@ -232,7 +245,11 @@ For instance, a PCR prep protocol might define and execute a profile like this:
             repetitions=20, 
             block_max_volume=32)
 
-    .. tab:: Non-blocking 
+      When you use the blocking :py:meth:`~.ThermocyclerContext.execute_profile` method, your protocol won't proceed until the entire profile is complete.
+      
+      .. versionadded:: 2.0
+
+    .. tab:: Concurrent
 
       .. code-block:: python
     
@@ -246,8 +263,9 @@ For instance, a PCR prep protocol might define and execute a profile like this:
             repetitions=20,
             block_max_volume=32)
 
-When you use the blocking :py:meth:`~.ThermocyclerContext.execute_profile` method, your protocol won't proceed until the entire profile is complete. Beginning with API version 2.27, you can choose the non-blocking :py:meth:`~.ThermocyclerContext.start_execute_profile` method to let the robot perform other pipetting and some other module actions while your profile runs. For more, see the :ref:`concurrent-module` section. 
+      Beginning with API version 2.27, you can use the concurrent :py:meth:`~.ThermocyclerContext.start_execute_profile` method to let the robot perform your next pipetting steps and some other module actions while your protocol runs. For more, see the :ref:`concurrent-module` section. 
 
+      .. versionadded:: 2.27
 
 In terms of the actions that the Thermocycler performs, running each of the examples above would be equivalent to nesting ``set_block_temperature`` (shown below) or ``start_set_block_temperature`` commands in a ``for`` loop:
 
@@ -263,10 +281,7 @@ However, this code would generate 60 lines in the protocol's run log, while exec
 .. note::
 
     Temperature profiles only control the temperature of the `block` in the Thermocycler. You should set a lid temperature before executing the profile using :py:meth:`~.ThermocyclerContext.set_lid_temperature`.
-
-.. versionadded:: 2.0
-.. versionchanged:: 2.27
-    Choose to use the non-blocking :py:meth:`.ThermocyclerContext.start_execute_profile` method to perform other protocol steps while the Thermocycler Module runs a defined profile. 
+ 
 
 Auto-sealing Lids
 =================

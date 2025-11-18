@@ -260,7 +260,7 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
 
       .. versionadded:: 2.13 
 
-    .. tab:: Non-blocking 
+    .. tab:: Concurrent
 
       .. code-block:: python
       
@@ -276,7 +276,7 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
     .. versionadded:: 2.27
  
 
-You can also use concurrent commands to heat and shake simultaneously. The amount of time it takes for the Heater-Shaker Module to reach either the target temperature or shake speed won't affect other steps in your protocol. The non-blocking ``set_target_temperature()`` and ``set_shake_speed()`` methods also allow some other simultaneous module actions. For more, see the :ref:`concurrent-module` section. 
+You can also use concurrent commands to heat and shake simultaneously. The amount of time it takes for the Heater-Shaker Module to reach either the target temperature or shake speed won't affect other steps in your protocol. The concurrent ``set_target_temperature()`` and ``set_shake_speed()`` methods also allow some other simultaneous module actions. For more, see the :ref:`concurrent-module` section. 
 
 
 Deactivating
