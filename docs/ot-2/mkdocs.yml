@@ -8,6 +8,7 @@ nav:
       - System Description: system-description/index.md
       - Robot Components: system-description/robot-components.md
       - Pipettes: system-description/pipettes.md
+      - System Specifications: system-description/specs.md
   - Installation and Relocation:
       - Installation and Relocation: installation/index.md
       - Installation Requirements: installation/requirements.md

@@ -85,19 +85,11 @@ The following table lists and describes these status lights.
 
 ### Power and network
 
-On the side panel below the LED status indicators, you can find the on/off switch, an Ethernet port, and the power connection from the robot's external power supply.
+On the side panel below the LED status indicators, you can find the on/off switch, an Ethernet port, and the power port for the robot's external power supply.
 
 ![Switch, Ethernet, and power connection](../images/power-ethernet.png)
 
-See <font color="red">PLACEHOLDER TEXT AND LINK TO INSTALLATION DOC</font> for information and instruction on how to connect your OT-2 to a network and power it on.
-
-### Power supply
-
-The OT-2 uses an external [Mean Well GST220A series power supply](https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A). The power supply's maximum consumption is 220 W (6.1 A, 36 V).
-
-Total power consumption depends on the specifics of the protocols run on the robot. The Opentrons OT-2 Liquid Handler generally consumes around 90-120 W when idle.
-
-Power consumption may range from approximately 100 to 180 W when running a protocol. Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the Opentrons OT-2 Liquid Handler and how many pipettes are attached.
+See [First Run](../installation/first-run.md) for information and instruction on how to properly connect your OT-2 to its external power supply and local network.
 
 ### USB ports
 

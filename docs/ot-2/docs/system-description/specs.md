@@ -1,0 +1,85 @@
+---
+title: "Opentrons OT-2: System Specifications"
+---
+
+## General specifications
+
+<table>
+  <thead>
+    <tr>
+      <th>Specification</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+        <td><strong>Dimensions</strong></td>
+        <td>The OT-2's dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x25").</td>
+    </tr>
+    <tr>
+        <td><strong>Weight</strong></td>
+        <td>The OT-2 weighs 48 kg (105 lbs).</td>
+    </tr>
+    <tr>
+        <td><strong>Deck slots</strong></td>
+        <td><ul>
+            <li>11 ANSI/SLAS-compatible slots in the working area.</li>
+            <li>1 slot for a removable trash bin.</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td><strong>Wi-Fi</strong></td>
+        <td>2.4 GHz IEEE 802.11b/g/n</td>
+    </tr>
+    <tr>
+        <td><strong>Ethernet</td>
+        <td>100 Mbps</td>
+    </tr>
+    <tr>
+        <td><strong>USB</strong></td>
+        <td>USB 2.0</td>
+    </tr>
+    <tr>
+        <td><strong>Camera</strong></td>
+        <td>2 megapixels</td>
+    </tr>
+    <tr>
+        <td><strong>Power supply</strong></td>
+        <td>The OT-2 uses an external <a href="https://www.meanwell.com/webapp/product/search.aspx?prod=GST220A">Mean Well GST220A series power supply</a>. Refer to the manufacturer's data sheet (linked above) for detailed specifications.</td>
+    </tr>
+    <tr>
+        <td><strong>Power consumption</strong></td>
+        <td>Total power consumption depends on the state of your robot and the specific requirements of a protocol. For example:
+        <p>
+            <ul>
+                <li>When idle, the OT-2 can use 90 to 120 W.</li>
+                <li>When active, the OT-2 can use 100 to 180 W.</li>
+            </ul>
+        </p>
+        <p>Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the Opentrons OT-2 Liquid Handler and how many pipettes are attached.</p></td>
+    </tr>
+    <tr>
+        <td><strong>Frame composition</strong></td>
+        <td>Steel and aluminum.</td>
+    </tr>
+    <tr>
+        <td><strong>Window composition</strong></td>
+        <td>Polycarbonate plastic.</td>
+    </tr>
+    <tr>
+        <td><strong>Ventilation requirements</strong></td>
+        <td>Leave at least 20 cm (8") around the the OT-2 to help ensure adequate ventilation.</td>
+    </tr>
+    <tr>
+        <td><strong>Connected PC requirements</strong></td>
+        <td>The Opentrons App runs on:
+            <ul>
+                <li>Windows 10 or later</li>
+                <li>macOS 10.10 or later</li>
+                <li>Ubuntu 12.04 or later</td>
+            </ul>
+        </td>
+    </tr>
+  </tbody>
+</table>
