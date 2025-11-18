@@ -48,7 +48,6 @@ import type {
   ModuleEntities,
   PipetteEntities,
   TimelineFrame,
-  TOUCHED_PIPETTABLE_LABWARE,
   TrashBinEntities,
   WasteChuteEntities,
 } from '../types'

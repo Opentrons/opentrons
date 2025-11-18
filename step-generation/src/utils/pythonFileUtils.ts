@@ -556,6 +556,7 @@ export function pythonDefRun(
     trashBinEntities,
   } = invariantContext
   const { modules, labware, pipettes } = robotState
+  console.log('robotStateTimeline: ', robotStateTimeline)
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
@@ -576,7 +577,8 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
-    getSetStoredLabware(moduleEntities, labwareEntities, labware),
+    // TODO: call this when we have a way to get the labware on the shuttle location
+    // getSetStoredLabware(moduleEntities, labwareEntities, labware),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -656,10 +658,7 @@ export const getSetStoredLabware = (
       }
     }
   })
-  //  filter any empty strings
-  const pythonLines = pythonSetStoredLabware.filter(Boolean)
-
-  return pythonLines.length > 0
-    ? `# Set Stored Labware:\n${pythonLines.join('\n').trimStart()}`
+  return pythonSetStoredLabware.length > 0
+    ? `# Set Stored Labware:\n${pythonSetStoredLabware}`
     : ''
 }
