@@ -277,12 +277,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const { numWellsToFitInTip } = multiWellHandling
 
   if (
-    // these conditions should never be true— they are checked in moveLiquidFormToArgs
+    // We stop users from selecting the consolidate path if we can't fit > 1 chunk into
+    //  the tip, but older protocols can have consolidate selected and trigger this error
     !multiWellHandling.isSupported ||
     numWellsToFitInTip == null ||
     numWellsToFitInTip === 1
   ) {
-    errors.push(errorCreators.multiDispenseValuesNotFound())
+    errors.push(errorCreators.multiAspirateVolumeTooHigh())
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
