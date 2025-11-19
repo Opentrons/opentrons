@@ -83,26 +83,19 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
     useState<string>(getInitialBlowoutLocation(state.blowOutDispense))
   const [flowRate, setFlowRate] = useState<number | null>(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
-  const fixtureLocationOptions = deckConfig.filter(
-    cutoutConfig =>
-      (typeof cutoutConfig.cutoutFixtureId === 'string' &&
-        WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId)) ||
-      cutoutConfig.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+
+  const trashBinCutoutConfig = deckConfig.find(
+    cutoutConfig => cutoutConfig.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
   )
-
-  const trashBinCutoutId = fixtureLocationOptions.find(
-    option => option.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
-  )?.cutoutId
-
   const trashBinOption: BlowOutLocation | undefined =
-    trashBinCutoutId != null
+    trashBinCutoutConfig != null
       ? {
-          cutoutId: trashBinCutoutId,
+          cutoutId: trashBinCutoutConfig.cutoutId,
           cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
         }
       : undefined
 
-  const wasteChuteOptions = fixtureLocationOptions
+  const wasteChuteOptions = deckConfig
     .filter(
       option =>
         typeof option.cutoutFixtureId === 'string' &&
