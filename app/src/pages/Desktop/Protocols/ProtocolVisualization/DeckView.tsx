@@ -134,7 +134,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   return (
     <div className={styles.deck_view_container}>
       <div className={styles.header_container}>
-        <StyledText desktopStyle="bodyLargeSemiBold">
+        <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('deck_view')}
         </StyledText>
         <StyledText
