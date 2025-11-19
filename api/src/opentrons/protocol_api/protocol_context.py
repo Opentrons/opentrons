@@ -135,7 +135,7 @@ class ProtocolContext(CommandPublisher):
     See the [Tutorial](../tutorial.md#the-run-function) for more information.
 
     Use [`get_protocol_api()`][opentrons.execute.get_protocol_api] to instantiate a `ProtocolContext` when
-    using Jupyter Notebook. See [Advanced Control](../advanced-control/index.md).
+    using Jupyter Notebook. See [Advanced Control](../advanced-control/jupyter.md).
 
     *New in version 2.0*
     """
@@ -222,8 +222,8 @@ class ProtocolContext(CommandPublisher):
           [metadata](../tutorial.md#metadata) or [requirements](../tutorial.md#requirements)
           dictionary determines `api_version`.
         - When the context is instantiated with
-          [`opentrons.execute.get_protocol_api`][opentrons.execute.get_protocol_api] or
-          [`opentrons.simulate.get_protocol_api`][opentrons.simulate.get_protocol_api], the value of its
+          [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api] or
+          [`opentrons.simulate.get_protocol_api()`][opentrons.simulate.get_protocol_api], the value of its
           `version` argument determines `api_version`.
 
         It may be lower than the [maximum version][maximum-supported-versions] supported by the
@@ -663,7 +663,7 @@ class ProtocolContext(CommandPublisher):
         If you try to load a trash bin on an OT-2, the API will raise an error.
 
         Args:
-            location: The [deck slot][deck-slots] where the trash bin is. The
+            location: The [deck slot](../deck-slots.md) where the trash bin is. The
                 location can be any unoccupied slot in column 1 or 3.
 
                 If you try to load a trash bin in column 2 or 4, the API will raise an error.
@@ -937,7 +937,7 @@ class ProtocolContext(CommandPublisher):
 
                 This is usually the name or number of the slot on the deck where you
                 will be placing the module, like `1`, `"1"`, or `"D1"`. See
-                [deck slots](../deck-slots.md).
+                [Deck Slots](../deck-slots.md).
 
                 The Thermocycler is only valid in one deck location.
                 You don't have to specify a location when loading it, but if you do,
@@ -1089,7 +1089,7 @@ class ProtocolContext(CommandPublisher):
         start the protocol until the correct instruments are attached and calibrated.
 
         Currently, this method only loads pipettes. You do not need to load the Flex
-        Gripper to use it in protocols. See [automatic-manual-moves].
+        Gripper to use it in protocols. See [Automatic vs Manual Moves][automatic-vs-manual-moves].
 
         Args:
             instrument_name (str): The instrument to load.
@@ -1298,9 +1298,9 @@ class ProtocolContext(CommandPublisher):
         """Wait for a list of tasks to complete before executing subsequent commands.
 
         Args:
-            tasks (list[Task]): A list of Task objects to wait for.
+            tasks (list[Task]): A list of `Task` objects to wait for.
 
-        Task objects can be commands that are allowed to run concurrently.
+        `Task` objects can be commands that are allowed to run concurrently.
         """
         task_cores = [task._core for task in tasks]
         self._core.wait_for_tasks(task_cores)
@@ -1470,7 +1470,7 @@ class ProtocolContext(CommandPublisher):
                 acceptable.
 
         Returns:
-            A [`Liquid`][opentrons.protocol_api.Liquid] object representing the specified liquid.
+            An object representing the specified liquid.
 
         *Changed in version 2.20:* You can now omit the `description` and `display_color` arguments.
             Formerly, when you didn't want to provide values, you had to supply
@@ -1526,9 +1526,7 @@ class ProtocolContext(CommandPublisher):
             LiquidClassDefinitionDoesNotExist: If the specified liquid class does not exist.
 
         Returns:
-            A new LiquidClass object.
-
-        *New in version 2.24.*
+            A new `LiquidClass` object.
         """
         return self._core.get_liquid_class(name=name, version=version)
 
@@ -1540,7 +1538,7 @@ class ProtocolContext(CommandPublisher):
         base_liquid_class: Optional[LiquidClass] = None,
         display_name: Optional[str] = None,
     ) -> LiquidClass:
-        """Define a custom liquid class, either based on an existing liquid class, or create a completely new one.
+        """Define a custom liquid class, either based on an existing liquid class, or a completely new one.
 
         Args:
             name: The name to give to the new liquid class. Cannot use the name of an Opentrons-verified liquid class.
@@ -1549,7 +1547,7 @@ class ProtocolContext(CommandPublisher):
             display_name: An optional name for the liquid class. Defaults to the title-case `name` if a display name isn't provided.
 
         Returns:
-            A new LiquidClass object.
+            A new `LiquidClass` object.
         """
         if definition_exists(name, DEFAULT_LC_VERSION):
             raise ValueError(

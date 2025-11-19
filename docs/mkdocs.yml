@@ -32,6 +32,7 @@ plugins:
             show_bases: false
             merge_init_into_class: false
             separate_signature: true
+            show_signature_annotations: true
             annotations_path: brief
             line_length: 80
             group_by_category: false
