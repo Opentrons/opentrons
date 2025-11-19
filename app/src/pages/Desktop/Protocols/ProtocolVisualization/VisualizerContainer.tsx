@@ -270,7 +270,6 @@ export function VisualizerContainer(
           milliSecondsPerFrame={milliSecondsPerFrame}
           setMilliSecondsPerFrame={setMilliSecondsPerFrame}
         />
-
         <DeckView
           commands={analysis.commands}
           liquids={liquids}

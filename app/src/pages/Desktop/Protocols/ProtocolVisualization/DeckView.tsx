@@ -5,8 +5,8 @@ import {
   COLORS,
   DeckFromLayers,
   FixedTrashText,
-  Flex,
   FlexTrash,
+  NO_WRAP,
   RobotCoordinateSpaceWithRef,
   SingleSlotFixture,
   SlotLabels,
@@ -24,13 +24,13 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import styles from './deckview.module.css'
 import { DeckViewDetails } from './DeckViewDetails'
 import {
   getActiveLayer,
   getIsCutoutA1Active,
   getIsPipetteOverTrash,
 } from './utils'
-import styles from './visualization.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'
@@ -132,16 +132,20 @@ export function DeckView(props: DeckViewProps): JSX.Element {
       : 0
 
   return (
-    <div className={styles.deck_view_padding}>
-      <div className={styles.deck_view_container}>
-        <Flex justifyContent="space-between" with="100%">
-          <StyledText desktopStyle="bodyLargeSemiBold">
-            {t('deck_view')}
-          </StyledText>
-          <StyledText color={COLORS.grey60} desktopStyle="bodyDefaultRegular">
-            {t('step', { number: selectedCommandIndex })}
-          </StyledText>
-        </Flex>
+    <div className={styles.deck_view_container}>
+      <div className={styles.header_container}>
+        <StyledText desktopStyle="bodyLargeSemiBold">
+          {t('deck_view')}
+        </StyledText>
+        <StyledText
+          color={COLORS.grey60}
+          desktopStyle="bodyDefaultRegular"
+          whiteSpace={NO_WRAP}
+        >
+          {t('step', { number: selectedCommandIndex })}
+        </StyledText>
+      </div>
+      <div className={styles.body_container}>
         <RobotCoordinateSpaceWithRef
           height="100%"
           width="100%"
