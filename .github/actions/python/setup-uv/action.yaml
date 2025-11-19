@@ -12,10 +12,10 @@ inputs:
     description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
     required: false
     default: 'true'
-  install-dev-deps:
-    description: 'Whether to install dev dependency group (--group dev)'
+  dependency-group:
+    description: 'Which dependency group to install (e.g., "dev", "robot"). If not specified (default), installs dev dependencies. Use empty string "" to install base dependencies only (no groups)'
     required: false
-    default: 'true'
+    default: 'dev'
 runs:
   using: 'composite'
   steps:
@@ -44,33 +44,41 @@ runs:
         START_TIME=$(date +%s)
         echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
         echo "::notice::Using UV for dependency management"
-        # Add dev group if requested and if it exists in pyproject.toml
-        DEV_GROUP=""
-        if [ "${{ inputs.install-dev-deps }}" == "true" ]; then
-          # Check if dev group exists in dependency-groups
-          if grep -q '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" && \
-             grep -A 20 '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" | grep -q '^dev ='; then
-            DEV_GROUP="--group dev"
+        
+        # Handle dependency-group input:
+        # - Not specified (default 'dev') → run uv sync --group dev (same as make setup)
+        # - Empty string "" → run uv sync without --group (base dependencies only)
+        # - Specific group name → run uv sync with that group
+        DEPENDENCY_GROUP="${{ inputs.dependency-group }}"
+        
+        if [ -z "${DEPENDENCY_GROUP}" ]; then
+          # Empty string explicitly provided, install base dependencies only (no groups)
+          echo "::notice::Installing base dependencies only (no dependency groups)"
+          
+          if [ -f "${{ inputs.project }}/uv.lock" ]; then
+            cd ${{ inputs.project }} && uv sync --frozen
           else
-            echo "::notice::No 'dev' dependency group found, skipping dev dependencies"
-          fi
-        fi
-        if [ -f "${{ inputs.project }}/uv.lock" ]; then
-          # Use --frozen to ensure exact versions from lockfile
-          cd ${{ inputs.project }} && uv sync --frozen $DEV_GROUP
-          # Verify dev dependencies are installed if dev group was used
-          if [ -n "$DEV_GROUP" ]; then
-            echo "::notice::Verifying dev dependencies are installed..."
-            uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
+            cd ${{ inputs.project }} && uv sync
           fi
         else
-          cd ${{ inputs.project }} && uv sync $DEV_GROUP
-          # Verify dev dependencies are installed if dev group was used
-          if [ -n "$DEV_GROUP" ]; then
-            echo "::notice::Verifying dev dependencies are installed..."
-            uv pip list | grep -E "(sphinx|mypy|pytest|black)" || echo "::warning::Some dev dependencies may not be installed"
+          # Group specified, check if it exists and install it
+          if grep -q '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" && \
+             grep -A 30 '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" | grep -q "^${DEPENDENCY_GROUP} ="; then
+            GROUP_FLAG="--group ${DEPENDENCY_GROUP}"
+            echo "::notice::Installing dependency group: ${DEPENDENCY_GROUP}"
+            
+            if [ -f "${{ inputs.project }}/uv.lock" ]; then
+              cd ${{ inputs.project }} && uv sync --frozen $GROUP_FLAG
+            else
+              cd ${{ inputs.project }} && uv sync $GROUP_FLAG
+            fi
+          else
+            echo "::warning::Dependency group '${DEPENDENCY_GROUP}' not found in pyproject.toml, skipping"
           fi
         fi
+        
+        echo "::notice::Verifying dependencies are installed..."
+        uv pip list | head -20
         END_TIME=$(date +%s)
         DURATION=$((END_TIME - START_TIME))
         echo "duration=$DURATION" >> $GITHUB_OUTPUT

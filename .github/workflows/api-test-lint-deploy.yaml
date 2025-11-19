@@ -108,7 +108,6 @@ jobs:
         with:
           project: 'api'
           python-version: ${{ matrix.python }}
-          install-dev-deps: 'true'
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Remove OT-3 hardware package
         run: make -C api setup-ot2
@@ -218,7 +217,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
-          install-dev-deps: 'false'
+          dependency-group: ''
       - name: 'build api distributables'
         shell: bash
         run: make -C api sdist wheel

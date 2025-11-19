@@ -94,7 +94,6 @@ jobs:
         with:
           project: 'shared-data'
           python-version: ${{ matrix.python }}
-          install-dev-deps: 'true'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
@@ -179,7 +178,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
-          install-dev-deps: 'false'
+          dependency-group: ''
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
