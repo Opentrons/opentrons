@@ -187,7 +187,7 @@ export const forFlexStackerStore = (
     ) {
       console.error('Cannot store labware bc there is no space in the stacker')
     }
-    // TODO: use the labware id on the module from the move labware command
+    // TODO: wire up labware id on the shuttle
     const newLabwareId = uuid()
     const moduleOnSlot = robotState.modules[moduleId].slot
     const labwareToStore = Object.entries(robotState.labware).find(
