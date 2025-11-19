@@ -1,5 +1,6 @@
 import type { IconName } from '@opentrons/components'
 import type {
+  FlexStackerStoredLabwareGroup,
   Height,
   LabwareLocation,
   NozzleConfigurationStyle,
@@ -172,6 +173,7 @@ export type StepType =
   | 'pause'
   | 'temperature'
   | 'thermocycler'
+  | 'flexStacker'
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
@@ -186,6 +188,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
   temperature: 'ot-temperature-v2',
   thermocycler: 'ot-thermocycler',
   heaterShaker: 'ot-heater-shaker',
+  flexStacker: 'ot-flex-stacker',
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
