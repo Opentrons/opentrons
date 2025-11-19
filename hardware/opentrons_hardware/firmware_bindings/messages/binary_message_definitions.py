@@ -1,5 +1,5 @@
 """Definition of Binary messages."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field, fields, MISSING
 from functools import lru_cache
 from typing import Type, Union, Optional
 from typing_extensions import get_args
@@ -23,50 +23,62 @@ log = logging.getLogger(__name__)
 class Echo(utils.BinarySerializable):
     """Send a message to the device and have it echoed back."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.echo)
-    length: utils.UInt16Field = utils.UInt16Field(0)
-    message: utils.BinaryFieldBase[bytes] = utils.BinaryFieldBase(bytes())
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.echo)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
+    message: utils.BinaryFieldBase[bytes] = field(
+        default_factory=utils.BinaryFieldBase(bytes())
+    )
 
 
 @dataclass
 class Ack(utils.BinarySerializable):
     """Sent as a reply from the device to signal message received."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.ack)
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.ack)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class AckFailed(utils.BinarySerializable):
     """Sent as a reply from the device to signal message could not be interpreted."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.ack_failed)
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.ack_failed)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class DeviceInfoRequest(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.device_info_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.device_info_request)
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class DeviceInfoResponse(utils.BinarySerializable):
     """Version information sent from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.device_info_response
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.device_info_response)
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
-    version: utils.UInt32Field = utils.UInt32Field(0)
-    flags: VersionFlagsField = VersionFlagsField(0)
-    shortsha: FirmwareShortSHADataField = FirmwareShortSHADataField(bytes())
-    revision: OptionalRevisionField = OptionalRevisionField("", "", "")
-    subidentifier: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
+    version: utils.UInt32Field = field(default_factory=lambda: utils.UInt32Field(0))
+    flags: VersionFlagsField = field(default_factory=lambda: VersionFlagsField(0))
+    shortsha: FirmwareShortSHADataField = field(
+        default_factory=lambda: FirmwareShortSHADataField(bytes())
+    )
+    revision: OptionalRevisionField = field(
+        default_factory=lambda: OptionalRevisionField("", "", "")
+    )
+    subidentifier: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
     @classmethod
     def build(cls, data: bytes) -> "DeviceInfoResponse":
@@ -121,118 +133,136 @@ class DeviceInfoResponse(utils.BinarySerializable):
 class EnterBootloaderRequest(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.enter_bootloader_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.enter_bootloader_request
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class EnterBootloaderResponse(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.enter_bootloader_response
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.enter_bootloader_response
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(1)
-    success: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(1))
+    success: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class EngageEstop(utils.BinarySerializable):
     """Send a request to enable the estop line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.engage_estop)
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.engage_estop)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class ReleaseEstop(utils.BinarySerializable):
     """Send a request to disable the estop line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.release_estop)
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.release_estop)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class EngageSyncOut(utils.BinarySerializable):
     """Send a request to enable the sync line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.engage_nsync_out)
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.engage_nsync_out)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class ReleaseSyncOut(utils.BinarySerializable):
     """Send a request to disable the sync line."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.release_nsync_out)
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.release_nsync_out)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class EstopStateChange(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.estop_state_change
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.estop_state_change)
     )
-    length: utils.UInt16Field = utils.UInt16Field(1)
-    engaged: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(1))
+    engaged: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class EstopButtonDetectionChange(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.estop_button_detection_change
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.estop_button_detection_change
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(2)
-    aux1_detected: utils.UInt8Field = utils.UInt8Field(0)
-    aux2_detected: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(2))
+    aux1_detected: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
+    aux2_detected: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class EstopButtonPresentRequest(utils.BinarySerializable):
     """Sent from the host to request any what aux ports are connected."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.estop_button_present_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.estop_button_present_request
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class EstopStateRequest(utils.BinarySerializable):
     """Sent from the host to request the estop state."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.estop_state_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.estop_state_request)
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class AuxPresentDetectionChange(utils.BinarySerializable):
     """Sent from the rear panel when a aux device is connected or disconnected."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.aux_present_detection_change
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.aux_present_detection_change
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(2)
-    aux1_detected: utils.UInt8Field = utils.UInt8Field(0)
-    aux2_detected: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(2))
+    aux1_detected: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
+    aux2_detected: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class AuxPresentRequest(utils.BinarySerializable):
     """Sent from the host to request any what aux ports are connected."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.aux_present_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.aux_present_request)
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
@@ -242,98 +272,112 @@ class AuxIDResponse(utils.BinarySerializable):
     # each value should return false if they are in their default state
     # or true if they are pulled in the opposite way
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.aux_id_response)
-    length: utils.UInt16Field = utils.UInt16Field(2)
-    aux1_id_state: utils.UInt8Field = utils.UInt8Field(0)
-    aux2_id_state: utils.UInt8Field = utils.UInt8Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.aux_id_response)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(2))
+    aux1_id_state: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
+    aux2_id_state: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class AuxIDRequest(utils.BinarySerializable):
     """Sent from the host during testing to request aux_id pin state."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.aux_id_request)
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.aux_id_request)
+    )
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class DoorSwitchStateRequest(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.door_switch_state_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.door_switch_state_request
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class DoorSwitchStateInfo(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.door_switch_state_info
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.door_switch_state_info
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(1)
-    door_open: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(1))
+    door_open: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class SyncStateRequest(utils.BinarySerializable):
     """Request the sync state from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.sync_state_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.sync_state_request)
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class SyncStateResponse(utils.BinarySerializable):
     """Request the version information from the device."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.sync_state_resposne
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.sync_state_resposne)
     )
-    length: utils.UInt16Field = utils.UInt16Field(1)
-    engaged: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(1))
+    engaged: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class WriteEEPromRequest(utils.BinarySerializable):
     """Write to the EEPROM."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.write_eeprom_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.write_eeprom_request)
     )
-    length: utils.UInt16Field = utils.UInt16Field(12)
-    data_address: utils.UInt16Field = utils.UInt16Field(0)
-    data_length: utils.UInt16Field = utils.UInt16Field(0)
-    data: EepromDataField = EepromDataField(bytes())
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(12))
+    data_address: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(0)
+    )
+    data_length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
+    data: EepromDataField = field(default_factory=EepromDataField(bytes()))
 
 
 @dataclass
 class ReadEEPromRequest(utils.BinarySerializable):
     """Read from the EEPROM."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.read_eeprom_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.read_eeprom_request)
     )
-    length: utils.UInt16Field = utils.UInt16Field(4)
-    data_address: utils.UInt16Field = utils.UInt16Field(0)
-    data_length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(4))
+    data_address: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(0)
+    )
+    data_length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class ReadEEPromResponse(utils.BinarySerializable):
     """Read from the EEPROM response."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.read_eeprom_response
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.read_eeprom_response)
     )
-    length: utils.UInt16Field = utils.UInt16Field(12)
-    data_address: utils.UInt16Field = utils.UInt16Field(0)
-    data_length: utils.UInt16Field = utils.UInt16Field(0)
-    data: EepromDataField = EepromDataField(bytes())
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(12))
+    data_address: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(0)
+    )
+    data_length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
+    data: EepromDataField = field(default_factory=EepromDataField(bytes()))
 
 
 @dataclass
@@ -344,38 +388,44 @@ class AddLightActionRequest(utils.BinarySerializable):
     range [0,255], where 0 is fully off and 255 is fully on.
     """
 
-    message_id: utils.UInt16Field = utils.UInt16Field(BinaryMessageId.add_light_action)
-    length: utils.UInt16Field = utils.UInt16Field(7)
-    transition_time: utils.UInt16Field = utils.UInt16Field(0)
-    transition_type: LightTransitionTypeField = LightTransitionTypeField(
-        LightTransitionType.linear
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.add_light_action)
     )
-    red: utils.UInt8Field = utils.UInt8Field(0)
-    green: utils.UInt8Field = utils.UInt8Field(0)
-    blue: utils.UInt8Field = utils.UInt8Field(0)
-    white: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(7))
+    transition_time: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(0)
+    )
+    transition_type: LightTransitionTypeField = field(
+        default_factory=LightTransitionTypeField(LightTransitionType.linear)
+    )
+    red: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
+    green: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
+    blue: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
+    white: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class ClearLightActionStagingQueue(utils.BinarySerializable):
     """Clear the staging queue for light actions."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.clear_light_action_staging_queue
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.clear_light_action_staging_queue
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class StartLightAction(utils.BinarySerializable):
     """Begin the action that is in the staging queue."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.start_light_action
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(BinaryMessageId.start_light_action)
     )
-    length: utils.UInt16Field = utils.UInt16Field(1)
-    type: LightAnimationTypeField = LightAnimationTypeField(
-        LightAnimationType.single_shot
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(1))
+    type: LightAnimationTypeField = field(
+        default_factory=lambda: LightAnimationTypeField(LightAnimationType.single_shot)
     )
 
 
@@ -383,33 +433,39 @@ class StartLightAction(utils.BinarySerializable):
 class SetDeckLightRequest(utils.BinarySerializable):
     """Set the deck light on or off."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.set_deck_light_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.set_deck_light_request
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(1)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(1))
     # Set to 0 for off, 1 for on
-    setting: utils.UInt8Field = utils.UInt8Field(0)
+    setting: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 @dataclass
 class GetDeckLightRequest(utils.BinarySerializable):
     """Get the deck light status."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.get_deck_light_request
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.get_deck_light_request
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
 
 
 @dataclass
 class GetDeckLightResponse(utils.BinarySerializable):
     """Contains deck light status."""
 
-    message_id: utils.UInt16Field = utils.UInt16Field(
-        BinaryMessageId.get_deck_light_response
+    message_id: utils.UInt16Field = field(
+        default_factory=lambda: utils.UInt16Field(
+            BinaryMessageId.get_deck_light_response
+        )
     )
-    length: utils.UInt16Field = utils.UInt16Field(1)
-    setting: utils.UInt8Field = utils.UInt8Field(0)
+    length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(1))
+    setting: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
 
 
 BinaryMessageDefinition = Union[
@@ -463,8 +519,18 @@ def get_binary_definition(
     """
     # Dumb linear search, but the result is memoized.
     for i in get_args(BinaryMessageDefinition):
-        if i.message_id.value == message_id:
-            # get args returns Tuple[Any...]
-            return i  # type: ignore[no-any-return]
+        for message_type_field in fields(i):
+            if message_type_field.name != "message_id":
+                continue
+            if (
+                message_type_field.default is not MISSING
+                and message_type_field.default.value == message_id
+            ):
+                return i
+            if (
+                message_type_field.default_factory is not MISSING
+                and message_type_field.default_factory().value == message_id
+            ):
+                return i
     log.error("No binary message definition found.")
     return None
