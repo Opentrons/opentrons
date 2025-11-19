@@ -33,7 +33,7 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
       <div className={styles.command_step}>
         <div className={styles.command_step_header}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t('timeline')}
+            {t('protocol_steps')}
           </StyledText>
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
             {t('percent_complete', { percent: percentComplete.toFixed(0) })}

@@ -32,7 +32,7 @@ describe('CommandSteps', () => {
   })
   it('should render header text', () => {
     render(props)
-    screen.getByText('Timeline')
+    screen.getByText('Protocol Steps')
     screen.getByText('50% complete')
   })
 
