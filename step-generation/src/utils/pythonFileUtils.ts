@@ -556,7 +556,6 @@ export function pythonDefRun(
     trashBinEntities,
   } = invariantContext
   const { modules, labware, pipettes } = robotState
-  console.log('robotStateTimeline: ', robotStateTimeline)
   const sections: string[] = [
     getLoadModules(moduleEntities, modules),
     getLoadAdapters(moduleEntities, labwareEntities, labware),
