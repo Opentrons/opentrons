@@ -18,7 +18,7 @@ wheel = "==0.37.1"
 pytest = "<9,>=8.4.0"
 pytest-cov = "==4.1.0"
 pytest-xdist = "~=3.5.0 "
-typeguard = "~=4.1.5"
+typeguard = "~=4.4.4"
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
