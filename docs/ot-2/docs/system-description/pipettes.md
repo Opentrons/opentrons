@@ -12,15 +12,15 @@ Opentrons OT-2 pipettes are configurable devices used to move liquids throughout
 
 <font color="red">PLACEHOLDER FOR GEN2 IMAGES ADD AFTER MERGE TO MAIN BRANCH</font>
 
-A single-channel and multi-channel pipette each occupy one mount (left or right) on the carriage.
+A single-channel or multi-channel pipette each occupy one mount (left or right) on the carriage.
 
 ## Installation
 
-For details on installing pipettes, see <font color="red">LINK REMIDNER Instrument Installation and Calibration</font>.
+For instructions on installing pipettes, see the [Instrument Installation and Calibration section](../installation/instruments.md).
 
 ## Picking up and dropping tips
 
-The pipettes pick up disposable plastic tips by pressing them onto the pipette nozzles, and then aspirate and dispense liquids using the tips. The total force required for pickup increases as more tips get picked up simultaneously.
+The pipettes pick up disposable plastic tips by pressing them onto the pipette nozzles, and then aspirate and dispense liquids using the tips. The total force required for pickup increases as more tips are picked up simultaneously.
 
 To discard tips (or return them to their rack), the pipette ejector mechanism pushes the tips off of the nozzles.
 
@@ -128,7 +128,7 @@ The following tables list the accuracy and precision specifications for OT-2 pip
 
 ### Multi-channel pipettes
 
-These instruments have 8 pipette channels.
+These instruments have 8 channels.
 
 <table>
   <thead>

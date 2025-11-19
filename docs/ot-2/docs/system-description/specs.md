@@ -14,7 +14,7 @@ title: "Opentrons OT-2: System Specifications"
   <tbody>
     <tr>
         <td><strong>Dimensions</strong></td>
-        <td>The OT-2's dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x25").</td>
+        <td>The OT-2's dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x 25").</td>
     </tr>
     <tr>
         <td><strong>Weight</strong></td>
@@ -23,7 +23,7 @@ title: "Opentrons OT-2: System Specifications"
     <tr>
         <td><strong>Deck slots</strong></td>
         <td><ul>
-            <li>11 ANSI/SLAS-compatible slots in the working area.</li>
+            <li>11 ANSI/SLAS-compliant slots in the working area.</li>
             <li>1 slot for a removable trash bin.</li>
             </ul>
         </td>
@@ -33,7 +33,7 @@ title: "Opentrons OT-2: System Specifications"
         <td>2.4 GHz IEEE 802.11b/g/n</td>
     </tr>
     <tr>
-        <td><strong>Ethernet</td>
+        <td><strong>Ethernet</strong></td>
         <td>100 Mbps</td>
     </tr>
     <tr>
@@ -57,7 +57,7 @@ title: "Opentrons OT-2: System Specifications"
                 <li>When active, the OT-2 can use 100 to 180 W.</li>
             </ul>
         </p>
-        <p>Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the Opentrons OT-2 Liquid Handler and how many pipettes are attached.</p></td>
+        <p>Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the OT-2 and the number of attached pipettes.</p></td>
     </tr>
     <tr>
         <td><strong>Frame composition</strong></td>

@@ -6,9 +6,9 @@ title: "Opentrons OT-2: Robot Components"
 
 ## Frame and enclosure
 
-The frame of the OT-2 provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems are situated on and mounted to the main frame. The frame is constructed of sheet metal and aluminum extrusions.
+The frame of the OT-2 provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems mounted to the main frame. The frame is constructed of sheet metal and aluminum extrusions.
 
-The metal frame has openings for side windows and a front door made of transparent polycarbonate that lets you see what's going on inside the robot. The lower-half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare and manipulate the deck before and during a protocol run.
+The metal frame has openings for side windows and a front door made of transparent polycarbonate that lets you see what's going on inside the robot. The lower half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare and manipulate the deck before and during a protocol run.
 
 Other frame elements include:
 
@@ -26,11 +26,11 @@ The gantry moves separately along the x- and y-axis to position the pipettes and
 
 In turn, the pipette carriage is attached to the gantry. The pipette carriage holds mounting points for single- and multi-channel pipettes. The mounting points move along the z-axis to position pipettes at precise locations for protocol execution.
 
-The electronics contained in the gantry provide power and communications to the pipettes, when attached.
+The electronics in the gantry provide power and communications to attached pipettes.
 
 ## OT-2 deck and working area
 
-The deck is the machined aluminum surface on which automated science protocols are executed. It provides 11 ANSI/SLAS-compliant slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck.
+The deck is the machined aluminum surface on which automated science protocols are executed. It provides 11 ANSI/SLAS-compliant slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the  rear right corner of the deck.
 
 ![deck and working area](../images/ot2-deck-working-area.png)
 
@@ -89,7 +89,7 @@ On the side panel below the LED status indicators, you can find the on/off switc
 
 ![Switch, Ethernet, and power connection](../images/power-ethernet.png)
 
-See [First Run](../installation/first-run.md) for information and instruction on how to properly connect your OT-2 to its external power supply and local network.
+See [First Run](../installation/first-run.md) for information on how to properly connect your OT-2 to its external power supply and local network.
 
 ### USB ports
 
