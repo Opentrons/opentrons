@@ -3,6 +3,7 @@ import type {
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
   FlexStackerSetStoredLabwareParams,
+  FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   LabwareDefinition2,
   LabwareLocation,
@@ -109,8 +110,9 @@ export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
   maxPoolCount: number
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
-  labwareInHopper: string[] | null
-  labwareInShuttle: string | null
+  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
+  // should this be a group too?
+  labwareOnShuttle: string | null
 }
 
 export type ModuleState =

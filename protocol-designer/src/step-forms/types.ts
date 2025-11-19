@@ -5,6 +5,7 @@ import type {
   FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
   FlexStackerSetStoredLabwareParams,
+  FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -74,8 +75,8 @@ export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
   maxPoolCount: number
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
-  labwareInHopper: string[] | null
-  labwareInShuttle: string | null
+  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
+  labwareOnShuttle: string | null
 }
 export type InitializationMode = 'single' | 'multi'
 export interface Initialization {

@@ -258,7 +258,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareInShuttle).not.toBeNull()
+    expect(moduleState?.labwareOnShuttle).not.toBeNull()
     expect(moduleState?.labwareInHopper).toHaveLength(2)
     expect(robotState.labware.tiprack1Id?.stack).toHaveLength(1)
   })
@@ -310,7 +310,7 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       robotState,
       FLEX_STACKER_ID
     ) as FlexStackerModuleState
-    expect(moduleState?.labwareInShuttle).toBeNull()
+    expect(moduleState?.labwareOnShuttle).toBeNull()
     expect(moduleState?.labwareInHopper).toHaveLength(4)
   })
 })

@@ -45,7 +45,7 @@ describe('flexStackerEmpty', () => {
         type: FLEX_STACKER_MODULE_TYPE,
         maxPoolCount: 6,
         storedLabwareDetails: null,
-        labwareInShuttle: null,
+        labwareOnShuttle: null,
         labwareInHopper: null,
       },
     }

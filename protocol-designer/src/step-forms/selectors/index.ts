@@ -233,7 +233,7 @@ const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   maxPoolCount: 0,
   storedLabwareDetails: null,
   labwareInHopper: null,
-  labwareInShuttle: null,
+  labwareOnShuttle: null,
 }
 
 const MODULE_INITIAL_STATES_MAP: Record<
