@@ -28,9 +28,34 @@ dependencies = [
     "wsproto==1.2.0",
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
+    "idna==3.3",
 ]
 
 dynamic = ['version']
+
+[dependency-groups]
+dev = [
+    "atomicwrites==1.4.0; sys_platform=='win32'",
+    "colorama==0.4.4; sys_platform=='win32'",
+    "pytest>=8,<9",
+    "pytest-asyncio<2,>=1",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=2.5.0",
+    "requests==2.31.0",
+    "mock==5.1.0",
+    "mypy==1.11.0",
+    "flake8==7.0.0",
+    "flake8-annotations==3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "decoy<3,>=2.2.0",
+    "httpx==0.26.0",
+    "black==22.3.0",
+    "types-requests~=2.31.0",
+    "types-mock~=5.1.0",
+    "sqlalchemy2-stubs==0.0.2a21",
+    "build~=1.2.0",
+]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/server-utils"

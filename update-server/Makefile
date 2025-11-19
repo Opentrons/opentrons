@@ -1,5 +1,5 @@
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
@@ -22,10 +22,18 @@ ssh_key ?= $(default_ssh_key)
 ssh_opts ?= $(default_ssh_opts)
 
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --group dev; \
+	else \
+		uv sync --group dev; \
+	fi
+endef
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
@@ -45,7 +53,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(UV) venv --remove
 
 .PHONY: test
 test:

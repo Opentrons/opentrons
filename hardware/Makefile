@@ -1,7 +1,7 @@
 # hardware makefile
 
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 
@@ -55,14 +55,22 @@ clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean wheel
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --group dev; \
+	else \
+		uv sync --group dev; \
+	fi
+endef
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(UV) venv --remove
 
 .PHONY: clean
 clean:
@@ -135,7 +143,7 @@ push: push-no-restart
 	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: push-no-restart-ot3
-push-no-restart-ot3: wheel Pipfile.lock
+push-no-restart-ot3: wheel
 	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
 
 .PHONY: push-ot3

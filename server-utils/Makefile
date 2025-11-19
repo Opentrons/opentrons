@@ -1,7 +1,7 @@
 # opentrons robot server makefile
 
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 
@@ -52,10 +52,18 @@ clean_all_cmd = $(clean_cmd) dist
 .PHONY: all
 all: clean wheel
 
+define uv_sync_dev
+	if [ -f uv.lock ]; then \
+		uv sync --frozen --group dev; \
+	else \
+		uv sync --group dev; \
+	fi
+endef
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@uv pip list
 
 .PHONY: clean
 clean:
@@ -64,7 +72,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(UV) venv --remove
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)
@@ -93,9 +101,6 @@ format:
 	$(python) -m black .
 
 
-.PHONY: local-shell
-local-shell:
-	$(pipenv) shell
 
 .PHONY: push
 push: wheel
