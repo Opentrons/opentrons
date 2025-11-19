@@ -28,7 +28,7 @@ describe('getStackerMaxPoolCountByHeight()', () => {
     )
   })
 
-  it('should throw an error if the module model is invalid', () => {
+  it('should console an error if the module model is invalid', () => {
     const mockConsoleError = vi
       .spyOn(console, 'error')
       .mockImplementation(() => {})
@@ -52,14 +52,17 @@ describe('getLabwareOverlapOffset()', () => {
     expect(result).toStrictEqual({ x: 0, y: 0, z: 0 })
   })
 
-  it('should throw an error if the module model is invalid', () => {
-    expect(() =>
-      getLabwareOverlapOffset(
-        MAGNETIC_MODULE_V1,
-        mockLabwareDefinition,
-        'labware-name'
-      )
-    ).toThrow(
+  it('should console an error if the module model is invalid', () => {
+    const mockConsoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {})
+    const result = getLabwareOverlapOffset(
+      MAGNETIC_MODULE_V1,
+      mockLabwareDefinition,
+      'labware-name'
+    )
+    expect(result).toStrictEqual({ x: 0, y: 0, z: 0 })
+    expect(mockConsoleError).toHaveBeenCalledWith(
       'Invalid module model for labware overlap offset: magneticModuleV1'
     )
   })

@@ -10,7 +10,8 @@ export const getModuleMaxFillHeight = (model: ModuleModel): number => {
       getModuleDef(FLEX_STACKER_MODULE_V1).dimensions.maxStackerFillHeight ?? 0
     )
   }
-  throw new Error(`Invalid module model for max fill height: ${model}`)
+  console.error(`Invalid module model for max fill height: ${model}`)
+  return 0
 }
 
 export const getStackerMaxPoolCountByHeight = (
@@ -39,7 +40,8 @@ export const getLabwareOverlapOffset = (
   belowLabwareName: string
 ): Vector3D => {
   if (model !== FLEX_STACKER_MODULE_V1) {
-    throw new Error(`Invalid module model for labware overlap offset: ${model}`)
+    console.error(`Invalid module model for labware overlap offset: ${model}`)
+    return { x: 0, y: 0, z: 0 }
   }
   if (
     belowLabwareName in Object.keys(definition.stackingOffsetWithLabware ?? {})
