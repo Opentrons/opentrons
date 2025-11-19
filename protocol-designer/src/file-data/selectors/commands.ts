@@ -97,7 +97,6 @@ export const getInitialRobotState: (
         return omit(m, ['id', 'type', 'model'])
       }
     )
-    console.log('modules:', modules)
     const robotState = StepGeneration.makeInitialRobotState({
       invariantContext,
       labwareLocations: labware,
