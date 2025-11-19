@@ -50,7 +50,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
 
     def transfer(
         pipette: InstrumentContext,
@@ -76,10 +76,15 @@ def run(protocol: ProtocolContext) -> None:
 
         # Perform transfer
         if source.current_liquid_volume() < volume:
-            src_location = source.meniscus(z=meniscus_z, target="end")
+            src_start_location = source.meniscus(z=meniscus_z, target="start")
+            src_end_location = source.meniscus(z=meniscus_z, target="end")
         else:
-            src_location = source.bottom(z=dot_bottom)
-        pipette.aspirate(volume, src_location)
+            src_start_location = source.bottom(z=dot_bottom)
+            src_end_location = source.bottom(z=dot_bottom)
+        pipette.prepare_to_aspirate()
+        pipette.aspirate(
+            volume, location=src_start_location, end_location=src_end_location
+        )
         pipette.move_to(source.top(), speed=5)
         pipette.dispense(volume, dest.bottom(z=dot_bottom))
         pipette.move_to(dest.top(), speed=5)

@@ -72,7 +72,7 @@ def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     protocol.capture_image(filename="start_of_run")
 
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
 
     # ======================== DOWNLOADED PARAMETERS ========================
     global REUSE_ANY_50_TIPS  # T/F Whether or not Reusing any p50

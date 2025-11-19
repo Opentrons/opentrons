@@ -72,13 +72,12 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
 def run(protocol: protocol_api.ProtocolContext) -> None:
     """Protocol Set Up."""
     protocol.capture_image(filename="start_of_run")
-
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "04")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -267,6 +266,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         dispensing at the top and 2 cycles of aspirating from middle,
         dispensing at the bottom
         """
+        protocol.capture_image(filename="mixing")
         center = well.top(5)
         asp = well.bottom(z=1)
         disp = well.top(-8)
@@ -297,6 +297,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
     def lysis(vol: float, source: Well) -> None:
         """Lysis."""
         protocol.comment("-----Beginning Lysis Steps-----")
+        protocol.capture_image(filename="lysis")
         num_transfers = math.ceil(vol / 980)
         tipcheck(m1000)
         total_lysis_aspirated = 0.0
@@ -339,6 +340,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
                                plate.
         """
         protocol.comment("-----Beginning Binding Steps-----")
+        protocol.capture_image(filename="binding_steps")
+
         for i, well in enumerate(samples_m):
             tipcheck(m1000)
             num_trans = math.ceil(vol1 / 980)
@@ -441,6 +444,8 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         """Wash Steps."""
         global whichwash  # Defines which wash the protocol is on to log on the app
         protocol.comment("-----Now starting Wash #" + str(whichwash) + "-----")
+        protocol.capture_image(filename="wash_step")
+
         global wash_volume_tracker
 
         num_trans = math.ceil(vol / 980.0)
@@ -489,6 +494,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         remove_supernatant(vol)
 
     def elute(vol: float) -> None:
+        protocol.capture_image(filename="elute_step")
         tipcheck(m1000)
         total_elution_vol = 0.0
         for i, m in enumerate(samples_m):
@@ -585,6 +591,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         )
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:

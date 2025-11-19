@@ -39,7 +39,7 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "05")
+    helpers.comment_protocol_version(protocol, "06")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -125,10 +125,16 @@ def run(protocol: ProtocolContext) -> None:
                 break
 
             p50.configure_for_volume(water_vol)
-            p50.aspirate(water_vol, water.meniscus(z=meniscus_z, target="end"))
+            p50.prepare_to_aspirate()
+            p50.aspirate(
+                water_vol,
+                location=water.meniscus(z=meniscus_z, target="start"),
+                end_location=water.meniscus(z=meniscus_z, target="end"),
+            )
             p50.dispense(
                 water_vol,
-                dest_plate_1[dest_well].meniscus(z=2, target="end"),
+                location=dest_plate_1[dest_well].meniscus(z=2, target="start"),
+                end_location=dest_plate_1[dest_well].meniscus(z=2, target="end"),
                 rate=0.5,
             )
             p50.configure_for_volume(50)
@@ -162,9 +168,17 @@ def run(protocol: ProtocolContext) -> None:
                 break
             p50.configure_for_volume(mmx_vol)
             p50.aspirate(
-                mmx_vol, reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="end")
+                mmx_vol,
+                location=reagent_rack[mmx_tube].meniscus(z=meniscus_z, target="start"),
+                end_location=reagent_rack[mmx_tube].meniscus(
+                    z=meniscus_z, target="end"
+                ),
             )
-            p50.dispense(mmx_vol, dest_plate_1[dest_well].meniscus(z=2, target="end"))
+            p50.dispense(
+                mmx_vol,
+                location=dest_plate_1[dest_well].meniscus(z=2, target="start"),
+                end_location=dest_plate_1[dest_well].meniscus(z=2, target="end"),
+            )
             protocol.delay(seconds=2)
             p50.blow_out()
             p50.touch_tip()
@@ -190,13 +204,21 @@ def run(protocol: ProtocolContext) -> None:
             p50.configure_for_volume(dna_vol)
             p50.aspirate(
                 dna_vol,
-                source_plate_1[dest_and_source_well].meniscus(
+                location=source_plate_1[dest_and_source_well].meniscus(
+                    z=meniscus_z, target="start"
+                ),
+                end_location=source_plate_1[dest_and_source_well].meniscus(
                     z=meniscus_z, target="end"
                 ),
             )
             p50.dispense(
                 dna_vol,
-                dest_plate_1[dest_and_source_well].meniscus(z=2, target="end"),
+                location=dest_plate_1[dest_and_source_well].meniscus(
+                    z=2, target="start"
+                ),
+                end_location=dest_plate_1[dest_and_source_well].meniscus(
+                    z=2, target="end"
+                ),
                 rate=0.5,
             )
 

@@ -103,7 +103,7 @@ def run(protocol: ProtocolContext) -> None:
         open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
 
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
@@ -298,7 +298,8 @@ def run(protocol: ProtocolContext) -> None:
             for i in range(2 if ninety_six else 1):
                 pip.aspirate(
                     49 - pip.current_volume,
-                    src.meniscus(z=-1, target="end"),
+                    location=src.meniscus(z=-1, target="start"),
+                    end_location=src.meniscus(z=-1, target="end"),
                     rate=0.2,
                 )  # aspirate extra (backlash compensation)
                 protocol.delay(seconds=delay_time)
@@ -323,9 +324,11 @@ def run(protocol: ProtocolContext) -> None:
             for i in range(length):
                 volume = 9.1 + i * 0.15
                 protocol.comment(f"\nVOLUME: {volume}")
+                pip.prepare_to_aspirate()
                 pip.aspirate(
                     volume + 1.5 if i == 0 else volume,
-                    src.meniscus(z=-1, target="end"),
+                    location=src.meniscus(z=-1, target="start"),
+                    end_location=src.meniscus(z=-1, target="end"),
                     rate=0.35,
                 )
                 protocol.delay(seconds=delay_time)
@@ -334,7 +337,8 @@ def run(protocol: ProtocolContext) -> None:
                 pip.move_to(destination[i].top(10))
                 pip.dispense(
                     volume,
-                    destination[i].meniscus(z=-1, target="end"),
+                    location=destination[i].meniscus(z=-1, target="start"),
+                    end_location=destination[i].meniscus(z=-1, target="end"),
                     rate=0.2 if volume <= 5 else 1,
                     push_out=0,
                 )
@@ -355,7 +359,11 @@ def run(protocol: ProtocolContext) -> None:
             pip.configure_nozzle_layout(style=ALL)
             pip.configure_for_volume(volume)
             pip.pick_up_tip(full_tips)
-            pip.aspirate(volume, src.meniscus(z=-1, target="end"))
+            pip.aspirate(
+                volume,
+                location=src.meniscus(z=-1, target="start"),
+                end_location=src.meniscus(z=-1, target="end"),
+            )
             protocol.delay(seconds=delay_time)
             pip.dispense(
                 volume, destination.meniscus(z=-1, target="end")
@@ -373,9 +381,19 @@ def run(protocol: ProtocolContext) -> None:
             pip.pick_up_tip(
                 col_tips[0].wells()[5 * 8 if mmx_to_sample_plate else 6 * 8]
             )
-            pip.aspirate(volume, src.meniscus(z=-1, target="end"), rate=0.2)
+            pip.aspirate(
+                volume,
+                location=src.meniscus(z=-1, target="start"),
+                end_location=src.meniscus(z=-1, target="end"),
+                rate=0.2,
+            )
             protocol.delay(seconds=delay_time)
-            pip.dispense(volume, destination.meniscus(z=-1, target="end"), rate=0.2)
+            pip.dispense(
+                volume,
+                location=destination.meniscus(z=-1, target="start"),
+                end_location=destination.meniscus(z=-1, target="end"),
+                rate=0.2,
+            )
             pip.blow_out(destination.meniscus(z=2, target="end"))
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
@@ -439,12 +457,15 @@ def run(protocol: ProtocolContext) -> None:
                 pip.pick_up_tip(ifp_tips.pop(0))
             pip.aspirate(
                 volume + 4,
-                src[i].meniscus(z=-1, target="end"),
+                location=src[i].meniscus(z=-1, target="start"),
+                end_location=src[i].meniscus(z=-1, target="end"),
                 rate=0.2 if volume <= 5 else 1,
             )
             protocol.delay(seconds=delay_time)
             pip.dispense(
-                2, src[i].meniscus(z=-1, target="end")
+                2,
+                location=src[i].meniscus(z=-1, target="start"),
+                end_location=src[i].meniscus(z=-1, target="end"),
             )  # compensate for backlash
             # Retract
             pip.dispense(
