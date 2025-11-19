@@ -35,9 +35,11 @@ import type {
   ViewSubstep,
 } from './types'
 
-// adds an incremental integer ID for Step reducers.
-// NOTE: if this is an "add step" directly performed by the user,
-// addAndSelectStepWithHints is probably what you want
+/**
+ * adds an incremental integer ID for Step reducers.
+ * NOTE: if this is an "add step" directly performed by the user,
+ * addAndSelectStepWithHints is probably what you want
+ */
 export const addStep = (args: {
   stepType: StepType
   robotStateTimeline: Timeline
@@ -53,10 +55,12 @@ export const addStep = (args: {
     },
   }
 }
+
 export const hoverSelection = (args: Selection): hoverSelectionAction => ({
   type: 'HOVER_DROPDOWN_ITEM',
   payload: { id: args.id, text: args.text },
 })
+
 export const selectDropdownItem = (args: {
   selection: Selection | null
   mode: Mode
@@ -81,35 +85,41 @@ export const hoverOnSubstep = (
   type: 'HOVER_ON_SUBSTEP',
   payload: payload,
 })
+
 export const selectTerminalItem = (
   terminalId: TerminalItemId
 ): SelectTerminalItemAction => ({
   type: 'SELECT_TERMINAL_ITEM',
   payload: terminalId,
 })
+
 export const hoverOnStep = (
   stepId: StepIdType | null | undefined
 ): HoverOnStepAction => ({
   type: 'HOVER_ON_STEP',
   payload: stepId,
 })
+
 export const hoverOnTerminalItem = (
   terminalId: TerminalItemId | null | undefined
 ): HoverOnTerminalItemAction => ({
   type: 'HOVER_ON_TERMINAL_ITEM',
   payload: terminalId,
 })
+
 export const setWellSelectionLabwareKey = (
   labwareName: string | null | undefined
 ): SetWellSelectionLabwareKeyAction => ({
   type: 'SET_WELL_SELECTION_LABWARE_KEY',
   payload: labwareName,
 })
+
 export const clearWellSelectionLabwareKey =
   (): ClearWellSelectionLabwareKeyAction => ({
     type: 'CLEAR_WELL_SELECTION_LABWARE_KEY',
     payload: null,
   })
+
 export const resetSelectStep =
   (stepId: StepIdType): ThunkAction<any> =>
   (dispatch: ThunkDispatch<any>, getState: GetState) => {
@@ -226,6 +236,7 @@ export const populateForm =
     setSelection(formData, dispatch)
     resetScrollElements()
   }
+
 export const selectStep =
   (stepId: StepIdType): ThunkAction<any> =>
   (dispatch: ThunkDispatch<any>, getState: GetState) => {
@@ -242,6 +253,7 @@ export const selectStep =
     })
     setSelection(formData, dispatch)
   }
+
 // NOTE(sa, 2020-12-11): this is a thunk so that we can populate the batch edit form with things later
 export const selectMultipleSteps =
   (
@@ -258,6 +270,7 @@ export const selectMultipleSteps =
     }
     dispatch(selectStepAction)
   }
+
 export const selectAllSteps =
   (): ThunkAction<SelectMultipleStepsAction | AnalyticsEventAction> =>
   (
@@ -284,8 +297,10 @@ export const selectAllSteps =
       dispatch(analyticsEvent(selectAllStepsEvent))
     }
   }
+
 export const EXIT_BATCH_EDIT_MODE_BUTTON_PRESS: 'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS' =
   'EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'
+
 // todo(mm, 2025-10-31): "deselectAllSteps" is a bit of a misnomer, since this also selects a step.
 export const deselectAllSteps =
   (
