@@ -16,7 +16,7 @@ metadata = {
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 open_location: Any = "A4"
 
@@ -85,6 +85,7 @@ def add_parameters(p: ParameterContext) -> None:
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
     global open_location
+    protocol.capture_image(filename="start_of_run")
 
     # Import Parameters
     if not protocol.is_simulating():

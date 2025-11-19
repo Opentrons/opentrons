@@ -25,7 +25,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.26",
+    "apiLevel": "2.27",
 }
 
 
@@ -74,6 +74,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    protocol.capture_image(filename="start_of_run")
+
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
@@ -291,14 +293,18 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 if STEP_HYB == 1:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    thermocycler.set_block_temperature(4)
-                    thermocycler.set_lid_temperature(100)
-                    temp_block.set_temperature(4)
+                    tc_block_task = thermocycler.start_set_block_temperature(4)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(100)
+                    temp_block_task = temp_block.start_set_temperature(4)
+                    protocol.wait_for_tasks(
+                        [tc_block_task, tc_lid_task, temp_block_task]
+                    )
                 else:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    thermocycler.set_block_temperature(58)
-                    thermocycler.set_lid_temperature(58)
-                    heatershaker.set_and_wait_for_temperature(58)
+                    tc_block_task = thermocycler.start_set_block_temperature(58)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
+                    hs_task = heatershaker.set_target_temperature(58)
+                    protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
             heatershaker.close_labware_latch()
 
             # Sample Plate contains 30ul  of DNA
@@ -426,11 +432,10 @@ def run(protocol: ProtocolContext) -> None:
 
                 if DRYRUN is False:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    thermocycler.set_block_temperature(58)
-                    thermocycler.set_lid_temperature(58)
-
-                if DRYRUN is False:
-                    heatershaker.set_and_wait_for_temperature(58)
+                    tc_block_task = thermocycler.start_set_block_temperature(58)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
+                    hs_task = heatershaker.set_target_temperature(58)
+                    protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
 
                 protocol.comment("--> Transfer Hybridization")
                 TransferSup = 100

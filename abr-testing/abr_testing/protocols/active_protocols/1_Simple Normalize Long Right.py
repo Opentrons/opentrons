@@ -15,7 +15,7 @@ metadata = {
     "source": "Protocol Library",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -37,6 +37,7 @@ def run(protocol: ProtocolContext) -> None:
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # DECK SETUP AND LABWARE
+    protocol.capture_image(filename="start_of_run")
     protocol.comment("THIS IS A NO MODULE RUN")
     tiprack_x_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
     tiprack_x_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
@@ -148,7 +149,12 @@ def run(protocol: ProtocolContext) -> None:
                 DilutionVol = float(data[current][2])
                 while Diluent_1.current_liquid_volume() < DilutionVol:
                     p1000.aspirate(
-                        DilutionVol, Diluent_1.meniscus(z=meniscus_z, target="end")
+                        DilutionVol,
+                        location=Diluent_1.meniscus(
+                            z=meniscus_z,
+                            target="start",
+                        ),
+                        end_location=Diluent_1.meniscus(z=-1, target="end"),
                     )
                     p1000.dispense(
                         DilutionVol,
@@ -189,7 +195,9 @@ def run(protocol: ProtocolContext) -> None:
                 while Diluent_2.current_liquid_volume() < DilutionVol:
                     p1000_single.pick_up_tip()
                     p1000_single.aspirate(
-                        DilutionVol, Diluent_2.meniscus(z=meniscus_z, target="end")
+                        DilutionVol,
+                        location=Diluent_2.meniscus(z=meniscus_z, target="start"),
+                        end_location=Diluent_2.meniscus(z=meniscus_z, target="end"),
                     )
                     p1000_single.dispense(
                         DilutionVol,
@@ -227,7 +235,9 @@ def run(protocol: ProtocolContext) -> None:
                 while Diluent_3.current_liquid_volume() < DilutionVol:
                     p1000_single.pick_up_tip()
                     p1000_single.aspirate(
-                        DilutionVol, Diluent_3.meniscus(z=meniscus_z, target="end")
+                        DilutionVol,
+                        location=Diluent_3.meniscus(z=meniscus_z, target="start"),
+                        end_location=Diluent_3.meniscus(z=meniscus_z, target="end"),
                     )
                     p1000_single.dispense(
                         DilutionVol,
@@ -267,7 +277,9 @@ def run(protocol: ProtocolContext) -> None:
                 while Diluent_3.current_liquid_volume() < DilutionVol:
                     p1000_single.pick_up_tip()
                     p1000_single.aspirate(
-                        DilutionVol, Diluent_3.meniscus(z=meniscus_z, target="end")
+                        DilutionVol,
+                        location=Diluent_3.meniscus(z=meniscus_z, target="start"),
+                        end_location=Diluent_3.meniscus(z=meniscus_z, target="end"),
                     )
                     p1000_single.dispense(
                         DilutionVol,

@@ -18,7 +18,7 @@ metadata = {
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 DECK_SLOTS = ["A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D2", "D3"]
@@ -124,6 +124,8 @@ def unload_tipracks_from_stacker(
 
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
+    ctx.capture_image(filename="start_of_run")
+
     use_temp_mod = ctx.params.use_temp_mod  # type: ignore[attr-defined]
     if not ctx.is_simulating():
         from abr_testing.protocols import helpers

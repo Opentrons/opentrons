@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.26",
+    "apiLevel": "2.27",
 }
 """
 Slot A1: Tips 200
@@ -78,6 +78,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    protocol.capture_image(filename="start_of_run")
+
     dry_run = False
     inc_lysis = True
     res_type = "opentrons_tough_12_reservoir_22ml"
@@ -131,7 +133,7 @@ def run(protocol: ProtocolContext) -> None:
     elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
-    temp.set_temperature(4)
+    temp_task = temp.start_set_temperature(4)
     magblock: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
@@ -607,6 +609,7 @@ def run(protocol: ProtocolContext) -> None:
         wash(wash_vol, all_washes)
         wash(wash_vol, all_washes)
         # dnase1 treatment
+        protocol.wait_for_tasks([temp_task])
         dnase(30, dnase1)
         stop_reaction(stop_vol, stopreaction)
         # Resume washes

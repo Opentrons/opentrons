@@ -14,7 +14,7 @@ metadata = {
     "protocolName": "PCR Protocol with TC Auto Sealing Lid",
     "author": "Rami Farawi <ndiehl@opentrons.com",
 }
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -30,6 +30,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    protocol.capture_image(filename="start_of_run")
+
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
     parsed_csv = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
@@ -83,8 +85,11 @@ def run(protocol: ProtocolContext) -> None:
     protocol.load_trash_bin("A3")
     try:
         tc_mod.open_lid()
-        tc_mod.set_lid_temperature(105)
-        temp_mod.set_temperature(4)
+        tc_task = tc_mod.start_set_lid_temperature(105)
+        temp_mod_task = temp_mod.start_set_temperature(4)
+        protocol.wait_for_tasks(
+            [tc_task, temp_mod_task],
+        )
 
         # LOAD LIQUIDS
         water: Well = reagent_rack["B1"]
@@ -222,8 +227,8 @@ def run(protocol: ProtocolContext) -> None:
                 final_extension_time_min=5,
             )
 
-            tc_mod.set_block_temperature(4)
-
+            block_task = tc_mod.start_set_block_temperature(4)
+            protocol.wait_for_tasks([block_task])
             tc_mod.open_lid()
             if disposable_lid:
                 protocol.move_lid(dest_plate_1, "C2", use_gripper=True)

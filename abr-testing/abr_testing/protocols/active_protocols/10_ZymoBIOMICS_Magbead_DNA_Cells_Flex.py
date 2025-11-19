@@ -19,7 +19,7 @@ metadata = {
 }
 
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 """
 Slot A1: Tips 1000
 Slot A2: Tips 1000
@@ -71,6 +71,8 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     """Protocol Set Up."""
+    protocol.capture_image(filename="start_of_run")
+
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
@@ -564,7 +566,7 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         wash(wash1_vol, all_washes)
         wash(wash2_vol, all_washes)
         wash(wash3_vol, all_washes)
-        h_s.set_and_wait_for_temperature(55)
+        h_s.set_target_temperature(55)
         for beaddry in np.arange(drybeads, 0, -0.5):
             protocol.delay(
                 minutes=0.5,

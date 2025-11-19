@@ -18,7 +18,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.25",
+    "apiLevel": "2.27",
 }
 
 
@@ -57,6 +57,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    protocol.capture_image(filename="start_of_run")
+
     # ======================== DOWNLOADED PARAMETERS ========================
     global COLUMNS  # Number of Columns of Samples
     # =================== LOADING THE RUNTIME PARAMETERS ====================
@@ -192,9 +194,10 @@ def run(protocol: ProtocolContext) -> None:
         thermocycler.open_lid()
         if DRYRUN is False:
             protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-            thermocycler.set_block_temperature(4)
-            thermocycler.set_lid_temperature(100)
-            temp_block.set_temperature(4)
+            tc_block_task = thermocycler.start_set_block_temperature(4)
+            tc_lid_task = thermocycler.start_set_lid_temperature(100)
+            temp_task = temp_block.start_set_temperature(4)
+            protocol.wait_for_tasks([tc_block_task, tc_lid_task, temp_task])
         if STEP_EZ_FRERAT:
             protocol.comment("==============================================")
             protocol.comment("--> Enzymatic Prep")
