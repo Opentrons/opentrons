@@ -2,8 +2,12 @@ import round from 'lodash/round'
 import uniq from 'lodash/uniq'
 import { UAParser } from 'ua-parser-js'
 
+import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
+import { convertStepHierarchyToArray } from '/protocol-designer/steplist/utils/stepHierarchy'
+
 import type { MouseEvent } from 'react'
 import type { StepIdType } from '/protocol-designer/form-types'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 export const capitalizeFirstLetterAfterNumber = (title: string): string =>
   title.replace(
@@ -64,23 +68,23 @@ export const getMetaSelectedSteps = (
 
 export const getShiftSelectedSteps = (
   priorSingleSelectedStepId: StepIdType | null,
-  orderedStepIds: StepIdType[],
+  stepHierarchy: StepHierarchy,
   newlySelectedStepId: StepIdType,
   priorMultiSelectedItemIds: StepIdType[] | null,
   lastMultiSelectedStepId: StepIdType | null
 ): StepIdType[] => {
   let stepsToSelect: StepIdType[]
   if (priorSingleSelectedStepId) {
-    stepsToSelect = getOrderedStepsInRange(
+    stepsToSelect = getOrderedVisibleStepsInRange(
       priorSingleSelectedStepId,
       newlySelectedStepId,
-      orderedStepIds
+      stepHierarchy
     )
   } else if (priorMultiSelectedItemIds?.length && lastMultiSelectedStepId) {
-    const potentialStepsToSelect = getOrderedStepsInRange(
+    const potentialStepsToSelect = getOrderedVisibleStepsInRange(
       lastMultiSelectedStepId,
       newlySelectedStepId,
-      orderedStepIds
+      stepHierarchy
     )
 
     const allSelected: boolean = potentialStepsToSelect
@@ -112,17 +116,22 @@ export const getShiftSelectedSteps = (
   return stepsToSelect
 }
 
-const getOrderedStepsInRange = (
+const getOrderedVisibleStepsInRange = (
   lastSelectedStepId: StepIdType,
   stepId: StepIdType,
-  orderedStepIds: StepIdType[]
+  stepHierarchy: StepHierarchy
 ): StepIdType[] => {
+  const orderedStepIds = convertStepHierarchyToArray(stepHierarchy)
+  const stepVisibilities = getStepVisibilities(stepHierarchy)
+
   const prevIndex: number = orderedStepIds.indexOf(lastSelectedStepId)
   const currentIndex: number = orderedStepIds.indexOf(stepId)
-
   const [startIndex, endIndex] = [prevIndex, currentIndex].sort((a, b) => a - b)
-  const orderedSteps = orderedStepIds.slice(startIndex, endIndex + 1)
-  return orderedSteps
+
+  const orderedVisibleSteps = orderedStepIds
+    .slice(startIndex, endIndex + 1)
+    .filter(stepId => stepVisibilities[stepId].isVisibleToUser)
+  return orderedVisibleSteps
 }
 
 export const nonePressed = (keysPressed: boolean[]): boolean =>

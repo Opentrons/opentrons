@@ -96,7 +96,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const hoveredStep = useSelector(getHoveredStepId)
   const selectedStepId = useSelector(getSelectedStepId)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
+  const stepHierarchy = useSelector(stepFormSelectors.getSavedStepHierarchy)
   const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selected: boolean =
@@ -155,7 +155,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
       if (isShiftKeyPressed) {
         stepsToSelect = getShiftSelectedSteps(
           selectedStepId,
-          orderedStepIds,
+          stepHierarchy,
           stepId,
           multiSelectItemIds,
           lastMultiSelectedStepId
