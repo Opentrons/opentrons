@@ -76,7 +76,7 @@ export interface FlexStackerModuleState {
   maxPoolCount: number
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
-  labwareOnShuttle: string | null
+  labwareOnShuttle: FlexStackerStoredLabwareGroup | null
 }
 export type InitializationMode = 'single' | 'multi'
 export interface Initialization {

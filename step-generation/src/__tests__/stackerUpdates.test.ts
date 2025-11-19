@@ -206,7 +206,11 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       labwareInHopper: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
-      labwareOnShuttle: 'tiprack1Id',
+      labwareOnShuttle: {
+        primaryLabwareId: 'tiprack1Id',
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      },
     } as any)
     forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
       robotState,

@@ -142,7 +142,7 @@ export const forFlexStackerRetrieve = (
       return
     }
     const labwareToRetrieve = moduleState?.labwareInHopper?.shift() ?? null
-    moduleState.labwareOnShuttle = labwareToRetrieve?.primaryLabwareId ?? null
+    moduleState.labwareOnShuttle = labwareToRetrieve ?? null
 
     if (labwareToRetrieve == null) {
       console.error(
