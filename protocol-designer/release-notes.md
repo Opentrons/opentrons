@@ -8,6 +8,29 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.7.0
+
+**Welcome to Protocol Designer 8.7.0!**
+
+This release adds support for manual tip selection in Protocol Designer and includes feature improvements and bug fixes.
+
+### New Features
+
+- Choose between automatic and manual tip tracking for transfer and mix steps in your protocols. In manual tip tracking, Protocol Designer lets you select the tip rack and individual tips the pipette will pick up to aspirate, dispense, or mix.
+- Manual tip tracking in Protocol Designer enables reusing tips more than once in a protocol.
+
+### Improved Features
+
+- Protocol Designer only shows compatible deck and labware locations to move a lid to.
+- Add Opentrons Tough Universal Lids to an available Opentrons Flex Deck Riser placed on the deck.
+- Move a tip rack lid to any tip rack on the deck without a lid.
+- When adding labware, click tok add a tip rack lid to a Flex 96-channel tip rack adapter with a tip rack inside.
+- When you click **Duplicate labware**, Protocol Designer duplicates all labware, adapters, lids, and liquids in the deck slot.
+
+### Bug Fixes
+
+- Protocol Designer updates flow rate maximums update to the latest version when you import an older protocol.
+
 ## Opentrons Protocol Designer Changes in 8.6.3
 
 **Welcome to Protocol Designer 8.6.3!**
