@@ -36,58 +36,64 @@ export const formatPercentage = (part: number, total: number): string => {
 }
 
 export const getMetaSelectedSteps = (
-  multiSelectItemIds: StepIdType[] | null,
-  stepId: StepIdType,
-  selectedStepId: StepIdType | null
+  priorMultiSelectedItemIds: StepIdType[] | null,
+  newlySelectedStepId: StepIdType,
+  priorSingleSelectedStepId: StepIdType | null
 ): StepIdType[] => {
   let stepsToSelect: StepIdType[]
-  if (multiSelectItemIds?.length) {
+  if (priorMultiSelectedItemIds?.length) {
     // already have a selection, add/remove the meta-clicked item
-    stepsToSelect = multiSelectItemIds.includes(stepId)
-      ? multiSelectItemIds.filter(id => id !== stepId)
-      : [...multiSelectItemIds, stepId]
-  } else if (selectedStepId && selectedStepId === stepId) {
+    stepsToSelect = priorMultiSelectedItemIds.includes(newlySelectedStepId)
+      ? priorMultiSelectedItemIds.filter(id => id !== newlySelectedStepId)
+      : [...priorMultiSelectedItemIds, newlySelectedStepId]
+  } else if (
+    priorSingleSelectedStepId &&
+    priorSingleSelectedStepId === newlySelectedStepId
+  ) {
     // meta-clicked on the selected single step
-    stepsToSelect = [selectedStepId]
-  } else if (selectedStepId) {
+    stepsToSelect = [priorSingleSelectedStepId]
+  } else if (priorSingleSelectedStepId) {
     // meta-clicked on a different step, multi-select both
-    stepsToSelect = [selectedStepId, stepId]
+    stepsToSelect = [priorSingleSelectedStepId, newlySelectedStepId]
   } else {
     // meta-clicked on a step when a terminal item was selected
-    stepsToSelect = [stepId]
+    stepsToSelect = [newlySelectedStepId]
   }
   return stepsToSelect
 }
 
 export const getShiftSelectedSteps = (
-  selectedStepId: StepIdType | null,
+  priorSingleSelectedStepId: StepIdType | null,
   orderedStepIds: StepIdType[],
-  stepId: StepIdType,
-  multiSelectItemIds: StepIdType[] | null,
+  newlySelectedStepId: StepIdType,
+  priorMultiSelectedItemIds: StepIdType[] | null,
   lastMultiSelectedStepId: StepIdType | null
 ): StepIdType[] => {
   let stepsToSelect: StepIdType[]
-  if (selectedStepId) {
+  if (priorSingleSelectedStepId) {
     stepsToSelect = getOrderedStepsInRange(
-      selectedStepId,
-      stepId,
+      priorSingleSelectedStepId,
+      newlySelectedStepId,
       orderedStepIds
     )
-  } else if (multiSelectItemIds?.length && lastMultiSelectedStepId) {
+  } else if (priorMultiSelectedItemIds?.length && lastMultiSelectedStepId) {
     const potentialStepsToSelect = getOrderedStepsInRange(
       lastMultiSelectedStepId,
-      stepId,
+      newlySelectedStepId,
       orderedStepIds
     )
 
     const allSelected: boolean = potentialStepsToSelect
       .slice(1)
-      .every(stepId => multiSelectItemIds.includes(stepId))
+      .every(stepId => priorMultiSelectedItemIds.includes(stepId))
 
     if (allSelected) {
       // if they're all selected, deselect them all
-      if (multiSelectItemIds.length - potentialStepsToSelect.length > 0) {
-        stepsToSelect = multiSelectItemIds.filter(
+      if (
+        priorMultiSelectedItemIds.length - potentialStepsToSelect.length >
+        0
+      ) {
+        stepsToSelect = priorMultiSelectedItemIds.filter(
           (id: StepIdType) => !potentialStepsToSelect.includes(id)
         )
       } else {
@@ -95,10 +101,13 @@ export const getShiftSelectedSteps = (
         stepsToSelect = [potentialStepsToSelect[0]]
       }
     } else {
-      stepsToSelect = uniq([...multiSelectItemIds, ...potentialStepsToSelect])
+      stepsToSelect = uniq([
+        ...priorMultiSelectedItemIds,
+        ...potentialStepsToSelect,
+      ])
     }
   } else {
-    stepsToSelect = [stepId]
+    stepsToSelect = [newlySelectedStepId]
   }
   return stepsToSelect
 }
