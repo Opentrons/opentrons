@@ -338,7 +338,7 @@ async def test_send_data_multiple_ack_some_errors(
     """It should return all acks."""
     successful_response = "M411"
     data = "M411"
-    error_response = "ERR003:test"
+    error_response = "ERR007:test"
     serial_successful_response = f" {successful_response}  {ack}"
     encoded_successful_response = serial_successful_response.encode()
     serial_error_response = f" {error_response}  {ack}"
