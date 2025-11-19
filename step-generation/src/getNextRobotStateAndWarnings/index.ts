@@ -60,9 +60,11 @@ function _getNextRobotStateAndWarningsSingleCommand(
 ): void {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
   switch (command.commandType) {
-    // TODO: add this in case 'aspirateWhileTracking':
+    case 'aspirateWhileTracking':
     case 'aspirate':
     case 'aspirateInPlace':
+      //  TODO: robot state will be updated for air gaps in PV since completedProtocolAnalysis
+      //  won't have isAirGap... so we need to figure out a fix for this but not sure how
       if (command.meta?.isAirGap === true) {
         break
       } else {
@@ -70,9 +72,11 @@ function _getNextRobotStateAndWarningsSingleCommand(
       }
       break
 
-    // TODO: add this in case 'dispenseWhileTracking':
+    case 'dispenseWhileTracking':
     case 'dispense':
     case 'dispenseInPlace':
+      //  TODO: robot state will be updated for air gaps in PV since completedProtocolAnalysis
+      //  won't have isAirGap... so we need to figure out a fix for this but not sure how
       if (command.meta?.isAirGap === true) {
         break
       } else {
