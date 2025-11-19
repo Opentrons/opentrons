@@ -17,6 +17,7 @@ classifiers = [
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "Hardware control for Opentrons Robots."
+readme = "README.md"
 dependencies = [
     "pyserial==3.5",
     "pydantic>=2,<3",
@@ -92,3 +93,11 @@ packages = ['opentrons_hardware']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons_hardware/LICENSE'
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
+# The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
+# during builds, but for local dev, uv uses these paths directly.
+opentrons-shared-data = { path = "../shared-data", editable = true }

@@ -5,6 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "ot3usb"
 description = "A daemon to provide a bridge between the OT-3 USB port and the internal TCP server"
+readme = "README.md"
 requires-python = "~=3.10"
 license = "Apache-2.0"
 authors = [
@@ -50,7 +51,6 @@ dev = [
     "types-mock~=5.1.0",
     "build~=1.2.0",
 ]
-readme = "README.md"
 
 [project.urls]
 "opentrons.com" = "https://www.opentrons.com"

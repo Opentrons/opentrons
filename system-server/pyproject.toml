@@ -16,6 +16,7 @@ classifiers = [
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "A server to provide an external interface to the robot."
+readme = "README.md"
 
 dependencies = [
     "pyjwt==2.6.0",
@@ -32,6 +33,7 @@ dependencies = [
     "importlib-metadata>=4.13.0,<5",
     "filetype==1.2.0",
     "zipp==3.21.0",
+    "server-utils==0.0.0",
 ]
 
 dynamic = ['version']
@@ -93,3 +95,11 @@ packages = ['system_server']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'system_server/LICENSE'
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
+# The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
+# during builds, but for local dev, uv uses these paths directly.
+server-utils = { path = "../server-utils", editable = true }

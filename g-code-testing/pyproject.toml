@@ -5,6 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "g-code-testing"
 description = "Library to run emulated OT-2 and gather its G-Code output"
+readme = "README.md"
 requires-python = ">=3.7"
 license = "Apache-2.0"
 authors = [
@@ -86,3 +87,12 @@ include = ['g_code_parsing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.fla
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'g_code_parsing/LICENSE'
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
+# The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
+# during builds, but for local dev, uv uses these paths directly.
+opentrons = { path = "../api", editable = true }
+robot-server = { path = "../robot-server", editable = true }
