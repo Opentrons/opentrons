@@ -189,7 +189,7 @@ async def stop_live_stream(robot_type: RobotType) -> None:
         log.info("Stopped the opentrons-live-stream service.")
     else:
         log.error(
-            f"Failed to stop opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to stop opentrons-live-stream, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
 
 
@@ -210,7 +210,7 @@ async def restart_live_stream(robot_type: RobotType) -> None:
         log.info("Restarted opentrons-live-stream service.")
     else:
         log.error(
-            f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to restart opentrons-live-stream, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
 
 
