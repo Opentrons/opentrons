@@ -30,13 +30,14 @@ runs:
         fi
     - shell: bash
       run: npm install --global shx@0.3.3
-    - name: Setup Python
-      uses: actions/setup-python@v5
+    - name: Setup Python and UV
+      uses: astral-sh/setup-uv@v7
       with:
         python-version: ${{ inputs.python-version != 'false' && inputs.python-version || '3.10' }}
-    - name: Install UV
-      uses: astral-sh/setup-uv@v7
-      # setup-uv automatically caches based on pyproject.toml and uv.lock files
+        enable-cache: true
+        cache-dependency-glob: |
+          ${{ inputs.project }}/pyproject.toml
+          ${{ inputs.project }}/uv.lock
     - name: Setup Python Environment
       id: setup-env
       shell: bash

@@ -52,10 +52,6 @@ jobs:
       - uses: 'actions/setup-node@v4'
         with:
           node-version: '22.12.0'
-      - uses: 'actions/setup-python@v3'
-        with:
-          python-version: '3.10'
-
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
@@ -87,9 +83,6 @@ jobs:
       - uses: 'actions/setup-node@v1'
         with:
           node-version: '22.12.0'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: ${{ matrix.python }}
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
@@ -172,9 +165,6 @@ jobs:
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved
           sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list
           sudo apt-get update && sudo apt-get install libudev-dev
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.10'
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
