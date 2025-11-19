@@ -6,7 +6,7 @@
 Utility Commands
 ****************
 
-With utility commands, you can control various robot functions such as pausing or delaying a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
+With utility commands, you can control various robot functions such as pausing or delaying a protocol, taking images with the built-in camera, turning robot lights on/off, and more. The following sections show you how to these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Delay and Resume
 ================
@@ -65,6 +65,22 @@ Call the :py:meth:`.ProtocolContext.comment` method if you want to write and dis
     protocol.comment("Hello, world!")
 
 .. versionadded:: 2.0
+
+Taking Camera Images 
+=====================
+
+Use the :py:meth:`.ProtocolContext.capture_image` method to take an image during a protocol with the Flex or OT-2's built-in camera. You can use images to check on key protocol steps while spending more time away from the bench. 
+
+This example uses optional parameters to home the pipette, clearing the camera's view, and save the image file as ``deck_view``::
+    
+    protocol.capture_image(
+        home_before="True",
+        filename="deck_view"
+    )
+
+.. versionadded:: 2.27
+
+You can further customize your images using the :py:meth:`~.ProtocolContext.capture_image` method's optional parameters, including image resolution, zoom, brightness, and more. After a protocol run, access and download your images from the Recent Protocol Runs section of the Opentrons App's robot details page.
 
 Control and Monitor Robot Rail Lights
 =====================================

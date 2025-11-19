@@ -1833,17 +1833,15 @@ class ProtocolContext(CommandPublisher):
         brightness: Optional[float] = None,
         saturation: Optional[float] = None,
     ) -> None:
-        """Capture an image using the camera. Captured images get saved as a result of the protocol run.
+        """Capture an image using the camera. Captured images are saved as during the protocol run.
 
-        :param home_before: Boolean to home the pipette before capturing an image.
-        :param filename: Filename to use when saving the captured image as a file.
-        :param resolution: Width/height tuple to determine the resolution to use when capturing an image.
-        :param zoom: Optional zoom level, with minimum/default of 1x zoom and maximum of 2x zoom.
-        :param contrast: Contrast level to be applied to an image, range is 0% to 100%.
-        :param brightness: Brightness level to be applied to an image, range is 0% to 100%.
-        :param saturation: Saturation level to be applied to an image, range is 0% to 100%.
-
-        .. versionadded:: 2.27
+        :param home_before: If `True`, homes the pipette before capturing an image.
+        :param filename: Name to use when saving the captured image as a file.
+        :param resolution: Accepts a width and height (as a tuple) to determine the camera's resolution when capturing the image.
+        :param zoom: Zoom level the camera will use. Defaults to the minimum of 1x zoom and has a maximum of 2x zoom.
+        :param contrast: The contrast level to be applied to an image. The acceptable range is from 0% to 100%.
+        :param brightness: The brightness level to be applied to an image. The acceptable range is from 0% to 100%.
+        :param saturation: The saturation level to be applied to an image. The acceptable range is from 0% to 100%.
 
         """
         if home_before is True:
