@@ -21,7 +21,7 @@ export const getStackerMaxPoolCountByHeight = (
   if (model === FLEX_STACKER_MODULE_V1) {
     const maxFillHeight = getModuleMaxFillHeight(model)
     if (maxFillHeight <= 0) {
-      throw new Error(
+      console.error(
         `Invalid max fill height for ${model}: ${maxFillHeight} must be greater than 0`
       )
     }
@@ -29,7 +29,8 @@ export const getStackerMaxPoolCountByHeight = (
       (maxFillHeight - poolOverlap) / (poolHeight - poolOverlap)
     )
   }
-  throw new Error(`Invalid module model for max pool count by height: ${model}`)
+  console.error(`Invalid module model for max pool count by height: ${model}`)
+  return 0
 }
 
 export const getLabwareOverlapOffset = (

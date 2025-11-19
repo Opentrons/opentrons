@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   fixtureTiprack1000ul,
@@ -29,9 +29,12 @@ describe('getStackerMaxPoolCountByHeight()', () => {
   })
 
   it('should throw an error if the module model is invalid', () => {
-    expect(() =>
-      getStackerMaxPoolCountByHeight(MAGNETIC_MODULE_V1, 100, 0)
-    ).toThrow(
+    const mockConsoleError = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => {})
+    const result = getStackerMaxPoolCountByHeight(MAGNETIC_MODULE_V1, 100, 0)
+    expect(result).toBe(0)
+    expect(mockConsoleError).toHaveBeenCalledWith(
       'Invalid module model for max pool count by height: magneticModuleV1'
     )
   })
