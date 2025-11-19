@@ -25,6 +25,7 @@ dependencies = [
     "opentrons_shared_data==0.0.0",
     "typing-extensions>=4.0.0,<5",
     "numpy==1.22.3",
+    "python-can==4.2.2",
 ]
 dynamic = ['version', 'hatch-dependency-coversion']
 
@@ -45,10 +46,8 @@ dev = [
     "matplotlib",
     "build~=1.2.0",
     "pytest-lazy-fixtures<2,>=1.1.4",
+    "setuptools",
 ]
-
-[project.optional-dependencies]
-"FLEX" = ["python-can==4.2.2"]
 
 [project.urls]
 "Source Code" = "https://github.com/Opentrons/opentrons"

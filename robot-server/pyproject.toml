@@ -69,7 +69,7 @@ dev = [
     "types-paho-mqtt==1.6.0.20240106",
     "types-requests~=2.27.1",
     "zipp==3.21.0",
-    "opentrons-hardware[FLEX]",
+    "opentrons-hardware",
 ]
 
 # uv: global settings and dependency tweaks
