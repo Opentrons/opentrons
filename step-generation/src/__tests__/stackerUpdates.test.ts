@@ -186,7 +186,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       labwareInHopper: [],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
-      labwareInShuttle: null,
+      labwareOnShuttle: null,
     } as any)
     forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
       robotState,
@@ -206,7 +206,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       labwareInHopper: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
-      labwareInShuttle: 'tiprack1Id',
+      labwareOnShuttle: 'tiprack1Id',
     } as any)
     forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
       robotState,
@@ -223,10 +223,26 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       .mockImplementation(() => {}) // Mock to prevent actual console output
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInHopper: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      labwareInHopper: [
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack2Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack4AdapterId',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+      ],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
-      labwareInShuttle: null,
+      labwareOnShuttle: null,
     } as any)
     forFlexStackerRetrieve({ moduleId: FLEX_STACKER_ID }, invariantContext, {
       robotState,
@@ -240,10 +256,26 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
   it('should retrieve the labware from the stacker', () => {
     vi.mocked(getModuleState).mockReturnValue({
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareInHopper: ['tiprack1Id', 'tiprack2Id', 'tiprack4AdapterId'],
+      labwareInHopper: [
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack2Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack4AdapterId',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+      ],
       max_pool_count: 6,
       labwareStored: LABWARE_ID,
-      labwareInShuttle: null,
+      labwareOnShuttle: null,
       storedLabwareDetails: {
         primaryLabware: LABWARE_ID,
       },
