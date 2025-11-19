@@ -68,7 +68,7 @@ export function LivestreamInfoScreen({
     case 'run-setup':
       return (
         <InfoScreen
-          content={t('confirm_camera_preferences')}
+          content={t('live_video_unavailable')}
           subContent={t('confirm_camera_preferences_desc')}
         />
       )
