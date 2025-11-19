@@ -107,6 +107,7 @@ GetFlexStackerCommandText): string => {
         t(
           'branded:flex_stacker_set_stored_labware_with_quantity_and_location',
           {
+            quantity: command.params.initialCount,
             stackerColumn: slotName,
             labwareAndLidDisplayNames:
               command.result?.primaryLabwareDefinition.metadata.displayName,

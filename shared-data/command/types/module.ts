@@ -463,6 +463,7 @@ interface StackerStoredLabwareDefinitionURIs {
 
 export interface FlexStackerSetStoredLabwareParams {
   moduleId: string
+  initialCount?: number | null
   primaryLabware: FlexStackerStoredLabwareDetails
   lidLabware: FlexStackerStoredLabwareDetails | null
   adapterLabware: FlexStackerStoredLabwareDetails | null
