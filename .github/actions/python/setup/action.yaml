@@ -12,10 +12,6 @@ inputs:
     description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
     required: false
     default: 'true'
-  install-dev-deps:
-    description: 'Whether to install dev optional dependencies'
-    required: false
-    default: 'true'
 outputs:
   start-time:
     description: 'Start time of the setup process (Unix timestamp)'
@@ -53,7 +49,8 @@ runs:
       run: |
         START_TIME=$(date +%s)
         echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
-        # For pipenv or make projects, just call make setup
+        # For pipenv projects, make setup runs "pipenv sync --dev" which always installs dev dependencies
+        # (see scripts/python.mk where pipenv_opts includes --dev)
         make -C ${{ inputs.project }} setup
         END_TIME=$(date +%s)
         DURATION=$((END_TIME - START_TIME))
