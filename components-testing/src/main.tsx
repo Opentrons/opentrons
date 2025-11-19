@@ -45,6 +45,7 @@ function App(): JSX.Element {
             showSlotLabels: true,
             showExpansion: true,
           }}
+          showLabwareLabels
         />
       </div>
     </div>

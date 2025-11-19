@@ -24,13 +24,12 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import styles from './deckview.module.css'
 import { DeckViewDetails } from './DeckViewDetails'
 import {
   getActiveLayer,
-  getBackgroundColor,
   getIsCutoutA1Active,
+  getIsPipetteOverTrash,
 } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -67,7 +66,6 @@ interface DeckViewProps {
   invariantContext: InvariantContext
   robotState: TimelineFrame
   robotType: RobotType
-  selectedSlot: string | null
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   liquids: Liquid[]
   selectedRunTimeCommand?: RunTimeCommand
@@ -80,7 +78,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const {
     robotType,
     invariantContext,
-    selectedSlot,
     setSelectedSlot,
     robotState,
     selectedRunTimeCommand,
@@ -96,7 +93,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     stagingAreaEntities,
     labwareEntities,
   } = invariantContext
-  const { labware, modules } = robotState
+  const { labware, modules, pipettes } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
   )
@@ -216,19 +213,11 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                   ))}
                   {Object.values(trashBinEntities).length > 0
                     ? trashBinFixtures.map(({ cutoutId, slot, id }) => {
-                        // TODO: the dropTipInPlace, airGapInplace, and
-                        // blowoutInPlace commands don't have
-                        // any knowledge of where its dropping. would be
-                        // nice to expand the results key to include the
-                        // addressable area name
-                        const isPipetteOverTrash =
-                          Object.values(robotState.pipettes).some(
-                            pipette => pipette.entityId === id
-                          ) &&
-                          selectedRunTimeCommand != null &&
-                          POTENTIAL_TRASH_COMMAND_TYPES.includes(
-                            selectedRunTimeCommand.commandType
-                          )
+                        const isPipetteOverTrash = getIsPipetteOverTrash(
+                          pipettes,
+                          id,
+                          selectedRunTimeCommand
+                        )
 
                         return (
                           <Fragment key={cutoutId}>
@@ -236,18 +225,15 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                               cutoutId={cutoutId}
                               deckDefinition={deckDef}
                               slotClipColor={COLORS.transparent}
-                              fixtureBaseColor={lightFill}
+                              fixtureBaseColor={
+                                isPipetteOverTrash ? COLORS.purple30 : lightFill
+                              }
                             />
                             <FlexTrash
                               robotType={robotType}
                               trashIconColor={lightFill}
                               trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={getBackgroundColor(
-                                hoveredSlot,
-                                selectedSlot,
-                                slot,
-                                isPipetteOverTrash
-                              )}
+                              backgroundColor={COLORS.grey50}
                               onClick={() => {
                                 setSelectedSlot(slot)
                               }}
@@ -256,14 +242,23 @@ export function DeckView(props: DeckViewProps): JSX.Element {
                         )
                       })
                     : null}
-                  {Object.values(wasteChuteEntities).map(entity => (
-                    <WasteChuteFixture
-                      key={entity.id}
-                      cutoutId={entity.location as typeof WASTE_CHUTE_CUTOUT}
-                      deckDefinition={deckDef}
-                      fixtureBaseColor={lightFill}
-                    />
-                  ))}
+                  {Object.values(wasteChuteEntities).map(({ id, location }) => {
+                    const isPipetteOverTrash = getIsPipetteOverTrash(
+                      pipettes,
+                      id,
+                      selectedRunTimeCommand
+                    )
+                    return (
+                      <WasteChuteFixture
+                        key={id}
+                        cutoutId={location as typeof WASTE_CHUTE_CUTOUT}
+                        deckDefinition={deckDef}
+                        fixtureBaseColor={
+                          isPipetteOverTrash ? COLORS.purple30 : lightFill
+                        }
+                      />
+                    )
+                  })}
                   {wasteChuteStagingAreaFixtures.map(fixture => (
                     <WasteChuteStagingAreaFixture
                       key={fixture.id}

@@ -1,14 +1,14 @@
-import {
-  getAddressableAreaFromSlotId,
-  getPositionFromSlotId,
-} from '@opentrons/shared-data'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { POTENTIAL_TRASH_COMMAND_TYPES } from './consants'
 import { DeckViewLabware } from './DeckViewLabware'
 import { DeckViewModules } from './DeckViewModules'
 import { DeckViewSlots } from './DeckViewSlots'
 import { FixtureCommandSummary } from './FixtureCommandSummary'
-import { getSlotIdsBlockedBySpanningForThermocycler } from './utils'
+import { Ot2FixedTrashCommandSummary } from './Ot2FixedTrashCommandSummary'
+import {
+  getFixtureSummaryInfo,
+  getSlotIdsBlockedBySpanningForThermocycler,
+} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -51,32 +51,27 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
     liquids,
     labwareEntitiesExtended,
   } = props
-  const { modules } = robotState
-  const { moduleEntities, trashBinEntities } = invariantContext
+  const { modules, pipettes } = robotState
+  const { moduleEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     modules,
     moduleEntities,
     robotType
   )
-  const pipetteCurrentTrashId = Object.values(robotState.pipettes).find(
-    pipette =>
-      pipette.entityId != null && trashBinEntities[pipette.entityId] != null
-  )?.entityId
-  const isPipetteOverTrash =
-    pipetteCurrentTrashId != null &&
-    selectedRunTimeCommand != null &&
-    POTENTIAL_TRASH_COMMAND_TYPES.includes(selectedRunTimeCommand.commandType)
-  const trashSlotWherePipetteIsOver =
-    pipetteCurrentTrashId != null
-      ? trashBinEntities[pipetteCurrentTrashId].location
-      : null
-  const trashAddressableArea =
-    trashSlotWherePipetteIsOver != null
-      ? getAddressableAreaFromSlotId(
-          trashSlotWherePipetteIsOver.split('cutout')[1],
-          deckDef
-        )
-      : null
+  const {
+    isPipetteOverTrash: isPipetteOverTrashBin,
+    trashLikeEntityCutoutId: trashCutoutId,
+  } = getFixtureSummaryInfo(pipettes, trashBinEntities, selectedRunTimeCommand)
+  const {
+    isPipetteOverTrash: isPipetteOverWasteChute,
+    trashLikeEntityCutoutId: wasteChuteCutoutId,
+  } = getFixtureSummaryInfo(
+    pipettes,
+    wasteChuteEntities,
+    selectedRunTimeCommand
+  )
+
   return (
     <>
       {/* all modules */}
@@ -117,14 +112,31 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
         hoveredSlot={hoveredSlot}
         selectedRunTimeCommand={selectedRunTimeCommand}
       />
-      {/* when commandSummary happens on a fixture */}
-      {isPipetteOverTrash &&
+      {/* when commandSummary happens on a trash bin */}
+      {isPipetteOverTrashBin &&
       selectedRunTimeCommand != null &&
-      trashAddressableArea != null ? (
+      trashCutoutId != null ? (
+        robotType === FLEX_ROBOT_TYPE ? (
+          <FixtureCommandSummary
+            commandType={selectedRunTimeCommand.commandType}
+            cutoutId={trashCutoutId as CutoutId}
+            type="trashBin"
+          />
+        ) : (
+          <Ot2FixedTrashCommandSummary
+            commandType={selectedRunTimeCommand.commandType}
+            cutoutId={trashCutoutId as CutoutId}
+          />
+        )
+      ) : null}
+      {/* when commandSummary happens on a waste chute */}
+      {isPipetteOverWasteChute &&
+      selectedRunTimeCommand != null &&
+      wasteChuteCutoutId != null ? (
         <FixtureCommandSummary
           commandType={selectedRunTimeCommand.commandType}
-          slotPosition={getPositionFromSlotId(trashAddressableArea.id, deckDef)}
-          slotBoundingBox={trashAddressableArea.boundingBox}
+          cutoutId={wasteChuteCutoutId as CutoutId}
+          type="wasteChute"
         />
       ) : null}
     </>

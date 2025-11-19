@@ -35,7 +35,6 @@ import type {
 } from '@opentrons/step-generation'
 import type { PDPythonFile, PythonDesignerApplication } from '../../file-types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
-import type { Selector } from '../../types'
 
 if (isEmpty(_OT_PD_VERSION_))
   console.warn('Could not find application version!')
@@ -74,7 +73,7 @@ export const getLabwareDefinitionsInUse = (
   )
 }
 
-export const createFile: Selector<PDPythonFile> = createSelector(
+export const createFile = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
@@ -96,7 +95,7 @@ export const createFile: Selector<PDPythonFile> = createSelector(
     orderedStepIds,
     labwareNicknamesById,
     invariantContext
-  ) => {
+  ): PDPythonFile => {
     const { pipetteEntities, moduleEntities, labwareEntities, liquidEntities } =
       invariantContext
 

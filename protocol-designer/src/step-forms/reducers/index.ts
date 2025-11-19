@@ -90,8 +90,7 @@ import type { Action } from '../../types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type {
   AddStepAction,
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
+  DuplicateSelectedStepsAction,
   ReorderSelectedStepAction,
   SelectMultipleStepsAction,
   SelectStepAction,
@@ -264,8 +263,7 @@ export type SavedStepFormsActions =
   | DeletePipettesAction
   | CreateModuleAction
   | DeleteModuleAction
-  | DuplicateStepAction
-  | DuplicateMultipleStepsAction
+  | DuplicateSelectedStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
   | SwapSlotContentsAction
@@ -927,28 +925,12 @@ export const savedStepForms = (
       }
     }
 
-    case 'DUPLICATE_STEP': {
-      // @ts-expect-error(sa, 2021-6-10): if  stepId is null, we will end up in situation where the entry for duplicateStepId
-      // will be {[duplicateStepId]: {id: duplicateStepId}}, which will be missing the rest of the properties from FormData
-      return {
-        ...savedStepForms,
-        [action.payload.duplicateStepId]: {
-          ...cloneDeep(
-            action.payload.stepId != null
-              ? savedStepForms[action.payload.stepId]
-              : {}
-          ),
-          id: action.payload.duplicateStepId,
-        },
-      }
-    }
-
-    case 'DUPLICATE_MULTIPLE_STEPS': {
+    case 'DUPLICATE_SELECTED_STEPS': {
       return action.payload.steps.reduce(
-        (acc, { stepId, duplicateStepId }) => ({
+        (acc, { originalStepId, duplicateStepId }) => ({
           ...acc,
           [duplicateStepId]: {
-            ...cloneDeep(savedStepForms[stepId]),
+            ...cloneDeep(savedStepForms[originalStepId]),
             id: duplicateStepId,
           },
         }),
@@ -1044,7 +1026,7 @@ type BatchEditFormActions =
   | SaveStepFormsMultiAction
   | SelectStepAction
   | SelectMultipleStepsAction
-  | DuplicateMultipleStepsAction
+  | DuplicateSelectedStepsAction
   | DeleteMultipleStepsAction
 export const batchEditFormChanges = (
   state: BatchEditFormChangesState = {},
@@ -1058,7 +1040,7 @@ export const batchEditFormChanges = (
     case 'SELECT_STEP':
     case 'SAVE_STEP_FORMS_MULTI':
     case 'SELECT_MULTIPLE_STEPS':
-    case 'DUPLICATE_MULTIPLE_STEPS':
+    case 'DUPLICATE_SELECTED_STEPS':
     case 'DELETE_MULTIPLE_STEPS':
     case 'RESET_BATCH_EDIT_FIELD_CHANGES': {
       return {}
@@ -1604,32 +1586,10 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
         ...stepsWithoutSelectedStep.slice(nextIndex),
       ]
     },
-    DUPLICATE_STEP: (
+    DUPLICATE_SELECTED_STEPS: (
       state: OrderedStepIdsState,
-      action: DuplicateStepAction
-    ): OrderedStepIdsState => {
-      const { stepId, duplicateStepId } = action.payload
-      const selectedIndex = state.findIndex(s => s === stepId)
-      return [
-        ...state.slice(0, selectedIndex + 1),
-        duplicateStepId,
-        ...state.slice(selectedIndex + 1, state.length),
-      ]
-    },
-    DUPLICATE_MULTIPLE_STEPS: (
-      state: OrderedStepIdsState,
-      action: DuplicateMultipleStepsAction
-    ): OrderedStepIdsState => {
-      const duplicateStepIds = action.payload.steps.map(
-        ({ duplicateStepId }) => duplicateStepId
-      )
-      const { indexToInsert } = action.payload
-      return [
-        ...state.slice(0, indexToInsert),
-        ...duplicateStepIds,
-        ...state.slice(indexToInsert, state.length),
-      ]
-    },
+      action: DuplicateSelectedStepsAction
+    ): OrderedStepIdsState => action.payload.newStepOrder,
     REORDER_STEPS: (
       state: OrderedStepIdsState,
       action: ReorderStepsAction

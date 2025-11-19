@@ -1,6 +1,8 @@
 import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
@@ -9,11 +11,13 @@ import { getCameraUsageState } from '/app/redux/protocol-runs'
 
 import { ProtocolSetupCamera } from '..'
 
+import type { Mock } from 'vitest'
 import type { ProtocolSetupCameraProps } from '..'
 
 vi.mock('/app/organisms/ODD/CameraSettings')
 vi.mock('/app/molecules/ODDBackButton')
 vi.mock('/app/redux/protocol-runs')
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: ProtocolSetupCameraProps) => {
   return renderWithProviders(<ProtocolSetupCamera {...props} />, {
@@ -23,8 +27,10 @@ const render = (props: ProtocolSetupCameraProps) => {
 
 describe('ProtocolSetupCamera', () => {
   let mockProps: ProtocolSetupCameraProps
+  let mockConfirmCamera: Mock
 
   beforeEach(() => {
+    mockConfirmCamera = vi.fn()
     mockProps = {
       runId: 'MOCK-RUN-ID',
       isCameraRequired: true,
@@ -46,6 +52,9 @@ describe('ProtocolSetupCamera', () => {
       recoveryEnabled: true,
       liveStreamEnabled: true,
     })
+    vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
+      addCameraSettingsToRun: mockConfirmCamera,
+    } as any)
   })
 
   it('renders CameraSettings with correct section heading', () => {
@@ -72,7 +81,7 @@ describe('ProtocolSetupCamera', () => {
     const confirmButton = screen.getByText('Confirm preferences')
     fireEvent.click(confirmButton)
 
-    expect(mockProps.confirmCameraSettings).toHaveBeenCalledTimes(1)
+    expect(mockConfirmCamera).toHaveBeenCalledTimes(1)
   })
 
   it('renders enabled chip when confirmed', () => {

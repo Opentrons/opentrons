@@ -53,6 +53,12 @@ export const getFlexHoverDimensions = (
   return { width: xDimension, height: Y_DIMENSION, x, y }
 }
 
+// these TC adjustements are because the TC hover slot
+// spans slots 7,8,10,11
+const TC_ADJUSTED_Y = 83
+const TC_ADJUSTED_W = 260
+const TC_ADJUSTED_H = 178
+
 export const getOT2HoverDimensions = (
   hasTCOnSlot: boolean,
   slotPosition: CoordinateTuple
@@ -61,9 +67,9 @@ export const getOT2HoverDimensions = (
   const x = slotPosition[0]
 
   return {
-    width: hasTCOnSlot ? 260 : 128,
-    height: hasTCOnSlot ? 178 : 85,
+    width: hasTCOnSlot ? TC_ADJUSTED_W : 128, // 128 is the standard width
+    height: hasTCOnSlot ? TC_ADJUSTED_H : 85, // 85 is the standard height
     x,
-    y: hasTCOnSlot ? y - 72 : y,
+    y: hasTCOnSlot ? y - TC_ADJUSTED_Y : y,
   }
 }

@@ -40,7 +40,7 @@ export interface ThermocyclerProfileGroup {
   /** The steps that run while the Thermocycler profile is running. */
   concurrentSteps: StandaloneStep[]
   /**
-   * The steps that waits for the Thermocycler profile to finish.
+   * The step that waits for the Thermocycler profile to finish.
    * This is hidden in the UI.
    */
   waitForThermocyclerProfileStepId: StepIdType
