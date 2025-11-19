@@ -1,13 +1,16 @@
 import { describe, expect, it } from 'vitest'
 
-import { getStepToSelectAfterDeletion } from '../utils/getStepToSelectAfterDeletion'
+import {
+  getStepsToSelectAfterDuplication,
+  getStepToSelectAfterDeletion,
+} from '../utils/getStepsToSelect'
 
 import type { StepIdType } from '/protocol-designer/form-types'
 import type { StepHierarchy } from '../utils/stepHierarchy'
 
-type Result = ReturnType<typeof getStepToSelectAfterDeletion>
-
 describe('getStepToSelectAfterDeletion', () => {
+  type Result = ReturnType<typeof getStepToSelectAfterDeletion>
+
   it('should generally return the first step after the last deleted step', () => {
     expect(
       getStepToSelectAfterDeletion(
@@ -133,5 +136,49 @@ describe('getStepToSelectAfterDeletion', () => {
     expect(
       getStepToSelectAfterDeletion(nonEmptyStepHierarchy, emptyStepsToDelete)
     ).toStrictEqual(null satisfies Result)
+  })
+})
+
+describe('getStepsToSelectAfterDuplication', () => {
+  type Result = ReturnType<typeof getStepsToSelectAfterDuplication>
+
+  it('should return visible duplicated steps in order, excluding implicit wait steps', () => {
+    expect(
+      getStepsToSelectAfterDuplication(
+        {
+          topLevelItems: [
+            { type: 'standaloneStep', stepId: '1' },
+            { type: 'standaloneStep', stepId: '2' },
+            {
+              type: 'thermocyclerProfileGroup',
+              thermocyclerProfileStepId: '3',
+              concurrentSteps: [
+                { type: 'standaloneStep', stepId: '4' },
+                { type: 'standaloneStep', stepId: '5' },
+              ],
+              waitForThermocyclerProfileStepId: '6',
+            },
+            { type: 'standaloneStep', stepId: '7' },
+            {
+              type: 'thermocyclerProfileGroup',
+              thermocyclerProfileStepId: '8',
+              concurrentSteps: [
+                { type: 'standaloneStep', stepId: '9' },
+                { type: 'standaloneStep', stepId: '10' },
+              ],
+              waitForThermocyclerProfileStepId: '11',
+            },
+            { type: 'standaloneStep', stepId: '12' },
+          ],
+        },
+        new Set([
+          '1', // top-level step
+          '3', // Thermocycler profile step
+          '6', // Thermocycler wait-for-profile step
+          '9', // step inside a Thermocycler group
+        ])
+      )
+      // Should omit '6', the Thermocyler wait-for-profile step, because it's not user-visible.
+    ).toStrictEqual(['1', '3', '9'] satisfies Result)
   })
 })
