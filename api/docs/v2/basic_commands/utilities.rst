@@ -6,7 +6,7 @@
 Utility Commands
 ****************
 
-With utility commands, you can control various robot functions such as pausing or delaying a protocol, taking images with the built-in camera, turning robot lights on/off, and more. The following sections show you how to these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
+With utility commands, you can control various robot functions such as pausing or delaying a protocol, taking images with the built-in camera, turning robot lights on/off, and more. The following sections show you how to use these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic :ref:`protocol template <protocol-template>`.
 
 Delay and Resume
 ================
