@@ -156,7 +156,7 @@ The API treats heating and shaking as separate, independent activities due to th
 In both cases, the API lets you choose whether to perform other protocol steps while heating and shaking. To do this, you can design your protocol to run in a blocking or concurrent manner:
 
 - **Blocking commands**: The robot will pause and wait, performing no other actions until the module reaches the required temperature or shake speed.
-- **Concurrent commands**: The robot continues to perform other pipetting and some other module actions while heating and shaking. 
+- **Concurrent commands**: The robot continues to perform subsequent actions while heating or shaking. For example, continue pipetting, move labware, or run other modules. 
 
 .. list-table::
     :header-rows: 1
@@ -224,14 +224,22 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
         Returns a :py:class:`.Task` that runs in the background of a protocol.
 
 
-If you want the robot to continue pipetting while the module holds a temperature for a certain length of time, you can use :py:meth:`.ProtocolContext.create_timer`:: 
+If you want the robot to continue pipetting while the module heats to prepare for a sample incubation, you can use :py:meth:`.ProtocolContext.create_timer`:: 
 
-  temp_timer = create_timer(seconds=120)
-  hs_mod.set_target_temperature(75)
+  # set target temperature
+  heat_task = hs_mod.set_target_temperature(75)
+
+  # pipette while the module heats 
   pipette.pick_up_tip()
   pipette.aspirate(50, plate["A1"])
   pipette.dispense(50, plate["B1"])
-  protocol.wait_for_tasks(temp_timer)
+
+  # wait for the module to finish heating 
+  protocol.wait_for_tasks([heat_task])
+
+  # set and hold for a sample incubation 
+  incubation_timer = create_timer(seconds=120)
+  protocol.wait_for_tasks([incubation_timer])
   hs_mod.deactivate_heater()
 
 .. versionadded: 2.27
@@ -256,7 +264,7 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
         pipette.drop_tip()
         protocol.delay(minutes=1)
       
-      In this example, no other commands will execute until the Heater-Shaker reaches a shake speed of 500 RPM with the blocking command :py:meth:`~.HeaterShakerContext.set_and_wait_for_shake_speed`. Because reaching the shake speed takes much less time than heating the module, these actions will take only about 65 seconds total.
+      In this example, no other commands will execute until the Heater-Shaker reaches a shake speed of 500 RPM with the blocking command :py:meth:`~.HeaterShakerContext.set_and_wait_for_shake_speed`. Because reaching the shake speed takes much less time than heating the module, these actions will take only about 85 seconds total.
 
       .. versionadded:: 2.13 
 

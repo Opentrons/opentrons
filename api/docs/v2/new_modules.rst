@@ -34,7 +34,7 @@ Pages in this section of the documentation cover:
         - :ref:`Magnetic Module <magnetic-module>`
         - :ref:`Temperature Module <temperature-module>`
         - :ref:`Thermocycler Module <thermocycler-module>`
-    - Using :ref:`concurrent module actions <concurrent-module>` to work with multiple different modules, even alongside pipetting actions.
+    - Using :ref:`concurrent module actions <concurrent-module>` to run modules while the robot performs other protocol steps, like pipetting, gripper, and other module actions.
     - Loading :ref:`multiple modules of the same type <moam>` in a single protocol. 
 
 .. note::

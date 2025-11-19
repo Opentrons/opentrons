@@ -69,8 +69,8 @@ Sometimes, the amount of time it takes for a module to finish a task is still im
 
     temp_adapter = temp_mod.load_adapter("opentrons_96_well_aluminum_block")
     temp_plate = temp_adapter.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
-    temp_task = temp_mod.start_set_temperature(75)
-    protocol.wait_for_tasks(temp_task)
+    heat_task = temp_mod.start_set_temperature(75)
+    protocol.wait_for_tasks([heat_task])
     protocol.move_labware(labware=temp_plate, new_location="D3", use_gripper=True)
     
     
@@ -79,14 +79,14 @@ Let's say your samples have to both reach a target temperature and incubate for 
 .. code-block:: python
 
     # set Heater-Shaker temperature and shake speed 
-    heat = hs_mod.start_set_temperature(75)
+    heat_task = hs_mod.start_set_temperature(75)
     hs_mod.set_shake_speed(300)
     
     # create timer for sample incubation
     hs_timer = create_timer(seconds=300)
 
     # wait for module to finish heating, then hold samples at target temperature
-    protocol.wait_for_tasks(heat, hs_timer)
+    protocol.wait_for_tasks([heat_task, hs_timer])
     hs_mod.deactivate_heater()
 
 Here, the Heater-Shaker Module will heat and shake samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Because the Heater-Shaker could take longer than 5 minutes to reach the target temperature, ``wait_for_tasks`` ensures the timer starts only after the target temperature is reached. 

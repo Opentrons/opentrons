@@ -154,14 +154,14 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
       .. code-block:: python
     
         # set block temperature 
-        cool = tc_mod.start_set_block_temperature(celsius=4)
+        cool_task = tc_mod.start_set_block_temperature(celsius=4)
         # complete pipetting actions while the block cools
-        pipette..pick_up_tip()   
+        pipette.pick_up_tip()   
         pipette.aspirate(50, plate["A1"])
         pipette.dispense(50, plate["B1"])
         pipette.drop_tip()
         # wait for the block to reach the target temperature
-        protocol.wait_for_tasks(cool)
+        protocol.wait_for_tasks([cool_task])
         # hold samples on the block at target temperature 
         block_timer = create_timer(seconds=255)
         protocol.wait_for_tasks(block_timer)
@@ -195,13 +195,13 @@ It is especially important to specify ``block_max_volume`` when holding at a tem
       .. code-block:: python
     
         # set block temperature and max volume
-        cool = tc_mod.start_set_block_temperature(
+        cool_task = tc_mod.start_set_block_temperature(
             temperature=4,
             block_max_volume=80)
         # set time to hold the block at temperature 
         block_timer = protocol.create_timer(seconds=20)
         # wait for the block to reach and hold at temperature 
-        protocol.wait_for_tasks(cool, block_timer)
+        protocol.wait_for_tasks([cool_task, block_timer])
       
       .. versionadded:: 2.27
 
