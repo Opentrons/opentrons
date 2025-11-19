@@ -131,20 +131,24 @@ function useDisabledReason({
   isCameraReadyToRun,
 }: UseDisabledReasonProps): string | null {
   const { t } = useTranslation(['run_details', 'shared'])
-  if (isCalibrationComplete) {
-    return t('instrument_calibration_incomplete')
-  } else if (isMissingModules) {
-    return t('modules_missing')
-  } else if (isModuleCalibrationComplete) {
-    return t('module_calibration_incomplete')
+  if (isRobotOnWrongVersionOfSoftware) {
+    return t('shared:a_software_update_is_available')
+  } else if (isClosingCurrentRun) {
+    return t('shared:robot_is_busy')
+  } else if (!isCameraReadyToRun) {
+    return t('enable_camera')
   } else if (isFixtureMismatch) {
     return t('fixture_mismatch')
-  } else if (isValidRunAgain) {
+  } else if (!isValidRunAgain) {
     return t('run_again_disabled')
   } else if (isOtherRunCurrent && !isResetRunLoading) {
     return t('shared:robot_is_busy')
-  } else if (isRobotOnWrongVersionOfSoftware) {
-    return t('shared:a_software_update_is_available')
+  } else if (!isCalibrationComplete) {
+    return t('instrument_calibration_incomplete')
+  } else if (isMissingModules) {
+    return t('modules_missing')
+  } else if (!isModuleCalibrationComplete) {
+    return t('module_calibration_incomplete')
   } else if (
     doorStatus.isDoorOpen &&
     doorStatus.moduleDoorLocation !== null &&
@@ -153,10 +157,6 @@ function useDisabledReason({
     return t('close_stacker_door')
   } else if (doorStatus.isDoorOpen && isStartRunStatus(runStatus)) {
     return t('close_door')
-  } else if (isClosingCurrentRun) {
-    return t('shared:robot_is_busy')
-  } else if (!isCameraReadyToRun) {
-    return t('enable_camera')
   } else {
     return null
   }
