@@ -658,7 +658,11 @@ export const getSetStoredLabware = (
       }
     }
   })
-  return pythonSetStoredLabware.length > 0
-    ? `# Set Stored Labware:\n${pythonSetStoredLabware}`
+
+  //  filter any empty strings
+  const pythonLines = pythonSetStoredLabware.filter(Boolean)
+
+  return pythonLines.length > 0
+    ? `# Set Stored Labware:\n${pythonLines.join('\n').trimStart()}`
     : ''
 }
