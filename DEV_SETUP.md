@@ -14,7 +14,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - ssh
 - Python v3.10
 - Node.js v22.12.0
-- [uv][] (Python package manager) - required for `api`, `shared-data`, and `robot-server` projects
+- [uv][] (Python package manager) - required for all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`)
 
 ### macOS
 
@@ -23,7 +23,7 @@ On macOS, we rely on:
 - [Homebrew][brew] to install general dependencies, like `git`
 - [Node Version Switcher][nvs] to install and manage Node.js
 - [pyenv][] to install and manage Python
-- [uv][] to manage Python dependencies for `api`, `shared-data`, and `robot-server` projects
+- [uv][] to manage Python dependencies for all Python projects
 
 The setup below is compatible with both Intel and ARM (e.g. M1) machines. It assumes you are using the system default shell of `zsh`.
 
@@ -152,7 +152,7 @@ eval "$(pyenv init -)"
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in the `api`, `shared-data`, and `robot-server` projects.
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
 
 Install `uv` using the official installer:
 
@@ -189,7 +189,7 @@ On Windows, we rely on:
 - [scoop][] to install general dependencies and Python
 - [Node Version Switcher][nvs] to install and manage Node.js
 - [Visual Studio][visual studio] to run electron-rebuild
-- [uv][] to manage Python dependencies for `api`, `shared-data`, and `robot-server` projects
+- [uv][] to manage Python dependencies for all Python projects
 
 #### 0. Install `scoop` and general dependencies
 
@@ -199,7 +199,7 @@ On Windows, we rely on:
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in the `api`, `shared-data`, and `robot-server` projects.
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
 
 Install `uv` using the official installer:
 
@@ -229,7 +229,7 @@ Linux setup is broadly similar to macOS setup, but it will depend heavily on you
 
 #### 3. Install `uv`
 
-[uv][] is a fast Python package installer and resolver that we use for dependency management in the `api`, `shared-data`, and `robot-server` projects.
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
 
 Install `uv` using the official installer:
 
@@ -285,7 +285,7 @@ Finally, you need to download and install all of our various development depende
 make setup
 ```
 
-**Note:** Some Python projects (`api`, `shared-data`, and `robot-server`) use [uv][] for dependency management instead of `pipenv`. These projects will automatically set up their Python environments using `uv` when you run `make setup`. The `uv` tool creates virtual environments in `.venv` directories within each project and manages dependencies via `pyproject.toml` and `uv.lock` files.
+**Note:** All Python projects in this repository use [uv][] for dependency management. These projects will automatically set up their Python environments using `uv` when you run `make setup`. The `uv` tool creates virtual environments in `.venv` directories within each project and manages dependencies via `pyproject.toml` and `uv.lock` files.
 
 Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide][] for more information. If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
 
