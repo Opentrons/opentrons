@@ -424,3 +424,15 @@ def test_custom_error_code_raise_custom_exception() -> None:
     assert error.value.command == "G28"
     assert error.value.response == "ERR999:test"
     assert error.value.port == "test_port"
+
+
+async def test_send_data_multiple_raises_unhandled(
+    mock_serial_port: AsyncMock, async_subject: AsyncResponseSerialConnection, ack: str
+) -> None:
+    """It shouldn't wait for both acks before raising an unhandled gcode"""
+    mock_serial_port.read_until.side_effect = [
+        f"ERR003:unhandled gcode {ack}".encode(),
+    ]
+    with pytest.raises(UnhandledGcode):
+        await async_subject._send_data_multiack(data="M411", retries=0, acks=3)
+    mock_serial_port.read_until.assert_called_once()
