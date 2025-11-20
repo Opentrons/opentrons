@@ -10,7 +10,7 @@ if (Test-Path -Path $VENV_DIR) {
 }
 
 Write-Output "Creating virtual environment in $VENV_DIR..."
-python -m venv $VENV_DIR
+uv venv $VENV_DIR --python 3.10
 
 Write-Output "Activating virtual environment..."
 if ($IsWindows) {

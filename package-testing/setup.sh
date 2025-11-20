@@ -11,7 +11,7 @@ if [ -d "$VENV_DIR" ]; then
 fi
 
 echo "Creating virtual environment in $VENV_DIR..."
-python -m venv "$VENV_DIR"
+uv venv "$VENV_DIR" --python 3.10
 
 echo "Activating virtual environment..."
 # shellcheck disable=SC1091
