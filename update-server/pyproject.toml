@@ -45,7 +45,6 @@ dev = [
     "black==22.3.0",
     "decoy<3,>=2.2.0",
     "build~=1.2.0",
-    "setuptools",
 ]
 
 [project.urls]

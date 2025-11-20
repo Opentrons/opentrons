@@ -55,7 +55,6 @@ dev = [
     "types-mock~=5.1.0",
     "sqlalchemy2-stubs==0.0.2a21",
     "build~=1.2.0",
-    "setuptools",
 ]
 
 [project.urls]

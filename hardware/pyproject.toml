@@ -46,7 +46,6 @@ dev = [
     "matplotlib",
     "build~=1.2.0",
     "pytest-lazy-fixtures<2,>=1.1.4",
-    "setuptools",
 ]
 
 [project.urls]

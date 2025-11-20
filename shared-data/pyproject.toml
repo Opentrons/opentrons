@@ -57,7 +57,6 @@ dev = [
     "build~=1.2.0",
     "pillow",
     "types-Pillow",
-    "setuptools",
 ]
 
 [project.urls]
