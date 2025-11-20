@@ -18,6 +18,7 @@ import {
   getFlexHoverDimensions,
   getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
+  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
 import styles from './deckviewoverlay.module.css'
@@ -71,7 +72,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const stagingAreaLocations = Object.values(stagingAreaEntities)?.map(
     stagingArea => stagingArea.location as string
   )
-  const wasteChuteOnSlot =
+  const isWasteChuteOnSlot =
     Object.values(wasteChuteEntities).length > 0 && slotId === 'D3'
 
   const cutoutId =
@@ -138,7 +139,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
         </RobotCoordsForeignObject>
         {/* This is to render the waste chute above the hover border - very gnarly but this
             is what design wanted */}
-        {wasteChuteOnSlot != null ? (
+        {isWasteChuteOnSlot ? (
           <RobotCoordsForeignObject
             width={WASTE_CHUTE_WIDTH}
             height={WASTE_CHUTE_HEIGHT}
