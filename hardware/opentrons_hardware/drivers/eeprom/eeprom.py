@@ -250,6 +250,4 @@ class EEPROMDriver:
                     date_string, "%Y%m%d"
                 )
                 self._eeprom_data.unit_number = int(prop.value[14:17])
-            elif prop.id == PropId.SKU and len(prop.value) >= 9:
-                self._eeprom_data.sku = str(prop.value)
         return self._eeprom_data
