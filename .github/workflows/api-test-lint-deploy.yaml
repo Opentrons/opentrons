@@ -61,6 +61,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
+          python-version: '3.10'
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
@@ -209,6 +210,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
+          python-version: '3.10'
           dependency-group: ''
       - name: 'build api distributables'
         shell: bash
