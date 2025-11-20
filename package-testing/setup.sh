@@ -17,11 +17,13 @@ echo "Activating virtual environment..."
 # shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate"
 
+VENV_PYTHON="$VENV_DIR/bin/python"
+
 echo "Installing packages..."
-pip install -U ../shared-data ../api # add ../hardware here to validate the below check
+uv pip install --python "$VENV_PYTHON" -U ../shared-data ../api # add ../hardware here to validate the below check
 
 echo "Validate opentrons-hardware is not installed..."
-if pip list 2>/dev/null | grep -q "opentrons-hardware"; then
+if uv pip list --python "$VENV_PYTHON" 2>/dev/null | grep -q "opentrons-hardware"; then
     echo "FAIL: opentrons-hardware is installed"
     exit 1
 else
@@ -29,7 +31,7 @@ else
 fi
 
 echo "Packages installed successfully."
-pip list
+uv pip list --python "$VENV_PYTHON"
 
 echo "To activate the virtual environment, run:"
 echo "source $VENV_DIR/bin/activate"
