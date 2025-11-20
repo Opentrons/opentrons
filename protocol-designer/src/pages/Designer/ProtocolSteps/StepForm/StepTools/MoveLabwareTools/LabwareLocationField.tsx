@@ -10,6 +10,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getUnoccupiedStackOptions,
   TIPRACK_LID_LOADNAME,
@@ -17,6 +18,7 @@ import {
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
+  getModuleEntities,
 } from '/protocol-designer/step-forms/selectors'
 import {
   getDeckSetupForActiveItem,
@@ -24,6 +26,8 @@ import {
   getUnoccupiedLabwareLocationOptions,
 } from '/protocol-designer/top-selectors/labware-locations'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
+import { getSortedAddressableArea } from './utils'
 
 import type { AddressableAreaName } from '@opentrons/shared-data'
 import type { Option } from '/protocol-designer/top-selectors/labware-locations'
@@ -42,6 +46,7 @@ export function LabwareLocationField(
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch()
   const labwareEntities = useSelector(getLabwareEntities)
+  const moduleEntities = useSelector(getModuleEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -66,7 +71,7 @@ export function LabwareLocationField(
     deckSetupLabware[labware]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
   const unoccupiedLabwareLocationsOptionsSelector =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
-
+  const robotType = useSelector(getRobotType)
   // invalid offDeck move filter
   let unoccupiedLabwareLocationsOptions = [
     ...unoccupiedLabwareStackOptions,
@@ -91,7 +96,29 @@ export function LabwareLocationField(
       )
   }
 
-  if (!isLabwareALid) {
+  // check lid-compatible labware and modules
+  if (isLabwareALid) {
+    const def = labwareEntities[labware]?.def
+    const compatibleParentLoadNames = new Set([
+      ...(def?.compatibleParentLabware ?? []),
+      ...Object.keys(def?.stackingOffsetWithLabware ?? {}),
+      ...Object.keys(def?.stackingOffsetWithModule ?? {}),
+    ])
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(({ value, name }) => {
+        let isCompatible = true
+        if (value in moduleEntities) {
+          isCompatible = compatibleParentLoadNames.has(
+            moduleEntities[value].model
+          )
+        } else if (value in labwareEntities) {
+          isCompatible = compatibleParentLoadNames.has(
+            labwareEntities[value].def.parameters.loadName
+          )
+        }
+        return name !== 'Trash bin' && isCompatible
+      })
+  } else {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(
         option => option.name !== 'Trash bin'
@@ -109,11 +136,18 @@ export function LabwareLocationField(
         option => !allSlotNames.includes(option.value as AddressableAreaName)
       )
   }
-
+  const optionsSorted =
+    robotState != null
+      ? getSortedAddressableArea(
+          unoccupiedLabwareLocationsOptions,
+          robotState,
+          robotType
+        )
+      : unoccupiedLabwareLocationsOptions
   return (
     <DropdownStepFormField
       {...props}
-      options={unoccupiedLabwareLocationsOptions}
+      options={optionsSorted}
       errorToShow={props.errorToShow}
       width="100%"
       title={t('protocol_steps:new_location')}

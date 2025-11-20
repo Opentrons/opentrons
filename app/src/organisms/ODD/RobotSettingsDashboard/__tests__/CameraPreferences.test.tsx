@@ -24,6 +24,7 @@ describe('CameraPreferences', () => {
   beforeEach(() => {
     mockProps = {
       setCurrentOption: vi.fn(),
+      robotName: 'robotName',
     }
     vi.mocked(CameraSettings).mockReturnValue(<div>MOCK_CAMERA_SETTINGS</div>)
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAVIGATION</div>)

@@ -10,8 +10,8 @@ import {
   getStoredProtocolGroupedCommands,
 } from '/app/redux/protocol-storage'
 
+import { VisualizerContainer } from '../../../../organisms/Desktop/ProtocolVisualization/VisualizerContainer'
 import styles from './visualization.module.css'
-import { VisualizerContainer } from './VisualizerContainer'
 
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'

@@ -5,6 +5,7 @@ import hashlib
 from pathlib import Path
 from typing import Annotated
 from fastapi import Depends
+import logging
 
 from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.data_files.dependencies import (
@@ -22,18 +23,24 @@ from ..service.dependencies import get_current_time, get_unique_id
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
-from opentrons.protocol_engine.errors import StorageLimitReachedError
+from opentrons.protocol_engine.errors import (
+    StorageLimitReachedError,
+    FileNameInvalidError,
+)
 from robot_server.disk_monitor.dependencies import get_disk_monitor
 from robot_server.disk_monitor.monitor import DiskMonitor
 from opentrons.protocol_engine.resources.file_provider import (
     FileData,
     ReadCmdFileNameMetadata,
     ImageCaptureCmdFileNameMetadata,
+    SPECIAL_CHARACTERS,
 )
 from robot_server.service.notifications.publishers import (
     DataFilePublisher,
     get_data_file_publisher,
 )
+
+log = logging.getLogger(__name__)
 
 
 class FileProviderExecutor:
@@ -133,6 +140,10 @@ class FileProviderExecutor:
 
     def _format_filename(self, file_data: FileData, file_id: str) -> str:
         """Build the finalized filename."""
+
+        def _string_cleanup(data: str) -> str:
+            return "".join([char for char in data if char not in SPECIAL_CHARACTERS])
+
         if isinstance(file_data.command_metadata, ReadCmdFileNameMetadata):
             metadata = file_data.command_metadata
             base_name = metadata.base_filename
@@ -143,22 +154,34 @@ class FileProviderExecutor:
             return base_name + str(metadata.wavelength) + "nm.csv"
         elif isinstance(file_data.command_metadata, ImageCaptureCmdFileNameMetadata):
             cmd_metadata = file_data.command_metadata
+            # Validate that provided base name does not contain invalid characters
+            if cmd_metadata.base_filename is not None and set(
+                SPECIAL_CHARACTERS
+            ).intersection(set(cmd_metadata.base_filename)):
+                raise FileNameInvalidError(
+                    message=f"Base filename metadata provided invalid character(s): {SPECIAL_CHARACTERS.intersection(set(cmd_metadata.base_filename))}"
+                )
             base_name = (
                 f"{cmd_metadata.base_filename}_" if cmd_metadata.base_filename else ""
             )
-            protocol_name = file_data.run_metadata.protocol_name or ""
+            robot_name = _string_cleanup(file_data.run_metadata.robot_name)
+            protocol_name = (
+                _string_cleanup(file_data.run_metadata.protocol_name)
+                if file_data.run_metadata.protocol_name is not None
+                else ""
+            )
 
             return (
                 base_name
-                + file_data.run_metadata.robot_name
+                + robot_name
                 + "_"
                 + protocol_name
                 + "_"
-                + str(file_data.run_metadata.run_created_at)
+                + str(file_data.run_metadata.run_created_at.strftime("%Y%m%d-%H%M%S"))
                 + "_"
                 + str(cmd_metadata.step_number)
                 + "_"
-                + str(cmd_metadata.command_timestamp)
+                + str(cmd_metadata.command_timestamp.strftime("%Y%m%d-%H%M%S"))
                 + ".jpeg"
             )
 

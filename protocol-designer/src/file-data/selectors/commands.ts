@@ -26,37 +26,36 @@ import type { Substeps } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
-export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> =
-  createSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId,
-    stepFormSelectors.getLabwareEntities,
-    (ingredLocations, labwareEntities) => {
-      const allLabwareIds: string[] = Object.keys(labwareEntities)
-      return allLabwareIds.reduce(
-        (
-          acc: StepGeneration.LabwareLiquidState,
-          labwareId
-        ): StepGeneration.LabwareLiquidState => {
-          const labwareDef = labwareEntities[labwareId].def
-          const allWells = labwareDef
-            ? StepGeneration.getAllWellsForLabware(labwareDef)
-            : []
-          const liquidStateForLabwareAllWells = allWells.reduce(
-            (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
-              ...innerAcc,
-              [well]:
-                (ingredLocations[labwareId] &&
-                  ingredLocations[labwareId][well]) ||
-                {},
-            }),
-            {}
-          )
-          return { ...acc, [labwareId]: liquidStateForLabwareAllWells }
-        },
-        {}
-      )
-    }
-  )
+export const getLabwareLiquidState = createSelector(
+  labwareIngredSelectors.getLiquidsByLabwareId,
+  stepFormSelectors.getLabwareEntities,
+  (ingredLocations, labwareEntities): StepGeneration.LabwareLiquidState => {
+    const allLabwareIds: string[] = Object.keys(labwareEntities)
+    return allLabwareIds.reduce(
+      (
+        acc: StepGeneration.LabwareLiquidState,
+        labwareId
+      ): StepGeneration.LabwareLiquidState => {
+        const labwareDef = labwareEntities[labwareId].def
+        const allWells = labwareDef
+          ? StepGeneration.getAllWellsForLabware(labwareDef)
+          : []
+        const liquidStateForLabwareAllWells = allWells.reduce(
+          (innerAcc: StepGeneration.SingleLabwareLiquidState, well) => ({
+            ...innerAcc,
+            [well]:
+              (ingredLocations[labwareId] &&
+                ingredLocations[labwareId][well]) ||
+              {},
+          }),
+          {}
+        )
+        return { ...acc, [labwareId]: liquidStateForLabwareAllWells }
+      },
+      {}
+    )
+  }
+)
 export const getInitialRobotState: (
   arg0: BaseState
 ) => StepGeneration.RobotState = createSelector(

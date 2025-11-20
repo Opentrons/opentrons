@@ -30,7 +30,12 @@ import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labw
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
-import { TIP_STATE_TO_TIP_TYPE } from './constants'
+import {
+  INACCESSIBLE_COLLISION,
+  INACCESSIBLE_INCOMPLETE,
+  INACCESSIBLE_TOO_MANY_PICKUPS,
+  TIP_STATE_TO_TIP_TYPE,
+} from './constants'
 import { DeckOverlay } from './DeckOverlay'
 import { PipetteShadow } from './PipetteShadows/PipetteShadow'
 import { TipLegend } from './TipLegend'
@@ -47,7 +52,11 @@ import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
-import type { TipSelectionBaseProps } from './types'
+import type {
+  AccessibilityStatus,
+  InaccessibleReason,
+  TipSelectionBaseProps,
+} from './types'
 
 const NINETY_SIX_ALL_TARGET_WELL = 'A1'
 
@@ -60,7 +69,7 @@ export function SelectTips(
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
     setShowPickupsRequiredBanner: Dispatch<SetStateAction<boolean>>
     primaryNozzle: string
-    tipAccessibilityStatus: Record<string, Record<string, boolean>>
+    tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
 ): JSX.Element {
   const { t } = useTranslation('tip_selection')
@@ -116,9 +125,35 @@ export function SelectTips(
   })
 
   const areAllHoveredWellsAccessibleAndOccupied = allWellsAffectedByHover.every(
-    well => tipAccessibileStatusByWellName[well] && tipState?.[well] !== EMPTY
+    well =>
+      tipAccessibileStatusByWellName[well].isAccessible &&
+      tipState?.[well] !== EMPTY
   )
+
+  // lower index means higher priority
+  const inaccessibilityPriority = [
+    INACCESSIBLE_COLLISION,
+    INACCESSIBLE_INCOMPLETE,
+    INACCESSIBLE_TOO_MANY_PICKUPS,
+  ]
+
+  const hoveredWellsInaccessibilityStatus =
+    allWellsAffectedByHover.reduce<InaccessibleReason | null>((acc, well) => {
+      const { isAccessible, inaccessibleReason } =
+        tipAccessibileStatusByWellName[well]
+      if (isAccessible || inaccessibleReason == null) {
+        return acc
+      }
+      if (acc == null) {
+        return inaccessibleReason
+      }
+      return inaccessibilityPriority.indexOf(inaccessibleReason) <
+        inaccessibilityPriority.indexOf(acc)
+        ? inaccessibleReason
+        : acc
+    }, null)
   const numPickupsRemaining = numTotalPickups - selectedTips.length
+  const hasPickupsRemaining = numPickupsRemaining > 0
 
   const handleUnselectWell = (unselectIndex: number): void => {
     setSelectedTips(selectedTips.slice(0, unselectIndex))
@@ -127,7 +162,7 @@ export function SelectTips(
   const handleClickWell = (wellName: string): void => {
     if (
       tipState?.[wellName] === 'EMPTY' ||
-      !tipAccessibileStatusByWellName[wellName] ||
+      !tipAccessibileStatusByWellName[wellName].isAccessible ||
       (allWellsAffectedByHover.includes(wellName) &&
         !areAllHoveredWellsAccessibleAndOccupied)
     ) {
@@ -149,14 +184,14 @@ export function SelectTips(
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)
-      } else if (numPickupsRemaining > 0) {
+      } else if (hasPickupsRemaining) {
         setSelectedTips(prevTips => [...prevTips, [wellName]])
       }
     } else if (channels === 8 || (channels === 96 && nozzles === COLUMN)) {
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)
-      } else if (numPickupsRemaining > 0) {
+      } else if (hasPickupsRemaining) {
         const allWellsInColumn = getAllWellsInColumn(wellName, labwareDef)
         setSelectedTips(prevTips => {
           const newTips = [...prevTips]
@@ -169,7 +204,7 @@ export function SelectTips(
       if (wellName in prevSelectedTipsByIndex) {
         const indexToUnselect = prevSelectedTipsByIndex[wellName]
         handleUnselectWell(indexToUnselect)
-      } else if (numPickupsRemaining > 0) {
+      } else if (hasPickupsRemaining) {
         setSelectedTips(prevTips => [...prevTips, allWells])
       }
     }
@@ -235,13 +270,16 @@ export function SelectTips(
             (acc, [wellName, state]) => {
               const rawState = TIP_STATE_TO_TIP_TYPE[state]
               let status = rawState
-              if (!tipAccessibileStatusByWellName[wellName]) {
+              if (!tipAccessibileStatusByWellName[wellName].isAccessible) {
                 status = rawState === NO ? NO : INACCESSIBLE
               }
-              if (selectedTips.some(tipSet => tipSet.includes(wellName))) {
+              if (selectedTips.flat().some(tip => tip === wellName)) {
                 status = rawState === USED ? SELECTED_USED : SELECTED
               } else if (allWellsAffectedByHover.includes(wellName)) {
-                if (areAllHoveredWellsAccessibleAndOccupied) {
+                if (
+                  areAllHoveredWellsAccessibleAndOccupied &&
+                  hasPickupsRemaining
+                ) {
                   status = rawState === USED ? SELECTED_USED : SELECTED
                 } else {
                   status = SELECTED_ERROR
@@ -281,8 +319,15 @@ export function SelectTips(
             hoveredWell={hoveredWell}
             selectedTiprackId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
-            isAccessible={areAllHoveredWellsAccessibleAndOccupied}
+            isHoveredWellSelected={selectedTips
+              .flat()
+              .some(tip => tip === hoveredWell)}
+            hasPickupsRemaining={hasPickupsRemaining}
+            isAccessible={hoveredWellsInaccessibilityStatus == null}
+            inaccessibleReason={hoveredWellsInaccessibilityStatus}
             primaryNozzle={primaryNozzle}
+            enclosingViewbox={viewBox}
+            nozzles={nozzles}
           />
         ) : null}
       </>
@@ -295,13 +340,15 @@ export function SelectTips(
         <StyledText desktopStyle="headingSmallBold">
           {t('click_to_select', { labwareName })}
         </StyledText>
-        {numPickupsRemaining > 0 ? (
-          <Chip
-            text={t('pickups_remaining', { count: numPickupsRemaining })}
-            type="info"
-            hasIcon={false}
-          />
-        ) : null}
+        <Chip
+          {...(hasPickupsRemaining
+            ? {
+                text: t('pickups_remaining', { count: numPickupsRemaining }),
+                type: 'info',
+              }
+            : { text: t('all_tips_selected'), type: 'success' })}
+          hasIcon={false}
+        />
       </Flex>
       <div className={styles.modal_body_select_tips}>
         <div className={styles.select_tips_deck_container}>

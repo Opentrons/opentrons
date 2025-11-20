@@ -13,6 +13,11 @@ import {
 import { useAllRunImagesRaw } from '@opentrons/react-api-client'
 
 import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './gallery.module.css'
 
@@ -39,7 +44,21 @@ export function GalleryContainerOverflowMenu({
   const [isPendingDownload, setIsPendingDownload] = useState(false)
   const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(runId)
 
-  const formattedRunTs = format(new Date(runTimestamp), 'M/d/yy_HH:mm:ss')
+  const robotType = useRobotType(robotName)
+
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType,
+  })
+  const formattedRunTs = (() => {
+    try {
+      if (runTimestamp == null) return ''
+      return format(new Date(runTimestamp), 'yyyyMMdd-HHmmss')
+    } catch (error) {
+      console.warn('Invalid timestamp:', runTimestamp)
+      return ''
+    }
+  })()
   const buildImagesZipName = (): string =>
     `${robotName}_${protocolName}_${formattedRunTs}_${t('images')}.zip`
 
@@ -51,6 +70,9 @@ export function GalleryContainerOverflowMenu({
     } else {
       setIsPendingDownload(true)
     }
+    reportPhotoAccessUsage({
+      action: 'downloadZip',
+    })
   }
 
   if (imagesZipFile != null && isPendingDownload) {

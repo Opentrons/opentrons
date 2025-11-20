@@ -5,11 +5,15 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import '@testing-library/jest-dom/vitest'
 
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 
 import { UpdateRobotSoftware } from '../UpdateRobotSoftware'
+
+import type { ComponentProps } from 'react'
 
 vi.mock('/app/redux/robot-settings/selectors')
 vi.mock('/app/redux/discovery')
@@ -18,13 +22,15 @@ vi.mock('../../../hooks')
 
 const mockOnUpdateStart = vi.fn()
 
-const render = () => {
+const render = (
+  props?: Partial<ComponentProps<typeof UpdateRobotSoftware>>
+) => {
   return renderWithProviders(
     <MemoryRouter>
       <UpdateRobotSoftware
         robotName="otie"
-        isRobotBusy={false}
         onUpdateStart={mockOnUpdateStart}
+        currentRun={props?.currentRun ?? null}
       />
     </MemoryRouter>,
     { i18nInstance: i18n }
@@ -64,6 +70,12 @@ describe('RobotSettings UpdateRobotSoftware', () => {
       updateFromFileDisabledReason: 'mock reason',
     })
     render()
+    const button = screen.getByText('Browse file system')
+    expect(button).toBeDisabled()
+  })
+
+  it('should be disabled if a run is running', () => {
+    render({ currentRun: { data: { status: RUN_STATUS_RUNNING } } } as any)
     const button = screen.getByText('Browse file system')
     expect(button).toBeDisabled()
   })

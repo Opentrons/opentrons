@@ -39,7 +39,11 @@ import {
 
 import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
-import { useIsFlex } from '/app/redux-resources/robots'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
@@ -67,8 +71,9 @@ export function HistoricalProtocolRunDrawer(
       (a, b) =>
         new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ) ?? []
-  const totalOutputFileCount =
-    outputFileIds.jpeg.length + outputFileIds.csv.length
+  const totalImageFileCount = outputFileIds.jpeg.length
+  const totalOutputFileCount = totalImageFileCount + outputFileIds.csv.length
+
   const runCsvFileIds =
     'runTimeParameters' in run
       ? run.runTimeParameters.reduce<string[]>((acc, parameter) => {
@@ -379,10 +384,15 @@ function ImagesFileDataRow({
   robotName: string
 }): JSX.Element {
   const { t } = useTranslation('run_details')
+  const robotType = useRobotType(robotName)
+  const { reportPhotoAccessUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType: robotType,
+  })
   const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
-  const runTimestamp = format(new Date(run.createdAt), 'M/d/yy_HH:mm:ss')
+  const formattedRunTs = format(new Date(run.createdAt), 'yyyyMMdd-HHmmss')
   const buildImagesZipName = (): string =>
-    `${robotName}_${protocolName}_${runTimestamp}_${t('images')}.zip`
+    `${robotName}_${protocolName}_${formattedRunTs}_${t('images')}.zip`
 
   return (
     <Flex
@@ -405,7 +415,7 @@ function ImagesFileDataRow({
         </LegacyStyledText>
       </Flex>
       <Box width="33%">
-        <LegacyStyledText as="p">{runTimestamp}</LegacyStyledText>
+        <LegacyStyledText as="p">{formattedRunTs}</LegacyStyledText>
       </Box>
       <Box width="34%">
         <Link
@@ -418,6 +428,9 @@ function ImagesFileDataRow({
           onClick={() => {
             if (imagesZipFile != null) {
               downloadFile(imagesZipFile, buildImagesZipName())
+              reportPhotoAccessUsage({
+                action: 'downloadZip',
+              })
             }
           }}
         >

@@ -1,4 +1,4 @@
-"""Command models to retrieve a labware from a Flex Stacker."""
+"""Command models to store a labware in a Flex Stacker."""
 
 from __future__ import annotations
 from typing import Optional, Literal, TYPE_CHECKING, Type, Union, cast

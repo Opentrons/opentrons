@@ -90,13 +90,28 @@ def test_max_flow_rates_per_volume(pipette: PipetteModel, action: str) -> None:
                 (
                     pipette_model_version_str
                     in {
+                        "p50_single_v3.3",
                         "p50_single_v3.4",
                         "p50_single_v3.5",
                         "p50_single_v3.6",
                         "p50_multi_v3.5",
                         "p50_multi_v3.4",
+                        "p50_multi_v3.3",
                     }
                     and liquid_properties.min_volume == 5.0
+                )
+                or (
+                    pipette_model_version_str
+                    in {
+                        "p50_single_v3.3",
+                        "p50_single_v3.4",
+                        "p50_single_v3.5",
+                        "p50_single_v3.6",
+                        "p50_multi_v3.5",
+                        "p50_multi_v3.4",
+                        "p50_multi_v3.3",
+                    }
+                    and liquid_properties.min_volume == 0.5
                 )
                 or (
                     pipette_model_version_str

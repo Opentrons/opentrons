@@ -72,6 +72,7 @@ module.exports = {
               'useAllCommandsAsPreSerializedList',
               'useSearchLabwareOffsets',
               'useImageFileQuery',
+              'useCamera',
             ],
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',

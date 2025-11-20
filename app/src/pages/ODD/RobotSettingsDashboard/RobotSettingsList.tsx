@@ -174,7 +174,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           onClick={() => {
             setCurrentOption('CameraPreferences')
           }}
-          iconName="photo-camera"
+          iconName="camera"
         />
         <RobotSettingButton
           settingName={t('app_settings:privacy')}
@@ -186,7 +186,10 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="privacy"
         />
         <RobotSettingButton
-          settingName={t('app_settings:error_recovery_mode')}
+          settingName={i18n.format(
+            t('app_settings:error_recovery_mode'),
+            'titleCase'
+          )}
           dataTestId="RobotSettingButton_error_recovery_mode"
           settingInfo={t('app_settings:error_recovery_mode_description')}
           iconName="recovery-alt"
@@ -217,7 +220,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('disable_stacker_sensors')}
           dataTestId="RobotSettingButton_disable_stacker_sensors"
           settingInfo={t('disable_stacker_sensors_description')}
-          iconName="stacker-sensors"
+          iconName="ot-flex-stacker"
           rightElement={<OnOffToggle isOn={sensorsDisabled} />}
           onClick={toggleSensors}
         />

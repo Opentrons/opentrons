@@ -22,6 +22,7 @@ import {
 
 import type {
   ModuleOnlyParams,
+  TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV6/command/module'
@@ -216,12 +217,12 @@ describe('thermocycler state updaters', () => {
       testName: 'forThermocyclerOpenLid should set lidOpen to true',
     },
   ]
-  const profileCases: TestCases<any> = [
+  const profileCases: TestCases<TCProfileParams> = [
     {
       params: {
         moduleId,
         profile: [],
-        volume: 10,
+        blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {},
       expectedUpdate: {},
@@ -233,19 +234,19 @@ describe('thermocycler state updaters', () => {
         moduleId,
         profile: [
           {
-            holdTime: 10,
-            temperature: 50,
+            holdSeconds: 10,
+            celsius: 50,
           },
           {
-            holdTime: 10,
-            temperature: 30,
+            holdSeconds: 10,
+            celsius: 30,
           },
           {
-            holdTime: 10,
-            temperature: 0,
+            holdSeconds: 10,
+            celsius: 0,
           },
         ],
-        volume: 10,
+        blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {
         blockTargetTemp: 42,
@@ -261,19 +262,19 @@ describe('thermocycler state updaters', () => {
         moduleId,
         profile: [
           {
-            holdTime: 10,
-            temperature: 0,
+            holdSeconds: 10,
+            celsius: 0,
           },
           {
-            holdTime: 10,
-            temperature: 50,
+            holdSeconds: 10,
+            celsius: 50,
           },
           {
-            holdTime: 10,
-            temperature: 20,
+            holdSeconds: 10,
+            celsius: 20,
           },
         ],
-        volume: 10,
+        blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {
         blockTargetTemp: 42,
@@ -289,11 +290,11 @@ describe('thermocycler state updaters', () => {
         moduleId,
         profile: [
           {
-            holdTime: 10,
-            temperature: 30,
+            holdSeconds: 10,
+            celsius: 30,
           },
         ],
-        volume: 10,
+        blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {
         blockTargetTemp: 42,

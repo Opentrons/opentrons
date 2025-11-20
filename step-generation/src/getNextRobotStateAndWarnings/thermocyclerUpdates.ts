@@ -139,7 +139,6 @@ export const forThermocyclerRunProfile = (
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
   if (profile.length > 0) {
-    // @ts-expect-error (sa, 2021-05-03): last might return undefined
-    moduleState.blockTargetTemp = last(profile).temperature
+    moduleState.blockTargetTemp = last(profile)!.celsius
   }
 }
