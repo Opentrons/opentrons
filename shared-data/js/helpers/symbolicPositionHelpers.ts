@@ -6,11 +6,12 @@ import type {
 } from '../../command/types/setup'
 import type { AddressableAreaName } from '../../deck'
 
-export const changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName =
-  (quoteUnquoteSlotName: string): boolean =>
-    ['offDeck', 'systemLocation', 'wasteChuteLocation'].includes(
-      quoteUnquoteSlotName
-    )
+export const changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName = (
+  quoteUnquoteSlotName: string
+): boolean =>
+  ['offDeck', 'systemLocation', 'wasteChuteLocation'].includes(
+    quoteUnquoteSlotName
+  )
 
 export const locationIsOffDeck = (
   labwareLocation: LabwareLocation
