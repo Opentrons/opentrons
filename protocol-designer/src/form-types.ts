@@ -501,6 +501,12 @@ export interface HydratedAbsorbanceReaderFormData extends AnnotationFields {
   wavelengths: string[]
 }
 
+export interface HydratedFlexStackerFormData extends AnnotationFields {
+  stepType: 'flexStacker'
+  id: string
+  moduleId: string
+}
+
 // fields used in TipPositionInput
 export type TipZOffsetFields =
   | 'aspirate_mmFromBottom'
@@ -619,3 +625,4 @@ export type HydratedFormData =
   | HydratedPauseFormData
   | HydratedTemperatureFormData
   | HydratedThermocyclerFormData
+  | HydratedFlexStackerFormData
