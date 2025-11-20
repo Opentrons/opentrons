@@ -34,6 +34,7 @@ plugins:
             separate_signature: true
             show_signature_annotations: true
             annotations_path: brief
+            modernize_annotations: true
             line_length: 80
             group_by_category: false
             filters: 

@@ -224,7 +224,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 it will behave the same as a volume of `None`/unspecified: aspirate
                 until the pipette is full. On API levels at or above 2.16, no liquid
                 will be aspirated.
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional):
+            location:
                 Tells the robot where
                 to aspirate from. The location can be a `Well` or a `Location`.
 
@@ -247,7 +247,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 [Pipette Flow Rates][pipette-flow-rates].
             flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
                 is specified, `rate` must not be set.
-            end_location (`Location`): Tells the robot to move between `location` and
+            end_location (Location): Tells the robot to move between `location` and
                 `end_location` while aspirating liquid. When this argument is used, the
                 `location` and `end_location` must both be
                 [`Location`][opentrons.types.Location].
@@ -502,11 +502,11 @@ class InstrumentContext(publisher.CommandPublisher):
             `location`, specify it as a keyword argument:
             `pipette.dispense(location=plate['A1'])`.
 
-        *New in version 2.15*: Added the `push_out` parameter.
+        *Changed in version 2.15*: Added the `push_out` parameter.
 
         *Changed in version 2.17*: Behavior of the `volume` parameter.
 
-        *New in version 2.24*: Added the `flow_rate` parameter.
+        *Changed in version 2.24*: Added the `flow_rate` parameter.
 
         *Changed in version 2.24*: `location` is no longer required if the pipette just
         moved to, dispensed, or blew out into a trash bin or waste chute.
@@ -692,7 +692,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 behave the same as a volume of `None`/unspecified: mix the full working
                 volume of the pipette. On API levels at or above 2.16, no liquid will
                 be mixed.
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional):
+            location:
                 The location where the
                 pipette will mix. If unspecified, the pipette will mix at its current
                 position.
@@ -888,7 +888,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 [`flow_rate.aspirate`][opentrons.protocol_api.InstrumentContext.flow_rate].
                 The dispensing flow rate is calculated as `rate` multiplied by
                 [`flow_rate.dispense`][opentrons.protocol_api.InstrumentContext.flow_rate].
-                See [new plunger flow rates][opentrons.protocol_api.InstrumentContext.flow_rate].
+                See [Pipette Flow Rates][pipette-flow-rates].
             aspirate_flow_rate (float, optional): The absolute flow rate for each
                 aspirate in the mix, in µL/s. If this is specified, `rate` must not be
                 set.
@@ -903,7 +903,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 final mix repetition. The pipette will not push out after earlier
                 repetitions. If not specified or `None`, the pipette will push out the
                 default non-zero amount. See
-                [push out dispense][opentrons.protocol_api.InstrumentContext.dispense].
+                [Push Out After Dispense][push-out-after-dispense].
             movement_delay (float, optional): Delay the x/y/z movement during a dynamic
                 mix. This option is only valid when using `aspirate_end_location` or
                 `dispense_end_location`. When this argument is used, the x/y/z movement
@@ -917,12 +917,6 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Returns:
             InstrumentContext: This instance.
-
-        !!! note
-            All the arguments of `mix()` are optional. However, if you omit one of them,
-            all subsequent arguments must be passed as keyword arguments. For instance,
-            `pipette.mix(1, location=wellplate['A1'])` is a valid call, but
-            `pipette.mix(1, wellplate['A1'])` is not.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} and {} at rate={}".format(
@@ -1067,7 +1061,7 @@ class InstrumentContext(publisher.CommandPublisher):
         all liquid from the pipette tip. See [Blow Out][blow-out-building-block].
 
         Args:
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Location`][opentrons.types.Location], optional):
+            location:
                 The blowout location.
                 If no location is specified, the pipette will blow out from its current
                 position.
@@ -1193,7 +1187,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See [Touch Tip][touch-tip-building-block] for more details and examples.
 
         Args:
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], None):
+            location:
                 If no location is passed, the pipette will touch its tip at the edges of
                 the current well.
             radius (float): How far to move, as a proportion of the target well's radius.
@@ -1320,7 +1314,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 pipette.
             height (float, optional): The height, in mm, to move above the current well
                 before creating the air gap. The default is 5 mm above the current well.
-                in_place (bool, optional): Air gap at the pipette's current position, without
+            in_place (bool, optional): Air gap at the pipette's current position, without
                 moving to some height above the well. If `in_place` is specified,
                 `height` must be unset.
             rate (float, optional): A multiplier for the default flow rate of the pipette.
@@ -1473,7 +1467,7 @@ class InstrumentContext(publisher.CommandPublisher):
         If no location is passed, the pipette will pick up the next available tip in its
         [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] list. Within
         each tip rack, tips will be picked up in the order specified by the labware
-        definition and [`wells()`][opentrons.protocol_api.labware.Labware.wells]. To
+        definition and [`Labware.wells()`][opentrons.protocol_api.labware.Labware.wells]. To
         adjust where the sequence starts, use
         [`starting_tip`][opentrons.protocol_api.InstrumentContext.starting_tip].
 
@@ -1493,7 +1487,7 @@ class InstrumentContext(publisher.CommandPublisher):
               parameter of pipetting actions to achieve the desired result.
 
         Args:
-            location (Union[`Well`][opentrons.protocol_api.labware.Well], [`Labware`][opentrons.protocol_api.labware.Labware], [`Location`][opentrons.types.Location], optional):
+            location:
                 The location from
                 which to pick up a tip. The `location` argument can be specified in
                 several ways:
@@ -1501,12 +1495,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 - As a `Well`. For example,
                 `pipette.pick_up_tip(tiprack.wells()[0])` will always pick up the first
                 tip in `tiprack`, even if the rack is not a member of
-                [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
+                [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
 
                 - As a labware. `pipette.pick_up_tip(tiprack)` will pick up the next
                 available tip in `tiprack`, even if the rack is not a member of
-                [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
-
+                [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
                 - As a `Location`. Use this to make fine adjustments to the pickup
                 location. For example, to tell the robot to start its pick up tip
                 routine 1 mm closer to the top of the well in the tip rack, call
@@ -1735,20 +1728,20 @@ class InstrumentContext(publisher.CommandPublisher):
             default location relative to the `WasteChute` object. For example,
             `pipette.drop_tip(location=waste_chute)`.
 
-        *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
-
         In API versions 2.15 to 2.17, if `location` is a `TrashBin` or not specified,
         the API will instruct the pipette to drop tips in different locations within
         the bin. Varying the tip drop location helps prevent tips from piling up in a
         single location.
 
-        *Changed in version 2.18*: The API will only vary the tip drop location if
+        Starting in API version 2.18, the API will only vary the tip drop location if
         `location` is not specified. Specifying a `TrashBin` as the `location` behaves
-        the same as specifying [`TrashBin.top`][opentrons.protocol_api.TrashBin.top],
+        the same as specifying [`TrashBin.top()`][opentrons.protocol_api.TrashBin.top],
         which is a fixed position.
 
         Args:
             location: Where to drop the tip.
+
+                *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
             home_after: Whether to home the pipette's plunger after dropping the tip.
                 If not specified, defaults to `True` on an OT-2.
 
@@ -1893,7 +1886,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 of each dispense. Defaults to the minimum volume of the pipette. See
                 [Disposal Volume][disposal-volume] for details.
 
-                - `mix_after`: Ignored.
+                - `mix_after` is ignored.
 
         Returns:
             This instance.
@@ -1986,7 +1979,7 @@ class InstrumentContext(publisher.CommandPublisher):
         ---
 
         Transfer accepts a number of optional parameters that give you greater control
-        over the exact steps it performs. See [Complex Liquid Handling Parameters](../complex-commands/parameters.md)
+        over the exact steps it performs. See [Complex Command Parameters](../complex-commands/parameters.md)
         or the links under each argument's entry below for additional details and examples.
 
         Keyword Args:
@@ -2245,7 +2238,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
             tip_racks (List[labware.Labware], optional): A list of tip racks to pick up
                 from for this command. If not provided, the pipette will pick up from its
-                associated [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
+                associated [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
                 Providing this argument does not change the value of
                 `InstrumentContext.tip_racks`.
 
@@ -2434,7 +2427,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
             tip_racks (List[labware.Labware], optional): A list of tip racks to pick up
                 from for this command. If not provided, the pipette will pick up from its
-                associated [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
+                associated [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
                 Providing this argument does not change the value of
                 `InstrumentContext.tip_racks`.
 
@@ -2442,12 +2435,12 @@ class InstrumentContext(publisher.CommandPublisher):
                 An ordered list of tips to use for the transfer. If the list contains
                 fewer tips than needed to complete the transfer, the API will raise an
                 error. The pipette will use only these tips even if
-                [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] or the
+                [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks] or the
                 `tip_racks` parameter of this method is set.
 
-        *New in version 2.25*: Added the `tip_racks` parameter.
+        *Changed in version 2.25*: Added the `tip_racks` parameter.
 
-        *New in version 2.27*: Added the `tips` parameter.
+        *Changed in version 2.27*: Added the `tips` parameter.
         """
         if volume == 0.0:
             _log.info(
@@ -2631,7 +2624,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
             tip_racks (List[labware.Labware], optional): A list of tip racks to pick up
                 from for this command. If not provided, the pipette will pick up from its
-                associated [`tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
+                associated [`InstrumentContext.tip_racks`][opentrons.protocol_api.InstrumentContext.tip_racks].
                 Providing this argument does not change the value of
                 `InstrumentContext.tip_racks`.
 
@@ -2793,7 +2786,7 @@ class InstrumentContext(publisher.CommandPublisher):
         See [Move To][move-to] for examples.
 
         Args:
-            location (Union[`Location`][opentrons.types.Location], [`TrashBin`][opentrons.protocol_api.TrashBin], [`WasteChute`][opentrons.protocol_api.WasteChute]):
+            location:
                 Where to move to.
 
                 *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
@@ -2874,8 +2867,8 @@ class InstrumentContext(publisher.CommandPublisher):
         immediately.
 
         Args:
-            location (types.Location): A location containing resin tips, must be a
-                Labware or a Well.
+            location: A location containing resin tips. Must be a
+                `Labware` or a `Well`.
         """
         if isinstance(location, labware.Labware):
             well = location.wells()[0]
@@ -3474,7 +3467,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 - `COLUMN` sets a 96-channel pipette to use 8 nozzles, aligned from front to back
                 with respect to the deck. This corresponds to a column of wells on labware.
                 For 8-channel pipettes, use `ALL` instead.
-                - `PARTIAL_COLUMN` sets an 8-channel pipette to use 2--7 nozzles, aligned from front to back
+                - `PARTIAL_COLUMN` sets an 8-channel pipette to use 2–7 nozzles, aligned from front to back
                 with respect to the deck. Not compatible with the 96-channel pipette.
                 - `ROW` sets a 96-channel pipette to use 12 nozzles, aligned from left to right
                 with respect to the deck. This corresponds to a row of wells on labware.
@@ -3490,7 +3483,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     If possible, don't use both `start="A1"` and `start="A12"` to pick up
                     tips *from the same rack*. Doing so can affect positional accuracy.
 
-                end (str or None): The nozzle at the end of a linear layout, which is used
+            end (str or None): The nozzle at the end of a linear layout, which is used
                 to determine how many tips will be picked up by a pipette. The string
                 should be of the same format used when identifying wells by name.
                 Required when setting `style=PARTIAL_COLUMN`.
@@ -3597,7 +3590,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Returns `True` if liquid is present and `False` if liquid is not present. Will
         not raise an error if it does not detect liquid. When simulating a protocol, the
         check always succeeds (returns `True`). Works with Flex 1-, 8-, and 96-channel
-        pipettes. See [`detect_liquid_presence`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence].
+        pipettes. See [Detect Liquids][detect-liquids].
 
         !!! note
             The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8
@@ -3617,8 +3610,8 @@ class InstrumentContext(publisher.CommandPublisher):
         recovery mode. In recovery mode, you can manually add liquid to resolve the
         error. When simulating a protocol, the check always succeeds (does not raise
         an error). Works with Flex 1-, 8-, and 96-channel pipettes. See
-        [`detect_liquid_presence()`][opentrons.protocol_api.InstrumentContext.detect_liquid_presence]
-        and [`require_liquid_presence`][opentrons.protocol_api.InstrumentContext.require_liquid_presence].
+        [Liquid Presence Detection][liquid-presence-detection]
+        and [Require Liquids][require-liquids].
 
         !!! note
             The pressure sensors for the Flex 8-channel pipette are on channels 1 and 8
