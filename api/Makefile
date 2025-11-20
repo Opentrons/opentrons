@@ -63,9 +63,9 @@ plot_type ?=
 
 define uv_sync_dev
 	if [ -f uv.lock ]; then \
-		uv sync --frozen --python 3.10 --group dev; \
+		uv sync --frozen --group dev; \
 	else \
-		uv sync --python 3.10 --group dev; \
+		uv sync --group dev; \
 	fi
 endef
 
