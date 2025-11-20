@@ -1,13 +1,15 @@
 """Protocol engine types to do with liquid classes."""
 from typing import Any
-from pydantic import Field
+from pydantic import Field, BaseModel
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     ByTipTypeSetting,
+    ByTipTypeSetting1,
+    ByTipTypeSetting2,
 )
 
 
-class LiquidClassRecord(ByTipTypeSetting, frozen=True):
+class LiquidClassRecordBase(BaseModel):
     """LiquidClassRecord is our internal representation of an (immutable) liquid class.
 
     Conceptually, a liquid class record is the tuple (name, pipette, tip, transfer properties).
@@ -50,10 +52,46 @@ class LiquidClassRecord(ByTipTypeSetting, frozen=True):
         return hash(dict_to_tuple(self.model_dump()))
 
 
-class LiquidClassRecordWithId(LiquidClassRecord, frozen=True):
+class LiquidClassRecord1(ByTipTypeSetting1, LiquidClassRecordBase, frozen=True):
+    """Inheirt from base schema 1."""
+
+    pass
+
+
+class LiquidClassRecord2(ByTipTypeSetting2, LiquidClassRecordBase, frozen=True):
+    """Inheirt from base schema 2."""
+
+    pass
+
+
+LiquidClassRecord = LiquidClassRecord1 | LiquidClassRecord2
+
+
+class LiquidClassRecordWithIdBase(BaseModel, frozen=True):
     """A LiquidClassRecord with its ID, for use in summary lists."""
 
     liquidClassId: str = Field(
         ...,
         description="Unique identifier for this liquid class.",
     )
+
+
+class LiquidClassRecordWithId1(LiquidClassRecord1, frozen=True):
+    """A LiquidClassRecord with its ID, for use in summary lists."""
+
+    liquidClassId: str = Field(
+        ...,
+        description="Unique identifier for this liquid class.",
+    )
+
+
+class LiquidClassRecordWithId2(LiquidClassRecord2, frozen=True):
+    """A LiquidClassRecord with its ID, for use in summary lists."""
+
+    liquidClassId: str = Field(
+        ...,
+        description="Unique identifier for this liquid class.",
+    )
+
+
+LiquidClassRecordWithId = LiquidClassRecordWithId1 | LiquidClassRecordWithId2

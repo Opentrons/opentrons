@@ -3,7 +3,10 @@
 from __future__ import annotations
 from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING, Sequence
 
-from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
+from opentrons_shared_data.liquid_classes import (
+    LiquidClassDefinitionDoesNotExist,
+    DEFAULT_LC_VERSION,
+)
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
@@ -1128,12 +1131,16 @@ class ProtocolCore(
             display_color=(liquid.displayColor.root if liquid.displayColor else None),
         )
 
-    def get_liquid_class(self, name: str, version: Optional[int]) -> LiquidClass:
+    def get_liquid_class(
+        self, name: str, version: Optional[int], schema_version: Optional[int]
+    ) -> LiquidClass:
         """Get an instance of a built-in liquid class."""
         if version is None:
             version = _default_liquid_class_versions.get_liquid_class_version(
                 self._api_version, name
             )
+        if schema_version is None:
+            schema_version = DEFAULT_LC_VERSION
         try:
             # Check if we have already loaded this liquid class' definition
             liquid_class_def = self._liquid_class_def_cache[(name, version)]
@@ -1142,7 +1149,9 @@ class ProtocolCore(
                 # Fetching the liquid class data from file and parsing it
                 # is an expensive operation and should be avoided.
                 # Calling this often will degrade protocol execution performance.
-                liquid_class_def = liquid_classes.load_definition(name, version=version)
+                liquid_class_def = liquid_classes.load_definition(
+                    name, version=version, schema_version=schema_version
+                )
                 self._liquid_class_def_cache[(name, version)] = liquid_class_def
             except LiquidClassDefinitionDoesNotExist:
                 raise ValueError(

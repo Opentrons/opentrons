@@ -1493,6 +1493,7 @@ class ProtocolContext(CommandPublisher):
         self,
         name: str,
         version: Optional[int] = None,
+        schema_version: Optional[int] = None,
     ) -> LiquidClass:
         """
         Get an instance of an Opentrons-verified liquid class for use in a Flex protocol.
@@ -1509,7 +1510,9 @@ class ProtocolContext(CommandPublisher):
 
         :returns: A new LiquidClass object.
         """
-        return self._core.get_liquid_class(name=name, version=version)
+        return self._core.get_liquid_class(
+            name=name, version=version, schema_version=schema_version
+        )
 
     @requires_version(2, 24)
     def define_liquid_class(

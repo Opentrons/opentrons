@@ -4,9 +4,17 @@ from typing import Optional, Dict, Sequence, Tuple, List, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedDataTransferProperties,
+    TransferProperties1 as SharedDataTransferProperties1,
+    TransferProperties2 as SharedDataTransferProperties2,
     AspirateProperties as SharedDataAspirateProperties,
+    AspirateProperties1 as SharedDataAspirate1Properties,
+    AspirateProperties2 as SharedDataAspirate2Properties,
     SingleDispenseProperties as SharedDataSingleDispenseProperties,
+    SingleDispenseProperties1 as SharedDataSingleDispense1Properties,
+    SingleDispenseProperties2 as SharedDataSingleDispense2Properties,
     MultiDispenseProperties as SharedDataMultiDispenseProperties,
+    MultiDispenseProperties1 as SharedDataMultiDispense1Properties,
+    MultiDispenseProperties2 as SharedDataMultiDispense2Properties,
     TipPosition as SharedDataTipPosition,
     DelayProperties as SharedDataDelayProperties,
     DelayParams as SharedDataDelayParams,
@@ -17,6 +25,8 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     BlowoutProperties as SharedDataBlowoutProperties,
     BlowoutParams as SharedDataBlowoutParams,
     ByTipTypeSetting as SharedByTipTypeSetting,
+    ByTipTypeSetting1 as SharedByTipTypeSetting1,
+    ByTipTypeSetting2 as SharedByTipTypeSetting2,
     Submerge as SharedDataSubmerge,
     RetractAspirate as SharedDataRetractAspirate,
     RetractDispense as SharedDataRetractDispense,
@@ -492,6 +502,7 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
     _retract: RetractAspirate
     _pre_wet: bool
     _mix: MixProperties
+    _aspirate_end_position: Optional[TipPosition] = None
 
     @property
     def aspirate_position(self) -> TipPosition:
@@ -515,10 +526,22 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
         return self._mix
 
     def as_shared_data_model(self) -> SharedDataAspirateProperties:
-        return SharedDataAspirateProperties(
+        if self._aspirate_end_position is None:
+            return SharedDataAspirate1Properties(
+                submerge=self._submerge.as_shared_data_model(),
+                retract=self._retract.as_shared_data_model(),
+                aspiratePosition=self._aspirate_position.as_shared_data_model(),
+                flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
+                preWet=self._pre_wet,
+                mix=self._mix.as_shared_data_model(),
+                delay=self._delay.as_shared_data_model(),
+                correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
+            )
+        return SharedDataAspirate2Properties(
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             aspiratePosition=self._aspirate_position.as_shared_data_model(),
+            aspirateEndPosition=self._aspirate_end_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             preWet=self._pre_wet,
             mix=self._mix.as_shared_data_model(),
@@ -534,6 +557,7 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
     _retract: RetractDispense
     _push_out_by_volume: LiquidHandlingPropertyByVolume
     _mix: MixProperties
+    _dispense_end_position: Optional[TipPosition] = None
 
     @property
     def dispense_position(self) -> TipPosition:
@@ -552,10 +576,22 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
         return self._mix
 
     def as_shared_data_model(self) -> SharedDataSingleDispenseProperties:
-        return SharedDataSingleDispenseProperties(
+        if self._dispense_end_position is None:
+            return SharedDataSingleDispense1Properties(
+                submerge=self._submerge.as_shared_data_model(),
+                retract=self._retract.as_shared_data_model(),
+                dispensePosition=self._dispense_position.as_shared_data_model(),
+                flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
+                mix=self._mix.as_shared_data_model(),
+                pushOutByVolume=self._push_out_by_volume.as_list_of_tuples(),
+                delay=self._delay.as_shared_data_model(),
+                correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
+            )
+        return SharedDataSingleDispense2Properties(
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
+            dispenseEndPosition=self._dispense_end_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             mix=self._mix.as_shared_data_model(),
             pushOutByVolume=self._push_out_by_volume.as_list_of_tuples(),
@@ -571,6 +607,7 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
     _retract: RetractDispense
     _conditioning_by_volume: LiquidHandlingPropertyByVolume
     _disposal_by_volume: LiquidHandlingPropertyByVolume
+    _dispense_end_position: Optional[TipPosition] = None
 
     @property
     def dispense_position(self) -> TipPosition:
@@ -589,10 +626,22 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
         return self._disposal_by_volume
 
     def as_shared_data_model(self) -> SharedDataMultiDispenseProperties:
-        return SharedDataMultiDispenseProperties(
+        if self._dispense_end_position is None:
+            return SharedDataMultiDispense1Properties(
+                submerge=self._submerge.as_shared_data_model(),
+                retract=self._retract.as_shared_data_model(),
+                dispensePosition=self._dispense_position.as_shared_data_model(),
+                flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
+                conditioningByVolume=self._conditioning_by_volume.as_list_of_tuples(),
+                disposalByVolume=self._disposal_by_volume.as_list_of_tuples(),
+                delay=self._delay.as_shared_data_model(),
+                correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
+            )
+        return SharedDataMultiDispense2Properties(
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
+            dispenseEndPosition=self._dispense_end_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             conditioningByVolume=self._conditioning_by_volume.as_list_of_tuples(),
             disposalByVolume=self._disposal_by_volume.as_list_of_tuples(),
@@ -797,8 +846,15 @@ def build_multi_dispense_properties(
 def build_transfer_properties(
     transfer_properties: Union[SharedDataTransferProperties, SharedByTipTypeSetting],
 ) -> TransferProperties:
-    if isinstance(transfer_properties, SharedByTipTypeSetting):
-        _transfer_properties = SharedDataTransferProperties(
+    _transfer_properties: SharedDataTransferProperties
+    if isinstance(transfer_properties, SharedByTipTypeSetting1):
+        _transfer_properties = SharedDataTransferProperties1(
+            aspirate=transfer_properties.aspirate,
+            singleDispense=transfer_properties.singleDispense,
+            multiDispense=transfer_properties.multiDispense,
+        )
+    if isinstance(transfer_properties, SharedByTipTypeSetting2):
+        _transfer_properties = SharedDataTransferProperties2(
             aspirate=transfer_properties.aspirate,
             singleDispense=transfer_properties.singleDispense,
             multiDispense=transfer_properties.multiDispense,

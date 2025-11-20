@@ -397,7 +397,7 @@ class RetractDispense(BaseLiquidClassModel):
     )
 
 
-class AspirateProperties(BaseLiquidClassModel):
+class AspiratePropertiesCommon(BaseLiquidClassModel):
     """Properties specific to the aspirate function."""
 
     submerge: Submerge = Field(..., description="Submerge settings for aspirate.")
@@ -427,7 +427,25 @@ class AspirateProperties(BaseLiquidClassModel):
     delay: DelayProperties = Field(..., description="Delay settings after an aspirate")
 
 
-class SingleDispenseProperties(BaseLiquidClassModel):
+class AspirateProperties1(AspiratePropertiesCommon):
+    """Properties specific to the aspirate function."""
+
+    pass
+
+
+class AspirateProperties2(AspiratePropertiesCommon):
+    """Properties specific to the aspirate function."""
+
+    aspirateEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="aspirate_end_position",
+        description="Tip position during aspirate.",
+        json_schema_extra=_remove_default,
+    )
+
+AspirateProperties = AspirateProperties1 | AspirateProperties2
+
+class SingleDispensePropertiesCommon(BaseLiquidClassModel):
     """Properties specific to the single-dispense function."""
 
     submerge: Submerge = Field(
@@ -459,7 +477,25 @@ class SingleDispenseProperties(BaseLiquidClassModel):
     delay: DelayProperties = Field(..., description="Delay after dispense, in seconds.")
 
 
-class MultiDispenseProperties(BaseLiquidClassModel):
+class SingleDispenseProperties1(SingleDispensePropertiesCommon):
+    """Properties specific to the single-dispense function."""
+
+    pass
+
+
+class SingleDispenseProperties2(SingleDispensePropertiesCommon):
+    """Properties specific to the single-dispense function."""
+
+    dispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="dispense_end_position",
+        description="Tip position during dispense.",
+        json_schema_extra=_remove_default,
+    )
+
+SingleDispenseProperties = SingleDispenseProperties1 | SingleDispenseProperties2
+
+class MultiDispensePropertiesCommon(BaseLiquidClassModel):
     """Properties specific to the multi-dispense function."""
 
     submerge: Submerge = Field(..., description="Submerge settings for multi-dispense.")
@@ -495,18 +531,36 @@ class MultiDispenseProperties(BaseLiquidClassModel):
     )
 
 
-class TransferProperties(BaseLiquidClassModel):
+class MultiDispenseProperties1(MultiDispensePropertiesCommon):
+    """Properties specific to the multi-dispense function."""
+
+    pass
+
+
+class MultiDispenseProperties2(MultiDispensePropertiesCommon):
+    """Properties specific to the multi-dispense function."""
+
+    dispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="dispense_end_position",
+        description="Tip position during dispense.",
+        json_schema_extra=_remove_default,
+    )
+
+MultiDispenseProperties = MultiDispenseProperties1 | MultiDispenseProperties2
+
+class TransferProperties1(BaseLiquidClassModel):
     """Properties used during a transfer."""
 
-    aspirate: AspirateProperties = Field(
+    aspirate: AspirateProperties1 = Field(
         ..., description="Aspirate parameters for this tip type."
     )
-    singleDispense: SingleDispenseProperties = Field(
+    singleDispense: SingleDispenseProperties1 = Field(
         ...,
         alias="dispense",
         description="Single dispense parameters for this tip type.",
     )
-    multiDispense: MultiDispenseProperties | SkipJsonSchema[None] = Field(
+    multiDispense: MultiDispenseProperties1 | SkipJsonSchema[None] = Field(
         None,
         alias="multi_dispense",
         description="Optional multi-dispense parameters for this tip type.",
@@ -514,7 +568,27 @@ class TransferProperties(BaseLiquidClassModel):
     )
 
 
-class ByTipTypeSetting(TransferProperties):
+class TransferProperties2(BaseLiquidClassModel):
+    """Properties used during a transfer."""
+
+    aspirate: AspirateProperties2 = Field(
+        ..., description="Aspirate parameters for this tip type."
+    )
+    singleDispense: SingleDispenseProperties2 = Field(
+        ...,
+        alias="dispense",
+        description="Single dispense parameters for this tip type.",
+    )
+    multiDispense: MultiDispenseProperties2 | SkipJsonSchema[None] = Field(
+        None,
+        alias="multi_dispense",
+        description="Optional multi-dispense parameters for this tip type.",
+        json_schema_extra=_remove_default,
+    )
+
+TransferProperties = TransferProperties1 | TransferProperties2
+
+class ByTipTypeSetting1(TransferProperties1):
     """Settings for each kind of tip this pipette can use."""
 
     tiprack: str = Field(
@@ -523,16 +597,36 @@ class ByTipTypeSetting(TransferProperties):
     )
 
 
-class ByPipetteSetting(BaseLiquidClassModel):
+class ByTipTypeSetting2(TransferProperties2):
+    """Settings for each kind of tip this pipette can use."""
+
+    tiprack: str = Field(
+        ...,
+        description="The name of tiprack whose tip will be used when handling this specific liquid class with this pipette",
+    )
+
+ByTipTypeSetting = ByTipTypeSetting1 | ByTipTypeSetting2
+
+class ByPipetteSetting1(BaseLiquidClassModel):
     """The settings for this liquid class when used with a specific kind of pipette."""
 
     pipetteModel: str = Field(..., description="The pipette model this applies to.")
-    byTipType: Sequence[ByTipTypeSetting] = Field(
+    byTipType: Sequence[ByTipTypeSetting1] = Field(
         ..., description="Settings for each kind of tip this pipette can use"
     )
 
 
-class LiquidClassSchemaV1(BaseLiquidClassModel):
+class ByPipetteSetting2(BaseLiquidClassModel):
+    """The settings for this liquid class when used with a specific kind of pipette."""
+
+    pipetteModel: str = Field(..., description="The pipette model this applies to.")
+    byTipType: Sequence[ByTipTypeSetting2] = Field(
+        ..., description="Settings for each kind of tip this pipette can use"
+    )
+
+ByPipetteSetting1 = ByPipetteSetting1 | ByPipetteSetting2
+
+class LiquidClassSchemaCommon(BaseLiquidClassModel):
     """Defines a single liquid class's properties for liquid handling functions."""
 
     liquidClassName: str = Field(
@@ -542,14 +636,34 @@ class LiquidClassSchemaV1(BaseLiquidClassModel):
     description: str = Field(
         ..., description="User-readable description of the liquid class"
     )
-    schemaVersion: Literal[1] = Field(
-        ..., description="Which schema version a liquid class is using"
-    )
     version: int = Field(
         ..., description="Version of the specific liquid class definition"
     )
     namespace: str = Field(...)
-    byPipette: Sequence[ByPipetteSetting] = Field(
+
+
+class LiquidClassSchemaV1(LiquidClassSchemaCommon):
+    """Defines a single liquid class's properties for liquid handling functions."""
+
+    schemaVersion: Literal[1] = Field(
+        ..., description="Which schema version a liquid class is using"
+    )
+    byPipette: Sequence[ByPipetteSetting1] = Field(
         ...,
         description="Liquid class settings by each pipette compatible with this liquid class.",
     )
+
+
+class LiquidClassSchemaV2(LiquidClassSchemaCommon):
+    """Defines a single liquid class's properties for liquid handling functions."""
+
+    schemaVersion: Literal[2] = Field(
+        ..., description="Which schema version a liquid class is using"
+    )
+    byPipette: Sequence[ByPipetteSetting2] = Field(
+        ...,
+        description="Liquid class settings by each pipette compatible with this liquid class.",
+    )
+
+
+LiquidClassSchema = LiquidClassSchemaV1 | LiquidClassSchemaV2

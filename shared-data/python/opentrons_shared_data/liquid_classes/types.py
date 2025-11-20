@@ -83,7 +83,7 @@ class RetractDispenseDict(TypedDict):
     blowout: BlowoutPropertiesDict
 
 
-class AspiratePropertiesDict(TypedDict):
+class AspiratePropertiesCommonDict(TypedDict):
     """A dict representing aspirate properties."""
 
     submerge: SubmergeDict
@@ -96,7 +96,19 @@ class AspiratePropertiesDict(TypedDict):
     mix: MixPropertiesDict
 
 
-class SingleDispensePropertiesDict(TypedDict):
+class AspiratePropertiesV1Dict(AspiratePropertiesCommonDict, TypedDict):
+    """A dict representing aspirate properties."""
+
+    pass
+
+
+class AspiratePropertiesV2Dict(AspiratePropertiesCommonDict, TypedDict):
+    """A dict representing aspirate properties."""
+
+    aspirate_end_position: NotRequired[TipPositionDict]
+
+
+class SingleDispensePropertiesCommonDict(TypedDict):
     """A dict representing single dispense properties."""
 
     submerge: SubmergeDict
@@ -109,7 +121,19 @@ class SingleDispensePropertiesDict(TypedDict):
     mix: MixPropertiesDict
 
 
-class MultiDispensePropertiesDict(TypedDict):
+class SingleDispensePropertiesV1Dict(SingleDispensePropertiesCommonDict, TypedDict):
+    """A dict representing single dispense properties."""
+
+    pass
+
+
+class SingleDispensePropertiesV2Dict(SingleDispensePropertiesCommonDict, TypedDict):
+    """A dict representing single dispense properties."""
+
+    dispense_end_position: NotRequired[TipPositionDict]
+
+
+class MultiDispensePropertiesCommonDict(TypedDict):
     """A dict representing multi dispense properties."""
 
     submerge: SubmergeDict
@@ -122,9 +146,31 @@ class MultiDispensePropertiesDict(TypedDict):
     disposal_by_volume: Sequence[Tuple[float, float]]
 
 
-class TransferPropertiesDict(TypedDict):
+class MultiDispensePropertiesV1Dict(MultiDispensePropertiesCommonDict, TypedDict):
+    """A dict representing multi dispense properties."""
+
+    pass
+
+
+class MultiDispensePropertiesV2Dict(MultiDispensePropertiesCommonDict, TypedDict):
+    """A dict representing multi dispense properties."""
+
+    dispense_end_position: NotRequired[TipPositionDict]
+
+
+class TransferPropertiesV1Dict(TypedDict):
     """A dict representing transfer properties for a specific pipette and tiprack."""
 
-    aspirate: AspiratePropertiesDict
-    dispense: SingleDispensePropertiesDict
-    multi_dispense: NotRequired[MultiDispensePropertiesDict]
+    aspirate: AspiratePropertiesV1Dict
+    dispense: SingleDispensePropertiesV1Dict
+    multi_dispense: NotRequired[MultiDispensePropertiesV1Dict]
+
+
+class TransferPropertiesV2Dict(TypedDict):
+    """A dict representing transfer properties for a specific pipette and tiprack."""
+
+    aspirate: AspiratePropertiesV2Dict
+    dispense: SingleDispensePropertiesV2Dict
+    multi_dispense: NotRequired[MultiDispensePropertiesV2Dict]
+
+TransferPropertiesDict = TransferPropertiesV1Dict | TransferPropertiesV2Dict
