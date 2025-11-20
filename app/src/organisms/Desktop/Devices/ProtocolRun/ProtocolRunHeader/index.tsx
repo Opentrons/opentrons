@@ -19,7 +19,6 @@ import {
   useCloseCurrentRun,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
@@ -53,7 +52,7 @@ export function ProtocolRunHeader(
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
-  const runStatus = useRunStatus(runId)
+  const runStatus = runRecord?.data.status ?? null
 
   const attachedModules =
     useModulesQuery({
@@ -62,7 +61,7 @@ export function ProtocolRunHeader(
     })?.data?.data ?? []
   const runErrors = useRunErrors({
     runRecord: runRecord ?? null,
-    runStatus,
+    runStatus: runStatus,
     runId,
   })
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()

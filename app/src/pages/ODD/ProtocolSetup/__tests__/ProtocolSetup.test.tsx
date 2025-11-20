@@ -80,7 +80,6 @@ import {
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
   useRunCreatedAtTimestamp,
-  useRunStatus,
 } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 
@@ -248,7 +247,7 @@ describe('ProtocolSetup', () => {
       <div>Mock ConfirmSetupStepsCompleteModal</div>
     )
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
-      data: { data: { id: 'mock-id' } },
+      data: { data: { id: 'mock-id', status: RUN_STATUS_IDLE } },
     } as any)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
@@ -279,7 +278,6 @@ describe('ProtocolSetup', () => {
         isResumeRunFromRecoveryActionLoading: false,
         isRunControlLoading: false,
       })
-    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockEmptyAnalysis,
     } as any)
@@ -607,7 +605,6 @@ describe('ProtocolSetup', () => {
   })
 
   it('should redirect to the protocols page when a run is stopped', () => {
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })

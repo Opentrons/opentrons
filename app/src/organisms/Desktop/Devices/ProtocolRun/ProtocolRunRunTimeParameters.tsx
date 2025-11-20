@@ -35,7 +35,6 @@ import { Divider } from '/app/atoms/structure'
 import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -49,7 +48,8 @@ export function ProtocolRunRuntimeParameters({
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runStatus = useRunStatus(runId)
+  const run = useNotifyRunQuery(runId).data
+  const runStatus = run?.data.status ?? null
   const isRunTerminal =
     runStatus == null
       ? false
@@ -57,7 +57,6 @@ export function ProtocolRunRuntimeParameters({
   // we access runTimeParameters from the run record rather than the most recent analysis
   // because the most recent analysis may not reflect the selected run (e.g. cloning a run
   // from a historical protocol run from the device details page)
-  const run = useNotifyRunQuery(runId).data
   const runTimeParametersFromRun =
     run?.data != null && 'runTimeParameters' in run?.data
       ? run?.data?.runTimeParameters

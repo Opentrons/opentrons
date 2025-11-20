@@ -49,7 +49,6 @@ import {
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
   useRunTimestamps,
 } from '/app/resources/runs'
 
@@ -95,11 +94,10 @@ export function RunningProtocol(): JSX.Element {
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === lastRunCommand?.key
   )
-  const runStatus = useRunStatus(runId, {
-    refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
-  })
+
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const runStatus = runRecord?.data.status ?? null
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,

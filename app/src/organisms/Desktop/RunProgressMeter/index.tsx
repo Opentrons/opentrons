@@ -31,7 +31,6 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import { useDownloadRunLog } from '../Devices/hooks'
@@ -50,10 +49,10 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
-  const runStatus = useRunStatus(runId)
   const { play } = useRunControls(runId)
   const { data: runRecord } = useNotifyRunQuery(runId)
   const runData = runRecord?.data ?? null
+  const runStatus = runData?.status ?? null
 
   const { data: mostRecentCommandData } = useNotifyAllCommandsQuery(runId, {
     pageLength: 1,

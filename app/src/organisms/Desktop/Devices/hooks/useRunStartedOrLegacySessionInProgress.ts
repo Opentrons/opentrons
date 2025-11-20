@@ -1,11 +1,12 @@
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
-import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
+import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 export function useRunStartedOrLegacySessionInProgress(): boolean {
   const runId = useCurrentRunId()
-  const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
+  const runStatus = runRecord?.data.status
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   return (

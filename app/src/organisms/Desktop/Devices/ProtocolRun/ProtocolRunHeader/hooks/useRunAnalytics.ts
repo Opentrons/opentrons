@@ -10,7 +10,7 @@ import {
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
-import { useIsRunCurrent, useRunStatus } from '/app/resources/runs'
+import { useIsRunCurrent, useNotifyRunQuery } from '/app/resources/runs'
 
 import { isTerminalRunStatus } from '../utils'
 
@@ -31,7 +31,8 @@ export function useRunAnalytics({
   const numberOfImages = outputFileIds.jpeg.length
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
-  const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
+  const runStatus = runRecord?.data.status ?? null
   const isRunCurrent = useIsRunCurrent(runId)
   const { reportImageCaptureUsage } = useCameraAnalytics({
     source: SOURCE_RUN_RECORD,

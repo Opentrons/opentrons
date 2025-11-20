@@ -4,9 +4,12 @@ import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { useRunStatus } from '/app/resources/runs'
+import { useNotifyRunQuery } from '/app/resources/runs'
 
 import { useRunHasStarted } from '../useRunHasStarted'
+
+import type { UseQueryResult } from 'react-query'
+import type { Run } from '@opentrons/api-client'
 
 vi.mock('/app/resources/runs')
 
@@ -14,7 +17,9 @@ const MOCK_RUN_ID = '1'
 
 describe('useRunHasStarted', () => {
   beforeEach(() => {
-    when(vi.mocked(useRunStatus)).calledWith(null).thenReturn(null)
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith(null)
+      .thenReturn({ data: null } as any)
   })
 
   it('should return false when no run id is provided', () => {
@@ -23,17 +28,30 @@ describe('useRunHasStarted', () => {
   })
 
   it('should return false when run has not started', () => {
-    when(vi.mocked(useRunStatus))
+    const idleRun = {
+      current: true,
+      id: MOCK_RUN_ID,
+      status: RUN_STATUS_IDLE,
+    }
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(MOCK_RUN_ID)
-      .thenReturn(RUN_STATUS_IDLE)
+      .thenReturn({ data: { data: idleRun } } as UseQueryResult<Run, unknown>)
     const { result } = renderHook(() => useRunHasStarted(MOCK_RUN_ID))
     expect(result.current).toEqual(false)
   })
 
   it('should return true when run has started', () => {
-    when(vi.mocked(useRunStatus))
+    const runningRun = {
+      current: true,
+      id: MOCK_RUN_ID,
+      status: RUN_STATUS_RUNNING,
+    }
+    when(vi.mocked(useNotifyRunQuery))
       .calledWith(MOCK_RUN_ID)
-      .thenReturn(RUN_STATUS_RUNNING)
+      .thenReturn({ data: { data: runningRun } } as UseQueryResult<
+        Run,
+        unknown
+      >)
     const { result } = renderHook(() => useRunHasStarted(MOCK_RUN_ID))
     expect(result.current).toEqual(true)
   })

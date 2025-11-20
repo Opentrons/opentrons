@@ -1,22 +1,44 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
+import {
+  RUN_STATUS_IDLE,
+  RUN_STATUS_RUNNING,
+  RUN_STATUS_SUCCEEDED,
+} from '@opentrons/api-client'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
-import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
+import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import { useRunStartedOrLegacySessionInProgress } from '..'
 
 import type { UseQueryResult } from 'react-query'
-import type { Sessions } from '@opentrons/api-client'
+import type { Run, Sessions } from '@opentrons/api-client'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('/app/resources/runs')
 
+const succeededRun = {
+  current: false,
+  id: 'test_id_done',
+  status: RUN_STATUS_SUCCEEDED,
+}
+
+const idleRun = {
+  current: true,
+  id: 'test_id_idle',
+  status: RUN_STATUS_IDLE,
+}
+
 describe('useRunStartedOrLegacySessionInProgress', () => {
   beforeEach(() => {
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
-    vi.mocked(useCurrentRunId).mockReturnValue('123')
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith('test_id_done')
+      .thenReturn({ data: { data: succeededRun } } as UseQueryResult<
+        Run,
+        unknown
+      >)
+    vi.mocked(useCurrentRunId).mockReturnValue('test_id_done')
     vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [],
       links: null,
@@ -32,15 +54,15 @@ describe('useRunStartedOrLegacySessionInProgress', () => {
   })
 
   it('returns false when run status is idle or sessions are not empty', () => {
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
     vi.mocked(useAllSessionsQuery).mockReturnValue({
       data: [
         {
-          id: 'test',
+          id: 'test_id_idle',
           createdAt: '2019-08-24T14:15:22Z',
           details: {},
           sessionType: 'calibrationCheck',
           createParams: {},
+          status: RUN_STATUS_IDLE,
         },
       ],
       links: {},

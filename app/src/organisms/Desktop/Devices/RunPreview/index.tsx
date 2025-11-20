@@ -31,7 +31,6 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import type { ForwardedRef } from 'react'
@@ -56,8 +55,8 @@ export const RunPreviewComponent = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['run_details', 'protocol_setup'])
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runStatus = useRunStatus(runId)
   const { data: runRecord } = useNotifyRunQuery(runId)
+  const runStatus = runRecord?.data.status ?? null
   const isRunTerminal =
     runStatus != null
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)

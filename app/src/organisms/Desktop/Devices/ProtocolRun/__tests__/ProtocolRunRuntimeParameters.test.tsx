@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import { RUN_STATUS_RUNNING, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -9,7 +10,6 @@ import { i18n } from '/app/i18n'
 import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 import {
   mockIdleUnstartedRun,
@@ -121,9 +121,8 @@ describe('ProtocolRunRuntimeParameters', () => {
       .thenReturn({
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
-    vi.mocked(useRunStatus).mockReturnValue('running')
     vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: mockSucceededRun },
+      data: { data: mockSucceededRun, status: RUN_STATUS_RUNNING },
     } as unknown as UseQueryResult<Run>)
   })
 
@@ -186,6 +185,7 @@ describe('ProtocolRunRuntimeParameters', () => {
           data: {
             ...mockSucceededRun,
             runTimeParameters: mockRunTimeParameterData,
+            status: RUN_STATUS_SUCCEEDED,
           },
         },
       } as any)
@@ -203,7 +203,6 @@ describe('ProtocolRunRuntimeParameters', () => {
       ],
     } as CompletedProtocolAnalysis)
 
-    vi.mocked(useRunStatus).mockReturnValue('succeeded')
     render(props)
     screen.getByText('Download files')
     screen.getByText(

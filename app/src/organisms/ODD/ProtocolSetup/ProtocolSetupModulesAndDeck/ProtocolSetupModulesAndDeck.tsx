@@ -27,7 +27,7 @@ import { useDeckConfigurationCompatibility } from '/app/resources/deck_configura
 import { useAttachedModules } from '/app/resources/modules'
 import {
   useMostRecentCompletedAnalysis,
-  useRunStatus,
+  useNotifyRunQuery,
 } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
@@ -60,7 +60,8 @@ export function ProtocolSetupModulesAndDeck({
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
+  const runStatus = runRecord?.data.status ?? null
   useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       navigate('/protocols')

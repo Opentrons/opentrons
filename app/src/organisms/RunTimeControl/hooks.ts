@@ -6,7 +6,6 @@ import {
   useCurrentRunId,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import type { UseQueryOptions } from 'react-query'
@@ -66,8 +65,8 @@ export function useCurrentRunStatus(
   options?: UseQueryOptions<Run>
 ): RunStatus | null {
   const currentRunId = useCurrentRunId()
-
-  return useRunStatus(currentRunId, options)
+  const { data: runRecord } = useNotifyRunQuery(currentRunId, options)
+  return runRecord?.data.status ?? null
 }
 
 export function useRunErrors(runId: string | null): RunData['errors'] {

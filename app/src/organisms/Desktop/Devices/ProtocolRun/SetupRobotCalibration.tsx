@@ -17,7 +17,7 @@ import {
   ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useRunHasStarted, useRunStatus } from '/app/resources/runs'
+import { useNotifyRunQuery, useRunHasStarted } from '/app/resources/runs'
 
 import { SetupDeckCalibration } from './SetupDeckCalibration'
 import { SetupInstrumentCalibration } from './SetupInstrumentCalibration'
@@ -50,7 +50,8 @@ export function SetupRobotCalibration({
   const trackEvent = useTrackEvent()
 
   const runHasStarted = useRunHasStarted(runId)
-  const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId)
+  const runStatus = runRecord?.data.status ?? null
   const isFlex = useIsFlex(robotName)
 
   let tooltipText: string | null = null
