@@ -12,13 +12,12 @@ import {
 } from '@opentrons/components'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
-
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getFlexStackerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import type { FlexStackerModuleState } from '@opentrons/step-generation'
 import type { StepFormProps } from '../../types'
-import { getFlexStackerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 
 export function FlexStackerTools(props: StepFormProps): JSX.Element {
   const { formData, propsForFields, toolboxStep, showFormErrors } = props
@@ -38,30 +37,26 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
 
   return (
     <Flex
-    flexDirection={DIRECTION_COLUMN}
-    gridGap={SPACING.spacing12}
-    width="100%"
-  >
-    <DropdownStepFormField
-      options={flexStackerOptions}
-      title={t('form:step_edit_form.field.absorbanceReader.moduleId.module')}
-      {...propsForFields.moduleId}
-      tooltipContent={null}
-      onEnter={(id: string) => {
-        dispatch(hoverSelection({ id, text: t('application:select') }))
-      }}
-      onExit={() => {
-        dispatch(hoverSelection({ id: null, text: null }))
-      }}
-      updateValue={value => {
-        console.log('value:', value)
-      }}
-    />
-    {moduleId != null ? ( 
-      <>
-        test flex stacker tools
-      </>
-    ) : null}
+      flexDirection={DIRECTION_COLUMN}
+      gridGap={SPACING.spacing12}
+      width="100%"
+    >
+      <DropdownStepFormField
+        options={flexStackerOptions}
+        title={t('form:step_edit_form.field.absorbanceReader.moduleId.module')}
+        {...propsForFields.moduleId}
+        tooltipContent={null}
+        onEnter={(id: string) => {
+          dispatch(hoverSelection({ id, text: t('application:select') }))
+        }}
+        onExit={() => {
+          dispatch(hoverSelection({ id: null, text: null }))
+        }}
+        updateValue={value => {
+          console.log('value:', value)
+        }}
+      />
+      {moduleId != null ? <>test flex stacker tools</> : null}
     </Flex>
   )
 }
