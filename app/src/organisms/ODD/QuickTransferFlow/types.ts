@@ -113,7 +113,6 @@ export interface QuickTransferSummaryState {
   }
   touchTipDispense?: number // specifies the tip position from the top of the well
   touchTipDispenseSpeed?: number
-  disposalVolume?: number
   blowOutDispense?: {
     location?: BlowOutLocation
     flowRate?: number
