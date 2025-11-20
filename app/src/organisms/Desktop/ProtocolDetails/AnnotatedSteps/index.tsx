@@ -99,7 +99,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       {showErrorDetailsModal ? (
         <ProtocolAnalysisErrorModal
           errors={analysis?.errors}
-          onClose={() => {setShowErrorDetailsModal(false)}}
+          onClose={() => {
+            setShowErrorDetailsModal(false)
+          }}
         />
       ) : null}
       <div className={styles.annotated_steps_container}>
@@ -178,7 +180,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                   }}
                 >
                   <div className={styles.annotated_steps_icon}>
-                  <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
+                    <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
                   </div>
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {error.detail}

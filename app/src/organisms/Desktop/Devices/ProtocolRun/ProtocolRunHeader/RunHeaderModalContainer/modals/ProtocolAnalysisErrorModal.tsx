@@ -6,12 +6,11 @@ import {
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
-  LegacyStyledText,
   Modal,
   OVERFLOW_WRAP_ANYWHERE,
   PrimaryButton,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 
 import { getTopPortalEl } from '/app/App/portal'
@@ -85,12 +84,15 @@ export function ProtocolAnalysisErrorModal({
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
         {robotName == null && displayName == null ? null : (
-          <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+          >
             {t('analysis_failure_on_robot', {
               protocolName: displayName,
               robotName,
             })}
-          </LegacyStyledText>
+          </StyledText>
         )}
         {errors.map((error, index) => (
           <CodeBlock key={`error-${index}`}>{error?.detail}</CodeBlock>
@@ -104,12 +106,9 @@ export function ProtocolAnalysisErrorModal({
           padding={`${SPACING.spacing8} ${SPACING.spacing48}`}
           onClick={onClose}
         >
-          <LegacyStyledText
-            css={TYPOGRAPHY.pSemiBold}
-            textTransform={TYPOGRAPHY.textTransformCapitalize}
-          >
+          <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('shared:close')}
-          </LegacyStyledText>
+          </StyledText>
         </PrimaryButton>
       </Flex>
     </Modal>,
