@@ -24,13 +24,11 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { getActiveLayer } from '../utils/getActiveLayer'
+import { getIsCutoutA1Active } from '../utils/getIsCutoutA1Active'
+import { getIsPipetteOverTrash } from '../utils/getIsPipetteOverTrash'
 import styles from './deckview.module.css'
 import { DeckViewDetails } from './DeckViewDetails'
-import {
-  getActiveLayer,
-  getIsCutoutA1Active,
-  getIsPipetteOverTrash,
-} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { StagingAreaLocation, TrashCutoutId } from '@opentrons/components'

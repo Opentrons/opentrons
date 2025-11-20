@@ -1,6 +1,6 @@
 import { Divider, StyledText } from '@opentrons/components'
 
-import styles from './visualization.module.css'
+import styles from './trashslotdetails.module.css'
 
 import type { TrashBinEntities } from '@opentrons/step-generation'
 

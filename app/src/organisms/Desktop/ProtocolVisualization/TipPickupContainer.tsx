@@ -14,7 +14,7 @@ import { getLabwareViewBox } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import styles from './tippickupcontainer.module.css'
-import { getMissingTips } from './utils'
+import { getMissingTips } from './utils/getMissingTips'
 
 import type { TipType } from '@opentrons/components'
 import type { LabwareEntity, RobotState } from '@opentrons/step-generation'

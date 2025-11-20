@@ -7,10 +7,10 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { getActiveLayer } from '../utils/getActiveLayer'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareCommandSummary } from './LabwareCommandSummary'
 import { LabwareOnDeck } from './LabwareOnDeck'
-import { getActiveLayer } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -20,7 +20,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
-import type { LabwareEntityExtended } from './DeckView'
+import type { LabwareEntityExtended } from '.'
 
 interface DeckViewLabwareProps {
   robotState: RobotState

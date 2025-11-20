@@ -1,6 +1,6 @@
 import { COLORS, StyledText } from '@opentrons/components'
 
-import styles from './visualization.module.css'
+import styles from './slotdetailsemptystate.module.css'
 
 export function SlotDetailsEmptyState(): JSX.Element {
   return (
