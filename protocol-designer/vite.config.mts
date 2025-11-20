@@ -113,8 +113,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
       esbuildOptions: {
         target: 'es2020',
       },
-      // Note: this is for cypress support so when we switch e2e to playwright we can remove it
-      include: ['tslib'],
     },
     css: {
       postcss: {
@@ -145,8 +143,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     resolve: {
       conditions: ['browser'],
-      // Note: this is for cypress support so when we switch e2e to playwright we can remove it
-      dedupe: ['tslib'],
       alias: {
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
         // files being processed with the wrong config (the config from the
@@ -165,9 +161,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     server: {
       port: 5178,
-      watch: {
-        ignored: ['**/cypress/downloads/**'],
-      },
     },
   }
 })
