@@ -20,7 +20,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import styles from './visualization.module.css'
+import styles from './deckviewoverlay.module.css'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { SlotDetails } from '../Protocols/ProtocolVisualization/SlotDetails'
+import { SlotDetails } from '/app/organisms/Desktop/ProtocolVisualization/SlotDetails'
 
 import type {
   Liquid,

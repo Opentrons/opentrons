@@ -1,6 +1,6 @@
 import { Divider, StyledText } from '@opentrons/components'
 
-import styles from './visualization.module.css'
+import styles from './trashslotdetails.module.css'
 
 import type { TrashBinEntities } from '@opentrons/step-generation'
 
@@ -18,7 +18,7 @@ export function TrashSlotDetails(props: TrashSlotDetailsProps): JSX.Element {
     <>
       <div className={styles.detail_container}>
         <div className={styles.slot_details_active_step}>
-          <StyledText desktopStyle="bodyDefaultSemiBold">{header}</StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">{header}</StyledText>
         </div>
       </div>
       <Divider />
