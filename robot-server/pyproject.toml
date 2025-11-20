@@ -70,6 +70,7 @@ dev = [
     "types-requests~=2.27.1",
     "zipp==3.21.0",
     "opentrons-hardware",
+    "setuptools",
 ]
 
 # uv: global settings and dependency tweaks
