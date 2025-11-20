@@ -96,13 +96,19 @@
   gap: var(--spacing-4);
 }
 
+.annotated_steps_icon {
+  width: 1rem;
+  height: 1rem;
+}
+
 .annotated_steps_error_header {
   display: flex;
   width: 100%;
   align-items: center;
   padding: var(--spacing-8);
   border-radius: var(--border-radius-4);
-  background-color: var(--red-20);
+  background-color: var(--red-30);
+  cursor: pointer;
   gap: var(--spacing-4);
   transition: background-color 500ms ease-out, border-color 500ms ease-out;
 }
