@@ -602,7 +602,7 @@ export type AffineTransformMatrix = [
   AffineTransformRow,
   AffineTransformRow,
   AffineTransformRow,
-  AffineTransformRow,
+  AffineTransformRow
 ]
 
 export interface SlotTransforms {

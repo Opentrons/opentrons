@@ -89,11 +89,10 @@ export function getStackedItemsOnStartingDeck(
       locationIsOnLabware(command.params.location)
   )
   const labwareAndLidOnDeck = commands
-    .filter(
-      (
-        command
-      ): command is LoadLabwareRunTimeCommand | LoadLidStackRunTimeCommand =>
-        ['loadLabware', 'loadLidStack'].includes(command.commandType)
+    .filter((command): command is
+      | LoadLabwareRunTimeCommand
+      | LoadLidStackRunTimeCommand =>
+      ['loadLabware', 'loadLidStack'].includes(command.commandType)
     )
     .toReversed()
     .reduce<StackedItemsOnDeck>((acc, command) => {
@@ -300,15 +299,12 @@ export function getStackedItemsOnStartingDeck(
 
   // add stacker labware after as we don't want the order of these commands reversed
   const allLabwareOnDeck = commands
-    .filter(
-      (
-        command
-      ): command is
-        | FlexStackerSetStoredLabwareRunTimeCommand
-        | FlexStackerFillRunTimeCommand =>
-        ['flexStacker/setStoredLabware', 'flexStacker/fill'].includes(
-          command.commandType
-        )
+    .filter((command): command is
+      | FlexStackerSetStoredLabwareRunTimeCommand
+      | FlexStackerFillRunTimeCommand =>
+      ['flexStacker/setStoredLabware', 'flexStacker/fill'].includes(
+        command.commandType
+      )
     )
     .reduce<StackedItemsOnDeck>((acc, command) => {
       if (command.result == null) return acc
@@ -454,30 +450,36 @@ export function getLabwareLiquidRenderInfoFromStack(
 }
 
 // filter function to get stacks with no modules and on deck
-export function getLabwareOnDeck(itemsOnDeck: StackedItemsOnDeck): {
+export function getLabwareOnDeck(
+  itemsOnDeck: StackedItemsOnDeck
+): {
   [location: string]: LabwareInStack[]
 } {
   // @ts-expect-error this filter should act as a type narrower
-  const labwareOnDeckEntries: Array<[string, LabwareInStack[]]> =
-    Object.entries(itemsOnDeck).filter(
-      ([key, value]) =>
-        key !== 'offDeck' &&
-        value.every(
-          (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
-        )
-    )
+  const labwareOnDeckEntries: Array<
+    [string, LabwareInStack[]]
+  > = Object.entries(itemsOnDeck).filter(
+    ([key, value]) =>
+      key !== 'offDeck' &&
+      value.every(
+        (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
+      )
+  )
   return Object.fromEntries(labwareOnDeckEntries)
 }
 
 // filter function to get stacks that include labware
-export function getStacksWithLabware(itemsOnDeck: StackedItemsOnDeck): {
+export function getStacksWithLabware(
+  itemsOnDeck: StackedItemsOnDeck
+): {
   [location: string]: StackItem[]
 } {
-  const stacksWithLabwareEntries = Object.entries(itemsOnDeck).filter(
-    ([key, value]) =>
-      value.some(
-        (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
-      )
+  const stacksWithLabwareEntries = Object.entries(
+    itemsOnDeck
+  ).filter(([key, value]) =>
+    value.some(
+      (stackItem): stackItem is LabwareInStack => 'labwareId' in stackItem
+    )
   )
   return Object.fromEntries(stacksWithLabwareEntries)
 }
@@ -519,7 +521,9 @@ export function getOffDeckRenderInfo(
 }
 
 // filter function to get stacks that include modules
-export function getStacksOnModules(itemsOnDeck: StackedItemsOnDeck): {
+export function getStacksOnModules(
+  itemsOnDeck: StackedItemsOnDeck
+): {
   [location: string]: {
     // This could be typed more cleverly as:
     // [ModuleInStack, ...StackItem[]]

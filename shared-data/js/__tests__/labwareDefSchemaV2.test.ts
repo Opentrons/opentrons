@@ -84,8 +84,8 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
   ]),
 
   // This is probably legitimate. Heterogeneous tubes.
-  'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip':
-    new Set([
+  'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip': new Set(
+    [
       'A3',
       'B3',
       'C3',
@@ -110,7 +110,8 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
       'B8',
       'C8',
       'D8',
-    ]),
+    ]
+  ),
 
   // These height mismatches are legitimate. The zDimension should match the taller side.
   opentrons_calibrationblock_short_side_left: new Set(['A1']),
@@ -122,12 +123,9 @@ const expectedWellsNotMatchingZDimension: Record<string, Set<string>> = {
 
   // These were probably bugs, but it's moot now, since these adapter+wellplate
   // combo-definitions have been superseded by proper labware stacking.
-  opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat:
-    standard96WellNames,
-  opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt:
-    standard96WellNames,
-  opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat:
-    standard384WellNames,
+  opentrons_96_flat_bottom_adapter_nest_wellplate_200ul_flat: standard96WellNames,
+  opentrons_96_pcr_adapter_nest_wellplate_100ul_pcr_full_skirt: standard96WellNames,
+  opentrons_universal_flat_adapter_corning_384_wellplate_112ul_flat: standard384WellNames,
 
   // This batch may have incompletely-updated geometry from recent work related to
   // liquid level detection and meniscus-relative pipetting. Probably, the wells were
@@ -376,8 +374,9 @@ const checkGeometryDefinitions = (labwareDef: LabwareDefinition2): void => {
       const depthFromWell = well.depth
       const xyDimensionsFromWell = extractXYDimensionsFromWell(well)
       const depthFromGeometry = topSection.topHeight
-      const xyDimensionsFromGeometry =
-        extractTopDimensionsFromGeometrySection(topSection)
+      const xyDimensionsFromGeometry = extractTopDimensionsFromGeometrySection(
+        topSection
+      )
 
       const labwareWithWellDepthMismatches = [
         // todo(mm, 2025-03-17): Investigate and resolve these mismatches.
@@ -628,7 +627,9 @@ function isInnerWellGeometry(
  * Extract some shape-specific properties from a well.
  * Fall back to undefined if that property doesn't exist, given the well's shape.
  */
-function extractXYDimensionsFromWell(well: LabwareWell): {
+function extractXYDimensionsFromWell(
+  well: LabwareWell
+): {
   diameter?: number
   xDimension?: number
   yDimension?: number
@@ -649,7 +650,9 @@ function extractXYDimensionsFromWell(well: LabwareWell): {
  * Extract some shape-specific properties from a geometry section.
  * Fall back to undefined if that property doesn't exist, given the geometry section's shape.
  */
-function extractTopDimensionsFromGeometrySection(section: WellSegment): {
+function extractTopDimensionsFromGeometrySection(
+  section: WellSegment
+): {
   diameter?: number
   xDimension?: number
   yDimension?: number

@@ -1,6 +1,6 @@
 from typing import Dict
 from string import Template
-from enum import Enum
+from enum import StrEnum
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -10,7 +10,7 @@ class SetTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     # Using this list to output string in specific order
     EXPECTED_ARGS = ["S", "P", "I", "D"]
 
-    class ValDefinedMessage(str, Enum):
+    class ValDefinedMessage(StrEnum):
         S = "Temperature: ${val}C"
         P = "Kp: $val"
         I = "Ki: $val"  # noqa: E741

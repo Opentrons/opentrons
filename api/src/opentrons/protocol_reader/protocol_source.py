@@ -1,16 +1,16 @@
 """Protocol source value objects."""
-from enum import Enum
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 from typing_extensions import Literal
 
-from opentrons.protocols.api_support.types import APIVersion
-
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocols.api_support.types import APIVersion
 
-class ProtocolType(str, Enum):
+
+class ProtocolType(StrEnum):
     """Type of protocol, JSON or Python."""
 
     JSON = "json"
@@ -18,7 +18,7 @@ class ProtocolType(str, Enum):
 
 
 # TODO(mc, 2021-12-07): add python support roles
-class ProtocolFileRole(str, Enum):
+class ProtocolFileRole(StrEnum):
     """The purpose of a given file in a protocol.
 
     Args:

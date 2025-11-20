@@ -31,14 +31,11 @@ export function getLabwareDefinitionsByURIForProtocol(
       }
     }, {})
   return commands
-    .filter(
-      (
-        command
-      ): command is
-        | LoadLabwareRunTimeCommand
-        | LoadLidStackRunTimeCommand
-        | LoadLidRunTimeCommand =>
-        ['loadLabware', 'loadLidStack', 'loadLid'].includes(command.commandType)
+    .filter((command): command is
+      | LoadLabwareRunTimeCommand
+      | LoadLidStackRunTimeCommand
+      | LoadLidRunTimeCommand =>
+      ['loadLabware', 'loadLidStack', 'loadLid'].includes(command.commandType)
     )
     .reduce<LabwareDefinitionsByURI>((acc, command) => {
       const definition = command.result?.definition
