@@ -76,7 +76,7 @@ class Point(NamedTuple):
 
     @classmethod
     def from_xyz_attrs(cls, has_xyz: _HasXYZ) -> Point:
-        """Construct a Point from another object that has .x/.y/.z attributes."""
+        """Construct a `Point` from another object that has .x/.y/.z attributes."""
         return cls(has_xyz.x, has_xyz.y, has_xyz.z)
 
 
@@ -197,7 +197,7 @@ class Location:
         """
         Alter the point stored in the location while preserving the labware.
 
-        This returns a new Location and does not alter the current one. It
+        This returns a new `Location` and does not alter the current one. It
         should be used like
 
         ```python
