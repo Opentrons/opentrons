@@ -36,7 +36,7 @@
                 "sha256:9f76d541cad6e36af7beb62e978876f3b41e3e04f2c1fbf0884604c0a9c4d93c"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.9'",
+            "markers": "python_version >= '3.9'", 
             "version": "==4.9.0"
         },
         "attrs": {

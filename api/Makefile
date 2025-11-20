@@ -90,7 +90,7 @@ wheel: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(P
 wheel: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 wheel:
 	$(clean_wheel_cmd)
-	$(python) -m build --wheel .
+	uv build --wheel .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 
@@ -101,7 +101,7 @@ sdist: export HATCH_VCS_TUNABLE_TAG_PATTERN=$(call git_tag_regex_for_project,$(P
 sdist: export HATCH_VCS_TUNABLE_RAW_OPTIONS=$(call hatch_raw_options_for_project,$(PROJECT))
 sdist:
 	$(clean_sdist_cmd)
-	$(python) -m build --sdist .
+	uv build --sdist .
 	$(SHX) rm -rf build
 	$(SHX) ls dist
 

@@ -36,12 +36,14 @@ dependencies = [
 [dependency-groups]
 # Robot dependencies - exact versions from Pipfile [packages] for robot deployment
 robot = [
+    "click==8.1.2",
     "jsonschema==4.17.3",
     "pydantic==2.11.7",
     "pydantic-settings==2.4.0",
     "anyio==4.9.0",
     "numpy==1.22.3",
     "packaging==22.0",
+    "pyserial==3.5",
     "pyusb==1.2.1",
     "zipp==3.21.0",
     "opentrons-hardware==0.0.0",

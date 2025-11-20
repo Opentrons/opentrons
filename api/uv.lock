@@ -283,14 +283,14 @@ wheels = [
 
 [[package]]
 name = "click"
-version = "8.3.1"
+version = "8.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3d/fa/656b739db8587d7b5dfa22e22ed02566950fbfbcdc20311993483657a5c0/click-8.3.1.tar.gz", hash = "sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a", size = 295065, upload-time = "2025-11-15T20:45:42.706Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/42/e1/4cb2d3a2416bcd871ac93f12b5616f7755a6800bccae05e5a99d3673eb69/click-8.1.2.tar.gz", hash = "sha256:479707fe14d9ec9a0757618b7a100a0ae4c4e236fac5b7f80ca68028141a1a72", size = 330315, upload-time = "2022-03-31T20:52:52.48Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/78/01c019cdb5d6498122777c1a43056ebb3ebfeef2076d9d026bfe15583b2b/click-8.3.1-py3-none-any.whl", hash = "sha256:981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6", size = 108274, upload-time = "2025-11-15T20:45:41.139Z" },
+    { url = "https://files.pythonhosted.org/packages/a0/66/c8196ad693d62384d8e800e5bd27434a64c0057fe169b61c69a73f1614a8/click-8.1.2-py3-none-any.whl", hash = "sha256:24e1a4a9ec5bf6299411369b208c1df2188d9eb8d916302fe6bf03faed227f1e", size = 96570, upload-time = "2022-03-31T20:52:50.525Z" },
 ]
 
 [[package]]
@@ -1183,6 +1183,7 @@ dev = [
     { name = "atomicwrites", marker = "sys_platform == 'win32'" },
     { name = "black" },
     { name = "build" },
+    { name = "click" },
     { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "coverage" },
     { name = "decoy" },
@@ -1203,6 +1204,7 @@ dev = [
     { name = "performance-metrics" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyserial" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
@@ -1224,6 +1226,7 @@ dev = [
 ]
 robot = [
     { name = "anyio" },
+    { name = "click" },
     { name = "jsonschema" },
     { name = "numpy" },
     { name = "opentrons-hardware", extra = ["flex"] },
@@ -1232,6 +1235,7 @@ robot = [
     { name = "performance-metrics" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyserial" },
     { name = "pyusb" },
     { name = "zipp" },
 ]
@@ -1262,6 +1266,7 @@ dev = [
     { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "black", specifier = "==22.3.0" },
     { name = "build", specifier = "~=1.2.0" },
+    { name = "click", specifier = "==8.1.2" },
     { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "coverage", specifier = "==7.4.1" },
     { name = "decoy", specifier = ">=2.2.0,<3" },
@@ -1283,6 +1288,7 @@ dev = [
     { name = "performance-metrics", editable = "../performance-metrics" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "pyserial", specifier = "==3.5" },
     { name = "pytest", specifier = ">=8,<9" },
     { name = "pytest-asyncio", specifier = ">=0.23.0,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
@@ -1304,6 +1310,7 @@ dev = [
 ]
 robot = [
     { name = "anyio", specifier = "==4.9.0" },
+    { name = "click", specifier = "==8.1.2" },
     { name = "jsonschema", specifier = "==4.17.3" },
     { name = "numpy", specifier = "==1.22.3" },
     { name = "opentrons-hardware", editable = "../hardware" },
@@ -1313,6 +1320,7 @@ robot = [
     { name = "performance-metrics", editable = "../performance-metrics" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "pyserial", specifier = "==3.5" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "zipp", specifier = "==3.21.0" },
 ]
