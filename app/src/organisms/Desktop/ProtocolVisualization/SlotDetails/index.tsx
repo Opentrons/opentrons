@@ -7,7 +7,7 @@ import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 import { LabwareSlotContainer } from '../LabwareSlotContainer'
 import { ModuleSlotDetails } from '../ModuleSlotDetails'
 import { TrashSlotDetails } from '../TrashSlotDetails'
-import styles from './visualization.module.css'
+import styles from './slotdetails.module.css'
 
 import type {
   Liquid,
