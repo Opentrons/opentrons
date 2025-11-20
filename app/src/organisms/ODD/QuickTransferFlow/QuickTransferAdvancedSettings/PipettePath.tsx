@@ -53,7 +53,7 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
   >(state.blowOutDispense?.location)
 
   const [disposalVolume, setDisposalVolume] = useState<number | undefined>(
-    state?.disposalVolume
+    state?.disposalVolumeDispenseSettings?.volume
   )
   const maxPipetteVolume = Object.values(state.pipette.liquids)[0].maxVolume
   const tipVolume = Object.values(state.tipRack.wells)[0].totalLiquidVolume
