@@ -16,7 +16,7 @@ nav:
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
       - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
-  - Python API: '!include v2/mkdocs.yml'
+  - Python API: '!include python-api/mkdocs.yml'
 
 plugins:
   - monorepo
@@ -48,7 +48,7 @@ plugins:
             show_symbol_type_toc: true
             heading_level: 2
             extensions:
-              - v2/griffe_version_required.py:RequiresVersionExtension
+              - python-api/griffe_version_required.py:RequiresVersionExtension
   - autorefs
   - macros
 

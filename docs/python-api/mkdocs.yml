@@ -1,5 +1,5 @@
 
-site_name: v2
+site_name: python-api
 
 nav:
   - Welcome: index.md
