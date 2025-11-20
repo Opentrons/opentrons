@@ -5,7 +5,7 @@ title: "Opentrons Flex: Python Protocol API"
 Writing protocol scripts in Python gives you the most fine-grained control of Opentrons Flex. Version 2 of the Python Protocol API is a single Python package that exposes a wide range of liquid handling features on Opentrons robots. 
 
 !!! info "Additional Documentation"
-    For an idea of the breadth of the API, check out the [full online documentation](https://docs.opentrons.com/v2/), which includes topic-based articles as well as a [comprehensive reference](https://docs.opentrons.com/v2/new_protocol_api.html) of all methods and functions contained in the package. If you've never written an Opentrons protocol before and want to build one from scratch, follow the [Tutorial](https://docs.opentrons.com/v2/tutorial.html).
+    For an idea of the breadth of the API, check out the [full API documentation](../../python-api/index.md), which includes topic-based articles as well as a [comprehensive reference](../../python-api/reference/protocols.md) of all methods and functions contained in the package. If you've never written an Opentrons protocol before and want to build one from scratch, follow the [Tutorial](../../python-api/tutorial.md).
 
 ## Writing and running scripts
 
@@ -17,14 +17,14 @@ Python protocols generally follow the same basic structure:
 
 3.  Defining a `run()` function that contains all of the instructions to the robot, including:
 
-    - [Pipettes](https://docs.opentrons.com/v2/new_pipette.html) the protocol will use.
+    - [Pipettes](../../python-api/pipettes/index.md) the protocol will use.
 
-    - Locations of [modules](https://docs.opentrons.com/v2/new_modules.html), [labware](https://docs.opentrons.com/v2/new_labware.html), and [deck fixtures](https://docs.opentrons.com/v2/deck_slots.html#deck-configuration).
+    - Locations of [modules](../../python-api/modules/index.md), [labware](../../python-api/labware.md), and [deck fixtures](../../python-api/deck-slots.md#deck-configuration).
 
-    - Liquid [classes](https://docs.opentrons.com/v2/liquid_classes) or [types and locations](https://docs.opentrons.com/v2/new_labware.html#labeling-liquids-in-labware) (optional).
+    - Liquid [classes](../../python-api/liquid-classes.md) or [types and locations](../../python-api/labware.md#labeling-liquids-in-labware) (optional).
 
-    - Commands the system will physically execute (e.g., [simple](https://docs.opentrons.com/v2/new_atomic_commands.html) or [complex](https://docs.opentrons.com/v2/new_complex_commands.html) liquid
-      handling commands, [module](https://docs.opentrons.com/v2/new_modules.html) commands, or [movement](https://docs.opentrons.com/v2/robot_position.html) commands).
+    - Commands the system will physically execute (e.g., [simple](../../python-api/building-block-commands/index.md) or [complex](../../python-api/complex-commands/index.md) liquid
+    handling commands, [module](../../python-api/modules/index.md) commands, or [movement](../../python-api/robot-position.md) commands).
 
 ```python
 from opentrons import protocol_api
@@ -77,21 +77,21 @@ Certain configurations allow changing which nozzles are used. For example, you c
 
 Starting in API version 2.18, you can define user-customizable variables in your Python protocols. This gives you greater flexibility and puts extra control in the hands of the technician running the protocol — without forcing them to switch between lots of protocol files or write code themselves.
 
-Runtime parameters can customize Boolean, numerical, and string values in your protocol. And starting in API version 2.20, you can require a CSV file of data to be parsed and used in the protocol. See the [API documentation on runtime parameters](https://docs.opentrons.com/v2/runtime_parameters.html) for information on writing them into protocols, and see the [Runtime Parameters section](../touchscreen/protocol-setup.md#runtime-parameters) of the Touchscreen chapter for information on changing parameter values during run setup.
+Runtime parameters can customize Boolean, numerical, and string values in your protocol. And starting in API version 2.20, you can require a CSV file of data to be parsed and used in the protocol. See the [API documentation on runtime parameters](../../python-api/runtime-parameters/index.md) for information on writing them into protocols, and see the [Runtime Parameters section](../touchscreen/protocol-setup.md#runtime-parameters) of the Touchscreen chapter for information on changing parameter values during run setup.
 
 ### Robot motor control 
 
-Starting in API version 2.22, you can move individual robot motors like the gantry, pipette plunger, and gripper jaws with [robot motor control commands](https://docs.opentrons.com/v2/advanced_control/motor_control.html#motor-control). Use helper and movement commands to calculate and move robot axes to precise positions on the Flex deck, and gripper commands to open or close the Flex Gripper jaws. 
+Starting in API version 2.22, you can move individual robot motors like the gantry, pipette plunger, and gripper jaws with [robot motor control commands](../../python-api/advanced-control/robot-motors.md). Use helper and movement commands to calculate and move robot axes to precise positions on the Flex deck, and gripper commands to open or close the Flex Gripper jaws. 
 
 Unlike other protocol commands, robot motor control commands execute movements independent of labware and hardware positions on the Flex. This lets you complete advanced tasks, like using 3D-printed labware in your protocols, moving the Flex's z-axis carriage without a pipette attached, or simultaneously pipetting and holding labware with the Flex Gripper. 
 
 ###  Liquid level detection 
 
-Sensors in Flex pipettes can detect the level of liquid in a well. You can use this feature to target a [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html?highlight=liquid+level#meniscus) while aspirating, dispensing, or mixing in a Python protocol. 
+Sensors in Flex pipettes can detect the level of liquid in a well. You can use this feature to target a [liquid meniscus](../../python-api/robot-position.md#meniscus) while aspirating, dispensing, or mixing in a Python protocol. 
 
 ### Non-blocking commands
 
-Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).
+Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](../../python-api/modules/heater-shaker.md#non-blocking-commands).
 
 ### Python packages
 
