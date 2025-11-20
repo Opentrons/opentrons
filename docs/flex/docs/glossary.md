@@ -244,7 +244,7 @@ A protocol script written using the Opentrons *Python Protocol API*. See the [Wr
 
 ##### Python Protocol API
 
-A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the online [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/).
+A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the [Opentrons Python Protocol API documentation](../python-api/index.md).
 
 ##### Removable deck slot
 
