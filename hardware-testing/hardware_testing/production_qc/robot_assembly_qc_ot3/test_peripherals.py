@@ -23,6 +23,11 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.data import ui
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    direct_property_write,
+    direct_eeprom_data,
+    DirectPropId,
+)
 
 SERVER_PORT = 8083
 SERVER_CMD = "{0} -m http.server {1} --directory {2}"
@@ -259,11 +264,18 @@ async def run(  # noqa: C901
             active_result = CSVResult.PASS
             # write the SKU to EEPROM to indicate that this is a Flex model with no Camera
             print(f"Writing SKU {sku} to EEPROM.")
+
+            # Query the existing EEPROM data and converted it to a hardware-testing handleable format
             eeprom_data = api._backend.eeprom_data  # type: ignore
-            eeprom_data.sku = sku
-            eeprom_set = eeprom_data.to_set()
-            sku_result = api._backend.eeprom_driver.property_write(eeprom_set)  # type: ignore
-            assert PropId.SKU in sku_result
+            converted_eeprom_data = direct_eeprom_data(eeprom_data)
+
+            # Update the data set with the provided SKU and write it to the EEPROM
+            converted_eeprom_data.sku = sku
+            eeprom_set = converted_eeprom_data.to_set()
+            sku_result = direct_property_write(api=api, properties=eeprom_set)
+
+            # Validate the SKU
+            assert DirectPropId.SKU in sku_result
 
             removed_result = CSVResult.PASS
         except Exception as e:
