@@ -142,8 +142,8 @@ class Well:
 
         - Returns `False` if:
 
-          - the well has no tip present, or
-          - the well has a tip that's been used by the protocol previously
+            - the well has no tip present, or
+            - the well has a tip that's been used by the protocol previously
 
         - Returns `True` if the well has an unused tip.
 
@@ -333,7 +333,7 @@ class Well:
         !!! note
             Even if the absolute values of `x`, `y`, and `z` are all less
             than 1, a location constructed from the well and the result of
-            `from_center_cartesian` may be outside of the physical well. For example,
+            `from_center_cartesian()` may be outside of the physical well. For example,
             `from_center_cartesian(0.9, 0.9, 0)` would be outside of a cylindrical
             well, but inside a square well.
 
