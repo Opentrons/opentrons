@@ -78,7 +78,7 @@ export function TipPickupContainer(
         </RobotWorkSpace>
       </div>
       <div className={styles.footer}>
-        <StyledText desktopStyle="captionSemiBold" color={COLORS.grey60}>
+        <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
           {t('tips_remaining')}
         </StyledText>
         <StyledText desktopStyle="captionSemiBold">
