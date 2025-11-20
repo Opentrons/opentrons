@@ -62,17 +62,17 @@ export function useProtocolAnalysisErrorsModal({
 }
 
 export interface ProtocolAnalysisErrorModalProps {
-  displayName: string | null
   errors: AnalysisError[]
   onClose: () => void
-  robotName: string
+  displayName?: string | null
+  robotName?: string
 }
 
 export function ProtocolAnalysisErrorModal({
-  displayName,
   errors,
   onClose,
   robotName,
+  displayName,
 }: ProtocolAnalysisErrorModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
 
@@ -84,12 +84,14 @@ export function ProtocolAnalysisErrorModal({
       onClose={onClose}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
-        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-          {t('analysis_failure_on_robot', {
-            protocolName: displayName,
-            robotName,
-          })}
-        </LegacyStyledText>
+        {robotName == null && displayName == null ? null : (
+          <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+            {t('analysis_failure_on_robot', {
+              protocolName: displayName,
+              robotName,
+            })}
+          </LegacyStyledText>
+        )}
         {errors.map((error, index) => (
           <CodeBlock key={`error-${index}`}>{error?.detail}</CodeBlock>
         ))}
