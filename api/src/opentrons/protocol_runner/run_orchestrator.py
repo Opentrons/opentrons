@@ -12,7 +12,6 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.robot.types import RobotType
-from opentrons.system import camera
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
@@ -195,13 +194,6 @@ class RunOrchestrator:
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
-        if self._camera_provider:
-            await camera.update_live_stream_status(
-                self.get_robot_type(),
-                True,
-                self._camera_provider,
-                self._protocol_engine.state_view.camera.get_enablement_settings(),
-            )
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,

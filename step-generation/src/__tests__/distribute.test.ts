@@ -2278,6 +2278,7 @@ mock_pipette.distribute_with_liquid_class(
     dest=[mock_dest_plate["A2"], mock_dest_plate["A3"], mock_dest_plate["A4"]],
     new_tip="always",
     return_tip=True,
+    trash_location=trash_bin_1,
     tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",
@@ -2378,6 +2379,7 @@ mock_pipette.distribute_with_liquid_class(
     dest=[mock_dest_plate["A2"], mock_dest_plate["A3"], mock_dest_plate["A4"]],
     new_tip="always",
     return_tip=True,
+    trash_location=trash_bin_1,
     tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
         name="distribute_step_1",

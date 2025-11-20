@@ -75,3 +75,8 @@ export const CONFIG_STYLE_SELECTED = css`
     }
   }
 `
+
+export const WASTE_CHUTE_WIDTH = 130
+export const WASTE_CHUTE_HEIGHT = 138
+export const WASTE_CHUTE_X = 322
+export const WASTE_CHUTE_Y = -51

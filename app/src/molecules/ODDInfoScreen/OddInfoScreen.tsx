@@ -11,7 +11,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { ODDStyles, StyleProps } from '@opentrons/components'
+import type { IconName, ODDStyles, StyleProps } from '@opentrons/components'
 
 export type OddInfoScreenType =
   | 'error'
@@ -26,7 +26,7 @@ interface OddInfoScreenProps extends StyleProps {
   hasIcon?: boolean
   subText?: string
   textSize?: 'small' | 'large'
-  iconName?: string
+  iconName?: IconName
 }
 
 const INFO_SCREEN_PROPS_BY_TYPE: Record<

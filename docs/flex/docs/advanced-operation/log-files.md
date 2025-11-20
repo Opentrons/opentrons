@@ -25,6 +25,8 @@ The records in these log files can be difficult to interpret and understand but 
 
 Follow these instructions to download the Flex log files:
 
+<div class="instruction-list" markdown>
+
 1. From the Opentrons App, click **Devices** and locate the robot that you want the logs from.
 
 2. For your selected robot, click the three-dot menu ( ⋮ ) and then click **Robot settings**.
@@ -37,3 +39,5 @@ Follow these instructions to download the Flex log files:
         Flex produces a single `.zip` file that contains the logs. The file name includes the robot’s name followed by `_logs.zip`. For example, if your robot is called “Flex1," the log file will be named `Flex1_logs.zip`.
 
 5. _(Optional)_ To read the logs, double-click the downloaded file to decompress it. The individual logs will expand into a new folder in the same location as the downloaded file. Any text editor should be able to open these files.
+
+</div>

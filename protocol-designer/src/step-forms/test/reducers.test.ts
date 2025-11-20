@@ -38,8 +38,7 @@ import type {
 import type { DeckSlot } from '../../types'
 import type {
   AddStepAction,
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
+  DuplicateSelectedStepsAction,
   SelectMultipleStepsAction,
   SelectStepAction,
   SelectTerminalItemAction,
@@ -103,75 +102,21 @@ describe('orderedStepIds reducer', () => {
     }
     expect(orderedStepIds(state, action)).toEqual(['2'])
   })
-  it('should add a new step when the step is duplicated', () => {
+  it('should set the new step order when steps are duplicated', () => {
     const state = ['1', '2', '3']
-    const action = {
-      type: 'DUPLICATE_STEP',
+    const action: DuplicateSelectedStepsAction = {
+      type: 'DUPLICATE_SELECTED_STEPS',
       payload: {
-        stepId: '1',
-        duplicateStepId: 'dup_1',
+        steps: [
+          {
+            originalStepId: '1',
+            duplicateStepId: 'dup_1',
+          },
+        ],
+        newStepOrder: ['1', 'dup_1', '2', '3'],
       },
     }
     expect(orderedStepIds(state, action)).toEqual(['1', 'dup_1', '2', '3'])
-  })
-  describe('duplicating multiple steps', () => {
-    const steps = [
-      {
-        stepId: 'id1',
-        duplicateStepId: 'dup_1',
-      },
-      {
-        stepId: 'id2',
-        duplicateStepId: 'dup_2',
-      },
-      {
-        stepId: 'id3',
-        duplicateStepId: 'dup_3',
-      },
-    ]
-    const testCases = [
-      {
-        name: 'should add new steps at the 0th index',
-        state: ['1', '2', '3'],
-        action: {
-          type: 'DUPLICATE_MULTIPLE_STEPS',
-          payload: {
-            steps: [...steps],
-            indexToInsert: 0,
-          },
-        },
-        expected: ['dup_1', 'dup_2', 'dup_3', '1', '2', '3'],
-      },
-      {
-        name: 'should add new steps at the 2nd index',
-        state: ['1', '2', '3'],
-        action: {
-          type: 'DUPLICATE_MULTIPLE_STEPS',
-          payload: {
-            steps: [...steps],
-            indexToInsert: 2,
-          },
-        },
-        expected: ['1', '2', 'dup_1', 'dup_2', 'dup_3', '3'],
-      },
-      {
-        name: 'should add new steps at the last index',
-        state: ['1', '2', '3'],
-        action: {
-          type: 'DUPLICATE_MULTIPLE_STEPS',
-          payload: {
-            steps: [...steps],
-            indexToInsert: 3,
-          },
-        },
-        expected: ['1', '2', '3', 'dup_1', 'dup_2', 'dup_3'],
-      },
-    ]
-    testCases.forEach(({ name, state, action, expected }) => {
-      it(name, () => {
-        expect(orderedStepIds(state, action)).toEqual(expected)
-      })
-    })
   })
   describe('reorder steps', () => {
     const state = ['1', '2', '3', '4']
@@ -773,7 +718,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         it(testName, () => {
           vi.mocked(_getInitialDeckSetupRootState).mockReturnValue(deckSetup)
           vi.mocked(getLabwareIsCompatible).mockReturnValue(
-            labwareIsCompatible as boolean
+            labwareIsCompatible!
           )
           const prevRootState = makePrevRootState(makeStateArgs)
           const action = moveDeckItem(sourceSlot, destSlot)
@@ -1238,33 +1183,9 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
       }
     })
-    it('should duplicate one step', () => {
-      const action: DuplicateStepAction = {
-        type: 'DUPLICATE_STEP',
-        payload: {
-          stepId: 'id1',
-          duplicateStepId: 'dup_1',
-        },
-      }
-      const expectedState = {
-        ...savedStepFormsState,
-        dup_1: {
-          id: 'dup_1',
-        },
-      }
-      expect(
-        savedStepForms(
-          // @ts-expect-error(sa, 2021-6-14): add missing keys to savedStepFormsState
-          {
-            savedStepForms: savedStepFormsState,
-          },
-          action
-        )
-      ).toEqual(expectedState)
-    })
-    it('should duplicate multiple steps', () => {
+    it('should duplicate steps', () => {
       const action = {
-        type: 'DUPLICATE_MULTIPLE_STEPS',
+        type: 'DUPLICATE_SELECTED_STEPS',
         payload: {
           steps: [
             {
@@ -1661,13 +1582,13 @@ describe('batchEditFormChanges reducer', () => {
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
   })
-  it('should reset state on DUPLICATE_MULTIPLE_STEPS', () => {
+  it('should reset state on DUPLICATE_SELECTED_STEPS', () => {
     const state = {
       someFieldName: 'someFieldValue',
     }
     // @ts-expect-error(sa, 2021-6-14): missing payload
-    const action: DuplicateMultipleStepsAction = {
-      type: 'DUPLICATE_MULTIPLE_STEPS',
+    const action: DuplicateSelectedStepsAction = {
+      type: 'DUPLICATE_SELECTED_STEPS',
     }
     expect(batchEditFormChanges(state, { ...action })).toEqual({})
   })

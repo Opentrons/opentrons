@@ -2,6 +2,7 @@ import mapValues from 'lodash/mapValues'
 
 import { castField } from '../../../steplist/fieldLevel'
 import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
+import { cameraFormToArgs } from './cameraFormToArgs'
 import { commentFormToArgs } from './commentFormToArgs'
 import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
@@ -67,6 +68,11 @@ export const stepFormToArgs = (
     }
     case 'moveLabware': {
       stepArgs = moveLabwareFormToArgs(_castForm(hydratedForm))
+
+      break
+    }
+    case 'camera': {
+      stepArgs = cameraFormToArgs(_castForm(hydratedForm))
 
       break
     }

@@ -56,7 +56,7 @@ export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {
       {isCameraSettingsEnabled && (
         <FloatingActionButton
           buttonText={t('image_capture')}
-          iconName="photo-camera"
+          iconName="camera"
           onClick={() => null}
         />
       )}
@@ -96,7 +96,7 @@ function GalleryListContent({
       {imagesInfo.map(item => (
         <GalleryListItem
           key={item.timestamp}
-          {...item}
+          item={item}
           protocolAnalysis={protocolAnalysis}
           runId={runId}
           robotType={robotType}

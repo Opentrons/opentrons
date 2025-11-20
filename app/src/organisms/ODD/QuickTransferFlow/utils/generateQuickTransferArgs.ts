@@ -58,7 +58,8 @@ function getOrderedWells(
 }
 
 export function getInvariantContextAndRobotState(
-  quickTransferState: QuickTransferSummaryState
+  quickTransferState: QuickTransferSummaryState,
+  deckConfig: DeckConfiguration
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
@@ -174,6 +175,44 @@ export function getInvariantContextAndRobotState(
   }
   let trashBinEntities: TrashBinEntities = {}
   let wasteChuteEntities: WasteChuteEntities = {}
+
+  // If the drop tip location is the tip rack, still a protocols needs to define a trash bin entity
+  const dropTipIsTiprack =
+    typeof quickTransferState.dropTipLocation === 'string' &&
+    quickTransferState.dropTipLocation ===
+      getLabwareDefURI(quickTransferState.tipRack)
+
+  if (dropTipIsTiprack) {
+    // check deck config for trash bin and waste chute
+    const installedTrashBin = deckConfig.find(
+      config => config.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    )
+    const installedWasteChute = deckConfig.find(config =>
+      WASTE_CHUTE_FIXTURES.includes(config.cutoutFixtureId)
+    )
+    const trashBinLocation =
+      installedTrashBin != null ? installedTrashBin.cutoutId : 'cutoutA3'
+    const trashId = `${uuid()}_trashBin`
+    const wasteChuteId = `${uuid()}_wasteChute`
+
+    if (installedTrashBin != null) {
+      trashBinEntities = {
+        [trashId]: {
+          id: trashId,
+          location: trashBinLocation,
+          pythonName: pythonTrashBinName,
+        },
+      }
+    } else if (installedWasteChute != null) {
+      wasteChuteEntities = {
+        [wasteChuteId]: {
+          id: wasteChuteId,
+          location: installedWasteChute.cutoutId,
+          pythonName: pythonWasteChuteName,
+        },
+      }
+    }
+  }
 
   if (
     typeof quickTransferState.dropTipLocation !== 'string' &&
@@ -308,8 +347,10 @@ export function generateQuickTransferArgs(
       }
     }
   }
-  const { invariantContext, robotState } =
-    getInvariantContextAndRobotState(quickTransferState)
+  const { invariantContext, robotState } = getInvariantContextAndRobotState(
+    quickTransferState,
+    deckConfig
+  )
 
   let blowoutLocation: string | undefined
   if (
@@ -406,8 +447,8 @@ export function generateQuickTransferArgs(
     stepId: 1,
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
-    sourceLabware: sourceLabwareEntity?.id as string,
-    destLabware: destLabwareEntity?.id as string,
+    sourceLabware: sourceLabwareEntity?.id!,
+    destLabware: destLabwareEntity?.id!,
     tipRack: pipetteEntity.tiprackDefURI[0],
     aspirateFlowRateUlSec: quickTransferState.aspirateFlowRate,
     dispenseFlowRateUlSec: quickTransferState.dispenseFlowRate,

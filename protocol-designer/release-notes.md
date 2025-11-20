@@ -8,11 +8,39 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
-## Opentrons Protocol Designer Changes in 8.6.2
+## Opentrons Protocol Designer Changes in 8.7.0
 
-**Welcome to Protocol Designer 8.6.2!**
+**Welcome to Protocol Designer 8.7.0!**
 
-This hotfix release improves bug tracking for future software updates.
+This release adds support for manual tip selection and camera steps in Protocol Designer, and includes feature improvements and bug fixes.
+
+### New Features
+
+- Choose between automatic and manual tip tracking for transfer and mix steps in your protocols. In manual tip tracking, Protocol Designer lets you select the tip rack and individual tips the pipette will pick up to transfer or mix liquid.
+- Manual tip tracking in Protocol Designer enables reusing tips more than once in a protocol.
+- Add a camera step in any Protocol Designer protocol. The Flex or OT-2's built-in camera can take a still image of your robot deck at any point during the protocol. Access your images in the Recent Protocol Runs section of the Opentrons App's robot details page.
+
+### Improved Features
+
+- Protocol Designer only shows compatible deck and labware locations to move a lid to.
+- Add Opentrons Tough Universal Lids to an available Opentrons Flex Deck Riser placed on the deck.
+- Move a tip rack lid to any tip rack on the deck without a lid.
+- When adding labware, click to add a tip rack lid to a Flex 96-channel tip rack adapter with a tip rack inside.
+- When you click **Duplicate labware**, Protocol Designer duplicates all labware, adapters, lids, and liquids in the deck slot.
+
+### Bug Fixes
+
+- Protocol Designer updates maximum flow rates to the latest version when you import an older protocol.
+
+## Opentrons Protocol Designer Changes in 8.6.3
+
+**Welcome to Protocol Designer 8.6.3!**
+
+This hotfix release addresses the following bugs:
+
+- Protocol Designer no longer crashes when uploading protocols containing custom labware.
+- Protocol Designer allows scrolling to view details of a transfer step using a "consolidate" pipette path.
+- Eliminates some crashes when deleting liquids that are already used in the protocol.
 
 ## Opentrons Protocol Designer Changes in 8.6.1
 
@@ -83,9 +111,6 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
-  - deleting a pipette involved in a mix step.
-  - deleting a Protocol Designer step title.
-  - checking labware details after deleting a liquid.
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.

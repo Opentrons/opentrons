@@ -161,6 +161,7 @@ export type NotifyTopic =
   | `robot-server/runs/${string}`
   | `robot-server/runs/pre_serialized_commands/${string}`
   | `robot-server/dataFiles/${string}/images`
+  | 'robot-server/camera'
 
 export interface NotifySubscribeAction {
   type: 'shell:NOTIFY_SUBSCRIBE'
@@ -184,7 +185,6 @@ export interface CameraStreamOpenAction {
   payload: {
     hostname: string
     robotName: string
-    runId: string
     windowTitle: string
   }
   meta: { shell: true }

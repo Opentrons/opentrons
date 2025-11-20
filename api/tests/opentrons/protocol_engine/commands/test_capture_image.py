@@ -8,6 +8,7 @@ from typing import Tuple
 from opentrons.system import camera
 from opentrons.system import ffmpeg
 from opentrons.protocol_engine.resources import FileProvider, CameraProvider
+from opentrons.protocol_engine.resources.file_provider import SPECIAL_CHARACTERS
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
@@ -24,6 +25,7 @@ from opentrons.protocol_engine.errors import (
     CameraCaptureError,
     CameraDisabledError,
     CameraSettingsInvalidError,
+    FileNameInvalidError,
 )
 from opentrons.system.camera import image_capture, ZOOM_DEFAULT, RESOLUTION_DEFAULT
 
@@ -238,8 +240,8 @@ async def test_ensure_camera_used_precondition_set(
             50,
         ],
         [
-            (1, 2),
-            (1, 2),
+            (320, 240),
+            (320, 240),
             1.5,
             1.5,
             (3, 4),
@@ -252,8 +254,8 @@ async def test_ensure_camera_used_precondition_set(
             75,
         ],
         [
-            (1, 2),
-            (1, 2),
+            (320, 240),
+            (320, 240),
             2.0,
             2.0,
             (3, 4),
@@ -266,8 +268,8 @@ async def test_ensure_camera_used_precondition_set(
             25,
         ],
         [
-            (9999999, 9999999),
-            (9999999, 9999999),
+            (7680, 4320),
+            (7680, 4320),
             1.0,
             1.0,
             (25, 45),
@@ -330,3 +332,140 @@ async def test_capture_image_returns_expected_params(
             ),
             state_update=result.state_update,
         )
+
+
+async def test_capture_image_result_has_clean_defaults(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider_image_capture: CameraProvider,
+) -> None:
+    """It should return the successful result of an image capture with all expected defaults."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider_image_capture,
+    )
+    params = CaptureImageParams(
+        fileName="coolpic",
+        resolution=None,
+        zoom=None,
+        pan=None,
+        contrast=None,
+        brightness=None,
+        saturation=None,
+    )
+    decoy.when(state_view.files.get_filecount()).then_return(0)
+
+    with mock.patch("os.path.exists", mock.Mock(return_value=True)):
+        result = await subject.execute(params=params)
+        assert result == SuccessData(
+            public=CaptureImageResult(
+                fileId=None,
+                resolution=(1920, 1080),
+                zoom=1.0,
+                pan=None,
+                contrast=50,
+                brightness=50,
+                saturation=50,
+            ),
+            state_update=result.state_update,
+        )
+
+
+async def test_raises_filename_error(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider: CameraProvider,
+) -> None:
+    """It should raise FileNameInvalidError when the capture image command is provided a bad file name."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider,
+    )
+    for char in SPECIAL_CHARACTERS:
+        params = CaptureImageParams(fileName="badname" + char)
+        with pytest.raises(FileNameInvalidError):
+            await subject.execute(params=params)
+
+
+@pytest.mark.parametrize(
+    argnames=[
+        "zoom",
+        "contrast",
+        "brightness",
+        "saturation",
+        "resolution",
+    ],
+    argvalues=[
+        [0.9, 1, 1, 1, (1920, 1080)],
+        [2.1, 1, 1, 1, (1920, 1080)],
+        [1, -1, 1, 1, (1920, 1080)],
+        [1, 101, 1, 1, (1920, 1080)],
+        [1, 1, -1, 1, (1920, 1080)],
+        [1, 1, 101, 1, (1920, 1080)],
+        [1, 1, 1, -1, (1920, 1080)],
+        [1, 1, 1, 101, (1920, 1080)],
+        [1, 1, 1, 1, (0, 0)],
+        [1, 1, 1, 1, (10000, 10000)],
+    ],
+)
+async def test_raises_image_parameter_error(
+    decoy: Decoy,
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider_image_capture: CameraProvider,
+    zoom: float,
+    contrast: float,
+    brightness: float,
+    saturation: float,
+    resolution: Tuple[int, int],
+) -> None:
+    """It should raise CameraSettingsInvalidError when the capture image command is provided bad filter params."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider_image_capture,
+    )
+    params = CaptureImageParams(
+        resolution=resolution,
+        zoom=zoom,
+        contrast=contrast,
+        brightness=brightness,
+        saturation=saturation,
+    )
+
+    decoy.when(state_view.files.get_filecount()).then_return(0)
+
+    with mock.patch("os.path.exists", mock.Mock(return_value=True)):
+        with pytest.raises(CameraSettingsInvalidError):
+            await subject.execute(params=params)
+
+
+async def test_raises_bad_resolution_and_zoom(
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider: CameraProvider,
+) -> None:
+    """It should raise CameraSettingsInvalidError when the capture image command is provided a bad resolution or zoom, even when the camera callback is unavailable."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider,
+    )
+
+    params = CaptureImageParams(resolution=(319, 239))
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)
+    params = CaptureImageParams(resolution=(7681, 4321))
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)
+
+    params = CaptureImageParams(zoom=0.9)
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)
+    params = CaptureImageParams(zoom=2.1)
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)

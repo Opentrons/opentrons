@@ -34,11 +34,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import type { TFunction } from 'i18next'
-import type {
-  AttachedModule,
-  CommandData,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -126,7 +122,7 @@ export function ModuleTableItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const { makeSnackbar } = useToaster()
 

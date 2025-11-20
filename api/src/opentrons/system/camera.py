@@ -21,8 +21,7 @@ from opentrons.system import ffmpeg
 log = logging.getLogger(__name__)
 
 # Default System Cameras
-FLEX_EMBEDDED_CAMERA = "/dev/video2"
-OT2_CAMERA = "/dev/video0"
+DEFAULT_SYSTEM_CAMERA = "/dev/ot_system_camera"
 
 # Stream Globals
 DEFAULT_CONF_FILE = (
@@ -38,6 +37,8 @@ STREAM_CONF_FILE_KEYS = [
 ]
 
 # Camera Parameter Globals
+RESOLUTION_MIN = (320, 240)
+RESOLUTION_MAX = (7680, 4320)
 RESOLUTION_DEFAULT = (1920, 1080)
 ZOOM_MIN = 1.0
 ZOOM_MAX = 2.0
@@ -160,7 +161,7 @@ async def update_live_stream_status(
         raw_device = str(contents["SOURCE"])[1:-1]
         if not os.path.exists(raw_device):
             log.error(
-                "Opentrons Live Stream cannot sample the camera. No video device found with device path: {raw_device}"
+                f"Opentrons Live Stream cannot sample the camera. No video device found with device path: {raw_device}"
             )
         # Enable the stream
         status = "ON"
@@ -246,6 +247,10 @@ def parse_stream_configuration_file_data(data: bytes) -> Dict[str, str] | None:
         )
         # We don't want to write bad or incomplete data to the file
         return None
+
+    # Migrate old camera default file data to new uniform default
+    if contents[StreamConfigurationKeys.SOURCE] == "NONE":
+        contents[StreamConfigurationKeys.SOURCE] = DEFAULT_SYSTEM_CAMERA
     return contents
 
 
@@ -274,13 +279,11 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
         fd.writelines(file_lines)
 
 
-async def image_capture(
+async def image_capture(  # noqa: C901
     robot_type: RobotType, parameters: ImageParameters
 ) -> bytes | CameraError:
     """Process an Image Capture request with a Camera utilizing a given set of parameters."""
-    camera = (
-        FLEX_EMBEDDED_CAMERA if ARCHITECTURE == SystemArchitecture.YOCTO else OT2_CAMERA
-    )
+    camera = DEFAULT_SYSTEM_CAMERA
 
     # We must always validate the camera exists
     if not os.path.exists(camera):
@@ -304,8 +307,16 @@ async def image_capture(
         parameters.saturation < SATURATION_MIN or parameters.saturation > SATURATION_MAX
     ):
         potential_invalid_param = "Saturation"
+    elif parameters.resolution is not None and (
+        parameters.resolution[0] < RESOLUTION_MIN[0]
+        or parameters.resolution[1] < RESOLUTION_MIN[1]
+        or parameters.resolution[0] > RESOLUTION_MAX[0]
+        or parameters.resolution[1] > RESOLUTION_MAX[1]
+    ):
+        potential_invalid_param = "Resolution"
     else:
         potential_invalid_param = None
+
     if potential_invalid_param is not None:
         return CameraError(
             message=f"{potential_invalid_param} parameter is outside the boundaries allowed for image capture.",
@@ -362,3 +373,9 @@ def get_boot_id() -> str:
         return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     else:
         return "SIMULATED_BOOT_ID"
+
+
+def camera_exists() -> bool:
+    """Validate whether or not the camera device exists."""
+    return os.path.exists(DEFAULT_SYSTEM_CAMERA)
+    # todo(chb, 2025-11-10): Eventually when we support multiple cameras this should accept a camera parameter to check for

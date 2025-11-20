@@ -17,7 +17,7 @@ import {
   substepTimelineMultiChannel,
   substepTimelineSingleChannel,
 } from './substepTimeline'
-import * as steplistUtils from './utils'
+import { mergeWhen } from './utils/mergeWhen'
 
 import type {
   ConsolidateArgs,
@@ -118,7 +118,7 @@ export const mergeSubstepRowsSingleChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
-  return steplistUtils.mergeWhen(
+  return mergeWhen(
     substepRows,
     (
       currentRow,

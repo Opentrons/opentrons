@@ -77,6 +77,7 @@ describe('pythonMetadata', () => {
         tags: ['wombat', 'kangaroo', 'wallaby'],
         source: 'Protocol Designer',
         protocolDesigner: 'fake_PD_version',
+        internalAppBuildDate: 'fake_build_date',
       })
     ).toBe(
       `
@@ -85,6 +86,7 @@ metadata = {
     "author": "Some Author",
     "description": "The description.",
     "created": "2001-09-09T01:46:40.000Z",
+    "internalAppBuildDate": "fake_build_date",
     "lastModified": "2001-09-09T01:46:41.000Z",
     "category": "PCR",
     "subcategory": "PCR Prep",

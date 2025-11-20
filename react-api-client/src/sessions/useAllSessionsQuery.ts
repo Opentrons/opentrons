@@ -5,7 +5,7 @@ import { getSessions } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, Sessions } from '@opentrons/api-client'
+import type { Sessions } from '@opentrons/api-client'
 
 export function useAllSessionsQuery(
   options: UseQueryOptions<Sessions, Error> = {}
@@ -14,7 +14,7 @@ export function useAllSessionsQuery(
   const query = useQuery<Sessions, Error>(
     ['session', host],
     () =>
-      getSessions(host as HostConfig)
+      getSessions(host!)
         .then(response => response.data)
         .catch((e: Error) => {
           throw e

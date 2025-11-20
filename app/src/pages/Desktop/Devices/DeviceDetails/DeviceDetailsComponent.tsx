@@ -20,7 +20,11 @@ import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtoco
 import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
-import { useIsFlex, useIsRobotViewable } from '/app/redux-resources/robots'
+import {
+  useIsFlex,
+  useIsRobotBusy,
+  useIsRobotViewable,
+} from '/app/redux-resources/robots'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -36,6 +40,7 @@ export function DeviceDetailsComponent({
   })
   const { isEmergencyStopModalDismissed } = useEstopContext()
   const isRobotViewable = useIsRobotViewable(robotName)
+  const isRobotBusy = useIsRobotBusy({ poll: true })
 
   // If we are explicitly redirected to an anchor link on this page,
   // scroll to it.
@@ -78,11 +83,16 @@ export function DeviceDetailsComponent({
         <InstrumentsAndModules
           robotName={robotName}
           isRobotViewable={isRobotViewable}
+          isRobotBusy={isRobotBusy}
         />
         {isRobotViewable && (
           <>
             <Divider width="100%" />
-            <Peripherals isFlex={isFlex} robotName={robotName} />
+            <Peripherals
+              isFlex={isFlex}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
           </>
         )}
       </Flex>

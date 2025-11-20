@@ -26,7 +26,7 @@ import { getMaxUiFlowRate } from '../../pages/Designer/ProtocolSteps/StepForm/Pi
 import {
   getDefaultBlowoutFlowRate,
   getDefaultPushOutVolume,
-  getMatchingTipLiquidSpecsFromSpec,
+  getMatchingTipLiquidSpecs,
 } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
@@ -87,7 +87,12 @@ const getClippedFlowRateForMoveLiquid = (args: {
   const tipLiquidSpecs = liquidClass?.byPipette
     .find(byPipette => byPipette.pipetteModel === pipetteName)
     ?.byTipType.find(byTipType => byTipType.tiprack === tiprack)
+  // TODO: this won't find the definition for a custom tiprack
   const tiprackDef = getAllDefinitions()[tiprack]
+  console.assert(
+    tiprackDef != null,
+    `could not find labware definition for ${tiprack}`
+  )
   let correctionVolume: number = 0
   if (tipLiquidSpecs != null && flowRateType !== 'blowout') {
     const liquidClassLookup =
@@ -127,10 +132,10 @@ const getClippedFlowRateForMoveLiquid = (args: {
       ) ?? 0
   }
 
-  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipetteSpecs,
     volume,
-    formData.tipRack as string
+    tiprackDef
   )
 
   const shaftULperMM = pipetteSpecs?.shaftULperMM

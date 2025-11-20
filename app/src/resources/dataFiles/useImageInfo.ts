@@ -17,6 +17,7 @@ const IMAGE_METADATA_POLL_MS = 5000
 
 export interface UseImagesInfoItem {
   imageId: string
+  filename: string
   stepCommandId: string
   previousStepCommandId: string
   timestamp: string
@@ -48,12 +49,26 @@ export function useImageInfo(runId: string): UseImagesInfoResult {
   )
   const items = useMemo(() => {
     if (data == null) return []
-    return data.data.map(img => ({
-      imageId: img.id,
-      stepCommandId: img.commandId ?? '',
-      previousStepCommandId: img.prevCommandId ?? '',
-      timestamp: format(new Date(String(img.createdAt)), 'M/d/yy HH:mm:ss'),
-    }))
+
+    return data.data.map(img => {
+      const timestamp = (() => {
+        try {
+          if (img?.createdAt == null) return ''
+          return format(new Date(String(img.createdAt)), 'M/d/yy HH:mm:ss')
+        } catch (error) {
+          console.warn('Invalid timestamp:', img?.createdAt)
+          return ''
+        }
+      })()
+
+      return {
+        imageId: img.id,
+        filename: img.filename,
+        stepCommandId: img.commandId ?? '',
+        previousStepCommandId: img.prevCommandId ?? '',
+        timestamp,
+      }
+    })
   }, [data])
   return { items, protocolAnalysis, isLoadingImages, allRunDefs }
 }

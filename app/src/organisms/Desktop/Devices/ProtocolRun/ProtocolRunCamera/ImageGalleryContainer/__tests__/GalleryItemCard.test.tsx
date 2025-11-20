@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -11,7 +11,7 @@ import type { RobotType } from '@opentrons/shared-data'
 import type { UseImageGalleryDataProps } from '/app/local-resources/images/hooks/useImageGalleryData'
 
 vi.mock('/app/resources/dataFiles/useImage')
-vi.mock('../GalleryItemOverflowMenu')
+vi.mock('/app/redux/discovery/selectors')
 
 const render = (props: UseImageGalleryDataProps) => {
   return renderWithProviders(
@@ -38,6 +38,7 @@ const MOCK_IMAGE_ITEM = {
   stepCommandId: 'step1',
   previousStepCommandId: 'step2',
   timestamp: '2024-01-01 12:00:00',
+  filename: 'test-filename',
 }
 const MOCK_RUN_ID = 'run123'
 describe('GalleryItemCard', () => {
@@ -77,5 +78,19 @@ describe('GalleryItemCard', () => {
     screen.getByText('Step ? / ?: ?')
     screen.getByText('View image')
     screen.getByText('2024-01-01 12:00:00')
+  })
+
+  it('shows overflow menu and calls actions when clicked', () => {
+    render(mockProps)
+
+    const overflowButton = screen.getByRole('button')
+    fireEvent.click(overflowButton)
+
+    const downloadItem = screen.getByText('Download image')
+    expect(downloadItem).toBeInTheDocument()
+
+    fireEvent.click(downloadItem)
+
+    expect(screen.queryByText('Download image')).toBeNull()
   })
 })

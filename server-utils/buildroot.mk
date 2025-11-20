@@ -32,5 +32,4 @@ ot_server_utils_name := python-opentrons-server-utils
 # Calling inner-python-package directly instead of using python-package macro
 # because our directory layout doesn’t conform to buildroot’s expectation of
 # having the directory name be the package name
-$(eval $(call inner-python-package,$(ot_server_utils_name),$(call UPPERCASE,$(ot_server_utils_name)),$(call UPPERCASE,$(ot_server_utils_name)),target))
-
+$(eval $(call inner-python-hatch-package,$(ot_server_utils_name),$(call UPPERCASE,$(ot_server_utils_name)),$(call UPPERCASE,$(ot_server_utils_name)),target))

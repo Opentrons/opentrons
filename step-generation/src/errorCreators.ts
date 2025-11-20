@@ -342,10 +342,19 @@ export const retractBelowDispense = (): CommandCreatorError => {
   }
 }
 
-export const multiDispenseValuesNotFound = (): CommandCreatorError => {
+export const multiAspirateVolumeTooHigh = (): CommandCreatorError => {
   return {
-    type: 'MULTI_DISPENSE_VALUES_NOT_FOUND',
-    message: 'Multi dispense values not found for liquid class',
+    type: 'MULTI_ASPIRATE_VOLUME_TOO_HIGH',
+    message:
+      'Consolidate pipette path was selected but cannot fit volume for more than 1 well in the tip',
+  }
+}
+
+export const multiDispenseVolumeTooHigh = (): CommandCreatorError => {
+  return {
+    type: 'MULTI_DISPENSE_VOLUME_TOO_HIGH',
+    message:
+      'Distribute pipette path was selected but cannot fit volume for more than 1 well in the tip',
   }
 }
 

@@ -1,21 +1,55 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useSearchParams } from 'react-router-dom'
 
 import { Chip } from '@opentrons/components'
 
 import { useHlsVideo } from '/app/pages/Desktop/LivestreamViewer/hooks/useHlsVideo'
+import { useReportWindowDurationEvent } from '/app/pages/Desktop/LivestreamViewer/hooks/useReportWindowDurationEvent'
 import {
   LivestreamInfoScreen,
   useLivestreamInfoScreen,
 } from '/app/pages/Desktop/LivestreamViewer/LivestreamInfoScreen'
+import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import styles from './livestream.module.css'
 
+const RUN_POLLING_INTERVAL_MS = 5000
+
 export function LivestreamViewer(): JSX.Element {
-  const { videoRef, videoError } = useHlsVideo()
-  const [searchParams] = useSearchParams()
-  const runId = searchParams.get('runId') ?? ''
-  const infoScreenType = useLivestreamInfoScreen(runId, videoError)
+  // We make UI affordances when a run has ended, even if it is un-currented.
+  // The livestream viewer makes the assumption that it will not *initially* render
+  // for a run that is already historical.
+  const [retainedRunId, setRetainedRunId] = useState<string | null>(null)
+  const currentRunId = useCurrentRunId({
+    refetchInterval: RUN_POLLING_INTERVAL_MS,
+  })
+
+  if (currentRunId != null && currentRunId !== retainedRunId) {
+    setRetainedRunId(currentRunId)
+  }
+
+  const { data: runData, isLoading: isRunLoading } = useNotifyRunQuery(
+    retainedRunId,
+    {
+      refetchInterval: RUN_POLLING_INTERVAL_MS,
+    }
+  )
+  const isCurrentRunLoading = retainedRunId == null || isRunLoading
+  const runStatus = runData?.data.status ?? null
+  const cameraData = runData?.data.cameraSettings ?? null
+  const { videoRef, videoError } = useHlsVideo(runStatus, cameraData)
+  const infoScreenType = useLivestreamInfoScreen(
+    runStatus,
+    cameraData,
+    isCurrentRunLoading,
+    videoError
+  )
+
+  useReportWindowDurationEvent(
+    retainedRunId,
+    runStatus,
+    cameraData?.liveStreamEnabled ?? false
+  )
 
   return (
     <div className={styles.container}>

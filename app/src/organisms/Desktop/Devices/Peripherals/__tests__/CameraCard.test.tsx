@@ -3,13 +3,11 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
-
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useCameraUsageSettings } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
-import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
+import { useFeatureFlag } from '/app/redux/config'
 
 import { CameraCard } from '../CameraCard'
 
@@ -18,7 +16,8 @@ import type { CameraCardProps } from '../CameraCard'
 
 vi.mock('/app/organisms/Desktop/Camera/CameraControls')
 vi.mock('/app/local-resources/images/hooks/useCameraUsageSettings')
-vi.mock('/app/resources/runs')
+vi.mock('/app/redux/config')
+vi.mock('/app/redux/discovery/selectors')
 
 const mockNavigate = vi.fn()
 vi.mock('react-router-dom', async () => {
@@ -48,17 +47,15 @@ describe('CameraCard', () => {
     mockProps = {
       isFlex: false,
       robotName: 'test-robot',
+      isRobotBusy: false,
     }
     mockToggleEnabled = vi.fn()
     vi.mocked(CameraControls).mockReturnValue(<div>MOCK_CAMERA_CONTROLS</div>)
-    vi.mocked(useCurrentRunId).mockReturnValue(null)
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { status: RUN_STATUS_IDLE } },
-    } as any)
     vi.mocked(useCameraUsageSettings).mockReturnValue({
       isCameraEnabled: true,
       toggleCameraEnabled: mockToggleEnabled,
     } as any)
+    vi.mocked(useFeatureFlag).mockReturnValue(true)
   })
 
   it('renders camera card with OT-2 image for non-Flex robot', () => {
@@ -78,11 +75,19 @@ describe('CameraCard', () => {
     expect(image.getAttribute('src')).toContain('system_camera_flex.png')
   })
 
-  it('renders on deck and camera text', () => {
-    render(mockProps)
+  it('renders on deck and camera text for Flex robot', () => {
+    const flexProps = { ...mockProps, isFlex: true }
+    render(flexProps)
 
     screen.getByText('On Deck')
-    screen.getByText('Camera')
+    screen.getByText('Flex Camera')
+  })
+
+  it('renders on deck and camera text for OT-2 robot', () => {
+    const ot2Props = { ...mockProps, isFlex: false }
+    render(ot2Props)
+    screen.getByText('On Deck')
+    screen.getByText('OT-2 Camera')
   })
 
   it('renders enabled chip by default', () => {
@@ -105,12 +110,7 @@ describe('CameraCard', () => {
   })
 
   it('overflow button is disabled when run exists and is not idle', () => {
-    vi.mocked(useCurrentRunId).mockReturnValue('test-run-id')
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { status: RUN_STATUS_RUNNING } },
-    } as any)
-
-    render(mockProps)
+    render({ ...mockProps, isRobotBusy: true })
 
     const overflowButton = screen.getByLabelText('overflow')
     expect(overflowButton).toBeDisabled()
