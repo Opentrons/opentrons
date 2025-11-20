@@ -18,7 +18,6 @@ import {
   getFlexHoverDimensions,
   getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
-  WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
 import styles from './deckviewoverlay.module.css'
