@@ -36,10 +36,14 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
   console.log('flexStackerState:', flexStackerState)
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing12}
-      width="100%"
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gridGap: SPACING.spacing8,
+        width: '100%',
+        paddingTop: SPACING.spacing16,
+      }}
     >
       <DropdownStepFormField
         options={flexStackerOptions}
@@ -57,6 +61,6 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         }}
       />
       {moduleId != null ? <>test flex stacker tools</> : null}
-    </Flex>
+    </div>
   )
 }
