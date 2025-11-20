@@ -160,7 +160,14 @@ export function useRunHeaderModalContainer({
           cameraEnabled: enabled,
           errorRecoveryCameraEnabled: recoveryEnabled,
         },
-      }).then(() => handlePlay())
+      })
+        .catch(error => {
+          console.warn(
+            'Failed to save camera settings, proceeding anyway',
+            error
+          )
+        })
+        .then(() => handlePlay())
     } else {
       return handlePlay()
     }

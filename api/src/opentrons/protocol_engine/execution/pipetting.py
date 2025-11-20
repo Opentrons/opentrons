@@ -1,4 +1,5 @@
 """Pipetting command handling."""
+
 from typing import Optional, Iterator, Tuple
 from typing_extensions import Protocol as TypingProtocol
 from contextlib import contextmanager
@@ -208,6 +209,9 @@ class HardwarePipettingHandler(PipettingHandler):
                 end_point=end_point,
                 volume=adjusted_volume,
                 movement_delay=movement_delay,
+                end_critical_point=self.get_state_view().motion.get_critical_point_for_wells_in_labware(
+                    labware_id
+                ),
             )
         return adjusted_volume
 
@@ -239,6 +243,9 @@ class HardwarePipettingHandler(PipettingHandler):
                 push_out=push_out,
                 is_full_dispense=is_full_dispense,
                 movement_delay=movement_delay,
+                end_critical_point=self.get_state_view().motion.get_critical_point_for_wells_in_labware(
+                    labware_id
+                ),
             )
         return adjusted_volume
 

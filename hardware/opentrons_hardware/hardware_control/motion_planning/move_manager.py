@@ -80,12 +80,15 @@ class MoveManager(Generic[AxisKey]):
         target_axes = move_info.unit_vector.keys()
         for axis in axes:
             if axis in target_axes:
-                move_target = MoveTarget.build(  # type: ignore[type-var]
-                    position=target,
-                    max_speed=float(
-                        speed * abs(1 / move_info.unit_vector[axis].item())
-                    ),
-                )
+                if not isclose(abs(move_info.unit_vector[axis].item()), 0):
+                    move_target = MoveTarget.build(  # type: ignore[type-var]
+                        position=target,
+                        max_speed=float(
+                            speed * abs(1 / move_info.unit_vector[axis].item())
+                        ),
+                    )
+                else:
+                    log.error("arguments to move resulted in a malformed target.")
         return move_target
 
     def ensure_pipette_flow_rate_unchanged(

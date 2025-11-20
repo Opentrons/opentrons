@@ -1,5 +1,5 @@
 .container {
-  padding: 0 var(--spacing-16) var(--spacing-16);
+  padding: 0 0 var(--spacing-16);
 }
 
 .controls_container {

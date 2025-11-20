@@ -143,6 +143,47 @@ class DispenseWhileTrackingImplementation(
             model_utils=self._model_utils,
             movement_delay=params.movement_delay,
         )
+
+        if isinstance(dispense_result, DefinedErrorData):
+            if isinstance(dispense_result.public, OverpressureError):
+                return DefinedErrorData(
+                    public=OverpressureError(
+                        id=dispense_result.public.id,
+                        createdAt=dispense_result.public.createdAt,
+                        wrappedErrors=dispense_result.public.wrappedErrors,
+                        errorInfo=dispense_result.public.errorInfo,
+                    ),
+                    state_update=dispense_result.state_update.set_liquid_operated(
+                        labware_id=params.labwareId,
+                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                            params.labwareId,
+                            params.wellName,
+                            params.pipetteId,
+                        ),
+                        volume_added=CLEAR,
+                    ),
+                    state_update_if_false_positive=dispense_result.state_update_if_false_positive,
+                )
+            elif isinstance(dispense_result.public, StallOrCollisionError):
+                return DefinedErrorData(
+                    public=StallOrCollisionError(
+                        id=dispense_result.public.id,
+                        createdAt=dispense_result.public.createdAt,
+                        wrappedErrors=dispense_result.public.wrappedErrors,
+                        errorInfo=dispense_result.public.errorInfo,
+                    ),
+                    state_update=dispense_result.state_update.set_liquid_operated(
+                        labware_id=params.labwareId,
+                        well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                            params.labwareId,
+                            params.wellName,
+                            params.pipetteId,
+                        ),
+                        volume_added=CLEAR,
+                    ),
+                    state_update_if_false_positive=dispense_result.state_update_if_false_positive,
+                )
+
         position_after_dispense = await self._gantry_mover.get_position(
             params.pipetteId
         )
@@ -151,22 +192,6 @@ class DispenseWhileTrackingImplementation(
             y=position_after_dispense.y,
             z=position_after_dispense.z,
         )
-
-        if isinstance(dispense_result, DefinedErrorData):
-            return DefinedErrorData(
-                public=dispense_result.public,
-                state_update=dispense_result.state_update.set_liquid_operated(
-                    labware_id=params.labwareId,
-                    well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
-                        params.labwareId,
-                        params.wellName,
-                        params.pipetteId,
-                    ),
-                    volume_added=CLEAR,
-                ),
-                state_update_if_false_positive=dispense_result.state_update_if_false_positive,
-            )
-
         return SuccessData(
             public=DispenseWhileTrackingResult(
                 volume=dispense_result.public.volume,

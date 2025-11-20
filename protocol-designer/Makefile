@@ -33,6 +33,7 @@ clean:
 
 .PHONY: build
 build: export NODE_ENV := production
+build: export NODE_OPTIONS := --max-old-space-size=8192
 build:
 	vite build
 	git rev-parse HEAD > dist/.commit
@@ -49,11 +50,13 @@ benchmarks:
 
 .PHONY: dev
 dev: export NODE_ENV := development
+dev: export NODE_OPTIONS := --max-old-space-size=8192
 dev:
 	vite serve
 
 # production assets server
 .PHONY: serve
+serve: export NODE_OPTIONS := --max-old-space-size=8192
 serve: all
 	vite preview
 

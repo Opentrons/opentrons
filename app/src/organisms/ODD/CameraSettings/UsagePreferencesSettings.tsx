@@ -60,7 +60,7 @@ export function UsagePreferencesSettings({
               className={styles.usage_subtext}
               oddStyle="level4HeaderRegular"
             >
-              {t('automatically_capture_image')}
+              {t('error_recovery_camera_description')}
             </StyledText>
           </div>
           <OnOffToggle isOn={isRecoveryCaptureEnabled} />

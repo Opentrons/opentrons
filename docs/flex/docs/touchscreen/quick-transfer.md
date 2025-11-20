@@ -42,7 +42,7 @@ If everything is set up correctly, you'll move on to selecting pipettes and tips
 
 Creating a quick transfer involves selecting a pipette and appropriate tips. Quick transfer can use any 1-, 8-, or 96-channel pipette that's attached to the robot. When selecting a pipette tip, try to match the tip to a pipette of the same capacity or larger. For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
 
-Beginning with robot software version 8.6.0, you can apply Opentrons-verified liquid class settings in a quick transfer. After choosing your pipette and tips, select the aqueous, viscous, or volatile liquid class to increase pipetting accuracy.
+Beginning with robot software version 8.6.0, you can apply Opentrons-verified liquid class settings in a quick transfer. Additionally, the release of robot software version 8.8.0 gives you the option to return tips to their original location, which can help you conserve them for future use. After choosing your pipette and tips, select the aqueous, viscous, or volatile liquid class to increase pipetting accuracy.
 
 ## Labware
 

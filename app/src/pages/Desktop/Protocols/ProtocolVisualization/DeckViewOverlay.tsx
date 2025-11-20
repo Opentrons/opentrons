@@ -5,6 +5,11 @@ import {
   COLORS,
   CURSOR_POINTER,
   RobotCoordsForeignObject,
+  WASTE_CHUTE_HEIGHT,
+  WASTE_CHUTE_WIDTH,
+  WASTE_CHUTE_X,
+  WASTE_CHUTE_Y,
+  WasteChute,
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
@@ -52,7 +57,8 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     setHoveredSlot,
     hover,
   } = props
-  const { stagingAreaEntities, moduleEntities } = invariantContext
+  const { stagingAreaEntities, moduleEntities, wasteChuteEntities } =
+    invariantContext
   const { modules } = robotState
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
 
@@ -65,6 +71,8 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const stagingAreaLocations = Object.values(stagingAreaEntities)?.map(
     stagingArea => stagingArea.location as string
   )
+  const wasteChuteOnSlot =
+    Object.values(wasteChuteEntities).length > 0 && slotId === 'D3'
 
   const cutoutId =
     getCutoutIdForAddressableArea(
@@ -86,45 +94,74 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
       slotPosition
     )
 
+    const callToActions = {
+      onClick: () => {
+        setSelectedSlot(slotId)
+      },
+      onMouseEnter: () => {
+        setHoveredSlot(slotId)
+      },
+      onMouseLeave: () => {
+        setHoveredSlot(null)
+      },
+    }
+
     return (
-      <RobotCoordsForeignObject
-        key={`${robotType.toLowerCase()}_slotOverlay`}
-        width={width}
-        height={height}
-        x={x}
-        y={y}
-        flexProps={{ flex: '1' }}
-        foreignObjectProps={{
-          opacity: hoverOpacity,
-          flex: '1',
-          cursor: CURSOR_POINTER,
-          textAlign: ALIGN_CENTER,
-          border: `3px solid ${COLORS.purple50}`,
-          borderRadius: '6px', // no const but matches the labware svg radius
-        }}
-        foreignObjectEvents={{
-          onClick: () => {
-            setSelectedSlot(slotId)
-          },
-          onMouseEnter: () => {
-            setHoveredSlot(slotId)
-          },
-          onMouseLeave: () => {
-            setHoveredSlot(null)
-          },
-        }}
-      >
-        {children != null ? (
-          <div className={styles.deck_overlay}>
-            <div
-              className={styles.text_background}
-              style={{ backgroundColor: slotFillColor }}
-            >
-              {children}
+      <>
+        <RobotCoordsForeignObject
+          key={`${robotType.toLowerCase()}_slotOverlay`}
+          width={width}
+          height={height}
+          x={x}
+          y={y}
+          flexProps={{ flex: '1' }}
+          foreignObjectProps={{
+            opacity: hoverOpacity,
+            flex: '1',
+            cursor: CURSOR_POINTER,
+            textAlign: ALIGN_CENTER,
+            border: `3px solid ${COLORS.purple50}`,
+            borderRadius: '6px', // no const but matches the labware svg radius
+          }}
+          foreignObjectEvents={callToActions}
+        >
+          {children != null ? (
+            <div className={styles.deck_overlay}>
+              <div
+                className={styles.text_background}
+                style={{ backgroundColor: slotFillColor }}
+              >
+                {children}
+              </div>
             </div>
-          </div>
+          ) : null}
+        </RobotCoordsForeignObject>
+        {/* This is to render the waste chute above the hover border - very gnarly but this
+            is what design wanted */}
+        {wasteChuteOnSlot != null ? (
+          <RobotCoordsForeignObject
+            width={WASTE_CHUTE_WIDTH}
+            height={WASTE_CHUTE_HEIGHT}
+            x={WASTE_CHUTE_X}
+            y={WASTE_CHUTE_Y}
+            flexProps={{
+              transform: 'rotate(180deg) scaleX(-1)',
+              width: '100%',
+            }}
+            foreignObjectProps={{
+              opacity: hoverOpacity,
+              cursor: CURSOR_POINTER,
+            }}
+            foreignObjectEvents={callToActions}
+          >
+            <WasteChute
+              key="wasteChute_hovered"
+              wasteIconColor={COLORS.grey35}
+              backgroundColor={COLORS.grey50}
+            />
+          </RobotCoordsForeignObject>
         ) : null}
-      </RobotCoordsForeignObject>
+      </>
     )
   } else {
     const { width, x, y, height } = getOT2HoverDimensions(

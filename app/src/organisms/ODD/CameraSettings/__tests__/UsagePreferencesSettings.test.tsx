@@ -54,7 +54,7 @@ describe('UsagePreferencesSettings', () => {
 
     screen.getByText('Error image capture')
     screen.getByText(
-      'Automatically capture an image of the deck in the event of an error.'
+      'Automatically capture an image of the deck if an error occurs.'
     )
   })
 
