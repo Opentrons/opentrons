@@ -254,8 +254,9 @@ async def run(  # noqa: C901
         try:
             # Assert there is no camera device at /dev/video2 to ensure it is removed
             print("Verifying camera not attached.")
+            active_result = CSVResult.FAIL
             assert not os.path.exists("/dev/video2")
-
+            active_result = CSVResult.PASS
             # write the SKU to EEPROM to indicate that this is a Flex model with no Camera
             print(f"Writing SKU {sku} to EEPROM.")
             eeprom_data = api._backend.eeprom_data  # type: ignore
@@ -270,6 +271,7 @@ async def run(  # noqa: C901
                 f"Confirming camera not attached failed with the following error: {e}"
             )
             removed_result = CSVResult.FAIL
+        report(section, "camera-active", [active_result])
         report(section, "camera-image", [removed_result])
     else:
         try:
