@@ -35,9 +35,9 @@ teardown-windows: clean-windows
 .PHONY: test
 test: clean
 	@echo "Running $(TESTS) tests for Unix-like system..."
-	$(VENV_DIR)/bin/python run_tests.py $(VENV_DIR) $(RESULTS_DIR) $(TESTS)
+	python run_tests.py $(VENV_DIR) $(RESULTS_DIR) $(TESTS)
 
 .PHONY: test-windows
 test-windows: clean-windows
 	@echo "Running $(TESTS) tests for Windows..."
-	$(VENV_DIR)/Scripts/python.exe run_tests.py $(VENV_DIR) $(RESULTS_DIR) $(TESTS)
+	python run_tests.py $(VENV_DIR) $(RESULTS_DIR) $(TESTS)
