@@ -466,7 +466,7 @@ def test_map_module_load(
                 module_id=matchers.IsA(str),
                 definition=test_definition,
                 slot_name=DeckSlotName.SLOT_1,
-                requested_model=ModuleModel.TEMPERATURE_MODULE_V2,
+                requested_model=ModuleModel.TEMPERATURE_MODULE_V1,
                 serial_number="module-serial",
             )
         ),

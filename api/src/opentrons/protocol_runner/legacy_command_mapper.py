@@ -846,7 +846,7 @@ class LegacyCommandMapper:
             module_id=module_id,
             definition=loaded_definition,
             slot_name=module_load_info.deck_slot,
-            requested_model=loaded_model,
+            requested_model=requested_model,
             serial_number=module_load_info.module_serial,
         )
         succeed_action = pe_actions.SucceedCommandAction(
