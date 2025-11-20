@@ -4,8 +4,9 @@ import {
   isAddressableAreaStandardSlot,
 } from '@opentrons/shared-data'
 
+import { getSlotIsEmpty } from '../utils/getSlotIsEmpty'
+import { getStagingAreaAddressableAreas } from '../utils/getStagingAreaAddressableAreas'
 import { DeckViewOverlay } from './DeckViewOverlay'
-import { getSlotIsEmpty, getStagingAreaAddressableAreas } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {

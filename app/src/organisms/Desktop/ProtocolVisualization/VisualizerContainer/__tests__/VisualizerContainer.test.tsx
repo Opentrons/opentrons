@@ -2,19 +2,19 @@ import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
+import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
+import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
 import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 
-import { CommandSteps } from '../CommandSteps'
-import { DeckView } from '../DeckView'
-import { VisualizerContainer } from '../VisualizerContainer'
+import { VisualizerContainer } from '../../../../../organisms/Desktop/ProtocolVisualization/VisualizerContainer'
 
 import type { ComponentProps } from 'react'
 
 vi.mock('/app/organisms/Desktop/ProtocolVisualization/Controls')
 vi.mock('/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer')
-vi.mock('../CommandSteps')
-vi.mock('../DeckView')
+vi.mock('/app/organisms/Desktop/ProtocolVisualization/CommandSteps')
+vi.mock('/app/organisms/Desktop/ProtocolVisualization/DeckView')
 
 const render = (props: ComponentProps<typeof VisualizerContainer>) => {
   return renderWithProviders(<VisualizerContainer {...props} />)[0]
@@ -49,6 +49,9 @@ const mockAnalysis = {
       'protocol-designer@chore_release-pd-8.6.0-20251016-222252',
     source: 'Protocol Designer',
   },
+  modules: [],
+  labware: [],
+  pipettes: [],
   result: 'ok',
   robotType: 'OT-3 Standard',
   runTimeParameters: [],

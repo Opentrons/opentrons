@@ -184,6 +184,14 @@ export const absorbanceReaderNoGripper = (): CommandCreatorError => {
   }
 }
 
+export const flexStackerNoGripper = (): CommandCreatorError => {
+  return {
+    type: 'FLEX_STACKER_NO_GRIPPER',
+    message:
+      'This step involves a gripper. Add a gripper or remove step to proceed.',
+  }
+}
+
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',

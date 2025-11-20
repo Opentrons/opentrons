@@ -8,14 +8,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
+import { getActiveLayer } from '../utils/getActiveLayer'
+import { getModuleInnerProps } from '../utils/getModuleInnerProps'
+import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOnModuleFromStack'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { LabwareOnDeck } from './LabwareOnDeck'
 import { ModuleCommandSummary } from './ModuleCommandSummary'
-import {
-  getActiveLayer,
-  getModuleInnerProps,
-  getTopmostLabwareOnModuleFromStack,
-} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
@@ -26,7 +24,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
-import type { LabwareEntityExtended } from './DeckView'
+import type { LabwareEntityExtended } from '../../../../organisms/Desktop/ProtocolVisualization/DeckView'
 
 interface DeckViewModulesProps {
   robotState: RobotState

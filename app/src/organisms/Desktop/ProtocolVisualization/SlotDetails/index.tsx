@@ -2,12 +2,12 @@ import { Divider, RobotInfoLabel, StyledText } from '@opentrons/components'
 import { getModuleDeckLabel } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
-import { LabwareSlotContainer } from '/app/organisms/Desktop/ProtocolVisualization/LabwareSlotContainer'
+import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
-import { ModuleSlotDetails } from './ModuleSlotDetails'
-import { SlotDetailsEmptyState } from './SlotDetailsEmptyState'
-import { TrashSlotDetails } from './TrashSlotDetails'
-import styles from './visualization.module.css'
+import { LabwareSlotContainer } from '../LabwareSlotContainer'
+import { ModuleSlotDetails } from '../ModuleSlotDetails'
+import { TrashSlotDetails } from '../TrashSlotDetails'
+import styles from './slotdetails.module.css'
 
 import type {
   Liquid,

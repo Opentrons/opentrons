@@ -16,7 +16,7 @@ import {
 } from '@opentrons/step-generation'
 
 import styles from './labwareslotcontainer.module.css'
-import { getAllWellContentsAtFrame } from './utils'
+import { getAllWellContentsAtFrame } from './utils/getAllWellContentsAtFrame'
 import { WellContainer } from './WellContainer'
 import { WellTooltip } from './WellTooltip'
 

@@ -1,14 +1,12 @@
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { getFixtureSummaryInfo } from '../utils/getFixtureSummaryInfo'
+import { getSlotIdsBlockedBySpanningForThermocycler } from '../utils/getSlotIdsBlockedBySpanningForThermocycler'
 import { DeckViewLabware } from './DeckViewLabware'
 import { DeckViewModules } from './DeckViewModules'
 import { DeckViewSlots } from './DeckViewSlots'
 import { FixtureCommandSummary } from './FixtureCommandSummary'
 import { Ot2FixedTrashCommandSummary } from './Ot2FixedTrashCommandSummary'
-import {
-  getFixtureSummaryInfo,
-  getSlotIdsBlockedBySpanningForThermocycler,
-} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -22,7 +20,7 @@ import type {
   InvariantContext,
   TimelineFrame,
 } from '@opentrons/step-generation'
-import type { LabwareEntityExtended } from './DeckView'
+import type { LabwareEntityExtended } from '.'
 
 interface DeckViewDetailsProps {
   labwareEntitiesExtended: Record<string, LabwareEntityExtended>

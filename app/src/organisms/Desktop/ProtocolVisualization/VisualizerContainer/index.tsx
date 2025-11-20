@@ -6,17 +6,17 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
-  constructInvariantContextFromRunCommands,
+  constructInvariantContextFromAnalysis,
   getResultingTimelineFrameFromRunCommands,
 } from '@opentrons/step-generation'
 
+import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
+import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
 import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 import { stepDetailViewerOpenAction } from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
-import { CommandSteps } from './CommandSteps'
-import { DeckView } from './DeckView'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
@@ -89,11 +89,11 @@ export function VisualizerContainer(
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromRunCommands =
-    constructInvariantContextFromRunCommands(commands)
+  const invariantContextFromAnalysis =
+    constructInvariantContextFromAnalysis(analysis)
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
-    invariantContextFromRunCommands
+    invariantContextFromAnalysis
   )
 
   const handlePlayPause = (): void => {

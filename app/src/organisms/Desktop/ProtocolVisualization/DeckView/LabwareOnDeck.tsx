@@ -4,7 +4,8 @@ import {
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
-import { getAllWellContentsAtFrame, getMissingTips } from './utils'
+import { getAllWellContentsAtFrame } from '../utils/getAllWellContentsAtFrame'
+import { getMissingTips } from '../utils/getMissingTips'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
