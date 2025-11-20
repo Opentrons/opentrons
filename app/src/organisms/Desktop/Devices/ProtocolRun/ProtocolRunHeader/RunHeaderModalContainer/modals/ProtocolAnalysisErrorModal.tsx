@@ -73,7 +73,7 @@ export function ProtocolAnalysisErrorModal({
   robotName,
   displayName,
 }: ProtocolAnalysisErrorModalProps): JSX.Element {
-  const { t } = useTranslation(['run_details', 'shared'])
+  const { t, i18n } = useTranslation(['run_details', 'shared'])
 
   return createPortal(
     <Modal
@@ -107,7 +107,7 @@ export function ProtocolAnalysisErrorModal({
           onClick={onClose}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
-            {t('shared:close')}
+            {i18n.format(t('shared:close'), 'capitalize')}
           </StyledText>
         </PrimaryButton>
       </Flex>
