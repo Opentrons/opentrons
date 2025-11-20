@@ -296,7 +296,7 @@ class ModuleContext(CommandPublisher):
             definition: The labware definition.
             label (str): An optional special name to give the labware. If
                 specified, this is the name the labware will appear as in the
-                run log and the calibration view in the Opentrons app.
+                run log and the calibration view in the Opentrons App.
 
         Returns:
             The initialized and loaded labware object.
@@ -438,7 +438,7 @@ class TemperatureModuleContext(ModuleContext):
     An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
-    created through [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
+    created through [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
     *New in version 2.0*
     """
@@ -540,7 +540,7 @@ class MagneticModuleContext(ModuleContext):
     An object representing a connected Magnetic Module.
 
     It should not be instantiated directly; instead, it should be
-    created through [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
+    created through [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
     *New in version 2.0*
     """
@@ -650,7 +650,7 @@ class ThermocyclerContext(ModuleContext):
     """An object representing a connected Thermocycler Module.
 
     It should not be instantiated directly; instead, it should be
-    created through [`load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
+    created through [`ProtocolContext.load_module()`][opentrons.protocol_api.ProtocolContext.load_module].
 
     *New in version 2.0*
     """
@@ -844,7 +844,7 @@ class ThermocyclerContext(ModuleContext):
         block_max_volume: Optional[float] = None,
     ) -> Task:
         """
-        Start a Thermocycler profile and return a `Task` representing its execution.
+        Start a Thermocycler profile and return a [`Task`][opentrons.protocol_api.Task] representing its execution.
         Profile is defined as a cycle of `steps`, for a given number of `repetitions`.
 
         Returns a task object that represents concurrent execution of the profile.
@@ -924,7 +924,7 @@ class ThermocyclerContext(ModuleContext):
         - `holding at target`: The lid has reached its target temperature
           and is actively maintaining that temperature.
         - `cooling`: The lid has previously heated and is now passively cooling.
-            `The Thermocycler lid does not have active cooling.`
+            *The Thermocycler lid does not have active cooling.*
         - `heating`: The lid is heating to a target temperature.
         - `idle`: The lid has not heated since the beginning of the protocol.
         - `error`: The temperature status can't be determined.
@@ -1098,7 +1098,7 @@ class HeaterShakerContext(ModuleContext):
         - `closing`: The latch is currently closing (in motion).
         - `idle_closed`: The latch is closed and not moving.
         - `idle_unknown`: The default status upon reset, regardless of physical latch position.
-          Use [`close_labware_latch`][opentrons.protocol_api.HeaterShakerContext.close_labware_latch] before other commands
+          Use [`close_labware_latch()`][opentrons.protocol_api.HeaterShakerContext.close_labware_latch] before other commands
           requiring confirmation that the latch is closed.
         - `unknown`: The latch status can't be determined.
         """
@@ -1325,7 +1325,7 @@ class AbsorbanceReaderContext(ModuleContext):
                 `350` and `1000`.
                 - The list must contain only one item when initializing a single measurement.
                 - The list can contain one to six items when initializing a multiple measurement.
-                reference_wavelength: An optional reference wavelength, in nm. If provided,
+            reference_wavelength: An optional reference wavelength, in nm. If provided,
                 [`read()`][opentrons.protocol_api.AbsorbanceReaderContext.read] will read at the
                 reference wavelength and then subtract the reference wavelength values from the
                 measurement wavelength values. Can only be used with single measurements.
