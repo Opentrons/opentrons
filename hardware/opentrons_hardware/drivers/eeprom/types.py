@@ -69,3 +69,4 @@ class EEPROMData:
     machine_version: Optional[str] = None
     programmed_date: Optional[datetime] = None
     unit_number: Optional[int] = None
+    
