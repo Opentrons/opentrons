@@ -42,7 +42,7 @@ class RobotContext(publisher.CommandPublisher):
     position, controlling the gripper jaw, or moving individual pipette motors.
 
     Objects in this class should not be instantiated directly. Instead, instances are
-    returned by [`robot()`][opentrons.protocol_api.ProtocolContext.robot].
+    returned by [`ProtocolContext.robot()`][opentrons.protocol_api.ProtocolContext.robot].
 
     *New in version 2.22*
     """
@@ -87,7 +87,7 @@ class RobotContext(publisher.CommandPublisher):
                 an instance of [`Mount`][opentrons.types.Mount] or one of the strings
                 `"left"`, `"right"`, `"extension"`, `"gripper"`. Note that the gripper
                 mount can be referred to either as `"extension"` or `"gripper"`.
-                destination: Any location on the deck, specified as:
+            destination: Any location on the deck, specified as:
 
                 - A slot, like `"A1"`.
                 - A defined location, like labware in a deck slot.
@@ -213,9 +213,9 @@ class RobotContext(publisher.CommandPublisher):
     ) -> AxisMapType:
         """
         Build an axis map from a location to provide to
-        either [`move_axes_to()`][opentrons.protocol_api.RobotContext.move_axes_to] or
-        [`move_axes_relative()`][opentrons.protocol_api.RobotContext.move_axes_relative].
-        You must provide only one of either a `location`, `slot`, or `module` to build
+        either [`RobotContext.move_axes_to()`][opentrons.protocol_api.RobotContext.move_axes_to] or
+        [`RobotContext.move_axes_relative()`][opentrons.protocol_api.RobotContext.move_axes_relative].
+        You must provide only one of either a location, slot, or module to build
         the axis map.
 
         Args:
