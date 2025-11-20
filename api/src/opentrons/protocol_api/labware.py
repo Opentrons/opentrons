@@ -447,9 +447,9 @@ class Labware:
 
     Create `Labware` objects by calling the appropriate `load_labware()` method,
     depending on where you are loading the labware. For example, to load labware on a
-    Thermocycler Module, use [`load_labware()`][opentrons.protocol_api.ThermocyclerContext.load_labware].
+    Thermocycler Module, use [`ThermocyclerContext.load_labware()`][opentrons.protocol_api.ThermocyclerContext.load_labware].
     To load labware directly on the deck, use
-    [`load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. See
+    [`ProtocolContext.load_labware()`][opentrons.protocol_api.ProtocolContext.load_labware]. See
     [Loading Labware][loading-labware-api].
     """
 
@@ -884,7 +884,7 @@ class Labware:
                 <ul>
                     <li>Offsets apply to any labware of the same type, in the same on-deck location.</li>
                     <li>Offsets can't be set on labware that is currently off-deck.</li>
-                    <li>Offsets do not follow a labware instance when using <a href="../protocols.md#move_labware">`move_labware()`</a>.</li>
+                    <li>Offsets do not follow a labware instance when using <a href="../protocols/#opentrons.protocol_api.ProtocolContext.move_labware"><code>move_labware()</code></a>.</li>
                 </ul>
                 </td>
             </tr>
@@ -900,7 +900,7 @@ class Labware:
             by running Labware Position Check in the Opentrons App.
 
             This method is designed for use with mechanisms like
-            [`get_protocol_api()`][opentrons.execute.get_protocol_api], which lack an
+            [`opentrons.execute.get_protocol_api()`][opentrons.execute.get_protocol_api], which lack an
             interactive way to adjust labware offsets. (See
             [Advanced Control][protocol-structure].)
 
@@ -927,7 +927,7 @@ class Labware:
         """The front-left-bottom corner of the labware, including its labware offset.
 
         The offset is an x, y, z vector in deck coordinates
-        (see :ref:`protocol-api-deck-coords`).
+        (see [Position Relative to the Deck][position-relative-to-the-deck]).
 
         When running a protocol in the Opentrons App or on the touchscreen, Labware
         Position Check sets the labware offset.
