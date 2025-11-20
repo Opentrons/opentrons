@@ -83,7 +83,7 @@ describe('DisposalVolume', () => {
     await user.click(screen.getByText('Continue'))
     screen.getByText('Select blowout location')
     screen.getByText('Continue')
-    screen.getByText('Trash bin')
+    screen.getByText('Trash bin in C3')
     screen.getByText('Source well')
   })
 
