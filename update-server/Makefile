@@ -57,7 +57,7 @@ teardown:
 
 .PHONY: test
 test:
-	$(python) -m pytest $(test_opts) $(tests)
+	$(pytest) $(test_opts) $(tests)
 
 .PHONY: lint
 lint:

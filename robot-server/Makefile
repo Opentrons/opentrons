@@ -55,12 +55,12 @@ clean_all_cmd = $(clean_cmd) dist
 # todo(mm, 2021-07-08): Figure out how to run the server with Python development
 # mode enabled, to expose more errors and warnings.
 #   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
-#     doesn't work because it applies the variable to the whole `pipenv run`
+#     doesn't work because it applies the variable to the whole `uv run`
 #     command, and we only want our inner server process running under dev mode,
-#     not the outer pipenv process.
+#     not the outer uv process.
 #   * Adding PYTHONDEVMODE=1 to the .env file specified by
 #     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
-#   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
+#   * Doing `uv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
@@ -109,13 +109,13 @@ wheel: $(ot_sources)
 
 .PHONY: test
 test:
-	uv run pytest $(tests) $(test_opts)
+	$(pytest) $(tests) $(test_opts)
 
 .PHONY: test-cov
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
-.PHONT: test-fast
+.PHONY: test-fast
 test-fast:
 	$(pytest) $(tests) $(test_opts) -m 'not slow'
 

@@ -68,7 +68,7 @@ teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	rm -rf .venv
+	$(UV) venv --remove
 
 
 .PHONY: clean
@@ -126,7 +126,7 @@ deploy: wheel sdist
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
+	$(pytest) --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
 
 
 .PHONY: generate-schema
