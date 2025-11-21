@@ -74,12 +74,10 @@ async def test_create_task(
     task = await subject.create_task(_task)
     await asyncio.wait_for(task_ran.wait(), timeout=0.25)
     await task.asyncioTask
+    await asyncio.sleep(0.25)
     assert task.createdAt == created_timestamp
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task)),
-        times=1,
-    )
-    decoy.verify(
+        action_dispatcher.dispatch(StartTaskAction(task=task)),
         action_dispatcher.dispatch(
             FinishTaskAction(
                 task_id=matchers.Anything(), finished_at=matchers.Anything(), error=None
@@ -263,7 +261,7 @@ async def test_generates_cancelled_error(
     task.asyncioTask.cancel(msg="Cancel task")
     try:
         await asyncio.wait_for(task.asyncioTask, timeout=0.25)
-    except (asyncio.CancelledError):
+    except asyncio.CancelledError:
         pass
     decoy.verify(
         action_dispatcher.dispatch(
