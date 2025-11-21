@@ -27,7 +27,6 @@ vi.mock('../CalibrationDetails/PipetteOffsetCalibrationItems')
 
 const mockFormattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[] =
   []
-const mockUpdateRobotStatus = vi.fn()
 
 const render = (
   props?: Partial<ComponentProps<typeof RobotSettingsPipetteOffsetCalibration>>
@@ -38,7 +37,7 @@ const render = (
         mockFormattedPipetteOffsetCalibrations
       }
       robotName="otie"
-      updateRobotStatus={mockUpdateRobotStatus}
+      isRobotBusy={false}
       {...props}
     />,
     {

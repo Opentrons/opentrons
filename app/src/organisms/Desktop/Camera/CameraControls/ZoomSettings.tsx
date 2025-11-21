@@ -57,7 +57,6 @@ function ZoomBtn({
     adjustZoom(btnZoomValue)
   }
   const isActive = currentZoom === btnZoomValue
-
   const buildBtnCopy = (): string => {
     switch (btnZoomValue) {
       case '1x':
@@ -75,6 +74,7 @@ function ZoomBtn({
       title={btnZoomValue}
       subText={buildBtnCopy()}
       isActive={isActive}
+      isOnDevice={false}
     />
   )
 }

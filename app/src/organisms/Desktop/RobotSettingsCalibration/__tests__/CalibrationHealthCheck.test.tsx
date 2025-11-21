@@ -10,28 +10,14 @@ import {
   ANALYTICS_CALIBRATION_HEALTH_CHECK_BUTTON_CLICKED,
   useTrackEvent,
 } from '/app/redux/analytics'
-import {
-  mockPipetteOffsetCalibration1,
-  mockPipetteOffsetCalibration2,
-} from '/app/redux/calibration/pipette-offset/__fixtures__'
-import {
-  mockTipLengthCalibration1,
-  mockTipLengthCalibration2,
-} from '/app/redux/calibration/tip-length/__fixtures__'
 import { mockAttachedPipette } from '/app/redux/pipettes/__fixtures__'
-import {
-  useAttachedPipetteCalibrations,
-  useAttachedPipettes,
-} from '/app/resources/instruments'
+import { useAttachedPipettes } from '/app/resources/instruments'
 import { useRunStatuses } from '/app/resources/runs'
 
 import { CalibrationHealthCheck } from '../CalibrationHealthCheck'
 
 import type { ComponentProps } from 'react'
-import type {
-  AttachedPipettesByMount,
-  PipetteCalibrationsByMount,
-} from '/app/redux/pipettes/types'
+import type { AttachedPipettesByMount } from '/app/redux/pipettes/types'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/config')
@@ -43,16 +29,6 @@ vi.mock('/app/redux-resources/robots')
 const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
-} as any
-const mockAttachedPipetteCalibrations: PipetteCalibrationsByMount = {
-  left: {
-    offset: mockPipetteOffsetCalibration1,
-    tipLength: mockTipLengthCalibration1,
-  },
-  right: {
-    offset: mockPipetteOffsetCalibration2,
-    tipLength: mockTipLengthCalibration2,
-  },
 } as any
 
 const RUN_STATUSES = {
@@ -74,6 +50,7 @@ const render = (
       dispatchRequests={mockDispatchRequests}
       isPending={false}
       robotName="otie"
+      isRobotBusy={props?.isRobotBusy ?? false}
       {...props}
     />,
     {
@@ -118,11 +95,7 @@ describe('CalibrationHealthCheck', () => {
   })
 
   it('Health check button is disabled when a robot is running', () => {
-    vi.mocked(useRunStatuses).mockReturnValue({
-      ...RUN_STATUSES,
-      isRunRunning: true,
-    })
-    render()
+    render({ isRobotBusy: true })
     const button = screen.getByRole('button', { name: 'Check health' })
     expect(button).toBeDisabled()
   })
@@ -146,19 +119,5 @@ describe('CalibrationHealthCheck', () => {
         )
       ).toBeInTheDocument()
     })
-  })
-
-  it('health check button should be disabled if there is a running protocol', () => {
-    vi.mocked(useAttachedPipettes).mockReturnValue(mockAttachedPipettes)
-    vi.mocked(useAttachedPipetteCalibrations).mockReturnValue(
-      mockAttachedPipetteCalibrations
-    )
-    vi.mocked(useRunStatuses).mockReturnValue({
-      ...RUN_STATUSES,
-      isRunRunning: true,
-    })
-    render()
-    const button = screen.getByRole('button', { name: 'Check health' })
-    expect(button).toBeDisabled()
   })
 })

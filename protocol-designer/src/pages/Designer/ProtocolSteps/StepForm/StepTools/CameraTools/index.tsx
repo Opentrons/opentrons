@@ -58,7 +58,7 @@ export function CameraTools(): JSX.Element {
           description={<div />}
           content={
             <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.white}>
-              {t('image_capture')}
+              {t('protocol_steps:camera.capture_image')}
             </StyledText>
           }
         />

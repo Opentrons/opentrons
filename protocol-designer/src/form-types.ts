@@ -175,7 +175,7 @@ export type StepType =
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
-  camera: 'photo-camera',
+  camera: 'camera',
   comment: 'comment',
   moveLabware: 'ot-move',
   moveLiquid: 'transfer',

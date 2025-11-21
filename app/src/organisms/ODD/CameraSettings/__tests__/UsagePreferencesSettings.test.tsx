@@ -44,14 +44,18 @@ describe('UsagePreferencesSettings', () => {
     render(mockProps)
 
     screen.getByText('Live video')
-    screen.getByText('View real-time video of the deck during protocol runs.')
+    screen.getByText(
+      'View real-time video of the deck in the Opentrons App while running a protocol.'
+    )
   })
 
   it('renders error recovery setting card', () => {
     render(mockProps)
 
-    screen.getByText('Error recovery')
-    screen.getByText('Automatically capture an image of the deck on error.')
+    screen.getByText('Error image capture')
+    screen.getByText(
+      'Automatically capture an image of the deck if an error occurs.'
+    )
   })
 
   it('calls toggleLiveVideoEnabled when live video button is clicked', () => {
@@ -66,7 +70,7 @@ describe('UsagePreferencesSettings', () => {
   it('calls toggleRecoveryCaptureEnabled when recovery capture button is clicked', async () => {
     render(mockProps)
 
-    const listButton = screen.getByText('Error recovery')
+    const listButton = screen.getByText('Error image capture')
     fireEvent.click(listButton)
 
     expect(mockProps.toggleRecoveryCaptureEnabled).toHaveBeenCalledTimes(1)

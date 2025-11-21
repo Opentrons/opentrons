@@ -47,7 +47,6 @@ import type { SelectMultipleStepsAction } from '/protocol-designer/ui/steps'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
-  stepNumber: number
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   sidebarWidth: number
@@ -58,10 +57,11 @@ export interface ConnectedStepInfoProps {
 // gap but it's made out of internal padding), there are hover gaps in `ConcurrentStepGroup`s.
 const DEBOUNCE_DURATION_MS = 500
 
+// todo(mm, 2025-11-14): I've made a mess of ConnectedStepInfo and ConnectedStepContainer.
+// We should try to either merge them, or clarify each one's responsibilities.
 export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const {
     stepId,
-    stepNumber,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
@@ -69,6 +69,9 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const stepIds = useSelector(getOrderedStepIds)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
+  const stepNumber = useSelector(stepFormSelectors.getUserVisibleStepNumbers)[
+    stepId
+  ]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
   ]
@@ -93,7 +96,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const hoveredStep = useSelector(getHoveredStepId)
   const selectedStepId = useSelector(getSelectedStepId)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
+  const stepHierarchy = useSelector(stepFormSelectors.getSavedStepHierarchy)
   const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
   const selected: boolean =
@@ -152,7 +155,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
       if (isShiftKeyPressed) {
         stepsToSelect = getShiftSelectedSteps(
           selectedStepId,
-          orderedStepIds,
+          stepHierarchy,
           stepId,
           multiSelectItemIds,
           lastMultiSelectedStepId

@@ -7,16 +7,16 @@ import { PeripheralsInfo } from '..'
 import { renderWithProviders } from '../../../../__testing-utils__'
 import { i18n } from '../../../../assets/localization'
 
-import type { PeripheralsInfoProps } from '..'
+import type { ComponentProps } from 'react'
 
-const render = (props: PeripheralsInfoProps) => {
+const render = (props: ComponentProps<typeof PeripheralsInfo>) => {
   return renderWithProviders(<PeripheralsInfo {...props} />, {
     i18nInstance: i18n,
   })
 }
 
 describe('PeripheralsInfo', () => {
-  let mockProps: PeripheralsInfoProps
+  let mockProps: ComponentProps<typeof PeripheralsInfo>
 
   beforeEach(() => {
     mockProps = {

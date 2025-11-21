@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom'
 import {
   Chip,
   Divider,
+  Flex,
+  Icon,
   MenuItem,
   OverflowBtn,
   StyledText,
@@ -24,18 +26,19 @@ import {
 } from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
-import { useCurrentRunId } from '/app/resources/runs'
 
 import styles from './inputdevices.module.css'
 
 export interface CameraCardProps {
   isFlex: boolean
   robotName: string
+  isRobotBusy: boolean
 }
 
 export function CameraCard({
   isFlex,
   robotName,
+  isRobotBusy,
 }: CameraCardProps): JSX.Element {
   const { t } = useTranslation('device_details')
   const { handleOverflowClick, showOverflowMenu, setShowOverflowMenu } =
@@ -47,9 +50,7 @@ export function CameraCard({
     return isFlex ? systemCameraFlex : systemCameraOT2
   }
 
-  const runId = useCurrentRunId()
   const robotType = useRobotType(robotName)
-  const doesRunExist = runId != null
 
   const cardOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -98,22 +99,28 @@ export function CameraCard({
             >
               {t('on_deck')}
             </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('camera')}
-            </StyledText>
+            <div className={styles.card_photo_content_container}>
+              <Icon className={styles.icon_container} name="camera" />
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {isFlex ? t('branded:flex_camera') : t('ot2_camera')}
+              </StyledText>
+            </div>
           </div>
-          {isCameraEnabled ? (
-            <Chip type="success" hasIcon={false} text={t('enabled')} />
-          ) : (
-            <Chip type="neutral" hasIcon={false} text={t('disabled')} />
-          )}
+          <Flex width="fit-content">
+            <Chip
+              type={isCameraEnabled ? 'success' : 'neutral'}
+              hasIcon={false}
+              text={isCameraEnabled ? t('enabled') : t('disabled')}
+              chipSize="small"
+            />
+          </Flex>
         </div>
       </div>
       <div className={styles.card_overflow_btn}>
         <OverflowBtn
           aria-label="overflow"
           onClick={handleOverflowClick}
-          disabled={doesRunExist}
+          disabled={isRobotBusy}
         />
       </div>
       {showOverflowMenu && (

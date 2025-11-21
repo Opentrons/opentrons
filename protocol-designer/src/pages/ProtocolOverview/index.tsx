@@ -29,10 +29,6 @@ import {
   EditProtocolMetadataModal,
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
-import {
-  getEnableJsonExport,
-  getEnableTimelineScrubber,
-} from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
@@ -47,7 +43,6 @@ import { HardwareInfo } from './HardwareInfo'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 import { ProtocolMetadata } from './ProtocolMetadata'
-import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
 
@@ -81,8 +76,6 @@ export function ProtocolOverview(): JSX.Element {
   const navigate = useNavigate()
   const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
     useState<boolean>(false)
-  const enableJsonExport = useSelector(getEnableJsonExport)
-  const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
   const [showEditMetadataModal, setShowEditMetadataModal] =
     useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
@@ -129,12 +122,16 @@ export function ProtocolOverview(): JSX.Element {
   const { protocolName, description, created, lastModified, author } =
     formValues
   const metaDataInfo = [
-    { description },
-    { author },
-    { created: created != null ? format(created, DATE_ONLY_FORMAT) : t('na') },
+    { title: 'description', value: description ?? null },
+    { title: 'author', value: author ?? null },
     {
-      modified:
-        lastModified != null ? format(lastModified, DATETIME_FORMAT) : t('na'),
+      title: 'created',
+      value: created != null ? format(created, DATE_ONLY_FORMAT) : null,
+    },
+    {
+      title: 'modified',
+      value:
+        lastModified != null ? format(lastModified, DATETIME_FORMAT) : null,
     },
   ]
 
@@ -216,21 +213,6 @@ export function ProtocolOverview(): JSX.Element {
               whiteSpace={NO_WRAP}
               height="3.5rem"
             />
-            {enableJsonExport ? (
-              <LargeButton
-                buttonType="stroke"
-                buttonText="Export JSON"
-                onClick={() => {
-                  dispatch(loadFileActions.saveJSONProtocolFile())
-                }}
-                whiteSpace={NO_WRAP}
-                height="3.5rem"
-                iconName="arrow-right"
-                css={css`
-                  border: 2px solid ${COLORS.blue50};
-                `}
-              />
-            ) : null}
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
@@ -266,7 +248,6 @@ export function ProtocolOverview(): JSX.Element {
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
           >
-            {enableTimelineScrubber ? <ScrubberContainer /> : null}
             <StartingDeck
               robotType={robotType}
               setShowMaterialsListModal={setShowMaterialsListModal}

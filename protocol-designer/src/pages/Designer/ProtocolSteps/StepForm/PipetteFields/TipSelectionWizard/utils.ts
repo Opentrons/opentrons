@@ -42,6 +42,11 @@ import type { AccessibilityStatus, LabelPlacement } from './types'
 // arbitrary constant to show slots surrounding the selected tiprack
 // TODO: confirm this padding with Design
 const PADDING_MM_X = 50
+const BASE_OFFSET_X = 15
+const BASE_OFFSET_Y = 15
+
+// additional offset to account for irregular OT-2 8-channel pipette geometry (right "hump")
+const OFFSET_OT2_8_CHANNEL = 10
 
 export const getViewboxFromSelectedLabware = (
   selectedLabwareId: string,
@@ -101,14 +106,8 @@ export const getHoveredOffsetFromWell = (args: {
   const labware = labwareState[selectedTiprackId ?? '']
   const well = labware.def.wells[wellName]
   return {
-    x:
-      well.x +
-      xOffset -
-      (well.shape === 'circular' ? well.diameter : well.xDimension) / 2,
-    y:
-      well.y +
-      yOffset -
-      (well.shape === 'circular' ? well.diameter : well.yDimension) / 2,
+    x: well.x + xOffset,
+    y: well.y + yOffset,
   }
 }
 
@@ -316,7 +315,7 @@ export const getPlacementByViewboxAndPipetteSpec = (args: {
 
   // pipette is left of viewbox
   if (channels === 96) {
-    if (x < leftBound - BASE_OFFSET) {
+    if (x < leftBound - BASE_OFFSET_X) {
       return LABEL_PLACEMENT_RIGHT
     }
     // pipette is right of viewbox
@@ -340,8 +339,6 @@ export const getPlacementByViewboxAndPipetteSpec = (args: {
   return isCloserToLeft ? LABEL_PLACEMENT_RIGHT : LABEL_PLACEMENT_LEFT
 }
 
-const BASE_OFFSET = 15
-
 // TODO (nd: 2025/11/06): extend to top-right, top-left, etc. once different nozzle configurations are supported
 export const getLabelOffsetByPlacement = (args: {
   labelPlacement: LabelPlacement
@@ -349,25 +346,33 @@ export const getLabelOffsetByPlacement = (args: {
   labelHeight: number
   shadowWidth: number
   shadowHeight: number
+  isOt2EightChannel: boolean
 }): {
   x: number
   y: number
 } => {
-  const { labelPlacement, labelWidth, labelHeight, shadowWidth, shadowHeight } =
-    args
+  const {
+    labelPlacement,
+    labelWidth,
+    labelHeight,
+    shadowWidth,
+    shadowHeight,
+    isOt2EightChannel,
+  } = args
   let labelOffsetX: number = 0
   let labelOffsetY: number = 0
   if (labelPlacement === LABEL_PLACEMENT_BOTTOM) {
-    labelOffsetX = BASE_OFFSET
+    labelOffsetX = BASE_OFFSET_X
     labelOffsetY = -labelHeight + 2 * LABEL_BORDER_WIDTH_PX
   } else if (labelPlacement === LABEL_PLACEMENT_TOP) {
-    labelOffsetX = BASE_OFFSET
+    labelOffsetX = BASE_OFFSET_X
     labelOffsetY = shadowHeight - 2 * LABEL_BORDER_WIDTH_PX
   } else if (labelPlacement === LABEL_PLACEMENT_LEFT) {
-    labelOffsetY = BASE_OFFSET
+    labelOffsetY = BASE_OFFSET_Y
     labelOffsetX = -labelWidth
   } else if (labelPlacement === LABEL_PLACEMENT_RIGHT) {
-    labelOffsetY = BASE_OFFSET
+    labelOffsetY =
+      BASE_OFFSET_Y + (isOt2EightChannel ? OFFSET_OT2_8_CHANNEL : 0)
     labelOffsetX = shadowWidth - LABEL_BORDER_WIDTH_PX
   }
   return {

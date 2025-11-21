@@ -62,7 +62,6 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
   switch (action.type) {
     case CAMERA_STREAM_OPEN:
       return openCameraStream({
-        runId: action.payload.runId,
         windowTitle: action.payload.windowTitle,
         robotIp: action.payload.hostname,
         robotName: action.payload.robotName,
@@ -138,7 +137,7 @@ function openWindow(details: SecondaryWindowDetails): void {
   const newWindow = createUi()
   secondaryWindows.set(windowId, newWindow)
 
-  newWindow.webContents.once('did-finish-load', () => {
+  newWindow.webContents.on('did-finish-load', () => {
     log.debug(`Did finish load for ${type}`)
     newWindow.webContents.send('window-type', 'secondary')
   })
