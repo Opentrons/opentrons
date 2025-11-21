@@ -957,7 +957,7 @@ class ProtocolContext(CommandPublisher):
                 and it didn't function properly, so it was removed.
 
         Returns:
-            The loaded and initialized module: a
+            ModuleTypes: The loaded and initialized module, which may be a
                 [`AbsorbanceReaderContext`][opentrons.protocol_api.AbsorbanceReaderContext],
                 [`FlexStackerContext`][opentrons.protocol_api.FlexStackerContext],
                 [`HeaterShakerContext`][opentrons.protocol_api.HeaterShakerContext],

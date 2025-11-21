@@ -21,9 +21,11 @@ import os
 import sys
 import json
 import pkgutil
+from typing import List
 
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath('../sphinxext'))
+sys.path.insert(0, os.path.abspath('../_ext'))
 
 # -- General configuration ------------------------------------------------
 
@@ -44,6 +46,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinxext.opengraph',
     'sphinx_tabs.tabs',
+    'markdown_docstrings',
     # todo(mm, 2021-09-30): Remove numpydoc when we're done transitioning to
     # Google-style docstrings. github.com/Opentrons/opentrons/issues/7051
     'numpydoc'
@@ -83,7 +86,7 @@ author = 'Opentrons Labworks'
 # to use the latest-supported *apiLevel* instead of the *Python package version*?
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'scripts'))
-import python_build_utils
+import python_build_utils  # type: ignore[import-not-found]
 sys.path = sys.path[:-1]
 _vers = python_build_utils.get_version('api', 'robot-stack')
 
@@ -122,7 +125,7 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = []
+exclude_patterns: List[str] = []
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -378,7 +381,7 @@ latex_show_urls = 'footnote'
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = []
+man_pages: List[tuple] = []
 
 # If true, show URL addresses after external links.
 #
@@ -390,12 +393,27 @@ man_pages = []
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = []
+texinfo_documents: List[tuple] = []
 
 numpydoc_show_class_members = False
 
+napoleon_type_aliases = {
+    'optional': 'typing.Optional',
+    'Optional': 'typing.Optional',
+    'ModuleContext': 'opentrons.protocol_api.module_contexts.ModuleContext',
+    'DeckLocation': 'opentrons.types.DeckLocation',
+    'MeniscusTrackingTarget': 'opentrons.types.MeniscusTrackingTarget',
+    'NozzleLayout': 'opentrons.protocol_api._nozzle_layout.NozzleLayout',
+    'LiquidClassDefinitionDoesNotExist': (
+        'opentrons_shared_data.liquid_classes.LiquidClassDefinitionDoesNotExist'
+    ),
+    'UnexpectedTipRemovalError': (
+        'opentrons_shared_data.errors.exceptions.UnexpectedTipRemovalError'
+    ),
+}
+
 # TODO: fix invalid :any: references
-suppress_warnings = []
+suppress_warnings: List[str] = []
 
 # Documents to append as an appendix to all manuals.
 #
@@ -454,4 +472,14 @@ nitpick_ignore_regex = [
         "py:class",
         r".*AbstractLabware|APIVersion|LabwareLike|LoadedCoreMap|ModuleTypes|NoneType|OffDeckType|ProtocolCore|TaskCore|WellCore",
     ),  # laundry list of not fully qualified things
+    ("py:class", r"optional"),
+    ("py:class", r"ModuleContext"),
+    ("py:class", r"DeckLocation"),
+    ("py:class", r"MeniscusTrackingTarget"),
+    ("py:class", r"NozzleLayout"),
+]
+
+nitpick_ignore = [
+    ("py:exc", "LiquidClassDefinitionDoesNotExist"),
+    ("py:exc", "UnexpectedTipRemovalError"),
 ]

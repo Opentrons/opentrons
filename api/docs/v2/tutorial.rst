@@ -158,7 +158,6 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 
         .. image:: ../img/tutorial/initial-deck-map-flex.png
             :scale: 50 %
-            :name: Initial Deck State – Flex
             :align: center
             :alt: Flex deck map with a tip rack in slot D1, reservoir in slot D2, and well plate in slot D3.
     
@@ -179,7 +178,6 @@ For serial dilution, you need to load a tip rack, reservoir, and 96-well plate o
 
         .. image:: ../img/tutorial/initial-deck-map.png
             :scale: 50 %
-            :name: Initial Deck State – OT-2
             :align: center
             :alt: OT-2 deck map with a tip rack in slot 1, reservoir in slot 2, and well plate in slot 3.
 
