@@ -143,19 +143,6 @@
   background-color: var(--white);
 }
 
-.command_step_header {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-16);
-}
-
-.command_step_groups {
-  height: 39rem;
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
-}
-
 .slot_details {
   height: 100vh;
   border-radius: var(--border-radius-8);
