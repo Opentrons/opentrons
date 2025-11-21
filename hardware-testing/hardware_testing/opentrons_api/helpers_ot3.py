@@ -1237,7 +1237,7 @@ def _generate_packet(prop_id: DirectPropId, value: Any) -> Optional[bytes]:
     return None
 
 
-def _encode_data(prop_id: DirectPropId, value: Any) -> Optional[bytes]:  # noqa: C901
+def _encode_data(prop_id: DirectPropId, value: Any) -> Optional[bytes]:
     if prop_id == DirectPropId.INVALID:
         return None
     encoded_data: bytes = b""
@@ -1274,7 +1274,7 @@ class DirectEEPROMData:
     sku: Optional[str] = None
 
     def to_set(self) -> set[tuple[DirectPropId, str | int]]:
-        """RHardware testing equivalent of an eeprom utility that returns a set of expected data values paired with a property id."""
+        """Hardware testing equivalent of an eeprom utility that returns a set of expected data values paired with a property id."""
         eeprom_set: set[tuple[DirectPropId, str | int]] = set()
         eeprom_set.add((DirectPropId.FORMAT_VERSION, self.format_version))
         if self.serial_number:
@@ -1311,7 +1311,6 @@ def direct_property_write(
 
 def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
     """Returns the hardware testing equivalent of the eeprom data return."""
-    # NOTE: SKU was added to eeprom in v8.8, so we need to handle cases in whihc it doesnt exist
     return DirectEEPROMData(
         format_version=data.format_version,
         serial_number=data.serial_number,
