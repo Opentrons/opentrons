@@ -23,6 +23,7 @@ See [The Off-Deck Location][the-off-deck-location] for details on using `OFF_DEC
 """
 WASTE_CHUTE: Final = OffDeckType.WASTE_CHUTE
 
+
 class PlungerPositionTypes(enum.Enum):
     PLUNGER_TOP = "top"
     PLUNGER_BOTTOM = "bottom"
