@@ -248,7 +248,7 @@ class CommandExecutor:
             # Only capture photos of errors if the setting to do so is enabled
             if (
                 camera_enablement.cameraEnabled
-                and camera_enablement.errorRecoveryEnabled
+                and camera_enablement.errorRecoveryCameraEnabled
             ):
                 # todo(chb, 2025-10-25): Eventually we will need to pass in client provided global settings here
                 image_data = await self._camera_provider.capture_image(
