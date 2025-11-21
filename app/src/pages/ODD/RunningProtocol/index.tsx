@@ -60,7 +60,6 @@ import type {
   RunningProtocolCommandListProps,
 } from '/app/organisms/ODD/RunningProtocol'
 
-const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
 
 export type ScreenOption =
@@ -100,7 +99,7 @@ export function RunningProtocol(): JSX.Element {
   const runStatus = runRecord?.data.status ?? null
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    staleTime: Infinity,
+    refetchInterval: Infinity,
   })
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??

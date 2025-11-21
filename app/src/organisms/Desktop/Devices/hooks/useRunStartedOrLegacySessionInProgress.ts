@@ -6,7 +6,7 @@ import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 export function useRunStartedOrLegacySessionInProgress(): boolean {
   const runId = useCurrentRunId()
   const { data: runRecord } = useNotifyRunQuery(runId)
-  const runStatus = runRecord?.data.status
+  const runStatus = runRecord?.data.status ?? null
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   return (

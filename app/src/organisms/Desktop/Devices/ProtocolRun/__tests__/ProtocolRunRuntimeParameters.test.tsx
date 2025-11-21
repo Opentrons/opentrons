@@ -2,7 +2,6 @@ import { screen } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_RUNNING, RUN_STATUS_SUCCEEDED } from '@opentrons/api-client'
 import { InfoScreen } from '@opentrons/components'
 
 import { renderWithProviders } from '/app/__testing-utils__'
@@ -121,8 +120,8 @@ describe('ProtocolRunRuntimeParameters', () => {
       .thenReturn({
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: mockSucceededRun, status: RUN_STATUS_RUNNING },
+    when(vi.mocked(useNotifyRunQuery)).calledWith(RUN_ID).thenReturn({
+      data: { data: mockSucceededRun },
     } as unknown as UseQueryResult<Run>)
   })
 
@@ -185,7 +184,6 @@ describe('ProtocolRunRuntimeParameters', () => {
           data: {
             ...mockSucceededRun,
             runTimeParameters: mockRunTimeParameterData,
-            status: RUN_STATUS_SUCCEEDED,
           },
         },
       } as any)
@@ -211,6 +209,21 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
+     when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: mockRunTimeParameterData,
+          },
+        },
+      } as any)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        runTimeParameters: [] as RunTimeParameter[],
+      } as CompletedProtocolAnalysis)
     render(props)
     screen.getByText('Dry Run')
     screen.getByText('Off')
@@ -235,6 +248,16 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
+      when(useNotifyRunQuery)
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: [ mockRunTimeParameterData , mockCsvRtp],
+          },
+        },
+      } as any)
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
     } as CompletedProtocolAnalysis)

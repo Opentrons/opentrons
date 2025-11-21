@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -247,7 +247,7 @@ describe('ProtocolSetup', () => {
       <div>Mock ConfirmSetupStepsCompleteModal</div>
     )
     vi.mocked(useNotifyCurrentMaintenanceRun).mockReturnValue({
-      data: { data: { id: 'mock-id', status: RUN_STATUS_IDLE } },
+      data: { data: { id: 'mock-id' } },
     } as any)
     vi.mocked(useLPCDisabledReason).mockReturnValue(null)
     vi.mocked(useAttachedModules).mockReturnValue([])
@@ -298,6 +298,7 @@ describe('ProtocolSetup', () => {
         data: {
           protocolId: PROTOCOL_ID,
           labwareOffsets: [mockOffset],
+          status: RUN_STATUS_STOPPED,
         },
       },
     } as any)

@@ -6,11 +6,7 @@ import first from 'lodash/first'
 import last from 'lodash/last'
 import { css } from 'styled-components'
 
-import {
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOPPED,
-} from '@opentrons/api-client'
+import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -797,6 +793,7 @@ export function ProtocolSetup(): JSX.Element {
       .data?.data.id != null
 
   const navigate = useNavigate()
+
   if (runStatus === RUN_STATUS_STOPPED) {
     navigate('/protocols')
   }

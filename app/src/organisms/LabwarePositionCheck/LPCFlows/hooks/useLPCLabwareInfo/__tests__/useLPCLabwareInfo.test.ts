@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-
+import {when} from 'vitest-when'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
@@ -17,6 +17,13 @@ vi.mock('../getLPCLabwareInfoFrom')
 vi.mock('../getLPCSearchParams')
 vi.mock('/app/resources/labware_offsets')
 vi.mock('/app/resources/runs')
+
+const runningRun = {
+  current: false,
+  id: 'test_id_running',
+  status: RUN_STATUS_RUNNING,
+}
+
 
 describe('useLPCLabwareInfo', () => {
   const RUN_ID = 'run-123'
@@ -125,8 +132,8 @@ describe('useLPCLabwareInfo', () => {
   })
 
   it('should not enable offset search if run status is not idle', () => {
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { status: RUN_STATUS_RUNNING } },
+    when(vi.mocked(useNotifyRunQuery)).calledWith('test_id_running').thenReturn({
+      data: { data: { status: runningRun } },
     } as any)
 
     const { result } = renderHook(() => {

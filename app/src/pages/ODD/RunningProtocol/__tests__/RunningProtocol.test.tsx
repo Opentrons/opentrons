@@ -196,9 +196,9 @@ describe('RunningProtocol', () => {
   })
   it('should render the canceling run modal when run status is stop requested', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .calledWith(RUN_ID, { refetchInterval: Infinity })
       .thenReturn({
-        data: { data: { status: RUN_STATUS_STOP_REQUESTED } },
+        data: { data: { id: RUN_ID, status: RUN_STATUS_STOP_REQUESTED } },
       } as any)
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(CancelingRunModal)).toHaveBeenCalled()
@@ -210,9 +210,9 @@ describe('RunningProtocol', () => {
 
   it('should render open door alert modal, when run staus is blocked by open door', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .calledWith(RUN_ID, { refetchInterval: Infinity })
       .thenReturn({
-        data: { data: { status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
+        data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
       } as any)
     when(vi.mocked(useIsDoorOpen))
       .calledWith(ROBOT_NAME)
@@ -226,9 +226,9 @@ describe('RunningProtocol', () => {
 
   it('should render open stacker door alert modal, when run staus is blocked by open stacker door', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .calledWith(RUN_ID, { refetchInterval: Infinity })
       .thenReturn({
-        data: { data: { status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
+        data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
       } as any)
 
     const mockOpenStacker = {
@@ -247,9 +247,9 @@ describe('RunningProtocol', () => {
 
   it('should render open unconfigured stacker door alert modal, when run staus is blocked by open stacker door not in the deck config', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .calledWith(RUN_ID, { refetchInterval: Infinity })
       .thenReturn({
-        data: { data: { status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
+        data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
       } as any)
 
     const mockUnconfiguredOpenStacker = {
@@ -268,22 +268,21 @@ describe('RunningProtocol', () => {
 
   it(`should render not open door alert modal, when run status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .calledWith(RUN_ID, { refetchInterval: Infinity })
       .thenReturn({
         data: {
-          data: { status: RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR },
+          data: { id: RUN_ID, status: RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR },
         },
       } as any)
-
     render(`/runs/${RUN_ID}/run`)
     expect(vi.mocked(OpenDoorAlertModal)).not.toHaveBeenCalled()
   })
 
   it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { refetchInterval: 5000 })
+      .calledWith(RUN_ID, { refetchInterval: Infinity })
       .thenReturn({
-        data: { data: { status: RUN_STATUS_AWAITING_RECOVERY } },
+        data: { data: { id: RUN_ID, status: RUN_STATUS_AWAITING_RECOVERY } },
       } as any)
 
     render(`/runs/${RUN_ID}/run`)

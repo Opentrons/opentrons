@@ -50,6 +50,8 @@ export function ProtocolRunRuntimeParameters({
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const run = useNotifyRunQuery(runId).data
   const runStatus = run?.data.status ?? null
+  console.log("🚀 ~ ProtocolRunRuntimeParameters ~ runStatus:", runStatus)
+  
   const isRunTerminal =
     runStatus == null
       ? false
@@ -61,6 +63,7 @@ export function ProtocolRunRuntimeParameters({
     run?.data != null && 'runTimeParameters' in run?.data
       ? run?.data?.runTimeParameters
       : []
+  console.log("🚀 ~ ProtocolRunRuntimeParameters ~ runTimeParametersFromRun:", runTimeParametersFromRun)
   const runTimeParametersFromAnalysis =
     mostRecentAnalysis?.runTimeParameters ?? []
   const runTimeParameters = isRunTerminal
