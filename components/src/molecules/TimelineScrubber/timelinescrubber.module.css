@@ -36,6 +36,10 @@
 
 .track_background {
   width: 100%;
+  background-color: var(--grey-20);
+}
+
+.track_container:hover .track_background {
   background-color: var(--blue-30);
 }
 
