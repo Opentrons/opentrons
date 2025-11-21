@@ -62,11 +62,7 @@ clean_all_cmd = $(clean_cmd) dist
 plot_type ?=
 
 define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --python 3.10 --group dev; \
-	else \
-		uv sync --python 3.10 --group dev; \
-	fi
+	$(UV) sync --group dev
 endef
 
 .PHONY: all
@@ -75,13 +71,13 @@ all: clean wheel
 .PHONY: setup
 setup:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: setup-ot2
 setup-ot2:
 	@$(uv_sync_dev)
-	@uv pip uninstall python-can
-	@uv pip list
+	@$(UV) pip uninstall python-can
+	@$(UV) pip list
 
 .PHONY: clean
 clean: docs-clean

@@ -70,23 +70,19 @@ run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) 
 all: clean wheel
 
 define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --group dev; \
-	else \
-		uv sync --group dev; \
-	fi
+	$(UV) sync --group dev
 endef
 
 .PHONY: setup
 setup:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: setup-ot2
 setup-ot2:
 	@$(uv_sync_dev)
-	@uv pip uninstall python-can
-	@uv pip list
+	@$(UV) pip uninstall python-can
+	@$(UV) pip list
 
 .PHONY: clean
 clean:
