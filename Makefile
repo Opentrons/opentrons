@@ -207,6 +207,9 @@ test-py-windows: $(WINDOWS_PYTHON_TEST_TARGETS)
 %-py-test:
 	$(MAKE) -C $* test
 
+shared-data-py-test:
+	$(MAKE) -C shared-data test-py
+
 .PHONY: test-js
 test-js: test-js-internal
 
