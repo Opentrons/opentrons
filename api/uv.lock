@@ -1319,8 +1319,10 @@ requires-dist = [
     { name = "pydantic-settings", specifier = ">=2,<3" },
     { name = "pyserial", specifier = "==3.5" },
     { name = "python-can", specifier = "==4.2.2" },
+    { name = "python-can", marker = "extra == 'flex'", specifier = "==4.2.2" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
 ]
+provides-extras = ["flex"]
 
 [package.metadata.requires-dev]
 dev = [
