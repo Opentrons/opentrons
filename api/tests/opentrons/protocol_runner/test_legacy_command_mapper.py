@@ -7,6 +7,7 @@ from typing import cast
 from opentrons.protocol_engine.state.update_types import (
     LoadPipetteUpdate,
     LoadedLabwareUpdate,
+    LoadModuleUpdate,
     PipetteConfigUpdate,
     StateUpdate,
 )
@@ -459,6 +460,15 @@ def test_map_module_load(
                 model=ModuleModel.TEMPERATURE_MODULE_V2,
             ),
             notes=[],
+        ),
+        state_update=StateUpdate(
+            loaded_module=LoadModuleUpdate(
+                module_id=matchers.IsA(str),
+                definition=test_definition,
+                slot_name=DeckSlotName.SLOT_1,
+                requested_model=ModuleModel.TEMPERATURE_MODULE_V1,
+                serial_number="module-serial",
+            )
         ),
     )
 
