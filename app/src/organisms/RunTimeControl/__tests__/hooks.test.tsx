@@ -91,7 +91,7 @@ describe('useCurrentRunStatus hook', () => {
           },
         },
       } as unknown as UseQueryResult<Run>)
-    const { result } = renderHook(() => useCurrentRunStatus())
+    const { result } = renderHook(() => useCurrentRunStatus({}))
     expect(result.current).toBe(RUN_STATUS_RUNNING)
   })
 })

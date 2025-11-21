@@ -120,9 +120,11 @@ describe('ProtocolRunRuntimeParameters', () => {
       .thenReturn({
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
-    when(vi.mocked(useNotifyRunQuery)).calledWith(RUN_ID).thenReturn({
-      data: { data: mockSucceededRun },
-    } as unknown as UseQueryResult<Run>)
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        data: { data: mockSucceededRun },
+      } as unknown as UseQueryResult<Run>)
   })
 
   afterEach(() => {
@@ -209,7 +211,7 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
-     when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID)
       .thenReturn({
         data: {
@@ -248,13 +250,13 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
-      when(useNotifyRunQuery)
+    when(useNotifyRunQuery)
       .calledWith(RUN_ID)
       .thenReturn({
         data: {
           data: {
             ...mockSucceededRun,
-            runTimeParameters: [ mockRunTimeParameterData , mockCsvRtp],
+            runTimeParameters: [mockRunTimeParameterData, mockCsvRtp],
           },
         },
       } as any)

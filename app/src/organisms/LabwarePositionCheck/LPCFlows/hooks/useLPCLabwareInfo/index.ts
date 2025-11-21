@@ -52,7 +52,7 @@ function useFlexLPCLabwareInfo({
 > {
   const { data: runRecord } = useNotifyRunQuery(runId)
   const runStatus = runRecord?.data.status ?? null
-  
+
   const lwLocationCombos = useMemo(
     () =>
       getUniqueValidLwLocationInfoByAnalysis({

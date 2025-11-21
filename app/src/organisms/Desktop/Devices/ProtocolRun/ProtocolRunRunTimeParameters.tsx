@@ -50,7 +50,7 @@ export function ProtocolRunRuntimeParameters({
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const run = useNotifyRunQuery(runId).data
   const runStatus = run?.data.status ?? null
-  
+
   const isRunTerminal =
     runStatus == null
       ? false
