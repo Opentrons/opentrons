@@ -59,7 +59,9 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         updateValue={value => {
           console.log('value:', value)
         }}
+        value={moduleId}
       />
+      <Divider marginY="0" />
       {moduleId != null ? <>test flex stacker tools</> : null}
     </div>
   )
