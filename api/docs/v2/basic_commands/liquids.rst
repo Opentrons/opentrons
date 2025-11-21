@@ -418,7 +418,7 @@ The :py:meth:`~.InstrumentContext.dynamic_mix` method lets you aspirate and disp
 Like the :py:meth:`~.InstrumentContext.mix` method, you can use other optional arguments customize your dynamic mix: 
 - specify the aspirate, dispense, or mix flow rate.
 - add a delay after an aspirate or dispense, or a ``movement_delay`` before moving to an ``end_location``.
-- include or a push out after an aspirate or dispense in the mix.
+- include a push out after an aspirate or dispense in the mix.
 
 .. versionadded:: 2.27
 
