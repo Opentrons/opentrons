@@ -210,6 +210,7 @@ class TrialState:
             new_volume = self.step_volume
 
         self.step_volume = max(config.min_step, min(config.max_step, new_volume))
+        # clamp step volume such that the total dispense does not exceed max volume
         self.step_volume = min(
             self.step_volume, config.max_volume - self.dispense_volume
         )
@@ -238,7 +239,8 @@ class TrialState:
                 )
                 self.status = "fail"
             return self.status
-        if self.dispense_volume == config.max_volume:
+        # if 10uL away from max volume, then set final
+        if self.dispense_volume >= config.max_volume - 10.0:
             self.status = "final"
             return self.status
         if config.lower_bound < self.hdelta < config.upper_bound:
@@ -731,9 +733,9 @@ def get_transfer_props(
     # changes dispense offset based on the "expected" liquid level.
 
     if volume > 15:
-        dispense_offset = expected_liquid_level + 1.0
+        dispense_offset = max(2.0, expected_liquid_level + 1.0)
     else:
-        dispense_offset = expected_liquid_level + 0.1
+        dispense_offset = max(2.0, expected_liquid_level + 0.1)
 
     # set pipette behavior based on tip size
     if config.liquid_tip == "50":

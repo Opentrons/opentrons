@@ -494,7 +494,7 @@ def get_transfer_props(volume: float, config: SetupState) -> None:
     """Get aspirate/dispense properties for ethanol liquid class. You can change these."""
     # this tries to mitigate liquid forming on the tip for small dispenses.
     if volume > 15:
-        dispense_offset = 0.1
+        dispense_offset = 1.0
     else:
         dispense_offset = 0.1
 
