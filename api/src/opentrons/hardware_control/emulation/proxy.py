@@ -1,4 +1,5 @@
 """The Proxy class module."""
+
 from __future__ import annotations
 import asyncio
 import logging
@@ -62,6 +63,8 @@ class Proxy:
         self._cons: List[Connection] = []
         self._servers: list[asyncio.Server] = []
         self._run_tasks: list["asyncio.Future[tuple[None, None]]"] = []
+        self._serving_upstream = asyncio.Event()
+        self._serving_downstream = asyncio.Event()
 
     @property
     def name(self) -> str:
@@ -75,6 +78,14 @@ class Proxy:
         )
         self._run_tasks.append(run_task)
         await run_task
+
+    async def wait_ready(self, timeout: float | None = None) -> None:
+        await asyncio.wait_for(
+            asyncio.gather(
+                self._serving_upstream.wait(), self._serving_downstream.wait()
+            ),
+            timeout=timeout,
+        )
 
     def stop(self) -> None:
         """Stop the proxy.
@@ -125,6 +136,8 @@ class Proxy:
             self._settings.emulator_port,
         )
         self._servers.append(server)
+
+        asyncio.get_running_loop().call_soon(self._serving_upstream.set)
         await server.serve_forever()
 
     async def _listen_client_connections(self) -> None:
@@ -139,6 +152,8 @@ class Proxy:
             self._settings.driver_port,
         )
         self._servers.append(server)
+
+        asyncio.get_running_loop().call_soon(self._serving_downstream.set)
         await server.serve_forever()
 
     async def _handle_server_connection(
