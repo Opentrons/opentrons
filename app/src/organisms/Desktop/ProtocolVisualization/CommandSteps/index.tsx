@@ -11,13 +11,17 @@ import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 interface CommandStepsProps {
-  groupedCommands: GroupedCommands | null
+  // Updated type to match parent injection
+  groupedCommands: (GroupedCommands & { id: string }) | null
   analysis: ProtocolAnalysisOutput
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
   percentComplete: number
   handlePause: () => void
   currentCommandIndex?: number
+  // Added new prop
+  searchQuery: string
 }
+
 export function CommandSteps(props: CommandStepsProps): JSX.Element {
   const {
     groupedCommands,
@@ -26,6 +30,7 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
     percentComplete,
     handlePause,
     currentCommandIndex,
+    searchQuery,
   } = props
   const { t } = useTranslation('protocol_visualization')
   return (
@@ -46,6 +51,8 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
             groupedCommands={groupedCommands}
             setSelectedCommand={setSelectedCommand}
             handlePause={handlePause}
+            // Pass search query down to the list renderer
+            searchQuery={searchQuery}
           />
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
 
@@ -27,6 +27,16 @@ export function ProtocolVisualization(): JSX.Element {
   const groupedCommands = useSelector((state: State) =>
     getStoredProtocolGroupedCommands(state, protocolKey)
   )
+
+  // CRITICAL FIX:
+  // We must use Object.assign on a cloned array.
+  // This attaches the 'id' property required by VisualizerContainer
+  // while preserving the Array prototype so .map() still works.
+  const groupedCommandsWithId = useMemo(() => {
+    if (groupedCommands == null) return null
+    return Object.assign([...groupedCommands], { id: protocolKey })
+  }, [groupedCommands, protocolKey])
+
   useEffect(() => {
     dispatch(fetchProtocols())
   }, [])
@@ -35,7 +45,7 @@ export function ProtocolVisualization(): JSX.Element {
     <div className={styles.top_container}>
       <VisualizerContainer
         analysis={storedProtocol.mostRecentAnalysis}
-        groupedCommands={groupedCommands}
+        groupedCommands={groupedCommandsWithId}
         protocolKey={protocolKey}
         srcFileNames={storedProtocol.srcFileNames}
       />

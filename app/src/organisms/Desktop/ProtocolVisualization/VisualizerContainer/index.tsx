@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { InputField } from '@opentrons/components'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -19,7 +20,7 @@ import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import styles from './visualizercontainer.module.css'
 
-import type { MouseEvent } from 'react'
+import type { ChangeEvent, MouseEvent } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
@@ -35,7 +36,8 @@ type ResizableColumn = 'left' | 'right'
 
 interface VisualizerContainerProps {
   analysis: ProtocolAnalysisOutput
-  groupedCommands: GroupedCommands | null
+  // Updated type definition to include the injected 'id'
+  groupedCommands: (GroupedCommands & { id: string }) | null
   protocolKey: string
   srcFileNames: string[]
 }
@@ -52,6 +54,8 @@ export function VisualizerContainer(
     INITIAL_MILLISECONDS_PER_FRAME
   )
   const [isDragging, setIsDragging] = useState<boolean>(false)
+
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
   const [selectedCommandId, setSelectedCommand] = useState<string | null>(
     commands[0]?.id ?? null
@@ -227,8 +231,16 @@ export function VisualizerContainer(
 
   return (
     <div ref={containerRef} className={styles.layout_container}>
-      {/* Left Column is resizable */}
       <div className={styles.left_column} style={{ width: `${leftWidth}px` }}>
+        <div style={{ padding: '0.75rem 0.75rem 0 0.75rem' }}>
+          <InputField
+            placeholder="Search commands..."
+            value={searchQuery}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearchQuery(e.target.value)
+            }
+          />
+        </div>
         <CommandSteps
           analysis={analysis}
           currentCommandIndex={filteredSelectedCommandIndex}
@@ -238,9 +250,9 @@ export function VisualizerContainer(
           handlePause={() => {
             setIsPlaying(false)
           }}
+          searchQuery={searchQuery}
         />
       </div>
-      {/* Gutter between left & center */}
       <div
         className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
         onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
@@ -295,14 +307,12 @@ export function VisualizerContainer(
           selectedRunTimeCommand={selectedRunTimeCommand}
         />
       </div>
-      {/* Gutter between center & right */}
       <div
         className={`${styles.gutter} ${isDragging ? styles.grabbing : ''}`}
         onMouseDown={(e: MouseEvent<HTMLDivElement>) => {
           handleMouseDown(e, 'right')
         }}
       />
-      {/* Right Column is resizable */}
       <div className={styles.right_column} style={{ width: `${rightWidth}px` }}>
         {selectedRunTimeCommand != null ? (
           <StepDetailContainer
