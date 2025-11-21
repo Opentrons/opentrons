@@ -88,14 +88,13 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background:
-    linear-gradient(
-      to right,
-      var(--blue-50) 0%,
-      var(--blue-50) var(--progress, 0%),
-      #ccc var(--progress, 0%),
-      #ccc 100%
-    );
+  background: linear-gradient(
+    to right,
+    var(--blue-50) 0%,
+    var(--blue-50) var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
 }
 
 /* Hide thumb initially */
@@ -141,19 +140,6 @@
 .command_step {
   border-radius: var(--border-radius-8);
   background-color: var(--white);
-}
-
-.command_step_header {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-16);
-}
-
-.command_step_groups {
-  height: 39rem;
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
 }
 
 .slot_details {

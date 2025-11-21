@@ -30,7 +30,7 @@
 }
 
 .command_step_groups {
-  height: 39rem;
+  height: 100%;
   min-height: 0;
   flex: 1;
   overflow-y: auto;
