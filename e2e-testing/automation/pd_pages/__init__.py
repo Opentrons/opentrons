@@ -23,4 +23,7 @@ __all__ = [
     "PipetteModal",
     "ProtocolEditorPage",
     "SettingsPage",
+    "ThermocyclerStepPage",
+    "TemperatureStepPage",
+    "HeaterShakerStepPage",
 ]
