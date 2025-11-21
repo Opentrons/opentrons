@@ -677,9 +677,9 @@ async def prepare_for_mock_blowout(
     with patch.object(
         ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.pick_up_tip)
     ) as mock_tip_pickup:
-        mock_tip_pickup.side_effect = ot3_hardware._pipette_handler.attached_instruments[
-            mount
-        ]["has_tip"] = True
+        mock_tip_pickup.side_effect = (
+            ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]
+        ) = (True)
         if not ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]:
             await ot3_hardware.pick_up_tip(mount, 100)
     return instr_data, ot3_hardware
