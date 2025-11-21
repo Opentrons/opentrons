@@ -35,6 +35,8 @@ from robot_server.persistence.tables import (
     run_command_table,
     action_table,
     run_csv_rtp_table,
+    input_data_files_table,
+    output_data_files_table,
 )
 from robot_server.persistence.pydantic import (
     json_to_pydantic,
@@ -684,14 +686,7 @@ class RunStore:
         return _parse_command(command)
 
     def remove(self, run_id: str) -> None:
-        """Remove a run by its unique identifier.
-
-        Arguments:
-            run_id: The run's unique identifier.
-
-        Raises:
-            RunNotFoundError: The specified run ID was not found.
-        """
+        """Remove a run by its unique identifier."""
         delete_run = sqlalchemy.delete(run_table).where(run_table.c.id == run_id)
         delete_actions = sqlalchemy.delete(action_table).where(
             action_table.c.run_id == run_id
@@ -702,10 +697,19 @@ class RunStore:
         delete_csv_rtps = sqlalchemy.delete(run_csv_rtp_table).where(
             run_csv_rtp_table.c.run_id == run_id
         )
+        delete_input_files = sqlalchemy.delete(input_data_files_table).where(
+            input_data_files_table.c.run_id == run_id
+        )
+        delete_output_files = sqlalchemy.delete(output_data_files_table).where(
+            output_data_files_table.c.run_id == run_id
+        )
+
         with self._sql_engine.begin() as transaction:
             transaction.execute(delete_actions)
             transaction.execute(delete_commands)
             transaction.execute(delete_csv_rtps)
+            transaction.execute(delete_input_files)
+            transaction.execute(delete_output_files)
             result = transaction.execute(delete_run)
 
         if result.rowcount < 1:

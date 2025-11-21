@@ -122,12 +122,16 @@ export function ProtocolOverview(): JSX.Element {
   const { protocolName, description, created, lastModified, author } =
     formValues
   const metaDataInfo = [
-    { description },
-    { author },
-    { created: created != null ? format(created, DATE_ONLY_FORMAT) : t('na') },
+    { title: 'description', value: description ?? null },
+    { title: 'author', value: author ?? null },
     {
-      modified:
-        lastModified != null ? format(lastModified, DATETIME_FORMAT) : t('na'),
+      title: 'created',
+      value: created != null ? format(created, DATE_ONLY_FORMAT) : null,
+    },
+    {
+      title: 'modified',
+      value:
+        lastModified != null ? format(lastModified, DATETIME_FORMAT) : null,
     },
   ]
 

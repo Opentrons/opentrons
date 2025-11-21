@@ -18,18 +18,14 @@ export interface ClearWellSelectionLabwareKeyAction {
   payload: null
 }
 interface DuplicateStepPayload {
-  stepId: StepIdType
+  originalStepId: StepIdType
   duplicateStepId: StepIdType
 }
-export interface DuplicateStepAction {
-  type: 'DUPLICATE_STEP'
-  payload: DuplicateStepPayload
-}
-export interface DuplicateMultipleStepsAction {
-  type: 'DUPLICATE_MULTIPLE_STEPS'
+export interface DuplicateSelectedStepsAction {
+  type: 'DUPLICATE_SELECTED_STEPS'
   payload: {
     steps: DuplicateStepPayload[]
-    indexToInsert: number
+    newStepOrder: StepIdType[]
   }
 }
 
@@ -93,13 +89,6 @@ export interface SelectMultipleStepsAction {
   }
 }
 
-export interface SelectMultipleStepsForGroupAction {
-  type: 'SELECT_MULTIPLE_STEPS_FOR_GROUP'
-  payload: {
-    stepIds: StepIdType[]
-    lastSelected: StepIdType
-  }
-}
 export type ViewSubstep = StepIdType | null
 export interface ToggleViewSubstepAction {
   type: 'TOGGLE_VIEW_SUBSTEP'

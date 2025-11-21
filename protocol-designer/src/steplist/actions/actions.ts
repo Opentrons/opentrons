@@ -1,6 +1,6 @@
 import { getSavedStepHierarchy } from '/protocol-designer/step-forms/selectors'
 
-import { getStepToSelectAfterDeletion } from '../utils/getStepToSelectAfterDeletion'
+import { getStepToSelectAfterDeletion } from '../utils/getStepsToSelect'
 import { getPairedSteps } from '../utils/stepHierarchy'
 
 import type { FormData, StepIdType } from '../../form-types'

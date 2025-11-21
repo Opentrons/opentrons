@@ -3,10 +3,13 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   getBatchEditFormHasUnsavedChanges,
   getEquippedPipetteOptions,
+  getNextUserVisibleStepNumber,
   getUnsavedFormIsPristineHeaterShakerForm,
   getUnsavedFormIsPristineSetTempForm,
+  getUserVisibleStepNumbers,
 } from '../selectors'
 
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type { FormData } from '../../form-types'
 
 vi.mock('../../steplist/fieldLevel')
@@ -39,8 +42,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
-    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState as any)
     expect(result).toEqual(expected)
   })
   it('does NOT append mount to pipette dropdown when pipettes are different models', () => {
@@ -66,8 +68,7 @@ describe('getEquippedPipetteOptions', () => {
         value: '456',
       },
     ]
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
-    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState as any)
     expect(result).toEqual(expected)
   })
   it('does NOT append mount to pipette dropdown when only one pipette', () => {
@@ -85,22 +86,19 @@ describe('getEquippedPipetteOptions', () => {
         value: '123',
       },
     ]
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
-    const result = getEquippedPipetteOptions.resultFunc(initialDeckState)
+    const result = getEquippedPipetteOptions.resultFunc(initialDeckState as any)
     expect(result).toEqual(expected)
   })
 })
 describe('getBatchEditFormHasUnsavedChanges', () => {
   it('should return true if there are unsaved changes ', () => {
     expect(
-      // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
       getBatchEditFormHasUnsavedChanges.resultFunc({
         someField: 'someVal',
       })
     ).toBe(true)
   })
   it('should return false if there are no unsaved changes ', () => {
-    // @ts-expect-error(sa, 2021-6-14): resultFunc (from reselect) is weirdly not part of their Selector interface
     expect(getBatchEditFormHasUnsavedChanges.resultFunc({})).toBe(false)
   })
 })
@@ -114,7 +112,6 @@ describe('getUnsavedFormIsPristineSetTempForm', () => {
       targetTemperature: 33,
     }
     const expected = true
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
       formData,
       mockIsPresaved
@@ -128,7 +125,6 @@ describe('getUnsavedFormIsPristineSetTempForm', () => {
       setTemperature: null,
     }
     const expected = false
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
       formData,
       mockIsPresaved
@@ -146,7 +142,6 @@ describe('getUnsavedFormIsPrestineSetHeaterShakerTempForm', () => {
       targetHeaterShakerTemperature: '10',
     }
     const expected = true
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
       formData,
       mockIsPresaved
@@ -160,11 +155,53 @@ describe('getUnsavedFormIsPrestineSetHeaterShakerTempForm', () => {
       targetHeaterShakerTemperature: null,
     }
     const expected = false
-    // @ts-expect-error(jr, 4/8/22): resultFunc (from reselect) is not part of their Selector interface
     const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
       formData,
       mockIsPresaved
     )
     expect(result).toEqual(expected)
+  })
+})
+
+describe('getUserVisibleStepNumbers() and getNextUserVisibleStepNumber()', () => {
+  it("should count steps, excluding hidden 'wait for Thermocycler profile' steps", () => {
+    const input: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'a' },
+        {
+          type: 'thermocyclerProfileGroup',
+          thermocyclerProfileStepId: 'b',
+          concurrentSteps: [{ type: 'standaloneStep', stepId: 'c' }],
+          waitForThermocyclerProfileStepId: 'd',
+        },
+        { type: 'standaloneStep', stepId: 'e' },
+      ],
+    }
+
+    const stepNumbersResult = getUserVisibleStepNumbers.resultFunc(input)
+    const nextStepNumberResult =
+      getNextUserVisibleStepNumber.resultFunc(stepNumbersResult)
+
+    expect(stepNumbersResult).toStrictEqual({
+      a: 1,
+      b: 2,
+      c: 3,
+      d: null,
+      e: 4,
+    })
+    expect(nextStepNumberResult).toStrictEqual(5)
+  })
+
+  it('should tolerate empty input', () => {
+    const input: StepHierarchy = {
+      topLevelItems: [],
+    }
+
+    const stepNumbersResult = getUserVisibleStepNumbers.resultFunc(input)
+    const nextStepNumberResult =
+      getNextUserVisibleStepNumber.resultFunc(stepNumbersResult)
+
+    expect(stepNumbersResult).toStrictEqual({})
+    expect(nextStepNumberResult).toStrictEqual(1)
   })
 })

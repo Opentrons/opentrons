@@ -2,6 +2,8 @@ import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
+  FlexStackerSetStoredLabwareParams,
+  FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   Height,
   LabwareDefinition2,
@@ -106,9 +108,12 @@ export interface AbsorbanceReaderState {
   initialization: Initialization | null
 }
 
-export interface FlexStackerState {
+export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  //  TODO: extend this state
+  maxPoolCount: number
+  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
+  labwareOnShuttle: FlexStackerStoredLabwareGroup | null
 }
 
 export type ModuleState =
@@ -118,7 +123,7 @@ export type ModuleState =
   | HeaterShakerModuleState
   | MagneticBlockState
   | AbsorbanceReaderState
-  | FlexStackerState
+  | FlexStackerModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -757,7 +762,8 @@ export type ErrorType =
   | 'MISSING_MODULE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
-  | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
+  | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
+  | 'MULTI_DISPENSE_VOLUME_TOO_HIGH'
   | 'NEXT_TIPRACK_HAS_LID'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
@@ -777,6 +783,7 @@ export type ErrorType =
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
+  | 'FLEX_STACKER_NO_GRIPPER'
 
 export interface CommandCreatorError {
   message: string

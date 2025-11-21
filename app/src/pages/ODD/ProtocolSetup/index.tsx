@@ -724,7 +724,11 @@ function PrepareToRun({
                 setSetupScreen('camera')
               }}
               title={t('camera_setup_step_title')}
-              detail={t('protocol_setup:enabled')}
+              detail={
+                appCameraSettings.enabled
+                  ? t('protocol_setup:enabled')
+                  : t('protocol_setup:disabled')
+              }
               status={cameraSettingsConfirmed ? 'ready' : 'general'}
             />
           </>
