@@ -48,6 +48,7 @@ async def subject(
     """Test subject."""
     p = Proxy("proxy", proxy_listener, setting)
     task = asyncio.get_running_loop().create_task(p.run())
+    await p.wait_ready()
     yield p
     p.stop()
 
