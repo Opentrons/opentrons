@@ -313,6 +313,9 @@
         "aspiratePosition": {
           "$ref": "#/definitions/tipPosition"
         },
+        "aspirateEndPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
         },
@@ -355,6 +358,9 @@
         "dispensePosition": {
           "$ref": "#/definitions/tipPosition"
         },
+        "dispenseEndPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
         },
@@ -394,6 +400,9 @@
           "$ref": "#/definitions/retractDispense"
         },
         "dispensePosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "dispenseEndPosition": {
           "$ref": "#/definitions/tipPosition"
         },
         "flowRateByVolume": {

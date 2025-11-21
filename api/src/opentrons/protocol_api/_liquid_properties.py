@@ -489,6 +489,7 @@ class _BaseLiquidHandlingProperties:
 class AspirateProperties(_BaseLiquidHandlingProperties):
 
     _aspirate_position: TipPosition
+    _aspirate_end_position: Optional[TipPosition]
     _retract: RetractAspirate
     _pre_wet: bool
     _mix: MixProperties
@@ -496,6 +497,10 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
     @property
     def aspirate_position(self) -> TipPosition:
         return self._aspirate_position
+
+    @property
+    def aspirate_end_position(self) -> Optional[TipPosition]:
+        return self._aspirate_end_position
 
     @property
     def pre_wet(self) -> bool:
@@ -531,6 +536,7 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
 class SingleDispenseProperties(_BaseLiquidHandlingProperties):
 
     _dispense_position: TipPosition
+    _dispense_end_position: Optional[TipPosition]
     _retract: RetractDispense
     _push_out_by_volume: LiquidHandlingPropertyByVolume
     _mix: MixProperties
@@ -538,6 +544,10 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
     @property
     def dispense_position(self) -> TipPosition:
         return self._dispense_position
+
+    @property
+    def dispense_end_position(self) -> Optional[TipPosition]:
+        return self._dispense_end_position
 
     @property
     def push_out_by_volume(self) -> LiquidHandlingPropertyByVolume:
@@ -556,6 +566,7 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
+            dispenseEndPosition=self._dispense_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             mix=self._mix.as_shared_data_model(),
             pushOutByVolume=self._push_out_by_volume.as_list_of_tuples(),
@@ -568,6 +579,7 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
 class MultiDispenseProperties(_BaseLiquidHandlingProperties):
 
     _dispense_position: TipPosition
+    _dispense_end_position: Optional[TipPosition]
     _retract: RetractDispense
     _conditioning_by_volume: LiquidHandlingPropertyByVolume
     _disposal_by_volume: LiquidHandlingPropertyByVolume
@@ -575,6 +587,10 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
     @property
     def dispense_position(self) -> TipPosition:
         return self._dispense_position
+
+    @property
+    def dispense_end_position(self) -> Optional[TipPosition]:
+        return self._dispense_end_position
 
     @property
     def retract(self) -> RetractDispense:
@@ -593,6 +609,7 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
+            dispenseEndPosition=self._dispense_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             conditioningByVolume=self._conditioning_by_volume.as_list_of_tuples(),
             disposalByVolume=self._disposal_by_volume.as_list_of_tuples(),
@@ -732,6 +749,11 @@ def build_aspirate_properties(
         _submerge=_build_submerge(aspirate_properties.submerge),
         _retract=_build_retract_aspirate(aspirate_properties.retract),
         _aspirate_position=_build_tip_position(aspirate_properties.aspiratePosition),
+        _aspirate_end_position=_build_tip_position(
+            aspirate_properties.aspirateEndPosition
+        )
+        if aspirate_properties.aspirateEndPosition is not None
+        else None,
         _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
             aspirate_properties.flowRateByVolume
         ),
@@ -753,6 +775,11 @@ def build_single_dispense_properties(
         _dispense_position=_build_tip_position(
             single_dispense_properties.dispensePosition
         ),
+        _dispense_end_position=_build_tip_position(
+            single_dispense_properties.dispenseEndPosition
+        )
+        if single_dispense_properties.dispenseEndPosition is not None
+        else None,
         _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
             single_dispense_properties.flowRateByVolume
         ),
@@ -778,6 +805,11 @@ def build_multi_dispense_properties(
         _dispense_position=_build_tip_position(
             multi_dispense_properties.dispensePosition
         ),
+        _dispense_end_position=_build_tip_position(
+            multi_dispense_properties.dispenseEndPosition
+        )
+        if multi_dispense_properties.dispenseEndPosition is not None
+        else None,
         _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
             multi_dispense_properties.flowRateByVolume
         ),

@@ -19,7 +19,7 @@ from opentrons.protocol_api import (
     OFF_DECK,
 )
 from opentrons import version
-from opentrons.protocol_api._liquid_properties import TransferProperties
+from opentrons.protocol_api._liquid_properties import TransferProperties, TipPosition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
     PositionReference,
@@ -991,11 +991,18 @@ def run_blank_test(
     offset = _get_offset_for_channel(fixture_settings, channel, 10)
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
+    # Override a None end position
+    transfer_properties.aspirate._aspirate_end_position = TipPosition(
+        _position_reference=PositionReference.LIQUID_MENISCUS_END, _offset=offset
+    )
+    transfer_properties.dispense._dispense_end_position = TipPosition(
+        _position_reference=PositionReference.LIQUID_MENISCUS_END, _offset=offset
+    )
     transfer_properties.aspirate.aspirate_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
     transfer_properties.dispense.dispense_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
 
     fixture_settings.pipette._core.load_liquid_class(  # type: ignore [attr-defined]
@@ -1081,20 +1088,29 @@ def run_one_test(
 
     # aspirate and dispense submerge start offsets.
     transfer_properties.aspirate.submerge.start_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
     transfer_properties.dispense.submerge.start_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
     transfer_properties.aspirate.submerge.start_position.offset = retracted_offset
     transfer_properties.dispense.submerge.start_position.offset = retracted_offset
 
     # aspirate and dispense offsets
     transfer_properties.aspirate.aspirate_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
     transfer_properties.dispense.dispense_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
+    )
+
+    transfer_properties.aspirate._aspirate_end_position = TipPosition(
+        _position_reference=PositionReference.LIQUID_MENISCUS_END,
+        _offset=submerged_offset,
+    )
+    transfer_properties.dispense._dispense_end_position = TipPosition(
+        _position_reference=PositionReference.LIQUID_MENISCUS_END,
+        _offset=submerged_offset,
     )
 
     transfer_properties.aspirate.aspirate_position.offset = submerged_offset
@@ -1103,10 +1119,10 @@ def run_one_test(
     # aspirate and dispense retract end offsets
 
     transfer_properties.aspirate.retract.end_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_END
     )
     transfer_properties.dispense.retract.end_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_END
     )
     transfer_properties.aspirate.retract.end_position.offset = retracted_offset
     transfer_properties.dispense.retract.end_position.offset = retracted_offset

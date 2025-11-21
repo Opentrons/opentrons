@@ -122,6 +122,7 @@ class TransferComponentsExecutor:
         instrument_core: InstrumentCore,
         transfer_properties: TransferProperties,
         target_location: Union[Location, TrashBin, WasteChute],
+        target_end_location: Optional[Location],
         target_well: Optional[WellCore],
         tip_state: TipState,
         transfer_type: TransferType,
@@ -150,6 +151,7 @@ class TransferComponentsExecutor:
         self._instrument = instrument_core
         self._transfer_properties = transfer_properties
         self._target_location = target_location
+        self._target_end_location = target_end_location
         self._target_well = target_well
         self._tip_state: TipState = deepcopy(tip_state)  # don't modify caller's object
         self._transfer_type: TransferType = transfer_type
@@ -234,11 +236,12 @@ class TransferComponentsExecutor:
         )
         self._instrument.aspirate(
             location=self._target_location,
-            well_core=None,
+            end_location=self._target_end_location,
+            well_core=None if self._target_end_location is None else self._target_well,
             volume=volume,
             rate=1,
             flow_rate=aspirate_props.flow_rate_by_volume.get_for_volume(volume),
-            in_place=True,
+            in_place=self._target_end_location is not None,
             correction_volume=correction_volume,
         )
         self._tip_state.append_liquid(volume)
@@ -262,11 +265,12 @@ class TransferComponentsExecutor:
         )
         self._instrument.dispense(
             location=self._target_location,
-            well_core=None,
+            end_location=self._target_end_location,
+            well_core=None if self._target_end_location is None else self._target_well,
             volume=volume,
             rate=1,
             flow_rate=dispense_properties.flow_rate_by_volume.get_for_volume(volume),
-            in_place=True,
+            in_place=self._target_end_location is not None,
             push_out=push_out_override,
             correction_volume=correction_volume,
         )
@@ -989,7 +993,16 @@ def absolute_point_from_position_reference_and_offset(
             reference_point = well.get_bottom(0)
         case PositionReference.WELL_CENTER:
             reference_point = well.get_center()
-        case PositionReference.LIQUID_MENISCUS:
+        case PositionReference.LIQUID_MENISCUS_START:
+            meniscus = well.get_meniscus()
+            if isinstance(meniscus, Point):
+                reference_point = meniscus
+            else:
+                # If estimated liquid height gives a SimulatedProbeResult then
+                # assume meniscus is at well center.
+                # Will this cause more harm than good? Is there a better alternative to this?
+                reference_point = well.get_center()
+        case PositionReference.LIQUID_MENISCUS_END:
             estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
                 mount=mount,
                 operation_volume=well_volume_difference,

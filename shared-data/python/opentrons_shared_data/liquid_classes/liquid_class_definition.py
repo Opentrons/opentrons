@@ -59,7 +59,8 @@ class PositionReference(Enum):
     WELL_BOTTOM = "well-bottom"
     WELL_TOP = "well-top"
     WELL_CENTER = "well-center"
-    LIQUID_MENISCUS = "liquid-meniscus"
+    LIQUID_MENISCUS_START = "liquid-meniscus-start"
+    LIQUID_MENISCUS_END = "liquid-meniscus-end"
 
 
 class BlowoutLocation(Enum):
@@ -407,6 +408,12 @@ class AspirateProperties(BaseLiquidClassModel):
     aspiratePosition: TipPosition = Field(
         ..., alias="aspirate_position", description="Tip position during aspirate."
     )
+    aspirateEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="aspirate_end_position",
+        description="Ending tip position during dynamic aspirate.",
+        json_schema_extra=_remove_default,
+    )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         alias="flow_rate_by_volume",
@@ -439,6 +446,12 @@ class SingleDispenseProperties(BaseLiquidClassModel):
     dispensePosition: TipPosition = Field(
         ..., alias="dispense_position", description="Tip position during dispense."
     )
+    dispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="dispense_end_position",
+        description="Ending tip position during dynamic dispense.",
+        json_schema_extra=_remove_default,
+    )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         alias="flow_rate_by_volume",
@@ -468,6 +481,12 @@ class MultiDispenseProperties(BaseLiquidClassModel):
     )
     dispensePosition: TipPosition = Field(
         ..., alias="dispense_position", description="Tip position during dispense."
+    )
+    dispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="dispense_end_position",
+        description="Ending tip position during dynamic dispense.",
+        json_schema_extra=_remove_default,
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
