@@ -10,7 +10,7 @@ class AccelerationGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     # Using this list to output string in specific order
     EXPECTED_ARGS = ["S", "X", "Y", "Z", "A", "B", "C"]
 
-    class ValDefinedMessage(str, StrEnum):
+    class ValDefinedMessage(StrEnum):
         S = "Default: $ident"
         Y = "Y-Axis: $ident"
         X = "X-Axis: $ident"
