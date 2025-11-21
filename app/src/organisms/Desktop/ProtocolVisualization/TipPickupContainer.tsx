@@ -52,7 +52,7 @@ export function TipPickupContainer(
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Tag text={t('tipPickup')} type="default" shrinkToContent />
+        <Tag text={t('tip_pickup')} type="default" shrinkToContent />
         <RobotInfoLabel deckLabel={slot} />
       </div>
       <div className={styles.subheader}>
