@@ -264,7 +264,7 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.24
             Added the ``flow_rate`` parameter.
         .. versionchanged:: 2.27
-            Added the ``end_location`` and ``movement_delay`` parameters. 
+            Added the ``end_location`` and ``movement_delay`` parameters.
         """
         if flow_rate is not None:
             if self.api_version < APIVersion(2, 24):
@@ -512,9 +512,9 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.24
             ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
             into a trash bin or waste chute.
-        
+
         .. versionchanged:: 2.27
-            Added the ``end_location`` and ``movement_delay`` parameters. 
+            Added the ``end_location`` and ``movement_delay`` parameters.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -2272,9 +2272,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                tips=[tip._core for tip in transfer_args.tips]
-                if transfer_args.tips is not None
-                else None,
+                tips=(
+                    [tip._core for tip in transfer_args.tips]
+                    if transfer_args.tips is not None
+                    else None
+                ),
             )
 
         return self
@@ -2446,9 +2448,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                tips=[tip._core for tip in transfer_args.tips]
-                if transfer_args.tips is not None
-                else None,
+                tips=(
+                    [tip._core for tip in transfer_args.tips]
+                    if transfer_args.tips is not None
+                    else None
+                ),
             )
 
         return self
@@ -2620,9 +2624,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                tips=[tip._core for tip in transfer_args.tips]
-                if transfer_args.tips is not None
-                else None,
+                tips=(
+                    [tip._core for tip in transfer_args.tips]
+                    if transfer_args.tips is not None
+                    else None
+                ),
             )
 
         return self
