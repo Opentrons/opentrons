@@ -27,7 +27,7 @@ class CameraSettings(BaseModel):
     liveStreamEnabled: bool = Field(
         ..., description="Enablement status for the Opentrons Live Stream service."
     )
-    errorRecoveryEnabled: bool = Field(
+    errorRecoveryCameraEnabled: bool = Field(
         ..., description="Enablement status for camera usage with Error Recovery."
     )
 
