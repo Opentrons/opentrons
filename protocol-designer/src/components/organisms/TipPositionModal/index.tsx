@@ -275,15 +275,18 @@ export function TipPositionModal(
       ? utils.getIsZValueAtBottom(zValue, wellDepthMm, reference)
       : false
 
+  const titleText =
+    prefix === 'aspirate' || prefix === 'dispense' || prefix === 'mix'
+      ? t('shared:tip_position', { prefix: MoveLiquidPrefixToAction[prefix] })
+      : t('shared:start_point', { prefix: MoveLiquidPrefixToAction[prefix] })
+
   return createPortal(
     <Modal
       marginLeft="0"
       type="info"
       width="47rem"
       closeOnOutsideClick
-      title={t('shared:tip_position', {
-        prefix: MoveLiquidPrefixToAction[prefix],
-      })}
+      title={titleText}
       onClose={handleCancel}
       footer={
         <Flex

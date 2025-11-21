@@ -277,12 +277,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const { numWellsToFitInTip } = multiWellHandling
 
   if (
-    // these conditions should never be true— they are checked in moveLiquidFormToArgs
+    // We stop users from selecting the consolidate path if we can't fit > 1 chunk into
+    // the tip, but older protocols can have consolidate selected and trigger this error
     !multiWellHandling.isSupported ||
     numWellsToFitInTip == null ||
     numWellsToFitInTip === 1
   ) {
-    errors.push(errorCreators.multiDispenseValuesNotFound())
+    errors.push(errorCreators.multiAspirateVolumeTooHigh())
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
@@ -370,6 +371,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const trashPipetteName =
     trashBinEntities[dropTipLocation]?.pythonName ??
     wasteChuteEntities[dropTipLocation]?.pythonName
+  const blowoutTrashPythonName =
+    blowoutLocation == null
+      ? null
+      : (trashBinEntities[blowoutLocation]?.pythonName ??
+        wasteChuteEntities[blowoutLocation]?.pythonName)
   const sourceLabwarePythonName = labwareEntities[sourceLabware].pythonName
   const destLabwarePythonName = labwareEntities[destLabware]?.pythonName
   const pythonSourceWells = sourceWells
@@ -433,8 +439,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     ...(isReturnTip
-      ? [`return_tip=True`]
-      : [`trash_location=${trashPipetteName}`, `keep_last_tip=True`]),
+      ? [
+          'return_tip=True',
+          ...(blowoutTrashPythonName != null
+            ? [`trash_location=${blowoutTrashPythonName}`]
+            : []),
+        ]
+      : [`trash_location=${trashPipetteName}`, 'keep_last_tip=True']),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [

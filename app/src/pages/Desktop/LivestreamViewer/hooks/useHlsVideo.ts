@@ -6,7 +6,7 @@ import { useHost } from '@opentrons/react-api-client'
 import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
 
 import type { RefObject } from 'react'
-import type { RunStatus } from '@opentrons/api-client'
+import type { CameraData, RunStatus } from '@opentrons/api-client'
 
 // TODO(jh, 09-05-25): /GET this from the /stream endpoint eventually.
 const STREAM_URL = (robotIp: string): string =>
@@ -19,7 +19,10 @@ export interface UseHlsVideoResult {
   videoError: string | null
 }
 
-export function useHlsVideo(runStatus: RunStatus | null): UseHlsVideoResult {
+export function useHlsVideo(
+  runStatus: RunStatus | null,
+  cameraData: CameraData | null
+): UseHlsVideoResult {
   const host = useHost()
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
@@ -28,6 +31,12 @@ export function useHlsVideo(runStatus: RunStatus | null): UseHlsVideoResult {
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const setupHls = useRef<() => void>()
+
+  const setLivestreamError = (msg: string): void => {
+    if (cameraData?.liveStreamEnabled) {
+      setError(msg)
+    }
+  }
 
   useEffect(() => {
     if (error) {
@@ -44,7 +53,7 @@ export function useHlsVideo(runStatus: RunStatus | null): UseHlsVideoResult {
 
     setupHls.current = () => {
       if (!Hls.isSupported()) {
-        setError('HLS streaming not supported in this browser.')
+        setLivestreamError('HLS streaming not supported in this browser.')
         return
       }
 
@@ -76,7 +85,9 @@ export function useHlsVideo(runStatus: RunStatus | null): UseHlsVideoResult {
         setError(null)
         video.play().catch(e => {
           console.error('Auto-play failed:', e)
-          setError('Auto-play failed. Please close and reopen the stream.')
+          setLivestreamError(
+            'Auto-play failed. Please close and reopen the stream.'
+          )
         })
       })
 
@@ -84,7 +95,8 @@ export function useHlsVideo(runStatus: RunStatus | null): UseHlsVideoResult {
         // `fatal` prevents refetching over-aggressively, ex, when the buffer is temporarily depleted.
         if (data.fatal && !isTerminalRunStatus(runStatus)) {
           retryCountRef.current++
-          setError(
+
+          setLivestreamError(
             `Service unavailable. Retrying (${retryCountRef.current})...`
           )
 
@@ -95,7 +107,7 @@ export function useHlsVideo(runStatus: RunStatus | null): UseHlsVideoResult {
       })
 
       const handleVideoError = (e: ErrorEvent): void => {
-        setError(`Video playback error: ${e.message}`)
+        setLivestreamError(`Video playback error: ${e.message}`)
       }
 
       video.addEventListener('error', handleVideoError)

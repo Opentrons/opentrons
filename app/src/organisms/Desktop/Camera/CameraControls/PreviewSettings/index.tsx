@@ -65,7 +65,7 @@ function PreviewImageBtn({
       {isLoading ? (
         <Icon name="ot-spinner" spin className={styles.icon_style} />
       ) : (
-        <Icon name="photo-camera" className={styles.icon_style} />
+        <Icon name="camera" className={styles.icon_style} />
       )}
       <StyledText>
         {hasPreviewImg ? t('retake_preview') : t('preview_image')}

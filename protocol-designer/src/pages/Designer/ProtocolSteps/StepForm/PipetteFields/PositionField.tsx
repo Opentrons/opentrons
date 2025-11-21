@@ -192,6 +192,15 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
     `protocol_steps:reference_positions.${referencePosition}`
   )
 
+  const titleText =
+    prefix === 'aspirate' || prefix === 'dispense' || prefix === 'mix'
+      ? t('protocol_steps:tip_position', {
+          prefix: MoveLiquidPrefixToAction[prefix],
+        })
+      : t('protocol_steps:start_point', {
+          prefix: MoveLiquidPrefixToAction[prefix],
+        })
+
   return (
     <>
       <Tooltip tooltipProps={tooltipProps}>{tooltipContent}</Tooltip>
@@ -204,12 +213,7 @@ export function PositionField(props: PositionFieldProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
         >
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-            {i18n.format(
-              t('protocol_steps:tip_position', {
-                prefix: MoveLiquidPrefixToAction[prefix],
-              }),
-              'capitalize'
-            )}
+            {i18n.format(titleText, 'capitalize')}
           </StyledText>
           <ListButton
             padding={SPACING.spacing12}

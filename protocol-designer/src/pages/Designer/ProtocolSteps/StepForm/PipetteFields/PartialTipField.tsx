@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { DropdownMenu, Flex, SPACING } from '@opentrons/components'
 import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
 
-import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
@@ -26,8 +25,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
   } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
-  const enablePartialTip = useSelector(getEnablePartialTipSupport)
-  const is96Channel = pipetteSpecs.channels === 96
+  const { channels } = pipetteSpecs
 
   const tipracks = Object.values(deckSetup.labware).filter(
     labware => labware.def.parameters.isTiprack
@@ -35,7 +33,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
   const tipracksNotOnAdapter = tipracks.filter(
     tiprack => tiprack.stack.length === 2
   )
-  const noTipracksOnAdapter = tipracksNotOnAdapter.length === 0
+  const areAllTipracksOnAdapter = tipracksNotOnAdapter.length === 0
 
   const options: DropdownOption[] = [
     {
@@ -43,26 +41,30 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
       value: ALL,
     },
   ]
-  if (is96Channel) {
-    options.push({
-      name: t('column'),
-      value: COLUMN,
-      disabled: noTipracksOnAdapter,
-      tooltipText: noTipracksOnAdapter
-        ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-        : null,
-    })
-    if (enablePartialTip) {
-      options.push({
-        name: t('single_nozzle'),
-        value: SINGLE,
-        disabled: noTipracksOnAdapter,
-        tooltipText: noTipracksOnAdapter
-          ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-          : null,
-      })
-    }
-  } else {
+  if (channels === 96) {
+    options.push(
+      ...[
+        {
+          name: t('column'),
+          value: COLUMN,
+          disabled: areAllTipracksOnAdapter,
+          tooltipText: areAllTipracksOnAdapter
+            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
+            : null,
+        },
+        {
+          name: t('single_nozzle'),
+          value: SINGLE,
+          disabled: areAllTipracksOnAdapter,
+          tooltipText: areAllTipracksOnAdapter
+            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
+            : null,
+        },
+      ]
+    )
+  }
+  if (channels === 8) {
+    // 8-channel
     options.push({
       name: t('single_nozzle'),
       value: SINGLE,

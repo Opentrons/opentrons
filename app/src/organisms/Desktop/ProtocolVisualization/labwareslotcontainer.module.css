@@ -3,7 +3,6 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  gap: auto;
 }
 
 .info_label_container {
@@ -34,5 +33,4 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  gap: auto;
 }

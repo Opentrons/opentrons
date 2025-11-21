@@ -31,7 +31,6 @@ import { OVERFLOW_MENU_POSITION_ADJUSTMENT } from '../../../../constants'
 import type { ThunkDispatch } from 'redux-thunk'
 import type { Dispatch, MutableRefObject, SetStateAction } from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
-import type { StepIdType } from '/protocol-designer/form-types'
 import type { BaseState } from '/protocol-designer/types'
 
 interface StepOverflowMenuProps {
@@ -76,21 +75,6 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     savedStepFormData.stepType === 'thermocycler' &&
     savedStepFormData.thermocyclerFormType === 'thermocyclerProfile'
 
-  const duplicateStep = (
-    stepId: StepIdType
-  ): ReturnType<typeof stepsActions.duplicateStep> =>
-    dispatch(stepsActions.duplicateStep(stepId))
-
-  const duplicateMultipleSteps = (): void => {
-    if (multiSelectItemIds) {
-      dispatch(stepsActions.duplicateMultipleSteps(multiSelectItemIds))
-    } else {
-      console.warn(
-        'something went wrong, you cannot duplicate multiple steps if none are selected'
-      )
-    }
-  }
-
   const selectViewDetailsEvent: AnalyticsEvent = {
     name: OPEN_STEP_DETAILS_EVENT,
     properties: {},
@@ -119,7 +103,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
             <MenuItem
               disabled={batchEditFormHasUnstagedChanges}
               onClick={() => {
-                duplicateMultipleSteps()
+                dispatch(stepsActions.duplicateSelectedSteps())
                 setOpenedOverflowMenuId(null)
               }}
             >
@@ -156,7 +140,7 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
             <MenuItem
               disabled={singleEditFormHasUnsavedChanges}
               onClick={() => {
-                duplicateStep(stepId)
+                dispatch(stepsActions.duplicateSelectedSteps())
                 setOpenedOverflowMenuId(null)
               }}
             >

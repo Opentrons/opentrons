@@ -14,7 +14,7 @@ import {
   makeContext,
 } from '@opentrons/step-generation'
 
-import { getOrderedWells } from '../../../utils'
+import { getOrderedWells } from '../../../utils/getOrderedWells'
 import {
   getAirGapData,
   getMixData,
@@ -25,7 +25,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HydratedMoveLiquidFormData } from '/protocol-designer/form-types'
 import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
 
-vi.mock('../../../utils')
+vi.mock('../../../utils/getOrderedWells')
 vi.mock('assert')
 
 const ASPIRATE_WELL = 'A2' // default source is trough for these tests
@@ -38,6 +38,15 @@ describe('move liquid step form -> command creator args', () => {
   const sourceLabwareType = getLabwareDefURI(sourceLabwareDef)
   const destLabwareDef = fixture_96_plate as LabwareDefinition2
   const destLabwareType = getLabwareDefURI(destLabwareDef)
+  const tiprackLabwareDef = {
+    parameters: {
+      tipLength: 10,
+      loadName: 'mockTiprack',
+    },
+    metadata: {
+      displayName: 'mock display name',
+    },
+  } as LabwareDefinition2
   beforeEach(() => {
     vi.mocked(getOrderedWells).mockClear()
     vi.mocked(getOrderedWells).mockImplementation(wells => wells)
@@ -50,17 +59,7 @@ describe('move liquid step form -> command creator args', () => {
       pipette: {
         id: 'pipetteId',
         spec: fixtureP10SingleV2Specs,
-        tiprackLabwareDef: [
-          {
-            parameters: {
-              tipLength: 10,
-              loadName: 'mockTiprack',
-            },
-            metadata: {
-              displayName: 'mock display name',
-            },
-          },
-        ] as any,
+        tiprackLabwareDef: [tiprackLabwareDef] as any,
       } as any,
       volume: 10,
       path: 'single',
@@ -71,7 +70,7 @@ describe('move liquid step form -> command creator args', () => {
         type: sourceLabwareType,
         def: sourceLabwareDef,
       },
-      tipRack: 'tiprack1Id',
+      tipRack: { tiprackDefURI: 'tiprack1Id', ...tiprackLabwareDef } as any,
       aspirate_wells: [ASPIRATE_WELL],
       aspirate_wellOrder_first: 'l2r',
       aspirate_wellOrder_second: 't2b',

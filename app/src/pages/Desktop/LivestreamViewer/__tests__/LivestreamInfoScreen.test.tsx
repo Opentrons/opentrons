@@ -35,4 +35,12 @@ describe('LivestreamInfoScreen', () => {
     render('run-terminal')
     screen.getByText('Live video has ended')
   })
+
+  it('renders run-setup state', () => {
+    render('run-setup')
+    screen.getByText('Live video is unavailable')
+    screen.getByText(
+      'Confirm your camera preferences to view the livestream during run setup.'
+    )
+  })
 })

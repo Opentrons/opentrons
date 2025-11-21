@@ -33,11 +33,7 @@ import { Dispense } from './Dispense'
 import { Overview } from './Overview'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import {
-  createQuickTransferFile,
-  getInitialSummaryState,
-  retrieveLiquidClassValues,
-} from './utils'
+import { getInitialSummaryState, retrieveLiquidClassValues } from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
@@ -60,7 +56,6 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
-  const enableExportJSON = useFeatureFlag('quickTransferExportJSON')
   const enableProtocolContentsLog = useFeatureFlag(
     'quickTransferProtocolContentsLog'
   )
@@ -122,19 +117,12 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = enableExportJSON
-      ? createQuickTransferFile(
-          state,
-          deckConfig,
-          protocolName,
-          enableProtocolContentsLog
-        )
-      : createQuickTransferPythonFile(
-          state,
-          deckConfig,
-          protocolName,
-          enableProtocolContentsLog
-        )
+    const protocolFile = createQuickTransferPythonFile(
+      state,
+      deckConfig,
+      protocolName,
+      enableProtocolContentsLog
+    )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -151,19 +139,12 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = enableExportJSON
-      ? createQuickTransferFile(
-          state,
-          deckConfig,
-          undefined,
-          enableProtocolContentsLog
-        )
-      : createQuickTransferPythonFile(
-          state,
-          deckConfig,
-          undefined,
-          enableProtocolContentsLog
-        )
+    const protocolFile = createQuickTransferPythonFile(
+      state,
+      deckConfig,
+      undefined,
+      enableProtocolContentsLog
+    )
 
     createProtocolAsync({
       files: [protocolFile],

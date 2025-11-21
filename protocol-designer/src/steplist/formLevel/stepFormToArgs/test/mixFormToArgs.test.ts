@@ -8,15 +8,15 @@ import { fixture_96_plate } from '@opentrons/shared-data/labware/fixtures/2'
 import { AUTOMATIC } from '@opentrons/step-generation'
 
 import { DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP } from '/protocol-designer/constants'
+import { getOrderedWells } from '/protocol-designer/steplist/utils/getOrderedWells'
 
-import { getOrderedWells } from '../../../utils'
 import { mixFormToArgs } from '../mixFormToArgs'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { HydratedMixFormData } from '/protocol-designer/form-types'
 import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
 
-vi.mock('../../../utils')
+vi.mock('../../../utils/getOrderedWells')
 
 let castForm: GetCastFormData<HydratedMixFormData>
 const labwareDef = fixture_96_plate as LabwareDefinition2
@@ -24,6 +24,16 @@ const labwareType = getLabwareDefURI(labwareDef)
 
 beforeEach(() => {
   vi.mocked(getOrderedWells).mockImplementation(wells => wells)
+
+  const tiprackLabwareDef = {
+    parameters: {
+      tipLength: 10,
+      loadName: 'mockTiprack',
+    },
+    metadata: {
+      displayName: 'mock display name',
+    },
+  } as LabwareDefinition2
 
   castForm = {
     id: 'stepId',
@@ -42,21 +52,11 @@ beforeEach(() => {
     blowout_checkbox: false,
     blowout_location: null,
     mix_mmFromBottom: 0.5,
-    tipRack: 'mockTiprack',
+    tipRack: { tiprackDefURI: 'mockTiprack', ...tiprackLabwareDef },
     pipette: {
       id: 'pipetteId',
       spec: fixtureP10SingleV2Specs,
-      tiprackLabwareDef: [
-        {
-          parameters: {
-            tipLength: 10,
-            loadName: 'mockTiprack',
-          },
-          metadata: {
-            displayName: 'mock display name',
-          },
-        },
-      ] as any,
+      tiprackLabwareDef: [tiprackLabwareDef] as any,
     } as any,
     // @ts-expect-error(sa, 2021-6-15): volume should be a number
     volume: '12',

@@ -30,7 +30,7 @@ describe('RobotSettingsCameraControls', () => {
   it('renders image and video settings section', () => {
     render()
 
-    screen.getByText('Image and Video Settings')
+    screen.getByText('Image and video settings')
     screen.getByText(
       'Configure the camera’s zoom, brightness, contrast, and saturation.'
     )
