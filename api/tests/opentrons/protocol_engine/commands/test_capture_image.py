@@ -136,7 +136,7 @@ async def test_raises_camera_disabled_error(
         CameraSettings(
             cameraEnabled=False,
             liveStreamEnabled=False,
-            errorRecoveryEnabled=False,
+            errorRecoveryCameraEnabled=False,
         )
     )
 

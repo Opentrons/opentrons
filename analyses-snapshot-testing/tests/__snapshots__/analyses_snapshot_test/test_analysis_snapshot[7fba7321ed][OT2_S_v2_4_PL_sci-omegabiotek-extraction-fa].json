@@ -171789,7 +171789,16 @@
     "protocolName": "Mag-BindÂ® Blood & Tissue DNA HDQ 96 Kit",
     "source": "Custom Protocol Request"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "6"
+      },
+      "model": "magneticModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",
