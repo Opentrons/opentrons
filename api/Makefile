@@ -67,13 +67,13 @@ all: clean wheel
 .PHONY: setup
 setup:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: setup-ot2
 setup-ot2:
 	@$(uv_sync_dev)
-	@uv pip uninstall python-can
-	@uv pip list
+	@$(UV) pip uninstall python-can
+	@$(UV) pip list
 
 .PHONY: clean
 clean: docs-clean

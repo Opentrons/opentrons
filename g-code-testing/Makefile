@@ -24,7 +24,7 @@ clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__p
 .PHONY: setup
 setup:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: clean
 clean:

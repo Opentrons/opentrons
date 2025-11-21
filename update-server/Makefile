@@ -27,7 +27,7 @@ ssh_opts ?= $(default_ssh_opts)
 .PHONY: setup
 setup:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true

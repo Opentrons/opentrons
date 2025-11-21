@@ -55,7 +55,7 @@ setup: setup-py
 .PHONY: setup-py
 setup-py:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: teardown
 teardown: teardown-py

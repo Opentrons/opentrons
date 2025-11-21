@@ -57,7 +57,7 @@ all: clean wheel
 .PHONY: setup
 setup:
 	@$(uv_sync_dev)
-	@uv pip list
+	@$(UV) pip list
 
 .PHONY: clean
 clean:
