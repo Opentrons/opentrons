@@ -12,7 +12,6 @@ from opentrons_hardware.hardware_control.rear_panel_settings import set_ui_color
 
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import StatusBarState, DoorState
-from opentrons_hardware.drivers.eeprom.types import PropId
 from opentrons.system import nmcli
 
 from hardware_testing.data import create_datetime_string
