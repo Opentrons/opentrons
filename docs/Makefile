@@ -11,6 +11,8 @@ build:
 .PHONY: setup
 setup:
 	uv sync
+	uv pip install -e ../shared-data/
+	uv pip install -e ../api/
 	uv run playwright install --with-deps chromium
 
 .PHONY: clean

@@ -14,10 +14,8 @@ dependencies = [
     "mkdocs-macros-plugin>=1.3.9",
     "mkdocs-parent-css-plugin",
     "mkdocs-print-site-plugin>=2.8",
-    "opentrons",
     "playwright>=1.55",
 ]
 
 [tool.uv.sources]
 mkdocs-parent-css-plugin = { path = "mkdocs-parent-css-plugin", editable = true }
-opentrons = { path = "../api", editable = true }
