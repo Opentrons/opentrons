@@ -65,10 +65,6 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
-        # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
-        # preferably in a nightly cronjob on edge or something
-        python: ['3.10']
-
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v4'
@@ -86,7 +82,6 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
-          python-version: ${{ matrix.python }}
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
@@ -168,7 +163,6 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
-          dependency-group: ''
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:

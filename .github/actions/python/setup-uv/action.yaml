@@ -4,18 +4,10 @@ inputs:
   project:
     description: 'Which project (by subdirectory) to set up'
     required: true
-  python-version:
-    description: "What Python version to use to create the project's virtual environment"
-    required: false
-    default: "false"
   install-system-deps:
     description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
     required: false
     default: 'true'
-  dependency-group:
-    description: 'Which dependency group to install (e.g., "dev", "robot"). If not specified (default), installs dev dependencies. Use empty string "" to install base dependencies only (no groups)'
-    required: false
-    default: 'dev'
 runs:
   using: 'composite'
   steps:
@@ -41,47 +33,4 @@ runs:
     - name: Setup Python Environment
       id: setup-env
       shell: bash
-      run: |
-        START_TIME=$(date +%s)
-        echo "start-time=$START_TIME" >> $GITHUB_OUTPUT
-        echo "::notice::Using UV for dependency management"
-        
-        # Handle dependency-group input:
-        # - Not specified (default 'dev') → run uv sync --group dev (same as make setup)
-        # - Empty string "" → run uv sync without --group (base dependencies only)
-        # - Specific group name → run uv sync with that group
-        DEPENDENCY_GROUP="${{ inputs.dependency-group }}"
-        
-        if [ -z "${DEPENDENCY_GROUP}" ]; then
-          # Empty string explicitly provided, install base dependencies only (no groups)
-          echo "::notice::Installing base dependencies only (no dependency groups)"
-          
-          if [ -f "${{ inputs.project }}/uv.lock" ]; then
-            cd ${{ inputs.project }} && uv sync --frozen
-          else
-            cd ${{ inputs.project }} && uv sync
-          fi
-        else
-          # Group specified, check if it exists and install it
-          if grep -q '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" && \
-             grep -A 30 '\[dependency-groups\]' "${{ inputs.project }}/pyproject.toml" | grep -q "^${DEPENDENCY_GROUP} ="; then
-            GROUP_FLAG="--group ${DEPENDENCY_GROUP}"
-            echo "::notice::Installing dependency group: ${DEPENDENCY_GROUP}"
-            
-            if [ -f "${{ inputs.project }}/uv.lock" ]; then
-              cd ${{ inputs.project }} && uv sync --frozen $GROUP_FLAG
-            else
-              cd ${{ inputs.project }} && uv sync $GROUP_FLAG
-            fi
-          else
-            echo "::warning::Dependency group '${DEPENDENCY_GROUP}' not found in pyproject.toml, skipping"
-          fi
-        fi
-        
-        echo "::notice::Verifying dependencies are installed..."
-        uv pip list | head -20
-        END_TIME=$(date +%s)
-        DURATION=$((END_TIME - START_TIME))
-        echo "duration=$DURATION" >> $GITHUB_OUTPUT
-        echo "::notice::Setup completed in ${DURATION} seconds"
-
+      run: make -C ${{ inputs.project }} setup

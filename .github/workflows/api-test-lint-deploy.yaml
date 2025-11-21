@@ -61,7 +61,6 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
-          python-version: '3.10'
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
@@ -71,7 +70,6 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
-        python: ['3.10']
         with-ot-hardware: ['true', 'false']
         exclude:
           - os: 'windows-2022'
@@ -101,12 +99,9 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
-          python-version: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Remove OT-3 hardware package
         run: make -C api setup-ot2
-        env:
-          OT_VIRTUALENV_VERSION: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Test without opentrons_hardware
         run: make -C api test-ot2
@@ -210,8 +205,6 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
-          python-version: '3.10'
-          dependency-group: ''
       - name: 'build api distributables'
         shell: bash
         run: make -C api sdist wheel
