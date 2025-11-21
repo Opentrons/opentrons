@@ -83,7 +83,7 @@ class CameraProvider:
             return self._camera_settings_callback()
         # If we are in analysis or simulation, return as if the camera is enabled
         return CameraSettings(
-            cameraEnabled=True, liveStreamEnabled=True, errorRecoveryEnabled=True
+            cameraEnabled=True, liveStreamEnabled=True, errorRecoveryCameraEnabled=True
         )
 
     async def capture_image(
