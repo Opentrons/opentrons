@@ -16,8 +16,10 @@ export function LabwareDetailsWithCount({
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: SPACING.spacing16,
         width: '100%',
+        backgroundColor: 'var(--grey-20)',
+        borderRadius: 'var(--border-radius-4)',
+        padding: 'var(--spacing-16) var(--spacing-8)',
       }}
     >
       <StyledText

@@ -1,0 +1,32 @@
+@import '../../ui-style-constants/spacing';
+@import '../../ui-style-constants/responsiveness';
+@import '../../ui-style-constants/colors';
+@import '../../ui-style-constants/borders';
+
+.icon-style {
+  width: var(--spacing-24);
+  height: var(--spacing-24);
+  @media (max-width: 768px) {
+    width: var(--spacing-40);
+    height: var(--spacing-40);
+  }
+}
+
+.card-style {
+    background-color: var(--grey-20);
+  border-radius: var(--border-radius-4);
+  gap: var(--spacing-8);
+  @media (max-width: 768px) {
+    background-color: var(--grey-35);
+    border-radius: var(--border-radius-8);
+  }
+}
+
+.line-clamp-style {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  -webkit-line-clamp: 2;
+}
