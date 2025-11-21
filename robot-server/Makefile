@@ -69,13 +69,7 @@ run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) 
 .PHONY: all
 all: clean wheel
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --group dev; \
-	else \
-		uv sync --group dev; \
-	fi
-endef
+
 
 .PHONY: setup
 setup:
@@ -95,7 +89,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(UV) venv --remove
+	$(SHX) rm -rf .venv
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

@@ -1,12 +1,17 @@
 # UV is required for Python dependency management
 UV ?= uv
+UV_PYTHON = 3.10
 
 # Python/pip/pytest commands using UV
-python := $(UV) run python
-pip := $(UV) pip
-pytest := $(UV) run pytest
+python := $(UV) run python --python $(UV_PYTHON)
+pip := $(UV) run pip --python $(UV_PYTHON)
+pytest := $(UV) run pytest --python $(UV_PYTHON)
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
+
+define uv_sync_dev
+	$(UV) sync --frozen --group dev --python $(UV_PYTHON)
+endef
 
 poetry := poetry
 poetry_run := $(poetry) run

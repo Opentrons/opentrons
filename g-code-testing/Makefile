@@ -19,13 +19,7 @@ tests_to_typecheck := \
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --group dev; \
-	else \
-		uv sync --group dev; \
-	fi
-endef
+
 
 .PHONY: setup
 setup:
@@ -38,7 +32,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(UV) venv --remove
+	$(SHX) rm -rf .venv
 
 .PHONY: test
 test:

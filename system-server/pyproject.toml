@@ -103,3 +103,12 @@ packages = ['system_server']
 # The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
 # during builds, but for local dev, uv uses these paths directly.
 server-utils = { path = "../server-utils", editable = true }
+
+# uv: global settings and dependency tweaks
+[tool.uv]
+# Provide static metadata so uv can resolve systemd-python without building its sdist on
+# macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+    ] },
+]

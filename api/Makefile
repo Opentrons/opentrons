@@ -61,14 +61,6 @@ clean_all_cmd = $(clean_cmd) dist
 
 plot_type ?=
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --python 3.10 --group dev; \
-	else \
-		uv sync --python 3.10 --group dev; \
-	fi
-endef
-
 .PHONY: all
 all: clean wheel
 
@@ -90,7 +82,7 @@ clean: docs-clean
 
 .PHONY: teardown
 teardown:
-	$(UV) venv --remove
+	$(SHX) rm -rf .venv
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

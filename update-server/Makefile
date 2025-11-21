@@ -22,13 +22,7 @@ ssh_key ?= $(default_ssh_key)
 ssh_opts ?= $(default_ssh_opts)
 
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --group dev; \
-	else \
-		uv sync --group dev; \
-	fi
-endef
+
 
 .PHONY: setup
 setup:
@@ -53,7 +47,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	$(UV) venv --remove
+	$(SHX) rm -rf .venv
 
 .PHONY: test
 test:

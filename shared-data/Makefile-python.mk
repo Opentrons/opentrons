@@ -47,13 +47,7 @@ clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean sdist wheel
 
-define uv_sync_dev
-	if [ -f uv.lock ]; then \
-		uv sync --frozen --group dev; \
-	else \
-		uv sync --group dev; \
-	fi
-endef
+
 
 .PHONY: setup
 setup: setup-py
@@ -68,7 +62,7 @@ teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	$(UV) venv --remove
+	$(SHX) rm -rf .venv
 
 
 .PHONY: clean
