@@ -52,6 +52,7 @@ export function SetupRobotCalibration({
   const runHasStarted = useRunHasStarted(runId)
   const { data: runRecord } = useNotifyRunQuery(runId)
   const runStatus = runRecord?.data.status ?? null
+  
   const isFlex = useIsFlex(robotName)
 
   let tooltipText: string | null = null
