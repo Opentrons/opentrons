@@ -6,15 +6,15 @@ title: "Opentrons OT-2: Robot Components"
 
 ## Frame and enclosure
 
-The frame of the OT-2 provides rigidity and structural support for its deck and gantry. All of the mechanical subsystems mounted to the main frame. The frame is constructed of sheet metal and aluminum extrusions.
+The frame of the OT-2 provides rigidity and structural support for its deck and gantry. It is constructed of sheet metal and aluminum extrusions. All of the mechanical subsystems are mounted to the frame. 
 
-The metal frame has openings for side windows and a front door made of transparent polycarbonate that lets you see what's going on inside the robot. The lower half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare and manipulate the deck before and during a protocol run.
+The metal frame has openings for side, top, and back windows along with a front door made of transparent polycarbonate that lets you see what's going on inside the robot. The lower half of the front door hinges open for access to the deck and working area. With the front door open, you can attach instruments to the gantry, place modules and labware on the deck, and prepare or organize the deck before and during a protocol run.
 
 Other frame elements include:
 
-- LED strips within the enclosure provide software-controllable ambient lighting.
-- A built-in camera can photograph the deck and working area for recording and tracking protocol execution.
-- A front LED indicates the robot's status. It turns solid blue when your OT-2 powered on and fully booted up.
+- LED strips within the enclosure that provide software-controllable ambient lighting.
+- A built-in 2-megapixel camera that can take still or video images of the deck and working area.
+- A front LED that indicates the robot's status. It turns solid blue when your OT-2 powered on and fully booted up.
 
 ## Gantry
 
@@ -42,7 +42,9 @@ The OT-2 deck slides in and out of the enclosure. You can pull it out part way, 
 
 ## Other connections
 
-When facing your OT-2, you can find the status lights, power switch, and Ethernet connections on the left side and back of the robot. The robot also provides USB ports inside the enclosure behind the gantry.
+When facing your OT-2, you can find the status lights, power switch, and Ethernet connections on the left side and back of the robot.
+
+Behind the gantry, USB ports inside the enclosure provide connectivity between the OT-2 and its attached deck modules.
 
 ### Rear LEDs
 
@@ -62,7 +64,7 @@ The following table lists and describes these status lights.
   <tbody>
     <tr>
       <td><img src="../../images/power-symbol.png" alt="power" width="50%"></td>
-      <td>Power light<br>Light should stay on and remain solid if the OT-2 is turned on and initialized.</td>
+      <td>Power light<br>The light should stay on and remain solid if the OT-2 is turned on and initialized.</td>
     </tr>
     <tr>
       <td><img src="../../images/ot2-network.png" alt="ethernet" width="50%"></td>

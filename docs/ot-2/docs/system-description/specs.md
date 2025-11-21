@@ -14,7 +14,7 @@ title: "Opentrons OT-2: System Specifications"
   <tbody>
     <tr>
         <td><strong>Dimensions</strong></td>
-        <td>The OT-2's dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x 25").</td>
+        <td>The OT-2 dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x 25").</td>
     </tr>
     <tr>
         <td><strong>Weight</strong></td>
@@ -50,14 +50,14 @@ title: "Opentrons OT-2: System Specifications"
     </tr>
     <tr>
         <td><strong>Power consumption</strong></td>
-        <td>Total power consumption depends on the state of your robot and the specific requirements of a protocol. For example:
-        <p>
+        <td>
+            <p>Total power consumption depends on the state of your robot and the specific requirements of a protocol. For example:</p>
             <ul>
                 <li>When idle, the OT-2 can use 90 to 120 W.</li>
                 <li>When active, the OT-2 can use 100 to 180 W.</li>
             </ul>
-        </p>
-        <p>Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the OT-2 and the number of attached pipettes.</p></td>
+            <p>Exact power consumption is determined by the amount of movement executed during a protocol or the amount of time the robot spends idle. Power consumption may also be affected by the status of the lights on the OT-2 and the number of attached pipettes.</p>
+        </td>
     </tr>
     <tr>
         <td><strong>Frame composition</strong></td>
@@ -69,15 +69,15 @@ title: "Opentrons OT-2: System Specifications"
     </tr>
     <tr>
         <td><strong>Ventilation requirements</strong></td>
-        <td>Leave at least 20 cm (8") around the the OT-2 to help ensure adequate ventilation.</td>
+        <td>Leave at least 20 cm (8") around the OT-2 to help ensure adequate ventilation.</td>
     </tr>
     <tr>
         <td><strong>Connected PC requirements</strong></td>
-        <td>The Opentrons App runs on:
+        <td><p>The Opentrons App runs on:</p>
             <ul>
                 <li>Windows 10 or later</li>
                 <li>macOS 10.10 or later</li>
-                <li>Ubuntu 12.04 or later</td>
+                <li>Ubuntu 12.04 or later</li>
             </ul>
         </td>
     </tr>
