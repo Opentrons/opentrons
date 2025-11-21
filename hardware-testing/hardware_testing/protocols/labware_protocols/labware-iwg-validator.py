@@ -26,7 +26,7 @@ import serial  # type: ignore[import]
 #  SET LABWARE HERE
 ###########################################
 
-LABWARE = "corning_falcon_384_wellplate_130ul_flat"
+LABWARE = "example_labware"
 
 ###########################################
 #  GLOBAL VARIABLES
@@ -493,7 +493,7 @@ def _setup(ctx: ProtocolContext) -> SetupState:
 def get_transfer_props(volume: float, config: SetupState) -> None:
     """Get aspirate/dispense properties for ethanol liquid class. You can change these."""
     # this tries to mitigate liquid forming on the tip for small dispenses.
-    if volume > 10:
+    if volume > 15:
         dispense_offset = 0.1
     else:
         dispense_offset = 0.1

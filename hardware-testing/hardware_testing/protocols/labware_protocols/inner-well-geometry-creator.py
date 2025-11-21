@@ -30,7 +30,7 @@ import serial  # type: ignore[import]
 #  SET LABWARE HERE
 ###########################################
 
-LABWARE = "corning_falcon_384_wellplate_130ul_flat"
+LABWARE = "example_labware"
 
 ###########################################
 #  GLOBAL VARIABLES
@@ -724,13 +724,16 @@ def build_IWG_definition(
                 ctx.pause(f"Labware Definition file: {IWG_file_path}")
 
 
-def get_transfer_props(height: float, volume: float, config: SetupState) -> None:
+def get_transfer_props(
+    expected_liquid_level: float, volume: float, config: SetupState
+) -> None:
     """Assigns the liquid class properties for ethanol and get the height to dispense at."""
     # changes dispense offset based on the "expected" liquid level.
-    if volume > 10:
-        dispense_offset = height + config.target_height + 8
+
+    if volume > 15:
+        dispense_offset = expected_liquid_level + 1.0
     else:
-        dispense_offset = height + config.target_height
+        dispense_offset = expected_liquid_level + 0.1
 
     # set pipette behavior based on tip size
     if config.liquid_tip == "50":
@@ -773,7 +776,8 @@ def prepare_transfer(
         trial.get_height_of_liquid_in_well(ctx, config, source=True)
     trial.dispense_volume += trial.step_volume
     volume_per_channel = trial.dispense_volume / config.liq_pipette.active_channels
-    get_transfer_props(trial.corrected_height, volume_per_channel, config)
+    expected_liquid_level = trial.corrected_height + config.target_height
+    get_transfer_props(expected_liquid_level, volume_per_channel, config)
     return volume_per_channel
 
 
