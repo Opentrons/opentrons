@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
@@ -33,12 +33,13 @@ import { Dispense } from './Dispense'
 import { Overview } from './Overview'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import { getInitialSummaryState, retrieveLiquidClassValues } from './utils'
+import { initializeSummaryState } from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
+import type { InitialSummaryStateProps } from './utils/getInitialSummaryState'
 
 interface SummaryAndSettingsProps {
   exitButtonProps: ComponentProps<typeof SmallButton>
@@ -65,15 +66,10 @@ export function SummaryAndSettings(
   const [selectedCategory, setSelectedCategory] = useState<string>('overview')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const initialSummaryState = getInitialSummaryState({
-    // @ts-expect-error TODO figure out how to make this type non-null as we know
-    // none of these values will be undefined
-    state: wizardFlowState,
-    deckConfig,
-  })
   const [state, dispatch] = useReducer(
     quickTransferSummaryReducer,
-    initialSummaryState
+    { state: wizardFlowState as InitialSummaryStateProps['state'], deckConfig },
+    initializeSummaryState
   )
 
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
@@ -89,19 +85,6 @@ export function SummaryAndSettings(
     },
     host
   )
-
-  useEffect(() => {
-    if (!state.liquidClassValuesInitialized) {
-      const liquidClassValues = retrieveLiquidClassValues(state, 'all')
-      dispatch({
-        type: 'SET_LIQUID_CLASS_VALUES',
-        liquidClassValues: {
-          ...liquidClassValues,
-          liquidClassValuesInitialized: true,
-        },
-      })
-    }
-  })
 
   const isMultiTransferDispense = state?.path === 'multiDispense'
 
