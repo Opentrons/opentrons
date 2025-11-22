@@ -36,6 +36,7 @@ export * from './matrixMath'
 export * from './getLoadedLabwareDefinitionsByUri'
 export * from './getFixedTrashLabwareDefinition'
 export * from './getOccludedSlotCountForModule'
+export * from './getFlexStackerHardwareProps'
 export * from './labwareInference'
 export * from './linearInterpolate'
 export * from './liquidClasses'
@@ -64,6 +65,7 @@ export * from './getModuleDeckLabel'
 export * from './deckConfig'
 export * from './testHelpers'
 export * from './symbolicPositionHelpers'
+export * from './slotHovers'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

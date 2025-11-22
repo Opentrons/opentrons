@@ -10,7 +10,6 @@ import type {
   CameraData,
   CameraResponse,
   ErrorResponse,
-  HostConfig,
 } from '@opentrons/api-client'
 
 export interface AddCameraSettingsToRunParams {
@@ -39,7 +38,7 @@ export function useAddCameraSettingsToRunMutation(): UseAddCameraSettingsToRunMu
     AxiosError<ErrorResponse>,
     AddCameraSettingsToRunParams
   >(({ runId, settings }) =>
-    addCameraSettingsToRun(host as HostConfig, runId, settings)
+    addCameraSettingsToRun(host!, runId, settings)
       .then(response => {
         queryClient
           .invalidateQueries([host, 'runs', runId])

@@ -21,8 +21,7 @@ export {
   findThermocyclerProfileRepetitions,
 }
 export * from './commandCreatorArgsGetters'
-export * from './constructInvariantContextFromRunCommands'
-export * from './createTimelineFromRunCommands'
+export * from './constructInvariantContextFromAnalysis'
 export * from './createTimelineFromRunCommands'
 export * from './heaterShakerCollision'
 export * from './liquidClassUtils'

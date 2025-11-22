@@ -19,7 +19,7 @@ export const useCanDisconnect = (robotName: string): boolean => {
 
   const active = wifiList.some(nw => nw.active)
   const supportsDisconnect = Semver.valid(apiVersion)
-    ? isFlex || Semver.gte(apiVersion as string, API_MIN_DISCONNECT_VERSION)
+    ? isFlex || Semver.gte(apiVersion!, API_MIN_DISCONNECT_VERSION)
     : false
 
   return Boolean(active && supportsDisconnect)

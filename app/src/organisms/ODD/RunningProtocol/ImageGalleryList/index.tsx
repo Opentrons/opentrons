@@ -56,7 +56,7 @@ export function ImageGalleryList(props: ImageGalleryListProps): JSX.Element {
       {isCameraSettingsEnabled && (
         <FloatingActionButton
           buttonText={t('image_capture')}
-          iconName="photo-camera"
+          iconName="camera"
           onClick={() => null}
         />
       )}

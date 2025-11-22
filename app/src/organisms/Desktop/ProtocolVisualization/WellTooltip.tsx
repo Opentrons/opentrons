@@ -9,7 +9,8 @@ import { swatchColors } from '@opentrons/step-generation'
 
 import { getModalPortalEl } from '/app/App/portal'
 
-import { formatPercentage, formatVolume } from './utils'
+import { formatPercentage } from './utils/formatPercentage'
+import { formatVolume } from './utils/formatVolume'
 import styles from './welltooltip.module.css'
 
 import type { MouseEvent, ReactNode } from 'react'

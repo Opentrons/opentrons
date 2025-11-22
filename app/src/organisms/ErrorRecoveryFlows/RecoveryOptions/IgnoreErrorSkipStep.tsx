@@ -63,7 +63,7 @@ export function IgnoreErrorStepHome({
     routeUpdateActions
 
   const [selectedOption, setSelectedOption] = useState<IgnoreOption>(
-    head(IGNORE_OPTIONS_IN_ORDER) as IgnoreOption
+    head(IGNORE_OPTIONS_IN_ORDER)!
   )
 
   // Reset client choice to ignore all errors whenever navigating back to this view. This prevents unexpected

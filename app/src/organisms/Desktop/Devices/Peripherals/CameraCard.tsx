@@ -100,7 +100,7 @@ export function CameraCard({
               {t('on_deck')}
             </StyledText>
             <div className={styles.card_photo_content_container}>
-              <Icon className={styles.icon_container} name="photo-camera" />
+              <Icon className={styles.icon_container} name="camera" />
               <StyledText desktopStyle="bodyDefaultRegular">
                 {isFlex ? t('branded:flex_camera') : t('ot2_camera')}
               </StyledText>

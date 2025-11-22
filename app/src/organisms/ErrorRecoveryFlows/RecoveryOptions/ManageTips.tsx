@@ -25,7 +25,6 @@ import {
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { FixitCommandTypeUtils } from '/app/organisms/DropTipWizardFlows'
-import type { PipetteWithTip } from '/app/resources/instruments'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
@@ -188,7 +187,7 @@ function DropTipFlowsContainer(
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
-  const { mount, specs } = tipStatusUtils.aPipetteWithTip as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
+  const { mount, specs } = tipStatusUtils.aPipetteWithTip! // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
     if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {

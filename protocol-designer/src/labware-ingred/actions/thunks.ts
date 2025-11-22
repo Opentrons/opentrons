@@ -17,6 +17,7 @@ import type {
   CreateContainerArgs,
   DeleteContainerAction,
   DuplicateLabwareAction,
+  OpenIngredientSelectorAction,
   ZoomedIntoSlotAction,
 } from './actions'
 
@@ -30,7 +31,10 @@ export interface RenameLabwareAction {
 export const renameLabware: (
   args: RenameLabwareAction['payload']
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
   const { labwareId } = args
   const allNicknamesById =
@@ -54,9 +58,12 @@ export const renameLabware: (
 export const createContainer: (
   args: CreateContainerArgs
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
-  const { labwareDefURIStack, slot } = args
+  const { labwareDefURIStack, slot, updateSelectedLabwareId } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
@@ -84,6 +91,15 @@ export const createContainer: (
         },
       })
 
+      // If the user wants to update the selected labware id,
+      // we do not have the option to return the created id, so we need to open the ingredient selector manually.
+      if (updateSelectedLabwareId) {
+        dispatch({
+          type: 'OPEN_INGREDIENT_SELECTOR',
+          payload: id,
+        })
+      }
+
       if (isTiprack) {
         // Tipracks cannot be named, but should auto-increment.
         // We can't rely on reducers to do that themselves bc they don't have access
@@ -92,6 +108,7 @@ export const createContainer: (
           labwareId: id,
         })(dispatch, getState)
       }
+
       if (availableSlot === 'offDeck') {
         dispatch({
           type: 'ZOOMED_INTO_SLOT',
@@ -106,68 +123,70 @@ export const createContainer: (
 }
 
 export const duplicateLabware: (
-  templateLabwareId: string
+  templateLabwareIds: string[]
 ) => ThunkAction<DuplicateLabwareAction> =
-  templateLabwareId => (dispatch, getState) => {
+  templateLabwareIds => (dispatch, getState) => {
     const state = getState()
     const robotType = state.fileData.robotType
-    const templateLabwareDefURI =
-      stepFormSelectors.getLabwareEntities(state)[templateLabwareId]
-        .labwareDefURI
-    console.assert(
-      templateLabwareDefURI,
-      `no labwareDefURI for labware ${templateLabwareId}, cannot run duplicateLabware thunk`
-    )
+    const labwareEntities = stepFormSelectors.getLabwareEntities(state)
+    const labwareDefsByURI = labwareDefSelectors.getLabwareDefsByURI(state)
     const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-    const templateLabwareIdIsOffDeck =
-      getSlotInLocationStack(
-        initialDeckSetup.labware[templateLabwareId].stack
-      ) === 'offDeck'
-    const labwareDef =
-      labwareDefSelectors.getLabwareDefsByURI(state)[templateLabwareDefURI]
-    const displayCategory = labwareDef.metadata.displayCategory
-    const duplicateSlot = getNextAvailableDeckSlot(
-      initialDeckSetup,
-      robotType,
-      labwareDef
-    )
-    if (duplicateSlot == null && !templateLabwareIdIsOffDeck) {
-      console.error('no slots available, cannot duplicate labware')
-    }
     const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
-    const templateNickname = allNicknamesById[templateLabwareId]
-    const duplicateLabwareNickname = getNextNickname(
-      Object.keys(allNicknamesById).map((id: string) => allNicknamesById[id]), // NOTE: flow won't do Object.values here >:(
-      templateNickname
-    )
-    const duplicateLabwareId = uuid() + ':' + templateLabwareDefURI
 
-    if (templateLabwareDefURI) {
-      if (templateLabwareIdIsOffDeck) {
-        dispatch({
-          type: 'DUPLICATE_LABWARE',
-          payload: {
-            duplicateLabwareNickname,
-            templateLabwareId,
-            duplicateLabwareId,
-            slot: 'offDeck',
-            displayCategory,
-          },
-        })
-      }
+    const templateLabwareDefURIs = templateLabwareIds.map(
+      id => labwareEntities[id]?.labwareDefURI
+    )
+
+    console.assert(
+      !templateLabwareDefURIs.some(uri => uri == null),
+      'Missing labwareDefURI for one or more templateLabwareIds:',
+      templateLabwareIds
+    )
+
+    // determine if duplicating off-deck
+    const firstTemplateId = templateLabwareIds[0]
+    const firstLabwareStack = initialDeckSetup.labware[firstTemplateId].stack
+    const isOffDeck = getSlotInLocationStack(firstLabwareStack) === 'offDeck'
+
+    const firstLabwareDefURI = templateLabwareDefURIs[0] as string
+    const labwareDef = labwareDefsByURI[firstLabwareDefURI]
+    const displayCategory = labwareDef?.metadata?.displayCategory
+
+    const templateSlot = isOffDeck
+      ? 'offDeck'
+      : getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
+
+    //  ensure templateSlot is not null
+    if (templateSlot == null) {
+      console.error('no slots available, cannot duplicate labware')
+      return
     }
-    if (duplicateSlot != null && !templateLabwareIdIsOffDeck) {
+
+    const duplicateNicknames = templateLabwareIds.map(id => {
+      const templateNickname = allNicknamesById[id]
+      return getNextNickname(Object.values(allNicknamesById), templateNickname)
+    })
+
+    let slot: string = templateSlot as string
+    templateLabwareIds.reverse().forEach((templateLabwareId, index) => {
+      const defURI = labwareEntities[templateLabwareId].labwareDefURI
+      const duplicateLabwareId = `${uuid()}:${defURI}`
+
       dispatch({
         type: 'DUPLICATE_LABWARE',
         payload: {
-          duplicateLabwareNickname,
+          duplicateLabwareNickname: duplicateNicknames[index],
           templateLabwareId,
           duplicateLabwareId,
-          slot: duplicateSlot,
+          slot,
           displayCategory,
         },
       })
-    }
+
+      if (!isOffDeck) {
+        slot = duplicateLabwareId
+      }
+    })
   }
 
 export interface EditMultipleLabwareAction {

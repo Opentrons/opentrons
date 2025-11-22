@@ -19,7 +19,7 @@ import { TipSelectionModal } from './TipSelectionModal'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
-import type { TipSelectionBaseProps } from './types'
+import type { AccessibilityStatus, TipSelectionBaseProps } from './types'
 
 const NUM_TOTAL_STEPS = 2
 
@@ -35,7 +35,7 @@ interface TipSelectionWizardProps {
   selectedTips: string[][]
   setSelectedTips: Dispatch<SetStateAction<string[][]>>
   validTiprackIds: string[]
-  tipAccessibilityStatus: Record<string, Record<string, boolean>>
+  tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
 }
 
 export function TipSelectionWizard(

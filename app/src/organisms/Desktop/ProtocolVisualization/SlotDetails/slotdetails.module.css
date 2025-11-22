@@ -1,0 +1,26 @@
+.slot_container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  padding-right: var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.slot_details {
+  height: 100vh;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+  overflow-y: scroll;
+}
+
+.command_step_header {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--spacing-16);
+}
+
+.slot_detail_header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+}

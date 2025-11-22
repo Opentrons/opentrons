@@ -25,6 +25,7 @@ const WINDOW_OPTS = {
   width: config.width,
   minWidth: config.minWidth,
   height: config.height,
+  minHeight: config.minHeight,
   frame: false, // hide menubar
   // allow webPreferences to be set at launchtime from config
   webPreferences: Object.assign(
