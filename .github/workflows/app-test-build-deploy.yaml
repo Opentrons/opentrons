@@ -87,7 +87,7 @@ jobs:
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: check make version
         run: make --version
       - name: 'test native(er) packages'
@@ -210,7 +210,7 @@ jobs:
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: check make version
         run: make --version
       - name: 'Configure Windows code signing environment'
