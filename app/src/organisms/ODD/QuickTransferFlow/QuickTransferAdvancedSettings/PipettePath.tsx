@@ -118,8 +118,6 @@ export function PipettePath(props: PipettePathProps): JSX.Element {
       dispatch({
         type: ACTIONS.SET_PIPETTE_PATH,
         path: selectedPath as PathOption,
-        disposalVolume,
-        blowOutLocation,
       })
       trackEventWithRobotSerial({
         name: ANALYTICS_QUICK_TRANSFER_SETTING_SAVED,

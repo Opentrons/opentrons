@@ -84,20 +84,6 @@ export function SummaryAndSettings(
     },
     host
   )
-
-  // useEffect(() => {
-  //   if (!state.liquidClassValuesInitialized) {
-  //     const liquidClassValues = retrieveLiquidClassValues(state, 'all')
-  //     dispatch({
-  //       type: 'SET_LIQUID_CLASS_VALUES',
-  //       liquidClassValues: {
-  //         ...liquidClassValues,
-  //         liquidClassValuesInitialized: true,
-  //       },
-  //     })
-  //   }
-  // })
-
   const isMultiTransferDispense = state?.path === 'multiDispense'
 
   const handleClickCreateTransfer = (): void => {

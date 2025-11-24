@@ -10,6 +10,8 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { getPipetteName } from './utils'
+
 import type { ComponentProps, Dispatch } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
@@ -37,16 +39,6 @@ export function SelectPipettePath({
 
   const sourceWells = state.sourceWells ?? []
   const destinationWells = state.destinationWells ?? []
-  // const pipetteName = getPipetteName(state.pipette)
-  // const liquidSpecs = state.pipette.liquids
-  // const tipType = getTipTypeFromTipRackDefinition(state.tipRack)
-  // const flowRatesForSupportedTip: SupportedTip | undefined =
-  //   state.volume < 5 &&
-  //   `lowVolumeDefault` in liquidSpecs &&
-  //   typeof pipetteName === 'string' &&
-  //   LOW_VOLUME_PIPETTES.includes(pipetteName)
-  //     ? liquidSpecs.lowVolumeDefault.supportedTips[tipType]
-  //     : liquidSpecs.default.supportedTips[tipType]
 
   // If the user is creating a 1:1 transfer or n:n transfer
   // If the user is creating a 1:n transfer, display options for single transfers and multi-dispense.
@@ -69,22 +61,10 @@ export function SelectPipettePath({
   }
 
   const handleClickNext = (): void => {
-    if (selectedPath === 'multiDispense') {
-      dispatch({
-        type: 'SET_PIPETTE_PATH',
-        path: 'multiDispense',
-        disposalVolumeDispenseSettings: {
-          volume: 10,
-          blowOutLocation: 'source_well',
-          flowRate: 800,
-        },
-      })
-    } else {
-      dispatch({
-        type: 'SET_PIPETTE_PATH',
-        path: selectedPath ?? 'single',
-      })
-    }
+    dispatch({
+      type: 'SET_PIPETTE_PATH',
+      path: selectedPath ?? 'single',
+    })
     onNext()
   }
 
