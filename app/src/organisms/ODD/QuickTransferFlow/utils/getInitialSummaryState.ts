@@ -12,6 +12,7 @@ import type {
   PipetteV2Specs,
 } from '@opentrons/shared-data'
 import type {
+  BlowOutLocation,
   ChangeTipOptions,
   PathOption,
   QuickTransferSummaryState,
@@ -36,6 +37,11 @@ export interface InitialSummaryStateProps {
     }
     changeTip: ChangeTipOptions
     dropTipLocation?: CutoutConfig
+    disposalVolumeDispenseSettings?: {
+      volume: number
+      blowOutLocation: BlowOutLocation
+      flowRate: number
+    }
   }
   deckConfig: DeckConfiguration
 }
@@ -96,9 +102,12 @@ export function getInitialSummaryState(
     aspirateFlowRate: flowRatesForSupportedTip.defaultAspirateFlowRate.default,
     dispenseFlowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
     path,
-    disposalVolume: path === 'multiDispense' ? state.volume : undefined,
-    blowOutDispense:
+    disposalVolumeDispenseSettings:
       path === 'multiDispense'
+        ? state.disposalVolumeDispenseSettings
+        : undefined,
+    blowOutDispense:
+      path !== 'multiDispense'
         ? {
             location: trashConfigCutout,
             flowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
