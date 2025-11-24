@@ -1,9 +1,8 @@
 """Gripper configurations."""
+from typing import List, Dict, Tuple, Any, NewType
 
 from typing_extensions import Annotated, Literal
-from typing import List, Dict, Tuple, Any, NewType
 from pydantic import ConfigDict, BaseModel, Field
-from enum import Enum
 
 from ..util import StrEnum
 
