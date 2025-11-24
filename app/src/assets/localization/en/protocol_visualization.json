@@ -28,6 +28,8 @@
   "tips_remaining": "Tips remaining",
   "trash_bin": "TRASH BIN",
   "trash": "TRASH",
+  "slot": "Slot",
+  "fixedTrash": "Fixed trash",
   "unable_to_show_steps_past_errors": "Unable to show steps past errors",
   "well_dimension": "{{number}} mm",
   "well_name": "Well {{wellName}}",
