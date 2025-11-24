@@ -29,6 +29,11 @@ export interface QuickTransferWizardState {
   changeTip?: ChangeTipOptions
   dropTipLocation?: CutoutConfig | string
   liquidClassName?: string
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -187,8 +192,11 @@ interface SetDispenseFlowRateAction {
 interface SetPipettePath {
   type: typeof ACTIONS.SET_PIPETTE_PATH
   path: PathOption
-  disposalVolume?: number
-  blowOutLocation?: BlowOutLocation
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }
 interface SetAspirateTipPosition {
   type: typeof ACTIONS.SET_ASPIRATE_TIP_POSITION

@@ -56,7 +56,7 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const keyboardRef = useRef(null)
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [volume, setVolume] = useState<number | null>(null)
-
+  console.log('volume', volume)
   const getInitialBlowoutLocation = (
     blowOut: typeof state.blowOutDispense
   ): string => {

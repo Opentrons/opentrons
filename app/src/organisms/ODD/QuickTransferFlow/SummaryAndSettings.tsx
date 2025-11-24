@@ -71,7 +71,6 @@ export function SummaryAndSettings(
     { state: wizardFlowState as InitialSummaryStateProps['state'], deckConfig },
     initializeSummaryState
   )
-
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(
@@ -85,6 +84,19 @@ export function SummaryAndSettings(
     },
     host
   )
+
+  // useEffect(() => {
+  //   if (!state.liquidClassValuesInitialized) {
+  //     const liquidClassValues = retrieveLiquidClassValues(state, 'all')
+  //     dispatch({
+  //       type: 'SET_LIQUID_CLASS_VALUES',
+  //       liquidClassValues: {
+  //         ...liquidClassValues,
+  //         liquidClassValuesInitialized: true,
+  //       },
+  //     })
+  //   }
+  // })
 
   const isMultiTransferDispense = state?.path === 'multiDispense'
 

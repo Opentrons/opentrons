@@ -32,6 +32,7 @@ export function useDispenseSettingsConfig({
 }: UseDispenseSettingsConfigProps): SettingItem[] {
   const { t, i18n } = useTranslation(['quick_transfer', 'shared'])
   const { makeSnackbar } = useToaster()
+  console.log('state.disposalVolumeDispenseSettings',state.disposalVolumeDispenseSettings)
   const getBlowoutValueCopy = (): string | undefined => {
     if (state.blowOutDispense == null) {
       return t('option_disabled')

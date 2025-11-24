@@ -1,3 +1,5 @@
+import { healthPolled } from '@opentrons/discovery-client/src/store'
+
 import { CONSOLIDATE, DISTRIBUTE, TRANSFER } from './constants'
 
 import type {
@@ -91,11 +93,22 @@ export function quickTransferWizardReducer(
       }
     }
     case 'SET_PIPETTE_PATH': {
-      return {
-        ...state,
-        path: action.path,
+      if (action.path === 'multiDispense') {
+        console.log('hello')
+        return {
+          ...state,
+          path: action.path,
+          disposalVolumeDispenseSettings: action.disposalVolumeDispenseSettings,
+        }
+      } else {
+        return {
+          ...state,
+          path: action.path,
+          disposalVolumeDispenseSettings: undefined,
+        }
       }
     }
+
     case 'SET_CHANGE_TIP': {
       return {
         ...state,
@@ -263,6 +276,7 @@ export function quickTransferSummaryReducer(
       }
     }
     case 'SET_DISPOSAL_VOLUME_DISPENSE': {
+      console.log('hello', action)
       return {
         ...state,
         disposalVolumeDispenseSettings: action.disposalVolumeDispenseSettings,
