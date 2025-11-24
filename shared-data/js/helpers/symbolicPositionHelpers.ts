@@ -1,8 +1,10 @@
+import { STANDARD_FLEX_SLOTS, STANDARD_OT2_SLOTS } from '../fixtures'
+
 import type {
   LabwareLocation,
   OnDeckLabwareLocation,
 } from '../../command/types/setup'
-import type { AddressableAreaName } from '../../js'
+import type { AddressableAreaName } from '../../deck'
 
 export const changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName =
   (quoteUnquoteSlotName: string): boolean =>
@@ -41,3 +43,14 @@ export const locationIsOnAddressableArea = (
   labwareLocation: LabwareLocation
 ): labwareLocation is { addressableAreaName: AddressableAreaName } =>
   locationIsOnDeck(labwareLocation) && 'addressableAreaName' in labwareLocation
+
+export const getIsValidSlotName = (slot: string): boolean => {
+  return (
+    STANDARD_OT2_SLOTS.includes(slot as AddressableAreaName) ||
+    STANDARD_FLEX_SLOTS.includes(slot as AddressableAreaName) ||
+    slot === 'A4' ||
+    slot === 'B4' ||
+    slot === 'C4' ||
+    slot === 'D4'
+  )
+}

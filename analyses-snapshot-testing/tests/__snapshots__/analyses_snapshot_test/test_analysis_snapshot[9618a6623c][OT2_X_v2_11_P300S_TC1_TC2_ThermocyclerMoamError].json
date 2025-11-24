@@ -2706,7 +2706,16 @@
   "metadata": {
     "apiLevel": "2.11"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "7"
+      },
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

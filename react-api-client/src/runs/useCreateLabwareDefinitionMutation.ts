@@ -5,10 +5,7 @@ import { createLabwareDefinition } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseMutateAsyncFunction, UseMutationResult } from 'react-query'
-import type {
-  CreateLabwareDefinitionResponsePayload,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { CreateLabwareDefinitionResponsePayload } from '@opentrons/api-client'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 
 interface CreateLabwareDefinitionParams {
@@ -37,7 +34,7 @@ export function useCreateLabwareDefinitionMutation(): UseCreateLabwareDefinition
     unknown,
     CreateLabwareDefinitionParams
   >(({ runId, data }) =>
-    createLabwareDefinition(host as HostConfig, runId, data)
+    createLabwareDefinition(host!, runId, data)
       .then(response => {
         queryClient.invalidateQueries([host, 'runs']).catch((e: Error) => {
           console.error(`error invalidating runs query: ${e.message}`)

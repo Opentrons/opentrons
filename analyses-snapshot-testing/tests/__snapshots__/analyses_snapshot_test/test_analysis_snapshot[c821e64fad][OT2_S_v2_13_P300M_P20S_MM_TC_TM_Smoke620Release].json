@@ -10528,7 +10528,32 @@
     "protocolName": "🛠 Logo-Modules-CustomLabware 🛠",
     "source": "Software Testing Team"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "9"
+      },
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "4"
+      },
+      "model": "temperatureModuleV1",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "7"
+      },
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

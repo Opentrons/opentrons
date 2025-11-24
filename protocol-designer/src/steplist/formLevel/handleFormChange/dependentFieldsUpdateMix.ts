@@ -168,6 +168,19 @@ const updatePatchOnNozzlesChange = (
   return patch
 }
 
+const updatePatchOnChangeTipChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'changeTip')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMix(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -199,5 +212,6 @@ export function dependentFieldsUpdateMix(
       ),
     chainPatch => updatePatchOnTiprackChange(chainPatch, rawForm),
     chainPatch => updatePatchOnNozzlesChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnChangeTipChange(chainPatch, rawForm),
   ])
 }

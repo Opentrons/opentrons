@@ -1,0 +1,21 @@
+.section_container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-8);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
+  gap: var(--spacing-16);
+}
+
+.time_container {
+  display: flex;
+  width: 100%;
+  gap: var(--spacing-16);
+}
+
+.button_container {
+  display: flex;
+  width: max-content;
+  justify-content: flex-end;
+}

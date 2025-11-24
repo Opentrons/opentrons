@@ -11,6 +11,7 @@ import type {
 import type { FormData } from '../../form-types'
 import type {
   CreateContainerAction,
+  OpenIngredientSelectorAction,
   RenameLabwareAction,
   ZoomedIntoSlotAction,
 } from '../../labware-ingred/actions'
@@ -26,7 +27,10 @@ export interface CreateContainerAboveModuleArgs {
 export const createContainerAboveModule: (
   args: CreateContainerAboveModuleArgs
 ) => ThunkAction<
-  CreateContainerAction | RenameLabwareAction | ZoomedIntoSlotAction
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
   const { slot, labwareDefURIStack } = args
   const state = getState()

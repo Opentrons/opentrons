@@ -51,12 +51,14 @@ interface StepSizeControlProps {
   stepSizes: StepSize[]
   currentStepSize: StepSize
   setCurrentStepSize: (stepSize: StepSize) => void
+  isOnDevice: boolean
 }
 
 function StepSizeButtons({
   stepSizes,
   currentStepSize,
   setCurrentStepSize,
+  isOnDevice,
 }: StepSizeControlProps): JSX.Element {
   const { t } = useTranslation('robot_calibration')
   return (
@@ -70,6 +72,7 @@ function StepSizeButtons({
           }}
           title={t(stepSizeTranslationKeyByStep[stepSize])}
           subText={`${stepSize} mm`}
+          isOnDevice={isOnDevice}
         />
       ))}
     </>
@@ -77,7 +80,7 @@ function StepSizeButtons({
 }
 
 export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
-  const { stepSizes, currentStepSize, setCurrentStepSize } = props
+  const { stepSizes, currentStepSize, setCurrentStepSize, isOnDevice } = props
   const { t } = useTranslation(['robot_calibration'])
 
   const increaseStepSize: () => void = () => {
@@ -124,6 +127,7 @@ export function StepSizeControl(props: StepSizeControlProps): JSX.Element {
               stepSizes={stepSizes}
               currentStepSize={currentStepSize}
               setCurrentStepSize={setCurrentStepSize}
+              isOnDevice={isOnDevice}
             />
           </Box>
         </Flex>

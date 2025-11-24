@@ -19,7 +19,7 @@ import type {
   TransferType,
 } from '../types'
 
-interface InitialSummaryStateProps {
+export interface InitialSummaryStateProps {
   state: {
     pipette: PipetteV2Specs
     mount: Mount

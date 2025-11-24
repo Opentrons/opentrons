@@ -21,7 +21,6 @@ import {
   selectSelectedLwWithOffsetDetailsMostRecentVectorOffset,
 } from '/app/redux/protocol-runs'
 
-import type { LoadedPipette } from '@opentrons/shared-data'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
@@ -31,7 +30,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
     commandUtils
 
   const currentSubstep = useSelector(selectCurrentSubstep(runId))
-  const pipette = useSelector(selectActivePipette(runId)) as LoadedPipette
+  const pipette = useSelector(selectActivePipette(runId))!
   const pipetteId = pipette.id
   const selectedLwInfo = useSelector(selectSelectedLwOverview(runId))
   const mostRecentVectorOffset = useSelector(

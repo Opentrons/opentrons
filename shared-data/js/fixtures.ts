@@ -587,7 +587,7 @@ export const getAAByAAId = (
   // there should be a match with addressableAreaId
   const aaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
     (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableAreaId
-  ) as AddressableAreaWithFakes
+  )!
   if (aaItem == null) {
     console.error(`Could not find AddressableArea for ${addressableAreaId}`)
   }
@@ -868,6 +868,7 @@ export function getFixtureDisplayName(
   }
 }
 
+// TODO: Move to helpers/deckDeclarationHelpers.ts
 export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_1,
   ADDRESSABLE_AREA_2,
@@ -882,6 +883,7 @@ export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_11,
 ]
 
+// TODO: Move to helpers
 export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
@@ -1016,7 +1018,7 @@ export const getVisualSlotIdFromAAId = (
   const vsId = Object.entries(VS_TO_AA).find(([key, value]) =>
     value.includes(aaId)
   )?.[0]
-  return vsId as string // should always find a match
+  return vsId! // should always find a match
 }
 
 export const getAAWithFakesFromVSId = (
@@ -1155,7 +1157,7 @@ export const getMainAAForAFixture = (
       const singleSlotId = getAAWithFakesFromVSId(vsId)
       return singleSlotId === addressableAreaId
     })
-    return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
+    return aa! // we can cast this bc there should me a match for every fixtureId
   }
 }
 

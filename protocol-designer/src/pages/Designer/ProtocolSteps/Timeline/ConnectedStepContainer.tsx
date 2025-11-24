@@ -59,6 +59,8 @@ export interface ConnectedStepContainerProps {
   isStepAfterError?: boolean
 }
 
+// todo(mm, 2025-11-14): I've made a mess of ConnectedStepInfo and ConnectedStepContainer.
+// We should try to either merge them, or clarify each one's responsibilities.
 export function ConnectedStepContainer(
   props: ConnectedStepContainerProps
 ): JSX.Element {
@@ -131,6 +133,8 @@ export function ConnectedStepContainer(
   const onDeleteClickAction = (): void => {
     if (multiSelectItemIds) {
       dispatch(steplistActions.deleteMultipleSteps(multiSelectItemIds))
+      // todo(mm, 2025-10-31): Why are we doing deselectAllSteps here?
+      // deleteMultipleSteps already adjusts the selection when any of them are deleted.
       dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
     } else {
       console.warn(

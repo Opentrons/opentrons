@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 
 import {
+  AlertPrimaryButton,
   ALIGN_CENTER,
   Check,
   COLORS,
@@ -51,9 +52,6 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
     handleContinue()
   }
 
-  const confirmButtonText =
-    hintKey === 'no_commands' ? 'continue_with_export' : 'confirm'
-
   return createPortal(
     <Modal
       marginLeft="0"
@@ -81,9 +79,15 @@ export function BlockingHintModal(props: HintProps): JSX.Element {
             <SecondaryButton onClick={onCancelClick}>
               {t('shared:cancel')}
             </SecondaryButton>
-            <PrimaryButton onClick={onContinueClick}>
-              {i18n.format(t(`shared:${confirmButtonText}`), 'capitalize')}
-            </PrimaryButton>
+            {hintKey === 'has_errors' || hintKey === 'no_commands' ? (
+              <AlertPrimaryButton onClick={onContinueClick}>
+                {i18n.format(t(`shared:continue_with_export`), 'capitalize')}
+              </AlertPrimaryButton>
+            ) : (
+              <PrimaryButton onClick={onContinueClick}>
+                {i18n.format(t(`shared:confirm`), 'capitalize')}
+              </PrimaryButton>
+            )}
           </Flex>
         </Flex>
       }

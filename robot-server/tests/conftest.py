@@ -24,6 +24,7 @@ from opentrons.calibration_storage import (
     helpers,
     save_robot_deck_attitude,
 )
+from server_utils.fastapi_utils.app_state import AppState, get_app_state
 
 # NOTE(FS 10-24-2023), the fixtures using these functions currently ONLY
 # get pulled in by OT-2 server tests. If this ever changes, we need to
@@ -47,6 +48,10 @@ from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.health.router import ComponentVersions, get_versions
 from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.service.notifications.notification_client import (
+    NotificationClient,
+    _notification_client_accessor,
+)
 
 test_router = routing.APIRouter()
 
@@ -179,11 +184,29 @@ def _override_run_data_manager_with_mock(run_data: MagicMock) -> Iterator[None]:
 
 
 @pytest.fixture
+def _override_app_state_with_notification_client(decoy: Decoy) -> Iterator[None]:
+    """Override app_state to include a mocked notification client."""
+    mock_app_state = AppState()
+    mock_notification_client = decoy.mock(cls=NotificationClient)
+
+    _notification_client_accessor.set_on(mock_app_state, mock_notification_client)
+
+    async def get_app_state_override() -> AppState:
+        """Override for get_app_state."""
+        return mock_app_state
+
+    app.dependency_overrides[get_app_state] = get_app_state_override
+    yield
+    del app.dependency_overrides[get_app_state]
+
+
+@pytest.fixture
 def api_client(
     _override_hardware_with_mock: None,
     _override_sql_engine_with_mock: None,
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
+    _override_app_state_with_notification_client: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(
@@ -199,6 +222,7 @@ def api_client_camera_overrides(
     _override_version_with_mock: None,
     _override_ot2_hardware_with_mock: None,
     _override_run_data_manager_with_mock: None,
+    _override_app_state_with_notification_client: None,
 ) -> TestClient:
     client = TestClient(app)
     client.headers.update(

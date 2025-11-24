@@ -16,15 +16,13 @@ import {
   getCutoutIdForAddressableArea,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  getFlexHoverDimensions,
   getModuleType,
+  getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '../../step-forms/selectors'
-import {
-  getFlexHoverDimensions,
-  getOT2HoverDimensions,
-} from '../Designer/DeckSetup/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
