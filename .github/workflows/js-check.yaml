@@ -6,23 +6,23 @@ name: 'JS checks'
 on:
   pull_request:
     paths:
-      - '**/*.js'
-      - './.*.js'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/*.json'
-      - '**/*.css'
-      - '**/*.md'
+      - '**.js'
+      - '**.mjs'
+      - '**.ts'
+      - '**.tsx'
+      - '**.json'
+      - '**.css'
+      - '**.md'
   push:
     paths:
-      - '**/*.js'
-      - './.*.js'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/*.json'
-      - '**/*.md'
+      - '**.js'
+      - '**.mjs'
+      - '**.ts'
+      - '**.tsx'
+      - '**.json'
+      - '**.css'
+      - '**.md'
       - '.github/workflows/js-check.yaml'
-      - '**/*.css'
   workflow_dispatch:
 
 concurrency:

@@ -18,6 +18,7 @@ on:
       - 'yarn.lock'
       - '.github/workflows/app-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
+      - 'vitest.config.*'
     branches:
       - '**'
     tags:
@@ -36,6 +37,7 @@ on:
       - '*.json'
       - 'yarn.lock'
       - 'scripts/**'
+      - '.vitest.config.*'
   workflow_dispatch: {}
 
 concurrency:

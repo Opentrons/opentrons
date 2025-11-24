@@ -12,6 +12,7 @@ on:
       - '.github/workflows/ll-test-build-deploy.yaml'
       - '.github/workflows/utils.js'
       - 'scripts/static-deploy/**'
+      - 'vitest.config.*'
   push:
     branches:
       - 'edge'

@@ -9,12 +9,14 @@ on:
       - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
+      - 'vitest.config.*'
   push:
     paths:
       - 'react-api-client/**'
       - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
+      - 'vitest.config.*'
     branches:
       - '*'
   workflow_dispatch:
