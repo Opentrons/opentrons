@@ -76,11 +76,13 @@ export function SummaryAndSettings(
     state: wizardFlowState,
     deckConfig,
   })
+  console.log('initialSummaryState', initialSummaryState)
   const [state, dispatch] = useReducer(
     quickTransferSummaryReducer,
-    initialSummaryState
+    { state: wizardFlowState, deckConfig },
+    getInitialSummaryState
   )
-
+  console.log('state', state)
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(
@@ -95,18 +97,18 @@ export function SummaryAndSettings(
     host
   )
 
-  useEffect(() => {
-    if (!state.liquidClassValuesInitialized) {
-      const liquidClassValues = retrieveLiquidClassValues(state, 'all')
-      dispatch({
-        type: 'SET_LIQUID_CLASS_VALUES',
-        liquidClassValues: {
-          ...liquidClassValues,
-          liquidClassValuesInitialized: true,
-        },
-      })
-    }
-  })
+  // useEffect(() => {
+  //   if (!state.liquidClassValuesInitialized) {
+  //     const liquidClassValues = retrieveLiquidClassValues(state, 'all')
+  //     dispatch({
+  //       type: 'SET_LIQUID_CLASS_VALUES',
+  //       liquidClassValues: {
+  //         ...liquidClassValues,
+  //         liquidClassValuesInitialized: true,
+  //       },
+  //     })
+  //   }
+  // })
 
   const isMultiTransferDispense = state?.path === 'multiDispense'
 
