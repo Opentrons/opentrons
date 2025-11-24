@@ -29,7 +29,7 @@ To add deck fixtures via the touchscreen:
 Click the :octicons-x-circle-fill-16: on a fixture on the deck map to remove it from the deck configuration.
 
 <figure class="screenshot" markdown>
-![Deck configuration screen showing the deck map with various modules attached.](../images/deck-config-multiple-slots.png "Deck configuration with staging slot in D3")
+![Deck configuration screen showing the deck map with various modules attached.](../images/deck-config-multiple-slots.png)
 <figcaption>A Flex configured with staging area slots and modules.</figcaption>
 </figure>
 
