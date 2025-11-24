@@ -11,7 +11,7 @@ import { useRunHasStarted } from '../useRunHasStarted'
 import type { UseQueryResult } from 'react-query'
 import type { Run } from '@opentrons/api-client'
 
-vi.mock('/app/resources/runs')
+vi.mock('../useNotifyRunQuery')
 
 const MOCK_RUN_ID = '1'
 
@@ -24,6 +24,7 @@ describe('useRunHasStarted', () => {
 
   it('should return false when no run id is provided', () => {
     const { result } = renderHook(() => useRunHasStarted(null))
+
     expect(result.current).toEqual(false)
   })
 
