@@ -1,5 +1,3 @@
-import { Box } from '@opentrons/components'
-
 import { Splash as SplashComponent } from './Splash'
 
 import type { Meta, StoryObj } from '@storybook/react'
@@ -9,9 +7,9 @@ const meta: Meta<typeof SplashComponent> = {
   component: SplashComponent,
   decorators: [
     Story => (
-      <Box height="20rem" width="100%">
+      <div style={{ height: '20rem', width: '100%' }}>
         <Story />
-      </Box>
+      </div>
     ),
   ],
 }
