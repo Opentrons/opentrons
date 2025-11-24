@@ -16,6 +16,7 @@ class GCODE(str, Enum):
     GET_PRESSURE_STATE = "M121"
     SET_PUMP_STATE = "M122"
     GET_PUMP_STATE = "M123"
+    SET_VENT_STATE = "M124"
 
     def build_command(self) -> CommandBuilder:
         """Build command."""
@@ -83,6 +84,13 @@ class LEDPattern(Enum):
     CONFIRM = 3
 
 
+class VentState(Enum):
+    """The State of the vent."""
+
+    OPENED = 0
+    CLOSED = 1
+
+
 @dataclass
 class PressureState:
     """Get the pressure state."""
@@ -92,6 +100,7 @@ class PressureState:
     pressure_abs_a: float
     pressure_abs_b: float
     pressure_atm: float
+    vent_state: VentState
 
 
 @dataclass
@@ -100,3 +109,7 @@ class PumpState:
 
     target_rpm: float
     current_rpm: float
+    target_pwm: float
+    current_pwm: float
+    pump_running: bool
+    manual_control: bool

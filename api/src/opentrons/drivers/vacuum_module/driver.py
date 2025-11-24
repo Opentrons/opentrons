@@ -12,6 +12,7 @@ from .types import (
     PumpState,
     VacuumModuleInfo,
     HardwareRevision,
+    VentState,
 )
 from .errors import VacuumModuleErrorCodes
 
@@ -62,9 +63,8 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_state(cls, response: str) -> PressureState:
         """Parse the get pressure state."""
-        _RE = re.compile(
-            rf"^{GCODE.GET_PRESSURE_STATE} T:(?P<T>\d) C:(?P<C>\d) A:(?P<A>\d) B:(?P<B>\d) H:(?P<H>\d)$"
-        )
+        pattern = r"T:(?P<T>\d.+) C:(?P<C>\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) V:(?P<V>\d)"
+        _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
             raise ValueError(f"Incorrect Response for get pressure state: {response}")
@@ -74,16 +74,25 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("A")),
             float(match.group("B")),
             float(match.group("H")),
+            VentState(int(match.group("V"))),
         )
 
     @classmethod
     def parse_get_pump_state(cls, response: str) -> PumpState:
         """Parse the get pump state."""
-        _RE = re.compile(rf"^{GCODE.GET_PUMP_STATE} T:(?P<T>\d) C:(?P<C>\d)$")
+        pattern = r"T:(?P<T>\d.+) R:(?P<R>\d.+) A:(?P<A>\d) D:(?P<D>\d) E:(?P<E>\d) M:(?P<M>\d)"
+        _RE = re.compile(rf"^{GCODE.GET_PUMP_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
             raise ValueError(f"Incorrect Response for get pump state: {response}")
-        return PumpState(float(match.group("T")), float(match.group("C")))
+        return PumpState(
+            float(match.group("T")),
+            float(match.group("R")),
+            int(match.group("A")),
+            int(match.group("D")),
+            bool(match.group("E")),
+            bool(match.group("M")),
+        )
 
     @classmethod
     async def create(
@@ -249,8 +258,6 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         resp = await self._connection.send_command(
             GCODE.GET_PRESSURE_STATE.build_command()
         )
-        if not re.match(rf"^{GCODE.GET_PRESSURE_STATE}$", resp):
-            raise ValueError(f"Incorrect Response for get pressure state: {resp}")
         return self.parse_get_pressure_state(resp)
 
     async def set_pump_state(
@@ -277,8 +284,6 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def get_pump_state(self) -> PumpState:
         """Get the pump state."""
         resp = await self._connection.send_command(GCODE.GET_PUMP_STATE.build_command())
-        if not re.match(rf"^{GCODE.GET_PUMP_STATE}$", resp):
-            raise ValueError(f"Incorrect Response for get pump state: {resp}")
         return self.parse_get_pump_state(resp)
 
     # TODO: change pump power to be more specific when we find out how were gonna operate that
@@ -291,6 +296,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         ...
 
     # turns off motor, then releases, takes a timeout for buffer between turn off and vent
-    async def vent(self) -> None:
-        """Release the vacuum in the module chamber."""
-        ...
+    async def vent(self, open: bool) -> None:
+        """Opens/Closes the vent, which release the vacuum in the module chamber."""
+
+        command = GCODE.SET_VENT_STATE.build_command().add_int("V", int(open))
+        resp = await self._connection.send_command(command)
+        if not re.match(rf"^{GCODE.SET_VENT_STATE}$", resp):
+            raise ValueError(f"Incorrect Response for set vent state: {resp}")

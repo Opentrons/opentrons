@@ -8,6 +8,7 @@ from opentrons.util.async_helpers import ensure_yield
 class SimulatingDriver(AbstractVacuumModuleDriver):
     def __init__(self, serial_number: str) -> None:
         self._serial_number = serial_number
+        self.vent_state = False
         self.vacuum_on = False
         self.pump_enabled = False
         self.pressure_sensor_enabled = False
@@ -64,8 +65,8 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     async def engage_vacuum(self, pump_power: Optional[float] = None) -> None:
         self.vacuum_on = True
 
-    async def vent(self, delay_s: float = 0.0) -> None:
-        self.vacuum_on = False
+    async def vent(self, open: bool) -> None:
+        self.vent_state = open
 
     async def set_led(
         self,

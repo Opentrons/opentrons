@@ -86,8 +86,8 @@ class AbstractVacuumModuleDriver(Protocol):
         """Stops the vacuum pump, doesn't vent air or disable the motor."""
         ...
 
-    async def vent(self) -> None:
-        """Release the vacuum in the module chamber."""
+    async def vent(self, open: bool) -> None:
+        """Opens/Closes the vent, which release the vacuum in the module chamber."""
         ...
 
     async def set_led(
