@@ -11,8 +11,9 @@ import {
   VIEWPORT,
 } from '@opentrons/components'
 
-import { AlphanumericKeyboard } from '.'
 import { configReducer } from '/app/redux/config/reducer'
+
+import { AlphanumericKeyboard } from '.'
 
 import type { Meta, StoryObj } from '@storybook/react'
 import type { Store, StoreEnhancer } from 'redux'
@@ -36,12 +37,12 @@ const meta: Meta<typeof AlphanumericKeyboard> = {
   component: AlphanumericKeyboard,
   parameters: VIEWPORT.touchScreenViewport,
   decorators: [
-      Story => (
-        <Provider store={store}>
-          <Story />
-        </Provider>
-      ),
-    ],
+    Story => (
+      <Provider store={store}>
+        <Story />
+      </Provider>
+    ),
+  ],
 }
 
 export default meta
