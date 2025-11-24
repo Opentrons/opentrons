@@ -570,14 +570,18 @@ class LiquidClassSchemaCommon(BaseLiquidClassModel):
         description="Liquid class settings by each pipette compatible with this liquid class.",
     )
 
+
 class LiquidClassSchemaV1(LiquidClassSchemaCommon):
     """Defines a single liquid class's properties for liquid handling functions."""
+
     schemaVersion: Literal[1] = Field(
         ..., description="Which schema version a liquid class is using"
     )
 
+
 class LiquidClassSchemaV2(LiquidClassSchemaCommon):
     """Defines a single liquid class's properties for liquid handling functions."""
+
     schemaVersion: Literal[1] = Field(
         ..., description="Which schema version a liquid class is using"
     )

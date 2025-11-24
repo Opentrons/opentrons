@@ -36,7 +36,7 @@ def load_definition(
 def definition_exists(
     name: str,
     version: int = DEFAULT_LC_VERSION,
-    schema_version: int = DEFAULT_SCHEMA_VERSION
+    schema_version: int = DEFAULT_SCHEMA_VERSION,
 ) -> bool:
     """Return whether a definition exists for the specified liquid class name.."""
     return Path(
