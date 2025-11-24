@@ -414,13 +414,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         transfer_properties.aspirate.aspirate_position.offset = asp_offset
         transfer_properties.aspirate.retract.end_position.offset = asp_offset
         transfer_properties.aspirate.aspirate_position.position_reference = (
-            PositionReference.LIQUID_MENISCUS
+            PositionReference.LIQUID_MENISCUS_END
         )
         transfer_properties.dispense.submerge.start_position.offset = disp_offset
         transfer_properties.dispense.dispense_position.offset = disp_offset
         transfer_properties.dispense.retract.end_position.offset = disp_offset
         transfer_properties.dispense.dispense_position.position_reference = (
-            PositionReference.LIQUID_MENISCUS
+            PositionReference.LIQUID_MENISCUS_END
         )
 
         if not ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
