@@ -325,7 +325,7 @@ export const saveStepForm: () => ThunkAction<any> =
     const initialState = getState()
     const unsavedForm = getUnsavedForm(initialState)
 
-    // this check is only for Flow. At this point, unsavedForm should always be populated
+    // this check is only for TypeScript. At this point, unsavedForm should always be populated
     if (!unsavedForm) {
       console.assert(
         false,
@@ -355,7 +355,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> =
     const isPristineSetTempForm =
       getUnsavedFormIsPristineSetTempForm(initialState)
 
-    // this check is only for Flow. At this point, unsavedForm should always be populated
+    // this check is only for TypeScript. At this point, unsavedForm should always be populated
     if (!unsavedSetTemperatureForm) {
       console.assert(
         false,
@@ -417,7 +417,7 @@ export const saveSetTempFormWithAddedPauseUntilTemp: () => ThunkAction<any> =
     // finally save the new pause form
     const unsavedPauseForm = getUnsavedForm(getState())
 
-    // this conditional is for Flow, the unsaved form should always exist
+    // this conditional is for TypeScript, the unsaved form should always exist
     if (unsavedPauseForm != null) {
       dispatch(_saveStepForm(unsavedPauseForm))
     } else {
@@ -491,6 +491,7 @@ export const saveHeaterShakerFormWithAddedPauseUntilTemp: () => ThunkAction<any>
     )
     const unsavedPauseForm = getUnsavedForm(getState())
 
+    // this conditional is for TypeScript, the unsaved form should always exist
     if (unsavedPauseForm != null) {
       dispatch(_saveStepForm(unsavedPauseForm))
     } else {
