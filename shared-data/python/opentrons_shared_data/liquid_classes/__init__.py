@@ -36,9 +36,10 @@ def load_definition(
 def definition_exists(
     name: str,
     version: int = DEFAULT_LC_VERSION,
+    schema_version: int = DEFAULT_SCHEMA_VERSION
 ) -> bool:
     """Return whether a definition exists for the specified liquid class name.."""
     return Path(
         get_shared_data_root()
-        / f"liquid-class/definitions/{DEFAULT_SCHEMA_VERSION}/{name}/{version}.json"
+        / f"liquid-class/definitions/{schema_version}/{name}/{version}.json"
     ).exists()

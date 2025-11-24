@@ -122,10 +122,10 @@ class TransferComponentsExecutor:
         instrument_core: InstrumentCore,
         transfer_properties: TransferProperties,
         target_location: Union[Location, TrashBin, WasteChute],
-        target_end_location: Optional[Location],
         target_well: Optional[WellCore],
         tip_state: TipState,
         transfer_type: TransferType,
+        target_end_location: Optional[Location] = None,
     ) -> None:
         """Create a TransferComponentsExecutor instance.
 

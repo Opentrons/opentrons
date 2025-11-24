@@ -18,7 +18,11 @@ from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedTransferProperties,
 )
-from opentrons_shared_data.liquid_classes import DEFAULT_LC_VERSION, definition_exists
+from opentrons_shared_data.liquid_classes import (
+    DEFAULT_LC_VERSION,
+    definition_exists,
+    DEFAULT_SCHEMA_VERSION,
+)
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
@@ -1530,7 +1534,7 @@ class ProtocolContext(CommandPublisher):
 
         :returns: A new LiquidClass object.
         """
-        if definition_exists(name, DEFAULT_LC_VERSION):
+        if definition_exists(name, DEFAULT_LC_VERSION, DEFAULT_SCHEMA_VERSION):
             raise ValueError(
                 f"Liquid class named {name} already exists. Please specify a different name."
             )
