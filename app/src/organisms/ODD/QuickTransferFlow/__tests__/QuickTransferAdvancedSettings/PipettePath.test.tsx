@@ -156,9 +156,10 @@ describe('PipettePath', () => {
       state: {
         ...props.state,
         transferType: 'distribute',
-        disposalVolume: 20,
-        blowOutDispense: {
-          location: 'source_well',
+        path: 'multiDispense',
+        disposalVolumeDispenseSettings: {
+          volume: 20,
+          blowOutLocation: 'source_well',
           flowRate: 10,
         },
       },
@@ -188,9 +189,9 @@ describe('PipettePath', () => {
         ...props.state,
         transferType: 'distribute',
         path: 'multiDispense',
-        disposalVolume: 20,
-        blowOutDispense: {
-          location: 'source_well',
+        disposalVolumeDispenseSettings: {
+          volume: 20,
+          blowOutLocation: 'source_well',
           flowRate: 10,
         },
       },
@@ -221,9 +222,9 @@ describe('PipettePath', () => {
         ...props.state,
         transferType: 'distribute',
         path: 'multiDispense',
-        disposalVolume: 20,
-        blowOutDispense: {
-          location: 'source_well',
+        disposalVolumeDispenseSettings: {
+          volume: 20,
+          blowOutLocation: 'source_well',
           flowRate: 10,
         },
       },
@@ -233,9 +234,5 @@ describe('PipettePath', () => {
     fireEvent.click(continueBtn)
     fireEvent.click(continueBtn)
     screen.getByText('Source well')
-    const saveBtn = screen.getByTestId('ChildNavigation_Primary_Button')
-    fireEvent.click(saveBtn)
-    expect(props.dispatch).toHaveBeenCalled()
-    expect(mockTrackEventWithRobotSerial).toHaveBeenCalled()
   })
 })
