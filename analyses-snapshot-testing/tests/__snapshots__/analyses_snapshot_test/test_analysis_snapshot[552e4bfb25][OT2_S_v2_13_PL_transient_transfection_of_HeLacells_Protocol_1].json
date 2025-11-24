@@ -3274,7 +3274,16 @@
     "description": "Protocol to transfect HeLa and A549 cells using the OT-2",
     "protocolName": "Transfection using Lipofectamine 3000 Reagent"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "1"
+      },
+      "model": "heaterShakerModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",
