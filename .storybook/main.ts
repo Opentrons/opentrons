@@ -20,7 +20,15 @@ const config: StorybookConfig = {
 
   framework: {
     name: '@storybook/react-vite',
-    options: {},
+    options: {
+      builder: {
+        // Storybook would normally find the Vite config automatically.
+        // That doesn't work for us because we have one monorepo-wide Storybook
+        // installation, while each project has its own local Vite config.
+        // So we treat Storybook as its own Vite project with its own config.
+        viteConfigPath: '.storybook/vite.config.mjs',
+      },
+    },
   },
 
   docs: {
