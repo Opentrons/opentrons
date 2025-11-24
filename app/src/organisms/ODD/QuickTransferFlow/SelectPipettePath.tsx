@@ -10,8 +10,6 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
-import { getPipetteName } from './utils'
-
 import type { ComponentProps, Dispatch } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type {
