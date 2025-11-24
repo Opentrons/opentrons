@@ -97,10 +97,14 @@ export function RunningProtocol(): JSX.Element {
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const runStatus = runRecord?.data.status ?? null
+  console.log('🚀 ~ RunningProtocol ~ runStatus:', runStatus)
+
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
-    refetchInterval: Infinity,
+    staleTime: Infinity,
   })
+  console.log('🚀 ~ RunningProtocol ~ data:', protocolRecord)
+
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
