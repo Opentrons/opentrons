@@ -133,6 +133,7 @@ jobs:
     strategy:
       matrix:
         os: ['ubuntu-24.04', 'macos-latest', 'windows-2022']
+        python: ['3.10', '3.11', '3.12', '3.13']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v4'
@@ -143,7 +144,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.12'
+          python-version: ${{matrix.python}}
       - name: Set up package-testing
         id: setup
         if: ${{ matrix.os != 'windows-2022' }}
@@ -172,7 +173,7 @@ jobs:
         id: results
         uses: actions/upload-artifact@v4
         with:
-          name: package-test-results-${{ matrix.os }}
+          name: package-test-results-${{ matrix.os }}-${{ matrix.python }}
           path: package-testing/results
       - name: Set job summary
         if: ${{ always() }}
