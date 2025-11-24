@@ -14,31 +14,33 @@ export function LabwareDetailsWithCount({
   return (
     <div
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
+        width: '318px',
         backgroundColor: 'var(--grey-20)',
         borderRadius: 'var(--border-radius-4)',
         padding: 'var(--spacing-16) var(--spacing-8)',
       }}
     >
-      <StyledText
-        oddStyle="level4HeaderSemiBold"
-        desktopStyle="headingSmallBold"
-      >
-        {title}
-      </StyledText>
+      <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
           gap: SPACING.spacing16,
           width: '100%',
+          color: 'var(--grey-60)',
         }}
       >
-        {subTitle}
+        <StyledText desktopStyle="bodyDefaultRegular">{subTitle}</StyledText>
       </div>
-      <StyledText desktopStyle="bodyDefaultSemiBold">{quantity}</StyledText>
+      <StyledText
+        desktopStyle="bodyDefaultSemiBold"
+        backgroundColor="var(--transparent-black-80)"
+        padding="2px 8px"
+        width="88px"
+        borderRadius="var(--border-radius-4)"
+      >
+        {quantity}
+      </StyledText>
     </div>
   )
 }

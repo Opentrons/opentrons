@@ -1,6 +1,7 @@
 import React from 'react'
-import { LabwareDetailsWithCount } from './LabwareDetailsWithCount'
+
 import { SPACING } from '../../ui-style-constants'
+import { LabwareDetailsWithCount } from './LabwareDetailsWithCount'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -9,7 +10,7 @@ const meta: Meta<typeof LabwareDetailsWithCount> = {
   component: LabwareDetailsWithCount,
   decorators: [
     Story => (
-      <div style={{ padding: SPACING.spacing16, transform: 'scaleY(-1.0)' }}>
+      <div>
         <Story />
       </div>
     ),
@@ -21,8 +22,8 @@ type Story = StoryObj<typeof LabwareDetailsWithCount>
 
 export const LabwareDetailsWithCountStory: Story = {
   args: {
-    title: 'Labware Title',
-    subTitle: 'Labware Subtitle',
-    quantity: 1,
+    title: 'Opentrons Flex 96 Tip Rack 1000 µL',
+    subTitle: 'With tip rack lid',
+    quantity: 'Quantity: 1',
   },
 }
