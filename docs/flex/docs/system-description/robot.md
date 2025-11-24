@@ -37,7 +37,7 @@ You should leave deck slots installed in locations where you want to place stand
 
 ## Staging area
 
-The *staging area* is additional space along the far right side of the deck (column 4). Labware and modules placed in column 4 are in the staging area. To create this new space, you replace the standard deck slots in column 3 with *staging area slots*. These special fixtures span two columns by fitting into column 3 and extending the deck to create the new column 4 locations (A4–D4). By adding staging area slots, you can reserve the main working area of the deck for equipment essential to your protocols while adding storage space and attachment points for auxiliary modules.
+The *staging area* is additional space along the far right side of the deck (column 4). Labware and modules placed in column 4 are in the staging area. To create this new space, you replace the standard deck slots in column 3 with [staging area slots](#staging-area-slots). These special fixtures span two columns by fitting into column 3 and extending the deck to create the new column 4 locations (A4–D4). An advantage of using the staging area is that it gives you extra labware storage and keeps space in the working area available for equipment essential to your protocols.
 
 !!!note
     Flex pipettes cannot reach into the staging area, but the gripper can pick up and move labware to and from this location.
@@ -51,12 +51,7 @@ You can also purchase a [set of four staging area slots](https://opentrons.com/p
 
 ## Deck fixtures
 
-Fixtures are hardware items that replace standard deck slots. They let
-you customize the deck layout and add functionality to your Flex.
-Currently, deck fixtures include the staging area slots, the internal
-trash bin, and the external waste chute. You can only install fixtures
-in a few specific deck slots. The following table lists the deck
-locations for each fixture.
+Fixtures are hardware items that replace standard deck slots. They let you customize the deck layout and add functionality to your Flex. Currently, deck fixtures include the staging area slots, the internal trash bin, and the external waste chute. You can only install fixtures in a few specific deck slots. The following table lists the deck locations for each fixture.
 
 | **Fixture**                        | **Slots**         |
 |------------------------------------|-------------------|
@@ -80,7 +75,7 @@ The Opentrons Flex Waste Chute transfers liquids, tips, tip racks, and well plat
 
 ## Staging area slots
 
-Staging area slots are ANSI/SLAS compatible deck pieces that replace standard slots in column 3 to create new slots in the staging area (column 4). You can install a single slot or a maximum of four slots to create new location coordinates (A4 to D4) along the right side of the deck. Note, however, that replacing deck slot A3 requires moving the trash bin. By adding staging area slots to the deck, your Flex robot can store more labware and operate more efficiently.
+_Staging area slots_ are ANSI/SLAS compatible deck pieces that replace standard slots in column 3 to create new slots in the [staging area](#staging-area) (column 4). You can install a single slot or a maximum of four slots to create new location coordinates (A4 to D4) along the right side of the deck. Note, however, that replacing deck slot A3 requires moving the trash bin. By adding staging area slots to the deck, your Flex robot can store more labware and operate more efficiently.
 
 <figure markdown>
 ![Flex staging area slot.](../images/staging-slot.png "Flex staging area slot")
