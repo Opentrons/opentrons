@@ -66,7 +66,7 @@ Call the :py:meth:`.ProtocolContext.comment` method if you want to write and dis
 
 .. versionadded:: 2.0
 
-Taking Camera Images 
+Capturing Images 
 =====================
 
 Use the :py:meth:`.ProtocolContext.capture_image` method to take an image during a protocol with the Flex or OT-2's built-in camera. You can use images to check on key protocol steps while spending more time away from the bench. 
@@ -74,7 +74,7 @@ Use the :py:meth:`.ProtocolContext.capture_image` method to take an image during
 This example uses optional parameters to home the pipette, clearing the camera's view, and save the image file as ``deck_view``::
     
     protocol.capture_image(
-        home_before="True",
+        home_before=True,
         filename="deck_view"
     )
 
