@@ -46,6 +46,7 @@ import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
@@ -95,15 +96,16 @@ export function RunningProtocol(): JSX.Element {
   )
 
   const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const runStatus = runRecord?.data.status ?? null
-  console.log('🚀 ~ RunningProtocol ~ runStatus:', runStatus)
 
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
-  console.log('🚀 ~ RunningProtocol ~ data:', protocolRecord)
 
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??

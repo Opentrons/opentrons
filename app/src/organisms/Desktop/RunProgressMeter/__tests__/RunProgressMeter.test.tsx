@@ -23,6 +23,7 @@ import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsQuery,
@@ -93,7 +94,9 @@ describe('RunProgressMeter', () => {
       .thenReturn({ key: NON_DETERMINISTIC_COMMAND_KEY } as RunCommandSummary)
 
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(NON_DETERMINISTIC_RUN_ID)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: {
           data: {
@@ -133,7 +136,9 @@ describe('RunProgressMeter', () => {
   it('should give no step info when run status is idle', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(NON_DETERMINISTIC_RUN_ID)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: {
           data: {
@@ -162,7 +167,9 @@ describe('RunProgressMeter', () => {
   it('should render no text when run status is completed', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(NON_DETERMINISTIC_RUN_ID)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: {
           data: {
@@ -184,7 +191,9 @@ describe('RunProgressMeter', () => {
   it('should render no text when the run is cancelled before running', () => {
     vi.mocked(useCommandQuery).mockReturnValue({ data: null } as any)
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(NON_DETERMINISTIC_RUN_ID)
+      .calledWith(NON_DETERMINISTIC_RUN_ID, {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: {
           data: {

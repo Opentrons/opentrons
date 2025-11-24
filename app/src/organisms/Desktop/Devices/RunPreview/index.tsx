@@ -27,6 +27,7 @@ import { NAV_BAR_WIDTH } from '/app/App/constants'
 import { Divider } from '/app/atoms/structure'
 import { CommandIcon } from '/app/molecules/Command'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsAsPreSerializedList,
@@ -55,7 +56,9 @@ export const RunPreviewComponent = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['run_details', 'protocol_setup'])
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const runStatus = runRecord?.data.status ?? null
   const isRunTerminal =
     runStatus != null

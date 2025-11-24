@@ -7,6 +7,7 @@ import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
@@ -121,7 +122,7 @@ describe('ProtocolRunRuntimeParameters', () => {
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: { data: mockSucceededRun },
       } as unknown as UseQueryResult<Run>)
@@ -133,7 +134,7 @@ describe('ProtocolRunRuntimeParameters', () => {
 
   it('should render title, and banner when RunTimeParameters are not empty and all values are default', () => {
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: mockIdleUnstartedRun,
@@ -163,7 +164,7 @@ describe('ProtocolRunRuntimeParameters', () => {
       ],
     } as CompletedProtocolAnalysis)
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: mockIdleUnstartedRun,
@@ -180,7 +181,7 @@ describe('ProtocolRunRuntimeParameters', () => {
 
   it('should render title, and banner when RunTimeParameters from view protocol run record overflow menu button', () => {
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: {
@@ -212,7 +213,7 @@ describe('ProtocolRunRuntimeParameters', () => {
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: {
@@ -251,7 +252,7 @@ describe('ProtocolRunRuntimeParameters', () => {
 
   it('should render csv row if a protocol requires a csv', () => {
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: {

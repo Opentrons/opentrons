@@ -1,6 +1,7 @@
 import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
 } from '/app/resources/runs'
@@ -18,7 +19,9 @@ export function useLastRunCommand(
   runId: string,
   options: UseQueryOptions<CommandsData, Error> = {}
 ): RunCommandSummary | null {
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const runStatus = runRecord?.data.status ?? null
   const { data: commandsData } = useNotifyAllCommandsQuery(
     runId,

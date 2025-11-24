@@ -4,7 +4,11 @@ import { when } from 'vitest-when'
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
-import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
+import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
+  useCurrentRunId,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
 
 import { useRunStartedOrLegacySessionInProgress } from '..'
 
@@ -29,7 +33,9 @@ const idleRun = {
 describe('useRunStartedOrLegacySessionInProgress', () => {
   beforeEach(() => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith('test_id_running')
+      .calledWith('test_id_running', {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({ data: { data: runningRun } } as UseQueryResult<
         Run,
         unknown
@@ -51,7 +57,9 @@ describe('useRunStartedOrLegacySessionInProgress', () => {
 
   it('returns false when run status is idle or sessions are not empty', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith('test_id_idle')
+      .calledWith('test_id_idle', {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({ data: { data: idleRun } } as UseQueryResult<Run, unknown>)
     vi.mocked(useCurrentRunId).mockReturnValue('test_id_idle')
     vi.mocked(useAllSessionsQuery).mockReturnValue({

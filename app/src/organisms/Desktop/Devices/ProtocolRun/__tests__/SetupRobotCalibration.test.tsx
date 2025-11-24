@@ -12,7 +12,11 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { mockDeckCalData } from '/app/redux/calibration/__fixtures__'
-import { useNotifyRunQuery, useRunHasStarted } from '/app/resources/runs'
+import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
+  useNotifyRunQuery,
+  useRunHasStarted,
+} from '/app/resources/runs'
 
 import { useDeckCalibrationData } from '../../hooks'
 import { SetupDeckCalibration } from '../SetupDeckCalibration'
@@ -76,7 +80,7 @@ describe('SetupRobotCalibration', () => {
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(false)
     when(vi.mocked(useIsFlex)).calledWith(ROBOT_NAME).thenReturn(false)
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: {

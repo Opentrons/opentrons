@@ -26,6 +26,7 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
@@ -60,7 +61,9 @@ export function ProtocolSetupModulesAndDeck({
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const runStatus = runRecord?.data.status ?? null
   useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {

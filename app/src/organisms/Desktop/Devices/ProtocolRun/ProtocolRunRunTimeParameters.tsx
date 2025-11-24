@@ -33,6 +33,7 @@ import {
 
 import { Divider } from '/app/atoms/structure'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
 } from '/app/resources/runs'
@@ -48,7 +49,9 @@ export function ProtocolRunRuntimeParameters({
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const run = useNotifyRunQuery(runId).data
+  const run = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  }).data
   const runStatus = run?.data.status ?? null
 
   const isRunTerminal =

@@ -4,7 +4,10 @@ import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE, RUN_STATUS_RUNNING } from '@opentrons/api-client'
 
-import { useNotifyRunQuery } from '/app/resources/runs'
+import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
 
 import { useRunHasStarted } from '../useRunHasStarted'
 
@@ -18,7 +21,7 @@ const MOCK_RUN_ID = '1'
 describe('useRunHasStarted', () => {
   beforeEach(() => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(null)
+      .calledWith(null, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({ data: null } as any)
   })
 
@@ -35,7 +38,9 @@ describe('useRunHasStarted', () => {
       status: RUN_STATUS_IDLE,
     }
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(MOCK_RUN_ID)
+      .calledWith(MOCK_RUN_ID, {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({ data: { data: idleRun } } as UseQueryResult<Run, unknown>)
     const { result } = renderHook(() => useRunHasStarted(MOCK_RUN_ID))
     expect(result.current).toEqual(false)
@@ -48,7 +53,9 @@ describe('useRunHasStarted', () => {
       status: RUN_STATUS_RUNNING,
     }
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(MOCK_RUN_ID)
+      .calledWith(MOCK_RUN_ID, {
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({ data: { data: runningRun } } as UseQueryResult<
         Run,
         unknown

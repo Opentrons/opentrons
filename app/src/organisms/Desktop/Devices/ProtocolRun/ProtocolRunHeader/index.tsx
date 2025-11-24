@@ -16,6 +16,7 @@ import { useInitializeCameraState } from '/app/local-resources/images/hooks/useI
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useCloseCurrentRun,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
@@ -49,7 +50,10 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
   const runStatus = runRecord?.data.status ?? null

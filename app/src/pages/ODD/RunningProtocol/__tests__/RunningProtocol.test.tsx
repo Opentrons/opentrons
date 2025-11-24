@@ -42,6 +42,7 @@ import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsQuery,
@@ -101,7 +102,10 @@ const render = (path = '/') => {
 describe('RunningProtocol', () => {
   beforeEach(() => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
+      .calledWith(RUN_ID, {
+        staleTime: Infinity,
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: {
           data: {
@@ -196,7 +200,10 @@ describe('RunningProtocol', () => {
   })
   it('should render the canceling run modal when run status is stop requested', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
+      .calledWith(RUN_ID, {
+        staleTime: Infinity,
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         key: PROTOCOL_KEY,
         data: {
@@ -224,7 +231,10 @@ describe('RunningProtocol', () => {
       .calledWith(ROBOT_NAME)
       .thenReturn(DOOR_RESULT)
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
+      .calledWith(RUN_ID, {
+        staleTime: Infinity,
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
       } as any)
@@ -243,7 +253,10 @@ describe('RunningProtocol', () => {
 
   it('should render open stacker door alert modal, when run staus is blocked by open stacker door', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
+      .calledWith(RUN_ID, {
+        staleTime: Infinity,
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
       } as any)
@@ -267,7 +280,10 @@ describe('RunningProtocol', () => {
 
   it('should render open unconfigured stacker door alert modal, when run staus is blocked by open stacker door not in the deck config', () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
+      .calledWith(RUN_ID, {
+        staleTime: Infinity,
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
       } as any)
@@ -291,7 +307,10 @@ describe('RunningProtocol', () => {
 
   it(`should render not open door alert modal, when run status is ${RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR}`, () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
+      .calledWith(RUN_ID, {
+        staleTime: Infinity,
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: {
           data: {
@@ -309,7 +328,10 @@ describe('RunningProtocol', () => {
 
   it(`should display a Run Paused splash screen if the run status is "${RUN_STATUS_AWAITING_RECOVERY}"`, () => {
     when(vi.mocked(useNotifyRunQuery))
-      .calledWith(RUN_ID, { staleTime: Infinity })
+      .calledWith(RUN_ID, {
+        staleTime: Infinity,
+        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+      })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_AWAITING_RECOVERY } },
       } as any)
