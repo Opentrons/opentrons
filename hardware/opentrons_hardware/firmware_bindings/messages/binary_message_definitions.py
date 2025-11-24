@@ -1,7 +1,7 @@
 """Definition of Binary messages."""
 from dataclasses import dataclass, field, fields, MISSING
 from functools import lru_cache
-from typing import Type, Union, Optional
+from typing import Type, Union, Optional, cast
 from typing_extensions import get_args
 
 from ..binary_constants import BinaryMessageId, LightTransitionType, LightAnimationType
@@ -28,7 +28,7 @@ class Echo(utils.BinarySerializable):
     )
     length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
     message: utils.BinaryFieldBase[bytes] = field(
-        default_factory=utils.BinaryFieldBase(bytes())
+        default_factory=lambda: utils.BinaryFieldBase(bytes())
     )
 
 
@@ -348,7 +348,7 @@ class WriteEEPromRequest(utils.BinarySerializable):
         default_factory=lambda: utils.UInt16Field(0)
     )
     data_length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
-    data: EepromDataField = field(default_factory=EepromDataField(bytes()))
+    data: EepromDataField = field(default_factory=lambda: EepromDataField(bytes()))
 
 
 @dataclass
@@ -377,7 +377,7 @@ class ReadEEPromResponse(utils.BinarySerializable):
         default_factory=lambda: utils.UInt16Field(0)
     )
     data_length: utils.UInt16Field = field(default_factory=lambda: utils.UInt16Field(0))
-    data: EepromDataField = field(default_factory=EepromDataField(bytes()))
+    data: EepromDataField = field(default_factory=lambda: EepromDataField(bytes()))
 
 
 @dataclass
@@ -396,7 +396,7 @@ class AddLightActionRequest(utils.BinarySerializable):
         default_factory=lambda: utils.UInt16Field(0)
     )
     transition_type: LightTransitionTypeField = field(
-        default_factory=LightTransitionTypeField(LightTransitionType.linear)
+        default_factory=lambda: LightTransitionTypeField(LightTransitionType.linear)
     )
     red: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
     green: utils.UInt8Field = field(default_factory=lambda: utils.UInt8Field(0))
@@ -526,11 +526,11 @@ def get_binary_definition(
                 message_type_field.default is not MISSING
                 and message_type_field.default.value == message_id
             ):
-                return i
+                return cast(Type[BinaryMessageDefinition], i)
             if (
                 message_type_field.default_factory is not MISSING
                 and message_type_field.default_factory().value == message_id
             ):
-                return i
+                return cast(Type[BinaryMessageDefinition], i)
     log.error("No binary message definition found.")
     return None

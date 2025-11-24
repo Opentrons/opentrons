@@ -57,7 +57,7 @@ class EmptyPayload(utils.BinarySerializable):
     # to work around this in binary_serializable.build() and can_comm.prompt_payload
     # we ignore the message_index when constructing args and then set the value manually after
     message_index: utils.UInt32Field = field(
-        init=False, default_factory=lambda: utils.UInt32Field(None)
+        init=False, default_factory=lambda: utils.UInt32Field(None)  # type: ignore[arg-type]
     )
 
 
