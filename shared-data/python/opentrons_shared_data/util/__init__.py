@@ -10,8 +10,11 @@ try:
 except ImportError:
     from enum import Enum
 
-    class StrEnum(str, Enum):
-        def __format__(self, spec) -> str:
+    class StrEnum(str, Enum):  # type: ignore[no-redef]
+        """Replacement for 3.11 style StrEnum in <3.11."""
+
+        def __format__(self, spec: str) -> str:
+            """Build an fstring without the enumerator class name."""
             return str.__format__(str(self.name), spec)
 
 
