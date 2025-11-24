@@ -31,3 +31,4 @@ gantry_speed,40,,,,,,,
 lld_every_tip,FALSE,,,,,,,
 single_tip_96,FALSE,,,,,,,
 multi_channels_to_test,0,1,2,3,7,6,5,4
+cavity_test,FALSE,,,,,,,

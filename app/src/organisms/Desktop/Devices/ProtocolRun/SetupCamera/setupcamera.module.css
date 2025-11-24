@@ -64,3 +64,16 @@
   flex-direction: column;
   gap: var(--spacing-8);
 }
+
+.confirm_btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-8);
+}
+
+.icon_style {
+  width: 1rem;
+  height: 1rem;
+}

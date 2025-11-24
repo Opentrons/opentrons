@@ -10,7 +10,8 @@ import {
 } from '@opentrons/shared-data'
 
 import { TipSvg } from './TipSvg'
-import { getTipSvgInfo, getWellVolume } from './utils'
+import { getTipSvgInfo } from './utils/getTipSvgInfo'
+import { getWellVolume } from './utils/getWellVolume'
 import styles from './wellcontainer.module.css'
 import { WellSvg } from './WellSvg'
 

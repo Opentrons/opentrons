@@ -76663,7 +76663,16 @@
     "author": "Macherey-Nagel <automation-bio@mn-net.com>",
     "protocolName": "NucleoMag_Virus_Rev01"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "10"
+      },
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

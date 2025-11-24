@@ -3,6 +3,8 @@ import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
@@ -27,6 +29,7 @@ vi.mock('/app/resources/health/useIsImageStorageLow')
 vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
+vi.mock('@opentrons/react-api-client')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {
@@ -37,9 +40,11 @@ const render = (props: SetupCameraProps) => {
 describe('SetupCamera', () => {
   let mockProps: SetupCameraProps
   let mockNavigate: Mock
+  let mockAddCameraToRun: Mock
 
   beforeEach(() => {
     mockNavigate = vi.fn()
+    mockAddCameraToRun = vi.fn()
     mockProps = {
       isCameraRequired: true,
       runId: 'MOCK-RUN-ID',
@@ -67,6 +72,9 @@ describe('SetupCamera', () => {
       recoveryEnabled: true,
       liveStreamEnabled: true,
     })
+    vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
+      addCameraSettingsToRun: mockAddCameraToRun,
+    } as any)
   })
 
   it('renders camera status section', () => {
@@ -164,17 +172,6 @@ describe('SetupCamera', () => {
     expect(confirmButton).not.toBeDisabled()
   })
 
-  it('confirm preferences button is disabled when camera is confirmed', () => {
-    const propsWithConfirmed = {
-      ...mockProps,
-      cameraConfirmed: true,
-    }
-    render(propsWithConfirmed)
-
-    const confirmButton = screen.getByText('Confirm preferences')
-    expect(confirmButton).toBeDisabled()
-  })
-
   it('calls confirmCameraSettings when confirm preferences button is clicked', async () => {
     const user = userEvent.setup()
     render(mockProps)
@@ -182,7 +179,7 @@ describe('SetupCamera', () => {
     const confirmButton = screen.getByText('Confirm preferences')
     await user.click(confirmButton)
 
-    expect(mockProps.confirmCameraSettings).toHaveBeenCalledTimes(1)
+    expect(mockAddCameraToRun).toHaveBeenCalledTimes(1)
   })
 
   it('renders the image storage almost full notification if storage is almost full', () => {
