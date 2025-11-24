@@ -20,6 +20,7 @@ from opentrons.types import (
     NozzleConfigurationType,
     NozzleMapInterface,
     MeniscusTrackingTarget,
+    Point,
 )
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
@@ -2193,12 +2194,26 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 mount=self.get_mount(),
             )
         )
+        aspirate_end_point: Optional[Point] = None
+        aspirate_end_location: Optional[Location] = None
+        if aspirate_props.aspirate_end_position:
+            aspirate_end_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
+                well=source_well,
+                well_volume_difference=-volume,
+                position_reference=aspirate_props.aspirate_end_position.position_reference,
+                offset=aspirate_props.aspirate_end_position.offset,
+                mount=self.get_mount(),
+            )
+            aspirate_end_location = Location(
+                aspirate_end_point, labware=source_loc.labware
+            )
         aspirate_location = Location(aspirate_point, labware=source_loc.labware)
 
         components_executor = tx_comps_executor.TransferComponentsExecutor(
             instrument_core=self,
             transfer_properties=transfer_properties,
             target_location=aspirate_location,
+            target_end_location=aspirate_end_location,
             target_well=source_well,
             transfer_type=transfer_type,
             tip_state=tx_comps_executor.TipState(
@@ -2337,6 +2352,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             dispense_location = dest
             dest_well = None
 
+        dispense_end_location: Optional[Location] = None
+        if dispense_props.dispense_end_position:
+            assert dest_well is not None
+            dispense_end_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
+                well=dest_well,
+                well_volume_difference=volume,
+                position_reference=dispense_props.dispense_end_position.position_reference,
+                offset=dispense_props.dispense_end_position.offset,
+                mount=self.get_mount(),
+            )
+            dispense_end_location = Location(
+                dispense_end_point, labware=dest_loc.labware
+            )
+
         last_liquid_and_airgap_in_tip = (
             tip_contents[-1]
             if tip_contents
@@ -2349,6 +2378,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             instrument_core=self,
             transfer_properties=transfer_properties,
             target_location=dispense_location,
+            target_end_location=dispense_end_location,
             target_well=dest_well,
             transfer_type=transfer_type,
             tip_state=tx_comps_executor.TipState(
@@ -2420,6 +2450,20 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)
+
+        dispense_end_location: Optional[Location] = None
+        if dispense_props.dispense_end_position:
+            dispense_end_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
+                well=dest_well,
+                well_volume_difference=volume,
+                position_reference=dispense_props.dispense_end_position.position_reference,
+                offset=dispense_props.dispense_end_position.offset,
+                mount=self.get_mount(),
+            )
+            dispense_end_location = Location(
+                dispense_end_point, labware=dest_loc.labware
+            )
+
         last_liquid_and_airgap_in_tip = (
             tip_contents[-1]
             if tip_contents
@@ -2432,6 +2476,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             instrument_core=self,
             transfer_properties=transfer_properties,
             target_location=dispense_location,
+            target_end_location=dispense_end_location,
             target_well=dest_well,
             transfer_type=transfer_type,
             tip_state=tx_comps_executor.TipState(

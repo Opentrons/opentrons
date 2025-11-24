@@ -408,6 +408,12 @@ class AspirateProperties(BaseLiquidClassModel):
     aspiratePosition: TipPosition = Field(
         ..., alias="aspirate_position", description="Tip position during aspirate."
     )
+    aspirateEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="aspirate_end_position",
+        description="Ending tip position during dynamic aspirate.",
+        json_schema_extra=_remove_default,
+    )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         alias="flow_rate_by_volume",
@@ -440,6 +446,12 @@ class SingleDispenseProperties(BaseLiquidClassModel):
     dispensePosition: TipPosition = Field(
         ..., alias="dispense_position", description="Tip position during dispense."
     )
+    dispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="dispense_end_position",
+        description="Ending tip position during dynamic dispense.",
+        json_schema_extra=_remove_default,
+    )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         alias="flow_rate_by_volume",
@@ -469,6 +481,12 @@ class MultiDispenseProperties(BaseLiquidClassModel):
     )
     dispensePosition: TipPosition = Field(
         ..., alias="dispense_position", description="Tip position during dispense."
+    )
+    dispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="dispense_end_position",
+        description="Ending tip position during dynamic dispense.",
+        json_schema_extra=_remove_default,
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
@@ -533,7 +551,7 @@ class ByPipetteSetting(BaseLiquidClassModel):
     )
 
 
-class LiquidClassSchemaV1(BaseLiquidClassModel):
+class LiquidClassSchemaCommon(BaseLiquidClassModel):
     """Defines a single liquid class's properties for liquid handling functions."""
 
     liquidClassName: str = Field(
@@ -543,9 +561,6 @@ class LiquidClassSchemaV1(BaseLiquidClassModel):
     description: str = Field(
         ..., description="User-readable description of the liquid class"
     )
-    schemaVersion: Literal[1] = Field(
-        ..., description="Which schema version a liquid class is using"
-    )
     version: int = Field(
         ..., description="Version of the specific liquid class definition"
     )
@@ -553,4 +568,16 @@ class LiquidClassSchemaV1(BaseLiquidClassModel):
     byPipette: Sequence[ByPipetteSetting] = Field(
         ...,
         description="Liquid class settings by each pipette compatible with this liquid class.",
+    )
+
+class LiquidClassSchemaV1(LiquidClassSchemaCommon):
+    """Defines a single liquid class's properties for liquid handling functions."""
+    schemaVersion: Literal[1] = Field(
+        ..., description="Which schema version a liquid class is using"
+    )
+
+class LiquidClassSchemaV2(LiquidClassSchemaCommon):
+    """Defines a single liquid class's properties for liquid handling functions."""
+    schemaVersion: Literal[1] = Field(
+        ..., description="Which schema version a liquid class is using"
     )
