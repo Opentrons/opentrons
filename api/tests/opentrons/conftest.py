@@ -876,7 +876,7 @@ def minimal_liquid_class_def2() -> LiquidClassSchemaV1:
                         singleDispense=SingleDispenseProperties(
                             submerge=Submerge(
                                 startPosition=TipPosition(
-                                    positionReference=PositionReference.LIQUID_MENISCUS,
+                                    positionReference=PositionReference.LIQUID_MENISCUS_END,
                                     offset=Coordinate(x=0, y=0, z=-5),
                                 ),
                                 speed=100,

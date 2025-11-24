@@ -14,7 +14,7 @@
           "aspirate": {
             "submerge": {
               "startPosition": {
-                "positionReference": "liquid-meniscus",
+                "positionReference": "liquid-meniscus-end",
                 "offset": {
                   "x": 0,
                   "y": 0,
@@ -89,7 +89,7 @@
           "singleDispense": {
             "submerge": {
               "startPosition": {
-                "positionReference": "liquid-meniscus",
+                "positionReference": "liquid-meniscus-end",
                 "offset": {
                   "x": 0,
                   "y": 0,
@@ -177,7 +177,7 @@
           "multiDispense": {
             "submerge": {
               "startPosition": {
-                "positionReference": "liquid-meniscus",
+                "positionReference": "liquid-meniscus-end",
                 "offset": {
                   "x": 0,
                   "y": 0,

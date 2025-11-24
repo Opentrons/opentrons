@@ -39,7 +39,13 @@
     "positionReference": {
       "type": "string",
       "description": "Reference point for positioning.",
-      "enum": ["well-bottom", "well-top", "well-center", "liquid-meniscus"]
+      "enum": [
+        "well-bottom",
+        "well-top",
+        "well-center",
+        "liquid-meniscus-start",
+        "liquid-meniscus-end"
+      ]
     },
     "coordinate": {
       "type": "object",

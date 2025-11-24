@@ -327,7 +327,8 @@ def test_submerge_raises_when_submerge_point_is_invalid(
     argnames=["position_reference"],
     argvalues=[
         [PositionReference.WELL_BOTTOM],
-        [PositionReference.LIQUID_MENISCUS],
+        [PositionReference.LIQUID_MENISCUS_START],
+        [PositionReference.LIQUID_MENISCUS_END],
     ],
 )
 def test_aspirate_and_wait(
@@ -400,7 +401,8 @@ def test_aspirate_and_wait_skips_delay(
     argnames=["position_reference"],
     argvalues=[
         [PositionReference.WELL_BOTTOM],
-        [PositionReference.LIQUID_MENISCUS],
+        [PositionReference.LIQUID_MENISCUS_START],
+        [PositionReference.LIQUID_MENISCUS_END],
     ],
 )
 def test_dispense_and_wait(
@@ -2431,7 +2433,12 @@ def test_multi_dispense_retract_raises_for_invalid_retract_point(
             Point(38, 40, 42),
         ),
         (
-            PositionReference.LIQUID_MENISCUS,
+            PositionReference.LIQUID_MENISCUS_END,
+            Coordinate(x=41, y=42, z=43),
+            Point(45, 47, 64),
+        ),
+        (
+            PositionReference.LIQUID_MENISCUS_START,
             Coordinate(x=41, y=42, z=43),
             Point(45, 47, 61),
         ),
@@ -2450,15 +2457,24 @@ def test_absolute_point_from_position_reference_and_offset(
     well_bottom_point = Point(4, 5, 6)
     well_center_point = Point(7, 8, 9)
     estimated_liquid_height = 12
+    operation_height_change = 3
     decoy.when(well.get_bottom(0)).then_return(well_bottom_point)
     decoy.when(well.get_top(0)).then_return(well_top_point)
     decoy.when(well.get_center()).then_return(well_center_point)
+    # after the change
     decoy.when(
         well.estimate_liquid_height_after_pipetting(
             operation_volume=123, mount=Mount.RIGHT
         ),
+    ).then_return(estimated_liquid_height + operation_height_change)
+    # before the change
+    decoy.when(
+        well.estimate_liquid_height_after_pipetting(
+            operation_volume=0, mount=Mount.RIGHT
+        ),
     ).then_return(estimated_liquid_height)
     decoy.when(well.get_bottom(12)).then_return(Point(4, 5, 18))
+    decoy.when(well.get_bottom(15)).then_return(Point(4, 5, 21))
 
     assert (
         absolute_point_from_position_reference_and_offset(

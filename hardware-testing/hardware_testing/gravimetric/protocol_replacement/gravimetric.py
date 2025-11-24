@@ -1113,20 +1113,20 @@ def run_one_test(
 
     # aspirate and dispense submerge start offsets.
     transfer_properties.aspirate.submerge.start_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
     transfer_properties.dispense.submerge.start_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
     transfer_properties.aspirate.submerge.start_position.offset = retracted_offset
     transfer_properties.dispense.submerge.start_position.offset = retracted_offset
 
     # aspirate and dispense offsets
     transfer_properties.aspirate.aspirate_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
     transfer_properties.dispense.dispense_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_START
     )
 
     transfer_properties.aspirate.aspirate_position.offset = submerged_offset
@@ -1135,10 +1135,10 @@ def run_one_test(
     # aspirate and dispense retract end offsets
 
     transfer_properties.aspirate.retract.end_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_END
     )
     transfer_properties.dispense.retract.end_position.position_reference = (
-        PositionReference.LIQUID_MENISCUS
+        PositionReference.LIQUID_MENISCUS_END
     )
     transfer_properties.aspirate.retract.end_position.offset = retracted_offset
     transfer_properties.dispense.retract.end_position.offset = retracted_offset

@@ -989,7 +989,19 @@ def absolute_point_from_position_reference_and_offset(
             reference_point = well.get_bottom(0)
         case PositionReference.WELL_CENTER:
             reference_point = well.get_center()
-        case PositionReference.LIQUID_MENISCUS:
+        case PositionReference.LIQUID_MENISCUS_START:
+            estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
+                mount=mount,
+                operation_volume=0.0,
+            )
+            if isinstance(estimated_liquid_height, (float, int)):
+                reference_point = well.get_bottom(z_offset=estimated_liquid_height)
+            else:
+                # If estimated liquid height gives a SimulatedProbeResult then
+                # assume meniscus is at well center.
+                # Will this cause more harm than good? Is there a better alternative to this?
+                reference_point = well.get_center()
+        case PositionReference.LIQUID_MENISCUS_END:
             estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
                 mount=mount,
                 operation_volume=well_volume_difference,

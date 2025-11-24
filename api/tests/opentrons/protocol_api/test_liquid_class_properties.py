@@ -24,7 +24,7 @@ def test_build_aspirate_settings() -> None:
 
     assert (
         aspirate_properties.submerge.start_position.position_reference.value
-        == "liquid-meniscus"
+        == "liquid-meniscus-end"
     )
     assert aspirate_properties.submerge.start_position.offset == Coordinate(
         x=0, y=0, z=-5
@@ -113,10 +113,10 @@ def test_aspirate_settings_overrides() -> None:
     aspirate_properties.retract.delay.duration = 0.5
     assert aspirate_properties.retract.delay.duration == 0.5
 
-    aspirate_properties.aspirate_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    aspirate_properties.aspirate_position.position_reference = "liquid-meniscus-end"  # type: ignore[assignment]
     assert (
         aspirate_properties.aspirate_position.position_reference.value
-        == "liquid-meniscus"
+        == "liquid-meniscus-end"
     )
     aspirate_properties.aspirate_position.offset = -1, -2, -3  # type: ignore[assignment]
     assert aspirate_properties.aspirate_position.offset == Coordinate(x=-1, y=-2, z=-3)
@@ -144,7 +144,7 @@ def test_build_single_dispense_settings() -> None:
 
     assert (
         single_dispense_properties.submerge.start_position.position_reference.value
-        == "liquid-meniscus"
+        == "liquid-meniscus-end"
     )
     assert single_dispense_properties.submerge.start_position.offset == Coordinate(
         x=0, y=0, z=-5
@@ -258,10 +258,10 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties.retract.delay.duration = 0.1
     assert single_dispense_properties.retract.delay.duration == 0.1
 
-    single_dispense_properties.dispense_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    single_dispense_properties.dispense_position.position_reference = "liquid-meniscus-end"  # type: ignore[assignment]
     assert (
         single_dispense_properties.dispense_position.position_reference.value
-        == "liquid-meniscus"
+        == "liquid-meniscus-end"
     )
     single_dispense_properties.dispense_position.offset = 11, 22, -33  # type: ignore[assignment]
     assert single_dispense_properties.dispense_position.offset == Coordinate(
@@ -291,7 +291,7 @@ def test_build_multi_dispense_settings() -> None:
 
     assert (
         multi_dispense_properties.submerge.start_position.position_reference.value
-        == "liquid-meniscus"
+        == "liquid-meniscus-end"
     )
     assert multi_dispense_properties.submerge.start_position.offset == Coordinate(
         x=0, y=0, z=-5
@@ -404,10 +404,10 @@ def test_multi_dispense_settings_override() -> None:
     multi_dispense_properties.retract.delay.duration = 0.1
     assert multi_dispense_properties.retract.delay.duration == 0.1
 
-    multi_dispense_properties.dispense_position.position_reference = "liquid-meniscus"  # type: ignore[assignment]
+    multi_dispense_properties.dispense_position.position_reference = "liquid-meniscus-end"  # type: ignore[assignment]
     assert (
         multi_dispense_properties.dispense_position.position_reference.value
-        == "liquid-meniscus"
+        == "liquid-meniscus-end"
     )
     multi_dispense_properties.dispense_position.offset = 11, 22, -33  # type: ignore[assignment]
     assert multi_dispense_properties.dispense_position.offset == Coordinate(
