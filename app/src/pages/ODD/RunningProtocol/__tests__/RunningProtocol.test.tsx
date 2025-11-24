@@ -271,7 +271,10 @@ describe('RunningProtocol', () => {
       .calledWith(RUN_ID, { refetchInterval: Infinity })
       .thenReturn({
         data: {
-          data: { id: RUN_ID, status: RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR },
+          data: {
+            id: RUN_ID,
+            status: RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
+          },
         },
       } as any)
     render(`/runs/${RUN_ID}/run`)
