@@ -17,7 +17,12 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       allowOnly: true,
-      exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**', '**/lib/**'],
+      exclude: [
+        ...configDefaults.exclude,
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/lib/**',
+      ],
       setupFiles: ['./setup-vitest.mts'],
       coverage: {
         exclude: [
@@ -25,7 +30,6 @@ export default mergeConfig(
           '**/dist/**',
           '**/__tests__/**',
           '**/lib/**',
-          'protocol-designer/cypress/**/*',
           'labware-library/cypress/**/*',
           ...configDefaults.exclude,
         ],
