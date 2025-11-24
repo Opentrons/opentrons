@@ -41,7 +41,7 @@ export const QuickTransferFlow = (): JSX.Element => {
 
   const [analyticsStartTime] = useState<Date>(new Date())
   const QUICK_TRANSFER_WIZARD_STEPS = 12
-  console.log('state', state)
+
   const {
     confirm: confirmExit,
     showConfirmation: showConfirmExit,

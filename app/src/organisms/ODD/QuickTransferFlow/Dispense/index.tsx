@@ -37,7 +37,6 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
     setSelectedSetting,
     isMultiTransfer,
   })
-  console.log('dispenseSettingsItems', dispenseSettingsItems)
   const handleResetSettings = (): void => {
     setShowResetAdvancedSettingsModal(true)
   }

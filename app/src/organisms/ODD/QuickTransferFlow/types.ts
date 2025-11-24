@@ -192,11 +192,6 @@ interface SetDispenseFlowRateAction {
 interface SetPipettePath {
   type: typeof ACTIONS.SET_PIPETTE_PATH
   path: PathOption
-  disposalVolumeDispenseSettings?: {
-    volume: number
-    blowOutLocation: BlowOutLocation
-    flowRate: number
-  }
 }
 interface SetAspirateTipPosition {
   type: typeof ACTIONS.SET_ASPIRATE_TIP_POSITION

@@ -33,7 +33,7 @@ import { Dispense } from './Dispense'
 import { Overview } from './Overview'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import { getInitialSummaryState, initializeSummaryState } from './utils'
+import { initializeSummaryState } from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
@@ -71,7 +71,7 @@ export function SummaryAndSettings(
     { state: wizardFlowState as InitialSummaryStateProps['state'], deckConfig },
     initializeSummaryState
   )
-  console.log('state', state)
+
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(
