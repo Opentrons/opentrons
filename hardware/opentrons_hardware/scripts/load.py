@@ -72,7 +72,10 @@ class BusProber:
         """Run a probe and return detected devices."""
         try:
             messenger.add_listener(self)
-            await asyncio.wait([self._stimulate(messenger)], timeout=response_timeout_s)
+            await asyncio.wait(
+                [asyncio.create_task(self._stimulate(messenger))],
+                timeout=response_timeout_s,
+            )
         except asyncio.TimeoutError:
             pass
         finally:
@@ -189,7 +192,7 @@ class BusLoader:
         )
         try:
             self._messenger.add_listener(self)
-            await asyncio.wait([self._load_bus()], timeout=run_for)
+            await asyncio.wait([asyncio.create_task(self._load_bus())], timeout=run_for)
         except asyncio.TimeoutError:
             pass
         except KeyboardInterrupt:
