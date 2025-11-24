@@ -37,6 +37,7 @@ export function Dispense(props: DispenseProps): JSX.Element | null {
     setSelectedSetting,
     isMultiTransfer,
   })
+
   const handleResetSettings = (): void => {
     setShowResetAdvancedSettingsModal(true)
   }

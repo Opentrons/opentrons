@@ -71,6 +71,7 @@ export function SummaryAndSettings(
     { state: wizardFlowState as InitialSummaryStateProps['state'], deckConfig },
     initializeSummaryState
   )
+
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
 
   const { createRun } = useCreateRunMutation(
@@ -84,6 +85,7 @@ export function SummaryAndSettings(
     },
     host
   )
+
   const isMultiTransferDispense = state?.path === 'multiDispense'
 
   const handleClickCreateTransfer = (): void => {
