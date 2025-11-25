@@ -246,10 +246,10 @@ class InstrumentContext(publisher.CommandPublisher):
             while aspirating liquid. When this argument is used, the ``location`` and
             ``end_location`` must both be a :py:class:`.Location`.
         :type end_location: :py:class:`.Location`
-        :param movement_delay: Time in seconds to delay the pipette's movement from the ``location`` to the ``end_location`` during a dynamic aspirate.
+        :param movement_delay: Time in seconds to delay after the pipette starts aspirating and before it begins moving from  ``location`` to ``end_location``.
             This option is only valid when using ``end_location``. When this argument
             is used, the pipette will wait the specified time after the pipette
-            starts to aspirate before moving. This may help when dispensing very viscous liquids
+            starts to aspirate before moving. This may help when aspirating very viscous liquids
             that need to build up some pressure before liquid starts to flow.
         :type movement_delay: float
         :returns: This instance.
@@ -485,7 +485,7 @@ class InstrumentContext(publisher.CommandPublisher):
             while dispensing liquid held in the pipette. When this argument is used,
             the ``location`` and ``end_location`` must both be a :py:class:`.Location`.
         :type end_location: :py:class:`.Location`
-        :param movement_delay: Time in seconds to delay the pipette's movement from the ``location`` to the ``end_location`` during a dynamic dispense.
+        :param movement_delay: Time in seconds to delay after the pipette starts dispensing and before it begins moving from  ``location`` to ``end_location``.
             This option is only valid when using ``end_location``. When this argument
             is used, the pipette will wait the specified time after the pipette
             starts to dispense before moving. This may help when dispensing very viscous liquids
@@ -889,7 +889,7 @@ class InstrumentContext(publisher.CommandPublisher):
                                pipette will not push out after earlier repetitions. If
                                not specified or ``None``, the pipette will push out the
                                default non-zero amount. See :ref:`push-out-dispense`.
-        :param movement_delay: Time in seconds to delay the pipette's movement during a dynamic mix.
+        :param movement_delay: Time in seconds to delay after the pipette starts aspirating or dispensing and before it begins moving from the ``aspirate_start_location`` or ``dispense_start_location`` to the ``aspirate_end_location`` or ``dispense_end_location``.
             This option is only valid when using ``aspirate_end_location`` or ``dispense_end_location``.
             When this argument is used, the pipette will wait the specified time
             after the pipette starts to aspirate or dispense before moving. This may help when mixing
@@ -900,10 +900,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. note::
 
-            All the arguments of ``dynamic_mix`` are optional. However, if you omit one of them,
-            all subsequent arguments must be passed as keyword arguments. For instance,
-            ``pipette.mix(1, location=wellplate['A1'])`` is a valid call, but
-            ``pipette.mix(1, wellplate['A1'])`` is not.
+            The ``aspirate_start_location`` and ``dispense_start_location`` arguments of ``dynamic_mix`` are required.
 
         """
         _log.debug(
