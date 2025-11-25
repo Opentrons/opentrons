@@ -353,30 +353,34 @@ export function generateQuickTransferArgs(
   )
 
   let blowoutLocation: string | undefined
+  const blowOutDispenseLocation =
+    quickTransferState.path === 'multiDispense'
+      ? quickTransferState.disposalVolumeDispenseSettings?.blowOutLocation
+      : quickTransferState.blowOutDispense?.location
+
   if (
-    quickTransferState?.blowOutDispense?.location != null &&
-    quickTransferState.blowOutDispense.location !== 'source_well' &&
-    quickTransferState.blowOutDispense.location !== 'dest_well' &&
-    'cutoutId' in quickTransferState.blowOutDispense.location
+    blowOutDispenseLocation != null &&
+    blowOutDispenseLocation !== 'source_well' &&
+    blowOutDispenseLocation !== 'dest_well' &&
+    typeof blowOutDispenseLocation === 'object' &&
+    'cutoutId' in blowOutDispenseLocation
   ) {
     const trashBinEntity = Object.values(
       invariantContext.trashBinEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOutDispense
-        ?.location as CutoutConfig
+      const blowoutObject = blowOutDispenseLocation as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const wasteChuteEntity = Object.values(
       invariantContext.wasteChuteEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOutDispense
-        ?.location as CutoutConfig
+      const blowoutObject = blowOutDispenseLocation as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const entity = trashBinEntity != null ? trashBinEntity : wasteChuteEntity
     blowoutLocation = entity?.id
   } else {
-    blowoutLocation = quickTransferState.blowOutDispense?.location
+    blowoutLocation = blowOutDispenseLocation as string | undefined
   }
 
   const dropTipTrashBinLocationEntity = Object.values(
@@ -455,7 +459,10 @@ export function generateQuickTransferArgs(
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
     dispenseOffsetFromBottomMm: quickTransferState.tipPositionDispense,
     blowoutLocation,
-    blowoutFlowRateUlSec: quickTransferState.blowOutDispense?.flowRate ?? 0,
+    blowoutFlowRateUlSec:
+      quickTransferState.path === 'multiDispense'
+        ? (quickTransferState.disposalVolumeDispenseSettings?.flowRate ?? 0)
+        : (quickTransferState.blowOutDispense?.flowRate ?? 0),
     blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,

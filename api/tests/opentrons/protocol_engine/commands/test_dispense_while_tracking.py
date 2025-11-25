@@ -31,6 +31,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     DeckPoint,
+    LabwareWellId,
 )
 from opentrons.protocol_engine.state import update_types
 
@@ -191,6 +192,13 @@ async def test_dispense_while_tracking_implementation(
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id-abc", ready_to_aspirate=False
                 ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
+                ),
             ),
         )
     else:
@@ -211,6 +219,13 @@ async def test_dispense_while_tracking_implementation(
                     labware_id="funky-labware",
                     well_names=["A3", "A4"],
                     volume_added=84.0,
+                ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
                 ),
             ),
         )
@@ -354,6 +369,13 @@ async def test_overpressure_error(
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id", ready_to_aspirate=False
                 ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
+                ),
             ),
         )
     else:
@@ -375,6 +397,13 @@ async def test_overpressure_error(
                 ),
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id", ready_to_aspirate=False
+                ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
                 ),
             ),
             state_update_if_false_positive=update_types.StateUpdate(),
