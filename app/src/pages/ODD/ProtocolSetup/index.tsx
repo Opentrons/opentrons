@@ -103,7 +103,6 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
-  useRunStatus,
 } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
@@ -762,6 +761,7 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
     refetchInterval: RUN_RECORD_REFETCH_MS,
   })
+  const runStatus = runRecord?.data.status ?? null
   const dispatch = useDispatch()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -793,7 +793,7 @@ export function ProtocolSetup(): JSX.Element {
       .data?.data.id != null
 
   const navigate = useNavigate()
-  const runStatus = useRunStatus(runId)
+
   if (runStatus === RUN_STATUS_STOPPED) {
     navigate('/protocols')
   }
