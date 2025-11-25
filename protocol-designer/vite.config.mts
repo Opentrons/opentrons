@@ -113,6 +113,8 @@ export default defineConfig(async (): Promise<UserConfig> => {
       esbuildOptions: {
         target: 'es2020',
       },
+      // For unknown reasons, PD whitescreens on launch unless we have this.
+      include: ['tslib'],
     },
     css: {
       postcss: {
@@ -143,6 +145,8 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     resolve: {
       conditions: ['browser'],
+      // For unknown reasons, PD whitescreens on launch unless we have this.
+      dedupe: ['tslib'],
       alias: {
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
         // files being processed with the wrong config (the config from the
