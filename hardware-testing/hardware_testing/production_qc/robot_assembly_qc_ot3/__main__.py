@@ -31,11 +31,18 @@ async def _main(cfg: TestConfig) -> None:
     # CSV REPORT
     report = build_report(test_name)
     helpers_ot3.set_csv_report_meta_data_ot3(api, report)
+    sku_code: str | None = None
+    if cfg.use_sku:
+        sku_code = input("SCAN device SKU barcode: ").strip()
+        print(f"SKU barcode: {sku_code}")
 
     # RUN TESTS
     for section, test_run in cfg.tests.items():
         ui.print_title(section.value)
-        await test_run(api, report, section.value)
+        if section == TestSection.PERIPHERALS:
+            await test_run(api, report, section.value, sku_code)
+        else:
+            await test_run(api, report, section.value)
 
     # SAVE REPORT
     ui.print_title("DONE")
@@ -46,6 +53,7 @@ async def _main(cfg: TestConfig) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--simulate", action="store_true")
+    parser.add_argument("--sku", action="store_true")
     # add each test-section as a skippable argument (eg: --skip-gantry)
     for s in TestSection:
         parser.add_argument(f"--skip-{s.value.lower()}", action="store_true")
@@ -60,5 +68,5 @@ if __name__ == "__main__":
         _t_sections = {
             s: f for s, f in TESTS if not getattr(args, f"skip_{s.value.lower()}")
         }
-    _config = TestConfig(simulate=args.simulate, tests=_t_sections)
+    _config = TestConfig(simulate=args.simulate, use_sku=args.sku, tests=_t_sections)  # type: ignore
     asyncio.run(_main(_config))
