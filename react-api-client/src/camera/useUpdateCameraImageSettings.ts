@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 
 import { createCameraImageSettings } from '@opentrons/api-client'
+import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 
 import { useHost } from '../api'
 
@@ -12,27 +13,25 @@ import type {
 } from 'react-query'
 import type {
   CameraImageSettings,
-  CameraResponse,
+  CameraImageSettingsResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
-import type { CameraId } from '@opentrons/shared-data'
 
 export type UseUpdateCameraImageSettingsMutationResult = UseMutationResult<
-  CameraResponse,
+  CameraImageSettingsResponse,
   AxiosError<ErrorResponse>,
   CameraImageSettings
 > & {
   updateCameraImageSettings: UseMutateFunction<
-    CameraResponse,
+    CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
     CameraImageSettings
   >
 }
 
 export function useUpdateCamera(
-  cameraId: CameraId,
   options: UseMutationOptions<
-    CameraResponse,
+    CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
     CameraImageSettings
   > = {}
@@ -41,20 +40,27 @@ export function useUpdateCamera(
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
-    CameraResponse,
+    CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
     CameraImageSettings
   >(
-    [host, 'camera', 'cameraSettings', cameraId],
+    [host, 'camera', 'cameraSettings', OT_SYSTEM_CAMERA],
     (data: CameraImageSettings) =>
-      createCameraImageSettings(host!, data, cameraId).then(response => {
-        queryClient
-          .invalidateQueries([host, 'camera', 'cameraSettings', cameraId])
-          .catch(e => {
-            throw e
-          })
-        return response.data
-      }),
+      createCameraImageSettings(host!, data, OT_SYSTEM_CAMERA).then(
+        response => {
+          queryClient
+            .invalidateQueries([
+              host,
+              'camera',
+              'cameraSettings',
+              OT_SYSTEM_CAMERA,
+            ])
+            .catch(e => {
+              throw e
+            })
+          return response.data
+        }
+      ),
     options
   )
 

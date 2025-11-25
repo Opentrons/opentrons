@@ -1,7 +1,6 @@
 import { GET, request } from '../request'
 
-import type { CameraId } from '@opentrons/shared-data'
-import type { CameraImageSettingsResponse } from '../camera'
+import type { CameraId, CameraImageSettingsResponse } from '../camera'
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
 

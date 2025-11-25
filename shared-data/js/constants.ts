@@ -71,7 +71,7 @@ export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
 // robot camera name
-export type CameraId = 'ot_system_camera'
+export const OT_SYSTEM_CAMERA = 'ot_system_camera'
 
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
