@@ -81,4 +81,4 @@ class EEPROMData:
             eeprom_set.add((PropId.SERIAL_NUMBER, self.serial_number))
         if self.sku:
             eeprom_set.add((PropId.SKU, self.sku))
-        return eeprom_set   
+        return eeprom_set
