@@ -9,24 +9,16 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
 
-import {
-  generateBuildInfoHtml,
-  getVersion,
-} from '../scripts/git-version-protocol-designer.mjs'
-import { latestLabwareVersions } from '../scripts/git-version.mjs'
+import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
+
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
 const REQUIRED_APP_VERSION = '8.7.0' // PD requires this robot stack version or higher
-
-// Sentry and sourcemaps are disabled in local development
-const isCI = process.env.CI === 'true'
-const enableSentry =
-  isCI &&
-  !!process.env.SENTRY_AUTH_TOKEN &&
-  !!process.env.SENTRY_ORG &&
-  !!process.env.SENTRY_PROJECT
+const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
+  project: 'protocol-designer',
+})
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(async (): Promise<UserConfig> => {

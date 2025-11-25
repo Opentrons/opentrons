@@ -7,6 +7,11 @@ import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
+import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
+
+const { generateBuildInfoHtml } = createGitVersionToolkit({
+  project: 'labware-library',
+})
 
 export default defineConfig({
   // this makes imports relative rather than absolute
@@ -31,6 +36,13 @@ export default defineConfig({
       },
     }),
     cssModuleSideEffect(), // Note for treeshake
+    {
+      name: 'build-info-generator',
+      closeBundle: async () => {
+        const outputPath = path.resolve(__dirname, 'dist', 'info', 'index.html')
+        await generateBuildInfoHtml(outputPath)
+      },
+    },
   ],
   optimizeDeps: {
     esbuildOptions: {
