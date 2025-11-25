@@ -272,7 +272,7 @@ Staging area slots are ANSI/SLAS compatible deck pieces that replace the standar
 
 ##### Status light
 
-A strip of color LEDs along the top front of the robot. This light provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states. See the [Touchscreen and LED displays section][status-light-flex] in the System Description chapter.
+A strip of color LEDs along the top front of the robot. This light provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states. See the [Status Light section][status-light-flex] in the System Description chapter.
 
 ##### Thermal adapter
 
@@ -292,7 +292,7 @@ An aluminum bracket used by the 96-channel pipette to attach a full rack of pipe
 
 ##### Touchscreen
 
-The interactive LCD screen mounted to the front of the robot. See the [Touchscreen and LED displays section][touchscreen-display] in the System Description chapter.
+The interactive LCD screen mounted to the front of the robot. See the [Touchscreen display section][touchscreen-display] in the System Description chapter.
 
 ##### Trash bin
 
