@@ -1,13 +1,10 @@
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  DIRECTION_COLUMN,
   Divider,
-  Flex,
   LabwareDetailsWithCount,
-  RadioButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -25,16 +22,17 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
   const { moduleId } = formData
   const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
-  const isAfterMount = useRef(false)
   const robotState = useSelector(getRobotStateAtActiveItem)
   const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
   console.log('flexStackerOptions:', flexStackerOptions)
 
+  console.log('moduleId: ', moduleId)
   const { modules } = robotState ?? {}
-  const flexStackerState = modules?.[moduleId]
-    ?.moduleState as FlexStackerModuleState
+  console.log('modules:', modules)
+  console.log('moduleId: ', moduleId)
+  const flexStackerModule = modules?.[moduleId]?.moduleState
 
-  console.log('flexStackerState:', flexStackerState)
+  console.log('flexStackerModule:', flexStackerModule)
 
   return (
     <div
@@ -63,7 +61,18 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         value={moduleId}
       />
       <Divider marginY="0" />
-      <div>
+      <div style={{ padding: SPACING.spacing16 }}>
+        <div>
+          <StyledText
+            desktopStyle="bodyDefaultSemiBold"
+            style={{ paddingBottom: SPACING.spacing8 }}
+          >
+            Stacker
+          </StyledText>
+          <StyledText desktopStyle="bodyDefaultRegular">
+            5/6 labware filled
+          </StyledText>
+        </div>
         <LabwareDetailsWithCount
           title="Opentrons Flex 96 Tip Rack 1000 µL"
           subTitle="With tip rack lid"
