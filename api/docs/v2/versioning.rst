@@ -150,13 +150,14 @@ Changes in API Versions
 
 Version 2.27
 ------------
-- Adds concurrent commands to perform Temperature, Heater-Shaker, or Thermocycler Module actions alongside other protocol steps: 
+- Adds :ref:`concurrent module commands <concurrent-module>` to perform Temperature, Heater-Shaker, or Thermocycler Module actions alongside other protocol steps: 
     - :py:meth:`.TemperatureModuleContext.start_set_temperature`
     - :py:meth:`.HeaterShakerContext.set_shake_speed`
     - :py:meth:`.ThermocyclerContext.start_set_block_temperature`, :py:meth:`.ThermocyclerContext.start_set_lid_temperature`, and :py:meth:`.ThermocyclerContext.start_execute_profile`
 - Control pipette movement while aspirating or dispensing: 
-    - Use the ``end_location`` and ``movement_delay`` parameters control pipette movement during an :py:meth:`~.InstrumentContext.aspirate` or :py:meth:`~.InstrumentContext.dispense`, including pipetting relative to the liquid meniscus as liquid level changes. See :ref:`new-aspirate` and :ref:`_new-dispense`. 
-    -  Set aspirate and dispense locations during a :ref:`dynamic-mix`. 
+    - Use the ``end_location`` and ``movement_delay`` parameters to control pipette movement while :ref:`aspirating <new-aspirate>` or :ref:`dispensing <new-dispense>`.
+    - Pipette relative to the :ref:`liquid meniscus <well-meniscus>` as liquid level changes.
+    -  Set locations to start and end aspirating and dispensing in a :ref:`dynamic-mix`. 
 - Take images using the Flex or OT-2's built in-camera with the new :py:meth:`.ProtocolContext.capture_image` method.
 - Use the ``tips`` parameter to select tips to use during a :py:meth:`~.InstrumentContext.transfer_with_liquid_class`. 
 
