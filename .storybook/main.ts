@@ -19,7 +19,9 @@ const config: StorybookConfig = {
     'storybook-addon-pseudo-states',
   ],
 
-  staticDirs: [{ from: '../app/src/assets', to: 'app/src/assets' }],
+  // todo(mm, 2025-11-25): This is meant to allow loading images in e.g.
+  // DeckFixtureSetupInstructionsModal, but it doesn't seem to be working.
+  staticDirs: ['../app/src/assets'],
 
   framework: {
     name: '@storybook/react-vite',
