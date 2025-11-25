@@ -2,6 +2,7 @@
 import asyncio
 import atexit
 import logging
+import struct
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -19,11 +20,18 @@ from typing import (
     Union,
     cast,
     Sequence,
+    Any,
 )
 from opentrons_hardware.drivers.can_bus import DriverSettings, build, CanMessenger
 from opentrons_hardware.drivers.can_bus import settings as can_bus_settings
 from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.sensors import sensor_driver, sensor_types
+from opentrons_hardware.drivers.eeprom.types import (
+    PropType,
+    MAX_DATA_LEN,
+    EEPROMData,
+    FORMAT_VERSION,
+)
 
 from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.labware import load_definition as load_labware
@@ -1204,3 +1212,110 @@ def clear_pipette_ul_per_mm(api: OT3API, mount: OT3Mount) -> None:
     assert pip.ul_per_mm(pip.working_volume, "aspirate") == pip_nominal_ul_per_mm
     assert pip.ul_per_mm(1, "dispense") == pip_nominal_ul_per_mm
     assert pip.ul_per_mm(pip.working_volume, "dispense") == pip_nominal_ul_per_mm
+
+
+class DirectPropId(Enum):
+    """The hardware-testing equivalent of a unique property id for a property."""
+
+    INVALID = 0xFF
+    FORMAT_VERSION = 1
+    SERIAL_NUMBER = 2
+    SKU = 3
+
+
+DIRECT_PROP_ID_TYPES = {
+    DirectPropId.FORMAT_VERSION: PropType.BYTE,
+    DirectPropId.SERIAL_NUMBER: PropType.STR,
+    DirectPropId.SKU: PropType.STR,
+}
+
+
+def _generate_packet(prop_id: DirectPropId, value: Any) -> Optional[bytes]:
+    data = _encode_data(prop_id, value)
+    if data and len(data) <= MAX_DATA_LEN:
+        return struct.pack("!BB", prop_id.value, len(data)) + data
+    return None
+
+
+def _encode_data(prop_id: DirectPropId, value: Any) -> Optional[bytes]:
+    if prop_id == DirectPropId.INVALID:
+        return None
+    encoded_data: bytes = b""
+    try:
+        prop_id = DirectPropId(prop_id)
+        data_type = DIRECT_PROP_ID_TYPES[prop_id]
+        if data_type == PropType.BYTE:
+            encoded_data = struct.pack("!B", value)
+        elif data_type == PropType.CHAR:
+            encoded_data = struct.pack("!B", ord(value))
+        elif data_type == PropType.SHORT:
+            encoded_data = struct.pack("!h", value)
+        elif data_type == PropType.INT:
+            encoded_data = struct.pack("!i", value)
+        elif data_type == PropType.STR:
+            encoded_data = f"{value}".encode("utf-8")
+        elif data_type == PropType.BIN:
+            encoded_data = bytes(value)
+        return encoded_data
+    except (ValueError, TypeError, struct.error):
+        return None
+
+
+@dataclass
+class DirectEEPROMData:
+    """Hardware testing equivalent of dataclass that represents the serialized data from the eeprom."""
+
+    format_version: int = FORMAT_VERSION
+    serial_number: Optional[str] = None
+    machine_type: Optional[str] = None
+    machine_version: Optional[str] = None
+    programmed_date: Optional[datetime] = None
+    unit_number: Optional[int] = None
+    sku: Optional[str] = None
+
+    def to_set(self) -> set[tuple[DirectPropId, str | int]]:
+        """Hardware testing equivalent of an eeprom utility that returns a set of expected data values paired with a property id."""
+        eeprom_set: set[tuple[DirectPropId, str | int]] = set()
+        eeprom_set.add((DirectPropId.FORMAT_VERSION, self.format_version))
+        if self.serial_number:
+            eeprom_set.add((DirectPropId.SERIAL_NUMBER, self.serial_number))
+        if self.sku:
+            eeprom_set.add((DirectPropId.SKU, self.sku))
+        return eeprom_set
+
+
+def direct_property_write(
+    api: OT3API, properties: set[tuple[DirectPropId, str | int]]
+) -> set[DirectPropId]:
+    """Hardware testing equivalent of the eeprom property write. Write the given properties to the eeprom, returning a set of the successful ones."""
+    written_props: set[DirectPropId] = set()
+    # sort the properties so they are written in ascending order
+    properties = set(sorted(properties, key=lambda prop: prop[0].value))
+    data: bytes = b""
+    for prop_id, value in properties:
+        packet = _generate_packet(prop_id, value)
+        if packet:
+            written_props.add(prop_id)
+            data += packet
+    if data:
+        try:
+            api._backend.eeprom_driver._gpio.activate_eeprom_wp()  # type: ignore
+            api._backend.eeprom_driver._write(data)  # type: ignore
+        except RuntimeError:
+            # something went wrong, clear written props
+            written_props = set()
+        finally:
+            api._backend.eeprom_driver._gpio.deactivate_eeprom_wp()  # type: ignore
+    return written_props
+
+
+def direct_eeprom_data(data: EEPROMData) -> DirectEEPROMData:
+    """Returns the hardware testing equivalent of the eeprom data return."""
+    return DirectEEPROMData(
+        format_version=data.format_version,
+        serial_number=data.serial_number,
+        machine_type=data.machine_type,
+        programmed_date=data.programmed_date,
+        unit_number=data.unit_number,
+        sku=getattr(data, "sku", None),
+    )
