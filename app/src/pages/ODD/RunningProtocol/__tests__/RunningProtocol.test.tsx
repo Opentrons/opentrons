@@ -42,7 +42,6 @@ import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
-  DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsQuery,
@@ -104,7 +103,7 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
-        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+        refetchInterval: 5000,
       })
       .thenReturn({
         data: {
@@ -202,7 +201,7 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
-        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+        refetchInterval: 5000,
       })
       .thenReturn({
         key: PROTOCOL_KEY,
@@ -233,7 +232,7 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
-        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+        refetchInterval: 5000,
       })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
@@ -255,7 +254,7 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
-        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+        refetchInterval: 5000,
       })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
@@ -282,7 +281,7 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
-        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+        refetchInterval: 5000,
       })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_BLOCKED_BY_OPEN_DOOR } },
@@ -309,7 +308,7 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
-        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+        refetchInterval: 5000,
       })
       .thenReturn({
         data: {
@@ -330,7 +329,7 @@ describe('RunningProtocol', () => {
     when(vi.mocked(useNotifyRunQuery))
       .calledWith(RUN_ID, {
         staleTime: Infinity,
-        refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+        refetchInterval: 5000,
       })
       .thenReturn({
         data: { data: { id: RUN_ID, status: RUN_STATUS_AWAITING_RECOVERY } },

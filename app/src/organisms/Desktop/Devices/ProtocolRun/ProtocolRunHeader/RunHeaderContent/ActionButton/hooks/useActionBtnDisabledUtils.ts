@@ -130,6 +130,7 @@ function useDisabledReason({
   isCalibrationComplete,
   isCameraReadyToRun,
 }: UseDisabledReasonProps): string | null {
+  console.log(`is valid run again ${isValidRunAgain}`)
   const { t } = useTranslation(['run_details', 'shared'])
   if (isRobotOnWrongVersionOfSoftware) {
     return t('shared:a_software_update_is_available')
