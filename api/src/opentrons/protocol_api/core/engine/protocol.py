@@ -11,7 +11,7 @@ from opentrons_shared_data.labware.labware_definition import (
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 from opentrons_shared_data import liquid_classes
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    LiquidClassSchemaV1,
+    LiquidClassSchema,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
@@ -124,7 +124,7 @@ class ProtocolCore(
             str, Union[ModuleCore, NonConnectedModuleCore]
         ] = {}
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
-        self._liquid_class_def_cache: Dict[Tuple[str, int], LiquidClassSchemaV1] = {}
+        self._liquid_class_def_cache: Dict[Tuple[str, int], LiquidClassSchema] = {}
         self._load_fixed_trash()
 
     @property

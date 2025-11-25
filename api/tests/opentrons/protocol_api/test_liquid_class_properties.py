@@ -321,7 +321,6 @@ def test_build_multi_dispense_settings() -> None:
     assert multi_dispense_properties.retract.blowout.flow_rate is None
     assert multi_dispense_properties.retract.delay.enabled is True
     assert multi_dispense_properties.retract.delay.duration == 1
-
     assert (
         multi_dispense_properties.dispense_position.position_reference.value
         == "well-bottom"

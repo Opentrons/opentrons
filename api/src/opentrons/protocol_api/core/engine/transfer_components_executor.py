@@ -234,6 +234,7 @@ class TransferComponentsExecutor:
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(
             self._instrument.get_current_volume() + volume
         )
+        print(f"Should be in place {self._target_end_location is None}")
         self._instrument.aspirate(
             location=self._target_location,
             end_location=self._target_end_location,
@@ -241,7 +242,7 @@ class TransferComponentsExecutor:
             volume=volume,
             rate=1,
             flow_rate=aspirate_props.flow_rate_by_volume.get_for_volume(volume),
-            in_place=self._target_end_location is not None,
+            in_place=self._target_end_location is None,
             correction_volume=correction_volume,
         )
         self._tip_state.append_liquid(volume)
@@ -270,7 +271,7 @@ class TransferComponentsExecutor:
             volume=volume,
             rate=1,
             flow_rate=dispense_properties.flow_rate_by_volume.get_for_volume(volume),
-            in_place=self._target_end_location is not None,
+            in_place=self._target_end_location is None,
             push_out=push_out_override,
             correction_volume=correction_volume,
         )

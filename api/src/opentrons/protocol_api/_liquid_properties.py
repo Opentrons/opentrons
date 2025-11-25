@@ -524,6 +524,9 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             aspiratePosition=self._aspirate_position.as_shared_data_model(),
+            aspirateEndPosition=None
+            if self._aspirate_end_position is None
+            else self._aspirate_end_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             preWet=self._pre_wet,
             mix=self._mix.as_shared_data_model(),
@@ -566,7 +569,9 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
-            dispenseEndPosition=self._dispense_position.as_shared_data_model(),
+            dispenseEndPosition=None
+            if self._dispense_end_position is None
+            else self._dispense_end_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             mix=self._mix.as_shared_data_model(),
             pushOutByVolume=self._push_out_by_volume.as_list_of_tuples(),
@@ -609,7 +614,9 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
-            dispenseEndPosition=self._dispense_position.as_shared_data_model(),
+            dispenseEndPosition=None
+            if self._dispense_end_position is None
+            else self._dispense_end_position.as_shared_data_model(),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             conditioningByVolume=self._conditioning_by_volume.as_list_of_tuples(),
             disposalByVolume=self._disposal_by_volume.as_list_of_tuples(),

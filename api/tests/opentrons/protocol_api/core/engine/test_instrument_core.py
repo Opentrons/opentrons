@@ -2148,6 +2148,7 @@ def test_aspirate_liquid_class_for_transfer_without_volume_config(
             target_well=source_well,
             tip_state=TipState(),
             transfer_type=TransferType.ONE_TO_ONE,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(
@@ -2249,6 +2250,7 @@ def test_aspirate_liquid_class_using_volume_config_below_2_28(
             target_well=source_well,
             tip_state=TipState(),  # air gap would have been removed during volume config
             transfer_type=TransferType.ONE_TO_ONE,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(
@@ -2378,6 +2380,7 @@ def test_aspirate_liquid_class_using_volume_config_2_28_and_above(
             target_well=source_well,
             tip_state=TipState(),  # air gap would have been removed during volume config
             transfer_type=TransferType.ONE_TO_ONE,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(
@@ -2512,6 +2515,7 @@ def test_aspirate_liquid_class_2_28_and_above_skips_configure_volume(
                 last_liquid_and_air_gap_in_tip=last_liquid_and_airgap_in_tip
             ),
             transfer_type=TransferType.ONE_TO_ONE,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(
@@ -2574,6 +2578,7 @@ def test_aspirate_liquid_class_for_consolidate(
             target_well=source_well,
             tip_state=TipState(),
             transfer_type=TransferType.MANY_TO_ONE,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(
@@ -2825,6 +2830,7 @@ def test_dispense_liquid_class(
             target_well=dest_well,
             tip_state=TipState(),
             transfer_type=TransferType.ONE_TO_ONE,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(
@@ -2905,6 +2911,7 @@ def test_dispense_liquid_class_during_multi_dispense(
             target_well=dest_well,
             tip_state=TipState(),
             transfer_type=TransferType.ONE_TO_MANY,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(
@@ -2987,6 +2994,7 @@ def test_last_dispense_liquid_class_during_multi_dispense(
             target_well=dest_well,
             tip_state=TipState(),
             transfer_type=TransferType.ONE_TO_MANY,
+            target_end_location=None,
         )
     ).then_return(mock_transfer_components_executor)
     decoy.when(

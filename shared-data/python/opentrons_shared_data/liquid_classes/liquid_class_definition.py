@@ -582,6 +582,8 @@ class LiquidClassSchemaV1(LiquidClassSchemaCommon):
 class LiquidClassSchemaV2(LiquidClassSchemaCommon):
     """Defines a single liquid class's properties for liquid handling functions."""
 
-    schemaVersion: Literal[1] = Field(
+    schemaVersion: Literal[2] = Field(
         ..., description="Which schema version a liquid class is using"
     )
+
+LiquidClassSchema = Union[LiquidClassSchemaV1, LiquidClassSchemaV2]

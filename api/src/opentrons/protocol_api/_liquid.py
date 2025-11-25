@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Optional, Dict, Union, TYPE_CHECKING, Tuple
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    LiquidClassSchemaV1,
+    LiquidClassSchema,
 )
 
 from opentrons.protocols.advanced_control.transfers.common import (
@@ -47,7 +47,7 @@ class LiquidClass:
     _by_pipette_setting: Dict[str, Dict[str, TransferProperties]]
 
     @classmethod
-    def create(cls, liquid_class_definition: LiquidClassSchemaV1) -> "LiquidClass":
+    def create(cls, liquid_class_definition: LiquidClassSchema) -> "LiquidClass":
         """Liquid class factory method."""
 
         by_pipette_settings: Dict[str, Dict[str, TransferProperties]] = {}
