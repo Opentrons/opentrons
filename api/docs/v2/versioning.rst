@@ -68,7 +68,7 @@ The maximum supported API version for your robot is listed in the Opentrons App 
 
 If you upload a protocol that specifies a higher API level than the maximum supported, your robot won't be able to analyze or run your protocol. You can increase the maximum supported version by updating your robot software and Opentrons App. 
 
-Opentrons robots running the latest software (8.7.0) support the following version ranges: 
+Opentrons robots running the latest software (8.8.0) support the following version ranges: 
 
     * **Flex:** version 2.15–|apiLevel|.
     * **OT-2:** versions 2.0–|apiLevel|.
@@ -84,6 +84,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+------------------------------+
 | API Version | Introduced in Robot Software |
 +=============+==============================+
+|     2.27    |          8.8.0               |
++-------------+------------------------------+
 |     2.26    |          8.7.0               |
 +-------------+------------------------------+
 |     2.25    |          8.6.0               |
@@ -145,6 +147,18 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 Changes in API Versions
 =======================
+
+Version 2.27
+------------
+- Adds concurrent commands to perform Temperature, Heater-Shaker, or Thermocycler Module actions alongside other protocol steps: 
+    - :py:meth:`.TemperatureModuleContext.start_set_temperature`
+    - :py:meth:`.HeaterShakerContext.set_shake_speed`
+    - :py:meth:`.ThermocyclerContext.start_set_block_temperature`, :py:meth:`.ThermocyclerContext.start_set_lid_temperature`, and :py:meth:`.ThermocyclerContext.start_execute_profile`
+- Control pipette movement while aspirating or dispensing: 
+    - Use the ``end_location`` and ``movement_delay`` parameters control pipette movement during an :py:meth:`~.InstrumentContext.aspirate` or :py:meth:`~.InstrumentContext.dispense`, including pipetting relative to the liquid meniscus as liquid level changes. See :ref:`new-aspirate` and :ref:`_new-dispense`. 
+    -  Set aspirate and dispense locations during a :ref:`dynamic-mix`. 
+- Take images using the Flex or OT-2's built in-camera with the new :py:meth:`.ProtocolContext.capture_image` method.
+- Use the ``tips`` parameter to select tips to use during a :py:meth:`~.InstrumentContext.transfer_with_liquid_class`. 
 
 Version 2.26
 -------------

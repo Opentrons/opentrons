@@ -112,7 +112,7 @@ Temperature Module
 
 .. autoclass:: opentrons.protocol_api.TemperatureModuleContext
    :members:
-   :exclude-members: start_set_temperature, await_temperature, broker, geometry, load_labware_object
+   :exclude-members: await_temperature, broker, geometry, load_labware_object
    :inherited-members:
 
 Thermocycler
