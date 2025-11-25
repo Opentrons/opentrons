@@ -1833,17 +1833,15 @@ class ProtocolContext(CommandPublisher):
         brightness: Optional[float] = None,
         saturation: Optional[float] = None,
     ) -> None:
-        """Capture an image using the camera. Captured images get saved as a result of the protocol run.
+        """Capture an image using the camera. Captured images are saved as during the protocol run.
 
-        :param home_before: Boolean to home the pipette before capturing an image.
-        :param filename: Filename to use when saving the captured image as a file.
-        :param resolution: Width/height tuple to determine the resolution to use when capturing an image.
-        :param zoom: Optional zoom level, with minimum/default of 1x zoom and maximum of 2x zoom.
-        :param contrast: Contrast level to be applied to an image, range is 0% to 100%.
-        :param brightness: Brightness level to be applied to an image, range is 0% to 100%.
-        :param saturation: Saturation level to be applied to an image, range is 0% to 100%.
-
-        .. versionadded:: 2.27
+        :param home_before: If ``True``, homes the pipette before capturing an image.
+        :param filename: Custom name to use when saving the captured image as a file. The custom name is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run, the step number, and a timestamp for the command running when the image was captured.
+        :param resolution: Accepts a width and height (as a tuple) to determine the camera's resolution when capturing the image.
+        :param zoom: Zoom level the camera will use. Defaults to the minimum of 1x zoom (``1.0``) and has a maximum of 2x zoom (``2.0``).
+        :param contrast: The contrast level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
+        :param brightness: The brightness level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
+        :param saturation: The saturation level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
 
         """
         if home_before is True:
