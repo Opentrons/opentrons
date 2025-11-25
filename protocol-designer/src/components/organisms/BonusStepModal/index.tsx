@@ -23,7 +23,7 @@ interface HandleClickProps {
   handleAddPauseClick: () => void
 }
 
-type AutoAddPauseUntilTempStepModalProps =
+type BonusStepModalProps =
   | ({
       modalType:
         | 'temperatureModule'
@@ -47,9 +47,7 @@ type AutoAddPauseUntilTempStepModalProps =
  * Implements the several modals that are like "you just saved a set-temperature step,
  * would you like to also add a pause step."
  */
-export const AutoAddPauseUntilTempStepModal = (
-  props: AutoAddPauseUntilTempStepModalProps
-): JSX.Element => {
+export const BonusStepModal = (props: BonusStepModalProps): JSX.Element => {
   const { modalType, handleSkipPauseClick, handleAddPauseClick } = props
   const { t } = useTranslation()
   const [rememberDismissal, setRememberDismissal] = useState(false)
