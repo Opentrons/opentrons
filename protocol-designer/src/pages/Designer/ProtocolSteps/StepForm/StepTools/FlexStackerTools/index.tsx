@@ -6,6 +6,7 @@ import {
   DIRECTION_COLUMN,
   Divider,
   Flex,
+  LabwareDetailsWithCount,
   RadioButton,
   SPACING,
   StyledText,
@@ -62,6 +63,13 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         value={moduleId}
       />
       <Divider marginY="0" />
+      <div>
+        <LabwareDetailsWithCount
+          title="Opentrons Flex 96 Tip Rack 1000 µL"
+          subTitle="With tip rack lid"
+          quantity="Quantity: 1"
+        />
+      </div>
       {moduleId != null ? <>test flex stacker tools</> : null}
     </div>
   )

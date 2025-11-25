@@ -1,9 +1,10 @@
-import { SPACING, StyledText } from '@opentrons/components'
+import { StyledText } from '../../atoms'
+import { SPACING } from '../../ui-style-constants'
 
 type LabwareDetailsWithCountProps = {
   title: string
   subTitle?: string
-  quantity: number
+  quantity: string
 }
 
 export function LabwareDetailsWithCount({
