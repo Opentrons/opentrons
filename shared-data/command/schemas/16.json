@@ -259,6 +259,11 @@
       "additionalProperties": false,
       "description": "Properties specific to the aspirate function.",
       "properties": {
+        "aspirateEndPosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Ending tip position during dynamic aspirate.",
+          "title": "Aspirateendposition"
+        },
         "aspiratePosition": {
           "$ref": "#/$defs/TipPosition",
           "description": "Tip position during aspirate."
@@ -3944,6 +3949,11 @@
           "$ref": "#/$defs/DelayProperties",
           "description": "Delay settings after each dispense"
         },
+        "dispenseEndPosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Ending tip position during dynamic dispense.",
+          "title": "Dispenseendposition"
+        },
         "dispensePosition": {
           "$ref": "#/$defs/TipPosition",
           "description": "Tip position during dispense."
@@ -4230,7 +4240,13 @@
     },
     "PositionReference": {
       "description": "Positional reference for liquid handling operations.",
-      "enum": ["well-bottom", "well-top", "well-center", "liquid-meniscus"],
+      "enum": [
+        "well-bottom",
+        "well-top",
+        "well-center",
+        "liquid-meniscus-start",
+        "liquid-meniscus-end"
+      ],
       "title": "PositionReference",
       "type": "string"
     },
@@ -5533,6 +5549,11 @@
         "delay": {
           "$ref": "#/$defs/DelayProperties",
           "description": "Delay after dispense, in seconds."
+        },
+        "dispenseEndPosition": {
+          "$ref": "#/$defs/TipPosition",
+          "description": "Ending tip position during dynamic dispense.",
+          "title": "Dispenseendposition"
         },
         "dispensePosition": {
           "$ref": "#/$defs/TipPosition",

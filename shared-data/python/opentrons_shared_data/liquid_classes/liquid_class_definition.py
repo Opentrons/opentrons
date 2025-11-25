@@ -586,4 +586,5 @@ class LiquidClassSchemaV2(LiquidClassSchemaCommon):
         ..., description="Which schema version a liquid class is using"
     )
 
+
 LiquidClassSchema = Union[LiquidClassSchemaV1, LiquidClassSchemaV2]
