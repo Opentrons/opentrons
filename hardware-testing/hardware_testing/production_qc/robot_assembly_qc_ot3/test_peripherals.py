@@ -1,5 +1,6 @@
 """Test Peripherals."""
 import asyncio
+import os
 from pathlib import Path
 from subprocess import run as run_subprocess, Popen, CalledProcessError
 from typing import List, Union, Optional, Dict
@@ -21,6 +22,11 @@ from hardware_testing.data.csv_report import (
     CSVLineRepeating,
 )
 from hardware_testing.data import ui
+from hardware_testing.opentrons_api.helpers_ot3 import (
+    direct_property_write,
+    direct_eeprom_data,
+    DirectPropId,
+)
 
 SERVER_PORT = 8083
 SERVER_CMD = "{0} -m http.server {1} --directory {2}"
@@ -28,9 +34,11 @@ SERVER_CMD = "{0} -m http.server {1} --directory {2}"
 CAM_PIC_FILE_NAME = "camera_{0}.jpg"
 
 CAM_CMD_OT3 = (
-    "v4l2-ctl --device /dev/ot_system_camera --set-fmt-video=width=640,height=480,pixelformat=MJPG "
+    "v4l2-ctl --device /dev/video2 --set-fmt-video=width=640,height=480,pixelformat=MJPG "
     "--stream-mmap --stream-to={0} --stream-count=1"
 )
+
+FLEX_SKUS_NO_CAMERA = ["999-00279"]
 
 COLOR_TO_STATE: Dict[str, Tuple[int, int, int, int]] = {
     "off": (
@@ -173,7 +181,9 @@ def build_csv_lines() -> List[Union[CSVLine, CSVLineRepeating]]:
     ]
 
 
-async def run(api: OT3API, report: CSVReport, section: str) -> None:
+async def run(  # noqa: C901
+    api: OT3API, report: CSVReport, section: str, sku: str | None = None
+) -> None:
     """Run."""
     await api.set_lights(rails=True)
     await api.set_status_bar_state(StatusBarState.IDLE)
@@ -244,12 +254,43 @@ async def run(api: OT3API, report: CSVReport, section: str) -> None:
 
     # CAMERA
     ui.print_header("CAMERA")
-    try:
-        cam_pic_path = await _take_picture(api, report, section)
-    except Exception as e:
-        print(f"Take a picture failed with the following error: {e}")
-    if cam_pic_path:
-        await _run_image_check_server(api, report, section, cam_pic_path)
-        cam_pic_path.unlink()
+    if sku and sku in FLEX_SKUS_NO_CAMERA:
+        try:
+            # Assert there is no camera device at /dev/video2 to ensure it is removed
+            print("Verifying camera not attached.")
+            active_result = CSVResult.FAIL
+            assert not os.path.exists("/dev/video2")
+            active_result = CSVResult.PASS
+            # write the SKU to EEPROM to indicate that this is a Flex model with no Camera
+            print(f"Writing SKU {sku} to EEPROM.")
+
+            # Query the existing EEPROM data and converted it to a hardware-testing handleable format
+            eeprom_data = api._backend.eeprom_data  # type: ignore
+            converted_eeprom_data = direct_eeprom_data(eeprom_data)
+
+            # Update the data set with the provided SKU and write it to the EEPROM
+            converted_eeprom_data.sku = sku
+            eeprom_set = converted_eeprom_data.to_set()
+            sku_result = direct_property_write(api=api, properties=eeprom_set)
+
+            # Validate the SKU
+            assert DirectPropId.SKU in sku_result
+
+            removed_result = CSVResult.PASS
+        except Exception as e:
+            print(
+                f"Confirming camera not attached failed with the following error: {e}"
+            )
+            removed_result = CSVResult.FAIL
+        report(section, "camera-active", [active_result])
+        report(section, "camera-image", [removed_result])
     else:
-        print("skipping checking the image, because taking a picture failed")
+        try:
+            cam_pic_path = await _take_picture(api, report, section)
+        except Exception as e:
+            print(f"Take a picture failed with the following error: {e}")
+        if cam_pic_path:
+            await _run_image_check_server(api, report, section, cam_pic_path)
+            cam_pic_path.unlink()
+        else:
+            print("skipping checking the image, because taking a picture failed")
