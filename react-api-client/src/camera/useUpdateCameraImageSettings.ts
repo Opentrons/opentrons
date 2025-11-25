@@ -29,7 +29,7 @@ export type UseUpdateCameraImageSettingsMutationResult = UseMutationResult<
   >
 }
 
-export function useUpdateCamera(
+export function useUpdateCameraImageSettings(
   options: UseMutationOptions<
     CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,

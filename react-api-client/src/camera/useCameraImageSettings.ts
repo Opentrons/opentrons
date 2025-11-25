@@ -17,7 +17,7 @@ import type {
   ErrorResponse,
 } from '@opentrons/api-client'
 
-export type UseUpdateCameraMutationResult = UseMutationResult<
+export type UseCameraImageSettingsMutationResult = UseMutationResult<
   CameraImageSettingsResponse,
   AxiosError<ErrorResponse>,
   CameraImageSettings
@@ -29,13 +29,13 @@ export type UseUpdateCameraMutationResult = UseMutationResult<
   >
 }
 
-export function useCreateCameraSettings(
+export function useCreateCameraImageSettings(
   options: UseMutationOptions<
     CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
     CameraImageSettings
   > = {}
-): UseUpdateCameraMutationResult {
+): UseCameraImageSettingsMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
