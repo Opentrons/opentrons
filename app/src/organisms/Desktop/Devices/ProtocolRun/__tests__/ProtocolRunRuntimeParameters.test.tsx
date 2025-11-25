@@ -7,9 +7,9 @@ import { InfoScreen } from '@opentrons/components'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 import {
   mockIdleUnstartedRun,
@@ -121,10 +121,11 @@ describe('ProtocolRunRuntimeParameters', () => {
       .thenReturn({
         runTimeParameters: mockRunTimeParameterData,
       } as CompletedProtocolAnalysis)
-    vi.mocked(useRunStatus).mockReturnValue('running')
-    vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: mockSucceededRun },
-    } as unknown as UseQueryResult<Run>)
+    when(vi.mocked(useNotifyRunQuery))
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
+      .thenReturn({
+        data: { data: mockSucceededRun },
+      } as unknown as UseQueryResult<Run>)
   })
 
   afterEach(() => {
@@ -133,7 +134,7 @@ describe('ProtocolRunRuntimeParameters', () => {
 
   it('should render title, and banner when RunTimeParameters are not empty and all values are default', () => {
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: mockIdleUnstartedRun,
@@ -163,7 +164,7 @@ describe('ProtocolRunRuntimeParameters', () => {
       ],
     } as CompletedProtocolAnalysis)
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: mockIdleUnstartedRun,
@@ -180,7 +181,7 @@ describe('ProtocolRunRuntimeParameters', () => {
 
   it('should render title, and banner when RunTimeParameters from view protocol run record overflow menu button', () => {
     when(useNotifyRunQuery)
-      .calledWith(RUN_ID)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
       .thenReturn({
         data: {
           data: {
@@ -203,7 +204,6 @@ describe('ProtocolRunRuntimeParameters', () => {
       ],
     } as CompletedProtocolAnalysis)
 
-    vi.mocked(useRunStatus).mockReturnValue('succeeded')
     render(props)
     screen.getByText('Download files')
     screen.getByText(
@@ -212,6 +212,21 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render RunTimeParameters when RunTimeParameters are not empty', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: mockRunTimeParameterData,
+          },
+        },
+      } as any)
+    when(vi.mocked(useMostRecentCompletedAnalysis))
+      .calledWith(RUN_ID)
+      .thenReturn({
+        runTimeParameters: [] as RunTimeParameter[],
+      } as CompletedProtocolAnalysis)
     render(props)
     screen.getByText('Dry Run')
     screen.getByText('Off')
@@ -236,6 +251,16 @@ describe('ProtocolRunRuntimeParameters', () => {
   })
 
   it('should render csv row if a protocol requires a csv', () => {
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID, { refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL })
+      .thenReturn({
+        data: {
+          data: {
+            ...mockSucceededRun,
+            runTimeParameters: [mockRunTimeParameterData, mockCsvRtp],
+          },
+        },
+      } as any)
     vi.mocked(useMostRecentCompletedAnalysis).mockReturnValue({
       runTimeParameters: [...mockRunTimeParameterData, mockCsvRtp],
     } as CompletedProtocolAnalysis)

@@ -11,7 +11,11 @@ import {
   RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 
-import { useCurrentRunId, useRunStatus } from '/app/resources/runs'
+import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
+  useCurrentRunId,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
 
@@ -24,7 +28,10 @@ interface RunStatusesInfo {
 
 export function useRunStatuses(): RunStatusesInfo {
   const currentRunId = useCurrentRunId()
-  const runStatus = useRunStatus(currentRunId)
+  const { data: runRecord } = useNotifyRunQuery(currentRunId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
+  const runStatus = runRecord?.data.status ?? null
   const isRunIdle = runStatus === RUN_STATUS_IDLE
   const isRunRunning =
     runStatus === RUN_STATUS_PAUSED ||

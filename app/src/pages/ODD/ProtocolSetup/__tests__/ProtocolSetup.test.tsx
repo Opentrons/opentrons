@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -80,7 +80,6 @@ import {
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
   useRunCreatedAtTimestamp,
-  useRunStatus,
 } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 
@@ -279,7 +278,6 @@ describe('ProtocolSetup', () => {
         isResumeRunFromRecoveryActionLoading: false,
         isRunControlLoading: false,
       })
-    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockEmptyAnalysis,
     } as any)
@@ -300,6 +298,7 @@ describe('ProtocolSetup', () => {
         data: {
           protocolId: PROTOCOL_ID,
           labwareOffsets: [mockOffset],
+          status: RUN_STATUS_STOPPED,
         },
       },
     } as any)
@@ -607,7 +606,6 @@ describe('ProtocolSetup', () => {
   })
 
   it('should redirect to the protocols page when a run is stopped', () => {
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })
