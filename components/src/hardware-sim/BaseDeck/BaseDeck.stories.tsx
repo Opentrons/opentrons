@@ -65,23 +65,23 @@ export const BaseDeck: Story = {
       {
         moduleLocation: { slotName: 'B1' },
         moduleModel: THERMOCYCLER_MODULE_V2,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition,
+        nestedLabwareDefsBottomToTop: fixture96Plate as LabwareDefinition,
         innerProps: { lidMotorState: 'open' },
       },
       {
         moduleLocation: { slotName: 'D1' },
         moduleModel: TEMPERATURE_MODULE_V2,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition,
+        nestedLabwareDefsBottomToTop: fixture96Plate as LabwareDefinition,
       },
       {
         moduleLocation: { slotName: 'B3' },
         moduleModel: HEATERSHAKER_MODULE_V1,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition,
+        nestedLabwareDefsBottomToTop: fixture96Plate as LabwareDefinition,
       },
       {
         moduleLocation: { slotName: 'D2' },
         moduleModel: MAGNETIC_BLOCK_V1,
-        nestedLabwareDef: fixture96Plate as LabwareDefinition,
+        nestedLabwareDefsBottomToTop: fixture96Plate as LabwareDefinition,
       },
     ],
     darkFill: 'rebeccapurple',

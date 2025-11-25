@@ -1,3 +1,5 @@
+import path from 'node:path'
+
 import type { StorybookConfig } from '@storybook/react-vite'
 
 const config: StorybookConfig = {
@@ -7,9 +9,10 @@ const config: StorybookConfig = {
     '../protocol-designer/**/*.stories.@(js|jsx|ts|tsx)',
     '../opentrons-ai-client/**/*.stories.@(js|jsx|ts|tsx)',
     '../components/**/*.mdx',
-    '../app/**/*.mdx',
-    '../protocol-designer/**/*.mdx',
-    '../opentrons-ai-client/**/*.mdx',
+    // ToDo activate when needed
+    // '../app/**/*.mdx',
+    // '../protocol-designer/**/*.mdx',
+    // '../opentrons-ai-client/**/*.mdx',
   ],
 
   addons: [
@@ -17,6 +20,8 @@ const config: StorybookConfig = {
     '@storybook/addon-essentials',
     'storybook-addon-pseudo-states',
   ],
+
+  staticDirs: ['../app/src/assets'],
 
   framework: {
     name: '@storybook/react-vite',
@@ -33,6 +38,16 @@ const config: StorybookConfig = {
 
   docs: {
     autodocs: true,
+  },
+
+  async viteFinal(config) {
+    config.resolve = config.resolve || {}
+    config.resolve.alias = config.resolve.alias || {}
+
+    // Add the same alias as in app/vite.config.mts to support /app/ imports
+    config.resolve.alias['/app/'] = path.resolve(__dirname, '../app/src/') + '/'
+
+    return config
   },
 }
 

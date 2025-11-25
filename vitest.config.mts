@@ -76,7 +76,6 @@ export default defineConfig({
         '**/dist/**',
         '**/__tests__/**',
         '**/lib/**',
-        'protocol-designer/cypress/**/*',
         'labware-library/cypress/**/*',
         ...configDefaults.exclude,
       ],
