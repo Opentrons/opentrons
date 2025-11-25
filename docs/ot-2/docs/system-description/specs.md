@@ -14,11 +14,11 @@ title: "Opentrons OT-2: System Specifications"
   <tbody>
     <tr>
         <td><strong>Dimensions</strong></td>
-        <td>The OT-2 dimensions are 66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x 25").</td>
+        <td>66 cm x 57 cm x 63 cm (≈ 26" x 22.5" x 25")</td>
     </tr>
     <tr>
         <td><strong>Weight</strong></td>
-        <td>The OT-2 weighs 48 kg (105 lbs).</td>
+        <td>48 kg (105 lbs)</td>
     </tr>
     <tr>
         <td><strong>Deck slots</strong></td>
