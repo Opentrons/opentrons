@@ -1,5 +1,3 @@
-import path from 'node:path'
-
 import type { StorybookConfig } from '@storybook/react-vite'
 
 const config: StorybookConfig = {
@@ -38,16 +36,6 @@ const config: StorybookConfig = {
 
   docs: {
     autodocs: true,
-  },
-
-  async viteFinal(config) {
-    config.resolve = config.resolve || {}
-    config.resolve.alias = config.resolve.alias || {}
-
-    // Add the same alias as in app/vite.config.mts to support /app/ imports
-    config.resolve.alias['/app/'] = path.resolve(__dirname, '../app/src/') + '/'
-
-    return config
   },
 }
 
