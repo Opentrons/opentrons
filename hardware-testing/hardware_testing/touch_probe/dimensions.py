@@ -4,24 +4,6 @@ from typing import Optional
 from dataclasses import dataclass
 
 # ============================================================================
-# Configuration
-# ============================================================================
-
-
-@dataclass
-class ProbeConfig:
-    """Global configuration for touch probe operations."""
-
-    safe_z: float = 150.0
-    probe_speed: float = 5.0
-    edge_offset: float = 6.0  # how far inside the SLOT we start
-    bound_offset: float = 5.0  # mm from edge of slot to consider as deck boundary
-    xy_debounce_offset: float = 3.0  # mm to back off in X or Y
-    shank_height: float = 22.0
-    ball_radius: float = 0.75
-
-
-# ============================================================================
 # Data
 # ============================================================================
 

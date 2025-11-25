@@ -2,8 +2,7 @@ import argparse
 import asyncio
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
-from hardware_testing.touch_probe import TouchProbe
-from hardware_testing.touch_probe.dimensions import ProbeConfig
+from hardware_testing.touch_probe import TouchProbe, ProbeConfig
 
 # ============================================================================
 # Main Function
@@ -17,17 +16,17 @@ async def _main(simulating: bool, mount: OT3Mount, num_wells: int, slot: int) ->
     )
     await api.home()
     await api.cache_instruments()
-    tp = TouchProbe(api, mount)
+    tp = TouchProbe(api, mount, config)
     # probe for deck surface
-    deck_pos = await tp.get_deck_z(slot + 1, config)
+    deck_pos = await tp.get_deck_z(slot + 1)
     print(f"z deck pos: {deck_pos.z}")
 
     # look for deck square hole. If hole, then get the center
-    deck_square_center_radius = await tp.search_hole_and_center(deck_pos, config)
+    deck_square_center_radius = await tp.search_hole_and_center(deck_pos)
     if deck_square_center_radius:
         deck_square_center, deck_square_radius = deck_square_center_radius
     print(f"\nStarting Calibration on slot #{slot}")
-    dimensions = await tp.calibrate_labware(slot, deck_pos, config)
+    dimensions = await tp.calibrate_labware(slot, deck_pos)
     if not dimensions:
         print("Calibration failed.")
         return
@@ -40,14 +39,14 @@ async def _main(simulating: bool, mount: OT3Mount, num_wells: int, slot: int) ->
     )
 
     # Detecting well hole + center
-    well_center_and_radius = await tp.search_hole_and_center(first_well_xy, config)
+    well_center_and_radius = await tp.search_hole_and_center(first_well_xy)
     if well_center_and_radius:
         well_center, dimensions.radius = well_center_and_radius
-        brim_z = await tp.get_brim_height(well_center, dimensions.radius, config)
+        brim_z = await tp.get_brim_height(well_center, dimensions.radius)
         if brim_z is not None:
             dimensions.z_max = dimensions.z_max._replace(z=brim_z)
             well_center = well_center._replace(z=brim_z)
-            dimensions.well_bottom = await tp.get_bottom(well_center, config)
+            dimensions.well_bottom = await tp.get_bottom(well_center)
         else:
             print("Unable to determine well dimensions.")
 

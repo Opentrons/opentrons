@@ -4,7 +4,26 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from opentrons.hardware_control.ot3api import OT3API
 from typing import Optional, Tuple
-from hardware_testing.touch_probe.dimensions import ProbeConfig, LabwareDims
+from hardware_testing.touch_probe.dimensions import LabwareDims
+from dataclasses import dataclass
+
+# ============================================================================
+# Configuration
+# ============================================================================
+
+
+@dataclass
+class ProbeConfig:
+    """Global configuration for touch probe operations."""
+
+    safe_z: float = 150.0
+    probe_speed: float = 4.0
+    edge_offset: float = 6.0  # how far inside the SLOT we start
+    bound_offset: float = 5.0  # mm from edge of slot to consider as deck boundary
+    xy_debounce_offset: float = 3.0  # mm to back off in X or Y
+    shank_height: float = 22.0
+    ball_radius: float = 1.0
+
 
 # ============================================================================
 # Calibration Functions
@@ -12,9 +31,30 @@ from hardware_testing.touch_probe.dimensions import ProbeConfig, LabwareDims
 
 
 class TouchProbe:
-    def __init__(self, api: OT3API, mount: OT3Mount):
+    def __init__(self, api: OT3API, mount: OT3Mount, config: ProbeConfig):
         self.api = api
         self.mount = mount
+        self.config = config
+
+    async def touch_probe(self, axis: Axis, speed: float, distance: float) -> Point:
+        """Perform a touch probe and return the contact point adjusted for the ball radius."""
+        probe_point = await self.api.touch_probe(self.mount, axis, speed, distance)
+
+        # Determine adjustment based on axis and movement direction
+        adjustment = (
+            -self.config.ball_radius if distance > 0 else self.config.ball_radius
+        )
+
+        if axis == Axis.X:
+            probe_point = probe_point._replace(x=probe_point.x + adjustment)
+        elif axis == Axis.Y:
+            probe_point = probe_point._replace(y=probe_point.y + adjustment)
+        elif axis == Axis.Z:
+            probe_point = probe_point._replace(z=probe_point.z + adjustment)
+        else:
+            raise ValueError(f"Unsupported axis: {axis}")
+
+        return probe_point
 
     async def get_pos(self, refresh: bool = False) -> Point:
         """Return the current position as a Point."""
@@ -29,7 +69,7 @@ class TouchProbe:
             z=current_position[Axis.Z],
         )
 
-    async def get_deck_z(self, slot: int, config: ProbeConfig) -> Point:
+    async def get_deck_z(self, slot: int) -> Point:
         """Probe and return the deck Z contact point."""
         deck_square_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
         probe_deck_safe_z = 100.0
@@ -42,66 +82,65 @@ class TouchProbe:
         await self.api.move_to(self.mount, current_pos._replace(z=probe_deck_safe_z))
 
         try:
-            measured_deck_pos = await self.api.touch_probe(
-                self.mount,
+            measured_deck_pos = await self.touch_probe(
                 axis=Axis.Z,
                 speed=3.33,
                 distance=probe_deck_safe_z,
             )
         except Exception:
-            await self.api.move_to(self.mount, current_pos._replace(z=config.safe_z))
+            await self.api.move_to(
+                self.mount, current_pos._replace(z=self.config.safe_z)
+            )
             raise RuntimeError("Failed to detect deck surface")
 
-        await self.api.move_to(self.mount, current_pos._replace(z=config.safe_z))
+        await self.api.move_to(self.mount, current_pos._replace(z=self.config.safe_z))
         return deck_square_pos._replace(z=measured_deck_pos.z)
 
     async def search_hole(
         self,
         start_point: Point,
-        config: ProbeConfig,
     ) -> bool:
         """Search for a hole at the given probe point by probing down from the surface."""
-        await self.api.move_to(self.mount, start_point._replace(z=config.safe_z))
+        await self.api.move_to(self.mount, start_point._replace(z=self.config.safe_z))
         await self.api.move_to(self.mount, start_point._replace(z=start_point.z + 5.0))
         try:
-            await self.api.touch_probe(
-                self.mount,
+            await self.touch_probe(
                 axis=Axis.Z,
-                speed=config.probe_speed,
-                distance=5.0,
+                speed=self.config.probe_speed,
+                distance=5.0 + self.config.ball_radius,
             )
-            await self.api.move_to(self.mount, start_point._replace(z=config.safe_z))
+            await self.api.move_to(
+                self.mount, start_point._replace(z=self.config.safe_z)
+            )
             return False
         except Exception:
             return True
 
     async def search_hole_center(
-        self, start_point: Point, config: ProbeConfig
+        self, start_point: Point
     ) -> Optional[Tuple[Point, float]]:
         """Search for hole center and compute a representative radius."""
         max_radius = 127
-        probe_depth = start_point.z - 1
-        start_point = start_point._replace(z=probe_depth)
 
         try:
             # X probe
             await self.api.move_to(self.mount, start_point)
-            x_left = await self.api.touch_probe(
-                self.mount, axis=Axis.X, speed=config.probe_speed, distance=max_radius
+            x_left = await self.touch_probe(
+                axis=Axis.X, speed=self.config.probe_speed, distance=max_radius
             )
             await self.api.move_to(self.mount, start_point)
-            x_right = await self.api.touch_probe(
-                self.mount, axis=Axis.X, speed=config.probe_speed, distance=-max_radius
+            x_right = await self.touch_probe(
+                axis=Axis.X, speed=self.config.probe_speed, distance=-max_radius
             )
 
             # Y probe
             await self.api.move_to(self.mount, start_point)
-            y_up = await self.api.touch_probe(
-                self.mount, axis=Axis.Y, speed=config.probe_speed, distance=-max_radius
+            y_up = await self.touch_probe(
+                axis=Axis.Y, speed=self.config.probe_speed, distance=-max_radius
             )
             await self.api.move_to(self.mount, start_point)
-            y_down = await self.api.touch_probe(
-                self.mount, axis=Axis.Y, speed=config.probe_speed, distance=max_radius
+            y_down = await self.touch_probe(
+                axis=Axis.Y, speed=self.config.probe_speed, distance=max_radius
             )
 
         except Exception as e:
@@ -110,10 +149,10 @@ class TouchProbe:
 
         center_x = (x_left.x + x_right.x) / 2
         center_y = (y_up.y + y_down.y) / 2
-        center = Point(x=center_x, y=center_y, z=start_point.z + 1.0)
+        center = Point(x=center_x, y=center_y, z=start_point.z)
 
-        radius_x = abs(x_right.x - x_left.x) / 2 + config.ball_radius
-        radius_y = abs(y_up.y - y_down.y) / 2 + config.ball_radius
+        radius_x = abs(x_right.x - x_left.x) / 2
+        radius_y = abs(y_up.y - y_down.y) / 2
         radius = min(radius_x, radius_y)
 
         if abs(radius_x - radius_y) > 1:
@@ -126,35 +165,32 @@ class TouchProbe:
         center_and_radius = center, radius
         return center_and_radius
 
-    async def get_bottom(
-        self, well_center: Point, config: ProbeConfig
-    ) -> Optional[Point]:
+    async def get_bottom(self, well_center: Point) -> Optional[Point]:
         """Probe the bottom of a well starting from its XY center."""
         current_pos = await self.get_pos()
-        await self.api.move_to(self.mount, current_pos._replace(z=config.safe_z))
-        await self.api.move_to(self.mount, well_center._replace(z=config.safe_z))
+        await self.api.move_to(self.mount, current_pos._replace(z=self.config.safe_z))
+        await self.api.move_to(self.mount, well_center._replace(z=self.config.safe_z))
         await self.api.move_to(self.mount, well_center)
 
         try:
-            bottom = await self.api.touch_probe(
-                self.mount,
+            bottom = await self.touch_probe(
                 axis=Axis.Z,
-                speed=config.probe_speed,
-                distance=config.shank_height,
+                speed=self.config.probe_speed,
+                distance=self.config.shank_height,
             )
         except Exception:
             return None
 
-        await self.api.move_to(self.mount, well_center._replace(z=config.safe_z))
+        await self.api.move_to(self.mount, well_center._replace(z=self.config.safe_z))
         return bottom
 
     async def search_hole_and_center(
-        self, start_point: Point, config: ProbeConfig
+        self, start_point: Point
     ) -> Optional[Tuple[Point, float]]:
         """# look for deck square hole. If hole, then get the center"""
-        if await self.search_hole(start_point, config):
+        if await self.search_hole(start_point):
             current_pos = await self.get_pos(refresh=True)
-            center_and_radius = await self.search_hole_center(current_pos, config)
+            center_and_radius = await self.search_hole_center(current_pos)
             if center_and_radius:
                 center, radius = center_and_radius
                 print(f"Deck hole center: {center}, radius: {radius:.3f} mm")
@@ -164,7 +200,6 @@ class TouchProbe:
         self,
         slot: int,
         deck_pos: Point,
-        config: ProbeConfig,
     ) -> Optional[LabwareDims]:
         """Probe Z, X, and Y bounds of labware in a given slot using absolute coordinates."""
         top_left = helpers_ot3.get_slot_top_left_position_ot3(slot)
@@ -172,28 +207,29 @@ class TouchProbe:
         slot_center = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
 
         # Slot boundaries with offsets
-        deck_bound_left = top_left.x - config.bound_offset
-        deck_bound_right = top_left.x + slot_size.x + config.bound_offset
-        deck_bound_up = top_left.y + config.bound_offset
-        deck_bound_down = top_left.y - slot_size.y - config.bound_offset
+        deck_bound_left = top_left.x - self.config.bound_offset
+        deck_bound_right = top_left.x + slot_size.x + self.config.bound_offset
+        deck_bound_up = top_left.y + self.config.bound_offset
+        deck_bound_down = top_left.y - slot_size.y - self.config.bound_offset
 
         # Move to safe Z before probing
         current_pos = await self.get_pos()
-        await self.api.move_to(self.mount, current_pos._replace(z=config.safe_z))
+        await self.api.move_to(self.mount, current_pos._replace(z=self.config.safe_z))
 
         # Z probe to get top of labware
         z_probe_pos = Point(
-            x=top_left.x + config.edge_offset, y=slot_center.y, z=config.safe_z
+            x=top_left.x + self.config.edge_offset,
+            y=slot_center.y,
+            z=self.config.safe_z,
         )
         await self.api.move_to(self.mount, z_probe_pos)
         print(f"Probing for top surface (Z) at {z_probe_pos}")
 
         try:
-            z_max = await self.api.touch_probe(
-                self.mount,
+            z_max = await self.touch_probe(
                 axis=Axis.Z,
-                speed=config.probe_speed,
-                distance=config.safe_z,
+                speed=self.config.probe_speed,
+                distance=self.config.safe_z,
             )
         except Exception:
             print("Failed to detect Z surface")
@@ -207,7 +243,7 @@ class TouchProbe:
 
         # Compute XY probe height based on labware height vs shank length
         labware_height = z_max.z - deck_pos.z
-        if labware_height < config.shank_height:
+        if labware_height < self.config.shank_height:
             xy_probe_z = deck_pos.z + 3.0  # probe near bottom for short labware
             print(
                 f"Labware is short ({labware_height:.2f} mm), probing XY near bottom at {xy_probe_z:.2f} mm"
@@ -238,27 +274,13 @@ class TouchProbe:
             )
             await self.api.move_to(self.mount, move_point)  # move to probe height
 
-            probe_loc = await self.api.touch_probe(
-                self.mount,
+            probe_loc = await self.touch_probe(
                 axis=probe_axis,
-                speed=config.probe_speed,
+                speed=self.config.probe_speed,
                 distance=25 * release_dir,
             )
             if probe_loc is None:
                 raise RuntimeError(f"Failed to detect {probe_axis.name} edge")
-
-            # TODO:
-            # Apply ball radius compensation. This really needs to be figured out.
-            if probe_axis == Axis.X:
-                if release_dir > 0:
-                    probe_loc = probe_loc._replace(x=probe_loc.x - config.ball_radius)
-                else:
-                    probe_loc = probe_loc._replace(x=probe_loc.x)
-            else:  # Axis.Y
-                if release_dir > 0:
-                    probe_loc = probe_loc._replace(y=probe_loc.y - config.ball_radius)
-                else:
-                    probe_loc = probe_loc._replace(y=probe_loc.y)
 
             # Store probe results
             if probe_axis == Axis.X:
@@ -275,14 +297,14 @@ class TouchProbe:
             # Debounce move
             if probe_axis == Axis.X:
                 release_pos = Point(
-                    x=move_point.x + config.xy_debounce_offset * release_dir,
+                    x=move_point.x + self.config.xy_debounce_offset * release_dir,
                     y=move_point.y,
                     z=safe_z_labware,
                 )
             else:
                 release_pos = Point(
                     x=move_point.x,
-                    y=move_point.y + config.xy_debounce_offset * release_dir,
+                    y=move_point.y + self.config.xy_debounce_offset * release_dir,
                     z=safe_z_labware,
                 )
             await self.api.move_to(self.mount, release_pos)
@@ -292,7 +314,7 @@ class TouchProbe:
 
         # Return to safe Z
         current_pos = await self.get_pos()
-        await self.api.move_to(self.mount, current_pos._replace(z=config.safe_z))
+        await self.api.move_to(self.mount, current_pos._replace(z=self.config.safe_z))
 
         if None in (x_min, x_max, y_min, y_max):
             print("Failed to collect all XY probe results")
@@ -312,20 +334,20 @@ class TouchProbe:
 
     # this assumes you call this function RIGHT AFTER you call search_hole_center
     async def get_brim_height(
-        self, well_center: Point, radius: float, config: ProbeConfig
+        self, well_center: Point, radius: float
     ) -> Optional[float]:
         """Gets the height of the lip of a well, given the well center and well radius."""
         # move to safe height above center
         current_pos = await self.get_pos()
-        await self.api.move_to(self.mount, current_pos._replace(z=config.safe_z))
+        await self.api.move_to(self.mount, current_pos._replace(z=self.config.safe_z))
         # Choose a point (brim_xy) slightly outside the left well edge
         left_well_edge = well_center.x - radius
-        brim_xy = well_center._replace(x=left_well_edge - 0.5, z=config.safe_z)
+        brim_xy = well_center._replace(x=left_well_edge - 0.5, z=self.config.safe_z)
         await self.api.move_to(self.mount, brim_xy)
         await self.api.move_to(self.mount, brim_xy._replace(z=well_center.z + 10))
         try:
-            brim_point = await self.api.touch_probe(
-                self.mount, axis=Axis.Z, speed=config.probe_speed, distance=10
+            brim_point = await self.touch_probe(
+                axis=Axis.Z, speed=self.config.probe_speed, distance=10
             )
             # compensate for ball radius on Z probe place holder
             try:
