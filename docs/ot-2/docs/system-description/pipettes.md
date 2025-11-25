@@ -14,8 +14,6 @@ Opentrons OT-2 pipettes are configurable devices used to move liquids throughout
 
 A single-channel or multi-channel pipette each occupy one mount (left or right) on the carriage.
 
-## Installation
-
 For instructions on installing pipettes, see the [Instrument Installation and Calibration section](../installation/instruments.md).
 
 ## Picking up and dropping tips
@@ -42,12 +40,16 @@ The following tables list the accuracy and precision specifications for OT-2 pip
 <table>
   <thead>
     <tr>
-      <th>Pipette</th>
-      <th>Volume (µL)</th>
+      <th rowspan="2">Pipette</th>
+      <th rowspan="2">Volume (µL)</th>
+      <th colspan="2">Accuracy (Systematic Error)</th>
+      <th colspan="2">Precision (Random Error)</th>
+    </tr>
+    <tr>
       <th>%D</th>
-      <th>Systematic Error (µL)</th>
+      <th>µL</th>
       <th>%CV</th>
-      <th>Random Error (µL)</th>
+      <th>µL</th>
     </tr>
   </thead>
   <tbody>
@@ -133,12 +135,16 @@ These instruments have 8 channels.
 <table>
   <thead>
     <tr>
-      <th>Pipette</th>
-      <th>Volume (µL)</th>
+      <th rowspan="2">Pipette</th>
+      <th rowspan="2">Volume (µL)</th>
+      <th colspan="2">Accuracy (Systematic Error)</th>
+      <th colspan="2">Precision (Random Error)</th>
+    </tr>
+    <tr>
       <th>%D</th>
-      <th>Systematic Error (µL)</th>
+      <th>µL</th>
       <th>%CV</th>
-      <th>Random Error (µL)</th>
+      <th>µL</th>
     </tr>
   </thead>
   <tbody>

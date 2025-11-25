@@ -36,7 +36,7 @@ The deck is the machined aluminum surface on which automated science protocols a
 
 The working area is the physical space on and above the deck that is accessible for pipetting. Labware placed in slots 1–11 are in the working area.
 
-The OT-2 deck slides in and out of the enclosure. You can pull it out part way, or remove it completely, to more easily place labware or clean the deck.
+The OT-2 deck slides in and out of the enclosure. You can pull it out part way, or remove it completely, for cleaning.
 
 ![OT-2 sliding deck](../images/sliding-deck.png)
 
@@ -57,29 +57,35 @@ The following table lists and describes these status lights.
 <table>
   <thead>
     <tr>
-      <th>Status light icon</th>
+      <th>Icon</th>
+      <th>Status</th>
       <th>Description</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><img src="../../images/power-symbol.png" alt="power" width="50%"></td>
-      <td>Power light<br>The light should stay on and remain solid if the OT-2 is turned on and initialized.</td>
+      <td>Power light</td>
+      <td>The light should stay on and remain solid if the OT-2 is turned on and initialized.</td>
     </tr>
     <tr>
       <td><img src="../../images/ot2-network.png" alt="ethernet" width="50%"></td>
-      <td>Ethernet connection<br>The light is solid when the robot is connected to the network and has an IP address. It is normal for the light to remain dark for a few moments after turning the robot on. If the light stays off, that indicates the OT-2 cannot connect to the local network.</td>
+      <td>Ethernet connection</td>
+      <td>The light is solid when the robot is connected to the network and has an IP address. It is normal for the light to remain dark for a few moments after turning the robot on. If the light stays off, that indicates the OT-2 cannot connect to the local network.</td>
     </tr>
     <tr>
       <td><img src="../../images/ot2-wifi.png" alt="wifi" width="50%"></td>
-      <td>Wi-Fi<br>The light is solid when the OT-2 has connected to a Wi-Fi network.</td>
+      <td>Wi-Fi</td>
+      <td>The light is solid when the OT-2 has connected to a Wi-Fi network.</td>
     </tr>
     <tr>
       <td><img src="../../images/ot2-heartbeat.png" alt="OS heartbeat" width="50%"></td>
-      <td>Operating system heartbeat<br>The light flashes once every few seconds if the robot's operating system has successfully booted up and is operating normally.</td>
+      <td>Operating system heartbeat</td>
+      <td>The light flashes once every few seconds if the robot's operating system has successfully booted up and is operating normally.</td>
     </tr>
     <tr>
       <td><img src="../../images/ot2-other.png" alt="not yet implemented" width="50%"></td>
+      <td>&mdash;</td>
       <td>Reserved for future use.</td>
     </tr>
   </tbody>

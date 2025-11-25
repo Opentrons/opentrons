@@ -76,8 +76,8 @@ title: "Opentrons OT-2: System Specifications"
         <td><p>The Opentrons App runs on:</p>
             <ul>
                 <li>Windows 10 or later</li>
-                <li>macOS 10.10 or later</li>
-                <li>Ubuntu 12.04 or later</li>
+                <li>macOS 10.16 or later</li>
+                <li>Ubuntu 20.04 or later</li>
             </ul>
         </td>
     </tr>
