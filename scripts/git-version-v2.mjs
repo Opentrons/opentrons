@@ -6,92 +6,122 @@ import git from 'simple-git'
 import semver from 'semver'
 
 const REPO_BASE = dirname(dirname(fileURLToPath(import.meta.url)))
-const PROJECT = 'protocol-designer'
-
-// Tag prefixes in priority order (production > staging)
-const TAG_PREFIXES = [
-    `${PROJECT}@`,
-    `staging-${PROJECT}@`
-]
 
 export function monorepoGit() {
-    return git({ baseDir: REPO_BASE })
+  return git({ baseDir: REPO_BASE })
 }
 
-export const versionFromTag = tag => {
-    // Extract version from tag format: protocol-designer@8.6.0 or staging-protocol-designer@8.6.0
-    const parts = tag.split('@')
-    return parts[1]
+function defaultTagPrefixes(project) {
+  if (project === 'robot-stack') {
+    return ['v']
+  }
+
+  return [`${project}@`, `staging-${project}@`]
 }
 
-export async function getTagsPointingAtHead() {
+function normalizeTagPrefixes(project, tagPrefixes) {
+  const prefixes = tagPrefixes?.length ? tagPrefixes : defaultTagPrefixes(project)
+  const unique = [...new Set(prefixes.filter(Boolean))]
+
+  if (unique.length === 0) {
+    throw new Error('At least one tag prefix is required')
+  }
+
+  return unique
+}
+
+function parseTagWithPrefixes(tag, prefixes) {
+  for (const prefix of prefixes) {
+    if (tag.startsWith(prefix)) {
+      return { prefix, version: tag.slice(prefix.length) }
+    }
+  }
+  return null
+}
+
+export function createGitVersionToolkit(options) {
+  const {
+    project,
+    tagPrefixes,
+  } = options ?? {}
+
+  if (!project) {
+    throw new Error('project is required')
+  }
+
+  const prefixes = normalizeTagPrefixes(project, tagPrefixes)
+
+  async function getTagsPointingAtHead() {
     try {
-        const tags = (
-            await monorepoGit().raw([
-                'tag',
-                '--points-at',
-                'HEAD',
-                '--list',
-                ...TAG_PREFIXES.map(prefix => `${prefix}*`),
-            ])
-        ).trim()
+      const tags = (
+        await monorepoGit().raw([
+          'tag',
+          '--points-at',
+          'HEAD',
+          '--list',
+          ...prefixes.map(prefix => `${prefix}*`),
+        ])
+      ).trim()
 
-        if (tags) {
-            return tags.split('\n').filter(t => t.length > 0)
-        }
+      if (tags) {
+        return tags.split('\n').filter(t => t.length > 0)
+      }
     } catch (error) {
-        // No tags found or git error
+      // ignore errors and fall through to empty list
     }
 
     return []
-}
+  }
 
-export async function getCurrentBranchName() {
+  async function getCurrentBranchName() {
     const isCI = process.env.CI === 'true'
 
     try {
-        const branch = (
-            await monorepoGit().raw(['rev-parse', '--abbrev-ref', 'HEAD'])
-        ).trim()
+      const branch = (
+        await monorepoGit().raw(['rev-parse', '--abbrev-ref', 'HEAD'])
+      ).trim()
+
+      if (isCI) {
+        console.log(`[git-version-v2] git rev-parse result: ${branch}`)
+      }
+
+      if (branch === 'HEAD') {
+        let ciBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
+
+        if (
+          ciBranch === process.env.GITHUB_REF_NAME &&
+          process.env.GITHUB_REF_TYPE === 'tag'
+        ) {
+          ciBranch = null
+        }
 
         if (isCI) {
-            console.log(`[git-version2] git rev-parse result: ${branch}`)
+          console.log(`[git-version-v2] Resolved CI branch: ${ciBranch}`)
         }
 
-        if (branch === 'HEAD') {
-            // Detached HEAD state - try CI environment variables
-            let ciBranch = process.env.GITHUB_HEAD_REF || process.env.GITHUB_REF_NAME
+        return ciBranch || null
+      }
 
-            // Skip if this is a tag ref, not a branch
-            if (ciBranch === process.env.GITHUB_REF_NAME &&
-                process.env.GITHUB_REF_TYPE === 'tag') {
-                ciBranch = null
-            }
-
-            if (isCI) {
-                console.log(`[git-version2] Resolved CI branch: ${ciBranch}`)
-            }
-
-            return ciBranch || null
-        }
-
-        return branch
+      return branch
     } catch (error) {
-        const fallbackBranch = process.env.GITHUB_HEAD_REF ||
-            process.env.GITHUB_REF_NAME ||
-            process.env.CI_COMMIT_REF_NAME ||
-            process.env.CIRCLE_BRANCH ||
-            null
+      const fallbackBranch =
+        process.env.GITHUB_HEAD_REF ||
+        process.env.GITHUB_REF_NAME ||
+        process.env.CI_COMMIT_REF_NAME ||
+        process.env.CIRCLE_BRANCH ||
+        null
 
-        if (isCI) {
-            console.log(`[git-version2] git command failed, using fallback: ${fallbackBranch}`)
-        }
+      if (isCI) {
+        console.log(
+          `[git-version-v2] git command failed, using fallback: ${fallbackBranch}`
+        )
+      }
 
-        return fallbackBranch
+      return fallbackBranch
     }
-}
+  }
 
-export function getTimestamp() {
+  function getTimestamp() {
     const now = new Date()
     const year = now.getUTCFullYear()
     const month = String(now.getUTCMonth() + 1).padStart(2, '0')
@@ -100,112 +130,104 @@ export function getTimestamp() {
     const minutes = String(now.getUTCMinutes()).padStart(2, '0')
     const seconds = String(now.getUTCSeconds()).padStart(2, '0')
     return `${year}${month}${day}-${hours}${minutes}${seconds}`
-}
+  }
 
-export async function getLatestTag() {
+  async function getLatestTag() {
     const gitClient = monorepoGit()
     const candidates = []
 
-    // Get all tags reachable from HEAD (all prefixes in one call)
     try {
-        const tagsOutput = (
-            await gitClient.raw([
-                'tag',
-                '--merged',
-                'HEAD',
-                '--list',
-                ...TAG_PREFIXES.map(prefix => `${prefix}*`),
-            ])
-        ).trim()
+      const tagsOutput = (
+        await gitClient.raw([
+          'tag',
+          '--merged',
+          'HEAD',
+          '--list',
+          ...prefixes.map(prefix => `${prefix}*`),
+        ])
+      ).trim()
 
-        if (tagsOutput.length === 0) {
-            throw new Error(`No matching tags found for ${PROJECT}.`)
+      if (tagsOutput.length === 0) {
+        throw new Error(`No matching tags found for ${project}.`)
+      }
+
+      const tags = tagsOutput.split('\n').filter(t => t.length > 0)
+
+      for (const tag of tags) {
+        const parsed = parseTagWithPrefixes(tag, prefixes)
+        if (!parsed) continue
+
+        const semverVersion = semver.parse(parsed.version)
+        if (semverVersion) {
+          candidates.push({
+            tag,
+            version: semverVersion,
+            prefix: parsed.prefix,
+          })
         }
-
-        const tags = tagsOutput.split('\n').filter(t => t.length > 0)
-
-        // Parse version from each tag and add to candidates
-        for (const tag of tags) {
-            try {
-                const version = versionFromTag(tag)
-                const parsedVersion = semver.parse(version)
-
-                if (parsedVersion != null) {
-                    // Determine which prefix this tag uses
-                    const prefix = TAG_PREFIXES.find(p => tag.startsWith(p))
-                    
-                    candidates.push({
-                        tag,
-                        version: parsedVersion,
-                        prefix,
-                    })
-                }
-            } catch (error) {
-                // Skip tags that don't have valid semver
-                continue
-            }
-        }
+      }
     } catch (error) {
-        throw new Error(`No matching tags found for ${PROJECT}.`)
+      throw new Error(`No matching tags found for ${project}.`)
     }
 
     if (candidates.length === 0) {
-        throw new Error(`No matching tags found for ${PROJECT}.`)
+      throw new Error(`No matching tags found for ${project}.`)
     }
 
-    // Sort by semantic version (highest first), then by prefix priority
     candidates.sort((a, b) => {
-        // Compare semantic versions
-        const versionCompare = semver.rcompare(a.version, b.version)
-        
-        if (versionCompare !== 0) {
-            return versionCompare
-        }
-
-        // If versions are equal, use prefix priority (production > staging)
-        return TAG_PREFIXES.indexOf(a.prefix) - TAG_PREFIXES.indexOf(b.prefix)
+      const versionCompare = semver.rcompare(a.version, b.version)
+      if (versionCompare !== 0) {
+        return versionCompare
+      }
+      return prefixes.indexOf(a.prefix) - prefixes.indexOf(b.prefix)
     })
 
     return candidates[0].tag
-}
+  }
 
-export async function getVersion() {
+  async function getVersion() {
     return getLatestTag()
-        .then(tag => versionFromTag(tag))
-        .catch(error => {
-            console.error(
-                `Could not find a version for ${PROJECT} (${error}) - no tags yet or no tags fetched? Using 0.0.0-dev`
-            )
-            return '0.0.0-dev'
-        })
-}
+      .then(tag => parseTagWithPrefixes(tag, prefixes)?.version)
+      .catch(error => {
+        console.error(
+          `Could not find a version for ${project} (${error}) - using 0.0.0-dev`
+        )
+        return '0.0.0-dev'
+      })
+  }
 
-export async function generateBuildInfoHtml(outputPath) {
+  async function generateBuildInfoHtml(outputPath) {
     const version = await getVersion()
     const timestamp = getTimestamp()
     const isCI = process.env.CI === 'true'
 
     let gitInfo = {}
     try {
-        const branch = await getCurrentBranchName()
-        const tags = await getTagsPointingAtHead()
-        const commitSha = (await monorepoGit().raw(['rev-parse', 'HEAD'])).trim()
-        const shortSha = commitSha.substring(0, 7)
-        const commitMessage = (await monorepoGit().raw(['log', '-1', '--pretty=%B'])).trim()
-        const commitAuthor = (await monorepoGit().raw(['log', '-1', '--pretty=%an'])).trim()
-        const commitDate = (await monorepoGit().raw(['log', '-1', '--pretty=%ci'])).trim()
+      const branch = await getCurrentBranchName()
+      const tags = await getTagsPointingAtHead()
+      const commitSha = (await monorepoGit().raw(['rev-parse', 'HEAD'])).trim()
+      const shortSha = commitSha.substring(0, 7)
+      const commitMessage = (
+        await monorepoGit().raw(['log', '-1', '--pretty=%B'])
+      ).trim()
+      const commitAuthor = (
+        await monorepoGit().raw(['log', '-1', '--pretty=%an'])
+      ).trim()
+      const commitDate = (
+        await monorepoGit().raw(['log', '-1', '--pretty=%ci'])
+      ).trim()
 
-        gitInfo = {
-            branch,
-            tags: tags.length > 0 ? tags : ['(none)'],
-            commitSha,
-            shortSha,
-            commitMessage,
-            commitAuthor,
-            commitDate
-        }
+      gitInfo = {
+        branch,
+        tags: tags.length > 0 ? tags : ['(none)'],
+        commitSha,
+        shortSha,
+        commitMessage,
+        commitAuthor,
+        commitDate,
+      }
     } catch (error) {
-        gitInfo = { error: error.message }
+      gitInfo = { error: error.message }
     }
 
     const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com'
@@ -215,79 +237,69 @@ export async function generateBuildInfoHtml(outputPath) {
     const baseRef = process.env.GITHUB_BASE_REF
 
     const githubInfo = {
-        // Run information
-        runId: runId || 'N/A',
-        runNumber: process.env.GITHUB_RUN_NUMBER || 'N/A',
-        runAttempt: process.env.GITHUB_RUN_ATTEMPT || 'N/A',
-        job: process.env.GITHUB_JOB || 'N/A',
-
-        // Workflow information
-        workflow: process.env.GITHUB_WORKFLOW || 'N/A',
-        workflowRef: process.env.GITHUB_WORKFLOW_REF || 'N/A',
-        workflowSha: process.env.GITHUB_WORKFLOW_SHA || 'N/A',
-
-        // Actor information
-        actor: process.env.GITHUB_ACTOR || 'N/A',
-        actorId: process.env.GITHUB_ACTOR_ID || 'N/A',
-        triggeringActor: process.env.GITHUB_TRIGGERING_ACTOR || 'N/A',
-
-        // Event information
-        event: process.env.GITHUB_EVENT_NAME || 'N/A',
-        eventPath: process.env.GITHUB_EVENT_PATH || 'N/A',
-
-        // Ref information
-        ref: process.env.GITHUB_REF || 'N/A',
-        refName: process.env.GITHUB_REF_NAME || 'N/A',
-        refType: process.env.GITHUB_REF_TYPE || 'N/A',
-        refProtected: process.env.GITHUB_REF_PROTECTED || 'N/A',
-        headRef: headRef || 'N/A',
-        baseRef: baseRef || 'N/A',
-
-        // Repository information
-        repository: repository,
-        repositoryId: process.env.GITHUB_REPOSITORY_ID || 'N/A',
-        repositoryOwner: process.env.GITHUB_REPOSITORY_OWNER || 'N/A',
-        repositoryOwnerId: process.env.GITHUB_REPOSITORY_OWNER_ID || 'N/A',
-
-        // Environment
-        environment: process.env.GITHUB_ENV || 'N/A',
-
-        // URLs
-        serverUrl: serverUrl,
-        apiUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
-        graphqlUrl: process.env.GITHUB_GRAPHQL_URL || 'https://api.github.com/graphql',
-
-        // Constructed links
-        runUrl: runId && repository
-            ? `${serverUrl}/${repository}/actions/runs/${runId}`
-            : null,
-        compareUrl: headRef && baseRef && repository
-            ? `${serverUrl}/${repository}/compare/${baseRef}...${headRef}`
-            : null,
-        prUrl: headRef && repository && process.env.GITHUB_EVENT_NAME === 'pull_request'
-            ? `${serverUrl}/${repository}/pull/${process.env.GITHUB_REF_NAME?.replace('refs/pull/', '').replace('/merge', '')}`
-            : null,
-        branchUrl: process.env.GITHUB_REF_TYPE === 'branch' && process.env.GITHUB_REF_NAME && repository
-            ? `${serverUrl}/${repository}/tree/${process.env.GITHUB_REF_NAME}`
-            : null,
-        tagUrl: process.env.GITHUB_REF_TYPE === 'tag' && process.env.GITHUB_REF_NAME && repository
-            ? `${serverUrl}/${repository}/releases/tag/${process.env.GITHUB_REF_NAME}`
-            : null
+      runId: runId || 'N/A',
+      runNumber: process.env.GITHUB_RUN_NUMBER || 'N/A',
+      runAttempt: process.env.GITHUB_RUN_ATTEMPT || 'N/A',
+      job: process.env.GITHUB_JOB || 'N/A',
+      workflow: process.env.GITHUB_WORKFLOW || 'N/A',
+      workflowRef: process.env.GITHUB_WORKFLOW_REF || 'N/A',
+      workflowSha: process.env.GITHUB_WORKFLOW_SHA || 'N/A',
+      actor: process.env.GITHUB_ACTOR || 'N/A',
+      actorId: process.env.GITHUB_ACTOR_ID || 'N/A',
+      triggeringActor: process.env.GITHUB_TRIGGERING_ACTOR || 'N/A',
+      event: process.env.GITHUB_EVENT_NAME || 'N/A',
+      eventPath: process.env.GITHUB_EVENT_PATH || 'N/A',
+      ref: process.env.GITHUB_REF || 'N/A',
+      refName: process.env.GITHUB_REF_NAME || 'N/A',
+      refType: process.env.GITHUB_REF_TYPE || 'N/A',
+      refProtected: process.env.GITHUB_REF_PROTECTED || 'N/A',
+      headRef: headRef || 'N/A',
+      baseRef: baseRef || 'N/A',
+      repository,
+      repositoryId: process.env.GITHUB_REPOSITORY_ID || 'N/A',
+      repositoryOwner: process.env.GITHUB_REPOSITORY_OWNER || 'N/A',
+      repositoryOwnerId: process.env.GITHUB_REPOSITORY_OWNER_ID || 'N/A',
+      environment: process.env.GITHUB_ENV || 'N/A',
+      serverUrl,
+      apiUrl: process.env.GITHUB_API_URL || 'https://api.github.com',
+      graphqlUrl: process.env.GITHUB_GRAPHQL_URL || 'https://api.github.com/graphql',
+      runUrl:
+        runId && repository ? `${serverUrl}/${repository}/actions/runs/${runId}` : null,
+      compareUrl:
+        headRef && baseRef && repository
+          ? `${serverUrl}/${repository}/compare/${baseRef}...${headRef}`
+          : null,
+      prUrl:
+        headRef &&
+        repository &&
+        process.env.GITHUB_EVENT_NAME === 'pull_request'
+          ? `${serverUrl}/${repository}/pull/${process.env.GITHUB_REF_NAME?.replace('refs/pull/', '').replace('/merge', '')}`
+          : null,
+      branchUrl:
+        process.env.GITHUB_REF_TYPE === 'branch' &&
+        process.env.GITHUB_REF_NAME &&
+        repository
+          ? `${serverUrl}/${repository}/tree/${process.env.GITHUB_REF_NAME}`
+          : null,
+      tagUrl:
+        process.env.GITHUB_REF_TYPE === 'tag' &&
+        process.env.GITHUB_REF_NAME &&
+        repository
+          ? `${serverUrl}/${repository}/releases/tag/${process.env.GITHUB_REF_NAME}`
+          : null,
     }
 
-    // Build information
     const buildInfo = {
-        project: PROJECT,
-        version,
-        timestamp,
-        buildDate: new Date().toISOString(),
-        nodeVersion: process.version,
-        platform: process.platform,
-        arch: process.arch,
-        isCI
+      project,
+      version,
+      timestamp,
+      buildDate: new Date().toISOString(),
+      nodeVersion: process.version,
+      platform: process.platform,
+      arch: process.arch,
+      isCI,
     }
 
-    // Generate HTML
     const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -667,7 +679,8 @@ export async function generateBuildInfoHtml(outputPath) {
                     ` : ''}
                     ${githubInfo.baseRef !== 'N/A' ? `
                     <div class="info-item">
-                        <div class="info-label">Base Ref (PR)</div>
+                        <div class="info-label">Base Ref (PR)
+                        </div>
                         <div class="info-value">${githubInfo.baseRef}</div>
                     </div>
                     ` : ''}
@@ -685,7 +698,8 @@ export async function generateBuildInfoHtml(outputPath) {
                     </div>
                     <div class="info-item">
                         <div class="info-label">Repository ID</div>
-                        <div class="info-value">${githubInfo.repositoryId}</div>
+                        <div class="info-value">${githubInfo.repositoryId}
+                        </div>
                     </div>
                     <div class="info-item">
                         <div class="info-label">Repository Owner</div>
@@ -706,24 +720,35 @@ export async function generateBuildInfoHtml(outputPath) {
         </div>
         
         <div class="footer">
-            Generated by git-version2.mjs on ${new Date().toLocaleString()}
+            Generated by git-version-v2.mjs on ${new Date().toLocaleString()}
         </div>
     </div>
 </body>
 </html>`
 
-    // Write the HTML file
     const fs = await import('fs')
     const path = await import('path')
 
-    // Ensure output directory exists
     const outputDir = path.dirname(outputPath)
     await fs.promises.mkdir(outputDir, { recursive: true })
 
-    // Write the file
     await fs.promises.writeFile(outputPath, html, 'utf-8')
 
     console.log(`✅ Build info HTML generated: ${outputPath}`)
 
     return outputPath
+  }
+
+  return {
+    project,
+    tagPrefixes: prefixes,
+    getTagsPointingAtHead,
+    getCurrentBranchName,
+    getTimestamp,
+    getLatestTag,
+    getVersion,
+    generateBuildInfoHtml,
+  }
 }
+
+export default createGitVersionToolkit
