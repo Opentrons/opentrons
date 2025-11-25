@@ -1289,7 +1289,7 @@ class ProtocolContext(CommandPublisher):
     def wait_for_tasks(self, tasks: list[Task]) -> None:
         """Wait for a list of tasks to complete before executing subsequent commands.
 
-        :param list Task: tasks: A list of Task objects to wait for.
+        :param list Task: tasks: A list of :py:class:`Task` objects to wait for.
 
         Task objects can be commands that are allowed to run concurrently.
         """
@@ -1299,7 +1299,7 @@ class ProtocolContext(CommandPublisher):
     @publish(command=cmds.create_timer)
     @requires_version(2, 27)
     def create_timer(self, seconds: float) -> Task:
-        """Create a timer task that runs in the background.
+        """Create a timer :py:class:`Task` that runs in the background.
 
         :param float seconds: The time to delay in seconds.
 
