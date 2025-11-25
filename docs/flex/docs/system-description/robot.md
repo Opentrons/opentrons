@@ -58,7 +58,7 @@ Fixtures are hardware items that replace standard deck slots. They let you custo
 | Staging area slots                 | A4–D4             |
 | Trash bin                          | A1–D1 and A3–D3   |
 | Waste chute                        | D3 only           |
-| Waste chute with staging area slot | D3 only           |
+| Waste chute with staging area slot | D3 and D4         |
 
 Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
