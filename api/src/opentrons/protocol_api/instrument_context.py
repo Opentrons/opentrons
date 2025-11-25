@@ -854,7 +854,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a multiple locations.
 
-        See :ref:`dynamic_mix` for examples.
+        See :ref:`dynamic-mix` for examples.
 
         :param repetitions: Number of times to mix (default is 1).
         :param volume: The volume to mix, measured in µL. If unspecified, defaults
