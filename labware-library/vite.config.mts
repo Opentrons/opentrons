@@ -1,4 +1,6 @@
+import fs from 'node:fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import postCssImport from 'postcss-import'
@@ -7,6 +9,37 @@ import postColorModFunction from 'postcss-color-mod-function'
 import postCssPresetEnv from 'postcss-preset-env'
 import lostCss from 'lost'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const LABWARE_IMAGE_DIR = path.resolve(
+  __dirname,
+  '../shared-data/labware/images'
+)
+const LABWARE_IMAGE_NAME_PATTERN = /\.(?:png|jpe?g)$/i
+
+const labwareImageFilenames: Set<string> = (() => {
+  try {
+    return new Set(
+      fs
+        .readdirSync(LABWARE_IMAGE_DIR, { withFileTypes: true })
+        .filter(
+          entry => entry.isFile() && LABWARE_IMAGE_NAME_PATTERN.test(entry.name)
+        )
+        .map(entry => entry.name)
+    )
+  } catch (error) {
+    console.warn(
+      '[labware-library] Unable to read shared labware images directory',
+      error
+    )
+    return new Set<string>()
+  }
+})()
+
+const isLabwareReferenceImage = (assetName?: string): boolean => {
+  if (assetName == null) return false
+  return labwareImageFilenames.has(assetName)
+}
 
 export default defineConfig({
   // this makes imports relative rather than absolute
@@ -19,6 +52,16 @@ export default defineConfig({
         // entry points for both Labware Library and Labware Creator
         main: path.resolve(__dirname, 'index.html'),
         create: path.resolve(__dirname, 'create/index.html'),
+      },
+      output: {
+        assetFileNames: assetInfo => {
+          if (isLabwareReferenceImage(assetInfo.name)) {
+            // Keep labware reference images stable for hotlinking
+            return 'labware-images/[name][extname]'
+          }
+
+          return 'assets/[name]-[hash][extname]'
+        },
       },
     },
   },
