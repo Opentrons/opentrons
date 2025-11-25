@@ -117,7 +117,7 @@ The electronics contained in the gantry provide 36 VDC power and communications 
 <figcaption>Location of instrument mounts on Flex.</figcaption>
 </figure>
 
-## Touchscreen and LED displays
+## Touchscreen display
 
 The primary user interface is the 7-inch LCD *touchscreen*, located on the front right of the robot. The touchscreen is covered with Gorilla Glass 3 for scratch and damage resistance. Access many features of Flex right on the touchscreen, including:
 
@@ -134,6 +134,8 @@ The primary user interface is the 7-inch LCD *touchscreen*, located on the front
 - Operation logs and error notifications
 
 For more information on using Flex via the touchscreen, see the [Touchscreen chapter](../touchscreen/index.md).
+
+## Status light { #status-light-flex }
 
 The *status light* is a strip of LEDs along the top front of the robot that provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states:
 
@@ -174,9 +176,13 @@ The *status light* is a strip of LEDs along the top front of the robot that prov
       <td>Protocol is paused</td>
     </tr>
     <tr>
-      <td><span class="status-dot yellow"></span> Yellow<br>Abnormal states</td>
+      <td rowspan="2"><span class="status-dot yellow"></span> Yellow<br>Abnormal states</td>
       <td>Solid</td>
       <td>Software error</td>
+    </tr>
+    <tr>
+      <td>Pulsing</td>
+      <td><a href="../../touchscreen/protocol-run/#error-recovery">Error recovery mode</a></td>
     </tr>
     <tr>
       <td><span class="status-dot red"></span> Red<br>Emergency states</td>
