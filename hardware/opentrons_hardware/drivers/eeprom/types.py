@@ -21,6 +21,7 @@ class PropId(Enum):
     INVALID = 0xFF
     FORMAT_VERSION = 1
     SERIAL_NUMBER = 2
+    SKU = 3
 
 
 class PropType(Enum):
@@ -37,6 +38,7 @@ class PropType(Enum):
 PROP_ID_TYPES = {
     PropId.FORMAT_VERSION: PropType.BYTE,
     PropId.SERIAL_NUMBER: PropType.STR,
+    PropId.SKU: PropType.STR,
 }
 
 PROP_TYPE_SIZE = {
@@ -69,3 +71,14 @@ class EEPROMData:
     machine_version: Optional[str] = None
     programmed_date: Optional[datetime] = None
     unit_number: Optional[int] = None
+    sku: Optional[str] = None
+
+    def to_set(self) -> set[tuple[PropId, str | int]]:
+        """Returns a set of expected data values paired with a property id."""
+        eeprom_set: set[tuple[PropId, str | int]] = set()
+        eeprom_set.add((PropId.FORMAT_VERSION, self.format_version))
+        if self.serial_number:
+            eeprom_set.add((PropId.SERIAL_NUMBER, self.serial_number))
+        if self.sku:
+            eeprom_set.add((PropId.SKU, self.sku))
+        return eeprom_set
