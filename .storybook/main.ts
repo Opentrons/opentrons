@@ -19,7 +19,7 @@ const config: StorybookConfig = {
     'storybook-addon-pseudo-states',
   ],
 
-  staticDirs: ['../app/src/assets'],
+  staticDirs: [{ from: '../app/src/assets', to: 'app/src/assets' }],
 
   framework: {
     name: '@storybook/react-vite',
