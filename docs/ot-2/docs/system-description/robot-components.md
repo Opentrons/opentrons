@@ -14,7 +14,7 @@ Other frame elements include:
 
 - LED strips within the enclosure that provide software-controllable ambient lighting.
 - A built-in 2-megapixel camera that can take still or video images of the deck and working area.
-- A front LED that indicates the robot's status. It turns solid blue when your OT-2 powered on and fully booted up.
+- A front LED that indicates the robot's status. It turns solid blue when your OT-2 is powered on and fully booted up.
 
 ## Gantry
 
@@ -30,7 +30,7 @@ The electronics in the gantry provide power and communications to attached pipet
 
 ## OT-2 deck and working area
 
-The deck is the machined aluminum surface on which automated science protocols are executed. It provides 11 ANSI/SLAS-compliant slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the  rear right corner of the deck.
+The deck is the machined aluminum surface on which automated science protocols are executed. It provides 11 ANSI/SLAS-compliant slots that can hold labware, modules, and consumables. These deck slots are numbered 1 to 11. A removable trash bin occupies its own special slot in the rear right corner of the deck.
 
 ![deck and working area](../images/ot2-deck-working-area.png)
 

@@ -24,7 +24,7 @@ The pipettes pick up disposable plastic tips by pressing them onto the pipette n
 
 To discard tips (or return them to their rack), the pipette ejector mechanism pushes the tips off of the nozzles.
 
-## OT-2 pipette specifications¶
+## OT-2 pipette specifications
 
 OT-2 pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure performance and quality, Opentrons has tested these instruments with different tips and liquid volume combinations.
 
