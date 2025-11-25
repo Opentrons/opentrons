@@ -1,6 +1,6 @@
 export * from './getCamera'
 export * from './createCamera'
-export * from './getCameraSettings'
-export * from './createCameraSettings'
+export * from './getCameraImageSettings'
+export * from './createCameraImageSettings'
 
 export * from './types'

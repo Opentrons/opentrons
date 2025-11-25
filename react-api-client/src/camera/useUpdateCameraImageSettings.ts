@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from 'react-query'
 
-import { createCameraSettings } from '@opentrons/api-client'
+import { createCameraImageSettings } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
@@ -11,46 +11,48 @@ import type {
   UseMutationResult,
 } from 'react-query'
 import type {
+  CameraImageSettings,
   CameraResponse,
-  CameraSettings,
   ErrorResponse,
 } from '@opentrons/api-client'
 import type { CameraId } from '@opentrons/shared-data'
 
-export type UseUpdateCameraMutationResult = UseMutationResult<
+export type UseUpdateCameraImageSettingsMutationResult = UseMutationResult<
   CameraResponse,
   AxiosError<ErrorResponse>,
-  CameraSettings
+  CameraImageSettings
 > & {
-  updateCameraSettings: UseMutateFunction<
+  updateCameraImageSettings: UseMutateFunction<
     CameraResponse,
     AxiosError<ErrorResponse>,
-    CameraSettings
+    CameraImageSettings
   >
 }
 
-export function useCameraSettings(
+export function useUpdateCamera(
+  cameraId: CameraId,
   options: UseMutationOptions<
     CameraResponse,
     AxiosError<ErrorResponse>,
-    CameraSettings
-  > = {},
-  cameraId: CameraId
-): UseUpdateCameraMutationResult {
+    CameraImageSettings
+  > = {}
+): UseUpdateCameraImageSettingsMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
     CameraResponse,
     AxiosError<ErrorResponse>,
-    CameraSettings
+    CameraImageSettings
   >(
-    [host, 'camera/settings'],
-    (data: CameraSettings) =>
-      createCameraSettings(host!, data, cameraId).then(response => {
-        queryClient.invalidateQueries([host, 'camera']).catch((e: Error) => {
-          throw e
-        })
+    [host, 'camera', 'cameraSettings', cameraId],
+    (data: CameraImageSettings) =>
+      createCameraImageSettings(host!, data, cameraId).then(response => {
+        queryClient
+          .invalidateQueries([host, 'camera', 'cameraSettings', cameraId])
+          .catch(e => {
+            throw e
+          })
         return response.data
       }),
     options
@@ -58,6 +60,6 @@ export function useCameraSettings(
 
   return {
     ...mutation,
-    updateCameraSettings: mutation.mutate,
+    updateCameraImageSettings: mutation.mutate,
   }
 }

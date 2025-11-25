@@ -7,37 +7,34 @@ import { useHost } from '../api'
 import type { AxiosError } from 'axios'
 import type { UseMutateFunction, UseMutationResult } from 'react-query'
 import type {
-  CameraResponse,
-  CameraSettings,
+  CameraImageSettings,
+  CameraImageSettingsResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
 
-export interface AddCameraImageSettingsToRunParams {
-  runId: string
-  settings: CameraSettings
-}
-
-export type UseAddCameraSettingsToRunMutationResult = UseMutationResult<
-  CameraResponse,
+export type UseAddCameraImageSettingsToRunMutationResult = UseMutationResult<
+  CameraImageSettingsResponse,
   AxiosError<ErrorResponse>,
-  AddCameraImageSettingsToRunParams
+  CameraImageSettings
 > & {
   addCameraImageSettingsToRun: UseMutateFunction<
-    CameraResponse,
+    CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
-    AddCameraImageSettingsToRunParams
+    CameraImageSettings
   >
 }
 
-export function useAddCameraSettingsToRunMutation(): UseAddCameraSettingsToRunMutationResult {
+export function useAddCameraImageSettingsToRunMutation(
+  runId: string
+): UseAddCameraImageSettingsToRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
   const mutation = useMutation<
-    CameraResponse,
+    CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
-    AddCameraImageSettingsToRunParams
-  >(({ runId, settings }) =>
+    CameraImageSettings
+  >(settings =>
     addCameraImageSettingsToRun(host!, runId, settings)
       .then(response => {
         queryClient
@@ -48,7 +45,7 @@ export function useAddCameraSettingsToRunMutation(): UseAddCameraSettingsToRunMu
         return response.data
       })
       .catch((e: Error) => {
-        console.error(`error adding camera settings: ${e.message}`)
+        console.error(`error adding camera image settings: ${e.message}`)
         throw e
       })
   )

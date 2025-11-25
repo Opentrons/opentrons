@@ -156,5 +156,3 @@ export type CutoutFixtureId =
   | FlexModuleCutoutFixtureId
   | OT2SingleStandardSlot
   | OT2FixedTrashSlot
-
-export type CameraId = 'ot_system_camera'
