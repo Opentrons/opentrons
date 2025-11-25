@@ -90,3 +90,13 @@ Let's say your samples have to both reach a target temperature and incubate for 
     hs_mod.deactivate_heater()
 
 Here, the Heater-Shaker Module will heat and shake samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Because the Heater-Shaker could take longer than 5 minutes to reach the target temperature, ``wait_for_tasks`` ensures the timer starts only after the target temperature is reached. 
+
+.. note::
+  
+  Using the :py:meth:`~.ProtocolContext.wait_for_tasks` method to wait for multiple of the same task on the same module will cause protocol failure. For example, if you need to heat a Temperature Module to two separate target temperatures, use :py:meth:`~.ProtocolContext.wait_for_tasks` twice::
+
+    heat_task_1 = temp_mod.start_set_temperature(55)
+    protocol.wait_for_tasks(heat_task_1)
+
+    heat_task_2 = temp_mod.start_set_temperature(75)
+    protocol.wait_for_tasks(heat_task_2)
