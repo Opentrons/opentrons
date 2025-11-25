@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Trans, useTranslation } from 'react-i18next'
-import capitalize from 'lodash/capitalize'
 import { css } from 'styled-components'
 
 import {
