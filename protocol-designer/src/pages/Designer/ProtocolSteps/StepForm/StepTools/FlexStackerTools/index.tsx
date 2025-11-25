@@ -24,9 +24,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
   const robotState = useSelector(getRobotStateAtActiveItem)
   const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
-  console.log('flexStackerOptions:', flexStackerOptions)
 
-  console.log('moduleId: ', moduleId)
   const { modules } = robotState ?? {}
   console.log('modules:', modules)
   console.log('moduleId: ', moduleId)
@@ -62,7 +60,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
       />
       <Divider marginY="0" />
       <div style={{ padding: SPACING.spacing16 }}>
-        <div>
+        <div style={{ display: 'flex' }}>
           <StyledText
             desktopStyle="bodyDefaultSemiBold"
             style={{ paddingBottom: SPACING.spacing8 }}
@@ -78,6 +76,17 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
           subTitle="With tip rack lid"
           quantity="Quantity: 1"
         />
+      </div>
+      <Divider marginY="0" />
+      <div style={{ padding: SPACING.spacing16 }}>
+        <div style={{ display: 'flex' }}>
+          <StyledText
+            desktopStyle="bodyDefaultSemiBold"
+            style={{ paddingBottom: SPACING.spacing8 }}
+          >
+            Shuttle
+          </StyledText>
+        </div>
       </div>
       {moduleId != null ? <>test flex stacker tools</> : null}
     </div>
