@@ -137,14 +137,14 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       {showAddPauseUntilTempStepModal &&
         (enableConcurrentModuleActions ? (
           <BonusStepModal
-            modalType="temperatureModule"
+            modalType="explainWaitForTemperatureModuleTemp"
             displayTemperature={formData?.targetTemperature ?? '?'}
             handleAddPauseClick={handleSave}
             handleSkipPauseClick={saveStepForm}
           />
         ) : (
           <BonusStepModal
-            modalType="legacy"
+            modalType="optionallyWaitForTemp"
             displayTemperature={formData?.targetTemperature ?? '?'}
             displayModule={
               formData.moduleId != null
@@ -160,14 +160,14 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       {showAddPauseUntilHeaterShakerTempStepModal &&
         (enableConcurrentModuleActions ? (
           <BonusStepModal
-            modalType="heaterShaker"
+            modalType="explainWaitForHeaterShakerTemp"
             displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
             handleSkipPauseClick={saveStepForm}
             handleAddPauseClick={handleSave}
           />
         ) : (
           <BonusStepModal
-            modalType="legacy"
+            modalType="optionallyWaitForTemp"
             displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
             displayModule={
               formData.moduleId != null
