@@ -16,6 +16,7 @@ on:
       - '.github/actions/environment/complex-variables/action.yml'
       - 'scripts/static-deploy/**'
       - 'scripts/git-version-protocol-designer.mjs'
+      - 'scripts/git-version-v2.mjs'
   push:
     branches:
       - 'edge'
