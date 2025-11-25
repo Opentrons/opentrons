@@ -70,7 +70,7 @@ class CSVParameter:
         rows: List[List[str]] = []
         if detect_dialect:
             try:
-                dialect = csv.Sniffer().sniff(self.contents[:1024])
+                dialect = csv.Sniffer().sniff(self.contents)
                 reader = csv.reader(self.contents.split("\n"), dialect, **kwargs)
             except (UnicodeDecodeError, csv.Error):
                 raise ParameterValueError(
