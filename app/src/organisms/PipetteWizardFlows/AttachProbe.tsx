@@ -69,7 +69,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
     proceed()
   }
 
-  const { t, i18n } = useTranslation('pipette_wizard_flows')
+  const { t, i18n } = useTranslation(['pipette_wizard_flows', 'shared'])
   const pipetteWizardStep = { mount, flowType, section: SECTIONS.ATTACH_PROBE }
   const [showUnableToDetect, setShowUnableToDetect] = useState<boolean>(false)
   const pipetteId = attachedPipettes[mount]?.serialNumber
@@ -199,7 +199,7 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
       }
       proceedButtonText={
         is96Channel && isWasteChuteOnDeck(deckConfig)
-          ? capitalize('shared:continue')
+          ? t('shared:continue')
           : t('begin_calibration')
       }
       proceed={
