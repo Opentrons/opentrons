@@ -53,7 +53,8 @@ Your protocol can include multiple module tasks that run parallel to one another
     tc_mod.start_execute_profile(
         steps=profile, 
         repetitions=20,
-        block_max_volume=32)
+        block_max_volume=32
+    )
     
     pipette.pick_up_tip()   
     pipette.aspirate(50, plate["A1"])
@@ -81,22 +82,25 @@ Let's say your samples have to both reach a target temperature and incubate for 
     # set Heater-Shaker temperature and shake speed 
     heat_task = hs_mod.start_set_temperature(75)
     hs_mod.set_shake_speed(300)
+
+    # wait for module to finish heating
+    protocol.wait_for_tasks([heat_task])
     
     # create timer for sample incubation
     hs_timer = create_timer(seconds=300)
 
-    # wait for module to finish heating, then hold samples at target temperature
-    protocol.wait_for_tasks([heat_task, hs_timer])
+    # hold samples at target temperature
+    protocol.wait_for_tasks([hs_timer])
     hs_mod.deactivate_heater()
 
 Here, the Heater-Shaker Module will heat and shake samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Because the Heater-Shaker could take longer than 5 minutes to reach the target temperature, ``wait_for_tasks`` ensures the timer starts only after the target temperature is reached. 
 
 .. note::
   
-  Using the :py:meth:`~.ProtocolContext.wait_for_tasks` method to wait for multiple of the same task on the same module will cause protocol failure. For example, if you need to heat a Temperature Module to two separate target temperatures, use :py:meth:`~.ProtocolContext.wait_for_tasks` twice::
+  Using the :py:meth:`~.ProtocolContext.wait_for_tasks` method to wait for multiple of the same task on the same module will cause the API to raise an error. For example, if you need to heat a Temperature Module to two separate target temperatures, use :py:meth:`~.ProtocolContext.wait_for_tasks` twice::
 
     heat_task_1 = temp_mod.start_set_temperature(55)
-    protocol.wait_for_tasks(heat_task_1)
+    protocol.wait_for_tasks([heat_task_1])
 
     heat_task_2 = temp_mod.start_set_temperature(75)
-    protocol.wait_for_tasks(heat_task_2)
+    protocol.wait_for_tasks([heat_task_2])
