@@ -71,7 +71,7 @@ Capturing Images
 
 Use the :py:meth:`.ProtocolContext.capture_image` method to take an image during a protocol with the Flex or OT-2's built-in camera. You can use images to check on key protocol steps while spending more time away from the bench. 
 
-This example uses optional parameters to home the pipette, clearing the camera's view, and save the image file as ``deck_view``::
+This example uses optional parameters to home the pipette, clearing the camera's view, and give a custom name to the image file::
     
     protocol.capture_image(
         home_before=True,
@@ -79,6 +79,8 @@ This example uses optional parameters to home the pipette, clearing the camera's
     )
 
 .. versionadded:: 2.27
+
+Image filenames include your robot and protocol name, step number, and timestamps for the protocol and command running when the image was taken. Here, the custom filename ``deck_view`` is added to the beginning of the filename, making it easier to find the exact image you're looking for. 
 
 You can further customize your images using the :py:meth:`~.ProtocolContext.capture_image` method's optional parameters, including image resolution, zoom, brightness, and more. After a protocol run, access and download your images from the Recent Protocol Runs section of the Opentrons App's robot details page.
 

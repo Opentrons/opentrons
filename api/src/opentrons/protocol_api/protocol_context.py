@@ -1836,12 +1836,12 @@ class ProtocolContext(CommandPublisher):
         """Capture an image using the camera. Captured images are saved as during the protocol run.
 
         :param home_before: If `True`, homes the pipette before capturing an image.
-        :param filename: Name to use when saving the captured image as a file.
+        :param filename: Custom name to use when saving the captured image as a file. The custom name is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run, the step number, and a timestamp for the command running when the image was captured. 
         :param resolution: Accepts a width and height (as a tuple) to determine the camera's resolution when capturing the image.
         :param zoom: Zoom level the camera will use. Defaults to the minimum of 1x zoom and has a maximum of 2x zoom.
-        :param contrast: The contrast level to be applied to an image. The acceptable range is from 0% to 100%.
-        :param brightness: The brightness level to be applied to an image. The acceptable range is from 0% to 100%.
-        :param saturation: The saturation level to be applied to an image. The acceptable range is from 0% to 100%.
+        :param contrast: The contrast level to be applied to an image. The acceptable range is from 0 to 100; provided as a percentage (0.0 to 100.0).
+        :param brightness: The brightness level to be applied to an image. The acceptable range is from 0 to 100; provided as a percentage (0.0 to 100.0)..
+        :param saturation: The saturation level to be applied to an image. The acceptable range is from 0 to 100; provided as a percentage (0.0 to 100.0).
 
         """
         if home_before is True:
