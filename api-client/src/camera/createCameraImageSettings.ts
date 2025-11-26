@@ -1,7 +1,7 @@
 import { POST, request } from '../request'
 
+import type { CameraId } from '@opentrons/shared-data'
 import type {
-  CameraId,
   CameraImageSettings,
   CameraImageSettingsResponse,
 } from '../camera'

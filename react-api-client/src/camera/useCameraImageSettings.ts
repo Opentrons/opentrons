@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 
 import { getCameraImageSettings } from '@opentrons/api-client'
 import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
@@ -6,63 +6,24 @@ import { OT_SYSTEM_CAMERA } from '@opentrons/shared-data'
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
-import type {
-  UseMutateFunction,
-  UseMutationOptions,
-  UseMutationResult,
-} from 'react-query'
-import type {
-  CameraImageSettings,
-  CameraImageSettingsResponse,
-  ErrorResponse,
-} from '@opentrons/api-client'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { CameraImageSettingsResponse } from '@opentrons/api-client'
 
-export type UseCameraImageSettingsMutationResult = UseMutationResult<
-  CameraImageSettingsResponse,
-  AxiosError<ErrorResponse>,
-  CameraImageSettings
-> & {
-  updateCameraImageSettings: UseMutateFunction<
-    CameraImageSettingsResponse,
-    AxiosError<ErrorResponse>,
-    CameraImageSettings
-  >
-}
+const cameraId = OT_SYSTEM_CAMERA
 
 export function useCreateCameraImageSettings(
-  options: UseMutationOptions<
-    CameraImageSettingsResponse,
-    AxiosError<ErrorResponse>,
-    CameraImageSettings
-  > = {}
-): UseCameraImageSettingsMutationResult {
+  options: UseQueryOptions<CameraImageSettingsResponse> = {}
+): UseQueryResult<CameraImageSettingsResponse> {
   const host = useHost()
-  const queryClient = useQueryClient()
-
-  const mutation = useMutation<
-    CameraImageSettingsResponse,
-    AxiosError<ErrorResponse>,
-    CameraImageSettings
-  >(
-    [host, 'camera', 'cameraSettings', OT_SYSTEM_CAMERA],
-    (data: CameraImageSettings) =>
-      getCameraImageSettings(host!, OT_SYSTEM_CAMERA).then(response => {
-        queryClient
-          .invalidateQueries([
-            host,
-            'camera',
-            'cameraSettings',
-            OT_SYSTEM_CAMERA,
-          ])
-          .catch((e: Error) => {
-            throw e
-          })
-        return response.data
-      }),
-    options
+  const query = useQuery<CameraImageSettingsResponse>(
+    [host, 'camera', 'cameraSettings', cameraId],
+    () =>
+      getCameraImageSettings(host!, cameraId)
+        .then(response => response.data)
+        .catch((e: AxiosError) => {
+          throw e
+        }),
+    { ...options }
   )
-  return {
-    ...mutation,
-    updateCameraImageSettings: mutation.mutate,
-  }
+  return query
 }

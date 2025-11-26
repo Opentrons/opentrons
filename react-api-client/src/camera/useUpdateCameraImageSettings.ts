@@ -29,6 +29,8 @@ export type UseUpdateCameraImageSettingsMutationResult = UseMutationResult<
   >
 }
 
+const cameraId = OT_SYSTEM_CAMERA
+
 export function useUpdateCameraImageSettings(
   options: UseMutationOptions<
     CameraImageSettingsResponse,
@@ -44,23 +46,16 @@ export function useUpdateCameraImageSettings(
     AxiosError<ErrorResponse>,
     CameraImageSettings
   >(
-    [host, 'camera', 'cameraSettings', OT_SYSTEM_CAMERA],
+    [host, 'camera', 'cameraSettings', cameraId],
     (data: CameraImageSettings) =>
-      createCameraImageSettings(host!, data, OT_SYSTEM_CAMERA).then(
-        response => {
-          queryClient
-            .invalidateQueries([
-              host,
-              'camera',
-              'cameraSettings',
-              OT_SYSTEM_CAMERA,
-            ])
-            .catch(e => {
-              throw e
-            })
-          return response.data
-        }
-      ),
+      createCameraImageSettings(host!, data, cameraId).then(response => {
+        queryClient
+          .invalidateQueries([host, 'camera', 'cameraSettings', cameraId])
+          .catch(e => {
+            throw e
+          })
+        return response.data
+      }),
     options
   )
 
