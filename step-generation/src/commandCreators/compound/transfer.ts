@@ -179,7 +179,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     labwareEntities,
     wasteChuteEntities,
     trashBinEntities,
-    args.destLabware
+    destLabware
   )
 
   const isTouchTipDisabled =
@@ -207,10 +207,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   const actionName = 'transfer'
   const errors: CommandCreatorError[] = []
 
-  if (
-    !prevRobotState.pipettes[args.pipette] ||
-    !pipetteEntities[args.pipette]
-  ) {
+  if (!prevRobotState.pipettes[pipette] || !pipetteEntities[pipette]) {
     // bail out before doing anything else
     errors.push(
       errorCreators.pipetteDoesNotExist({
@@ -275,7 +272,7 @@ export const transfer: CommandCreator<TransferArgs> = (
   }
 
   if (
-    !args.destLabware ||
+    !destLabware ||
     (!labwareEntities[destLabware] &&
       !wasteChuteEntities[destLabware] &&
       !trashBinEntities[destLabware])
@@ -283,6 +280,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
+  // This is a terrible name :( Note that `tipRack` above is a string, and `tiprack` here is an entity
   const tiprack = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => labwareDefURI === tipRack
   )
@@ -361,7 +359,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     spec: pipetteSpecs,
     name: pipetteName,
     pythonName: pythonPipetteName,
-  } = pipetteEntities[args.pipette]
+  } = pipetteEntities[pipette]
 
   const { labwareDefURI: tiprackDefUri } = tiprack ?? {}
   const { tipracks } = getNextTiprack(
@@ -385,9 +383,9 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const dispenseCorrectionVolumeForSubtransferTarget =
     getByVolumeValue({
-      liquidClass: args.liquidClass,
+      liquidClass: liquidClass,
       pipetteSpecs,
-      tiprackDefUri: args.tipRack,
+      tiprackDefUri: tipRack,
       targetVolume: subTransferVol,
       liquidHandlingAction: 'singleDispense',
       byVolumeProperty: 'correctionByVolume',
@@ -396,9 +394,9 @@ export const transfer: CommandCreator<TransferArgs> = (
 
   const aspirateCorrectionVolumeForSubtransferTarget =
     getByVolumeValue({
-      liquidClass: args.liquidClass,
+      liquidClass: liquidClass,
       pipetteSpecs,
-      tiprackDefUri: args.tipRack,
+      tiprackDefUri: tipRack,
       targetVolume: subTransferVol,
       liquidHandlingAction: 'aspirate',
       byVolumeProperty: 'correctionByVolume',
@@ -423,8 +421,8 @@ export const transfer: CommandCreator<TransferArgs> = (
     .map(well => `${sourceLabwarePythonName}[${formatPyStr(well)}]`)
     .join(', ')
   const pythonDestWells =
-    args.destWells != null && destLabwarePythonName != null
-      ? args.destWells
+    destWells != null && destLabwarePythonName != null
+      ? destWells
           .map(well => `${destLabwarePythonName}[${formatPyStr(well)}]`)
           .join(', ')
       : null
@@ -708,8 +706,8 @@ export const transfer: CommandCreator<TransferArgs> = (
           // if (changeTipNow && !probedWells.has(sourceWell)) {
           //   liquidProbeCommand = [
           //     curryWithoutPython(liquidProbe, {
-          //       pipetteId: args.pipette,
-          //       labwareId: args.sourceLabware,
+          //       pipetteId: pipette,
+          //       labwareId: sourceLabware,
           //       wellName: sourceWell,
           //       wellLocation: SAFE_MOVE_TO_WELL_LOCATION,
           //     }),
