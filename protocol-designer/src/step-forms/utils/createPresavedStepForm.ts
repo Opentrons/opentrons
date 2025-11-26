@@ -355,6 +355,7 @@ const _patchFlexStackerModuleId =
       const flexStackerState = modules[moduleId]
         ?.moduleState as FlexStackerModuleState | null
 
+      // get labware details in hopper at moment
       return {
         moduleId,
         maxPoolCount: flexStackerState?.maxPoolCount ?? 0,

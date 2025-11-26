@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Divider,
+  InfoScreen,
   LabwareDetailsWithCount,
   SPACING,
   StyledText,
@@ -79,16 +80,24 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
       </div>
       <Divider marginY="0" />
       <div style={{ padding: SPACING.spacing16 }}>
-        <div style={{ display: 'flex' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gridGap: SPACING.spacing8,
+          }}
+        >
           <StyledText
             desktopStyle="bodyDefaultSemiBold"
             style={{ paddingBottom: SPACING.spacing8 }}
           >
             Shuttle
           </StyledText>
+          <div>
+            <InfoScreen content="No labware on shuttle" />
+          </div>
         </div>
       </div>
-      {moduleId != null ? <>test flex stacker tools</> : null}
     </div>
   )
 }
