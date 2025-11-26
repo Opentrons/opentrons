@@ -4,8 +4,10 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Divider,
+  Icon,
   InfoScreen,
   LabwareDetailsWithCount,
+  RadioButton,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -79,24 +81,75 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         />
       </div>
       <Divider marginY="0" />
-      <div style={{ padding: SPACING.spacing16 }}>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gridGap: SPACING.spacing8,
-          }}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          padding: SPACING.spacing16,
+          gridGap: SPACING.spacing8,
+        }}
+      >
+        <StyledText
+          desktopStyle="bodyDefaultSemiBold"
+          style={{ paddingBottom: SPACING.spacing8 }}
         >
-          <StyledText
-            desktopStyle="bodyDefaultSemiBold"
-            style={{ paddingBottom: SPACING.spacing8 }}
-          >
-            Shuttle
-          </StyledText>
-          <div>
-            <InfoScreen content="No labware on shuttle" />
-          </div>
+          Shuttle
+        </StyledText>
+        <div>
+          <InfoScreen content="No labware on shuttle" />
         </div>
+      </div>
+      <Divider marginY="0" />
+      <div
+        style={{
+          padding: SPACING.spacing16,
+          display: 'flex',
+          flexDirection: 'column',
+          gridGap: SPACING.spacing8,
+        }}
+      >
+        <StyledText
+          desktopStyle="bodyDefaultSemiBold"
+          style={{ paddingBottom: SPACING.spacing8 }}
+        >
+          Module controls
+          <Icon name="info" size="16px" />
+        </StyledText>
+        <RadioButton
+          buttonValue="retrieve"
+          buttonLabel={
+            <StyledText
+              style={{ width: '100%' }}
+              desktopStyle="bodyDefaultRegular"
+            >
+              Retrieve
+            </StyledText>
+          }
+          buttonSubLabel={{
+            label: 'Retrieve labware from the stacker onto the shuttle',
+          }}
+          onChange={() => {}}
+          largeDesktopBorderRadius
+        />
+        <RadioButton
+          buttonValue="refill"
+          buttonLabel="Refill"
+          buttonSubLabel={{
+            label:
+              'Refill the stacker with labware. Manually fill the stacker with more labware',
+          }}
+          onChange={() => {}}
+          largeDesktopBorderRadius
+        />
+        <RadioButton
+          buttonValue="empty"
+          buttonLabel="empty"
+          buttonSubLabel={{
+            label: 'Manually empty all labware from the stacker',
+          }}
+          onChange={() => {}}
+          largeDesktopBorderRadius
+        />
       </div>
     </div>
   )
