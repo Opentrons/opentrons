@@ -29,11 +29,14 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
   const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
 
   const { modules } = robotState ?? {}
-  console.log('modules:', modules)
-  console.log('moduleId: ', moduleId)
-  const flexStackerModule = modules?.[moduleId]?.moduleState
 
-  console.log('flexStackerModule:', flexStackerModule)
+  const flexStackerModuleState = modules?.[moduleId]
+    ?.moduleState as FlexStackerModuleState | null
+
+  const labwareInHopperCount =
+    flexStackerModuleState?.labwareInHopper?.length ?? 0
+  const maxPoolCount = flexStackerModuleState?.maxPoolCount ?? 0
+  const labwareOnShuttle = flexStackerModuleState?.labwareOnShuttle ?? null
 
   return (
     <div
@@ -117,6 +120,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         </StyledText>
         <RadioButton
           buttonValue="retrieve"
+          disabled={labwareInHopperCount === 0 || labwareOnShuttle != null}
           buttonLabel={
             <StyledText
               style={{ width: '100%' }}
