@@ -50,7 +50,9 @@ class TouchProbe:
         elif axis == Axis.Y:
             probe_point = probe_point._replace(y=probe_point.y + adjustment)
         elif axis == Axis.Z:
-            probe_point = probe_point._replace(z=probe_point.z + adjustment)
+            probe_point = probe_point._replace(
+                z=probe_point.z
+            )  # removed adjustment in Z
         else:
             raise ValueError(f"Unsupported axis: {axis}")
 
@@ -105,9 +107,7 @@ class TouchProbe:
         await self.api.move_to(self.mount, start_point._replace(z=start_point.z + 5.0))
         try:
             await self.touch_probe(
-                axis=Axis.Z,
-                speed=self.config.probe_speed,
-                distance=5.0 + self.config.ball_radius,
+                axis=Axis.Z, speed=self.config.probe_speed, distance=5.0
             )
             await self.api.move_to(
                 self.mount, start_point._replace(z=self.config.safe_z)
@@ -119,8 +119,11 @@ class TouchProbe:
     async def search_hole_center(
         self, start_point: Point
     ) -> Optional[Tuple[Point, float]]:
-        """Search for hole center and compute a representative radius."""
+        """Search for hole center and compute a representative radius. Start point should be the position after search_hole, i.e just above the hole."""
         max_radius = 127
+        start_point = start_point._replace(
+            z=start_point.z - 1.0
+        )  # go a bit lower to hit the walls
 
         try:
             # X probe
@@ -149,7 +152,9 @@ class TouchProbe:
 
         center_x = (x_left.x + x_right.x) / 2
         center_y = (y_up.y + y_down.y) / 2
-        center = Point(x=center_x, y=center_y, z=start_point.z)
+        center = Point(
+            x=center_x, y=center_y, z=start_point.z + 1.0
+        )  # recorrect for the 1mm z offset from the beginning
 
         radius_x = abs(x_right.x - x_left.x) / 2
         radius_y = abs(y_up.y - y_down.y) / 2
