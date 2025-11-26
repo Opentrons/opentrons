@@ -709,7 +709,9 @@ def build_IWG_definition(
     """Build inner well geometry definition for the labware."""
     if not ctx.is_simulating():
         passed_trials = [
-            trial for trial in trial_results if trial.status in ("pass", "final", "none")
+            trial
+            for trial in trial_results
+            if trial.status in ("pass", "final", "none")
         ]
         frusta_data = np.array(
             [(trial.dispense_volume, trial.height) for trial in passed_trials]
