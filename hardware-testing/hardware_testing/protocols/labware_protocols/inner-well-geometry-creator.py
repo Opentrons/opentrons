@@ -709,7 +709,9 @@ def build_IWG_definition(
     """Build inner well geometry definition for the labware."""
     if not ctx.is_simulating():
         passed_trials = [
-            trial for trial in trial_results if trial.status in ("pass", "final")
+            trial
+            for trial in trial_results
+            if trial.status in ("pass", "final", "none")
         ]
         frusta_data = np.array(
             [(trial.dispense_volume, trial.height) for trial in passed_trials]
@@ -733,7 +735,7 @@ def get_transfer_props(
     # changes dispense offset based on the "expected" liquid level.
 
     if volume > 15:
-        dispense_offset = max(2.0, expected_liquid_level + 1.0)
+        dispense_offset = max(2.0, expected_liquid_level + 5)
     else:
         dispense_offset = max(2.0, expected_liquid_level + 0.1)
 
@@ -767,6 +769,8 @@ def get_transfer_props(
         ethanol_props.dispense.retract.blowout.enabled = True  # disable if bubbles
         ethanol_props.dispense.retract.end_position.position_reference = wt
         ethanol_props.dispense.retract.end_position.offset.z = 10.0
+        ethanol_props.dispense.retract.delay.enabled = True
+        ethanol_props.dispense.retract.delay.duration = 3.0
 
 
 def prepare_transfer(
@@ -827,9 +831,9 @@ def geometry_creator(
         # Precheck if there's clearance for touch tip
         if (
             trial.corrected_height + config.target_height
-            <= config.labware["A1"].depth - 4.0
+            <= config.labware["A1"].depth - 1.0
         ):
-            config.liq_pipette.touch_tip()
+            config.liq_pipette.touch_tip(v_offset=-0.5, speed=30)
 
         trial.get_liquid_height(ctx, config)
         trial.compute_height_delta()

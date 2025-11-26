@@ -494,7 +494,7 @@ def get_transfer_props(volume: float, config: SetupState) -> None:
     """Get aspirate/dispense properties for ethanol liquid class. You can change these."""
     # this tries to mitigate liquid forming on the tip for small dispenses.
     if volume > 15:
-        dispense_offset = 1.0
+        dispense_offset = 5.0
     else:
         dispense_offset = 0.1
 
@@ -527,6 +527,8 @@ def get_transfer_props(volume: float, config: SetupState) -> None:
         ethanol_props.dispense.retract.blowout.enabled = True
         ethanol_props.dispense.retract.end_position.position_reference = wt
         ethanol_props.dispense.retract.end_position.offset.z = 5
+        ethanol_props.dispense.retract.delay.enabled = True
+        ethanol_props.dispense.retract.delay.duration = 3.0
 
 
 def prepare_transfer(
@@ -588,8 +590,8 @@ def aspirate_dispense_measure(
         )
 
         # Touch tip if clearance allows
-        if trial.expected_height <= config.labware["A1"].depth - 4:
-            config.liq_pipette.touch_tip()
+        if trial.expected_height <= config.labware["A1"].depth - 1.0:
+            config.liq_pipette.touch_tip(v_offset=-0.5, speed=30)
 
         height = trial.get_height_of_liquid_in_well(ctx, config)
         trial.measured_height = height + trial.tip_z_error
