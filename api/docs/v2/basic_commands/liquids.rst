@@ -407,7 +407,7 @@ And this example adds a push out of 10 µL after the final dispense in the mix::
 .. versionchanged:: 2.24
     Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters. 
 
-.. _dynamic_mix:
+.. _dynamic-mix:
 
 Dynamic Mix
 ===========
