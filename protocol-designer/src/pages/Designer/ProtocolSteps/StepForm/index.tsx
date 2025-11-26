@@ -107,6 +107,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     invariantContext,
     allLabwareDefs
   )
+  console.log('hydratedForm: ', hydratedForm)
   const focusHandlers = {
     focusedField,
     dirtyFields,

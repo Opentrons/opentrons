@@ -3,6 +3,7 @@ import last from 'lodash/last'
 import {
   ABSORBANCE_READER_TYPE,
   ALL,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -40,7 +41,7 @@ import type {
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type { FormPatch } from '../../steplist/actions/types'
 import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
-import type { InitialDeckSetup } from '../types'
+import type { FlexStackerModuleState, InitialDeckSetup } from '../types'
 
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
@@ -319,6 +320,52 @@ const _patchHeaterShakerModuleId =
     return null
   }
 
+const _patchFlexStackerModuleId =
+  (args: {
+    initialDeckSetup: InitialDeckSetup
+    orderedStepIds: OrderedStepIdsState
+    savedStepForms: SavedStepFormState
+    stepType: StepType
+    robotStateTimeline: Timeline
+  }): FormUpdater =>
+  () => {
+    const { initialDeckSetup, stepType, robotStateTimeline } = args
+    const numOfModules =
+      Object.values(initialDeckSetup.modules).filter(
+        module => module.type === FLEX_STACKER_MODULE_TYPE
+      )?.length ?? 1
+    const hasFlexStackerModuleId = stepType === 'flexStacker'
+
+    const robotState: RobotState | null =
+      last(robotStateTimeline.timeline)?.robotState ?? null
+
+    const modules = robotState?.modules ?? {}
+    const labware = robotState?.labware ?? {}
+
+    // pre-select form type if module is set
+    if (hasFlexStackerModuleId && numOfModules === 1) {
+      const moduleId =
+        getModuleOnDeckByType(initialDeckSetup, FLEX_STACKER_MODULE_TYPE)?.id ??
+        null
+
+      if (moduleId == null) {
+        return null
+      }
+
+      const flexStackerState = modules[moduleId]
+        ?.moduleState as FlexStackerModuleState | null
+
+      return {
+        moduleId,
+        maxPoolCount: flexStackerState?.maxPoolCount ?? 0,
+        storedLabwareDetails: flexStackerState?.storedLabwareDetails ?? null,
+        labwareInHopper: flexStackerState?.labwareInHopper ?? null,
+        labwareOnShuttle: flexStackerState?.labwareOnShuttle ?? null,
+      }
+    }
+    return null
+  }
+
 const _patchAbsorbanceReaderModuleId =
   (args: {
     initialDeckSetup: InitialDeckSetup
@@ -494,6 +541,14 @@ export const createPresavedStepForm = ({
     robotStateTimeline,
   })
 
+  const updateFlexStackerModuleId = _patchFlexStackerModuleId({
+    initialDeckSetup,
+    orderedStepIds,
+    savedStepForms,
+    stepType,
+    robotStateTimeline,
+  })
+
   const updateThermocyclerFields = _patchThermocyclerFields({
     initialDeckSetup,
     stepType,
@@ -515,6 +570,7 @@ export const createPresavedStepForm = ({
     updateHeaterShakerModuleId,
     updateMagneticModuleId,
     updateAbsorbanceReaderModuleId,
+    updateFlexStackerModuleId,
     updateDefaultLabwareLocations,
     updateMoveLabwareFields,
   ].reduce<FormData>(

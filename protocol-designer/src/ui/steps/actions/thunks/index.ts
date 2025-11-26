@@ -2,6 +2,7 @@ import last from 'lodash/last'
 
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -147,6 +148,20 @@ export const addAndSelectStep: (arg: {
             text: 'Selected',
             field: '1',
           },
+          mode: 'add',
+        })
+      )
+    }
+  } else if (payload.stepType === 'flexStacker') {
+    const flexStackerModules = Object.entries(modules).filter(
+      ([key, module]) => module.type === FLEX_STACKER_MODULE_TYPE
+    )
+    const flexStackerId =
+      flexStackerModules.length === 1 ? flexStackerModules[0][0] : null
+    if (flexStackerId != null) {
+      dispatch(
+        selectDropdownItem({
+          selection: { id: flexStackerId, text: 'Selected', field: '1' },
           mode: 'add',
         })
       )
