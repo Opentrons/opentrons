@@ -4,7 +4,10 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useNotifySearchLabwareOffsets } from '/app/resources/labware_offsets'
-import { useNotifyRunQuery, useRunStatus } from '/app/resources/runs'
+import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
+  useNotifyRunQuery,
+} from '/app/resources/runs'
 
 import { getLPCLabwareInfoFrom } from './getLPCLabwareInfoFrom'
 import { getLPCSearchParams } from './getLPCSearchParams'
@@ -50,7 +53,10 @@ function useFlexLPCLabwareInfo({
   UseLPCLabwareInfoResult,
   'labwareInfo' | 'storedOffsets'
 > {
-  const runStatus = useRunStatus(runId ?? null)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
+  const runStatus = runRecord?.data.status ?? null
 
   const lwLocationCombos = useMemo(
     () =>

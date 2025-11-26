@@ -15,6 +15,7 @@ Hardware Modules
     modules/magnetic_module
     modules/temperature_module
     modules/thermocycler
+    modules/concurrent_module
     modules/multiple_same_type
 
 Hardware modules are powered and unpowered deck-mounted peripherals. The Flex and OT-2 are aware of deck-mounted powered modules when they're attached via a USB connection and used in an uploaded protocol. The robots do not know about unpowered modules until you use one in a protocol and upload it to the Opentrons App.
@@ -33,7 +34,8 @@ Pages in this section of the documentation cover:
         - :ref:`Magnetic Module <magnetic-module>`
         - :ref:`Temperature Module <temperature-module>`
         - :ref:`Thermocycler Module <thermocycler-module>`
-    - Working with :ref:`multiple modules of the same type <moam>` in a single protocol. 
+    - Using :ref:`concurrent module actions <concurrent-module>` to run modules while the robot performs other protocol steps, like pipetting, gripper, and other module actions.
+    - Loading :ref:`multiple modules of the same type <moam>` in a single protocol. 
 
 .. note::
 

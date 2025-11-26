@@ -1,12 +1,17 @@
-# Git Version Protocol Designer - Semantic Version Resolution
+# Git Version Toolkit - Semantic Version Resolution
 
 ## Summary
 
-`scripts/git-version-protocol-designer.mjs` provides semantic version-based tag resolution and build information generation for Protocol Designer.
+`scripts/git-version-v2.mjs` is the shared semantic-version toolkit that powers build information generation for multiple web apps.
+
+### Current Consumers
+
+1. **Protocol Designer** – configured via `createGitVersionToolkit({ project: 'protocol-designer' })` inside `protocol-designer/vite.config.mts`
+2. **Labware Library** – configured via `createGitVersionToolkit({ project: 'labware-library' })` inside `labware-library/vite.config.mts`
 
 ### Key Features
 
-1. **Semantic version resolution**: Finds the highest semantic version among all tags reachable from `HEAD` for both production (`protocol-designer@`) and staging (`staging-protocol-designer@`) prefixes.
+1. **Semantic version resolution**: Finds the highest semantic version among all tags reachable from `HEAD` for each project's production (`<project>@`) and staging (`staging-<project>@`) prefixes.
 2. **Prerelease support**: Properly handles prerelease versions like `-alpha.0`, `-beta.1`, etc., following semver precedence rules.
 3. **Prefix priority**: When production and staging tags have identical versions, production tags win.
 4. **Simple version output**: Always returns the portion to the right of `@`.
@@ -14,7 +19,7 @@
 
 ### Tag Priority and Semver Rules
 
-For the `protocol-designer` project:
+For any supported project (Protocol Designer and Labware Library today):
 
 - **Version comparison**: Tags are compared using semantic versioning (semver) rules
   - Stable releases take precedence over prerelease versions of the same version (e.g., `8.6.0` > `8.6.0-beta.1`)
@@ -23,10 +28,10 @@ For the `protocol-designer` project:
   - Prerelease numbers are compared numerically (e.g., `alpha.2` > `alpha.1`)
 
 - **Prefix priority** (tie-breaker when versions are identical):
-  1. `protocol-designer@*` (production)
-  2. `staging-protocol-designer@*` (staging)
+  1. `<project>@*` (production)
+  2. `staging-<project>@*` (staging)
 
-When production and staging tags have the exact same version, the production prefix wins.
+When production and staging tags have the exact same version, the production prefix wins (e.g., `protocol-designer@*` beats `staging-protocol-designer@*`, `labware-library@*` beats `staging-labware-library@*`).
 
 ### Version Resolution Logic
 
@@ -51,6 +56,7 @@ When production and staging tags have the exact same version, the production pre
      - `protocol-designer@8.6.0` → `8.6.0`
      - `staging-protocol-designer@8.7.0-alpha.1` → `8.7.0-alpha.1`
      - `protocol-designer@8.6.0-beta.2` → `8.6.0-beta.2`
+     - `labware-library@5.3.0` → `5.3.0`
 
 5. **No tags available**
    - If no matching tags are found, log an error and return `0.0.0-dev`.
@@ -74,8 +80,10 @@ The script automatically generates a comprehensive build information page at `di
 
 ### Accessing Build Info
 
-- Local deployment: `http://localhost:5178/info/` — available during `make serve`
-- Production: `https://designer.opentrons.com/info/` (or your deployed URL)
+- Protocol Designer (local): `http://localhost:5178/info/` — available during `make serve`
+- Labware Library (local): `http://localhost:5173/info/` — served by `make serve`
+- Protocol Designer (production): `https://designer.opentrons.com/info/`
+- Labware Library (production): `https://labware.opentrons.com/info/`
 
 ## Testing Results
 
@@ -103,6 +111,8 @@ The script automatically generates a comprehensive build information page at `di
   - History: No `protocol-designer@` or `staging-protocol-designer@` tags
   - Result: ✅ Falls back to `0.0.0-dev`
 
+Equivalent scenarios apply to Labware Library, substituting `labware-library@` and `staging-labware-library@` tag prefixes.
+
 ## Implementation Notes
 
 - **Semantic versioning**: Uses the `semver` package to properly compare versions according to semver rules.
@@ -113,4 +123,5 @@ The script automatically generates a comprehensive build information page at `di
 
 ## Integration
 
-The script is integrated into Protocol Designer's build process via a Vite plugin in `vite.config.mts`, ensuring the build info page is generated after every build.
+- **Protocol Designer**: `protocol-designer/vite.config.mts` registers a Vite plugin that invokes `generateBuildInfoHtml` after bundling, ensuring `/info/index.html` ships with every build.
+- **Labware Library**: `labware-library/vite.config.mts` wires the same helper into its build so both the creator and main surfaces expose `/info/index.html`.
