@@ -155,14 +155,6 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
         maximum=100,
         description="Set dispense exit speed.",
     )
-    parameters.add_int(
-        display_name="air gap",
-        variable_name="air_gap",
-        default=0,
-        minimum=0,
-        maximum=10,
-        description="Set Trailing air gap.",
-    )
 
     parameters.add_float(
         display_name="aspirate_submerge_depth",
@@ -409,18 +401,16 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             pip._retract()
             ctx.pause("Replace tip rack.")
             pip.pick_up_tip(tips["A1"])
-        return src_liquid_height
+        
+        return src_liquid_height - 2
 
-    def _set_pipettte_motion_settings() -> Tuple[
-        float, float, float, float, float, float
-    ]:
+    def _set_pipettte_motion_settings() -> Tuple[float, float, float, float, float]:
         if ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
             aspirate_submerge_speed = 50
             dispense_submerge_speed = 50
             aspirate_exit_speed = 50
             dispense_exit_speed = 50
-            air_gap = 0.0
-            if not ctx.is_simulating():
+            if not ctx.is_simulating:  # type: ignore [truthy-function]
                 from hardware_testing.gravimetric.liquid_class.defaults import (
                     get_liquid_class,
                 )
@@ -434,7 +424,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
                 pip.flow_rate.aspirate = liquid_class.aspirate.plunger_flow_rate
                 pip.flow_rate.dispense = liquid_class.dispense.plunger_flow_rate
                 set_push_out = liquid_class.dispense.blow_out_submerged
-                air_gap = liquid_class.aspirate.trailing_air_gap
             else:  # if simulating
                 pip.flow_rate.aspirate = ctx.params.asp_flow_rate  # type: ignore [attr-defined]
                 pip.flow_rate.dispense = ctx.params.disp_flow_rate  # type: ignore [attr-defined]
@@ -446,14 +435,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             pip.flow_rate.blow_out = ctx.params.blowout_flow_rate  # type: ignore [attr-defined]
             aspirate_submerge_speed = ctx.params.asp_submerge_speed  # type: ignore [attr-defined]
             dispense_submerge_speed = ctx.params.disp_submerge_speed  # type: ignore [attr-defined]
-            air_gap = ctx.params.air_gap  # type: ignore [attr-defined]
         return (
             aspirate_submerge_speed,
             aspirate_exit_speed,
             dispense_submerge_speed,
             dispense_exit_speed,
             set_push_out,
-            air_gap,
         )
 
     (
@@ -462,7 +449,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
         dispense_submerge_speed,
         dispense_exit_speed,
         set_push_out,
-        air_gap,
     ) = _set_pipettte_motion_settings()
     current_src_volume = ctx.params.dye_volume  # type: ignore [attr-defined]
     current_plate_volume = 0
@@ -519,7 +505,6 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # noqa: C901
             location=dye_source["A1"].top(),
             speed=aspirate_exit_speed,
         )
-        pip.air_gap(air_gap, height=0)
         # Retract pipette
         pip._retract()
         # Pause after aspiration
