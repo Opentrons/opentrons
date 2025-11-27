@@ -1180,23 +1180,23 @@ def preheat_96ch(ctx: ProtocolContext,fixture_settings:FixtureSettings):
         axis_settings = [Axis.P_L, Axis.Q]
         ot3api.disengage_axes(axis_settings)
 
-    
+    ot3api = fixture_settings.ctx._core.get_hardware()
+    if not ctx.is_simulating():
+        OT3API.read_sensor = read_sensor  # type: ignore [attr-defined]
+    primary = EnvironmentSensor.build(
+        sensor_id=SensorId.S0,
+        node_id=NodeId.pipette_left,
+    )
+    secondary = EnvironmentSensor.build(
+        sensor_id=SensorId.S1,
+        node_id=NodeId.pipette_left,
+    )
 
     # _ = ctx.load_instrument(
     #     f"flex_96channel_{ctx.params.model_type}", "left"  # type: ignore [attr-defined]
     # )
-    if not fixture_settings.ctx.is_simulating():
-        ot3api = fixture_settings.ctx._core.get_hardware()
-        if not fixture_settings.ctx.is_simulating():
-            OT3API.read_sensor = read_sensor  # type: ignore [attr-defined]
-        primary = EnvironmentSensor.build(
-            sensor_id=SensorId.S0,
-            node_id=NodeId.pipette_left,
-        )
-        secondary = EnvironmentSensor.build(
-            sensor_id=SensorId.S1,
-            node_id=NodeId.pipette_left,
-        )
+    if not ctx.is_simulating():
+        
         current_temp_1 = ot3api.read_sensor(primary)
         current_temp_2 = ot3api.read_sensor(secondary)
         get_motors_hot(ot3api)  # type: ignore [arg-type]
