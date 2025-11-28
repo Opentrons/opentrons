@@ -13,7 +13,6 @@ import {
   useCloseCurrentRun,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import { ProtocolRunHeader } from '..'
@@ -61,14 +60,18 @@ describe('ProtocolRunHeader', () => {
     }
 
     vi.mocked(useNavigate).mockReturnValue(mockNavigate)
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_RUNNING)
     vi.mocked(useIsRobotViewable).mockReturnValue(true)
     vi.mocked(useProtocolDetailsForRun).mockReturnValue({
       protocolData: {} as any,
       displayName: MOCK_PROTOCOL,
     } as any)
     vi.mocked(useNotifyRunQuery).mockReturnValue({
-      data: { data: { hasEverEnteredErrorRecovery: false } },
+      data: {
+        data: {
+          hasEverEnteredErrorRecovery: false,
+          status: RUN_STATUS_RUNNING,
+        },
+      },
     } as any)
     vi.mocked(useModulesQuery).mockReturnValue({
       data: { data: [] },

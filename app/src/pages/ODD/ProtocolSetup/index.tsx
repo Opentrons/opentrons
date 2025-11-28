@@ -24,7 +24,6 @@ import {
 } from '@opentrons/components'
 import {
   useAddCameraSettingsToRunMutation,
-  useCamera,
   useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -92,6 +91,7 @@ import {
   updateCameraEnablement,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -103,7 +103,6 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
-  useRunStatus,
 } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
@@ -724,7 +723,11 @@ function PrepareToRun({
                 setSetupScreen('camera')
               }}
               title={t('camera_setup_step_title')}
-              detail={t('protocol_setup:enabled')}
+              detail={
+                appCameraSettings.enabled
+                  ? t('protocol_setup:enabled')
+                  : t('protocol_setup:disabled')
+              }
               status={cameraSettingsConfirmed ? 'ready' : 'general'}
             />
           </>
@@ -758,6 +761,7 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
     refetchInterval: RUN_RECORD_REFETCH_MS,
   })
+  const runStatus = runRecord?.data.status ?? null
   const dispatch = useDispatch()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -789,7 +793,7 @@ export function ProtocolSetup(): JSX.Element {
       .data?.data.id != null
 
   const navigate = useNavigate()
-  const runStatus = useRunStatus(runId)
+
   if (runStatus === RUN_STATUS_STOPPED) {
     navigate('/protocols')
   }
@@ -847,7 +851,9 @@ export function ProtocolSetup(): JSX.Element {
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
-  const { data: initialRobotCameraSettings } = useCamera()
+  const { data: initialRobotCameraSettings } = useNotifyCamera({
+    staleTime: Infinity,
+  })
 
   // The initial app-internal camera state should match the server state.
   useEffect(() => {

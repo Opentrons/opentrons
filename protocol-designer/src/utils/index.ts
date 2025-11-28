@@ -4,6 +4,7 @@ import uuidv1 from 'uuid/v4'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
+  getLabwareDefURI,
   getTiprackVolume,
   INTERACTIVE_WELL_DATA_ATTRIBUTE,
   isAddressableAreaStandardSlot,
@@ -188,13 +189,11 @@ export function getMatchingTipLiquidSpecs(
   volume: number,
   tiprackDef: LabwareDefinition2
 ): SupportedTip {
-  const tipLength = tiprackDef?.parameters.tipLength ?? 0
+  const tipLength = tiprackDef?.parameters?.tipLength ?? 0
 
   if (tipLength === 0) {
     console.error(
-      `expected to find a tiplength with tiprack ${
-        tiprackDef?.metadata.displayName ?? 'unknown displayName'
-      } but could not`
+      `expected to find a tiplength for tiprack ${getLabwareDefURI(tiprackDef)} but could not`
     )
   }
 
@@ -217,9 +216,7 @@ export function getMatchingTipLiquidSpecs(
   })[0]
   console.assert(
     matchingTipLiquidSpecs,
-    `expected to find the tip liquid specs but could not with pipette tiprack displayname ${
-      tiprackDef?.metadata.displayName ?? 'unknown displayname'
-    }`
+    `expected to find the tip liquid specs but could not for tiprack ${getLabwareDefURI(tiprackDef)}`
   )
 
   return matchingTipLiquidSpecs

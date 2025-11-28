@@ -37,7 +37,7 @@ interface FlexPipetteCardProps {
   attachedPipette: PipetteData | BadPipette | null
   pipetteModelSpecs: PipetteModelSpecs | null
   mount: Mount
-  isRunActive: boolean
+  isRobotBusy: boolean
   isEstopNotDisengaged: boolean
 }
 
@@ -57,7 +57,7 @@ export function FlexPipetteCard({
   pipetteModelSpecs,
   attachedPipette,
   mount,
-  isRunActive,
+  isRobotBusy,
   isEstopNotDisengaged,
 }: FlexPipetteCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
@@ -139,7 +139,7 @@ export function FlexPipetteCard({
       ? [
           {
             label: t('attach_pipette'),
-            disabled: attachedPipette != null || isRunActive,
+            disabled: attachedPipette != null || isRobotBusy,
             onClick: handleChoosePipette,
           },
         ]
@@ -149,12 +149,12 @@ export function FlexPipetteCard({
               attachedPipette.data.calibratedOffset?.last_modified != null
                 ? t('recalibrate_pipette')
                 : t('calibrate_pipette'),
-            disabled: attachedPipette == null || isRunActive,
+            disabled: attachedPipette == null || isRobotBusy,
             onClick: handleCalibrate,
           },
           {
             label: t('detach_pipette'),
-            disabled: attachedPipette == null || isRunActive,
+            disabled: attachedPipette == null || isRobotBusy,
             onClick: handleDetach,
           },
           {
@@ -166,7 +166,7 @@ export function FlexPipetteCard({
           },
           {
             label: i18n.format(t('drop_tips'), 'capitalize'),
-            disabled: attachedPipette == null || isRunActive,
+            disabled: attachedPipette == null || isRobotBusy,
             onClick: () => {
               enableDTWiz()
             },

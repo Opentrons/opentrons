@@ -1,4 +1,5 @@
 """Motion state store and getters."""
+
 from dataclasses import dataclass
 from typing import List, Optional, Union
 import logging
@@ -78,14 +79,9 @@ class MotionView:
             isinstance(current_location, CurrentWell)
             and current_location.pipette_id == pipette_id
         ):
-            if self._labware.get_should_center_column_on_target_well(
+            critical_point = self.get_critical_point_for_wells_in_labware(
                 current_location.labware_id
-            ):
-                critical_point = CriticalPoint.Y_CENTER
-            elif self._labware.get_should_center_pipette_on_target_well(
-                current_location.labware_id
-            ):
-                critical_point = CriticalPoint.XY_CENTER
+            )
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
     def _get_pipette_offset_for_reservoirs(
@@ -124,6 +120,17 @@ class MotionView:
             x_offset = -1 * well_x_dim / 24
         return Point(x=x_offset, y=y_offset)
 
+    def get_critical_point_for_wells_in_labware(
+        self, labware_id: str
+    ) -> CriticalPoint | None:
+        """Get the appropriate critical point override for this labware."""
+        if self._labware.get_should_center_column_on_target_well(labware_id):
+            return CriticalPoint.Y_CENTER
+        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
+            return CriticalPoint.XY_CENTER
+        else:
+            return None
+
     def get_movement_waypoints_to_well(
         self,
         pipette_id: str,
@@ -142,11 +149,7 @@ class MotionView:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
 
-        destination_cp: Optional[CriticalPoint] = None
-        if self._labware.get_should_center_column_on_target_well(labware_id):
-            destination_cp = CriticalPoint.Y_CENTER
-        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
-            destination_cp = CriticalPoint.XY_CENTER
+        destination_cp = self.get_critical_point_for_wells_in_labware(labware_id)
 
         destination = self._geometry.get_well_position(
             labware_id=labware_id,
@@ -397,12 +400,7 @@ class MotionView:
             mm_from_edge=mm_from_edge,
             edge_path_type=edge_path_type,
         )
-        critical_point: Optional[CriticalPoint] = None
-
-        if self._labware.get_should_center_column_on_target_well(labware_id):
-            critical_point = CriticalPoint.Y_CENTER
-        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
-            critical_point = CriticalPoint.XY_CENTER
+        critical_point = self.get_critical_point_for_wells_in_labware(labware_id)
 
         return [
             motion_planning.Waypoint(position=p, critical_point=critical_point)

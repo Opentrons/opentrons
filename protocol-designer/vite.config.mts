@@ -9,16 +9,16 @@ import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
 
-import {
-  generateBuildInfoHtml,
-  getVersion,
-} from '../scripts/git-version-protocol-designer.mjs'
+import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
 import { latestLabwareVersions } from '../scripts/git-version.mjs'
 import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
 const REQUIRED_APP_VERSION = '8.7.0' // PD requires this robot stack version or higher
+const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
+  project: 'protocol-designer',
+})
 
 // Sentry and sourcemaps are disabled in local development
 const isCI = process.env.CI === 'true'
@@ -113,7 +113,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       esbuildOptions: {
         target: 'es2020',
       },
-      // Note: this is for cypress support so when we switch e2e to playwright we can remove it
+      // For unknown reasons, PD whitescreens on launch unless we have this.
       include: ['tslib'],
     },
     css: {
@@ -145,7 +145,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     resolve: {
       conditions: ['browser'],
-      // Note: this is for cypress support so when we switch e2e to playwright we can remove it
+      // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
@@ -165,9 +165,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     server: {
       port: 5178,
-      watch: {
-        ignored: ['**/cypress/downloads/**'],
-      },
     },
   }
 })
@@ -190,7 +187,6 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
     'OT_PD_ENABLE_STACKING',
     'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
-    'OT_PD_ENABLE_JSON_EXPORT',
     'OT_PD_ENABLE_BY_VOLUME_BUILDER',
     'OT_PD_ENABLE_TIP_SELCTION',
     'OT_PD_ENABLE_CAMERA_SUPPORT',

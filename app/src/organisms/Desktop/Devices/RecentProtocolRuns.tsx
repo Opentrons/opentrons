@@ -12,7 +12,7 @@ import {
   LegacyStyledText,
   SIZE_4,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import { useAllProtocolsQuery } from '@opentrons/react-api-client'
 
@@ -58,16 +58,14 @@ export function RecentProtocolRuns({
       width="100%"
       marginBottom="6rem"
     >
-      <LegacyStyledText
-        as="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      <StyledText
+        desktopStyle="bodyLargeSemiBold"
         borderBottom={BORDERS.lineBorder}
         padding={SPACING.spacing16}
         width="100%"
-        id="RecentProtocolRuns_title"
       >
         {t('recent_protocol_runs')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}

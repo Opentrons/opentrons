@@ -18,6 +18,7 @@ import {
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
+  getModuleEntities,
 } from '/protocol-designer/step-forms/selectors'
 import {
   getDeckSetupForActiveItem,
@@ -45,6 +46,7 @@ export function LabwareLocationField(
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch()
   const labwareEntities = useSelector(getLabwareEntities)
+  const moduleEntities = useSelector(getModuleEntities)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
@@ -94,7 +96,29 @@ export function LabwareLocationField(
       )
   }
 
-  if (!isLabwareALid) {
+  // check lid-compatible labware and modules
+  if (isLabwareALid) {
+    const def = labwareEntities[labware]?.def
+    const compatibleParentLoadNames = new Set([
+      ...(def?.compatibleParentLabware ?? []),
+      ...Object.keys(def?.stackingOffsetWithLabware ?? {}),
+      ...Object.keys(def?.stackingOffsetWithModule ?? {}),
+    ])
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(({ value, name }) => {
+        let isCompatible = true
+        if (value in moduleEntities) {
+          isCompatible = compatibleParentLoadNames.has(
+            moduleEntities[value].model
+          )
+        } else if (value in labwareEntities) {
+          isCompatible = compatibleParentLoadNames.has(
+            labwareEntities[value].def.parameters.loadName
+          )
+        }
+        return name !== 'Trash bin' && isCompatible
+      })
+  } else {
     unoccupiedLabwareLocationsOptions =
       unoccupiedLabwareLocationsOptions.filter(
         option => option.name !== 'Trash bin'

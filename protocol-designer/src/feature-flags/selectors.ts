@@ -38,14 +38,6 @@ export const getEnableMutlipleTempsOT2: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_MULTIPLE_TEMPS_OT2 ?? false
 )
-export const getEnableTimelineScrubber: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_TIMELINE_SCRUBBER ?? false
-)
-export const getEnablePartialTipSupport: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_PARTIAL_TIP_SUPPORT ?? false
-)
 export const getEnableStacking: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_STACKING ?? false
@@ -55,15 +47,7 @@ export const getEnableConcurrentModuleActions: Selector<boolean> =
     getFeatureFlagData,
     flags => flags.OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS ?? false
   )
-export const getEnableJsonExport: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_JSON_EXPORT ?? false
-)
 export const getEnableByVolumeBuilder: Selector<boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_BY_VOLUME_BUILDER ?? false
-)
-export const getEnableTipSelection: Selector<boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_TIP_SELCTION ?? false
 )

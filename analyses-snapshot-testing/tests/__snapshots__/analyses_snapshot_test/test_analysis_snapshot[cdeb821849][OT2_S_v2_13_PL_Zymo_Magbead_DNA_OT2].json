@@ -37278,7 +37278,24 @@
     "author": "Zach Galluzzo <zachary.galluzzo@opentrons.com>",
     "protocolName": "ZymoBIOMICs Magbead DNA Extraction from Cells"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "6"
+      },
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "10"
+      },
+      "model": "heaterShakerModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

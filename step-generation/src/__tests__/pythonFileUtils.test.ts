@@ -8,6 +8,8 @@ import {
   fixtureTiprack1000ul,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   GLYCEROL_LIQUID_CLASS_NAME,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
@@ -31,6 +33,7 @@ import {
   getLoadPipettes,
   getLoadTrashBins,
   getLoadWasteChute,
+  getSetStoredLabware,
   PAPI_VERSION,
   pythonMetadata,
   pythonRequirements,
@@ -74,6 +77,7 @@ describe('pythonMetadata', () => {
         tags: ['wombat', 'kangaroo', 'wallaby'],
         source: 'Protocol Designer',
         protocolDesigner: 'fake_PD_version',
+        internalAppBuildDate: 'fake_build_date',
       })
     ).toBe(
       `
@@ -82,6 +86,7 @@ metadata = {
     "author": "Some Author",
     "description": "The description.",
     "created": "2001-09-09T01:46:40.000Z",
+    "internalAppBuildDate": "fake_build_date",
     "lastModified": "2001-09-09T01:46:41.000Z",
     "category": "PCR",
     "subcategory": "PCR Prep",
@@ -108,6 +113,7 @@ describe('pythonRequirements', () => {
 const moduleId = '1'
 const moduleId2 = '2'
 const moduleId3 = '3'
+const moduleId4 = '4'
 const mockModuleEntities: ModuleEntities = {
   [moduleId]: {
     id: moduleId,
@@ -137,6 +143,7 @@ const labwareId6 = 'labwareId6'
 const labwareId7 = 'labwareId7'
 const labwareId8 = 'labwareId8'
 const deckRiserId = 'deckRiserId'
+const flexStackerLabwareId = 'flexStackerLabwareId'
 const mockLabwareEntities: LabwareEntities = {
   [labwareId1]: {
     id: labwareId1,
@@ -418,6 +425,51 @@ well_plate_3 = protocol.load_labware_from_definition(
     location="C2",
     label="sample plate",
 )`.trimStart()
+    )
+  })
+
+  it('should generate loadLabware for a flex stacker', () => {
+    const mockModuleEntitiesWithFlexStackerModule = {
+      ...mockModuleEntities,
+      [moduleId4]: {
+        ...mockModuleEntities[moduleId4],
+        id: moduleId4,
+        model: FLEX_STACKER_MODULE_V1,
+        type: FLEX_STACKER_MODULE_TYPE,
+        pythonName: 'flex_stacker_1',
+      },
+    }
+    const mockLabwareEntitiesWithFlexStackerLabware = {
+      ...mockLabwareEntities,
+      [flexStackerLabwareId]: {
+        id: flexStackerLabwareId,
+        labwareDefURI: 'opentrons/fixture_96_plate/1',
+        def: opentrons96Plate as LabwareDefinition2,
+        pythonName: 'well_plate_4',
+      },
+    }
+
+    const mockLabwareRobotStateWithFlexStackerLabware = {
+      ...labwareRobotState,
+      [flexStackerLabwareId]: {
+        ...labwareRobotState[labwareId6],
+        stack: [flexStackerLabwareId, moduleId4, 'A4'],
+      },
+    }
+
+    const setStoredLabware = getSetStoredLabware(
+      mockModuleEntitiesWithFlexStackerModule,
+      mockLabwareEntitiesWithFlexStackerLabware,
+      mockLabwareRobotStateWithFlexStackerLabware
+    )
+
+    expect(setStoredLabware).toBe(
+      `# Set Stored Labware:
+flex_stacker_1 = protocol.set_stored_labware(
+    loadName="fixture_96_plate",
+    namespace="opentrons",
+    version=1,
+    count=1)`.trimStart()
     )
   })
 })

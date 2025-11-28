@@ -11,7 +11,7 @@ import {
   LegacyStyledText,
   SIZE_3,
   SPACING,
-  TYPOGRAPHY,
+  StyledText,
 } from '@opentrons/components'
 import {
   useInstrumentsQuery,
@@ -24,7 +24,6 @@ import { ModuleCard } from '/app/organisms/ModuleCard'
 import { useModuleApiRequests } from '/app/organisms/ModuleCard/utils'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useCurrentRunId, useRunStatuses } from '/app/resources/runs'
 import { getShowPipetteCalibrationWarning } from '/app/transformations/instruments'
 
 import { GripperCard } from './GripperCard'
@@ -43,11 +42,13 @@ const EQUIPMENT_POLL_MS = 5000
 interface InstrumentsAndModulesProps {
   robotName: string
   isRobotViewable: boolean
+  isRobotBusy: boolean
 }
 
 export function InstrumentsAndModules({
   robotName,
   isRobotViewable,
+  isRobotBusy,
 }: InstrumentsAndModulesProps): JSX.Element | null {
   const { t } = useTranslation(['device_details', 'shared'])
   const isFlex = useIsFlex(robotName)
@@ -58,8 +59,6 @@ export function InstrumentsAndModules({
       enabled: !isFlex,
     }
   )?.data ?? { left: undefined, right: undefined }
-  const currentRunId = useCurrentRunId()
-  const { isRunTerminal, isRunRunning } = useRunStatuses()
   const isEstopNotDisengaged = useIsEstopNotDisengaged(robotName)
   const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
 
@@ -125,14 +124,12 @@ export function InstrumentsAndModules({
       flexDirection={DIRECTION_COLUMN}
       width="100%"
     >
-      <LegacyStyledText
-        as="h3"
-        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      <StyledText
+        desktopStyle="bodyLargeSemiBold"
         marginBottom={SPACING.spacing16}
-        id="InstrumentsAndModules_title"
       >
         {t('instruments_and_modules')}
-      </LegacyStyledText>
+      </StyledText>
       <Flex
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
@@ -141,7 +138,7 @@ export function InstrumentsAndModules({
         width="100%"
         flexDirection={DIRECTION_COLUMN}
       >
-        {currentRunId != null && !isRunTerminal && (
+        {isRobotBusy && (
           <Flex
             paddingBottom={SPACING.spacing16}
             flexDirection={DIRECTION_COLUMN}
@@ -153,7 +150,7 @@ export function InstrumentsAndModules({
         )}
         {isRobotViewable &&
         getShowPipetteCalibrationWarning(attachedInstruments) &&
-        (isRunTerminal || currentRunId == null) ? (
+        !isRobotBusy ? (
           <Flex paddingBottom={SPACING.spacing16} width="100%">
             <PipetteRecalibrationWarning />
           </Flex>
@@ -176,7 +173,7 @@ export function InstrumentsAndModules({
                   }
                   mount={LEFT}
                   robotName={robotName}
-                  isRunActive={currentRunId != null && isRunRunning}
+                  isRobotBusy={isRobotBusy}
                   isEstopNotDisengaged={isEstopNotDisengaged}
                 />
               ) : (
@@ -191,7 +188,7 @@ export function InstrumentsAndModules({
                         : null
                     }
                     mount={LEFT}
-                    isRunActive={currentRunId != null && isRunRunning}
+                    isRobotBusy={isRobotBusy}
                     isEstopNotDisengaged={isEstopNotDisengaged}
                   />
                   <GripperCard
@@ -201,7 +198,7 @@ export function InstrumentsAndModules({
                       attachedGripper?.data?.calibratedOffset?.last_modified !=
                         null
                     }
-                    isRunActive={currentRunId != null && isRunRunning}
+                    isRobotBusy={isRobotBusy}
                     isEstopNotDisengaged={isEstopNotDisengaged}
                   />
                 </>
@@ -238,7 +235,7 @@ export function InstrumentsAndModules({
                   }
                   mount={RIGHT}
                   robotName={robotName}
-                  isRunActive={currentRunId != null && isRunRunning}
+                  isRobotBusy={isRobotBusy}
                   isEstopNotDisengaged={isEstopNotDisengaged}
                 />
               ) : null}
@@ -253,7 +250,7 @@ export function InstrumentsAndModules({
                       : null
                   }
                   mount={RIGHT}
-                  isRunActive={currentRunId != null && isRunRunning}
+                  isRobotBusy={isRobotBusy}
                   isEstopNotDisengaged={isEstopNotDisengaged}
                 />
               ) : null}
