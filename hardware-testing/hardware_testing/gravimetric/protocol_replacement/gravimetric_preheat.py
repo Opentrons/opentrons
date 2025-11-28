@@ -1210,7 +1210,7 @@ def preheat_96ch(ctx: ProtocolContext,fixture_settings:FixtureSettings):
             current_temp_2 = ot3api.read_sensor(secondary)
             avg_temp = (current_temp_1 + current_temp_2) / 2
             ctx.delay(seconds=15, msg=f"加热中或散热,移液器温度 {avg_temp} 目标温度={target}")
-            if  abs(avg_temp - target)<=0.1:
+            if  avg_temp - target >= 0.2:
                 ctx.delay(seconds=2, msg=f"退出加热,开始测试, 移液器温度 {avg_temp} 目标温度={target}")
                 dis_motors_hot(ot3api=ot3api)
                 break
