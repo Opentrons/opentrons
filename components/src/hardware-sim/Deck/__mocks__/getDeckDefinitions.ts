@@ -3,8 +3,8 @@ import path from 'path'
 // replace webpack-specific require.context with Node-based glob in tests
 import glob from 'glob'
 import { vi } from 'vitest'
-import type { Mock } from 'vitest'
 
+import type { Mock } from 'vitest'
 import type { DeckDefinition } from '@opentrons/shared-data'
 
 const DECK_FIXTURE_PATTERN = path.join(
@@ -19,12 +19,13 @@ assert(
   `no deck fixtures found, is the path correct? ${DECK_FIXTURE_PATTERN}`
 )
 
-export const getDeckDefinitions: Mock<() => Record<string, DeckDefinition>> = vi.fn(() =>
-  (allDecks as DeckDefinition[]).reduce(
-    (acc, deck: DeckDefinition): Record<string, DeckDefinition> => ({
-      ...acc,
-      [deck.otId]: deck,
-    }),
-    {}
+export const getDeckDefinitions: Mock<() => Record<string, DeckDefinition>> =
+  vi.fn(() =>
+    (allDecks as DeckDefinition[]).reduce(
+      (acc, deck: DeckDefinition): Record<string, DeckDefinition> => ({
+        ...acc,
+        [deck.otId]: deck,
+      }),
+      {}
+    )
   )
-)

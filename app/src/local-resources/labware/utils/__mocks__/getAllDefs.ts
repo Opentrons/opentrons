@@ -15,7 +15,7 @@ const DEFS_FIXTURE_PATTERN = path.join(
 
 const allDefs: unknown[] = glob.sync(DEFS_FIXTURE_PATTERN).map(require)
 
-export const getAllDefs: Mock<() =>Record<string, LabwareDefinition>> = vi.fn(
+export const getAllDefs: Mock<() => Record<string, LabwareDefinition>> = vi.fn(
   (): Record<string, LabwareDefinition> =>
     (allDefs as LabwareDefinition[]).reduce(
       (acc, def: LabwareDefinition): Record<string, LabwareDefinition> => ({
