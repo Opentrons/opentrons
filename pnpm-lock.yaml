@@ -603,6 +603,9 @@ importers:
       '@opentrons/shared-data':
         specifier: link:../shared-data
         version: link:../shared-data
+      '@opentrons/step-generation':
+        specifier: link:../step-generation
+        version: link:../step-generation
       '@opentrons/usb-bridge/node-client':
         specifier: link:../usb-bridge/node-client
         version: link:../usb-bridge/node-client
@@ -1067,6 +1070,9 @@ importers:
       '@types/query-string':
         specifier: 6.2.0
         version: 6.2.0
+      '@types/styled-components':
+        specifier: ^5.1.26
+        version: 5.1.34
       '@types/webpack-env':
         specifier: ^1.16.0
         version: 1.18.8
