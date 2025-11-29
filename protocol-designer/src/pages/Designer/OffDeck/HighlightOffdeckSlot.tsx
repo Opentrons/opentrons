@@ -11,13 +11,13 @@ import {
 import type { CoordinateTuple } from '@opentrons/shared-data'
 import type { LabwareOnDeck } from '../../../step-forms'
 
-interface HighlightOffdeckSlotProps {
+interface HighlightOffDeckSlotProps {
   labwareOnDeck?: LabwareOnDeck
   position: CoordinateTuple
 }
 
-export function HighlightOffdeckSlot(
-  props: HighlightOffdeckSlotProps
+export function HighlightOffDeckSlot(
+  props: HighlightOffDeckSlotProps
 ): JSX.Element | null {
   const { labwareOnDeck, position } = props
   const { t } = useTranslation('application')
