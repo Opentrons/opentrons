@@ -41,6 +41,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-router-dom": "6.24.1",
+    "styled-components": "5.3.6",
     "yup": "0.32.9"
   }
 }
