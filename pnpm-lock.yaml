@@ -1000,6 +1000,9 @@ importers:
       '@opentrons/components':
         specifier: link:../components
         version: link:../components
+      '@opentrons/shared-data':
+        specifier: link:../shared-data
+        version: link:../shared-data
       ajv:
         specifier: 6.12.3
         version: 6.12.3

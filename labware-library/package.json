@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@opentrons/components": "link:../components",
+    "@opentrons/shared-data": "link:../shared-data",
     "ajv": "6.12.3",
     "classnames": "2.2.5",
     "cookie": "0.4.0",
