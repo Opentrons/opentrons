@@ -22,9 +22,10 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons#readme",
   "dependencies": {
-    "serialport": "10.5.0",
-    "yargs": "15.4.0",
+    "@serialport/bindings-cpp": "^13.0.1",
+    "agent-base": "^6.0.0",
     "node-fetch": "2.6.7",
-    "agent-base": "^6.0.0"
+    "serialport": "10.5.0",
+    "yargs": "15.4.0"
   }
 }

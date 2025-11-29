@@ -43,6 +43,7 @@
     "@types/styled-components": "^5.1.26",
     "@types/webpack-env": "^1.16.0",
     "classnames": "2.2.5",
+    "date-fns": "^4.1.0",
     "interactjs": "^1.10.27",
     "lodash": "4.17.21",
     "react-markdown": "9.0.3",
