@@ -1299,6 +1299,9 @@ importers:
       styled-components:
         specifier: 5.3.6
         version: 5.3.6(react-dom@18.2.0)(react-is@19.1.0)(react@18.2.0)
+      tslib:
+        specifier: ^2.8.1
+        version: 2.8.1
       ua-parser-js:
         specifier: ^0.7.23
         version: 0.7.40

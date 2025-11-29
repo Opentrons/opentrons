@@ -148,6 +148,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
+        tslib: path.resolve('node_modules/tslib'),
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
         // files being processed with the wrong config (the config from the
         // consuming project vs. the config from the source project).
