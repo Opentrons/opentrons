@@ -25,6 +25,7 @@
     "@fontsource/public-sans": "5.0.3",
     "@opentrons/api-client": "link:../api-client",
     "@opentrons/components": "link:../components",
+    "@opentrons/discovery-client": "link:../discovery-client",
     "@opentrons/labware-library": "link:../labware-library",
     "@opentrons/react-api-client": "link:../react-api-client",
     "@opentrons/shared-data": "link:../shared-data",
