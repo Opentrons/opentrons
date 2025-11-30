@@ -1,37 +1,55 @@
 'use strict'
 
+const importOrder = [
+  '^(react)(.*)$',
+  '<THIRD_PARTY_MODULES>',
+  '',
+  '^@opentrons/(.*)$',
+  '',
+  '^/(.*)/(?!assets)(.*)$',
+  '',
+  '^[./](?!.*\\.(png|jpg|jpeg|gif|svg|webm|mp4)$)',
+  '',
+  '<TYPES>',
+  '<TYPES>^(react)(.*)$',
+  '<TYPES><THIRD_PARTY_MODULES>',
+  '<TYPES>^@opentrons/(.*)$',
+  '<TYPES>^/(.*)/(?!assets)(.*)$',
+  '<TYPES>^[./]',
+  '',
+  '.*/assets/.*',
+  '.*\\.(png|jpg|jpeg|gif|svg|webm|mp4)$',
+]
+
 module.exports = {
-  printWidth: 80, // default
-  tabWidth: 2, // default
-  useTabs: false, // default
+  // --- GLOBAL CONFIG (Applies to all files: JSON, MD, YAML, JS, TS) ---
+  printWidth: 80,
+  tabWidth: 2,
+  useTabs: false,
   semi: false,
   singleQuote: true,
-  jsxSingleQuote: false, // default
+  jsxSingleQuote: false,
   trailingComma: 'es5',
-  bracketSpacing: true, // default
-  bracketSameLine: false, // default
-  arrowParens: 'avoid', // default
+  bracketSpacing: true,
+  bracketSameLine: false,
+  arrowParens: 'avoid',
   endOfLine: 'lf',
-  plugins: ['@ianvs/prettier-plugin-sort-imports'],
-  importOrder: [
-    '^(react)(.*)$',
-    '<THIRD_PARTY_MODULES>',
-    '',
-    '^@opentrons/(.*)$',
-    '',
-    '^/(.*)/(?!assets)(.*)$',
-    '',
-    '^[./](?!.*\\.(png|jpg|jpeg|gif|svg|webm|mp4)$)',
-    '',
-    '<TYPES>',
-    '<TYPES>^(react)(.*)$',
-    '<TYPES><THIRD_PARTY_MODULES>',
-    '<TYPES>^@opentrons/(.*)$',
-    '<TYPES>^/(.*)/(?!assets)(.*)$',
-    '<TYPES>^[./]',
-    '',
-    '.*/assets/.*',
-    '.*\\.(png|jpg|jpeg|gif|svg|webm|mp4)$',
+
+  overrides: [
+    {
+      // apply the plugin following only to JS/TS files
+      files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
+      options: {
+        plugins: ['@ianvs/prettier-plugin-sort-imports'],
+        importOrder,
+        importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
+      },
+    },
+    {
+      files: ['*.d.ts'],
+      options: {
+        plugins: []
+      }
+    }
   ],
-  importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
 }
