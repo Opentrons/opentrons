@@ -92,7 +92,7 @@ describe('SelectLabwareModal', () => {
     })
   })
 
-  // Note temporarily skip 
+  // Note temporarily skip
   it.skip('renders an empty slot with all the labware options', () => {
     render(props)
     screen.getAllByText('Add labware')
@@ -109,7 +109,7 @@ describe('SelectLabwareModal', () => {
     expect(vi.mocked(selectTopLabware)).toHaveBeenCalled()
   })
 
-   // Note temporarily skip 
+  // Note temporarily skip
   it.skip('renders deck slot and selects an adapter and labware', () => {
     vi.mocked(selectors.getZoomedInSlotInfo).mockReturnValue({
       selectedAdapterDefURI: 'fixture/fixture_universal_flat_bottom_adapter/1',

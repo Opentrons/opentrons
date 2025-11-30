@@ -40,7 +40,7 @@ module.exports = {
       // apply the plugin following only to JS/TS files
       files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
       options: {
-        plugins: ['@ianvs/prettier-plugin-sort-imports'],
+        plugins: [require.resolve('@ianvs/prettier-plugin-sort-imports')],
         importOrder,
         importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
       },
