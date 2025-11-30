@@ -1,5 +1,6 @@
 'use strict'
 
+// We define the order here as a variable, but we ONLY use it inside the override.
 const importOrder = [
   '^(react)(.*)$',
   '<THIRD_PARTY_MODULES>',
@@ -22,7 +23,8 @@ const importOrder = [
 ]
 
 module.exports = {
-  // --- GLOBAL CONFIG (Applies to all files: JSON, MD, YAML, JS, TS) ---
+  // --- STANDARD PRETTIER OPTIONS (Global) ---
+  // These apply to ALL files (JS, JSON, MD, YAML)
   printWidth: 80,
   tabWidth: 2,
   useTabs: false,
@@ -35,21 +37,24 @@ module.exports = {
   arrowParens: 'avoid',
   endOfLine: 'lf',
 
+  // ⚠️ CRITICAL: NO PLUGINS OR PLUGIN OPTIONS HERE ⚠️
+  // If you put importOrder here, JSON/MD files will warn because they don't have the plugin.
+
   overrides: [
     {
-      // apply the plugin following only to JS/TS files
+      // --- CONFIGURATION FOR JS/TS ONLY ---
       files: ['*.js', '*.jsx', '*.ts', '*.tsx'],
       options: {
+        // 1. Load the plugin ONLY for these files
+        // We use require.resolve to satisfy pnpm
         plugins: [require.resolve('@ianvs/prettier-plugin-sort-imports')],
-        importOrder,
+
+        // 2. Apply the options ONLY for these files
+        importOrder: importOrder,
         importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
       },
     },
-    {
-      files: ['*.d.ts'],
-      options: {
-        plugins: []
-      }
-    }
+    // We do NOT need an override for *.md/*.json anymore because
+    // the global config is now clean.
   ],
 }
