@@ -23,39 +23,41 @@ interface HandleClickProps {
   handleAddPauseClick: () => void
 }
 
-type AutoAddPauseUntilTempStepModalProps =
+type BonusStepModalProps =
   | ({
+      // "We've added a ___ step for you"
       modalType:
-        | 'temperatureModule'
-        | 'heaterShaker'
-        | 'thermocyclerBlock'
-        | 'thermocyclerLid'
+        | 'explainWaitForTemperatureModuleTemp'
+        | 'explainWaitForHeaterShakerTemp'
+        | 'explainWaitForThermocyclerBlockTemp'
+        | 'explainWaitForThermocyclerLidTemp'
       displayTemperature: string
     } & HandleClickProps)
   | ({
-      modalType: 'thermocyclerProfile'
+      modalType: 'explainWaitForThermocyclerProfile'
       displayTemperature?: null
     } & HandleClickProps)
   | ({
-      // todo(mm, 2025-09-26): Delete legacy mode when enableConcurrentModuleActions FF is deleted.
-      modalType: 'legacy'
+      // "Would you like to add a ___ step"
+      // todo(mm, 2025-09-26): Delete this modal type when enableConcurrentModuleActions FF is deleted
+      modalType: 'optionallyWaitForTemp'
       displayTemperature: string
       displayModule: string
     } & HandleClickProps)
+
+export type BonusStepModalType = BonusStepModalProps['modalType']
 
 /**
  * Implements the several modals that are like "you just saved a set-temperature step,
  * would you like to also add a pause step."
  */
-export const AutoAddPauseUntilTempStepModal = (
-  props: AutoAddPauseUntilTempStepModalProps
-): JSX.Element => {
+export const BonusStepModal = (props: BonusStepModalProps): JSX.Element => {
   const { modalType, handleSkipPauseClick, handleAddPauseClick } = props
   const { t } = useTranslation()
   const [rememberDismissal, setRememberDismissal] = useState(false)
 
-  // todo(mm, 2025-09-29): Delete legacy mode when enableConcurrentModuleActions FF is deleted.
-  if (modalType === 'legacy') {
+  // todo(mm, 2025-09-26): Delete this modal type when enableConcurrentModuleActions FF is deleted
+  if (modalType === 'optionallyWaitForTemp') {
     const { displayModule, displayTemperature } = props
     return (
       <Modal
@@ -102,15 +104,15 @@ export const AutoAddPauseUntilTempStepModal = (
   } else {
     const titleKey: string = (() => {
       switch (modalType) {
-        case 'temperatureModule':
+        case 'explainWaitForTemperatureModuleTemp':
           return 'modal:auto_add_pause_until_temp_step.temperature_module.title'
-        case 'heaterShaker':
+        case 'explainWaitForHeaterShakerTemp':
           return 'modal:auto_add_pause_until_temp_step.heater_shaker.title'
-        case 'thermocyclerBlock':
+        case 'explainWaitForThermocyclerBlockTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_block.title'
-        case 'thermocyclerLid':
+        case 'explainWaitForThermocyclerLidTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_lid.title'
-        case 'thermocyclerProfile':
+        case 'explainWaitForThermocyclerProfile':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_profile.title'
         // default omitted, for exhaustiveness checking.
       }
@@ -119,15 +121,15 @@ export const AutoAddPauseUntilTempStepModal = (
 
     const bodyParagraphsKey: string = (() => {
       switch (modalType) {
-        case 'temperatureModule':
+        case 'explainWaitForTemperatureModuleTemp':
           return 'modal:auto_add_pause_until_temp_step.temperature_module.body'
-        case 'heaterShaker':
+        case 'explainWaitForHeaterShakerTemp':
           return 'modal:auto_add_pause_until_temp_step.heater_shaker.body'
-        case 'thermocyclerBlock':
+        case 'explainWaitForThermocyclerBlockTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_block.body'
-        case 'thermocyclerLid':
+        case 'explainWaitForThermocyclerLidTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_lid.body'
-        case 'thermocyclerProfile':
+        case 'explainWaitForThermocyclerProfile':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_profile.body'
         // default omitted, for exhaustiveness checking.
       }
