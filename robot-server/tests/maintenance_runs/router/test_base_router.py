@@ -37,6 +37,8 @@ from robot_server.maintenance_runs.router.base_router import (
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from opentrons.protocol_engine.resources import CameraProvider
+from robot_server.camera.provider import CameraProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -54,11 +56,26 @@ def labware_offset_create() -> pe_types.LegacyLabwareOffsetCreate:
     )
 
 
+@pytest.fixture()
+def mock_camera_provider_wrapper(decoy: Decoy) -> CameraProviderWrapper:
+    """Return a mock CameraProviderWrapper."""
+    return decoy.mock(cls=CameraProviderWrapper)
+
+
+@pytest.fixture()
+def mock_camera_provider(
+    decoy: Decoy, mock_camera_provider_wrapper: CameraProviderWrapper
+) -> CameraProvider:
+    """Return a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
+
+
 async def test_create_run(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
     labware_offset_create: pe_types.LabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -90,6 +107,7 @@ async def test_create_run(
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            camera_provider=mock_camera_provider,
         )
     ).then_return(expected_response)
 
@@ -103,6 +121,7 @@ async def test_create_run(
         is_ok_to_create_maintenance_run=True,
         deck_configuration_store=mock_deck_configuration_store,
         notify_publishers=mock_notify_publishers,
+        camera_provider=mock_camera_provider,
         check_estop=True,
     )
 
@@ -114,6 +133,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should respond with a conflict error if protocol run is active during maintenance run creation."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -130,6 +150,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
             notify_publishers=mock_notify_publishers,
+            camera_provider=mock_camera_provider,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"

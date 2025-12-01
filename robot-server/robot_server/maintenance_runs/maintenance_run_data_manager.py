@@ -19,6 +19,8 @@ from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 from opentrons.protocol_engine.types import DeckConfigurationType
 
 from robot_server.service.notifications import MaintenanceRunsPublisher
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.system import camera
 
 
 def _build_run(
@@ -92,6 +94,7 @@ class MaintenanceRunDataManager:
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
+        camera_provider: CameraProvider,
     ) -> MaintenanceRun:
         """Create a new, current maintenance run.
 
@@ -100,6 +103,7 @@ class MaintenanceRunDataManager:
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
+            camera_provider: Utility for accessing image capture and camera settings.
 
         Returns:
             The run resource.
@@ -113,6 +117,13 @@ class MaintenanceRunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
+        )
+
+        await camera.update_live_stream_status(
+            self._run_orchestrator_store._robot_type,
+            True,
+            camera_provider,
+            state_summary.cameraSettings,
         )
 
         maintenance_run_data = _build_run(
@@ -151,11 +162,14 @@ class MaintenanceRunDataManager:
             state_summary=state_summary,
         )
 
-    async def delete(self, run_id: str) -> None:
+    async def delete(
+        self, run_id: str, run_exists: bool, camera_provider: CameraProvider
+    ) -> None:
         """Delete a maintenance run.
 
         Args:
             run_id: The identifier of the run to remove.
+            run_exists: Whether or not a standard run exists outside of the maintenance run.
 
         Raises:
             RunConflictError: If deleting the current run, the current run
@@ -163,8 +177,18 @@ class MaintenanceRunDataManager:
             RunNotFoundError: The given run identifier was not found.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
+            state_summary = self._get_state_summary(run_id)
             await self._run_orchestrator_store.clear()
             await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+
+            if run_exists and state_summary is not None:
+                # Restart the live stream for now that the maintenance run has ended.
+                await camera.update_live_stream_status(
+                    self._run_orchestrator_store._robot_type,
+                    True,
+                    camera_provider,
+                    state_summary.cameraSettings,
+                )
 
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)
