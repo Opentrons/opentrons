@@ -71,7 +71,7 @@ import {
   TemperatureTools,
   ThermocyclerTools,
 } from './StepTools'
-import { FlexStackerTools } from './StepTools/FlexStackerTools'
+import { FlexStackerToolsContainer } from './StepTools/FlexStackerTools'
 import {
   capitalizeFirstLetter,
   getIsErrorOnCurrentPage,
@@ -108,7 +108,7 @@ const STEP_FORM_MAP: StepFormMap = {
   comment: CommentTools,
   camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
-  flexStacker: FlexStackerTools,
+  flexStacker: FlexStackerToolsContainer,
 }
 
 // used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings

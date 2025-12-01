@@ -38,6 +38,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
     robotState,
     flexStackerOptions,
   } = props
+  console.log('flexStackerOptions:', flexStackerOptions)
   const { moduleId } = formData
   const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
@@ -161,7 +162,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         />
         <RadioButton
           buttonValue="empty"
-          buttonLabel="empty"
+          buttonLabel="Empty"
           buttonSubLabel={{
             label: 'Manually empty all labware from the stacker',
           }}
@@ -174,7 +175,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
 }
 
 export const FlexStackerToolsContainer = (
-  props: FlexStackerToolsProps
+  props: StepFormProps
 ): JSX.Element => {
   const robotState = useSelector(getRobotStateAtActiveItem)
   const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
