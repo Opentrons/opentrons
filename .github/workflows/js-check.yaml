@@ -69,12 +69,13 @@ jobs:
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
       - name: 'setup-js'
         id: 'setup-js'
-        run: |
-          npm config set cache ${{ github.workspace }}/.npm-cache
-          pnpm config set cache ${{ github.workspace }}/.pnpm-cache
-          make setup-js
+        uses: ./.github/actions/js/setup
+        # run: |
+        #   npm config set cache ${{ github.workspace }}/.npm-cache
+        #   pnpm config set cache ${{ github.workspace }}/.pnpm-cache
+        #   make setup-js
         # Use the if to run all the lint checks even of some fail
-        shell: bash
+        # shell: bash
       - name: 'typechecks'
         if: always() && steps.setup-js.outcome == 'success'
         run: make check-js
