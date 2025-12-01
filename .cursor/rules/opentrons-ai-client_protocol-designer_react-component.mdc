@@ -145,7 +145,7 @@ Example prompt template:
    This monorepo uses Stylelint. The configuration file is located at the root as .stylelintrc.js.
    To run linting on a specific file, use the following command:
    ```shell
-   yarn stylelint opentrons-ai-client/src/file_path
+   pnpm stylelint opentrons-ai-client/src/file_path
    ```
 
 ## TypeScript Best Practices
@@ -330,13 +330,13 @@ it('should handle empty data', () => {
 To run tests for a specific file (assuming the current directory is the project root), use:
 
 ```shell
-yarn vitest opentrons-ai-client/src/file_path
+pnpm vitest opentrons-ai-client/src/file_path
 ```
 
 To run multiple tests within a folder, use:
 
 ```shell
-yarn vitest opentrons-ai-client/src/folder_path
+pnpm vitest opentrons-ai-client/src/folder_path
 ```
 
 1. **Props Pattern:**
