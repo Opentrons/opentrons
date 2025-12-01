@@ -68,6 +68,7 @@ import type {
   CommandCreatorError,
   CurriedCommandCreator,
   DistributeArgs,
+  LabwareEntity,
 } from '../../types'
 
 export const distribute: CommandCreator<DistributeArgs> = (
@@ -143,7 +144,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     pushOut,
     sourceLabware,
     sourceWell,
-    tipRack,
+    tipRack: userSelectedTipRackURI, // the tiprack the user selected, not necessarily the one used for this step
     tipTracking,
     tiprackSelected,
     tipsSelected,
@@ -249,19 +250,31 @@ export const distribute: CommandCreator<DistributeArgs> = (
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
-  const tiprack = Object.values(labwareEntities).find(
-    ({ labwareDefURI }) => labwareDefURI === tipRack
-  )
-  if (tiprack == null) {
+  let tiprackEntity: LabwareEntity | undefined, tiprackURI: string
+  // TODO: We currently ask users to select a tip rack even if the tip handling policy
+  // for this step is `never`, in which case we must ignore the tip rack the user selected
+  // and use the tip rack from the previous step where we actually picked up the tip.
+  if (changeTip === 'never') {
+    const prevTiprackID = prevRobotState.tipState.pipettes[pipette]?.tiprackURI
+    // pipettes[pipette].tiprackURI is a misnomer: it's an labwareID, not a URI
+    tiprackEntity = invariantContext.labwareEntities[prevTiprackID ?? '']
+    tiprackURI = tiprackEntity?.labwareDefURI
+  } else {
+    tiprackEntity = Object.values(labwareEntities).find(
+      ({ labwareDefURI }) => labwareDefURI === userSelectedTipRackURI
+    )
+    tiprackURI = userSelectedTipRackURI
+  }
+
+  if (tiprackEntity == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
-        labware: tipRack,
+        labware: tiprackURI,
       })
     )
   }
-  const { def: tiprackDefinition = null, labwareDefURI: tiprackDefUri } =
-    tiprack ?? {}
+  const { def: tiprackDefinition = null } = tiprackEntity ?? {}
   const {
     spec: pipetteSpecs,
     name: pipetteName,
@@ -278,7 +291,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         ({ pipetteModel }) =>
           pipetteModel === getFlexNameConversion(pipetteSpecs)
       )
-      ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri) ?? null
+      ?.byTipType.find(({ tiprack }) => tiprack === tiprackURI) ?? null
   const { aspirate, multiDispense } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
@@ -372,7 +385,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   ]
 
   const maxVolume =
-    getPipetteWithTipMaxVol(pipette, invariantContext, tipRack) -
+    getPipetteWithTipMaxVol(pipette, invariantContext, tiprackURI) -
     aspirateAirGapVolume
   const maxWellsPerChunk = Math.floor((maxVolume - disposalVolume) / volume)
 
@@ -393,7 +406,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     }
   const { tipracks } = getNextTiprack(
     pipette,
-    tipRack,
+    tiprackURI,
     invariantContext,
     prevRobotState,
     ...(nozzles != null ? [nozzles] : [])
@@ -403,7 +416,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: volume,
       liquidHandlingAction: 'multiDispense',
       byVolumeProperty: 'correctionByVolume',
@@ -441,7 +454,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       pipetteName: isFlexPipette(pipetteName)
         ? getFlexNameConversion(pipetteSpecs)
         : pipetteName,
-      tiprackUri: tipRack,
+      tiprackUri: tiprackURI,
       liquidClassValuesForTip,
     })}`,
   ]
@@ -560,7 +573,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: aspirateAirGapVolume,
       liquidHandlingAction: 'aspirate',
       byVolumeProperty: 'flowRateByVolume',
@@ -570,7 +583,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: aspirateAirGapVolume,
       liquidHandlingAction: 'multiDispense',
       byVolumeProperty: 'flowRateByVolume',
@@ -580,7 +593,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: dispenseAirGapVolume,
       liquidHandlingAction: 'aspirate',
       byVolumeProperty: 'flowRateByVolume',
@@ -590,7 +603,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: dispenseAirGapVolume,
       liquidHandlingAction: 'multiDispense',
       byVolumeProperty: 'flowRateByVolume',
@@ -652,7 +665,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               isReturnTip && fallBackTrashLikeId != null
                 ? fallBackTrashLikeId
                 : dropTipLocation,
-            tipRack,
+            tipRack: tiprackURI,
             ...(nozzles != null ? { nozzles } : {}),
             ...(tipTracking === MANUAL &&
             nextTip != null &&
@@ -689,7 +702,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         getByVolumeValue({
           liquidClass,
           pipetteSpecs,
-          tiprackDefUri: tipRack,
+          tiprackDefUri: tiprackURI,
           targetVolume: dispenseAirGapVolume,
           liquidHandlingAction: 'multiDispense',
           byVolumeProperty: 'correctionByVolume',
@@ -781,7 +794,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             finalPushOut: 0, // according to transfer_components_executor, don't push out here
             invariantContext,
             liquidClass,
-            tiprack: tipRack,
+            tiprack: tiprackURI,
             generatePython: false,
           })
         : []
@@ -798,7 +811,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
               finalPushOut: 0, // according to transfer_components_executor, don't push out here
               invariantContext,
               liquidClass,
-              tiprack: tipRack,
+              tiprack: tiprackURI,
               generatePython: false,
             })
           : []
@@ -843,7 +856,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         getByVolumeValue({
           liquidClass,
           pipetteSpecs,
-          tiprackDefUri: tipRack,
+          tiprackDefUri: tiprackURI,
           targetVolume: aspirateAirGapVolume,
           liquidHandlingAction: 'aspirate',
           byVolumeProperty: 'correctionByVolume',
@@ -871,7 +884,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         getByVolumeValue({
           liquidClass,
           pipetteSpecs,
-          tiprackDefUri: tipRack,
+          tiprackDefUri: tiprackURI,
           targetVolume: totalGrossAspirateVolume,
           liquidHandlingAction: 'aspirate',
           byVolumeProperty: 'correctionByVolume',
@@ -881,7 +894,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
         getByVolumeValue({
           liquidClass,
           pipetteSpecs,
-          tiprackDefUri: tipRack,
+          tiprackDefUri: tiprackURI,
           targetVolume: conditioningVolume,
           liquidHandlingAction: 'multiDispense',
           byVolumeProperty: 'correctionByVolume',
@@ -955,7 +968,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             getByVolumeValue({
               liquidClass,
               pipetteSpecs,
-              tiprackDefUri: tipRack,
+              tiprackDefUri: tiprackURI,
               targetVolume: airGapInTip,
               liquidHandlingAction: 'multiDispense',
               byVolumeProperty: 'correctionByVolume',
@@ -1091,7 +1104,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
             getByVolumeValue({
               liquidClass,
               pipetteSpecs,
-              tiprackDefUri: tipRack,
+              tiprackDefUri: tiprackURI,
               targetVolume: dispenseAirGapVolume,
               liquidHandlingAction: 'aspirate',
               byVolumeProperty: 'correctionByVolume',
@@ -1270,7 +1283,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
           ? [
               curryWithoutPython(dropTip, {
                 pipette,
-                dropTipLocation: tipRack,
+                dropTipLocation: tiprackURI,
                 isReturnTip,
               }),
             ]
