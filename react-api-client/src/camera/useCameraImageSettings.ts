@@ -9,11 +9,10 @@ import type { AxiosError } from 'axios'
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type { CameraImageSettingsResponse } from '@opentrons/api-client'
 
-const cameraId = OT_SYSTEM_CAMERA
-
-export function useCreateCameraImageSettings(
+export function useCameraImageSettings(
   options: UseQueryOptions<CameraImageSettingsResponse> = {}
 ): UseQueryResult<CameraImageSettingsResponse> {
+  const cameraId = OT_SYSTEM_CAMERA
   const host = useHost()
   const query = useQuery<CameraImageSettingsResponse>(
     [host, 'camera', 'cameraSettings', cameraId],

@@ -17,27 +17,26 @@ import type {
   ErrorResponse,
 } from '@opentrons/api-client'
 
-export type UseUpdateCameraImageSettingsMutationResult = UseMutationResult<
+export type UseCreateCameraImageSettingsMutationResult = UseMutationResult<
   CameraImageSettingsResponse,
   AxiosError<ErrorResponse>,
   CameraImageSettings
 > & {
-  updateCameraImageSettings: UseMutateFunction<
+  createCameraImageSettings: UseMutateFunction<
     CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
     CameraImageSettings
   >
 }
 
-const cameraId = OT_SYSTEM_CAMERA
-
-export function useUpdateCameraImageSettings(
+export function useCreateCameraImageSettings(
   options: UseMutationOptions<
     CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,
     CameraImageSettings
   > = {}
-): UseUpdateCameraImageSettingsMutationResult {
+): UseCreateCameraImageSettingsMutationResult {
+  const cameraId = OT_SYSTEM_CAMERA
   const host = useHost()
   const queryClient = useQueryClient()
 
@@ -61,6 +60,6 @@ export function useUpdateCameraImageSettings(
 
   return {
     ...mutation,
-    updateCameraImageSettings: mutation.mutateAsync,
+    createCameraImageSettings: mutation.mutate,
   }
 }
