@@ -44,37 +44,31 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('target_block_temperature')}
             </StyledText>
-            <Chip
-              type="info"
-              hasIcon={false}
-              text={
-                blockTargetTemp != null
-                  ? t('temperature', { temp: blockTargetTemp })
-                  : t('deactivated')
-              }
-            />
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {blockTargetTemp != null
+                ? t('temperature', { temp: blockTargetTemp })
+                : t('deactivated')}
+            </StyledText>
           </div>
           <div className={styles.module_details_status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('target_lid_temperature')}
             </StyledText>
-            <Chip
-              type="info"
-              hasIcon={false}
-              text={
-                lidTargetTemp != null
-                  ? t('temperature', { temp: lidTargetTemp })
-                  : t('deactivated')
-              }
-            />
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {lidTargetTemp != null
+                ? t('temperature', { temp: lidTargetTemp })
+                : t('deactivated')}
+            </StyledText>
           </div>
           <div className={styles.module_details_status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('lid_status')}
             </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {lidOpen || lidOpen == null ? t('open') : t('closed')}
-            </StyledText>
+            <Chip
+              type="neutral"
+              hasIcon={false}
+              text={lidOpen || lidOpen == null ? t('open') : t('closed')}
+            />
           </div>
         </div>
       )
@@ -88,39 +82,35 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('target_temperature')}
             </StyledText>
-            <Chip
-              type="info"
-              hasIcon={false}
-              text={
-                targetTemp != null
-                  ? t('temperature', { temp: targetTemp })
-                  : t('deactivated')
-              }
-            />
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {targetTemp != null
+                ? t('temperature', { temp: targetTemp })
+                : t('deactivated')}
+            </StyledText>
           </div>
           <div className={styles.module_details_status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('target_speed')}
             </StyledText>
-            <Chip
-              type="info"
-              hasIcon={false}
-              text={
-                targetSpeed != null
-                  ? t('speed', { speed: targetSpeed })
-                  : t('idle')
-              }
-            />
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {targetSpeed != null
+                ? t('speed', { speed: targetSpeed })
+                : t('idle')}
+            </StyledText>
           </div>
           <div className={styles.module_details_status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               {t('labware_latch')}
             </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {latchOpen || latchOpen == null
-                ? t('open')
-                : t('closed_and_locked')}
-            </StyledText>
+            <Chip
+              type="neutral"
+              hasIcon={false}
+              text={
+                latchOpen || latchOpen == null
+                  ? t('open')
+                  : t('closed_and_locked')
+              }
+            />
           </div>
         </div>
       )
@@ -135,8 +125,8 @@ export function ModuleContainer({
               {t('status')}
             </StyledText>
             <Chip
-              type="info"
-              hasIcon={false}
+              type={engaged ? 'info' : 'neutral'}
+              iconName="connection-status"
               text={engaged ? t('engaged') : t('disengaged')}
             />
           </div>
@@ -146,19 +136,81 @@ export function ModuleContainer({
     }
     case TEMPERATURE_MODULE_TYPE: {
       const { status, targetTemperature } = moduleState
+      moduleDetails = (
+        <div className={styles.module_details_status_container}>
+          <div className={styles.module_details_status}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t(status)}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {targetTemperature != null
+                ? t('temperature', { temp: targetTemperature })
+                : t('deactivated')}
+            </StyledText>
+          </div>
+        </div>
+      )
       break
     }
     case ABSORBANCE_READER_TYPE: {
       const { lidOpen, initialization } = moduleState
+      moduleDetails = (
+        <div className={styles.module_details_status_container}>
+          <div className={styles.module_details_status}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('lid_status')}
+            </StyledText>
+            <Chip
+              type="neutral"
+              hasIcon={false}
+              text={lidOpen || lidOpen == null ? t('open') : t('closed')}
+            />
+          </div>
+          {initialization != null ? (
+            <>
+              <div className={styles.module_details_status}>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('initialization')}
+                </StyledText>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {initialization.mode}
+                </StyledText>
+              </div>
+              <div className={styles.module_details_status}>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {t('wavelengths')}
+                </StyledText>
+                <StyledText desktopStyle="bodyDefaultRegular">
+                  {initialization.wavelengths}
+                </StyledText>
+              </div>
+              {initialization.referenceWavelength != null ? (
+                <div className={styles.module_details_status}>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {t('reference_wavelength')}
+                  </StyledText>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {initialization.referenceWavelength}
+                  </StyledText>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+      )
       break
     }
     case FLEX_STACKER_MODULE_TYPE: {
-      const {
-        maxPoolCount,
-        storedLabwareDetails,
-        labwareInHopper,
-        labwareOnShuttle,
-      } = moduleState
+      //  TODO: add this in when the flex stacker module state is finalized for PD
+      //   const {
+      //     maxPoolCount,
+      //     storedLabwareDetails,
+      //     labwareInHopper,
+      //     labwareOnShuttle,
+      //   } = moduleState
+      console.error(
+        "TODO: update this when PD's flex stacker module state is finalized"
+      )
       break
     }
     case MAGNETIC_BLOCK_TYPE: {
@@ -174,7 +226,7 @@ export function ModuleContainer({
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>
-        <StyledText desktopStyle="captionRegular">
+        <StyledText desktopStyle="bodyDefaultSemiBold">
           {moduleDisplayName}
         </StyledText>
         {moduleDetails}

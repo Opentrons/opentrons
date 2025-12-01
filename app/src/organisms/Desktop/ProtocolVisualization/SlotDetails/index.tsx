@@ -1,13 +1,18 @@
 import { useTranslation } from 'react-i18next'
 
-import { Divider, RobotInfoLabel, StyledText } from '@opentrons/components'
-import { getIsTiprack, getModuleDeckLabel } from '@opentrons/shared-data'
+import {
+  Divider,
+  MODULE_ICON_NAME_BY_TYPE,
+  RobotInfoLabel,
+  StyledText,
+} from '@opentrons/components'
+import { getIsTiprack } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
 import { LabwareSlotContainer } from '../LabwareSlotContainer'
-import { ModuleSlotDetails } from '../ModuleSlotDetails'
+import { ModuleContainer } from '../ModuleContainer'
 import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 import styles from './slotdetails.module.css'
@@ -67,27 +72,19 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             <StyledText desktopStyle="bodyLargeSemiBold">
               {t('slot')}
             </StyledText>
-            {moduleOnSlot != null ? (
-              <RobotInfoLabel
-                deckLabel={getModuleDeckLabel(
-                  moduleEntities[moduleOnSlot[0]].type,
-                  slotId
-                )}
-              />
-            ) : null}
             <RobotInfoLabel
               deckLabel={slotId === 'fixedTrash' ? t('fixedTrash') : slotId}
             />
+            {moduleOnSlot != null ? (
+              <RobotInfoLabel
+                iconName={
+                  MODULE_ICON_NAME_BY_TYPE[moduleEntities[moduleOnSlot[0]].type]
+                }
+              />
+            ) : null}
           </div>
         </div>
         <Divider />
-        {moduleOnSlot != null ? (
-          <ModuleSlotDetails
-            moduleId={moduleOnSlot[0]}
-            moduleEntities={moduleEntities}
-            moduleRobotState={modules}
-          />
-        ) : null}
         {topMostLabwareOnSlot != null && isTopmostLabwareATiprack ? (
           <TipPickupContainer
             tiprackEntity={labwareEntities[topMostLabwareOnSlot]}
@@ -108,6 +105,13 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
         ) : null}
         {isTrashOnSlot ? (
           <TipDisposalContainer robotState={robotState} />
+        ) : null}
+        {moduleOnSlot != null ? (
+          <ModuleContainer
+            moduleId={moduleOnSlot[0]}
+            moduleEntities={moduleEntities}
+            moduleRobotState={modules}
+          />
         ) : null}
         {moduleOnSlot == null &&
         topMostLabwareOnSlot == null &&
