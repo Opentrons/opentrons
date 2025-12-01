@@ -1,7 +1,7 @@
 .container {
+  padding: 0 0 var(--spacing-16);
   container-name: controls-container;
   container-type: inline-size;
-  padding: 0 0 var(--spacing-16);
 }
 
 .controls_container {
@@ -77,13 +77,14 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background: linear-gradient(
-    to right,
-    var(--blue-50) 0%,
-    var(--blue-50) var(--progress, 0%),
-    #ccc var(--progress, 0%),
-    #ccc 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      var(--blue-50) 0%,
+      var(--blue-50) var(--progress, 0%),
+      #ccc var(--progress, 0%),
+      #ccc 100%
+    );
 }
 
 .range_input::-webkit-slider-thumb {
@@ -99,13 +100,14 @@
 .range_input::-moz-range-track {
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background: linear-gradient(
-    to right,
-    var(--blue-50) 0%,
-    var(--blue-50) var(--progress, 0%),
-    #ccc var(--progress, 0%),
-    #ccc 100%
-  );
+  background:
+    linear-gradient(
+      to right,
+      var(--blue-50) 0%,
+      var(--blue-50) var(--progress, 0%),
+      #ccc var(--progress, 0%),
+      #ccc 100%
+    );
 }
 
 .range_input::-moz-range-thumb {
