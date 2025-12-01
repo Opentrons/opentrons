@@ -116,7 +116,8 @@ describe('SkipStepInfo', () => {
   })
 
   it('renders error message for unexpected recovery option', () => {
-    props.currentRecoveryOptionUtils.selectedRecoveryOption = 'UNEXPECTED_ROUTE' as any
+    props.currentRecoveryOptionUtils.selectedRecoveryOption =
+      'UNEXPECTED_ROUTE' as any
     render(props)
 
     expect(screen.getAllByText('UNEXPECTED STEP')[0]).toBeInTheDocument()

@@ -13,7 +13,6 @@
 !api/release-notes.md
 !app-shell/build/release-notes.md
 **/.yarn-cache/**
-protocol-designer/cypress/downloads/**
 
 # components library
 storybook-static

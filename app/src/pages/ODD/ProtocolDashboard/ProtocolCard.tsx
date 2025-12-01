@@ -63,10 +63,8 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   } = props
   const navigate = useNavigate()
   const [showIcon, setShowIcon] = useState<boolean>(false)
-  const [
-    showFailedAnalysisModal,
-    setShowFailedAnalysisModal,
-  ] = useState<boolean>(false)
+  const [showFailedAnalysisModal, setShowFailedAnalysisModal] =
+    useState<boolean>(false)
   const { t, i18n } = useTranslation(['protocol_info', 'branded'])
   const protocolName = protocol.metadata.protocolName ?? protocol.files[0].name
   const longpress = useLongPress()
@@ -75,17 +73,16 @@ export function ProtocolCard(props: ProtocolCardProps): JSX.Element {
   const updatedLastRun = useUpdatedLastRunTime(lastRun)
 
   const { id: protocolId, analysisSummaries } = protocol
-  const {
-    data: mostRecentSuccessfulAnalysis,
-  } = useMostRecentSuccessfulAnalysisAsDocumentQuery(
-    protocolId,
-    analysisSummaries,
-    {
-      enabled: protocol != null,
-      refetchInterval: analysisData =>
-        analysisData == null ? REFETCH_INTERVAL : false,
-    }
-  )
+  const { data: mostRecentSuccessfulAnalysis } =
+    useMostRecentSuccessfulAnalysisAsDocumentQuery(
+      protocolId,
+      analysisSummaries,
+      {
+        enabled: protocol != null,
+        refetchInterval: analysisData =>
+          analysisData == null ? REFETCH_INTERVAL : false,
+      }
+    )
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocol.analysisSummaries)?.id ?? null,

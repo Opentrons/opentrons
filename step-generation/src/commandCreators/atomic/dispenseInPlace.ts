@@ -13,14 +13,8 @@ export const dispenseInPlace: CommandCreator<DispenseInPlaceAtomicParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const {
-    pipetteId,
-    volume,
-    flowRate,
-    pushOut,
-    correctionVolume,
-    isAirGap,
-  } = args
+  const { pipetteId, volume, flowRate, pushOut, correctionVolume, isAirGap } =
+    args
 
   const errors: CommandCreatorError[] = []
   if (!prevRobotState.tipState.pipettes[pipetteId]?.hasTip) {

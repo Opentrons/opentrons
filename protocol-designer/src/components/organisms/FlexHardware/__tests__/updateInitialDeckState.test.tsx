@@ -354,7 +354,8 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           addressableAreaId: 'D4',
         },
       ],
@@ -380,7 +381,8 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           addressableAreaId: 'D4',
         },
       ],
@@ -405,7 +407,8 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           addressableAreaId: 'D4',
         },
       ],
@@ -436,7 +439,8 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           addressableAreaId: 'D4',
         },
       ],

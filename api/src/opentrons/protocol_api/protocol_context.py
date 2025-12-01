@@ -11,6 +11,7 @@ from typing import (
     Union,
     Mapping,
     cast,
+    Tuple,
 )
 
 from opentrons_shared_data.labware.types import LabwareDefinition
@@ -1288,7 +1289,7 @@ class ProtocolContext(CommandPublisher):
     def wait_for_tasks(self, tasks: list[Task]) -> None:
         """Wait for a list of tasks to complete before executing subsequent commands.
 
-        :param list Task: tasks: A list of Task objects to wait for.
+        :param list Task: tasks: A list of :py:class:`Task` objects to wait for.
 
         Task objects can be commands that are allowed to run concurrently.
         """
@@ -1298,7 +1299,7 @@ class ProtocolContext(CommandPublisher):
     @publish(command=cmds.create_timer)
     @requires_version(2, 27)
     def create_timer(self, seconds: float) -> Task:
-        """Create a timer task that runs in the background.
+        """Create a timer :py:class:`Task` that runs in the background.
 
         :param float seconds: The time to delay in seconds.
 
@@ -1818,6 +1819,51 @@ class ProtocolContext(CommandPublisher):
                 api_version=self._api_version,
                 protocol_core=self._core,
                 core_map=self._core_map,
+            )
+        return None
+
+    @requires_version(2, 27)
+    def capture_image(
+        self,
+        home_before: Optional[bool] = False,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using the camera. Captured images are saved as during the protocol run.
+
+        :param home_before: If ``True``, homes the pipette before capturing an image.
+        :param filename: Custom name to use when saving the captured image as a file. The custom name is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run, the step number, and a timestamp for the command running when the image was captured.
+        :param resolution: Accepts a width and height (as a tuple) to determine the camera's resolution when capturing the image.
+        :param zoom: Zoom level the camera will use. Defaults to the minimum of 1x zoom (``1.0``) and has a maximum of 2x zoom (``2.0``).
+        :param contrast: The contrast level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
+        :param brightness: The brightness level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
+        :param saturation: The saturation level to be applied to the image. The acceptable range is from 0 to 100; provided as a percentage (``0.0`` to ``100.0``).
+
+        """
+        if home_before is True:
+            self._core.home()
+
+        with publish_context(
+            broker=self.broker,
+            command=cmds.capture_image(
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
+            ),
+        ):
+            self._core.capture_image(
+                filename=filename,
+                resolution=resolution,
+                zoom=zoom,
+                contrast=contrast,
+                brightness=brightness,
+                saturation=saturation,
             )
         return None
 

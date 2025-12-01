@@ -180,9 +180,4 @@ describe('ConnectedStepContainer', () => {
     expect(text).toHaveStyle(`color: ${COLORS.red60}`)
     expect(subtext).toHaveStyle(`color: ${COLORS.red60}`)
   })
-
-  it('renders the divider if hover targets that step', () => {
-    render({ ...props, dragHovered: true })
-    screen.getByTestId('divider')
-  })
 })

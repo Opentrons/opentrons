@@ -5,6 +5,17 @@ from opentrons_shared_data.deck.types import RobotModel
 from robot_server.service.json_api import BaseResponseBody
 
 
+class DiskDetails(BaseModel):
+    """System disk usage details."""
+
+    systemAvailableMb: float = Field(
+        ..., description="The system's available disk space in MB."
+    )
+    imagesDirectorySizeMb: float = Field(
+        ..., description="The system's images directory disk size in MB."
+    )
+
+
 class HealthLinks(BaseModel):
     """Useful server links."""
 
@@ -119,5 +130,8 @@ class Health(BaseResponseBody):
         default=None,
         description="The robot serial number. Should be used if present; if not present, use result of /server/update/health.",
         examples=["OT2CEP20190604A02"],
+    )
+    disk_details: DiskDetails = Field(
+        ..., description="Information concerning the system's disk."
     )
     links: HealthLinks

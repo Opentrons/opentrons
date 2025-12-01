@@ -14,10 +14,8 @@ import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 export function modulePrepCommands(
   offsetLocationDetails: OffsetLocationDetails
 ): CreateCommand[] {
-  const {
-    closestBeneathModuleId,
-    closestBeneathModuleModel,
-  } = offsetLocationDetails
+  const { closestBeneathModuleId, closestBeneathModuleModel } =
+    offsetLocationDetails
 
   const moduleType =
     closestBeneathModuleModel != null
@@ -123,10 +121,8 @@ const thermocyclerInitCommands = (
 const heaterShakerCleanupCommands = (
   offsetLocationDetails: OffsetLocationDetails
 ): CreateCommand[] => {
-  const {
-    closestBeneathModuleId,
-    closestBeneathModuleModel,
-  } = offsetLocationDetails
+  const { closestBeneathModuleId, closestBeneathModuleModel } =
+    offsetLocationDetails
 
   const moduleType =
     closestBeneathModuleModel != null

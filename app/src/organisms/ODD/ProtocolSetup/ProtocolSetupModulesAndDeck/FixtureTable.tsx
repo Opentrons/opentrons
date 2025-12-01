@@ -63,9 +63,8 @@ export function FixtureTable({
     deckConfigCompatibility
   )
 
-  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
-    requiredDeckConfigCompatibility
-  )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(requiredDeckConfigCompatibility)
 
   // list not configured/conflicted fixtures first
   const sortedDeckConfigCompatibility = filteredDeckConfigCompatibility.sort(
@@ -111,13 +110,10 @@ function FixtureTableItem({
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
-  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
-    false
-  )
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] =
+    useState<boolean>(false)
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
     compatibleCutoutFixtureIds,

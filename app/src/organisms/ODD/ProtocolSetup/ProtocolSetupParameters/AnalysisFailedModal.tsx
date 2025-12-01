@@ -38,10 +38,8 @@ export function AnalysisFailedModal({
     hasExitIcon: true,
   }
 
-  const {
-    isLoading: isDismissing,
-    mutateAsync: dismissCurrentRunAsync,
-  } = useDismissCurrentRunMutation()
+  const { isLoading: isDismissing, mutateAsync: dismissCurrentRunAsync } =
+    useDismissCurrentRunMutation()
 
   const handleRestartSetup = (): void => {
     dismissCurrentRunAsync(runId).then(() => {

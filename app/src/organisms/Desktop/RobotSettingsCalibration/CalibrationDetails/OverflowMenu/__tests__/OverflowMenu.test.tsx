@@ -82,8 +82,6 @@ const RUN_STATUSES = {
   isRunIdle: false,
 }
 
-const mockUpdateRobotStatus = vi.fn()
-
 describe('OverflowMenu', () => {
   let props: ComponentProps<typeof OverflowMenu>
   const mockDeleteCalibration = vi.fn()
@@ -94,8 +92,8 @@ describe('OverflowMenu', () => {
       robotName: ROBOT_NAME,
       mount: 'left' as Mount,
       serialNumber: 'serialNumber',
-      updateRobotStatus: mockUpdateRobotStatus,
       pipetteName: PIPETTE_NAME,
+      isRobotBusy: false,
       tiprackDefURI: 'mock/tiprack/uri',
     }
     vi.mocked(useAttachedPipettesFromInstrumentsQuery).mockReturnValue({
@@ -323,13 +321,9 @@ describe('OverflowMenu', () => {
   })
 
   it('should disable the calibration overflow menu option when the run is running', () => {
-    vi.mocked(useRunStatuses).mockReturnValue({
-      ...RUN_STATUSES,
-      isRunRunning: true,
-    })
     vi.mocked(isFlexPipette).mockReturnValue(true)
 
-    render(props)
+    render({ ...props, isRobotBusy: true })
 
     fireEvent.click(
       screen.getByLabelText('CalibrationOverflowMenu_button_pipetteOffset')

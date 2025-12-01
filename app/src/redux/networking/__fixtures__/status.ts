@@ -38,17 +38,15 @@ const {
   failureMeta,
   success,
   failure,
-}: ResponseFixtures<
-  NetworkingStatusResponse,
-  { message: string }
-> = makeResponseFixtures({
-  method: GET,
-  path: '/networking/status',
-  successStatus: 200,
-  successBody: mockNetworkingStatus,
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+}: ResponseFixtures<NetworkingStatusResponse, { message: string }> =
+  makeResponseFixtures({
+    method: GET,
+    path: '/networking/status',
+    successStatus: 200,
+    successBody: mockNetworkingStatus,
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  })
 
 export {
   successMeta as mockNetworkingStatusSuccessMeta,

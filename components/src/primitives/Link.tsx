@@ -20,13 +20,11 @@ export const Link: PrimitiveComponent<'a', LinkProps> = styled.a
   .withConfig<LinkProps>({
     shouldForwardProp: p => isntStyleProp(p) && p !== 'external',
   })
-  .attrs(
-    (props: LinkProps): ComponentProps<PrimitiveComponent<'a'>> => {
-      return props.external === true
-        ? { target: '_blank', rel: 'noopener noreferrer' }
-        : { tabIndex: '0' }
-    }
-  )`
+  .attrs((props: LinkProps): ComponentProps<PrimitiveComponent<'a'>> => {
+    return props.external === true
+      ? { target: '_blank', rel: 'noopener noreferrer' }
+      : { tabIndex: '0' }
+  })`
   text-decoration: none;
   cursor: ${CURSOR_POINTER};
   ${styleProps}

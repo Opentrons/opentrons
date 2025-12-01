@@ -228,7 +228,7 @@ export function Onboarding(): JSX.Element | null {
         update: {
           pipetteLocationUpdate: mapValues(
             pipettesById,
-            (p: typeof pipettesById[keyof typeof pipettesById]) => p.mount
+            (p: (typeof pipettesById)[keyof typeof pipettesById]) => p.mount
           ),
         },
       })

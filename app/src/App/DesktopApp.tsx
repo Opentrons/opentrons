@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Navigate, Route, Routes, useMatch } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -46,10 +46,8 @@ import type { RouteProps } from './types'
 
 export const DesktopApp = (): JSX.Element => {
   useSoftwareUpdatePoll()
-  const [
-    isEmergencyStopModalDismissed,
-    setIsEmergencyStopModalDismissed,
-  ] = useState<boolean>(false)
+  const [isEmergencyStopModalDismissed, setIsEmergencyStopModalDismissed] =
+    useState<boolean>(false)
 
   // note for react-scan
   const enableReactScan = useFeatureFlag('reactScan')
@@ -89,8 +87,7 @@ export const DesktopApp = (): JSX.Element => {
     {
       Component: ProtocolVisualization,
       name: 'Visualization',
-      path:
-        '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
+      path: '/devices/:robotName/:runId/:runCreatedAtTimestamp/:protocolKey/visualization',
     },
     {
       Component: Labware,
@@ -145,7 +142,7 @@ export const DesktopApp = (): JSX.Element => {
                 setIsEmergencyStopModalDismissed,
               }}
             >
-              <Box width="100%">
+              <Box width="100%" height="100vh">
                 <Alerts>
                   <Routes>
                     {desktopRoutes.map(({ Component, path }: RouteProps) => {
@@ -153,12 +150,18 @@ export const DesktopApp = (): JSX.Element => {
                         <Route
                           key={path}
                           element={
-                            <Fragment key={Component.name}>
+                            <Box
+                              key={Component.name}
+                              display="flex"
+                              flexDirection="column"
+                              height="100%"
+                            >
                               <Breadcrumbs />
                               <Box
                                 position={POSITION_RELATIVE}
                                 width="100%"
-                                height="100%"
+                                flex="1"
+                                minHeight="0"
                               >
                                 <Box
                                   width="100%"
@@ -170,7 +173,7 @@ export const DesktopApp = (): JSX.Element => {
                                   <Component />
                                 </Box>
                               </Box>
-                            </Fragment>
+                            </Box>
                           }
                           path={path}
                         />

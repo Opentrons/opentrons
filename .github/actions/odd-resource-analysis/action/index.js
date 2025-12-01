@@ -1,4 +1,5 @@
 const core = require('@actions/core')
+const fs = require('fs')
 const { analyzeMemoryTrendsAcrossVersions } = require('./analyzeMemoryTrends')
 
 async function run() {
@@ -36,7 +37,13 @@ async function run() {
         )
         .join('\n')
 
-    core.setOutput('analysis-results', JSON.stringify(memoryAnalysis))
+    // Use modern GitHub Actions output method
+    if (process.env.GITHUB_OUTPUT) {
+      fs.appendFileSync(
+        process.env.GITHUB_OUTPUT,
+        `analysis-results=${JSON.stringify(memoryAnalysis)}\n`
+      )
+    }
 
     await core.summary
       .addHeading('ODD Memory Usage Results')

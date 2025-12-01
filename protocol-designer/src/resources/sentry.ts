@@ -6,18 +6,30 @@ import {
 } from '@sentry/react'
 
 import { getHasOptedIn } from '../analytics/selectors'
-import { getIsProduction } from '../networking/opentronsWebApi'
+import { getIsProduction, getIsStaging } from '../networking/opentronsWebApi'
 
 import type { BaseState } from '../types'
 
 let isSentryInitialized = false
 
-// Note (kk: 06/09/2025) at this moment, we are not using a dev DSN
-// because we are not using Sentry in development. If we decide to use it
-// in the future, we can add a dev DSN here.
-const sentryDsn = getIsProduction()
-  ? _OT_PD_SENTRY_DSN_
-  : _OT_PD_SENTRY_DEV_DSN_
+// Production DSN is shared by production and staging so sourcemaps live in one project.
+// Development can still fall back to the dev DSN if it is configured locally.
+const sentryDsn = _OT_PD_SENTRY_DSN_ ?? _OT_PD_SENTRY_DEV_DSN_
+
+const resolveSentryEnvironment = ():
+  | 'production'
+  | 'staging'
+  | 'development' => {
+  if (getIsProduction()) {
+    return 'production'
+  }
+
+  if (getIsStaging()) {
+    return 'staging'
+  }
+
+  return 'development'
+}
 
 export const initializeSentry = (state: BaseState): void => {
   const optedIn = getHasOptedIn(state)?.hasOptedIn ?? false
@@ -34,7 +46,7 @@ export const initializeSentry = (state: BaseState): void => {
     try {
       init({
         dsn: sentryDsn,
-        environment: 'production',
+        environment: resolveSentryEnvironment(),
         release: _OT_PD_VERSION_,
         integrations: [
           captureConsoleIntegration({ levels: ['assert'] }),
@@ -49,7 +61,13 @@ export const initializeSentry = (state: BaseState): void => {
         ],
         replaysSessionSampleRate: 0.0, // No Session Replay
         replaysOnErrorSampleRate: 0.0, // No Session Replay
-        ignoreErrors: [/Failed to fetch/i], // Ignore the fetch since PD doesn't use fetch
+        ignoreErrors: [
+          // Ignore the fetch since PD doesn't use fetch
+          /Failed to fetch/i,
+          // Most likely triggered by MS Defender trying to run PD. Nothing we can do but ignore it:
+          // https://github.com/getsentry/sentry-javascript/issues/3440
+          'Non-Error promise rejection captured with value: Object Not Found Matching Id:',
+        ],
       })
       isSentryInitialized = true
       console.log('Sentry.init done')

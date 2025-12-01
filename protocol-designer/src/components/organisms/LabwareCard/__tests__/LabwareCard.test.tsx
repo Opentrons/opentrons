@@ -88,10 +88,10 @@ describe('LabwareCard', () => {
         lidId: {
           id: 'lidId',
           labwareDefURI: 'mockuri',
-          def: ({
+          def: {
             ...fixture96Plate,
             metadata: { displayName: 'mock lid' },
-          } as any) as LabwareDefinition2,
+          } as any as LabwareDefinition2,
           pythonName: 'mockPythonName',
           stack: ['labwareId', 'A1'],
         },

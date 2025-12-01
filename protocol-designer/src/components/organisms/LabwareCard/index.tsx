@@ -123,13 +123,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
               gridGap={SPACING.spacing16}
               padding={SPACING.spacing16}
             >
-              <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+              <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText desktopStyle="bodyDefaultSemiBold">
                   {nickName}
                 </StyledText>
                 {isNicknameDifferent ? (
                   <StyledText
-                    desktopStyle="captionRegular"
+                    desktopStyle="bodyDefaultRegular"
                     color={COLORS.grey60}
                   >
                     {displayName}
@@ -137,7 +137,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 ) : null}
                 {lidId != null && deckSetupLabware[lidId] != null ? (
                   <StyledText
-                    desktopStyle="captionRegular"
+                    desktopStyle="bodyDefaultRegular"
                     color={COLORS.grey60}
                   >
                     {t('with_lid', {
@@ -145,8 +145,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                     })}
                   </StyledText>
                 ) : null}
-
-                <Flex gridGap={SPACING.spacing8}>
+                <Flex gridGap={SPACING.spacing8} paddingTop={SPACING.spacing8}>
                   {!isAdapterOrTiprack && !isLid ? (
                     <LiquidInfoDisplay
                       text={

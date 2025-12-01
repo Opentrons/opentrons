@@ -219,7 +219,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("environment", choices=["sandbox", "staging", "production"], help="Deployment environment")
     parser.add_argument(
         "application",
-        choices=["labware_library", "protocol_designer", "docs", "mkdocs"],
+        choices=["labware_library", "protocol_designer", "docs", "mkdocs", "components"],
         help="Application to deploy",
     )
     parser.add_argument("relative_artifact_dir", help="Path to the directory containing artifacts to deploy")

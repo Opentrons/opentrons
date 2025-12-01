@@ -7,6 +7,7 @@ import { aspirate } from './aspirate'
 import { aspirateInPlace } from './aspirateInPlace'
 import { blowOutInPlace } from './blowOutInPlace'
 import { blowOutInWell } from './blowOutInWell'
+import { captureImage } from './captureImage'
 import { comment } from './comment'
 import { configureForVolume } from './configureForVolume'
 import { configureNozzleLayout } from './configureNozzleLayout'
@@ -39,6 +40,7 @@ export {
   aspirateInPlace,
   blowOutInPlace,
   blowOutInWell,
+  captureImage,
   comment,
   configureForVolume,
   configureNozzleLayout,

@@ -88,9 +88,8 @@ describe('heaterShakerOpenLatch', () => {
   })
   it('should not return an error when there is labware east/west that is above 53 mm for flex', () => {
     if (FlexPipetteNameSpecs != null) {
-      invariantContext.pipetteEntities[
-        DEFAULT_PIPETTE
-      ].spec = FlexPipetteNameSpecs
+      invariantContext.pipetteEntities[DEFAULT_PIPETTE].spec =
+        FlexPipetteNameSpecs
     }
     vi.mocked(getIsTallLabwareEastWestOfHeaterShaker).mockReturnValue(false)
 

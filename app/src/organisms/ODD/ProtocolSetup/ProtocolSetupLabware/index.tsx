@@ -247,10 +247,8 @@ function LabwareLatch({
   refetchModules,
 }: LabwareLatchProps): JSX.Element {
   const { t } = useTranslation(['heater_shaker', 'protocol_setup'])
-  const {
-    createLiveCommand,
-    isLoading: isLiveCommandLoading,
-  } = useCreateLiveCommandMutation()
+  const { createLiveCommand, isLoading: isLiveCommandLoading } =
+    useCreateLiveCommandMutation()
   const [isRefetchingModules, setIsRefetchingModules] = useState(false)
   const isLatchLoading =
     isLiveCommandLoading ||

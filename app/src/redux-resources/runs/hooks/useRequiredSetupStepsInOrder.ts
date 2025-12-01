@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { useFeatureFlag } from '/app/redux/config'
 import {
   CAMERA_SETUP_STEP_KEY,
   getSetupStepsRequired,
@@ -51,14 +50,13 @@ const NO_ANALYSIS_STEPS_IN_ORDER = [
 
 const keysInOrder = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null,
-  noLwOffsetsInRun: boolean,
-  isCameraEnabled: boolean
+  noLwOffsetsInRun: boolean
 ): UseRequiredSetupStepsInOrderReturn => {
   const orderedSteps =
     protocolAnalysis == null ? NO_ANALYSIS_STEPS_IN_ORDER : ALL_STEPS_IN_ORDER
-  const orderedFinalizedSteps = !isCameraEnabled
-    ? orderedSteps
-    : orderedSteps.filter(step => step !== CAMERA_SETUP_STEP_KEY)
+  const orderedFinalizedSteps = orderedSteps.filter(
+    step => step !== CAMERA_SETUP_STEP_KEY
+  )
 
   const orderedApplicableSteps =
     protocolAnalysis == null
@@ -70,8 +68,6 @@ const keysInOrder = (
           ) {
             return false
           } else if (stepKey === LPC_STEP_KEY && noLwOffsetsInRun) {
-            return false
-          } else if (stepKey === CAMERA_SETUP_STEP_KEY && !isCameraEnabled) {
             return false
           } else {
             return true
@@ -98,14 +94,9 @@ export function useRequiredSetupStepsInOrder({
   )
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0
-  const isCameraEnabled = useFeatureFlag('camera')
 
   useEffect(() => {
-    const applicable = keysInOrder(
-      protocolAnalysis,
-      noLwOffsetsInRun,
-      isCameraEnabled
-    )
+    const applicable = keysInOrder(protocolAnalysis, noLwOffsetsInRun)
     dispatch(
       updateRunSetupStepsRequired(runId, {
         ...ALL_STEPS_IN_ORDER.reduce<

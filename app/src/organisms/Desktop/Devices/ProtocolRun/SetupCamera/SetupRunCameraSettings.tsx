@@ -1,21 +1,32 @@
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { ToggleButton } from '/app/atoms/buttons'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import styles from './setupcamera.module.css'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
-
 export interface SetupCameraProps {
-  settings: UseStubCameraUsageSettingsResult
+  robotName: string
+  liveStreamEnabled: boolean
+  recoveryEnabled: boolean
+  cameraConfirmed: boolean
+  toggleRecoveryEnabled: () => void
+  toggleLiveStreamEnabled: () => void
 }
 
 export function SetupRunCameraUsage({
-  settings,
+  robotName,
+  liveStreamEnabled,
+  recoveryEnabled,
+  cameraConfirmed,
+  toggleRecoveryEnabled,
+  toggleLiveStreamEnabled,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const robotType = useRobotType(robotName)
 
   return (
     <div className={styles.usage_settings_container}>
@@ -23,19 +34,23 @@ export function SetupRunCameraUsage({
         {t('usage_settings')}
       </StyledText>
       <div className={styles.usage_settings_card_container}>
+        {robotType !== OT2_ROBOT_TYPE && (
+          <SettingCard
+            title={t('live_video')}
+            subtext={t('view_realtime_video')}
+            toggleLabelText={t('live_video')}
+            enabled={liveStreamEnabled}
+            onToggle={toggleLiveStreamEnabled}
+            isToggleDisabled={cameraConfirmed}
+          />
+        )}
         <SettingCard
-          title={t('live_video')}
-          subtext={t('view_realtime_video')}
-          toggleLabelText={t('live_video')}
-          enabled={settings.isLiveVideoEnabled}
-          onToggle={settings.toggleLiveVideoEnabled}
-        />
-        <SettingCard
-          title={t('error_recovery')}
+          title={t('error_recovery_lc')}
           subtext={t('automatically_capture_image')}
           toggleLabelText={t('error_recovery')}
-          enabled={settings.isRecoveryCaptureEnabled}
-          onToggle={settings.toggleRecoveryCaptureEnabled}
+          enabled={recoveryEnabled}
+          onToggle={toggleRecoveryEnabled}
+          isToggleDisabled={cameraConfirmed}
         />
       </div>
     </div>
@@ -47,6 +62,7 @@ interface SettingCardProps {
   subtext: string
   toggleLabelText: string
   enabled: boolean
+  isToggleDisabled: boolean
   onToggle: () => void
 }
 
@@ -54,6 +70,7 @@ function SettingCard({
   title,
   subtext,
   toggleLabelText,
+  isToggleDisabled,
   onToggle,
   enabled,
 }: SettingCardProps): JSX.Element {
@@ -68,6 +85,7 @@ function SettingCard({
           label={toggleLabelText}
           toggledOn={enabled}
           onClick={onToggle}
+          disabled={isToggleDisabled}
         />
       </div>
     </div>

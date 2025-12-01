@@ -22,6 +22,7 @@ describe('CameraStatusContainer', () => {
     mockProps = {
       toggleCameraEnabled: vi.fn(),
       isCameraEnabled: false,
+      toggleDisabled: false,
     }
   })
 
@@ -35,7 +36,7 @@ describe('CameraStatusContainer', () => {
     render(mockProps)
 
     screen.getByText(
-      'The deck camera provides live video during protocol runs, allows manual or automated image capture of the deck, and records images automatically when errors occur for easier troubleshooting.'
+      'The deck camera offers live video monitoring during protocol runs and supports image capture—either manually, automatically, or in response to runtime errors for easier troubleshooting.'
     )
   })
 
@@ -63,5 +64,12 @@ describe('CameraStatusContainer', () => {
     await user.click(toggleButton)
 
     expect(mockProps.toggleCameraEnabled).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables toggle button when toggleDisabled is true', () => {
+    render({ ...mockProps, toggleDisabled: true })
+
+    const toggleButton = screen.getByRole('switch')
+    expect(toggleButton).toBeDisabled()
   })
 })

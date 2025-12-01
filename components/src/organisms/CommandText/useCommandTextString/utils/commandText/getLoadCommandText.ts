@@ -7,6 +7,8 @@ import {
   getModuleType,
   getOccludedSlotCountForModule,
   getPipetteSpecsV2,
+  locationIsOffDeck,
+  locationIsOnLabware,
 } from '@opentrons/shared-data'
 
 import { getLabwareDisplayLocation } from '../getLabwareDisplayLocation'
@@ -35,7 +37,7 @@ export const getLoadCommandText = ({
       return t('load_pipette_protocol_setup', {
         pipette_name:
           pipetteModel != null
-            ? getPipetteSpecsV2(pipetteModel)?.displayName ?? ''
+            ? (getPipetteSpecsV2(pipetteModel)?.displayName ?? '')
             : '',
         mount_name: command.params.mount === 'left' ? t('left') : t('right'),
       })
@@ -72,10 +74,7 @@ export const getLoadCommandText = ({
 
       // use in preposition for modules and slots, on for labware and adapters
       let displayLocation = t('in_location', { location })
-      if (
-        command.params.location === 'offDeck' ||
-        command.params.location === 'systemLocation'
-      ) {
+      if (locationIsOffDeck(command.params.location)) {
         displayLocation = location
       } else if ('labwareId' in command.params.location) {
         displayLocation = t('on_location', { location })
@@ -104,11 +103,7 @@ export const getLoadCommandText = ({
           : ''
       // use in preposition for modules and slots, on for labware and adapters
       let displayLocation = t('in_location', { location })
-      if (
-        command.params.location !== 'systemLocation' &&
-        command.params.location !== 'offDeck' &&
-        'labwareId' in command.params.location
-      ) {
+      if (locationIsOnLabware(command.params.location)) {
         displayLocation = t('on_location', { location })
       }
       const lidName = command.result.definition.metadata.displayName

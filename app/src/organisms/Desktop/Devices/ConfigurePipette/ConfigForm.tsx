@@ -48,13 +48,8 @@ const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 const QUIRK_KEY = 'quirks'
 
 export function ConfigForm(props: ConfigFormProps): JSX.Element {
-  const {
-    updateInProgress,
-    formId,
-    settings,
-    updateSettings,
-    groupLabels,
-  } = props
+  const { updateInProgress, formId, settings, updateSettings, groupLabels } =
+    props
 
   const getFieldsByKey = (
     keys: string[],

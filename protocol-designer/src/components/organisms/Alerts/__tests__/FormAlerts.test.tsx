@@ -74,7 +74,7 @@ describe('FormAlerts', () => {
         type: 'TIP_POSITIONED_LOW_IN_TUBE',
         title: 'mockTitle',
         dependentFields: [],
-        location: 'form',
+        location: ['form'],
       },
     ])
     render(props)

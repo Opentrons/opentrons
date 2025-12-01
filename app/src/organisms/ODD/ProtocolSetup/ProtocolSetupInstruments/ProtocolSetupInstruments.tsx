@@ -42,9 +42,9 @@ export function ProtocolSetupInstruments({
       ? isGripperInCommands(mostRecentAnalysis?.commands ?? [])
       : false
   const attachedGripperMatch = usesGripper
-    ? (attachedInstruments?.data ?? []).find(
+    ? ((attachedInstruments?.data ?? []).find(
         (i): i is GripperData => i.instrumentType === 'gripper' && i.ok
-      ) ?? null
+      ) ?? null)
     : null
 
   return (

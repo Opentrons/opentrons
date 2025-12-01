@@ -15,7 +15,7 @@ import type {
 // do not list in any "available labware" UI.
 // TODO(mc, 2019-12-3): how should this correspond to RETIRED_LABWARE?
 // see shared-data/js/helpers/index.js
-export const LABWAREV2_DO_NOT_LIST = [
+export const LABWAREV2_DO_NOT_LIST = new Set([
   // Labware definitions only used for back-compat with legacy v1 defs:
   'opentrons_40_aluminumblock_eppendorf_24x2ml_safelock_snapcap_generic_16x0.2ml_pcr_strip',
   'opentrons_24_tuberack_eppendorf_2ml_safelock_snapcap_acrylic',
@@ -48,10 +48,10 @@ export const LABWAREV2_DO_NOT_LIST = [
   // temporarily blocking 20 uL Flex tip racks until they launch
   'opentrons_flex_96_tiprack_20ul',
   'opentrons_flex_96_filtertiprack_20ul',
-]
+])
 // NOTE(sa, 2020-7-14): in PD we do not want to list calibration blocks
 // or the adapter/labware combos since we migrated to splitting them up
-export const PD_DO_NOT_LIST = [
+export const PD_DO_NOT_LIST = new Set([
   'opentrons_calibrationblock_short_side_left',
   'opentrons_calibrationblock_short_side_right',
   'opentrons_96_aluminumblock_biorad_wellplate_200ul',
@@ -70,7 +70,7 @@ export const PD_DO_NOT_LIST = [
   // temporarily blocking 20 uL Flex tip racks until they launch
   'opentrons_flex_96_tiprack_20ul',
   'opentrons_flex_96_filtertiprack_20ul',
-]
+])
 
 export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
   return Boolean(def?.metadata?.isTiprack)

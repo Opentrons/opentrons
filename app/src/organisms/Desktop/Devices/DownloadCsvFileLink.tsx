@@ -9,7 +9,7 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useCsvFileRawQuery } from '@opentrons/react-api-client'
+import { useDataFileRawQuery } from '@opentrons/react-api-client'
 
 import { downloadFile } from './utils'
 
@@ -22,7 +22,7 @@ export function DownloadCsvFileLink(
 ): JSX.Element {
   const { fileId, fileName } = props
   const { t } = useTranslation('run_details')
-  const { data: csvFileRaw } = useCsvFileRawQuery(fileId)
+  const { data: csvFileRaw } = useDataFileRawQuery(fileId)
 
   return (
     <Link

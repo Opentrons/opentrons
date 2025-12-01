@@ -156,12 +156,8 @@ export function ErrorRecoveryFlows(
 
   const allRunDefs = runLwDefsByUri != null ? Object.values(runLwDefsByUri) : []
 
-  const {
-    showTakeover,
-    isActiveUser,
-    intent,
-    toggleERWizAsActiveUser,
-  } = useRecoveryTakeover(toggleERWizard)
+  const { showTakeover, isActiveUser, intent, toggleERWizAsActiveUser } =
+    useRecoveryTakeover(toggleERWizard)
 
   const recoveryUtils = useERUtils({
     ...props,

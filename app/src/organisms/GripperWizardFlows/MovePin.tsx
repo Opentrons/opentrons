@@ -107,7 +107,8 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                   createRunCommand({
                     maintenanceRunId,
                     command: {
-                      commandType: 'calibration/moveToMaintenancePosition' as const,
+                      commandType:
+                        'calibration/moveToMaintenancePosition' as const,
                       params: {
                         mount: EXTENSION,
                       },

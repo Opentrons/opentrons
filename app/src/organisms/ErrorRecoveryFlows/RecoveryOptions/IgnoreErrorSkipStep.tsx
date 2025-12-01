@@ -59,14 +59,11 @@ export function IgnoreErrorStepHome({
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { ignoreErrorKindThisRun } = recoveryCommands
-  const {
-    proceedNextStep,
-    proceedToRouteAndStep,
-    goBackPrevStep,
-  } = routeUpdateActions
+  const { proceedNextStep, proceedToRouteAndStep, goBackPrevStep } =
+    routeUpdateActions
 
   const [selectedOption, setSelectedOption] = useState<IgnoreOption>(
-    head(IGNORE_OPTIONS_IN_ORDER) as IgnoreOption
+    head(IGNORE_OPTIONS_IN_ORDER)!
   )
 
   // Reset client choice to ignore all errors whenever navigating back to this view. This prevents unexpected

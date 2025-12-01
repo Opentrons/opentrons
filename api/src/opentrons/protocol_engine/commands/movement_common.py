@@ -48,8 +48,8 @@ class WellLocationMixin(BaseModel):
     )
 
 
-class LiquidHandlingWellLocationMixin(BaseModel):
-    """Mixin for command requests that take a location that's somewhere in a well."""
+class LiquidHandlingWellMixin(BaseModel):
+    """Base Mixin for command requests that take a well."""
 
     labwareId: str = Field(
         ...,
@@ -59,9 +59,36 @@ class LiquidHandlingWellLocationMixin(BaseModel):
         ...,
         description="Name of well to use in labware.",
     )
+
+
+class LiquidHandlingWellLocationMixin(LiquidHandlingWellMixin):
+    """Mixin for command requests that take a location that's somewhere in a well."""
+
     wellLocation: LiquidHandlingWellLocation = Field(
         default_factory=LiquidHandlingWellLocation,
         description="Relative well location at which to perform the operation",
+    )
+
+
+class DynamicLiquidHandlingWellLocationMixin(LiquidHandlingWellMixin):
+    """Mixin for command requests that move between two locations in a well."""
+
+    trackFromLocation: LiquidHandlingWellLocation = Field(
+        default_factory=LiquidHandlingWellLocation,
+        description="Relative well location at which to start the operation",
+    )
+    trackToLocation: LiquidHandlingWellLocation = Field(
+        default_factory=LiquidHandlingWellLocation,
+        description="Relative well location at which to end the operation",
+    )
+    movement_delay: float | SkipJsonSchema[None] = Field(
+        None,
+        description=(
+            "Optional movement delay in seconds."
+            " When this argument is used, the x/y/z movement will wait movement_delay seconds"
+            " after the pipetting action starts before beginning the x/y/z move."
+        ),
+        json_schema_extra=_remove_default,
     )
 
 

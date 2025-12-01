@@ -12,6 +12,8 @@ from .errors import (
     ErrorResponse,
     BaseErrorCode,
     DefaultErrorCodes,
+    UnhandledGcode,
+    GCodeCacheFull,
 )
 from .async_serial import AsyncSerial
 
@@ -555,6 +557,23 @@ class AsyncResponseSerialConnection(SerialConnection):
                 # A read timeout, end
                 yield "empty-unknown", data
 
+    def _raise_on_parser_error(self, data: str, response: bytes) -> None:
+        """Raise an exception if this response contains an error from the gcode parser on the module.
+
+        This has to be treated specially because multiack commands won't get multiple acks if the command
+        fails at the parse stage. The errors handled here should be kept in sync with the module gcode
+        parse code.
+        """
+        try:
+            str_response = self.process_raw_response(
+                command=data, response=response.replace(self._ack, b"").decode()
+            )
+            self.raise_on_error(response=str_response, request=data)
+        except (UnhandledGcode, GCodeCacheFull):
+            raise
+        except Exception:
+            pass
+
     async def _send_one_retry(self, data: str, acks: int) -> list[str]:
         data_encode = data.encode("utf-8")
         log.debug(f"{self._name}: Write -> {data_encode!r}")
@@ -567,8 +586,10 @@ class AsyncResponseSerialConnection(SerialConnection):
         async for response_type, response in self._consume_responses(acks):
             if response_type == "error":
                 async_errors.append(response)
+                self._raise_on_parser_error(data, response)
             elif response_type == "response":
                 command_acks.append(response)
+                self._raise_on_parser_error(data, response)
             else:
                 break
 

@@ -28,7 +28,7 @@ import {
 import {
   INIT_STATUS,
   useRobotInitializationStatus,
-} from '/app/resources/health/hooks'
+} from '/app/resources/health/useRobotInitializationStatus'
 
 import { FOOTER_BUTTON_STYLE } from './UpdateRobotModal'
 import { useRobotUpdateInfo } from './useRobotUpdateInfo'
@@ -37,7 +37,7 @@ import type { ChangeEventHandler } from 'react'
 import type { SetStatusBarCreateCommand } from '@opentrons/shared-data/protocol'
 import type { RobotUpdateSession } from '/app/redux/robot-update/types'
 import type { State } from '/app/redux/types'
-import type { RobotInitializationStatus } from '/app/resources/health/hooks'
+import type { RobotInitializationStatus } from '/app/resources/health/useRobotInitializationStatus'
 import type { UpdateStep } from './useRobotUpdateInfo'
 
 const UPDATE_PROGRESS_BAR_STYLE = css`

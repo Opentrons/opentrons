@@ -58,10 +58,8 @@ export function QuickTransferCard(props: {
   } = props
   const navigate = useNavigate()
   const [showIcon, setShowIcon] = useState<boolean>(false)
-  const [
-    showFailedAnalysisModal,
-    setShowFailedAnalysisModal,
-  ] = useState<boolean>(false)
+  const [showFailedAnalysisModal, setShowFailedAnalysisModal] =
+    useState<boolean>(false)
   const { t, i18n } = useTranslation(['quick_transfer', 'branded'])
   const transferName =
     quickTransfer.metadata.protocolName ?? quickTransfer.files[0].name
@@ -70,17 +68,16 @@ export function QuickTransferCard(props: {
   const host = useHost()
 
   const { id: transferId, analysisSummaries } = quickTransfer
-  const {
-    data: mostRecentSuccessfulAnalysis,
-  } = useMostRecentSuccessfulAnalysisAsDocumentQuery(
-    transferId,
-    analysisSummaries,
-    {
-      enabled: quickTransfer != null,
-      refetchInterval: analysisData =>
-        analysisData == null ? REFETCH_INTERVAL : false,
-    }
-  )
+  const { data: mostRecentSuccessfulAnalysis } =
+    useMostRecentSuccessfulAnalysisAsDocumentQuery(
+      transferId,
+      analysisSummaries,
+      {
+        enabled: quickTransfer != null,
+        refetchInterval: analysisData =>
+          analysisData == null ? REFETCH_INTERVAL : false,
+      }
+    )
   const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     transferId,
     last(quickTransfer.analysisSummaries)?.id ?? null,
@@ -164,8 +161,8 @@ export function QuickTransferCard(props: {
       background-color: ${longpress.isLongPressed
         ? ''
         : isFailedAnalysis
-        ? COLORS.red40
-        : COLORS.grey50};
+          ? COLORS.red40
+          : COLORS.grey50};
     }
   `
 

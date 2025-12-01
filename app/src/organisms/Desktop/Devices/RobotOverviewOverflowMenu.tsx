@@ -72,10 +72,8 @@ export const RobotOverviewOverflowMenu = (
     dispatch(home(robot.name, ROBOT))
   }
 
-  const [
-    showChooseProtocolSlideout,
-    setShowChooseProtocolSlideout,
-  ] = useState<boolean>(false)
+  const [showChooseProtocolSlideout, setShowChooseProtocolSlideout] =
+    useState<boolean>(false)
   const [showDisconnectModal, setShowDisconnectModal] = useState<boolean>(false)
 
   const canDisconnect = useCanDisconnect(robot.name)

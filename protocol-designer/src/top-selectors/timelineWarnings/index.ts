@@ -22,20 +22,21 @@ export const getTimelineWarningsForSelectedStep: Selector<
   }
 )
 type HasWarningsPerStep = Record<string, boolean>
-export const getHasTimelineWarningsPerStep: Selector<HasWarningsPerStep> = createSelector(
-  dismissSelectors.getDismissedTimelineWarningTypes,
-  fileDataSelectors.timelineWarningsPerStep,
-  stepFormSelectors.getOrderedStepIds,
-  (dismissedWarningTypes, warningsPerStep, orderedStepIds) => {
-    return orderedStepIds.reduce((stepAcc: HasWarningsPerStep, stepId) => {
-      const warningTypesForStep = (warningsPerStep[stepId] || []).map(
-        w => w.type
-      )
-      const hasUndismissedWarnings =
-        warningTypesForStep.filter(
-          warningType => !dismissedWarningTypes.includes(warningType)
-        ).length > 0
-      return { ...stepAcc, [stepId]: hasUndismissedWarnings }
-    }, {})
-  }
-)
+export const getHasTimelineWarningsPerStep: Selector<HasWarningsPerStep> =
+  createSelector(
+    dismissSelectors.getDismissedTimelineWarningTypes,
+    fileDataSelectors.timelineWarningsPerStep,
+    stepFormSelectors.getOrderedStepIds,
+    (dismissedWarningTypes, warningsPerStep, orderedStepIds) => {
+      return orderedStepIds.reduce((stepAcc: HasWarningsPerStep, stepId) => {
+        const warningTypesForStep = (warningsPerStep[stepId] || []).map(
+          w => w.type
+        )
+        const hasUndismissedWarnings =
+          warningTypesForStep.filter(
+            warningType => !dismissedWarningTypes.includes(warningType)
+          ).length > 0
+        return { ...stepAcc, [stepId]: hasUndismissedWarnings }
+      }, {})
+    }
+  )

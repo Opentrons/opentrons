@@ -355,6 +355,48 @@ And this example adds a push out of 10 µL after the final dispense in the mix::
 .. versionchanged:: 2.24
     Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters. 
 
+.. _dynamic_mix:
+
+Dynamic Mix
+===========
+
+The :py:meth:`~.InstrumentContext.dynamic_mix` method aspirates and dispenses repeatedly in a multiple locations. It's designed to mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix.
+
+This example draws 100 µL from the current well and mixes it three times::
+
+    pipette.mix(repetitions=3, volume=100)
+
+This example draws 100 µL from well B1 and mixes it three times::
+
+    pipette.mix(3, 100, plate["B1"])
+
+This example draws an amount equal to the pipette's maximum rated volume and mixes it three times::
+
+    pipette.mix(repetitions=3)
+
+Like an ``aspirate()`` or ``dispense()``, you can use optional arguments to specify the flow rate, a delay, or a push out after an aspirate or dispense in the mix.
+
+This example draws 100 µL from the current well and mixes it three times, aspirating at 50 µL/sec and with a 5 second delay after each aspirate::
+
+    pipette.mix(
+        repetitions=3,
+        volume=100,
+        aspirate_flow_rate=50,
+        aspirate_delay=5
+    )
+
+And this example adds a push out of 10 µL after the final dispense in the mix::
+
+    pipette.mix(repetitions=3, volume=100, final_push_out=10)
+
+.. note::
+
+    In API versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API versions 2.3 and later, the pipette does not move while mixing.
+
+.. versionadded:: 2.0
+.. versionchanged:: 2.24
+    Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters.
+
 .. _air-gap:
 
 Air Gap

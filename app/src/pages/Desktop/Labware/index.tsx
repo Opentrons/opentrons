@@ -104,10 +104,8 @@ export function Labware(): JSX.Element {
   const { newLabwareName, clearLabwareName } = useNewLabwareName()
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = useState(false)
 
-  const [
-    currentLabwareDef,
-    setCurrentLabwareDef,
-  ] = useState<null | LabwareDefAndDate>(null)
+  const [currentLabwareDef, setCurrentLabwareDef] =
+    useState<null | LabwareDefAndDate>(null)
 
   const sortOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {

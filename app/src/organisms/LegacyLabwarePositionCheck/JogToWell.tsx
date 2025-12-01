@@ -84,9 +84,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     shouldUseMetalProbe,
   } = props
 
-  const [joggedPosition, setJoggedPosition] = useState<VectorOffset>(
-    initialPosition
-  )
+  const [joggedPosition, setJoggedPosition] =
+    useState<VectorOffset>(initialPosition)
   const isOnDevice = useSelector(getIsOnDevice)
   const [showFullJogControls, setShowFullJogControls] = useState(false)
   useEffect(() => {

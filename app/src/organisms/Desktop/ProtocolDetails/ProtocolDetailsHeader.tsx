@@ -20,6 +20,7 @@ import {
   SPACING,
   StyledText,
   Tag,
+  WRAP,
 } from '@opentrons/components'
 
 import {
@@ -99,15 +100,15 @@ export function ProtocolDetailsHeader({
 
   const creationMethod =
     mostRecentAnalysis != null
-      ? getCreationMethod(
+      ? (getCreationMethod(
           mostRecentAnalysis.config,
           mostRecentAnalysis.metadata
-        ) ?? t('shared:no_data')
+        ) ?? t('shared:no_data'))
       : t('shared:no_data')
 
   const author =
     mostRecentAnalysis != null
-      ? mostRecentAnalysis?.metadata?.author ?? t('shared:no_data')
+      ? (mostRecentAnalysis?.metadata?.author ?? t('shared:no_data'))
       : t('shared:no_data')
 
   const lastAnalyzed =
@@ -156,12 +157,15 @@ export function ProtocolDetailsHeader({
           <Flex flexDirection={DIRECTION_COLUMN} gap={SPACING.spacing16}>
             <Flex
               flexDirection={DIRECTION_ROW}
-              gap={SPACING.spacing4}
+              gap={SPACING.spacing24}
               justifyContent={JUSTIFY_SPACE_BETWEEN}
               alignItems={ALIGN_CENTER}
               paddingRight={SPACING.spacing24}
             >
-              <StyledText desktopStyle="headingSmallBold">
+              <StyledText
+                desktopStyle="headingSmallBold"
+                style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}
+              >
                 {protocolDisplayName}
               </StyledText>
               <Flex gridGap={SPACING.spacing8}>
@@ -207,7 +211,11 @@ export function ProtocolDetailsHeader({
               </StyledText>
             </Flex>
             {/* tag section */}
-            <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing4}>
+            <Flex
+              flexDirection={DIRECTION_ROW}
+              gap={SPACING.spacing4}
+              flexWrap={WRAP}
+            >
               <Tag
                 text={`${i18n.format(t('date_added'), 'titleCase')}:  ${format(
                   new Date(modified),
@@ -223,7 +231,7 @@ export function ProtocolDetailsHeader({
                 type="default"
               />
               <Tag text={creationMethod} type="default" />
-              <Tag text={`Author:${author}`} type="default" />
+              <Tag text={`Author: ${author}`} type="default" />
             </Flex>
           </Flex>
         </Flex>

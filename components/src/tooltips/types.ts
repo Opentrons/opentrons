@@ -54,7 +54,7 @@ export interface UseTooltipResultTooltipProps {
 
 export type UseTooltipResult = [
   UseTooltipResultTargetProps,
-  UseTooltipResultTooltipProps
+  UseTooltipResultTooltipProps,
 ]
 
 export type UseHoverTooltipOptions = Partial<
@@ -67,5 +67,5 @@ export interface UseHoverTooltipTargetProps
 
 export type UseHoverTooltipResult = [
   UseHoverTooltipTargetProps,
-  UseTooltipResultTooltipProps & { visible: boolean }
+  UseTooltipResultTooltipProps & { visible: boolean },
 ]

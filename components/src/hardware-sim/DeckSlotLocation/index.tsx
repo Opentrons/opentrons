@@ -20,7 +20,8 @@ interface LegacyDeckSlotLocationProps extends SVGProps<SVGGElement> {
   slotClipColor?: SVGProps<SVGPathElement>['stroke']
 }
 
-type AddressableAreaFromDeckDef = typeof ot2DeckDefV5.locations.addressableAreas[number]
+type AddressableAreaFromDeckDef =
+  (typeof ot2DeckDefV5.locations.addressableAreas)[number]
 
 // dimensions of the OT-2 fixed trash, not in deck definition
 export const OT2_FIXED_TRASH_X_DIMENSION = 172.86
@@ -32,13 +33,8 @@ export const OT2_FIXED_TRASH_Y_DIMENSION = 165.86
 export function LegacyDeckSlotLocation(
   props: LegacyDeckSlotLocationProps
 ): JSX.Element | null {
-  const {
-    robotType,
-    slotName,
-    slotBaseColor,
-    slotClipColor,
-    ...restProps
-  } = props
+  const { robotType, slotName, slotBaseColor, slotClipColor, ...restProps } =
+    props
 
   if (robotType !== OT2_ROBOT_TYPE) return null
 
@@ -54,7 +50,7 @@ export function LegacyDeckSlotLocation(
 
   const slotPosition = getPositionFromSlotId(
     slotName,
-    (ot2DeckDefV5 as unknown) as DeckDefinition
+    ot2DeckDefV5 as unknown as DeckDefinition
   )
 
   const isFixedTrash = slotName === 'fixedTrash'

@@ -42,19 +42,14 @@ export function SendProtocolToFlexSlideout(
   props: SendProtocolToFlexSlideoutProps
 ): JSX.Element | null {
   const { isExpanded, onCloseClick, storedProtocolData } = props
-  const {
-    protocolKey,
-    srcFileNames,
-    srcFiles,
-    mostRecentAnalysis,
-  } = storedProtocolData
+  const { protocolKey, srcFileNames, srcFiles, mostRecentAnalysis } =
+    storedProtocolData
   const { t } = useTranslation(['protocol_details', 'protocol_list'])
 
   const [selectedRobot, setSelectedRobot] = useState<Robot | null>(null)
 
-  const isSelectedRobotOnDifferentSoftwareVersion = useIsRobotOnWrongVersionOfSoftware(
-    selectedRobot?.name ?? ''
-  )
+  const isSelectedRobotOnDifferentSoftwareVersion =
+    useIsRobotOnWrongVersionOfSoftware(selectedRobot?.name ?? '')
 
   const { eatToast, makeToast } = useToaster()
 

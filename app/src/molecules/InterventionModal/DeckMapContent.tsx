@@ -151,9 +151,8 @@ export function LabwareHighlight({
   highlight: boolean
   definition: LabwareDefinition
 }): JSX.Element {
-  const { xDimension: width, yDimension: height } = getSchema2Dimensions(
-    definition
-  )
+  const { xDimension: width, yDimension: height } =
+    getSchema2Dimensions(definition)
   const cornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(definition)
 
   return (

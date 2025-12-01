@@ -39,12 +39,12 @@ export function ErrorContent({
               errorCode: errors[0].errorCode,
             })
           : runStatus === RUN_STATUS_SUCCEEDED
-          ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
-              count: errors.length,
-            })
-          : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
-              count: errors.length,
-            })}
+            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                count: errors.length,
+              })
+            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                count: errors.length,
+              })}
       </LegacyStyledText>
       <Flex css={ERROR_MESSAGE_STYLE}>
         {' '}

@@ -33,11 +33,8 @@ export const PipetteSettingsSlideout = (
     settings,
   } = props
   const { t } = useTranslation('device_details')
-  const {
-    updatePipetteSettings,
-    isLoading,
-    error,
-  } = useUpdatePipetteSettingsMutation(pipetteId, { onSuccess: onCloseClick })
+  const { updatePipetteSettings, isLoading, error } =
+    useUpdatePipetteSettingsMutation(pipetteId, { onSuccess: onCloseClick })
 
   const FORM_ID = `configurePipetteForm_${pipetteId}`
 

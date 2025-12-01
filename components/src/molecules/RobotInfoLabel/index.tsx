@@ -5,9 +5,11 @@ import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './robotinfolabel.module.css'
 
+import type { IconName } from '../../icons'
+
 export interface RobotInfoLabelProps {
   deckLabel?: string
-  iconName?: string
+  iconName?: IconName
   highlight?: boolean
   size?: 'large' | 'default'
   height?: string | number

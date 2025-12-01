@@ -6,14 +6,14 @@ import { OnOffToggle } from '/app/organisms/ODD/RobotSettingsDashboard'
 
 import styles from './preferences.module.css'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
+import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 
 export interface UsagePreferencesSettingsProps {
-  toggleLiveVideoEnabled: UseStubCameraUsageSettingsResult['toggleLiveVideoEnabled']
-  toggleRecoveryCaptureEnabled: UseStubCameraUsageSettingsResult['toggleRecoveryCaptureEnabled']
-  isLiveVideoEnabled: UseStubCameraUsageSettingsResult['isLiveVideoEnabled']
-  isRecoveryCaptureEnabled: UseStubCameraUsageSettingsResult['isRecoveryCaptureEnabled']
+  toggleLiveVideoEnabled: UseCameraUsageSettingsResult['toggleLiveVideoEnabled']
+  toggleRecoveryCaptureEnabled: UseCameraUsageSettingsResult['toggleRecoveryCaptureEnabled']
+  isLiveVideoEnabled: UseCameraUsageSettingsResult['isLiveVideoEnabled']
+  isRecoveryCaptureEnabled: UseCameraUsageSettingsResult['isRecoveryCaptureEnabled']
+  robotName: string
 }
 
 export function UsagePreferencesSettings({
@@ -23,7 +23,6 @@ export function UsagePreferencesSettings({
   toggleLiveVideoEnabled,
 }: UsagePreferencesSettingsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
   return (
     <div className={styles.usage_preferences_container}>
       <StyledText oddStyle="level4HeaderSemiBold">
@@ -43,7 +42,7 @@ export function UsagePreferencesSettings({
               className={styles.usage_subtext}
               oddStyle="level4HeaderRegular"
             >
-              {t('live_video_description')}
+              {t('branded:live_video_description_odd')}
             </StyledText>
           </div>
           <OnOffToggle isOn={isLiveVideoEnabled} />

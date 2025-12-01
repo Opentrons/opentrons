@@ -47,8 +47,8 @@ export function generatePromptPreviewApplicationItems(
     scientificApplication === OTHER
       ? otherApplication
       : scientificApplication !== ''
-      ? t(scientificApplication)
-      : ''
+        ? t(scientificApplication)
+        : ''
 
   return [
     scientificOrOtherApplication !== '' && scientificOrOtherApplication,
@@ -370,8 +370,8 @@ export function generateChatPrompt(
             : '',
         ].filter(Boolean)
       : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
-      ? [values.instruments.ninetySixChannelPipette]
-      : [values.instruments.pipettes]
+        ? [values.instruments.ninetySixChannelPipette]
+        : [values.instruments.pipettes]
 
   const pipetteMounts =
     values.instruments.pipettes === TWO_PIPETTES
@@ -384,8 +384,8 @@ export function generateChatPrompt(
           .filter(Boolean)
           .join('\n')
       : values.instruments.pipettes === NINETY_SIX_CHANNEL_PIPETTE
-      ? `- ${t(values.instruments.ninetySixChannelPipette)}`
-      : `- ${t(values.instruments.pipettes)}`
+        ? `- ${t(values.instruments.ninetySixChannelPipette)}`
+        : `- ${t(values.instruments.pipettes)}`
   const flexGripper =
     values.instruments.flexGripper === FLEX_GRIPPER &&
     values.instruments.robot === OPENTRONS_FLEX

@@ -366,6 +366,8 @@
         "label": "Tip tracking",
         "manual": {
           "description": {
+            "has_tips_one": "{{count}} pickup selected",
+            "has_tips_multiple": "{{count}} pickups selected",
             "no_tips": "No tips selected"
           },
           "title": "Select tips for manual tip tracking"

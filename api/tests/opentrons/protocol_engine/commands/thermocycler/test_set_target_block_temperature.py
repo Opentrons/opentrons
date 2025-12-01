@@ -8,9 +8,9 @@ from opentrons.protocol_engine.state.module_substates import (
     ThermocyclerModuleSubState,
     ThermocyclerModuleId,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.actions import ActionDispatcher, Action, StartTaskAction
-from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.set_target_block_temperature import (
@@ -50,10 +50,10 @@ async def test_set_target_block_temperature(
     decoy.when(
         state_view.modules.get_thermocycler_module_substate("input-thermocycler-id")
     ).then_return(tc_module_substate)
-    decoy.when(model_utils.ensure_id("taskId")).then_return("taskId")
     decoy.when(tc_module_substate.module_id).then_return(
         ThermocyclerModuleId("thermocycler-id")
     )
+    decoy.when(model_utils.ensure_id("taskId")).then_return("taskId")
 
     # Stub temperature validation from TC module view
     decoy.when(tc_module_substate.validate_target_block_temperature(12.3)).then_return(
@@ -88,8 +88,8 @@ async def test_set_target_block_temperature(
     decoy.verify(
         await tc_hardware.set_target_block_temperature(
             celsius=45.6,
-            volume=77.6,
             hold_time_seconds=654321,
+            volume=77.6,
             ramp_rate=None,
         ),
     )

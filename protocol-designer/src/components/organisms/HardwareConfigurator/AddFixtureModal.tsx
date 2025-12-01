@@ -130,9 +130,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     ? 'moduleOptions'
     : 'modulesOrFixtures'
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
   // Bind allFixtureOptions with useEffect
   const [allFixtureOptions, setAllFixtureOptions] = useState<
     CutoutConfigMap[][]
@@ -306,7 +305,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
                 : getSlotFromAddressableAreaName(
                     newModule.addressableAreaId as AddressableAreaName
                   ),
-            cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
+            cutoutFixtureId:
+              newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
             cutoutId: newModule.cutoutId,
           },
         }

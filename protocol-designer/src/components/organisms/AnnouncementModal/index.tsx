@@ -37,9 +37,8 @@ export const AnnouncementModal = (
   const { i18n, t } = useTranslation(['modal', 'button'])
   const announcements = useAnnouncements()
 
-  const { announcementKey, message, heading, image } = announcements[
-    announcements.length - 1
-  ]
+  const { announcementKey, message, heading, image } =
+    announcements[announcements.length - 1]
 
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey

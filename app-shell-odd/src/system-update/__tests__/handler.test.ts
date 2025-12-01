@@ -62,7 +62,7 @@ describe('update driver manager', () => {
   it('creates a driver once config is loaded', () => {
     when(getConfig)
       .calledWith('update')
-      .thenReturn(({ channel: 'alpha' } as any) as Cfg.Config['update'])
+      .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
     const driver = manageDriver(dispatch)
     expect(driver.getUpdateDriver()).toBeNull()
     expect(getConfig).not.toHaveBeenCalled()
@@ -85,7 +85,7 @@ describe('update driver manager', () => {
   it('reloads the web driver when appropriate', () => {
     when(getConfig)
       .calledWith('update')
-      .thenReturn(({ channel: 'alpha' } as any) as Cfg.Config['update'])
+      .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
     const fakeProvider = {
       teardown: vi.fn(),
       refreshUpdateCache: vi.fn(),
@@ -93,11 +93,11 @@ describe('update driver manager', () => {
       lockUpdateCache: vi.fn(),
       unlockUpdateCache: vi.fn(),
       name: vi.fn(),
-      source: () => (({ channel: 'alpha' } as any) as WebUpdateSource),
+      source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
     }
     const fakeProvider2 = {
       ...fakeProvider,
-      source: () => (({ channel: 'beta' } as any) as WebUpdateSource),
+      source: () => ({ channel: 'beta' }) as any as WebUpdateSource,
     }
     when(getWebProvider)
       .calledWith({
@@ -137,9 +137,9 @@ describe('update driver manager', () => {
         expect(getWebProvider).toHaveBeenCalledOnce()
         when(getConfig)
           .calledWith('update')
-          .thenReturn(({
+          .thenReturn({
             channel: 'beta',
-          } as any) as Cfg.Config['update'])
+          } as any as Cfg.Config['update'])
         return driverManager.handleAction({
           type: VALUE_UPDATED,
         } as ConfigValueUpdatedAction)
@@ -166,7 +166,7 @@ describe('update driver', () => {
     lockUpdateCache: vi.fn(),
     unlockUpdateCache: vi.fn(),
     name: vi.fn(),
-    source: () => (({ channel: 'alpha' } as any) as WebUpdateSource),
+    source: () => ({ channel: 'alpha' }) as any as WebUpdateSource,
   }
   const fakeUsbProviders: Record<string, UpdateProvider<USBUpdateSource>> = {
     first: {
@@ -177,9 +177,9 @@ describe('update driver', () => {
       unlockUpdateCache: vi.fn(),
       name: () => '/some/usb/path',
       source: () =>
-        (({
+        ({
           massStorageRootPath: '/some/usb/path',
-        } as any) as USBUpdateSource),
+        }) as any as USBUpdateSource,
     },
   }
 
@@ -190,7 +190,7 @@ describe('update driver', () => {
     when(getSystemUpdateDir).calledWith().thenReturn(thisTd)
     when(getConfig)
       .calledWith('update')
-      .thenReturn(({ channel: 'alpha' } as any) as Cfg.Config['update'])
+      .thenReturn({ channel: 'alpha' } as any as Cfg.Config['update'])
     when(getWebProvider)
       .calledWith({
         manifestUrl: FLEX_MANIFEST_URL,
@@ -207,9 +207,9 @@ describe('update driver', () => {
       unlockUpdateCache: vi.fn(),
       name: () => '/some/usb/path',
       source: () =>
-        (({
+        ({
           massStorageRootPath: '/some/usb/path',
-        } as any) as USBUpdateSource),
+        }) as any as USBUpdateSource,
     }
     fakeUsbProviders.second = {
       teardown: vi.fn(),
@@ -219,9 +219,9 @@ describe('update driver', () => {
       unlockUpdateCache: vi.fn(),
       name: () => '/some/other/usb/path',
       source: () =>
-        (({
+        ({
           massStorageRootPath: '/some/other/usb/path',
-        } as any) as USBUpdateSource),
+        }) as any as USBUpdateSource,
     }
     subject = createUpdateDriver(dispatch)
   })
@@ -240,7 +240,7 @@ describe('update driver', () => {
   })
 
   it('checks updates when told to check updates', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(fakeProvider.refreshUpdateCache)
       .calledWith(expect.any(Function))
       .thenDo(
@@ -279,7 +279,7 @@ describe('update driver', () => {
       })
   })
   it('forwards in-progress downloads when no USB updates are present', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(fakeProvider.refreshUpdateCache)
       .calledWith(expect.any(Function))
       .thenDo(
@@ -363,7 +363,7 @@ describe('update driver', () => {
       })
   })
   it('creates a usb provider when it gets a message that a usb device was added', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -397,7 +397,7 @@ describe('update driver', () => {
       })
   })
   it('does not create a usb provider if it already has one for a path', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -485,7 +485,7 @@ describe('update driver', () => {
       })
   })
   it('tears down a usb provider when it is removed', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -528,7 +528,7 @@ describe('update driver', () => {
       })
   })
   it('re-adds a usb provider if it is inserted after being removed', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -582,7 +582,7 @@ describe('update driver', () => {
       })
   })
   it('prefers usb updates to web updates', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,
@@ -658,7 +658,7 @@ describe('update driver', () => {
       })
   })
   it('selects the highest version usb update', () => {
-    const thisSubject = subject as UpdateDriver
+    const thisSubject = subject!
     when(getUsbProvider)
       .calledWith({
         currentVersion: CURRENT_SYSTEM_VERSION,

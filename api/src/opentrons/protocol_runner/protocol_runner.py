@@ -24,7 +24,7 @@ from opentrons.protocol_engine import (
     Command,
     commands as pe_commands,
 )
-from opentrons.protocol_engine.types import CommandAnnotation
+from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
 from opentrons.protocols.parse import PythonParseMode
 from opentrons.util.async_helpers import asyncio_yield
 from opentrons.util.broker import Broker
@@ -58,6 +58,7 @@ class RunResult(NamedTuple):
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
     command_annotations: List[CommandAnnotation]
+    command_preconditions: Optional[CommandPreconditions]
 
 
 class AbstractRunner(ABC):
@@ -284,11 +285,15 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
+        preconditions = (
+            self._protocol_engine.state_view.preconditions.get_precondition()
+        )
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=parameters,
             command_annotations=[],
+            command_preconditions=preconditions,
         )
 
 
@@ -403,11 +408,15 @@ class JsonRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
+        preconditions = (
+            self._protocol_engine.state_view.preconditions.get_precondition()
+        )
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=[],
             command_annotations=self._command_annotations,
+            command_preconditions=preconditions,
         )
 
     async def _add_and_execute_commands(self) -> None:
@@ -479,11 +488,15 @@ class LiveRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
+        preconditions = (
+            self._protocol_engine.state_view.preconditions.get_precondition()
+        )
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=[],
             command_annotations=[],
+            command_preconditions=preconditions,
         )
 
 

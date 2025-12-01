@@ -27,14 +27,10 @@ interface AspirateProps {
 export function Aspirate(props: AspirateProps): JSX.Element | null {
   const { state, dispatch, isMultiTransfer } = props
   const { t } = useTranslation(['quick_transfer', 'shared'])
-  const [
-    selectedSetting,
-    setSelectedSetting,
-  ] = useState<AspirateSettingOption | null>(null)
-  const [
-    showResetAdvancedSettingsModal,
-    setShowResetAdvancedSettingsModal,
-  ] = useState<boolean>(false)
+  const [selectedSetting, setSelectedSetting] =
+    useState<AspirateSettingOption | null>(null)
+  const [showResetAdvancedSettingsModal, setShowResetAdvancedSettingsModal] =
+    useState<boolean>(false)
 
   const aspirateSettingsItems = useAspirateSettingsConfig({
     state,

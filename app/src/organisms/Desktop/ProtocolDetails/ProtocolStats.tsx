@@ -56,11 +56,12 @@ export const ProtocolStats = (
   )
   const pipettePickUpStats = Object.entries(pickUpTipCountsByPipetteId).map(
     ([pipetteId, pickUpCount]) => {
-      const pipetteName = analysis.pipettes.find(p => p.id === pipetteId)
-        ?.pipetteName
+      const pipetteName = analysis.pipettes.find(
+        p => p.id === pipetteId
+      )?.pipetteName
       const displayName =
         pipetteName != null
-          ? getPipetteNameSpecs(pipetteName)?.displayName ?? pipetteName
+          ? (getPipetteNameSpecs(pipetteName)?.displayName ?? pipetteName)
           : pipetteId
       return {
         displayName: t('pipette_pick_up_count', { pipette: displayName }),
@@ -81,11 +82,12 @@ export const ProtocolStats = (
   )
   const pipetteAspirateStats = Object.entries(aspirateCountsByPipetteId).map(
     ([pipetteId, pickUpCount]) => {
-      const pipetteName = analysis.pipettes.find(p => p.id === pipetteId)
-        ?.pipetteName
+      const pipetteName = analysis.pipettes.find(
+        p => p.id === pipetteId
+      )?.pipetteName
       const displayName =
         pipetteName != null
-          ? getPipetteNameSpecs(pipetteName)?.displayName ?? pipetteName
+          ? (getPipetteNameSpecs(pipetteName)?.displayName ?? pipetteName)
           : pipetteId
       return {
         displayName: t('pipette_aspirate_count', { pipette: displayName }),
@@ -106,11 +108,12 @@ export const ProtocolStats = (
   )
   const pipetteDispenseStats = Object.entries(dispenseCountsByPipetteId).map(
     ([pipetteId, pickUpCount]) => {
-      const pipetteName = analysis.pipettes.find(p => p.id === pipetteId)
-        ?.pipetteName
+      const pipetteName = analysis.pipettes.find(
+        p => p.id === pipetteId
+      )?.pipetteName
       const displayName =
         pipetteName != null
-          ? getPipetteNameSpecs(pipetteName)?.displayName ?? pipetteName
+          ? (getPipetteNameSpecs(pipetteName)?.displayName ?? pipetteName)
           : pipetteId
       return {
         displayName: t('pipette_dispense_count', { pipette: displayName }),

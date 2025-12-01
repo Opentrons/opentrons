@@ -2,13 +2,17 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useRobotType } from '/app/redux-resources/robots'
 
 import { SetupRunCameraUsage } from '../SetupRunCameraSettings'
 
-import type { UseStubCameraUsageSettingsResult } from '/app/organisms/Desktop/Devices/RobotSettings/RobotSettingsCamera/hooks/useStubCameraUsageSettings'
 import type { SetupCameraProps } from '../SetupRunCameraSettings'
+
+vi.mock('/app/redux-resources/robots')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupRunCameraUsage {...props} />, {
@@ -17,21 +21,18 @@ const render = (props: SetupCameraProps) => {
 }
 
 describe('SetupRunCameraUsage', () => {
-  let mockSettings: UseStubCameraUsageSettingsResult
   let mockProps: SetupCameraProps
 
   beforeEach(() => {
-    mockSettings = {
-      toggleCameraEnabled: vi.fn(),
-      isCameraEnabled: true,
-      toggleLiveVideoEnabled: vi.fn(),
-      isLiveVideoEnabled: true,
-      toggleRecoveryCaptureEnabled: vi.fn(),
-      isRecoveryCaptureEnabled: true,
-    }
     mockProps = {
-      settings: mockSettings,
+      liveStreamEnabled: true,
+      recoveryEnabled: true,
+      cameraConfirmed: false,
+      toggleLiveStreamEnabled: vi.fn(),
+      toggleRecoveryEnabled: vi.fn(),
+      robotName: 'MOCK-NAME',
     }
+    vi.mocked(useRobotType).mockReturnValue(FLEX_ROBOT_TYPE)
   })
 
   it('renders usage settings header', () => {
@@ -43,18 +44,30 @@ describe('SetupRunCameraUsage', () => {
   it('renders live video setting card', () => {
     render(mockProps)
 
-    screen.getByText('Live Video')
+    screen.getByText('Live video')
     screen.getByText(
       'View real-time video of the deck while a running a protocol.'
     )
   })
 
+  it('does not render live video card if the robot is an OT-2', () => {
+    vi.mocked(useRobotType).mockReturnValue(OT2_ROBOT_TYPE)
+    render(mockProps)
+
+    expect(screen.queryByText('Live Video')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        'View real-time video of the deck while a running a protocol.'
+      )
+    ).not.toBeInTheDocument()
+  })
+
   it('renders error recovery setting card', () => {
     render(mockProps)
 
-    screen.getByText('Error Recovery')
+    screen.getByText('Error image capture')
     screen.getByText(
-      'Automatically capture an image of the deck if an error occurs.'
+      'Automatically capture an image of the deck in the event of an error.'
     )
   })
 
@@ -72,7 +85,7 @@ describe('SetupRunCameraUsage', () => {
     const toggleButtons = screen.getAllByRole('switch')
     await user.click(toggleButtons[0])
 
-    expect(mockSettings.toggleLiveVideoEnabled).toHaveBeenCalledTimes(1)
+    expect(mockProps.toggleLiveStreamEnabled).toHaveBeenCalledTimes(1)
   })
 
   it('calls toggleRecoveryCaptureEnabled when recovery capture toggle is clicked', async () => {
@@ -82,6 +95,6 @@ describe('SetupRunCameraUsage', () => {
     const toggleButtons = screen.getAllByRole('switch')
     await user.click(toggleButtons[1])
 
-    expect(mockSettings.toggleRecoveryCaptureEnabled).toHaveBeenCalledTimes(1)
+    expect(mockProps.toggleRecoveryEnabled).toHaveBeenCalledTimes(1)
   })
 })

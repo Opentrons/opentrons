@@ -85,12 +85,10 @@ function TouchscreenModal({
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
 
-  const {
-    handlePlaceReaderLid,
-    isValidPlateReaderMove,
-  } = usePlacePlateReaderLid({
-    onSettled: closeModal,
-  })
+  const { handlePlaceReaderLid, isValidPlateReaderMove } =
+    usePlacePlateReaderLid({
+      onSettled: closeModal,
+    })
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
@@ -159,12 +157,10 @@ function DesktopModal({
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
-  const {
-    handlePlaceReaderLid,
-    isValidPlateReaderMove,
-  } = usePlacePlateReaderLid({
-    onSettled: closeModal,
-  })
+  const { handlePlaceReaderLid, isValidPlateReaderMove } =
+    usePlacePlateReaderLid({
+      onSettled: closeModal,
+    })
 
   const modalProps: ModalProps = {
     type: 'error',

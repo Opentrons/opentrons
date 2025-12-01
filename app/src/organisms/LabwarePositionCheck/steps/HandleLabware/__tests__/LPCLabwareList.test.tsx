@@ -102,20 +102,16 @@ describe('LPCLabwareList', () => {
       type: 'PROCEED_EDIT_OFFSET_SUBSTEP',
     } as any)
 
-    vi.mocked(
-      selectStepInfo
-    ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
-
-    vi.mocked(
-      selectIsDefaultOffsetAbsent
-    ).mockImplementation((runId: string, uri: string) => (state: any) =>
-      uri === 'labware-uri-1'
+    vi.mocked(selectStepInfo).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.steps
     )
 
-    vi.mocked(
-      selectIsNecessaryDefaultOffsetMissing
-    ).mockImplementation((runId: string, uri: string) => (state: any) =>
-      uri === 'labware-uri-1'
+    vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(
+      (runId: string, uri: string) => (state: any) => uri === 'labware-uri-1'
+    )
+
+    vi.mocked(selectIsNecessaryDefaultOffsetMissing).mockImplementation(
+      (runId: string, uri: string) => (state: any) => uri === 'labware-uri-1'
     )
 
     vi.mocked(selectAllLabwareInfoAndDefaultStatusSorted).mockImplementation(
@@ -163,12 +159,12 @@ describe('LPCLabwareList', () => {
   })
 
   it('shows correct offset message for labware with one offset', () => {
-    vi.mocked(
-      selectIsDefaultOffsetAbsent
-    ).mockImplementation((runId: any, uri: any) => (state: any) => false)
-    vi.mocked(
-      selectIsNecessaryDefaultOffsetMissing
-    ).mockImplementation((runId: any, uri: any) => (state: any) => false)
+    vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(
+      (runId: any, uri: any) => (state: any) => false
+    )
+    vi.mocked(selectIsNecessaryDefaultOffsetMissing).mockImplementation(
+      (runId: any, uri: any) => (state: any) => false
+    )
 
     render(props)
 

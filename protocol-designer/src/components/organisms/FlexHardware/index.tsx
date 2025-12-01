@@ -99,7 +99,8 @@ export function FlexHardware(): JSX.Element {
         return acc
       }
       if (hasStagingAreaAndWasteChute && fixture.name === 'wasteChute') {
-        cutoutFixtureId = STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+        cutoutFixtureId =
+          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
       } else if (fixture.name === 'stagingArea') {
         cutoutFixtureId = STAGING_AREA_RIGHT_SLOT_FIXTURE
       } else if (fixture.name === 'wasteChute') {

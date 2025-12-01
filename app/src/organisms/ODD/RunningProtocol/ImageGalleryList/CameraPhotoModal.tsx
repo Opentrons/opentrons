@@ -8,7 +8,7 @@ import type { OddModalHeaderBaseProps } from '/app/molecules/OddModal/types'
 
 export interface CameraPhotoModalProps {
   imagePath: string
-  stepCommandText: string
+  stepCountStr: string
   timestamp: string
 }
 
@@ -19,7 +19,7 @@ export const handleCameraPhotoModal = (
 const CameraPhotoModal = NiceModal.create(
   ({
     imagePath,
-    stepCommandText,
+    stepCountStr,
     timestamp,
   }: CameraPhotoModalProps): JSX.Element => {
     const { t } = useTranslation('run_details')
@@ -31,7 +31,7 @@ const CameraPhotoModal = NiceModal.create(
 
     const headerProps: OddModalHeaderBaseProps = {
       title: t('image_at_step_at_timestamp', {
-        step: stepCommandText,
+        step: stepCountStr,
         timestamp,
       }),
       onClick,

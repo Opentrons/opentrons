@@ -30,7 +30,11 @@ export const commandCreatorFromStepArgs = (
         args
       )
     }
-
+    case 'captureImage':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.captureImage,
+        args
+      )
     case 'engageMagnet':
       return StepGeneration.curryCommandCreator(
         StepGeneration.engageMagnet,

@@ -41,7 +41,7 @@ export function getRobotUpdateTargetForRobot(
 
 export function getRobotUpdateForced(state: State, robotName: string): boolean {
   const target = getRobotUpdateTarget(state, robotName)
-  return target ? state.robotUpdate[target]?.force ?? false : false
+  return target ? (state.robotUpdate[target]?.force ?? false) : false
 }
 
 export function getRobotUpdateVersion(
@@ -49,7 +49,7 @@ export function getRobotUpdateVersion(
   robotName: string
 ): string | null {
   const target = getRobotUpdateTarget(state, robotName)
-  return target ? state.robotUpdate[target]?.version ?? null : null
+  return target ? (state.robotUpdate[target]?.version ?? null) : null
 }
 
 export const getRobotUpdateInfo: (
@@ -134,27 +134,26 @@ export function getRobotSessionIsManualFile(state: State): boolean | null {
   return state.robotUpdate.session?.fileInfo?.isManualFile ?? null
 }
 
-export const getRobotUpdateRobot: (
-  state: State
-) => ViewableRobot | null = createSelector(
-  getViewableRobots,
-  getRobotUpdateSessionRobotName,
-  (robots, robotName) => {
-    if (robotName === null) return null
+export const getRobotUpdateRobot: (state: State) => ViewableRobot | null =
+  createSelector(
+    getViewableRobots,
+    getRobotUpdateSessionRobotName,
+    (robots, robotName) => {
+      if (robotName === null) return null
 
-    return (
-      robots.find(robot => {
-        const searchName =
-          robot.serverHealth?.capabilities?.buildrootUpdate != null ||
-          robot.serverHealth?.capabilities?.systemUpdate != null
-            ? robotName.replace(/^opentrons-/, '')
-            : robotName
+      return (
+        robots.find(robot => {
+          const searchName =
+            robot.serverHealth?.capabilities?.buildrootUpdate != null ||
+            robot.serverHealth?.capabilities?.systemUpdate != null
+              ? robotName.replace(/^opentrons-/, '')
+              : robotName
 
-        return robot.name === searchName
-      }) || null
-    )
-  }
-)
+          return robot.name === searchName
+        }) || null
+      )
+    }
+  )
 
 const getRobotUpdateType = (
   currentVersion: string | null,

@@ -15,19 +15,18 @@ export const isTimeFormatMinutesSeconds: ErrorChecker = (
     ? null
     : 'Must be a valid time (mm:ss)'
 }
-export const minFieldValue = (minimum: number): ErrorChecker => (
-  value: unknown
-): string | null =>
-  !value || Number(value) >= minimum ? null : `Min is ${minimum}`
-export const maxFieldValue = (maximum: number): ErrorChecker => (
-  value: unknown
-): string | null =>
-  !value || Number(value) <= maximum ? null : `Max is ${maximum}`
+export const minFieldValue =
+  (minimum: number): ErrorChecker =>
+  (value: unknown): string | null =>
+    !value || Number(value) >= minimum ? null : `Min is ${minimum}`
+export const maxFieldValue =
+  (maximum: number): ErrorChecker =>
+  (value: unknown): string | null =>
+    !value || Number(value) <= maximum ? null : `Max is ${maximum}`
 
-export const enterValueWithinRange = (
-  minimum: number,
-  maximum: number
-): ErrorChecker => (value: unknown): string | null =>
-  !value || (Number(value) <= maximum && Number(value) >= minimum)
-    ? null
-    : 'Enter a value within the specified range'
+export const enterValueWithinRange =
+  (minimum: number, maximum: number): ErrorChecker =>
+  (value: unknown): string | null =>
+    !value || (Number(value) <= maximum && Number(value) >= minimum)
+      ? null
+      : 'Enter a value within the specified range'

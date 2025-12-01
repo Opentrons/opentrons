@@ -32,8 +32,10 @@ type FlexReleaseComponent =
   | 'openembedded'
 type OT2ReleaseComponent = ReleaseComponent | 'buildroot'
 
-type FlexReleaseComponentVersions = `${FlexReleaseComponent}_${ComponentVersionKind}`
-type OT2ReleaseComponentVersions = `${OT2ReleaseComponent}_${ComponentVersionKind}`
+type FlexReleaseComponentVersions =
+  `${FlexReleaseComponent}_${ComponentVersionKind}`
+type OT2ReleaseComponentVersions =
+  `${OT2ReleaseComponent}_${ComponentVersionKind}`
 export type OT2VersionInfo = Record<
   'build_type' | OT2ReleaseComponentVersions | 'robot_type',
   string

@@ -50,14 +50,14 @@ const BODY_STYLE = css`
 `
 interface PipetteOffsetCalibrationItemsProps {
   robotName: string
+  isRobotBusy: boolean
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function PipetteOffsetCalibrationItems({
   robotName,
+  isRobotBusy,
   formattedPipetteOffsetCalibrations,
-  updateRobotStatus,
 }: PipetteOffsetCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -65,7 +65,8 @@ export function PipetteOffsetCalibrationItems({
     return getCustomLabwareDefinitions(state)
   })
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
-  const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipetteFromInstrumentQuery =
+    useAttachedPipettesFromInstrumentsQuery()
   const isFlex = useIsFlex(robotName)
   const attachedPipettes = isFlex
     ? attachedPipetteFromInstrumentQuery
@@ -146,15 +147,15 @@ export function PipetteOffsetCalibrationItems({
                   <OverflowMenu
                     calType="pipetteOffset"
                     robotName={robotName}
+                    isRobotBusy={isRobotBusy}
                     mount={calibration.mount}
                     serialNumber={calibration.serialNumber ?? null}
-                    updateRobotStatus={updateRobotStatus}
                     pipetteName={
                       isFlex
-                        ? attachedPipetteFromInstrumentQuery[calibration.mount]
-                            ?.instrumentName ?? null
-                        : attachedPipettesFromPipetteQuery[calibration.mount]
-                            ?.name ?? null
+                        ? (attachedPipetteFromInstrumentQuery[calibration.mount]
+                            ?.instrumentName ?? null)
+                        : (attachedPipettesFromPipetteQuery[calibration.mount]
+                            ?.name ?? null)
                     }
                   />
                 </StyledTableCell>

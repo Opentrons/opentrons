@@ -61,7 +61,7 @@ export function getHardwareInSlotInUse(
     moduleId: isModuleInUse ? moduleOnDeck.id : null,
     fixtureIds: isFixtureInUse ? fixtureIds : null,
     fourthColumnSlotLabwareId: isLabwareInUse
-      ? matchingLabwareFor4thColumn?.id ?? null
+      ? (matchingLabwareFor4thColumn?.id ?? null)
       : null,
   }
 }

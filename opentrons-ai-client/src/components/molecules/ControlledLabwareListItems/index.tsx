@@ -44,7 +44,7 @@ export function ControlledLabwareListItems(): JSX.Element | null {
                   name: `${labware.count}`,
                   value: `${labware.count}`,
                 },
-                title: (null as unknown) as string,
+                title: null as unknown as string,
                 onClick: (value: string) => {
                   field.onChange(
                     labwares.map(lw =>

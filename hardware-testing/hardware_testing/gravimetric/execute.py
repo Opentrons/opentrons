@@ -435,8 +435,11 @@ def build_gm_report(
 ) -> report.CSVReport:
     """Build a CSVReport formated for gravimetric tests."""
     ui.print_header("CREATE TEST-REPORT")
+    channels = [0]
+    if pipette_channels == 8 and not increment:
+        channels = [i for i in range(8)]
     test_report = report.create_csv_test_report(
-        test_volumes, pipette_channels, increment, trials, name, run_id=run_id
+        test_volumes, channels, trials, name, run_id=run_id
     )
     test_report.set_tag(pipette_tag)
     test_report.set_operator(operator_name)

@@ -286,21 +286,21 @@ export const statusPollEpic: Epic = (action$, state$) => {
 }
 
 // filter for an active session with given properties
-const passActiveSession = (props: Partial<RobotUpdateSession>) => (
-  state: State
-): boolean => {
-  const robot = getRobotUpdateRobot(state)
-  const session = getRobotUpdateSession(state)
+const passActiveSession =
+  (props: Partial<RobotUpdateSession>) =>
+  (state: State): boolean => {
+    const robot = getRobotUpdateRobot(state)
+    const session = getRobotUpdateSession(state)
 
-  return (
-    robot !== null &&
-    session?.error == null &&
-    every(
-      props,
-      (value, key) => session?.[key as keyof RobotUpdateSession] === value
+    return (
+      robot !== null &&
+      session?.error == null &&
+      every(
+        props,
+        (value, key) => session?.[key as keyof RobotUpdateSession] === value
+      )
     )
-  )
-}
+  }
 
 // upload the update file to the robot when it switches to `awaiting-file`
 export const uploadFileEpic: Epic = (_, state$) => {

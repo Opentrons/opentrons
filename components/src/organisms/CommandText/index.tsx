@@ -14,14 +14,16 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { StyleProps } from '../../primitives'
-import type { CommandTextData } from '../ProtocolTimelineScrubber/types'
 import type {
+  CommandTextData,
   GetTCRunExtendedProfileCommandTextResult,
   GetTCRunProfileCommandTextResult,
   GetTCStartRunExtendedProfileCommandTextResult,
 } from './useCommandTextString'
 
 export * from './useCommandTextString'
+export * from './getCommandData'
+
 interface LegacySTProps {
   as?: ComponentProps<typeof LegacyStyledText>['as']
   modernStyledTextDefaults?: false
@@ -164,7 +166,7 @@ function ThermocyclerRunProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText
@@ -231,7 +233,7 @@ function ThermocyclerRunExtendedProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText
@@ -321,7 +323,7 @@ function ThermocyclerStartRunExtendedProfile(
       css={`
         @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
           display: flex !important;
-        } ;
+        }
       `}
     >
       <CommandStyledText

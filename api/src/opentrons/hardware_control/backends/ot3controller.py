@@ -49,6 +49,7 @@ from .ot3utils import (
     gripper_jaw_state_from_fw,
     get_system_constraints,
     get_system_constraints_for_plunger_acceleration,
+    add_delay_to_move_group,
 )
 from .tip_presence_manager import TipPresenceManager
 
@@ -658,11 +659,17 @@ class OT3Controller(FlexBackend):
         speed: float,
         stop_condition: HWStopCondition,
         nodes_in_moves_only: bool,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> Tuple[Optional[MoveGroupRunner], bool]:
         if not target:
             return None, False
-        move_target = MoveTarget.build(position=target, max_speed=speed)
+        # Create a target that doesn't incorporate the plunger into a joint axis with the gantry
+        plunger_axes = [Axis.P_L, Axis.P_R]
+
         try:
+            move_target = self._move_manager.devectorize_axes(
+                origin, target, speed, plunger_axes
+            )
             _, movelist = self._move_manager.plan_motion(
                 origin=origin, target_list=[move_target]
             )
@@ -684,6 +691,28 @@ class OT3Controller(FlexBackend):
         move_group, _ = create_move_group(
             origin, moves, ordered_nodes, MoveStopCondition[stop_condition.name]
         )
+
+        if delay is not None:
+            delay_axes, delay_time = delay
+            delay_nodes = [axis_to_node(ax) for ax in delay_axes]
+            move_group = add_delay_to_move_group(
+                move_group, ordered_nodes, (delay_nodes, delay_time)
+            )
+
+        (
+            plunger_slowed,
+            error_str,
+        ) = self._move_manager.ensure_pipette_flow_rate_unchanged(
+            [node_to_axis(node) for node in ordered_nodes],
+            origin,
+            target,
+            speed,
+            move_group,
+            [(ax, axis_to_node(ax)) for ax in plunger_axes],
+        )
+        if plunger_slowed:
+            log.error(error_str)
+
         return (
             MoveGroupRunner(
                 move_groups=[move_group],
@@ -729,6 +758,7 @@ class OT3Controller(FlexBackend):
         speed: float,
         stop_condition: HWStopCondition = HWStopCondition.none,
         nodes_in_moves_only: bool = True,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> None:
         """Move to a position.
 
@@ -751,7 +781,7 @@ class OT3Controller(FlexBackend):
 
         maybe_runners = (
             self._build_move_node_axis_runner(
-                origin, target, speed, stop_condition, nodes_in_moves_only
+                origin, target, speed, stop_condition, nodes_in_moves_only, delay
             ),
             self._build_move_gear_axis_runner(
                 possible_q_axis_origin,

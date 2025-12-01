@@ -51,10 +51,8 @@ export function WifiConnectionDetails({
   const subnetMask = wifi?.subnetMask != null ? wifi.subnetMask : noData
   const macAddress = wifi?.macAddress != null ? wifi.macAddress : noData
 
-  const [
-    showNetworkDetailsModal,
-    setShowNetworkDetailsModal,
-  ] = useState<boolean>(false)
+  const [showNetworkDetailsModal, setShowNetworkDetailsModal] =
+    useState<boolean>(false)
 
   useEffect(() => {
     dispatch(fetchStatus(robotName))

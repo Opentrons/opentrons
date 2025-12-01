@@ -73,15 +73,12 @@ export const FlexTrash = ({
   const [x = 0, y = 0] = trashCutout?.position ?? []
 
   // a standard addressable area slot bounding box dimension
-  const {
-    xDimension: slotXDimension = 0,
-    yDimension: slotYDimension = 0,
-  } = deckDefinition.locations.addressableAreas[0].boundingBox
+  const { xDimension: slotXDimension = 0, yDimension: slotYDimension = 0 } =
+    deckDefinition.locations.addressableAreas[0].boundingBox
 
   // adjust for dimensions from trash definition
-  const { x: xAdjustment, y: yAdjustment } = getSchema2CornerOffsetFromSlot(
-    trashLabwareDef
-  )
+  const { x: xAdjustment, y: yAdjustment } =
+    getSchema2CornerOffsetFromSlot(trashLabwareDef)
   const { xDimension, yDimension } = getSchema2Dimensions(trashLabwareDef)
 
   // rotate trash 180 degrees in column 1

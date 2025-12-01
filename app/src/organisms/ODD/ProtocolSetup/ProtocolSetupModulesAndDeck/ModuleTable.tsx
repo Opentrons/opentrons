@@ -40,9 +40,10 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
     deckConfigCompatibility,
   } = props
 
-  const attachedProtocolModuleMatchesSortedBySlotName = attachedProtocolModuleMatches.sort(
-    (a, b) => a.slotName.localeCompare(b.slotName)
-  )
+  const attachedProtocolModuleMatchesSortedBySlotName =
+    attachedProtocolModuleMatches.sort((a, b) =>
+      a.slotName.localeCompare(b.slotName)
+    )
 
   const { data: deckConfig } = useNotifyDeckConfigurationQuery({
     refetchInterval: DECK_CONFIG_REFETCH_INTERVAL,
@@ -87,9 +88,9 @@ export function ModuleTable(props: ModuleTableProps): JSX.Element {
                   comboFixtureId={comboFixtureId}
                   conflictedFixture={
                     comboFixtureConflict
-                      ? deckConfigCompatibility.find(
+                      ? (deckConfigCompatibility.find(
                           configItem => configItem.cutoutId === 'cutoutD3'
-                        ) ?? null
+                        ) ?? null)
                       : null
                   }
                   deckDef={deckDef}

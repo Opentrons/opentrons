@@ -1,0 +1,14 @@
+.detail_container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
+}
+
+.slot_details_active_step {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-12) var(--spacing-12) var(--spacing-12);
+  gap: var(--spacing-8);
+}

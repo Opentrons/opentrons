@@ -39,12 +39,8 @@ const makeOptionsWithImages = (
     ),
   }))
 
-export const wellShapeOptionsWithIcons: OptionsWithImages = makeOptionsWithImages(
-  wellShapeOptions,
-  WELL_SHAPE_IMAGES
-)
+export const wellShapeOptionsWithIcons: OptionsWithImages =
+  makeOptionsWithImages(wellShapeOptions, WELL_SHAPE_IMAGES)
 
-export const wellBottomShapeOptionsWithIcons: OptionsWithImages = makeOptionsWithImages(
-  wellBottomShapeOptions,
-  WELL_BOTTOM_IMAGES
-)
+export const wellBottomShapeOptionsWithIcons: OptionsWithImages =
+  makeOptionsWithImages(wellBottomShapeOptions, WELL_BOTTOM_IMAGES)

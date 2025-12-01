@@ -19,11 +19,7 @@ interface ConcurrentGroupProps {
  *
  * This should be rendered directly after the parent step, as a sibling to it.
  *
- * Each child may be:
- *
- * - A `ConcurrentGroupCheckpoint`.
- * - A `ConcurrentGroupStepContainer`.
- * - A drag-and-drop indicator.
+ * Each child should be a `ConcurrentGroupChild`.
  */
 export function ConcurrentGroup(
   props: PropsWithChildren<ConcurrentGroupProps>

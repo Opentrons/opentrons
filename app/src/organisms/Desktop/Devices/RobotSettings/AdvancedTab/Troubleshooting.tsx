@@ -39,9 +39,8 @@ export function Troubleshooting({
   const robot = useRobot(robotName)
   const controlDisabled = robot?.status !== CONNECTABLE
   const logsAvailable = robot?.health?.logs != null
-  const [isDownloadingRobotLogs, setIsDownloadingRobotLogs] = useState<boolean>(
-    false
-  )
+  const [isDownloadingRobotLogs, setIsDownloadingRobotLogs] =
+    useState<boolean>(false)
   const { makeToast, eatToast } = useToaster()
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 

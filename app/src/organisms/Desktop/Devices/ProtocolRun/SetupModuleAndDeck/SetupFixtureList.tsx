@@ -59,9 +59,8 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
-    deckConfigCompatibility
-  )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(deckConfigCompatibility)
   return (
     <>
       {filteredDeckConfigCompatibility.map(cutoutConfigAndCompatibility => (
@@ -128,18 +127,13 @@ export function FixtureListItem({
     )
   }
 
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
-  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
-    false
-  )
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] =
+    useState<boolean>(false)
 
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
 
   const isFourthColumnFixture =
     (partialRequiredCutoutFixtureId != null &&

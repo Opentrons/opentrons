@@ -96,6 +96,7 @@ export function quickTransferWizardReducer(
         path: action.path,
       }
     }
+
     case 'SET_CHANGE_TIP': {
       return {
         ...state,
@@ -135,22 +136,9 @@ export function quickTransferSummaryReducer(
       }
     }
     case 'SET_PIPETTE_PATH': {
-      if (action.path === 'multiDispense') {
-        return {
-          ...state,
-          path: action.path,
-          disposalVolume: action.disposalVolume,
-          blowOutDispense: {
-            location: action.blowOutLocation,
-            flowRate: state.dispenseFlowRate,
-          },
-        }
-      } else {
-        return {
-          ...state,
-          path: action.path,
-          disposalVolume: undefined,
-        }
+      return {
+        ...state,
+        path: action.path,
       }
     }
     case 'SET_ASPIRATE_TIP_POSITION': {

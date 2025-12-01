@@ -44,9 +44,9 @@ describe('LPCComplete', () => {
   beforeEach(() => {
     mockHandleCloseAndHome = vi.fn()
 
-    vi.mocked(
-      selectStepInfo
-    ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
+    vi.mocked(selectStepInfo).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.steps
+    )
 
     vi.mocked(getIsOnDevice).mockReturnValue(false)
 

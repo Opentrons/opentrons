@@ -56,6 +56,8 @@ export function getDefaultsForStepType(
         times: null,
         tipRack: null,
         tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: undefined,
         wells: [],
       }
@@ -149,9 +151,21 @@ export function getDefaultsForStepType(
         pushOut_volume: null,
         tipRack: null,
         tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: null,
       }
 
+    case 'camera':
+      return {
+        home_before: false,
+        filename: null,
+        resolution: null,
+        zoom: null,
+        contrast: null,
+        brightness: null,
+        saturation: null,
+      }
     case 'comment':
       return {
         message: null,
