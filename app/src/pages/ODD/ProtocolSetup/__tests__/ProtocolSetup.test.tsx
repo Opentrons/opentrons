@@ -3,7 +3,7 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { RUN_STATUS_IDLE, RUN_STATUS_STOPPED } from '@opentrons/api-client'
+import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import {
   useAddCameraSettingsToRunMutation,
   useAllPipetteOffsetCalibrationsQuery,
@@ -52,7 +52,10 @@ import {
   useRunControls,
 } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
-import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import {
+  useCameraAnalytics,
+  useTrackProtocolRunEvent,
+} from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
@@ -77,7 +80,6 @@ import {
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
   useRunCreatedAtTimestamp,
-  useRunStatus,
 } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 
@@ -217,15 +219,16 @@ const mockFixture = {
 
 const MOCK_MAKE_SNACKBAR = vi.fn()
 const mockTrackProtocolRunEvent = vi.fn()
-
 // TODO(jh, 04-23-25): Some of these tests are failing (the skipped ones) due to circular
 //  imports. Investigate further.
 
 describe('ProtocolSetup', () => {
   let mockLaunchLPC = vi.fn()
+
   beforeEach(() => {
     mockLaunchLPC = vi.fn()
     mockNavigate = vi.fn()
+
     MockProtocolSetupLabware.mockImplementation(
       vi.fn(({ setIsConfirmed, setSetupScreen }) => {
         setIsConfirmed(true)
@@ -275,7 +278,6 @@ describe('ProtocolSetup', () => {
         isResumeRunFromRecoveryActionLoading: false,
         isRunControlLoading: false,
       })
-    when(vi.mocked(useRunStatus)).calledWith(RUN_ID).thenReturn(RUN_STATUS_IDLE)
     vi.mocked(useProtocolAnalysisAsDocumentQuery).mockReturnValue({
       data: mockEmptyAnalysis,
     } as any)
@@ -296,6 +298,7 @@ describe('ProtocolSetup', () => {
         data: {
           protocolId: PROTOCOL_ID,
           labwareOffsets: [mockOffset],
+          status: RUN_STATUS_STOPPED,
         },
       },
     } as any)
@@ -338,6 +341,17 @@ describe('ProtocolSetup', () => {
     when(vi.mocked(useTrackProtocolRunEvent))
       .calledWith(RUN_ID, ROBOT_NAME)
       .thenReturn({ trackProtocolRunEvent: mockTrackProtocolRunEvent })
+
+    when(vi.mocked(useCameraAnalytics))
+      .calledWith({ source: 'runRecord', robotType: 'OT-3 Standard' })
+      .thenReturn({
+        reportCameraSettings: vi.fn(),
+        reportCameraEnablementSettings: vi.fn(),
+        reportPhotoAccessUsage: vi.fn(),
+        reportImageCaptureUsage: vi.fn(),
+        reportLiveFeedUsage: vi.fn(),
+        reportLiveFeedDuration: vi.fn(),
+      })
     vi.mocked(useScrollPosition).mockReturnValue({
       isScrolled: false,
       scrollRef: {} as any,
@@ -592,7 +606,6 @@ describe('ProtocolSetup', () => {
   })
 
   it('should redirect to the protocols page when a run is stopped', () => {
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_STOPPED)
     render(`/runs/${RUN_ID}/setup/`)
     expect(mockNavigate).toHaveBeenCalledWith('/protocols')
   })

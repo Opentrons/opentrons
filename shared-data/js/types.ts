@@ -569,6 +569,7 @@ export interface ModuleDimensions {
   labwareInterfaceXDimension?: number
   labwareInterfaceYDimension?: number
   lidHeight?: number
+  maxStackerFillHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
@@ -1039,6 +1040,7 @@ export type RunTimeParameter =
 export interface CommandPreconditions {
   isCameraUsed: boolean
 }
+export type CameraId = 'ot_system_camera'
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {

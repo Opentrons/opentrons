@@ -60,3 +60,16 @@
   box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
   white-space: nowrap;
 }
+
+.card_photo_content_container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.icon_container {
+  width: 16px;
+  height: 16px;
+  color: var(--grey-50);
+}

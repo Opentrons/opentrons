@@ -24,7 +24,6 @@ import {
 } from '@opentrons/components'
 import {
   useAddCameraSettingsToRunMutation,
-  useCamera,
   useInstrumentsQuery,
   useProtocolAnalysisAsDocumentQuery,
   useProtocolQuery,
@@ -65,9 +64,11 @@ import { ConfirmCancelRunModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
+  SOURCE_RUN_RECORD,
   useRobotAnalyticsData,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
+import { useCameraAnalytics } from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -90,6 +91,7 @@ import {
   updateCameraEnablement,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
+import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { getRequiredDeckConfig } from '/app/resources/deck_configuration/utils'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -101,7 +103,6 @@ import {
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
   useProtocolAnalysisErrors,
-  useRunStatus,
 } from '/app/resources/runs'
 import { getProtocolModulesInfo } from '/app/transformations/analysis'
 import {
@@ -125,7 +126,9 @@ import type {
   SetupScreens,
 } from '/app/organisms/ODD/ProtocolSetup'
 import type { StepKey } from '/app/redux/protocol-runs'
+import type { CameraState } from '/app/redux/protocol-runs/types'
 import type { State } from '/app/redux/types'
+import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 import type { ProtocolModuleInfo } from '/app/transformations/analysis'
 import type {
   ProtocolFixture,
@@ -149,6 +152,8 @@ interface PrepareToRunProps {
   cameraSettingsConfirmed: boolean
   isLPCInitializing: boolean
   isCameraRequired: boolean
+  appCameraSettings: CameraState
+  storageInfo: RobotStorageInfo
 }
 
 function PrepareToRun({
@@ -165,6 +170,8 @@ function PrepareToRun({
   offsetsConfirmed,
   cameraSettingsConfirmed,
   isCameraRequired,
+  appCameraSettings,
+  storageInfo,
 }: PrepareToRunProps): JSX.Element {
   const { t, i18n } = useTranslation([
     'protocol_setup',
@@ -185,7 +192,20 @@ function PrepareToRun({
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name ??
     ''
-
+  const robotType = useRobotType(robotName)
+  const { reportCameraEnablementSettings, reportPhotoAccessUsage } =
+    useCameraAnalytics({
+      source: SOURCE_RUN_RECORD,
+      robotType: robotType,
+    })
+  useEffect(() => {
+    if (storageInfo.isImageStorageLow) {
+      reportPhotoAccessUsage({
+        action: 'storageWarning',
+        transactionId: runId,
+      })
+    }
+  }, [storageInfo.isImageStorageLow != null])
   const mostRecentAnalysisSummary = last(protocolRecord?.data.analysisSummaries)
   const [isPollingForCompletedAnalysis, setIsPollingForCompletedAnalysis] =
     useState<boolean>(mostRecentAnalysisSummary?.status !== 'completed')
@@ -207,8 +227,6 @@ function PrepareToRun({
       setIsPollingForCompletedAnalysis(true)
     }
   }, [mostRecentAnalysis?.status])
-
-  const robotType = useRobotType(robotName)
 
   const onConfirmCancelClose = (): void => {
     setShowConfirmCancelModal(false)
@@ -411,6 +429,11 @@ function PrepareToRun({
           trackProtocolRunEvent({
             name: ANALYTICS_PROTOCOL_RUN_ACTION.START,
             properties: robotAnalyticsData ?? {},
+          })
+          reportCameraEnablementSettings({
+            cameraEnabled: appCameraSettings.enabled,
+            liveFeedEnabled: appCameraSettings.liveStreamEnabled,
+            recoveryCaptureEnabled: appCameraSettings.recoveryEnabled,
           })
         }
       } else if (!isCameraReadyToRun) {
@@ -700,7 +723,11 @@ function PrepareToRun({
                 setSetupScreen('camera')
               }}
               title={t('camera_setup_step_title')}
-              detail={t('protocol_setup:enabled')}
+              detail={
+                appCameraSettings.enabled
+                  ? t('protocol_setup:enabled')
+                  : t('protocol_setup:disabled')
+              }
               status={cameraSettingsConfirmed ? 'ready' : 'general'}
             />
           </>
@@ -734,6 +761,7 @@ export function ProtocolSetup(): JSX.Element {
     staleTime: Infinity,
     refetchInterval: RUN_RECORD_REFETCH_MS,
   })
+  const runStatus = runRecord?.data.status ?? null
   const dispatch = useDispatch()
   const { analysisErrors } = useProtocolAnalysisErrors(runId)
   const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -765,7 +793,7 @@ export function ProtocolSetup(): JSX.Element {
       .data?.data.id != null
 
   const navigate = useNavigate()
-  const runStatus = useRunStatus(runId)
+
   if (runStatus === RUN_STATUS_STOPPED) {
     navigate('/protocols')
   }
@@ -823,7 +851,9 @@ export function ProtocolSetup(): JSX.Element {
   const { applyOffsets, isApplyingOffsets } = useApplyOffsets(runId)
 
   const [cameraSettingsConfirmed, setCameraSettingsConfirmed] = useState(false)
-  const { data: initialRobotCameraSettings } = useCamera()
+  const { data: initialRobotCameraSettings } = useNotifyCamera({
+    staleTime: Infinity,
+  })
 
   // The initial app-internal camera state should match the server state.
   useEffect(() => {
@@ -940,6 +970,8 @@ export function ProtocolSetup(): JSX.Element {
         offsetsConfirmed={offsetsConfirmed}
         cameraSettingsConfirmed={cameraSettingsConfirmed}
         isCameraRequired={isCameraRequired}
+        appCameraSettings={appCameraSettings}
+        storageInfo={storageInfo}
       />
     ),
     instruments: (

@@ -69,20 +69,13 @@ describe('getMaxConditioningVolume', () => {
     const args = {
       transferVolume: 10,
       disposalVolume: 5,
-      tiprackDefUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-      labwareEntities: {
-        tiprack: {
-          id: 'tiprack',
-          labwareDefURI: 'opentrons/opentrons_96_tiprack_300ul/1',
-          def: {
-            parameters: {
-              loadName: 'opentrons_96_tiprack_300ul',
-            },
-            wells: {
-              A1: {
-                totalLiquidVolume: 300,
-              },
-            },
+      tiprackDef: {
+        parameters: {
+          loadName: 'opentrons_96_tiprack_300ul',
+        },
+        wells: {
+          A1: {
+            totalLiquidVolume: 300,
           },
         },
       },
@@ -104,8 +97,7 @@ describe('getMaxConditioningVolume', () => {
     const args = {
       transferVolume: 10,
       disposalVolume: 5,
-      tiprackDefUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-      labwareEntities: {},
+      tiprackDefUri: {},
       pipetteSpecs: {
         liquids: {
           default: {
@@ -124,20 +116,13 @@ describe('getMaxConditioningVolume', () => {
     const args = {
       transferVolume: 10,
       disposalVolume: 0,
-      tiprackDefUri: 'opentrons/opentrons_96_tiprack_300ul/1',
-      labwareEntities: {
-        tiprack: {
-          id: 'tiprack',
-          labwareDefURI: 'opentrons/opentrons_96_tiprack_300ul/1',
-          def: {
-            parameters: {
-              loadName: 'opentrons_96_tiprack_300ul',
-            },
-            wells: {
-              A1: {
-                totalLiquidVolume: 300,
-              },
-            },
+      tiprackDef: {
+        parameters: {
+          loadName: 'opentrons_96_tiprack_300ul',
+        },
+        wells: {
+          A1: {
+            totalLiquidVolume: 300,
           },
         },
       },

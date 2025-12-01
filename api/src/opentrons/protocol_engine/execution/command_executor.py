@@ -155,6 +155,7 @@ class CommandExecutor:
         log.debug(
             f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
         )
+        error_occurred = False
         try:
             result = await command_impl.execute(
                 running_command.params  # type: ignore[arg-type]
@@ -191,7 +192,7 @@ class CommandExecutor:
                     type=error_recovery_type,
                 )
             )
-            await self.capture_error_image(running_command)
+            error_occurred = True
 
         else:
             if isinstance(result, SuccessData):
@@ -227,6 +228,10 @@ class CommandExecutor:
                         type=error_recovery_type,
                     )
                 )
+                error_occurred = True
+        finally:
+            # Handle error image capture if appropriate
+            if error_occurred:
                 await self.capture_error_image(running_command)
 
     def cancel_tasks(self, message: str | None = None) -> None:
@@ -236,11 +241,14 @@ class CommandExecutor:
     async def capture_error_image(self, running_command: Command) -> None:
         """Capture an image of an error event."""
         try:
-            camera_enablement = await self._camera_provider.get_camera_settings()
+            camera_enablement = self._state_store.camera.get_enablement_settings()
+            if camera_enablement is None:
+                # Utilize the global camera settings
+                camera_enablement = await self._camera_provider.get_camera_settings()
             # Only capture photos of errors if the setting to do so is enabled
             if (
                 camera_enablement.cameraEnabled
-                and camera_enablement.errorRecoveryEnabled
+                and camera_enablement.errorRecoveryCameraEnabled
             ):
                 # todo(chb, 2025-10-25): Eventually we will need to pass in client provided global settings here
                 image_data = await self._camera_provider.capture_image(

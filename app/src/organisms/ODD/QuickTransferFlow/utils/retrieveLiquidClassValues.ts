@@ -166,7 +166,7 @@ const getNoLiquidClassValues = (
     dispenseMaxUiFlowRate
   )
 
-  const aspirateState = {
+  const aspirateState: Partial<QuickTransferSummaryState> = {
     aspirateFlowRate: aspirateFlowRateFields.aspirate_flowRate ?? 0,
     tipPositionAspirate: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     submergeAspirate: {
@@ -193,7 +193,7 @@ const getNoLiquidClassValues = (
     conditionAspirate: actualConditioningVolume ?? 0,
   }
 
-  const dispenseState = {
+  const dispenseState: Partial<QuickTransferSummaryState> = {
     dispenseFlowRate: dispenseFlowRateFields.dispense_flowRate ?? 0,
     tipPositionDispense: DEFAULT_MM_OFFSET_FROM_BOTTOM,
     submergeDispense: {
@@ -220,7 +220,7 @@ const getNoLiquidClassValues = (
       : dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
     disposalVolumeDispenseSettings: {
-      volume: 0,
+      volume: pipette.liquids.default.minVolume,
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,

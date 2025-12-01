@@ -325,6 +325,7 @@ def test_get_pipette_working_volume(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
+                available_volume_modes_min_vol={},
             )
         },
     )
@@ -366,6 +367,7 @@ def test_get_pipette_working_volume_raises_if_tip_volume_is_none(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
+                available_volume_modes_min_vol={},
             )
         },
     )
@@ -419,6 +421,7 @@ def test_get_pipette_available_volume(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
+                available_volume_modes_min_vol={},
             ),
             "pipette-id-none": StaticPipetteConfig(
                 min_volume=1,
@@ -444,6 +447,7 @@ def test_get_pipette_available_volume(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
+                available_volume_modes_min_vol={},
             ),
         },
     )
@@ -566,6 +570,7 @@ def test_get_static_config(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={},
     )
 
     subject = get_pipette_view(
@@ -627,6 +632,7 @@ def test_get_nominal_tip_overlap(
         shaft_ul_per_mm=5.0,
         available_sensors=available_sensors,
         volume_mode=VolumeModes.default,
+        available_volume_modes_min_vol={},
     )
 
     subject = get_pipette_view(static_config_by_id={"pipette-id": config})
@@ -1063,6 +1069,7 @@ def test_get_pipette_bounds_at_location(
                 shaft_ul_per_mm=5.0,
                 available_sensors=available_sensors,
                 volume_mode=VolumeModes.default,
+                available_volume_modes_min_vol={},
             )
         },
     )

@@ -44,7 +44,7 @@ from .module_validation_and_errors import (
 from .labware import Labware
 from . import validation
 from . import Task
-
+from opentrons.drivers.thermocycler.driver import BLOCK_VOL_MIN, BLOCK_VOL_MAX
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 
@@ -456,13 +456,14 @@ class TemperatureModuleContext(ModuleContext):
     @publish(command=cmds.tempdeck_set_temp)
     @requires_version(2, 3)
     def start_set_temperature(self, celsius: float) -> Task:
-        """Set the target temperature without waiting for the target to be hit.
+        """Sets the Temperature Module's target temperature and returns immediately without waiting for the module to reach the target. Allows the protocol to proceed while the Temperature Module heats.
 
         .. versionchanged:: 2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+            Returns a :py:class:`Task` object that represents concurrent heating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the module to finish heating.
 
-        On version 2.26 or below, this function returns ``None``.
+        In API version 2.26 or below, this function returns ``None``.
+
         :param celsius: A value between 4 and 95, representing the target temperature in °C.
         """
         task = self._core.set_target_temperature(celsius)
@@ -715,9 +716,9 @@ class ThermocyclerContext(ModuleContext):
         ramp_rate: Optional[float] = None,
         block_max_volume: Optional[float] = None,
     ) -> Task:
-        """Starts to set the target temperature for the well block, in °C.
+        """Sets the target temperature for the Thermocycler Module's well block, in °C.
 
-        Returns a task object that represents concurrent preheating.
+        Returns a :py:class:`Task` object that represents concurrent heating.
         Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
         the preheat to complete.
 
@@ -726,10 +727,10 @@ class ThermocyclerContext(ModuleContext):
         :param block_max_volume: The greatest volume of liquid contained in any
                                  individual well of the loaded labware, in µL.
                                  If not specified, the default is 25 µL.
-                                 After API version 2.27 it will attempt to use
-                                 the liquid tracking of the labware first and
-                                 then fall back to the 25 if there is no probed
-                                 or loaded liquid.
+                                 In API version 2.27 and newer, the API will first attempt to use
+                                 the liquid tracking in labware,
+                                 then default to 25 µL if the protocol lacks probed
+                                 or loaded liquid information.
         """
 
         if block_max_volume is None:
@@ -746,10 +747,6 @@ class ThermocyclerContext(ModuleContext):
     def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
-        Returns a task object that represents concurrent preheating.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
-
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
 
@@ -765,19 +762,13 @@ class ThermocyclerContext(ModuleContext):
     @publish(command=cmds.thermocycler_start_set_lid_temperature)
     @requires_version(2, 27)
     def start_set_lid_temperature(self, temperature: float) -> Task:
-        """Set the target temperature for the heated lid, in °C.
+        """Sets a target temperature to heat the Thermocycler Module's lid, in °C. Returns a :py:class:`Task` object that represents concurrent heating.
 
-        Returns a task object that represents concurrent preheating.
         Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for
-        the preheat to complete.
+        the lid to reach the target temperature.
 
         :param temperature: A value between 37 and 110, representing the target
                             temperature in °C.
-
-        .. note::
-
-            The Thermocycler will proceed to the next command immediately after
-            ``temperature`` is reached.
 
         """
         task = self._core.start_set_target_lid_temperature(celsius=temperature)
@@ -824,11 +815,10 @@ class ThermocyclerContext(ModuleContext):
         repetitions: int,
         block_max_volume: Optional[float] = None,
     ) -> Task:
-        """Start a Thermocycler profile and return a :py:class:`Task` representing its execution.
+        """Starts a defined Thermocycler Module profile and return a :py:class:`Task` representing its concurrent execution.
         Profile is defined as a cycle of ``steps``, for a given number of ``repetitions``.
 
-        Returns a task object that represents concurrent execution of the profile.
-        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+        Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the profile run to complete.
 
         :param steps: List of steps that make up a single cycle.
                       Each list item should be a dictionary that maps to the parameters
@@ -981,6 +971,10 @@ class ThermocyclerContext(ModuleContext):
                     # ignore simulated probe results
                     if isinstance(well_vol, float):
                         max_vol = max(max_vol, well_vol)
+                    if max_vol > BLOCK_VOL_MAX:
+                        max_vol = BLOCK_VOL_MAX
+                    elif max_vol < BLOCK_VOL_MIN:
+                        max_vol = BLOCK_VOL_MIN
         return max_vol
 
 
@@ -1100,17 +1094,17 @@ class HeaterShakerContext(ModuleContext):
         """Set target temperature and return immediately.
 
         Sets the Heater-Shaker's target temperature and returns immediately without
-        waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached.
+        waiting for the target to be reached. Allows the protocol to proceed while the module
+        reaches the target temperature.
         Use :py:meth:`~.HeaterShakerContext.wait_for_temperature` to delay
-        protocol execution for api levels below 2.27.
+        protocol execution for API levels below 2.27.
 
         .. versionchanged:: 2.25
             Removed the minimum temperature limit of 37 °C. Note that temperatures under ambient are
             not achievable.
         .. versionchanged:: 2.27
-            Returns a task object that represents concurrent preheating.
-            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the preheat to complete.
+            Returns a :py:class:`Task` object that represents concurrent heating.
+            Pass the task object to :py:meth:`ProtocolContext.wait_for_tasks` to wait for the module to reach the target temperature.
 
         :param celsius: A value under 95, representing the target temperature in °C.
                         Values are automatically truncated to two decimal places,
@@ -1154,11 +1148,11 @@ class HeaterShakerContext(ModuleContext):
     @requires_version(2, 27)
     @publish(command=cmds.heater_shaker_set_shake_speed)
     def set_shake_speed(self, rpm: int) -> Task:
-        """Set a shake speed in rpm to run in the background.
+        """Sets the Heater-Shaker's shake speed in RPM and returns a :py:class:`Task` that represents concurrent shaking.
 
         .. note::
 
-            Before shaking, this command will retract the pipettes upward if they are parked adjacent to the Heater-Shaker.
+            Before shaking, this command retracts pipettes upward if they are adjacent to the Heater-Shaker Module.
 
         :param rpm: A value between 200 and 3000, representing the target shake speed in revolutions per minute.
         """

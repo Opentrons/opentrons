@@ -5,12 +5,13 @@ import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
-  AutoAddPauseUntilTempStepModal,
+  BonusStepModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
 } from '/protocol-designer/components/organisms'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
@@ -25,6 +26,7 @@ import { getDirtyFields } from './utils'
 import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
 
 interface StateProps {
@@ -34,6 +36,7 @@ interface StateProps {
   isPristineSetTempForm: boolean
   isPristineSetHeaterShakerTempForm: boolean
   invariantContext: InvariantContext
+  allLabwareDefs: LabwareDefByDefURI
   enableConcurrentModuleActions: boolean
   formData?: FormData | null
 }
@@ -58,6 +61,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
     invariantContext,
+    allLabwareDefs,
     enableConcurrentModuleActions,
   } = props
   const [focusedField, setFocusedField] = useState<string | null>(null)
@@ -98,7 +102,11 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   if (formData == null) {
     return null
   }
-  const hydratedForm = getHydratedForm(formData, invariantContext)
+  const hydratedForm = getHydratedForm(
+    formData,
+    invariantContext,
+    allLabwareDefs
+  )
   const focusHandlers = {
     focusedField,
     dirtyFields,
@@ -128,15 +136,15 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       )}
       {showAddPauseUntilTempStepModal &&
         (enableConcurrentModuleActions ? (
-          <AutoAddPauseUntilTempStepModal
-            modalType="temperatureModule"
+          <BonusStepModal
+            modalType="explainWaitForTemperatureModuleTemp"
             displayTemperature={formData?.targetTemperature ?? '?'}
             handleAddPauseClick={handleSave}
             handleSkipPauseClick={saveStepForm}
           />
         ) : (
-          <AutoAddPauseUntilTempStepModal
-            modalType="legacy"
+          <BonusStepModal
+            modalType="optionallyWaitForTemp"
             displayTemperature={formData?.targetTemperature ?? '?'}
             displayModule={
               formData.moduleId != null
@@ -151,15 +159,15 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
         ))}
       {showAddPauseUntilHeaterShakerTempStepModal &&
         (enableConcurrentModuleActions ? (
-          <AutoAddPauseUntilTempStepModal
-            modalType="heaterShaker"
+          <BonusStepModal
+            modalType="explainWaitForHeaterShakerTemp"
             displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
             handleSkipPauseClick={saveStepForm}
             handleAddPauseClick={handleSave}
           />
         ) : (
-          <AutoAddPauseUntilTempStepModal
-            modalType="legacy"
+          <BonusStepModal
+            modalType="optionallyWaitForTemp"
             displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
             displayModule={
               formData.moduleId != null
@@ -199,6 +207,7 @@ const mapStateToProps = (state: BaseState): StateProps => {
     isPristineSetTempForm:
       stepFormSelectors.getUnsavedFormIsPristineSetTempForm(state),
     invariantContext: getInvariantContext(state),
+    allLabwareDefs: labwareDefSelectors.getLabwareDefsByURI(state),
     enableConcurrentModuleActions: getEnableConcurrentModuleActions(state),
   }
 }

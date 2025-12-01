@@ -12,13 +12,19 @@ from opentrons.system.camera import (
     CONTRAST_DEFAULT,
     BRIGHTNESS_DEFAULT,
     SATURATION_DEFAULT,
+    ZOOM_MIN,
+    ZOOM_MAX,
     ZOOM_DEFAULT,
+    RESOLUTION_MIN,
+    RESOLUTION_MAX,
     RESOLUTION_DEFAULT,
 )
 from ..types import PreconditionTypes
 from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import (
     CameraDisabledError,
+    CameraSettingsInvalidError,
+    FileNameInvalidError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
 
@@ -26,6 +32,7 @@ from ..resources.file_provider import (
     ImageCaptureCmdFileNameMetadata,
 )
 from ..resources import FileProvider
+from ..resources.file_provider import SPECIAL_CHARACTERS
 from ..resources import CameraProvider
 from ..resources.camera_provider import ImageParameters
 from ..state import update_types
@@ -158,6 +165,47 @@ def _revert_image_parameters(
     )
 
 
+def _validate_image_params(params: CaptureImageParams) -> None:
+    # Validate the filename param provided to fail analysis
+    if params.fileName is not None and set(SPECIAL_CHARACTERS).intersection(
+        set(params.fileName)
+    ):
+        raise FileNameInvalidError(
+            message=f"Capture image filename cannot contain character(s): {SPECIAL_CHARACTERS.intersection(set(params.fileName))}"
+        )
+
+    # Validate the image filter parameters
+    if params.zoom is not None and (params.zoom < ZOOM_MIN or params.zoom > ZOOM_MAX):
+        raise CameraSettingsInvalidError(
+            message="Capture image zoom must be a valid value from 1.0X to 2.0X zoom."
+        )
+    if params.resolution is not None and (
+        params.resolution[0] < RESOLUTION_MIN[0]
+        or params.resolution[1] < RESOLUTION_MIN[1]
+        or params.resolution[0] > RESOLUTION_MAX[0]
+        or params.resolution[1] > RESOLUTION_MAX[1]
+    ):
+        raise CameraSettingsInvalidError(
+            message="Capture image resolution must be a valid resolution from 240p through 8K resolutuon."
+        )
+    if params.brightness is not None and (
+        params.brightness < 0 or params.brightness > 100
+    ):
+        raise CameraSettingsInvalidError(
+            message="Capture image brightness must be a percentage from 0% to 100%."
+        )
+    if params.contrast is not None and (params.contrast < 0 or params.contrast > 100):
+        raise CameraSettingsInvalidError(
+            message="Capture image contrast must be a percentage from 0% to 100%."
+        )
+    if params.saturation is not None and (
+        params.saturation < 0 or params.saturation > 100
+    ):
+        raise CameraSettingsInvalidError(
+            message="Capture image saturation must be a percentage from 0% to 100%."
+        )
+
+
 class CaptureImageImpl(
     AbstractCommandImpl[CaptureImageParams, SuccessData[CaptureImageResult]]
 ):
@@ -182,6 +230,9 @@ class CaptureImageImpl(
         state_update.precondition_update = update_types.PreconditionUpdate(
             {PreconditionTypes.IS_CAMERA_USED: True}
         )
+
+        # Validate that the provided parameters are all acceptable. We do this here and in system/camera.py to ensure analysis fails properly.
+        _validate_image_params(params)
 
         # Handle capturing an image with the CameraProvider - Engine camera settings take priority
         camera_settings = await self._camera_provider.get_camera_settings()
@@ -212,7 +263,7 @@ class CaptureImageImpl(
                 data=camera_data,
                 mime_type=MimeType.IMAGE_JPEG,
                 command_metadata=ImageCaptureCmdFileNameMetadata(
-                    step_number=len(self._state_view.commands.get_all()) + 1,
+                    step_number=len(self._state_view.commands.get_all()),
                     command_timestamp=datetime.now(),
                     base_filename=params.fileName,
                     command_id=this_cmd_id or "",

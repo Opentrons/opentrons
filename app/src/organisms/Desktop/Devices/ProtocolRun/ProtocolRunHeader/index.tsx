@@ -16,10 +16,10 @@ import { useInitializeCameraState } from '/app/local-resources/images/hooks/useI
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useCloseCurrentRun,
   useNotifyRunQuery,
   useProtocolDetailsForRun,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import { EQUIPMENT_POLL_MS } from '../../../../DoorOpenControl/constants'
@@ -50,10 +50,14 @@ export function ProtocolRunHeader(
 
   const navigate = useNavigate()
 
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const { protocolData } = useProtocolDetailsForRun(runId)
   const isRobotViewable = useIsRobotViewable(robotName)
-  const runStatus = useRunStatus(runId)
+  const runStatus = runRecord?.data.status ?? null
+
   const attachedModules =
     useModulesQuery({
       refetchInterval: EQUIPMENT_POLL_MS,
@@ -61,7 +65,7 @@ export function ProtocolRunHeader(
     })?.data?.data ?? []
   const runErrors = useRunErrors({
     runRecord: runRecord ?? null,
-    runStatus,
+    runStatus: runStatus,
     runId,
   })
   const { closeCurrentRun, isClosingCurrentRun } = useCloseCurrentRun()

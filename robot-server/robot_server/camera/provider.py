@@ -35,7 +35,7 @@ class CameraProviderWrapper:
         return CameraSettings(
             cameraEnabled=self._camera_settings_store.get_camera_enabled(),
             liveStreamEnabled=self._camera_settings_store.get_live_stream_enabled(),
-            errorRecoveryEnabled=self._camera_settings_store.get_error_recovery_camera_enabled(),
+            errorRecoveryCameraEnabled=self._camera_settings_store.get_error_recovery_camera_enabled(),
         )
 
     async def process_image_capture(

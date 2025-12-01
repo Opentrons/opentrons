@@ -58,7 +58,8 @@ function getOrderedWells(
 }
 
 export function getInvariantContextAndRobotState(
-  quickTransferState: QuickTransferSummaryState
+  quickTransferState: QuickTransferSummaryState,
+  deckConfig: DeckConfiguration
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
@@ -174,6 +175,44 @@ export function getInvariantContextAndRobotState(
   }
   let trashBinEntities: TrashBinEntities = {}
   let wasteChuteEntities: WasteChuteEntities = {}
+
+  // If the drop tip location is the tip rack, still a protocols needs to define a trash bin entity
+  const dropTipIsTiprack =
+    typeof quickTransferState.dropTipLocation === 'string' &&
+    quickTransferState.dropTipLocation ===
+      getLabwareDefURI(quickTransferState.tipRack)
+
+  if (dropTipIsTiprack) {
+    // check deck config for trash bin and waste chute
+    const installedTrashBin = deckConfig.find(
+      config => config.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    )
+    const installedWasteChute = deckConfig.find(config =>
+      WASTE_CHUTE_FIXTURES.includes(config.cutoutFixtureId)
+    )
+    const trashBinLocation =
+      installedTrashBin != null ? installedTrashBin.cutoutId : 'cutoutA3'
+    const trashId = `${uuid()}_trashBin`
+    const wasteChuteId = `${uuid()}_wasteChute`
+
+    if (installedTrashBin != null) {
+      trashBinEntities = {
+        [trashId]: {
+          id: trashId,
+          location: trashBinLocation,
+          pythonName: pythonTrashBinName,
+        },
+      }
+    } else if (installedWasteChute != null) {
+      wasteChuteEntities = {
+        [wasteChuteId]: {
+          id: wasteChuteId,
+          location: installedWasteChute.cutoutId,
+          pythonName: pythonWasteChuteName,
+        },
+      }
+    }
+  }
 
   if (
     typeof quickTransferState.dropTipLocation !== 'string' &&
@@ -308,34 +347,40 @@ export function generateQuickTransferArgs(
       }
     }
   }
-  const { invariantContext, robotState } =
-    getInvariantContextAndRobotState(quickTransferState)
+  const { invariantContext, robotState } = getInvariantContextAndRobotState(
+    quickTransferState,
+    deckConfig
+  )
 
   let blowoutLocation: string | undefined
+  const blowOutDispenseLocation =
+    quickTransferState.path === 'multiDispense'
+      ? quickTransferState.disposalVolumeDispenseSettings?.blowOutLocation
+      : quickTransferState.blowOutDispense?.location
+
   if (
-    quickTransferState?.blowOutDispense?.location != null &&
-    quickTransferState.blowOutDispense.location !== 'source_well' &&
-    quickTransferState.blowOutDispense.location !== 'dest_well' &&
-    'cutoutId' in quickTransferState.blowOutDispense.location
+    blowOutDispenseLocation != null &&
+    blowOutDispenseLocation !== 'source_well' &&
+    blowOutDispenseLocation !== 'dest_well' &&
+    typeof blowOutDispenseLocation === 'object' &&
+    'cutoutId' in blowOutDispenseLocation
   ) {
     const trashBinEntity = Object.values(
       invariantContext.trashBinEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOutDispense
-        ?.location as CutoutConfig
+      const blowoutObject = blowOutDispenseLocation as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const wasteChuteEntity = Object.values(
       invariantContext.wasteChuteEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOutDispense
-        ?.location as CutoutConfig
+      const blowoutObject = blowOutDispenseLocation as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const entity = trashBinEntity != null ? trashBinEntity : wasteChuteEntity
     blowoutLocation = entity?.id
   } else {
-    blowoutLocation = quickTransferState.blowOutDispense?.location
+    blowoutLocation = blowOutDispenseLocation as string | undefined
   }
 
   const dropTipTrashBinLocationEntity = Object.values(
@@ -414,7 +459,10 @@ export function generateQuickTransferArgs(
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
     dispenseOffsetFromBottomMm: quickTransferState.tipPositionDispense,
     blowoutLocation,
-    blowoutFlowRateUlSec: quickTransferState.blowOutDispense?.flowRate ?? 0,
+    blowoutFlowRateUlSec:
+      quickTransferState.path === 'multiDispense'
+        ? (quickTransferState.disposalVolumeDispenseSettings?.flowRate ?? 0)
+        : (quickTransferState.blowOutDispense?.flowRate ?? 0),
     blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,

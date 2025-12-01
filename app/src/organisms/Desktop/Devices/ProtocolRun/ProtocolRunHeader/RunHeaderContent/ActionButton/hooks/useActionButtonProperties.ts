@@ -10,7 +10,13 @@ import {
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
+import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
+import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
+} from '/app/redux-resources/analytics/'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
@@ -27,6 +33,7 @@ import {
   isRunAgainStatus,
   isStartRunStatus,
 } from '../../../utils'
+import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
 
 import type { IconName } from '@opentrons/components'
 import type { StepKey } from '/app/redux/protocol-runs'
@@ -43,8 +50,9 @@ interface UseButtonPropertiesProps extends BaseActionButtonProps {
   isValidRunAgain: boolean
   isOtherRunCurrent: boolean
   isRobotOnWrongVersionOfSoftware: boolean
-  isClosingCurrentRun: boolean
   areCameraPreferencesConfirmed: boolean
+  isClosingCurrentRun: boolean
+  isCameraReadyToRun: boolean
 }
 
 // Returns ActionButton properties.
@@ -54,8 +62,12 @@ export function useActionButtonProperties({
   robotName,
   runId,
   currentRunId,
+  isOtherRunCurrent,
+  isRobotOnWrongVersionOfSoftware,
   confirmAttachment,
   confirmMissingSteps,
+  makeHandleJumpToStep,
+  runRecord,
   robotAnalyticsData,
   robotSerialNumber,
   protocolRunControls,
@@ -64,6 +76,9 @@ export function useActionButtonProperties({
   isResetRunLoadingRef,
   isClosingCurrentRun,
   areCameraPreferencesConfirmed,
+  isValidRunAgain,
+  protocolRunHeaderRef,
+  isCameraReadyToRun,
 }: UseButtonPropertiesProps): {
   buttonText: string
   handleButtonClick: () => void
@@ -72,6 +87,11 @@ export function useActionButtonProperties({
   const { t } = useTranslation(['run_details', 'shared'])
   const { play, pause, reset } = protocolRunControls
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
+  const robotType = useRobotType(robotName)
+  const { reportCameraEnablementSettings } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType: robotType,
+  })
   const isHeaterShakerInProtocol = useIsHeaterShakerInProtocol()
   const isHeaterShakerShaking = isAnyHeaterShakerShaking(attachedModules)
   const trackEvent = useTrackEvent()
@@ -99,7 +119,34 @@ export function useActionButtonProperties({
           ? robotAnalyticsData
           : {},
     })
+    const { enabled, recoveryEnabled, liveStreamEnabled } = runCameraSettings
+    reportCameraEnablementSettings({
+      cameraEnabled: enabled,
+      liveFeedEnabled: liveStreamEnabled,
+      recoveryCaptureEnabled: recoveryEnabled,
+    })
   }
+  const isSetupComplete = !missingSetupSteps || missingSetupSteps.length === 0
+  const { makeSnackbar } = useToaster()
+  const { isDisabled, disabledReason } = useActionBtnDisabledUtils({
+    robotName,
+    runId,
+    isValidRunAgain,
+    isSetupComplete,
+    isOtherRunCurrent,
+    isProtocolNotReady,
+    isRobotOnWrongVersionOfSoftware,
+    isClosingCurrentRun,
+    makeHandleJumpToStep,
+    runRecord,
+    runStatus,
+    isResetRunLoadingRef,
+    protocolRunHeaderRef,
+    attachedModules,
+    protocolRunControls,
+    runHeaderModalContainerUtils,
+    isCameraReadyToRun,
+  })
 
   if (isProtocolNotReady) {
     buttonIconName = 'ot-spinner'
@@ -122,6 +169,10 @@ export function useActionButtonProperties({
     buttonText =
       runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
     handleButtonClick = () => {
+      if (isDisabled && disabledReason) {
+        makeSnackbar(disabledReason)
+        return
+      }
       if (isHeaterShakerShaking && isHeaterShakerInProtocol) {
         runHeaderModalContainerUtils.HSRunningModalUtils.toggleModal?.()
       } else if (
@@ -142,6 +193,7 @@ export function useActionButtonProperties({
       else if (!areCameraPreferencesConfirmed) {
         const { enabled, recoveryEnabled, liveStreamEnabled } =
           runCameraSettings
+
         addCameraSettingsToRun(
           {
             runId,

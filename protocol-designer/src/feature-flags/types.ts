@@ -31,6 +31,11 @@ export const DEPRECATED_FLAGS = [
   'OT_PD_ENABLE_RETURN_TIP',
   'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
   'OT_PD_ALLOW_ALL_TIPRACKS',
+  'OT_PD_ENABLE_CAMERA_SUPPORT',
+  'OT_PD_ENABLE_JSON_EXPORT',
+  'OT_PD_ENABLE_TIMELINE_SCRUBBER',
+  'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
+  'OT_PD_ENABLE_TIP_SELECTION',
 ]
 // union of feature flag string constant IDs
 export type FlagTypes =
@@ -40,14 +45,9 @@ export type FlagTypes =
   | 'OT_PD_ENABLE_HOT_KEYS_DISPLAY'
   | 'OT_PD_ENABLE_REACT_SCAN'
   | 'OT_PD_ENABLE_MULTIPLE_TEMPS_OT2'
-  | 'OT_PD_ENABLE_TIMELINE_SCRUBBER'
-  | 'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT'
   | 'OT_PD_ENABLE_STACKING'
   | 'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS'
-  //  this feature is for internal purposes, users should never export JSON
-  | 'OT_PD_ENABLE_JSON_EXPORT'
   | 'OT_PD_ENABLE_BY_VOLUME_BUILDER'
-  | 'OT_PD_ENABLE_TIP_SELCTION'
   | 'OT_PD_ENABLE_CAMERA_SUPPORT'
 // flags that are not in this list only show in prerelease mode
 export const userFacingFlags: FlagTypes[] = [
@@ -60,13 +60,9 @@ export const allFlags: FlagTypes[] = [
   'PRERELEASE_MODE',
   'OT_PD_ENABLE_COMMENT',
   'OT_PD_ENABLE_REACT_SCAN',
-  'OT_PD_ENABLE_TIMELINE_SCRUBBER',
-  'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
   'OT_PD_ENABLE_STACKING',
   'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
-  'OT_PD_ENABLE_JSON_EXPORT',
   'OT_PD_ENABLE_BY_VOLUME_BUILDER',
-  'OT_PD_ENABLE_TIP_SELCTION',
   'OT_PD_ENABLE_CAMERA_SUPPORT',
 ]
 export type Flags = Partial<Record<FlagTypes, boolean | null | undefined>>

@@ -841,8 +841,16 @@ class LegacyCommandMapper:
             # We just set this above, so we know it's not None.
             started_at=succeeded_command.startedAt,  # type: ignore[arg-type]
         )
+        state_update = StateUpdate()
+        state_update.set_load_module(
+            module_id=module_id,
+            definition=loaded_definition,
+            slot_name=module_load_info.deck_slot,
+            requested_model=requested_model,
+            serial_number=module_load_info.module_serial,
+        )
         succeed_action = pe_actions.SucceedCommandAction(
-            command=succeeded_command, state_update=StateUpdate()
+            command=succeeded_command, state_update=state_update
         )
 
         self._command_count["LOAD_MODULE"] = count + 1

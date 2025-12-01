@@ -26,6 +26,7 @@ const START_RUN_STATUSES: RunStatus[] = [
 const RUN_AGAIN_STATUSES: RunStatus[] = [
   RUN_STATUS_STOPPED,
   RUN_STATUS_FINISHING,
+  RUN_STATUS_PAUSED,
   RUN_STATUS_FAILED,
   RUN_STATUS_SUCCEEDED,
 ]
@@ -101,4 +102,24 @@ export function getFallbackRobotSerialNumber(
 ): string {
   const sn = robot?.status != null ? getRobotSerialNumber(robot) : null
   return sn ?? ''
+}
+
+export const isSupportedVersion = (
+  versionA: number[],
+  versionB: number[]
+): boolean => {
+  const maxLength = Math.max(versionA.length, versionB.length)
+
+  for (let i = 0; i < maxLength; i++) {
+    // if the version is not defined, use 0
+    const a = versionA[i] ?? 0
+    const b = versionB[i] ?? 0
+
+    if (a > b) {
+      return true
+    } else if (a < b) {
+      return false
+    }
+  }
+  return true
 }

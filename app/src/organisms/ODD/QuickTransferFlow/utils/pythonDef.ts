@@ -1,5 +1,6 @@
 import upperCase from 'lodash/upperCase'
 
+import { getIsTiprack } from '@opentrons/shared-data'
 import {
   consolidate,
   distribute,
@@ -35,8 +36,12 @@ export function quickTransferStepCommands(
   props: QuickTransferStepCommandsProps
 ): string {
   const { stepArgs, invariantContext, initialRobotState } = props
-  const { trashBinEntities, wasteChuteEntities, pipetteEntities } =
-    invariantContext
+  const {
+    trashBinEntities,
+    wasteChuteEntities,
+    pipetteEntities,
+    labwareEntities,
+  } = invariantContext
   const pipettePythonName = Object.values(pipetteEntities)[0].pythonName
   let nonLoadCommandCreator: CommandCreatorResult | null = null
   if (stepArgs?.commandCreatorFnName === 'transfer') {
@@ -66,11 +71,22 @@ export function quickTransferStepCommands(
 
   let finalDropTipCommand = ''
 
-  if (Object.values(trashBinEntities).length > 0) {
-    finalDropTipCommand = `${pipettePythonName}.drop_tip()`
-  } else if (Object.values(wasteChuteEntities).length > 0) {
-    const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
-    finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+  const dropTipLocation = stepArgs?.dropTipLocation
+  const matchingDropTipLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
+  const isReturnTip =
+    matchingDropTipLabwareEntity != null &&
+    getIsTiprack(matchingDropTipLabwareEntity.def)
+
+  // if the drop tip location is not a tip rack, a protocol needs to add a drop tip command
+  if (!isReturnTip) {
+    if (Object.values(trashBinEntities).length > 0) {
+      finalDropTipCommand = `${pipettePythonName}.drop_tip()`
+    } else if (Object.values(wasteChuteEntities).length > 0) {
+      const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
+      finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+    }
   }
 
   return (
