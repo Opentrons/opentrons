@@ -322,6 +322,12 @@
         "aspirateEndPosition": {
           "$ref": "#/definitions/tipPosition"
         },
+        "overrideAspiratePosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "overrideAspirateEndPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
         },
@@ -367,6 +373,12 @@
         "dispenseEndPosition": {
           "$ref": "#/definitions/tipPosition"
         },
+        "overrideDispensePosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "overrideDispenseEndPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
         "flowRateByVolume": {
           "$ref": "#/definitions/flowRateByVolume"
         },
@@ -409,6 +421,12 @@
           "$ref": "#/definitions/tipPosition"
         },
         "dispenseEndPosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "overrideDispensePosition": {
+          "$ref": "#/definitions/tipPosition"
+        },
+        "overrideDispenseEndPosition": {
           "$ref": "#/definitions/tipPosition"
         },
         "flowRateByVolume": {

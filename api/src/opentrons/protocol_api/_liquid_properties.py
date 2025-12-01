@@ -110,24 +110,10 @@ class TipPosition:
     _position_reference: PositionReference
     _offset: Coordinate
 
-    @property
-    def position_reference(self) -> PositionReference:
-        return self._position_reference
-
-    @position_reference.setter
-    def position_reference(self, new_position: Union[str, PositionReference]) -> None:
-        self._position_reference = (
-            new_position
-            if isinstance(new_position, PositionReference)
-            else PositionReference(new_position)
-        )
-
-    @property
-    def offset(self) -> Coordinate:
-        return self._offset
-
-    @offset.setter
-    def offset(self, new_offset: Union[Sequence[float], Coordinate]) -> None:
+    @classmethod
+    def create_offset(
+        cls, new_offset: Union[Sequence[float], Coordinate]
+    ) -> Coordinate:
         if isinstance(new_offset, Coordinate):
             new_coordinate: Sequence[Union[int, float]] = [
                 new_offset.x,
@@ -137,13 +123,45 @@ class TipPosition:
         else:
             new_coordinate = new_offset
         x, y, z = validation.validate_coordinates(new_coordinate)
-        self._offset = Coordinate(x=x, y=y, z=z)
+        return Coordinate(x=x, y=y, z=z)
+
+    @classmethod
+    def create_position_reference(
+        cls, new_position: Union[str, PositionReference]
+    ) -> PositionReference:
+        return (
+            new_position
+            if isinstance(new_position, PositionReference)
+            else PositionReference(new_position)
+        )
+
+    @property
+    def position_reference(self) -> PositionReference:
+        return self._position_reference
+
+    @position_reference.setter
+    def position_reference(self, new_position: Union[str, PositionReference]) -> None:
+        self._position_reference = TipPosition.create_position_reference(new_position)
+
+    @property
+    def offset(self) -> Coordinate:
+        return self._offset
+
+    @offset.setter
+    def offset(self, new_offset: Union[Sequence[float], Coordinate]) -> None:
+        self._offset = TipPosition.create_offset(new_offset)
 
     def as_shared_data_model(self) -> SharedDataTipPosition:
         return SharedDataTipPosition(
             positionReference=self._position_reference,
             offset=self.offset,
         )
+
+    @classmethod
+    def maybe_as_shared_data_model(
+        cls, position: Optional["TipPosition"]
+    ) -> Optional[SharedDataTipPosition]:
+        return position.as_shared_data_model() if position else None
 
 
 @dataclass(slots=True)
@@ -493,13 +511,23 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
     _retract: RetractAspirate
     _pre_wet: bool
     _mix: MixProperties
+    _override_aspirate_position: Optional[TipPosition]
+    _override_aspirate_end_position: Optional[TipPosition]
 
     @property
     def aspirate_position(self) -> TipPosition:
-        return self._aspirate_position
+        return self._override_aspirate_position or self._aspirate_position
 
     @property
     def aspirate_end_position(self) -> Optional[TipPosition]:
+        return self._override_aspirate_end_position or self._aspirate_end_position
+
+    @property
+    def fallback_aspirate_position(self) -> TipPosition:
+        return self._aspirate_position
+
+    @property
+    def fallback_aspirate_end_position(self) -> Optional[TipPosition]:
         return self._aspirate_end_position
 
     @property
@@ -524,15 +552,43 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             aspiratePosition=self._aspirate_position.as_shared_data_model(),
-            aspirateEndPosition=None
-            if self._aspirate_end_position is None
-            else self._aspirate_end_position.as_shared_data_model(),
+            aspirateEndPosition=TipPosition.maybe_as_shared_data_model(
+                self._aspirate_end_position
+            ),
+            overrideAspiratePosition=TipPosition.maybe_as_shared_data_model(
+                self._override_aspirate_position
+            ),
+            overrideAspirateEndPosition=TipPosition.maybe_as_shared_data_model(
+                self._override_aspirate_end_position
+            ),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             preWet=self._pre_wet,
             mix=self._mix.as_shared_data_model(),
             delay=self._delay.as_shared_data_model(),
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
         )
+
+    def override_tip_positions(
+        self,
+        new_position: Union[str, PositionReference],
+        new_offset: Union[Sequence[float], Coordinate],
+        new_end_position: Optional[Union[str, PositionReference]] = None,
+        new_end_offset: Optional[Union[Sequence[float], Coordinate]] = None,
+    ) -> None:
+        self._override_aspirate_position = TipPosition(
+            TipPosition.create_position_reference(new_position),
+            TipPosition.create_offset(new_offset),
+        )
+        if (new_end_position is None) != (new_end_offset is None):
+            # they must either both be none or both defined
+            raise ValueError(
+                f"New end position and new end offset must both be specified got position {new_end_position} and offset {new_end_offset}"
+            )
+        if new_end_position and new_end_offset:
+            self._override_aspirate_end_position = TipPosition(
+                TipPosition.create_position_reference(new_end_position),
+                TipPosition.create_offset(new_end_offset),
+            )
 
 
 @dataclass(slots=True)
@@ -543,13 +599,23 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
     _retract: RetractDispense
     _push_out_by_volume: LiquidHandlingPropertyByVolume
     _mix: MixProperties
+    _override_dispense_position: Optional[TipPosition]
+    _override_dispense_end_position: Optional[TipPosition]
 
     @property
     def dispense_position(self) -> TipPosition:
-        return self._dispense_position
+        return self._override_dispense_position or self._dispense_position
 
     @property
     def dispense_end_position(self) -> Optional[TipPosition]:
+        return self._override_dispense_end_position or self._dispense_end_position
+
+    @property
+    def fallback_dispense_position(self) -> TipPosition:
+        return self._dispense_position
+
+    @property
+    def fallback_dispense_end_position(self) -> Optional[TipPosition]:
         return self._dispense_end_position
 
     @property
@@ -569,15 +635,43 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
-            dispenseEndPosition=None
-            if self._dispense_end_position is None
-            else self._dispense_end_position.as_shared_data_model(),
+            dispenseEndPosition=TipPosition.maybe_as_shared_data_model(
+                self._dispense_end_position
+            ),
+            overrideDispensePosition=TipPosition.maybe_as_shared_data_model(
+                self._override_dispense_position
+            ),
+            overrideDispenseEndPosition=TipPosition.maybe_as_shared_data_model(
+                self._override_dispense_end_position
+            ),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             mix=self._mix.as_shared_data_model(),
             pushOutByVolume=self._push_out_by_volume.as_list_of_tuples(),
             delay=self._delay.as_shared_data_model(),
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
         )
+
+    def override_tip_positions(
+        self,
+        new_position: Union[str, PositionReference],
+        new_offset: Union[Sequence[float], Coordinate],
+        new_end_position: Optional[Union[str, PositionReference]] = None,
+        new_end_offset: Optional[Union[Sequence[float], Coordinate]] = None,
+    ) -> None:
+        self._override_dispense_position = TipPosition(
+            TipPosition.create_position_reference(new_position),
+            TipPosition.create_offset(new_offset),
+        )
+        if (new_end_position is None) != (new_end_offset is None):
+            # they must either both be none or both defined
+            raise ValueError(
+                f"New end position and new end offset must both be specified got position {new_end_position} and offset {new_end_offset}"
+            )
+        if new_end_position and new_end_offset:
+            self._override_dispense_end_position = TipPosition(
+                TipPosition.create_position_reference(new_end_position),
+                TipPosition.create_offset(new_end_offset),
+            )
 
 
 @dataclass(slots=True)
@@ -588,13 +682,23 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
     _retract: RetractDispense
     _conditioning_by_volume: LiquidHandlingPropertyByVolume
     _disposal_by_volume: LiquidHandlingPropertyByVolume
+    _override_dispense_position: Optional[TipPosition]
+    _override_dispense_end_position: Optional[TipPosition]
 
     @property
     def dispense_position(self) -> TipPosition:
-        return self._dispense_position
+        return self._override_dispense_position or self._dispense_position
 
     @property
     def dispense_end_position(self) -> Optional[TipPosition]:
+        return self._override_dispense_end_position or self._dispense_end_position
+
+    @property
+    def fallback_dispense_position(self) -> TipPosition:
+        return self._dispense_position
+
+    @property
+    def fallback_dispense_end_position(self) -> Optional[TipPosition]:
         return self._dispense_end_position
 
     @property
@@ -614,15 +718,43 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
             submerge=self._submerge.as_shared_data_model(),
             retract=self._retract.as_shared_data_model(),
             dispensePosition=self._dispense_position.as_shared_data_model(),
-            dispenseEndPosition=None
-            if self._dispense_end_position is None
-            else self._dispense_end_position.as_shared_data_model(),
+            dispenseEndPosition=TipPosition.maybe_as_shared_data_model(
+                self._dispense_end_position
+            ),
+            overrideDispensePosition=TipPosition.maybe_as_shared_data_model(
+                self._override_dispense_position
+            ),
+            overrideDispenseEndPosition=TipPosition.maybe_as_shared_data_model(
+                self._override_dispense_end_position
+            ),
             flowRateByVolume=self._flow_rate_by_volume.as_list_of_tuples(),
             conditioningByVolume=self._conditioning_by_volume.as_list_of_tuples(),
             disposalByVolume=self._disposal_by_volume.as_list_of_tuples(),
             delay=self._delay.as_shared_data_model(),
             correctionByVolume=self._correction_by_volume.as_list_of_tuples(),
         )
+
+    def override_tip_positions(
+        self,
+        new_position: Union[str, PositionReference],
+        new_offset: Union[Sequence[float], Coordinate],
+        new_end_position: Optional[Union[str, PositionReference]] = None,
+        new_end_offset: Optional[Union[Sequence[float], Coordinate]] = None,
+    ) -> None:
+        self._override_dispense_position = TipPosition(
+            TipPosition.create_position_reference(new_position),
+            TipPosition.create_offset(new_offset),
+        )
+        if (new_end_position is None) != (new_end_offset is None):
+            # they must either both be none or both defined
+            raise ValueError(
+                f"New end position and new end offset must both be specified got position {new_end_position} and offset {new_end_offset}"
+            )
+        if new_end_position and new_end_offset:
+            self._override_dispense_end_position = TipPosition(
+                TipPosition.create_position_reference(new_end_position),
+                TipPosition.create_offset(new_end_offset),
+            )
 
 
 @dataclass(slots=True)
@@ -651,6 +783,12 @@ def _build_tip_position(tip_position: SharedDataTipPosition) -> TipPosition:
     return TipPosition(
         _position_reference=tip_position.positionReference, _offset=tip_position.offset
     )
+
+
+def _maybe_build_tip_position(
+    tip_position: Optional[SharedDataTipPosition],
+) -> Optional[TipPosition]:
+    return _build_tip_position(tip_position) if tip_position else None
 
 
 def _build_delay_properties(
@@ -756,11 +894,15 @@ def build_aspirate_properties(
         _submerge=_build_submerge(aspirate_properties.submerge),
         _retract=_build_retract_aspirate(aspirate_properties.retract),
         _aspirate_position=_build_tip_position(aspirate_properties.aspiratePosition),
-        _aspirate_end_position=_build_tip_position(
+        _aspirate_end_position=_maybe_build_tip_position(
             aspirate_properties.aspirateEndPosition
-        )
-        if aspirate_properties.aspirateEndPosition is not None
-        else None,
+        ),
+        _override_aspirate_position=_maybe_build_tip_position(
+            aspirate_properties.overrideAspiratePosition
+        ),
+        _override_aspirate_end_position=_maybe_build_tip_position(
+            aspirate_properties.overrideAspirateEndPosition
+        ),
         _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
             aspirate_properties.flowRateByVolume
         ),
@@ -782,11 +924,15 @@ def build_single_dispense_properties(
         _dispense_position=_build_tip_position(
             single_dispense_properties.dispensePosition
         ),
-        _dispense_end_position=_build_tip_position(
+        _dispense_end_position=_maybe_build_tip_position(
             single_dispense_properties.dispenseEndPosition
-        )
-        if single_dispense_properties.dispenseEndPosition is not None
-        else None,
+        ),
+        _override_dispense_position=_maybe_build_tip_position(
+            single_dispense_properties.overrideDispensePosition
+        ),
+        _override_dispense_end_position=_maybe_build_tip_position(
+            single_dispense_properties.overrideDispenseEndPosition
+        ),
         _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
             single_dispense_properties.flowRateByVolume
         ),
@@ -812,11 +958,15 @@ def build_multi_dispense_properties(
         _dispense_position=_build_tip_position(
             multi_dispense_properties.dispensePosition
         ),
-        _dispense_end_position=_build_tip_position(
+        _dispense_end_position=_maybe_build_tip_position(
             multi_dispense_properties.dispenseEndPosition
-        )
-        if multi_dispense_properties.dispenseEndPosition is not None
-        else None,
+        ),
+        _override_dispense_position=_maybe_build_tip_position(
+            multi_dispense_properties.overrideDispensePosition
+        ),
+        _override_dispense_end_position=_maybe_build_tip_position(
+            multi_dispense_properties.overrideDispenseEndPosition
+        ),
         _flow_rate_by_volume=LiquidHandlingPropertyByVolume(
             multi_dispense_properties.flowRateByVolume
         ),

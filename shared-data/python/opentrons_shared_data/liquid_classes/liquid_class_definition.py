@@ -414,6 +414,18 @@ class AspirateProperties(BaseLiquidClassModel):
         description="Ending tip position during dynamic aspirate.",
         json_schema_extra=_remove_default,
     )
+    overrideAspiratePosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="override_aspirate_position",
+        description="Tip position during aspirate if this position is not possible it will fall back to aspirate_position.",
+        json_schema_extra=_remove_default,
+    )
+    overrideAspirateEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="override_aspirate_end_position",
+        description="Ending tip position during dynamic aspirate if this position is not possible it will fall back to aspirate_end_position.",
+        json_schema_extra=_remove_default,
+    )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         alias="flow_rate_by_volume",
@@ -452,6 +464,18 @@ class SingleDispenseProperties(BaseLiquidClassModel):
         description="Ending tip position during dynamic dispense.",
         json_schema_extra=_remove_default,
     )
+    overrideDispensePosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="override_dispense_position",
+        description="Tip position during dispense if this position is not possible it will fall back to dispense_position.",
+        json_schema_extra=_remove_default,
+    )
+    overrideDispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="override_dispense_end_position",
+        description="Ending tip position during dynamic dispense if this position is not possible it will fall back to dispense_end_position.",
+        json_schema_extra=_remove_default,
+    )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(
         ...,
         alias="flow_rate_by_volume",
@@ -486,6 +510,18 @@ class MultiDispenseProperties(BaseLiquidClassModel):
         None,
         alias="dispense_end_position",
         description="Ending tip position during dynamic dispense.",
+        json_schema_extra=_remove_default,
+    )
+    overrideDispensePosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="override_dispense_position",
+        description="Tip position during dispense if this position is not possible it will fall back to dispense_position.",
+        json_schema_extra=_remove_default,
+    )
+    overrideDispenseEndPosition: TipPosition | SkipJsonSchema[None] = Field(
+        None,
+        alias="override_dispense_end_position",
+        description="Ending tip position during dynamic dispense if this position is not possible it will fall back to dispense_end_position.",
         json_schema_extra=_remove_default,
     )
     flowRateByVolume: LiquidHandlingPropertyByVolume = Field(

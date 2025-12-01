@@ -92,6 +92,8 @@ class AspiratePropertiesDict(TypedDict):
     delay: DelayPropertiesDict
     aspirate_position: TipPositionDict
     aspirate_end_position: NotRequired[TipPositionDict]
+    override_aspirate_position: NotRequired[TipPositionDict]
+    override_aspirate_end_position: NotRequired[TipPositionDict]
     retract: RetractAspirateDict
     pre_wet: bool
     mix: MixPropertiesDict
@@ -106,6 +108,8 @@ class SingleDispensePropertiesDict(TypedDict):
     delay: DelayPropertiesDict
     dispense_position: TipPositionDict
     dispense_end_position: NotRequired[TipPositionDict]
+    override_dispense_position: NotRequired[TipPositionDict]
+    override_dispense_end_position: NotRequired[TipPositionDict]
     retract: RetractDispenseDict
     push_out_by_volume: Sequence[Tuple[float, float]]
     mix: MixPropertiesDict
@@ -120,6 +124,8 @@ class MultiDispensePropertiesDict(TypedDict):
     delay: DelayPropertiesDict
     dispense_position: TipPositionDict
     dispense_end_position: NotRequired[TipPositionDict]
+    override_dispense_position: NotRequired[TipPositionDict]
+    override_dispense_end_position: NotRequired[TipPositionDict]
     retract: RetractDispenseDict
     conditioning_by_volume: Sequence[Tuple[float, float]]
     disposal_by_volume: Sequence[Tuple[float, float]]
