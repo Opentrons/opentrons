@@ -89,7 +89,7 @@ Under normal circumstances, the OT-2 does not create detectable aerosols from so
 
 To minimize the potential risk of aerosol exposure from the OT-2, it is a good practice to:
 
-- Perform maintenance as described in the [Maintenance chapter](maintenance.md).
+- Perform maintenance as described in the [Maintenance chapter](./maintenance/index.md).
 - Properly install and secure all instrument covers, pipettes, modules, and labware.
 - Use proper pipetting technique to aid in the mitigation of aerosols.
 
