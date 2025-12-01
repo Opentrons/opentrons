@@ -12,7 +12,7 @@ from robot_server.camera.settings.store import (
     get_camera_setting_store,
 )
 from robot_server.protocols.dependencies import get_protocol_store
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolStore
 from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.data_files.dependencies import get_data_file_auto_deleter

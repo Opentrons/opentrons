@@ -29,8 +29,7 @@ from robot_server.persistence.tables import (
     run_csv_rtp_table,
     ProtocolKindSQLEnum,
 )
-from robot_server.protocols.protocol_models import ProtocolKind
-
+from opentrons_shared_data.protocol.constants import ProtocolKind
 
 _CACHE_ENTRIES = 32
 

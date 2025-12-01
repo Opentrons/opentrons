@@ -35,7 +35,7 @@ from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisStore,
     CompletedAnalysisResource,
 )
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource, ProtocolStore
 from robot_server.protocols.rtp_resources import CSVParameterResource
 

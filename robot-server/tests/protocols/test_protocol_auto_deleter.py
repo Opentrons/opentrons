@@ -9,7 +9,7 @@ from decoy import Decoy
 
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.protocols.protocol_auto_deleter import ProtocolAutoDeleter
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolResource,
     ProtocolStore,

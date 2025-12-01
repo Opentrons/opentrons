@@ -29,7 +29,7 @@ from opentrons.protocol_runner.run_orchestrator import ParseMode
 import opentrons.util.helpers as datetime_helper
 
 from robot_server.protocols.analysis_store import AnalysisStore
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.protocol_analyzer import ProtocolAnalyzer
 import robot_server.errors.error_mappers as em
@@ -182,7 +182,11 @@ async def test_analyze(
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )
-    decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
+    decoy.when(
+        await orchestrator.run(
+            deck_configuration=[],
+        )
+    ).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(

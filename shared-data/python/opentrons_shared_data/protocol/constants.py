@@ -96,3 +96,10 @@ class JsonThermocyclerCommand(Enum):
     thermocyclerAwaitProfileComplete: "ThermocyclerAwaitProfileCommandId" = (
         "thermocycler/awaitProfileComplete"
     )
+
+
+class ProtocolKind(str, Enum):
+    """Kind of protocol, standard or quick-transfer."""
+
+    STANDARD = "standard"
+    QUICK_TRANSFER = "quick-transfer"

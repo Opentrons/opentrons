@@ -3,7 +3,6 @@
 from datetime import datetime
 from pydantic import ConfigDict, BaseModel, Field
 from typing import Any, List, Optional
-from enum import Enum
 
 from opentrons.protocol_reader import (
     ProtocolType as ProtocolType,
@@ -11,16 +10,10 @@ from opentrons.protocol_reader import (
 )
 
 from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.protocol.constants import ProtocolKind
 
 from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
-
-
-class ProtocolKind(str, Enum):
-    """Kind of protocol, standard or quick-transfer."""
-
-    STANDARD = "standard"
-    QUICK_TRANSFER = "quick-transfer"
 
 
 class ProtocolFile(BaseModel):

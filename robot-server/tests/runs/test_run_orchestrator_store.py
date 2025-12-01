@@ -35,7 +35,7 @@ from robot_server.runs.run_orchestrator_store import (
     handle_hardware_event,
 )
 from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 
 
 def mock_notify_publishers() -> None:

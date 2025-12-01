@@ -4,7 +4,7 @@
 from logging import getLogger
 
 from robot_server.deletion_planner import ProtocolDeletionPlanner
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from .protocol_store import ProtocolStore
 
 

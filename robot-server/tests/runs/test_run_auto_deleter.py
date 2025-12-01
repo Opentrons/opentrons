@@ -11,7 +11,7 @@ from decoy import Decoy
 from opentrons.protocol_reader import ProtocolSource
 
 from robot_server.deletion_planner import RunDeletionPlanner
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource, ProtocolStore
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_store import RunStore, RunResource, BadRunResource

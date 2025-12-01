@@ -11,7 +11,7 @@ from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.protocols import protocol_analyzer
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.analyses_manager import (
     AnalysesManager,
     FailedToInitializeAnalyzer,

@@ -32,7 +32,7 @@ from robot_server.protocols.analysis_models import (
     AnalysisStatus,
     RunTimeParameterAnalysisData,
 )
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolStore,
     ProtocolResource,

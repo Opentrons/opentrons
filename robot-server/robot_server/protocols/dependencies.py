@@ -7,7 +7,7 @@ from typing_extensions import Annotated
 
 from anyio import Path as AsyncPath
 from fastapi import Depends
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.protocol_reader import ProtocolReader, FileReaderWriter, FileHasher

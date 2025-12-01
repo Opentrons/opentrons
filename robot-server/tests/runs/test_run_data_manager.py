@@ -7,7 +7,7 @@ from unittest.mock import sentinel, Mock
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.data_files import RunFileNameMetadata
+from opentrons_shared_data.data_files import RunFileMetadata
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
@@ -37,7 +37,7 @@ from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs import error_recovery_mapping
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule
@@ -365,7 +365,7 @@ async def test_create(
     )
     decoy.verify(
         mock_file_provider.set_run_metadata(
-            RunFileNameMetadata(
+            RunFileMetadata(
                 robot_name=config.name(),
                 run_id=run_id,
                 run_created_at=created_at,

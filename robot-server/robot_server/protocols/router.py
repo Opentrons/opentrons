@@ -57,7 +57,8 @@ from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFo
 from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
 
 from .protocol_auto_deleter import ProtocolAutoDeleter
-from .protocol_models import Protocol, ProtocolFile, Metadata, ProtocolKind
+from .protocol_models import Protocol, ProtocolFile, Metadata
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
 from .analysis_models import (
     ProtocolAnalysis,

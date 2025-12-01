@@ -37,7 +37,7 @@ from robot_server.service.json_api import (
     ResourceLink,
 )
 
-from robot_server.protocols.protocol_models import ProtocolKind
+from opentrons_shared_data.protocol.constants import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolResource,
