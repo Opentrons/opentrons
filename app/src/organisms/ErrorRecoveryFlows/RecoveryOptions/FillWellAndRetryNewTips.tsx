@@ -15,11 +15,8 @@ export function FillWellAndRetryNewTips(
 ): JSX.Element {
   const { recoveryMap, routeUpdateActions } = props
   const { step, route } = recoveryMap
-  const {
-    MANUAL_FILL_AND_RETRY_NEW_TIPS,
-    DROP_TIP_FLOWS,
-    CANCEL_RUN,
-  } = RECOVERY_MAP
+  const { MANUAL_FILL_AND_RETRY_NEW_TIPS, DROP_TIP_FLOWS, CANCEL_RUN } =
+    RECOVERY_MAP
 
   if (step === MANUAL_FILL_AND_RETRY_NEW_TIPS.STEPS.DROP_TIPS) {
     void routeUpdateActions.proceedToRouteAndStep(

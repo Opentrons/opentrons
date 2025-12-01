@@ -148,6 +148,7 @@ export interface TCSetTargetBlockTemperatureRunTimeCommand
     TCSetTargetBlockTemperatureCreateCommand {
   result?: any
 }
+
 export interface TCSetTargetLidTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetLidTemperature'
@@ -158,6 +159,7 @@ export interface TCSetTargetLidTemperatureRunTimeCommand
     TCSetTargetLidTemperatureCreateCommand {
   result?: any
 }
+
 export interface TCWaitForBlockTemperatureCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForBlockTemperature'
@@ -459,17 +461,18 @@ interface StackerStoredLabwareDefinitionURIs {
   lidLabwareURI?: string | null
 }
 
+export interface FlexStackerSetStoredLabwareParams {
+  moduleId: string
+  initialCount?: number | null
+  primaryLabware: FlexStackerStoredLabwareDetails
+  lidLabware: FlexStackerStoredLabwareDetails | null
+  adapterLabware: FlexStackerStoredLabwareDetails | null
+}
+
 export interface FlexStackerSetStoredLabwareCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'flexStacker/setStoredLabware'
-  params: {
-    moduleId: string
-    initialCount?: number | null
-    initialStoredLabware?: FlexStackerStoredLabwareGroup[] | null
-    primaryLabware: FlexStackerStoredLabwareDetails
-    lidLabware: FlexStackerStoredLabwareDetails | null
-    adapterLabware: FlexStackerStoredLabwareDetails | null
-  }
+  params: FlexStackerSetStoredLabwareParams
 }
 
 export interface FlexStackerSetStoredLabwareRunTimeCommand
@@ -500,25 +503,29 @@ export interface FlexStackerStoreCreateCommand extends CommonCommandCreateInfo {
   }
 }
 
+export interface FlexStackerFillParams {
+  moduleId: string
+  strategy: 'manualWithPause' | 'logical'
+  message?: string
+  count?: number
+  labwareToStore?: FlexStackerStoredLabwareGroup[]
+}
+
 export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/fill'
-  params: {
-    moduleId: string
-    strategy: 'manualWithPause' | 'logical'
-    message?: string
-    count?: number
-    labwareToStore?: FlexStackerStoredLabwareGroup[]
-  }
+  params: FlexStackerFillParams
+}
+
+export interface FlexStackerEmptyParams {
+  moduleId: string
+  strategy: 'manualWithPause' | 'logical'
+  message?: string
+  count?: number
 }
 
 export interface FlexStackerEmptyCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/empty'
-  params: {
-    moduleId: string
-    strategy: 'manualWithPause' | 'logical'
-    message?: string
-    count?: number
-  }
+  params: FlexStackerEmptyParams
 }
 
 export interface FlexStackerPrepareShuttleCreateCommand

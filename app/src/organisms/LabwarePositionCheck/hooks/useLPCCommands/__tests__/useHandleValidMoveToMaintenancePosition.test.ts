@@ -59,9 +59,8 @@ describe('useHandleValidMoveToMaintenancePosition', () => {
       useHandleValidMoveToMaintenancePosition(mockProps)
     )
 
-    const response = await result.current.handleValidMoveToMaintenancePosition(
-      mockPipette
-    )
+    const response =
+      await result.current.handleValidMoveToMaintenancePosition(mockPipette)
 
     expect(moveToMaintenancePosition).toHaveBeenCalledWith(mockPipette)
     expect(mockChainLPCCommands).toHaveBeenCalledWith(

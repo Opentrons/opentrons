@@ -55,8 +55,6 @@ const mockTipLengthCalibrations = [
   },
 ]
 
-const mockUpdateRobotStatus = vi.fn()
-
 const render = (
   props: ComponentProps<typeof TipLengthCalibrationItems>
 ): ReturnType<typeof renderWithProviders> => {
@@ -73,7 +71,7 @@ describe('TipLengthCalibrationItems', () => {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
       formattedTipLengthCalibrations: mockTipLengthCalibrations,
-      updateRobotStatus: mockUpdateRobotStatus,
+      isRobotBusy: false,
     }
   })
 

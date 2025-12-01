@@ -36,6 +36,9 @@
     "targetTemperature": "Valid range between 4 and 95 °C",
     "volume": "Recommended between 0.1 and {{max}}"
   },
+  "camera": {
+    "capture_image": "Capture image of the deck"
+  },
   "change_tips": "Change tips",
   "column": "Column",
   "comfirm_reset_settings": {
@@ -166,9 +169,11 @@
   "select_volume": "Select a volume",
   "select_wells": "Select wells using a {{displayName}}",
   "shake": "Shake",
+  "shake_speed": "Shake speed",
   "single": "Single transfer",
   "single_nozzle": "Single",
   "speed": "Speed",
+  "start_point": "{{prefix}} start point",
   "starting_deck": "Starting deck",
   "step_substeps": "{{stepType}} details",
   "submerge": "Submerge",
@@ -213,6 +218,10 @@
       "block": "<text>Set thermocycler block to</text><tag/>",
       "lid_position": "<text>Lid position</text><tag/>",
       "lid_temperature": "<text>Set thermocycler lid to</text><tag/>"
+    },
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
     }
   },
   "time": "Time",

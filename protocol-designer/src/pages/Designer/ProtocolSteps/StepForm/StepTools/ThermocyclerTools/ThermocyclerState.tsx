@@ -101,7 +101,7 @@ export function ThermocyclerState(props: ThermocyclerStateProps): JSX.Element {
         toggleValue={propsForFields[lidPositionField].value}
         tooltipContent={
           propsForFields[lidPositionField].disabled
-            ? propsForFields[lidPositionField].tooltipContent ?? null
+            ? (propsForFields[lidPositionField].tooltipContent ?? null)
             : null
         }
       />

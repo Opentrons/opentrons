@@ -7,7 +7,7 @@ import type { Socket } from 'dgram'
 import type { Browser as BaseBrowser } from 'mdns-js'
 
 const socket = (address: string): Socket =>
-  ({ address: () => ({ address, port: 0 }) } as Socket)
+  ({ address: () => ({ address, port: 0 }) }) as Socket
 
 describe('interface utilities', () => {
   describe('getting browser interfaces', () => {

@@ -29,29 +29,33 @@ export * from './deck-calibration'
 export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
 
-export const mockCalibrationCheckSessionAttributes: Types.CalibrationCheckSessionResponseAttributes = {
-  sessionType: Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
-  createParams: mockRobotCalibrationCheckSessionParams,
-  details: mockRobotCalibrationCheckSessionDetails,
-}
+export const mockCalibrationCheckSessionAttributes: Types.CalibrationCheckSessionResponseAttributes =
+  {
+    sessionType: Constants.SESSION_TYPE_CALIBRATION_HEALTH_CHECK,
+    createParams: mockRobotCalibrationCheckSessionParams,
+    details: mockRobotCalibrationCheckSessionDetails,
+  }
 
-export const mockTipLengthCalibrationSessionAttributes: Types.TipLengthCalibrationSessionResponseAttributes = {
-  sessionType: Constants.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
-  createParams: mockTipLengthCalibrationSessionParams,
-  details: mockTipLengthCalibrationSessionDetails,
-}
+export const mockTipLengthCalibrationSessionAttributes: Types.TipLengthCalibrationSessionResponseAttributes =
+  {
+    sessionType: Constants.SESSION_TYPE_TIP_LENGTH_CALIBRATION,
+    createParams: mockTipLengthCalibrationSessionParams,
+    details: mockTipLengthCalibrationSessionDetails,
+  }
 
-export const mockDeckCalibrationSessionAttributes: Types.DeckCalibrationSessionResponseAttributes = {
-  sessionType: Constants.SESSION_TYPE_DECK_CALIBRATION,
-  createParams: {},
-  details: mockDeckCalibrationSessionDetails,
-}
+export const mockDeckCalibrationSessionAttributes: Types.DeckCalibrationSessionResponseAttributes =
+  {
+    sessionType: Constants.SESSION_TYPE_DECK_CALIBRATION,
+    createParams: {},
+    details: mockDeckCalibrationSessionDetails,
+  }
 
-export const mockPipetteOffsetCalibrationSessionAttributes: Types.PipetteOffsetCalibrationSessionResponseAttributes = {
-  sessionType: Constants.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
-  createParams: mockPipetteOffsetCalibrationSessionParams,
-  details: mockPipetteOffsetCalibrationSessionDetails,
-}
+export const mockPipetteOffsetCalibrationSessionAttributes: Types.PipetteOffsetCalibrationSessionResponseAttributes =
+  {
+    sessionType: Constants.SESSION_TYPE_PIPETTE_OFFSET_CALIBRATION,
+    createParams: mockPipetteOffsetCalibrationSessionParams,
+    details: mockPipetteOffsetCalibrationSessionDetails,
+  }
 
 export const mockSession: Types.Session = {
   ...mockCalibrationCheckSessionAttributes,
@@ -82,12 +86,13 @@ export const mockTipLengthCalibrationSessionResponse: Types.SessionResponse = {
   },
 }
 
-export const mockPipetteOffsetCalibrationSessionResponse: Types.SessionResponse = {
-  data: {
-    ...mockPipetteOffsetCalibrationSessionAttributes,
-    id: mockSessionId,
-  },
-}
+export const mockPipetteOffsetCalibrationSessionResponse: Types.SessionResponse =
+  {
+    data: {
+      ...mockPipetteOffsetCalibrationSessionAttributes,
+      id: mockSessionId,
+    },
+  }
 
 export const mockDeckCalibrationSessionResponse: Types.SessionResponse = {
   data: {

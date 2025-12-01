@@ -120,16 +120,13 @@ export function TipPositionModal(
   const [xValue, setXValue] = useState<string>(
     xSpec?.value == null ? '0' : String(xSpec?.value)
   )
-  const {
-    positionReferenceDropdown,
-    reference,
-    setReference,
-  } = usePositionReference({
-    initialReference: referenceSpec?.value,
-    zValue: Number(zValue),
-    updateZValue: setZValue,
-    wellDepth: wellDepthMm,
-  })
+  const { positionReferenceDropdown, reference, setReference } =
+    usePositionReference({
+      initialReference: referenceSpec?.value,
+      zValue: Number(zValue),
+      updateZValue: setZValue,
+      wellDepth: wellDepthMm,
+    })
 
   // submerge/retract in well warning
   const isInWell =
@@ -182,12 +179,10 @@ export function TipPositionModal(
     reference,
     wellDepthMm
   )
-  const { minValue: yMinWidth, maxValue: yMaxWidth } = utils.getMinMaxWidth(
-    wellYWidthMm
-  )
-  const { minValue: xMinWidth, maxValue: xMaxWidth } = utils.getMinMaxWidth(
-    wellXWidthMm
-  )
+  const { minValue: yMinWidth, maxValue: yMaxWidth } =
+    utils.getMinMaxWidth(wellYWidthMm)
+  const { minValue: xMinWidth, maxValue: xMaxWidth } =
+    utils.getMinMaxWidth(wellXWidthMm)
 
   const createErrors = (
     value: string | null,
@@ -280,15 +275,18 @@ export function TipPositionModal(
       ? utils.getIsZValueAtBottom(zValue, wellDepthMm, reference)
       : false
 
+  const titleText =
+    prefix === 'aspirate' || prefix === 'dispense' || prefix === 'mix'
+      ? t('shared:tip_position', { prefix: MoveLiquidPrefixToAction[prefix] })
+      : t('shared:start_point', { prefix: MoveLiquidPrefixToAction[prefix] })
+
   return createPortal(
     <Modal
       marginLeft="0"
       type="info"
       width="47rem"
       closeOnOutsideClick
-      title={t('shared:tip_position', {
-        prefix: MoveLiquidPrefixToAction[prefix],
-      })}
+      title={titleText}
       onClose={handleCancel}
       footer={
         <Flex
@@ -424,8 +422,11 @@ export function TipPositionModal(
               <TipPositionSideView
                 mmFromBottom={
                   zValue !== null
-                    ? getMmFromBottom(Number(zValue), reference, wellDepthMm) ??
-                      defaultMmFromBottom
+                    ? (getMmFromBottom(
+                        Number(zValue),
+                        reference,
+                        wellDepthMm
+                      ) ?? defaultMmFromBottom)
                     : defaultMmFromBottom
                 }
                 wellDepthMm={wellDepthMm}

@@ -115,9 +115,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
     placement: 'top-end',
   })
 
-  const [dropdownPosition, setDropdownPosition] = useState<
-    Omit<MenuPlacement, 'auto'>
-  >('bottom')
+  const [dropdownPosition, setDropdownPosition] =
+    useState<Omit<MenuPlacement, 'auto'>>('bottom')
   const dropDownMenuWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowDropdownMenu(false)
@@ -171,7 +170,8 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         !menuItemsContainerRef.current
       )
         return
-      const currentTriggerRect = dropDownMenuWrapperRef.current.getBoundingClientRect()
+      const currentTriggerRect =
+        dropDownMenuWrapperRef.current.getBoundingClientRect()
       const currentMenuHeight = menuItemsContainerRef.current.scrollHeight
       const currentViewportHeight = window.innerHeight
       const currentSpaceAbove = currentTriggerRect.top

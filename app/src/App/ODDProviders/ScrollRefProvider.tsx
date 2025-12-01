@@ -7,9 +7,8 @@ export interface SharedScrollRefContextType {
   element: HTMLElement | null
 }
 
-export const SharedScrollRefContext = createContext<SharedScrollRefContextType | null>(
-  null
-)
+export const SharedScrollRefContext =
+  createContext<SharedScrollRefContextType | null>(null)
 
 // This provider exists to capture the ref of the main scrollable Box element in the ODD
 // This is so that we can do things like auto scroll (using the ref) across components

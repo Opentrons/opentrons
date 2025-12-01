@@ -11,7 +11,12 @@ import type { StyleProps } from '../../primitives'
 
 export * from './ListButtonChildren/index'
 
-type ListButtonType = 'noActive' | 'connected' | 'notConnected' | 'onColor'
+type ListButtonType =
+  | 'noActive'
+  | 'connected'
+  | 'notConnected'
+  | 'onColor'
+  | 'error'
 
 interface ListButtonProps extends StyleProps {
   /** ListButton type */
@@ -46,6 +51,10 @@ const DESKTOP_LIST_BUTTON_PROPS_BY_TYPE: Record<
     backgroundColor: COLORS.white,
     hoverBackgroundColor: COLORS.grey10,
   },
+  error: {
+    backgroundColor: COLORS.red30,
+    hoverBackgroundColor: COLORS.red35,
+  },
 }
 
 const ODD_LIST_BUTTON_PROPS_BY_TYPE: Record<
@@ -67,6 +76,10 @@ const ODD_LIST_BUTTON_PROPS_BY_TYPE: Record<
   onColor: {
     backgroundColor: COLORS.white,
     hoverBackgroundColor: COLORS.grey20,
+  },
+  error: {
+    backgroundColor: COLORS.red35,
+    hoverBackgroundColor: COLORS.red40,
   },
 }
 

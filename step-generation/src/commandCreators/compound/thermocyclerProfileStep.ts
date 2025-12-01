@@ -12,11 +12,9 @@ import type {
   ThermocyclerProfileStepArgs,
 } from '../../types'
 
-export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const thermocyclerProfileStep: CommandCreator<
+  ThermocyclerProfileStepArgs
+> = (args, invariantContext, prevRobotState) => {
   const {
     blockTargetTempHold,
     lidTargetTempHold,

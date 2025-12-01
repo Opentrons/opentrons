@@ -25,6 +25,10 @@ from .command_annotations import (
     CustomCommandAnnotation,
     CommandAnnotation,
 )
+from .command_preconditions import (
+    CommandPreconditions,
+    PreconditionTypes,
+)
 from .partial_tip_configuration import (
     AllNozzleLayoutConfiguration,
     SingleNozzleLayoutConfiguration,
@@ -169,6 +173,9 @@ __all__ = [
     "SecondOrderCommandAnnotation",
     "CustomCommandAnnotation",
     "CommandAnnotation",
+    # Command preconditions
+    "PreconditionTypes",
+    "CommandPreconditions",
     # Partial tip handling
     "AllNozzleLayoutConfiguration",
     "SingleNozzleLayoutConfiguration",

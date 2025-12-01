@@ -1,4 +1,4 @@
-import { GET, request } from '../request'
+import { createAxiosConfig, GET, request } from '../request'
 
 import type { ResponsePromise } from '../request'
 import type { HostConfig } from '../types'
@@ -29,6 +29,6 @@ export function getLabwareOffsets(
     '/labwareOffsets',
     null,
     config,
-    params
+    params && createAxiosConfig({ params })
   )
 }

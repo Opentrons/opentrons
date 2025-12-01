@@ -62,7 +62,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -85,13 +85,10 @@ interface SetupModulesListProps {
 
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId, deckConfigCompatibility } = props
-  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    runId
-  )
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = useUnmatchedModulesForProtocol(robotName, runId)
+  const moduleRenderInfoForProtocolById =
+    useModuleRenderInfoForProtocolById(runId)
+  const { missingModuleIds, remainingAttachedModules } =
+    useUnmatchedModulesForProtocol(robotName, runId)
 
   const isFlex = useIsFlex(robotName)
   const { robotModel } = useRobot(robotName) ?? {}
@@ -228,7 +225,7 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -236,10 +233,8 @@ export function ModulesListItem({
   const [showModuleSetupModal, setShowModuleSetupModal] = useState<
     string | null
   >(null)
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
 
   const { parseModuleUSBPort } = useModuleUSBPort()
 

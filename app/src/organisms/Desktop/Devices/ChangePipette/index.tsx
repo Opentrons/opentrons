@@ -87,10 +87,8 @@ export function ChangePipette(props: Props): JSX.Element | null {
       ? getCalibrationForPipette(state, robotName, attachedPipette.id, mount)
       : null
   )
-  const [
-    wrongWantedPipette,
-    setWrongWantedPipette,
-  ] = useState<PipetteNameSpecs | null>(wantedPipette)
+  const [wrongWantedPipette, setWrongWantedPipette] =
+    useState<PipetteNameSpecs | null>(wantedPipette)
   const [confirmPipetteLevel, setConfirmPipetteLevel] = useState<boolean>(false)
 
   const movementStatus = useSelector((state: State) => {

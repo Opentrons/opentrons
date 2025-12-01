@@ -55,6 +55,35 @@ export function useDispenseSettingsConfig({
       return t('blow_out_into_waste_chute')
     }
   }
+  const getDisposalVolumeLocationCopy = (): string => {
+    if (state.disposalVolumeDispenseSettings?.blowOutLocation == null) {
+      return t('trashBin')
+    }
+    if (
+      state.disposalVolumeDispenseSettings.blowOutLocation ===
+      SOURCE_WELL_BLOWOUT_DESTINATION
+    ) {
+      return t('blow_out_source_well')
+    }
+    if (
+      typeof state.disposalVolumeDispenseSettings.blowOutLocation ===
+        'object' &&
+      state.disposalVolumeDispenseSettings.blowOutLocation.cutoutFixtureId ===
+        TRASH_BIN_ADAPTER_FIXTURE
+    ) {
+      return t('trashBin')
+    }
+    if (
+      typeof state.disposalVolumeDispenseSettings.blowOutLocation ===
+        'object' &&
+      WASTE_CHUTE_FIXTURES.includes(
+        state.disposalVolumeDispenseSettings.blowOutLocation.cutoutFixtureId
+      )
+    ) {
+      return t('wasteChute')
+    }
+    return t('trashBin')
+  }
 
   const touchTipEnabled = getIsTouchTipEnabled(state.destination)
   const hasLiquidClass = state.liquidClassName !== 'none'
@@ -197,11 +226,7 @@ export function useDispenseSettingsConfig({
         state.disposalVolumeDispenseSettings != null && isMultiTransfer
           ? t('disposal_volume_label', {
               volume: state.disposalVolumeDispenseSettings.volume,
-              location:
-                state.disposalVolumeDispenseSettings.blowOutLocation ===
-                SOURCE_WELL_BLOWOUT_DESTINATION
-                  ? t('blow_out_source_well')
-                  : t('trashBin'),
+              location: getDisposalVolumeLocationCopy(),
               flowRate: state.disposalVolumeDispenseSettings.flowRate,
             })
           : t('option_disabled'),

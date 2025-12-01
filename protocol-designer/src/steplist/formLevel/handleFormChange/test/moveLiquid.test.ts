@@ -693,3 +693,14 @@ describe('air gap > dispense volume', () => {
     })
   })
 })
+
+describe('change tip', () => {
+  it('should update the tips_selected field when the changeTip field is changed', () => {
+    const form = {
+      changeTip: 'always',
+      tips_selected: [['A1']],
+    }
+    const result = handleFormHelper({ changeTip: 'once' }, form)
+    expect(result.tips_selected).toEqual([])
+  })
+})

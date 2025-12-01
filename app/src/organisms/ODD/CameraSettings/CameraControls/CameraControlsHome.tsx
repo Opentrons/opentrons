@@ -5,7 +5,7 @@ import { Icon, ListButton, StyledText } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubPreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/useStubPreviewImage'
+import { usePreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from '../preferences.module.css'
@@ -27,7 +27,7 @@ export function CameraControlsHome({
   settings,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { isLoading, imgPath, takePhoto } = useStubPreviewImage()
+  const { isLoading, imgPath, takePhoto } = usePreviewImage()
 
   const [showModal, setShowModal] = useState(false)
 

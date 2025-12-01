@@ -76,14 +76,14 @@ export function ResultsSummary(
       pipette: leftPipette,
       calibration:
         leftPipette != null
-          ? comparisonsByPipette?.[leftPipette.rank] ?? null
+          ? (comparisonsByPipette?.[leftPipette.rank] ?? null)
           : null,
     },
     right: {
       pipette: rightPipette,
       calibration:
         rightPipette != null
-          ? comparisonsByPipette?.[rightPipette.rank] ?? null
+          ? (comparisonsByPipette?.[rightPipette.rank] ?? null)
           : null,
     },
   }

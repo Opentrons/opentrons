@@ -19,6 +19,7 @@ from .hardware import (
 from .persistence.fastapi_dependencies import (
     start_initializing_persistence,
     clean_up_persistence,
+    initialize_images_directory,
 )
 from .router import router
 from .service.logging import initialize_logging
@@ -70,6 +71,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             ],
         )
         exit_stack.push_async_callback(clean_up_hardware, app.state)
+
+        await initialize_images_directory(
+            app_state=app.state, images_directory_root=settings.images_directory
+        )
 
         start_initializing_persistence(
             app_state=app.state,

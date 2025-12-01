@@ -14,10 +14,8 @@ import { selectActivePipetteChannelCount } from '/app/redux/protocol-runs'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
 
 export function AttachProbe(props: LPCWizardContentProps): JSX.Element {
-  const {
-    handleAttachProbeCheck,
-    handleCloseWithoutHome,
-  } = props.commandUtils.headerCommands
+  const { handleAttachProbeCheck, handleCloseWithoutHome } =
+    props.commandUtils.headerCommands
   const { t } = useTranslation('labware_position_check')
   const channelCount = useSelector(selectActivePipetteChannelCount(props.runId))
 

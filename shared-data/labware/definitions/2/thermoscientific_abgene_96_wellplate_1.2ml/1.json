@@ -13,9 +13,9 @@
     ["A11", "B11", "C11", "D11", "E11", "F11", "G11", "H11"],
     ["A12", "B12", "C12", "D12", "E12", "F12", "G12", "H12"]
   ],
-  "brand": { "brand": "thermoscientific", "brandId": ["AB0564"] },
+  "brand": { "brand": "Thermo Scientific", "brandId": ["AB0564"] },
   "metadata": {
-    "displayName": "Thermoscientific ABgene 96 Well Plate 1.2mL",
+    "displayName": "Thermo Scientific ABgene 96 Well Plate 1.2mL",
     "displayCategory": "wellPlate",
     "displayVolumeUnits": "mL",
     "tags": []

@@ -14,13 +14,13 @@ import {
   FLEX_ROBOT_TYPE,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  getFlexHoverDimensions,
+  getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
-
-import { getFlexHoverDimensions, getOT2HoverDimensions } from '../utils'
 
 import type { MutableRefObject, ReactNode } from 'react'
 import type {
@@ -39,13 +39,8 @@ interface SlotOverlayProps {
 }
 
 export function SlotOverlay(props: SlotOverlayProps): JSX.Element | null {
-  const {
-    slotId,
-    slotPosition,
-    slotFillColor,
-    slotFillOpacity,
-    children,
-  } = props
+  const { slotId, slotPosition, slotFillColor, slotFillOpacity, children } =
+    props
   const robotType = useSelector(getRobotType)
   const deckSetup = useSelector(getInitialDeckSetup)
   const [stableOpacity, setStableOpacity] = useState<string>(slotFillOpacity)

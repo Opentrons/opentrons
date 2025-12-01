@@ -28,11 +28,8 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
   } = RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { skipFailedCommand } = recoveryCommands
-  const {
-    moveLabwareWithoutPause,
-    manualRetrieve,
-    manualStore,
-  } = recoveryCommands
+  const { moveLabwareWithoutPause, manualRetrieve, manualStore } =
+    recoveryCommands
   const { handleMotionRouting } = routeUpdateActions
   const { ROBOT_SKIPPING_STEP } = RECOVERY_MAP
   const { t } = useTranslation('error_recovery')

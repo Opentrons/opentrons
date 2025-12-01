@@ -10,8 +10,8 @@ import {
   getStoredProtocolGroupedCommands,
 } from '/app/redux/protocol-storage'
 
-import styles from './preview.module.css'
-import { VisualizerContainer } from './VisualizerContainer'
+import { VisualizerContainer } from '../../../../organisms/Desktop/ProtocolVisualization/VisualizerContainer'
+import styles from './visualization.module.css'
 
 import type { DesktopRouteParams } from '/app/App/types'
 import type { Dispatch, State } from '/app/redux/types'
@@ -32,12 +32,14 @@ export function ProtocolVisualization(): JSX.Element {
   }, [])
 
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
-    <VisualizerContainer
-      analysis={storedProtocol.mostRecentAnalysis}
-      groupedCommands={groupedCommands}
-      protocolKey={protocolKey}
-      srcFileNames={storedProtocol.srcFileNames}
-    />
+    <div className={styles.top_container}>
+      <VisualizerContainer
+        analysis={storedProtocol.mostRecentAnalysis}
+        groupedCommands={groupedCommands}
+        protocolKey={protocolKey}
+        srcFileNames={storedProtocol.srcFileNames}
+      />
+    </div>
   ) : (
     <div className={styles.loading_icon}>
       <Icon size="8rem" name="ot-spinner" spin color={COLORS.blue50} />

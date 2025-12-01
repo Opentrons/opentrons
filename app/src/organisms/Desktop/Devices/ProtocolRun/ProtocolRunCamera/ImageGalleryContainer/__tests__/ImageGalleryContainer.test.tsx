@@ -3,48 +3,75 @@ import { beforeEach, describe, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
+import { useImageInfo } from '/app/resources/dataFiles/useImageInfo'
 
 import { ImageGalleryContainer } from '..'
 import { GalleryItemCard } from '../GalleryItemCard'
-import { useStubImagesInfo } from '../hooks/useStubImagesInfo'
 
-import type { UseStubImagesInfoResult } from '../hooks/useStubImagesInfo'
+import type { RobotType } from '@opentrons/shared-data'
+import type { UseImagesInfoItem } from '/app/resources/dataFiles/useImageInfo'
 
 vi.mock('../GalleryItemCard')
-vi.mock('../hooks/useStubImagesInfo')
+vi.mock('/app/resources/dataFiles/useImageInfo')
+vi.mock('/app/redux/protocol-runs')
+vi.mock('../GalleryContainerOverflowMenu')
 
 const render = () => {
-  return renderWithProviders(<ImageGalleryContainer />, {
-    i18nInstance: i18n,
-  })
+  const RUN_ID = 'run123'
+  const robotType = 'OT-3 Standard' as RobotType
+  return renderWithProviders(
+    <ImageGalleryContainer
+      runId={RUN_ID}
+      robotType={robotType}
+      protocolName="MOCK-PROTOCOL"
+      runTimestamp="MOCK-RUN-TIMESTAMP"
+      robotName="MOCK-ROBOT-NAME"
+    />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
-const mockImagesInfo: UseStubImagesInfoResult[] = [
+const mockImagesInfo: UseImagesInfoItem[] = [
   {
-    imagePath: '/path/to/image1.jpg',
-    stepCommandText: 'Step 1 command',
-    previousStepCommandText: 'Previous step 1',
+    imageId: '/path/to/image1.jpg',
+    stepCommandId: 'Step 1 command',
+    previousStepCommandId: 'Previous step 1',
     timestamp: '2024-01-01 10:00:00',
+    filename: 'filename-1',
   },
   {
-    imagePath: '/path/to/image2.jpg',
-    stepCommandText: 'Step 2 command',
-    previousStepCommandText: 'Previous step 2',
+    imageId: '/path/to/image2.jpg',
+    stepCommandId: 'Step 2 command',
+    previousStepCommandId: 'Previous step 2',
     timestamp: '2024-01-01 11:00:00',
+    filename: 'filename-2',
   },
   {
-    imagePath: '/path/to/image3.jpg',
-    stepCommandText: 'Step 3 command',
-    previousStepCommandText: 'Previous step 3',
+    imageId: '/path/to/image3.jpg',
+    stepCommandId: 'Step 3 command',
+    previousStepCommandId: 'Previous step 3',
     timestamp: '2024-01-01 12:00:00',
+    filename: 'filename-3',
   },
 ]
 
+const mockProtocolAnalysis = {
+  commands: [],
+  labware: [],
+} as any
+
 describe('ImageGalleryContainer', () => {
   beforeEach(() => {
-    vi.mocked(useStubImagesInfo).mockReturnValue(mockImagesInfo)
-    vi.mocked(GalleryItemCard).mockImplementation(({ timestamp }) => (
-      <div>MOCK_GALLERY_ITEM_CARD_{timestamp}</div>
+    vi.mocked(useImageInfo).mockReturnValue({
+      items: mockImagesInfo,
+      protocolAnalysis: mockProtocolAnalysis,
+      isLoadingImages: false,
+      allRunDefs: [],
+    })
+    vi.mocked(GalleryItemCard).mockImplementation(({ item }) => (
+      <div>MOCK_GALLERY_ITEM_CARD_{item.timestamp}</div>
     ))
   })
 
@@ -54,7 +81,7 @@ describe('ImageGalleryContainer', () => {
     screen.getByText('Image Gallery')
     screen.getByText('3 photos')
     screen.getByText(
-      'Protocol images can be viewed once captured and downloaded when the run is complete.'
+      'Images can be viewed immediately after capture and downloaded once the run is complete.'
     )
   })
 

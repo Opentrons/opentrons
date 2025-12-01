@@ -2,6 +2,8 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
@@ -24,6 +26,8 @@ describe('RobotSettingsCameraUsage', () => {
       isLiveVideoEnabled: false,
       toggleRecoveryCaptureEnabled: vi.fn(),
       isRecoveryCaptureEnabled: false,
+      toggleDisabled: false,
+      robotType: FLEX_ROBOT_TYPE,
     }
   })
 
@@ -36,7 +40,7 @@ describe('RobotSettingsCameraUsage', () => {
   it('renders live video section with correct text', () => {
     render(mockProps)
 
-    screen.getByText('Live Video')
+    screen.getByText('Live video')
     screen.getByText(
       'View real-time video of the deck while a running a protocol.'
     )
@@ -45,10 +49,21 @@ describe('RobotSettingsCameraUsage', () => {
   it('renders error recovery section with correct text', () => {
     render(mockProps)
 
-    screen.getByText('Error Recovery')
+    screen.getByText('Error image capture')
     screen.getByText(
-      'Automatically capture an image of the deck if an error occurs.'
+      'Automatically capture an image of the deck in the event of an error.'
     )
+  })
+
+  it('does not render live video section  if the robot is an OT-2', () => {
+    render({ ...mockProps, robotType: OT2_ROBOT_TYPE })
+
+    expect(screen.queryByText('Live Video')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(
+        'View real-time video of the deck while a running a protocol.'
+      )
+    ).not.toBeInTheDocument()
   })
 
   it('calls toggleLiveVideoEnabled when live video toggle is clicked', async () => {
@@ -69,5 +84,13 @@ describe('RobotSettingsCameraUsage', () => {
     await user.click(toggleButtons[1])
 
     expect(mockProps.toggleRecoveryCaptureEnabled).toHaveBeenCalledTimes(1)
+  })
+
+  it('disables both toggle buttons when toggleDisabled is true', () => {
+    render({ ...mockProps, toggleDisabled: true })
+
+    const toggleButtons = screen.getAllByRole('switch')
+    expect(toggleButtons[0]).toBeDisabled()
+    expect(toggleButtons[1]).toBeDisabled()
   })
 })

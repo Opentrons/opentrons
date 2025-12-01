@@ -72,5 +72,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--border-radius-4);
+}
+
+.modal_content img {
+  width: auto;
+  max-width: 41.625rem;
+  height: auto;
+  max-height: 24.0625rem;
+  border-radius: var(--border-radius-12);
+  object-fit: contain;
 }

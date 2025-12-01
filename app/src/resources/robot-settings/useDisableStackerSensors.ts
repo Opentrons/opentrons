@@ -11,15 +11,12 @@ import type { RobotSettings } from '/app/redux/robot-settings/types'
 import type { Dispatch, State } from '/app/redux/types'
 
 // not releveant to the OT-2, this controls the front LED lights on the Flex
-export function useDisableStackerSensors(
-  robotName: string
-): {
+export function useDisableStackerSensors(robotName: string): {
   sensorsDisabled: boolean
   toggleSensors: () => void
 } {
-  const [sensorDisabledCache, setSensorsDisabledCache] = useState<boolean>(
-    false
-  )
+  const [sensorDisabledCache, setSensorsDisabledCache] =
+    useState<boolean>(false)
 
   const dispatch = useDispatch<Dispatch>()
 

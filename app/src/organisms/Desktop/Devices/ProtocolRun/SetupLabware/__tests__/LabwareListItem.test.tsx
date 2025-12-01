@@ -104,12 +104,12 @@ describe('LabwareListItem', () => {
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
       attachedModuleInfo: {
-        [mockModuleId]: ({
+        [mockModuleId]: {
           moduleId: 'thermocyclerModuleId',
-          attachedModuleMatch: (mockThermocycler as any) as AttachedModule,
+          attachedModuleMatch: mockThermocycler as any as AttachedModule,
           moduleDef: mockThermocyclerModuleDefinition as any,
           ...mockAttachedModuleInfo,
-        } as any) as ModuleRenderInfoForProtocol,
+        } as any as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
       slotName: '7,8,10,11',
@@ -140,12 +140,12 @@ describe('LabwareListItem', () => {
       ],
       extraAttentionModules: ['thermocyclerModuleType'],
       attachedModuleInfo: {
-        [mockModuleId]: ({
+        [mockModuleId]: {
           moduleId: 'thermocyclerModuleId',
-          attachedModuleMatch: (mockThermocycler as any) as AttachedModule,
+          attachedModuleMatch: mockThermocycler as any as AttachedModule,
           moduleDef: mockThermocyclerModuleDefinition as any,
           ...mockAttachedModuleInfo,
-        } as any) as ModuleRenderInfoForProtocol,
+        } as any as ModuleRenderInfoForProtocol,
       },
       isFlex: true,
       slotName: 'A1+B1',
@@ -173,10 +173,10 @@ describe('LabwareListItem', () => {
       slotName: mockModuleSlot.slotName,
       extraAttentionModules: ['magneticModuleType'],
       attachedModuleInfo: {
-        [mockModuleId]: ({
+        [mockModuleId]: {
           moduleId: 'magneticModuleId',
 
-          attachedModuleMatch: (mockMagneticModule as any) as AttachedModule,
+          attachedModuleMatch: mockMagneticModule as any as AttachedModule,
           moduleDef: {
             moduleId: 'someMagneticModule',
             model: 'magneticModuleV2' as ModuleModel,
@@ -184,7 +184,7 @@ describe('LabwareListItem', () => {
             ...mockLocationInfo,
           } as any,
           ...mockAttachedModuleInfo,
-        } as any) as ModuleRenderInfoForProtocol,
+        } as any as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
       onClick: vi.fn(),
@@ -214,9 +214,9 @@ describe('LabwareListItem', () => {
       slotName: mockModuleSlot.slotName,
       extraAttentionModules: [],
       attachedModuleInfo: {
-        [mockModuleId]: ({
+        [mockModuleId]: {
           moduleId: 'temperatureModuleId',
-          attachedModuleMatch: (mockTemperatureModule as any) as AttachedModule,
+          attachedModuleMatch: mockTemperatureModule as any as AttachedModule,
           moduleDef: {
             moduleId: 'someTemperatureModule',
             model: 'temperatureModuleV2' as ModuleModel,
@@ -224,7 +224,7 @@ describe('LabwareListItem', () => {
             ...mockLocationInfo,
           } as any,
           ...mockAttachedModuleInfo,
-        } as any) as ModuleRenderInfoForProtocol,
+        } as any as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
       onClick: vi.fn(),
@@ -256,9 +256,9 @@ describe('LabwareListItem', () => {
       slotName: '7',
       extraAttentionModules: [],
       attachedModuleInfo: {
-        [mockModuleId]: ({
+        [mockModuleId]: {
           moduleId: 'temperatureModuleId',
-          attachedModuleMatch: (mockTemperatureModule as any) as AttachedModule,
+          attachedModuleMatch: mockTemperatureModule as any as AttachedModule,
           moduleDef: {
             moduleId: 'someTemperatureModule',
             model: 'temperatureModuleV2' as ModuleModel,
@@ -266,7 +266,7 @@ describe('LabwareListItem', () => {
             ...mockLocationInfo,
           } as any,
           ...mockAttachedModuleInfo,
-        } as any) as ModuleRenderInfoForProtocol,
+        } as any as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
       onClick: vi.fn(),
@@ -321,9 +321,9 @@ describe('LabwareListItem', () => {
       slotName: mockModuleSlot.slotName,
       extraAttentionModules: ['heaterShakerModuleType'],
       attachedModuleInfo: {
-        [mockModuleId]: ({
+        [mockModuleId]: {
           moduleId: 'heaterShakerModuleId',
-          attachedModuleMatch: (mockHeaterShaker as any) as AttachedModule,
+          attachedModuleMatch: mockHeaterShaker as any as AttachedModule,
           moduleDef: {
             moduleId: 'someheaterShakerModule',
             model: 'heaterShakerModuleV1' as ModuleModel,
@@ -331,7 +331,7 @@ describe('LabwareListItem', () => {
             ...mockLocationInfo,
           } as any,
           ...mockAttachedModuleInfo,
-        } as any) as ModuleRenderInfoForProtocol,
+        } as any as ModuleRenderInfoForProtocol,
       },
       isFlex: false,
       onClick: vi.fn(),

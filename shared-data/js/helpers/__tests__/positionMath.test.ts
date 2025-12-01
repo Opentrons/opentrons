@@ -9,7 +9,7 @@ import {
 
 import type { DeckDefinition } from '../..'
 
-const OT3_DECK_DEF = (ot3StandardDeckV5Untyped as unknown) as DeckDefinition
+const OT3_DECK_DEF = ot3StandardDeckV5Untyped as unknown as DeckDefinition
 
 describe('computeLabwareOrigin()', () => {
   // Preserving legacy misbehavior:
@@ -22,12 +22,10 @@ describe('computeLabwareOrigin()', () => {
       //
       // The remainder of this test will check that the final x and y of the tip rack
       // follow the x and y of the underlying slot, NOT of the adapter.
-      const adapter = getAllDefinitions()[
-        'opentrons/opentrons_flex_96_tiprack_adapter/1'
-      ]
-      const tipRack = getAllDefinitions()[
-        'opentrons/opentrons_flex_96_tiprack_1000ul/1'
-      ]
+      const adapter =
+        getAllDefinitions()['opentrons/opentrons_flex_96_tiprack_adapter/1']
+      const tipRack =
+        getAllDefinitions()['opentrons/opentrons_flex_96_tiprack_1000ul/1']
 
       const result = computeLabwareOrigin({
         labwareDefinitionsTopToBottom: [tipRack, adapter],
@@ -47,12 +45,10 @@ describe('computeLabwareOrigin()', () => {
 
     test('where the base is a module', () => {
       const stackerModuleDef = getModuleDef('flexStackerModuleV1')
-      const tipRackDef = getAllDefinitions()[
-        'opentrons/opentrons_flex_96_tiprack_1000ul/1'
-      ]
-      const lidDef = getAllDefinitions()[
-        'opentrons/opentrons_flex_tiprack_lid/1'
-      ]
+      const tipRackDef =
+        getAllDefinitions()['opentrons/opentrons_flex_96_tiprack_1000ul/1']
+      const lidDef =
+        getAllDefinitions()['opentrons/opentrons_flex_tiprack_lid/1']
 
       const resultForTipRackAndLid = computeLabwareOrigin({
         labwareDefinitionsTopToBottom: [lidDef, tipRackDef],

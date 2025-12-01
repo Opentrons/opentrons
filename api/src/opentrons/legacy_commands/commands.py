@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Sequence, Union, overload
+from typing import TYPE_CHECKING, List, Sequence, Union, overload, Optional
 
 
 from .helpers import (
@@ -31,10 +31,21 @@ def aspirate(
     location: Location,
     flow_rate: float,
     rate: float,
+    end_location: Optional[Location],
 ) -> command_types.AspirateCommand:
     location_text = stringify_location(location)
-    template = "Aspirating {volume} uL from {location} at {flow} uL/sec"
-    text = template.format(volume=float(volume), location=location_text, flow=flow_rate)
+    end_location_text = (
+        f" while moving to {stringify_location(end_location)}"
+        if end_location is not None
+        else ""
+    )
+    template = "Aspirating {volume} uL from {location} at {flow} uL/sec{end}"
+    text = template.format(
+        volume=float(volume),
+        location=location_text,
+        flow=flow_rate,
+        end=end_location_text,
+    )
 
     return {
         "name": command_types.ASPIRATE,
@@ -44,6 +55,7 @@ def aspirate(
             "location": location,
             "rate": rate,
             "text": text,
+            "end_location": end_location,
         },
     }
 
@@ -54,10 +66,21 @@ def dispense(
     location: Location,
     flow_rate: float,
     rate: float,
+    end_location: Optional[Location],
 ) -> command_types.DispenseCommand:
     location_text = stringify_location(location)
-    template = "Dispensing {volume} uL into {location} at {flow} uL/sec"
-    text = template.format(volume=float(volume), location=location_text, flow=flow_rate)
+    end_location_text = (
+        f" while moving to {stringify_location(end_location)}"
+        if end_location is not None
+        else ""
+    )
+    template = "Dispensing {volume} uL into {location} at {flow} uL/sec{end}"
+    text = template.format(
+        volume=float(volume),
+        location=location_text,
+        flow=flow_rate,
+        end=end_location_text,
+    )
 
     return {
         "name": command_types.DISPENSE,
@@ -67,6 +90,7 @@ def dispense(
             "location": location,
             "rate": rate,
             "text": text,
+            "end_location": end_location,
         },
     }
 
@@ -204,6 +228,35 @@ def mix(
             "volume": volume,
             "repetitions": repetitions,
             "text": text,
+        },
+    }
+
+
+def dynamic_mix(
+    instrument: InstrumentContext,
+    repetitions: int,
+    volume: float,
+    aspirate_start_location: Location,
+    aspirate_end_location: Union[Location, None],
+    dispense_start_location: Location,
+    dispense_end_location: Union[Location, None],
+    movement_delay: float,
+) -> command_types.DynamicMixCommand:
+    text = "Dynamically mixing {repetitions} times with a volume of {volume} ul".format(
+        repetitions=repetitions, volume=float(volume)
+    )
+    return {
+        "name": command_types.MIX,
+        "payload": {
+            "instrument": instrument,
+            "aspirate_start_location": aspirate_start_location,
+            "aspirate_end_location": aspirate_end_location,
+            "dispense_start_location": dispense_start_location,
+            "dispense_end_location": dispense_end_location,
+            "volume": volume,
+            "repetitions": repetitions,
+            "text": text,
+            "movement_delay": movement_delay,
         },
     }
 

@@ -117,7 +117,23 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [ABSORBANCE_READER_TYPE]: ['nest_96_wellplate_200ul_flat'],
-  [FLEX_STACKER_MODULE_TYPE]: [],
+  [FLEX_STACKER_MODULE_TYPE]: [
+    // all flex tipracks
+    'opentrons_flex_96_filtertiprack_1000ul',
+    'opentrons_flex_96_filtertiprack_200ul',
+    'opentrons_flex_96_filtertiprack_50ul',
+    'opentrons_flex_96_tiprack_1000ul',
+    'opentrons_flex_96_tiprack_200ul',
+    'opentrons_flex_96_tiprack_50ul',
+    // tested and verified well plates
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'biorad_96_wellplate_200ul_pcr',
+    'biorad_384_wellplate_50ul',
+    'corning_24_wellplate_3.4ml_flat',
+    'nest_96_wellplate_2ml_deep',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_200ul_flat',
+  ],
 }
 
 export const MOAM_MODELS_WITH_FF: ModuleModel[] = [TEMPERATURE_MODULE_V2]

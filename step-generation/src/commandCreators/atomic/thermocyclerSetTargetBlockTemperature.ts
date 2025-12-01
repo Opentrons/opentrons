@@ -3,11 +3,9 @@ import { uuid } from '../../utils'
 import type { TemperatureParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-export const thermocyclerSetTargetBlockTemperature: CommandCreator<TemperatureParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const thermocyclerSetTargetBlockTemperature: CommandCreator<
+  TemperatureParams
+> = (args, invariantContext, prevRobotState) => {
   if (args.celsius !== undefined) {
     console.warn(
       `'volume' param not implemented for thermocycler/setTargetBlockTemperature, should not be set!`

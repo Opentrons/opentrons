@@ -20,7 +20,11 @@ interface DeckLabelSetProps {
   height: number
   invert?: boolean
   showModuleIcon?: boolean
+  showBorder?: boolean
 }
+//  +15/30 to leave room for the deck info label to be fully visible in the viewbox
+const WIDTH_ADJUSTED = 15
+const HEIGHT_ADJUSTED = 30
 
 const DeckLabelSetComponent = (
   props: DeckLabelSetProps,
@@ -34,12 +38,15 @@ const DeckLabelSetComponent = (
     height,
     invert = false,
     showModuleIcon = false,
+    showBorder = true,
   } = props
 
   return (
     <RobotCoordsForeignDiv
       x={x}
       y={y}
+      width={width + WIDTH_ADJUSTED}
+      height={height + HEIGHT_ADJUSTED}
       innerDivProps={{
         transform: `rotate(180deg) scaleX(-1) scaleY(${invert ? '-1' : '1'})`,
       }}
@@ -50,6 +57,7 @@ const DeckLabelSetComponent = (
           height={height}
           isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
           data-testid="DeckLabeSet"
+          showBorder={showBorder}
         />
         {showModuleIcon && (
           <IconWrapper leftPosition={width - 16}>
@@ -83,12 +91,20 @@ export const DeckLabelSet = forwardRef<HTMLDivElement, DeckLabelSetProps>(
 
 interface StyledBoxProps {
   isZoomed: boolean
+  showBorder: boolean
 }
 
-const StyledBox = styled(Box)<StyledBoxProps>`
+const StyledBox = styled(Box).withConfig({
+  shouldForwardProp: prop => prop !== 'isZoomed' && prop !== 'showBorder',
+})<StyledBoxProps>`
   border-radius: ${BORDERS.borderRadius4};
-  border: ${({ isZoomed }) =>
-    isZoomed ? `1.5px solid ${COLORS.blue50}` : `3px solid ${COLORS.blue50}`};
+  border: ${({ isZoomed, showBorder }) => {
+    if (!showBorder) {
+      return 'none'
+    }
+    const width = isZoomed ? '1.5px' : '3px'
+    return `${width} solid ${COLORS.blue50}`
+  }};
 `
 
 const LabelContainer = styled.div`

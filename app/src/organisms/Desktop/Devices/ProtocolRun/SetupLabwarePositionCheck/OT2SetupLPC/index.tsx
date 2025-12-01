@@ -75,12 +75,10 @@ export function OT2SetupLPC(
   const [runLPCTargetProps, runLPCTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_LEFT,
   })
-  const [
-    confirmOffsetsTargetProps,
-    confirmOffsetsTooltipProps,
-  ] = useHoverTooltip({
-    placement: TOOLTIP_LEFT,
-  })
+  const [confirmOffsetsTargetProps, confirmOffsetsTooltipProps] =
+    useHoverTooltip({
+      placement: TOOLTIP_LEFT,
+    })
 
   const { launchLPC, lpcProps, showLPC, isLaunchingLPC } = useLPCFlows({
     runId,

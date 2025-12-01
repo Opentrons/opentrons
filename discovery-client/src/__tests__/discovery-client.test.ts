@@ -21,7 +21,7 @@ vi.mock('../mdns-browser')
 
 const createHealthPoller = HealthPollerModule.createHealthPoller
 const createMdnsBrowser = MdnsBrowserModule.createMdnsBrowser
-const logger = ({} as unknown) as Logger
+const logger = {} as unknown as Logger
 
 describe('discovery client', () => {
   const onListChange = vi.fn()
@@ -43,21 +43,22 @@ describe('discovery client', () => {
   }
 
   const emitPollResult = (result: HealthPollerResult): void => {
-    //  @ts-expect-error: mock doesn't exist on type
-    const { onPollResult } = createHealthPoller.mock.calls[
+    const { onPollResult } =
       //  @ts-expect-error: mock doesn't exist on type
-      createHealthPoller.mock.calls.length - 1
-    ][0]
+      createHealthPoller.mock.calls[
+        //  @ts-expect-error: mock doesn't exist on type
+        createHealthPoller.mock.calls.length - 1
+      ][0]
     onPollResult(result)
   }
 
   const emitService = (service: MdnsBrowserService): void => {
-    //  @ts-expect-error: mock doesn't exist on type
-    const { onService } = createMdnsBrowser.mock.calls[
+    const { onService } =
       //  @ts-expect-error: mock doesn't exist on type
-
-      createMdnsBrowser.mock.calls.length - 1
-    ][0]
+      createMdnsBrowser.mock.calls[
+        //  @ts-expect-error: mock doesn't exist on type
+        createMdnsBrowser.mock.calls.length - 1
+      ][0]
     onService(service)
   }
 

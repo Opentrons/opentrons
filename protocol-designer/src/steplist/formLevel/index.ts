@@ -71,6 +71,8 @@ import {
   targetTemperatureRequired,
   temperatureRequired,
   timesRequired,
+  tiprackRequired,
+  tipSelectionRequired,
   transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
@@ -93,6 +95,7 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
+  HydratedCameraFormData,
   HydratedCommentFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
@@ -133,6 +136,7 @@ interface StepFormDataMap {
   temperature: HydratedTemperatureFormData
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
+  camera: HydratedCameraFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -180,7 +184,8 @@ const stepFormHelperMap: {
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
       transferVolumeMin,
-      pipetteRequired
+      pipetteRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
       mixTipPositionInTube,
@@ -232,11 +237,13 @@ const stepFormHelperMap: {
       blowoutFlowRateRequired,
       transferVolumeMin,
       pipetteRequired,
+      tiprackRequired,
       aspirateSubmergeSpeedRequired,
       aspirateRetractSpeedRequired,
       dispenseSubmergeSpeedRequired,
       dispenseRetractSpeedRequired,
-      disposalVolumeRequired
+      disposalVolumeRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
       maxDispenseWellVolume,
@@ -279,6 +286,9 @@ const stepFormHelperMap: {
   },
   comment: {
     getErrors: composeErrors(messageRequired),
+  },
+  camera: {
+    getErrors: composeErrors(),
   },
 }
 
@@ -361,6 +371,12 @@ export const getFormErrors = (
     case 'comment':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedCommentFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'camera':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedCameraFormData,
         moduleEntities,
         labwareEntities
       )

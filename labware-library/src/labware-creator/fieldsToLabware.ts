@@ -110,9 +110,9 @@ export function fieldsToLabware(
       const zValue = parseFloat(String(z))
       const adapterHeight =
         adapterDefinitions != null
-          ? Object.values(adapterDefinitions).find(
+          ? (Object.values(adapterDefinitions).find(
               definition => definition.parameters.loadName === loadName
-            )?.dimensions.zDimension ?? 0
+            )?.dimensions.zDimension ?? 0)
           : 0
 
       stackingOffsetWithLabware[loadName] = {

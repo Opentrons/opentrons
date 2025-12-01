@@ -4,7 +4,8 @@ export function getLiquidDisplayName(
   liquids: Liquid[],
   liquidId: string
 ): string {
-  const liquidDisplayName = liquids.find(liquid => liquid.id === liquidId)
-    ?.displayName
+  const liquidDisplayName = liquids.find(
+    liquid => liquid.id === liquidId
+  )?.displayName
   return liquidDisplayName ?? ''
 }

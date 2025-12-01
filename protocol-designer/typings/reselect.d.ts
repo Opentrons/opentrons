@@ -19,7 +19,7 @@ declare module 'reselect' {
     R13,
     R14,
     R15,
-    T
+    T,
   >(
     selector1: Selector<S, R1>,
     selector2: Selector<S, R2>,

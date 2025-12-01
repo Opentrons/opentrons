@@ -33,6 +33,7 @@
   "save": "save",
   "stepType": {
     "absorbanceReader": "absorbance plate reader",
+    "camera": "camera",
     "comment": "comment",
     "ending_hold": "ending hold",
     "heaterShaker": "heater-shaker",
@@ -41,8 +42,8 @@
     "moveLabware": "move",
     "moveLiquid": "transfer",
     "pause": "pause",
-    "profile_settings": "profile settings",
     "profile_steps": "profile steps",
+    "profile": "Program a Thermocycler profile",
     "temperature": "temperature",
     "thermocycler": "thermocycler"
   },

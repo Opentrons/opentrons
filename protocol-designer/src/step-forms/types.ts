@@ -4,6 +4,8 @@ import type {
   CutoutId,
   FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
+  FlexStackerSetStoredLabwareParams,
+  FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -71,7 +73,10 @@ export interface MagneticBlockState {
 
 export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  // TODO: extend this state
+  maxPoolCount: number
+  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
+  labwareOnShuttle: FlexStackerStoredLabwareGroup | null
 }
 export type InitializationMode = 'single' | 'multi'
 export interface Initialization {
@@ -109,7 +114,8 @@ export type NormalizedLabwareById = Record<
     displayCategory: string
   }
 >
-export type NormalizedLabware = NormalizedLabwareById[keyof NormalizedLabwareById]
+export type NormalizedLabware =
+  NormalizedLabwareById[keyof NormalizedLabwareById]
 // =========== TEMPORAL ONLY =====
 // Temporal properties (eg location) that are time-variant
 export interface LabwareTemporalProperties {

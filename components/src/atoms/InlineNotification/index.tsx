@@ -133,8 +133,11 @@ export function InlineNotification(
               oddStyle="bodyTextRegular"
               desktopStyle="bodyDefaultRegular"
               textDecoration="underline"
+              css={css`
+                white-space: nowrap;
+              `}
             >
-              {linkText}{' '}
+              {linkText}
             </StyledText>
           </Link>
         )}

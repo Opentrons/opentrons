@@ -24,9 +24,8 @@ export const useProtocolExportHandler = ({
   onConfirmExport,
 }: UseProtocolExportHandlerProps): UseProtocolExportHandlerResult => {
   const { t } = useTranslation(['protocol_overview', 'alert'])
-  const [showModalWithWarning, setShowModalWithWarning] = useState<boolean>(
-    false
-  )
+  const [showModalWithWarning, setShowModalWithWarning] =
+    useState<boolean>(false)
   const argsAndErrorsByStepId = useSelector(getArgsAndErrorsByStepId)
   const timeline = useSelector(getRobotStateTimeline)
   const hasFormErrors = Object.values(argsAndErrorsByStepId).some(
@@ -38,9 +37,9 @@ export const useProtocolExportHandler = ({
 
   const content = (
     <StyledText desktopStyle="bodyDefaultRegular">
-      {!hasCommands
-        ? t('alert:export_warnings.redesign.no_commands.body1')
-        : t('alert:hint.has_errors.body1')}
+      {hasTimelineErrors || hasFormErrors
+        ? t('alert:hint.has_errors.body1')
+        : t('alert:export_warnings.redesign.no_commands.body1')}
     </StyledText>
   )
 

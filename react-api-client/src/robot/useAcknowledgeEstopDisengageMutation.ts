@@ -36,7 +36,7 @@ export function useAcknowledgeEstopDisengageMutation(
   const mutation = useMutation<EstopStatus, AxiosError, unknown>(
     [host, 'robot/control/acknowledgeEstopDisengage'],
     () => {
-      return acknowledgeEstopDisengage(host as HostConfig)
+      return acknowledgeEstopDisengage(host!)
         .then((response: AxiosResponse<EstopStatus>) => {
           queryClient.setQueryData(
             [host, 'robot/control/estopStatus'],

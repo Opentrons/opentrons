@@ -14,7 +14,6 @@ import {
 import { DEFAULT_RUN_QUERY_REFETCH_INTERVAL } from './constants'
 import { useNotifyRunQuery } from './useNotifyRunQuery'
 import { useRunCommands } from './useRunCommands'
-import { useRunStatus } from './useRunStatus'
 
 export interface RunTimestamps {
   startedAt: string | null
@@ -24,11 +23,12 @@ export interface RunTimestamps {
 }
 
 export function useRunTimestamps(runId: string | null): RunTimestamps {
-  const runStatus = useRunStatus(runId)
-  const { actions = [], errors = [] } =
-    useNotifyRunQuery(runId, {
-      refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
-    })?.data?.data ?? {}
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_RUN_QUERY_REFETCH_INTERVAL,
+  })
+  const runStatus = runRecord?.data.status ?? null
+  const actions = runRecord?.data.actions ?? null
+  const errors = runRecord?.data.errors ?? null
   const runCommands =
     useRunCommands(
       runId,
@@ -44,7 +44,7 @@ export function useRunTimestamps(runId: string | null): RunTimestamps {
       }
     ) ?? []
 
-  const firstPlay = actions.find(
+  const firstPlay = actions?.find(
     action => action.actionType === RUN_ACTION_TYPE_PLAY
   )
   const lastAction = last(actions)

@@ -75,7 +75,7 @@ export function DraggableSidebar({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
       height="100%"
     >
-      <SidebarContainer ref={sidebarRef} /* resizedWidth={sidebarWidth} */>
+      <SidebarContainer ref={sidebarRef}>
         <SidebarContent>
           <TimelineToolbox
             sidebarWidth={sidebarWidth}

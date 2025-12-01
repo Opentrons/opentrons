@@ -112,7 +112,9 @@ const EXPANDED_STYLE = css`
 
   visibility: visible;
   height: auto;
-  transition: height 300ms ease-in, visibility 300ms step-start;
+  transition:
+    height 300ms ease-in,
+    visibility 300ms step-start;
 `
 const COLLAPSED_STYLE = css`
   interpolate-size: allow-keywords;
@@ -120,7 +122,9 @@ const COLLAPSED_STYLE = css`
 
   visibility: hidden;
   height: 0;
-  transition: height 500ms ease-out, visibility 500ms step-end;
+  transition:
+    height 500ms ease-out,
+    visibility 500ms step-end;
 `
 const ACCORDION_STYLE = css`
   border-radius: 50%;

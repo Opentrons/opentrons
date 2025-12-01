@@ -26,10 +26,10 @@ import type { Substeps } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
 
 // NOTE this just adds missing well keys to the labware-ingred 'deck setup' liquid state
-export const getLabwareLiquidState: Selector<StepGeneration.LabwareLiquidState> = createSelector(
+export const getLabwareLiquidState = createSelector(
   labwareIngredSelectors.getLiquidsByLabwareId,
   stepFormSelectors.getLabwareEntities,
-  (ingredLocations, labwareEntities) => {
+  (ingredLocations, labwareEntities): StepGeneration.LabwareLiquidState => {
     const allLabwareIds: string[] = Object.keys(labwareEntities)
     return allLabwareIds.reduce(
       (
@@ -117,41 +117,42 @@ export const getSubsteps: Selector<Substeps> = state =>
 type WarningsPerStep = {
   [stepId in number | string]?: StepGeneration.CommandCreatorWarning[] | null
 }
-export const timelineWarningsPerStep: Selector<WarningsPerStep> = createSelector(
-  stepFormSelectors.getOrderedStepIds,
-  getRobotStateTimeline,
-  (orderedStepIds, timeline) =>
-    timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
-      const stepId = orderedStepIds[timelineIndex]
-      // remove warnings of duplicate 'type'. chosen arbitrarily
-      return { ...acc, [stepId]: uniqBy(frame.warnings, w => w.type) }
-    }, {})
-)
-export const getErrorStepId: Selector<
-  StepIdType | null | undefined
-> = createSelector(
-  stepFormSelectors.getOrderedStepIds,
-  getRobotStateTimeline,
-  (orderedStepIds, timeline) => {
-    const hasErrors = timeline.errors && timeline.errors.length > 0
+export const timelineWarningsPerStep: Selector<WarningsPerStep> =
+  createSelector(
+    stepFormSelectors.getOrderedStepIds,
+    getRobotStateTimeline,
+    (orderedStepIds, timeline) =>
+      timeline.timeline.reduce((acc: WarningsPerStep, frame, timelineIndex) => {
+        const stepId = orderedStepIds[timelineIndex]
+        // remove warnings of duplicate 'type'. chosen arbitrarily
+        return { ...acc, [stepId]: uniqBy(frame.warnings, w => w.type) }
+      }, {})
+  )
+export const getErrorStepId: Selector<StepIdType | null | undefined> =
+  createSelector(
+    stepFormSelectors.getOrderedStepIds,
+    getRobotStateTimeline,
+    (orderedStepIds, timeline) => {
+      const hasErrors = timeline.errors && timeline.errors.length > 0
 
-    if (hasErrors) {
-      // the frame *after* the last frame in the timeline is the error-throwing one
-      const errorIndex = timeline.timeline.length
-      const errorStepId = orderedStepIds[errorIndex]
-      return errorStepId
+      if (hasErrors) {
+        // the frame *after* the last frame in the timeline is the error-throwing one
+        const errorIndex = timeline.timeline.length
+        const errorStepId = orderedStepIds[errorIndex]
+        return errorStepId
+      }
+
+      return null
     }
-
-    return null
-  }
-)
-export const lastValidRobotState: Selector<StepGeneration.RobotState> = createSelector(
-  getRobotStateTimeline,
-  getInitialRobotState,
-  (timeline, initialRobotState) => {
-    const lastTimelineFrame = last(timeline.timeline)
-    return (
-      (lastTimelineFrame && lastTimelineFrame.robotState) || initialRobotState
-    )
-  }
-)
+  )
+export const lastValidRobotState: Selector<StepGeneration.RobotState> =
+  createSelector(
+    getRobotStateTimeline,
+    getInitialRobotState,
+    (timeline, initialRobotState) => {
+      const lastTimelineFrame = last(timeline.timeline)
+      return (
+        (lastTimelineFrame && lastTimelineFrame.robotState) || initialRobotState
+      )
+    }
+  )

@@ -72,8 +72,7 @@ describe('GeneralSettings', () => {
     ).toBeTruthy()
     expect(
       screen.getByRole('link', {
-        name:
-          'Learn more about keeping the Opentrons App and robot software in sync',
+        name: 'Learn more about keeping the Opentrons App and robot software in sync',
       })
     ).toHaveAttribute('href', 'https://support.opentrons.com/s/')
   })

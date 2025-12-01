@@ -36,6 +36,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     DeckPoint,
+    LabwareWellId,
 )
 from opentrons.protocol_engine.state import update_types
 
@@ -63,7 +64,6 @@ def subject(
 
 
 @pytest.mark.parametrize(
-    # add a well location
     "location,stateupdateLabware,stateupdateWell",
     [
         (
@@ -104,7 +104,8 @@ async def test_aspirate_while_tracking_implementation(
         pipetteId="pipette-id-abc",
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
-        wellLocation=well_location,
+        trackFromLocation=well_location,
+        trackToLocation=well_location,
         volume=123,
         flowRate=1.234,
     )
@@ -115,6 +116,17 @@ async def test_aspirate_while_tracking_implementation(
             pipette_id="pipette-id-abc",
         )
     ).then_return(2)
+
+    decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id=stateupdateLabware,
+            well_name=stateupdateWell,
+            well_location=well_location,
+            operation_volume=-123,
+            pipette_id="pipette-id-abc",
+        )
+    ).then_return(Point(1, 2, 3))
+
     decoy.when(
         state_view.geometry.get_wells_covered_by_pipette_with_active_well(
             stateupdateLabware, stateupdateWell, "pipette-id-abc"
@@ -135,6 +147,7 @@ async def test_aspirate_while_tracking_implementation(
             pipette_id="pipette-id-abc",
             volume=123,
             flow_rate=1.234,
+            end_point=Point(1, 2, 3),
             command_note_adder=mock_command_note_adder,
             labware_id=stateupdateLabware,
             well_name=stateupdateWell,
@@ -160,7 +173,7 @@ async def test_aspirate_while_tracking_implementation(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-123,
+            operation_volume=None,
             offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
@@ -170,7 +183,8 @@ async def test_aspirate_while_tracking_implementation(
     if isinstance(location, CurrentWell):
         assert result == SuccessData(
             public=AspirateWhileTrackingResult(
-                volume=123, position=DeckPoint(x=1, y=2, z=3)
+                volume=123,
+                position=DeckPoint(x=1, y=2, z=3),
             ),
             state_update=update_types.StateUpdate(
                 liquid_operated=update_types.LiquidOperatedUpdate(
@@ -182,12 +196,20 @@ async def test_aspirate_while_tracking_implementation(
                     pipette_id="pipette-id-abc",
                     fluid=AspiratedFluid(kind=FluidKind.LIQUID, volume=123),
                 ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
+                ),
             ),
         )
     else:
         assert result == SuccessData(
             public=AspirateWhileTrackingResult(
-                volume=123, position=DeckPoint(x=1, y=2, z=3)
+                volume=123,
+                position=DeckPoint(x=1, y=2, z=3),
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteAspiratedFluidUpdate(
@@ -198,6 +220,13 @@ async def test_aspirate_while_tracking_implementation(
                     labware_id="funky-labware",
                     well_names=["A3", "A4"],
                     volume_added=-246.0,
+                ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
                 ),
             ),
         )
@@ -220,7 +249,8 @@ async def test_handle_aspirate_while_tracking_request_not_ready_to_aspirate(
         pipetteId="pipette-id-abc",
         labwareId="funky-labware",
         wellName="funky-well",
-        wellLocation=well_location,
+        trackFromLocation=well_location,
+        trackToLocation=well_location,
         volume=123,
         flowRate=1.234,
     )
@@ -261,7 +291,8 @@ async def test_aspirate_raises_volume_error(
         pipetteId="pipette-id-abc",
         labwareId="funky-labware",
         wellName="funky-well",
-        wellLocation=well_location,
+        trackFromLocation=well_location,
+        trackToLocation=well_location,
         volume=50,
         flowRate=1.23,
     )
@@ -276,10 +307,20 @@ async def test_aspirate_raises_volume_error(
         True
     )
     decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id="funky-labware",
+            well_name="funky-well",
+            well_location=well_location,
+            operation_volume=-50,
+            pipette_id="pipette-id-abc",
+        )
+    ).then_return(Point(0, 0, 0))
+    decoy.when(
         await pipetting.aspirate_while_tracking(
             pipette_id="pipette-id-abc",
             volume=50,
             flow_rate=1.23,
+            end_point=Point(0, 0, 0),
             command_note_adder=mock_command_note_adder,
             labware_id="funky-labware",
             well_name="funky-well",
@@ -299,7 +340,7 @@ async def test_aspirate_raises_volume_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-50,
+            operation_volume=None,
             offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
@@ -364,7 +405,8 @@ async def test_overpressure_error(
         pipetteId=pipette_id,
         labwareId="funky-labware",
         wellName="funky-well",
-        wellLocation=well_location,
+        trackFromLocation=well_location,
+        trackToLocation=well_location,
         volume=50,
         flowRate=1.23,
     )
@@ -376,10 +418,20 @@ async def test_overpressure_error(
     decoy.when(state_view.pipettes.get_ready_to_aspirate(pipette_id)).then_return(True)
 
     decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id="funky-labware",
+            well_name="funky-well",
+            well_location=well_location,
+            operation_volume=-50,
+            pipette_id="pipette-id-abc",
+        )
+    ).then_return(Point(0, 0, 0))
+    decoy.when(
         await pipetting.aspirate_while_tracking(
             pipette_id=pipette_id,
             volume=50,
             flow_rate=1.23,
+            end_point=Point(0, 0, 0),
             command_note_adder=mock_command_note_adder,
             labware_id="funky-labware",
             well_name="funky-well",
@@ -404,7 +456,7 @@ async def test_overpressure_error(
             force_direct=False,
             minimum_z_height=None,
             speed=None,
-            operation_volume=-50,
+            operation_volume=None,
             offset_pipette_for_reservoir_subwells=False,
         ),
     ).then_return(Point(x=4, y=5, z=6))
@@ -428,6 +480,13 @@ async def test_overpressure_error(
                 pipette_aspirated_fluid=update_types.PipetteUnknownFluidUpdate(
                     pipette_id="pipette-id-abc"
                 ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
+                ),
             ),
         )
     else:
@@ -446,6 +505,13 @@ async def test_overpressure_error(
                     labware_id="funky-labware",
                     well_names=["A3", "A4"],
                     volume_added=update_types.CLEAR,
+                ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
                 ),
             ),
         )

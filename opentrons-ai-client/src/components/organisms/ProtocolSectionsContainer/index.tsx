@@ -46,9 +46,8 @@ export function ProtocolSectionsContainer(): JSX.Element | null {
     trigger,
     watch,
   } = useFormContext()
-  const [{ currentSection, focusSection }, setCreateProtocolAtom] = useAtom(
-    createProtocolAtom
-  )
+  const [{ currentSection, focusSection }, setCreateProtocolAtom] =
+    useAtom(createProtocolAtom)
 
   const robotType: string = watch(ROBOT_FIELD_NAME)
 

@@ -36,7 +36,7 @@ export const useLongPress = (): UseLongPressResult => {
 
   const enable = (): void => {
     if (interactiveRef?.current != null) {
-      interact((interactiveRef.current as unknown) as HTMLElement)
+      interact(interactiveRef.current as unknown as HTMLElement)
         .pointerEvents({
           holdDuration: HOLD_DURATION_MS,
         })
@@ -50,7 +50,7 @@ export const useLongPress = (): UseLongPressResult => {
   }
   const disable = (): void => {
     if (interactiveRef?.current != null) {
-      interact((interactiveRef.current as unknown) as HTMLElement).unset()
+      interact(interactiveRef.current as unknown as HTMLElement).unset()
     }
   }
 

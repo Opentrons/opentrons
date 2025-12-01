@@ -34,7 +34,11 @@ import type {
 } from './robot-settings/types'
 import type { RobotUpdateAction, RobotUpdateState } from './robot-update/types'
 import type { SessionsAction, SessionState } from './sessions/types'
-import type { ShellAction, ShellState } from './shell/types'
+import type {
+  ShellAction,
+  ShellState,
+  StepDetailViewerUpdateAction,
+} from './shell/types'
 import type { SystemInfoAction, SystemInfoState } from './system-info/types'
 
 export interface State {
@@ -80,6 +84,7 @@ export type Action =
   | AnalyticsTriggerAction
   | AddCustomLabwareFromCreatorAction
   | ProtocolRunAction
+  | StepDetailViewerUpdateAction
 
 export type GetState = () => State
 

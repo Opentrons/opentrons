@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -19,25 +18,23 @@ import { useHost } from '@opentrons/react-api-client'
 
 import { handleModuleWizardFlows } from '/app/organisms/ModuleWizardFlows'
 import { useIsEstopNotDisengaged } from '/app/resources/devices/hooks/useIsEstopNotDisengaged'
-import { useRunStatuses } from '/app/resources/runs'
 import { getModuleTooHot } from '/app/transformations/modules'
 
-import type { HostConfig } from '@opentrons/api-client'
 import type { AttachedModule } from '/app/redux/modules/types'
 import type { FormattedPipetteOffsetCalibration } from '..'
 
 interface ModuleCalibrationOverflowMenuProps {
   isCalibrated: boolean
+  isRobotBusy: boolean
   attachedModule: AttachedModule
-  updateRobotStatus: (isRobotBusy: boolean) => void
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   robotName: string
 }
 
 export function ModuleCalibrationOverflowMenu({
   isCalibrated,
+  isRobotBusy,
   attachedModule,
-  updateRobotStatus,
   formattedPipetteOffsetCalibrations,
   robotName,
 }: ModuleCalibrationOverflowMenuProps): JSX.Element {
@@ -46,7 +43,7 @@ export function ModuleCalibrationOverflowMenu({
     'robot_calibration',
     'module_wizard_flows',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const {
     menuOverlay,
@@ -55,7 +52,6 @@ export function ModuleCalibrationOverflowMenu({
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
 
-  const { isRunRunning: isRunning } = useRunStatuses()
   const [targetProps, tooltipProps] = useHoverTooltip()
 
   const OverflowMenuRef = useOnClickOutside<HTMLDivElement>({
@@ -78,12 +74,6 @@ export function ModuleCalibrationOverflowMenu({
       host,
     })
   }
-
-  useEffect(() => {
-    if (isRunning) {
-      updateRobotStatus(true)
-    }
-  }, [isRunning, updateRobotStatus])
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN} position={POSITION_RELATIVE}>
@@ -109,7 +99,7 @@ export function ModuleCalibrationOverflowMenu({
           <MenuItem
             onClick={handleCalibration}
             disabled={
-              isRunning ||
+              isRobotBusy ||
               requiredAttachOrCalibratePipette ||
               getModuleTooHot(attachedModule)
             }

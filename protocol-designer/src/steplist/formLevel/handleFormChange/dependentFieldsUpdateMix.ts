@@ -155,6 +155,32 @@ const updatePatchOnTiprackChange = (
   return patch
 }
 
+const updatePatchOnNozzlesChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'nozzles')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tiprack_selected', 'tips_selected', 'tip_tracking'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnChangeTipChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'changeTip')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMix(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -185,5 +211,7 @@ export function dependentFieldsUpdateMix(
         labwareEntities
       ),
     chainPatch => updatePatchOnTiprackChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnNozzlesChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnChangeTipChange(chainPatch, rawForm),
   ])
 }

@@ -17,7 +17,12 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       allowOnly: true,
-      exclude: [...configDefaults.exclude, '**/node_modules/**', '**/dist/**'],
+      exclude: [
+        ...configDefaults.exclude,
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/lib/**',
+      ],
       setupFiles: ['./setup-vitest.mts'],
       css: true,
       coverage: {
@@ -25,7 +30,7 @@ export default mergeConfig(
           '**/node_modules/**',
           '**/dist/**',
           '**/__tests__/**',
-          'protocol-designer/cypress/**/*',
+          '**/lib/**',
           'labware-library/cypress/**/*',
           ...configDefaults.exclude,
         ],
@@ -35,9 +40,10 @@ export default mergeConfig(
     },
     resolve: {
       alias: {
-        '@opentrons/components/styles/global': path.resolve(
-          './components/src/styles/global.css'
-        ),
+        // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+        // files being processed with the wrong config (the config from the
+        // consuming project vs. the config from the source project).
+        // Can these be replaced with regular package.json dependencies?
         '@opentrons/components/styles': path.resolve(
           './components/src/index.module.css'
         ),

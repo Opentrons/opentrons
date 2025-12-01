@@ -9,7 +9,7 @@ import {
   fixture24Tuberack,
   fixtureTiprackAdapter,
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getDeckDefFromRobotType,
   HEATERSHAKER_MODULE_V1,
 } from '@opentrons/shared-data'
@@ -44,10 +44,10 @@ vi.mock('@opentrons/components', async importOriginal => {
   }
 })
 vi.mock('@opentrons/shared-data', async importOriginal => {
-  const actual = await importOriginal<typeof getAllLabwareDefs>()
+  const actual = await importOriginal<typeof getAllDefinitions>()
   return {
     ...actual,
-    getAllLabwareDefs: vi.fn(),
+    getAllDefinitions: vi.fn(),
   }
 })
 
@@ -66,7 +66,7 @@ describe('SelectedItems', () => {
       slotPosition: [0, 0, 0],
     }
     vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
-    vi.mocked(getAllLabwareDefs).mockReturnValue({
+    vi.mocked(getAllDefinitions).mockReturnValue({
       [mockAdapterURI]: {
         ...fixture24Tuberack,
         metadata: {

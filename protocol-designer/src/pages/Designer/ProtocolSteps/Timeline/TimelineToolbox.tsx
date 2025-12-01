@@ -23,12 +23,10 @@ import {
 } from '/protocol-designer/components/atoms'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getFileMetadata } from '/protocol-designer/file-data/selectors'
-import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import {
   END_TERMINAL_ITEM_ID,
   START_TERMINAL_ITEM_ID,
-  actions as steplistActions,
 } from '/protocol-designer/steplist'
 import { actions as stepsActions } from '/protocol-designer/ui/steps'
 import {
@@ -43,7 +41,6 @@ import { PresavedStep } from './PresavedStep'
 import { TerminalItemStep } from './TerminalItemStep'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { StepIdType } from '/protocol-designer/form-types'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 const SIDEBAR_MIN_WIDTH_FOR_ICON = 170
@@ -62,7 +59,6 @@ export function TimelineToolbox({
     'protocol_overview',
     'starting_deck_state',
   ])
-  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
   const fileMetadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -185,13 +181,7 @@ export function TimelineToolbox({
               id={START_TERMINAL_ITEM_ID}
               sidebarWidth={sidebarWidth}
             />
-            <DraggableSteps
-              orderedStepIds={orderedStepIds}
-              reorderSteps={(stepIds: StepIdType[]) => {
-                dispatch(steplistActions.reorderSteps(stepIds))
-              }}
-              sidebarWidth={sidebarWidth}
-            />
+            <DraggableSteps sidebarWidth={sidebarWidth} />
             <PresavedStep sidebarWidth={sidebarWidth} />
             <TerminalItemStep
               id={END_TERMINAL_ITEM_ID}

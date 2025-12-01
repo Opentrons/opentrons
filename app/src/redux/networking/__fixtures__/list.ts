@@ -25,17 +25,15 @@ const {
   failureMeta,
   success,
   failure,
-}: ResponseFixtures<
-  WifiListResponse,
-  { message: string }
-> = makeResponseFixtures({
-  method: GET,
-  path: WIFI_LIST_PATH,
-  successStatus: 200,
-  successBody: mockWifiList,
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+}: ResponseFixtures<WifiListResponse, { message: string }> =
+  makeResponseFixtures({
+    method: GET,
+    path: WIFI_LIST_PATH,
+    successStatus: 200,
+    successBody: mockWifiList,
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  })
 
 export {
   successMeta as mockWifiListSuccessMeta,

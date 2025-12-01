@@ -94,7 +94,7 @@ export function CustomizeExpandButtonComponent(
             <Flex
               flexDirection={DIRECTION_COLUMN}
               backgroundColor={COLORS.blue10}
-              padding={`${SPACING.spacing16} ${SPACING.spacing20}`}
+              padding={SPACING.spacing16}
               borderRadius={BORDERS.borderRadius4}
             >
               {isLid && !isNestedDefALid ? (
@@ -106,6 +106,7 @@ export function CustomizeExpandButtonComponent(
                   }}
                   value={stackingProps.checked}
                   label={stackingProps.checkboxCaption}
+                  padding={`0 0 0 ${SPACING.spacing8}`}
                 />
               ) : null}
               {stackingProps.definition.stackLimit != null &&

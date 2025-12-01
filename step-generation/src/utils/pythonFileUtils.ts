@@ -2,6 +2,7 @@ import max from 'lodash/max'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAllLiquidClassDefs,
   getCutoutDisplayName,
   getFlexNameConversion,
@@ -36,6 +37,7 @@ import type {
   LabwareEntities,
   LabwareEntity,
   LabwareLiquidState,
+  LabwareTemporalProperties,
   LiquidEntities,
   ModuleEntities,
   PipetteEntities,
@@ -45,15 +47,17 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-const PAPI_VERSION = '2.26' // latest version from api/src/opentrons/protocols/api_support/definitions.py
-export const PD_APPLICATION_VERSION = '8.6.0' // latest PD version to insert into DESIGNER_APPLICATION blob
+export const PAPI_VERSION = '2.27' // latest version from api/src/opentrons/protocols/api_support/definitions.py
+export const PD_APPLICATION_VERSION = '8.7.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')
 }
 
 export function pythonMetadata(
-  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string }
+  fileMetadata: ProtocolFile<{}>['metadata'] & { protocolDesigner?: string } & {
+    internalAppBuildDate?: string
+  }
 ): string {
   // FileMetadataFields has timestamps, lists, etc., but Python metadata dict can only contain strings
   function formatTimestamp(timestamp: number | null | undefined): string {
@@ -65,6 +69,7 @@ export function pythonMetadata(
       author: fileMetadata.author,
       description: fileMetadata.description,
       created: formatTimestamp(fileMetadata.created),
+      internalAppBuildDate: fileMetadata.internalAppBuildDate,
       lastModified: formatTimestamp(fileMetadata.lastModified),
       category: fileMetadata.category,
       subcategory: fileMetadata.subcategory,
@@ -574,6 +579,8 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
+    // TODO: call this when we have a way to get the labware on the shuttle location
+    // getSetStoredLabware(moduleEntities, labwareEntities, labware),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -619,4 +626,45 @@ export const formatChangeTipArg = (changeTip: ChangeTipOptions): string => {
       return changeTip
     }
   }
+}
+export const getSetStoredLabware = (
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities,
+  labware: { [labwareId: string]: LabwareTemporalProperties }
+): string => {
+  const pythonSetStoredLabware = Object.values(moduleEntities).map(module => {
+    const { id, type, pythonName } = module
+
+    if (type === FLEX_STACKER_MODULE_TYPE) {
+      const labwareOnModule = Object.entries(labware).find(([_, labware]) =>
+        labware.stack?.includes(id)
+      )
+      if (labwareOnModule == null) {
+        return ''
+      } else {
+        // Count only labware items (excluding slot, module, and adapters)
+        const labwareCount = labwareOnModule[1].stack.filter(
+          itemId =>
+            itemId in labwareEntities &&
+            !labwareEntities[itemId].def.allowedRoles?.includes('adapter') &&
+            !labwareEntities[itemId].def.allowedRoles?.includes('lid')
+        ).length
+        const labwareEntity = labwareEntities[labwareOnModule[0]]
+        const setStoredLabwareArgs = [
+          `loadName=${formatPyStr(labwareEntity.def.parameters.loadName)}`,
+          `namespace=${formatPyStr(labwareEntity.def.namespace)}`,
+          `version=${labwareEntity.def.version}`,
+          `count=${labwareCount}`,
+        ].join(',\n')
+        return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware(\n${indentPyLines(setStoredLabwareArgs)})`
+      }
+    }
+  })
+
+  //  filter any empty strings
+  const pythonLines = pythonSetStoredLabware.filter(Boolean)
+
+  return pythonLines.length > 0
+    ? `# Set Stored Labware:\n${pythonLines.join('\n').trimStart()}`
+    : ''
 }

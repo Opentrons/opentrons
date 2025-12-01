@@ -1,4 +1,5 @@
 import {
+  changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName,
   FLEX_STACKER_MODULE_TYPE,
   getModuleDeckLabel,
   getModuleDisplayName,
@@ -65,12 +66,12 @@ export function getLabwareDisplayLocation(
 
   const { slotName, moduleModel, adapterName } = locationResult
 
-  if (slotName === 'offDeck' || slotName === 'systemLocation') {
+  if (
+    changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName(
+      slotName
+    )
+  ) {
     return t('off_deck')
-  } else if (slotName === 'systemLocation') {
-    // returning system location for slot name which we'll use to swap out
-    // run log copy, this should never reach the user
-    return slotName
   }
   // Simple slot location
   else if (moduleModel == null && adapterName == null) {

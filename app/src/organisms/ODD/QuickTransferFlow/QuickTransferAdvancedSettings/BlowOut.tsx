@@ -123,7 +123,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
     BlowOutLocation | undefined
   >(state.blowOutDispense?.location ?? undefined)
   const [speed, setSpeed] = useState<number | null>(
-    (state.blowOutDispense?.flowRate as number) ?? null
+    state.blowOutDispense?.flowRate! ?? null
   )
   const enableBlowOutDisplayItems = [
     {
@@ -232,8 +232,8 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const correctionByVolume = tipTypeSettings?.singleDispense?.correctionByVolume
   const retract = tipTypeSettings?.singleDispense?.retract
 
-  const referenceVolumesForByVolumeInterpolation = getTransferPlanAndReferenceVolumes(
-    {
+  const referenceVolumesForByVolumeInterpolation =
+    getTransferPlanAndReferenceVolumes({
       pipetteSpecs: state.pipette,
       volume: state.volume,
       tiprackDefinition: state.tipRack,
@@ -245,8 +245,7 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       conditioningByVolume:
         (correctionByVolume as Array<[number, number]>) ?? null,
       disposalByVolume: null, // note always null because blowout is available only for single dispense
-    }
-  )
+    })
 
   const [referenceVolumeFlowRate, referenceVolumeCorrection] = [
     referenceVolumesForByVolumeInterpolation.referenceVolumes?.flowRate

@@ -24,6 +24,7 @@ describe('CameraPreferences', () => {
   beforeEach(() => {
     mockProps = {
       setCurrentOption: vi.fn(),
+      robotName: 'robotName',
     }
     vi.mocked(CameraSettings).mockReturnValue(<div>MOCK_CAMERA_SETTINGS</div>)
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAVIGATION</div>)
@@ -35,7 +36,7 @@ describe('CameraPreferences', () => {
     expect(vi.mocked(CameraSettings)).toHaveBeenCalledWith(
       expect.objectContaining({
         sectionHeadingText:
-          'The camera provides live video during runs, allows automated or manual image capture, and records images automatically when errors occur.',
+          'The deck camera offers live video monitoring during protocol runs and supports image capture.',
       }),
       {}
     )

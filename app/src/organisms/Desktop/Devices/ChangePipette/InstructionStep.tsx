@@ -18,14 +18,8 @@ interface Props {
 }
 
 export function InstructionStep(props: Props): JSX.Element {
-  const {
-    children,
-    channels,
-    diagram,
-    displayCategory,
-    mount,
-    direction,
-  } = props
+  const { children, channels, diagram, displayCategory, mount, direction } =
+    props
   const channelsKey = channels === 8 ? 'multi' : 'single'
 
   const display =

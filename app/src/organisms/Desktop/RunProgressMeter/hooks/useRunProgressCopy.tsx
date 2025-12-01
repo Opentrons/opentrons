@@ -9,12 +9,11 @@ import {
   CommandText,
   getCommandTextData,
   getLabwareDefinitionsFromCommands,
-  LegacyStyledText,
 } from '@opentrons/components'
 
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
 
-import { TERMINAL_RUN_STATUSES } from '../constants'
+import { isTerminalRunStatus } from '../../Devices/ProtocolRun/ProtocolRunHeader/utils'
 
 import type { ReactNode } from 'react'
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
@@ -72,13 +71,13 @@ export function useRunProgressCopy({
   )
 
   const currentStepContents = ((): JSX.Element | null => {
-    if (runHasNotBeenStarted) {
-      return <LegacyStyledText as="h2">{t('not_started_yet')}</LegacyStyledText>
+    if (isTerminalRunStatus(runStatus) || runHasNotBeenStarted) {
+      return null
     } else if (analysis != null && !hasRunDiverged) {
       return (
         <CommandText
           commandTextData={getCommandTextData(analysis)}
-          command={analysisCommands[(currentStepNumber as number) - 1]}
+          command={analysisCommands[currentStepNumber! - 1]}
           robotType={robotType}
           allRunDefs={allRunDefs}
         />
@@ -103,33 +102,24 @@ export function useRunProgressCopy({
 
   const progressPercentage = runHasNotBeenStarted
     ? 0
-    : ((currentStepNumber as number) / analysisCommands.length) * 100
+    : (currentStepNumber! / analysisCommands.length) * 100
 
   const stepCountStr = ((): string | null => {
-    if (runStatus == null) {
+    if (isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_IDLE) {
       return null
+    }
+    if (currentStepNumber == null) {
+      return `${t(`current_step`)}: ${t('na')}`
+    } else if (hasRunDiverged) {
+      return `${t(`current_step`)} ${t('na')}:`
     } else {
-      const isTerminalStatus = TERMINAL_RUN_STATUSES.includes(runStatus)
-      const stepType = isTerminalStatus ? t('final_step') : t('current_step')
-
-      if (runStatus === RUN_STATUS_IDLE) {
-        return `${stepType}:`
-      } else if (isTerminalStatus && currentStepNumber == null) {
-        return `${stepType}: ${t('na')}`
-      } else if (hasRunDiverged) {
-        return `${stepType} ${t('na')}:`
-      } else {
-        const getCountString = (): string => {
-          const current = currentStepNumber ?? '?'
-          const total = totalStepCount ?? '?'
-
-          return `${current}/${total}`
-        }
-
-        const countString = getCountString()
-
-        return `${stepType} ${countString}:`
+      const getCountString = (): string => {
+        const current = currentStepNumber ?? '?'
+        const total = totalStepCount ?? '?'
+        return `${current}/${total}`
       }
+
+      return `${t(`current_step`)} ${getCountString()}:`
     }
   })()
   const { reportModuleCommand } = useModuleCommandAnalytics()

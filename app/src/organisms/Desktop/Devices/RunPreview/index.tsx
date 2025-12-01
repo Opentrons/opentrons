@@ -27,11 +27,11 @@ import { NAV_BAR_WIDTH } from '/app/App/constants'
 import { Divider } from '/app/atoms/structure'
 import { CommandIcon } from '/app/molecules/Command'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsAsPreSerializedList,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import type { ForwardedRef } from 'react'
@@ -56,8 +56,10 @@ export const RunPreviewComponent = (
 ): JSX.Element | null => {
   const { t } = useTranslation(['run_details', 'protocol_setup'])
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runStatus = useRunStatus(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
+  const runStatus = runRecord?.data.status ?? null
   const isRunTerminal =
     runStatus != null
       ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
@@ -78,10 +80,8 @@ export const RunPreviewComponent = (
   const currentRunCommandKey = useLastRunCommand(runId, {
     refetchInterval: LIVE_RUN_COMMANDS_POLL_MS,
   })?.key
-  const [
-    isCurrentCommandVisible,
-    setIsCurrentCommandVisible,
-  ] = useState<boolean>(true)
+  const [isCurrentCommandVisible, setIsCurrentCommandVisible] =
+    useState<boolean>(true)
 
   const isValidRobotSideAnalysis = robotSideAnalysis != null
   const allRunDefs = useMemo(
@@ -197,7 +197,8 @@ export const RunPreviewComponent = (
                   borderRadius={BORDERS.borderRadius4}
                   padding={SPACING.spacing8}
                   css={css`
-                    transition: background-color ${COLOR_FADE_MS}ms ease-out,
+                    transition:
+                      background-color ${COLOR_FADE_MS}ms ease-out,
                       border-color ${COLOR_FADE_MS}ms ease-out;
                   `}
                 >

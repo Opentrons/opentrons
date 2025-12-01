@@ -17,6 +17,7 @@ import { OddModal } from '/app/molecules/OddModal'
 import { retrieveLiquidClassValues } from '../utils'
 
 import type { Dispatch } from 'react'
+import type { IconName } from '@opentrons/components'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -45,7 +46,7 @@ export function ResetAdvancedSettingsModal({
   const { displayName, liquidClassName } = liquidClass
   const modalHeader = {
     title: t('reset_kind_settings', { transferName: kind }),
-    iconName: 'ot-alert',
+    iconName: 'ot-alert' as IconName,
     iconColor: COLORS.yellow50,
   }
   const modalProps = {

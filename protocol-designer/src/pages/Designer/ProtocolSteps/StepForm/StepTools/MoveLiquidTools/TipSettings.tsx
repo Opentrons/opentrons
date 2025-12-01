@@ -8,8 +8,10 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { getEnableTipSelection } from '/protocol-designer/feature-flags/selectors'
-import { getAdditionalEquipmentEntities } from '/protocol-designer/step-forms/selectors'
+import {
+  getAdditionalEquipmentEntities,
+  getPipetteEntities,
+} from '/protocol-designer/step-forms/selectors'
 
 import { DropTipField } from '../../PipetteFields'
 import { ChangeTipField } from '../../PipetteFields/ChangeTipField'
@@ -27,11 +29,11 @@ interface TipSettingsProps {
 export function TipSettings(props: TipSettingsProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
   const { propsForFields, formData, stepType } = props
-
+  const pipetteEntities = useSelector(getPipetteEntities)
+  const channels = pipetteEntities[formData.pipette as string].spec.channels
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const enableTipSelection = useSelector(getEnableTipSelection)
 
   const isDisposalLocation =
     stepType === 'moveLiquid' &&
@@ -73,16 +75,18 @@ export function TipSettings(props: TipSettingsProps): JSX.Element {
           <DropTipField
             {...propsForFields.dropTip_location}
             nozzles={formData.nozzles}
+            channels={channels}
             tiprackDefUri={formData.tipRack}
             tooltipContent={null}
             padding="0"
           />
         </Flex>
       </Flex>
-      {enableTipSelection ? (
+      {formData.changeTip !== 'never' ? (
         <TipTrackingField
           propsForFields={propsForFields}
           padding={`0 ${SPACING.spacing16}`}
+          formData={formData}
         />
       ) : null}
     </Flex>

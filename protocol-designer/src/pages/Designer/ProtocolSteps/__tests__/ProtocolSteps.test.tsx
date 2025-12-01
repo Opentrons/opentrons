@@ -56,6 +56,7 @@ const render = () => {
       showLiquidOverflowMenu={vi.fn()}
       targetWidth={235}
       setTargetWidth={vi.fn()}
+      showDefineLiquidModal={false}
     />,
     {
       i18nInstance: i18n,

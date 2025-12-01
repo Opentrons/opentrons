@@ -121,9 +121,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const attachedPipettesByMount = useAttachedPipettesFromInstrumentsQuery()
-  const [showExitConfirmation, setShowExitConfirmation] = useState<boolean>(
-    false
-  )
+  const [showExitConfirmation, setShowExitConfirmation] =
+    useState<boolean>(false)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)
     ? t('ninety_six_channel', {

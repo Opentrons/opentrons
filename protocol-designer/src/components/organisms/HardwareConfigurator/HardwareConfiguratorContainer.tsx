@@ -31,18 +31,15 @@ export function HardwareConfiguratorContainer(
     updateInitialDeckState,
   } = props
 
-  const {
-    addFixtureModal,
-    addFixtureToCutout,
-    removeFixtureFromCutout,
-  } = useDeckConfigurationEditing(
-    deckConfig,
-    modules,
-    fixtures,
-    hasGripper,
-    setValue,
-    updateInitialDeckState
-  )
+  const { addFixtureModal, addFixtureToCutout, removeFixtureFromCutout } =
+    useDeckConfigurationEditing(
+      deckConfig,
+      modules,
+      fixtures,
+      hasGripper,
+      setValue,
+      updateInitialDeckState
+    )
   return (
     <>
       {addFixtureModal}

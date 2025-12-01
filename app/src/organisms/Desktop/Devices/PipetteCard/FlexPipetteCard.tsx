@@ -26,12 +26,7 @@ import { FLOWS } from '/app/organisms/PipetteWizardFlows/constants'
 import { AboutPipetteSlideout } from './AboutPipetteSlideout'
 
 import type { MouseEventHandler } from 'react'
-import type {
-  BadPipette,
-  HostConfig,
-  Mount,
-  PipetteData,
-} from '@opentrons/api-client'
+import type { BadPipette, Mount, PipetteData } from '@opentrons/api-client'
 import type { PipetteModelSpecs } from '@opentrons/shared-data'
 import type { MenuOverlayItemProps } from '/app/molecules/InstrumentCard/MenuOverlay'
 import type {
@@ -43,7 +38,7 @@ interface FlexPipetteCardProps {
   attachedPipette: PipetteData | BadPipette | null
   pipetteModelSpecs: PipetteModelSpecs | null
   mount: Mount
-  isRunActive: boolean
+  isRobotBusy: boolean
   isEstopNotDisengaged: boolean
 }
 
@@ -63,16 +58,14 @@ export function FlexPipetteCard({
   pipetteModelSpecs,
   attachedPipette,
   mount,
-  isRunActive,
+  isRobotBusy,
   isEstopNotDisengaged,
 }: FlexPipetteCardProps): JSX.Element {
   const { t, i18n } = useTranslation(['device_details', 'shared'])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
-  const [
-    showAboutPipetteSlideout,
-    setShowAboutPipetteSlideout,
-  ] = useState<boolean>(false)
+  const [showAboutPipetteSlideout, setShowAboutPipetteSlideout] =
+    useState<boolean>(false)
   const [showChoosePipette, setShowChoosePipette] = useState(false)
   const [selectedPipette, setSelectedPipette] = useState<SelectablePipettes>(
     SINGLE_MOUNT_PIPETTES
@@ -147,7 +140,7 @@ export function FlexPipetteCard({
       ? [
           {
             label: t('attach_pipette'),
-            disabled: attachedPipette != null || isRunActive,
+            disabled: attachedPipette != null || isRobotBusy,
             onClick: handleChoosePipette,
           },
         ]
@@ -157,12 +150,12 @@ export function FlexPipetteCard({
               attachedPipette.data.calibratedOffset?.last_modified != null
                 ? t('recalibrate_pipette')
                 : t('calibrate_pipette'),
-            disabled: attachedPipette == null || isRunActive,
+            disabled: attachedPipette == null || isRobotBusy,
             onClick: handleCalibrate,
           },
           {
             label: t('detach_pipette'),
-            disabled: attachedPipette == null || isRunActive,
+            disabled: attachedPipette == null || isRobotBusy,
             onClick: handleDetach,
           },
           {
@@ -174,7 +167,7 @@ export function FlexPipetteCard({
           },
           {
             label: i18n.format(t('drop_tips'), 'capitalize'),
-            disabled: attachedPipette == null || isRunActive,
+            disabled: attachedPipette == null || isRobotBusy,
             onClick: () => {
               enableDTWiz()
             },

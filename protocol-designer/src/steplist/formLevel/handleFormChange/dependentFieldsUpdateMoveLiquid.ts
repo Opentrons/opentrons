@@ -12,7 +12,7 @@ import {
   getMinPipetteVolume,
   getPipetteCapacity,
 } from '../../../pipettes/pipetteData'
-import { getWellRatio } from '../../utils'
+import { getWellRatio } from '../../utils/getWellRatio'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
@@ -706,6 +706,32 @@ const updatePatchOnPathChange = (
   return patch
 }
 
+const updatePatchOnNozzlesChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'nozzles')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tiprack_selected', 'tips_selected', 'tip_tracking'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnChangeTipChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'changeTip')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
+    }
+  }
+  return patch
+}
+
 export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
@@ -751,5 +777,7 @@ export function dependentFieldsUpdateMoveLiquid(
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnConditioningVolumeChange(chainPatch, rawForm),
     chainPatch => updatePatchOnPathChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchOnNozzlesChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnChangeTipChange(chainPatch, rawForm),
   ])
 }

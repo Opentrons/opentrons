@@ -184,6 +184,14 @@ export const absorbanceReaderNoGripper = (): CommandCreatorError => {
   }
 }
 
+export const flexStackerNoGripper = (): CommandCreatorError => {
+  return {
+    type: 'FLEX_STACKER_NO_GRIPPER',
+    message:
+      'This step involves a gripper. Add a gripper or remove step to proceed.',
+  }
+}
+
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',
@@ -216,26 +224,29 @@ export const heaterShakerEastWestWithLatchOpen = (): CommandCreatorError => {
   }
 }
 
-export const heaterShakerNorthSouthEastWestShaking = (): CommandCreatorError => {
-  return {
-    type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
-    message: 'The Heater-Shaker is shaking',
+export const heaterShakerNorthSouthEastWestShaking =
+  (): CommandCreatorError => {
+    return {
+      type: 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING',
+      message: 'The Heater-Shaker is shaking',
+    }
   }
-}
 
-export const heaterShakerEastWestOfMultiChannelPipette = (): CommandCreatorError => {
-  return {
-    type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
-    message: 'The Heater-Shaker is shaking',
+export const heaterShakerEastWestOfMultiChannelPipette =
+  (): CommandCreatorError => {
+    return {
+      type: 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL',
+      message: 'The Heater-Shaker is shaking',
+    }
   }
-}
 
-export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette = (): CommandCreatorError => {
-  return {
-    type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
-    message: '8-Channel pipette cannot access labware',
+export const heaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette =
+  (): CommandCreatorError => {
+    return {
+      type: 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL',
+      message: '8-Channel pipette cannot access labware',
+    }
   }
-}
 
 export const labwareOffDeck = (): CommandCreatorError => {
   return {
@@ -331,10 +342,19 @@ export const retractBelowDispense = (): CommandCreatorError => {
   }
 }
 
-export const multiDispenseValuesNotFound = (): CommandCreatorError => {
+export const multiAspirateVolumeTooHigh = (): CommandCreatorError => {
   return {
-    type: 'MULTI_DISPENSE_VALUES_NOT_FOUND',
-    message: 'Multi dispense values not found for liquid class',
+    type: 'MULTI_ASPIRATE_VOLUME_TOO_HIGH',
+    message:
+      'Consolidate pipette path was selected but cannot fit volume for more than 1 well in the tip',
+  }
+}
+
+export const multiDispenseVolumeTooHigh = (): CommandCreatorError => {
+  return {
+    type: 'MULTI_DISPENSE_VOLUME_TOO_HIGH',
+    message:
+      'Distribute pipette path was selected but cannot fit volume for more than 1 well in the tip',
   }
 }
 
@@ -343,7 +363,7 @@ export const closingThermocyclerWithInvalidLid = (args: {
 }): CommandCreatorError => {
   return {
     type: 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID',
-    message: `Cannot close thermocycler lid with ${args.lidDisplayName}`,
+    message: `Closing the Thermocycler lid with ${args.lidDisplayName} in place will cause damage`,
   }
 }
 

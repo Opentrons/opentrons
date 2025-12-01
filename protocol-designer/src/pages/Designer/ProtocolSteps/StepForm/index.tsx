@@ -5,12 +5,13 @@ import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
-  AutoAddPauseUntilTempStepModal,
+  BonusStepModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
-  DELETE_STEP_FORM,
 } from '/protocol-designer/components/organisms'
+import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
+import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
@@ -24,11 +25,8 @@ import { getDirtyFields } from './utils'
 
 import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
-import type {
-  FormData,
-  StepFieldName,
-  StepIdType,
-} from '/protocol-designer/form-types'
+import type { FormData, StepFieldName } from '/protocol-designer/form-types'
+import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
 
 interface StateProps {
@@ -38,10 +36,11 @@ interface StateProps {
   isPristineSetTempForm: boolean
   isPristineSetHeaterShakerTempForm: boolean
   invariantContext: InvariantContext
+  allLabwareDefs: LabwareDefByDefURI
+  enableConcurrentModuleActions: boolean
   formData?: FormData | null
 }
 interface DispatchProps {
-  deleteStep: (stepId: string) => void
   handleClose: () => void
   saveSetTempFormWithAddedPauseUntilTemp: () => void
   saveHeaterShakerFormWithAddedPauseUntilTemp: () => void
@@ -52,7 +51,6 @@ type StepFormManagerProps = StateProps & DispatchProps
 function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   const {
     canSave,
-    deleteStep,
     formData,
     formHasChanges,
     handleClose,
@@ -63,6 +61,8 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveHeaterShakerFormWithAddedPauseUntilTemp,
     saveStepForm,
     invariantContext,
+    allLabwareDefs,
+    enableConcurrentModuleActions,
   } = props
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
@@ -79,21 +79,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       return prevDirtyFields
     })
   }
-  const stepId = formData?.id
-  const handleDelete = (): void => {
-    if (stepId != null) {
-      deleteStep(stepId)
-    } else {
-      console.error(
-        `StepEditForm: tried to delete step with no step id, this should not happen`
-      )
-    }
-  }
-  const {
-    confirm: confirmDelete,
-    showConfirmation: showConfirmDeleteModal,
-    cancel: cancelDelete,
-  } = useConditionalConfirm(handleDelete, true)
   const {
     confirm: confirmClose,
     showConfirmation: showConfirmCancelModal,
@@ -117,7 +102,11 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   if (formData == null) {
     return null
   }
-  const hydratedForm = getHydratedForm(formData, invariantContext)
+  const hydratedForm = getHydratedForm(
+    formData,
+    invariantContext,
+    allLabwareDefs
+  )
   const focusHandlers = {
     focusedField,
     dirtyFields,
@@ -136,13 +125,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
 
   return (
     <>
-      {showConfirmDeleteModal && (
-        <ConfirmDeleteModal
-          modalType={DELETE_STEP_FORM}
-          onCancelClick={cancelDelete}
-          onContinueClick={confirmDelete}
-        />
-      )}
       {showConfirmCancelModal && (
         <ConfirmDeleteModal
           modalType={
@@ -152,25 +134,52 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           onContinueClick={confirmClose}
         />
       )}
-      {showAddPauseUntilTempStepModal ||
-      showAddPauseUntilHeaterShakerTempStepModal ? (
-        <AutoAddPauseUntilTempStepModal
-          displayTemperature={
-            showAddPauseUntilTempStepModal
-              ? formData?.targetTemperature
-              : formData?.targetHeaterShakerTemperature ?? '?'
-          }
-          displayModule={
-            formData.moduleId != null
-              ? getModuleDisplayName(
-                  invariantContext.moduleEntities[formData.moduleId].model
-                )
-              : ''
-          }
-          handleCancelClick={saveStepForm}
-          handleContinueClick={handleSave}
-        />
-      ) : null}
+      {showAddPauseUntilTempStepModal &&
+        (enableConcurrentModuleActions ? (
+          <BonusStepModal
+            modalType="explainWaitForTemperatureModuleTemp"
+            displayTemperature={formData?.targetTemperature ?? '?'}
+            handleAddPauseClick={handleSave}
+            handleSkipPauseClick={saveStepForm}
+          />
+        ) : (
+          <BonusStepModal
+            modalType="optionallyWaitForTemp"
+            displayTemperature={formData?.targetTemperature ?? '?'}
+            displayModule={
+              formData.moduleId != null
+                ? getModuleDisplayName(
+                    invariantContext.moduleEntities[formData.moduleId].model
+                  )
+                : ''
+            }
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ))}
+      {showAddPauseUntilHeaterShakerTempStepModal &&
+        (enableConcurrentModuleActions ? (
+          <BonusStepModal
+            modalType="explainWaitForHeaterShakerTemp"
+            displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ) : (
+          <BonusStepModal
+            modalType="optionallyWaitForTemp"
+            displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
+            displayModule={
+              formData.moduleId != null
+                ? getModuleDisplayName(
+                    invariantContext.moduleEntities[formData.moduleId].model
+                  )
+                : ''
+            }
+            handleSkipPauseClick={saveStepForm}
+            handleAddPauseClick={handleSave}
+          />
+        ))}
       <StepFormToolbox
         {...{
           canSave,
@@ -193,19 +202,17 @@ const mapStateToProps = (state: BaseState): StateProps => {
     formData: stepFormSelectors.getUnsavedForm(state),
     formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
     isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
-    isPristineSetHeaterShakerTempForm: stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm(
-      state
-    ),
-    isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
-      state
-    ),
+    isPristineSetHeaterShakerTempForm:
+      stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm(state),
+    isPristineSetTempForm:
+      stepFormSelectors.getUnsavedFormIsPristineSetTempForm(state),
     invariantContext: getInvariantContext(state),
+    allLabwareDefs: labwareDefSelectors.getLabwareDefsByURI(state),
+    enableConcurrentModuleActions: getEnableConcurrentModuleActions(state),
   }
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
-  const deleteStep = (stepId: StepIdType): void =>
-    dispatch(actions.deleteStep(stepId))
   const handleClose = (): void => dispatch(actions.cancelStepForm())
   const saveHeaterShakerFormWithAddedPauseUntilTemp = (): void =>
     dispatch(stepsActions.saveHeaterShakerFormWithAddedPauseUntilTemp())
@@ -214,7 +221,6 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
   const saveStepForm = (): void => dispatch(stepsActions.saveStepForm())
 
   return {
-    deleteStep,
     handleClose,
     saveSetTempFormWithAddedPauseUntilTemp,
     saveStepForm,

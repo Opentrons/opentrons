@@ -29,10 +29,8 @@ export const MAXIMUM_RECENT_RUN_PROTOCOLS = 8
 
 export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
-  const {
-    data: allRunsQueryData,
-    error: allRunsQueryError,
-  } = useNotifyAllRunsQuery()
+  const { data: allRunsQueryData, error: allRunsQueryError } =
+    useNotifyAllRunsQuery()
   const protocols = useAllProtocolsQuery()
 
   const { unfinishedUnboxingFlowRoute } = useSelector(

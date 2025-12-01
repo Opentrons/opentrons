@@ -75,6 +75,5 @@ function StyledWellsComponent(props: StyledWellProps): JSX.Element {
   )
 }
 
-export const StyledWells: MemoExoticComponent<
-  typeof StyledWellsComponent
-> = memo(StyledWellsComponent)
+export const StyledWells: MemoExoticComponent<typeof StyledWellsComponent> =
+  memo(StyledWellsComponent)

@@ -5,7 +5,8 @@ import type { StoredProtocolData, StoredProtocolDir } from '../types'
 
 export const storedProtocolData: StoredProtocolData = {
   protocolKey: 'protocolKeyStub',
-  mostRecentAnalysis: (simpleAnalysisFileFixture as any) as ProtocolAnalysisOutput,
+  mostRecentAnalysis:
+    simpleAnalysisFileFixture as any as ProtocolAnalysisOutput,
   srcFileNames: ['fakeSrcFileName'],
   srcFiles: ['fakeSrcFile' as any],
   modified: 123456789,
@@ -13,7 +14,7 @@ export const storedProtocolData: StoredProtocolData = {
 
 export const storedProtocolDataWithCsvRunTimeParameter: StoredProtocolData = {
   protocolKey: 'protocolKeyStub',
-  mostRecentAnalysis: ({
+  mostRecentAnalysis: {
     ...simpleAnalysisFileFixture,
     runTimeParameters: [
       ...simpleAnalysisFileFixture.runTimeParameters,
@@ -25,7 +26,7 @@ export const storedProtocolDataWithCsvRunTimeParameter: StoredProtocolData = {
         file: null,
       },
     ],
-  } as any) as ProtocolAnalysisOutput,
+  } as any as ProtocolAnalysisOutput,
   srcFileNames: ['fakeSrcFileName'],
   srcFiles: ['fakeSrcFile' as any],
   modified: 123456789,
@@ -33,10 +34,10 @@ export const storedProtocolDataWithCsvRunTimeParameter: StoredProtocolData = {
 
 export const storedProtocolDataWithoutRunTimeParameters: StoredProtocolData = {
   protocolKey: 'protocolKeyStub',
-  mostRecentAnalysis: ({
+  mostRecentAnalysis: {
     ...simpleAnalysisFileFixture,
     runTimeParameters: [],
-  } as any) as ProtocolAnalysisOutput,
+  } as any as ProtocolAnalysisOutput,
   srcFileNames: ['fakeSrcFileName'],
   srcFiles: ['fakeSrcFile' as any],
   modified: 123456789,
@@ -51,7 +52,8 @@ export const storedProtocolDir: StoredProtocolDir = {
 
 export const storedProtocolDataTwo: StoredProtocolData = {
   protocolKey: 'protocolKeyStubTwo',
-  mostRecentAnalysis: (simpleAnalysisFileFixture as any) as ProtocolAnalysisOutput,
+  mostRecentAnalysis:
+    simpleAnalysisFileFixture as any as ProtocolAnalysisOutput,
   srcFileNames: ['fakeSrcFileNameTwo'],
   srcFiles: ['fakeSrcFileTwo' as any],
   modified: 987654321,

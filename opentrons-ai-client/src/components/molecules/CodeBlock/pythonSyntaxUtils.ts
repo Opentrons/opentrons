@@ -17,8 +17,10 @@ export const PYTHON_REGEX_PATTERNS = {
   comment: /#.*$/g,
   text: /(["'])((?:\\.|(?!\1).)*?)\1/g,
   literal: /\b\d+\.?\d*\b/g,
-  keyword: /\b(def|class|if|elif|else|for|while|return|import|from|as|try|except|finally|with|pass|break|continue|raise|assert|yield|lambda|global|nonlocal|del|is|in|not|and|or|True|False|None)\b/g,
-  builtin: /\b(print|len|range|int|str|float|bool|list|dict|set|tuple|type|input|open|file|help|dir|abs|all|any|bin|chr|ord|hex|oct|round|sorted|sum|min|max|zip|map|filter|enumerate|reversed|slice|super|property|isinstance|issubclass|hasattr|getattr|setattr|delattr|callable|eval|exec|compile|vars|locals|globals)\b/g,
+  keyword:
+    /\b(def|class|if|elif|else|for|while|return|import|from|as|try|except|finally|with|pass|break|continue|raise|assert|yield|lambda|global|nonlocal|del|is|in|not|and|or|True|False|None)\b/g,
+  builtin:
+    /\b(print|len|range|int|str|float|bool|list|dict|set|tuple|type|input|open|file|help|dir|abs|all|any|bin|chr|ord|hex|oct|round|sorted|sum|min|max|zip|map|filter|enumerate|reversed|slice|super|property|isinstance|issubclass|hasattr|getattr|setattr|delattr|callable|eval|exec|compile|vars|locals|globals)\b/g,
   functionCall: /\b(\w+)(?=\()/g,
   methodCall: /\.(\w+)(?=\()/g,
   self: /\bself\b/g,

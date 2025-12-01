@@ -22,6 +22,10 @@ from rich.console import Console
 
 console = Console()
 
+PR_SPECIAL_BRANCH_PREFIXES: tuple[str, ...] = ("chore_release",)
+PR_SPECIAL_BRANCH_NAMES: tuple[str, ...] = ("edge", "release")
+PR_SANDBOX_SUFFIX = "-pr"
+
 
 @dataclass(frozen=True)
 class CIConfig:
@@ -33,30 +37,55 @@ class CIConfig:
     relative_artifact_dir: str
 
 
+def _determine_application_from_tag(ref_name: str) -> str | None:
+    """Determine application from tag name patterns."""
+    ref_name_lower = ref_name.lower()
+
+    tag_patterns = {
+        "labware_library": ["staging-labware-library", "labware-library"],
+        "mkdocs": ["staging-mkdocs", "mkdocs"],
+        "docs": ["staging-docs", "docs"],
+        "protocol_designer": ["staging-protocol-designer", "protocol-designer"],
+    }
+
+    for app_name, prefixes in tag_patterns.items():
+        if any(ref_name_lower.startswith(prefix) for prefix in prefixes):
+            return app_name
+
+    return None
+
+
+def _determine_application_from_workflow() -> str | None:
+    """Determine application from workflow name."""
+    workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
+
+    workflow_patterns = {
+        "mkdocs": "Docs build and deploy",
+        "protocol_designer": "PD test, build, and deploy",
+        "labware_library": "Labware Library test, build, and deploy",
+        "components": "Components test, build, and deploy",
+        "docs": "API docs build",
+    }
+
+    for app_name, pattern in workflow_patterns.items():
+        if pattern in workflow_name:
+            return app_name
+
+    return None
+
+
 def _determine_application(ref_type: str, ref_name: str) -> str:
     """Determine application from ref type and name."""
+    # Try tag-based detection first
     if ref_type == "tag":
-        # Tag-based application detection - normalize to lowercase for comparison
-        ref_name_lower = ref_name.lower()
-        if any(ref_name_lower.startswith(prefix) for prefix in ["staging-labware-library", "labware-library"]):
-            return "labware_library"
-        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-mkdocs", "mkdocs"]):
-            return "mkdocs"
-        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-docs", "docs"]):
-            return "docs"
-        elif any(ref_name_lower.startswith(prefix) for prefix in ["staging-protocol-designer", "protocol-designer"]):
-            return "protocol_designer"
+        app_from_tag = _determine_application_from_tag(ref_name)
+        if app_from_tag:
+            return app_from_tag
 
-    # If not a tag, or a tag we are not expecting, determine application from workflow name.
-    workflow_name = os.environ.get("GITHUB_WORKFLOW", "")
-    if "Docs build and deploy" in workflow_name:
-        return "mkdocs"
-    elif "PD test, build, and deploy" in workflow_name:
-        return "protocol_designer"
-    elif "Labware Library test, build, and deploy" in workflow_name:
-        return "labware_library"
-    elif "API docs build" in workflow_name:
-        return "docs"
+    # Fall back to workflow-based detection
+    app_from_workflow = _determine_application_from_workflow()
+    if app_from_workflow:
+        return app_from_workflow
 
     # No application could be determined - exit with error
     raise ValueError(
@@ -73,6 +102,8 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
         # Handle empty or null head_ref values
         if head_ref and head_ref.lower() not in ["", "null", "none"]:
             sandbox_prefix = head_ref
+            if _is_special_pr_branch(head_ref):
+                sandbox_prefix = _alternate_pr_sandbox_prefix(head_ref)
         else:
             sandbox_prefix = "unknown"
         return environment, sandbox_prefix
@@ -93,6 +124,23 @@ def _determine_environment_and_prefix(event_name: str, ref_type: str, ref_name: 
             return "sandbox", ref_name
 
     raise ValueError(f"No deployment configuration found for event: {event_name}, ref_type: {ref_type}")
+
+
+def _is_special_pr_branch(branch_name: str) -> bool:
+    """Return True if the PR branch should use an alternate sandbox prefix."""
+    normalized = branch_name.lower()
+    if normalized in PR_SPECIAL_BRANCH_NAMES:
+        return True
+
+    return any(normalized.startswith(prefix) for prefix in PR_SPECIAL_BRANCH_PREFIXES)
+
+
+def _alternate_pr_sandbox_prefix(branch_name: str) -> str:
+    """Build the alternate sandbox prefix for special PR branches."""
+    if branch_name.endswith(PR_SANDBOX_SUFFIX):
+        return branch_name
+
+    return f"{branch_name}{PR_SANDBOX_SUFFIX}"
 
 
 def parse_github_event_context(

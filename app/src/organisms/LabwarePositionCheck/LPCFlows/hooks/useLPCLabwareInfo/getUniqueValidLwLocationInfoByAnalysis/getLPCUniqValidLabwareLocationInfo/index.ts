@@ -20,7 +20,11 @@ export function getLPCUniqValidLabwareLocationInfo(
   protocolData: CompletedProtocolAnalysis | null,
   lwDefs: LabwareDefinition[]
 ): LabwareLocationInfo[] {
-  const { commands, labware, modules = [] } = protocolData ?? {
+  const {
+    commands,
+    labware,
+    modules = [],
+  } = protocolData ?? {
     labware: [],
     modules: [],
     commands: [],

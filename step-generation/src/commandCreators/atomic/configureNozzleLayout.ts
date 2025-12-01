@@ -3,11 +3,9 @@ import { formatPyStr, indentPyLines, uuid } from '../../utils'
 import type { ConfigureNozzleLayoutParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-export const configureNozzleLayout: CommandCreator<ConfigureNozzleLayoutParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const configureNozzleLayout: CommandCreator<
+  ConfigureNozzleLayoutParams
+> = (args, invariantContext, prevRobotState) => {
   const { pipetteId, configurationParams } = args
   const { style, primaryNozzle } = configurationParams
   const commands = [

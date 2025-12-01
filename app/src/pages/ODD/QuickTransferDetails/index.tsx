@@ -182,7 +182,7 @@ const transferSectionTabOptions = [
   'deck',
 ] as const
 
-type TabOption = typeof transferSectionTabOptions[number]
+type TabOption = (typeof transferSectionTabOptions)[number]
 
 interface TransferSectionTabsProps {
   currentOption: TabOption
@@ -293,10 +293,8 @@ export function QuickTransferDetails(): JSX.Element | null {
   const { quickTransferId: transferId } = useParams<
     keyof OnDeviceRouteParams
   >() as OnDeviceRouteParams
-  const {
-    missingProtocolHardware,
-    conflictedSlots,
-  } = useMissingProtocolHardware(transferId)
+  const { missingProtocolHardware, conflictedSlots } =
+    useMissingProtocolHardware(transferId)
   const chipText = useHardwareStatusText(
     missingProtocolHardware,
     conflictedSlots
@@ -311,12 +309,10 @@ export function QuickTransferDetails(): JSX.Element | null {
   )
 
   const [showMaxPinsAlert, setShowMaxPinsAlert] = useState<boolean>(false)
-  const {
-    data: protocolRecord,
-    isLoading: isTransferFetching,
-  } = useProtocolQuery(transferId, {
-    staleTime: Infinity,
-  })
+  const { data: protocolRecord, isLoading: isTransferFetching } =
+    useProtocolQuery(transferId, {
+      staleTime: Infinity,
+    })
 
   // Watch for scrolling to toggle dropshadow
   const { scrollRef, isScrolled } = useScrollPosition()
@@ -351,15 +347,13 @@ export function QuickTransferDetails(): JSX.Element | null {
   const handleRunTransfer = (): void => {
     createRun({ protocolId: transferId })
   }
-  const [
-    showConfirmDeleteTransfer,
-    setShowConfirmationDeleteTransfer,
-  ] = useState<boolean>(false)
+  const [showConfirmDeleteTransfer, setShowConfirmationDeleteTransfer] =
+    useState<boolean>(false)
 
   const displayName =
     !isTransferFetching && protocolRecord != null
-      ? protocolRecord?.data.metadata.protocolName ??
-        protocolRecord?.data.files[0].name
+      ? (protocolRecord?.data.metadata.protocolName ??
+        protocolRecord?.data.files[0].name)
       : null
 
   return (

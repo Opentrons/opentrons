@@ -20,8 +20,10 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
+  getModuleType,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
   STAGING_AREA_CUTOUTS,
@@ -38,6 +40,7 @@ import type { CutoutId, DeckSlotId, RobotType } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
 
 const RIGHT_COLUMN_FIXTURE_PADDING = 50 // mm
+const FLEX_STACKER_FIXTURE_PADDING = 220 // mm
 const WASTE_CHUTE_SPACE = 30
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -99,11 +102,18 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
   const hasWasteChute =
     wasteChuteFixtures.length > 0 || wasteChuteStagingAreaFixtures.length > 0
 
+  const hasFlexStacker = Object.values(initialDeckSetup.modules).some(
+    module => getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE
+  )
   const filteredAddressableAreas = deckDef.locations.addressableAreas.filter(
     aa => isAddressableAreaStandardSlot(aa.id, deckDef)
   )
   const hasRightColumnFixtures =
-    stagingAreaFixtures.length + wasteChuteFixtures.length > 0
+    stagingAreaFixtures.length + wasteChuteFixtures.length > 0 || hasFlexStacker
+  const rightColumnAdjustment = hasFlexStacker
+    ? FLEX_STACKER_FIXTURE_PADDING
+    : RIGHT_COLUMN_FIXTURE_PADDING
+
   return (
     <Flex
       width="100%"
@@ -125,7 +135,7 @@ export function DeckThumbnail(props: DeckThumbnailProps): JSX.Element {
             : deckDef.cornerOffsetFromOrigin[1]
         } ${
           hasRightColumnFixtures
-            ? deckDef.dimensions[0] + RIGHT_COLUMN_FIXTURE_PADDING
+            ? deckDef.dimensions[0] + rightColumnAdjustment
             : deckDef.dimensions[0]
         } ${deckDef.dimensions[1]}`}
         zoomed

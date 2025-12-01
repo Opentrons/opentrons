@@ -30,9 +30,8 @@ export function useProtocolRunAnalyticsData(
   getProtocolRunAnalyticsData: GetProtocolRunAnalyticsData
 } {
   const robotProtocolMetadata = useProtocolMetadata()
-  const { protocolData: robotProtocolAnalysis } = useProtocolDetailsForRun(
-    runId
-  )
+  const { protocolData: robotProtocolAnalysis } =
+    useProtocolDetailsForRun(runId)
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(

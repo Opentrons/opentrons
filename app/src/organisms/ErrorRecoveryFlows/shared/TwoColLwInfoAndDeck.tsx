@@ -39,9 +39,8 @@ export function TwoColLwInfoAndDeck(
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
-  const {
-    displayNameCurrentLoc: slot,
-  } = failedLabwareUtils.relevantPickUpTipLwLocs
+  const { displayNameCurrentLoc: slot } =
+    failedLabwareUtils.relevantPickUpTipLwLocs
 
   const buildTitle = (): string => {
     switch (selectedRecoveryOption) {

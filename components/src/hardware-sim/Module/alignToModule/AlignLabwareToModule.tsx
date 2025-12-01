@@ -33,13 +33,8 @@ export type AlignLabwareToModuleProps = PropsWithChildren<{
 export function AlignLabwareToModule(
   props: AlignLabwareToModuleProps
 ): JSX.Element {
-  const {
-    deckId,
-    slotId,
-    moduleDefinition,
-    labwareDefinition,
-    children,
-  } = props
+  const { deckId, slotId, moduleDefinition, labwareDefinition, children } =
+    props
   const { x, y } = getModuleParentOriginToLabwareOrigin(
     deckId,
     slotId,

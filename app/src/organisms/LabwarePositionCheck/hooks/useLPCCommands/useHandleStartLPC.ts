@@ -54,9 +54,8 @@ function buildInstrumentLabwarePrepCommands(
   protocolData: CompletedProtocolAnalysis
 ): SetupCreateCommand[] {
   const setupCommandsFromLoadCommands = processLoadCommands(protocolData)
-  const setupCommandsFromStackerCommands = processFlexStackerCommands(
-    protocolData
-  )
+  const setupCommandsFromStackerCommands =
+    processFlexStackerCommands(protocolData)
 
   return [...setupCommandsFromLoadCommands, ...setupCommandsFromStackerCommands]
 }

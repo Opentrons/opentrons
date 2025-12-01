@@ -60,18 +60,14 @@ interface ProtocolListProps {
   storedProtocols: StoredProtocolData[]
 }
 export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
-  const [
-    showImportProtocolSlideout,
-    setShowImportProtocolSlideout,
-  ] = useState<boolean>(false)
+  const [showImportProtocolSlideout, setShowImportProtocolSlideout] =
+    useState<boolean>(false)
   const [
     showChooseRobotToRunProtocolSlideout,
     setShowChooseRobotToRunProtocolSlideout,
   ] = useState<boolean>(false)
-  const [
-    showSendProtocolToFlexSlideout,
-    setShowSendProtocolToFlexSlideout,
-  ] = useState<boolean>(false)
+  const [showSendProtocolToFlexSlideout, setShowSendProtocolToFlexSlideout] =
+    useState<boolean>(false)
   const sortBy = useSelector(getProtocolsDesktopSortKey) ?? 'alphabetical'
   const [showSortByMenu, setShowSortByMenu] = useState<boolean>(false)
   const toggleSetShowSortByMenu = (): void => {
@@ -79,10 +75,8 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
   }
   const { t } = useTranslation('protocol_info')
   const { storedProtocols } = props
-  const [
-    selectedProtocol,
-    setSelectedProtocol,
-  ] = useState<StoredProtocolData | null>(null)
+  const [selectedProtocol, setSelectedProtocol] =
+    useState<StoredProtocolData | null>(null)
 
   const sortedStoredProtocols = useSortedProtocols(sortBy, storedProtocols)
 

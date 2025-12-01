@@ -235,6 +235,8 @@ describe('createPresavedStepForm', () => {
       liquidClass: 'none',
       stepNumber: 0,
       tip_tracking: 'automatic',
+      tiprack_selected: null,
+      tips_selected: [],
     })
   })
   describe('mix step', () => {
@@ -282,6 +284,8 @@ describe('createPresavedStepForm', () => {
         pushOut_volume: null,
         mix_position_reference: 'well-bottom',
         tip_tracking: 'automatic',
+        tiprack_selected: null,
+        tips_selected: [],
       })
     })
   })

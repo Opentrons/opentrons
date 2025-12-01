@@ -5,7 +5,7 @@ import round from 'lodash/round'
 
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getAllLiquidClassDefs,
   getFlexNameConversion,
   getPipetteSpecsV2,
@@ -26,7 +26,7 @@ import { getMaxUiFlowRate } from '../../pages/Designer/ProtocolSteps/StepForm/Pi
 import {
   getDefaultBlowoutFlowRate,
   getDefaultPushOutVolume,
-  getMatchingTipLiquidSpecsFromSpec,
+  getMatchingTipLiquidSpecs,
 } from '../../utils'
 import { getMigratedPositionFromTop } from './utils/getMigrationPositionFromTop'
 
@@ -87,22 +87,27 @@ const getClippedFlowRateForMoveLiquid = (args: {
   const tipLiquidSpecs = liquidClass?.byPipette
     .find(byPipette => byPipette.pipetteModel === pipetteName)
     ?.byTipType.find(byTipType => byTipType.tiprack === tiprack)
-  const tiprackDef = getAllLabwareDefs()[tiprack]
+  // TODO: this won't find the definition for a custom tiprack
+  const tiprackDef = getAllDefinitions()[tiprack]
+  console.assert(
+    tiprackDef != null,
+    `could not find labware definition for ${tiprack}`
+  )
   let correctionVolume: number = 0
   if (tipLiquidSpecs != null && flowRateType !== 'blowout') {
     const liquidClassLookup =
       flowRateType === 'dispense'
         ? path === 'multiDispense'
-          ? tipLiquidSpecs.multiDispense ?? tipLiquidSpecs.singleDispense
+          ? (tipLiquidSpecs.multiDispense ?? tipLiquidSpecs.singleDispense)
           : tipLiquidSpecs.singleDispense
         : tipLiquidSpecs.aspirate
     const conditioningByVolume =
       path === 'multiDispense'
-        ? tipLiquidSpecs.multiDispense?.conditioningByVolume ?? []
+        ? (tipLiquidSpecs.multiDispense?.conditioningByVolume ?? [])
         : []
     const disposalByVolume =
       path === 'multiDispense'
-        ? tipLiquidSpecs.multiDispense?.disposalByVolume ?? []
+        ? (tipLiquidSpecs.multiDispense?.disposalByVolume ?? [])
         : []
 
     const { referenceVolumes } = getTransferPlanAndReferenceVolumes({
@@ -127,10 +132,10 @@ const getClippedFlowRateForMoveLiquid = (args: {
       ) ?? 0
   }
 
-  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecsFromSpec(
+  const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
     pipetteSpecs,
     volume,
-    formData.tipRack as string
+    tiprackDef
   )
 
   const shaftULperMM = pipetteSpecs?.shaftULperMM
@@ -170,12 +175,8 @@ export const migrateFile = (
   if (designerApplication == null || designerApplication?.data == null) {
     throw Error('The designerApplication key in your file is corrupt.')
   }
-  const {
-    savedStepForms,
-    ingredients,
-    labware,
-    pipettes,
-  } = designerApplication.data
+  const { savedStepForms, ingredients, labware, pipettes } =
+    designerApplication.data
   const { model: robotType } = robot
 
   const allLabwareDefsByURI =
@@ -184,7 +185,7 @@ export const migrateFile = (
     //  for OpentronsAI
     Object.values(labwareDefinitions).length > 0
       ? labwareDefinitions
-      : getAllLabwareDefs()
+      : getAllDefinitions()
   const migratedIngredients: Ingredients = Object.entries(
     ingredients
   ).reduce<Ingredients>((acc, [id, ingredient]) => {
@@ -244,9 +245,10 @@ export const migrateFile = (
         ...rest
       } = form
       const aspirateLabwareUri = labware[aspirate_labware].labwareDefURI
-      const isAspirateLabwareTouchtipDisabled = allLabwareDefsByURI[
-        aspirateLabwareUri
-      ].parameters.quirks?.includes('touchTipDisabled')
+      const isAspirateLabwareTouchtipDisabled =
+        allLabwareDefsByURI[aspirateLabwareUri].parameters.quirks?.includes(
+          'touchTipDisabled'
+        )
       const dispenseLabwareUri = labware[dispense_labware]?.labwareDefURI
 
       const isDispenseLabwareTouchtipDisabled =
@@ -429,9 +431,10 @@ export const migrateFile = (
         } = form
         const tipRackDef = allLabwareDefsByURI[form.tipRack]
         const mixLabwareUri = labware[formLabware].labwareDefURI
-        const isLabwareTouchtipDisabled = allLabwareDefsByURI[
-          mixLabwareUri
-        ].parameters.quirks?.includes('touchTipDisabled')
+        const isLabwareTouchtipDisabled =
+          allLabwareDefsByURI[mixLabwareUri].parameters.quirks?.includes(
+            'touchTipDisabled'
+          )
         const pipetteName = pipettes?.[form.pipette]?.pipetteName ?? null
         const pipetteSpecs =
           pipetteName != null ? getPipetteSpecsV2(pipetteName) : null

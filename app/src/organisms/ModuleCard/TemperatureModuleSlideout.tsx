@@ -42,13 +42,14 @@ export const TemperatureModuleSlideout = (
   const { reportModuleCommand } = useModuleCommandAnalytics()
   const handleSubmitTemperature = (): void => {
     if (temperatureValue != null) {
-      const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand = {
-        commandType: 'temperatureModule/setTargetTemperature',
-        params: {
-          moduleId: module.id,
-          celsius: temperatureValue,
-        },
-      }
+      const saveTempCommand: TemperatureModuleSetTargetTemperatureCreateCommand =
+        {
+          commandType: 'temperatureModule/setTargetTemperature',
+          params: {
+            moduleId: module.id,
+            celsius: temperatureValue,
+          },
+        }
       createLiveCommand({
         command: saveTempCommand,
       })

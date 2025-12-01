@@ -79,33 +79,27 @@ describe('DetachProbe', () => {
     mockHandleMoveToInitialOffsetPosition = vi.fn().mockResolvedValue(undefined)
     mockGoBackLastStep = vi.fn()
 
-    vi.mocked(
-      selectStepInfo
-    ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
-    vi.mocked(
-      selectActivePipetteChannelCount
-    ).mockImplementation((runId: string) => (state: any) =>
-      state[runId]?.activePipette?.channelCount || 1
+    vi.mocked(selectStepInfo).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.steps
     )
-    vi.mocked(
-      selectActivePipette
-    ).mockImplementation((runId: string) => (state: any) =>
-      state[runId]?.activePipette
+    vi.mocked(selectActivePipetteChannelCount).mockImplementation(
+      (runId: string) => (state: any) =>
+        state[runId]?.activePipette?.channelCount || 1
     )
-    vi.mocked(
-      selectCurrentSubstep
-    ).mockImplementation((runId: string) => (state: any) =>
-      state[runId]?.currentSubstep
+    vi.mocked(selectActivePipette).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.activePipette
     )
-    vi.mocked(
-      selectSelectedLwOverview
-    ).mockImplementation((runId: string) => (state: any) =>
-      state[runId]?.selectedLwOverview
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.currentSubstep
+    )
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.selectedLwOverview
     )
     vi.mocked(
       selectSelectedLwWithOffsetDetailsMostRecentVectorOffset
-    ).mockImplementation((runId: string) => (state: any) =>
-      state[runId]?.selectedLwWithOffsetDetailsMostRecentVectorOffset
+    ).mockImplementation(
+      (runId: string) => (state: any) =>
+        state[runId]?.selectedLwWithOffsetDetailsMostRecentVectorOffset
     )
 
     props = {
@@ -118,7 +112,8 @@ describe('DetachProbe', () => {
         },
         toggleRobotMoving: mockToggleRobotMoving,
         home: mockHome,
-        handleMoveToInitialOffsetPosition: mockHandleMoveToInitialOffsetPosition,
+        handleMoveToInitialOffsetPosition:
+          mockHandleMoveToInitialOffsetPosition,
       },
       goBackLastStep: mockGoBackLastStep,
     }

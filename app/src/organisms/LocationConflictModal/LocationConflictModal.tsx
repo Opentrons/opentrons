@@ -159,11 +159,12 @@ export const LocationConflictModal = (
         requiredModule,
         deckDef
       )
-      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(
-        slotName,
-        moduleFixtures,
-        deckDef
-      )
+      const moduleFixtureIdByCutoutId =
+        getFixtureIdByCutoutIdFromModuleSlotName(
+          slotName,
+          moduleFixtures,
+          deckDef
+        )
 
       const newDeckConfig = deckConfig.map(existingCutoutConfig => {
         const replacementCutoutFixtureId =

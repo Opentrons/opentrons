@@ -152,6 +152,7 @@ export type SetupCreateCommand =
 export type LabwareLocation =
   | 'offDeck'
   | 'systemLocation'
+  | 'wasteChuteLocation'
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
@@ -198,7 +199,7 @@ export interface OnAddressableAreaLocationSequenceComponent {
 
 export interface NotOnDeckLocationSequenceComponent {
   kind: 'notOnDeck'
-  logicalLocationName: 'offDeck' | 'systemLocation'
+  logicalLocationName: 'offDeck' | 'systemLocation' | 'wasteChuteLocation'
 }
 
 export interface OnCutoutFixtureLocationSequenceComponent {

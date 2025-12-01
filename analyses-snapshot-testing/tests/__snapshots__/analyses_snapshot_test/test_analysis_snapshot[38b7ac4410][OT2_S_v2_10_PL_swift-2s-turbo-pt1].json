@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -9124,7 +9127,16 @@
     "protocolName": "Swift 2S Turbo DNA Library Kit Protocol: Part 1/3 -     Enzymatic Prep & Ligation",
     "source": "Protocol Library"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "3"
+      },
+      "model": "temperatureModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",
