@@ -5,7 +5,7 @@ import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
-  AutoAddPauseUntilTempStepModal,
+  BonusStepModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
@@ -136,15 +136,15 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       )}
       {showAddPauseUntilTempStepModal &&
         (enableConcurrentModuleActions ? (
-          <AutoAddPauseUntilTempStepModal
-            modalType="temperatureModule"
+          <BonusStepModal
+            modalType="explainWaitForTemperatureModuleTemp"
             displayTemperature={formData?.targetTemperature ?? '?'}
             handleAddPauseClick={handleSave}
             handleSkipPauseClick={saveStepForm}
           />
         ) : (
-          <AutoAddPauseUntilTempStepModal
-            modalType="legacy"
+          <BonusStepModal
+            modalType="optionallyWaitForTemp"
             displayTemperature={formData?.targetTemperature ?? '?'}
             displayModule={
               formData.moduleId != null
@@ -159,15 +159,15 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
         ))}
       {showAddPauseUntilHeaterShakerTempStepModal &&
         (enableConcurrentModuleActions ? (
-          <AutoAddPauseUntilTempStepModal
-            modalType="heaterShaker"
+          <BonusStepModal
+            modalType="explainWaitForHeaterShakerTemp"
             displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
             handleSkipPauseClick={saveStepForm}
             handleAddPauseClick={handleSave}
           />
         ) : (
-          <AutoAddPauseUntilTempStepModal
-            modalType="legacy"
+          <BonusStepModal
+            modalType="optionallyWaitForTemp"
             displayTemperature={formData?.targetHeaterShakerTemperature ?? '?'}
             displayModule={
               formData.moduleId != null
