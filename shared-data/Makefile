@@ -126,4 +126,4 @@ test-cov:
 
 .PHONY: pack
 pack: build-ts lib-js
-	yarn pack
+	pnpm pack
