@@ -14,8 +14,8 @@ runs:
 
     - name: Install pnpm
       uses: pnpm/action-setup@v4
-      with:
-        version: 10
+      # Version is auto-detected from 'packageManager' in package.json
+
     - name: 'Setup Node'
       uses: actions/setup-node@v4
       with:
@@ -32,6 +32,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/Cypress
+        # Logic looks good here
         key: cypress-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
     - name: 'Install udev for USB-detection'
@@ -43,7 +44,14 @@ runs:
       shell: bash
       run: |
         # Set up Cypress to download from package-mirror
-        CYPRESS_VERSION=$(grep '"cypress"' package.json | sed 's/.*"cypress": *"\([^"]*\)".*/\1/' | tr -d ' \n\r\t')
+        # FIX: Use Node to parse version instead of risky grep/sed
+        CYPRESS_VERSION=$(node -p "try { require('./package.json').devDependencies.cypress } catch(e) { require('./package.json').dependencies.cypress }")
+
+        if [ -z "$CYPRESS_VERSION" ] || [ "$CYPRESS_VERSION" == "undefined" ]; then
+          echo "Error: Could not detect Cypress version from package.json"
+          exit 1
+        fi
+
         if [[ "$RUNNER_OS" == "Linux" ]]; then
           PLATFORM="linux-x64"
         elif [[ "$RUNNER_OS" == "macOS" ]]; then
@@ -51,6 +59,8 @@ runs:
         else
           PLATFORM="win32-x64"
         fi
+
         export CYPRESS_INSTALL_BINARY="https://github.com/Opentrons/package-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}.zip"
 
+        # Ensure this target runs 'pnpm install'
         make setup-js
