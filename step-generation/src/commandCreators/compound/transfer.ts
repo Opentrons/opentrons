@@ -282,7 +282,6 @@ export const transfer: CommandCreator<TransferArgs> = (
   }
 
   let tiprackEntity: LabwareEntity | undefined, tiprackURI: string
-
   // TODO: We currently ask users to select a tip rack even if the tip handling policy
   // for this step is `never`, in which case we must ignore the tip rack the user selected
   // and use the tip rack from the previous step where we actually picked up the tip.
@@ -292,10 +291,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     tiprackEntity = invariantContext.labwareEntities[prevTiprackID ?? '']
     tiprackURI = tiprackEntity?.labwareDefURI
   } else {
-    tiprackURI = userSelectedTipRackURI
     tiprackEntity = Object.values(labwareEntities).find(
-      ({ labwareDefURI }) => labwareDefURI === tiprackURI
+      ({ labwareDefURI }) => labwareDefURI === userSelectedTipRackURI
     )
+    tiprackURI = userSelectedTipRackURI
   }
 
   if (tiprackEntity == null) {
