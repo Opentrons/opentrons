@@ -10,7 +10,6 @@ interface WizardHeaderProps {
   /* Optional copy override for the exit button. */
   exitButtonCopy?: string
   totalSteps?: number | null
-  // 1-indexed
   currentStep?: number | null
   exitDisabled?: boolean
   hideStepText?: boolean
