@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import { useCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
 
 import { CameraControls } from '..'
 import { CameraControlsHome } from '../CameraControlsHome'
@@ -14,7 +14,7 @@ import { ZoomSettingsView } from '../ZoomSettingsView'
 import type { CameraControlsProps } from '..'
 
 vi.mock(
-  '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+  '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
 )
 vi.mock('../CameraControlsHome')
 vi.mock('../CameraTileSetting')
@@ -33,7 +33,7 @@ describe('CameraControls', () => {
     mockProps = {
       toggleShowControls: vi.fn(),
     }
-    vi.mocked(useStubCameraSettingsValues).mockReturnValue({
+    vi.mocked(useCameraSettingsValues).mockReturnValue({
       zoom: '1x',
       brightness: 50,
       contrast: 50,

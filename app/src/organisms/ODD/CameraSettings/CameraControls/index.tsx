@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import { useCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
 
 import { CameraControlsHome } from './CameraControlsHome'
 import { CameraTileSetting } from './CameraTileSetting'
@@ -25,7 +25,7 @@ export function CameraControls({
   const { t } = useTranslation('device_settings')
 
   const [activeSubView, setActiveSubView] = useState<ActiveControlView>(null)
-  const settings = useStubCameraSettingsValues()
+  const settings = useCameraSettingsValues()
 
   const returnToHomeView = (): void => {
     setActiveSubView(null)

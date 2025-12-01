@@ -12,13 +12,13 @@ import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
 import type { ActiveControlView } from '.'
 
 export interface CameraControlsHomeProps {
   setActiveSubView: (view: ActiveControlView) => void
   toggleShowControls: () => void
-  settings: UseStubCameraSettingsValuesResult
+  settings: UseCameraSettingsValuesResult
 }
 
 export function CameraControlsHome({

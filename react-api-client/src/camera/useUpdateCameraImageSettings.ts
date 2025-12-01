@@ -61,6 +61,6 @@ export function useUpdateCameraImageSettings(
 
   return {
     ...mutation,
-    updateCameraImageSettings: mutation.mutate,
+    updateCameraImageSettings: mutation.mutateAsync,
   }
 }

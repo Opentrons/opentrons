@@ -1,25 +1,42 @@
 import { useTranslation } from 'react-i18next'
 
 import { Modal, PrimaryButton, Slider } from '@opentrons/components'
+import { useUpdateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 
 import styles from './cameracontrols.module.css'
-import { useStubCameraSettingsValues } from './hooks/useStubCameraSettingsValues'
+import { useCameraSettingsValues } from './hooks/useCameraSettingsValues'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
-import type { UseStubCameraSettingsValuesResult } from './hooks/useStubCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from './hooks/useCameraSettingsValues'
+
+function zoomStringToNumber(value: string): number {
+  return Number(value.replace(/x/i, ''))
+}
 
 export interface CameraControlsProps {
   onClose: () => void
 }
+const { updateCameraImageSettings } = useUpdateCameraImageSettings()
 
 export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
-  const settings = useStubCameraSettingsValues()
+  const settings = useCameraSettingsValues()
+  console.log('🚀 ~ CameraControls ~ settings:', settings)
+  console.log('save')
+  const handleSave = async (): Promise<void> => {
+    await updateCameraImageSettings({
+      cameraId: 'ot_system_camera',
+      zoom: zoomStringToNumber(settings.zoom),
+      brightness: settings.brightness,
+      contrast: settings.contrast,
+      saturation: settings.saturation,
+    })
+    onClose()
+  }
 
   return (
     <Modal onClose={onClose} title={t('camera_controls')} width="46rem">
@@ -33,13 +50,7 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
             onClick={settings.restoreToDefault}
             buttonText={t('restore_to_default')}
           />
-          <PrimaryButton
-            onClick={() => {
-              console.log('Stubbed setting savings...')
-            }}
-          >
-            {t('save')}
-          </PrimaryButton>
+          <PrimaryButton onClick={handleSave}>{t('save')}</PrimaryButton>
         </div>
       </div>
     </Modal>
@@ -47,7 +58,7 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
 }
 
 interface CameraControlSettingsProps {
-  settings: UseStubCameraSettingsValuesResult
+  settings: UseCameraSettingsValuesResult
 }
 
 function CameraControlSettings({

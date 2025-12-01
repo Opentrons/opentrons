@@ -6,11 +6,11 @@ import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
 
 import styles from './cameracontrols.module.css'
 
-import type { UseStubCameraSettingsValuesResult } from './hooks/useStubCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from './hooks/useCameraSettingsValues'
 
 export interface ZoomSettingsProps {
-  zoom: UseStubCameraSettingsValuesResult['zoom']
-  adjustZoom: UseStubCameraSettingsValuesResult['adjustZoom']
+  zoom: UseCameraSettingsValuesResult['zoom']
+  adjustZoom: UseCameraSettingsValuesResult['adjustZoom']
 }
 
 export function ZoomSettings({
@@ -41,9 +41,9 @@ export function ZoomSettings({
 }
 
 interface ZoomBtnProps {
-  currentZoom: UseStubCameraSettingsValuesResult['zoom']
-  btnZoomValue: UseStubCameraSettingsValuesResult['zoom']
-  adjustZoom: UseStubCameraSettingsValuesResult['adjustZoom']
+  currentZoom: UseCameraSettingsValuesResult['zoom']
+  btnZoomValue: UseCameraSettingsValuesResult['zoom']
+  adjustZoom: UseCameraSettingsValuesResult['adjustZoom']
 }
 
 function ZoomBtn({

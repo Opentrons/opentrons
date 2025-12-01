@@ -11,7 +11,7 @@ import { CameraControlsHome } from '../CameraControlsHome'
 import { ImagePreviewModal } from '../ImagePreviewModal'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
 import type { CameraControlsHomeProps } from '../CameraControlsHome'
 
 vi.mock(
@@ -28,7 +28,7 @@ const render = (props: CameraControlsHomeProps) => {
 
 describe('CameraControlsHome', () => {
   let mockProps: CameraControlsHomeProps
-  let mockSettings: UseStubCameraSettingsValuesResult
+  let mockSettings: UseCameraSettingsValuesResult
 
   beforeEach(() => {
     mockSettings = {

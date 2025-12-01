@@ -7,17 +7,17 @@ import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 import styles from './cameracontrols.module.css'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
 
-const ZOOM_VALUES: Array<UseStubCameraSettingsValuesResult['zoom']> = [
+const ZOOM_VALUES: Array<UseCameraSettingsValuesResult['zoom']> = [
   '1x',
   '1.5x',
   '2x',
 ]
 
 export interface ZoomSettingsViewProps {
-  zoomValue: UseStubCameraSettingsValuesResult['zoom']
-  adjustZoom: UseStubCameraSettingsValuesResult['adjustZoom']
+  zoomValue: UseCameraSettingsValuesResult['zoom']
+  adjustZoom: UseCameraSettingsValuesResult['adjustZoom']
   returnToHomeView: () => void
 }
 
@@ -29,7 +29,7 @@ export function ZoomSettingsView({
   const { t } = useTranslation('device_settings')
 
   const buildSubLabel = (
-    value: UseStubCameraSettingsValuesResult['zoom']
+    value: UseCameraSettingsValuesResult['zoom']
   ): string => {
     switch (value) {
       case '1x':
