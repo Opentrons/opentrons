@@ -1,5 +1,3 @@
-import type { CameraId } from '@opentrons/shared-data'
-
 export interface CameraData {
   cameraEnabled: boolean
   liveStreamEnabled: boolean
