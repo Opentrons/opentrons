@@ -134,10 +134,8 @@ jobs:
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
       - name: 'js deps'
-        run: |
-          npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
-          make setup-js
+        id: 'setup-js'
+        uses: ./.github/actions/js/setup
       - name: 'run shared-data JS unit tests'
         run: make -C shared-data test-cov
       - name: 'Upload coverage report'
@@ -255,10 +253,8 @@ jobs:
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
       - name: 'js deps'
-        run: |
-          npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
-          make setup-js
+        id: 'setup-js'
+        uses: ./.github/actions/js/setup
       - name: 'build typescript'
         run: make build-ts
       - name: 'build library'
