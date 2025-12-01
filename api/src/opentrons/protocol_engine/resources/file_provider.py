@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from opentrons_shared_data.data_files import (
     DataFileInfo,
     MimeType,
-    RunFileNameMetadata,
+    RunFileMetadata,
 )
 
 SPECIAL_CHARACTERS = {
@@ -69,14 +69,14 @@ class FileData:
 
     data: bytes
     mime_type: MimeType
-    run_metadata: RunFileNameMetadata
+    run_metadata: RunFileMetadata
     command_metadata: CommandFileNameMetadata
 
     @staticmethod
     def build(
         data: bytes,
         mime_type: MimeType,
-        run_metadata: RunFileNameMetadata,
+        run_metadata: RunFileMetadata,
         command_metadata: CommandFileNameMetadata,
     ) -> "FileData":
         """Build a generic file data class."""
@@ -190,7 +190,7 @@ class FileProvider:
             data_files_filecount: Callback to check the amount of data files already present in the data files directory.
         """
         self._data_files_write_file_cb = data_files_write_file_cb
-        self._run_metadata: RunFileNameMetadata | None = None
+        self._run_metadata: RunFileMetadata | None = None
 
     async def write_file(
         self,
@@ -227,7 +227,7 @@ class FileProvider:
             mime_type=mime_type,
         )
 
-    def set_run_metadata(self, metadata: RunFileNameMetadata) -> None:
+    def set_run_metadata(self, metadata: RunFileMetadata) -> None:
         """Sets metadata specific to the run."""
         self._run_metadata = metadata
 

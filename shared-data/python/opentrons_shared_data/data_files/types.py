@@ -5,14 +5,17 @@ from datetime import datetime
 from enum import Enum
 from typing import Union, Optional
 
+from opentrons_shared_data.protocol.constants import ProtocolKind
+
 
 @dataclass(frozen=True)
-class RunFileNameMetadata:
+class RunFileMetadata:
     """Data from the run used that may be used to build a finalized file name."""
 
     robot_name: str
     run_id: str
     run_created_at: datetime
+    protocol_kind: Optional[ProtocolKind]
     protocol_name: Optional[str]
 
 

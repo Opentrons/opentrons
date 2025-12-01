@@ -9,7 +9,7 @@ from .types import (
     IODataFileInfo,
     DataFileSource,
     DataFileInfoWithCommands,
-    RunFileNameMetadata,
+    RunFileMetadata,
 )
 
 
@@ -21,6 +21,6 @@ __all__ = [
     "CmdDataFileInfo",
     "MimeType",
     "DataFileSource",
-    "RunFileNameMetadata",
+    "RunFileMetadata",
     "DataFileInfoWithCommands",
 ]

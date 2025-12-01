@@ -5,7 +5,7 @@ from typing import Dict, List, Optional, Callable, Union, Mapping, Sequence
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
-from opentrons_shared_data.data_files import RunFileNameMetadata
+from opentrons_shared_data.data_files import RunFileMetadata
 
 from opentrons import config
 from opentrons.types import NozzleMapInterface
@@ -246,7 +246,7 @@ class RunDataManager:
             else None
         )
         self._file_provider.set_run_metadata(
-            RunFileNameMetadata(
+            RunFileMetadata(
                 robot_name=config.name(),
                 run_id=run_id,
                 run_created_at=created_at,
