@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 
 import { InlineNotification, StyledText } from '@opentrons/components'
 
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   SOURCE_ROBOT_SETTINGS,
   useCameraAnalytics,
@@ -17,7 +18,10 @@ import styles from './preferences.module.css'
 import { UsagePreferencesSettings } from './UsagePreferencesSettings'
 
 import type { ReactNode } from 'react'
+import type { Protocol } from '@opentrons/api-client'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
+
+const TOAST_DURATION_MS = 3000
 
 export interface CameraSettingsProps {
   /* A header element for the page content. */
@@ -34,6 +38,7 @@ export interface CameraSettingsProps {
   not general settings context. */
   storageInfo: RobotStorageInfo | null
   isCameraRequired: boolean | null
+  protocolRecord: Protocol | null
 }
 
 export function CameraSettings({
@@ -48,8 +53,12 @@ export function CameraSettings({
   toggleLiveStreamEnabled,
   isRecoveryCaptureEnabled,
   isLiveVideoEnabled,
+  protocolRecord,
 }: CameraSettingsProps): JSX.Element {
+  const { t } = useTranslation('protocol_setup')
   const isCameraSettingsEnabled = useFeatureFlag('camera')
+  const isQuickTransfer = protocolRecord?.data.protocolKind === 'quick-transfer'
+  const { makeSnackbar } = useToaster()
   const [showControls, setShowControls] = useState(false)
   const toggleShowControls = (): void => {
     setShowControls(!showControls)
@@ -59,6 +68,9 @@ export function CameraSettings({
     robotType: robotType,
     source: SOURCE_ROBOT_SETTINGS,
   })
+  const recoveryEnabledByRunType = isQuickTransfer
+    ? false
+    : isRecoveryCaptureEnabled
 
   const handleToggleCamera = (): void => {
     toggleCameraEnabled()
@@ -66,7 +78,7 @@ export function CameraSettings({
       reportCameraEnablementSettings({
         cameraEnabled: !isCameraEnabled,
         liveFeedEnabled: isLiveVideoEnabled,
-        recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+        recoveryCaptureEnabled: recoveryEnabledByRunType,
       })
     }
   }
@@ -76,19 +88,26 @@ export function CameraSettings({
       reportCameraEnablementSettings({
         cameraEnabled: isCameraEnabled,
         liveFeedEnabled: !isLiveVideoEnabled,
-        recoveryCaptureEnabled: isRecoveryCaptureEnabled,
+        recoveryCaptureEnabled: recoveryEnabledByRunType,
       })
     }
   }
 
   const handleToggleRecovery = (): void => {
-    toggleRecoveryEnabled()
-    if (isCameraRequired === null) {
-      reportCameraEnablementSettings({
-        cameraEnabled: isCameraEnabled,
-        liveFeedEnabled: isLiveVideoEnabled,
-        recoveryCaptureEnabled: !isRecoveryCaptureEnabled,
-      })
+    if (isQuickTransfer) {
+      makeSnackbar(
+        t('no_camera_during_quick_transfer') as string,
+        TOAST_DURATION_MS
+      )
+    } else {
+      toggleRecoveryEnabled()
+      if (isCameraRequired === null) {
+        reportCameraEnablementSettings({
+          cameraEnabled: isCameraEnabled,
+          liveFeedEnabled: isLiveVideoEnabled,
+          recoveryCaptureEnabled: !isRecoveryCaptureEnabled,
+        })
+      }
     }
   }
   if (showControls) {
@@ -123,7 +142,7 @@ export function CameraSettings({
                 toggleLiveVideoEnabled={handleToggleLiveStream}
                 toggleRecoveryCaptureEnabled={handleToggleRecovery}
                 isLiveVideoEnabled={isLiveVideoEnabled}
-                isRecoveryCaptureEnabled={isRecoveryCaptureEnabled}
+                isRecoveryCaptureEnabled={recoveryEnabledByRunType}
                 robotName={robotName}
               />
               {isCameraSettingsEnabled && (

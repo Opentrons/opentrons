@@ -19,6 +19,7 @@ import {
 import styles from './setupcamera.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { Protocol } from '@opentrons/api-client'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type { State } from '/app/redux/types'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -33,6 +34,7 @@ export interface ProtocolSetupCameraProps {
   confirmCameraSettings: () => void
   storageInfo: RobotStorageInfo | null
   setSetupScreen: Dispatch<SetStateAction<SetupScreens>>
+  protocolRecord: Protocol | null
 }
 
 export function ProtocolSetupCamera(

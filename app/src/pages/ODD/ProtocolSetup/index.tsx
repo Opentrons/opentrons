@@ -1010,6 +1010,7 @@ export function ProtocolSetup(): JSX.Element {
         confirmCameraSettings={confirmCameraSettings}
         setSetupScreen={setSetupScreen}
         storageInfo={storageInfo}
+        protocolRecord={protocolRecord ?? null}
       />
     ),
     'view only parameters': (
