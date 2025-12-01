@@ -24,7 +24,7 @@
       "path": "cz-conventional-changelog"
     }
   },
-  "packageManager": "pnpm@8.15.1",
+  "packageManager": "pnpm@10",
   "engines": {
     "node": ">=22.12.0"
   },
