@@ -1,28 +1,10 @@
 ---
-title: "Opentrons OT-2: Instrument Services"
+title: "Opentrons OT-2: Self-service Procedures"
 ---
 
-The OT-2 is designed for years of full-time operation. Unlike cleaning, you should not attempt to service or repair the OT-2 yourself, unless at the direction of Opentrons Support.
+Open-source, hands on robot. You can do it, but only at the direction of Opentrons support. Do not attempt on your own etc., etc.
 
-Opentrons also offers multiple levels of service for the OT-2 and related hardware, some of which include maintenance and repairs. See the [Instrument Services section](https://opentrons.com/instrument-services) of our website for information about our service contract offerings.
-
-## Opentrons services
-
-Opentrons offers two levels of service, Opentrons Care and Opentrons Care Plus, both of which include benefits for onboarding, maintenance, repair, and more. Both services are available in the continental United States; Opentrons Care is also available internationally. Both services include:
-
-- Onboarding with an Opentrons field applications scientist.
-- Parts for yearly preventive maintenance.
-- Access to a dedicated support engineer.
-
-In addition, Opentrons Care Plus includes on-site visits for:
-
-- Installation.
-- Preventive maintenance, yearly.
-- Repairs, as needed.
-
-You can also purchase services individually, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
-
-## Maintenance schedule summary
+## Other maintenance procedures
 
 Along with routine cleaning, Opentrons also recommends the following optional procedures to help keep your Flex running smoothly. Feel free to adapt this schedule to your robot's workload. Alternatively, let Opentrons do the work for you. Our service offerings cover a range of options to adapt to the needs of your lab.
 

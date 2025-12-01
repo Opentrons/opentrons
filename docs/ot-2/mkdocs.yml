@@ -19,7 +19,8 @@ nav:
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
-      - Service: maintenance/service.md
+      - Self-Service Procedures: maintenance/self-service.md
+      - Instrument Services: maintenance/service.md
   - Appendices:
       - Additional Documentation: additional-docs.md
       - Open-Source Software: open-source.md
