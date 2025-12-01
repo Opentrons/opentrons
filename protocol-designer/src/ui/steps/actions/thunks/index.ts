@@ -350,7 +350,6 @@ export const saveStepForm: (options?: {
     return
   }
 
-  // TODO: Understand these hints.
   if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
     dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
   }
