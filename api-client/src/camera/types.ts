@@ -1,7 +1,19 @@
+import type { CameraId } from '@opentrons/shared-data'
+
 export interface CameraData {
   cameraEnabled: boolean
   liveStreamEnabled: boolean
   errorRecoveryCameraEnabled: boolean
+}
+
+export interface CameraImageSettings {
+  cameraId: CameraId
+  resolution?: [number, number]
+  zoom?: number
+  contrast?: number
+  brightness?: number
+  saturation?: number
+  pan?: [number, number]
 }
 
 export interface CreateCameraData {
@@ -9,3 +21,4 @@ export interface CreateCameraData {
 }
 
 export type CameraResponse = CameraData
+export type CameraImageSettingsResponse = CameraImageSettings
