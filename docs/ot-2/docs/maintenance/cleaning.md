@@ -102,3 +102,19 @@ Filtered pipette tips help prevent contaminating the barrel or inside of the pip
 4. Rinse with distilled water.
 5. Let the pipette air dry.
 6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
+
+## Pipette O-rings
+
+The GEN2 multi-channel (8-channel) pipettes have a rubber O-ring around their nozzles. These O-rings help tips form a good seal against the pipette. You can replace the O-rings on a GEN2 multi-channel pipette if the rings become worn or broken.
+
+!!!note
+    - OT-2 single-channel and very early model 8-channel pipettes do not have O-rings.
+    - OT-2 and Flex pipette O-rings are not interchangeable.
+
+Each GEN2 multi-channel pipette ships with the special tools and replacement O-rings rings shown here.
+
+![Labeled O-ring tool parts](../images/o-ring-tools.jpeg)
+
+
+<font color="red">Might need some Jackson help with illustration here</font>
+
