@@ -98,6 +98,7 @@
   "enable_camera_to_proceed": "Enable the camera to proceed",
   "enabled": "Enabled",
   "error_confirming_camera": "Error confirming camera preferences",
+  "no_camera_during_quick_transfer": "No images are captured during Quick Transfer",
   "example": "Example",
   "exit_to_deck_configuration": "Exit to deck configuration",
   "extension_mount": "extension mount",

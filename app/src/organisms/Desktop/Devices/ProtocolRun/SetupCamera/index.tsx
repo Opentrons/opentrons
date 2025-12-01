@@ -27,6 +27,7 @@ import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import styles from './setupcamera.module.css'
 
+import type { Protocol } from '@opentrons/api-client'
 import type { UseCameraUsageSettingsResult } from '/app/local-resources/images/hooks/useCameraUsageSettings'
 import type { State } from '/app/redux/types'
 
@@ -38,6 +39,7 @@ export interface SetupCameraProps {
   isCameraRequired: boolean
   cameraConfirmed: boolean
   confirmCameraSettings: () => void
+  protocolRecord: Protocol | null
 }
 
 export function SetupCamera({
@@ -46,6 +48,7 @@ export function SetupCamera({
   isCameraRequired,
   cameraConfirmed,
   confirmCameraSettings,
+  protocolRecord,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const isCameraSettingsEnabled = useFeatureFlag('camera')
@@ -55,19 +58,28 @@ export function SetupCamera({
   const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
 
   const [isConfirmPending, setIsConfirmPending] = useState(false)
+  const isQuickTransfer = protocolRecord?.data.protocolKind === 'quick-transfer'
 
   const {
     liveStreamEnabled,
     enabled: cameraEnabled,
     recoveryEnabled,
   } = useSelector((state: State) => getCameraUsageState(state, runId))
+  const recoveryEnabledByRunType = isQuickTransfer ? false : recoveryEnabled
 
   const toggleCameraEnabled = (): void => {
     dispatch(updateCameraEnablement(runId, !cameraEnabled))
   }
 
   const toggleRecoveryEnabled = (): void => {
-    dispatch(updateCameraRecoveryEnablement(runId, !recoveryEnabled))
+    if (isQuickTransfer) {
+      makeSnackbar(
+        t('no_camera_during_quick_transfer') as string,
+        TOAST_DURATION_MS
+      )
+    } else {
+      dispatch(updateCameraRecoveryEnablement(runId, !recoveryEnabled))
+    }
   }
 
   const toggleLiveStreamEnabled = (): void => {
@@ -83,7 +95,7 @@ export function SetupCamera({
         settings: {
           cameraEnabled,
           liveStreamEnabled,
-          errorRecoveryCameraEnabled: recoveryEnabled,
+          errorRecoveryCameraEnabled: recoveryEnabledByRunType,
         },
       },
       {
@@ -123,7 +135,7 @@ export function SetupCamera({
           <SetupRunCameraUsage
             robotName={robotName}
             liveStreamEnabled={liveStreamEnabled}
-            recoveryEnabled={recoveryEnabled}
+            recoveryEnabled={recoveryEnabledByRunType}
             toggleRecoveryEnabled={toggleRecoveryEnabled}
             toggleLiveStreamEnabled={toggleLiveStreamEnabled}
             cameraConfirmed={cameraConfirmed}

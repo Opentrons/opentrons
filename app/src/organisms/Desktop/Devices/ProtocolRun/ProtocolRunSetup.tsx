@@ -418,6 +418,7 @@ export function ProtocolRunSetup({
             )
             setExpandedStepKey(null)
           }}
+          protocolRecord={protocolRecord ?? null}
         />
       ),
       description: t(`${CAMERA_SETUP_STEP_KEY}_description`),
