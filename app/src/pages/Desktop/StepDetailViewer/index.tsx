@@ -82,7 +82,6 @@ export function StepDetailViewer(): JSX.Element {
   const { slot, command, robotState, invariantContext, analysis, liquids } =
     data
 
-  console.log(robotState)
   return (
     <SlotDetails
       slotId={slot}
