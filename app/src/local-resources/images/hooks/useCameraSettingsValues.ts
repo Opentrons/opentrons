@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
 
 import {
+  useCameraImageSettings,
   useCreateCameraImageSettings,
-  useUpdateCameraImageSettings,
 } from '@opentrons/react-api-client'
+
+import { zoomNumberToString, zoomStringToNumber } from '../utils/cameraUtils'
 
 export type CameraZoomSetting = '1x' | '1.5x' | '2x'
 
 export interface UseCameraSettingsValuesResult {
-  zoom: CameraZoomSetting
+  zoom: number
   brightness: number
   contrast: number
   saturation: number
@@ -19,20 +21,16 @@ export interface UseCameraSettingsValuesResult {
   restoreToDefault: () => void
 }
 
-export function zoomNumberToString(value: number): CameraZoomSetting {
-  return `${value}x` as CameraZoomSetting
-}
-
 // Camera image specific settings.
 export function useCameraSettingsValues(): UseCameraSettingsValuesResult {
-  const { data: cameraImageSettings } = useCreateCameraImageSettings()
-  const { mutateAsync: updateCameraImageSettings } =
-    useUpdateCameraImageSettings()
+  const { data: cameraImageSettings } = useCameraImageSettings()
   const [zoom, setZoom] = useState<CameraZoomSetting>('1x')
+  const zoomValue = zoomStringToNumber(zoom)
   const [brightness, setBrightness] = useState(50)
   const [contrast, setContrast] = useState(50)
   const [saturation, setSaturation] = useState(50)
-
+  const { mutateAsync: createCameraImageSettings } =
+    useCreateCameraImageSettings()
   useEffect(() => {
     if (cameraImageSettings) {
       setZoom(
@@ -48,22 +46,18 @@ export function useCameraSettingsValues(): UseCameraSettingsValuesResult {
 
   const adjustZoom = (value: CameraZoomSetting): void => {
     setZoom(value)
-    console.log('🚀 ~ adjustZoom ~ value:', value)
   }
 
   const adjustBrightness = (value: number): void => {
     setBrightness(value)
-    console.log('🚀 ~ adjustBrightness ~ value:', value)
   }
 
   const adjustContrast = (value: number): void => {
     setContrast(value)
-    console.log('🚀 ~ adjustContrast ~ value:', value)
   }
 
   const adjustSaturation = (value: number): void => {
     setSaturation(value)
-    console.log('🚀 ~ adjustSaturation ~ value:', value)
   }
 
   const restoreToDefault = (): void => {
@@ -71,10 +65,16 @@ export function useCameraSettingsValues(): UseCameraSettingsValuesResult {
     setContrast(50)
     setSaturation(50)
     setZoom('1x')
+    createCameraImageSettings({
+      zoom: 1,
+      brightness: 50,
+      contrast: 50,
+      saturation: 50,
+    })
   }
 
   return {
-    zoom,
+    zoom: zoomValue,
     brightness,
     contrast,
     saturation,

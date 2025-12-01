@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { StyledText } from '@opentrons/components'
 
 import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
 
 import styles from './cameracontrols.module.css'
 
-import type { UseCameraSettingsValuesResult } from './hooks/useCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface ZoomSettingsProps {
   zoom: UseCameraSettingsValuesResult['zoom']
@@ -28,13 +29,13 @@ export function ZoomSettings({
         </StyledText>
       </div>
       <div className={styles.zoom_btn_container}>
-        <ZoomBtn currentZoom={zoom} btnZoomValue="1x" adjustZoom={adjustZoom} />
+        <ZoomBtn currentZoom={zoom} btnZoomValue={1} adjustZoom={adjustZoom} />
         <ZoomBtn
           currentZoom={zoom}
-          btnZoomValue="1.5x"
+          btnZoomValue={1.5}
           adjustZoom={adjustZoom}
         />
-        <ZoomBtn currentZoom={zoom} btnZoomValue="2x" adjustZoom={adjustZoom} />
+        <ZoomBtn currentZoom={zoom} btnZoomValue={2} adjustZoom={adjustZoom} />
       </div>
     </div>
   )
@@ -52,13 +53,14 @@ function ZoomBtn({
   adjustZoom,
 }: ZoomBtnProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const btnZoomValueString = zoomNumberToString(btnZoomValue)
 
   const onClick = (): void => {
-    adjustZoom(btnZoomValue)
+    adjustZoom(btnZoomValueString)
   }
   const isActive = currentZoom === btnZoomValue
   const buildBtnCopy = (): string => {
-    switch (btnZoomValue) {
+    switch (btnZoomValueString) {
       case '1x':
         return t('default')
       case '1.5x':
@@ -71,7 +73,7 @@ function ZoomBtn({
   return (
     <TouchControlButton
       onClick={onClick}
-      title={btnZoomValue}
+      title={btnZoomValueString}
       subText={buildBtnCopy()}
       isActive={isActive}
       isOnDevice={false}

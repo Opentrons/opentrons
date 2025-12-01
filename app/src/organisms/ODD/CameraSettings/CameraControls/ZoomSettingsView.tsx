@@ -2,18 +2,15 @@ import { useTranslation } from 'react-i18next'
 
 import { RadioButton, StyledText } from '@opentrons/components'
 
+import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from './cameracontrols.module.css'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
-const ZOOM_VALUES: Array<UseCameraSettingsValuesResult['zoom']> = [
-  '1x',
-  '1.5x',
-  '2x',
-]
+const ZOOM_VALUES: Array<UseCameraSettingsValuesResult['zoom']> = [1, 1.5, 2]
 
 export interface ZoomSettingsViewProps {
   zoomValue: UseCameraSettingsValuesResult['zoom']
@@ -31,7 +28,8 @@ export function ZoomSettingsView({
   const buildSubLabel = (
     value: UseCameraSettingsValuesResult['zoom']
   ): string => {
-    switch (value) {
+    const zoomString = zoomNumberToString(value)
+    switch (zoomString) {
       case '1x':
         return t('default')
       case '1.5x':
@@ -50,19 +48,20 @@ export function ZoomSettingsView({
         </StyledText>
         <div className={styles.zoom_btn_container}>
           {ZOOM_VALUES.map(val => {
+            const zoomString = zoomNumberToString(val)
             return (
               <RadioButton
                 key={val}
                 radioButtonType="large"
-                buttonLabel={t(val)}
+                buttonLabel={t(zoomString)}
                 buttonSubLabel={{
                   label: buildSubLabel(val),
                   align: 'vertical',
                 }}
-                buttonValue={val}
+                buttonValue={zoomString}
                 isSelected={val === zoomValue}
                 onChange={() => {
-                  adjustZoom(val)
+                  adjustZoom(zoomString)
                 }}
               />
             )

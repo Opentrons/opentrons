@@ -1,41 +1,51 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Modal, PrimaryButton, Slider } from '@opentrons/components'
-import { useUpdateCameraImageSettings } from '@opentrons/react-api-client'
+import {
+  Icon,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  Slider,
+} from '@opentrons/components'
+import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
+import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 import styles from './cameracontrols.module.css'
-import { useCameraSettingsValues } from './hooks/useCameraSettingsValues'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
-import type { UseCameraSettingsValuesResult } from './hooks/useCameraSettingsValues'
-
-function zoomStringToNumber(value: string): number {
-  return Number(value.replace(/x/i, ''))
-}
+import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface CameraControlsProps {
   onClose: () => void
 }
-const { updateCameraImageSettings } = useUpdateCameraImageSettings()
 
 export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const settings = useCameraSettingsValues()
-  console.log('🚀 ~ CameraControls ~ settings:', settings)
-  console.log('save')
+  const [isLoading, setIsLoading] = useState(false)
+  const { createCameraImageSettings } = useCreateCameraImageSettings()
   const handleSave = async (): Promise<void> => {
-    await updateCameraImageSettings({
-      cameraId: 'ot_system_camera',
-      zoom: zoomStringToNumber(settings.zoom),
-      brightness: settings.brightness,
-      contrast: settings.contrast,
-      saturation: settings.saturation,
-    })
-    onClose()
+    createCameraImageSettings(
+      {
+        zoom: settings.zoom,
+        brightness: settings.brightness,
+        contrast: settings.contrast,
+        saturation: settings.saturation,
+      },
+      {
+        onSuccess: () => {
+          onClose()
+        },
+        onSettled: () => {
+          setIsLoading(true)
+        },
+      }
+    )
   }
 
   return (
@@ -50,7 +60,15 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
             onClick={settings.restoreToDefault}
             buttonText={t('restore_to_default')}
           />
-          <PrimaryButton onClick={handleSave}>{t('save')}</PrimaryButton>
+          <div className={styles.buttons}>
+            <SecondaryButton onClick={onClose}>{t('Cancel')}</SecondaryButton>
+            <PrimaryButton onClick={handleSave} disabled={isLoading}>
+              <div className={styles.save_button}>
+                {isLoading && <Icon name="ot-spinner" spin size="1rem" />}
+                {t('Save')}
+              </div>
+            </PrimaryButton>
+          </div>
         </div>
       </div>
     </Modal>

@@ -22,7 +22,7 @@ describe('ZoomSettingsView', () => {
 
   beforeEach(() => {
     mockProps = {
-      zoomValue: '1x',
+      zoomValue: 1,
       adjustZoom: vi.fn(),
       returnToHomeView: vi.fn(),
     }

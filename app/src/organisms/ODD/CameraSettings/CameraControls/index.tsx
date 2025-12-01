@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useCameraSettingsValues'
+import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 import { CameraControlsHome } from './CameraControlsHome'
 import { CameraTileSetting } from './CameraTileSetting'
