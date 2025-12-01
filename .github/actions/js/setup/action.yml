@@ -12,15 +12,19 @@ runs:
     - uses: ./.github/actions/git/resolve-tag
     - uses: ./.github/actions/environment/complex-variables
 
+    # 1. Install pnpm explicitly (Must be BEFORE Setup Node)
     - name: Install pnpm
       uses: pnpm/action-setup@v4
-      # Version is auto-detected from 'packageManager' in package.json
+      with:
+        # It will read "packageManager": "pnpm@10" from your package.json
+        run_install: false
 
+    # 2. Setup Node with pnpm caching enabled
     - name: 'Setup Node'
       uses: actions/setup-node@v4
       with:
         node-version: '22.12.0'
-        cache: 'pnpm'
+        cache: 'pnpm' # This works now because pnpm is installed
 
     - name: 'Setup Python'
       uses: actions/setup-python@v4
@@ -32,7 +36,6 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/Cypress
-        # Logic looks good here
         key: cypress-${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
 
     - name: 'Install udev for USB-detection'
@@ -43,10 +46,10 @@ runs:
     - name: 'Setup JS'
       shell: bash
       run: |
-        # Set up Cypress to download from package-mirror
-        # FIX: Use Node to parse version instead of risky grep/sed
+        # 3. Use Node to safely parse package.json (better than grep)
         CYPRESS_VERSION=$(node -p "try { require('./package.json').devDependencies.cypress } catch(e) { require('./package.json').dependencies.cypress }")
-
+        
+        # Verify version was found
         if [ -z "$CYPRESS_VERSION" ] || [ "$CYPRESS_VERSION" == "undefined" ]; then
           echo "Error: Could not detect Cypress version from package.json"
           exit 1
@@ -59,8 +62,8 @@ runs:
         else
           PLATFORM="win32-x64"
         fi
-
+        
         export CYPRESS_INSTALL_BINARY="https://github.com/Opentrons/package-mirror/releases/download/cypress-${CYPRESS_VERSION}/cypress-${CYPRESS_VERSION}-${PLATFORM}.zip"
 
-        # Ensure this target runs 'pnpm install'
+        # 4. Run the make target (Ensure this runs 'pnpm install' in your Makefile)
         make setup-js
