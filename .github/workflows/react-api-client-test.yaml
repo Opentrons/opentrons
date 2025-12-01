@@ -55,10 +55,8 @@ jobs:
           restore-keys: |
             js-${{ secrets.GH_CACHE_VERSION }}-${{ runner.os }}-pnpm-
       - name: 'setup-js'
-        run: |
-          npm config set cache ./.npm-cache
-          pnpm config set cache ./.pnpm-cache
-          make setup-js
+        id: 'setup-js'
+        uses: ./.github/actions/js/setup
       - name: 'run api-client and react-api-client unit tests'
         run: make -C api-client test-cov
       - name: 'Upload coverage report'
