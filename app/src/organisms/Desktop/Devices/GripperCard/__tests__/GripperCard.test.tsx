@@ -39,7 +39,7 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: true,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     vi.mocked(GripperWizardFlows).mockReturnValue(<>wizard flow launched</>)
@@ -79,7 +79,7 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: false,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
 
@@ -102,7 +102,7 @@ describe('GripperCard', () => {
         },
       } as GripperData,
       isCalibrated: false,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: true,
     }
 
@@ -145,7 +145,7 @@ describe('GripperCard', () => {
     props = {
       attachedGripper: null,
       isCalibrated: false,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -163,7 +163,7 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: false,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -182,7 +182,7 @@ describe('GripperCard', () => {
         ok: false,
       } as any,
       isCalibrated: true,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
