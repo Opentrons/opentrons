@@ -370,6 +370,7 @@ async def test_create(
                 run_id=run_id,
                 run_created_at=created_at,
                 protocol_name="test_protocol",
+                protocol_kind=ProtocolKind.STANDARD,
             )
         )
     )

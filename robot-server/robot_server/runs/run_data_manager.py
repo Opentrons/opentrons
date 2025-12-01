@@ -251,6 +251,7 @@ class RunDataManager:
                 run_id=run_id,
                 run_created_at=created_at,
                 protocol_name=protocol_name,
+                protocol_kind=protocol.protocol_kind if protocol else None,
             )
         )
 

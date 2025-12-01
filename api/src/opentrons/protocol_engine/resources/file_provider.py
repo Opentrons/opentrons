@@ -10,6 +10,7 @@ from opentrons_shared_data.data_files import (
     MimeType,
     RunFileMetadata,
 )
+from opentrons_shared_data.protocol.constants import ProtocolKind
 
 SPECIAL_CHARACTERS = {
     "#",
@@ -205,8 +206,11 @@ class FileProvider:
         Raises:
             Note that the callback may raise a StorageLimitReachedError.
         """
-        if self._data_files_write_file_cb is not None:
-            assert self._run_metadata is not None
+        if (
+            self._data_files_write_file_cb is not None
+            and self._run_metadata is not None
+            and self._run_metadata.protocol_kind != ProtocolKind.QUICK_TRANSFER
+        ):
             file_data = FileData.build(
                 data=data,
                 mime_type=mime_type,
@@ -215,7 +219,7 @@ class FileProvider:
             )
 
             return await self._data_files_write_file_cb(file_data)
-        # If we are in an analysis or simulation state, return an empty `DataFileInfo`
+        # If we are in an analysis, a QT run, or simulation state, return an empty `DataFileInfo`.
         return DataFileInfo(
             id="",
             name="",
