@@ -280,11 +280,10 @@ export const transfer: CommandCreator<TransferArgs> = (
     errors.push(errorCreators.equipmentDoesNotExist())
   }
 
-  // This is a terrible name :( Note that `tipRack` above is a string, and `tiprack` here is an entity
-  const tiprack = Object.values(labwareEntities).find(
+  const tiprackEntity = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => labwareDefURI === tipRack
   )
-  if (tiprack == null) {
+  if (tiprackEntity == null) {
     errors.push(
       errorCreators.labwareDoesNotExist({
         actionName,
@@ -361,7 +360,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonName: pythonPipetteName,
   } = pipetteEntities[pipette]
 
-  const { labwareDefURI: tiprackDefUri } = tiprack ?? {}
+  const { labwareDefURI: tiprackDefUri } = tiprackEntity ?? {}
   const { tipracks } = getNextTiprack(
     pipette,
     tipRack,
