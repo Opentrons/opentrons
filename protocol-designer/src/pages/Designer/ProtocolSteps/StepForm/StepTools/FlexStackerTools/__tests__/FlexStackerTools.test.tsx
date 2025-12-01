@@ -25,6 +25,8 @@ describe('FlexStackerTools', () => {
       tab: 'aspirate',
       setTab: vi.fn(),
       setShowFormErrors: vi.fn(),
+      robotState: null,
+      flexStackerOptions: [],
     }
   })
 

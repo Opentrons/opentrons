@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Divider,
+  DropdownOption,
   Icon,
   InfoScreen,
   LabwareDetailsWithCount,
@@ -17,16 +18,29 @@ import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labw
 import { getFlexStackerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
-import type { FlexStackerModuleState } from '@opentrons/step-generation'
+import type {
+  FlexStackerModuleState,
+  TimelineFrame,
+} from '@opentrons/step-generation'
 import type { StepFormProps } from '../../types'
 
-export function FlexStackerTools(props: StepFormProps): JSX.Element {
-  const { formData, propsForFields, toolboxStep, showFormErrors } = props
+export type FlexStackerToolsProps = StepFormProps & {
+  robotState: TimelineFrame | null
+  flexStackerOptions: DropdownOption[]
+}
+
+export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
+  const {
+    formData,
+    propsForFields,
+    toolboxStep,
+    showFormErrors,
+    robotState,
+    flexStackerOptions,
+  } = props
   const { moduleId } = formData
   const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
-  const robotState = useSelector(getRobotStateAtActiveItem)
-  const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
 
   const { modules } = robotState ?? {}
 
@@ -156,5 +170,20 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         />
       </div>
     </div>
+  )
+}
+
+export const FlexStackerToolsContainer = (
+  props: FlexStackerToolsProps
+): JSX.Element => {
+  const robotState = useSelector(getRobotStateAtActiveItem)
+  const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
+
+  return (
+    <FlexStackerTools
+      {...props}
+      robotState={robotState}
+      flexStackerOptions={flexStackerOptions}
+    />
   )
 }
