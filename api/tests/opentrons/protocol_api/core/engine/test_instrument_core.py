@@ -2138,6 +2138,8 @@ def test_aspirate_liquid_class_for_transfer_without_volume_config(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=0, y=0, z=-5),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2240,6 +2242,8 @@ def test_aspirate_liquid_class_using_volume_config_below_2_28(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=0, y=0, z=-5),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2370,6 +2374,8 @@ def test_aspirate_liquid_class_using_volume_config_2_28_and_above(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=0, y=0, z=-5),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2503,6 +2509,8 @@ def test_aspirate_liquid_class_2_28_and_above_skips_configure_volume(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=0, y=0, z=-5),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2568,6 +2576,8 @@ def test_aspirate_liquid_class_for_consolidate(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=0, y=0, z=-5),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2820,6 +2830,8 @@ def test_dispense_liquid_class(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=0, y=0, z=-5),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=0, y=0, z=-5),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2901,6 +2913,8 @@ def test_dispense_liquid_class_during_multi_dispense(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=1, y=3, z=2),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=1, y=3, z=2),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
@@ -2984,6 +2998,8 @@ def test_last_dispense_liquid_class_during_multi_dispense(
             position_reference=PositionReference.WELL_BOTTOM,
             offset=Coordinate(x=1, y=3, z=2),
             mount=Mount.LEFT,
+            fallback_position_reference=PositionReference.WELL_BOTTOM,
+            fallback_offset=Coordinate(x=1, y=3, z=2),
         )
     ).then_return(Point(1, 2, 3))
     decoy.when(
