@@ -7,8 +7,11 @@ on:
   pull_request:
     paths:
       - '**.js'
+      - '**.cjs'
       - '**.mjs'
       - '**.ts'
+      - '**.cts'
+      - '**.mts'
       - '**.tsx'
       - '**.json'
       - '**.css'
@@ -16,8 +19,11 @@ on:
   push:
     paths:
       - '**.js'
+      - '**.cjs'
       - '**.mjs'
       - '**.ts'
+      - '**.cts'
+      - '**.mts'
       - '**.tsx'
       - '**.json'
       - '**.css'
