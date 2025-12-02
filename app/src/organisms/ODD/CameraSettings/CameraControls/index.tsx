@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
+
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 import { CameraControlsHome } from './CameraControlsHome'
 import { CameraTileSetting } from './CameraTileSetting'
 import { ZoomSettingsView } from './ZoomSettingsView'
+
+import type { CameraImageSettings } from '@opentrons/api-client'
 
 export type ActiveControlView =
   | 'zoom'
@@ -23,12 +27,22 @@ export function CameraControls({
   toggleShowControls,
 }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
+  const [isLoading, setIsLoading] = useState(false)
 
   const [activeSubView, setActiveSubView] = useState<ActiveControlView>(null)
-  const settings = useStubCameraSettingsValues()
+  const settings = useCameraSettingsValues()
+  const { createCameraImageSettings } = useCreateCameraImageSettings()
 
-  const returnToHomeView = (): void => {
-    setActiveSubView(null)
+  const returnToHomeView = (settings: CameraImageSettings): void => {
+    setIsLoading(true)
+    createCameraImageSettings(settings, {
+      onSuccess: () => {
+        setActiveSubView(null)
+      },
+      onSettled: () => {
+        setIsLoading(false)
+      },
+    })
   }
 
   switch (activeSubView) {
@@ -37,7 +51,10 @@ export function CameraControls({
         <ZoomSettingsView
           zoomValue={settings.zoom}
           adjustZoom={settings.adjustZoom}
-          returnToHomeView={returnToHomeView}
+          returnToHomeView={() => {
+            returnToHomeView({ zoom: settings.zoom })
+          }}
+          isLoading={isLoading}
         />
       )
 
@@ -48,7 +65,10 @@ export function CameraControls({
           title={t('brightness')}
           subtext={t('adjust_brightness')}
           adjustValue={settings.adjustBrightness}
-          returnToHomeView={returnToHomeView}
+          returnToHomeView={() => {
+            returnToHomeView({ brightness: settings.brightness })
+          }}
+          isLoading={isLoading}
         />
       )
 
@@ -59,7 +79,10 @@ export function CameraControls({
           title={t('contrast')}
           subtext={t('adjust_contrast')}
           adjustValue={settings.adjustContrast}
-          returnToHomeView={returnToHomeView}
+          returnToHomeView={() => {
+            returnToHomeView({ contrast: settings.contrast })
+          }}
+          isLoading={isLoading}
         />
       )
 
@@ -70,7 +93,10 @@ export function CameraControls({
           title={t('saturation')}
           subtext={t('adjust_saturation')}
           adjustValue={settings.adjustSaturation}
-          returnToHomeView={returnToHomeView}
+          returnToHomeView={() => {
+            returnToHomeView({ saturation: settings.saturation })
+          }}
+          isLoading={isLoading}
         />
       )
 

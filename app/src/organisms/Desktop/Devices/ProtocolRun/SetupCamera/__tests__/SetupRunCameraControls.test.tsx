@@ -11,9 +11,12 @@ import { SetupRunCameraControls } from '../SetupRunCameraControls'
 vi.mock('/app/organisms/Desktop/Camera/CameraControls')
 
 const render = () => {
-  return renderWithProviders(<SetupRunCameraControls />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <SetupRunCameraControls cameraConfirmed={false} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('SetupRunCameraControls', () => {
