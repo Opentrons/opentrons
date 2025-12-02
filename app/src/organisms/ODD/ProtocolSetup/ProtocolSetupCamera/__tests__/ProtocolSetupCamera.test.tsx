@@ -39,6 +39,7 @@ describe('ProtocolSetupCamera', () => {
       cameraConfirmed: false,
       setSetupScreen: vi.fn(),
       storageInfo: {} as any,
+      protocolRecord: { data: { protocolKind: 'standard' } } as any,
     }
     vi.mocked(CameraSettings).mockImplementation(({ headerElement }) => (
       <div>

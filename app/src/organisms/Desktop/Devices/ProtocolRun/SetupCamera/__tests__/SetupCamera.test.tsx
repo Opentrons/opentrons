@@ -51,6 +51,7 @@ describe('SetupCamera', () => {
       cameraConfirmed: false,
       confirmCameraSettings: vi.fn(),
       robotName: 'test-robot',
+      protocolRecord: { data: { protocolKind: 'standard' } } as any,
     }
     vi.mocked(SetupRunCameraControls).mockReturnValue(
       <div>MOCK_SETUP_RUN_CAMERA_CONTROLS</div>
