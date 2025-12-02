@@ -133,6 +133,22 @@ def test_aspirate_settings_overrides() -> None:
     aspirate_properties.delay.duration = 2.3
     assert aspirate_properties.delay.duration == 2.3
 
+    aspirate_properties.override_tip_positions(
+        new_position="well-bottom",
+        new_offset=Coordinate(x=4, y=5, z=6),
+    )
+    assert (
+        aspirate_properties.fallback_aspirate_position.position_reference.value
+        == "liquid-meniscus-end"
+    )
+    assert aspirate_properties.fallback_aspirate_position.offset == Coordinate(
+        x=-1, y=-2, z=-3
+    )
+    assert (
+        aspirate_properties.aspirate_position.position_reference.value == "well-bottom"
+    )
+    assert aspirate_properties.aspirate_position.offset == Coordinate(x=4, y=5, z=6)
+
 
 def test_build_single_dispense_settings() -> None:
     """It should convert the shared data single dispense settings to the PAPI type."""
@@ -278,6 +294,25 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties.delay.duration = 25.25
     assert single_dispense_properties.delay.duration == 25.25
 
+    single_dispense_properties.override_tip_positions(
+        new_position="well-bottom",
+        new_offset=Coordinate(x=4, y=5, z=6),
+    )
+    assert (
+        single_dispense_properties.fallback_dispense_position.position_reference.value
+        == "liquid-meniscus-end"
+    )
+    assert single_dispense_properties.fallback_dispense_position.offset == Coordinate(
+        x=11, y=22, z=-33
+    )
+    assert (
+        single_dispense_properties.dispense_position.position_reference.value
+        == "well-bottom"
+    )
+    assert single_dispense_properties.dispense_position.offset == Coordinate(
+        x=4, y=5, z=6
+    )
+
 
 def test_build_multi_dispense_settings() -> None:
     """It should convert the shared data multi dispense settings to the PAPI type."""
@@ -416,6 +451,25 @@ def test_multi_dispense_settings_override() -> None:
     assert multi_dispense_properties.delay.enabled is False
     multi_dispense_properties.delay.duration = 25.25
     assert multi_dispense_properties.delay.duration == 25.25
+
+    multi_dispense_properties.override_tip_positions(
+        new_position="well-bottom",
+        new_offset=Coordinate(x=4, y=5, z=6),
+    )
+    assert (
+        multi_dispense_properties.fallback_dispense_position.position_reference.value
+        == "liquid-meniscus-end"
+    )
+    assert multi_dispense_properties.fallback_dispense_position.offset == Coordinate(
+        x=11, y=22, z=-33
+    )
+    assert (
+        multi_dispense_properties.dispense_position.position_reference.value
+        == "well-bottom"
+    )
+    assert multi_dispense_properties.dispense_position.offset == Coordinate(
+        x=4, y=5, z=6
+    )
 
 
 def test_build_multi_dispense_settings_none(
