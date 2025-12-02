@@ -14,6 +14,7 @@ on:
       - 'app/src/molecules/**'
       - 'protocol-designer/src/components/**'
       - 'scripts/static-deploy/**'
+      - 'vitest.config.*'
   push:
     branches:
       - 'edge'

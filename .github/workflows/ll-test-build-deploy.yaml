@@ -13,6 +13,7 @@ on:
       - '.github/workflows/utils.js'
       - 'scripts/static-deploy/**'
       - 'scripts/git-version-v2.mjs'
+      - 'vitest.config.*'
   push:
     branches:
       - 'edge'

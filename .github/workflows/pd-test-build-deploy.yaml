@@ -5,17 +5,19 @@ name: 'PD test, build, and deploy'
 on:
   pull_request:
     paths:
-      - "protocol-designer/**"
-      - "step-generation/**"
-      - "shared-data/**"
-      - "components/**"
-      - "package.json"
-      - ".github/workflows/pd-test-build-deploy.yaml"
-      - ".github/actions/js/setup/action.yml"
-      - ".github/actions/git/resolve-tag/action.yml"
-      - ".github/actions/environment/complex-variables/action.yml"
-      - "scripts/static-deploy/**"
-      - "scripts/git-version-v2.mjs"
+      - 'protocol-designer/**'
+      - 'step-generation/**'
+      - 'shared-data/**'
+      - 'components/**'
+      - 'package.json'
+      - '.github/workflows/pd-test-build-deploy.yaml'
+      - '.github/actions/js/setup/action.yml'
+      - '.github/actions/git/resolve-tag/action.yml'
+      - '.github/actions/environment/complex-variables/action.yml'
+      - 'scripts/static-deploy/**'
+      - 'scripts/git-version-protocol-designer.mjs'
+      - 'scripts/git-version-v2.mjs'
+      - 'vitest.config.*'
   push:
     branches:
       - 'edge'
