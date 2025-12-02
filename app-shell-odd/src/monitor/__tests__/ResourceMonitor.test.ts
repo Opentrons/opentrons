@@ -19,13 +19,14 @@ import { UI_INITIALIZED } from '../../constants'
 import { PARENT_PROCESSES, ResourceMonitor } from '../ResourceMonitor'
 
 vi.mock('child_process')
-vi.mock('../../log', async importOriginal => {
+vi.mock('../../log', () => {
   const fakeLogger = {
     debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
   }
+
   return {
     createLogger: () => fakeLogger,
   }
