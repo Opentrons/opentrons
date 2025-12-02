@@ -55,10 +55,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
 
   const labwareFiledComponent = (
     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-      <StyledText
-        desktopStyle="bodyDefaultSemiBold"
-        style={{ paddingBottom: SPACING.spacing8 }}
-      >
+      <StyledText desktopStyle="bodyDefaultSemiBold">
         {t('protocol_steps:flex_stacker.stacker.label')}
       </StyledText>
 
@@ -131,10 +128,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           gridGap: SPACING.spacing8,
         }}
       >
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          style={{ paddingBottom: SPACING.spacing8 }}
-        >
+        <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('protocol_steps:flex_stacker.shuttle.label')}
         </StyledText>
         <div>
@@ -167,48 +161,57 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           gridGap: SPACING.spacing8,
         }}
       >
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          style={{ paddingBottom: SPACING.spacing8 }}
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            width: '100%',
+          }}
         >
-          Module controls
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('protocol_steps:flex_stacker.module_controls.label')}
+          </StyledText>
           <Icon name="info" size="16px" />
-        </StyledText>
+        </div>
         <RadioButton
           buttonValue="retrieve"
           disabled={labwareInHopperCount === 0 || labwareOnShuttle != null}
           buttonLabel={
-            <StyledText
-              style={{ width: '100%' }}
-              desktopStyle="bodyDefaultRegular"
-            >
-              Retrieve
-            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular">Retrieve</StyledText>
           }
           buttonSubLabel={{
             align: 'vertical',
-            label: 'Retrieve labware from the stacker onto the shuttle',
+            label: t(
+              'protocol_steps:flex_stacker.module_controls.retrieve_sublabel'
+            ),
           }}
           onChange={() => {}}
           largeDesktopBorderRadius
         />
         <RadioButton
           buttonValue="refill"
-          buttonLabel="Refill"
+          buttonLabel={t(
+            'protocol_steps:flex_stacker.module_controls.refill_label'
+          )}
           buttonSubLabel={{
             align: 'vertical',
-            label:
-              'Refill the stacker with labware. Manually fill the stacker with more labware',
+            label: t(
+              'protocol_steps:flex_stacker.module_controls.refill_sublabel'
+            ),
           }}
           onChange={() => {}}
           largeDesktopBorderRadius
         />
         <RadioButton
           buttonValue="empty"
-          buttonLabel="Empty"
+          buttonLabel={t(
+            'protocol_steps:flex_stacker.module_controls.empty_label'
+          )}
           buttonSubLabel={{
             align: 'vertical',
-            label: 'Manually empty all labware from the stacker',
+            label: t(
+              'protocol_steps:flex_stacker.module_controls.empty_sublabel'
+            ),
           }}
           onChange={() => {}}
           largeDesktopBorderRadius

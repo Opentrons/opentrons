@@ -24,7 +24,10 @@
       "label": "Module controls",
       "retrieve_label": "Retrieve",
       "refill_label": "Refill",
-      "empty_label": "Empty"
+      "empty_label": "Empty",
+      "retrieve_sublabel": "Retrieve labware from the stacker onto the shuttle",
+      "refill_sublabel": "Refill the stacker with labware. Manually fill the stacker with more labware",
+      "empty_sublabel": "Manually empty all labware from the stacker"
     }
   },
   "add_details": "Add step details",
