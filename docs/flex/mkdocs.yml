@@ -70,6 +70,7 @@ nav:
       - Glossary: glossary.md
       - Additional Documentation: additional-docs.md
       - Open-Source Software: open-source.md
+      - Release Notes: release-notes.md
       - Support and Contact Information: support.md
 
 theme:
