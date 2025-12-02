@@ -4,7 +4,11 @@ nav:
   - OT-2 Instruction Manual: index.md
   - Introduction: introduction.md
   - Safety and Regulatory Information: regulatory.md
-  - Product Elements: box-contents.md
+  - System Description:
+      - System Description: system-description/index.md
+      - Robot Components: system-description/robot-components.md
+      - Pipettes: system-description/pipettes.md
+      - System Specifications: system-description/specs.md
   - Installation and Relocation:
       - Installation and Relocation: installation/index.md
       - Installation Requirements: installation/requirements.md
@@ -12,7 +16,6 @@ nav:
       - First Run: installation/first-run.md
       - Instrument Installation and Calibration: installation/instruments.md
       - Relocation: installation/relocation.md
-  - System Description: system-description.md
   - Instruments and Modules: modules.md
   - Labware: labware.md
   - Software: software.md
