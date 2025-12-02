@@ -2,9 +2,9 @@
 title: "Opentrons OT-2: Cleaning"
 ---
 
-Routine cleaning helps keep your OT-2 free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. You should review this section for information, instructions, and resources about how to clean your robot.
+Routine cleaning helps keep your OT-2 free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. Review this section for information and instructions on how to clean your robot.
 
-If you have any questions about cleaning your OT-2, and its related components, contact the support team at <support@opentrons.com>.
+If you have any questions about cleaning your OT-2 or its related components, contact the support team at <support@opentrons.com>.
 
 ## Before you begin
 
@@ -14,11 +14,11 @@ Along with turning the power off, remove any instruments, modules, and labware b
 
 ## What you can clean
 
-You can wipe off all the visible and easily accessible surfaces of your OT-2. This includes the exterior and interior frame, window panels, gantry, and deck. The OT-2 does not have any internal parts that you need to open or disassemble for this level of maintenance. If you can see it, you can clean it. If you can't see it, don't clean it.
+You can wipe off all the visible and easily accessible surfaces of your OT-2. This includes the exterior and interior frame, window panels, gantry, and deck. Do not open or disassemble the OT-2 for this level of maintenance. If you can see it, you can clean it. If you can't see it, don't clean it.
 
 ## Cleaning solutions
 
-The following table lists the chemicals you can use to clean your Flex. Diluted alcohol and distilled water are our recommended cleaning solutions, but you can refer to this list for other cleaning options. You can also use these chemicals to clean modules, pipettes, and other attached hardware.
+The following table lists the chemicals you can use to clean your OT-2. Diluted alcohol and distilled water are our recommended cleaning solutions, but you can refer to this list for other cleaning options. You can also use these chemicals to clean modules, pipettes, and other attached hardware.
 
 !!!warning
     _Do not use acetone._ The robot, pipettes, and modules are made from materials that acetone can damage.
@@ -31,7 +31,7 @@ The following table lists the chemicals you can use to clean your Flex. Diluted 
 
 ## Frame and window panel cleaning
 
-To clean the exterior and interior frame and window panels of your Flex:
+To clean the exterior and interior frame and window panels of your OT-2:
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the exposed and easily accessible surface areas.
@@ -78,7 +78,7 @@ To clean a single- or multi-channel pipette:
 
 ## Pipette decontamination
 
-The routine cleaning steps described above may not clean your pipette if it becomes contaminated with substances like nucleic acids, proteins, or radioactive material. When a pipette becomes contaminated, try the decontamination steps described in this section. You can also contact support if your pipette gets contaminated and these cleaning procedures do not work.
+The routine cleaning steps described above may not clean your pipette if it becomes contaminated with substances like nucleic acids, proteins, or radioactive materials. When a pipette becomes contaminated, try the decontamination steps described in this section. You can also contact support if your pipette gets contaminated and these cleaning procedures do not work.
 
 ### Pipette exterior
 
@@ -111,7 +111,7 @@ The GEN2 multi-channel (8-channel) pipettes have a rubber O-ring around their no
     - OT-2 single-channel and very early model 8-channel pipettes do not have O-rings.
     - OT-2 and Flex pipette O-rings are not interchangeable.
 
-Each GEN2 multi-channel pipette ships with the special tools and replacement O-rings rings shown here.
+Each GEN2 multi-channel pipette ships with the special tools and replacement O-rings shown here.
 
 ![Labeled O-ring tool parts](../images/o-ring-tools.jpeg)
 <!-- original image above, no Opentrons blue -->
@@ -135,7 +135,7 @@ OT-2 pipette tips are disposable items and should be discarded after use. You ca
 
 ## Module cleaning
 
-You can clean the surfaces of any of your OT-2 modules. The general cleaning procedure is the same for all supported modules:
+You can clean the surfaces of any OT-2 module. The general cleaning procedure is the same for all supported modules:
 
 Be sure to turn the module's power off before cleaning it. You can clean the top surfaces of modules while they're installed in a deck slot. However, for better access, you may want to:
 
@@ -169,3 +169,81 @@ To set up the Thermocycler with a clean, reusable rubber seal:
 ## Autoclaving labware
 
 Opentrons doesn't recommend re-using autoclaved labware with your OT-2. The heat and pressure may cause items to warp or shrink, even if they're considered "autoclave safe." While autoclaved labware may be acceptable for quick, proof-of-concept testing, it's always better to use fresh labware for production runs, which helps ensure the best results. You can find robot-compatible labware in the [Opentrons Labware Library](https://labware.opentrons.com/) and on the [Tips & Labware section](https://opentrons.com/products/categories/tips-&-labware) of our website.
+
+## Self-service inspection schedule
+
+Along with routine cleaning, Opentrons also recommends the following optional procedures to help keep your OT-2 running smoothly. Feel free to adapt this schedule to your robot's workload. Alternatively, let Opentrons do the work for you. Our [service offerings](https://opentrons.com/instrument-services) cover a range of options to adapt to the needs of your lab.
+
+<table>
+  <thead>
+    <tr>
+      <th>Frequency</th>
+      <th>Task</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="2">Daily</td>
+      <td>Empty Trash Bin</td>
+      <td>If the trash bin reaches capacity.</td>
+    </tr>
+    <tr>
+      <td>Inspect the Deck</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Weekly</td>
+      <td>Pipette visual check</td>
+      <td>If pipette aspirate or dispense actions appear to show any signs of malfunction or pipetting inaccuracy.</td>
+    </tr>
+    <tr>
+      <td>OT-2, Module, and Pipette Cleaning</td>
+      <td>Immediately after contamination or spillage occurs, or if the pipette and/or module look dirty.</td>
+    </tr>
+    <tr>
+      <td rowspan="2">Monthly</td>
+      <td>Check Single-Channel Pipette's Ejection Mechanism</td>
+      <td>If the pipette does not eject/pick up tips consistently.</td>
+    </tr>
+    <tr>
+      <td>Power Cycle OT-2 and Modules</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Quarterly</td>
+      <td>Robot Calibration Health Check</td>
+      <td>If movement appears to be malfunctioning or incorrect. Or after deck calibration, pipette offset calibration, or tip length calibration.</td>
+    </tr>
+    <tr>
+      <td rowspan="4">Every six months</td>
+      <td>Deck Calibration</td>
+      <td>If OT-2's Calibration Health Check shows inaccurate calibration results. Or if installing a new pipette. Or if pipette positioning appears to cause crashing into the deck or labware.</td>
+    </tr>
+    <tr>
+      <td>Pipette Offset</td>
+      <td>If OT-2's Calibration Health Check shows inaccurate calibration results. Or if installing a new pipette. Or if pipette positioning appears to cause crashing into the deck or labware.</td>
+    </tr>
+    <tr>
+      <td>Tip Length Calibration</td>
+      <td>If installing a new pipette.</td>
+    </tr>
+    <tr>
+      <td>Labware Position Check</td>
+      <td>If liquid handler positioning to any designated labware appears to be offset. Or if installing and using new types of labware from previous runs.</td>
+    </tr>
+    <tr>
+      <td rowspan="3">Yearly</td>
+      <td>Pipette Replacement</td>
+      <td>If pipette aspirate or dispense actions appear to show any signs of malfunction or pipetting inaccuracy.</td>
+    </tr>
+    <tr>
+      <td>Air Clean Electronics Board</td>
+      <td>If noticeable dust and debris have accumulated on the black electronics cover.</td>
+    </tr>
+    <tr>
+      <td>Replace the O-rings on your 8-Channel GEN2 pipette</td>
+      <td>Replace the rubber O-ring wrapped around the outside of each channel if you notice any nicks or tears.</td>
+    </tr>
+  </tbody>
+</table>

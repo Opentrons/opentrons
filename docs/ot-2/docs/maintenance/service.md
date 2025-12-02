@@ -2,9 +2,7 @@
 title: "Opentrons OT-2: Instrument Services"
 ---
 
-The OT-2 is designed for years of full-time operation. Unlike cleaning, you should not attempt to service or repair the OT-2 yourself, unless at the direction of Opentrons Support.
-
-Opentrons also offers multiple levels of service for the OT-2 and related hardware, some of which include maintenance and repairs. See the [Instrument Services section](https://opentrons.com/instrument-services) of our website for information about our service contract offerings.
+Opentrons offers multiple levels of service for the OT-2 and related hardware, some of which include maintenance and repairs. See the [Instrument Services section](https://opentrons.com/instrument-services) of our website for information about our service contract offerings.
 
 ## Opentrons services
 
@@ -21,4 +19,3 @@ In addition, Opentrons Care Plus includes on-site visits for:
 - Repairs, as needed.
 
 You can also purchase services individually, including installation, protocol development (remote or on-site), repair, relocation, and preventive maintenance. Contact Opentrons Sales for more information.
-

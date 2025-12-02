@@ -1,83 +1,95 @@
 ---
-title: "Opentrons OT-2: Self-service Procedures"
+title: "Opentrons OT-2: User-level Maintenance Procedures"
 ---
 
-Open-source, hands on robot. You can do it, but only at the direction of Opentrons support. Do not attempt on your own etc., etc.
+The OT-2 is designed for years of reliable, full-time operation. However, unlike the cleaning procedures described in this section of the manual, you should not attempt to service or repair the OT-2 yourself. But, sometimes it may be necessary, and faster, to perform some maintenance tasks or replace malfunctioning components yourself. The instructions in this section will guide you through these tasks.
 
-## Other maintenance procedures
+!!!warning
+    - Do not attempt these troubleshooting or repair procedures unless at the direction of Opentrons Support.
+    - Before you begin, turn off the power to the robot and unplug it from the wall outlet.
 
-Along with routine cleaning, Opentrons also recommends the following optional procedures to help keep your Flex running smoothly. Feel free to adapt this schedule to your robot's workload. Alternatively, let Opentrons do the work for you. Our service offerings cover a range of options to adapt to the needs of your lab.
+## Replacing the motor controller board
 
-<table>
-  <thead>
-    <tr>
-      <th>Frequency</th>
-      <th>Task</th>
-      <th>Notes</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td rowspan="2">Daily</td>
-      <td>Empty Trash Bin</td>
-      <td>If the trash bin reaches capacity.</td>
-    </tr>
-    <tr>
-      <td>Inspect the Deck</td>
-      <td>N/A</td>
-    </tr>
-    <tr>
-      <td rowspan="2">Weekly</td>
-      <td>Pipette visual check</td>
-      <td>If pipette aspirate or dispense actions appear to show any signs of malfunction or pipetting inaccuracy.</td>
-    </tr>
-    <tr>
-      <td>OT-2, Module, and Pipette Cleaning</td>
-      <td>Immediately after contamination or spillage occurs, or if the pipette and/or module look dirty.</td>
-    </tr>
-    <tr>
-      <td rowspan="2">Monthly</td>
-      <td>Check Single-Channel Pipette's Ejection Mechanism</td>
-      <td>If the pipette does not eject/pick up tips consistently.</td>
-    </tr>
-    <tr>
-      <td>Power Cycle OT-2 and Modules</td>
-      <td>N/A</td>
-    </tr>
-    <tr>
-      <td>Quarterly</td>
-      <td>Robot Calibration Health Check</td>
-      <td>If movement appears to be malfunctioning or incorrect. Or after deck calibration, pipette offset calibration, or tip length calibration.</td>
-    </tr>
-    <tr>
-      <td rowspan="4">Every six months</td>
-      <td>Deck Calibration</td>
-      <td>If OT-2's Calibration Health Check shows inaccurate calibration results. Or if installing a new pipette. Or if pipette positioning appears to cause crashing into the deck or labware.</td>
-    </tr>
-    <tr>
-      <td>Pipette Offset</td>
-      <td>If OT-2's Calibration Health Check shows inaccurate calibration results. Or if installing a new pipette. Or if pipette positioning appears to cause crashing into the deck or labware.</td>
-    </tr>
-    <tr>
-      <td>Tip Length Calibration</td>
-      <td>If installing a new pipette.</td>
-    </tr>
-    <tr>
-      <td>Labware Position Check</td>
-      <td>If liquid handler positioning to any designated labware appears to be offset. Or if installing and using new types of labware from previous runs.</td>
-    </tr>
-    <tr>
-      <td rowspan="3">Yearly</td>
-      <td>Pipette Replacement</td>
-      <td>If pipette aspirate or dispense actions appear to show any signs of malfunction or pipetting inaccuracy.</td>
-    </tr>
-    <tr>
-      <td>Air Clean Electronics Board</td>
-      <td>If noticeable dust and debris have accumulated on the black electronics cover.</td>
-    </tr>
-    <tr>
-      <td>Replace the O-rings on your 8-Channel GEN2 pipette</td>
-      <td>Replace the rubber O-ring wrapped around the outside of each channel if you notice any nicks or tears.</td>
-    </tr>
-  </tbody>
-</table>
+This printed circuit board assembly (PCBA) contains the electronics controlling the motors responsible for moving the pipettes. It is attached to the pipette carriage <font color="red">LINK REMINDER TO SYS DESC</font> beneath the carriage cover. The information in this section section explains how to:
+
+- Remove and replace the pipette carriage cover.
+- Disconnect, remove, and replace the motor controller board.
+
+This procedure requires the following tools:
+
+- 2 mm hex screwdriver
+- 2.5 mm hex screwdriver
+- T10 Torx screwdriver
+
+### Removing the cover
+
+1. Remove the top, front, and side window panels for better access to the gantry and pipette carriage.
+
+2. Use a 2 mm hex screwdriver to remove the 2 screws from the perforated cover on the top of the carriage cover and a 2.5 mm hex screwdriver to remove the 2 screws from the back of the carriage.
+
+    ![Carriage top and back screws](../images/carriage-top.png)
+
+2. Use a 2.5 mm hex screwdriver to remove the remaining 4 screws from the back of the cover.
+
+    ![Carriage lower back screws](../images/carriage-back.png)
+
+3. Slide the carriage cover down and then pull it off to expose the motor controller board.
+
+### Removing the controller board
+
+4. Disconnect the cables shown below from the controller board.
+
+    ![OT-2 controller board showing cable connections](../images/ot2-controller-board.png)
+
+5. Find this green connector and use a small flathead screwdriver to loosen the screws that hold the 2 wires in place.
+
+    ![OT-2 controller showing small connector](../images/ot2-controller-board-green-connector.png)
+
+6. Use a 2.5 mm hex screwdriver to remove the screws that hold the PCBA to the carriage and remove the board.
+
+    ![OT-2 controller screws](../images/ot2-controller-board-screws.png)
+
+### Installing a new controller board
+
+7. Hold the new board in place.
+
+8. Use a 2.5 mm hex screwdriver to reattach the board with the screws you removed while taking it off the robot.
+
+9. Reconnect all the cables.
+
+10. Reattach the carriage cover.
+
+After installing a new board, follow up with Opentrons Support for further troubleshooting steps or instructions.
+
+## Replacing the rear panel boards
+
+The two PCBAs mounted inside the back panel of the OT-2 provide other command, control, network, and power distribution functions. Again, you should never have to remove this panel or work with the rear electronics unless directed to by Opentrons Support. The information in this section explains how to:
+
+- Remove the back panel cover and identifies the main components in this area.
+- Disconnect, remove, and replace the PCBAs housed in this location.
+
+This procedure requires the following tools:
+
+- 2.5 mm hex screwdriver
+
+### Removing the rear panel cover and boards
+
+1. Use a T10 Torx to remove the short and long screws that fasten the back panel to the robot. 
+
+    ![OT-2R back panel with labeled screws](../images/ot2R-back-panel.png)
+
+2. Disconnect any cables connected to the board you're working with.
+
+    ![Rear panel boards](../images/ot2-rear-panels.png)
+
+3. Use a T10 Torx, to remove the screws that hold the PCBAs to the robot and remove the board you want to work with or replace.
+
+4. Hold the new board in place.
+
+5. Use a 2.5 mm hex screwdriver to reattach the board with the screws you removed while taking it off the robot.
+
+6. Reattach all the cables
+
+6. Use a 2.5 mm hex screwdriver to reattach the rear panel cover to the robot.
+
+After installing a new board, follow up with Opentrons Support for further troubleshooting steps or instructions.
