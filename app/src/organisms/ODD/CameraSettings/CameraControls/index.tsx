@@ -59,7 +59,6 @@ export function CameraControls({
       )
 
     case 'brightness':
-      console.log('🚀 ~ CameraControls ~ isLoading:', isLoading)
       return (
         <CameraTileSetting
           value={settings.brightness}

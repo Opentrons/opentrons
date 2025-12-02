@@ -47,7 +47,7 @@ export function CameraTileSetting({
       <ChildNavigation
         header={title}
         onClickBack={returnToHomeView}
-        iconName={isLoading ? 'ot-spinner' : 'back'}
+        backIconName={isLoading ? 'ot-spinner' : 'back'}
       />
       <div className={styles.content_container}>
         <StyledText oddStyle="level4HeaderRegular">{subtext}</StyledText>
