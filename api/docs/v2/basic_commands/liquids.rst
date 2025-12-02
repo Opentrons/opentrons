@@ -34,15 +34,21 @@ Now our pipette holds 300 µL.
 Aspirate by Well or Location
 ----------------------------
 
-The :py:meth:`~.InstrumentContext.aspirate` method includes a ``location`` parameter that accepts either a :py:class:`.Well` or a :py:class:`~.types.Location`. 
+The :py:meth:`~.InstrumentContext.aspirate` method includes the location parameters ``location`` and ``end_location``. Each accepts different location types:
 
-If you specify a well, like ``plate["A1"]``, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the ``aspirate`` attribute of :py:obj:`.well_bottom_clearance`:: 
+- ``location`` accepts either a :py:class:`.Well` or a :py:class:`~.types.Location`.
+- ``end_location`` can only be used in combination with the ``location`` parameter. Both must be a  :py:class:`~.types.Location`. 
+
+.. versionchanged:: 2.27
+    Use the ``end_location`` parameter to specify multiple locations during an aspirate. 
+
+If you specify a single ``location`` like the well ``"A1"``, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the ``aspirate`` attribute of :py:obj:`.well_bottom_clearance`:: 
 
     pipette.pick_up_tip
     pipette.well_bottom_clearance.aspirate = 2  # tip is 2 mm above well bottom
     pipette.aspirate(200, plate["A1"])
 
-You can also aspirate from a location along the center vertical axis within a well using the :py:meth:`.Well.top` and :py:meth:`.Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well::
+You can also aspirate from a :py:class:`~.types.Location` along the center vertical axis within a well using the :py:meth:`.Well.top` and :py:meth:`.Well.bottom` methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well::
 
     pipette.pick_up_tip()
     depth = plate["A1"].bottom(z=2) # tip is 2 mm above well bottom
@@ -52,7 +58,7 @@ You can also aspirate from a location along the center vertical axis within a we
 Use the :py:meth:`.Well.meniscus` method to aspirate relative to the meniscus of liquid in a well with a Flex pipette. First, you'll need to determine the amount of liquid in your well one of two ways: 
 
 - Specify your starting liquid volume with :py:meth:`~.Labware.load_liquid`.
-- Measure the height of the liquid with :py:meth:`~.InstrumentContext.measure_liquid_height`. 
+- Measure the height of the liquid with :py:meth:`~.InstrumentContext.measure_liquid_height`.
 
 This example measures the liquid height in well A2 of a plate and then immediately aspirates below the meniscus:: 
 
@@ -64,17 +70,39 @@ This example measures the liquid height in well A2 of a plate and then immediate
         ) 
     # aspirates at 1 mm below the liquid meniscus
 
-The liquid meniscus changes when you aspirate liquid from a well. Set ``target="end"`` to ensure the pipette stays submerged while aspirating. For more information, see :ref:`well-meniscus`.
-
-``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes.
-
 .. versionadded:: 2.23
+    Set ``target="start"`` or ``"end"`` to target the liquid meniscus during an aspirate. 
+
+To ensure the pipette stays submerged while aspirating, set ``target="end"`` for the aspirate or use multiple location parameters. For more, see :ref:`well-meniscus`. 
+
+!!! note:: 
+    ``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes.
+
+Use the ``location`` and ``end_location`` parameters in combination to direct the pipette to move to specific locations while aspirating::
+
+    pipette.pick_up_tip()
+    well_top = plate["A1"].top(z=-1)
+    depth = plate["A1"].bottom(z=2)
+    pipette.aspirate(
+        volume=200,
+        location=well_top,
+        end_location=depth
+    )
+
+Here, the pipette begins aspirating at 1 mm below the well top, and finishes aspirating at 2 mm above the well bottom. 
+
+.. note:: 
+    When you use both the ``location`` and ``end_location`` parameters, you can optionally specify a ``movement_delay`` to ensure the pipette waits a set amount of time in seconds before moving to the ``end_location``. This can be useful when pipetting viscous liquids. An additional 1 second ``movement_delay`` can help build up pressure in the tip before liquid starts to flow. 
+
+.. versionchanged:: 2.27
+    Use the ``end_location`` and ``movement_delay`` parameters when specifying multiple locations in a single aspirate. 
 
 See also:
 
 - :ref:`new-default-op-positions` for information about controlling pipette height for a particular pipette.
 - :ref:`position-relative-labware` for information about controlling pipette height from within a well.
 - :ref:`move-to` for information about moving a pipette to any reachable deck location.
+- :ref:`well-meniscus` for information about pipetting relative to the liquid meniscus as it changes during an aspirate. 
 
 Aspiration Flow Rates
 ---------------------
@@ -126,9 +154,15 @@ If the pipette doesn’t move, you can specify an additional dispense action wit
 Dispense by Well or Location
 ----------------------------
 
-The :py:meth:`~.InstrumentContext.dispense` method includes a ``location`` parameter that accepts either a :py:class:`.Well` or a :py:class:`~.types.Location`.
+The :py:meth:`~.InstrumentContext.dispense` method includes the ``location`` parameters ``location`` and ``end_location``. Each accepts different location types: 
 
-If you specify a well, like ``plate["B1"]``, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance`::
+- ``location`` accepts either a :py:class:`.Well` or a :py:class:`~.types.Location`.
+- ``end_location`` can only be used in combination with the ``location`` parameter. Both must be a :py:class:`~.types.Location`. 
+
+.. versionchanged:: 2.27
+     Use the ``end_location`` parameter to specify multiple locations during a dispense. 
+
+If you specify a single ``location`` like the well ``"B1"``, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, you would call :py:obj:`.well_bottom_clearance`::
 
     pipette.well_bottom_clearance.dispense=2 # tip is 2 mm above well bottom
     pipette.dispense(200, plate["B1"])
@@ -153,17 +187,37 @@ This example measures the liquid height in well B1 of a plate and then immediate
         ) 
     # dispenses at 1 mm below the liquid meniscus
 
-The liquid meniscus changes when you dispense liquid into a well. Set ``target="start"`` to ensure the pipette begins the dispense at the liquid meniscus. For more information, see :ref:`well-meniscus`.
-
-``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes.
-
 .. versionadded:: 2.23
+    Set ``target="start"`` or ``"end"`` to target the liquid meniscus during a dispense.
+
+To ensure the pipette begins the dispense at the liquid meniscus, set ``target="start"``. See :ref:`well-meniscus` for more details on pipetting relative to the liquid meniscus. 
+
+!!! note::
+    ``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes. 
+
+
+You can use the ``location`` and ``end_location`` parameters in combination to direct the pipette to move to specific locations while dispensing:: 
+
+    well_top = plate["B1"].top(z=-1)
+    depth = plate["B1"].bottom(z=2)
+    pipette.dispense(
+        volume=200,
+        location=depth,
+        end_location=well_top,
+        movement_delay=1
+    )
+
+Here, the pipette begins dispensing at 2 mm above the well bottom, and finishes dispensing at 1 mm below the well top. When you use both the ``location`` and ``end_location`` parameters, you can optionally specify a ``movement_delay`` to ensure the pipette waits a set amount of time, like 1 second, before moving to the ``end_location``. 
+
+.. versionchanged:: 2.27
+    Use the ``end_location`` and ``movement_delay`` parameters when specifying multiple locations in a single dispense.
 
 See also:
 
 - :ref:`new-default-op-positions` for information about controlling pipette height for a particular pipette.
 - :ref:`position-relative-labware` for formation about controlling pipette height from within a well.
 - :ref:`move-to` for information about moving a pipette to any reachable deck location.
+- :ref:`well-meniscus` for information about pipetting relative to the liquid meniscus as it changes during a dispense. 
 
 Dispense Flow Rates
 -------------------
@@ -182,8 +236,6 @@ You can also specify an absolute ``flow_rate`` to set the flow rate in µL/secon
     Add the dispense ``flow_rate`` parameter. 
 
 The ``rate`` and ``flow_rate`` parameters are mutually exclusive. If you specify both in the same command, the API will raise an error.  
-
-
 
 
 .. _push-out-dispense:
@@ -355,47 +407,31 @@ And this example adds a push out of 10 µL after the final dispense in the mix::
 .. versionchanged:: 2.24
     Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters. 
 
-.. _dynamic_mix:
+.. _dynamic-mix:
 
 Dynamic Mix
 ===========
 
-The :py:meth:`~.InstrumentContext.dynamic_mix` method aspirates and dispenses repeatedly in a multiple locations. It's designed to mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. This method includes arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix.
+The :py:meth:`~.InstrumentContext.dynamic_mix` method lets you aspirate and dispense repeatedly in multiple locations. Like the :py:meth:`~.InstrumentContext.mix` method, it's designed to mix the contents of a well together using a single command rather than using multiple ``aspirate()`` and ``dispense()`` calls. Both methods includes argument that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix. :py:meth:`~.InstrumentContext.dynamic_mix` lets you additionally specify multiple aspirate and dispense locations:: 
 
-This example draws 100 µL from the current well and mixes it three times::
-
-    pipette.mix(repetitions=3, volume=100)
-
-This example draws 100 µL from well B1 and mixes it three times::
-
-    pipette.mix(3, 100, plate["B1"])
-
-This example draws an amount equal to the pipette's maximum rated volume and mixes it three times::
-
-    pipette.mix(repetitions=3)
-
-Like an ``aspirate()`` or ``dispense()``, you can use optional arguments to specify the flow rate, a delay, or a push out after an aspirate or dispense in the mix.
-
-This example draws 100 µL from the current well and mixes it three times, aspirating at 50 µL/sec and with a 5 second delay after each aspirate::
-
-    pipette.mix(
+    depth = plate["A1"].bottom(z=2)
+    well_top = plate["A1"].top(z=-1)
+    pipette.dynamic_mix(
+        aspirate_start_location=depth,
+        aspirate_end_location=well_top,
+        dispense_start_location=well_top,
+        dispense_end_location=depth,
         repetitions=3,
-        volume=100,
-        aspirate_flow_rate=50,
-        aspirate_delay=5
+        volume=100
     )
 
-And this example adds a push out of 10 µL after the final dispense in the mix::
+Like the :py:meth:`~.InstrumentContext.mix` method, you can use other optional arguments to customize your dynamic mix: 
 
-    pipette.mix(repetitions=3, volume=100, final_push_out=10)
+- specify the aspirate, dispense, or mix flow rate.
+- add a delay after an aspirate or dispense, or a ``movement_delay`` before moving to an ``end_location``.
+- include a push out after an aspirate or dispense in the mix.
 
-.. note::
-
-    In API versions 2.2 and earlier, during a mix, the pipette moves up and out of the target well. In API versions 2.3 and later, the pipette does not move while mixing.
-
-.. versionadded:: 2.0
-.. versionchanged:: 2.24
-    Adds the ``aspirate_flow_rate``, ``dispense_flow_rate``, ``aspirate_delay``, ``dispense_delay``, and ``final_push_out`` parameters.
+.. versionadded:: 2.27
 
 .. _air-gap:
 
