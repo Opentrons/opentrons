@@ -1,9 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import { useCameraImageSettings } from '@opentrons/react-api-client'
+
+import { zoomNumberToString, zoomStringToNumber } from '../utils/cameraUtils'
 
 export type CameraZoomSetting = '1x' | '1.5x' | '2x'
 
-export interface UseStubCameraSettingsValuesResult {
-  zoom: CameraZoomSetting
+export interface UseCameraSettingsValuesResult {
+  zoom: number
   brightness: number
   contrast: number
   saturation: number
@@ -14,12 +18,26 @@ export interface UseStubCameraSettingsValuesResult {
   restoreToDefault: () => void
 }
 
-// Stubs camera-specific settings.
-export function useStubCameraSettingsValues(): UseStubCameraSettingsValuesResult {
+// Camera image specific settings.
+export function useCameraSettingsValues(): UseCameraSettingsValuesResult {
+  const { data: cameraImageSettings } = useCameraImageSettings()
   const [zoom, setZoom] = useState<CameraZoomSetting>('1x')
+  const zoomValue = zoomStringToNumber(zoom)
   const [brightness, setBrightness] = useState(50)
   const [contrast, setContrast] = useState(50)
   const [saturation, setSaturation] = useState(50)
+  useEffect(() => {
+    if (cameraImageSettings) {
+      setZoom(
+        cameraImageSettings.zoom != null
+          ? zoomNumberToString(cameraImageSettings.zoom)
+          : '1x'
+      )
+      setBrightness(cameraImageSettings.brightness ?? 50)
+      setContrast(cameraImageSettings.contrast ?? 50)
+      setSaturation(cameraImageSettings.saturation ?? 50)
+    }
+  }, [cameraImageSettings])
 
   const adjustZoom = (value: CameraZoomSetting): void => {
     setZoom(value)
@@ -45,7 +63,7 @@ export function useStubCameraSettingsValues(): UseStubCameraSettingsValuesResult
   }
 
   return {
-    zoom,
+    zoom: zoomValue,
     brightness,
     contrast,
     saturation,
