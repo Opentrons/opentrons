@@ -4,7 +4,7 @@ import { SPACING } from '../../ui-style-constants'
 type LabwareDetailsWithCountProps = {
   title: string
   subTitle?: string
-  quantity: string
+  quantity?: string | null
 }
 
 export function LabwareDetailsWithCount({
@@ -33,15 +33,17 @@ export function LabwareDetailsWithCount({
       >
         <StyledText desktopStyle="bodyDefaultRegular">{subTitle}</StyledText>
       </div>
-      <StyledText
-        desktopStyle="bodyDefaultSemiBold"
-        backgroundColor="var(--transparent-black-80)"
-        padding="2px 8px"
-        width="88px"
-        borderRadius="var(--border-radius-4)"
-      >
-        {quantity}
-      </StyledText>
+      {quantity != null ? (
+        <StyledText
+          desktopStyle="bodyDefaultSemiBold"
+          backgroundColor="var(--transparent-black-80)"
+          padding="2px 8px"
+          width="88px"
+          borderRadius="var(--border-radius-4)"
+        >
+          {quantity}
+        </StyledText>
+      ) : null}
     </div>
   )
 }

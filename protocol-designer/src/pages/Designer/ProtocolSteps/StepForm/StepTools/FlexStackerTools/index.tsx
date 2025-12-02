@@ -138,9 +138,24 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           {t('protocol_steps:flex_stacker.shuttle.label')}
         </StyledText>
         <div>
-          <InfoScreen
-            content={t('protocol_steps:flex_stacker.shuttle.no_labware')}
-          />
+          {labwareOnShuttle != null &&
+          flexStackerModuleState?.storedLabwareDetails != null ? (
+            <LabwareDetailsWithCount
+              title={
+                flexStackerModuleState.storedLabwareDetails?.primaryLabware
+                  .loadName
+              }
+              subTitle={
+                flexStackerModuleState.storedLabwareDetails?.lidLabwareId
+                  ?.loadName
+              }
+              quantity={null}
+            />
+          ) : (
+            <InfoScreen
+              content={t('protocol_steps:flex_stacker.shuttle.no_labware')}
+            />
+          )}
         </div>
       </div>
       <Divider margin="0" />
