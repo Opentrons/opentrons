@@ -34,7 +34,13 @@ import {
   dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { CLEAN, EMPTY, STAGING_AREA_SLOTS, ZERO_OFFSET } from '../constants'
+import {
+  CLEAN,
+  EMPTY,
+  HOPPER_STACKER_LOCATION,
+  STAGING_AREA_SLOTS,
+  ZERO_OFFSET,
+} from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators, uuid } from './index'
 
@@ -1344,4 +1350,16 @@ export function createStagingAreaForInvariantContext(
     }
   }
   return {}
+}
+
+export const getLabwareIdOnHopper = (
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  moduleSlotLocation: string
+): string => {
+  const largestStackInSlot = getLargestStackInSlot(labware, moduleSlotLocation)
+  const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
+  const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
+  return labwareIdOnModule
 }

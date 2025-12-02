@@ -48,7 +48,7 @@
   "default_location_offset_adjusted": "已调整默认耗材校准数据",
   "default_offset_description": "除非您调整校准数据，否则放置的耗材都将使用默认数据。",
   "detach_probe": "移除校准探头",
-  "ensure_labware_accurately_placed": "请按照说明将耗材准确放置在甲板位上。",
+  "ensure_labware_accurately_placed": "确保耗材根据提供的说明准确放置在工作台，以防止损坏。",
   "ensure_nozzle_position_desktop": "<block>确保 {{tip_type}} 居中并与 {{item_location}} 水平对齐。如果不对齐，请使用下面的控制器或键盘来移动移液器，直到其正确对齐。</block>",
   "ensure_nozzle_position_odd": "<block>确保 {{tip_type}} 居中并与 {{item_location}} 水平对齐。如果不对齐，请点击 <bold>移动移液器</bold>，然后调整移液器，直到其正确对齐。</block>",
   "ensure_probe_attached": "继续操作之前请确保其已正确连接。",
