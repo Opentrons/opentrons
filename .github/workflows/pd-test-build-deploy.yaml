@@ -52,7 +52,7 @@ jobs:
       relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
@@ -74,7 +74,7 @@ jobs:
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/js/setup
       - name: 'run unit tests'
         run: make -C protocol-designer test-cov
@@ -91,7 +91,7 @@ jobs:
       - determine-deploy-config
     runs-on: 'ubuntu-24.04'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0 # Unlimited fetch depth. Required for getsentry/action-release.
       - id: resolve-tag
@@ -149,7 +149,7 @@ jobs:
           role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
           aws-region: us-east-2
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - id: resolve-tag
@@ -201,7 +201,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'success' || needs.unit-test.result == 'skipped') && needs.build-pd.result == 'success' && needs.deploy-pd.result == 'success'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: 'Send success alert'
         uses: ./.github/actions/simple-build-alert
         with:
@@ -216,7 +216,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'failure' || needs.build-pd.result == 'failure' || needs.deploy-pd.result == 'failure')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: 'Determine failed jobs'
         id: failed-jobs
         shell: bash
@@ -250,7 +250,7 @@ jobs:
     if: always() && github.event_name == 'push' && startsWith(github.ref, 'refs/tags/') && (needs.unit-test.result == 'cancelled' || needs.build-pd.result == 'cancelled' || needs.deploy-pd.result == 'cancelled')
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: 'Send cancelled alert'
         uses: ./.github/actions/simple-build-alert
         with:
