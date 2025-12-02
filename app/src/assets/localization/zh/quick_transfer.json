@@ -78,7 +78,7 @@
   "dispense_volume_µL": "每孔排液体积(µL)",
   "disposal_volume": "处理体积",
   "disposal_volume_flow_rate": "在 {{min}} 和 {{max}} 之间",
-  "disposal_volume_label": "{{volume}}, {{location}}, {{flowRate}} µL/s",
+  "disposal_volume_label": "{{volume}} µL, {{location}}, {{flowRate}} µL/s",
   "disposal_volume_µL": "废液量（µL）",
   "distance_bottom_of_well_mm": "距离孔底的高度（mm）",
   "distance_from_bottom": "距离孔底部的距离（毫米）",
