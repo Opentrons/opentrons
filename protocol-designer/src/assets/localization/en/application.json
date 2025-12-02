@@ -45,7 +45,8 @@
     "profile_steps": "profile steps",
     "profile": "Program a Thermocycler profile",
     "temperature": "temperature",
-    "thermocycler": "thermocycler"
+    "thermocycler": "thermocycler",
+    "flexStacker": "flex stacker"
   },
   "select": "Select",
   "selected": "Selected",

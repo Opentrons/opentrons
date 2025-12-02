@@ -145,6 +145,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
             </StyledText>
           }
           buttonSubLabel={{
+            align: 'vertical',
             label: 'Retrieve labware from the stacker onto the shuttle',
           }}
           onChange={() => {}}
@@ -154,6 +155,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           buttonValue="refill"
           buttonLabel="Refill"
           buttonSubLabel={{
+            align: 'vertical',
             label:
               'Refill the stacker with labware. Manually fill the stacker with more labware',
           }}
@@ -164,6 +166,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           buttonValue="empty"
           buttonLabel="Empty"
           buttonSubLabel={{
+            align: 'vertical',
             label: 'Manually empty all labware from the stacker',
           }}
           onChange={() => {}}
