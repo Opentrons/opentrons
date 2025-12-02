@@ -62,12 +62,14 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         {t('protocol_steps:flex_stacker.stacker.label')}
       </StyledText>
 
-      <StyledText desktopStyle="bodyDefaultRegular">
-        {t('protocol_steps:flex_stacker.stacker.labware_filled', {
-          amount: labwareInHopperCount,
-          total: maxPoolCount,
-        })}
-      </StyledText>
+      {labwareInHopperCount > 0 ? (
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('protocol_steps:flex_stacker.stacker.labware_filled', {
+            amount: labwareInHopperCount,
+            total: maxPoolCount,
+          })}
+        </StyledText>
+      ) : null}
     </div>
   )
 
@@ -102,13 +104,23 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         {labwareFiledComponent}
         {flexStackerModuleState?.storedLabwareDetails != null ? (
           <LabwareDetailsWithCount
-            title={flexStackerModuleState.storedLabwareDetails.primaryLabware.loadName}
-            subTitle={flexStackerModuleState.storedLabwareDetails.lidLabware?.loadName}
-            quantity={flexStackerModuleState.storedLabwareDetails.initialCount?.toString() ?? '0'}
+            title={
+              flexStackerModuleState.storedLabwareDetails.primaryLabware
+                .loadName
+            }
+            subTitle={
+              flexStackerModuleState.storedLabwareDetails.lidLabware?.loadName
+            }
+            quantity={
+              flexStackerModuleState.storedLabwareDetails.initialCount?.toString() ??
+              '0'
+            }
           />
-        ) :           
-        <InfoScreen content={t('protocol_steps:flex_stacker.stacker.no_labware')} />
-}
+        ) : (
+          <InfoScreen
+            content={t('protocol_steps:flex_stacker.stacker.no_labware')}
+          />
+        )}
       </div>
       <Divider margin="0" />
       <div
@@ -123,10 +135,12 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           desktopStyle="bodyDefaultSemiBold"
           style={{ paddingBottom: SPACING.spacing8 }}
         >
-          Shuttle
+          {t('protocol_steps:flex_stacker.shuttle.label')}
         </StyledText>
         <div>
-          <InfoScreen content="No labware on shuttle" />
+          <InfoScreen
+            content={t('protocol_steps:flex_stacker.shuttle.no_labware')}
+          />
         </div>
       </div>
       <Divider margin="0" />
