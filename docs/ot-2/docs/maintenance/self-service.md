@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: User-level Maintenance Procedures"
 ---
 
-The OT-2 is designed for years of reliable, full-time operation. Unlike the cleaning procedures described in this section of the manual, you should not attempt to service or repair the OT-2 yourself. But, sometimes it may be necessary, and faster, to perform some maintenance tasks or replace malfunctioning components yourself. The instructions in this section will guide you through these tasks.
+The OT-2 is designed for years of reliable, full-time operation. Unlike the cleaning procedures described in this section of the manual, you should not attempt to service or repair an OT-2 yourself. But, sometimes it may be necessary, and faster, to perform some maintenance tasks or replace malfunctioning components yourself. The instructions in this section will guide you through these tasks.
 
 !!!warning
     - Do not attempt these troubleshooting or repair procedures unless directed by Opentrons Support.
