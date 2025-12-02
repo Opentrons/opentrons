@@ -120,7 +120,7 @@ export function FirstStepMoveLiquidTools({
         title={t('pipette_path')}
       />
       <Divider marginY="0" />
-      <VolumeField {...propsForFields.volume} />
+      <VolumeField fieldProps={propsForFields.volume} path={formData.path} />
     </Flex>
   )
 }
