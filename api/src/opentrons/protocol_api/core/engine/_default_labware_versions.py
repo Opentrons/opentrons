@@ -144,6 +144,11 @@ DEFAULT_LABWARE_VERSIONS: DefaultLabwareVersions = {
         "usascientific_12_reservoir_22ml": 4,
         "usascientific_96_wellplate_2.4ml_deep": 4,
     },
+    APIVersion(2, 28): {
+        "black_96_well_microtiter_plate_lid": 2,
+        "corning_96_wellplate_360ul_lid": 2,
+        "corning_falcon_384_wellplate_130ul_flat_lid": 2,
+    },
 }
 
 
