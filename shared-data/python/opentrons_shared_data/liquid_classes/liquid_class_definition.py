@@ -61,6 +61,8 @@ class PositionReference(Enum):
     WELL_CENTER = "well-center"
     LIQUID_MENISCUS_START = "liquid-meniscus-start"
     LIQUID_MENISCUS_END = "liquid-meniscus-end"
+    #Same as liquid meniscus end
+    LIQUID_MENISCUS = "liquid-meniscus"
 
 
 class BlowoutLocation(Enum):

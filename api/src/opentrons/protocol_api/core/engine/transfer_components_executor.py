@@ -1010,7 +1010,7 @@ def absolute_point_from_position_reference_and_offset(
                     # assume meniscus is at well center.
                     # Will this cause more harm than good? Is there a better alternative to this?
                     reference_point = well.get_center()
-            case PositionReference.LIQUID_MENISCUS_END:
+            case PositionReference.LIQUID_MENISCUS_END | PositionReference.LIQUID_MENISCUS:
                 estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
                     mount=mount,
                     operation_volume=well_volume_difference,
