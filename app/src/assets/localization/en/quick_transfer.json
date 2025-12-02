@@ -78,7 +78,7 @@
   "dispense_volume_µL": "Dispense volume per well (µL)",
   "disposal_volume": "Disposal volume",
   "disposal_volume_flow_rate": "Between {{min}} and {{max}}",
-  "disposal_volume_label": "{{volume}} µL, {{location}}, {{flowRate}} µL/s",
+  "disposal_volume_label": "{{volume}}, {{location}}, {{flowRate}} µL/s",
   "disposal_volume_µL": "Disposal volume (µL)",
   "distance_bottom_of_well_mm": "Distance from bottom of well (mm)",
   "distance_from_bottom": "Distance from bottom of well (mm)",
