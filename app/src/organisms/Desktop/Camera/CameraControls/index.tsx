@@ -1,10 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { UseMutateFunction } from 'react-query'
-import { ErrorResponse } from 'react-router-dom'
-import { AxiosError } from 'axios'
 
-import { CameraImageSettings } from '@opentrons/api-client'
 import {
   Icon,
   Modal,
@@ -21,14 +17,19 @@ import styles from './cameracontrols.module.css'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
-import type { CameraImageSettingsResponse } from '@opentrons/api-client'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
+import type {
+  CameraImageSettings,
+  CameraImageSettingsResponse,
+} from '@opentrons/api-client'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface CameraControlsProps {
   onClose: () => void
   postCameraImageSettings: UseMutateFunction<
     CameraImageSettingsResponse,
-    AxiosError<ErrorResponse>,
+    AxiosError,
     CameraImageSettings
   >
 }
@@ -40,7 +41,7 @@ export function CameraControls({
   const { t } = useTranslation('device_settings')
   const settings = useCameraSettingsValues()
   const [isLoading, setIsLoading] = useState(false)
-  const handleSave = async (): Promise<void> => {
+  const handleSave = (): void => {
     setIsLoading(true)
     postCameraImageSettings(
       {

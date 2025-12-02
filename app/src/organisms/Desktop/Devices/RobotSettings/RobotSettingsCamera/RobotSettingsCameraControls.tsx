@@ -15,7 +15,7 @@ import type { JSX } from 'react'
 export function RobotSettingsCameraControls(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
-
+  const { createCameraImageSettings } = useCreateCameraImageSettings()
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
@@ -44,7 +44,7 @@ export function RobotSettingsCameraControls(): JSX.Element {
         createPortal(
           <CameraControls
             onClose={toggleControls}
-            postCameraImageSettings={useCreateCameraImageSettings}
+            postCameraImageSettings={createCameraImageSettings}
           />,
           getTopPortalEl()
         )}
