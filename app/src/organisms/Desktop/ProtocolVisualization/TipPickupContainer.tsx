@@ -81,7 +81,7 @@ export function TipPickupContainer(
         <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
           {t('tips_remaining')}
         </StyledText>
-        <StyledText desktopStyle="captionSemiBold">
+        <StyledText desktopStyle="captionRegular">
           {t('remaining_tips', { remaining: tipsRemaining })}
         </StyledText>
       </div>
