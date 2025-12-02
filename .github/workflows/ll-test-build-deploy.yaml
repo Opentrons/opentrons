@@ -196,7 +196,7 @@ jobs:
           if [[ "${{ needs.deploy-ll.result }}" == "failure" ]]; then
             failed_jobs+=("deploy-ll")
           fi
-          
+
           IFS=','
           echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
 

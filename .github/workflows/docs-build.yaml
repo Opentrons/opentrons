@@ -56,7 +56,7 @@ jobs:
       relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
@@ -80,7 +80,7 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/git/resolve-tag
       - uses: ./.github/actions/environment/complex-variables
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.12.0'
       - uses: './.github/actions/python/setup-uv'
@@ -108,7 +108,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: ./.github/actions/git/resolve-tag

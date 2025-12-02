@@ -55,7 +55,7 @@ jobs:
       - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.12.0'
       - uses: './.github/actions/python/setup-uv'
@@ -89,7 +89,7 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.12.0'
       - name: 'set complex environment variables'
@@ -170,8 +170,8 @@ jobs:
     runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
     permissions:
-      id-token: write  # Required for OIDC
-      contents: read   # Required for checkout
+      id-token: write # Required for OIDC
+      contents: read # Required for checkout
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -182,7 +182,7 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.12.0'
       - name: 'set complex environment variables'

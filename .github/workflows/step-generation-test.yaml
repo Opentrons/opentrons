@@ -42,7 +42,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/js/setup
       - name: 'run step generation unit tests'
         run: make -C step-generation test-cov
