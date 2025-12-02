@@ -1,1 +1,1 @@
-declare module 'mixpanel-browser';
+declare module 'mixpanel-browser'

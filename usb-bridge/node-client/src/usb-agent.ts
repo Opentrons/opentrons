@@ -4,10 +4,10 @@ import agent from 'agent-base'
 import { SerialPort } from 'serialport'
 
 import type { PortInfo } from '@serialport/bindings-cpp'
+import type { Agent as AgentBase } from 'agent-base'
 import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
 import type { Logger, LogLevel } from './types'
-import type { Agent as AgentBase } from 'agent-base'
 
 const MAX_SOCKET_CREATE_RETRIES = 10
 const SOCKET_OPEN_RETRY_TIME_MS = 100
