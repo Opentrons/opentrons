@@ -75,7 +75,11 @@ from opentrons_shared_data.errors.exceptions import (
     UnsupportedHardwareCommand,
     CommandPreconditionViolated,
 )
-from opentrons_shared_data.liquid_classes.liquid_class_definition import BlowoutLocation
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutLocation,
+    PositionReference,
+    Coordinate,
+)
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from . import overlap_versions, pipette_movement_conflict
 from . import transfer_components_executor as tx_comps_executor
@@ -2197,14 +2201,23 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         aspirate_end_point: Optional[Point] = None
         aspirate_end_location: Optional[Location] = None
         if aspirate_props.aspirate_end_position:
+            fb_aspirate_end_location: Optional[PositionReference] = None
+            fb_aspirate_end_offset: Optional[Coordinate] = None
+            if aspirate_props.fallback_aspirate_end_position:
+                fb_aspirate_end_location = (
+                    aspirate_props.fallback_aspirate_end_position.position_reference
+                )
+                fb_aspirate_end_offset = (
+                    aspirate_props.fallback_aspirate_end_position.offset
+                )
             aspirate_end_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=source_well,
                 well_volume_difference=-volume,
                 position_reference=aspirate_props.aspirate_end_position.position_reference,
                 offset=aspirate_props.aspirate_end_position.offset,
                 mount=self.get_mount(),
-                fallback_position_reference=aspirate_props.fallback_aspirate_end_position.position_reference,  # type: ignore[union-attr]
-                fallback_offset=aspirate_props.fallback_aspirate_end_position.offset,  # type: ignore[union-attr]
+                fallback_position_reference=fb_aspirate_end_location,
+                fallback_offset=fb_aspirate_end_offset,
             )
             aspirate_end_location = Location(
                 aspirate_end_point, labware=source_loc.labware
@@ -2359,14 +2372,23 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dispense_end_location: Optional[Location] = None
         if dispense_props.dispense_end_position:
             assert dest_well is not None
+            fb_dispense_end_location: Optional[PositionReference] = None
+            fb_dispense_end_offset: Optional[Coordinate] = None
+            if dispense_props.fallback_dispense_end_position:
+                fb_dispense_end_location = (
+                    dispense_props.fallback_dispense_end_position.position_reference
+                )
+                fb_dispense_end_offset = (
+                    dispense_props.fallback_dispense_end_position.offset
+                )
             dispense_end_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=dest_well,
                 well_volume_difference=volume,
                 position_reference=dispense_props.dispense_end_position.position_reference,
                 offset=dispense_props.dispense_end_position.offset,
                 mount=self.get_mount(),
-                fallback_position_reference=dispense_props.fallback_dispense_end_position.position_reference,  # type: ignore[union-attr]
-                fallback_offset=dispense_props.fallback_dispense_end_position.offset,  # type: ignore[union-attr]
+                fallback_position_reference=fb_dispense_end_location,
+                fallback_offset=fb_dispense_end_offset,
             )
             dispense_end_location = Location(
                 dispense_end_point, labware=dest_loc.labware
@@ -2459,14 +2481,23 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
 
         dispense_end_location: Optional[Location] = None
         if dispense_props.dispense_end_position:
+            fb_dispense_end_location: Optional[PositionReference] = None
+            fb_dispense_end_offset: Optional[Coordinate] = None
+            if dispense_props.fallback_dispense_end_position:
+                fb_dispense_end_location = (
+                    dispense_props.fallback_dispense_end_position.position_reference
+                )
+                fb_dispense_end_offset = (
+                    dispense_props.fallback_dispense_end_position.offset
+                )
             dispense_end_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
                 well=dest_well,
                 well_volume_difference=volume,
                 position_reference=dispense_props.dispense_end_position.position_reference,
                 offset=dispense_props.dispense_end_position.offset,
                 mount=self.get_mount(),
-                fallback_position_reference=dispense_props.fallback_dispense_end_position.position_reference,  # type: ignore[union-attr]
-                fallback_offset=dispense_props.fallback_dispense_end_position.offset,  # type: ignore[union-attr]
+                fallback_position_reference=fb_dispense_end_location,
+                fallback_offset=fb_dispense_end_offset,
             )
             dispense_end_location = Location(
                 dispense_end_point, labware=dest_loc.labware
