@@ -19,7 +19,7 @@
   padding: var(--spacing-16);
   border-radius: var(--border-radius-8);
   background-color: var(--white);
-  gap: var(--spacing-12);
+  gap: var(--spacing-16);
 }
 
 .main_content {

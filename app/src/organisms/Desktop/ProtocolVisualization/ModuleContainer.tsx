@@ -13,6 +13,7 @@ import {
 } from '@opentrons/shared-data'
 
 import styles from './modulecontainer.module.css'
+import { ModuleStatusContainer } from './ModuleStatusContainer'
 
 import type { ModuleEntities, RobotState } from '@opentrons/step-generation'
 
@@ -32,7 +33,7 @@ export function ModuleContainer({
   const { moduleState } = moduleRobotState[moduleId]
   const moduleDisplayName = getModuleDisplayName(model)
 
-  let moduleDetails = <div></div>
+  let moduleDetails = null
 
   switch (moduleState.type) {
     case THERMOCYCLER_MODULE_TYPE: {
@@ -40,36 +41,27 @@ export function ModuleContainer({
 
       moduleDetails = (
         <div className={styles.module_details_status_container}>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('target_block_temperature')}
-            </StyledText>
+          <ModuleStatusContainer title="target_block_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
               {blockTargetTemp != null
                 ? t('temperature', { temp: blockTargetTemp })
                 : t('deactivated')}
             </StyledText>
-          </div>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('target_lid_temperature')}
-            </StyledText>
+          </ModuleStatusContainer>
+          <ModuleStatusContainer title="target_lid_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
               {lidTargetTemp != null
                 ? t('temperature', { temp: lidTargetTemp })
                 : t('deactivated')}
             </StyledText>
-          </div>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('lid_status')}
-            </StyledText>
+          </ModuleStatusContainer>
+          <ModuleStatusContainer title="lid_status">
             <Chip
               type="neutral"
               hasIcon={false}
               text={lidOpen || lidOpen == null ? t('open') : t('closed')}
             />
-          </div>
+          </ModuleStatusContainer>
         </div>
       )
       break
@@ -78,30 +70,21 @@ export function ModuleContainer({
       const { targetSpeed, targetTemp, latchOpen } = moduleState
       moduleDetails = (
         <div className={styles.module_details_status_container}>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('target_temperature')}
-            </StyledText>
+          <ModuleStatusContainer title="target_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemp != null
                 ? t('temperature', { temp: targetTemp })
                 : t('deactivated')}
             </StyledText>
-          </div>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('target_speed')}
-            </StyledText>
+          </ModuleStatusContainer>
+          <ModuleStatusContainer title="target_speed">
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetSpeed != null
                 ? t('speed', { speed: targetSpeed })
                 : t('idle')}
             </StyledText>
-          </div>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('labware_latch')}
-            </StyledText>
+          </ModuleStatusContainer>
+          <ModuleStatusContainer title="labware_latch">
             <Chip
               type="neutral"
               hasIcon={false}
@@ -111,7 +94,7 @@ export function ModuleContainer({
                   : t('closed_and_locked')
               }
             />
-          </div>
+          </ModuleStatusContainer>
         </div>
       )
       break
@@ -120,16 +103,13 @@ export function ModuleContainer({
       const { engaged } = moduleState
       moduleDetails = (
         <div className={styles.module_details_status_container}>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('status')}
-            </StyledText>
+          <ModuleStatusContainer title="status">
             <Chip
               type={engaged ? 'info' : 'neutral'}
               iconName="connection-status"
               text={engaged ? t('engaged') : t('disengaged')}
             />
-          </div>
+          </ModuleStatusContainer>
         </div>
       )
       break
@@ -138,16 +118,13 @@ export function ModuleContainer({
       const { status, targetTemperature } = moduleState
       moduleDetails = (
         <div className={styles.module_details_status_container}>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t(status)}
-            </StyledText>
+          <ModuleStatusContainer title={status}>
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemperature != null
                 ? t('temperature', { temp: targetTemperature })
                 : t('deactivated')}
             </StyledText>
-          </div>
+          </ModuleStatusContainer>
         </div>
       )
       break
@@ -156,16 +133,13 @@ export function ModuleContainer({
       const { lidOpen, initialization } = moduleState
       moduleDetails = (
         <div className={styles.module_details_status_container}>
-          <div className={styles.module_details_status}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('lid_status')}
-            </StyledText>
+          <ModuleStatusContainer title="lid_status">
             <Chip
               type="neutral"
               hasIcon={false}
               text={lidOpen || lidOpen == null ? t('open') : t('closed')}
             />
-          </div>
+          </ModuleStatusContainer>
           {initialization != null ? (
             <>
               <div className={styles.module_details_status}>
