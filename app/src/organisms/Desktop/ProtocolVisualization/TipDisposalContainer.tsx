@@ -33,10 +33,10 @@ export function TipDisposalContainer({
       </div>
       <div className={styles.main_content}>
         <div className={styles.text_container}>
-          <StyledText desktopStyle="captionSemiBold" color={COLORS.grey60}>
+          <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {t('tips_in_trash')}
           </StyledText>
-          <StyledText desktopStyle="captionSemiBold">
+          <StyledText desktopStyle="captionRegular">
             {t('remaining_tips', { remaining: totalEmptyTips })}
           </StyledText>
         </div>
