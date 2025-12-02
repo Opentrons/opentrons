@@ -107,6 +107,11 @@ def comment_protocol_version(protocol: ProtocolContext, version: str) -> None:
 
 
 # FUNCTIONS FOR LOADING COMMON PARAMETERS
+def create_camera_parameter(parameters: ParameterContext) -> None:
+    """Use camera parameter."""
+    parameters.add_bool(variable_name="camera", display_name="use_camera", default=True)
+
+
 def create_channel_parameter(parameters: ParameterContext) -> None:
     """Create pipette channel parameter."""
     parameters.add_str(
