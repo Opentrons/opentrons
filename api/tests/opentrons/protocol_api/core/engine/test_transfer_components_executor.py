@@ -32,6 +32,7 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
     LocationCheckDescriptors,
 )
 from opentrons.types import Location, Point, Mount
+from opentrons.protocol_engine import errors
 
 
 @pytest.fixture
@@ -2495,6 +2496,63 @@ def test_absolute_point_from_position_reference_and_offset(
         )
         == expected_result
     )
+
+
+@pytest.mark.parametrize(
+    argnames=["error"],
+    argvalues=[
+        [errors.LiquidHeightUnknownError("LiquidHeightUnknownError")],
+        [errors.IncompleteWellDefinitionError("IncompleteWellDefinitionError")],
+        [errors.IncompleteLabwareDefinitionError("IncompleteLabwareDefinitionError")],
+    ],
+)
+def test_absolute_point_from_position_reference_and_offset_with_fallback(
+    decoy: Decoy,
+    error: errors.ProtocolEngineError,
+) -> None:
+    """It should return the correct absolute point based on well, position reference and offset."""
+    well = decoy.mock(cls=WellCore)
+
+    well_bottom_point = Point(4, 5, 6)
+    decoy.when(well.get_bottom(0)).then_return(well_bottom_point)
+
+    decoy.when(
+        well.estimate_liquid_height_after_pipetting(
+            operation_volume=123, mount=Mount.RIGHT
+        ),
+    ).then_raise(error)
+
+    assert absolute_point_from_position_reference_and_offset(
+        well=well,
+        well_volume_difference=123,
+        position_reference=PositionReference.LIQUID_MENISCUS_END,
+        offset=Coordinate(x=0, y=0, z=-2),
+        mount=Mount.RIGHT,
+        fallback_position_reference=PositionReference.WELL_BOTTOM,
+        fallback_offset=Coordinate(x=21, y=22, z=23),
+    ) == Point(25, 27, 29)
+
+
+def test_absolute_point_from_position_reference_and_offset_without_fallback(
+    decoy: Decoy,
+) -> None:
+    """It should return the correct absolute point based on well, position reference and offset."""
+    well = decoy.mock(cls=WellCore)
+
+    decoy.when(
+        well.estimate_liquid_height_after_pipetting(
+            operation_volume=123, mount=Mount.RIGHT
+        ),
+    ).then_raise(errors.LiquidHeightUnknownError("LiquidHeightUnknownError"))
+
+    with pytest.raises(errors.LiquidHeightUnknownError):
+        absolute_point_from_position_reference_and_offset(
+            well=well,
+            well_volume_difference=123,
+            position_reference=PositionReference.LIQUID_MENISCUS_END,
+            offset=Coordinate(x=0, y=0, z=-2),
+            mount=Mount.RIGHT,
+        )
 
 
 def test_absolute_point_from_position_reference_and_offset_raises_errors(
