@@ -66,7 +66,7 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
             <PrimaryButton onClick={handleSave} disabled={isLoading}>
               <div className={styles.save_button}>
                 {isLoading && <Icon name="ot-spinner" spin size="1rem" />}
-                {t('Save')}
+                {t('save')}
               </div>
             </PrimaryButton>
           </div>

@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import {
-  useCameraImageSettings,
-  useCreateCameraImageSettings,
-} from '@opentrons/react-api-client'
+import { useCameraImageSettings } from '@opentrons/react-api-client'
 
 import { zoomNumberToString, zoomStringToNumber } from '../utils/cameraUtils'
 
@@ -29,8 +26,6 @@ export function useCameraSettingsValues(): UseCameraSettingsValuesResult {
   const [brightness, setBrightness] = useState(50)
   const [contrast, setContrast] = useState(50)
   const [saturation, setSaturation] = useState(50)
-  const { mutateAsync: createCameraImageSettings } =
-    useCreateCameraImageSettings()
   useEffect(() => {
     if (cameraImageSettings) {
       setZoom(
@@ -65,12 +60,6 @@ export function useCameraSettingsValues(): UseCameraSettingsValuesResult {
     setContrast(50)
     setSaturation(50)
     setZoom('1x')
-    createCameraImageSettings({
-      zoom: 1,
-      brightness: 50,
-      contrast: 50,
-      saturation: 50,
-    })
   }
 
   return {
