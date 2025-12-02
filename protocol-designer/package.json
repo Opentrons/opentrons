@@ -76,6 +76,6 @@
   },
   "devDependencies": {
     "@sentry/vite-plugin": "^3.3.1",
-    "@types/mixpanel-browser": "^2.35.6"
+    "@types/mixpanel-browser": "2.35.6"
   }
 }
