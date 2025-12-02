@@ -2185,14 +2185,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         ):
             self.prepare_to_aspirate()
 
-        aspirate_point = (
-            tx_comps_executor.absolute_point_from_position_reference_and_offset(
-                well=source_well,
-                well_volume_difference=-volume,
-                position_reference=aspirate_props.aspirate_position.position_reference,
-                offset=aspirate_props.aspirate_position.offset,
-                mount=self.get_mount(),
-            )
+        aspirate_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
+            well=source_well,
+            well_volume_difference=-volume,
+            position_reference=aspirate_props.aspirate_position.position_reference,
+            offset=aspirate_props.aspirate_position.offset,
+            mount=self.get_mount(),
+            fallback_position_reference=aspirate_props.fallback_aspirate_position.position_reference,
+            fallback_offset=aspirate_props.fallback_aspirate_position.offset,
         )
         aspirate_end_point: Optional[Point] = None
         aspirate_end_location: Optional[Location] = None
@@ -2203,6 +2203,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 position_reference=aspirate_props.aspirate_end_position.position_reference,
                 offset=aspirate_props.aspirate_end_position.offset,
                 mount=self.get_mount(),
+                fallback_position_reference=aspirate_props.fallback_aspirate_end_position.position_reference,  # type: ignore[union-attr]
+                fallback_offset=aspirate_props.fallback_aspirate_end_position.offset,  # type: ignore[union-attr]
             )
             aspirate_end_location = Location(
                 aspirate_end_point, labware=source_loc.labware
@@ -2346,6 +2348,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 position_reference=dispense_props.dispense_position.position_reference,
                 offset=dispense_props.dispense_position.offset,
                 mount=self.get_mount(),
+                fallback_position_reference=dispense_props.fallback_dispense_position.position_reference,
+                fallback_offset=dispense_props.fallback_dispense_position.offset,
             )
             dispense_location = Location(dispense_point, labware=dest_loc.labware)
         else:
@@ -2361,6 +2365,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 position_reference=dispense_props.dispense_end_position.position_reference,
                 offset=dispense_props.dispense_end_position.offset,
                 mount=self.get_mount(),
+                fallback_position_reference=dispense_props.fallback_dispense_end_position.position_reference,  # type: ignore[union-attr]
+                fallback_offset=dispense_props.fallback_dispense_end_position.offset,  # type: ignore[union-attr]
             )
             dispense_end_location = Location(
                 dispense_end_point, labware=dest_loc.labware
@@ -2440,14 +2446,14 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         dispense_props = transfer_properties.multi_dispense
 
         dest_loc, dest_well = dest
-        dispense_point = (
-            tx_comps_executor.absolute_point_from_position_reference_and_offset(
-                well=dest_well,
-                well_volume_difference=volume,
-                position_reference=dispense_props.dispense_position.position_reference,
-                offset=dispense_props.dispense_position.offset,
-                mount=self.get_mount(),
-            )
+        dispense_point = tx_comps_executor.absolute_point_from_position_reference_and_offset(
+            well=dest_well,
+            well_volume_difference=volume,
+            position_reference=dispense_props.dispense_position.position_reference,
+            offset=dispense_props.dispense_position.offset,
+            mount=self.get_mount(),
+            fallback_position_reference=dispense_props.fallback_dispense_position.position_reference,
+            fallback_offset=dispense_props.fallback_dispense_position.offset,
         )
         dispense_location = Location(dispense_point, labware=dest_loc.labware)
 
@@ -2459,6 +2465,8 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 position_reference=dispense_props.dispense_end_position.position_reference,
                 offset=dispense_props.dispense_end_position.offset,
                 mount=self.get_mount(),
+                fallback_position_reference=dispense_props.fallback_dispense_end_position.position_reference,  # type: ignore[union-attr]
+                fallback_offset=dispense_props.fallback_dispense_end_position.offset,  # type: ignore[union-attr]
             )
             dispense_end_location = Location(
                 dispense_end_point, labware=dest_loc.labware
