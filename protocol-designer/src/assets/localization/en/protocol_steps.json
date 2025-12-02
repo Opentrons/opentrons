@@ -13,7 +13,8 @@
     "label": "Flex Stacker",
     "stacker": {
       "label": "Stacker",
-      "labware_filled": "{{amount}}/{{total}} labware filled"
+      "labware_filled": "{{amount}}/{{total}} labware filled",
+      "no_labware": "No labware stored on stacker"
     },
     "shuttle": {
       "no_labware": "No labware on shuttle",

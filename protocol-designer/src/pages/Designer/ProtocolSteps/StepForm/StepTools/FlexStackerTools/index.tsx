@@ -54,22 +54,20 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
   const labwareOnShuttle = flexStackerModuleState?.labwareOnShuttle ?? null
 
   const labwareFiledComponent = (
-    <div style={{ padding: SPACING.spacing16 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          style={{ paddingBottom: SPACING.spacing8 }}
-        >
-          {t('protocol_steps:flex_stacker.stacker.label')}
-        </StyledText>
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+      <StyledText
+        desktopStyle="bodyDefaultSemiBold"
+        style={{ paddingBottom: SPACING.spacing8 }}
+      >
+        {t('protocol_steps:flex_stacker.stacker.label')}
+      </StyledText>
 
-        <StyledText desktopStyle="bodyDefaultRegular">
-          {t('protocol_steps:flex_stacker.stacker.labware_filled', {
-            amount: labwareInHopperCount,
-            total: maxPoolCount,
-          })}
-        </StyledText>
-      </div>
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {t('protocol_steps:flex_stacker.stacker.labware_filled', {
+          amount: labwareInHopperCount,
+          total: maxPoolCount,
+        })}
+      </StyledText>
     </div>
   )
 
@@ -99,9 +97,20 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         }}
         value={moduleId}
       />
-      <Divider marginY="0" />
-      {labwareFiledComponent}
-      <Divider marginY="0" />
+      <Divider margin="0" />
+      <div style={{ padding: SPACING.spacing16 }}>
+        {labwareFiledComponent}
+        {flexStackerModuleState?.storedLabwareDetails != null ? (
+          <LabwareDetailsWithCount
+            title={flexStackerModuleState.storedLabwareDetails.primaryLabware.loadName}
+            subTitle={flexStackerModuleState.storedLabwareDetails.lidLabware?.loadName}
+            quantity={flexStackerModuleState.storedLabwareDetails.initialCount?.toString() ?? '0'}
+          />
+        ) :           
+        <InfoScreen content={t('protocol_steps:flex_stacker.stacker.no_labware')} />
+}
+      </div>
+      <Divider margin="0" />
       <div
         style={{
           display: 'flex',
@@ -120,7 +129,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           <InfoScreen content="No labware on shuttle" />
         </div>
       </div>
-      <Divider marginY="0" />
+      <Divider margin="0" />
       <div
         style={{
           padding: SPACING.spacing16,
