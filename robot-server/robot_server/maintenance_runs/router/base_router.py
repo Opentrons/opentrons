@@ -47,6 +47,7 @@ from robot_server.camera.fastapi_dependencies import (
     get_camera_provider,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.types import EngineStatus
 
 log = logging.getLogger(__name__)
 base_router = LightRouter()
@@ -288,10 +289,24 @@ async def remove_run(
         runId: Run ID pulled from URL.
         maintenance_run_data_manager: Current maintenance run data management.
         run_data_manager: Current run data management.
+        camera_provider: Utility for accessing image capture and camera settings.
     """
     try:
-        run_exists = True if run_data_manager.current_run_id is not None else False
-        await maintenance_run_data_manager.delete(runId, run_exists, camera_provider)
+        camera_settings = None
+        if run_data_manager.current_run_id is not None:
+            # Import the camera settings from an external run if one exists
+            state_summary = run_data_manager._get_good_state_summary(
+                run_data_manager.current_run_id
+            )
+            if (
+                state_summary is not None
+                and state_summary.status is not EngineStatus.FINISHING
+            ):
+                camera_settings = state_summary.cameraSettings
+
+        await maintenance_run_data_manager.delete(
+            runId, camera_settings, camera_provider
+        )
 
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e

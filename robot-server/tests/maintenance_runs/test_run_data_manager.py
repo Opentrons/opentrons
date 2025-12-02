@@ -316,6 +316,7 @@ async def test_get_run_not_current(
 async def test_delete_current_run(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_camera_provider: CameraProvider,
     subject: MaintenanceRunDataManager,
 ) -> None:
     """It should delete the current run from the engine."""
@@ -324,7 +325,9 @@ async def test_delete_current_run(
         run_id
     )
 
-    await subject.delete(run_id=run_id)
+    await subject.delete(
+        run_id=run_id, camera_settings=None, camera_provider=mock_camera_provider
+    )
 
     decoy.verify(
         await mock_maintenance_run_orchestrator_store.clear(),

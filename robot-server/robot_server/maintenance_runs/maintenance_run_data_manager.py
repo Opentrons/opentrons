@@ -19,7 +19,10 @@ from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
 from opentrons.protocol_engine.types import DeckConfigurationType
 
 from robot_server.service.notifications import MaintenanceRunsPublisher
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+    CameraSettings,
+)
 from opentrons.system import camera
 
 
@@ -163,13 +166,17 @@ class MaintenanceRunDataManager:
         )
 
     async def delete(
-        self, run_id: str, run_exists: bool, camera_provider: CameraProvider
+        self,
+        run_id: str,
+        camera_settings: CameraSettings | None,
+        camera_provider: CameraProvider,
     ) -> None:
         """Delete a maintenance run.
 
         Args:
             run_id: The identifier of the run to remove.
-            run_exists: Whether or not a standard run exists outside of the maintenance run.
+            camera_settings: Optional set of camera settings form an external run. If None do not attempt to restart the live stream.
+            camera_provider: Utility for accessing image capture and camera settings.
 
         Raises:
             RunConflictError: If deleting the current run, the current run
@@ -177,17 +184,16 @@ class MaintenanceRunDataManager:
             RunNotFoundError: The given run identifier was not found.
         """
         if run_id == self._run_orchestrator_store.current_run_id:
-            state_summary = self._get_state_summary(run_id)
             await self._run_orchestrator_store.clear()
             await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
 
-            if run_exists and state_summary is not None:
-                # Restart the live stream for now that the maintenance run has ended.
+            if camera_settings is not None:
+                # Restart the live stream for the external run when the maintenance run has ended.
                 await camera.update_live_stream_status(
                     self._run_orchestrator_store._robot_type,
                     True,
                     camera_provider,
-                    state_summary.cameraSettings,
+                    camera_settings,
                 )
 
         else:
