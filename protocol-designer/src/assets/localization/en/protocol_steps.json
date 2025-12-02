@@ -9,6 +9,23 @@
     "read": "<text>Plate reader reading</text><tag/><text>Saving file as</text><tag2/>",
     "reference": "<text>with reference wavelength</text><tag/>"
   },
+  "flex_stacker": {
+    "label": "Flex Stacker",
+    "stacker": {
+      "label": "Stacker",
+      "labware_filled": "{{amount}}/{{total}} labware filled"
+    },
+    "shuttle": {
+      "no_labware": "No labware on shuttle",
+      "label": "Shuttle"
+    },
+    "module_controls": {
+      "label": "Module controls",
+      "retrieve_label": "Retrieve",
+      "refill_label": "Refill",
+      "empty_label": "Empty"
+    }
+  },
   "add_details": "Add step details",
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",

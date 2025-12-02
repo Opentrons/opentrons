@@ -53,6 +53,26 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
   const maxPoolCount = flexStackerModuleState?.maxPoolCount ?? 0
   const labwareOnShuttle = flexStackerModuleState?.labwareOnShuttle ?? null
 
+  const labwareFiledComponent = (
+    <div style={{ padding: SPACING.spacing16 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <StyledText
+          desktopStyle="bodyDefaultSemiBold"
+          style={{ paddingBottom: SPACING.spacing8 }}
+        >
+          {t('protocol_steps:flex_stacker.stacker.label')}
+        </StyledText>
+
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('protocol_steps:flex_stacker.stacker.labware_filled', {
+            amount: labwareInHopperCount,
+            total: maxPoolCount,
+          })}
+        </StyledText>
+      </div>
+    </div>
+  )
+
   return (
     <div
       style={{
@@ -80,24 +100,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         value={moduleId}
       />
       <Divider marginY="0" />
-      <div style={{ padding: SPACING.spacing16 }}>
-        <div style={{ display: 'flex' }}>
-          <StyledText
-            desktopStyle="bodyDefaultSemiBold"
-            style={{ paddingBottom: SPACING.spacing8 }}
-          >
-            Stacker
-          </StyledText>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            5/6 labware filled
-          </StyledText>
-        </div>
-        <LabwareDetailsWithCount
-          title="Opentrons Flex 96 Tip Rack 1000 µL"
-          subTitle="With tip rack lid"
-          quantity="Quantity: 1"
-        />
-      </div>
+      {labwareFiledComponent}
       <Divider marginY="0" />
       <div
         style={{
