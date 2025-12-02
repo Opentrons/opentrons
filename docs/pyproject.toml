@@ -11,7 +11,7 @@ dependencies = [
     "mkdocs-monorepo-plugin>=1.1.2",
     "mkdocs-parent-css-plugin",
     "mkdocs-print-site-plugin>=2.8",
-    "playwright>=1.55"
+    "playwright>=1.55",
 ]
 
 [tool.uv.sources]

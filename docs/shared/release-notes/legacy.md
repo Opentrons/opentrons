@@ -1,4 +1,13 @@
-## Opentrons App Changes in 6.3.1
+---
+title: "Opentrons App: Legacy Release Notes"
+---
+
+This document lists changes made in legacy versions of the Opentrons App.
+
+!!! note
+    Opentrons no longer supports using these versions of the Opentrons App. This document is maintained for historical purposes only.
+
+## Version 6.3.1
 
 Welcome to the v6.3.1 release of the Opentrons App!
 
@@ -7,7 +16,7 @@ There are no changes to the Opentrons App in v6.3.1, but it is required for upda
 ---
 
 
-## Opentrons App Changes in 6.3.0
+## Version 6.3.0
 
 Welcome to the v6.3.0 release of the Opentrons App!
 
@@ -43,7 +52,7 @@ Run Progress Monitor: The run log has been redesigned to give you a better sense
 ---
 
 
-## Opentrons App Changes in 6.2.1
+## Version 6.2.1
 
 Welcome to the v6.2.1 release of the Opentrons App!
 
@@ -58,7 +67,7 @@ Welcome to the v6.2.1 release of the Opentrons App!
 ---
 
 
-## Opentrons App Changes in 6.2.0
+## Version 6.2.0
 
 Welcome to the v6.2.0 release of the Opentrons App! This release focuses on adding support for the Thermocycler Module GEN2.
 
@@ -70,7 +79,7 @@ Welcome to the v6.2.0 release of the Opentrons App! This release focuses on addi
 ---
 
 
-## Opentrons App Changes in 6.1.0
+## Version 6.1.0
 
 Welcome to the v6.1.0 release of the Opentrons App! This release focuses on adding support for the [Opentrons Heater-Shaker Module](https://shop.opentrons.com/heater-shaker-module/).
 
@@ -101,7 +110,7 @@ Module cards now show if a Heater-Shaker or Thermocycler has an error
 ---
 
 
-## Opentrons App Changes in 6.0.1
+## Version 6.0.1
 
 Welcome to the v6.0.1 release of the Opentrons App! This release focuses on a visual redesign of the app that offers more ways to manage protocols even when you're not connected to a robot.
 
@@ -146,7 +155,7 @@ Labware Position Check
 ---
 
 
-## Opentrons App Changes in 5.0.2
+## Version 5.0.2
 
 Welcome to the v5.0.2 release of the Opentrons App!
 
@@ -179,7 +188,7 @@ The 5.0.1 hotfix release contains a small fix to the Labware Position Check to a
 ---
 
 
-## Opentrons App Changes in 4.7.0
+## Version 4.7.0
 
 The 4.7.0 release is primarily focused on bug fixes on the robot software side. You shouldn't notice any big changes with this upgrade.
 
@@ -194,7 +203,7 @@ None in the Opentrons App.
 ---
 
 
-## Opentrons App Changes in 4.6.2
+## Version 4.6.2
 
 The 4.6.2 release is primarily focused on bug fixes on the robot software side and behind the scenes changes in the app for future work. You shouldn't notice any big changes with this upgrade.
 
@@ -217,7 +226,7 @@ The 4.6.1 hotfix release contains a small configuration change to fix an issue w
 ---
 
 
-## Opentrons App Changes in 4.5.0
+## Version 4.5.0
 
 This release of the app is focused on quality of life improvements as we continue large behind-the-scenes improvements.
 
@@ -234,14 +243,14 @@ This release of the app is focused on quality of life improvements as we continu
 ---
 
 
-## Opentrons App Changes in 4.4.0
+## Version 4.4.0
 
 This is a quiet release on the app front as we make some behind-the-scenes improvements to how the app is built, so we don't have any changes to report here. There are changes to the OT-2 software, though, so make sure you update your app so it can get your robot fully up to date!
 
 ---
 
 
-## Opentrons App Changes in 4.3.1
+## Version 4.3.1
 
 We've improved module functionality with Opentrons App 4.3.0. The app now supports protocols with two Temperature Modules or two Magnetic Modules for Python API Protocols. All connected modules display their USB port connection (including limited USB port information for hubs). We've also updated how modules are displayed on the Run tab.
 
@@ -257,7 +266,7 @@ We've improved module functionality with Opentrons App 4.3.0. The app now suppor
 ---
 
 
-## Opentrons App Changes in 4.2.1
+## Version 4.2.1
 
 ### Changes
 
@@ -266,7 +275,7 @@ We've improved module functionality with Opentrons App 4.3.0. The app now suppor
 ---
 
 
-## Opentrons App Changes in 4.2.0
+## Version 4.2.0
 
 ### Changes
 
@@ -280,14 +289,14 @@ We've improved module functionality with Opentrons App 4.3.0. The app now suppor
 ---
 
 
-## Opentrons App Changes in 4.1.1
+## Version 4.1.1
 
 There are no changes to the Opentrons App in 4.1.1; it is a bugfix release for an issue with installing Python packages on the OT-2.
 
 ---
 
 
-## Opentrons App Changes in 4.1.0
+## Version 4.1.0
 
 Opentrons App 4.1.0 brings some new features to robot calibration.
 
@@ -305,7 +314,7 @@ Opentrons App 4.1.0 brings some new features to robot calibration.
 ---
 
 
-## Opentrons App Changes in 4.0.0
+## Version 4.0.0
 
 Opentrons App 4.0.0 is a major software release, bringing an entirely overhauled robot calibration process for the OT-2; a full switch to Opentrons Protocol API Version 2; and many look and feel improvements.
 

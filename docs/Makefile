@@ -12,6 +12,7 @@ build:
 setup:
 	uv sync
 	uv run playwright install --with-deps chromium
+	uv run python ./split_release_notes.py
 
 .PHONY: clean
 clean:

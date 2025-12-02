@@ -1,4 +1,10 @@
-## Opentrons App Changes in 8.8.0
+---
+title: "Opentrons App: v8 Release Notes"
+---
+
+This document lists changes made in v8 of the Opentrons App.
+
+## Version 8.8.0
 
 Welcome to the v8.8.0 release of the Opentrons App! This release includes concurrent module actions and other new features, and addresses several bugs.
 
@@ -19,7 +25,7 @@ Welcome to the v8.8.0 release of the Opentrons App! This release includes concur
 ---
 
 
-## Opentrons App Changes in 8.7.0
+## Version 8.7.0
 
 Welcome to the v8.7.0 release of the Opentrons App! This release adds support for Opentrons Tough Universal Lids, improves error recovery on the Opentrons App and Flex touchscreen, and addresses several bugs.
 
@@ -42,7 +48,7 @@ Use Opentrons Tough Universal Lids on compatible well plates and reservoirs.
 - Quick transfers no longer crash when adding an air gap or blow out after dispensing.
 
 
-## Opentrons App Changes in 8.6.0
+## Version 8.6.0
 
 Welcome to the v8.6.0 release of the Opentrons App! This release adds support for the Flex Stacker Module, as well as other improvements.
 
@@ -63,7 +69,7 @@ Welcome to the v8.6.0 release of the Opentrons App! This release adds support fo
 ---
 
 
-## Opentrons App Changes in 8.5.1
+## Version 8.5.1
 
 Welcome to the v8.5.1 release of the Opentrons App!
 
@@ -72,7 +78,7 @@ There are no changes to the Opentrons App in v8.5.1, but it is required for upda
 ---
 
 
-## Opentrons App Changes in 8.5.0
+## Version 8.5.0
 
 Welcome to the v8.5.0 release of the Opentrons App! This release features the ability to run protocols that use liquid classes to improve pipetting accuracy.
 
@@ -88,7 +94,7 @@ Welcome to the v8.5.0 release of the Opentrons App! This release features the ab
 ---
 
 
-## Opentrons App Changes in 8.4.1
+## Version 8.4.1
 
 The 8.4.1 hotfix release fixes two issues:
 
@@ -99,7 +105,7 @@ The 8.4.1 hotfix release fixes two issues:
 ---
 
 
-## Opentrons App Changes in 8.4.0
+## Version 8.4.0
 
 Welcome to the v8.4.0 release of the Opentrons App! This release includes updates to labware offsets on the Flex, as well as other new features, improvements, and bug fixes.
 
@@ -125,7 +131,7 @@ Welcome to the v8.4.0 release of the Opentrons App! This release includes update
 ---
 
 
-## Opentrons App Changes in 8.3.2
+## Version 8.3.2
 
 Welcome to the v8.3.2 release of the Opentrons App!
 
@@ -134,14 +140,14 @@ There are no changes to the Opentrons App in v8.3.2, but it is required for upda
 ---
 
 
-## Opentrons App Changes in 8.3.1
+## Version 8.3.1
 
 The 8.3.1 hotfix release includes a small fix to allow all robots to properly reboot after an upgrade to v8.3.0.
 
 ---
 
 
-## Opentrons App Changes in 8.3.0
+## Version 8.3.0
 
 Welcome to the v8.3.0 release of the Opentrons App! This release adds support for Mandarin in the app or Flex touchscreen and includes other beta features for our commercial partners.
 
@@ -158,7 +164,7 @@ Note: The Mac and Linux versions of the Opentrons App now require macOS 10.16 an
 ---
 
 
-## Opentrons App Changes in 8.2.0
+## Version 8.2.0
 
 Welcome to the v8.2.0 release of the Opentrons App! This release adds support for the Opentrons Absorbance Plate Reader Module, as well as other features.
 
@@ -187,7 +193,7 @@ Welcome to the v8.2.0 release of the Opentrons App! This release adds support fo
 ---
 
 
-## Opentrons App Changes in 8.1.0
+## Version 8.1.0
 
 Welcome to the v8.1.0 release of the Opentrons App!
 
@@ -200,7 +206,7 @@ There are no new features in the Opentrons App in v8.1.0, but it is required for
 ---
 
 
-## Opentrons App Changes in 8.0.0
+## Version 8.0.0
 
 Welcome to the v8.0.0 release of the Opentrons App!
 

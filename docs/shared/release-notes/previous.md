@@ -1,4 +1,10 @@
-## Opentrons App Changes in 7.5.0
+---
+title: "Opentrons App: v7 Release Notes"
+---
+
+This document lists changes made in v7 of the Opentrons App.
+
+## Version 7.5.0
 
 Welcome to the v7.5.0 release of the Opentrons App!
 
@@ -7,7 +13,7 @@ There are no changes to the Opentrons App in v7.5.0, but it is required for upda
 ---
 
 
-## Opentrons App Changes in 7.3.1
+## Version 7.3.1
 
 Welcome to the v7.3.1 release of the Opentrons App!
 
@@ -20,7 +26,7 @@ There are no changes to the Opentrons App in v7.3.1, but it is required for upda
 ---
 
 
-## Opentrons App Changes in 7.3.0
+## Version 7.3.0
 
 Welcome to the v7.3.0 release of the Opentrons App! This release adds support for Python protocols with runtime parameters, letting you change the behavior of a protocol each time you run it.
 
@@ -62,7 +68,7 @@ Modules in Deck Configuration
 ---
 
 
-## Opentrons App Changes in 7.2.2
+## Version 7.2.2
 
 Welcome to the v7.2.2 release of the Opentrons App!
 
@@ -71,7 +77,7 @@ There are no changes to the Opentrons App in v7.2.2, but it is required for upda
 ---
 
 
-## Opentrons App Changes in 7.2.1
+## Version 7.2.1
 
 Welcome to the v7.2.1 release of the Opentrons App!
 
@@ -82,7 +88,7 @@ Welcome to the v7.2.1 release of the Opentrons App!
 ---
 
 
-## Opentrons App Changes in 7.2.0
+## Version 7.2.0
 
 Welcome to the v7.2.0 release of the Opentrons App!
 
@@ -110,7 +116,7 @@ The Linux version of the Opentrons App now requires Ubuntu 20.04 or newer.
 ---
 
 
-## Opentrons App Changes in 7.1.1
+## Version 7.1.1
 
 Welcome to the v7.1.1 release of the Opentrons App!
 
@@ -121,7 +127,7 @@ Welcome to the v7.1.1 release of the Opentrons App!
 ---
 
 
-## Opentrons App Changes in 7.1.0
+## Version 7.1.0
 
 Welcome to the v7.1.0 release of the Opentrons App! This release includes new deck and pipette functionality for Opentrons Flex, a new workflow for dropping tips after a protocol is canceled, and other improvements.
 
@@ -143,7 +149,7 @@ Welcome to the v7.1.0 release of the Opentrons App! This release includes new de
 ---
 
 
-## Opentrons App Changes in 7.0.2
+## Version 7.0.2
 
 Welcome to the v7.0.2 release of the Opentrons App!
 
@@ -155,7 +161,7 @@ Welcome to the v7.0.2 release of the Opentrons App!
 ---
 
 
-## Opentrons App Changes in 7.0.1
+## Version 7.0.1
 
 Welcome to the v7.0.1 release of the Opentrons App! This release builds on the major release that added support for Opentrons Flex.
 
@@ -171,7 +177,7 @@ Welcome to the v7.0.1 release of the Opentrons App! This release builds on the m
 ---
 
 
-## Opentrons App Changes in 7.0.0
+## Version 7.0.0
 
 Welcome to the v7.0.0 release of the Opentrons App! This release adds support for the Opentrons Flex robot, instruments, modules, and labware.
 
