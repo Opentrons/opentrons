@@ -26,14 +26,11 @@ def add_parameters(parameters: ParameterContext) -> None:
     helpers.create_deactivate_modules_parameter(parameters)
     helpers.create_meniscus_z_parameter(parameters)
     helpers.create_probe_liquid_height_parameter(parameters)
-    helpers.create_camera_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    camera = protocol.params.camera  # type: ignore[attr-defined]
-    if camera:
-        protocol.capture_image(filename="start_of_run")
+    protocol.capture_image(filename="start_of_run")
 
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
@@ -269,8 +266,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.find_liquid_height_of_all_wells(protocol, p50, [liquid_waste])
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
-        if camera:
-            protocol.capture_image(filename="end_of_run")
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
             slack_bot.send_run_completed_message(metadata["protocolName"])
     except Exception as e:
