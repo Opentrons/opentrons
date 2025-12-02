@@ -10,7 +10,7 @@ The OT-2 is designed for years of reliable, full-time operation. Unlike the clea
 
 ## Replacing the motor controller board
 
-This printed circuit board assembly (PCBA) contains the electronics controlling the motors responsible for moving the pipettes. It is attached to the pipette carriage <font color="red">LINK REMINDER TO SYS DESC</font> beneath the carriage cover. The information in this section section explains how to:
+This printed circuit board assembly (PCBA) controls the motors responsible for pipette movement. It is attached to the pipette carriage <font color="red">LINK REMINDER TO SYS DESC</font> beneath the carriage cover. The information in this section explains how to:
 
 - Remove and replace the pipette carriage cover.
 - Disconnect, remove, and replace the motor controller board.
@@ -71,10 +71,11 @@ The two PCBAs mounted inside the back panel of the OT-2 provide other command, c
 This procedure requires the following tools:
 
 - 2.5 mm hex screwdriver
+- T10 Torx screwdriver
 
 ### Removing the rear panel cover and boards
 
-1. Use a T10 Torx to remove the short and long screws that fasten the back panel to the robot. 
+1. Use a 2.5 mm hex screwdriver to remove the short and long screws that fasten the back panel to the robot. 
 
     ![OT-2R back panel with labeled screws](../images/ot2R-back-panel.png)
 
@@ -88,8 +89,8 @@ This procedure requires the following tools:
 
 5. Use a 2.5 mm hex screwdriver to reattach the board with the screws you removed while taking it off the robot.
 
-6. Reattach all the cables
+6. Reattach all the cables.
 
 6. Use a 2.5 mm hex screwdriver to reattach the rear panel cover to the robot.
 
-After installing a new board, follow up with Opentrons Support for further troubleshooting steps or instructions.
+After installing any new boards, follow up with Opentrons Support for further troubleshooting steps or instructions.
