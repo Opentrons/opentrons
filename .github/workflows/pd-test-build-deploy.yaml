@@ -17,6 +17,7 @@ on:
       - 'scripts/static-deploy/**'
       - 'scripts/git-version-protocol-designer.mjs'
       - 'scripts/git-version-v2.mjs'
+      - 'vitest.config.*'
   push:
     branches:
       - 'edge'
