@@ -20,13 +20,14 @@ import { PARENT_PROCESSES, ResourceMonitor } from '../ResourceMonitor'
 
 vi.mock('child_process')
 vi.mock('../../log', async importOriginal => {
-  const actual = await importOriginal<typeof createLogger>()
+  const fakeLogger = {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+  }
   return {
-    ...actual,
-    createLogger: () => ({
-      debug: vi.fn(),
-      error: vi.fn(),
-    }),
+    createLogger: () => fakeLogger,
   }
 })
 
