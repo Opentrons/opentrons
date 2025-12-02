@@ -1,6 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { UseMutateFunction } from 'react-query'
+import { ErrorResponse } from 'react-router-dom'
+import { AxiosError } from 'axios'
 
+import { CameraImageSettings } from '@opentrons/api-client'
 import {
   Icon,
   Modal,
@@ -8,7 +12,6 @@ import {
   SecondaryButton,
   Slider,
 } from '@opentrons/components'
-import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
@@ -18,20 +21,28 @@ import styles from './cameracontrols.module.css'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
+import type { CameraImageSettingsResponse } from '@opentrons/api-client'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface CameraControlsProps {
   onClose: () => void
+  postCameraImageSettings: UseMutateFunction<
+    CameraImageSettingsResponse,
+    AxiosError<ErrorResponse>,
+    CameraImageSettings
+  >
 }
 
-export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
+export function CameraControls({
+  onClose,
+  postCameraImageSettings,
+}: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const settings = useCameraSettingsValues()
   const [isLoading, setIsLoading] = useState(false)
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
   const handleSave = async (): Promise<void> => {
     setIsLoading(true)
-    createCameraImageSettings(
+    postCameraImageSettings(
       {
         zoom: settings.zoom,
         brightness: settings.brightness,

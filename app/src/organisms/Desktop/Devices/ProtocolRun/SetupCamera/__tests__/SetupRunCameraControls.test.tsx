@@ -12,7 +12,7 @@ vi.mock('/app/organisms/Desktop/Camera/CameraControls')
 
 const render = () => {
   return renderWithProviders(
-    <SetupRunCameraControls cameraConfirmed={false} />,
+    <SetupRunCameraControls cameraConfirmed={false} runId={'runid'} />,
     {
       i18nInstance: i18n,
     }
