@@ -13,7 +13,7 @@ export const flexStackerRetrieve: CommandCreator<
   const moduleLocation = modules[moduleId].slot
   const labwareIdOnModule = getLabwareIdOnHopper(labware, moduleLocation)
   const labwarePythonName = labwareEntities[labwareIdOnModule]?.pythonName
-  //  TODO: add error creator if there is no labware in the stack
+  //  TODO: add error creator if there is no labware in the hopper
 
   return {
     commands: [
