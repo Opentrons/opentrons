@@ -19,6 +19,7 @@ export interface CameraTileSettingProps {
   adjustValue: (value: number) => void
   title: string
   subtext: string
+  isLoading: boolean
   returnToHomeView: () => void
 }
 
@@ -28,6 +29,7 @@ export function CameraTileSetting({
   value,
   subtext,
   adjustValue,
+  isLoading,
 }: CameraTileSettingProps): JSX.Element {
   const adjustedValue = roundValueToValidPercentage(value)
 
@@ -42,7 +44,11 @@ export function CameraTileSetting({
 
   return (
     <div className={styles.container}>
-      <ChildNavigation header={title} onClickBack={returnToHomeView} />
+      <ChildNavigation
+        header={title}
+        onClickBack={returnToHomeView}
+        iconName={isLoading ? 'ot-spinner' : 'back'}
+      />
       <div className={styles.content_container}>
         <StyledText oddStyle="level4HeaderRegular">{subtext}</StyledText>
         <div className={styles.tile_setting_container}>

@@ -16,12 +16,14 @@ export interface ZoomSettingsViewProps {
   zoomValue: UseCameraSettingsValuesResult['zoom']
   adjustZoom: UseCameraSettingsValuesResult['adjustZoom']
   returnToHomeView: () => void
+  isLoading: boolean
 }
 
 export function ZoomSettingsView({
   zoomValue,
   adjustZoom,
   returnToHomeView,
+  isLoading,
 }: ZoomSettingsViewProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -41,7 +43,11 @@ export function ZoomSettingsView({
 
   return (
     <div className={styles.container}>
-      <ChildNavigation header={t('zoom')} onClickBack={returnToHomeView} />
+      <ChildNavigation
+        header={t('zoom')}
+        onClickBack={returnToHomeView}
+        iconName={isLoading ? 'ot-spinner' : 'back'}
+      />
       <div className={styles.content_container}>
         <StyledText oddStyle="level4HeaderRegular">
           {t('adjust_deck_appearance')}

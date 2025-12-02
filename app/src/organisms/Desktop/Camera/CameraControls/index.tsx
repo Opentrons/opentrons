@@ -30,6 +30,7 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
   const [isLoading, setIsLoading] = useState(false)
   const { createCameraImageSettings } = useCreateCameraImageSettings()
   const handleSave = async (): Promise<void> => {
+    setIsLoading(true)
     createCameraImageSettings(
       {
         zoom: settings.zoom,
@@ -42,7 +43,7 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
           onClose()
         },
         onSettled: () => {
-          setIsLoading(true)
+          setIsLoading(false)
         },
       }
     )

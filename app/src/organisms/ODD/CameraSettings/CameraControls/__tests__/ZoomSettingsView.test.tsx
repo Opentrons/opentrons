@@ -25,6 +25,7 @@ describe('ZoomSettingsView', () => {
       zoomValue: 1,
       adjustZoom: vi.fn(),
       returnToHomeView: vi.fn(),
+      isLoading: false,
     }
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAVIGATION</div>)
   })

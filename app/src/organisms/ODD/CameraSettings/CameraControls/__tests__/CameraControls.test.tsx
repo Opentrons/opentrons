@@ -100,6 +100,7 @@ describe('CameraControls', () => {
         subtext: 'Adjust the overall lightness or darkness.',
         adjustValue: expect.any(Function),
         returnToHomeView: expect.any(Function),
+        isLoading: false,
       }),
       {}
     )
