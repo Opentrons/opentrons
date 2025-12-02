@@ -62,6 +62,7 @@ import {
   AbsorbanceReaderTools,
   CameraTools,
   CommentTools,
+  FlexStackerToolsContainer,
   HeaterShakerTools,
   MagnetTools,
   MixTools,
@@ -71,7 +72,6 @@ import {
   TemperatureTools,
   ThermocyclerTools,
 } from './StepTools'
-import { FlexStackerToolsContainer } from './StepTools/FlexStackerTools'
 import {
   capitalizeFirstLetter,
   getIsErrorOnCurrentPage,
@@ -537,7 +537,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               desktopStyle="bodyLargeSemiBold"
               css={LINE_CLAMP_TEXT_STYLE(2, true)}
             >
-              {capitalizeFirstLetter(String(formData.stepName))}
+              {/* TODO: how can we use json key names instead of stepType?*/}
+              {t(`protocol_steps:${formData.stepType}`)}
             </StyledText>
           </Flex>
         }
