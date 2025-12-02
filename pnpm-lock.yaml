@@ -74,6 +74,9 @@ importers:
       '@types/lodash':
         specifier: ^4.14.191
         version: 4.17.21
+      '@types/mixpanel-browser':
+        specifier: ^2.49.0
+        version: 2.66.0
       '@types/multer':
         specifier: ^1.4.5
         version: 1.4.13
@@ -1031,8 +1034,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       mixpanel-browser:
-        specifier: 2.29.1
-        version: 2.29.1
+        specifier: 2.22.1
+        version: 2.22.1
       query-string:
         specifier: 6.2.0
         version: 6.2.0
@@ -1104,8 +1107,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       mixpanel-browser:
-        specifier: 2.67.0
-        version: 2.67.0
+        specifier: 2.22.1
+        version: 2.22.1
       react:
         specifier: 18.2.0
         version: 18.2.0
@@ -1134,6 +1137,9 @@ importers:
         specifier: 11.1.0
         version: 11.1.0
     devDependencies:
+      '@types/mixpanel-browser':
+        specifier: ^2.35.6
+        version: 2.66.0
       '@types/styled-components':
         specifier: ^5.1.26
         version: 5.1.36
@@ -1196,10 +1202,10 @@ importers:
         version: 8.3.0
       '@typescript-eslint/eslint-plugin':
         specifier: ^6.10.0
-        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.3.3))(eslint@8.57.1)(typescript@5.3.3)
+        version: 6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
       '@typescript-eslint/parser':
         specifier: ^6.10.0
-        version: 6.21.0(eslint@8.57.1)(typescript@5.3.3)
+        version: 6.21.0(eslint@8.57.1)(typescript@5.9.3)
       '@vituum/vite-plugin-postcss':
         specifier: 1.1.0
         version: 1.1.0(@types/node@24.10.1)(sugarss@2.0.0)(tsx@4.21.0)
@@ -7737,6 +7743,7 @@ packages:
 
   eslint-formatter-summary-chart@0.3.0:
     resolution: {integrity: sha512-xRGVLIt5SjH0Tq3aPg7MA0xGPPIvKCNk9rqYhrgoQiHDPyaMmWDPz0176qAtBdhGfpiclhxkbuo/rrxZLf/U+g==}
+    bundledDependencies: []
 
   eslint-import-resolver-node@0.3.9:
     resolution: {integrity: sha512-WFj2isz22JahUv+B788TlO3N6zL3nNJGU8CcZbPZvVEkBPaJdCV4vy5wyghty5ROFbCRnm132v8BScu5/1BQ8g==}
@@ -10531,9 +10538,6 @@ packages:
 
   mixpanel-browser@2.22.1:
     resolution: {integrity: sha512-rzrej3V+G3e0wqnRJMhj0X5aTwIsGYfTxymshAdB71mwABIgAkBLWM+grlt7I/AXtwvV0gO6jYAy96A9kCghtw==}
-
-  mixpanel-browser@2.29.1:
-    resolution: {integrity: sha512-RSBqVBznOkKBz3MkCXRrkTEEXqoNNYAbASpjaCxvhpT5pykWhjh7JY54fAmOvtG9XNL3GHYA6XiB7Yos4ngNYQ==}
 
   mixpanel-browser@2.67.0:
     resolution: {integrity: sha512-LudY4eRIkvjEpAlIAg10i2T2mbtiKZ4XlMGbTyF1kcAhEqMa9JhEEdEcjxYPwiKhuMVSBM3RVkNCZaNqcnE4ww==}
@@ -19588,6 +19592,26 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@typescript-eslint/eslint-plugin@6.21.0(@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)':
+    dependencies:
+      '@eslint-community/regexpp': 4.12.2
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/scope-manager': 6.21.0
+      '@typescript-eslint/type-utils': 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      '@typescript-eslint/visitor-keys': 6.21.0
+      debug: 4.4.3(supports-color@6.1.0)
+      eslint: 8.57.1
+      graphemer: 1.4.0
+      ignore: 5.3.2
+      natural-compare: 1.4.0
+      semver: 7.7.3
+      ts-api-utils: 1.4.3(typescript@5.9.3)
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
   '@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.3.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 6.21.0
@@ -19598,6 +19622,19 @@ snapshots:
       eslint: 8.57.1
     optionalDependencies:
       typescript: 5.3.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/parser@6.21.0(eslint@8.57.1)(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/scope-manager': 6.21.0
+      '@typescript-eslint/types': 6.21.0
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.9.3)
+      '@typescript-eslint/visitor-keys': 6.21.0
+      debug: 4.4.3(supports-color@6.1.0)
+      eslint: 8.57.1
+    optionalDependencies:
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
@@ -19638,6 +19675,18 @@ snapshots:
       ts-api-utils: 1.4.3(typescript@5.3.3)
     optionalDependencies:
       typescript: 5.3.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@typescript-eslint/type-utils@6.21.0(eslint@8.57.1)(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.9.3)
+      '@typescript-eslint/utils': 6.21.0(eslint@8.57.1)(typescript@5.9.3)
+      debug: 4.4.3(supports-color@6.1.0)
+      eslint: 8.57.1
+      ts-api-utils: 1.4.3(typescript@5.9.3)
+    optionalDependencies:
+      typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
 
@@ -19702,6 +19751,21 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@typescript-eslint/typescript-estree@6.21.0(typescript@5.9.3)':
+    dependencies:
+      '@typescript-eslint/types': 6.21.0
+      '@typescript-eslint/visitor-keys': 6.21.0
+      debug: 4.4.3(supports-color@6.1.0)
+      globby: 11.1.0
+      is-glob: 4.0.3
+      minimatch: 9.0.3
+      semver: 7.7.3
+      ts-api-utils: 1.4.3(typescript@5.9.3)
+    optionalDependencies:
+      typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
   '@typescript-eslint/typescript-estree@8.48.0(typescript@5.3.3)':
     dependencies:
       '@typescript-eslint/project-service': 8.48.0(typescript@5.3.3)
@@ -19740,6 +19804,20 @@ snapshots:
       '@typescript-eslint/scope-manager': 6.21.0
       '@typescript-eslint/types': 6.21.0
       '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.3.3)
+      eslint: 8.57.1
+      semver: 7.7.3
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
+
+  '@typescript-eslint/utils@6.21.0(eslint@8.57.1)(typescript@5.9.3)':
+    dependencies:
+      '@eslint-community/eslint-utils': 4.9.0(eslint@8.57.1)
+      '@types/json-schema': 7.0.15
+      '@types/semver': 7.7.1
+      '@typescript-eslint/scope-manager': 6.21.0
+      '@typescript-eslint/types': 6.21.0
+      '@typescript-eslint/typescript-estree': 6.21.0(typescript@5.9.3)
       eslint: 8.57.1
       semver: 7.7.3
     transitivePeerDependencies:
@@ -26557,8 +26635,6 @@ snapshots:
 
   mixpanel-browser@2.22.1: {}
 
-  mixpanel-browser@2.29.1: {}
-
   mixpanel-browser@2.67.0:
     dependencies:
       rrweb: 2.0.0-alpha.18
@@ -30399,6 +30475,10 @@ snapshots:
   ts-api-utils@1.4.3(typescript@5.3.3):
     dependencies:
       typescript: 5.3.3
+
+  ts-api-utils@1.4.3(typescript@5.9.3):
+    dependencies:
+      typescript: 5.9.3
 
   ts-api-utils@2.1.0(typescript@5.3.3):
     dependencies:

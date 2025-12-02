@@ -7,6 +7,7 @@ import type { PortInfo } from '@serialport/bindings-cpp'
 import type { AgentOptions } from 'http'
 import type { Socket } from 'net'
 import type { Logger, LogLevel } from './types'
+import type { Agent as AgentBase } from 'agent-base'
 
 const MAX_SOCKET_CREATE_RETRIES = 10
 const SOCKET_OPEN_RETRY_TIME_MS = 100
@@ -35,7 +36,7 @@ interface SerialPortListMonitorOptions {
   logger?: Logger
 }
 
-export function buildUSBAgent(opts: { serialPort: string }): http.Agent {
+export function buildUSBAgent(opts: { serialPort: string }): AgentBase {
   const port = new SerialPort({ path: opts.serialPort, baudRate: 115200 })
   const usbAgent = agent(
     (req: http.ClientRequest, opts: http.RequestOptions): Duplex => {

@@ -32,7 +32,7 @@
     "react-hook-form": "7.50.1",
     "react-markdown": "9.0.1",
     "styled-components": "5.3.6",
-    "mixpanel-browser": "2.67.0",
+    "mixpanel-browser": "2.22.1",
     "react-router-dom": "6.24.1",
     "react-transition-group": "4.4.5",
     "uuid": "11.1.0"
@@ -44,6 +44,7 @@
     "@types/styled-components": "^5.1.26",
     "axios-mock-adapter": "1.22.0",
     "lost": "8.3.1",
+    "@types/mixpanel-browser": "^2.35.6",
     "postcss-apply": "0.12.0",
     "postcss-color-mod-function": "3.0.3",
     "postcss-import": "16.0.0",

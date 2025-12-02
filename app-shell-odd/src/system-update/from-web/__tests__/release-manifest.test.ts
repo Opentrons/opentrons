@@ -41,7 +41,9 @@ describe('ensureCacheDirectory', () => {
           expect(contents).toHaveLength(1)
           expect(contents[0].isDirectory()).toBeTruthy()
           expect(contents[0].name).toEqual('someotherrandomname')
-          return readdir(path.join(contents[0].path, contents[0].name))
+          return readdir(
+            path.join(directory, 'somerandomname', contents[0].name)
+          )
         })
         .then(contents => {
           expect(contents).toHaveLength(0)
@@ -61,7 +63,7 @@ describe('ensureCacheDirectory', () => {
           expect(contents).toHaveLength(1)
           expect(contents[0].isDirectory()).toBeTruthy()
           expect(contents[0].name).toEqual('somerandomname')
-          return readdir(path.join(contents[0].path, contents[0].name))
+          return readdir(path.join(directory, contents[0].name))
         })
         .then(contents => {
           expect(contents).toHaveLength(0)

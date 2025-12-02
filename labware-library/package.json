@@ -38,7 +38,7 @@
     "formik": "2.1.4",
     "jszip": "3.2.2",
     "lodash": "4.17.21",
-    "mixpanel-browser": "2.29.1",
+    "mixpanel-browser": "2.22.1",
     "query-string": "6.2.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
