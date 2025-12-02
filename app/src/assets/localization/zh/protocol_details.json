@@ -12,6 +12,7 @@
   "creation_method": "创建方法",
   "csv_file": "CSV文件",
   "csv_file_type_required": "需要CSV文件类型",
+  "date_added": "添加日期",
   "deck": "甲板",
   "deck_view": "甲板视图",
   "default_value": "默认值",
@@ -97,5 +98,6 @@
   "value_out_of_range": "值必须在{{min}}-{{max}}之间",
   "view_run_details": "查看运行详情",
   "view_unavailable_robots": "在设备页面查看不可用的工作站",
+  "visualize": "可视化",
   "with_lid_name": "和 {{lid}}"
 }
