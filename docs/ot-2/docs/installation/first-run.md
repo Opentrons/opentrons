@@ -30,8 +30,7 @@ The OT-2 is powered by an external power supply that converts AC wall current to
 
 5. Turn on the power by pressing the power button on the OT-2.
 
-    ![external power supply connection](../images/OT2-power.png)
-
+    ![external power supply connection](../images/ot2-power.png)
 After turning on the power, it may take up to 45 seconds, or longer, before the OT-2 starts running. During the startup process:
 
 - The light on the front of the robot will blink on and off and then turn solid blue.
