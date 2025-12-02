@@ -297,13 +297,12 @@ def push_local(api_key, project_id, dry_run=False):
 
 def download_remote(api_key, project_id, dry_run=False):
     """
-    Download English and Chinese translations from Locize.
+    Sync from the latest translations in Locize to local files.
 
     Equivalent to:
-        npx -y locize-cli@latest download \\
+        npx -y locize-cli@latest sync \\
             --api-key KEY \\
             --project-id ID \\
-            --language en,zh \\
             --path ./app/src/assets/localization \\
             --ver latest
 
@@ -314,13 +313,11 @@ def download_remote(api_key, project_id, dry_run=False):
         "npx",
         "-y",
         "locize-cli@latest",
-        "download",
+        "sync",
         "--api-key",
         api_key,
         "--project-id",
         project_id,
-        "--language",
-        ",".join(LANGUAGES),
         "--path",
         str(APP_LOCALIZATION),
         "--ver",
@@ -339,11 +336,19 @@ def download_remote(api_key, project_id, dry_run=False):
 
     result = subprocess.run(cmd, cwd=REPO_ROOT)
 
+    if result.stdout:
+        console.print("\n[bold cyan]📄 stdout:[/]")
+        console.print(f"[dim]{result.stdout}[/]\n")
+    if result.stderr:
+        console.print("\n[bold yellow]⚠️  stderr:[/]")
+        console.print(f"[dim]{result.stderr}[/]\n")
+
     if result.returncode != 0:
-        console.print(
-            "[bold red]✗ Error:[/] Failed to download translations from Locize"
-        )
         sys.exit(result.returncode)
+    else:
+        console.print(
+            f"[dim]Sync command completed successfully. Return code: {result.returncode}[/]\n"
+        )
 
     if dry_run:
         console.print(

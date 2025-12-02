@@ -29,7 +29,7 @@ env:
   # to the working-directory of our tools: scripts/static-deploy
   # our script deploy_ci_config.py expects this ENV variable is set
   RELATIVE_ARTIFACT_DIR: '../../dist'
-  
+
 jobs:
   build-docs:
     timeout-minutes: 5
@@ -43,7 +43,7 @@ jobs:
       artifacts-path: ${{ steps.upload-artifacts.outputs.path }}
     steps:
       - name: 'Checkout Repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
@@ -66,35 +66,35 @@ jobs:
           retention-days: 1
 
   determine-deploy-config:
-      name: Determine Deployment Configuration
-      runs-on: ubuntu-24.04
-      outputs:
-        application: ${{ steps.deploy-config.outputs.APPLICATION }}
-        environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
-        sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
-        relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
-        branch: ${{ steps.config.outputs.branch }}
-        bucket: ${{ steps.config.outputs.bucket }}
-        url: ${{ steps.config.outputs.url }}
-      steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
-        - uses: ./.github/actions/git/resolve-tag
-        - name: Setup UV
-          uses: astral-sh/setup-uv@v6
-          with:
-            python-version: '3.10'
-            enable-cache: true
-        - name: Setup Deploy Dependencies
-          working-directory: scripts/static-deploy
-          run: make setup
-        - name: Determine Deployment Configuration
-          id: deploy-config
-          working-directory: scripts/static-deploy
-          run: make resolve-ci
+    name: Determine Deployment Configuration
+    runs-on: ubuntu-24.04
+    outputs:
+      application: ${{ steps.deploy-config.outputs.APPLICATION }}
+      environment: ${{ steps.deploy-config.outputs.ENVIRONMENT }}
+      sandbox_prefix: ${{ steps.deploy-config.outputs.SANDBOX_PREFIX }}
+      relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
+      branch: ${{ steps.config.outputs.branch }}
+      bucket: ${{ steps.config.outputs.bucket }}
+      url: ${{ steps.config.outputs.url }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - uses: ./.github/actions/git/resolve-tag
+      - name: Setup UV
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: '3.10'
+          enable-cache: true
+      - name: Setup Deploy Dependencies
+        working-directory: scripts/static-deploy
+        run: make setup
+      - name: Determine Deployment Configuration
+        id: deploy-config
+        working-directory: scripts/static-deploy
+        run: make resolve-ci
 
   deploy-docs:
-    needs: 
+    needs:
       - build-docs
       - determine-deploy-config
     timeout-minutes: 5
@@ -109,7 +109,7 @@ jobs:
       URL: ${{ needs.determine-deploy-config.outputs.url }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - id: resolve-tag
         uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
@@ -119,8 +119,7 @@ jobs:
           enable-cache: true
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
-        run:
-          make setup
+        run: make setup
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -141,7 +140,7 @@ jobs:
           ENVIRONMENT=${{ needs.determine-deploy-config.outputs.environment }} \
           SANDBOX_PREFIX=${{ needs.determine-deploy-config.outputs.sandbox_prefix }} \
           RELATIVE_ARTIFACT_DIR=${{ needs.determine-deploy-config.outputs.relative_artifact_dir }}
-          
+
       - name: Output Deployment URL
         run: |
           echo "## 🚀 Docs site deployed to ${{ env.ENVIRONMENT }}" >> $GITHUB_STEP_SUMMARY
