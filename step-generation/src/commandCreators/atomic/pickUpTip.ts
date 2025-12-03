@@ -2,6 +2,7 @@ import { ALL } from '@opentrons/shared-data'
 
 import { AUTOMATIC, COLUMN_4_SLOTS, MANUAL } from '../../constants'
 import {
+  incompletePickup,
   pipettingIntoColumn4,
   possiblePipetteCollision,
 } from '../../errorCreators'
@@ -69,6 +70,10 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
 
   if (!isSafePipetteMovement || !isSafeWithinTiprack.isSafe) {
     errors.push(possiblePipetteCollision())
+  }
+
+  if (isSafeWithinTiprack.isComplete !== true) {
+    errors.push(incompletePickup())
   }
 
   const tiprackSlot = getSlotInLocationStack(

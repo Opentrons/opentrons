@@ -160,16 +160,6 @@ export function SelectTips(
   }
 
   const handleClickWell = (wellName: string): void => {
-    if (
-      tipState?.[wellName] === 'EMPTY' ||
-      !tipAccessibileStatusByWellName[wellName].isAccessible ||
-      (allWellsAffectedByHover.includes(wellName) &&
-        !areAllHoveredWellsAccessibleAndOccupied)
-    ) {
-      return
-    }
-    setShowPickupsRequiredBanner(false)
-
     const prevSelectedTipsByIndex = selectedTips.reduce<Record<string, number>>(
       (acc, tipList, index) => {
         const innerAcc = tipList.reduce((acc, tip) => {
@@ -179,6 +169,18 @@ export function SelectTips(
       },
       {}
     )
+
+    if (
+      // always allow tip unselection
+      !(wellName in prevSelectedTipsByIndex) &&
+      (tipState?.[wellName] === 'EMPTY' ||
+        !tipAccessibileStatusByWellName[wellName].isAccessible ||
+        (allWellsAffectedByHover.includes(wellName) &&
+          !areAllHoveredWellsAccessibleAndOccupied))
+    ) {
+      return
+    }
+    setShowPickupsRequiredBanner(false)
 
     if (channels === 1 || nozzles === SINGLE) {
       if (wellName in prevSelectedTipsByIndex) {

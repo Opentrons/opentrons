@@ -394,3 +394,10 @@ export const stackTooHigh = (args: { slot: string }): CommandCreatorError => {
     message: `The stack on slot ${args.slot} is too high`,
   }
 }
+
+export const incompletePickup = (): CommandCreatorError => {
+  return {
+    type: 'INCOMPLETE_PICKUP',
+    message: 'At least one of the selected tips is empty',
+  }
+}
