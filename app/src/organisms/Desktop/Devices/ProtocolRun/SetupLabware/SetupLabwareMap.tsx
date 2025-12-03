@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 
 import {
-  AlignControlToModule,
+  AlignToModuleChildSlot,
   BaseDeck,
   Box,
   CenterLabwareInSlot,
@@ -145,10 +145,7 @@ export function SetupLabwareMap({
             cursor="pointer"
           >
             {topLabwareDefinition != null && topLabwareInfo != null ? (
-              <AlignControlToModule
-                // todo(mm, 2025-07-14): This <AlignControlToModule> ought to be an
-                // <AlignLabwareToModule>. Right now, this will misalign the overlay
-                // for schema-3 labware definitions.
+              <AlignToModuleChildSlot
                 deckId={deckDef.otId}
                 slotId={slotName}
                 moduleDefinition={moduleDefinition}
@@ -166,7 +163,7 @@ export function SetupLabwareMap({
                       : 0
                   }
                 />
-              </AlignControlToModule>
+              </AlignToModuleChildSlot>
             ) : null}
           </g>
         ),
