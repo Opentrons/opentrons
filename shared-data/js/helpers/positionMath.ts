@@ -427,17 +427,14 @@ export function getLabwareOriginToLabwareOrigin(
  * deck slot that the module is in, to the origin (again, front-left, -x,-y corner) of
  * the slot atop that module.
  *
+ * Some modules, like the Thermocycler and Heater-Shaker, do not physically have slots.
+ * In those cases, this returns the corner of what I'll call the module's "labware
+ * area", which is roughly a slot-sized area centered over where a labware would go.
+ * We're trying to move away from that idea for actual robot path planning, but it's
+ * good enough for UI purposes.
+ *
  * On a Flex, modules are not really "in deck slots". There, "the deck slot that the
  * module is in" means "the deck slot that the module replaces."
- *
- * @deprecated We are trying to move away from the idea that modules always have slots
- *  atop them and that things should be positioned relative to those slots' -x,-y
- *  corners. That idea is especially untrue for things like the Thermocycler and
- *  Heater-Shaker. You probably want `getModuleParentOriginToLabwareOrigin()` instead,
- *  which is higher-level and can model different ways that a labware can mate with a
- *  module. This is exported to support things like UI controls that want to cover
- *  a module's "labware area" and whose implementations assume the traditional
- *  slot -x,-y corner idea.
  */
 export function getModuleParentOriginToChildSlotOrigin(
   deckId: string | null,
