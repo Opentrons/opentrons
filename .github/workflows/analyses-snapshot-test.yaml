@@ -40,7 +40,7 @@ jobs:
       matrix_json: ${{ steps.set-matrix.outputs.json }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
@@ -67,7 +67,7 @@ jobs:
     if: github.event_name == 'pull_request'
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Are the analyses snapshots in my PR branch in sync with the target branch?
         if: github.event_name == 'pull_request'
         run: |
@@ -95,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
@@ -132,7 +132,7 @@ jobs:
       PR_TARGET_BRANCH: ${{ github.event.pull_request.base.ref || 'edge'}}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
