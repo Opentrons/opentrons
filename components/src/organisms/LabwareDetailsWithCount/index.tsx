@@ -1,4 +1,4 @@
-import { StyledText } from '../../atoms'
+import { StyledText, Tag } from '../../atoms'
 import styles from './LabwareDetailsWithCount.module.css'
 
 type LabwareDetailsWithCountProps = {
@@ -20,7 +20,7 @@ export function LabwareDetailsWithCount({
       </div>
       {label != null ? (
         <div className={styles.label}>
-          <StyledText desktopStyle="bodyDefaultSemiBold">{label}</StyledText>
+          <Tag type="default" text={label} />
         </div>
       ) : null}
     </div>

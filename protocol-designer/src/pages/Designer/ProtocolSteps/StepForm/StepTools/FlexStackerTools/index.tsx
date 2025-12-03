@@ -68,17 +68,6 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         options={flexStackerOptions}
         title={t('form:step_edit_form.field.absorbanceReader.moduleId.module')}
         {...propsForFields.moduleId}
-        tooltipContent={null}
-        onEnter={(id: string) => {
-          dispatch(hoverSelection({ id, text: t('application:select') }))
-        }}
-        onExit={() => {
-          dispatch(hoverSelection({ id: null, text: null }))
-        }}
-        updateValue={value => {
-          console.log('value:', value)
-        }}
-        value={moduleId}
       />
       <Divider margin="0" marginY="0" />
       <div className={`${styles.container} ${styles.paddingX}`}>
