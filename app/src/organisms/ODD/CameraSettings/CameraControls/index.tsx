@@ -24,7 +24,7 @@ export type ActiveControlView =
 
 export interface CameraControlsProps {
   toggleShowControls: () => void
-  runId?: string
+  runId: string | null
 }
 
 export function CameraControls({
@@ -36,18 +36,20 @@ export function CameraControls({
 
   const [activeSubView, setActiveSubView] = useState<ActiveControlView>(null)
   const settings = useCameraSettingsValues()
-  const globalMutation = useCreateCameraImageSettings()
-  const runMutation = useAddCameraImageSettingsToRunMutation(runId || '')
+  const createGlobalCameraSettings = useCreateCameraImageSettings()
+  const createRunCameraSettings = useAddCameraImageSettingsToRunMutation(
+    runId || ''
+  )
 
   const returnToHomeView = (settings: CameraImageSettings): void => {
     setIsLoading(true)
 
-    const mutate =
+    const createCameraSettings =
       runId != null
-        ? runMutation.addCameraImageSettingsToRun
-        : globalMutation.createCameraImageSettings
+        ? createRunCameraSettings.addCameraImageSettingsToRun
+        : createGlobalCameraSettings.createCameraImageSettings
 
-    mutate(settings, {
+    createCameraSettings(settings, {
       onSuccess: () => {
         setActiveSubView(null)
       },

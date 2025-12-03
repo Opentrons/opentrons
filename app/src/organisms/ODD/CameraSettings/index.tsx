@@ -34,7 +34,7 @@ export interface CameraSettingsProps {
   not general settings context. */
   storageInfo: RobotStorageInfo | null
   isCameraRequired: boolean | null
-  runId?: string
+  runId: string | null
 }
 
 export function CameraSettings({
