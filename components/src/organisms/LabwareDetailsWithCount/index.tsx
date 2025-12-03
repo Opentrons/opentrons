@@ -1,48 +1,27 @@
 import { StyledText } from '../../atoms'
-import { SPACING } from '../../ui-style-constants'
+import styles from './LabwareDetailsWithCount.module.css'
 
 type LabwareDetailsWithCountProps = {
   title: string
   subTitle?: string
-  quantity?: string | null
+  label?: string
 }
 
 export function LabwareDetailsWithCount({
   title,
   subTitle,
-  quantity,
+  label,
 }: LabwareDetailsWithCountProps): JSX.Element {
   return (
-    <div
-      style={{
-        width: '318px',
-        backgroundColor: 'var(--grey-20)',
-        borderRadius: 'var(--border-radius-4)',
-        padding: 'var(--spacing-16) var(--spacing-8)',
-      }}
-    >
+    <div className={styles.container}>
       <StyledText desktopStyle="bodyDefaultRegular">{title}</StyledText>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: SPACING.spacing16,
-          width: '100%',
-          color: 'var(--grey-60)',
-        }}
-      >
+      <div className={styles.subTitle}>
         <StyledText desktopStyle="bodyDefaultRegular">{subTitle}</StyledText>
       </div>
-      {quantity != null ? (
-        <StyledText
-          desktopStyle="bodyDefaultSemiBold"
-          backgroundColor="var(--transparent-black-80)"
-          padding="2px 8px"
-          width="88px"
-          borderRadius="var(--border-radius-4)"
-        >
-          {quantity}
-        </StyledText>
+      {label != null ? (
+        <div className={styles.label}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">{label}</StyledText>
+        </div>
       ) : null}
     </div>
   )

@@ -251,6 +251,7 @@ export function getDefaultsForStepType(
         referenceWavelengthActive: false,
         wavelengths: [Object.keys(ABSORBANCE_READER_COLOR_BY_WAVELENGTH)[0]], // default to first known wavelength
       }
+    // TODO(TZ, 2025-12-03): not fully flushed out, but this is the initial state for the flex stacker form
     case 'flexStacker':
       return {
         moduleId: null,

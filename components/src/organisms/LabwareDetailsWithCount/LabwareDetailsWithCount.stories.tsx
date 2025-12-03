@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { SPACING } from '../../ui-style-constants'
-import { LabwareDetailsWithCount } from './LabwareDetailsWithCount'
+import { LabwareDetailsWithCount } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -24,6 +24,6 @@ export const LabwareDetailsWithCountStory: Story = {
   args: {
     title: 'Opentrons Flex 96 Tip Rack 1000 µL',
     subTitle: 'With tip rack lid',
-    quantity: 'Quantity: 1',
+    label: 'Quantity: 1',
   },
 }

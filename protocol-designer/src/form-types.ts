@@ -1,6 +1,5 @@
 import type { IconName } from '@opentrons/components'
 import type {
-  FlexStackerStoredLabwareGroup,
   Height,
   LabwareLocation,
   NozzleConfigurationStyle,
@@ -501,6 +500,7 @@ export interface HydratedAbsorbanceReaderFormData extends AnnotationFields {
   wavelengths: string[]
 }
 
+// TODO(TZ, 2025-12-03): not fully flushed out, but this is the initial hydrated form data for the flex stacker form
 export interface HydratedFlexStackerFormData extends AnnotationFields {
   stepType: 'flexStacker'
   id: string

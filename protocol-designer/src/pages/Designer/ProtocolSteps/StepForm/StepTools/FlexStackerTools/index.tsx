@@ -30,14 +30,7 @@ export type FlexStackerToolsProps = StepFormProps & {
 }
 
 export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
-  const {
-    formData,
-    propsForFields,
-    toolboxStep,
-    showFormErrors,
-    robotState,
-    flexStackerOptions,
-  } = props
+  const { formData, propsForFields, robotState, flexStackerOptions } = props
   const { moduleId } = formData
   const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
