@@ -179,12 +179,7 @@ async def _calibrate_belts(
 
 def run_belt_calibration(
     ctx: ProtocolContext,
-) -> Tuple[
-    Optional[_TestBeltCalibrationData],
-    Optional[AttitudeMatrix],
-    Optional[Dict[str, Any]],
-    Optional[_TestBeltCalibrationData],
-]:
+) -> Optional[_TestBeltCalibrationData]:
     """Do the belt accuracy test and maybe create calibration data depending on RTP."""
     OT3API._calibrate_pipette = _calibrate_pipette  # type: ignore[attr-defined]
     OT3API._check_belt_accuracy = _check_belt_accuracy  # type: ignore[attr-defined]
@@ -198,16 +193,14 @@ def run_belt_calibration(
     api.move_rel(mount, Point(x=0, y=0, z=-20))
     ctx.pause("Attach probe to pipette")
 
-    without_data: Optional[_TestBeltCalibrationData] = None
     with_data: Optional[_TestBeltCalibrationData] = None
-    attitude: Optional[AttitudeMatrix] = None
-    details: Optional[Dict[str, Any]] = None
     try:
         # calibrate belts
         if ctx.params.do_calibration:  # type: ignore[attr-defined]
             ctx.comment("CALIBRATE BELTS")
             api.reset_instrument_offset(mount)
             attitude, details = api._calibrate_belts(mount)
+            ctx.comment(f"New calibration attitude {attitude}")
 
         # test after
         ctx.comment("TEST WITH CALIBRATION")
@@ -215,12 +208,7 @@ def run_belt_calibration(
             pipette_offset=api._calibrate_pipette(mount),
             deck_offsets=api._check_belt_accuracy(mount),
         )
-        ctx.comment("TEST WITHOUT CALIBRATION")
-        api.reset_robot_calibration()  # set NOMINAL belt calibration
-        without_data = _TestBeltCalibrationData(
-            pipette_offset=api._calibrate_pipette(mount),
-            deck_offsets=api._check_belt_accuracy(mount),
-        )
+
     finally:
         api.retract(mount)
 
@@ -228,7 +216,7 @@ def run_belt_calibration(
     api.move_to(mount, attach_pos._replace(z=current_pos.z))
     api.move_rel(mount, Point(x=0, y=0, z=-20))
     ctx.pause("Remove probe from pipette")
-    return without_data, attitude, details, with_data
+    return with_data
 
 
 def run(ctx: ProtocolContext) -> None:
@@ -237,7 +225,7 @@ def run(ctx: ProtocolContext) -> None:
 
     if not ctx.is_simulating():
         try:
-            before, attitude, details, after = run_belt_calibration(ctx)
+            after = run_belt_calibration(ctx)
         except (
             EarlyCapacitiveSenseTrigger,
             EdgeNotFoundError,
@@ -246,7 +234,7 @@ def run(ctx: ProtocolContext) -> None:
         ) as e:
             ctx.pause(f"{str(e)}")
             raise e
-        if before and after:
+        if after:
             results: List[float] = []
             zero = Point(x=0, y=0, z=0)
             for slot in TEST_SLOTS:
