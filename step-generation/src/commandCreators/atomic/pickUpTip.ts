@@ -1,3 +1,5 @@
+import { ALL } from '@opentrons/shared-data'
+
 import { AUTOMATIC, COLUMN_4_SLOTS, MANUAL } from '../../constants'
 import {
   pipettingIntoColumn4,
@@ -5,6 +7,8 @@ import {
 } from '../../errorCreators'
 import {
   formatPyStr,
+  getDefaultPrimaryNozzle,
+  getIsSafePickupWithinTiprack,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   uuid,
@@ -30,24 +34,40 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
   invariantContext,
   prevRobotState
 ) => {
-  const { pipetteId, labwareId, wellName, tipTrackingOption = AUTOMATIC } = args
+  const {
+    pipetteId,
+    labwareId,
+    wellName,
+    tipTrackingOption = AUTOMATIC,
+    nozzles,
+  } = args
   const errors: CommandCreatorError[] = []
 
-  const isMultiChannelPipette =
-    invariantContext.pipetteEntities[pipetteId]?.spec.channels !== 1
+  const channels = invariantContext.pipetteEntities[pipetteId].spec.channels
 
-  if (
-    isMultiChannelPipette &&
-    !getIsSafePipetteMovement({
-      robotState: prevRobotState,
-      invariantContext,
-      pipetteId,
-      labwareId,
-      //  we don't adjust the offset when moving to the tiprack
-      wellLocationOffset: { x: 0, y: 0 },
-      wellTargetName: wellName,
-    })
-  ) {
+  const isSafePipetteMovement = getIsSafePipetteMovement({
+    robotState: prevRobotState,
+    invariantContext,
+    pipetteId,
+    labwareId,
+    //  we don't adjust the offset when moving to the tiprack
+    wellLocationOffset: { x: 0, y: 0 },
+    wellTargetName: wellName,
+  })
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels,
+  })
+  const isSafeWithinTiprack = getIsSafePickupWithinTiprack({
+    tipState: prevRobotState.tipState.tipracks[labwareId],
+    primaryNozzle,
+    channels,
+    nozzleConfiguration: nozzles ?? ALL,
+    wellName,
+    tiprackDef: invariantContext.labwareEntities[labwareId].def,
+  })
+
+  if (!isSafePipetteMovement || !isSafeWithinTiprack.isSafe) {
     errors.push(possiblePipetteCollision())
   }
 
