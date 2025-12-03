@@ -52,9 +52,8 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const topMostLabwareOnSlot =
     stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null
   const isTopmostLabwareATiprack =
-    topMostLabwareOnSlot != null
-      ? getIsTiprack(labwareEntities[topMostLabwareOnSlot].def)
-      : false
+    topMostLabwareOnSlot != null &&
+    getIsTiprack(labwareEntities[topMostLabwareOnSlot].def)
   const isTrashOnSlot =
     Object.values(trashBinEntities).some(
       trash => trash.location.split('cutout')[1] === slotId
