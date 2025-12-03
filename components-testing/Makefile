@@ -6,8 +6,8 @@
 
 # Directory for packed .tgz files and extracted packages
 PACK_DIR := pack
-SHARED_DATA_PACK := $(PACK_DIR)/opentrons-shared-data-v0.0.0-dev.tgz
-COMPONENTS_PACK := $(PACK_DIR)/opentrons-components-v0.0.0-dev.tgz
+SHARED_DATA_PACK := $(PACK_DIR)/opentrons-shared-data-0.0.0-dev.tgz
+COMPONENTS_PACK := $(PACK_DIR)/opentrons-components-0.0.0-dev.tgz
 SHARED_DATA_DIR := $(PACK_DIR)/opentrons-shared-data
 COMPONENTS_DIR := $(PACK_DIR)/opentrons-components
 
