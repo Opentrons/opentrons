@@ -35,11 +35,11 @@ build-local-packages:
 	@echo "Building shared-data package..."
 	make -C ../shared-data pack
 	@echo "Moving shared-data package to pack directory..."
-	@mv ../shared-data/opentrons-shared-data-v0.0.0-dev.tgz $(SHARED_DATA_PACK)
+	@mv ../shared-data/opentrons-shared-data-0.0.0-dev.tgz $(SHARED_DATA_PACK)
 	@echo "Building components package..."
 	make -C ../components pack
 	@echo "Moving components package to pack directory..."
-	@mv ../components/opentrons-components-v0.0.0-dev.tgz $(COMPONENTS_PACK)
+	@mv ../components/opentrons-components-0.0.0-dev.tgz $(COMPONENTS_PACK)
 	@echo "Extracting packages..."
 	@mkdir -p $(SHARED_DATA_DIR) $(COMPONENTS_DIR)
 	@tar -xzf $(SHARED_DATA_PACK) --strip-components=1 -C $(SHARED_DATA_DIR)
