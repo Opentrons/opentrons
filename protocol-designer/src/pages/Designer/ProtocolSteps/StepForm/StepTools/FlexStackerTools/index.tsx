@@ -115,10 +115,11 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
             subTitle={
               flexStackerModuleState.storedLabwareDetails.lidLabware?.loadName
             }
-            quantity={
-              flexStackerModuleState.storedLabwareDetails.initialCount?.toString() ??
-              '0'
-            }
+            quantity={t('protocol_steps:flex_stacker.stacker.quantity', {
+              count:
+                flexStackerModuleState.storedLabwareDetails.initialCount?.toString() ??
+                '0',
+            })}
           />
         ) : (
           <InfoScreen

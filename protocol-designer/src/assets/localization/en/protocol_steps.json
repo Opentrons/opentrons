@@ -14,7 +14,8 @@
     "stacker": {
       "label": "Stacker",
       "labware_filled": "{{amount}}/{{total}} labware filled",
-      "no_labware": "No labware stored on stacker"
+      "no_labware": "No labware stored on stacker",
+      "quantity": "Quantity: {{count}}"
     },
     "shuttle": {
       "no_labware": "No labware on shuttle",
