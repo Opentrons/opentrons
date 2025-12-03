@@ -5,7 +5,7 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { flexStackerFill } from '../commandCreators/atomic/flexStackerFill'
+import { flexStackerFillItems } from '../commandCreators/atomic/flexStackerFillItems'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 
 import type { InvariantContext, RobotState } from '../types'
@@ -13,7 +13,7 @@ import type { InvariantContext, RobotState } from '../types'
 const moduleId = 'flexStackerId'
 vi.mock('../robotStateSelectors')
 
-describe('flexStackerStore', () => {
+describe('flexStackerFillItems', () => {
   let invariantContext: InvariantContext
   let robotState: RobotState
   beforeEach(() => {
@@ -27,11 +27,10 @@ describe('flexStackerStore', () => {
     }
   })
   it('creates flex stacker fill command with count', () => {
-    const result = flexStackerFill(
+    const result = flexStackerFillItems(
       {
         moduleId,
-        count: 10,
-        strategy: 'manualWithPause',
+       labware: [],
       },
       invariantContext,
       robotState
@@ -39,7 +38,7 @@ describe('flexStackerStore', () => {
     expect(result).toEqual({
       commands: [
         {
-          commandType: 'flexStacker/fill',
+          commandType: 'flexStacker/fillItems',
           key: expect.any(String),
           params: {
             moduleId,
@@ -52,7 +51,7 @@ describe('flexStackerStore', () => {
     })
   })
   it('creates flex stacker fill command with message', () => {
-    const result = flexStackerFill(
+    const result = flexStackerFillItems(
       {
         moduleId,
         message: 'Filling...',
