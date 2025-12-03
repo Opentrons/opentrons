@@ -123,6 +123,7 @@ def _import_protocol_and_open_editor(page: Page) -> ProtocolEditorPage:
 
     page.get_by_role("button", name="Edit protocol").click()
     expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
+    print("mix complete")
     return ProtocolEditorPage(page)
 
 
