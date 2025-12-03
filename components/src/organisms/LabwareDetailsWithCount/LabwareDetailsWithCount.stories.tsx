@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { SPACING } from '../../ui-style-constants'
 import { LabwareDetailsWithCount } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
