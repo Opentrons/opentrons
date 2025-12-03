@@ -128,7 +128,9 @@ export function SetupCamera({
             toggleLiveStreamEnabled={toggleLiveStreamEnabled}
             cameraConfirmed={cameraConfirmed}
           />
-          {isCameraSettingsEnabled && <SetupRunCameraControls />}
+          {isCameraSettingsEnabled && (
+            <SetupRunCameraControls cameraConfirmed={cameraConfirmed} />
+          )}
         </>
       )}
       <div className={styles.camera_btn_container}>

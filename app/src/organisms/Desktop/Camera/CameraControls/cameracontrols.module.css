@@ -9,6 +9,19 @@
   gap: var(--spacing-24);
 }
 
+.save_button {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-10);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-10);
+}
+
 .footer_container {
   display: flex;
   width: 100%;
