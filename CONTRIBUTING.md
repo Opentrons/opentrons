@@ -162,7 +162,7 @@ You will need the following tools installed to develop on the Opentrons platform
 - ssh
 - Python v3.10
 - Node.js v22.12.0+
-- [Yarn 1][yarn]
+- [pnpm][pnpm]
 
 See [DEV_SETUP.md](./DEV_SETUP.md) for our recommended development setup guides for macOS, Windows, and Linux.
 
@@ -284,7 +284,7 @@ Most, if not all, of the tools above have plugins available for your code editor
 
 #### JavaScript
 
-JavaScript dependencies are installed by [yarn][]. When calling yarn, you should do so from the repository level.
+JavaScript dependencies are installed by [pnpm][]. When calling pnpm, you should do so from the repository level.
 
 ##### Adding a development dependency
 
@@ -298,10 +298,10 @@ To add a development dependency:
 
 ```shell
 # with long option names
-yarn add --dev --ignore-workspace-root-check <dependency_name>
+pnpm add -w --dev <dependency_name>
 
 # or, with less typing
-yarn add -DW <dependency_name>
+pnpm add -DW <dependency_name>
 ```
 
 ##### Adding a project dependency
@@ -314,7 +314,7 @@ A project dependency is a dependency that an application or library will `import
 Project dependencies should be added _to the specific project that depends on them_. To add one:
 
 ```shell
-yarn workspace <project_name> add <dependency_name>
+pnpm add -w --dev --filter=<project_name> <dependency_name>
 ```
 
 ##### Adding type definitions
@@ -423,7 +423,7 @@ An OT-2's filesystem is mounted from two separate locations. `/data`, `/var`, an
 [commit-message-how-to]: https://chris.beams.io/posts/git-commit/
 [makefiles]: https://en.wikipedia.org/wiki/Makefile
 [nvm]: https://github.com/creationix/nvm
-[yarn]: https://classic.yarnpkg.com/
+[pnpm]: https://pnpm.io/
 [commitizen]: https://github.com/commitizen/cz-cli
 [conventional-commits]: https://conventionalcommits.org/
 [lerna]: https://github.com/lerna/lerna

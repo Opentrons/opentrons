@@ -203,7 +203,7 @@ Add this label to a PR to automatically:
 
 - **Python 3.10+**
 - **uv** package manager (https://github.com/astral-sh/uv)
-- **Node.js/yarn** (for prettier formatting)
+- **Node.js/pnpm** (for prettier formatting)
 
 ### Initial Setup
 
