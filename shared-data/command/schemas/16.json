@@ -4265,7 +4265,8 @@
         "well-top",
         "well-center",
         "liquid-meniscus-start",
-        "liquid-meniscus-end"
+        "liquid-meniscus-end",
+        "liquid-meniscus"
       ],
       "title": "PositionReference",
       "type": "string"
