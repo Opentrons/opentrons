@@ -36,7 +36,6 @@ vi.mock('electron', () => {
   return { app, shell, dialog }
 })
 
-
 let autoUpdater: MockedAutoUpdater
 vi.mock('electron-updater', () => {
   const emitter = new EventEmitter() as MockedAutoUpdater
@@ -90,9 +89,7 @@ describe('update', () => {
 
     expect(vi.mocked(Cfg.getConfig)).toHaveBeenCalledWith('update.channel')
     expect(autoUpdater.channel).toEqual('dev')
-    expect(
-      autoUpdater.checkForUpdates
-    ).toHaveBeenCalledTimes(1)
+    expect(autoUpdater.checkForUpdates).toHaveBeenCalledTimes(1)
 
     autoUpdater.emit('update-available', {
       version: '1.0.0',
@@ -136,9 +133,7 @@ describe('update', () => {
       meta: { shell: true },
     })
 
-    expect(
-      vi.mocked(autoUpdater).downloadUpdate
-    ).toHaveBeenCalledTimes(1)
+    expect(vi.mocked(autoUpdater).downloadUpdate).toHaveBeenCalledTimes(1)
 
     const progress: any = {
       percent: 20,
