@@ -54,4 +54,4 @@ test-cov:
 
 .PHONY: pack
 pack: build-ts lib
-	pnpm dlx pack
+	pnpm pack
