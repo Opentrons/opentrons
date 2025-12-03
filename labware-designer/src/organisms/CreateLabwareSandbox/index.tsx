@@ -215,7 +215,6 @@ export function CreateLabwareSandbox(): JSX.Element {
                     return null // Should not happen.
                   }
 
-                  // TOMAX
                   const slotOriginToLabwareOrigin =
                     getDeckSlotOriginToLabwareOrigin(
                       slotDefinition,

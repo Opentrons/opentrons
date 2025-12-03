@@ -12,8 +12,6 @@ type Props = Omit<ComponentProps<typeof LabwareRender>, 'definition'> & {
   definition: LabwareDefinition2
 }
 
-// TOMAX: Seems like this might be what I've been calling "standalone labware", which is easy to update.
-
 /** Avoid boilerplate for viewbox-based-on-labware-dimensions */
 export function SingleLabware(props: Props): JSX.Element {
   return (

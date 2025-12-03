@@ -2,7 +2,6 @@ import { LabwareRender } from '@opentrons/components'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-// TOMAX: What is the difference between LabwareOnDeck and LabwareRenderOnDeck? :(
 interface LabwareRenderOnDeckProps {
   labwareDef: LabwareDefinition2
   x: number

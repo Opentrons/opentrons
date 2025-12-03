@@ -77,7 +77,6 @@ export function MoveLabwareOnDeck(
     otherLabwareDefinitions: labwareDefinitions,
   })
 
-  // TOMAX
   const initialCoordinates =
     initialResolvedLocation === 'error' || initialResolvedLocation === 'offDeck'
       ? initialResolvedLocation
