@@ -2,18 +2,17 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_IDLE,
-} from '@opentrons/api-client'
-import {
   CommandText,
   getCommandTextData,
   getLabwareDefinitionsFromCommands,
 } from '@opentrons/components'
 
+import {
+  isIdleStatus,
+  isRunStatusNotStarted,
+  isTerminalRunStatus,
+} from '/app/local-resources/runs/utils'
 import { useModuleCommandAnalytics } from '/app/redux-resources/analytics/'
-
-import { isTerminalRunStatus } from '../../Devices/ProtocolRun/ProtocolRunHeader/utils'
 
 import type { ReactNode } from 'react'
 import type { CommandDetail, RunStatus } from '@opentrons/api-client'
@@ -57,9 +56,7 @@ export function useRunProgressCopy({
   const { t } = useTranslation('run_details')
 
   const runHasNotBeenStarted =
-    (currentStepNumber === 0 &&
-      runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR) ||
-    runStatus === RUN_STATUS_IDLE
+    currentStepNumber === 0 && isRunStatusNotStarted(runStatus)
 
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
@@ -105,7 +102,7 @@ export function useRunProgressCopy({
     : (currentStepNumber! / analysisCommands.length) * 100
 
   const stepCountStr = ((): string | null => {
-    if (isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_IDLE) {
+    if (isTerminalRunStatus(runStatus) || isIdleStatus(runStatus)) {
       return null
     }
     if (currentStepNumber == null) {

@@ -1,18 +1,17 @@
 import { useEffect } from 'react'
 
-import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOP_REQUESTED,
-} from '@opentrons/api-client'
 import { useErrorRecoverySettings } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+import {
+  isIdleStatus,
+  isTerminatingOrTerminal,
+} from '/app/local-resources/runs/utils'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import { useCurrentRunCommands, useIsRunCurrent } from '/app/resources/runs'
 
-import { isTerminalRunStatus } from '../../utils'
 import { useProtocolDropTipModal } from '../modals'
 
 import type { Run, RunStatus } from '@opentrons/api-client'
@@ -105,11 +104,9 @@ export function useRunHeaderDropTip({
         }
       : { showDTWiz: false, dtWizProps: null }
   }
-
+  const isRunTerminatingOrTerminal = isTerminatingOrTerminal(runStatus)
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
-  const isRunTerminatingOrTerminal =
-    isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_STOP_REQUESTED
   const runSummaryNoFixit = useCurrentRunCommands(
     {
       includeFixitCommands: false,
@@ -122,7 +119,7 @@ export function useRunHeaderDropTip({
   useEffect(() => {
     // If a user begins a new run without navigating away from the run page, reset tip status.
     if (robotType === FLEX_ROBOT_TYPE) {
-      if (runStatus === RUN_STATUS_IDLE) {
+      if (isIdleStatus(runStatus)) {
         resetTipStatus()
       }
       // Only run tip checking if it wasn't *just* handled during Error Recovery.

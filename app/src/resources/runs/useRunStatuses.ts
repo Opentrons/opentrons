@@ -1,23 +1,13 @@
 import {
-  RUN_STATUS_AWAITING_RECOVERY,
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_FINISHING,
-  RUN_STATUS_IDLE,
-  RUN_STATUS_PAUSED,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUSES_TERMINAL,
-} from '@opentrons/api-client'
-
+  isIdleStatus,
+  isRunningStatus,
+  isTerminalRunStatus,
+} from '/app/local-resources/runs/utils'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useCurrentRunId,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-
-import type { RunStatus } from '@opentrons/api-client'
 
 interface RunStatusesInfo {
   isRunStill: boolean
@@ -32,21 +22,10 @@ export function useRunStatuses(): RunStatusesInfo {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
   })
   const runStatus = runRecord?.data.status ?? null
-  const isRunIdle = runStatus === RUN_STATUS_IDLE
-  const isRunRunning =
-    runStatus === RUN_STATUS_PAUSED ||
-    runStatus === RUN_STATUS_RUNNING ||
-    runStatus === RUN_STATUS_AWAITING_RECOVERY ||
-    runStatus === RUN_STATUS_AWAITING_RECOVERY_PAUSED ||
-    runStatus === RUN_STATUS_STOP_REQUESTED ||
-    runStatus === RUN_STATUS_FINISHING ||
-    runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR ||
-    runStatus === RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR
-  const isRunTerminal =
-    runStatus != null
-      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
-      : false
-  const isRunStill = isRunTerminal || isRunIdle
+  const isRunIdle = isIdleStatus(runStatus)
+  const isRunRunning = isRunningStatus(runStatus)
+  const isRunTerminal = isTerminalRunStatus(runStatus)
+  const isRunStill = isIdleStatus(runStatus) || isTerminalRunStatus(runStatus)
 
   return { isRunStill, isRunTerminal, isRunIdle, isRunRunning }
 }
