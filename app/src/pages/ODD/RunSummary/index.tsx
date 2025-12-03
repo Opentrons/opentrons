@@ -177,8 +177,7 @@ export function RunSummary(): JSX.Element {
     runId,
     { cursor: 0, pageLength: 100 },
     {
-      enabled:
-        runStatus != null && isTerminalRunStatus(runStatus) && isRunCurrent,
+      enabled: isTerminalRunStatus(runStatus) && isRunCurrent,
     }
   )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.

@@ -30,10 +30,6 @@ export function isStartRunStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && START_RUN_STATUSES.includes(runStatus)
 }
 
-export function isRunAgainStatus(runStatus: RunStatus | null): boolean {
-  return runStatus !== null && RUN_AGAIN_STATUSES.includes(runStatus)
-}
-
 export function isValidRunAgainStatus(
   runStatus: RunStatus | null,
   isClosingCurrentRun: boolean

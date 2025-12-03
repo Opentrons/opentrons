@@ -61,9 +61,11 @@ export function useActionBtnDisabledUtils(
   const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
   const isResetRunLoading = isResetRunLoadingRef.current
   const isCurrentRun = useCurrentRunId() === runId
-  const isCalibrationComplete = !useRunCalibrationStatus(robotName, runId)
-    .complete
-  const isModuleCalibrationComplete = !useModuleCalibrationStatus(
+  const isCalibrationComplete = useRunCalibrationStatus(
+    robotName,
+    runId
+  ).complete
+  const isModuleCalibrationComplete = useModuleCalibrationStatus(
     robotName,
     runId
   ).complete

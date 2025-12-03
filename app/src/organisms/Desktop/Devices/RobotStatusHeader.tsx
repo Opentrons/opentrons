@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   Btn,
@@ -24,6 +23,7 @@ import {
 import { useProtocolQuery } from '@opentrons/react-api-client'
 
 import { QuaternaryButton } from '/app/atoms/buttons'
+import { isIdleStatus } from '/app/local-resources/runs/utils'
 import { useCurrentRunStatus } from '/app/organisms/RunTimeControl/hooks'
 import { useIsFlex } from '/app/redux-resources/robots'
 import {
@@ -95,7 +95,7 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         </LegacyStyledText>
         <Link
           to={`/devices/${name}/protocol-runs/${currentRunId}/${
-            currentRunStatus === RUN_STATUS_IDLE ? 'setup' : 'run-preview'
+            isIdleStatus(currentRunStatus) ? 'setup' : 'run-preview'
           }`}
           id={`RobotStatusHeader_${String(name)}_goToRun`}
         >

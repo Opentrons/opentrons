@@ -6,7 +6,6 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import {
   isIdleStatus,
   isInActiveProtocol,
-  isRunAgainStatus,
   isStartRunStatus,
   isStopRequestedStatus,
   needsConfirmationStatus,
@@ -99,10 +98,10 @@ export function useActionButtonProperties({
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
-
   let buttonText = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
+  console.log('🚀 ~ handlePlay ~ runStatus:', runStatus)
 
   const handlePlay = (): void => {
     play()
@@ -204,7 +203,7 @@ export function useActionButtonProperties({
         handlePlay()
       }
     }
-  } else if (isRunAgainStatus(runStatus)) {
+  } else if (isValidRunAgain) {
     buttonIconName = isResetRunLoadingRef.current ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
@@ -220,6 +219,5 @@ export function useActionButtonProperties({
       })
     }
   }
-
   return { buttonText, handleButtonClick, buttonIconName }
 }

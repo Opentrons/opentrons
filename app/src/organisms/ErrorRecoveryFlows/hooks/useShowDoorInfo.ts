@@ -21,7 +21,7 @@ export function useShowDoorInfo(
   // TODO(jh, 07-16-24): "recovery paused" is only used for door status and therefore
   // a valid way to ensure all apps show the door open prompt, however this could be problematic in the future.
   // Consider restructuring this check once the takeover modals are added.
-  const isDoorOpen = runStatus != null && isDoorOpenStatus(runStatus)
+  const isDoorOpen = isDoorOpenStatus(runStatus)
   const isProhibitedDoorOpen =
     isDoorOpen &&
     !isDoorPermittedOpen(recoveryMap) &&
