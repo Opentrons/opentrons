@@ -1,7 +1,10 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
+import {
+  useAddCameraImageSettingsToRunMutation,
+  useCreateCameraImageSettings,
+} from '@opentrons/react-api-client'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
@@ -21,21 +24,32 @@ export type ActiveControlView =
 
 export interface CameraControlsProps {
   toggleShowControls: () => void
+  runId: string | null
 }
 
 export function CameraControls({
   toggleShowControls,
+  runId,
 }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [isLoading, setIsLoading] = useState(false)
 
   const [activeSubView, setActiveSubView] = useState<ActiveControlView>(null)
   const settings = useCameraSettingsValues()
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
+  const createGlobalCameraSettings = useCreateCameraImageSettings()
+  const createRunCameraSettings = useAddCameraImageSettingsToRunMutation(
+    runId || ''
+  )
 
   const returnToHomeView = (settings: CameraImageSettings): void => {
     setIsLoading(true)
-    createCameraImageSettings(settings, {
+
+    const createCameraSettings =
+      runId != null
+        ? createRunCameraSettings.addCameraImageSettingsToRun
+        : createGlobalCameraSettings.createCameraImageSettings
+
+    createCameraSettings(settings, {
       onSuccess: () => {
         setActiveSubView(null)
       },
