@@ -2,9 +2,7 @@
   display: flex;
   width: 100%;
   flex-direction: column;
-  padding: var(--spacing-16);
-
-  /* border-radius: var(--border-radius-8); */
+  padding-top: var(--spacing-16);
   background-color: var(--white);
   gap: var(--spacing-4);
 }
@@ -12,20 +10,21 @@
 .module_details_status {
   display: flex;
   justify-content: space-between;
-  padding-left: var(--spacing-16);
 }
 
-.detail_container {
+.container {
   display: flex;
-  height: 100%;
+  width: 100%;
   flex-direction: column;
+  padding: var(--spacing-16);
   border-radius: var(--border-radius-8);
   background-color: var(--white);
+  gap: var(--spacing-16);
 }
 
-.slot_details_active_step {
+.main_content {
   display: flex;
+  width: 100%;
   flex-direction: column;
-  padding: 0 var(--spacing-12) var(--spacing-12) var(--spacing-12);
-  gap: var(--spacing-8);
+  justify-content: space-between;
 }
