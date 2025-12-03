@@ -52,6 +52,8 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
           : null
       // TODO: ja 8.27.25: find a better way to find the matching lid def without
       // relying on the lidDisplayNames
+      // TODO: mm 12.3.25: deduplicate with other places where we're doing the same thing
+      // (grep for matchingLidDef)
       const matchingLidDef = Object.values(definitionsByURI).find(
         uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
       )
@@ -97,6 +99,10 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       topLabwareInfo != null
         ? definitionsByURI[topLabwareInfo.definitionUri]
         : null
+    // TODO: ja 8.27.25: find a better way to find the matching lid def without
+    // relying on the lidDisplayNames
+    // TODO: mm 12.3.25: deduplicate with other places where we're doing the same thing
+    // (grep for matchingLidDef)
     const matchingLidDef = Object.values(definitionsByURI).find(
       uri => uri.metadata.displayName === topLabwareInfo?.lidDisplayName
     )
