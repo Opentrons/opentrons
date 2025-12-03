@@ -1096,23 +1096,26 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           conditioningByVolume
         ) ?? 0)
       : 0
+
+  const isCustomTiprack = tiprackDefinition?.namespace !== 'opentrons'
   const isMultiDispenseAvailable =
-    conditioningByVolume != null &&
-    disposalByVolume != null &&
-    maxWorkingVolume >=
-      minVolumeForMultiAspirateDispense +
-        conditioningVolumeForMultiAspirateDispense +
-        (linearInterpolate(
-          minVolumeForMultiAspirateDispense,
-          disposalByVolume
-        ) ?? 0) +
-        // don't take air gap into account if conditioning volume is present
-        (conditioningVolumeForMultiAspirateDispense === 0
-          ? (linearInterpolate(
-              minVolumeForMultiAspirateDispense,
-              aspirateAirGapByVolume
-            ) ?? 0)
-          : 0)
+    isCustomTiprack ||
+    (conditioningByVolume != null &&
+      disposalByVolume != null &&
+      maxWorkingVolume >=
+        minVolumeForMultiAspirateDispense +
+          conditioningVolumeForMultiAspirateDispense +
+          (linearInterpolate(
+            minVolumeForMultiAspirateDispense,
+            disposalByVolume
+          ) ?? 0) +
+          // don't take air gap into account if conditioning volume is present
+          (conditioningVolumeForMultiAspirateDispense === 0
+            ? (linearInterpolate(
+                minVolumeForMultiAspirateDispense,
+                aspirateAirGapByVolume
+              ) ?? 0)
+            : 0))
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
