@@ -34,6 +34,7 @@ export interface CameraSettingsProps {
   not general settings context. */
   storageInfo: RobotStorageInfo | null
   isCameraRequired: boolean | null
+  runId?: string
 }
 
 export function CameraSettings({
@@ -48,6 +49,7 @@ export function CameraSettings({
   toggleLiveStreamEnabled,
   isRecoveryCaptureEnabled,
   isLiveVideoEnabled,
+  runId,
 }: CameraSettingsProps): JSX.Element {
   const isCameraSettingsEnabled = useFeatureFlag('camera')
   const [showControls, setShowControls] = useState(false)
@@ -92,7 +94,9 @@ export function CameraSettings({
     }
   }
   if (showControls) {
-    return <CameraControls toggleShowControls={toggleShowControls} />
+    return (
+      <CameraControls toggleShowControls={toggleShowControls} runId={runId} />
+    )
   } else {
     return (
       <div
