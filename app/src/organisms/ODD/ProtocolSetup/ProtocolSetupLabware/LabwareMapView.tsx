@@ -1,6 +1,11 @@
 import { useMemo } from 'react'
 
-import { BaseDeck, Flex, LabwareRender } from '@opentrons/components'
+import {
+  BaseDeck,
+  CenterLabwareInSlot,
+  Flex,
+  LabwareRender,
+} from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getLabwareDefinitionsByURIForProtocol,
@@ -122,15 +127,17 @@ export function LabwareMapView(props: LabwareMapViewProps): JSX.Element {
       onLabwareClick: () => {
         handleLabwareClick([slotName, stackedItems])
       },
-      wellFill: wellFill,
+      wellFill,
       highlight: true,
       stacked: isLabwareInStack,
       labwareChildren:
         matchingLidDef != null ? (
-          <LabwareRender
-            definition={matchingLidDef}
-            positioningMode="passThrough"
-          />
+          <CenterLabwareInSlot definition={matchingLidDef}>
+            <LabwareRender
+              definition={matchingLidDef}
+              positioningMode="passThrough"
+            />
+          </CenterLabwareInSlot>
         ) : null,
     }
   })
