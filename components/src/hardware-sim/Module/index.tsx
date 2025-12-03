@@ -38,7 +38,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { FlexDirection } from '../Deck'
 
-export * from './alignToModule'
 export * from './Thermocycler'
 
 interface Props {
