@@ -4,6 +4,7 @@ import {
   AlignControlToModule,
   BaseDeck,
   Box,
+  CenterLabwareInSlot,
   DIRECTION_COLUMN,
   Flex,
   LabwareInfoOverlay,
@@ -205,10 +206,12 @@ export function SetupLabwareMap({
       labwareChildren: (
         <>
           {matchingLidDef != null ? (
-            <LabwareRender
-              definition={matchingLidDef}
-              positioningMode="passThrough"
-            />
+            <CenterLabwareInSlot definition={matchingLidDef}>
+              <LabwareRender
+                definition={matchingLidDef}
+                positioningMode="passThrough"
+              />
+            </CenterLabwareInSlot>
           ) : null}
           <g
             cursor="pointer"
