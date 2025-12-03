@@ -276,7 +276,13 @@ export function SelectTips(
                 status = rawState === NO ? NO : INACCESSIBLE
               }
               if (selectedTips.flat().some(tip => tip === wellName)) {
-                status = rawState === USED ? SELECTED_USED : SELECTED
+                const isAccessible =
+                  tipAccessibileStatusByWellName[wellName].isAccessible
+                if (!isAccessible) {
+                  status = SELECTED_ERROR
+                } else {
+                  status = rawState === USED ? SELECTED_USED : SELECTED
+                }
               } else if (allWellsAffectedByHover.includes(wellName)) {
                 if (
                   areAllHoveredWellsAccessibleAndOccupied &&
