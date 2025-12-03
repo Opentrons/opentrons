@@ -37,6 +37,7 @@ export function AlignControlToModule(
   props: AlignControlToModuleProps
 ): JSX.Element {
   const { deckId, slotId, moduleDefinition, children } = props
+  // TOMAX
   const { x, y } = getModuleParentOriginToChildSlotOrigin(
     deckId,
     slotId,
@@ -44,3 +45,5 @@ export function AlignControlToModule(
   )
   return <g transform={`translate(${x} ${y})`}>{children}</g>
 }
+
+// TOMAX: Does this still have a place in the world? Is this still deprecated?

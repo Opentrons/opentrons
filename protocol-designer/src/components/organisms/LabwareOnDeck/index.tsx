@@ -28,6 +28,7 @@ interface LabwareOnDeckProps {
   ignoreMissingTips?: boolean
 }
 
+// TOMAX: This one is used in a bunch of pd places.
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
   const {
     labwareOnDeck,

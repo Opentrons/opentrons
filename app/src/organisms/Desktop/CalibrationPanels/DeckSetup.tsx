@@ -153,6 +153,7 @@ export function DeckSetup(props: CalibrationPanelProps): JSX.Element {
                     return null // Shouldn't happen.
                   }
 
+                  // TOMAX
                   const slotOriginToLabwareOrigin =
                     getDeckSlotOriginToLabwareOrigin(
                       addressableArea,

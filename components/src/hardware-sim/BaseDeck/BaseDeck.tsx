@@ -358,6 +358,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   targetSlotId={moduleLocation.slotName}
                   childrenPositioningMode="passThrough"
                 >
+                  {/*TOMAX: OK so this wasn't implemented before. Is this actually the bug? */}
                   {/* TODO(ja, 8.27.25): create a <AlignLabwareToLabware/> component to align the lid
                       to the labware. We want to make something like this:
                       <Module ...>
@@ -444,6 +445,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                     labwareDefinition={nestedLabwareDefsBottomToTop[0]}
                   >
                     <g cursor={onLabwareClick != null ? 'pointer' : ''}>
+                      {/* TOMAX: This is not right. */}
                       {nestedLabwareDefsBottomToTop.map((def, index) => (
                         <LabwareRender
                           key={`${index}_${def.parameters.loadName}`}
