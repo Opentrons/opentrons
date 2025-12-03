@@ -114,6 +114,8 @@ export interface ComputeLabwareOriginInput {
 export function computeLabwareOrigin(
   input: ComputeLabwareOriginInput
 ): Vector3D | null {
+  // todo(mm, 2025-12-03): Instead of attempting physical accuracy, simply center the
+  // labware in the underlying slot. https://opentrons.atlassian.net/browse/EXEC-2093
   const stack = getLabwareStackAsArray(input)
 
   if (stack == null) {
