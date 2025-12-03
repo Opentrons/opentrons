@@ -22,6 +22,7 @@ Behavior:
     4. opentrons
   - Finds the last tag matching the configured tag pattern.
   - If there are new commits since that tag, increments the tag and (unless dry-run) pushes it.
+- Removes the 'clean-repos' directory after completion.
 
 Tag increment logic:
 - ot3-firmware: v67       → v68       (numeric bump)
@@ -254,6 +255,17 @@ def clone_clean_repos(branch_name: str) -> None:
         run_command(["git", "pull", "origin", branch_name], cwd=target_dir)
 
 
+def cleanup_repos() -> None:
+    """Remove the clean-repos directory."""
+    if CLEAN_ROOT.exists():
+        print()
+        print("=" * 60)
+        print(f"Cleaning up: Removing {CLEAN_ROOT}")
+        print("=" * 60)
+        shutil.rmtree(CLEAN_ROOT)
+        print(f"✅ Removed {CLEAN_ROOT}")
+
+
 def tag_repo_if_updated(
     repo_name: str,
     repo_path: Path,
@@ -330,34 +342,39 @@ def main():
     print(f"Dry run: {args.dry_run}")
     print()
 
-    # 1) Determine latest chore_release-* branch from opentrons
-    opentrons_clone_url = next(r["clone_url"] for r in REPOS if r["name"] == "opentrons")
-    latest_branch = find_latest_chore_release_branch(opentrons_clone_url)
+    try:
+        # 1) Determine latest chore_release-* branch from opentrons
+        opentrons_clone_url = next(r["clone_url"] for r in REPOS if r["name"] == "opentrons")
+        latest_branch = find_latest_chore_release_branch(opentrons_clone_url)
 
-    # 2) Confirm with user
-    answer = input(f"Use branch '{latest_branch}' for all repos? [Y/n]: ").strip().lower()
-    if answer not in ("", "y", "yes"):
-        print("Aborting by user request.")
-        sys.exit(0)
+        # 2) Confirm with user
+        answer = input(f"Use branch '{latest_branch}' for all repos? [Y/n]: ").strip().lower()
+        if answer not in ("", "y", "yes"):
+            print("Aborting by user request.")
+            sys.exit(0)
 
-    # 3) Prepare clean clones on that branch
-    clone_clean_repos(branch_name=latest_branch)
+        # 3) Prepare clean clones on that branch
+        clone_clean_repos(branch_name=latest_branch)
 
-    # 4) Tag each repo if updated (in the configured order:
-    #    ot3-firmware → buildroot → oe-core → opentrons)
-    for repo in REPOS:
-        repo_path = CLEAN_ROOT / repo["dir_name"]
-        tag_repo_if_updated(
-            repo_name=repo["name"],
-            repo_path=repo_path,
-            tag_pattern=repo["tag_pattern"],
-            tag_type=repo["tag_type"],
-            dry_run=args.dry_run,
-        )
+        # 4) Tag each repo if updated (in the configured order:
+        #    ot3-firmware → buildroot → oe-core → opentrons)
+        for repo in REPOS:
+            repo_path = CLEAN_ROOT / repo["dir_name"]
+            tag_repo_if_updated(
+                repo_name=repo["name"],
+                repo_path=repo_path,
+                tag_pattern=repo["tag_pattern"],
+                tag_type=repo["tag_type"],
+                dry_run=args.dry_run,
+            )
 
-    print("=" * 60)
-    print("Alpha release process complete!")
-    print("=" * 60)
+        print("=" * 60)
+        print("Alpha release process complete!")
+        print("=" * 60)
+
+    finally:
+        # 5) Always cleanup the repos directory
+        cleanup_repos()
 
 
 if __name__ == "__main__":
