@@ -92,6 +92,7 @@ describe('path should update...', () => {
     const patch = {}
     expect(handleFormHelper(patch, { blah: 'blaaah' })).toEqual({
       path: 'single',
+      tips_selected: [],
     })
   })
   describe('if path is multi and volume*2 + air gap volume exceeds pipette/tip capacity', () => {
@@ -255,13 +256,14 @@ describe('disposal volume should update...', () => {
       disposalVolume_volume: null,
       conditioning_volume: null,
       conditioning_checkbox: false,
+      tips_selected: [],
     })
   })
 
   it('when volume is raised but disposal vol is still in capacity, do not change (noop case)', () => {
     const patch = { volume: '2.5' }
     const result = handleFormHelper(patch, form)
-    expect(result).toEqual(patch)
+    expect(result).toEqual({ ...patch, tips_selected: [] })
   })
 
   it('when the aspirate > air gap volume is large', () => {
@@ -272,7 +274,7 @@ describe('disposal volume should update...', () => {
       aspirate_airGap_volume: '3',
       volume: '1',
     })
-    expect(result).toEqual({ disposalVolume_volume: '5' })
+    expect(result).toEqual({ disposalVolume_volume: '5', tips_selected: [] })
   })
   it('when the aspirate > air gap volume is increased', () => {
     const patch = { aspirate_airGap_volume: '3' }
@@ -286,6 +288,7 @@ describe('disposal volume should update...', () => {
     expect(result).toEqual({
       aspirate_airGap_volume: '3',
       disposalVolume_volume: '5',
+      tips_selected: [],
     })
   })
   it('skipped when the aspirate > air gap checkbox not checked', () => {
@@ -296,7 +299,7 @@ describe('disposal volume should update...', () => {
       aspirate_airGap_volume: '3',
       volume: '1',
     })
-    expect(result).toEqual({ disposalVolume_volume: '6' })
+    expect(result).toEqual({ disposalVolume_volume: '6', tips_selected: [] })
   })
 
   describe('when volume is raised so that disposal vol must be exactly zero, clear/zero disposal volume fields', () => {
@@ -316,6 +319,7 @@ describe('disposal volume should update...', () => {
         dispense_mix_times: null,
         dispense_mix_volume: null,
         blowout_checkbox: false,
+        tips_selected: [],
       })
     })
 
@@ -325,6 +329,7 @@ describe('disposal volume should update...', () => {
       expect(result).toEqual({
         ...patch,
         disposalVolume_volume: '0',
+        tips_selected: [],
       })
     })
   })
@@ -334,17 +339,18 @@ describe('disposal volume should update...', () => {
     expect(result).toEqual({
       volume: '4.6',
       disposalVolume_volume: '0.8',
+      tips_selected: [],
     })
   })
 
   it('clamp excessive disposal volume to max', () => {
     const result = handleFormHelper({ disposalVolume_volume: '9999' }, form)
-    expect(result).toEqual({ disposalVolume_volume: '6' })
+    expect(result).toEqual({ disposalVolume_volume: '6', tips_selected: [] })
   })
 
   it('when disposal volume is a negative number, set to zero', () => {
     const result = handleFormHelper({ disposalVolume_volume: '-2' }, form)
-    expect(result).toEqual({ disposalVolume_volume: '0' })
+    expect(result).toEqual({ disposalVolume_volume: '0', tips_selected: [] })
   })
 
   describe('mix fields should clear...', () => {
@@ -368,6 +374,7 @@ describe('disposal volume should update...', () => {
         aspirate_mix_times: null,
         aspirate_mix_volume: null,
         preWetTip: false,
+        tips_selected: [],
       })
     })
   })
@@ -391,7 +398,7 @@ describe('disposal volume should update...', () => {
     ]
 
     testCases.forEach(({ prevPath, nextPath, incompatible }) => {
-      const patch = { path: nextPath }
+      const patch = { path: nextPath, tips_selected: [] }
       it(`when changing path ${prevPath} → ${nextPath}, arbitrary labware still allowed`, () => {
         // @ts-expect-error(sa, 2021-6-15): missing id and stepType to be valid formData type
         const result = updatePatchBlowoutFields(patch, {
