@@ -15,7 +15,11 @@ dependencies = [
     "mkdocs-parent-css-plugin",
     "mkdocs-print-site-plugin>=2.8",
     "playwright>=1.55",
+    "opentrons",
+    "opentrons-shared-data",
 ]
 
 [tool.uv.sources]
 mkdocs-parent-css-plugin = { path = "mkdocs-parent-css-plugin", editable = true }
+opentrons-shared-data = { path = "../shared-data", editable = true }
+opentrons = { path = "../api", editable = true }
