@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -9,7 +8,6 @@ import {
   InfoScreen,
   LabwareDetailsWithCount,
   RadioButton,
-  SPACING,
   StyledText,
 } from '@opentrons/components'
 
@@ -17,6 +15,8 @@ import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getFlexStackerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
 import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
+
+import styles from './FlexStackerTools.module.css'
 
 import type {
   FlexStackerModuleState,
@@ -46,7 +46,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
   const labwareOnShuttle = flexStackerModuleState?.labwareOnShuttle ?? null
 
   const labwareFiledComponent = (
-    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+    <div className={styles.spaceBetween}>
       <StyledText desktopStyle="bodyDefaultSemiBold">
         {t('protocol_steps:flex_stacker.stacker.label')}
       </StyledText>
@@ -63,15 +63,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
   )
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gridGap: SPACING.spacing8,
-        width: '100%',
-        paddingTop: SPACING.spacing16,
-      }}
-    >
+    <div className={styles.container}>
       <DropdownStepFormField
         options={flexStackerOptions}
         title={t('form:step_edit_form.field.absorbanceReader.moduleId.module')}
@@ -89,14 +81,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         value={moduleId}
       />
       <Divider margin="0" marginY="0" />
-      <div
-        style={{
-          padding: `0 ${SPACING.spacing16}`,
-          gap: SPACING.spacing8,
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+      <div className={`${styles.container} ${styles.paddingX}`}>
         {labwareFiledComponent}
         {flexStackerModuleState?.storedLabwareDetails != null ? (
           <LabwareDetailsWithCount
@@ -107,7 +92,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
             subTitle={
               flexStackerModuleState.storedLabwareDetails.lidLabware?.loadName
             }
-            quantity={t('protocol_steps:flex_stacker.stacker.quantity', {
+            label={t('protocol_steps:flex_stacker.stacker.quantity', {
               count:
                 flexStackerModuleState.storedLabwareDetails.initialCount?.toString() ??
                 '0',
@@ -120,14 +105,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         )}
       </div>
       <Divider margin="0" marginY="0" />
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          padding: `0 ${SPACING.spacing16}`,
-          gridGap: SPACING.spacing8,
-        }}
-      >
+      <div className={`${styles.container} ${styles.paddingX}`}>
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('protocol_steps:flex_stacker.shuttle.label')}
         </StyledText>
@@ -143,7 +121,6 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
                 flexStackerModuleState.storedLabwareDetails?.lidLabwareId
                   ?.loadName
               }
-              quantity={null}
             />
           ) : (
             <InfoScreen
@@ -153,21 +130,8 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         </div>
       </div>
       <Divider margin="0" marginY="0" />
-      <div
-        style={{
-          padding: `0 ${SPACING.spacing16}`,
-          display: 'flex',
-          flexDirection: 'column',
-          gridGap: SPACING.spacing8,
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            width: '40%',
-          }}
-        >
+      <div className={`${styles.container} ${styles.paddingX}`}>
+        <div className={styles.spaceBetween} style={{ width: '40%' }}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('protocol_steps:flex_stacker.module_controls.label')}
           </StyledText>
