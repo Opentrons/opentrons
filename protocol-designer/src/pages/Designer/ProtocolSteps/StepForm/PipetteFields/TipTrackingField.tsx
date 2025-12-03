@@ -11,12 +11,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import {
-  getAllLiquidClassDefs,
-  getFlexNameConversion,
-  OT2_ROBOT_TYPE,
-  WATER_LIQUID_CLASS_NAME,
-} from '@opentrons/shared-data'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
   getDefaultPrimaryNozzle,
@@ -72,28 +67,6 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     tiprackEntity => tiprackEntity.labwareDefURI === formData.tipRack
   )?.def
 
-  const allLiquidClassDefs = getAllLiquidClassDefs()
-  const liquidClassDef =
-    allLiquidClassDefs[formData.liquidClass ?? ''] ??
-    allLiquidClassDefs[WATER_LIQUID_CLASS_NAME]
-  const convertedPipetteName =
-    pipette != null ? getFlexNameConversion(pipette.spec) : null
-  const liquidClassValuesForPipette = liquidClassDef.byPipette.find(
-    ({ pipetteModel }) => convertedPipetteName === pipetteModel
-  )
-  const liquidClassValuesForTip = liquidClassValuesForPipette?.byTipType.find(
-    tipObject => tipObject.tiprack === formData.tipRack
-  )
-
-  let airGapByVolume: Array<[number, number]> = []
-  // no air gap included for mix step
-  if (formData.stepType === 'moveLiquid') {
-    airGapByVolume =
-      (liquidClassValuesForTip?.aspirate.retract.airGapByVolume as Array<
-        [number, number]
-      >) ?? []
-  }
-
   const transferPlanAndReferenceVolumes =
     pipette != null && tiprackDefinition != null && formData != null
       ? getTransferPlanAndReferenceVolumes({
@@ -118,7 +91,9 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
             robotType === OT2_ROBOT_TYPE
               ? []
               : [[0, Number(formData.disposalVolume_volume ?? 0)]],
-          aspirateAirGapByVolume: airGapByVolume,
+          aspirateAirGapByVolume: [
+            [0, Number(formData.aspirate_airGap_volume ?? 0)],
+          ],
         })
       : null
 
