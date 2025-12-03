@@ -37,13 +37,18 @@ dev:
 serve: all
 	vite preview --host=::
 
+# Cypress binary install (this will removed when playwright is used instead)
+.PHONY: cypress-install
+cypress-install:
+	pnpm exec cypress install
+
 .PHONY: clean-downloads
 clean-downloads:
 	shx rm -rf cypress/downloads
 
 # end to end tests
 .PHONY: test-e2e
-test-e2e: clean-downloads
+test-e2e: cypress-install clean-downloads
 	concurrently --no-color --kill-others --success first --names "labware-library-server,labware-library-tests" \
 	"$(MAKE) dev GTM_ID=''" \
 	"wait-on http://localhost:5179/ && echo \"Running cypress at $(date)\" && cypress run --browser chrome --headless --record false"
