@@ -2,15 +2,14 @@
 title: "Opentrons OT-2: User-level Maintenance Procedures"
 ---
 
-The OT-2 is designed for years of reliable, full-time operation. Unlike the cleaning procedures described in this section of the manual, you should not attempt to service or repair an OT-2 yourself. But, sometimes it may be necessary, and faster, to perform some maintenance tasks or replace malfunctioning components yourself. The instructions in this section will guide you through these tasks.
+The OT-2 is designed for years of reliable, full-time operation. If your robot requires service, you should not attempt to repair it unless directed by Opentrons Support. This section provides instructions for performing some circuit board replacements on a limited self-service basis.
 
 !!!warning
-    - Do not attempt these troubleshooting or repair procedures unless directed by Opentrons Support.
-    - Before you begin, turn off the power to the robot and unplug it from the wall outlet.
+    Never perform these procedures with the OT-2 powered on or plugged in. Always turn off the power to the robot and unplug it from the wall outlet before you begin.
 
 ## Replacing the motor controller board
 
-This printed circuit board assembly (PCBA) controls the motors responsible for pipette movement. It is attached to the pipette carriage <font color="red">LINK REMINDER TO SYS DESC</font> beneath the carriage cover. The information in this section explains how to:
+This printed circuit board assembly (PCBA) controls the motors responsible for pipette movement. It is attached to the pipette carriage <font color="red"><strong>LINK REMINDER TO SYS DESC</strong></font> beneath the carriage cover. The information in this section explains how to:
 
 - Remove and replace the pipette carriage cover.
 - Disconnect, remove, and replace the motor controller board.
@@ -20,10 +19,11 @@ This procedure requires the following tools:
 - 2 mm hex screwdriver
 - 2.5 mm hex screwdriver
 - T10 Torx screwdriver
+- A small flathead screwdriver
 
-### Removing the cover
+### Removing the carriage cover
 
-1. Remove the top, front, and side window panels for better access to the gantry and pipette carriage.
+1. Use a 2.5 mm hex screwdriver to remove the top, front, and side window panels on the robot. Detaching these panels gives you better access to the gantry and pipette carriage.
 
 2. Use a 2 mm hex screwdriver to remove the 2 screws from the perforated cover on the top of the carriage cover and a 2.5 mm hex screwdriver to remove the 2 screws from the back of the carriage.
 
@@ -63,7 +63,7 @@ After installing a new board, follow up with Opentrons Support for further troub
 
 ## Replacing the rear panel boards
 
-The two PCBAs mounted inside the back panel of the OT-2 provide other command, control, network, and power distribution functions. Again, you should never have to remove this panel or work with the rear electronics unless directed to by Opentrons Support. The information in this section explains how to:
+The two PCBAs mounted inside the back panel of the OT-2 provide other command, control, network, and power distribution functions. The information in this section explains how to:
 
 - Remove the back panel cover and identifies the main components in this area.
 - Disconnect, remove, and replace the PCBAs housed in this location.
