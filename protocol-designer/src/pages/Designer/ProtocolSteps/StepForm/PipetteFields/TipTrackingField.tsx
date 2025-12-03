@@ -113,13 +113,11 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
           conditioningByVolume:
             robotType === OT2_ROBOT_TYPE
               ? []
-              : ((liquidClassValuesForTip?.multiDispense
-                  ?.conditioningByVolume as Array<[number, number]>) ?? null),
+              : [[0, Number(formData.conditioning_volume ?? 0)]],
           disposalByVolume:
             robotType === OT2_ROBOT_TYPE
               ? []
-              : ((liquidClassValuesForTip?.multiDispense
-                  ?.disposalByVolume as Array<[number, number]>) ?? null),
+              : [[0, Number(formData.disposalVolume_volume ?? 0)]],
           aspirateAirGapByVolume: airGapByVolume,
         })
       : null
