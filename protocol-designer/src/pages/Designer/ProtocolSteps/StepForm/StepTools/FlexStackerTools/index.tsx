@@ -96,8 +96,15 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         }}
         value={moduleId}
       />
-      <Divider margin="0" />
-      <div style={{ padding: SPACING.spacing16 }}>
+      <Divider margin="0" marginY="0" />
+      <div
+        style={{
+          padding: `0 ${SPACING.spacing16}`,
+          gap: SPACING.spacing8,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         {labwareFiledComponent}
         {flexStackerModuleState?.storedLabwareDetails != null ? (
           <LabwareDetailsWithCount
@@ -119,12 +126,12 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           />
         )}
       </div>
-      <Divider margin="0" />
+      <Divider margin="0" marginY="0" />
       <div
         style={{
           display: 'flex',
           flexDirection: 'column',
-          padding: SPACING.spacing16,
+          padding: `0 ${SPACING.spacing16}`,
           gridGap: SPACING.spacing8,
         }}
       >
@@ -152,10 +159,10 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           )}
         </div>
       </div>
-      <Divider margin="0" />
+      <Divider margin="0" marginY="0" />
       <div
         style={{
-          padding: SPACING.spacing16,
+          padding: `0 ${SPACING.spacing16}`,
           display: 'flex',
           flexDirection: 'column',
           gridGap: SPACING.spacing8,
@@ -165,7 +172,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           style={{
             display: 'flex',
             justifyContent: 'space-between',
-            width: '100%',
+            width: '40%',
           }}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -199,7 +206,9 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
               'protocol_steps:flex_stacker.module_controls.refill_sublabel'
             ),
           }}
-          onChange={() => {}}
+          onChange={e => {
+            console.log('e:', e)
+          }}
           largeDesktopBorderRadius
         />
         <RadioButton
