@@ -537,8 +537,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               desktopStyle="bodyLargeSemiBold"
               css={LINE_CLAMP_TEXT_STYLE(2, true)}
             >
-              {/* TODO: how can we use json key names instead of stepType?*/}
-              {t(`protocol_steps:${formData.stepType}`)}
+              {/* TODO: use  module object from form.json instead */}
+              {formData.stepType === 'flexStacker'
+                ? t(`protocol_steps:${formData.stepType}`)
+                : capitalizeFirstLetter(String(formData.stepName))}
             </StyledText>
           </Flex>
         }
