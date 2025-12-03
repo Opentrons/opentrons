@@ -38,7 +38,6 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
     robotState,
     flexStackerOptions,
   } = props
-  console.log('flexStackerOptions:', flexStackerOptions)
   const { moduleId } = formData
   const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
