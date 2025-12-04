@@ -24,7 +24,7 @@ def test_build_aspirate_settings() -> None:
 
     assert (
         aspirate_properties.submerge.start_position.position_reference.value
-        == "liquid-meniscus-end"
+        == "liquid-meniscus"
     )
     assert aspirate_properties.submerge.start_position.offset == Coordinate(
         x=0, y=0, z=-5
@@ -160,7 +160,7 @@ def test_build_single_dispense_settings() -> None:
 
     assert (
         single_dispense_properties.submerge.start_position.position_reference.value
-        == "liquid-meniscus-end"
+        == "liquid-meniscus"
     )
     assert single_dispense_properties.submerge.start_position.offset == Coordinate(
         x=0, y=0, z=-5
@@ -326,7 +326,7 @@ def test_build_multi_dispense_settings() -> None:
 
     assert (
         multi_dispense_properties.submerge.start_position.position_reference.value
-        == "liquid-meniscus-end"
+        == "liquid-meniscus"
     )
     assert multi_dispense_properties.submerge.start_position.offset == Coordinate(
         x=0, y=0, z=-5
