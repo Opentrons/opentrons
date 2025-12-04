@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import {
   CommandText,
   getCommandTextData,
@@ -8,7 +9,6 @@ import {
 } from '@opentrons/components'
 
 import {
-  isIdleStatus,
   isRunStatusNotStarted,
   isTerminalRunStatus,
 } from '/app/local-resources/runs/utils'
@@ -102,7 +102,7 @@ export function useRunProgressCopy({
     : (currentStepNumber! / analysisCommands.length) * 100
 
   const stepCountStr = ((): string | null => {
-    if (isTerminalRunStatus(runStatus) || isIdleStatus(runStatus)) {
+    if (isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_IDLE) {
       return null
     }
     if (currentStepNumber == null) {

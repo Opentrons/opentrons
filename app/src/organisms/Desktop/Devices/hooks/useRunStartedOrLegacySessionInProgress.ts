@@ -1,6 +1,6 @@
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAllSessionsQuery } from '@opentrons/react-api-client'
 
-import { isIdleStatus } from '/app/local-resources/runs/utils'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useCurrentRunId,
@@ -16,7 +16,7 @@ export function useRunStartedOrLegacySessionInProgress(): boolean {
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   return (
-    isIdleStatus(runStatus) ||
+    (runStatus !== null && runStatus !== RUN_STATUS_IDLE) ||
     (allSessionsQueryResponse?.data?.data != null &&
       allSessionsQueryResponse?.data?.data?.length !== 0)
   )

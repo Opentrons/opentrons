@@ -1,4 +1,5 @@
-import { isIdleStatus } from '/app/local-resources/runs/utils'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
   useNotifyRunQuery,
@@ -9,5 +10,5 @@ export function useRunHasStarted(runId: string | null): boolean {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
   })
   const runStatus = runRecord?.data.status ?? null
-  return runStatus != null && !isIdleStatus(runStatus)
+  return runStatus != null && !(runStatus === RUN_STATUS_IDLE)
 }

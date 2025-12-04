@@ -1,5 +1,6 @@
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
+
 import {
-  isIdleStatus,
   isRunningStatus,
   isTerminalRunStatus,
 } from '/app/local-resources/runs/utils'
@@ -22,10 +23,10 @@ export function useRunStatuses(): RunStatusesInfo {
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
   })
   const runStatus = runRecord?.data.status ?? null
-  const isRunIdle = isIdleStatus(runStatus)
+  const isRunIdle = runStatus === RUN_STATUS_IDLE
   const isRunRunning = isRunningStatus(runStatus)
   const isRunTerminal = isTerminalRunStatus(runStatus)
-  const isRunStill = isIdleStatus(runStatus) || isTerminalRunStatus(runStatus)
+  const isRunStill = isRunIdle || isTerminalRunStatus(runStatus)
 
   return { isRunStill, isRunTerminal, isRunIdle, isRunRunning }
 }

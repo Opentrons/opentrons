@@ -1,19 +1,18 @@
 import {
-  RUN_STATUS_IDLE,
   RUN_STATUS_STOP_REQUESTED,
   RUN_STATUS_STOPPED,
 } from '@opentrons/api-client'
 
 import {
-  ACTIVE_PROTOCOL_STATUSES,
   CANCELLABLE_STATUSES,
   DISABLED_STATUSES,
   DOOR_OPEN_STATUSES,
   INVALID_ER_RUN_STATUSES,
-  NEEDS_CONFIRMATION_STATUSES,
   RECOVERY_STATUSES,
   RUN_AGAIN_STATUSES,
+  RUN_MODULE_REQUIRES_CONFIRM_STATUSES,
   RUN_NOT_STARTED_STATUSES,
+  RUNNING_RECOVERY_STATUSES,
   RUNNING_STATUSES,
   START_RUN_STATUSES,
   TERMINAL_STATUSES,
@@ -64,9 +63,13 @@ export function isDoorOpenStatus(runStatus: RunStatus | null): boolean {
 export function isCancellableStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && CANCELLABLE_STATUSES.includes(runStatus)
 }
-
-export function isInActiveProtocol(runStatus: RunStatus | null): boolean {
-  return runStatus !== null && ACTIVE_PROTOCOL_STATUSES.includes(runStatus)
+export function isRunAgainStatus(runStatus: RunStatus | null): boolean {
+  return runStatus !== null && RUN_AGAIN_STATUSES.includes(runStatus)
+}
+export function isRunningOrRecoveryStatus(
+  runStatus: RunStatus | null
+): boolean {
+  return runStatus !== null && RUNNING_RECOVERY_STATUSES.includes(runStatus)
 }
 
 export function isRunningStatus(runStatus: RunStatus | null): boolean {
@@ -77,12 +80,13 @@ export function isStopRequestedStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && runStatus === RUN_STATUS_STOP_REQUESTED
 }
 
-export function needsConfirmationStatus(runStatus: RunStatus | null): boolean {
-  return runStatus !== null && NEEDS_CONFIRMATION_STATUSES.includes(runStatus)
-}
-
-export function isIdleStatus(runStatus: RunStatus | null): boolean {
-  return runStatus !== null && runStatus === RUN_STATUS_IDLE
+export function isModuleConfirmationStatus(
+  runStatus: RunStatus | null
+): boolean {
+  return (
+    runStatus !== null &&
+    RUN_MODULE_REQUIRES_CONFIRM_STATUSES.includes(runStatus)
+  )
 }
 
 export function isTerminatingOrTerminal(runStatus: RunStatus | null): boolean {

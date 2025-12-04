@@ -38,7 +38,7 @@ export const RUN_NOT_STARTED_STATUSES: RunStatus[] = [
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
 ]
 
-export const NEEDS_CONFIRMATION_STATUSES: RunStatus[] = [
+export const RUN_MODULE_REQUIRES_CONFIRM_STATUSES: RunStatus[] = [
   RUN_STATUS_IDLE,
   RUN_STATUS_STOPPED,
 ]
@@ -84,7 +84,7 @@ export const CANCELLABLE_STATUSES: RunStatus[] = [
   ...RECOVERY_STATUSES,
 ]
 
-export const ACTIVE_PROTOCOL_STATUSES: RunStatus[] = [
+export const RUNNING_RECOVERY_STATUSES: RunStatus[] = [
   RUN_STATUS_RUNNING,
   ...RECOVERY_STATUSES,
 ]

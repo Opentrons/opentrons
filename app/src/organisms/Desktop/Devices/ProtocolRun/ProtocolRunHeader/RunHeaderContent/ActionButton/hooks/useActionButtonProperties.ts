@@ -1,14 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import {
-  isIdleStatus,
-  isInActiveProtocol,
+  isModuleConfirmationStatus,
+  isRunAgainStatus,
+  isRunningOrRecoveryStatus,
   isStartRunStatus,
   isStopRequestedStatus,
-  needsConfirmationStatus,
 } from '/app/local-resources/runs/utils'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
@@ -106,11 +107,12 @@ export function useActionButtonProperties({
   const handlePlay = (): void => {
     play()
     trackProtocolRunEvent({
-      name: isIdleStatus(runStatus)
-        ? ANALYTICS_PROTOCOL_RUN_ACTION.START
-        : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
+      name:
+        runStatus === RUN_STATUS_IDLE
+          ? ANALYTICS_PROTOCOL_RUN_ACTION.START
+          : ANALYTICS_PROTOCOL_RUN_ACTION.RESUME,
       properties:
-        isIdleStatus(runStatus) && robotAnalyticsData != null
+        runStatus === RUN_STATUS_IDLE && robotAnalyticsData != null
           ? robotAnalyticsData
           : {},
     })
@@ -149,7 +151,7 @@ export function useActionButtonProperties({
   } else if (isClosingCurrentRun) {
     buttonIconName = 'ot-spinner'
     buttonText = t('shared:robot_is_busy')
-  } else if (isInActiveProtocol(runStatus)) {
+  } else if (isRunningOrRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     handleButtonClick = () => {
@@ -161,7 +163,8 @@ export function useActionButtonProperties({
     buttonText = t('canceling_run')
   } else if (isStartRunStatus(runStatus)) {
     buttonIconName = 'play'
-    buttonText = isIdleStatus(runStatus) ? t('start_run') : t('resume_run')
+    buttonText =
+      runStatus === RUN_STATUS_IDLE ? t('start_run') : t('resume_run')
     handleButtonClick = () => {
       if (isDisabled && disabledReason) {
         makeSnackbar(disabledReason)
@@ -171,13 +174,13 @@ export function useActionButtonProperties({
         runHeaderModalContainerUtils.HSRunningModalUtils.toggleModal?.()
       } else if (
         missingSetupSteps.length !== 0 &&
-        needsConfirmationStatus(runStatus)
+        isModuleConfirmationStatus(runStatus)
       ) {
         confirmMissingSteps()
       } else if (
         isHeaterShakerInProtocol &&
         !isHeaterShakerShaking &&
-        needsConfirmationStatus(runStatus)
+        isModuleConfirmationStatus(runStatus)
       ) {
         confirmAttachment()
       }
@@ -203,7 +206,7 @@ export function useActionButtonProperties({
         handlePlay()
       }
     }
-  } else if (isValidRunAgain) {
+  } else if (isRunAgainStatus(runStatus)) {
     buttonIconName = isResetRunLoadingRef.current ? 'ot-spinner' : 'play'
     buttonText = t('run_again')
     handleButtonClick = () => {
