@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import clsx from 'clsx'
 
-import { COLORS, CommandText, StyledText } from '@opentrons/components'
+import { COLORS, CommandText } from '@opentrons/components'
 import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { CommandIcon } from '/app/molecules/Command'
@@ -36,7 +36,6 @@ export function IndividualCommand({
   commandNumber,
   scrollTargetId,
 }: IndividualCommandProps): JSX.Element {
-  const [showNumber, setShowNumber] = useState<boolean>(false)
   const commandRef = useRef<HTMLDivElement | null>(null)
   const iconColor = isHighlighted ? COLORS.purple50 : COLORS.grey50
 
@@ -67,12 +66,6 @@ export function IndividualCommand({
     <div
       className={individualCommandContainerStyle}
       ref={commandRef}
-      onMouseEnter={() => {
-        setShowNumber(true)
-      }}
-      onMouseLeave={() => {
-        setShowNumber(false)
-      }}
     >
       <div
         className={commandWrapStyle}
@@ -90,11 +83,6 @@ export function IndividualCommand({
               allRunDefs={allRunDefs}
             />
           </div>
-          {showNumber ? (
-            <StyledText color={COLORS.grey60} desktopStyle="captionRegular">
-              {commandNumber}
-            </StyledText>
-          ) : null}
         </div>
       </div>
     </div>
