@@ -1,17 +1,27 @@
-import { COLORS, StyledText } from '@opentrons/components'
+import { useTranslation } from 'react-i18next'
+
+import { COLORS, StyledText, RobotInfoLabel } from '@opentrons/components'
 
 import styles from './slotdetailsemptystate.module.css'
 
-export function SlotDetailsEmptyState(): JSX.Element {
+interface SlotDetailsEmptyStateProps {
+  slotId: string
+}
+
+export function SlotDetailsEmptyState(
+  props: SlotDetailsEmptyStateProps
+): JSX.Element {
+  const { slotId } = props
+  const { t } = useTranslation('protocol_visualization')
   return (
-    <div>
-      <div className={styles.slot_details_active_step}>
-        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-          Empty
-        </StyledText>
+    <div className={styles.slot_empty_container}>
+      <div className={styles.slot_empty_header}>
+      <RobotInfoLabel deckLabel={slotId} />
       </div>
-      <div className={styles.empty_state_box_container}>
-        <div className={styles.empty_state_box} />
+      <div className={styles.slot_empty_body}>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey50}>
+          {t('slot_empty')}
+        </StyledText>
       </div>
     </div>
   )

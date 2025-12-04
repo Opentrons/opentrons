@@ -4,7 +4,6 @@ import {
   Divider,
   MODULE_ICON_NAME_BY_TYPE,
   RobotInfoLabel,
-  StyledText,
 } from '@opentrons/components'
 import { getIsTiprack } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
@@ -23,6 +22,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+import { is } from 'date-fns/locale'
 
 interface SlotDetailsProps {
   slotId: string
@@ -63,14 +63,18 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     ) ||
     slotId === 'fixedTrash'
 
+
+  const isSlotEmpty =  moduleOnSlot == null &&
+        topMostLabwareOnSlot == null &&
+        !isTrashOnSlot 
+
   return (
+    <>
+    {isSlotEmpty ? <div className={styles.slot_detail_container}><SlotDetailsEmptyState slotId={slotId} /></div> : null}
     <div className={styles.slot_container}>
       <div className={styles.slot_details}>
         <div className={styles.command_step_header}>
           <div className={styles.slot_detail_header}>
-            <StyledText desktopStyle="bodyLargeSemiBold">
-              {t('slot')}
-            </StyledText>
             <RobotInfoLabel
               deckLabel={slotId === 'fixedTrash' ? t('fixedTrash') : slotId}
             />
@@ -112,12 +116,8 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             moduleRobotState={modules}
           />
         ) : null}
-        {moduleOnSlot == null &&
-        topMostLabwareOnSlot == null &&
-        !isTrashOnSlot ? (
-          <SlotDetailsEmptyState />
-        ) : null}
       </div>
     </div>
+    </>
   )
 }
