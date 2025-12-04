@@ -63,10 +63,7 @@ export function IndividualCommand({
   )
 
   return (
-    <div
-      className={individualCommandContainerStyle}
-      ref={commandRef}
-    >
+    <div className={individualCommandContainerStyle} ref={commandRef}>
       <div
         className={commandWrapStyle}
         onClick={() => {
