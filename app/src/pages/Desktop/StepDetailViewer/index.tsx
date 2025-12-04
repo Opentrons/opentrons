@@ -3,13 +3,15 @@ import { useParams } from 'react-router-dom'
 
 import { SlotDetails } from '/app/organisms/Desktop/ProtocolVisualization/SlotDetails'
 
+import { SkeletonForSlotDetail } from './SkeletonForSlotDetail'
+
 import type {
   Liquid,
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
-import { SkeletonForSlotDetail } from './SkeletonForSlotDetail'
+
 interface StepDetailData {
   analysis: ProtocolAnalysisOutput
   robotState: RobotState
