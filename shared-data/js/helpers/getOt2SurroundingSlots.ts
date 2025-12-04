@@ -12,10 +12,9 @@ export const getOt2SurroundingSlots = (
   slot: OT2AddressableAreaName
 ): DeckSlotId[] => {
   const rowIndex = OT2_SLOT_ROWS.findIndex(row => row.includes(slot))
-  let columnIndex = -1
   const surroundingSlots: DeckSlotId[] = []
   if (rowIndex >= 0) {
-    columnIndex = OT2_SLOT_ROWS[rowIndex].indexOf(slot)
+    const columnIndex = OT2_SLOT_ROWS[rowIndex].indexOf(slot)
     const minRowIndexToSearch = Math.max(0, rowIndex - 1)
     const maxRowIndexToSearch = Math.min(OT2_SLOT_ROWS.length - 1, rowIndex + 1)
     const minColumnIndexToSearch = Math.max(0, columnIndex - 1)
