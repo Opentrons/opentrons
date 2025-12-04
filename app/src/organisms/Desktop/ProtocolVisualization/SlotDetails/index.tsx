@@ -22,7 +22,6 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
-import { is } from 'date-fns/locale'
 
 interface SlotDetailsProps {
   slotId: string
