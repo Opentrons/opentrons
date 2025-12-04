@@ -21,6 +21,11 @@ env:
   LOCIZE_API_KEY: ${{ secrets.LOCIZE_API_KEY }}
   LOCIZE_PROJECT_ID: ${{ secrets.LOCIZE_PROJECT_ID }}
 
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
 jobs:
   sync:
     name: Run Locize sync
