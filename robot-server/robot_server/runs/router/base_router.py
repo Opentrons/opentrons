@@ -32,7 +32,6 @@ from robot_server.data_files.dependencies import (
 )
 from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.hardware import get_hardware, get_robot_type_enum
@@ -76,7 +75,6 @@ from ..run_data_manager import (
 from ..dependencies import (
     get_run_data_manager,
     get_run_auto_deleter,
-    get_quick_transfer_run_auto_deleter,
 )
 
 from robot_server.deck_configuration.fastapi_dependencies import (
@@ -195,9 +193,6 @@ async def create_run(  # noqa: C901
     run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
-    quick_transfer_run_auto_deleter: Annotated[
-        RunAutoDeleter, Depends(get_quick_transfer_run_auto_deleter)
-    ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
@@ -216,7 +211,6 @@ async def create_run(  # noqa: C901
         created_at: Timestamp to attach to created run.
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
-        quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
         data_files_directory: Persistence directory for data files.
         data_files_store: Database of data file resources.
         resources to make room for the new run.
@@ -263,13 +257,7 @@ async def create_run(  # noqa: C901
     # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
-    run_deleter: RunAutoDeleter = run_auto_deleter
-    if (
-        protocol_resource
-        and protocol_resource.protocol_kind == ProtocolKind.QUICK_TRANSFER
-    ):
-        run_deleter = quick_transfer_run_auto_deleter
-    run_deleter.make_room_for_new_run()
+    run_auto_deleter.make_room_for_new_run()
 
     try:
         run_data = await run_data_manager.create(
