@@ -31,7 +31,6 @@ export function RobotDashboard(): JSX.Element {
   const { t } = useTranslation('device_details')
   const { data: allRunsQueryData, error: allRunsQueryError } =
     useNotifyAllRunsQuery()
-  const protocols = useAllProtocolsQuery()
 
   const { unfinishedUnboxingFlowRoute } = useSelector(
     getOnDeviceDisplaySettings
