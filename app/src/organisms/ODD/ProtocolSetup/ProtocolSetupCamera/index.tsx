@@ -122,6 +122,7 @@ export function ProtocolSetupCamera(
       toggleLiveStreamEnabled={toggleLiveStreamEnabled}
       toggleRecoveryEnabled={toggleRecoveryEnabled}
       toggleCameraEnabled={toggleCameraEnabled}
+      runId={runId}
     />
   )
 }

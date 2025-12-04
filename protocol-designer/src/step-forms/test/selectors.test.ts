@@ -2,10 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   getBatchEditFormHasUnsavedChanges,
+  getBonusStepModalType,
   getEquippedPipetteOptions,
   getNextUserVisibleStepNumber,
-  getUnsavedFormIsPristineHeaterShakerForm,
-  getUnsavedFormIsPristineSetTempForm,
   getUserVisibleStepNumbers,
 } from '../selectors'
 
@@ -103,63 +102,84 @@ describe('getBatchEditFormHasUnsavedChanges', () => {
   })
 })
 
-describe('getUnsavedFormIsPristineSetTempForm', () => {
-  const mockIsPresaved = true
-  it('should return true if temperature mod set temp is true formData ', () => {
-    // @ts-expect-error(jr, 4/8/22): missing module id
+describe('getBonusStepModalType', () => {
+  it('should handle temperature module set temp form', () => {
     const formData: FormData = {
+      id: 'step_123',
       stepType: 'temperature',
       targetTemperature: 33,
     }
-    const expected = true
-    const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
-      formData,
-      mockIsPresaved
-    )
-    expect(result).toEqual(expected)
-  })
-  it('should return false if temperature mod is false in formData ', () => {
-    // @ts-expect-error(jr, 4/8/22): missing module id
-    const formData: FormData = {
-      stepType: 'temperature',
-      setTemperature: null,
-    }
-    const expected = false
-    const result = getUnsavedFormIsPristineSetTempForm.resultFunc(
-      formData,
-      mockIsPresaved
-    )
-    expect(result).toEqual(expected)
-  })
-})
+    const mockIsPresaved = true
 
-describe('getUnsavedFormIsPrestineSetHeaterShakerTempForm', () => {
-  const mockIsPresaved = true
-  it('should return true if heater shaker temperature is true in formData ', () => {
-    // @ts-expect-error(jr, 4/8/22): missing module id
+    const resultWithoutConcurrentModuleActions =
+      getBonusStepModalType.resultFunc(formData, mockIsPresaved, false)
+    expect(resultWithoutConcurrentModuleActions).toEqual(
+      'optionallyWaitForTemp'
+    )
+
+    const resultWithConcurrentModuleActions = getBonusStepModalType.resultFunc(
+      formData,
+      mockIsPresaved,
+      true
+    )
+    expect(resultWithConcurrentModuleActions).toEqual(
+      'explainWaitForTemperatureModuleTemp'
+    )
+  })
+  it('should handle heater shaker set temp form', () => {
     const formData: FormData = {
+      id: 'step_123',
       stepType: 'heaterShaker',
       targetHeaterShakerTemperature: '10',
     }
-    const expected = true
-    const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
-      formData,
-      mockIsPresaved
+    const mockIsPresaved = true
+
+    const resultWithoutConcurrentModuleActions =
+      getBonusStepModalType.resultFunc(formData, mockIsPresaved, false)
+    expect(resultWithoutConcurrentModuleActions).toEqual(
+      'optionallyWaitForTemp'
     )
-    expect(result).toEqual(expected)
+
+    const resultWithConcurrentModuleActions = getBonusStepModalType.resultFunc(
+      formData,
+      mockIsPresaved,
+      true
+    )
+    expect(resultWithConcurrentModuleActions).toEqual(
+      'explainWaitForHeaterShakerTemp'
+    )
   })
-  it('should return false if heater shaker temperature is false in formData ', () => {
-    // @ts-expect-error(jr, 4/8/22): missing module id
+  it('should handle thermocycler profile form', () => {
     const formData: FormData = {
-      stepType: 'heaterShaker',
-      targetHeaterShakerTemperature: null,
+      id: 'step_123',
+      stepType: 'thermocycler',
+      thermocyclerFormType: 'thermocyclerProfile',
     }
-    const expected = false
-    const result = getUnsavedFormIsPristineHeaterShakerForm.resultFunc(
+    const mockIsPresaved = true
+
+    const resultWithoutConcurrentModuleActions =
+      getBonusStepModalType.resultFunc(formData, mockIsPresaved, false)
+    expect(resultWithoutConcurrentModuleActions).toEqual(null)
+
+    const resultWithConcurrentModuleActions = getBonusStepModalType.resultFunc(
       formData,
-      mockIsPresaved
+      mockIsPresaved,
+      true
     )
-    expect(result).toEqual(expected)
+    expect(resultWithConcurrentModuleActions).toEqual(
+      'explainWaitForThermocyclerProfile'
+    )
+  })
+  it('should return null when formData is null', () => {
+    const formData: FormData | null = null
+    const mockIsPresaved = true
+    const mockEnableConcurrentModuleActions = false
+    const result = getBonusStepModalType.resultFunc(
+      formData,
+      mockIsPresaved,
+      mockEnableConcurrentModuleActions
+    )
+    expect(result).toEqual(null)
   })
 })
 

@@ -70,6 +70,9 @@ export const GRIPPER_MODELS = [
 export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
+// robot camera name
+export const OT_SYSTEM_CAMERA = 'ot_system_camera'
+
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
 export const GEN2: 'GEN2' = 'GEN2'

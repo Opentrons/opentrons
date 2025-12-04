@@ -16,6 +16,8 @@ export { useAllCommandsQuery } from './useAllCommandsQuery'
 export { useAllCommandsAsPreSerializedList } from './useAllCommandsAsPreSerializedList'
 export { useCommandQuery } from './useCommandQuery'
 export { useRunCommandErrors } from './useRunCommandErrors'
+export { useAddCameraImageSettingsToRunMutation } from './useAddCameraImageSettingsToRunMutation'
+
 export * from './useAddLabwareOffsetToRunMutation'
 export * from './useCreateLabwareDefinitionMutation'
 export * from './useUpdateErrorRecoveryPolicy'

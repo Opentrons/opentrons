@@ -3,16 +3,26 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
+import { useAddCameraImageSettingsToRunMutation } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
 import { CameraControls } from '/app/organisms/Desktop/Camera/CameraControls'
 import styles from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/setupcamera.module.css'
 
-export function SetupRunCameraControls(): JSX.Element {
+export interface SetupRunCameraControlsProps {
+  cameraConfirmed: boolean
+  runId: string
+}
+
+export function SetupRunCameraControls({
+  cameraConfirmed,
+  runId,
+}: SetupRunCameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
-
+  const { addCameraImageSettingsToRun } =
+    useAddCameraImageSettingsToRunMutation(runId)
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
@@ -31,7 +41,7 @@ export function SetupRunCameraControls(): JSX.Element {
             {t('configure_camera_settings')}
           </StyledText>
         </div>
-        <TertiaryButton onClick={toggleControls}>
+        <TertiaryButton onClick={toggleControls} disabled={cameraConfirmed}>
           <StyledText desktopStyle="captionSemiBold">
             {t('edit_settings')}
           </StyledText>
@@ -39,7 +49,10 @@ export function SetupRunCameraControls(): JSX.Element {
       </div>
       {showControls &&
         createPortal(
-          <CameraControls onClose={toggleControls} />,
+          <CameraControls
+            onClose={toggleControls}
+            postCameraImageSettings={addCameraImageSettingsToRun}
+          />,
           getTopPortalEl()
         )}
     </div>

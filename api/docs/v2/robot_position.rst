@@ -101,6 +101,16 @@ The liquid meniscus in a well changes during aspirating or dispensing, so you'll
 - Set ``target="start"`` to target the existing liquid meniscus in the destination well before a dispense. 
 - Set ``target="end"`` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
 
+You can use the optional ``location`` and ``end_location`` parameters of the :py:meth:`~.InstrumentContext.aspirate` :py:meth:`~.InstrumentContext.dispense` methods to pipette relative to the liquid meniscus as it changes:: 
+
+    pipette.aspirate(
+        volume=100, 
+        location=plate["A1"].meniscus(z=-1, target="start"),
+        end_location=plate["A1"].meniscus(z=-1, target="end")
+    )
+
+Here, the pipette tip stays at 1 mm below the liquid meniscus, regardless of changes in liquid height during the aspirate. For more, see the :ref:`new-aspirate` and :ref:`new-dispense` sections.  
+
 .. note::
     To use the :py:meth:`~.Well.meniscus` method, you'll first need to specify the starting liquid volume with :py:meth:`~.Labware.load_liquid` or probe for liquid with :py:meth:`~.InstrumentContext.measure_liquid_height`.
 

@@ -83,7 +83,6 @@ export function DeviceDetailsComponent({
         <InstrumentsAndModules
           robotName={robotName}
           isRobotViewable={isRobotViewable}
-          isRobotBusy={isRobotBusy}
         />
         {isRobotViewable && (
           <>
