@@ -19,7 +19,24 @@ export type CenterLabwareInModuleChildSlotProps = PropsWithChildren<{
 }>
 
 /**
- * Goes from the origin of the module to
+ * This visually aligns a labware so it's centered in the slot atop a module.
+ *
+ * Certain modules, like the Thermocycler and Heater-Shaker, don't have slots. In those
+ * cases, the labware will be centered over the thermal block or whatever the module has
+ * instead.
+ *
+ * The parent SVG origin should be the front-left (-x,-y) corner of the slot that the
+ * module is in, which is also the origin of the module.
+ *
+ * Example:
+ *
+ * ```
+ * <Module childrenPositioningMode="passThrough" ...>
+ *   <CenterLabwareInModuleChildSlot ...>
+ *     <LabwareRender positioningMode="passThrough" ... />
+ *   </CenterLabwareInModuleChildSlot>
+ * </Module>
+ * ```
  */
 export function CenterLabwareInModuleChildSlot(
   props: CenterLabwareInModuleChildSlotProps
