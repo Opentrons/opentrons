@@ -136,7 +136,7 @@ async def test_raises_camera_disabled_error(
         CameraSettings(
             cameraEnabled=False,
             liveStreamEnabled=False,
-            errorRecoveryEnabled=False,
+            errorRecoveryCameraEnabled=False,
         )
     )
 
@@ -442,3 +442,30 @@ async def test_raises_image_parameter_error(
     with mock.patch("os.path.exists", mock.Mock(return_value=True)):
         with pytest.raises(CameraSettingsInvalidError):
             await subject.execute(params=params)
+
+
+async def test_raises_bad_resolution_and_zoom(
+    state_view: StateView,
+    file_provider: FileProvider,
+    camera_provider: CameraProvider,
+) -> None:
+    """It should raise CameraSettingsInvalidError when the capture image command is provided a bad resolution or zoom, even when the camera callback is unavailable."""
+    subject = CaptureImageImpl(
+        state_view=state_view,
+        file_provider=file_provider,
+        camera_provider=camera_provider,
+    )
+
+    params = CaptureImageParams(resolution=(319, 239))
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)
+    params = CaptureImageParams(resolution=(7681, 4321))
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)
+
+    params = CaptureImageParams(zoom=0.9)
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)
+    params = CaptureImageParams(zoom=2.1)
+    with pytest.raises(CameraSettingsInvalidError):
+        await subject.execute(params=params)

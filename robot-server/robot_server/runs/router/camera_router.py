@@ -86,7 +86,7 @@ async def add_camera_settings(
         liveStreamEnabled=request_body.data.liveStreamEnabled
         if request_body.data.liveStreamEnabled is not None
         else False,
-        errorRecoveryEnabled=request_body.data.errorRecoveryCameraEnabled
+        errorRecoveryCameraEnabled=request_body.data.errorRecoveryCameraEnabled
         if request_body.data.errorRecoveryCameraEnabled is not None
         else False,
     )
@@ -111,7 +111,7 @@ async def add_camera_settings(
             data=CameraEnable(
                 cameraEnabled=response_data.cameraEnabled,
                 liveStreamEnabled=response_data.liveStreamEnabled,
-                errorRecoveryCameraEnabled=response_data.errorRecoveryEnabled,
+                errorRecoveryCameraEnabled=response_data.errorRecoveryCameraEnabled,
             )
         ),
         status_code=status.HTTP_201_CREATED,

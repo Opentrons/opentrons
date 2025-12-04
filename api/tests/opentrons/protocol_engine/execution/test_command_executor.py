@@ -566,7 +566,7 @@ async def test_execute_undefined_error(
             CameraSettings(
                 cameraEnabled=True,
                 liveStreamEnabled=True,
-                errorRecoveryEnabled=True,
+                errorRecoveryCameraEnabled=True,
             )
         )
 
@@ -743,7 +743,7 @@ async def test_execute_defined_error(
             CameraSettings(
                 cameraEnabled=True,
                 liveStreamEnabled=True,
-                errorRecoveryEnabled=True,
+                errorRecoveryCameraEnabled=True,
             )
         )
 

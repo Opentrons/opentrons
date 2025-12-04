@@ -137,7 +137,7 @@ function openWindow(details: SecondaryWindowDetails): void {
   const newWindow = createUi()
   secondaryWindows.set(windowId, newWindow)
 
-  newWindow.webContents.once('did-finish-load', () => {
+  newWindow.webContents.on('did-finish-load', () => {
     log.debug(`Did finish load for ${type}`)
     newWindow.webContents.send('window-type', 'secondary')
   })

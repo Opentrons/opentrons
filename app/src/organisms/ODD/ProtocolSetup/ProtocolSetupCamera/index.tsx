@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -7,6 +8,7 @@ import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 import { SmallButton } from '/app/atoms/buttons'
 import { ODDBackButton } from '/app/molecules/ODDBackButton'
 import { CameraSettings } from '/app/organisms/ODD/CameraSettings'
+import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getCameraUsageState,
   updateCameraEnablement,
@@ -20,6 +22,8 @@ import type { Dispatch, SetStateAction } from 'react'
 import type { SetupScreens } from '/app/organisms/ODD/ProtocolSetup'
 import type { State } from '/app/redux/types'
 import type { RobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
+
+const TOAST_DURATION_MS = 3000
 
 export interface ProtocolSetupCameraProps {
   runId: string
@@ -38,6 +42,9 @@ export function ProtocolSetupCamera(
   const { t } = useTranslation('protocol_setup')
   const dispatch = useDispatch()
   const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const { makeSnackbar } = useToaster()
+
+  const [isConfirmPending, setIsConfirmPending] = useState(false)
 
   const {
     liveStreamEnabled,
@@ -64,15 +71,36 @@ export function ProtocolSetupCamera(
   }
 
   const onConfirmPreferences = (): void => {
-    addCameraSettingsToRun({
-      runId,
-      settings: {
-        cameraEnabled,
-        liveStreamEnabled,
-        errorRecoveryCameraEnabled: recoveryEnabled,
+    setIsConfirmPending(true)
+
+    addCameraSettingsToRun(
+      {
+        runId,
+        settings: {
+          cameraEnabled,
+          liveStreamEnabled,
+          errorRecoveryCameraEnabled: recoveryEnabled,
+        },
       },
-    })
-    confirmCameraSettings()
+      {
+        onSuccess: confirmCameraSettings,
+        onError: () => {
+          // This request only fails if the camera is not connected to the robot.
+          // We only want to surface the error if a user expects the camera to be enabled.
+          if (cameraEnabled) {
+            makeSnackbar(
+              t('error_confirming_camera') as string,
+              TOAST_DURATION_MS
+            )
+          } else {
+            confirmCameraSettings()
+          }
+        },
+        onSettled: () => {
+          setIsConfirmPending(false)
+        },
+      }
+    )
   }
 
   return (
@@ -82,6 +110,7 @@ export function ProtocolSetupCamera(
           {...props}
           onConfirmPreferences={onConfirmPreferences}
           cameraEnabled={cameraEnabled}
+          isConfirmPending={isConfirmPending}
         />
       }
       {...props}
@@ -100,6 +129,7 @@ export function ProtocolSetupCamera(
 interface SetupCameraHeaderProps extends ProtocolSetupCameraProps {
   onConfirmPreferences: () => void
   cameraEnabled: boolean
+  isConfirmPending: boolean
 }
 
 function SetupCameraHeader({
@@ -107,6 +137,7 @@ function SetupCameraHeader({
   cameraConfirmed,
   onConfirmPreferences,
   cameraEnabled,
+  isConfirmPending,
 }: SetupCameraHeaderProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
 
@@ -131,6 +162,8 @@ function SetupCameraHeader({
           onClick={onConfirmPreferences}
           buttonCategory="rounded"
           padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+          iconName={isConfirmPending ? 'ot-spinner' : null}
+          iconPlacement={isConfirmPending ? 'startIcon' : null}
         />
       )}
     </div>

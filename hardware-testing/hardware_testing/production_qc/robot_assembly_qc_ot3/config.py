@@ -29,6 +29,7 @@ class TestConfig:
     """Test Config."""
 
     simulate: bool
+    use_sku: bool
     tests: Dict[TestSection, Callable]
 
 

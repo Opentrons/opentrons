@@ -425,10 +425,12 @@ export function ProtocolRunSetup({
       rightElProps: {
         stepKey: CAMERA_SETUP_STEP_KEY,
         complete: !missingSteps.includes(CAMERA_SETUP_STEP_KEY),
-        completeText: t('camera_enabled'),
+        completeText: cameraEnabled
+          ? t('camera_enabled')
+          : t('camera_disabled'),
         incompleteText: t('check_preferences'),
         incompleteElement: null,
-        disabledHardware: !cameraEnabled,
+        disabledHardware: !cameraEnabled && isCameraRequired,
         missingHardware: !!storageInfo?.isImageStorageLow,
         missingHardwareText: t('check_preferences'),
       },
