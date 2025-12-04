@@ -235,7 +235,6 @@ class TransferComponentsExecutor:
         correction_volume = aspirate_props.correction_by_volume.get_for_volume(
             self._instrument.get_current_volume() + volume
         )
-        print(f"Should be in place {self._target_end_location is None}")
         self._instrument.aspirate(
             location=self._target_location,
             end_location=self._target_end_location,
