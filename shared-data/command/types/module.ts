@@ -36,11 +36,13 @@ export type ModuleRunTimeCommand =
   | AbsorbanceReaderCloseLidRunTimeCommand
   | AbsorbanceReaderInitializeRunTimeCommand
   | AbsorbanceReaderReadRunTimeCommand
-  | FlexStackerSetStoredLabwareRunTimeCommand
-  | FlexStackerRetrieveRunTimeCommand
-  | FlexStackerStoreRunTimeCommand
-  | FlexStackerFillRunTimeCommand
   | FlexStackerEmptyRunTimeCommand
+  | FlexStackerFillItemsRunTimeCommand
+  | FlexStackerFillRunTimeCommand
+  | FlexStackerRetrieveRunTimeCommand
+  | FlexStackerSetStoredLabwareItemsRunTimeCommand
+  | FlexStackerSetStoredLabwareRunTimeCommand
+  | FlexStackerStoreRunTimeCommand
   | IdentifyModuleRunTimeCommand
 
 export type ModuleCreateCommand =
@@ -500,6 +502,18 @@ export interface FlexStackerSetStoredLabwareItemsCreateCommand
   params: FlexStackerSetStoredLabwareItemsParams
 }
 
+export interface FlexStackerSetStoredLabwareItemsRunTimeCommand
+  extends FlexStackerSetStoredLabwareItemsCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    primaryLabwareDefinition: LabwareDefinition
+    lidLabwareDefinition?: LabwareDefinition | null
+    adapterLabwareDefinition?: LabwareDefinition | null
+    count: number
+    storedLabware: FlexStackerStoredLabwareGroup[]
+  } & StackerStoredLabwareLocationSequences
+}
+
 export interface FlexStackerRetrieveCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'flexStacker/retrieve'
@@ -538,6 +552,17 @@ export interface FlexStackerFillItemsCreateCommand
   extends CommonCommandCreateInfo {
   commandType: 'flexStacker/fillItems'
   params: FlexStackerFillItemsParams
+}
+
+export interface FlexStackerFillItemsRunTimeCommand
+  extends FlexStackerFillItemsCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: {
+    count: number
+    storedLabware?: FlexStackerStoredLabwareGroup[] | null
+    addedLabware?: FlexStackerStoredLabwareGroup[] | null
+  } & StackerStoredLabwareLocationSequences &
+    StackerStoredLabwareDefinitionURIs
 }
 
 export interface FlexStackerEmptyParams {

@@ -1,4 +1,9 @@
-import { formatPyList, uuid } from '../../utils'
+import {
+  getChunkForIndentingLists,
+  INDENT,
+  indentPyLines,
+  uuid,
+} from '../../utils'
 
 import type { FlexStackerFillItemsCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
@@ -7,18 +12,24 @@ export const flexStackerFillItems: CommandCreator<
   FlexStackerFillItemsCreateCommand['params']
 > = (args, invariantContext) => {
   const { moduleId, labware } = args
-  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
+  const modulePythonName = invariantContext.moduleEntities[moduleId].pythonName
   const labwarePythonNames = labware.map(
     lw => invariantContext.labwareEntities[lw].pythonName
   )
+  const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
+
+  const indentedLabwarePythonNames = labwareChunks
+    .map(chunk => INDENT + chunk.join(', '))
+    .join(',\n')
+
+  const pythonLabwareNames =
+    labwarePythonNames.length < 4
+      ? labwarePythonNames.join(', ')
+      : `\n${indentedLabwarePythonNames}\n`
+
   // TODO: add error creators
-
-  const pythonArgs = [
-    ...(labware.length > 0
-      ? [`labware=${formatPyList(labwarePythonNames)}`]
-      : []),
-  ]
-
+  const pythonArgs =
+    labware.length > 0 ? `labware=[${pythonLabwareNames}],\n` : ''
   return {
     commands: [
       {
@@ -30,6 +41,9 @@ export const flexStackerFillItems: CommandCreator<
         },
       },
     ],
-    python: `${pythonName}.fill_items(${pythonArgs.join(', ')})`,
+    python:
+      `${modulePythonName}.fill_items(\n` +
+      `${indentPyLines(pythonArgs)}` +
+      `)`,
   }
 }

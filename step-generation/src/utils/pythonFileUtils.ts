@@ -12,6 +12,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { HOPPER_STACKER_LOCATION } from '../constants'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -636,27 +637,31 @@ export const getSetStoredLabware = (
     const { id, type, pythonName } = module
 
     if (type === FLEX_STACKER_MODULE_TYPE) {
-      const labwareOnModule = Object.entries(labware).find(([_, labware]) =>
-        labware.stack?.includes(id)
+      const labwaresOnHopper = Object.entries(labware).filter(
+        ([_, labware]) =>
+          labware.stack.includes(id) &&
+          //  TODO: this might change! we might change the stack arch
+          labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
-      if (labwareOnModule == null) {
+      if (labwaresOnHopper.length === 0) {
         return ''
       } else {
-        // Count only labware items (excluding slot, module, and adapters)
-        const labwareCount = labwareOnModule[1].stack.filter(
-          itemId =>
-            itemId in labwareEntities &&
-            !labwareEntities[itemId].def.allowedRoles?.includes('adapter') &&
-            !labwareEntities[itemId].def.allowedRoles?.includes('lid')
-        ).length
-        const labwareEntity = labwareEntities[labwareOnModule[0]]
-        const setStoredLabwareArgs = [
-          `loadName=${formatPyStr(labwareEntity.def.parameters.loadName)}`,
-          `namespace=${formatPyStr(labwareEntity.def.namespace)}`,
-          `version=${labwareEntity.def.version}`,
-          `count=${labwareCount}`,
-        ].join(',\n')
-        return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware(\n${indentPyLines(setStoredLabwareArgs)})`
+        const labwarePythonNames = Object.values(labwaresOnHopper).map(
+          labware => labwareEntities[labware[0]].pythonName
+        )
+        const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
+
+        const indentedLabwarePythonNames = labwareChunks
+          .map(chunk => INDENT + chunk.join(', '))
+          .join(',\n')
+
+        const pythonLabwareNames =
+          labwarePythonNames.length < 4
+            ? labwarePythonNames.join(', ')
+            : `\n${indentedLabwarePythonNames}\n`
+        const pythonArgs = `labware=[${pythonLabwareNames}],\n`
+
+        return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware_list(\n${indentPyLines(pythonArgs)})`
       }
     }
   })

@@ -7,10 +7,11 @@ import {
 } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { uuid } from '../utils'
+import { getLargestStackInSlot, uuid } from '../utils'
 
 import type {
   FlexStackerEmptyParams,
+  FlexStackerFillItemsParams,
   FlexStackerFillParams,
   FlexStackerStoredLabwareGroup,
   ModuleOnlyParams,
@@ -57,6 +58,22 @@ export const forFlexStackerEmpty = (
       moduleState.labwareInHopper = null
     }
   }
+}
+
+export const forFlexStackerFillItems = (
+  params: FlexStackerFillItemsParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void => {
+  // TODO: we need to update both the labwareInHopper key and all the robotState.labware entities currently in the hopper
+  // const { robotState } = robotStateAndWarnings
+  // const { moduleId, labware } = params
+  // const slot = robotState.modules[moduleId].slot
+  // const moduleState = _getStackerModuleState(robotState, moduleId)
+  // const largestStackInSlot = getLargestStackInSlot(robotState.labware, slot)
+  // if (moduleState != null) {
+  //   moduleState.labwareInHopper = [labware, ...moduleState.labwareInHopper]
+  // }
 }
 
 export const forFlexStackerFill = (

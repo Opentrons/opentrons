@@ -20,6 +20,7 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
+import { HOPPER_STACKER_LOCATION } from '../constants'
 import {
   formatChangeTipArg,
   formatPyStr,
@@ -440,7 +441,6 @@ well_plate_3 = protocol.load_labware_from_definition(
       },
     }
     const mockLabwareEntitiesWithFlexStackerLabware = {
-      ...mockLabwareEntities,
       [flexStackerLabwareId]: {
         id: flexStackerLabwareId,
         labwareDefURI: 'opentrons/fixture_96_plate/1',
@@ -450,10 +450,8 @@ well_plate_3 = protocol.load_labware_from_definition(
     }
 
     const mockLabwareRobotStateWithFlexStackerLabware = {
-      ...labwareRobotState,
       [flexStackerLabwareId]: {
-        ...labwareRobotState[labwareId6],
-        stack: [flexStackerLabwareId, moduleId4, 'A4'],
+        stack: [flexStackerLabwareId, HOPPER_STACKER_LOCATION, moduleId4, 'A4'],
       },
     }
 
@@ -465,11 +463,9 @@ well_plate_3 = protocol.load_labware_from_definition(
 
     expect(setStoredLabware).toBe(
       `# Set Stored Labware:
-flex_stacker_1 = protocol.set_stored_labware(
-    loadName="fixture_96_plate",
-    namespace="opentrons",
-    version=1,
-    count=1)`.trimStart()
+flex_stacker_1 = protocol.set_stored_labware_list(
+    labware=[well_plate_4],
+)`.trimStart()
     )
   })
 })
