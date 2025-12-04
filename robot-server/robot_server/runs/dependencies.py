@@ -3,6 +3,18 @@
 from typing import Annotated
 
 from fastapi import Depends, status
+
+from robot_server.error_recovery.settings.store import (
+    ErrorRecoverySettingStore,
+    get_error_recovery_setting_store,
+)
+from robot_server.camera.settings.store import (
+    CameraSettingStore,
+    get_camera_setting_store,
+)
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
+from robot_server.data_files.dependencies import get_data_file_auto_deleter
+from robot_server.file_provider.fastapi_dependencies import get_file_provider
 from sqlalchemy.engine import Engine as SQLEngine
 
 from opentrons.hardware_control import HardwareControlAPI
