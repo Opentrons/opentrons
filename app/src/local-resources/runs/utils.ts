@@ -17,6 +17,7 @@ import {
   RUNNING_STATUSES,
   START_RUN_STATUSES,
   TERMINAL_STATUSES,
+  TERMINATING_STATUSES,
   VALID_ER_RUN_STATUSES,
 } from './constants'
 
@@ -25,7 +26,9 @@ import type { RunStatus } from '@opentrons/api-client'
 export function isTerminalRunStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && TERMINAL_STATUSES.includes(runStatus)
 }
-
+export function isTerminatingRunStatus(runStatus: RunStatus | null): boolean {
+  return runStatus !== null && TERMINATING_STATUSES.includes(runStatus)
+}
 export function isStartRunStatus(runStatus: RunStatus | null): boolean {
   return runStatus !== null && START_RUN_STATUSES.includes(runStatus)
 }
