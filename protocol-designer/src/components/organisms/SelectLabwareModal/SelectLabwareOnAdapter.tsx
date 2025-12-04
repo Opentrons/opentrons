@@ -97,7 +97,7 @@ export function SelectLabwareOnAdapter(
         isExpanded={parentLabwareURI === selectedAdapterDefURI}
       >
         {has96Channel && loadName === ADAPTER_96_CHANNEL
-          ? [...permittedTipracks].map((tiprackDefUri, index) => {
+          ? permittedTipracks.map((tiprackDefUri, index) => {
               const nestedDef =
                 defs[tiprackDefUri] ?? customLabwareDefs[tiprackDefUri]
               const stackingLabwareDefUris = getStackerDefinitions(
