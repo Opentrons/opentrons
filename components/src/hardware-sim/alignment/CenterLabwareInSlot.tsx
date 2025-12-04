@@ -33,7 +33,8 @@ export function CenterLabwareInSlot(
     labwareOriginToLabwareCenter
   )
 
-  // This assumes all slots
+  // This uses a hard-coded standard slot size. For correctness, we might want to change
+  // this to get the slot dimensions from the underlying deck or module definition.
   const slotOriginToSlotCenter = {
     x: SLOT_RENDER_WIDTH / 2,
     y: SLOT_RENDER_HEIGHT / 2,
