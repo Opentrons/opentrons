@@ -1,7 +1,9 @@
-import { it, describe, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { i18n } from '/app/i18n'
+import { beforeEach, describe, it } from 'vitest'
+
 import { renderWithProviders } from '/app/__testing-utils__'
+import { i18n } from '/app/i18n'
+
 import { SlotDetailsEmptyState } from '..'
 
 import type { ComponentProps } from 'react'
@@ -13,17 +15,17 @@ const render = (props: ComponentProps<typeof SlotDetailsEmptyState>) => {
 }
 
 describe('SlotDetailsEmptyState', () => {
-    let props: ComponentProps<typeof SlotDetailsEmptyState>
+  let props: ComponentProps<typeof SlotDetailsEmptyState>
 
-    beforeEach(() => {
-        props = {
-            slotId: 'A1',
-        }
-    })
+  beforeEach(() => {
+    props = {
+      slotId: 'A1',
+    }
+  })
 
-    it('should render slot empty state', () => {
-        render(props)
-        screen.getByText('A1')
-        screen.getByText('Slot empty')
-    })
+  it('should render slot empty state', () => {
+    render(props)
+    screen.getByText('A1')
+    screen.getByText('Slot empty')
+  })
 })

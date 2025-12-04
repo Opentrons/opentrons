@@ -62,61 +62,65 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     ) ||
     slotId === 'fixedTrash'
 
-
-  const isSlotEmpty =  moduleOnSlot == null &&
-        topMostLabwareOnSlot == null &&
-        !isTrashOnSlot 
+  const isSlotEmpty =
+    moduleOnSlot == null && topMostLabwareOnSlot == null && !isTrashOnSlot
 
   return (
     <>
-    {isSlotEmpty ? <div className={styles.slot_detail_container}><SlotDetailsEmptyState slotId={slotId} /></div> : null}
-    <div className={styles.slot_container}>
-      <div className={styles.slot_details}>
-        <div className={styles.command_step_header}>
-          <div className={styles.slot_detail_header}>
-            <RobotInfoLabel
-              deckLabel={slotId === 'fixedTrash' ? t('fixedTrash') : slotId}
-            />
-            {moduleOnSlot != null ? (
-              <RobotInfoLabel
-                iconName={
-                  MODULE_ICON_NAME_BY_TYPE[moduleEntities[moduleOnSlot[0]].type]
-                }
-              />
-            ) : null}
-          </div>
+      {isSlotEmpty ? (
+        <div className={styles.slot_detail_container}>
+          <SlotDetailsEmptyState slotId={slotId} />
         </div>
-        <Divider />
-        {topMostLabwareOnSlot != null && isTopmostLabwareATiprack ? (
-          <TipPickupContainer
-            tiprackEntity={labwareEntities[topMostLabwareOnSlot]}
-            robotState={robotState}
-          />
-        ) : null}
-        {topMostLabwareOnSlot != null && !isTopmostLabwareATiprack ? (
-          <LabwareSlotContainer
-            topLabwareOnSlotId={topMostLabwareOnSlot}
-            labwareEntities={labwareEntities}
-            commands={commands}
-            currentCommand={command}
-            liquids={liquids}
-            robotState={robotState}
-            pipetteEntities={pipetteEntities}
-            moduleEntities={moduleEntities}
-          />
-        ) : null}
-        {isTrashOnSlot ? (
-          <TipDisposalContainer robotState={robotState} />
-        ) : null}
-        {moduleOnSlot != null ? (
-          <ModuleContainer
-            moduleId={moduleOnSlot[0]}
-            moduleEntities={moduleEntities}
-            moduleRobotState={modules}
-          />
-        ) : null}
+      ) : null}
+      <div className={styles.slot_container}>
+        <div className={styles.slot_details}>
+          <div className={styles.command_step_header}>
+            <div className={styles.slot_detail_header}>
+              <RobotInfoLabel
+                deckLabel={slotId === 'fixedTrash' ? t('fixedTrash') : slotId}
+              />
+              {moduleOnSlot != null ? (
+                <RobotInfoLabel
+                  iconName={
+                    MODULE_ICON_NAME_BY_TYPE[
+                      moduleEntities[moduleOnSlot[0]].type
+                    ]
+                  }
+                />
+              ) : null}
+            </div>
+          </div>
+          <Divider />
+          {topMostLabwareOnSlot != null && isTopmostLabwareATiprack ? (
+            <TipPickupContainer
+              tiprackEntity={labwareEntities[topMostLabwareOnSlot]}
+              robotState={robotState}
+            />
+          ) : null}
+          {topMostLabwareOnSlot != null && !isTopmostLabwareATiprack ? (
+            <LabwareSlotContainer
+              topLabwareOnSlotId={topMostLabwareOnSlot}
+              labwareEntities={labwareEntities}
+              commands={commands}
+              currentCommand={command}
+              liquids={liquids}
+              robotState={robotState}
+              pipetteEntities={pipetteEntities}
+              moduleEntities={moduleEntities}
+            />
+          ) : null}
+          {isTrashOnSlot ? (
+            <TipDisposalContainer robotState={robotState} />
+          ) : null}
+          {moduleOnSlot != null ? (
+            <ModuleContainer
+              moduleId={moduleOnSlot[0]}
+              moduleEntities={moduleEntities}
+              moduleRobotState={modules}
+            />
+          ) : null}
+        </div>
       </div>
-    </div>
     </>
   )
 }
