@@ -972,6 +972,48 @@ class TransferComponentsExecutor:
         self._tip_state.delete_air_gap(last_air_gap)
 
 
+def _match_absolute_point(
+    well: WellCore,
+    well_volume_difference: float,
+    position_reference: PositionReference,
+    offset: Coordinate,
+    mount: Mount
+) -> Point:
+    match position_reference:
+        case PositionReference.WELL_TOP:
+            reference_point = well.get_top(0)
+        case PositionReference.WELL_BOTTOM:
+            reference_point = well.get_bottom(0)
+        case PositionReference.WELL_CENTER:
+            reference_point = well.get_center()
+        case PositionReference.LIQUID_MENISCUS_START:
+            estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
+                mount=mount,
+                operation_volume=0.0,
+            )
+            if isinstance(estimated_liquid_height, (float, int)):
+                reference_point = well.get_bottom(z_offset=estimated_liquid_height)
+            else:
+                # If estimated liquid height gives a SimulatedProbeResult then
+                # assume meniscus is at well center.
+                # Will this cause more harm than good? Is there a better alternative to this?
+                reference_point = well.get_center()
+        case PositionReference.LIQUID_MENISCUS_END | PositionReference.LIQUID_MENISCUS:
+            estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
+                mount=mount,
+                operation_volume=well_volume_difference,
+            )
+            if isinstance(estimated_liquid_height, (float, int)):
+                reference_point = well.get_bottom(z_offset=estimated_liquid_height)
+            else:
+                # If estimated liquid height gives a SimulatedProbeResult then
+                # assume meniscus is at well center.
+                # Will this cause more harm than good? Is there a better alternative to this?
+                reference_point = well.get_center()
+        case _:
+            raise ValueError(f"Unknown position reference {position_reference}")
+    return reference_point + Point(offset.x, offset.y, offset.z)
+
 def absolute_point_from_position_reference_and_offset(
     well: WellCore,
     well_volume_difference: float,
@@ -990,40 +1032,7 @@ def absolute_point_from_position_reference_and_offset(
     expected to be a -ve value while for a dispense, it will be a +ve value.
     """
     try:
-        match position_reference:
-            case PositionReference.WELL_TOP:
-                reference_point = well.get_top(0)
-            case PositionReference.WELL_BOTTOM:
-                reference_point = well.get_bottom(0)
-            case PositionReference.WELL_CENTER:
-                reference_point = well.get_center()
-            case PositionReference.LIQUID_MENISCUS_START:
-                estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
-                    mount=mount,
-                    operation_volume=0.0,
-                )
-                if isinstance(estimated_liquid_height, (float, int)):
-                    reference_point = well.get_bottom(z_offset=estimated_liquid_height)
-                else:
-                    # If estimated liquid height gives a SimulatedProbeResult then
-                    # assume meniscus is at well center.
-                    # Will this cause more harm than good? Is there a better alternative to this?
-                    reference_point = well.get_center()
-            case PositionReference.LIQUID_MENISCUS_END | PositionReference.LIQUID_MENISCUS:
-                estimated_liquid_height = well.estimate_liquid_height_after_pipetting(
-                    mount=mount,
-                    operation_volume=well_volume_difference,
-                )
-                if isinstance(estimated_liquid_height, (float, int)):
-                    reference_point = well.get_bottom(z_offset=estimated_liquid_height)
-                else:
-                    # If estimated liquid height gives a SimulatedProbeResult then
-                    # assume meniscus is at well center.
-                    # Will this cause more harm than good? Is there a better alternative to this?
-                    reference_point = well.get_center()
-            case _:
-                raise ValueError(f"Unknown position reference {position_reference}")
-        return reference_point + Point(offset.x, offset.y, offset.z)
+        return _match_absolute_point(well, well_volume_difference, position_reference, offset, mount)
     except (
         errors.LiquidHeightUnknownError,
         errors.IncompleteWellDefinitionError,
@@ -1033,13 +1042,5 @@ def absolute_point_from_position_reference_and_offset(
         if fallback_position_reference is None or fallback_offset is None:
             # No fallback so raise the error
             raise e
-        # try again with the fallback and set the fallbacks to None so we don't recurse forever
-        return absolute_point_from_position_reference_and_offset(
-            well,
-            well_volume_difference,
-            fallback_position_reference,
-            fallback_offset,
-            mount,
-            None,
-            None,
-        )
+        pass
+    return _match_absolute_point(well, well_volume_difference, fallback_position_reference, fallback_offset, mount)
