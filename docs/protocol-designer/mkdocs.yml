@@ -44,7 +44,7 @@ nav:
       - Module steps: steps/module.md 
       - Magnet steps: steps/magnet.md
       - Pause steps: steps/pause.md
-      - Camera steps: camera.md
+      - Camera steps: steps/camera.md
   - Editing steps: edit-steps.md
   - Warnings and errors: warnings-errors.md
   - Export a protocol: export-protocol.md
