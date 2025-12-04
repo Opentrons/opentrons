@@ -6,7 +6,7 @@ Your protocol timeline includes steps the robot will peform in your protocol. To
 
 ## The basics
 
-Transfer steps move liquid from one well or group of wells to another. Adding a transfer step opens a three-part form. In the first, select basic settings for your liquid transfer: 
+Transfer steps move liquid from one well or group of wells to another. Adding a transfer step opens a four-part form. In the first, select basic settings for your liquid transfer: 
 
 * The pipette to perform the transfer and the tip rack it will use. 
 * Source and destination labware, including wells. 
@@ -17,23 +17,23 @@ Click **Choose wells**, and then click and drag to select source and destination
 
 | **Pipette Path** | **Well Ratio** | **Description** {style="width: 25%;"}| **Tip Handling** |
 | ---------------- | -------------- | --------------- | ---------------- |
-| Single path | N to N | <ul><li>Aspirates enough liquid for a single transfer and repeats</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Per source well</li><li>Never</li></ul> |
-| Consolidate path | Many-to-1 | <ul><li>Multi-aspirate</li><li>Aspirates from multiple wells for a single dispense</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
-| Distribute path | 1-to-many | <ul><li>Multi-dispense</li><li>Aspirates enough volume from 1 well for multiple dispenses</li></ul> | Select a new tip: <ul><li>Before every aspirate</li><li>Once at the start of the step</li><li>Never</li></ul> |
+| Single path | N to N | <ul><li>Aspirates enough liquid for a single transfer and repeats</li></ul> | Select a new tip: <ul><li>Always</li><li>Never</li><li>Once</li><li>Per source</li></ul> |
+| Consolidate path | Many-to-1 | <ul><li>Multi-aspirate</li><li>Aspirates from multiple wells for a single dispense</li></ul> | Select a new tip: <ul><li>Always</li><li>Never</li><li>Once</li></ul> |
+| Distribute path | 1-to-many | <ul><li>Multi-dispense</li><li>Aspirates enough volume from 1 well for multiple dispenses</li></ul> | Select a new tip: <ul><li>Always</li><li>Never</li><li>Once</li></ul> |
 
 Lids on labware block transfer steps in your protocol. If every piece of labware on the deck includes a lid, only move, pause, and relevant module steps will be available. Use a move step to remove lids, then add a transfer step. 
 
 ## Tip management
 
-Customizing tip management in your transfer steps can prevent contamination or reduce tip use in a protocol. Choose how often the robot selects a new tip: 
+Customizing tip management in your transfer steps can prevent contamination or reduce tip use in a protocol. First, choose how often the robot selects a new tip: 
 
-* **Before every aspirate**: selects a new tip before every aspirate in a transfer step. 
-* **Once at the start of the step**: selects a new tip once at the beginning of the entire transfer step. 
+* **Always**: selects a new tip before every aspirate in a transfer step. 
+* **Once**: selects a new tip once at the beginning of the entire transfer step. 
 * **Never**: reuses the tip used in the previous step. 
-* **Per source well**: selects a new tip for each source well, including the first. Not compatible with a consolidate or distribute path. 
-* **Per destination well**: selects a new tip for each destination well, including the first. Not compatible with a consolidate or distribute path. 
+* **Per source**: selects a new tip for each source well, including the first. Not compatible with a consolidate or distribute path. 
+* **Per destination**: selects a new tip for each destination well, including the first. Not compatible with a consolidate or distribute path. 
 
-Consolidate and distribute paths use a cycle of aspiration and dispensing to combine liquid in source or destination wells. When you choose "before every aspirate" for a consolidate or dispense path, the robot selects a new tip before the first aspirate of the cycle: 
+Consolidate and distribute paths use a cycle of aspiration and dispensing to combine liquid in source or destination wells. When you choose "always" for a consolidate or dispense path, the robot selects a new tip before the first aspirate of the cycle: 
 
 * Consolidate cycle: aspirate, aspirate, dispense.
 * Distribute cycle: aspirate, dispense, dispense. 
@@ -45,10 +45,19 @@ If you choose an incompatible well ratio or an empty source well, Protocol Desig
   <figcaption>Incompatible well ratio in a transfer step.</figcaption>
 </figure>
 
-Choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol, or to return tips to the tip rack.
+Next, choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol, or to return tips to the tip rack.
 
 !!! Note
-    If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol.  
+    If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol. 
+
+You can customize tip tracking settings in your Protocol Designer protocols. When you select automatic tip tracking, Protocol Designer keeps track of which tips have been picked up and used, starting with the tip in position A1 of the tip rack you chose for the transfer. 
+
+Click **manual tip tracking** to choose the tips the pipette will use in your transfer step. Tips are labeled as  new, used, or selected for your transfer. Protocol Designer also shows you tips that have been discarded and are missing from the tip rack, or tips that are inaccessible, or unable to be picked up by, your chosen pipette.
+
+<figure class="screenshot" markdown>
+  ![Manual tip selection](../images/tip_selection.png)
+  <figcaption>Click to select tips for your transfer step.</figcaption>
+</figure>
 
 In the second form, choose whether to use liquid class settings in the transfer. You can choose from three Opentrons-verified liquid classes: for an aqueous, viscous, or volatile liquid. Applying a liquid class changes the transfer step's pipetting settings, so Protocol Designer will ask you each time. 
 
