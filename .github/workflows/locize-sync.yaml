@@ -21,11 +21,6 @@ env:
   LOCIZE_API_KEY: ${{ secrets.LOCIZE_API_KEY }}
   LOCIZE_PROJECT_ID: ${{ secrets.LOCIZE_PROJECT_ID }}
 
-permissions:
-  contents: write
-  pull-requests: write
-  actions: write
-
 jobs:
   sync:
     name: Run Locize sync
@@ -34,7 +29,7 @@ jobs:
       CI: true
     steps:
       - name: Checkout target branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ inputs.target_branch }}
           fetch-depth: 1
