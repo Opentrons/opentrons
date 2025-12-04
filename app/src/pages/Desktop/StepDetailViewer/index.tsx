@@ -9,6 +9,7 @@ import type {
   RunTimeCommand,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+import { SkeletonForSlotDetail } from './SkeletonForSlotDetail'
 
 interface StepDetailData {
   analysis: ProtocolAnalysisOutput
@@ -73,8 +74,8 @@ export function StepDetailViewer(): JSX.Element {
     }
   }, [protocolKey])
 
-  if (loading) {
-    return <div>loading</div>
+  if (true) {
+    return <SkeletonForSlotDetail />
   }
   if (!data) {
     return <div>no data found</div>
