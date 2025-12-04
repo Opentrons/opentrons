@@ -24,6 +24,10 @@ Welcome to the v8.8.0 release of the Opentrons App! This release includes concur
 - An attached pipette no longer descends to attach a calibration probe for Labware Position Check, creating more clearance on the deck.
 - Changed runtime parameters no longer revert to their default values.
 
+### Known Issues
+
+- Error recovery in the app or on the Flex touchscreen can't successfully resolve overpressure errors that occur during a dynamic aspirate or dispense. We recommend canceling the protocol when these errors occur.
+
 ---
 
 ## Opentrons App Changes in 8.7.0
