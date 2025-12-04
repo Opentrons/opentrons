@@ -220,7 +220,7 @@ const getNoLiquidClassValues = (
       : dispense.retract.touchTip.params?.zOffset,
     touchTipDispenseSpeed: dispense.retract.touchTip.params?.speed,
     disposalVolumeDispenseSettings: {
-      volume: 0,
+      volume: pipette.liquids.default.minVolume,
       blowOutLocation:
         convertBlowoutLocation(
           dispense?.retract.blowout?.params?.location,

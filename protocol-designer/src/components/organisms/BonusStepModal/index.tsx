@@ -18,45 +18,56 @@ import {
 
 import type { PropsWithChildren } from 'react'
 
-interface HandleClickProps {
+interface HandleSkipPauseClickProps {
   handleSkipPauseClick: () => void
+}
+
+interface HandleAddPauseClickProps {
   handleAddPauseClick: () => void
 }
 
-type AutoAddPauseUntilTempStepModalProps =
+type BonusStepModalProps =
   | ({
+      // "We've added a ___ step for you"
       modalType:
-        | 'temperatureModule'
-        | 'heaterShaker'
-        | 'thermocyclerBlock'
-        | 'thermocyclerLid'
+        | 'explainWaitForTemperatureModuleTemp'
+        | 'explainWaitForHeaterShakerTemp'
+        | 'explainWaitForThermocyclerBlockTemp'
+        | 'explainWaitForThermocyclerLidTemp'
       displayTemperature: string
-    } & HandleClickProps)
+    } & HandleAddPauseClickProps)
   | ({
-      modalType: 'thermocyclerProfile'
+      modalType: 'explainWaitForThermocyclerProfile'
       displayTemperature?: null
-    } & HandleClickProps)
+    } & HandleAddPauseClickProps)
   | ({
-      // todo(mm, 2025-09-26): Delete legacy mode when enableConcurrentModuleActions FF is deleted.
-      modalType: 'legacy'
+      // "Would you like to add a ___ step"
+      // todo(mm, 2025-09-26): Delete this modal type when enableConcurrentModuleActions FF is deleted
+      modalType: 'optionallyWaitForTemp'
       displayTemperature: string
       displayModule: string
-    } & HandleClickProps)
+    } & HandleAddPauseClickProps &
+      HandleSkipPauseClickProps)
+
+export type BonusStepModalType = BonusStepModalProps['modalType']
 
 /**
  * Implements the several modals that are like "you just saved a set-temperature step,
  * would you like to also add a pause step."
  */
-export const AutoAddPauseUntilTempStepModal = (
-  props: AutoAddPauseUntilTempStepModalProps
-): JSX.Element => {
-  const { modalType, handleSkipPauseClick, handleAddPauseClick } = props
+export const BonusStepModal = (props: BonusStepModalProps): JSX.Element => {
+  const { modalType } = props
   const { t } = useTranslation()
   const [rememberDismissal, setRememberDismissal] = useState(false)
 
-  // todo(mm, 2025-09-29): Delete legacy mode when enableConcurrentModuleActions FF is deleted.
-  if (modalType === 'legacy') {
-    const { displayModule, displayTemperature } = props
+  // todo(mm, 2025-09-26): Delete this modal type when enableConcurrentModuleActions FF is deleted
+  if (modalType === 'optionallyWaitForTemp') {
+    const {
+      displayModule,
+      displayTemperature,
+      handleSkipPauseClick,
+      handleAddPauseClick,
+    } = props
     return (
       <Modal
         marginLeft="0"
@@ -100,34 +111,36 @@ export const AutoAddPauseUntilTempStepModal = (
       </Modal>
     )
   } else {
+    const { displayTemperature, handleAddPauseClick } = props
+
     const titleKey: string = (() => {
       switch (modalType) {
-        case 'temperatureModule':
+        case 'explainWaitForTemperatureModuleTemp':
           return 'modal:auto_add_pause_until_temp_step.temperature_module.title'
-        case 'heaterShaker':
+        case 'explainWaitForHeaterShakerTemp':
           return 'modal:auto_add_pause_until_temp_step.heater_shaker.title'
-        case 'thermocyclerBlock':
+        case 'explainWaitForThermocyclerBlockTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_block.title'
-        case 'thermocyclerLid':
+        case 'explainWaitForThermocyclerLidTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_lid.title'
-        case 'thermocyclerProfile':
+        case 'explainWaitForThermocyclerProfile':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_profile.title'
         // default omitted, for exhaustiveness checking.
       }
     })()
-    const title = t(titleKey, { temperature: props.displayTemperature })
+    const title = t(titleKey, { temperature: displayTemperature })
 
     const bodyParagraphsKey: string = (() => {
       switch (modalType) {
-        case 'temperatureModule':
+        case 'explainWaitForTemperatureModuleTemp':
           return 'modal:auto_add_pause_until_temp_step.temperature_module.body'
-        case 'heaterShaker':
+        case 'explainWaitForHeaterShakerTemp':
           return 'modal:auto_add_pause_until_temp_step.heater_shaker.body'
-        case 'thermocyclerBlock':
+        case 'explainWaitForThermocyclerBlockTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_block.body'
-        case 'thermocyclerLid':
+        case 'explainWaitForThermocyclerLidTemp':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_lid.body'
-        case 'thermocyclerProfile':
+        case 'explainWaitForThermocyclerProfile':
           return 'modal:auto_add_pause_until_temp_step.thermocycler_profile.body'
         // default omitted, for exhaustiveness checking.
       }
@@ -137,7 +150,7 @@ export const AutoAddPauseUntilTempStepModal = (
       <Trans
         t={t}
         i18nKey={bodyParagraphsKey}
-        values={{ temperature: props.displayTemperature }}
+        values={{ temperature: displayTemperature }}
         components={{ p: <BodyParagraph /> }}
       />
     )

@@ -213,7 +213,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
   const configureNozzleLayoutCommand: CurriedCommandCreator[] =
     //  only emit the command if previous nozzle state and tiprack state are different
     //  only check for the 96-channel since we do not support 8-channel partial tip yet
-    channels === 96 &&
+    channels !== 1 &&
     args.nozzles != null &&
     (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)
       ? [

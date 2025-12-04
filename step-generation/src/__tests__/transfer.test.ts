@@ -147,7 +147,7 @@ describe('pick up tip if no tip on pipette', () => {
 
     robotStateWithTip.tipState.pipettes.p300SingleId = {
       hasTip: true,
-      tiprackURI: 'tiprackId',
+      tiprackURI: 'tiprack1Id',
     }
 
     noTipArgs = {
@@ -2364,7 +2364,7 @@ describe('single transfer exceeding pipette max', () => {
     // begin with tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = {
       hasTip: true,
-      tiprackURI: 'tiprackId',
+      tiprackURI: 'tiprack1Id',
     }
 
     const result = transfer(transferArgs, invariantContext, robotStateWithTip)
@@ -2660,7 +2660,7 @@ describe('single transfer exceeding pipette max', () => {
     // begin with tip on pipette
     robotStateWithTip.tipState.pipettes.p300SingleId = {
       hasTip: true,
-      tiprackURI: 'tiprackId',
+      tiprackURI: 'tiprack1Id',
     }
 
     const result = transfer(transferArgs, invariantContext, robotStateWithTip)
