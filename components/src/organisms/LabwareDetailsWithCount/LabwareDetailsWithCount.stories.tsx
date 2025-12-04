@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { LabwareDetailsWithCount } from './index'
 
@@ -23,6 +24,6 @@ export const LabwareDetailsWithCountStory: Story = {
   args: {
     title: 'Opentrons Flex 96 Tip Rack 1000 µL',
     subTitle: 'With tip rack lid',
-    label: 'Quantity: 1',
+    quantity: 1,
   },
 }

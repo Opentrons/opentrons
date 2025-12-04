@@ -14,7 +14,6 @@ import {
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getFlexStackerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
-import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 
 import styles from './FlexStackerTools.module.css'
 
@@ -81,11 +80,9 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
             subTitle={
               flexStackerModuleState.storedLabwareDetails.lidLabware?.loadName
             }
-            label={t('protocol_steps:flex_stacker.stacker.quantity', {
-              count:
-                flexStackerModuleState.storedLabwareDetails.initialCount?.toString() ??
-                '0',
-            })}
+            quantity={
+              flexStackerModuleState.storedLabwareDetails.initialCount ?? 0
+            }
           />
         ) : (
           <InfoScreen
@@ -104,11 +101,14 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
             <LabwareDetailsWithCount
               title={
                 flexStackerModuleState.storedLabwareDetails?.primaryLabware
-                  .loadName
+                  ?.loadName ?? ''
               }
               subTitle={
-                flexStackerModuleState.storedLabwareDetails?.lidLabwareId
-                  ?.loadName
+                flexStackerModuleState.storedLabwareDetails?.lidLabware
+                  ?.loadName ?? undefined
+              }
+              quantity={
+                flexStackerModuleState.storedLabwareDetails?.initialCount ?? 0
               }
             />
           ) : (

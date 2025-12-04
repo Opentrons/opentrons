@@ -1,52 +1,59 @@
+import { useTranslation } from 'react-i18next'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { DeckLabelSet } from '..'
-import { BORDERS, COLORS } from '../../../helix-design-system'
-import { DeckLabel } from '../../../molecules/DeckLabel'
+import { LabwareDetailsWithCount } from '..'
 import { renderWithProviders } from '../../../testing/utils'
 
 import type { ComponentProps } from 'react'
 
-vi.mock('../../../molecules/DeckLabel')
+vi.mock('react-i18next', () => ({
+  useTranslation: vi.fn(),
+  initReactI18next: vi.fn(),
+}))
 
-const mockDeckLabels = [
-  {
-    text: 'Label',
-    isSelected: false,
-    labelBorderRadius: BORDERS.borderRadius4,
-    isZoomed: true,
-  },
-  {
-    text: 'Label',
-    isSelected: false,
-    labelBorderRadius: BORDERS.borderRadius4,
-    isZoomed: true,
-  },
-]
-
-const render = (props: ComponentProps<typeof DeckLabelSet>) => {
-  return renderWithProviders(<DeckLabelSet {...props} />)
+vi.mock('i18next', () => {
+  return {
+    default: {
+      use: () => ({ init: vi.fn() }),
+      createInstance: () => ({
+        use: () => ({ init: vi.fn() }),
+        init: vi.fn(),
+        t: (k: string) => k,
+      }),
+      init: vi.fn(),
+      t: (k: string) => k,
+    },
+  }
+})
+const render = (props: ComponentProps<typeof LabwareDetailsWithCount>) => {
+  return renderWithProviders(<LabwareDetailsWithCount {...props} />)
 }
-describe('DeckLabelSet', () => {
-  let props: ComponentProps<typeof DeckLabelSet>
-
+describe('LabwareDetailsWithCount', () => {
+  let props: ComponentProps<typeof LabwareDetailsWithCount>
+  const t = vi.fn(key => key)
   beforeEach(() => {
     props = {
-      x: 1,
-      y: 1,
-      width: 50,
-      height: 50,
-      deckLabels: mockDeckLabels,
+      title: 'Title',
+      subTitle: 'SubTitle',
+      quantity: 1,
     }
-    vi.mocked(DeckLabel).mockReturnValue(<div>mock DeckLabels</div>)
+    vi.mocked(useTranslation).mockReturnValue({ t } as any)
   })
 
-  it('should render blue border and DeckLabel', () => {
+  it('should render title, subTitle and label', () => {
     render(props)
-    expect(screen.getAllByText('mock DeckLabels').length).toBe(2)
-    const deckLabelSet = screen.getByTestId('DeckLabeSet')
-    expect(deckLabelSet).toHaveStyle(`border: 1.5px solid ${COLORS.blue50}`)
-    expect(deckLabelSet).toHaveStyle(`border-radius: ${BORDERS.borderRadius4}`)
+    expect(screen.getByText('Title')).toBeInTheDocument()
+    expect(screen.getByText('SubTitle')).toBeInTheDocument()
+    expect(screen.getByText('quantity')).toBeInTheDocument()
+  })
+
+  it('should render title without subTitle and label', () => {
+    props.subTitle = undefined
+    props.quantity = undefined
+    render(props)
+    expect(screen.getByText('Title')).toBeInTheDocument()
+    expect(screen.queryByText('SubTitle')).not.toBeInTheDocument()
+    expect(screen.queryByText('quantity')).not.toBeInTheDocument()
   })
 })
