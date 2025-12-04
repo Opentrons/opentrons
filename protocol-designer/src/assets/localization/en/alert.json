@@ -178,6 +178,10 @@
       "NEXT_TIPRACK_HAS_LID": {
         "title": "Unable to pick up tips",
         "body": "The next available tip rack has a lid. Remove the lid from the tip rack to pick up tips."
+      },
+      "INCOMPLETE_PICKUP": {
+        "title": "Incomplete tip pickup",
+        "body": "At least one of the selected tips is empty"
       }
     },
     "warning": {
