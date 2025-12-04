@@ -197,7 +197,7 @@ const getSlotHasPotentialCollidingObject = (
 ): boolean => {
   const isThermocyclerOnDeck = Object.values(
     invariantContext.moduleEntities
-  ).some(module => module.type === THERMOCYCLER_MODULE_TYPE)
+  ).some(({ type }) => type === THERMOCYCLER_MODULE_TYPE)
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
