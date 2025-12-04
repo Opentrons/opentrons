@@ -126,11 +126,6 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const robotType = useRobotType(robotName)
-  const onCloneRunSuccess = (): void => {
-    if (isQuickTransfer) {
-      deleteRun(runId)
-    }
-  }
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(
     runId,
@@ -146,7 +141,7 @@ export function RunSummary(): JSX.Element {
     }
   }, [isRunCurrent, enteredER])
 
-  const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
+  const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
