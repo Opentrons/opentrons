@@ -112,6 +112,7 @@ export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
   maxPoolCount: number
   storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
 }

@@ -1,0 +1,184 @@
+import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
+
+import {
+  Divider,
+  Icon,
+  InfoScreen,
+  LabwareDetailsWithCount,
+  RadioButton,
+  StyledText,
+} from '@opentrons/components'
+
+import { DropdownStepFormField } from '/protocol-designer/components/molecules'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getFlexStackerLabwareOptions } from '/protocol-designer/ui/modules/selectors'
+
+import styles from './FlexStackerTools.module.css'
+
+import type { DropdownOption } from '@opentrons/components'
+import type {
+  FlexStackerModuleState,
+  TimelineFrame,
+} from '@opentrons/step-generation'
+import type { StepFormProps } from '../../types'
+
+export type FlexStackerToolsProps = StepFormProps & {
+  robotState: TimelineFrame | null
+  flexStackerOptions: DropdownOption[]
+}
+
+export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
+  const { formData, propsForFields, robotState, flexStackerOptions } = props
+  const { moduleId } = formData
+  const { t } = useTranslation(['application', 'form', 'protocol_steps'])
+
+  const { modules } = robotState ?? {}
+
+  const flexStackerModuleState = modules?.[moduleId]
+    ?.moduleState as FlexStackerModuleState | null
+
+  const labwareInHopperCount =
+    flexStackerModuleState?.labwareInHopper?.length ?? 0
+  const maxPoolCount = flexStackerModuleState?.maxPoolCount ?? 0
+  const labwareOnShuttle = flexStackerModuleState?.labwareOnShuttle ?? null
+
+  console.log('labwareOnShuttle:', labwareOnShuttle)
+  const labwareFiledComponent = (
+    <div className={styles.spaceBetween}>
+      <StyledText desktopStyle="bodyDefaultSemiBold">
+        {t('protocol_steps:flex_stacker.stacker.label')}
+      </StyledText>
+
+      {labwareInHopperCount > 0 ? (
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('protocol_steps:flex_stacker.stacker.labware_filled', {
+            amount: labwareInHopperCount,
+            total: maxPoolCount,
+          })}
+        </StyledText>
+      ) : null}
+    </div>
+  )
+
+  return (
+    <div className={styles.container}>
+      <DropdownStepFormField
+        options={flexStackerOptions}
+        title={t('form:step_edit_form.field.absorbanceReader.moduleId.module')}
+        {...propsForFields.moduleId}
+        updateValue={() => {}}
+      />
+      <Divider margin="0" marginY="0" />
+      <div className={`${styles.container} ${styles.paddingX}`}>
+        {labwareFiledComponent}
+        {flexStackerModuleState?.storedLabwareDetails != null ? (
+          <LabwareDetailsWithCount
+            title={
+              flexStackerModuleState.storedLabwareDetails.primaryLabware
+                .loadName
+            }
+            subTitle={
+              flexStackerModuleState.storedLabwareDetails.lidLabware?.loadName
+            }
+            quantity={
+              flexStackerModuleState.storedLabwareDetails.initialCount ?? 0
+            }
+          />
+        ) : (
+          <InfoScreen
+            content={t('protocol_steps:flex_stacker.stacker.no_labware')}
+          />
+        )}
+      </div>
+      <Divider margin="0" marginY="0" />
+      <div className={`${styles.container} ${styles.padding_x}`}>
+        <StyledText desktopStyle="bodyDefaultSemiBold">
+          {t('protocol_steps:flex_stacker.shuttle.label')}
+        </StyledText>
+        <div>
+          {labwareOnShuttle != null &&
+          flexStackerModuleState?.storedLabwareDetails != null ? (
+            <LabwareDetailsWithCount
+              title={labwareOnShuttle?.primaryLabwareId ?? ''}
+              subTitle={labwareOnShuttle?.lidLabwareId ?? undefined}
+            />
+          ) : (
+            <InfoScreen
+              content={t('protocol_steps:flex_stacker.shuttle.no_labware')}
+            />
+          )}
+        </div>
+      </div>
+      <Divider margin="0" marginY="0" />
+      <div className={`${styles.container} ${styles.padding_x}`}>
+        <div className={styles.spaceBetween} style={{ width: '40%' }}>
+          <StyledText desktopStyle="bodyDefaultSemiBold">
+            {t('protocol_steps:flex_stacker.module_controls.label')}
+          </StyledText>
+          <Icon name="info" size="16px" />
+        </div>
+        <RadioButton
+          buttonValue="retrieve"
+          disabled={labwareInHopperCount === 0 || labwareOnShuttle != null}
+          buttonLabel={
+            <StyledText desktopStyle="bodyDefaultRegular">Retrieve</StyledText>
+          }
+          buttonSubLabel={{
+            align: 'vertical',
+            label: t(
+              'protocol_steps:flex_stacker.module_controls.retrieve_sublabel'
+            ),
+          }}
+          onChange={() => {}}
+          largeDesktopBorderRadius
+        />
+        <RadioButton
+          buttonValue="refill"
+          buttonLabel={t(
+            'protocol_steps:flex_stacker.module_controls.refill_label'
+          )}
+          buttonSubLabel={{
+            align: 'vertical',
+            label: t(
+              'protocol_steps:flex_stacker.module_controls.refill_sublabel'
+            ),
+          }}
+          onChange={e => {
+            console.log('e:', e)
+          }}
+          largeDesktopBorderRadius
+        />
+        <RadioButton
+          buttonValue="empty"
+          buttonLabel={t(
+            'protocol_steps:flex_stacker.module_controls.empty_label'
+          )}
+          buttonSubLabel={{
+            align: 'vertical',
+            label: t(
+              'protocol_steps:flex_stacker.module_controls.empty_sublabel'
+            ),
+          }}
+          onChange={() => {}}
+          largeDesktopBorderRadius
+        />
+      </div>
+    </div>
+  )
+}
+
+export const FlexStackerToolsContainer = (
+  props: StepFormProps
+): JSX.Element => {
+  const robotState = useSelector(getRobotStateAtActiveItem)
+  const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
+
+  return (
+    <FlexStackerTools
+      {...props}
+      robotState={robotState}
+      flexStackerOptions={flexStackerOptions}
+    />
+  )
+}
