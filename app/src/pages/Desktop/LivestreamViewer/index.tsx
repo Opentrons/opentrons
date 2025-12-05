@@ -16,6 +16,7 @@ import {
   LivestreamInfoScreen,
   useLivestreamInfoScreen,
 } from '/app/pages/Desktop/LivestreamViewer/LivestreamInfoScreen'
+import { useFeatureFlag } from '/app/redux/config'
 import { useCurrentRunId, useNotifyRunQuery } from '/app/resources/runs'
 
 import styles from './livestream.module.css'
@@ -53,6 +54,7 @@ export function LivestreamViewer(): JSX.Element {
     isCurrentRunLoading,
     videoError
   )
+  const liveStreamImageCaptureEnabled = useFeatureFlag('camera')
 
   useReportWindowDurationEvent(
     retainedRunId,
@@ -81,7 +83,7 @@ export function LivestreamViewer(): JSX.Element {
           </div>
         )}
       </div>
-      {infoScreenType == null && (
+      {infoScreenType == null && liveStreamImageCaptureEnabled && (
         <Btn
           className={styles.capture_image_button}
           backgroundColor={COLORS.blue50}
@@ -89,7 +91,7 @@ export function LivestreamViewer(): JSX.Element {
           <Flex className={styles.capture_image_button_text}>
             <Icon name="camera" size="1rem" color={COLORS.white} />
             <StyledText color={COLORS.white} desktopStyle="bodyDefaultSemiBold">
-              {t('capture_image')}{' '}
+              {t('capture_image')}
             </StyledText>
           </Flex>
         </Btn>
