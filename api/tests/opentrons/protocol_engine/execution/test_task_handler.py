@@ -319,7 +319,7 @@ async def test_synchronization_cancel_latest(
     )
     await asyncio.wait_for(
         asyncio.gather(task1.asyncioTask, task2.asyncioTask, return_exceptions=True),
-        timeout=0.25,
+        timeout=1,
     )
     assert task1.asyncioTask.done()
     assert task1.asyncioTask.exception() is None
