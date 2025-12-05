@@ -31,27 +31,21 @@ function getLabwareDefURI(def: LabwareDefinition): string {
   return `${def.namespace}/${def.parameters.loadName}/${def.version}`
 }
 
-const schema1DefinitionsByPath: Record<
-  string,
-  LabwareDefinition1
-> = import.meta.glob('../labware/definitions/1/*.json', {
-  eager: true,
-  import: 'default',
-})
-const schema2DefinitionsByPath: Record<
-  string,
-  LabwareDefinition2
-> = import.meta.glob('../labware/definitions/2/*/*.json', {
-  eager: true,
-  import: 'default',
-})
-const schema3DefinitionsByPath: Record<
-  string,
-  LabwareDefinition3
-> = import.meta.glob('../labware/definitions/3/*/*.json', {
-  eager: true,
-  import: 'default',
-})
+const schema1DefinitionsByPath: Record<string, LabwareDefinition1> =
+  import.meta.glob('../labware/definitions/1/*.json', {
+    eager: true,
+    import: 'default',
+  })
+const schema2DefinitionsByPath: Record<string, LabwareDefinition2> =
+  import.meta.glob('../labware/definitions/2/*/*.json', {
+    eager: true,
+    import: 'default',
+  })
+const schema3DefinitionsByPath: Record<string, LabwareDefinition3> =
+  import.meta.glob('../labware/definitions/3/*/*.json', {
+    eager: true,
+    import: 'default',
+  })
 
 const schema1DefinitionsByName = Object.fromEntries(
   Object.values(schema1DefinitionsByPath).map(def => [def.metadata.name, def])
