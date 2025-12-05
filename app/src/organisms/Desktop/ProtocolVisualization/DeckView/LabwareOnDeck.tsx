@@ -81,7 +81,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
       cursor="pointer"
     >
       <LabwareRender
-        positioningMode="offsetInSlot"
+        positioningMode="passThrough"
         definition={labwareDef}
         wellFill={wellFill}
         highlightedWells={wellGroup}

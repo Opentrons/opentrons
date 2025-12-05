@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
 
-import { COLORS, StyledText } from '@opentrons/components'
+import { CenterLabwareInSlot, COLORS, StyledText } from '@opentrons/components'
 import {
   getAddressableAreaFromSlotId,
   getPositionFromSlotId,
@@ -77,16 +77,20 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
           isActiveLayerVisible && selectedRunTimeCommand != null
         return (
           <Fragment key={id}>
-            <LabwareOnDeck
-              x={slotPosition[0]}
-              y={slotPosition[1]}
-              robotState={robotState}
-              labwareDef={labwareEntitiesExtended[id].def}
-              liquids={liquids}
-              labwareId={id}
-              setSelectedSlot={setSelectedSlot}
-              setHoveredSlot={setHoveredSlot}
-            />
+            <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>
+              <CenterLabwareInSlot definition={labwareEntitiesExtended[id].def}>
+                <LabwareOnDeck
+                  x={0}
+                  y={0}
+                  robotState={robotState}
+                  labwareDef={labwareEntitiesExtended[id].def}
+                  liquids={liquids}
+                  labwareId={id}
+                  setSelectedSlot={setSelectedSlot}
+                  setHoveredSlot={setHoveredSlot}
+                />
+              </CenterLabwareInSlot>
+            </g>
             <DeckViewOverlay
               key={`${slot}_hoveredSlot_labware`}
               slotId={slot}
