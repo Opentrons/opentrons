@@ -41,7 +41,7 @@ import type {
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type { FormPatch } from '../../steplist/actions/types'
 import type { OrderedStepIdsState, SavedStepFormState } from '../reducers'
-import type { FlexStackerModuleState, InitialDeckSetup } from '../types'
+import type { InitialDeckSetup } from '../types'
 
 export interface CreatePresavedStepFormArgs {
   stepId: StepIdType
@@ -339,8 +339,6 @@ const _patchFlexStackerModuleId =
     const robotState: RobotState | null =
       last(robotStateTimeline.timeline)?.robotState ?? null
 
-    const modules = robotState?.modules ?? {}
-
     // pre-select form type if module is set
     if (hasFlexStackerModuleId && numOfModules === 1) {
       const moduleId =
@@ -350,10 +348,6 @@ const _patchFlexStackerModuleId =
       if (moduleId == null) {
         return null
       }
-
-      const flexStackerState = modules[moduleId]
-        ?.moduleState as FlexStackerModuleState | null
-
       // get labware details in hopper at moment
       return {
         moduleId,
