@@ -35,6 +35,14 @@ def run(protocol: ProtocolContext) -> None:
     labware = protocol.load_labware(LABWARE, "D3")
     labware_lid = protocol.load_lid_stack("opentrons_tough_universal_lid", "C3", 2)
 
+    # Lid loading
+    if labware_lid:
+        for _ in range(2):
+            protocol.move_lid("C3", labware, use_gripper=True)
+            protocol.move_lid(labware, deck_riser, use_gripper=True)
+            protocol.move_lid(deck_riser, "C3", use_gripper=True)
+
+    # pick up tip
     pipette.pick_up_tip()
 
     # move tip to positions

@@ -10,6 +10,8 @@ from dataclasses import dataclass
 
 @dataclass
 class ProbeTarget:
+    """Global configuration of dimensions found."""
+
     deck_pos: Point
     x_min: Point
     x_max: Point
@@ -44,7 +46,8 @@ class LabwareDims(ProbeTarget):
     y_offset: float = 0.0
     spacing: float = 0.0
 
-    def set_num_wells(self, num_wells: int):
+    def set_num_wells(self, num_wells: int) -> None:
+        """Determines dimensions based on well number."""
         self.num_wells = num_wells
         match num_wells:
             case 96:

@@ -1,8 +1,9 @@
+"""Proof of concept for use of touch probe."""
 import argparse
 import asyncio
 from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
-from hardware_testing.touch_probe import TouchProbe, ProbeConfig
+from hardware_testing.drivers.touch_probe import TouchProbe, ProbeConfig
 
 # ============================================================================
 # Main Function
@@ -41,7 +42,6 @@ async def _main(simulating: bool, mount: OT3Mount, num_wells: int, slot: int) ->
     print(f"  Height: {block_dims.height:.3f} mm")
 
     # probe module
-    # module_pos = helpers_ot3.get_slot_calibration_square_position_ot3(slot)
     print(f"\nProbing Module on slot #{4}")
     module_pos = await tp.get_deck_z(4)
     print(f"z module pos: {module_pos.z}")

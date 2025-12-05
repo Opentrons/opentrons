@@ -4,7 +4,7 @@ from hardware_testing.opentrons_api import helpers_ot3
 from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
 from opentrons.hardware_control.ot3api import OT3API
 from typing import Optional, Tuple
-from hardware_testing.touch_probe.dimensions import LabwareDims
+from hardware_testing.drivers.touch_probe.dimensions import LabwareDims
 from dataclasses import dataclass
 
 # ============================================================================
@@ -31,7 +31,10 @@ class ProbeConfig:
 
 
 class TouchProbe:
-    def __init__(self, api: OT3API, mount: OT3Mount, config: ProbeConfig):
+    """Basic functions to use the probe."""
+
+    def __init__(self, api: OT3API, mount: OT3Mount, config: ProbeConfig) -> None:
+        """Touch probe properties."""
         self.api = api
         self.mount = mount
         self.config = config
@@ -192,7 +195,7 @@ class TouchProbe:
     async def search_hole_and_center(
         self, start_point: Point
     ) -> Optional[Tuple[Point, float]]:
-        """# look for deck square hole. If hole, then get the center"""
+        """# look for deck square hole. If hole, then get the center."""
         if await self.search_hole(start_point):
             current_pos = await self.get_pos(refresh=True)
             center_and_radius = await self.search_hole_center(current_pos)

@@ -1,8 +1,9 @@
+"""Measure calibration block."""
 import argparse
 import asyncio
 from hardware_testing.opentrons_api import helpers_ot3
-from hardware_testing.opentrons_api.types import OT3Mount, Axis, Point
-from hardware_testing.touch_probe import TouchProbe, ProbeConfig
+from hardware_testing.opentrons_api.types import OT3Mount, Axis
+from hardware_testing.drivers.touch_probe import TouchProbe, ProbeConfig
 
 # ============================================================================
 # Main Function

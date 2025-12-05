@@ -1,5 +1,4 @@
-# touch_probe/__init__.py
-
+"""CNC Driver."""
 from .dimensions import ProbeTarget
 from .touch_probe import TouchProbe, ProbeConfig
 
