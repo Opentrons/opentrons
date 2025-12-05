@@ -8,7 +8,11 @@ import {
 
 import { flexStackerRetrieve } from '../commandCreators/atomic/flexStackerRetrieve'
 import { HOPPER_STACKER_LOCATION } from '../constants'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import {
+  getErrorResult,
+  getInitialRobotStateStandard,
+  makeContext,
+} from '../fixtures'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
@@ -100,6 +104,43 @@ describe('flexStackerRetrieve', () => {
         },
       ],
       python: 'wellPlate_1 = mock_flex_stacker_1.retrieve()',
+    })
+  })
+  it('raises an error if the hopper is empty', () => {
+    robotState = {
+      ...robotState,
+      modules: {
+        [mockModuleId]: {
+          slot: 'D3',
+          moduleState: {} as any,
+        },
+      },
+      labware: {
+        [mockLabwareId]: {
+          stack: ['D2'],
+        },
+      },
+    }
+    invariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        [mockLabwareId]: {
+          labwareDefURI: 'mockURI',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'wellPlate_1',
+          id: mockLabwareId,
+        },
+      },
+    }
+    const result = flexStackerRetrieve(
+      {
+        moduleId: mockModuleId,
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HOPPER_EMPTY',
     })
   })
 })
