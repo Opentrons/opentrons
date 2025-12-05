@@ -357,10 +357,6 @@ const _patchFlexStackerModuleId =
       // get labware details in hopper at moment
       return {
         moduleId,
-        maxPoolCount: flexStackerState?.maxPoolCount ?? 0,
-        storedLabwareDetails: flexStackerState?.storedLabwareDetails ?? null,
-        labwareInHopper: flexStackerState?.labwareInHopper ?? null,
-        labwareOnShuttle: flexStackerState?.labwareOnShuttle ?? null,
       }
     }
     return null
