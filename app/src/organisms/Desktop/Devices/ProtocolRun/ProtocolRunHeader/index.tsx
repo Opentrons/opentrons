@@ -13,6 +13,7 @@ import {
 import { useModulesQuery } from '@opentrons/react-api-client'
 
 import { useInitializeCameraState } from '/app/local-resources/images/hooks/useInitializeCameraState'
+import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { useIsRobotViewable } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import {
@@ -32,7 +33,6 @@ import {
   useRunHeaderModalContainer,
 } from './RunHeaderModalContainer'
 import { RunHeaderProtocolName } from './RunHeaderProtocolName'
-import { isCancellableStatus } from './utils'
 
 import type { RefObject } from 'react'
 
