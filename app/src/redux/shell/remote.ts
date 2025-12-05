@@ -61,6 +61,15 @@ export async function appShellRequestor<Data>(
   if (result?.error != null) {
     throw result.error
   }
+
+  // Blob data doesn't serialize properly across the IPC, so we parse it from
+  // an Array type sent from the shell layer.
+  if (config.responseType === 'blob' && Array.isArray(result.data)) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const uint8Array = new Uint8Array(result.data)
+    result.data = new Blob([uint8Array]) as Data
+  }
+
   return result
 }
 
