@@ -318,7 +318,30 @@ export const transfer: CommandCreator<TransferArgs> = (
     getPipetteWithTipMaxVol(pipette, invariantContext, tiprackURI) -
     aspirateAirGapVol
 
+  if (effectiveTransferVol <= 0 || !isFinite(effectiveTransferVol)) {
+    errors.push(
+      errorCreators.pipetteVolumeExceeded({
+        volume,
+        maxVolume: effectiveTransferVol,
+        actionName,
+      })
+    )
+    return { errors }
+  }
+
   const chunksPerSubTransfer = Math.ceil(volume / effectiveTransferVol)
+
+  if (!isFinite(chunksPerSubTransfer) || chunksPerSubTransfer <= 0) {
+    errors.push(
+      errorCreators.pipetteVolumeExceeded({
+        volume,
+        maxVolume: chunksPerSubTransfer,
+        actionName,
+      })
+    )
+    return { errors }
+  }
+
   const subTransferVol = volume / chunksPerSubTransfer
   // volume of each chunk in a sub-transfer
   const subTransferVolumes: number[] =
