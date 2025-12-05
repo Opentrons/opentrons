@@ -1,4 +1,4 @@
-import { LegacyStyledText, StepMeter, StyledText } from '../../atoms'
+import { StepMeter, StyledText } from '../../atoms'
 import { grey60 } from '../../helix-design-system/colors'
 import { Box, Btn, Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_ROW } from '../../styles'
