@@ -74,41 +74,96 @@ export function StepDetailContainer({
     currentCommand
   )
 
+  // StepDetailContainer.tsx
+  type ComponentType =
+    | 'left_pipette'
+    | 'right_pipette'
+    | 'tiprack'
+    | 'labware'
+    | 'disposal'
+
+  const getComponentsToRender = (): ComponentType[] => {
+    const components: ComponentType[] = []
+
+    if (leftMountPipetteName != null || is96Channel) {
+      components.push('left_pipette')
+    }
+    if (rightMountPipetteName != null) {
+      components.push('right_pipette')
+    }
+    if (tiprackOnSlot != null && labwareEntities[tiprackOnSlot] != null) {
+      components.push('tiprack')
+    }
+    if (topMostLabwareOnSlot != null) {
+      components.push('labware')
+    }
+    components.push('disposal')
+
+    return components
+  }
+
+  const renderComponent = (type: ComponentType, index: number): JSX.Element => {
+    const className = styles[`${type}_container`] ?? styles.container
+
+    switch (type) {
+      case 'left_pipette':
+        return (
+          <div key={`left-pipette-${index}`} className={className}>
+            <PipetteContainer
+              mount={is96Channel ? 'left_right_mount' : 'left_mount'}
+              pipetteName={leftMountPipetteName!}
+              selected={isLeftPipetteActive}
+            />
+          </div>
+        )
+      case 'right_pipette':
+        return (
+          <div key={`right-pipette-${index}`} className={className}>
+            <PipetteContainer
+              mount="right_mount"
+              pipetteName={rightMountPipetteName!}
+              selected={isRightPipetteActive}
+            />
+          </div>
+        )
+      case 'tiprack':
+        return (
+          <div key={`tiprack-${index}`} className={className}>
+            <TipPickupContainer
+              tiprackEntity={labwareEntities[tiprackOnSlot!]}
+              robotState={robotState}
+            />
+          </div>
+        )
+      case 'labware':
+        return (
+          <div key={`labware-${index}`} className={className}>
+            <LabwareSlotContainer
+              topLabwareOnSlotId={topMostLabwareOnSlot!}
+              labwareEntities={labwareEntities}
+              commands={commands}
+              currentCommand={currentCommand}
+              liquids={liquids}
+              robotState={robotState}
+              pipetteEntities={pipetteEntities}
+              moduleEntities={moduleEntities}
+            />
+          </div>
+        )
+      case 'disposal':
+        return (
+          <div key={`disposal-${index}`} className={className}>
+            <TipDisposalContainer robotState={robotState} />
+          </div>
+        )
+    }
+  }
+
   return (
     <div className={styles.container}>
-      {leftMountPipetteName != null || is96Channel ? (
-        <PipetteContainer
-          mount={is96Channel ? 'left_right_mount' : 'left_mount'}
-          pipetteName={leftMountPipetteName}
-          selected={isLeftPipetteActive}
-        />
-      ) : null}
-      {rightMountPipetteName != null ? (
-        <PipetteContainer
-          mount={'right_mount'}
-          pipetteName={rightMountPipetteName}
-          selected={isRightPipetteActive}
-        />
-      ) : null}
-      {tiprackOnSlot != null && labwareEntities[tiprackOnSlot] != null ? (
-        <TipPickupContainer
-          tiprackEntity={labwareEntities[tiprackOnSlot]}
-          robotState={robotState}
-        />
-      ) : null}
-      {topMostLabwareOnSlot != null ? (
-        <LabwareSlotContainer
-          topLabwareOnSlotId={topMostLabwareOnSlot}
-          labwareEntities={labwareEntities}
-          commands={commands}
-          currentCommand={currentCommand}
-          liquids={liquids}
-          robotState={robotState}
-          pipetteEntities={pipetteEntities}
-          moduleEntities={moduleEntities}
-        />
-      ) : null}
-      <TipDisposalContainer robotState={robotState} />
+      {getComponentsToRender().map((type, index) =>
+        renderComponent(type, index)
+      )}
     </div>
   )
 }
