@@ -73,45 +73,48 @@ export function RecentProtocolRuns({
         {isRobotViewable && allRunsMutable && allRunsMutable?.length > 0 && (
           <>
             <Flex
-              display="grid"
               justifyContent={JUSTIFY_FLEX_START}
               padding={SPACING.spacing8}
               width="88%"
               marginRight="12%"
-              gap={SPACING.spacing20}
+              gridGap={SPACING.spacing20}
               color={COLORS.grey60}
-              gridTemplateColumns={COLUMNS}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
+              <LegacyStyledText
+                as="p"
+                width="25%"
                 data-testid="RecentProtocolRuns_RunTitle"
               >
                 {t('run')}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="27%"
                 data-testid="RecentProtocolRuns_ProtocolTitle"
               >
                 {t('protocol')}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="5%"
                 data-testid="RecentProtocolRuns_FilesTitle"
               >
                 {t('files')}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
-              </StyledText>
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
+              </LegacyStyledText>
+              <LegacyStyledText
+                as="p"
+                width="14%"
                 data-testid="RecentProtocolRuns_DurationTitle"
               >
                 {t('run_duration')}
-              </StyledText>
+              </LegacyStyledText>
             </Flex>
             {allRunsMutable
               .sort(
@@ -157,7 +160,7 @@ export function RecentProtocolRuns({
         )}
         {isRobotViewable && allRunsMutable?.length === 0 && (
           <LegacyStyledText
-            forwardedAs="p"
+            as="p"
             alignItems={ALIGN_CENTER}
             display={DISPLAY_FLEX}
             flex="1 0"
