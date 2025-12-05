@@ -22,7 +22,7 @@ metadata = {
 }
 
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
@@ -41,6 +41,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     # Load Parameters
+    protocol.capture_image(filename="start_of_run")
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     column_tip_pick_up = protocol.params.column_tip_pickup  # type: ignore[attr-defined]
@@ -49,7 +50,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
 
     def transfer(
         pipette: InstrumentContext,
@@ -75,10 +76,15 @@ def run(protocol: ProtocolContext) -> None:
 
         # Perform transfer
         if source.current_liquid_volume() < volume:
-            src_location = source.meniscus(z=meniscus_z, target="end")
+            src_start_location = source.meniscus(z=meniscus_z, target="start")
+            src_end_location = source.meniscus(z=meniscus_z, target="end")
         else:
-            src_location = source.bottom(z=dot_bottom)
-        pipette.aspirate(volume, src_location)
+            src_start_location = source.bottom(z=dot_bottom)
+            src_end_location = source.bottom(z=dot_bottom)
+        pipette.prepare_to_aspirate()
+        pipette.aspirate(
+            volume, location=src_start_location, end_location=src_end_location
+        )
         pipette.move_to(source.top(), speed=5)
         pipette.dispense(volume, dest.bottom(z=dot_bottom))
         pipette.move_to(dest.top(), speed=5)
@@ -178,8 +184,9 @@ def run(protocol: ProtocolContext) -> None:
 
         # Step 1-2: Set temperatures
         thermocycler.open_lid()
-        temp_module.set_temperature(8)
-        thermocycler.set_block_temperature(8)
+        temp_mod_task = temp_module.start_set_temperature(8)
+        tc_block_task = thermocycler.start_set_block_temperature(8)
+        protocol.wait_for_tasks([tc_block_task, temp_mod_task])
 
         column_tips = partial_tiprack.rows()[0][::-1]
         if column_tip_pick_up:
