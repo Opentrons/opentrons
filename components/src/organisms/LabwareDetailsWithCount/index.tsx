@@ -1,10 +1,9 @@
 import { useTranslation } from 'react-i18next'
-import { TFunction } from 'i18next'
 
 import { StyledText, Tag } from '../../atoms'
 import styles from './LabwareDetailsWithCount.module.css'
 
-type LabwareDetailsWithCountProps = {
+interface LabwareDetailsWithCountProps {
   title: string
   subTitle?: string
   quantity?: number

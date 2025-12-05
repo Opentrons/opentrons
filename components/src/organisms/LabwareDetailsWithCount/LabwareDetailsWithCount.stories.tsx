@@ -1,6 +1,3 @@
-import React from 'react'
-import { useTranslation } from 'react-i18next'
-
 import { LabwareDetailsWithCount } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'

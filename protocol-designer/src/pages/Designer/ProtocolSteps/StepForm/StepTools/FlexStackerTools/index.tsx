@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import {
   Divider,
-  DropdownOption,
   Icon,
   InfoScreen,
   LabwareDetailsWithCount,
@@ -17,6 +16,7 @@ import { getFlexStackerLabwareOptions } from '/protocol-designer/ui/modules/sele
 
 import styles from './FlexStackerTools.module.css'
 
+import type { DropdownOption } from '@opentrons/components'
 import type {
   FlexStackerModuleState,
   TimelineFrame,
@@ -31,7 +31,6 @@ export type FlexStackerToolsProps = StepFormProps & {
 export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
   const { formData, propsForFields, robotState, flexStackerOptions } = props
   const { moduleId } = formData
-  const dispatch = useDispatch()
   const { t } = useTranslation(['application', 'form', 'protocol_steps'])
 
   const { modules } = robotState ?? {}
@@ -67,6 +66,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         options={flexStackerOptions}
         title={t('form:step_edit_form.field.absorbanceReader.moduleId.module')}
         {...propsForFields.moduleId}
+        updateValue={() => {}}
       />
       <Divider margin="0" marginY="0" />
       <div className={`${styles.container} ${styles.paddingX}`}>

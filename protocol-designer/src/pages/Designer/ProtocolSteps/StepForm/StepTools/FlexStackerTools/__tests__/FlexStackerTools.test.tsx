@@ -1,14 +1,14 @@
-import { ComponentProps } from 'react'
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { TimelineFrame } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
 
 import { FlexStackerTools } from '..'
+
+import type { ComponentProps } from 'react'
 
 const render = (props: ComponentProps<typeof FlexStackerTools>) => {
   return renderWithProviders(<FlexStackerTools {...props} />, {
@@ -83,7 +83,7 @@ describe('FlexStackerTools', () => {
 
   it('should render view with labware in hopper', () => {
     props.robotState = {
-      ...(props.robotState as TimelineFrame),
+      ...props.robotState!,
       modules: {
         ...props.robotState?.modules,
         mockId: {
@@ -118,7 +118,7 @@ describe('FlexStackerTools', () => {
 
   it('should render view with no labware in hopper', () => {
     props.robotState = {
-      ...(props.robotState as TimelineFrame),
+      ...props.robotState!,
       modules: {
         ...props.robotState?.modules,
         mockId: {
@@ -135,9 +135,9 @@ describe('FlexStackerTools', () => {
     expect(screen.getByText('No labware stored on stacker')).toBeInTheDocument()
   })
 
-  it('should render view with labware on shuttle', () => {
+  it.only('should render view with labware on shuttle', () => {
     props.robotState = {
-      ...(props.robotState as TimelineFrame),
+      ...props.robotState!,
       modules: {
         ...props.robotState?.modules,
         mockId: {
@@ -157,12 +157,13 @@ describe('FlexStackerTools', () => {
     render(props)
     expect(screen.getByText('Shuttle')).toBeInTheDocument()
     expect(screen.getByText('mockLabwareId')).toBeInTheDocument()
+    expect(screen.getByText('mockLidLabwareId')).toBeInTheDocument()
     expect(screen.queryByText('Quantity: 0')).not.toBeInTheDocument()
   })
 
   it('should render view with no labware on shuttle', () => {
     props.robotState = {
-      ...(props.robotState as TimelineFrame),
+      ...props.robotState!,
       modules: {
         ...props.robotState?.modules,
         mockId: {

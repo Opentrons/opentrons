@@ -340,7 +340,6 @@ const _patchFlexStackerModuleId =
       last(robotStateTimeline.timeline)?.robotState ?? null
 
     const modules = robotState?.modules ?? {}
-    const labware = robotState?.labware ?? {}
 
     // pre-select form type if module is set
     if (hasFlexStackerModuleId && numOfModules === 1) {
