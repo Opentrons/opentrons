@@ -222,7 +222,7 @@ export interface StepDetailViewerUpdateAction {
   type: 'shell:STEP_DETAIL_VIEWER_UPDATE'
   payload: {
     protocolKey: string
-    slot: string
+    slot: string | null
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext
