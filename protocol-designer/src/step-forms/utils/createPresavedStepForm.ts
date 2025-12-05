@@ -329,16 +329,12 @@ const _patchFlexStackerModuleId =
     robotStateTimeline: Timeline
   }): FormUpdater =>
   () => {
-    const { initialDeckSetup, stepType, robotStateTimeline } = args
+    const { initialDeckSetup, stepType } = args
     const numOfModules =
       Object.values(initialDeckSetup.modules).filter(
         module => module.type === FLEX_STACKER_MODULE_TYPE
       )?.length ?? 1
     const hasFlexStackerModuleId = stepType === 'flexStacker'
-
-    const robotState: RobotState | null =
-      last(robotStateTimeline.timeline)?.robotState ?? null
-
     // pre-select form type if module is set
     if (hasFlexStackerModuleId && numOfModules === 1) {
       const moduleId =

@@ -135,7 +135,7 @@ describe('FlexStackerTools', () => {
     expect(screen.getByText('No labware stored on stacker')).toBeInTheDocument()
   })
 
-  it.only('should render view with labware on shuttle', () => {
+  it('should render view with labware on shuttle', () => {
     props.robotState = {
       ...props.robotState!,
       modules: {

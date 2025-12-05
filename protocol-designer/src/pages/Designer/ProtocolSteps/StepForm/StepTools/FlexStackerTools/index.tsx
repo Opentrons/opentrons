@@ -43,6 +43,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
   const maxPoolCount = flexStackerModuleState?.maxPoolCount ?? 0
   const labwareOnShuttle = flexStackerModuleState?.labwareOnShuttle ?? null
 
+  console.log('labwareOnShuttle:', labwareOnShuttle)
   const labwareFiledComponent = (
     <div className={styles.spaceBetween}>
       <StyledText desktopStyle="bodyDefaultSemiBold">
@@ -100,15 +101,10 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           flexStackerModuleState?.storedLabwareDetails != null ? (
             <LabwareDetailsWithCount
               title={
-                flexStackerModuleState.storedLabwareDetails?.primaryLabware
-                  ?.loadName ?? ''
+                labwareOnShuttle?.primaryLabwareId ?? ''
               }
               subTitle={
-                flexStackerModuleState.storedLabwareDetails?.lidLabware
-                  ?.loadName ?? undefined
-              }
-              quantity={
-                flexStackerModuleState.storedLabwareDetails?.initialCount ?? 0
+                labwareOnShuttle?.lidLabwareId ?? undefined
               }
             />
           ) : (

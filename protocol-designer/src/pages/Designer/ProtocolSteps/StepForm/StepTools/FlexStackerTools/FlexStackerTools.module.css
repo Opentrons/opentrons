@@ -11,6 +11,6 @@ div.container {
   gap: var(--spacing-8);
 }
 
-div.container.padding_x {
+.padding_x {
   padding: 0 var(--spacing-16);
 }
