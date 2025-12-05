@@ -31,6 +31,7 @@
   "remaining_tips": "{{remaining}} tips",
   "right_mount": "RIGHT MOUNT",
   "seconds_per_step": "{{seconds}}s per step",
+  "slot_empty": "Slot empty",
   "slot": "Slot",
   "source_tips": "Source tips",
   "source_well_view": "Source well view",
