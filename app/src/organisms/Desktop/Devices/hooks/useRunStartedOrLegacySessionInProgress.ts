@@ -16,7 +16,7 @@ export function useRunStartedOrLegacySessionInProgress(): boolean {
   const allSessionsQueryResponse = useAllSessionsQuery()
 
   return (
-    (runStatus != null && runStatus !== RUN_STATUS_IDLE) ||
+    (runStatus !== null && runStatus !== RUN_STATUS_IDLE) ||
     (allSessionsQueryResponse?.data?.data != null &&
       allSessionsQueryResponse?.data?.data?.length !== 0)
   )
