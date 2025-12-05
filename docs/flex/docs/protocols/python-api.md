@@ -89,9 +89,17 @@ Unlike other protocol commands, robot motor control commands execute movements i
 
 Sensors in Flex pipettes can detect the level of liquid in a well. You can use this feature to target a [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html?highlight=liquid+level#meniscus) while aspirating, dispensing, or mixing in a Python protocol. 
 
-### Non-blocking commands
+### Dynamic pipetting
 
-Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).
+Starting in API version 2.27, use start and end location parameters to control pipette movements during liquid transfers: 
+
+- Continuously target the [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html?highlight=liquid+level#meniscus) as it changes while pipetting liquid. 
+-  Change the pipette's position within a well while aspirating, dispensing, or mixing.
+- Mix in different locations in labware using the [dynamic mix](https://docs.opentrons.com/v2/basic_commands/liquids.html#dynamic-mix) method.  
+
+### Concurrent commands
+
+Some module commands that take a long time to complete (such as executing a Thermocycler profile or heating to a high temperature) can be run in a *concurrent* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. As of API 2.27, concurrent commands are currently supported on the [Heater-Shaker](https://docs.opentrons.com/v2/modules/heater_shaker.html#heating-and-shaking), [Temperature](https://docs.opentrons.com/v2/modules/temperature_module.hmtl#temperature-control), and [Thermocyler](https://docs.opentrons.com/v2/modules/thermocycler.html) modules. You can also run multiple modules at the same time. See [Concurrent Module Actions](https://docs.opentrons.com/v2/modules/concurrent_module.html) for more. 
 
 ### Python packages
 
