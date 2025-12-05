@@ -1,16 +1,16 @@
-div.spaceBetween {
+.space_between {
   display: flex;
   justify-content: space-between;
 }
 
 div.container {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-8);
   width: 100%;
+  flex-direction: column;
   padding-top: var(--spacing-16);
+  gap: var(--spacing-8);
 }
 
-div.container.paddingX{
-    padding: 0 var(--spacing-16);
+div.container.padding_x {
+  padding: 0 var(--spacing-16);
 }

@@ -91,7 +91,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         )}
       </div>
       <Divider margin="0" marginY="0" />
-      <div className={`${styles.container} ${styles.paddingX}`}>
+      <div className={`${styles.container} ${styles.padding_x}`}>
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('protocol_steps:flex_stacker.shuttle.label')}
         </StyledText>
@@ -119,7 +119,7 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
         </div>
       </div>
       <Divider margin="0" marginY="0" />
-      <div className={`${styles.container} ${styles.paddingX}`}>
+      <div className={`${styles.container} ${styles.padding_x}`}>
         <div className={styles.spaceBetween} style={{ width: '40%' }}>
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('protocol_steps:flex_stacker.module_controls.label')}

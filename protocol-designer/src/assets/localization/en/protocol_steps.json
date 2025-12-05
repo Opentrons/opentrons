@@ -89,7 +89,7 @@
       "quantity": "Quantity: {{count}}"
     }
   },
-  "flexStacker": "Flex Stacker",
+  "flexStacker": "Stacker",
   "flow_rate_builder": "Flow rate builder",
   "flow_type_title": "{{type}} flow rate",
   "from": "from",

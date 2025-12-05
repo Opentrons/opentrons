@@ -1,24 +1,24 @@
 div.container {
   width: 318px;
-  background-color: var(--grey-20);
-  border-radius: var(--border-radius-4);
   padding: var(--spacing-16) var(--spacing-8);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-20);
 }
 
-div.subTitle {
+div.sub_title {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-8);
   width: 100%;
+  flex-direction: column;
   color: var(--grey-60);
+  gap: var(--spacing-8);
 }
 
 div.label {
   display: flex;
-  justify-content: center;
-  align-items: center;
   width: 88px;
   height: 24px;
-  background-color: var(--transparent-black-80);
+  align-items: center;
+  justify-content: center;
   border-radius: var(--border-radius-4);
+  background-color: var(--transparent-black-80);
 }
