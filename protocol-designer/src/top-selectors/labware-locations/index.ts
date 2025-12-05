@@ -133,6 +133,10 @@ export const getRobotStateAtActiveItem: Selector<RobotState | null> =
   )
 
 //  TODO(jr, 9/20/23): we should test this util since it does a lot.
+
+// For Stacker: Update this selector to create an additional labware locaiton for the hopper
+// or, consider the hopper labware to be "on the module" and pass in an additional spot for
+// labware on X4
 export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
   createSelector(
     getRobotStateAtActiveItem,

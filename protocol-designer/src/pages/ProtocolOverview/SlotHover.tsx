@@ -32,10 +32,12 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 
+type StackerHopperId = 'Hopper A'
+
 interface SlotHoverProps {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
-  slotId: DeckSlotId
+  slotId: DeckSlotId | StackerHopperId
   slotPosition: CoordinateTuple | null
   robotType: RobotType
 }
@@ -72,7 +74,7 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
   //  return null for TC slots
   if (slotPosition === null || (hasTCOnSlot && tcSlots.includes(slotId)))
     return null
-
+  console.log('hover', hover)
   const hoverOpacity = hover != null && hover === slotId ? 1 : 0
   const slotFill = (
     <Flex

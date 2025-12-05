@@ -66,6 +66,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     deckDef,
     stagingAreaAddressableAreas,
   } = props
+  // slot id here needs to be configured to allow for the hopper location
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )

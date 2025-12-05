@@ -120,6 +120,15 @@ export const DeckThumbnailDetails = (
                   slotPosition={[0, 0, 0]}
                   slotId={slotId}
                 />
+                {moduleState.type === FLEX_STACKER_MODULE_TYPE ? (
+                  <SlotHover
+                    robotType={robotType}
+                    hover={hover}
+                    setHover={setHover}
+                    slotPosition={[175, 0, 0]}
+                    slotId={'Hopper'} // set this up to have the correct hopper name
+                  />
+                ) : null}
               </>
             </Module>
           </Fragment>
