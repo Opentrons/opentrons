@@ -17,7 +17,8 @@ import {
 
 import type { RunTimeCommand } from '../../../command/types'
 
-const mockRunTimeCommands: RunTimeCommand[] = simpleAnalysisFileFixture.commands as any
+const mockRunTimeCommands: RunTimeCommand[] =
+  simpleAnalysisFileFixture.commands as any
 const mockLoadLiquidRunTimeCommands = [
   {
     id: '97ba49a5-04f6-4f91-986a-04a0eb632882',
@@ -194,7 +195,7 @@ describe('parseRequiredModulesEntity', () => {
 })
 describe('parseInitialLoadedLabwareByAdapter', () => {
   it('returns only labware loaded in adapters', () => {
-    const mockCommandsWithAdapter = ([
+    const mockCommandsWithAdapter = [
       {
         id: 'commands.LOAD_LABWARE-2',
         createdAt: '2022-04-01T15:46:01.745870+00:00',
@@ -274,7 +275,7 @@ describe('parseInitialLoadedLabwareByAdapter', () => {
         startedAt: '2022-04-01T15:46:01.745870+00:00',
         completedAt: '2022-04-01T15:46:01.745870+00:00',
       },
-    ] as any) as RunTimeCommand[]
+    ] as any as RunTimeCommand[]
     const labware2 = 'labware-2'
 
     const expected = {
@@ -314,7 +315,7 @@ describe('parseInitialLoadedLabwareBySlot', () => {
     )
   })
   it('returns labware loaded in addressable areas', () => {
-    const mockAddressableAreaLoadedLabwareCommand = ([
+    const mockAddressableAreaLoadedLabwareCommand = [
       {
         id: 'commands.LOAD_LABWARE-3',
         createdAt: '2022-04-01T15:46:01.745870+00:00',
@@ -340,7 +341,7 @@ describe('parseInitialLoadedLabwareBySlot', () => {
         startedAt: '2022-04-01T15:46:01.745870+00:00',
         completedAt: '2022-04-01T15:46:01.745870+00:00',
       },
-    ] as any) as RunTimeCommand[]
+    ] as any as RunTimeCommand[]
 
     const expected = {
       D4: mockAddressableAreaLoadedLabwareCommand.find(
