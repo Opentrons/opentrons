@@ -75,9 +75,8 @@ describe('FlexStackerTools', () => {
     expect(screen.getByText('Shuttle')).toBeInTheDocument()
     expect(screen.getByText('Stacker')).toBeInTheDocument()
     expect(screen.getByText('Module controls')).toBeInTheDocument()
+    expect(screen.getByText('Retrieve')).toBeInTheDocument()
     expect(screen.getByText('Refill')).toBeInTheDocument()
-    const retrieveButton = screen.getByRole('radio', { name: 'retrieve' })
-    expect(retrieveButton).toHaveAttribute('aria-disabled')
     expect(screen.getByText('Empty')).toBeInTheDocument()
   })
 

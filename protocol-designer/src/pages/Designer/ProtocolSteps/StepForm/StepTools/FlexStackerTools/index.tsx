@@ -100,12 +100,8 @@ export function FlexStackerTools(props: FlexStackerToolsProps): JSX.Element {
           {labwareOnShuttle != null &&
           flexStackerModuleState?.storedLabwareDetails != null ? (
             <LabwareDetailsWithCount
-              title={
-                labwareOnShuttle?.primaryLabwareId ?? ''
-              }
-              subTitle={
-                labwareOnShuttle?.lidLabwareId ?? undefined
-              }
+              title={labwareOnShuttle?.primaryLabwareId ?? ''}
+              subTitle={labwareOnShuttle?.lidLabwareId ?? undefined}
             />
           ) : (
             <InfoScreen
