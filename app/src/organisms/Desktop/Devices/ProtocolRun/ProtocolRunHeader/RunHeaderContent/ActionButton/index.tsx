@@ -14,16 +14,14 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { isValidRunAgainStatus } from '/app/local-resources/runs/utils'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import { useRobot } from '/app/redux-resources/robots'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 
-import {
-  getFallbackRobotSerialNumber,
-  isValidRunAgainStatus,
-} from '../../utils'
+import { getFallbackRobotSerialNumber } from '../../utils'
 import { useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject } from 'react'

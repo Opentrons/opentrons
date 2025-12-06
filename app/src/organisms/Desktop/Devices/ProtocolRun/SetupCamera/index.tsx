@@ -129,7 +129,10 @@ export function SetupCamera({
             cameraConfirmed={cameraConfirmed}
           />
           {isCameraSettingsEnabled && (
-            <SetupRunCameraControls cameraConfirmed={cameraConfirmed} />
+            <SetupRunCameraControls
+              cameraConfirmed={cameraConfirmed}
+              runId={runId}
+            />
           )}
         </>
       )}

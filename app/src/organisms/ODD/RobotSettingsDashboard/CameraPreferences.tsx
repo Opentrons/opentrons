@@ -36,6 +36,7 @@ export function CameraPreferences({
       toggleLiveStreamEnabled={settings.toggleLiveVideoEnabled}
       storageInfo={null}
       isCameraRequired={null}
+      runId={null}
     />
   )
 }

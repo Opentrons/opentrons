@@ -29,7 +29,6 @@ export function useAddCameraImageSettingsToRunMutation(
 ): UseAddCameraImageSettingsToRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
-
   const mutation = useMutation<
     CameraImageSettingsResponse,
     AxiosError<ErrorResponse>,

@@ -30,6 +30,7 @@ describe('CameraControls', () => {
   beforeEach(() => {
     mockProps = {
       toggleShowControls: vi.fn(),
+      runId: 'run-id',
     }
     vi.mocked(useCameraSettingsValues).mockReturnValue({
       zoom: 1,
