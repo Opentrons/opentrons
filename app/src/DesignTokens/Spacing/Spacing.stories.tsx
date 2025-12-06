@@ -19,17 +19,21 @@ export default {
 } as Meta
 
 interface SpacingsStorybookProps {
-  spacings: string[]
+  spacings: Array<[string, string]>
 }
 
 const Template: Story<SpacingsStorybookProps> = args => {
-  const targetSpacings = args.spacings.filter(s => !s[1].includes('auto'))
+  const targetSpacings = args.spacings.filter(
+    (s: [string, string]) => !s[1].includes('auto')
+  )
   // sort by rem value
-  const sortedSpacing = targetSpacings.sort((a, b) => {
-    const aValue = parseFloat(a[1].replace('rem', ''))
-    const bValue = parseFloat(b[1].replace('rem', ''))
-    return aValue - bValue
-  })
+  const sortedSpacing = targetSpacings.sort(
+    (a: [string, string], b: [string, string]) => {
+      const aValue = parseFloat(a[1].replace('rem', ''))
+      const bValue = parseFloat(b[1].replace('rem', ''))
+      return aValue - bValue
+    }
+  )
 
   const convertToPx = (remFormat: string): string => {
     const pxVal = Number(remFormat.replace('rem', '')) * 16
@@ -42,7 +46,7 @@ const Template: Story<SpacingsStorybookProps> = args => {
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing24}
     >
-      {sortedSpacing.map((spacing, index) => (
+      {sortedSpacing.map((spacing: [string, string], index) => (
         <Flex
           key={`spacing_${index}`}
           flexDirection={DIRECTION_COLUMN}

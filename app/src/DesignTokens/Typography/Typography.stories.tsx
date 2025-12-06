@@ -71,7 +71,7 @@ export default {
   title: 'Design Tokens/Typography',
   argTypes: {
     text: {
-      type: 'text',
+      type: 'string',
     },
     styles: {
       control: {
@@ -139,10 +139,17 @@ const fontWeightForPairForLegacy = (style: string, weight: string): string => {
 
 const valueFromFlattenedInterp = (
   style: FlattenSimpleInterpolation,
-  valueName: str
+  valueName: string
 ): string => {
-  return style.reduce(
-    ([sawKey, value]: [boolean, null | string], el) => {
+  if (style == null) {
+    return ''
+  }
+  const styleArray = Array.isArray(style) ? style : [style]
+  const result = styleArray.reduce<[boolean, null | string]>(
+    ([sawKey, value], el) => {
+      if (el == null || typeof el !== 'string') {
+        return [sawKey, value]
+      }
       const thisEl = el.trim()
       if (sawKey && value == null) {
         return [sawKey, el]
@@ -157,6 +164,7 @@ const valueFromFlattenedInterp = (
     },
     [false, null]
   )[1]
+  return result ?? ''
 }
 
 const styleForPair = (

@@ -17,7 +17,7 @@ export default {
       description: 'The text that appears above the table',
     },
     listTableHeaders: {
-      control: 'array',
+      control: { type: 'array' },
       description: 'Headers for the list table',
     },
     rowCount: {
@@ -59,7 +59,7 @@ const Template: Story<TextListTableContentStoryProps> = args => {
     return Array.from({ length: rowCount }, (_, i) => {
       return (
         // @ts-expect-error Works.
-        <tr key={`row-${i}`} css={rowStyle(numColumns)}>
+        <tr key={`row-${i}`} css={rowStyle(numColumns as number)}>
           {Array.from({ length: numColumns }, (_, j) => {
             const textIndex = (i + j) % loremIpsumSentences.length
             return (

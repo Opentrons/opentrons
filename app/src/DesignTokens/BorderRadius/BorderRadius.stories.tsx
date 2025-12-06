@@ -5,8 +5,8 @@ import {
   COLORS,
   DIRECTION_COLUMN,
   Flex,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
@@ -17,13 +17,13 @@ export default {
 } as Meta
 
 interface BorderRadiusStorybookProps {
-  borderRadius: string[]
+  borderRadius: Array<[string, string]>
 }
 
 const Template: Story<BorderRadiusStorybookProps> = args => {
   const targetBorderRadiuses = args.borderRadius
     .filter(s => s[0].includes('borderRadius'))
-    .sort((a, b) => {
+    .sort((a: [string, string], b: [string, string]) => {
       const aValue = parseInt(a[1])
       const bValue = parseInt(b[1])
       return aValue - bValue
@@ -45,9 +45,9 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           width="100%"
           height="6rem"
         >
-          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {`${br[0]}" ${br[1]}`}
-          </LegacyStyledText>
+          </StyledText>
           <Box
             width="10rem"
             height="4rem"
