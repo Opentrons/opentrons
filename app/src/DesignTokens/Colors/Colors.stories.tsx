@@ -7,34 +7,40 @@ import {
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Colors',
 } as Meta
 
 interface ColorsStorybookProps {
-  colors: string[]
+  colors: Array<[string, string]>
 }
 
-const Template: Story<ColorsStorybookProps> = args => {
+const Template: StoryFn<ColorsStorybookProps> = args => {
   const targetColors = args.colors
-  const colorCategories = targetColors.reduce((acc, color) => {
-    const match = color[0].match(/[a-zA-Z]+/)
-    const category = match?.[0]
-    if (category) {
-      if (!acc[category]) {
-        acc[category] = []
+  const colorCategories: Record<
+    string,
+    Array<[string, string]>
+  > = targetColors.reduce(
+    (acc: Record<string, Array<[string, string]>>, color: [string, string]) => {
+      const match = color[0].match(/[a-zA-Z]+/)
+      const category = match?.[0]
+      if (category) {
+        if (!acc[category]) {
+          acc[category] = []
+        }
+        acc[category].push(color)
       }
-      acc[category].push(color)
-    }
-    return acc
-  }, {})
+      return acc
+    },
+    {} as Record<string, Array<[string, string]>>
+  )
 
   const invertColor = (hex: string): string => {
     if (hex.indexOf('#') === 0) {
@@ -58,44 +64,47 @@ const Template: Story<ColorsStorybookProps> = args => {
 
   return (
     <Flex flexDirection={DIRECTION_ROW} padding={SPACING.spacing16}>
-      {Object.entries(colorCategories).map(([category, colors], index) => (
-        <Flex key={`category_${index}`} flexDirection={DIRECTION_COLUMN}>
-          {colors.map((color, colorIndex) => (
-            <Flex
-              className={`color_${colorIndex}`}
-              key={`color_${colorIndex}`}
-              flexDirection={DIRECTION_COLUMN}
-              alignItems={ALIGN_FLEX_START}
-              justifyContent={JUSTIFY_SPACE_BETWEEN}
-              backgroundColor={color[1]}
-              padding={SPACING.spacing40}
-              width="12rem"
-              height="12rem"
-              margin={SPACING.spacing2} // Add some margin between color rows
-              borderRadius={BORDERS.borderRadius4}
-              style={{
-                cursor: CURSOR_POINTER,
-                border: `1px solid ${COLORS.grey20}`,
-              }}
-            >
-              <LegacyStyledText
-                color={invertColor(color[1] as string)}
-                fontSize={TYPOGRAPHY.fontSizeP}
-                fontWeight={TYPOGRAPHY.fontWeightBold}
+      {Object.keys(colorCategories).map((category, index) => {
+        const colors = colorCategories[category]
+        return (
+          <Flex key={`category_${index}`} flexDirection={DIRECTION_COLUMN}>
+            {colors.map((color: [string, string], colorIndex) => (
+              <Flex
+                className={`color_${colorIndex}`}
+                key={`color_${colorIndex}`}
+                flexDirection={DIRECTION_COLUMN}
+                alignItems={ALIGN_FLEX_START}
+                justifyContent={JUSTIFY_SPACE_BETWEEN}
+                backgroundColor={color[1]}
+                padding={SPACING.spacing40}
+                width="12rem"
+                height="12rem"
+                margin={SPACING.spacing2} // Add some margin between color rows
+                borderRadius={BORDERS.borderRadius4}
+                style={{
+                  cursor: CURSOR_POINTER,
+                  border: `1px solid ${COLORS.grey20}`,
+                }}
               >
-                {color[0]}
-              </LegacyStyledText>
-              <LegacyStyledText
-                fontSize={TYPOGRAPHY.fontSizeP}
-                color={invertColor(color[1] as string)}
-                fontWeight={TYPOGRAPHY.fontWeightRegular}
-              >
-                {color[1]}
-              </LegacyStyledText>
-            </Flex>
-          ))}
-        </Flex>
-      ))}
+                <StyledText
+                  color={invertColor(color[1] as string)}
+                  fontSize={TYPOGRAPHY.fontSizeP}
+                  fontWeight={TYPOGRAPHY.fontWeightBold}
+                >
+                  {color[0]}
+                </StyledText>
+                <StyledText
+                  fontSize={TYPOGRAPHY.fontSizeP}
+                  color={invertColor(color[1] as string)}
+                  fontWeight={TYPOGRAPHY.fontWeightRegular}
+                >
+                  {color[1]}
+                </StyledText>
+              </Flex>
+            ))}
+          </Flex>
+        )
+      })}
     </Flex>
   )
 }

@@ -57,7 +57,7 @@ const Template: Story<{
   innerProps: {}
 }> = args => {
   // Add null check and default to first module model if undefined
-  const moduleModel = args.model || moduleModels[0]
+  const moduleModel = (args.model as ModuleModel) || moduleModels[0]
   const moduleDef = getModuleDef(moduleModel)
   const labwareDef = args.hasLabware
     ? (fixture96Plate as LabwareDefinition)

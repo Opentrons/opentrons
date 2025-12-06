@@ -12,7 +12,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Spacing',
@@ -22,7 +22,7 @@ interface SpacingsStorybookProps {
   spacings: Array<[string, string]>
 }
 
-const Template: Story<SpacingsStorybookProps> = args => {
+const Template: StoryFn<SpacingsStorybookProps> = args => {
   const targetSpacings = args.spacings.filter(
     (s: [string, string]) => !s[1].includes('auto')
   )

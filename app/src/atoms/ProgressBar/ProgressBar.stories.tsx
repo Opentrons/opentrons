@@ -11,15 +11,17 @@ import {
 
 import { ProgressBar } from './index'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
 export default {
   title: 'App/Atoms/ProgressBar',
   component: ProgressBar,
 } as Meta
 
-const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
-  const [progress, setProgress] = React.useState<number>(args.percentComplete)
+const Template: StoryFn<React.ComponentProps<typeof ProgressBar>> = args => {
+  const initialProgress: number =
+    typeof args.percentComplete === 'number' ? args.percentComplete : 0
+  const [progress, setProgress] = React.useState<number>(initialProgress)
   React.useEffect(() => {
     if (progress < 100) {
       const interval = setInterval(() => {
@@ -39,7 +41,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
       padding={SPACING.spacing16}
     >
       <LegacyStyledText>
-        {'Add 5% to the current progress every 0.2 sec'}
+        Add 5% to the current progress every 0.2 sec
       </LegacyStyledText>
       <ProgressBar percentComplete={progress} />
       <SecondaryButton
@@ -48,7 +50,7 @@ const Template: Story<React.ComponentProps<typeof ProgressBar>> = args => {
         }}
         width="5rem"
       >
-        {'reset'}
+        reset
       </SecondaryButton>
     </Flex>
   )
