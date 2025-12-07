@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from 'react'
+
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -10,22 +13,25 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/BorderRadius',
 } as Meta
 
 interface BorderRadiusStorybookProps {
-  borderRadius: string[]
+  borderRadius: Array<[string, string]>
 }
 
-const Template: Story<BorderRadiusStorybookProps> = args => {
+const Template: StoryFn<BorderRadiusStorybookProps> = args => {
   const targetBorderRadiuses = args.borderRadius
-    .filter(s => s[0].includes('borderRadius'))
+    .filter(
+      (s): s is [string, string] =>
+        typeof s[0] === 'string' && s[0].includes('borderRadius')
+    )
     .sort((a, b) => {
-      const aValue = parseInt(a[1])
-      const bValue = parseInt(b[1])
+      const aValue = parseInt(String(a[1]), 10)
+      const bValue = parseInt(String(b[1]), 10)
       return aValue - bValue
     })
 
@@ -52,7 +58,7 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
             width="10rem"
             height="4rem"
             backgroundColor={COLORS.blue50}
-            borderRadius={br[1]}
+            borderRadius={String(br[1])}
           />
         </Flex>
       ))}
@@ -61,7 +67,7 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
 }
 
 export const AllBorderRadiuses = Template.bind({})
-const allBorderRadiuses = Object.entries(BORDERS)
+const allBorderRadiuses = Object.entries(BORDERS) as Array<[string, string]>
 AllBorderRadiuses.args = {
   borderRadius: allBorderRadiuses,
 }

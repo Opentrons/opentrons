@@ -12,22 +12,25 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Spacing',
 } as Meta
 
 interface SpacingsStorybookProps {
-  spacings: string[]
+  spacings: Array<[string, string]>
 }
 
-const Template: Story<SpacingsStorybookProps> = args => {
-  const targetSpacings = args.spacings.filter(s => !s[1].includes('auto'))
+const Template: StoryFn<SpacingsStorybookProps> = args => {
+  const targetSpacings = args.spacings.filter(
+    (s): s is [string, string] =>
+      typeof s[1] === 'string' && !s[1].includes('auto')
+  )
   // sort by rem value
   const sortedSpacing = targetSpacings.sort((a, b) => {
-    const aValue = parseFloat(a[1].replace('rem', ''))
-    const bValue = parseFloat(b[1].replace('rem', ''))
+    const aValue = parseFloat(String(a[1]).replace('rem', ''))
+    const bValue = parseFloat(String(b[1]).replace('rem', ''))
     return aValue - bValue
   })
 
@@ -53,9 +56,9 @@ const Template: Story<SpacingsStorybookProps> = args => {
           height="6rem"
         >
           <StyledText desktopStyle="bodyLargeSemiBold">
-            {`${spacing[0]} - ${spacing[1]}: ${convertToPx(spacing[1])}`}
+            {`${spacing[0]} - ${spacing[1]}: ${convertToPx(String(spacing[1]))}`}
           </StyledText>
-          <Flex gridGap={spacing[1]} backgroundColor={COLORS.blue50}>
+          <Flex gridGap={String(spacing[1])} backgroundColor={COLORS.blue50}>
             <StyledBox />
             <StyledBox />
           </Flex>
@@ -66,7 +69,7 @@ const Template: Story<SpacingsStorybookProps> = args => {
 }
 
 export const AllSpacing = Template.bind({})
-const allSpacings = Object.entries(SPACING)
+const allSpacings = Object.entries(SPACING) as Array<[string, string]>
 AllSpacing.args = {
   spacings: allSpacings,
 }
