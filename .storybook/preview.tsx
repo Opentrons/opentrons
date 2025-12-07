@@ -93,3 +93,4 @@ export const decorators = [
     </I18nextProvider>
   ),
 ]
+export const tags = ['autodocs'];
