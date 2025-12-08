@@ -68,8 +68,9 @@ export function TipSelectionWizard(
   const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
     tiprackSelected
   )
-  const [errorBannerReason, setErrorBannerReason] =
-    useState<TipSelectionBannerReason | null>(null)
+  const [showErrorBanner, setShowErrorBanner] = useState<boolean>(
+    selectedTips.flat().length > 0
+  )
   const robotState = useSelector(getRobotStateAtActiveItem)
   const tipState =
     selectedTiprackId != null
@@ -113,16 +114,29 @@ export function TipSelectionWizard(
         INACCESSIBLE_INCOMPLETE
     )
 
+  const errorReason = ((): TipSelectionBannerReason | null => {
+    if (isAnySelectedWellTooManyPickups) {
+      return 'tooManyTips'
+    }
+    if (isAnySelectedWellIncomplete) {
+      return 'incompletePickup'
+    }
+    if (selectedTips.length !== numPickups) {
+      return 'pickupsRequired'
+    }
+    return null
+  })()
+
   const handleContinue = (): void => {
     if (selectedTiprackId == null) {
       makeSnackbar(t('no_tiprack_selected') as string)
     } else if (currentStepIndex === NUM_TOTAL_STEPS - 1) {
-      if (selectedTips.length !== numPickups) {
-        setErrorBannerReason('pickupsRequired')
-      } else if (isAnySelectedWellTooManyPickups) {
-        setErrorBannerReason('tooManyTips')
-      } else if (isAnySelectedWellIncomplete) {
-        setErrorBannerReason('incompletePickup')
+      if (
+        selectedTips.length !== numPickups ||
+        isAnySelectedWellTooManyPickups ||
+        isAnySelectedWellIncomplete
+      ) {
+        setShowErrorBanner(true)
       } else {
         handleSave()
       }
@@ -164,7 +178,7 @@ export function TipSelectionWizard(
           primaryNozzle={primaryNozzle}
           selectedTips={selectedTips}
           setSelectedTips={setSelectedTips}
-          setErrorBannerReason={setErrorBannerReason}
+          setShowErrorBanner={setShowErrorBanner}
           numTotalPickups={numPickups}
           nozzles={nozzles}
           tipAccessibilityStatus={tipAccessibilityStatus}
@@ -191,9 +205,10 @@ export function TipSelectionWizard(
       }
       currentStepIndex={currentStepIndex}
       totalSteps={NUM_TOTAL_STEPS}
-      errorBannerReason={errorBannerReason}
+      showErrorBanner={showErrorBanner}
       numPickupsRemaining={numPickups - selectedTips.length}
       showReusingTipsBanner={isAnySelectedWellUsed}
+      errorReason={errorReason}
     >
       {currentComponent}
     </TipSelectionModal>

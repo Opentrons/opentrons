@@ -27,9 +27,10 @@ interface TipSelectionModalProps {
   totalSteps: number
   showBackButton?: boolean
   continueText?: string
-  errorBannerReason: TipSelectionBannerReason | null
+  showErrorBanner: boolean
   numPickupsRemaining: number
   showReusingTipsBanner: boolean
+  errorReason: TipSelectionBannerReason | null
 }
 
 export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
@@ -42,9 +43,10 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     continueText,
     currentStepIndex,
     totalSteps,
-    errorBannerReason,
+    showErrorBanner,
     numPickupsRemaining,
     showReusingTipsBanner,
+    errorReason,
   } = props
   const { t } = useTranslation('tip_selection')
 
@@ -59,19 +61,19 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
 
   const footerElement = (
     <div className={styles.modal_footer}>
-      {errorBannerReason != null ? (
+      {errorReason != null && showErrorBanner && currentStepIndex === 1 ? (
         <InlineNotification
           type="error"
           message={t(
-            `error_banner.${errorBannerReason}`,
-            errorBannerReason === 'pickupsRequired'
+            `error_banner.${errorReason}`,
+            errorReason === 'pickupsRequired'
               ? { count: numPickupsRemaining }
               : {}
           )}
           hug
         />
       ) : null}
-      {errorBannerReason == null &&
+      {(errorReason == null || !showErrorBanner) &&
       showReusingTipsBanner &&
       currentStepIndex === 1 ? (
         <InlineNotification
