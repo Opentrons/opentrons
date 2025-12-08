@@ -122,7 +122,7 @@ def count_image_capture(file: Dict[str, Any]) -> Dict[str, float]:
     )
     return {
         "Total Image Captures": num_of_images,
-        "Image Capture Time (sec)": image_capture_time,
+        "Average Image Capture Time (sec)": image_capture_time,
     }
 
 
