@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import styles from './modulecontainer.module.css'
+import styles from './ModuleContainer/modulecontainer.module.css'
 
 interface ModuleStatusContainerProps {
   title: string
