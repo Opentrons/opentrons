@@ -18,7 +18,7 @@ metadata = {
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 DECK_SLOTS = ["A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D2", "D3"]
@@ -83,6 +83,8 @@ def move_plates_to_deck_fill_and_store(
     """Move plates to the deck, fill them with water, and store back in stacker."""
     # Move PCR Plates and Fill
     plates_on_deck = []
+    ctx.capture_image(filename="move_plates")
+
     for i in range(6):
         plate = stacker.retrieve()
         ctx.move_labware(plate, LABWARE_SLOTS[i], use_gripper=True)
@@ -112,6 +114,8 @@ def unload_tipracks_from_stacker(
     tiprack_adapters: List[Labware],
 ) -> None:
     """Unload tipracks and assign to pipette."""
+    ctx.capture_image(filename="unload_tipracks")
+
     p96.tip_racks.clear()
     for i in range(2):
         tip_rack = stacker.retrieve()
@@ -124,12 +128,13 @@ def unload_tipracks_from_stacker(
 
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
+    ctx.capture_image(filename="start_of_run")
+
     use_temp_mod = ctx.params.use_temp_mod  # type: ignore[attr-defined]
     if not ctx.is_simulating():
         from abr_testing.protocols import helpers
 
-        helpers.comment_protocol_version(ctx, "02")
-
+        helpers.comment_protocol_version(ctx, "03")
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     tiprack_adapters = [

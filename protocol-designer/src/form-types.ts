@@ -172,6 +172,7 @@ export type StepType =
   | 'pause'
   | 'temperature'
   | 'thermocycler'
+  | 'flexStacker'
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
@@ -186,6 +187,7 @@ export const stepIconsByType: Record<StepType, IconName> = {
   temperature: 'ot-temperature-v2',
   thermocycler: 'ot-thermocycler',
   heaterShaker: 'ot-heater-shaker',
+  flexStacker: 'ot-flex-stacker',
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
@@ -498,6 +500,13 @@ export interface HydratedAbsorbanceReaderFormData extends AnnotationFields {
   wavelengths: string[]
 }
 
+// TODO(TZ, 2025-12-03): not fully flushed out, but this is the initial hydrated form data for the flex stacker form
+export interface HydratedFlexStackerFormData extends AnnotationFields {
+  stepType: 'flexStacker'
+  id: string
+  moduleId: string
+}
+
 // fields used in TipPositionInput
 export type TipZOffsetFields =
   | 'aspirate_mmFromBottom'
@@ -616,3 +625,4 @@ export type HydratedFormData =
   | HydratedPauseFormData
   | HydratedTemperatureFormData
   | HydratedThermocyclerFormData
+  | HydratedFlexStackerFormData

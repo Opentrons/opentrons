@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_RUNNING,
-  RUN_STATUS_STOP_REQUESTED,
-  RUN_STATUS_STOPPED,
-} from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
 
+import {
+  isModuleConfirmationStatus,
+  isRunAgainStatus,
+  isRunningOrRecoveryStatus,
+  isStartRunStatus,
+  isStopRequestedStatus,
+} from '/app/local-resources/runs/utils'
 import { useIsHeaterShakerInProtocol } from '/app/organisms/ModuleCard/hooks'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useTrackProtocolRunEvent } from '/app/redux-resources/analytics'
@@ -28,11 +30,6 @@ import {
 } from '/app/redux/protocol-runs'
 
 import { isAnyHeaterShakerShaking } from '../../../RunHeaderModalContainer/modals'
-import {
-  isRecoveryStatus,
-  isRunAgainStatus,
-  isStartRunStatus,
-} from '../../../utils'
 import { useActionBtnDisabledUtils } from './useActionBtnDisabledUtils'
 
 import type { IconName } from '@opentrons/components'
@@ -102,10 +99,10 @@ export function useActionButtonProperties({
   const runCameraSettings = useSelector((state: State) =>
     getCameraUsageState(state, runId)
   )
-
   let buttonText = ''
   let handleButtonClick = (): void => {}
   let buttonIconName: IconName | null = null
+  console.log('🚀 ~ handlePlay ~ runStatus:', runStatus)
 
   const handlePlay = (): void => {
     play()
@@ -154,14 +151,14 @@ export function useActionButtonProperties({
   } else if (isClosingCurrentRun) {
     buttonIconName = 'ot-spinner'
     buttonText = t('shared:robot_is_busy')
-  } else if (runStatus === RUN_STATUS_RUNNING || isRecoveryStatus(runStatus)) {
+  } else if (isRunningOrRecoveryStatus(runStatus)) {
     buttonIconName = 'pause'
     buttonText = t('pause_run')
     handleButtonClick = () => {
       pause()
       trackProtocolRunEvent({ name: ANALYTICS_PROTOCOL_RUN_ACTION.PAUSE })
     }
-  } else if (runStatus === RUN_STATUS_STOP_REQUESTED) {
+  } else if (isStopRequestedStatus(runStatus)) {
     buttonIconName = 'ot-spinner'
     buttonText = t('canceling_run')
   } else if (isStartRunStatus(runStatus)) {
@@ -177,13 +174,13 @@ export function useActionButtonProperties({
         runHeaderModalContainerUtils.HSRunningModalUtils.toggleModal?.()
       } else if (
         missingSetupSteps.length !== 0 &&
-        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+        isModuleConfirmationStatus(runStatus)
       ) {
         confirmMissingSteps()
       } else if (
         isHeaterShakerInProtocol &&
         !isHeaterShakerShaking &&
-        (runStatus === RUN_STATUS_IDLE || runStatus === RUN_STATUS_STOPPED)
+        isModuleConfirmationStatus(runStatus)
       ) {
         confirmAttachment()
       }
@@ -225,6 +222,5 @@ export function useActionButtonProperties({
       })
     }
   }
-
   return { buttonText, handleButtonClick, buttonIconName }
 }

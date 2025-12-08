@@ -26,7 +26,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.26",
+    "apiLevel": "2.27",
 }
 """
 Slot A1: Tips 200
@@ -78,6 +78,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    protocol.capture_image(filename="start_of_run")
+
     dry_run = False
     inc_lysis = True
     res_type = "opentrons_tough_12_reservoir_22ml"
@@ -99,7 +101,7 @@ def run(protocol: ProtocolContext) -> None:
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
-    helpers.comment_protocol_version(protocol, "04")
+    helpers.comment_protocol_version(protocol, "05")
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
     # Protocol Parameters
@@ -131,7 +133,7 @@ def run(protocol: ProtocolContext) -> None:
     elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
-    temp.set_temperature(4)
+    temp_task = temp.start_set_temperature(4)
     magblock: MagneticBlockContext = protocol.load_module(
         helpers.mag_str, "C1"
     )  # type: ignore[assignment]
@@ -326,7 +328,12 @@ def run(protocol: ProtocolContext) -> None:
         for i in range(num_cols):
             tvol = vol / num_transfers
             for t in range(num_transfers):
-                m1000.aspirate(tvol, src.meniscus(z=meniscus_z, target="end"))
+                m1000.prepare_to_aspirate()
+                m1000.aspirate(
+                    tvol,
+                    location=src.meniscus(z=meniscus_z, target="start"),
+                    end_location=src.meniscus(z=meniscus_z, target="end"),
+                )
                 m1000.dispense(m1000.current_volume, cells_m[i].top(-3))
                 if src.current_liquid_volume() < (tvol * 8):
                     protocol.comment("-----Changing to second lysis well.------")
@@ -340,9 +347,15 @@ def run(protocol: ProtocolContext) -> None:
             for x in range(8 if not dry_run else 1):
                 m1000.prepare_to_aspirate()
                 m1000.aspirate(
-                    tvol * 0.75, cells_m[i].meniscus(z=meniscus_z, target="end")
+                    tvol * 0.75,
+                    location=cells_m[i].meniscus(z=meniscus_z, target="start"),
+                    end_location=cells_m[i].meniscus(z=meniscus_z, target="end"),
                 )
-                m1000.dispense(tvol * 0.75, cells_m[i].meniscus(z=8, target="end"))
+                m1000.dispense(
+                    tvol * 0.75,
+                    location=cells_m[i].meniscus(z=8, target="start"),
+                    end_location=cells_m[i].meniscus(z=8, target="end"),
+                )
                 if x == 3:
                     protocol.delay(minutes=0.0167)
                     m1000.blow_out(cells_m[i].meniscus(z=1, target="end"))
@@ -371,7 +384,11 @@ def run(protocol: ProtocolContext) -> None:
             # Transfer cells+lysis/bind to wells with beads
             tiptrack(m1000)
             m1000.prepare_to_aspirate()
-            m1000.aspirate(120, cells_m[i].meniscus(z=meniscus_z, target="end"))
+            m1000.aspirate(
+                120,
+                location=cells_m[i].meniscus(z=meniscus_z, target="start"),
+                end_location=cells_m[i].meniscus(z=meniscus_z, target="end"),
+            )
             m1000.air_gap(10)
             m1000.dispense(m1000.current_volume, well.meniscus(z=8, target="end"))
             # Mix after transfer
@@ -456,8 +473,16 @@ def run(protocol: ProtocolContext) -> None:
             src = source[i]
             m1000.flow_rate.aspirate = 10
             for n in range(num_trans):
-                m1000.aspirate(vol_per_trans, src.meniscus(z=meniscus_z, target="end"))
-                m1000.dispense(vol_per_trans, m.meniscus(z=3, target="end"))
+                m1000.aspirate(
+                    vol_per_trans,
+                    location=src.meniscus(z=meniscus_z, target="start"),
+                    end_location=src.meniscus(z=meniscus_z, target="end"),
+                )
+                m1000.dispense(
+                    vol_per_trans,
+                    location=m.meniscus(z=meniscus_z, target="start"),
+                    end_location=m.meniscus(z=meniscus_z, target="end"),
+                )
             m1000.blow_out(m.top(-3))
             m1000.prepare_to_aspirate()
             m1000.air_gap(20)
@@ -607,6 +632,7 @@ def run(protocol: ProtocolContext) -> None:
         wash(wash_vol, all_washes)
         wash(wash_vol, all_washes)
         # dnase1 treatment
+        protocol.wait_for_tasks([temp_task])
         dnase(30, dnase1)
         stop_reaction(stop_vol, stopreaction)
         # Resume washes
