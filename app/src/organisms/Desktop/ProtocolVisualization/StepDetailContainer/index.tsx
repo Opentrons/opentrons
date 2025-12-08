@@ -74,7 +74,6 @@ export function StepDetailContainer({
     currentCommand
   )
 
-  // StepDetailContainer.tsx
   type ComponentType =
     | 'left_pipette'
     | 'right_pipette'
