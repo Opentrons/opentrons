@@ -5,6 +5,7 @@ import {
   incompletePickup,
   pipettingIntoColumn4,
   possiblePipetteCollision,
+  tooManyTips,
 } from '../../errorCreators'
 import {
   formatPyStr,
@@ -68,8 +69,12 @@ export const pickUpTip: CommandCreator<PickUpTipAtomicParams> = (
     tiprackDef: invariantContext.labwareEntities[labwareId].def,
   })
 
-  if (!isSafePipetteMovement || !isSafeWithinTiprack.isSafe) {
+  if (!isSafePipetteMovement) {
     errors.push(possiblePipetteCollision())
+  }
+
+  if (!isSafeWithinTiprack.isSafe) {
+    errors.push(tooManyTips())
   }
 
   if (isSafeWithinTiprack.isComplete !== true) {
