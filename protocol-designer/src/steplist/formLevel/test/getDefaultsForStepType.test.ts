@@ -242,7 +242,7 @@ describe('getDefaultsForStepType', () => {
         fillLabwareUri: null,
         fillQuantity: null,
         flexStackerFormType: null,
-        fillMessage: null,
+        interventionMessage: null,
         moduleId: null,
       })
     })

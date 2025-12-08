@@ -515,9 +515,9 @@ export interface HydratedFlexStackerFormData extends AnnotationFields {
   stepType: 'flexStacker'
   id: string
   fillLabwareUri: string | null
-  fillMessage: string | null
   fillQuantity: number | null
   flexStackerFormType: FlexStackerFormType | null
+  interventionMessage: string | null
   moduleId: string
 }
 
