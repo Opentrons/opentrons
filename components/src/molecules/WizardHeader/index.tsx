@@ -56,7 +56,12 @@ export const WizardHeader = (props: WizardHeaderProps): JSX.Element => {
           ) : null}
         </Flex>
         {onExit != null ? (
-          <Btn onClick={onExit} aria-label="Exit" disabled={exitDisabled}>
+          <Btn
+            onClick={onExit}
+            aria-label="Exit"
+            disabled={exitDisabled}
+            className={styles.exit_button}
+          >
             <StyledText
               desktopStyle="bodyDefaultSemiBold"
               oddStyle="bodyTextSemiBold"
