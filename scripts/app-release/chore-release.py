@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-alpha-release - Automated multi-repo alpha release tagging script
+chore-release - Automated multi-repo alpha release tagging script
 
 Usage:
-    ./alpha-release [--dry-run]
+    ./chore-release [--dry-run]
 
 Examples:
-    ./alpha-release
-    ./alpha-release --dry-run
+    ./chore-release
+    ./chore-release --dry-run
 
 Behavior:
 - Creates a fresh 'clean-repos' directory.
