@@ -30,7 +30,10 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { DECK_SETUP_TOOLS_WIDTH_REM } from '../../../constants'
+import {
+  DECK_SETUP_TOOLS_WIDTH_REM,
+  HOPPER_ZOOM_OFFSET_POSTITION,
+} from '../../../constants'
 import { getDisableModuleRestrictions } from '../../../feature-flags/selectors'
 import {
   editSlotInfo,
@@ -143,6 +146,8 @@ export function DeckSetupContainer(
   }, '')
 
   const addEquipment = (slotId: string): void => {
+    const isOnHopper = slotId.includes('hopper')
+    const slot = isOnHopper ? slotId.split('hopper')[1] : slotId
     const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
       deckSetup: activeDeckSetup,
       slot: slotId,
@@ -151,7 +156,7 @@ export function DeckSetupContainer(
 
     const cutoutId =
       getCutoutIdForAddressableArea(
-        slotId as AddressableAreaName,
+        slot as AddressableAreaName,
         deckDef.cutoutFixtures
       ) ?? null
     if (cutoutId == null) {
@@ -159,7 +164,11 @@ export function DeckSetupContainer(
     }
     dispatch(selectZoomedIntoSlot({ slot: slotId, cutout: cutoutId }))
 
-    const zoomInSlotPosition = getPositionFromSlotId(slotId ?? '', deckDef)
+    const zoomInSlotPosition = getPositionFromSlotId(
+      slot ?? '',
+      deckDef,
+      isOnHopper ? HOPPER_ZOOM_OFFSET_POSTITION : undefined
+    )
     if (zoomInSlotPosition != null) {
       const zoomedInViewBox = zoomInOnCoordinate({
         x: zoomInSlotPosition[0],
@@ -210,7 +219,6 @@ export function DeckSetupContainer(
   )
 
   const svgContainerWidth = getSVGContainerWidth(robotType, isZoomed)
-
   return (
     <>
       <Flex

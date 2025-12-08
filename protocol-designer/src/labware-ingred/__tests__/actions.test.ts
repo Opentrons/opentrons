@@ -122,6 +122,7 @@ describe('createContainer', () => {
           labwareDefURI: 'someLabwareDefURI',
           slot: '4',
           displayCategory: 'wellPlate',
+          isOnHopper: false,
         },
       },
     ]
@@ -168,6 +169,7 @@ describe('createContainer', () => {
           labwareDefURI: 'someLabwareDefURI',
           slot: '3',
           displayCategory: 'wellPlate',
+          isOnHopper: false,
         },
       },
     ]
@@ -264,6 +266,7 @@ describe('createContainer', () => {
           labwareDefURI: 'someLabwareDefURI',
           slot: '4',
           displayCategory: 'tipRack',
+          isOnHopper: false,
         },
       },
       {

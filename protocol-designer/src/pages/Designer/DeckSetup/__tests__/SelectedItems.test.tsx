@@ -64,6 +64,7 @@ describe('SelectedItems', () => {
       deckDef: getDeckDefFromRobotType(FLEX_ROBOT_TYPE),
       robotType: FLEX_ROBOT_TYPE,
       slotPosition: [0, 0, 0],
+      isSlotAHopper: false,
     }
     vi.mocked(getSelectedTerminalItemId).mockReturnValue(START_TERMINAL_ITEM_ID)
     vi.mocked(getAllDefinitions).mockReturnValue({

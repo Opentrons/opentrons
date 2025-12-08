@@ -79,6 +79,7 @@ export interface CreateContainerArgs {
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
   updateSelectedLabwareId?: boolean
+  isOnHopper?: boolean
 }
 
 export interface CreateContainerAction {
@@ -88,6 +89,7 @@ export interface CreateContainerAction {
     slot: DeckSlot
     id: string
     displayCategory: LabwareDisplayCategory
+    isOnHopper: boolean
   }
 }
 export interface DeleteContainerAction {
@@ -124,6 +126,7 @@ export interface DuplicateLabwareAction {
     duplicateLabwareNickname: string
     slot: DeckSlot
     displayCategory: LabwareDisplayCategory
+    isOnHopper: boolean
   }
 }
 

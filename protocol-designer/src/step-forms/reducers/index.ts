@@ -56,6 +56,7 @@ import type { Reducer } from 'redux'
 import type { Action as ReduxActionsAction } from 'redux-actions'
 import type { PipetteName } from '@opentrons/shared-data'
 import type {
+  LabwareLocationUpdateInfo,
   NormalizedAdditionalEquipmentById,
   NormalizedPipetteById,
 } from '@opentrons/step-generation'
@@ -368,22 +369,29 @@ export const savedStepForms = (
       const { savedStepForms: stepFormsFromFile, labware } = metadata
       const prevInitialDeckSetupStep =
         stepFormsFromFile[INITIAL_DECK_SETUP_STEP_ID]
-      const formLabwareLocationUpdate: Record<string, string> =
-        prevInitialDeckSetupStep.labwareLocationUpdate
+      const formLabwareLocationUpdate: Record<
+        string,
+        LabwareLocationUpdateInfo
+      > = prevInitialDeckSetupStep.labwareLocationUpdate
       const allLabware = getAllDefinitions()
       const latestDefs = getOnlyLatestDefs()
       const updatedLabwareLocationUpdate = Object.entries(
         formLabwareLocationUpdate
-      ).reduce((acc: Record<string, string>, [id, location]) => {
-        const updatedLabwareId = getMigratedLabwareId(
-          id,
-          labware,
-          allLabware,
-          latestDefs
-        )
-        acc[updatedLabwareId] = location
-        return acc
-      }, {})
+      ).reduce(
+        (acc: Record<string, LabwareLocationUpdateInfo>, [id, location]) => {
+          const updatedLabwareId = getMigratedLabwareId(
+            id,
+            labware,
+            allLabware,
+            latestDefs
+          )
+          acc[updatedLabwareId] = {
+            ...location,
+          }
+          return acc
+        },
+        {}
+      )
 
       return mapValues(stepFormsFromFile, (stepForm: FormData, formId) => {
         if (formId === INITIAL_DECK_SETUP_STEP_ID) {
@@ -566,7 +574,7 @@ export const savedStepForms = (
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
-
+      const isOnHopper = action.payload.isOnHopper
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
@@ -577,7 +585,10 @@ export const savedStepForms = (
           ...prevInitialDeckSetupStep,
           labwareLocationUpdate: {
             ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            [labwareId]: slot,
+            [labwareId]: {
+              slot,
+              ...(isOnHopper ? { attributes: { isOnHopper: true } } : {}),
+            },
           },
         },
       }
@@ -589,19 +600,19 @@ export const savedStepForms = (
       const labwareOccupyingDestination = getDeckItemIdInSlot(
         prevInitialDeckSetupStep.labwareLocationUpdate as Record<
           string,
-          string
+          LabwareLocationUpdateInfo
         >,
         action.payload.slot
       )
       const moduleId = action.payload.id
       // If module is going into a slot occupied by a labware,
       // move the labware on top of the new module
-      const labwareLocationUpdate =
+      const labwareLocationUpdate: Record<string, LabwareLocationUpdateInfo> =
         labwareOccupyingDestination == null
           ? prevInitialDeckSetupStep.labwareLocationUpdate
           : {
               ...prevInitialDeckSetupStep.labwareLocationUpdate,
-              [labwareOccupyingDestination]: moduleId,
+              [labwareOccupyingDestination]: { slot: moduleId },
             }
       return mapValues(savedStepForms, (savedForm: FormData, formId) => {
         if (formId === INITIAL_DECK_SETUP_STEP_ID) {
@@ -640,88 +651,101 @@ export const savedStepForms = (
 
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
+
       return mapValues(savedStepForms, (savedForm: FormData): FormData => {
-        if (savedForm.stepType === 'manualIntervention') {
-          // swap labware/module slots from all manualIntervention steps
-          // (or place compatible labware in dest slot onto module)
-          const sourceLabwareId = getDeckItemIdInSlot(
-            savedForm.labwareLocationUpdate as Record<string, string>,
-            sourceSlot
-          )
-          const destLabwareId = getDeckItemIdInSlot(
-            savedForm.labwareLocationUpdate as Record<string, string>,
-            destSlot
-          )
-          const sourceModuleId = getDeckItemIdInSlot(
-            savedForm.moduleLocationUpdate as Record<string, string>,
-            sourceSlot
-          )
-          const destModuleId = getDeckItemIdInSlot(
-            savedForm.moduleLocationUpdate as Record<string, string>,
-            destSlot
+        if (savedForm.stepType !== 'manualIntervention') {
+          return savedForm
+        }
+        const formLabwareLocationUpdate: Record<
+          string,
+          LabwareLocationUpdateInfo
+        > = savedForm.labwareLocationUpdate
+        const formModuleLocationUpdate: Record<string, string> =
+          savedForm.moduleLocationUpdate
+
+        const getLabwareInSlot = (slot: string): string | null =>
+          Object.keys(formLabwareLocationUpdate).find(
+            labwareId => formLabwareLocationUpdate[labwareId]?.slot === slot
+          ) ?? null
+
+        const getModuleInSlot = (slot: string): string | null =>
+          Object.keys(formModuleLocationUpdate).find(
+            moduleId => formModuleLocationUpdate[moduleId] === slot
+          ) ?? null
+
+        const sourceLabwareId = getLabwareInSlot(sourceSlot)
+        const destLabwareId = getLabwareInSlot(destSlot)
+        const sourceModuleId = getModuleInSlot(sourceSlot)
+        const destModuleId = getModuleInSlot(destSlot)
+
+        // only in this special case, we put module under the labware
+        if (sourceModuleId && destLabwareId) {
+          const prevInitialDeckSetup = _getInitialDeckSetupRootState(rootState)
+
+          const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
+          const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
+
+          const isCompat = getLabwareIsCompatible(
+            labwareEntity.def,
+            moduleEntity.type
           )
 
-          if (sourceModuleId && destLabwareId) {
-            // moving module to a destination slot with labware
-            const prevInitialDeckSetup =
-              _getInitialDeckSetupRootState(rootState)
+          const moduleIsOccupied = getLabwareInSlot(sourceModuleId) != null // some labware sitting on module
 
-            const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
-            const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
-            const isCompat = getLabwareIsCompatible(
-              labwareEntity.def,
-              moduleEntity.type
-            )
-            const moduleIsOccupied =
-              getDeckItemIdInSlot(
-                savedForm.labwareLocationUpdate as Record<string, string>,
-                sourceModuleId
-              ) != null
-
-            if (isCompat && !moduleIsOccupied) {
-              // only in this special case, we put module under the labware
-              return {
-                ...savedForm,
-                labwareLocationUpdate: {
-                  ...savedForm.labwareLocationUpdate,
-                  [destLabwareId]: sourceModuleId,
+          if (isCompat && !moduleIsOccupied) {
+            return {
+              ...savedForm,
+              labwareLocationUpdate: {
+                ...savedForm.labwareLocationUpdate,
+                [destLabwareId]: {
+                  ...savedForm.labwareLocationUpdate[destLabwareId],
+                  slot: sourceModuleId, // labware now sits on module
                 },
-                moduleLocationUpdate: {
-                  ...savedForm.moduleLocationUpdate,
-                  [sourceModuleId]: destSlot,
-                },
-              }
+              },
+              moduleLocationUpdate: {
+                ...savedForm.moduleLocationUpdate,
+                [sourceModuleId]: destSlot, // module moves to dest slot
+              },
             }
           }
-
-          const labwareLocationUpdate: Record<string, string> = {
-            ...savedForm.labwareLocationUpdate,
-          }
-
-          if (sourceLabwareId != null) {
-            labwareLocationUpdate[sourceLabwareId] = destSlot
-          }
-
-          if (destLabwareId != null) {
-            labwareLocationUpdate[destLabwareId] = sourceSlot
-          }
-
-          const moduleLocationUpdate: Record<string, string> = {
-            ...savedForm.moduleLocationUpdate,
-          }
-
-          if (sourceModuleId != null) {
-            moduleLocationUpdate[sourceModuleId] = destSlot
-          }
-
-          if (destModuleId != null) {
-            moduleLocationUpdate[destModuleId] = sourceSlot
-          }
-
-          return { ...savedForm, labwareLocationUpdate, moduleLocationUpdate }
         }
 
-        return savedForm
+        // default case: swap labware + modules normally
+        const labwareLocationUpdate = {
+          ...savedForm.labwareLocationUpdate,
+        }
+
+        if (sourceLabwareId != null) {
+          labwareLocationUpdate[sourceLabwareId] = {
+            ...labwareLocationUpdate[sourceLabwareId],
+            slot: destSlot,
+          }
+        }
+
+        if (destLabwareId != null) {
+          labwareLocationUpdate[destLabwareId] = {
+            ...labwareLocationUpdate[destLabwareId],
+            slot: sourceSlot,
+          }
+        }
+
+        const moduleLocationUpdate = {
+          ...savedForm.moduleLocationUpdate,
+        }
+
+        if (sourceModuleId != null) {
+          moduleLocationUpdate[sourceModuleId] = destSlot
+        }
+
+        if (destModuleId != null) {
+          moduleLocationUpdate[destModuleId] = sourceSlot
+        }
+
+        return {
+          ...savedForm,
+          labwareLocationUpdate,
+          moduleLocationUpdate,
+        }
       })
     }
 
@@ -731,17 +755,20 @@ export const savedStepForms = (
         if (savedForm.stepType === 'manualIntervention') {
           // remove instances of labware from all manualIntervention steps
           const updatedLabwareLocation = Object.entries(
-            savedForm.labwareLocationUpdate as Record<string, string>
-          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
+            savedForm.labwareLocationUpdate as Record<
+              string,
+              LabwareLocationUpdateInfo
+            >
+          ).reduce((acc: Record<string, string>, [labwareId, location]) => {
             if (labwareId === labwareIdToDelete) {
               return acc
             }
 
             // If labware is on an adapter and adapter was deleted, update labwareId's location
             const newLocationId =
-              locationId === labwareIdToDelete
+              location.slot === labwareIdToDelete
                 ? savedForm.labwareLocationUpdate[labwareIdToDelete]
-                : locationId
+                : { slot: location.slot }
 
             acc[labwareId] = newLocationId
             return acc
@@ -832,8 +859,13 @@ export const savedStepForms = (
             moduleLocationUpdate: omit(form.moduleLocationUpdate, moduleId),
             labwareLocationUpdate: mapValues(
               form.labwareLocationUpdate,
-              labwareSlot =>
-                labwareSlot === moduleId ? deletedModuleSlot : labwareSlot
+              location =>
+                location.slot === moduleId
+                  ? {
+                      ...location,
+                      slot: deletedModuleSlot,
+                    }
+                  : location
             ),
           }
         } else if (
@@ -842,6 +874,7 @@ export const savedStepForms = (
             form.stepType === 'heaterShaker' ||
             form.stepType === 'absorbanceReader' ||
             form.stepType === 'thermocycler' ||
+            form.stepType === 'flexStacker' ||
             form.stepType === 'pause') &&
           form.moduleId === moduleId
         ) {

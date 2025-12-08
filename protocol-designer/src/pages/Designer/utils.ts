@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { reduce } from 'lodash'
+import reduce from 'lodash/reduce'
 
 import {
   FLEX_ROBOT_TYPE,
@@ -15,8 +15,12 @@ import {
 } from '@opentrons/shared-data'
 import {
   getFullStackFromLabwares,
+  getIsSlotAHopper,
   getSlotInLocationStack,
+  HOPPER_LOCATION_MAP,
 } from '@opentrons/step-generation'
+
+import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
@@ -39,6 +43,7 @@ import type {
 import type {
   AdditionalEquipmentName,
   DeckSlot,
+  HopperLocationMapKey,
   LabwareEntities,
   LabwareEntity,
   RobotState,
@@ -65,6 +70,7 @@ interface SlotInformation {
   createdStackForSlot: string[]
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
+  isSlotAHopper: boolean
   createdModuleForSlot?: ModuleOnDeck
   createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
@@ -95,17 +101,25 @@ export const getSlotInformation = (
     .filter(def => def.allowedRoles?.includes('lid'))
     ?.map(def => def.parameters.loadName)
   const offDeckLabware = deckSetupLabware[slot]
+  const isSlotAHopper = getIsSlotAHopper(slot)
+  const adjustedSlot = isSlotAHopper
+    ? HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
   const slotPosition =
     deckDef != null && offDeckLabware == null
-      ? (getPositionFromSlotId(slot, deckDef) ?? null)
+      ? (getPositionFromSlotId(
+          adjustedSlot,
+          deckDef,
+          isSlotAHopper ? HOPPER_LABWARE_X_OFFSET : undefined
+        ) ?? null)
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
-    module => module.slot === slot
+    module => module.slot === adjustedSlot
   )
-
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabware),
-    slot
+    slot,
+    isSlotAHopper
   )
   const labwareStackOnSlot =
     fullStackFromLabwares?.filter(
@@ -192,6 +206,7 @@ export const getSlotInformation = (
     createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,
+    isSlotAHopper,
     matchingLabwareFor4thColumn: matchingLabware,
     createdStackForSlot:
       slot === 'offDeck'

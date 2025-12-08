@@ -37,6 +37,7 @@ import {
 import {
   CLEAN,
   EMPTY,
+  HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
   ZERO_OFFSET,
@@ -1362,4 +1363,8 @@ export const getLabwareIdOnHopper = (
   const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
   const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
   return labwareIdOnModule
+}
+
+export const getIsSlotAHopper = (slot: string): boolean => {
+  return HOPPER_FAKE_LOCATIONS.includes(slot)
 }

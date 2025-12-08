@@ -2,7 +2,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { getModuleDisplayName } from '@opentrons/shared-data'
-import { getTopLocationInStack } from '@opentrons/step-generation'
+import {
+  getIsSlotAHopper,
+  getTopLocationInStack,
+} from '@opentrons/step-generation'
 
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
@@ -32,10 +35,10 @@ export function SlotDetailsContainer(
   )
   const nickNames = useSelector(uiLabwareSelectors.getLabwareNicknamesById)
   const liquidEntities = useSelector(getLiquidEntities)
-
   if (slot == null || (slot === 'offDeck' && offDeckLabwareId == null)) {
     return null
   }
+  const isSlotAHopper = getIsSlotAHopper(slot)
 
   const {
     modules: deckSetupModules,
@@ -47,11 +50,13 @@ export function SlotDetailsContainer(
     offDeckLabwareId != null ? nickNames[offDeckLabwareId] : null
 
   const moduleOnSlot = Object.values(deckSetupModules).find(
-    module => module.slot === slot
+    module =>
+      module.slot === slot || (slot.includes(module.slot) && isSlotAHopper)
   )
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),
-    slot
+    slot,
+    isSlotAHopper
   )
   const topLocationLabwareId =
     fullStackFromLabwares?.length > 0

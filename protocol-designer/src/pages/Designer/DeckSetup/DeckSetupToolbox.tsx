@@ -20,6 +20,10 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import { ABSORBANCE_READER_V1 } from '@opentrons/shared-data'
+import {
+  getIsSlotAHopper,
+  HOPPER_LOCATION_MAP,
+} from '@opentrons/step-generation'
 
 import {
   LINK_BUTTON_STYLE,
@@ -44,6 +48,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
@@ -145,6 +150,8 @@ export function DeckSetupToolbox(
   const handleConfirm = (): void => {
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
+    const isHopperSlot = getIsSlotAHopper(slot)
+
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
@@ -152,7 +159,9 @@ export function DeckSetupToolbox(
     if (hasModule) {
       dispatch(
         createContainerAboveModule({
-          slot,
+          slot: isHopperSlot
+            ? HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+            : slot,
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
             ...(selectedTopLabware.labwareDefURI != null
@@ -160,6 +169,7 @@ export function DeckSetupToolbox(
               : []),
             ...(selectedLidLabware != null ? [selectedLidLabware] : []),
           ],
+          isOnHopper: isHopperSlot,
         })
       )
     } else {
@@ -217,6 +227,11 @@ export function DeckSetupToolbox(
     }
   }
 
+  const displaySlot = getIsSlotAHopper(slot)
+    ? t('shared:stacker', {
+        slot: HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
+      })
+    : slot
   return (
     <>
       {showSelectLabwareModal ? (
@@ -248,7 +263,7 @@ export function DeckSetupToolbox(
               deckLabel={
                 slot === 'offDeck' || deckSetup.labware[slot] != null
                   ? i18n.format(t('off_deck_title'), 'upperCase')
-                  : slot
+                  : displaySlot
               }
             />
             <StyledText desktopStyle="bodyLargeSemiBold">

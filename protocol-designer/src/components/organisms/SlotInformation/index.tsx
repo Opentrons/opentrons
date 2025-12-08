@@ -21,12 +21,17 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import {
+  getIsSlotAHopper,
+  HOPPER_LOCATION_MAP,
+} from '@opentrons/step-generation'
 
 import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 
 interface SlotInformationProps {
   location: string
@@ -51,11 +56,18 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
       : TC_MODULE_LOCATION_OT2
-  const modifiedLocation =
+
+  let modifiedLocation = location
+  if (
     modules.includes(getModuleDisplayName(THERMOCYCLER_MODULE_V2)) ||
     modules.includes(getModuleDisplayName(THERMOCYCLER_MODULE_V1))
-      ? tcDisplayLocation
-      : location
+  ) {
+    modifiedLocation = tcDisplayLocation
+  } else if (getIsSlotAHopper(location)) {
+    modifiedLocation = t('stacker', {
+      slot: HOPPER_LOCATION_MAP[location as HopperLocationMapKey],
+    })
+  }
 
   return (
     <Flex

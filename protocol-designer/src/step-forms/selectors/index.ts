@@ -46,6 +46,7 @@ import type {
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
+  LabwareLocationUpdateInfo,
   LiquidEntities,
   ModuleEntities,
   NormalizedAdditionalEquipmentById,
@@ -269,7 +270,7 @@ const _getInitialDeckSetup = (
     'expected initial deck setup step to be "manualIntervention" step'
   )
 
-  const labwareLocations: Record<string, string> =
+  const labwareLocations: Record<string, LabwareLocationUpdateInfo> =
     (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
   const moduleLocations: Record<string, string> =
     (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
@@ -286,11 +287,13 @@ const _getInitialDeckSetup = (
     }
     return aeEntities
   }, {})
-
   return {
-    labware: mapValues<Record<string, string>, LabwareOnDeck>(
-      labwareLocations as Record<string, string>,
-      (id: string, labwareId: string): LabwareOnDeck => {
+    labware: mapValues<
+      Record<string, LabwareLocationUpdateInfo>,
+      LabwareOnDeck
+    >(
+      labwareLocations as Record<string, LabwareLocationUpdateInfo>,
+      (info: LabwareLocationUpdateInfo, labwareId: string): LabwareOnDeck => {
         return {
           stack: getLocationStackTopToBottom(
             labwareId,

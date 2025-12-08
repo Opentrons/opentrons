@@ -13,6 +13,8 @@ import {
 } from '@opentrons/shared-data'
 import {
   getSlotInLocationStack,
+  HOPPER_LOCATION_MAP,
+  HOPPER_STACKER_LOCATION,
   PROTOCOL_CONTEXT_NAME,
 } from '@opentrons/step-generation'
 
@@ -30,7 +32,9 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
+  HopperLocationMapKey,
   LabwareEntities,
+  LabwareLocationUpdateInfo,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
@@ -358,32 +362,104 @@ export const getMaxConditioningVolume = (args: {
 }
 
 // for stacking
+// export function getLocationStackTopToBottom(
+//   labwareId: string,
+//   labwareLocationUpdate: Record<string, LabwareLocationUpdateInfo>,
+//   moduleLocationUpdate: Record<string, string>
+// ): string[] {
+//   const stack: string[] = []
+//   let current = labwareId
+
+//   while (true) {
+//     // push the current labware (top -> bottom)
+//     stack.push(current)
+
+//     const info = labwareLocationUpdate[current]
+//     let parent = info?.slot ?? moduleLocationUpdate[current]
+//     const isOnHopper = info?.attributes?.isOnHopper === true
+
+//     // If this labware is flagged as on the hopper and the parent resolves to a module,
+//     // try to find the shuttle labware that is attached to that same module and insert it.
+//     if (isOnHopper && parent && moduleLocationUpdate[parent] !== undefined) {
+//       // `parent` here is the moduleId
+//       const moduleId = parent
+
+//       // find a labware whose slot points to the same moduleId and that is NOT the hopper itself
+//       // prefer a labware that is NOT marked as onHopper (i.e., the shuttle)
+//       const shuttleId = Object.keys(labwareLocationUpdate).find(lwId => {
+//         if (lwId === current) return false
+//         const lwInfo = labwareLocationUpdate[lwId]
+//         return (
+//           lwInfo?.slot === moduleId && lwInfo?.attributes?.isOnHopper !== true
+//         )
+//       })
+
+//       // insert hopper marker
+//       stack.push(HOPPER_STACKER_LOCATION)
+
+//       if (shuttleId) {
+//         // instead of jumping straight to the module, set parent to the shuttle so
+//         // the loop will next push the shuttle and then continue upward to module -> slot
+//         parent = shuttleId
+//       } else {
+//         // no shuttle found; fall back to the module (existing behavior)
+//         parent = moduleId
+//       }
+//     }
+
+//     // stop if no parent was found
+//     if (!parent) break
+
+//     // move up the chain
+//     current = parent
+//   }
+//   console.log('stack', stack)
+//   return stack
+// }
+
 export function getLocationStackTopToBottom(
   labwareId: string,
-  labwareLocationUpdate: Record<string, string>,
+  labwareLocationUpdate: Record<string, LabwareLocationUpdateInfo>,
   moduleLocationUpdate: Record<string, string>
 ): string[] {
-  const stack = []
+  const stack: string[] = []
   let current = labwareId
 
-  //  while parent still exists
   while (true) {
     stack.push(current)
-    const parent =
-      labwareLocationUpdate[current] || moduleLocationUpdate[current]
+
+    const info = labwareLocationUpdate[current]
+    const parent = info?.slot ?? moduleLocationUpdate[current]
+    const isOnHopper = info?.attributes?.isOnHopper === true
+
+    if (isOnHopper) {
+      // Hopper stack shape: [labware, hopper, moduleId, slot]
+      // So when the node is on the hopper, insert the hopper marker once
+      stack.push(HOPPER_STACKER_LOCATION)
+    }
+
     if (!parent) break
+
     current = parent
   }
 
+  console.log('stack', stack)
   return stack
 }
 
 export const getLabwaresOnModuleFromStack = (
   moduleId: string,
   labware: LabwareOnDeck[]
-): { topMostId: string | null; rightBelowTopId: string | null } => {
+): {
+  topMostId: string | null
+  rightBelowTopId: string | null
+  hopperTopMostId: string | null
+} => {
   // all stacks involving this module
-  const allStacks = labware.filter(lw => lw.stack.includes(moduleId))
+  const allStacks = labware.filter(
+    lw =>
+      lw.stack.includes(moduleId) && !lw.stack.includes(HOPPER_STACKER_LOCATION)
+  )
   const largestStack = allStacks.sort(
     (a, b) => b.stack.length - a.stack.length
   )[0]
@@ -391,18 +467,37 @@ export const getLabwaresOnModuleFromStack = (
   const isTopMostIdALid = labware.find(
     lw => lw.id === topMostId && lw.def.allowedRoles?.includes('lid')
   )
+  // all stacks involving the hopper if there is one
+  const allStacksOnHopper = labware.filter(
+    lw =>
+      lw.stack.includes(moduleId) && lw.stack.includes(HOPPER_STACKER_LOCATION)
+  )
+  const largestStackOnHopper = allStacksOnHopper.sort(
+    (a, b) => b.stack.length - a.stack.length
+  )[0]
   return {
     topMostId: largestStack?.stack[0],
     rightBelowTopId: isTopMostIdALid ? largestStack?.stack[1] : null,
+    hopperTopMostId: largestStackOnHopper?.stack[0],
   }
 }
 
 export const getFullStackFromLabwaresOnDeck = (
   labwareOnDeck: LabwareOnDeck[],
-  slot: DeckSlotId
+  slot: DeckSlotId,
+  onHopper: boolean
 ): string[] => {
+  const slotInStack = onHopper
+    ? HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
   return labwareOnDeck
-    .filter(lw => lw.stack.includes(slot))
+    .filter(
+      lw =>
+        lw.stack.includes(slotInStack) &&
+        (onHopper
+          ? lw.stack.includes(HOPPER_STACKER_LOCATION)
+          : !lw.stack.includes(HOPPER_STACKER_LOCATION))
+    )
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
 }
 

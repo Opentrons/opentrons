@@ -17,6 +17,7 @@ import {
 } from '@opentrons/components'
 import {
   getFullStackFromLabwares,
+  getIsSlotAHopper,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
@@ -63,7 +64,7 @@ const TOP_SLOT_Y_POSITION_2_BUTTONS = 35
 const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 interface SlotOverflowMenuProps {
-  //   can be off-deck id or deck slot
+  //   can be off-deck id or deck slot or flexStackerAddressableArea
   location: DeckSlotId | string
   setShowMenuList: (value: SetStateAction<boolean>) => void
   addEquipment: (slotId: string) => void
@@ -81,6 +82,7 @@ export function SlotOverflowMenu(
     invertY = false,
   } = props
   const { t } = useTranslation('starting_deck_state')
+  const isOnHopper = getIsSlotAHopper(location)
   const savedSteps = useSelector(getSavedStepForms)
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [showDeleteLabwareModal, setShowDeleteLabwareModal] =
@@ -138,7 +140,9 @@ export function SlotOverflowMenu(
       makeSnackbar(t('deck_slots_full') as string)
       return
     }
-    dispatch(duplicateLabware(labwareStackOnSlot))
+    dispatch(
+      duplicateLabware({ templateLabwareIds: labwareStackOnSlot, isOnHopper })
+    )
     setShowMenuList(false)
   }
 
