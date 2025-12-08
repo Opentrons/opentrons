@@ -9,6 +9,7 @@ Your protocol timeline includes steps the robot will peform in your protocol. To
 Transfer steps move liquid from one well or group of wells to another. Adding a transfer step opens a four-part form. In the first, select basic settings for your liquid transfer: 
 
 * The pipette to perform the transfer and the tip rack it will use. 
+* The number of multi-channel pipette nozzles to use. For more, see [partial tip pickup](transfer.md#partial-tip-use).
 * Source and destination labware, including wells. 
 * Pipette path, or motion the pipette uses to perform the transfer. 
 * The volume of liquid to transfer.  
@@ -89,16 +90,39 @@ If you choose an incompatible well ratio or an empty source well, Protocol Desig
   <figcaption>Incompatible well ratio in a transfer step.</figcaption>
 </figure>
 
-Next, choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol, or to return tips to the tip rack.
-
-!!! Note
-    If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol. 
+Next, choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol, or to return tips to the tip rack. If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. 
 
 You can also customize tip tracking settings in your Protocol Designer protocols. When you select automatic tip tracking, Protocol Designer keeps track of which tips have been picked up and used, starting with the tip in position A1 of the tip rack you chose for the transfer. 
 
-Click **manual tip tracking** to choose the tips the pipette will use in your transfer step. Tips are labeled as  new, used, or selected for your transfer. Protocol Designer also shows you tips that have been discarded and are missing from the tip rack, or tips that are inaccessible, or unable to be picked up by your chosen pipette.
+Click **manual tip tracking** to select the tips the pipette will use in your transfer step. Tips in your tip rack are labeled as:
+
+* **New** tips that haven't been used yet.
+* **Used** tips that have been returned to the tip rack.
+* **Selected** tips will be used in your transfer. Tips are numbered to show how many will be picked up at once.
+* Tips labeled **no tip** have been discarded and are missing from the tip rack.
+* **Inaccessible** tips can't be picked up by your chosen pipette.
 
 <figure class="screenshot" markdown>
   ![Manual tip selection](../images/tip_selection.png)
   <figcaption>Click to select tips for your transfer step.</figcaption>
 </figure> 
+
+Protocol Designer includes warnings if your tip selections might be incompatible with other parts of your protocol, especially in partial tip use. See below for more.
+
+### Partial tip use
+
+You can use partial tip pickup to use less tips than a Flex or OT-2 multi-channel pipette can pick up at once: 
+
+* Pick up a single column or individual tip with the Flex 96-channel pipette. 
+* Pick up individual tips with Flex and OT-2 8-channel pipettes. 
+
+When you add a transfer or mix step, start by selecting **column** or **single** from the available nozzle options in the first form.
+
+!!! Note
+    You'll need to place tip racks directly on the starting deck for partial tip pickup with the Flex 96-channel pipette. 
+
+    When you select the Flex 96-channel pipette, Protocol Designer automatically places your first tip rack on the deck with a 96-channel tip rack adapter, required for picking up a full rack of tips. Add a second tip rack directly on the deck to enable partial tip use.
+
+In the fourth form, you can choose between automatic and manual tip tracking for your multi-channel pipette. Protocol Designer includes warnings, both in the tip selection form and as a step error, if your partial tip selections could cause pipette collisions. We always recommend resolving all errors before exporting your protocol and running it on a robot. 
+
+

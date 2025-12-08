@@ -13,12 +13,11 @@ You can customize settings for your mix step in a four-part form. Just like in a
 
 In the second and third forms, choose whether to apply liquid class or other advanced settings. In the aspirate and dispense tabs, you can adjust the flow rate, well order, and tip position within the well. Available advanced settings in a mix step include a delay after aspirating or dispensing and a push out, blowout, or touch tip after dispensing. See [additional settings](transfer.md#additional-settings) for descriptions of each.
 
-Finally, choose [tip management](transfer.md#tip-management) settings, like how often to select a new tip and where to dispose of used tips. Like in a transfer step, Protocol Designer lets you choose between automatic and manual tip tracking: 
+Finally, choose [tip management](transfer.md#tip-management) settings, like how often to select a new tip and where to dispose of used tips. If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. 
+
+Protocol Designer also lets you choose between automatic and manual tip tracking: 
 
 - **automatic**: Protocol Designer tracks which tips have been picked up and used, and selects the next available tip in the tip rack. 
-- **manual**: Choose the tips the pipette will use in your transfer step. View new, used, or selected tips in the form, as well as tips that are discarded or inaccessible. 
-
-!!! Note
-    If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. You won't be able to pick up these tips again in the same protocol. 
+- **manual**: Choose the tips the pipette will use in your transfer step. View new, used, or selected tips in the form, as well as tips that have been discarded or are inaccessible. 
 
 Like a transfer step, mix steps are blocked by lids on labware. Use a move step to remove lids, then add a mix step to your protocol. 
