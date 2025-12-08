@@ -134,6 +134,11 @@ jobs:
       matrix:
         os: ['ubuntu-24.04', 'macos-latest', 'windows-2022']
         python: ['3.10', '3.11', '3.12', '3.13']
+        exclude:
+          # numpy 1.26.4 does not have a precompiled wheel for 3.13, and building it locally gives
+          # a bad object that crashes a bunch
+          - os: 'windows-2022'
+            python: '3.13'
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v4'
