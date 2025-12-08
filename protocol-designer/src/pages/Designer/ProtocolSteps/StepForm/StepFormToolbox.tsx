@@ -62,6 +62,7 @@ import {
   AbsorbanceReaderTools,
   CameraTools,
   CommentTools,
+  FlexStackerToolsContainer,
   HeaterShakerTools,
   MagnetTools,
   MixTools,
@@ -107,6 +108,7 @@ const STEP_FORM_MAP: StepFormMap = {
   comment: CommentTools,
   camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
+  flexStacker: FlexStackerToolsContainer,
 }
 
 // used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings
@@ -535,7 +537,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               desktopStyle="bodyLargeSemiBold"
               css={LINE_CLAMP_TEXT_STYLE(2, true)}
             >
-              {capitalizeFirstLetter(String(formData.stepName))}
+              {/* TODO: use  module object from form.json instead */}
+              {formData.stepType === 'flexStacker'
+                ? t(`protocol_steps:${formData.stepType}`)
+                : capitalizeFirstLetter(String(formData.stepName))}
             </StyledText>
           </Flex>
         }

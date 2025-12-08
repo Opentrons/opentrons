@@ -20,6 +20,7 @@ import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import {
   InterventionModal,
   useInterventionModal,
@@ -35,7 +36,6 @@ import {
 } from '/app/resources/runs'
 
 import { useDownloadRunLog } from '../Devices/hooks'
-import { isTerminalRunStatus } from '../Devices/ProtocolRun/ProtocolRunHeader/utils'
 import { useRunProgressCopy } from './hooks'
 import { InterventionTicks } from './InterventionTicks'
 

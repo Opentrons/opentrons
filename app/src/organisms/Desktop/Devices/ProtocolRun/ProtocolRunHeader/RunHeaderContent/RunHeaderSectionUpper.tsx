@@ -15,12 +15,12 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { isCancellableStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import { useRunCreatedAtTimestamp, useRunTimestamps } from '/app/resources/runs'
 
 import { DisplayRunStatus } from '../DisplayRunStatus'
-import { isCancellableStatus } from '../utils'
 import { ActionButton } from './ActionButton'
 import { LabeledValue } from './LabeledValue'
 
