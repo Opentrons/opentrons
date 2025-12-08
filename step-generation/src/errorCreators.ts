@@ -395,6 +395,13 @@ export const stackTooHigh = (args: { slot: string }): CommandCreatorError => {
   }
 }
 
+export const tooManyTips = (): CommandCreatorError => {
+  return {
+    type: 'TOO_MANY_TIPS',
+    message: 'Action will pick up too many tips',
+  }
+}
+
 export const incompletePickup = (): CommandCreatorError => {
   return {
     type: 'INCOMPLETE_PICKUP',
