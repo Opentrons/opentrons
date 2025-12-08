@@ -138,7 +138,7 @@ export function SlotOverflowMenu(
       makeSnackbar(t('deck_slots_full') as string)
       return
     }
-    dispatch(duplicateLabware({ templateLabwareIds: labwareStackOnSlot }))
+    dispatch(duplicateLabware(labwareStackOnSlot))
     setShowMenuList(false)
   }
 

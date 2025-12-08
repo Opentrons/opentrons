@@ -123,75 +123,72 @@ export const createContainer: (
   }
 }
 
-interface DuplicateLabwareProps {
-  templateLabwareIds: string[]
-}
 export const duplicateLabware: (
-  props: DuplicateLabwareProps
-) => ThunkAction<DuplicateLabwareAction> = args => (dispatch, getState) => {
-  const { templateLabwareIds } = args
-  const state = getState()
-  const robotType = state.fileData.robotType
-  const labwareEntities = stepFormSelectors.getLabwareEntities(state)
-  const labwareDefsByURI = labwareDefSelectors.getLabwareDefsByURI(state)
-  const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
-  const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
+  templateLabwareIds: string[]
+) => ThunkAction<DuplicateLabwareAction> =
+  templateLabwareIds => (dispatch, getState) => {
+    const state = getState()
+    const robotType = state.fileData.robotType
+    const labwareEntities = stepFormSelectors.getLabwareEntities(state)
+    const labwareDefsByURI = labwareDefSelectors.getLabwareDefsByURI(state)
+    const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
+    const allNicknamesById = uiLabwareSelectors.getLabwareNicknamesById(state)
 
-  const templateLabwareDefURIs = templateLabwareIds.map(
-    id => labwareEntities[id]?.labwareDefURI
-  )
+    const templateLabwareDefURIs = templateLabwareIds.map(
+      id => labwareEntities[id]?.labwareDefURI
+    )
 
-  console.assert(
-    !templateLabwareDefURIs.some(uri => uri == null),
-    'Missing labwareDefURI for one or more templateLabwareIds:',
-    templateLabwareIds
-  )
+    console.assert(
+      !templateLabwareDefURIs.some(uri => uri == null),
+      'Missing labwareDefURI for one or more templateLabwareIds:',
+      templateLabwareIds
+    )
 
-  // determine if duplicating off-deck
-  const firstTemplateId = templateLabwareIds[0]
-  const firstLabwareStack = initialDeckSetup.labware[firstTemplateId].stack
-  const isOffDeck = getSlotInLocationStack(firstLabwareStack) === 'offDeck'
+    // determine if duplicating off-deck
+    const firstTemplateId = templateLabwareIds[0]
+    const firstLabwareStack = initialDeckSetup.labware[firstTemplateId].stack
+    const isOffDeck = getSlotInLocationStack(firstLabwareStack) === 'offDeck'
 
-  const firstLabwareDefURI = templateLabwareDefURIs[0] as string
-  const labwareDef = labwareDefsByURI[firstLabwareDefURI]
-  const displayCategory = labwareDef?.metadata?.displayCategory
+    const firstLabwareDefURI = templateLabwareDefURIs[0] as string
+    const labwareDef = labwareDefsByURI[firstLabwareDefURI]
+    const displayCategory = labwareDef?.metadata?.displayCategory
 
-  const templateSlot = isOffDeck
-    ? 'offDeck'
-    : getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
+    const templateSlot = isOffDeck
+      ? 'offDeck'
+      : getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDef)
 
-  //  ensure templateSlot is not null
-  if (templateSlot == null) {
-    console.error('no slots available, cannot duplicate labware')
-    return
-  }
+    //  ensure templateSlot is not null
+    if (templateSlot == null) {
+      console.error('no slots available, cannot duplicate labware')
+      return
+    }
 
-  const duplicateNicknames = templateLabwareIds.map(id => {
-    const templateNickname = allNicknamesById[id]
-    return getNextNickname(Object.values(allNicknamesById), templateNickname)
-  })
-
-  let slot: string = templateSlot as string
-  templateLabwareIds.reverse().forEach((templateLabwareId, index) => {
-    const defURI = labwareEntities[templateLabwareId].labwareDefURI
-    const duplicateLabwareId = `${uuid()}:${defURI}`
-
-    dispatch({
-      type: 'DUPLICATE_LABWARE',
-      payload: {
-        duplicateLabwareNickname: duplicateNicknames[index],
-        templateLabwareId,
-        duplicateLabwareId,
-        slot,
-        displayCategory,
-      },
+    const duplicateNicknames = templateLabwareIds.map(id => {
+      const templateNickname = allNicknamesById[id]
+      return getNextNickname(Object.values(allNicknamesById), templateNickname)
     })
 
-    if (!isOffDeck) {
-      slot = duplicateLabwareId
-    }
-  })
-}
+    let slot: string = templateSlot as string
+    templateLabwareIds.reverse().forEach((templateLabwareId, index) => {
+      const defURI = labwareEntities[templateLabwareId].labwareDefURI
+      const duplicateLabwareId = `${uuid()}:${defURI}`
+
+      dispatch({
+        type: 'DUPLICATE_LABWARE',
+        payload: {
+          duplicateLabwareNickname: duplicateNicknames[index],
+          templateLabwareId,
+          duplicateLabwareId,
+          slot,
+          displayCategory,
+        },
+      })
+
+      if (!isOffDeck) {
+        slot = duplicateLabwareId
+      }
+    })
+  }
 
 export interface EditMultipleLabwareAction {
   type: 'EDIT_MULTIPLE_LABWARE_PYTHON_NAME'
