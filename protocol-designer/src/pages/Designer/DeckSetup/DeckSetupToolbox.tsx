@@ -19,7 +19,10 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ABSORBANCE_READER_V1 } from '@opentrons/shared-data'
+import {
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
+} from '@opentrons/shared-data'
 import {
   getIsSlotAHopper,
   HOPPER_LOCATION_MAP,
@@ -151,12 +154,15 @@ export function DeckSetupToolbox(
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
     const isHopperSlot = getIsSlotAHopper(slot)
+    const isOnShuttle =
+      !isHopperSlot && selectedModuleModel === FLEX_STACKER_MODULE_V1
 
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
     }
-    if (hasModule) {
+    //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
+    if (hasModule && !isOnShuttle) {
       dispatch(
         createContainerAboveModule({
           slot: isHopperSlot
@@ -169,7 +175,6 @@ export function DeckSetupToolbox(
               : []),
             ...(selectedLidLabware != null ? [selectedLidLabware] : []),
           ],
-          isOnHopper: isHopperSlot,
         })
       )
     } else {

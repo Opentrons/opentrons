@@ -864,12 +864,3 @@ export interface WellContentsByNumber {
 }
 
 export type TipTrackingOption = typeof AUTOMATIC | typeof MANUAL
-
-export interface LabwareLocationUpdateInfo {
-  slot: string
-  //  attributes can be expanded on in the future to include
-  //  other location quirks
-  attributes?: {
-    isOnHopper?: boolean
-  }
-}

@@ -22,7 +22,6 @@ import type { CreateModuleAction } from './modules'
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId
   labwareDefURIStack: string[]
-  isOnHopper: boolean
 }
 
 export const createContainerAboveModule: (
@@ -33,7 +32,7 @@ export const createContainerAboveModule: (
   | ZoomedIntoSlotAction
   | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
-  const { slot, labwareDefURIStack, isOnHopper } = args
+  const { slot, labwareDefURIStack } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
@@ -44,7 +43,6 @@ export const createContainerAboveModule: (
     createContainer({
       slot: moduleId,
       labwareDefURIStack,
-      isOnHopper,
     })
   )
 }

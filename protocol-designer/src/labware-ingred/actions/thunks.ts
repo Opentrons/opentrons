@@ -63,7 +63,7 @@ export const createContainer: (
   | ZoomedIntoSlotAction
   | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
-  const { labwareDefURIStack, slot, updateSelectedLabwareId, isOnHopper } = args
+  const { labwareDefURIStack, slot, updateSelectedLabwareId } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
@@ -89,7 +89,6 @@ export const createContainer: (
           labwareDefURI: labwareUri,
           slot: currentSlot,
           displayCategory: labwareDisplayCategory,
-          isOnHopper: isOnHopper ?? false,
         },
       })
 
@@ -126,12 +125,11 @@ export const createContainer: (
 
 interface DuplicateLabwareProps {
   templateLabwareIds: string[]
-  isOnHopper?: boolean
 }
 export const duplicateLabware: (
   props: DuplicateLabwareProps
 ) => ThunkAction<DuplicateLabwareAction> = args => (dispatch, getState) => {
-  const { isOnHopper, templateLabwareIds } = args
+  const { templateLabwareIds } = args
   const state = getState()
   const robotType = state.fileData.robotType
   const labwareEntities = stepFormSelectors.getLabwareEntities(state)
@@ -186,7 +184,6 @@ export const duplicateLabware: (
         duplicateLabwareId,
         slot,
         displayCategory,
-        isOnHopper: isOnHopper ?? false,
       },
     })
 

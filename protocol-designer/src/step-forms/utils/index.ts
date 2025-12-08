@@ -34,7 +34,6 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
-  LabwareLocationUpdateInfo,
   NormalizedPipette,
   NormalizedPipetteById,
   PipetteEntities,
@@ -111,11 +110,11 @@ export function getIdsInRange<T extends string | number>(
 }
 // NOTE: deck items include labware and modules
 export function getDeckItemIdInSlot(
-  itemIdToSlot: Record<string, LabwareLocationUpdateInfo>,
+  itemIdToSlot: Record<string, string>,
   slot: DeckSlotId
 ): string | null | undefined {
   const idsForSourceSlot = Object.entries(itemIdToSlot)
-    .filter(([id, info]) => info.slot === slot)
+    .filter(([id, location]) => location === slot)
     .map(([id, labwareSlot]) => id)
   console.assert(
     idsForSourceSlot.length < 2,

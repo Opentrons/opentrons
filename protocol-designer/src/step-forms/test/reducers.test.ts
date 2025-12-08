@@ -28,10 +28,7 @@ import {
 } from '../selectors'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 
-import type {
-  LabwareLocationUpdateInfo,
-  ModuleEntity,
-} from '@opentrons/step-generation'
+import type { ModuleEntity } from '@opentrons/step-generation'
 import type { FormData, StepType } from '../../form-types'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
@@ -302,7 +299,7 @@ describe('moduleInvariantProperties reducer', () => {
   })
 })
 interface MakeDeckSetupStepArgs {
-  labwareLocationUpdate?: Record<string, LabwareLocationUpdateInfo>
+  labwareLocationUpdate?: Record<string, DeckSlot>
   pipetteLocationUpdate?: Record<string, DeckSlot>
   moduleLocationUpdate?: Record<string, DeckSlot>
 }
@@ -344,7 +341,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             duplicateLabwareNickname: 'new labware nickname',
             slot: newSlot,
             displayCategory: 'wellPlate',
-            isOnHopper: false,
           },
         },
       },
@@ -357,7 +353,6 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             labwareDefURI: 'fixtures/foo/1',
             id: newLabwareId,
             displayCategory: 'adapter',
-            isOnHopper: false,
           },
         },
       },
@@ -366,15 +361,15 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       it(testName, () => {
         const prevRootState = makePrevRootState({
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '1' },
+            [existingLabwareId]: '1',
           },
         })
         const result = savedStepForms(prevRootState, action)
         expect(
           result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
         ).toEqual({
-          [existingLabwareId]: { slot: '1' },
-          [newLabwareId]: { slot: newSlot },
+          [existingLabwareId]: '1',
+          [newLabwareId]: newSlot,
         })
       })
     })
@@ -396,11 +391,11 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '1' },
+            [existingLabwareId]: '1',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: { slot: '3' },
+          [existingLabwareId]: '3',
         },
       },
       {
@@ -409,13 +404,13 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '1' },
-            [otherLabwareId]: { slot: '3' },
+            [existingLabwareId]: '1',
+            [otherLabwareId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: { slot: '3' },
-          [otherLabwareId]: { slot: '1' },
+          [existingLabwareId]: '3',
+          [otherLabwareId]: '1',
         },
       },
       {
@@ -424,14 +419,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: moduleId,
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '1' },
+            [existingLabwareId]: '1',
           },
           moduleLocationUpdate: {
             [moduleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: { slot: moduleId },
+          [existingLabwareId]: moduleId,
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -445,16 +440,16 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: moduleId,
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '1' },
-            [labwareOnModuleId]: { slot: moduleId },
+            [existingLabwareId]: '1',
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
             [moduleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [existingLabwareId]: { slot: moduleId },
-          [labwareOnModuleId]: { slot: '1' },
+          [existingLabwareId]: moduleId,
+          [labwareOnModuleId]: '1',
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -482,7 +477,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '3' },
+            [existingLabwareId]: '3',
           },
           moduleLocationUpdate: {
             [moduleId]: '1',
@@ -510,7 +505,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         labwareIsCompatible: false,
         expectedLabwareLocations: {
-          [existingLabwareId]: { slot: '1' },
+          [existingLabwareId]: '1',
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -523,7 +518,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '3' },
+            [existingLabwareId]: '3',
           },
           moduleLocationUpdate: {
             [moduleId]: '1',
@@ -551,7 +546,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         labwareIsCompatible: true,
         expectedLabwareLocations: {
-          [existingLabwareId]: { slot: moduleId },
+          [existingLabwareId]: moduleId,
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -564,8 +559,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [existingLabwareId]: { slot: '3' },
-            [labwareOnModuleId]: { slot: moduleId },
+            [existingLabwareId]: '3',
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
             [moduleId]: '1',
@@ -600,8 +595,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
         labwareIsCompatible: true,
         expectedLabwareLocations: {
-          [existingLabwareId]: { slot: '1' },
-          [labwareOnModuleId]: { slot: moduleId },
+          [existingLabwareId]: '1',
+          [labwareOnModuleId]: moduleId,
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -613,14 +608,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: { slot: moduleId },
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
             [moduleId]: '1',
           },
         },
         expectedLabwareLocations: {
-          [labwareOnModuleId]: { slot: '3' },
+          [labwareOnModuleId]: '3',
         },
         expectedModuleLocations: {
           [moduleId]: '1',
@@ -632,7 +627,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: { slot: moduleId },
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
             [moduleId]: '1',
@@ -640,7 +635,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
         },
         expectedLabwareLocations: {
-          [labwareOnModuleId]: { slot: moduleId },
+          [labwareOnModuleId]: moduleId,
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -670,8 +665,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: { slot: moduleId },
-            [otherLabwareId]: { slot: otherModuleId },
+            [labwareOnModuleId]: moduleId,
+            [otherLabwareId]: otherModuleId,
           },
           moduleLocationUpdate: {
             [moduleId]: '1',
@@ -679,8 +674,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
         },
         expectedLabwareLocations: {
-          [labwareOnModuleId]: { slot: moduleId },
-          [otherLabwareId]: { slot: otherModuleId },
+          [labwareOnModuleId]: moduleId,
+          [otherLabwareId]: otherModuleId,
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -693,7 +688,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: { slot: moduleId },
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
             [moduleId]: '1',
@@ -701,7 +696,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
         },
         expectedLabwareLocations: {
-          [labwareOnModuleId]: { slot: moduleId },
+          [labwareOnModuleId]: moduleId,
         },
         expectedModuleLocations: {
           [moduleId]: '3',
@@ -748,8 +743,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     const labwareToDeleteId = '__labwareToDelete'
     const prevRootState = makePrevRootState({
       labwareLocationUpdate: {
-        [existingLabwareId]: { slot: '1' },
-        [labwareToDeleteId]: { slot: '2' },
+        [existingLabwareId]: '1',
+        [labwareToDeleteId]: '2',
       },
     })
     const action: DeleteContainerAction = {
@@ -760,7 +755,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     }
     const result = savedStepForms(prevRootState, action)
     expect(result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate).toEqual({
-      [existingLabwareId]: { slot: '1' },
+      [existingLabwareId]: '1',
     })
   })
   it('delete pipettes -> removes pipette(s) from initial deck setup step', () => {
@@ -804,11 +799,11 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             'create module in empty deck slot (labware in unrelated slot unaffected)',
           makeStateArgs: {
             labwareLocationUpdate: {
-              [existingLabwareId]: { slot: '6' },
+              [existingLabwareId]: '6',
             },
           },
           expectedLabwareLocations: {
-            [existingLabwareId]: { slot: '6' },
+            [existingLabwareId]: '6',
           },
           expectedModuleLocations: {
             [moduleId]: destSlot,
@@ -819,11 +814,11 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             'create module in deck slot occupied with labware -> move that labware to the new module',
           makeStateArgs: {
             labwareLocationUpdate: {
-              [existingLabwareId]: { slot: destSlot },
+              [existingLabwareId]: destSlot,
             },
           },
           expectedLabwareLocations: {
-            [existingLabwareId]: { slot: moduleId },
+            [existingLabwareId]: moduleId,
           },
           expectedModuleLocations: {
             [moduleId]: destSlot,
@@ -1000,14 +995,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         testName: 'delete occupied module -> labware goes into its slot',
         makeStateArgs: {
           labwareLocationUpdate: {
-            [labwareOnModuleId]: { slot: moduleId },
+            [labwareOnModuleId]: moduleId,
           },
           moduleLocationUpdate: {
             [moduleId]: '3',
           },
         },
         expectedLabwareLocations: {
-          [labwareOnModuleId]: { slot: '3' },
+          [labwareOnModuleId]: '3',
         },
         expectedModuleLocations: {},
       },

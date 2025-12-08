@@ -3,6 +3,7 @@ import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getLabwareDefURI,
   getTiprackVolume,
@@ -34,7 +35,6 @@ import type {
   AdditionalEquipmentEntity,
   HopperLocationMapKey,
   LabwareEntities,
-  LabwareLocationUpdateInfo,
   PipetteEntities,
 } from '@opentrons/step-generation'
 import type { BoundingRect, GenericRect } from '../collision-types'
@@ -361,66 +361,11 @@ export const getMaxConditioningVolume = (args: {
   )
 }
 
-// for stacking
-// export function getLocationStackTopToBottom(
-//   labwareId: string,
-//   labwareLocationUpdate: Record<string, LabwareLocationUpdateInfo>,
-//   moduleLocationUpdate: Record<string, string>
-// ): string[] {
-//   const stack: string[] = []
-//   let current = labwareId
-
-//   while (true) {
-//     // push the current labware (top -> bottom)
-//     stack.push(current)
-
-//     const info = labwareLocationUpdate[current]
-//     let parent = info?.slot ?? moduleLocationUpdate[current]
-//     const isOnHopper = info?.attributes?.isOnHopper === true
-
-//     // If this labware is flagged as on the hopper and the parent resolves to a module,
-//     // try to find the shuttle labware that is attached to that same module and insert it.
-//     if (isOnHopper && parent && moduleLocationUpdate[parent] !== undefined) {
-//       // `parent` here is the moduleId
-//       const moduleId = parent
-
-//       // find a labware whose slot points to the same moduleId and that is NOT the hopper itself
-//       // prefer a labware that is NOT marked as onHopper (i.e., the shuttle)
-//       const shuttleId = Object.keys(labwareLocationUpdate).find(lwId => {
-//         if (lwId === current) return false
-//         const lwInfo = labwareLocationUpdate[lwId]
-//         return (
-//           lwInfo?.slot === moduleId && lwInfo?.attributes?.isOnHopper !== true
-//         )
-//       })
-
-//       // insert hopper marker
-//       stack.push(HOPPER_STACKER_LOCATION)
-
-//       if (shuttleId) {
-//         // instead of jumping straight to the module, set parent to the shuttle so
-//         // the loop will next push the shuttle and then continue upward to module -> slot
-//         parent = shuttleId
-//       } else {
-//         // no shuttle found; fall back to the module (existing behavior)
-//         parent = moduleId
-//       }
-//     }
-
-//     // stop if no parent was found
-//     if (!parent) break
-
-//     // move up the chain
-//     current = parent
-//   }
-//   console.log('stack', stack)
-//   return stack
-// }
-
 export function getLocationStackTopToBottom(
   labwareId: string,
-  labwareLocationUpdate: Record<string, LabwareLocationUpdateInfo>,
-  moduleLocationUpdate: Record<string, string>
+  labwareLocationUpdate: Record<string, string>,
+  moduleLocationUpdate: Record<string, string>,
+  moduleEntities: ModuleEntities
 ): string[] {
   const stack: string[] = []
   let current = labwareId
@@ -428,9 +373,11 @@ export function getLocationStackTopToBottom(
   while (true) {
     stack.push(current)
 
-    const info = labwareLocationUpdate[current]
-    const parent = info?.slot ?? moduleLocationUpdate[current]
-    const isOnHopper = info?.attributes?.isOnHopper === true
+    const slot = labwareLocationUpdate[current]
+    const parent = slot ?? moduleLocationUpdate[current]
+    const isOnHopper =
+      moduleEntities[slot] != null &&
+      moduleEntities[slot].type === FLEX_STACKER_MODULE_TYPE
 
     if (isOnHopper) {
       // Hopper stack shape: [labware, hopper, moduleId, slot]
