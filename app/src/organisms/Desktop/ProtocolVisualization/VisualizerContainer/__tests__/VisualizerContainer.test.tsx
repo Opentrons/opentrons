@@ -5,9 +5,9 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
-import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 
 import { VisualizerContainer } from '../../../../../organisms/Desktop/ProtocolVisualization/VisualizerContainer'
+import { StepDetailContainer } from '../../StepDetailContainer'
 
 import type { ComponentProps } from 'react'
 
