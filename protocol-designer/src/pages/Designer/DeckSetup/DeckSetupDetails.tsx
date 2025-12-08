@@ -19,10 +19,7 @@ import {
   HOPPER_LOCATION_MAP,
 } from '@opentrons/step-generation'
 
-import {
-  HOPPER_LABWARE_X_OFFSET,
-  HOPPER_ZOOM_OFFSET_POSTITION,
-} from '/protocol-designer/constants'
+import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -193,7 +190,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const menuListSlotPosition = getPositionFromSlotId(
     adjustedMenuListId ?? '',
     deckDef,
-    isMenuListIdForHopper ? HOPPER_ZOOM_OFFSET_POSTITION : undefined
+    isMenuListIdForHopper ? HOPPER_LABWARE_X_OFFSET : undefined
   )
   const multichannelWarningSlotIds: AddressableAreaName[] =
     showGen1MultichannelCollisionWarnings
