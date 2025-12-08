@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from 'react'
+
 import {
   ALIGN_FLEX_START,
   BORDERS,
@@ -12,19 +15,21 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Colors',
 } as Meta
 
 interface ColorsStorybookProps {
-  colors: string[]
+  colors: Array<[string, string]>
 }
 
-const Template: Story<ColorsStorybookProps> = args => {
+const Template: StoryFn<ColorsStorybookProps> = args => {
   const targetColors = args.colors
-  const colorCategories = targetColors.reduce((acc, color) => {
+  const colorCategories = targetColors.reduce<
+    Record<string, Array<[string, string]>>
+  >((acc, color) => {
     const match = color[0].match(/[a-zA-Z]+/)
     const category = match?.[0]
     if (category) {
@@ -116,7 +121,7 @@ const order = [
 
 const filteredColors = Object.entries(COLORS).filter(([key]) =>
   order.some(color => key.toLowerCase().includes(color))
-)
+) as Array<[string, string]>
 
 const sortedColors = filteredColors.sort((a, b) => {
   const aOrder = order.findIndex(color => a[0].toLowerCase().includes(color))

@@ -4,7 +4,7 @@ import { Box, SIZE_6 } from '@opentrons/components'
 
 import { RadioGroup as RadioGroupComponent } from './RadioGroup'
 
-import type { Meta, Story } from '@storybook/react'
+import type { Meta, StoryFn } from '@storybook/react'
 
 export default {
   title: 'Library/Molecules/Forms/Radio Group',
@@ -16,14 +16,17 @@ const OPTIONS = [
   { name: 'Ginger', value: 'ginger' },
 ]
 
-const Template: Story<React.ComponentProps<typeof RadioGroupComponent>> = ({
+const Template: StoryFn<React.ComponentProps<typeof RadioGroupComponent>> = ({
   value,
   onChange,
   ...args
 }) => {
-  const [controlledValue, setControlledValue] = React.useState<string>(
-    args?.options?.[0] != null ? args.options[0].value : ''
-  )
+  const firstOptionValue: string =
+    args.options != null && args.options.length > 0 && args.options[0] != null
+      ? args.options[0].value
+      : ''
+  const [controlledValue, setControlledValue] =
+    React.useState<string>(firstOptionValue)
   return (
     <Box width={SIZE_6}>
       <RadioGroupComponent
