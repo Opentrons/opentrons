@@ -114,6 +114,18 @@ def count_command_in_run_data(
     return total_command, avg_time
 
 
+def count_image_capture(file: Dict[str, Any]) -> Dict[str, float]:
+    """Count image captures per protocol."""
+    commands = file.get("commands", "")
+    num_of_images, image_capture_time = count_command_in_run_data(
+        commands, "captureImage", True
+    )
+    return {
+        "Total Image Captures": num_of_images,
+        "Image Capture Time (sec)": image_capture_time,
+    }
+
+
 def identify_labware_ids(
     file_results: Dict[str, Any], labware_name: Optional[str]
 ) -> List[str]:
@@ -536,7 +548,6 @@ def temperature_module_commands(file_results: Dict[str, Any]) -> Dict[str, Any]:
 
 def thermocycler_commands(file_results: Dict[str, Any]) -> Dict[str, float]:
     """Counts # of lid engagements, temp changes, and temp sustaining mins."""
-    # TODO: modify for cases that have more than 1 thermocycler.
     commandData = file_results.get("commands", "")
     lid_engagements: float = 0.0
     block_temp_changes: float = 0.0
