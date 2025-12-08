@@ -319,14 +319,10 @@ export const getIsSafePipetteMovement = (args: {
     return true
   }
 
-  const tiprackURI = tipState.pipettes[pipetteId]?.tiprackURI
-  const tiprackEntityId =
-    tiprackURI != null
-      ? Object.keys(labwareEntities).find(lwKey => lwKey.includes(tiprackURI))
-      : null
+  const tiprackEntityId = tipState.pipettes[pipetteId]?.tiprackURI
   const tiprackTipLength =
     tiprackEntityId != null
-      ? labwareEntities[tiprackEntityId].def.parameters.tipLength
+      ? labwareEntities[tiprackEntityId]?.def.parameters.tipLength
       : 0
   const stagingAreaSlots = Object.values(stagingAreaEntities).map(
     stagingArea => stagingArea.location as string
