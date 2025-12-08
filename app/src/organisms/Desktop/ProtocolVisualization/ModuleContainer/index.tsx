@@ -13,7 +13,7 @@ import {
 } from '@opentrons/shared-data'
 
 import styles from './modulecontainer.module.css'
-import { ModuleStatusContainer } from './ModuleStatusContainer'
+import { ModuleStatusContainer } from '../ModuleStatusContainer'
 
 import type { ModuleEntities, RobotState } from '@opentrons/step-generation'
 

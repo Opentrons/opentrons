@@ -13,7 +13,7 @@ import {
 import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
-import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
+import { StepDetailContainer } from '../StepDetailContainer'
 import {
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
