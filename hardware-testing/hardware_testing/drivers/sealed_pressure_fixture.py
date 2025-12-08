@@ -3,8 +3,8 @@
 
 import time
 from typing import Union, Optional, Any, List
-import serial
-from serial.tools.list_ports import comports
+import serial  # type: ignore[import]
+from serial.tools.list_ports import comports  # type: ignore[import]
 
 ReceiveBuffer = 100
 
