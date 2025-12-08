@@ -3,20 +3,20 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 
-import { LabwareSlotContainer } from '../LabwareSlotContainer'
-import { PipetteContainer } from '../PipetteContainer'
-import { StepDetailContainer } from '../StepDetailContainer'
-import { TipDisposalContainer } from '../TipDisposalContainer'
-import { TipPickupContainer } from '../TipPickupContainer'
+import { LabwareSlotContainer } from '../../LabwareSlotContainer'
+import { PipetteContainer } from '../../PipetteContainer'
+import { StepDetailContainer } from '../../StepDetailContainer'
+import { TipDisposalContainer } from '../../TipDisposalContainer'
+import { TipPickupContainer } from '../../TipPickupContainer'
 
 import type { ComponentProps } from 'react'
 import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 
-vi.mock('../PipetteContainer')
-vi.mock('../TipDisposalContainer')
-vi.mock('../TipPickupContainer')
-vi.mock('../LabwareSlotContainer')
+vi.mock('../../PipetteContainer')
+vi.mock('../../TipDisposalContainer')
+vi.mock('../../TipPickupContainer')
+vi.mock('../../LabwareSlotContainer')
 
 const render = (props: ComponentProps<typeof StepDetailContainer>) => {
   return renderWithProviders(<StepDetailContainer {...props} />)
