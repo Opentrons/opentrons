@@ -26,7 +26,7 @@ Welcome to the v8.8.0 release of the Opentrons App! This release includes concur
 
 ### Known Issues
 
-- Error recovery in the app or on the Flex touchscreen can't successfully resolve overpressure errors that occur during a dynamic aspirate or dispense. We recommend canceling the protocol when these errors occur.
+- Error recovery in the app or on the Flex touchscreen can't successfully resolve overpressure errors that occur while pipetting relative to the liquid meniscus. We recommend canceling the protocol when these errors occur.
 - Images captured in a protocol are not available during the run via USB. Use a different connection type (Wi-Fi or Ethernet), view the images on the touchscreen, or download the images after the run is complete.
 
 ---
