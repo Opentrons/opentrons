@@ -5,9 +5,9 @@
     "baseAnnotation": {
       "description": "Things all annotations have",
       "type": "object",
-      "required": ["annotationType", "annotationID"],
+      "required": ["annotationType", "annotationId"],
       "properties": {
-        "annotationID": {
+        "annotationId": {
           "description": "A unique identifier for a command annotation.",
           "type": "string"
         },
@@ -60,7 +60,7 @@
       "type": "object",
       "required": [
         "annotationType",
-        "annotationID",
+        "annotationId",
         "params",
         "userSpecifiedName"
       ],
