@@ -96,8 +96,8 @@ You can also customize tip tracking settings in your Protocol Designer protocols
 
 Click **manual tip tracking** to select the tips the pipette will use in your transfer step. Tips in your tip rack are labeled as:
 
-* **New** tips that haven't been used yet.
-* **Used** tips that have been returned to the tip rack.
+* **New** tips haven't been used yet.
+* **Used** tips have been used and returned to the tip rack.
 * **Selected** tips will be used in your transfer. Tips are numbered to show how many will be picked up at once.
 * Tips labeled **no tip** have been discarded and are missing from the tip rack.
 * **Inaccessible** tips can't be picked up by your chosen pipette.
@@ -109,7 +109,7 @@ Click **manual tip tracking** to select the tips the pipette will use in your tr
 
 Protocol Designer includes warnings if your tip selections might be incompatible with other parts of your protocol, especially in partial tip use. See below for more.
 
-### Partial tip use
+## Partial tip use
 
 You can use partial tip pickup to use less tips than a Flex or OT-2 multi-channel pipette can pick up at once: 
 

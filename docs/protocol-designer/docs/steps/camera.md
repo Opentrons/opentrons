@@ -17,4 +17,4 @@ After running your Protocol Designer protocol, you can access and download your 
 - the step number 
 - protocol and command timestamps 
 
-There are even more options available in the Opentrons App to control the camera, including launching a live stream of your robot's deck. See 
+There are even more options available in the Opentrons App to control the camera, including launching a live stream of your robot's deck. 

@@ -17,7 +17,7 @@ Finally, choose [tip management](transfer.md#tip-management) settings, like how 
 
 Protocol Designer also lets you choose between automatic and manual tip tracking: 
 
-- **automatic**: Protocol Designer tracks which tips have been picked up and used, and selects the next available tip in the tip rack. 
-- **manual**: Choose the tips the pipette will use in your transfer step. View new, used, or selected tips in the form, as well as tips that have been discarded or are inaccessible. 
+- **Automatic**: Protocol Designer tracks which tips have been picked up and used, and selects the next available tip in the tip rack. 
+- **Manual**: Choose the tips the pipette will use in your transfer step. View new, used, or selected tips in the form, as well as tips that have been discarded or are inaccessible. 
 
 Like a transfer step, mix steps are blocked by lids on labware. Use a move step to remove lids, then add a mix step to your protocol. 
