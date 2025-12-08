@@ -6,7 +6,7 @@ import { CLEAN, EMPTY } from '@opentrons/step-generation'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 
-import { TipDisposalContainer } from '../TipDisposalContainer'
+import { TipDisposalContainer } from '..'
 
 import type { ComponentProps } from 'react'
 
