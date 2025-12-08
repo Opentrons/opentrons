@@ -55,6 +55,7 @@ import type {
 import type {
   AccessibilityStatus,
   InaccessibleReason,
+  TipSelectionBannerReason,
   TipSelectionBaseProps,
 } from './types'
 
@@ -67,7 +68,9 @@ export function SelectTips(
     numTotalPickups: number
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
-    setShowPickupsRequiredBanner: Dispatch<SetStateAction<boolean>>
+    setErrorBannerReason: Dispatch<
+      SetStateAction<TipSelectionBannerReason | null>
+    >
     primaryNozzle: string
     tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
@@ -87,7 +90,7 @@ export function SelectTips(
     selectedTips,
     setSelectedTips,
     numTotalPickups,
-    setShowPickupsRequiredBanner,
+    setErrorBannerReason,
     tipAccessibilityStatus,
     nozzles,
     primaryNozzle,
@@ -180,7 +183,7 @@ export function SelectTips(
     ) {
       return
     }
-    setShowPickupsRequiredBanner(false)
+    setErrorBannerReason(null)
 
     if (channels === 1 || nozzles === SINGLE) {
       if (wellName in prevSelectedTipsByIndex) {

@@ -16,6 +16,7 @@ import { getMainPagePortalEl } from '/protocol-designer/components/organisms/Por
 import styles from './tipselectionwizard.module.css'
 
 import type { ReactNode } from 'react'
+import type { TipSelectionBannerReason } from './types'
 
 interface TipSelectionModalProps {
   onClose: () => void
@@ -26,7 +27,7 @@ interface TipSelectionModalProps {
   totalSteps: number
   showBackButton?: boolean
   continueText?: string
-  showPickupsRequiredBanner: boolean
+  errorBannerReason: TipSelectionBannerReason | null
   numPickupsRemaining: number
   showReusingTipsBanner: boolean
 }
@@ -41,7 +42,7 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
     continueText,
     currentStepIndex,
     totalSteps,
-    showPickupsRequiredBanner,
+    errorBannerReason,
     numPickupsRemaining,
     showReusingTipsBanner,
   } = props
@@ -58,17 +59,21 @@ export function TipSelectionModal(props: TipSelectionModalProps): JSX.Element {
 
   const footerElement = (
     <div className={styles.modal_footer}>
-      {showPickupsRequiredBanner ? (
+      {errorBannerReason != null ? (
         <InlineNotification
           type="error"
-          message={t('not_enough_tips_selected', {
-            count: numPickupsRemaining,
-          })}
+          message={t(
+            `error_banner.${errorBannerReason}`,
+            errorBannerReason === 'pickupsRequired'
+              ? { count: numPickupsRemaining }
+              : {}
+          )}
           hug
         />
       ) : null}
-      {/* pickups required error takes precedence over reusing tips warning */}
-      {showReusingTipsBanner && !showPickupsRequiredBanner ? (
+      {errorBannerReason == null &&
+      showReusingTipsBanner &&
+      currentStepIndex === 1 ? (
         <InlineNotification
           type="alert"
           message={t('reusing_tips_banner')}
