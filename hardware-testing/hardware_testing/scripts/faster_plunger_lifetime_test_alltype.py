@@ -85,9 +85,9 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
     Z2 = Axis.Z_R
     mount = OT3Mount.LEFT
     settings = helpers_ot3.get_gantry_load_per_axis_motion_settings_ot3(api, ax)
-    settings.max_speed = 25
+    settings.max_speed = 90
     settings.acceleration = 100
-    settings.run_current = 0.7
+    settings.run_current = 1.0
     default_current = settings.run_current
     default_speed = settings.max_speed
     default_acceleration = 100
