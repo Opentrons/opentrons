@@ -158,7 +158,7 @@ class PressureFixture(PressureFixtureBase):
     def connect(self) -> None:
         """Connect."""
         self._port.open()
-        self._port.flushInput()
+        self._port.flushInput()  # type: ignore[attr-defined]
         # NOTE: device might take a few seconds to boot up
         sleep(FIXTURE_REBOOT_TIME)
         fw_version = self.firmware_version()
