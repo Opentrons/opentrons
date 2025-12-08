@@ -46,9 +46,9 @@ class TestData(TypedDict):
 
 
 PLUNGER_MAX_SKIP_MM = 0.1
-SPEEDS_TO_TEST: float = 25
+SPEEDS_TO_TEST: float = 90
 CURRENTS_SPEEDS: Dict[float, float] = {
-    0.7: SPEEDS_TO_TEST,
+    1.0: SPEEDS_TO_TEST,
 }
 
 
@@ -66,11 +66,11 @@ async def _is_plunger_still_aligned_with_encoder(
 async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
     """Run."""
     if cfg.pipettetype == 96:
-        pipette_string = "p1000_96_v3.4" if cfg.pipette == 1000 else "p200_96_v3.1"
+        pipette_string = "p1000_96_v3.4" if cfg.pipette == 1000 else "p200_96_v3.2"
     elif cfg.pipettetype ==8:
-        pipette_string = "p1000_single_v3.5" if cfg.pipette == 1000 else "p1000_multi_v3.4"
+        pipette_string = "p50_multi_v3.5" if cfg.pipette == 1000 else "p1000_multi_v3.5"
     elif cfg.pipettetype == 1:
-        pipette_string = "p50_single_v3.6" if cfg.pipette == 1000 else "p1000_single_v3.5"
+        pipette_string = "p50_single_v3.6" if cfg.pipette == 1000 else "p1000_single_v3.6"
 
 
     api = await helpers_ot3.build_async_ot3_hardware_api(
@@ -144,17 +144,17 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                             acceleration=default_acceleration,
                         )
                         # MOVE DOWN
-                        print(f"moving down {blow_out} mm at {speed} mm/sec")
+                        print(f"moving down {bottom} mm at {speed} mm/sec")
                         position_checked = await position_check()
                         print(f"position checked: {position_checked}")
                         try:
                             await helpers_ot3.move_plunger_absolute_ot3(
-                                api, mount, blow_out, speed=speed, motor_current=current
+                                api, mount, bottom, speed=speed, motor_current=current
                             )
                             down_passed = await position_check()
                             test_data["time_sec"] = time.time() - start_time
                             test_data["cycle"] = cycle
-                            test_data["position"] = "blow_out"
+                            test_data["position"] = "bottom"
                             test_data["position_check"] = down_passed
                             test_data["stall"] = "NONE"
                             print(test_data)
@@ -186,7 +186,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                             await helpers_ot3.move_plunger_absolute_ot3(
                                 api,
                                 mount,
-                                blow_out,
+                                bottom,
                                 speed=default_speed,
                                 motor_current=default_current,
                             )
@@ -380,17 +380,17 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                         acceleration=default_acceleration,
                     )
                     # MOVE DOWN
-                    print(f"moving down {blow_out} mm at {speed} mm/sec")
+                    print(f"moving down {bottom} mm at {speed} mm/sec")
                     position_checked = await position_check()
                     print(f"position checked: {position_checked}")
                     try:
                         await helpers_ot3.move_plunger_absolute_ot3(
-                            api, mount, blow_out, speed=speed, motor_current=current
+                            api, mount, bottom, speed=speed, motor_current=current
                         )
                         down_passed = await position_check()
                         test_data["time_sec"] = time.time() - start_time
                         test_data["cycle"] = cycle
-                        test_data["position"] = "blow_out"
+                        test_data["position"] = "bottom"
                         test_data["position_check"] = down_passed
                         test_data["stall"] = "NONE"
                         print(test_data)
@@ -422,7 +422,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                         await helpers_ot3.move_plunger_absolute_ot3(
                             api,
                             mount,
-                            blow_out,
+                            bottom,
                             speed=default_speed,
                             motor_current=default_current,
                         )
