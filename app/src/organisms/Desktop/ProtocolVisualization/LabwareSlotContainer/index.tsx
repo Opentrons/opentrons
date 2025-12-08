@@ -15,10 +15,10 @@ import {
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
-import styles from './labwareslotcontainer.module.css'
 import { getAllWellContentsAtFrame } from '../utils/getAllWellContentsAtFrame'
 import { WellContainer } from '../WellContainer'
 import { WellTooltip } from '../WellTooltip'
+import styles from './labwareslotcontainer.module.css'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'

@@ -12,8 +12,8 @@ import {
 import { TipSvg } from '../TipSvg'
 import { getTipSvgInfo } from '../utils/getTipSvgInfo'
 import { getWellVolume } from '../utils/getWellVolume'
-import styles from './wellcontainer.module.css'
 import { WellSvg } from '../WellSvg'
+import styles from './wellcontainer.module.css'
 
 import type {
   LabwareWellMap,

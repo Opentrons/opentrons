@@ -12,8 +12,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import styles from './modulecontainer.module.css'
 import { ModuleStatusContainer } from '../ModuleStatusContainer'
+import styles from './modulecontainer.module.css'
 
 import type { ModuleEntities, RobotState } from '@opentrons/step-generation'
 

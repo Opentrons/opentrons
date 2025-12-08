@@ -3,12 +3,12 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
 import { LabwareSlotContainer } from '../LabwareSlotContainer'
 import { PipetteContainer } from '../PipetteContainer'
-import styles from './stepdetailcontainer.module.css'
 import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 import { getActiveSlotForLabwareDetails } from '../utils/getActiveSlotForLabwareDetails'
 import { getActiveSlotForTiprackDetails } from '../utils/getActiveSlotForTiprackDetails'
 import { getIsPipetteActive } from '../utils/getIsPipetteActive'
+import styles from './stepdetailcontainer.module.css'
 
 import type { Liquid, RunTimeCommand } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
