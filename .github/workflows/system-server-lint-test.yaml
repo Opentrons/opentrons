@@ -77,7 +77,7 @@ jobs:
         with:
           project: 'system-server'
       - name: Test
-        run: make -C system-server test test_opts="-vvv -s"
+        run: make -C system-server test
       - uses: 'codecov/codecov-action@v3'
         with:
           files: ./system-server/coverage.xml
