@@ -317,7 +317,7 @@ class TouchProbe:
                 )
             await self.api.move_to(self.mount, release_pos)
             print(
-                f"{probe_axis.name} surface detected at {probe_loc.x if probe_axis == Axis.X else probe_loc.y:.3f} mm"
+                f"{probe_axis.name} surface detected at {probe_loc.x if probe_axis==Axis.X else probe_loc.y:.3f} mm"
             )
 
         # Return to safe Z
