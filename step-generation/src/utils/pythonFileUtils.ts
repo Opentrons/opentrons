@@ -48,8 +48,8 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-export const PAPI_VERSION = '2.27' // latest version from api/src/opentrons/protocols/api_support/definitions.py from the RS release branch
-export const PD_APPLICATION_VERSION = '8.7.0' // latest PD version to insert into DESIGNER_APPLICATION blob
+export const PAPI_VERSION = '2.28' // latest version from api/src/opentrons/protocols/api_support/definitions.py from the RS release branch
+export const PD_APPLICATION_VERSION = '8.9.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')
@@ -280,7 +280,7 @@ export function getLoadLabware(
   const lidEntities = Object.values(allLabwareEntities).filter(lw =>
     lw.def.allowedRoles?.includes('lid')
   )
-
+  console.log('labwareRobotState', labwareRobotState)
   const pythonLabware = Object.values(labwareEntities)
     .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
@@ -292,6 +292,9 @@ export function getLoadLabware(
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
+      const isLabwareOnHopper = labwareRobotState[id].stack.includes(
+        HOPPER_STACKER_LOCATION
+      )
       // 2nd item in stack is the slot the labware is on
       const labwareSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[labwareSlot] != null
@@ -299,14 +302,16 @@ export function getLoadLabware(
 
       let parentName: string
       let locationArg: string | undefined
-      if (onAdapter) {
+      if (onAdapter && !isLabwareOnHopper) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
         parentName = moduleEntities[labwareSlot].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
         locationArg = `location=${
-          labwareSlot === 'offDeck' ? OFF_DECK : formatPyStr(labwareSlot)
+          labwareSlot === 'offDeck' || isLabwareOnHopper
+            ? OFF_DECK
+            : formatPyStr(labwareSlot)
         }`
       }
       const labelArg = hasNickname
@@ -580,8 +585,7 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
-    // TODO: call this when we have a way to get the labware on the shuttle location
-    // getSetStoredLabware(moduleEntities, labwareEntities, labware),
+    getSetStoredLabware(moduleEntities, labwareEntities, labware),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -660,7 +664,7 @@ export const getSetStoredLabware = (
             : `\n${indentedLabwarePythonNames}\n`
         const pythonArgs = `labware=[${pythonLabwareNames}],\n`
 
-        return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware_list(\n${indentPyLines(pythonArgs)})`
+        return `${pythonName}.set_stored_labware_items(\n${indentPyLines(pythonArgs)})`
       }
     }
   })
