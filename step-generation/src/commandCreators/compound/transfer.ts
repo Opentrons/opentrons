@@ -296,14 +296,14 @@ export const transfer: CommandCreator<TransferArgs> = (
     )
     tiprackURI = userSelectedTipRackURI
   }
-
   if (tiprackEntity == null) {
-    errors.push(
-      errorCreators.labwareDoesNotExist({
-        actionName,
-        labware: tiprackURI,
-      })
-    )
+    if (changeTip === 'never') {
+      errors.push(errorCreators.noTipOnPipette({ actionName, pipette }))
+    } else {
+      errors.push(
+        errorCreators.labwareDoesNotExist({ actionName, labware: tiprackURI })
+      )
+    }
   }
 
   if (errors.length > 0) {
