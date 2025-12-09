@@ -114,7 +114,7 @@ class CameraView:
 
     def get_pan(self) -> Tuple[int, int] | None:
         """Get the pan values set as the default for this run. None means we will use the system default."""
-        return self._state.resolution
+        return self._state.pan
 
     def get_contrast(self) -> float | None:
         """Get the contrast set as the default for this run. None means we will use the system default."""
