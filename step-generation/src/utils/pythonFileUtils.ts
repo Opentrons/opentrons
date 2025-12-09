@@ -280,7 +280,6 @@ export function getLoadLabware(
   const lidEntities = Object.values(allLabwareEntities).filter(lw =>
     lw.def.allowedRoles?.includes('lid')
   )
-  console.log('labwareRobotState', labwareRobotState)
   const pythonLabware = Object.values(labwareEntities)
     .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
