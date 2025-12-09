@@ -640,7 +640,6 @@ export const getSetStoredLabware = (
       const labwaresOnHopper = Object.entries(labware).filter(
         ([_, labware]) =>
           labware.stack.includes(id) &&
-          //  TODO: this might change! we might change the stack arch
           labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
       if (labwaresOnHopper.length === 0) {
