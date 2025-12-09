@@ -12,18 +12,18 @@
 }
 
 .main_content {
-  flex-grow: 1;
   display: flex;
-  justify-content: center;
+  flex-grow: 1;
   align-items: center;
-  background-color: var(--grey-10);
-  border-radius: var(--border-radius-4);
+  justify-content: center;
   padding: var(--spacing-16) var(--spacing-24);
+  border-radius: var(--border-radius-4);
+  background-color: var(--grey-10);
 }
 
 .footer {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
