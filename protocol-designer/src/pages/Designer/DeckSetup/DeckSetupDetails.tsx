@@ -187,11 +187,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const adjustedMenuListId = isMenuListIdForHopper
     ? FAKE_HOPPER_LOCATION_MAP[menuListId as HopperLocationMapKey]
     : menuListId
-  const menuListSlotPosition = getPositionFromSlotId(
-    adjustedMenuListId ?? '',
-    deckDef,
-    isMenuListIdForHopper ? HOPPER_LABWARE_X_OFFSET : undefined
-  )
+  const menuListSlotPosition =
+    adjustedMenuListId != null
+      ? getPositionFromSlotId(
+          adjustedMenuListId as string,
+          deckDef,
+          ...(isMenuListIdForHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
+        )
+      : null
   const multichannelWarningSlotIds: AddressableAreaName[] =
     showGen1MultichannelCollisionWarnings
       ? getSlotsWithCollisions(deckDef, allModules)

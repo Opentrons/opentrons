@@ -108,7 +108,7 @@ export const getSlotInformation = (
   const slotPosition =
     deckDef != null && offDeckLabware == null
       ? getPositionFromSlotId(
-          adjustedSlot,
+          adjustedSlot as string,
           deckDef,
           ...(isSlotAHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
         )

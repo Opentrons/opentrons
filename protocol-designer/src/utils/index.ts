@@ -439,7 +439,7 @@ export const getFullStackFromLabwaresOnDeck = (
   return labwareOnDeck
     .filter(
       ({ stack }) =>
-        stack.includes(slotInStack) &&
+        stack.includes(slotInStack as string) &&
         onHopper === stack.includes(HOPPER_STACKER_LOCATION)
     )
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
