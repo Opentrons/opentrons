@@ -218,4 +218,56 @@ describe('flexStackerStore', () => {
       type: 'MISMATCHED_STACKER_LABWARE_TYPE',
     })
   })
+  it ('raises an error if the hopper is full', () => {
+    vi.mocked(flexStackerStateGetter).mockReturnValue({
+      labwareOnShuttle: {
+        primaryLabwareId: 'mockLabwareId',
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      },
+      labwareInHopper: [
+        {
+          primaryLabwareId: 'mockLabwareId',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+      ],
+      maxPoolCount: 10,
+      storedLabwareDetails: {
+        moduleId,
+        initialCount: 10,
+        primaryLabware: {
+          loadName: 'fixture_96_plate',
+          namespace: 'opentrons',
+          version: 1,
+        },
+        lidLabware: null,
+        adapterLabware: null,
+      },
+      type: FLEX_STACKER_MODULE_TYPE,
+    } as FlexStackerModuleState)
+    const fullRobotState = {
+      ...robotState,
+      modules: {
+        [moduleId]: {
+          slot: 'D3',
+          moduleState: {} as FlexStackerModuleState,
+        },
+      },
+      labware: {
+        mockLabwareId: {
+          stack: ['mockLabwareId', 'D3'],
+        },
+      },
+    }
+    const result = flexStackerStore(
+      { moduleId, strategy: 'automatic' },
+      invariantContext,
+      fullRobotState
+    )
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'HOPPER_FULL',
+    })
+  })
+
 })
