@@ -3,8 +3,8 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
-import { LabwareSlot } from '../SecondWindow/LabwareSlot'
 import { ModuleContainer } from '../ModuleContainer'
+import { LabwareSlot } from '../SecondWindow/LabwareSlot'
 import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
 import styles from './slotdetails.module.css'
