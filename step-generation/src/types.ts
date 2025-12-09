@@ -708,6 +708,7 @@ export interface TimelineFrame {
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
+        /** TODO: tiprackURI is a misnomer: it's a labwareId, not a URI */
         tiprackURI: string | null
       }
     }
