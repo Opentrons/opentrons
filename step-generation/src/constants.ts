@@ -97,3 +97,19 @@ export const MANUAL: 'manual' = 'manual'
 export const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 export const HOPPER_STACKER_LOCATION = 'hopper'
+
+export const HOPPER_FAKE_LOCATIONS = [
+  'hopperA4',
+  'hopperB4',
+  'hopperC4',
+  'hopperD4',
+]
+
+export const FAKE_HOPPER_LOCATION_MAP = {
+  hopperA4: 'A4',
+  hopperB4: 'B4',
+  hopperC4: 'C4',
+  hopperD4: 'D4',
+}
+
+export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP
