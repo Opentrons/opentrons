@@ -60,9 +60,9 @@ Additional advanced pipetting settings are available in the Aspirate and Dispens
 | Mix | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Mix the contents of the well either before aspirating or after dispensing</li><li>Customize volume and number of repetitions</li><li>Can take place at your chosen aspirate or submerge position</li></ul> |
 | Delay | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Hold the pipette tip at the submerge, aspirate or dispense, or retract position for a defined amount of time after aspirating or dispensing</li><li>Customize duration and position from bottom of well</li></ul> |
 | Condition | <ul><li>Aspirate</li></ul> | <ul><li>Aspirate a small conditioning volume after aspirating the total volume to be transferred</li><li>Pipetted back into the source for a more accurate first dispense</li><li>Only available for distribute, or multi-dispenses</li></ul> |
-| Push out | <ul><li>Dispense</li><ul> | <ul><li>Dispense a small amount of liquid to ensure all liquid leaves the tip</li><li>Customize volume</li></ul> |
+| Push out | <ul><li>Dispense</li><ul> | <ul><li>Dispense past the pipette's plunger bottom to ensure all liquid leaves the tip</li><li>Customize volume</li></ul> |
 | Blowout | <ul><li>Dispense</li></ul> | <ul><li>Blow any remaining liquid out of the tip</li><li>Customize location (source well, destination well, trash bin, or trash chute)</li><li>Customize flow rate and tip position from bottom during blowout</li></ul> |
-| Disposal volume | <ul><li>Dispense</li></ul> | <ul><li>Aspirate a small amount of liquid after completing a multi-dispense</li><li>Customize disposal volume and blowout volume and flow rate</li><li>Only available for distribute, or multi-dispenses</li></ul> |
+| Disposal volume | <ul><li>Dispense</li></ul> | <ul><li>Aspirate a small amount of liquid before completing a multi-dispense</li><li>Ensures each dispense is the correct volume</li><li>Customize disposal volume and blowout volume and flow rate</li><li>Only available for distribute, or multi-dispenses</li></ul> |
 | Touch tip | <ul><li>Aspirate</li><li>Dispense</li></ul> | <ul><li>Touch the tip to the four sides of the well to remove droplets after aspirating or dispensing</li><li>Customize touch tip position from the top of the well</li></ul> |
 | Air gap | <ul><li>Aspirate</li></ul> | <ul><li>Draw air into the tip after aspirating transfer volume</li><li>Customize air gap volume</li><li>Occurs at your retract location, as long as it's safe to do so (more than 2 mm above the top of the well)</li></ul> |
 
@@ -92,9 +92,7 @@ If you choose an incompatible well ratio or an empty source well, Protocol Desig
 
 Next, choose a tip drop location to dispose of used tips before clicking **Continue**. Options include fixtures like the trash bin and waste chute, if used in your protocol, or to return tips to the tip rack. If you select **Tip rack** as the tip drop location, the pipette will return tips to their original position in the tip rack. 
 
-You can also customize tip tracking settings in your Protocol Designer protocols. When you select automatic tip tracking, Protocol Designer keeps track of which tips have been picked up and used, starting with the tip in position A1 of the tip rack you chose for the transfer. 
-
-Click **manual tip tracking** to select the tips the pipette will use in your transfer step. Tips in your tip rack are labeled as:
+You can also customize tip tracking settings in your Protocol Designer protocols. When you select automatic tip tracking, Protocol Designer keeps track of which tips have been picked up and used. You can click **manual tip tracking** to manually select the tips the pipette will use in your transfer step. Tips in your tip rack are labeled as:
 
 * **New** tips haven't been used yet.
 * **Used** tips have been used and returned to the tip rack.
@@ -123,6 +121,15 @@ When you add a transfer or mix step, start by selecting **column** or **single**
 
     When you select the Flex 96-channel pipette, Protocol Designer automatically places your first tip rack on the deck with a 96-channel tip rack adapter, required for picking up a full rack of tips. Add a second tip rack directly on the deck to enable partial tip use.
 
-In the fourth form, you can choose between automatic and manual tip tracking for your multi-channel pipette. Protocol Designer includes warnings, both in the tip selection form and as a step error, if your partial tip selections could cause pipette collisions. We always recommend resolving all errors before exporting your protocol and running it on a robot. 
+In the fourth form, you can choose between automatic and manual tip tracking for your multi-channel pipette. Protocol Designer includes warnings, both in the tip selection form and as a step error, if your partial tip selections could cause pipette collisions. 
+
+<figure class="screenshot" markdown>
+  ![Pipette collision risk](../images/partial-tip-collision.png)
+  <figcaption>Labware in adjacent slots can cause pipette collisions.</figcaption>
+</figure> 
+
+Partial tip pickups require the pipette to hover above adjacent slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision. Despite the tip rack being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
+
+We always recommend resolving all errors before exporting your protocol and running it on a robot. 
 
 
