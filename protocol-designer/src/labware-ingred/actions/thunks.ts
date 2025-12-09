@@ -78,7 +78,6 @@ export const createContainer: (
       const id = `${uuid()}:${labwareUri}`
       const labwareDef =
         labwareDefSelectors.getLabwareDefsByURI(state)[labwareUri]
-
       const labwareDisplayCategory = labwareDef.metadata.displayCategory
       const isTiprack = getIsTiprack(labwareDef)
 

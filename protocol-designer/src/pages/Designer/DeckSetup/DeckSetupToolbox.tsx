@@ -24,8 +24,8 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
-  HOPPER_LOCATION_MAP,
 } from '@opentrons/step-generation'
 
 import {
@@ -166,7 +166,7 @@ export function DeckSetupToolbox(
       dispatch(
         createContainerAboveModule({
           slot: isHopperSlot
-            ? HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+            ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
             : slot,
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
@@ -234,7 +234,7 @@ export function DeckSetupToolbox(
 
   const displaySlot = getIsSlotAHopper(slot)
     ? t('shared:stacker', {
-        slot: HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
+        slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
       })
     : slot
   return (

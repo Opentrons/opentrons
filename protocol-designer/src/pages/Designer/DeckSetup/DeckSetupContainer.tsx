@@ -145,12 +145,12 @@ export function DeckSetupContainer(
     return i < viewBoxNumerical.length - 1 ? acc + `${num} ` : acc + `${num}`
   }, '')
 
-  const addEquipment = (slotId: string): void => {
-    const isOnHopper = slotId.includes('hopper')
-    const slot = isOnHopper ? slotId.split('hopper')[1] : slotId
+  const addEquipment = (location: string): void => {
+    const isOnHopper = location.includes('hopper')
+    const slot = isOnHopper ? location.split('hopper')[1] : location
     const { createdModuleForSlot, preSelectedFixture } = getSlotInformation({
       deckSetup: activeDeckSetup,
-      slot: slotId,
+      slot: location,
       deckDef,
     })
 
@@ -162,7 +162,7 @@ export function DeckSetupContainer(
     if (cutoutId == null) {
       console.error('expected to find a cutoutId but could not')
     }
-    dispatch(selectZoomedIntoSlot({ slot: slotId, cutout: cutoutId }))
+    dispatch(selectZoomedIntoSlot({ slot: location, cutout: cutoutId }))
 
     const zoomInSlotPosition = getPositionFromSlotId(
       slot ?? '',

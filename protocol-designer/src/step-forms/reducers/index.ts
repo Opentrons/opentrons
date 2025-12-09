@@ -382,7 +382,6 @@ export const savedStepForms = (
           latestDefs
         )
         acc[updatedLabwareId] = location
-
         return acc
       }, {})
 

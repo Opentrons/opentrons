@@ -22,8 +22,8 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
-  HOPPER_LOCATION_MAP,
 } from '@opentrons/step-generation'
 
 import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
@@ -65,7 +65,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     modifiedLocation = tcDisplayLocation
   } else if (getIsSlotAHopper(location)) {
     modifiedLocation = t('stacker', {
-      slot: HOPPER_LOCATION_MAP[location as HopperLocationMapKey],
+      slot: FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey],
     })
   }
 

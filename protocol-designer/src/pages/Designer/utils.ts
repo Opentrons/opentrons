@@ -14,10 +14,10 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,
   getIsSlotAHopper,
   getSlotInLocationStack,
-  HOPPER_LOCATION_MAP,
 } from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
@@ -103,7 +103,7 @@ export const getSlotInformation = (
   const offDeckLabware = deckSetupLabware[slot]
   const isSlotAHopper = getIsSlotAHopper(slot)
   const adjustedSlot = isSlotAHopper
-    ? HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
     : slot
   const slotPosition =
     deckDef != null && offDeckLabware == null

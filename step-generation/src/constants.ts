@@ -105,11 +105,11 @@ export const HOPPER_FAKE_LOCATIONS = [
   'hopperD4',
 ]
 
-export const HOPPER_LOCATION_MAP = {
+export const FAKE_HOPPER_LOCATION_MAP = {
   hopperA4: 'A4',
   hopperB4: 'B4',
   hopperC4: 'C4',
   hopperD4: 'D4',
 }
 
-export type HopperLocationMapKey = keyof typeof HOPPER_LOCATION_MAP
+export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP

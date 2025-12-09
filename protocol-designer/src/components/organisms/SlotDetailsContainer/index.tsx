@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux'
 
 import { getModuleDisplayName } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
   getTopLocationInStack,
+  HopperLocationMapKey,
 } from '@opentrons/step-generation'
 
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
@@ -39,6 +41,9 @@ export function SlotDetailsContainer(
     return null
   }
   const isSlotAHopper = getIsSlotAHopper(slot)
+  const adjustedSlotToFindModule = isSlotAHopper
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
 
   const {
     modules: deckSetupModules,
@@ -50,8 +55,7 @@ export function SlotDetailsContainer(
     offDeckLabwareId != null ? nickNames[offDeckLabwareId] : null
 
   const moduleOnSlot = Object.values(deckSetupModules).find(
-    module =>
-      module.slot === slot || (slot.includes(module.slot) && isSlotAHopper)
+    module => module.slot === adjustedSlotToFindModule
   )
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabwares),

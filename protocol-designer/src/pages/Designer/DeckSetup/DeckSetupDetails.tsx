@@ -14,9 +14,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
   getSlotInLocationStack,
-  HOPPER_LOCATION_MAP,
 } from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
@@ -185,7 +185,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const isMenuListIdForHopper =
     menuListId != null && getIsSlotAHopper(menuListId)
   const adjustedMenuListId = isMenuListIdForHopper
-    ? HOPPER_LOCATION_MAP[menuListId as HopperLocationMapKey]
+    ? FAKE_HOPPER_LOCATION_MAP[menuListId as HopperLocationMapKey]
     : menuListId
   const menuListSlotPosition = getPositionFromSlotId(
     adjustedMenuListId ?? '',

@@ -13,8 +13,8 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getSlotInLocationStack,
-  HOPPER_LOCATION_MAP,
   HOPPER_STACKER_LOCATION,
   PROTOCOL_CONTEXT_NAME,
 } from '@opentrons/step-generation'
@@ -361,6 +361,7 @@ export const getMaxConditioningVolume = (args: {
   )
 }
 
+//  for stacking
 export function getLocationStackTopToBottom(
   labwareId: string,
   labwareLocationUpdate: Record<string, string>,
@@ -389,8 +390,6 @@ export function getLocationStackTopToBottom(
 
     current = parent
   }
-
-  console.log('stack', stack)
   return stack
 }
 
@@ -402,7 +401,7 @@ export const getLabwaresOnModuleFromStack = (
   rightBelowTopId: string | null
   hopperTopMostId: string | null
 } => {
-  // all stacks involving this module
+  // all stacks involving this module and not on the hopper if its a flex stacker
   const allStacks = labware.filter(
     lw =>
       lw.stack.includes(moduleId) && !lw.stack.includes(HOPPER_STACKER_LOCATION)
@@ -435,7 +434,7 @@ export const getFullStackFromLabwaresOnDeck = (
   onHopper: boolean
 ): string[] => {
   const slotInStack = onHopper
-    ? HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
     : slot
   return labwareOnDeck
     .filter(
