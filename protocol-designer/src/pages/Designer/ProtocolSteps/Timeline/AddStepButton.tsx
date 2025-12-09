@@ -52,10 +52,7 @@ import {
   getIsModuleOnDeck,
   selectors as stepFormSelectors,
 } from '/protocol-designer/step-forms'
-import {
-  getLabwareEntities,
-  getModuleEntities,
-} from '/protocol-designer/step-forms/selectors'
+import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import {
   getIsMultiSelectMode,
   actions as stepsActions,

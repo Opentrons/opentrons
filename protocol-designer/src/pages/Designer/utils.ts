@@ -23,7 +23,6 @@ import {
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
-import { HOPPER_STACKER_LOCATION } from '../../../../step-generation/src/constants'
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
