@@ -1389,5 +1389,5 @@ export const spaceInHopper = (
   const maximumAllowedLabware = stackerState?.maxPoolCount ?? 0
   const labwareStored = stackerState?.labwareInHopper
   const numberOfLabwareStored = labwareStored?.length ?? 0
-  return numberOfLabwareStored + 1 < maximumAllowedLabware
+  return maximumAllowedLabware > numberOfLabwareStored
 }

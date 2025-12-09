@@ -28,19 +28,16 @@ export const flexStackerFill: CommandCreator<
     }
   }
   if (labwareToStore) {
-    for (const labware of labwareToStore) {
-      if (
-        labwareMatchesLabwareInHopper(
-          labware.primaryLabwareId,
-          invariantContext,
-          flexStackerState
-        )
-      ) {
-        continue
-      } else {
-        return {
-          errors: [errorCreators.flexStackerLabwareTypeMismatch()],
-        }
+    const allMatch = labwareToStore.every(labware =>
+      labwareMatchesLabwareInHopper(
+        labware.primaryLabwareId,
+        invariantContext,
+        flexStackerState
+      )
+    )
+    if (!allMatch) {
+      return {
+        errors: [errorCreators.flexStackerLabwareTypeMismatch()],
       }
     }
   }
