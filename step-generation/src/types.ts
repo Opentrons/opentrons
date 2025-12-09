@@ -634,56 +634,26 @@ export interface CaptureImageArgs extends CommonArgs {
   saturation: number
 }
 
-export interface FlexStackerStore extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerStore'
-}
-
-export interface FlexStackerRetrieve extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerRetrieve'
-}
-
-export interface FlexStackerEmpty extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerEmpty'
-  interventionMessage: string | null
-}
-
-export interface FlexStackerFillItems extends CommonArgs {
-  moduleId: string
-  commandCreatorFnName: 'flexStackerFillItems'
-  fillLabwareUri: string | null
-  fillQuantity: number | null
-}
-
-export type FlexStackerArgs =
-  | FlexStackerStore
-  | FlexStackerRetrieve
-  | FlexStackerEmpty
-  | FlexStackerFillItems
-
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
-  | AbsorbanceReaderLidArgs
   | AbsorbanceReaderReadArgs
-  | CaptureImageArgs
-  | CommentArgs
+  | AbsorbanceReaderLidArgs
   | ConsolidateArgs
-  | DeactivateTemperatureArgs
-  | DisengageMagnetArgs
+  | CaptureImageArgs
   | DistributeArgs
-  | EngageMagnetArgs
-  | FlexStackerArgs
-  | HeaterShakerArgs
   | MixArgs
-  | MoveLabwareArgs
   | PauseArgs
+  | TransferArgs
+  | EngageMagnetArgs
+  | DisengageMagnetArgs
   | SetTemperatureArgs
+  | WaitForTemperatureArgs
+  | DeactivateTemperatureArgs
   | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
-  | TransferArgs
-  | WaitForTemperatureArgs
+  | HeaterShakerArgs
+  | MoveLabwareArgs
+  | CommentArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
