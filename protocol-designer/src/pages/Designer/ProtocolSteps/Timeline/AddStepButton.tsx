@@ -52,7 +52,10 @@ import {
   getIsModuleOnDeck,
   selectors as stepFormSelectors,
 } from '/protocol-designer/step-forms'
-import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import {
+  getLabwareEntities,
+  getModuleEntities,
+} from '/protocol-designer/step-forms/selectors'
 import {
   getIsMultiSelectMode,
   actions as stepsActions,
@@ -106,18 +109,25 @@ export function AddStepButton({
   const lastTimelineFrame =
     timeline.length > 0 ? last(timeline)?.robotState : initialTimeline
   const labwareAtLastState = lastTimelineFrame?.labware ?? {}
+  const moduleAtLastState = lastTimelineFrame?.modules ?? {}
   const isLabwarePresentForLiquidHandling = Object.entries(
     labwareAtLastState
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
     const isLidOnSlot = labwareDef != null ? getIsLid(labwareDef) : false
+    const isStackerInSlot = Object.values(modules).some(
+      module =>
+        module.type === FLEX_STACKER_MODULE_TYPE &&
+        moduleAtLastState[module.id].slot === slot
+    )
     return (
       labwareDef != null &&
       slot !== OFFDECK &&
       !getIsTiprack(labwareDef) &&
       !getIsAdapterFromDef(labwareDef) &&
-      !isLidOnSlot
+      !isLidOnSlot &&
+      !isStackerInSlot
     )
   })
   const getSupportedSteps = (): Array<
