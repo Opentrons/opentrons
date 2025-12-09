@@ -36,7 +36,16 @@ class CameraStore(HasState[CameraState], HandlesActions):
 
     def __init__(self) -> None:
         """Initialize a Camera store and its state."""
-        self._state = CameraState(enablement_settings=None)
+        self._state = CameraState(
+            enablement_settings=None,
+            camera_id=None,
+            resolution=None,
+            zoom=None,
+            pan=None,
+            contrast=None,
+            brightness=None,
+            saturation=None,
+        )
 
     def handle_action(self, action: Action) -> None:
         """Modify state in reaction to an action."""
@@ -92,22 +101,29 @@ class CameraView:
         return self._state.enablement_settings
 
     def get_camera_id(self) -> str | None:
+        """Get the id of the camera set as the default for this run. None means we will use the system default."""
         return self._state.camera_id
 
     def get_resolution(self) -> Tuple[int, int] | None:
+        """Get the resolution set as the default for this run. None means we will use the system default."""
         return self._state.resolution
 
     def get_zoom(self) -> float | None:
+        """Get the resolution set as the default for this run. None means we will use the system default."""
         return self._state.zoom
 
     def get_pan(self) -> Tuple[int, int] | None:
+        """Get the pan values set as the default for this run. None means we will use the system default."""
         return self._state.resolution
 
     def get_contrast(self) -> float | None:
+        """Get the contrast set as the default for this run. None means we will use the system default."""
         return self._state.contrast
 
     def get_brightness(self) -> float | None:
+        """Get the brightness set as the default for this run. None means we will use the system default."""
         return self._state.brightness
 
     def get_saturation(self) -> float | None:
+        """Get the saturation set as the default for this run. None means we will use the system default."""
         return self._state.saturation
