@@ -286,10 +286,11 @@ const _getInitialDeckSetup = (
     }
     return aeEntities
   }, {})
+
   return {
     labware: mapValues<Record<string, string>, LabwareOnDeck>(
       labwareLocations as Record<string, string>,
-      (location: string, labwareId: string): LabwareOnDeck => {
+      (id: string, labwareId: string): LabwareOnDeck => {
         return {
           stack: getLocationStackTopToBottom(
             labwareId,

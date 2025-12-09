@@ -110,11 +110,11 @@ export function getIdsInRange<T extends string | number>(
 }
 // NOTE: deck items include labware and modules
 export function getDeckItemIdInSlot(
-  itemIdToSlot: Record<string, string>,
+  itemIdToSlot: Record<string, DeckSlotId>,
   slot: DeckSlotId
 ): string | null | undefined {
   const idsForSourceSlot = Object.entries(itemIdToSlot)
-    .filter(([id, location]) => location === slot)
+    .filter(([id, labwareSlot]) => labwareSlot === slot)
     .map(([id, labwareSlot]) => id)
   console.assert(
     idsForSourceSlot.length < 2,
