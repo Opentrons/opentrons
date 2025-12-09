@@ -5,6 +5,7 @@ import {
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getFlexSurroundingSlots,
+  getModuleDef,
   getOt2SurroundingSlots,
   getPositionFromSlotId,
   OT2_ROBOT_TYPE,
@@ -141,14 +142,19 @@ const getHasOverlappingRectangles = (
 }
 
 const getModuleHeightFromDeckDefinition = (
-  moduleModel: ModuleModel
+  moduleModel: ModuleModel,
+  robotType: RobotType
 ): number => {
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const { addressableAreas } = deckDef.locations
-  const moduleAddressableArea = addressableAreas.find(addressableArea =>
-    addressableArea.id.includes(moduleModel)
-  )
-  return moduleAddressableArea?.offsetFromCutoutFixture[2] ?? 0
+  if (robotType === FLEX_ROBOT_TYPE) {
+    const deckDef = getDeckDefFromRobotType(robotType)
+    const { addressableAreas } = deckDef.locations
+    const moduleAddressableArea = addressableAreas.find(addressableArea =>
+      addressableArea.id.includes(moduleModel)
+    )
+    return moduleAddressableArea?.offsetFromCutoutFixture[2] ?? 0
+  }
+  // OT-2
+  return getModuleDef(moduleModel).dimensions.bareOverallHeight
 }
 
 //  check the highest Z-point of all items stacked given a deck slot (including modules,
@@ -156,7 +162,8 @@ const getModuleHeightFromDeckDefinition = (
 const getHighestZInSlot = (
   robotState: RobotState,
   invariantContext: InvariantContext,
-  slotId: string
+  slotId: string,
+  robotType: RobotType
 ): number => {
   const { modules, labware } = robotState
   const { moduleEntities, labwareEntities } = invariantContext
@@ -168,11 +175,12 @@ const getHighestZInSlot = (
   )
 
   //  if slot has labware, includes labware, adapters, and module
-  if (largestLabwareStack != null) {
+  if (largestLabwareStack.length > 0) {
     largestLabwareStack.forEach(item => {
       if (modules[item] != null) {
         totalHeight += getModuleHeightFromDeckDefinition(
-          moduleEntities[item].model
+          moduleEntities[item].model,
+          robotType
         )
       }
       if (labware[item] != null) {
@@ -182,7 +190,8 @@ const getHighestZInSlot = (
     // if slot only has module
   } else if (moduleInSlot != null) {
     totalHeight += getModuleHeightFromDeckDefinition(
-      moduleEntities[moduleInSlot].model
+      moduleEntities[moduleInSlot].model,
+      robotType
     )
   }
   return totalHeight
@@ -242,7 +251,8 @@ const getSlotHasPotentialCollidingObject = (
           ? getHighestZInSlot(
               robotState,
               invariantContext,
-              slot.addressableArea.id
+              slot.addressableArea.id,
+              robotType
             )
           : 0
       if (highestZInSurroundingSlot >= pipetteBounds[0]?.z) {
