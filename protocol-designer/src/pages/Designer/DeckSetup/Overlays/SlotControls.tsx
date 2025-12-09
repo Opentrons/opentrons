@@ -13,7 +13,11 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getCutoutIdFromAddressableArea } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_TYPE,
+  getCutoutIdFromAddressableArea,
+} from '@opentrons/shared-data'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { DND_TYPES } from '/protocol-designer/constants'
 import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
@@ -69,8 +73,11 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
+  const isSlotAHopper = getIsSlotAHopper(itemId)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
-  const cutoutId = getCutoutIdFromAddressableArea(itemId, deckDef)
+  const cutoutId = isSlotAHopper
+    ? null
+    : getCutoutIdFromAddressableArea(itemId, deckDef)
   const trashSlots = Object.values(additionalEquipment)
     .filter(ae => ae.name === 'trashBin' || ae.name === 'wasteChute')
     ?.map(ae => ae.location as CutoutId)
@@ -155,7 +162,10 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       draggedDef != null &&
       !getLabwareIsCompatible(draggedDef, moduleType) &&
       !isCustomLabware) ||
-    (isOver && hasTrashAndNotD4)
+    (isOver && hasTrashAndNotD4) ||
+    //  TODO: temp prohibit swapping on stacker,
+    //  will add that feature in the future
+    (isOver && moduleType === FLEX_STACKER_MODULE_TYPE)
 
   drag(drop(ref))
 

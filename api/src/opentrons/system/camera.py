@@ -158,7 +158,7 @@ async def update_live_stream_status(
         and camera_enable_settings.liveStreamEnabled
     ):
         # Check to see if the camera device is available
-        raw_device = str(contents["SOURCE"])[1:-1]
+        raw_device = str(contents["SOURCE"])
         if not os.path.exists(raw_device):
             log.error(
                 f"Opentrons Live Stream cannot sample the camera. No video device found with device path: {raw_device}"

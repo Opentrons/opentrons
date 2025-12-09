@@ -98,7 +98,8 @@ export function SelectLabwareOnAdapter(
       >
         {has96Channel && loadName === ADAPTER_96_CHANNEL
           ? permittedTipracks.map((tiprackDefUri, index) => {
-              const nestedDef = defs[tiprackDefUri]
+              const nestedDef =
+                defs[tiprackDefUri] ?? customLabwareDefs[tiprackDefUri]
               const stackingLabwareDefUris = getStackerDefinitions(
                 {
                   ...defs,

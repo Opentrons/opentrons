@@ -1,14 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
+  fixture96Plate,
+  fixture384Plate,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { flexStackerStore } from '../commandCreators/atomic/flexStackerStore'
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
+import {
+  getErrorResult,
+  getInitialRobotStateStandard,
+  makeContext,
+} from '../fixtures'
+import { flexStackerStateGetter } from '../robotStateSelectors'
 
-import type { InvariantContext, RobotState } from '../types'
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type {
+  FlexStackerModuleState,
+  InvariantContext,
+  RobotState,
+} from '../types'
 
 const moduleId = 'flexStackerId'
 vi.mock('../robotStateSelectors')
@@ -25,13 +37,60 @@ describe('flexStackerStore', () => {
       model: FLEX_STACKER_MODULE_V1,
       pythonName: 'mock_flex_stacker_1',
     }
+    invariantContext.labwareEntities = {
+      mockLabwareId: {
+        id: 'mockLabwareId',
+        labwareDefURI: 'mockURI',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'wellPlate_1',
+      },
+    }
+    vi.mocked(flexStackerStateGetter).mockReturnValue({
+      labwareOnShuttle: {
+        primaryLabwareId: 'mockLabwareId',
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      },
+      labwareInHopper: [
+        {
+          primaryLabwareId: 'mockLabwareId',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+      ],
+      maxPoolCount: 10,
+      storedLabwareDetails: {
+        moduleId,
+        initialCount: 5,
+        primaryLabware: {
+          loadName: 'fixture_96_plate',
+          namespace: 'opentrons',
+          version: 1,
+        },
+        lidLabware: null,
+        adapterLabware: null,
+      },
+      type: FLEX_STACKER_MODULE_TYPE,
+    } as FlexStackerModuleState)
+    robotState = {
+      ...robotState,
+      modules: {
+        [moduleId]: {
+          slot: 'D3',
+          moduleState: {} as FlexStackerModuleState,
+        },
+      },
+      labware: {
+        mockLabwareId: {
+          stack: ['mockLabwareId', 'D3'],
+        },
+      },
+    }
   })
+
   it('creates flex stacker store command', () => {
     const result = flexStackerStore(
-      {
-        moduleId,
-        strategy: 'automatic',
-      },
+      { moduleId, strategy: 'automatic' },
       invariantContext,
       robotState
     )
@@ -47,6 +106,116 @@ describe('flexStackerStore', () => {
         },
       ],
       python: 'mock_flex_stacker_1.store()',
+    })
+  })
+
+  it('raises an error if the shuttle is empty', () => {
+    vi.mocked(flexStackerStateGetter).mockReturnValue({
+      labwareOnShuttle: null,
+      labwareInHopper: null,
+      maxPoolCount: 10,
+      storedLabwareDetails: null,
+      type: FLEX_STACKER_MODULE_TYPE,
+    })
+
+    const emptyShuttleRobotState: RobotState = {
+      ...robotState,
+      modules: {
+        [moduleId]: {
+          slot: 'D3',
+          moduleState: {} as FlexStackerModuleState,
+        },
+      },
+    }
+
+    const emptyShuttleInvariantContext: InvariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        [moduleId]: {
+          id: moduleId,
+          labwareDefURI: 'mockURI',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'wellPlate_1',
+        },
+      },
+    }
+
+    const result = flexStackerStore(
+      { moduleId, strategy: 'automatic' },
+      emptyShuttleInvariantContext,
+      emptyShuttleRobotState
+    )
+
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'SHUTTLE_EMPTY',
+    })
+  })
+
+  it('raises an error if the labware to be stored does not match the current labware in the hopper', () => {
+    vi.mocked(flexStackerStateGetter).mockReturnValue({
+      labwareOnShuttle: {
+        primaryLabwareId: 'labware-in-shuttle',
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      },
+      labwareInHopper: [
+        {
+          primaryLabwareId: 'labware-in-hopper',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+      ],
+      maxPoolCount: 10,
+      storedLabwareDetails: {
+        moduleId,
+        initialCount: 5,
+        primaryLabware: {
+          loadName: 'wellPlate_1',
+          namespace: 'opentrons',
+          version: 1,
+        },
+        lidLabware: null,
+        adapterLabware: null,
+      },
+      type: FLEX_STACKER_MODULE_TYPE,
+    })
+    const mismatchRobotState: RobotState = {
+      ...robotState,
+      modules: {
+        [moduleId]: {
+          slot: 'D3',
+          moduleState: {} as FlexStackerModuleState,
+        },
+      },
+      labware: {
+        'labware-in-hopper': { stack: ['labware-in-hopper', 'D3'] },
+        'labware-in-shuttle': { stack: ['labware-in-shuttle', 'D3'] },
+      },
+    }
+    const mismatchInvariantContext: InvariantContext = {
+      ...invariantContext,
+      labwareEntities: {
+        'labware-in-hopper': {
+          id: 'labware-in-hopper',
+          labwareDefURI: 'mockURI',
+          def: fixture96Plate as LabwareDefinition2,
+          pythonName: 'wellPlate_1',
+        },
+        'labware-in-shuttle': {
+          id: 'labware-in-shuttle',
+          labwareDefURI: 'differentMockURI',
+          def: fixture384Plate as LabwareDefinition2,
+          pythonName: 'wellPlate_2',
+        },
+      },
+    }
+    const result = flexStackerStore(
+      { moduleId, strategy: 'automatic' },
+      mismatchInvariantContext,
+      mismatchRobotState
+    )
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'MISMATCHED_STACKER_LABWARE_TYPE',
     })
   })
 })

@@ -13,8 +13,8 @@ import {
 import { getLabwareViewBox } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { getMissingTips } from '../utils/getMissingTips'
 import styles from './tippickupcontainer.module.css'
-import { getMissingTips } from './utils/getMissingTips'
 
 import type { TipType } from '@opentrons/components'
 import type { LabwareEntity, RobotState } from '@opentrons/step-generation'
@@ -69,7 +69,7 @@ export function TipPickupContainer(
             <g>
               <LabwareRender
                 definition={def}
-                positioningMode="offsetInSlot"
+                positioningMode="passThrough"
                 missingTips={missingTips}
                 tipStatusByWellName={tipStatusByWellName}
               />
