@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
 import {
-  Divider,
   MODULE_ICON_NAME_BY_TYPE,
   RobotInfoLabel,
 } from '@opentrons/components'
@@ -10,7 +9,7 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
-import { LabwareSlotContainer } from '../LabwareSlotContainer'
+import { LabwareSlot } from '../SecondWindow/LabwareSlot'
 import { ModuleContainer } from '../ModuleContainer'
 import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupContainer } from '../TipPickupContainer'
@@ -65,6 +64,47 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   const isSlotEmpty =
     moduleOnSlot == null && topMostLabwareOnSlot == null && !isTrashOnSlot
 
+  const getLabwareType = (): 'tiprack' | 'labware' | null => {
+    if (topMostLabwareOnSlot == null) {
+      return null
+    }
+    if (isTopmostLabwareATiprack === true) {
+      return 'tiprack'
+    }
+    return 'labware'
+  }
+
+  const renderLabwareContent = (): JSX.Element | null => {
+    const labwareType = getLabwareType()
+    if (topMostLabwareOnSlot == null) {
+      return null
+    }
+    switch (labwareType) {
+      case 'tiprack':
+        return (
+          <TipPickupContainer
+            tiprackEntity={labwareEntities[topMostLabwareOnSlot]}
+            robotState={robotState}
+          />
+        )
+      case 'labware':
+        return (
+          <LabwareSlot
+            topLabwareOnSlotId={topMostLabwareOnSlot}
+            labwareEntities={labwareEntities}
+            commands={commands}
+            currentCommand={command}
+            liquids={liquids}
+            robotState={robotState}
+            pipetteEntities={pipetteEntities}
+            moduleEntities={moduleEntities}
+          />
+        )
+      default:
+        return null
+    }
+  }
+
   return (
     <>
       {isSlotEmpty ? (
@@ -90,25 +130,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
               ) : null}
             </div>
           </div>
-          <Divider />
-          {topMostLabwareOnSlot != null && isTopmostLabwareATiprack ? (
-            <TipPickupContainer
-              tiprackEntity={labwareEntities[topMostLabwareOnSlot]}
-              robotState={robotState}
-            />
-          ) : null}
-          {topMostLabwareOnSlot != null && !isTopmostLabwareATiprack ? (
-            <LabwareSlotContainer
-              topLabwareOnSlotId={topMostLabwareOnSlot}
-              labwareEntities={labwareEntities}
-              commands={commands}
-              currentCommand={command}
-              liquids={liquids}
-              robotState={robotState}
-              pipetteEntities={pipetteEntities}
-              moduleEntities={moduleEntities}
-            />
-          ) : null}
+          {renderLabwareContent()}
           {isTrashOnSlot ? (
             <TipDisposalContainer robotState={robotState} />
           ) : null}

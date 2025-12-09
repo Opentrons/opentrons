@@ -109,7 +109,7 @@ export function createStepDetailViewerUi({
 
   stepDetailViewerWindow.once('ready-to-show', () => {
     log.debug('Step detail viewer window ready to show')
-    stepDetailViewerWindow.setTitle('Slot Spotlight')
+    stepDetailViewerWindow.setTitle('Slot spotlight')
     stepDetailViewerWindow.show()
   })
 
