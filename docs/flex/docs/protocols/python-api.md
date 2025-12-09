@@ -63,7 +63,7 @@ Certain features are only available in Python protocols, either because they are
 
 ### Partial tip pickup
 
-The Python API supports the most partial tip pickup configurations. Currently, Protocol Designer only supports column pickup with the 96-channel pipette. The `InstrumentContext.configure_nozzle_layout()` method supports these additional layouts:
+The Python API supports the most partial tip pickup configurations. The `InstrumentContext.configure_nozzle_layout()` method supports multiple layouts:
 
 - Row pickup with the 96-channel pipette.
 
@@ -72,6 +72,8 @@ The Python API supports the most partial tip pickup configurations. Currently, P
 - Single tip pickup with all multi-channel pipettes.
 
 Certain configurations allow changing which nozzles are used. For example, you can pick up a column of tips with either the left or right edge of the 96-channel pipette.
+
+Protocol Designer supports some partial tip use, like single tip pickup and 96-channel column pickup, but doesn't let you change which nozzles are used.
 
 ### Runtime parameters
 
