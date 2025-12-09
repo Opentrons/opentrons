@@ -31,7 +31,7 @@ Use Opentrons Tough Universal Lids on compatible well plates and reservoirs.
 
 ### Improvements
 
-Transfer aqueous, viscous, or volatile liquids with the Opentrons Flex 96-Channel Pipette (1–200 μL) to apply optimized, liquid class transfer behavior to volumes as low as 1 µL.
+Transfer aqueous, viscous, or volatile liquids with the Opentrons Flex 96-Channel Pipette (1–200 µL) to apply optimized, liquid class transfer behavior to volumes as low as 1 µL.
 
 ### Bug Fixes
 
@@ -45,12 +45,12 @@ Welcome to the v8.6.0 release of the Opentrons robot software! This release adds
 ### New Features
 
 - Automate labware storage with the Flex Stacker Module. Use new commands like `retrieve()` and `store()` to move well plates, reservoirs, or Flex tip racks to and from the Stacker during a protocol.
-- This release adds support for the Opentrons Flex 96-Channel Pipette (1–200 μL) to transfer as little as 1 µL in a protocol.
+- This release adds support for the Opentrons Flex 96-Channel Pipette (1–200 µL) to transfer as little as 1 µL in a protocol.
 - Control individual robot motors, like the gantry, extension mount, or gripper, with new commands.
 
 ### Known Limitations
 
-- The Opentrons Flex 96-Channel Pipette (1–200 μL) does not yet support liquid classes. Use legacy liquid-handling commands from the Python Protocol API.
+- The Opentrons Flex 96-Channel Pipette (1–200 µL) does not yet support liquid classes. Use legacy liquid-handling commands from the Python Protocol API.
 - The Flex Gripper can't currently sense if it has failed to pick up a labware lid.
 - Certain partial tip pickup actions adjacent to a Flex Stacker raise an error, even though no collision would occur.
 - Certain robot motor control commands don't appear properly in the run log. The commands are still functional.

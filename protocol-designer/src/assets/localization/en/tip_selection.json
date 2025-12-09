@@ -3,6 +3,11 @@
   "all_tips_selected": "All tips selected",
   "click_to_select": "Click to select tips in {{labwareName}}",
   "continue": "Continue",
+  "error_banner": {
+    "incompletePickup": "Selection will not pickup enough tips",
+    "pickupsRequired": "Not enough tips selected ({{count}} pickups remaining)",
+    "tooManyTips": "Selection will pickup too many tips"
+  },
   "go_back": "Go back",
   "legend": {
     "inaccessible_tip": "Inaccessible tip",
