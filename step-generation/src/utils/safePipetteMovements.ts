@@ -23,6 +23,7 @@ import type {
   NozzleConfigurationStyle,
   OT2AddressableAreaName,
   PipetteChannels,
+  PipetteV2Specs,
   RobotType,
 } from '@opentrons/shared-data'
 import type {
@@ -91,7 +92,8 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   pipetteEntity: PipetteEntity,
   tipLength: number,
   wellTargetPoint: Point,
-  primaryNozzle: string
+  primaryNozzle: string,
+  tipOverlapOnNozzle: number
 ): Point[] => {
   const { nozzleMap, nozzleOffset, pipetteBoundingBoxOffsets } =
     pipetteEntity.spec
@@ -116,7 +118,6 @@ const getPipetteBoundsAtSpecifiedMoveToPosition = (
   const frontY =
     wellTargetPoint.y - (primaryNozzlePoint[1] - pipetteBoundingBoxFrontYOffset)
 
-  const tipOverlapOnNozzle = 0
   const zNozzles = (wellTargetPoint.z ?? 0) + tipLength - tipOverlapOnNozzle
 
   const backLeftBound = { x: leftX, y: backY, z: zNozzles }
@@ -344,15 +345,9 @@ export const getIsSafePipetteMovement = (args: {
     return true
   }
 
-  const tiprackURI = tipState.pipettes[pipetteId]?.tiprackURI
-  const tiprackEntityId =
-    tiprackURI != null
-      ? Object.keys(labwareEntities).find(lwKey => lwKey.includes(tiprackURI))
-      : null
+  const tiprackId = tipState.pipettes[pipetteId]?.tiprackURI
   const tiprackTipLength =
-    tiprackEntityId != null
-      ? labwareEntities[tiprackEntityId].def.parameters.tipLength
-      : 0
+    tiprackId != null ? labwareEntities[tiprackId].def.parameters.tipLength : 0
   const stagingAreaSlots = Object.values(stagingAreaEntities).map(
     stagingArea => stagingArea.location as string
   )
@@ -388,11 +383,21 @@ export const getIsSafePipetteMovement = (args: {
   if (!isWithinPipetteExtents) {
     return false
   }
+  const tiprackEntity = tiprackId != null ? labwareEntities[tiprackId] : null
+  const tipOverlapOnNozzle =
+    tiprackEntity != null
+      ? getTipOverlap({
+          pipetteSpecs,
+          tiprackUri: tiprackEntity.labwareDefURI,
+          nozzles: nozzleConfiguration,
+        })
+      : 0
   const pipetteBoundsAtWellLocation = getPipetteBoundsAtSpecifiedMoveToPosition(
     pipetteEntity,
     tipLength,
     wellTargetPoint,
-    primaryNozzle
+    primaryNozzle,
+    tipOverlapOnNozzle
   )
   const surroundingSlots =
     robotType === OT2_ROBOT_TYPE
@@ -585,4 +590,55 @@ export const getTargetTipsFromWellSets = (args: {
     )
     return wellSet[0]
   })
+}
+
+const getTipOverlap = (args: {
+  pipetteSpecs: PipetteV2Specs
+  tiprackUri: string
+  nozzles: NozzleConfigurationStyle
+}): number => {
+  const { pipetteSpecs, tiprackUri, nozzles } = args
+  const { channels } = pipetteSpecs
+  const overlapKey = getOverlapKeyForPipetteSpecs(channels, nozzles)
+  const tipOverlaps =
+    pipetteSpecs.pickUpTipConfigurations.pressFit.configurationsByNozzleMap[
+      overlapKey
+    ]?.default.tipOverlaps
+
+  // protect in case we get a bad overlap key
+  if (tipOverlaps == null) {
+    console.error(
+      `No tip overlaps found for ${nozzles} and ${overlapKey} overlap.`
+    )
+    return 0
+  }
+  const maxVersion = Math.max(
+    ...Object.keys(tipOverlaps).map(version => Number(version.slice(1)))
+  )
+  return (
+    tipOverlaps[`v${maxVersion}`]?.[tiprackUri] ??
+    tipOverlaps[`v${maxVersion}`]?.default ??
+    0
+  )
+}
+
+const getOverlapKeyForPipetteSpecs = (
+  channels: PipetteChannels,
+  nozzles: NozzleConfigurationStyle
+): string => {
+  if (channels === 1) {
+    return 'SingleA1'
+  }
+  if (channels === 8) {
+    return nozzles === SINGLE ? 'SingleH1' : 'Full'
+  }
+  if (channels === 96) {
+    if (nozzles === SINGLE) {
+      return 'SingleH12'
+    } else if (nozzles === COLUMN) {
+      return 'Column12'
+    }
+  }
+  // default
+  return 'Full'
 }
