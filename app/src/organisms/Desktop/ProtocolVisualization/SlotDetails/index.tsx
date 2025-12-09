@@ -1,9 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
-import {
-  MODULE_ICON_NAME_BY_TYPE,
-  RobotInfoLabel,
-} from '@opentrons/components'
 import { getIsTiprack } from '@opentrons/shared-data'
 import { getFullStackFromLabwares } from '@opentrons/step-generation'
 
@@ -42,7 +36,6 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     pipetteEntities,
   } = invariantContext
   const { commands } = analysis
-  const { t } = useTranslation('protocol_visualization')
   const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
   const moduleOnSlot = Object.entries(modules).find(
     ([id, module]) => module.slot === slotId
