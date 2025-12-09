@@ -566,7 +566,6 @@ export const savedStepForms = (
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
-
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
@@ -596,7 +595,7 @@ export const savedStepForms = (
       const moduleId = action.payload.id
       // If module is going into a slot occupied by a labware,
       // move the labware on top of the new module
-      const labwareLocationUpdate =
+      const labwareLocationUpdate: Record<string, string> =
         labwareOccupyingDestination == null
           ? prevInitialDeckSetupStep.labwareLocationUpdate
           : {
@@ -732,16 +731,16 @@ export const savedStepForms = (
           // remove instances of labware from all manualIntervention steps
           const updatedLabwareLocation = Object.entries(
             savedForm.labwareLocationUpdate as Record<string, string>
-          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
+          ).reduce((acc: Record<string, string>, [labwareId, location]) => {
             if (labwareId === labwareIdToDelete) {
               return acc
             }
 
             // If labware is on an adapter and adapter was deleted, update labwareId's location
             const newLocationId =
-              locationId === labwareIdToDelete
+              location === labwareIdToDelete
                 ? savedForm.labwareLocationUpdate[labwareIdToDelete]
-                : locationId
+                : location
 
             acc[labwareId] = newLocationId
             return acc
@@ -842,6 +841,7 @@ export const savedStepForms = (
             form.stepType === 'heaterShaker' ||
             form.stepType === 'absorbanceReader' ||
             form.stepType === 'thermocycler' ||
+            form.stepType === 'flexStacker' ||
             form.stepType === 'pause') &&
           form.moduleId === moduleId
         ) {

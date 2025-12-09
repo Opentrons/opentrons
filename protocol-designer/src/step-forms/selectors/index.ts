@@ -295,7 +295,8 @@ const _getInitialDeckSetup = (
           stack: getLocationStackTopToBottom(
             labwareId,
             labwareLocations,
-            moduleLocations
+            moduleLocations,
+            moduleEntities
           ),
           ...labwareEntities[labwareId],
         }

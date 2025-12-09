@@ -37,6 +37,7 @@ import {
 import {
   CLEAN,
   EMPTY,
+  HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
   ZERO_OFFSET,
@@ -62,6 +63,7 @@ import type {
 import type {
   CommandCreator,
   CurriedCommandCreator,
+  FlexStackerModuleState,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -1362,4 +1364,26 @@ export const getLabwareIdOnHopper = (
   const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
   const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
   return labwareIdOnModule
+}
+
+export const getIsSlotAHopper = (slot: string): boolean => {
+  return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getLabwareIdOnShuttle = (
+  stackerState: FlexStackerModuleState
+): string | null => {
+  return stackerState.labwareOnShuttle?.primaryLabwareId ?? null
+}
+
+export const labwareMatchesLabwareInHopper = (
+  labwareId: string,
+  invariantContext: InvariantContext,
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const loadedLabware =
+    stackerState?.storedLabwareDetails?.primaryLabware.loadName
+  const def = invariantContext.labwareEntities[labwareId].def
+  const labwareToBeStored = def.parameters.loadName
+  return loadedLabware === labwareToBeStored
 }
