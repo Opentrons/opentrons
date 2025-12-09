@@ -63,6 +63,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
   )
   const hoveredItem = useSelector(getHoveredDropdownItem)
   const selectedDropdownItems = useSelector(getSelectedDropdownItem)
+
   if (
     hoveredItem == null &&
     (selectedDropdownItems == null || selectedDropdownItems.length === 0)

@@ -167,7 +167,7 @@ export function DeckSetupContainer(
     const zoomInSlotPosition = getPositionFromSlotId(
       slot ?? '',
       deckDef,
-      isOnHopper ? HOPPER_ZOOM_OFFSET_POSTITION : undefined
+      ...(isOnHopper ? [HOPPER_ZOOM_OFFSET_POSTITION] : [])
     )
     if (zoomInSlotPosition != null) {
       const zoomedInViewBox = zoomInOnCoordinate({

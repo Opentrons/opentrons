@@ -369,25 +369,25 @@ export function getLocationStackTopToBottom(
   moduleEntities: ModuleEntities
 ): string[] {
   const stack: string[] = []
-  let current = labwareId
-
-  while (true) {
+  const visited = new Set<string>()
+  let current: string | undefined = labwareId
+  while (current != null) {
+    // Cycle detection: if we've seen this node before, break to prevent infinite loop
+    if (visited.has(current)) {
+      break
+    }
+    visited.add(current)
     stack.push(current)
-
-    const slot = labwareLocationUpdate[current]
-    const parent = slot ?? moduleLocationUpdate[current]
+    const slot: string | undefined = labwareLocationUpdate[current]
+    const parent: string | undefined = slot ?? moduleLocationUpdate[current]
     const isOnHopper =
       moduleEntities[slot] != null &&
       moduleEntities[slot].type === FLEX_STACKER_MODULE_TYPE
-
     if (isOnHopper) {
       // Hopper stack shape: [labware, hopper, moduleId, slot]
       // So when the node is on the hopper, insert the hopper marker once
       stack.push(HOPPER_STACKER_LOCATION)
     }
-
-    if (!parent) break
-
     current = parent
   }
   return stack
@@ -403,8 +403,8 @@ export const getLabwaresOnModuleFromStack = (
 } => {
   // all stacks involving this module and not on the hopper if its a flex stacker
   const allStacks = labware.filter(
-    lw =>
-      lw.stack.includes(moduleId) && !lw.stack.includes(HOPPER_STACKER_LOCATION)
+    ({ stack }) =>
+      stack.includes(moduleId) && !stack.includes(HOPPER_STACKER_LOCATION)
   )
   const largestStack = allStacks.sort(
     (a, b) => b.stack.length - a.stack.length
@@ -415,8 +415,8 @@ export const getLabwaresOnModuleFromStack = (
   )
   // all stacks involving the hopper if there is one
   const allStacksOnHopper = labware.filter(
-    lw =>
-      lw.stack.includes(moduleId) && lw.stack.includes(HOPPER_STACKER_LOCATION)
+    ({ stack }) =>
+      stack.includes(moduleId) && stack.includes(HOPPER_STACKER_LOCATION)
   )
   const largestStackOnHopper = allStacksOnHopper.sort(
     (a, b) => b.stack.length - a.stack.length
@@ -438,11 +438,9 @@ export const getFullStackFromLabwaresOnDeck = (
     : slot
   return labwareOnDeck
     .filter(
-      lw =>
-        lw.stack.includes(slotInStack) &&
-        (onHopper
-          ? lw.stack.includes(HOPPER_STACKER_LOCATION)
-          : !lw.stack.includes(HOPPER_STACKER_LOCATION))
+      ({ stack }) =>
+        stack.includes(slotInStack) &&
+        onHopper === stack.includes(HOPPER_STACKER_LOCATION)
     )
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
 }

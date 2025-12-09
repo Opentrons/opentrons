@@ -107,11 +107,11 @@ export const getSlotInformation = (
     : slot
   const slotPosition =
     deckDef != null && offDeckLabware == null
-      ? (getPositionFromSlotId(
+      ? getPositionFromSlotId(
           adjustedSlot,
           deckDef,
-          isSlotAHopper ? HOPPER_LABWARE_X_OFFSET : undefined
-        ) ?? null)
+          ...(isSlotAHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
+        )
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === adjustedSlot

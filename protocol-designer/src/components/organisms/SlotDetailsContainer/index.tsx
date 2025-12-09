@@ -6,7 +6,6 @@ import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
   getTopLocationInStack,
-  HopperLocationMapKey,
 } from '@opentrons/step-generation'
 
 import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
@@ -18,6 +17,7 @@ import { getFullStackFromLabwaresOnDeck } from '/protocol-designer/utils'
 import { SlotInformation } from '../SlotInformation'
 
 import type { DeckSlotId, RobotType } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
 
 interface SlotDetailContainerProps {

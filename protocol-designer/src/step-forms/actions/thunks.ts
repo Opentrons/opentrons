@@ -36,6 +36,7 @@ export const createContainerAboveModule: (
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
+
   const moduleId = Object.values(modules).find(
     module => module.slot === slot
   )?.id
