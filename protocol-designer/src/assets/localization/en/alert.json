@@ -178,6 +178,22 @@
       "NEXT_TIPRACK_HAS_LID": {
         "title": "Unable to pick up tips",
         "body": "The next available tip rack has a lid. Remove the lid from the tip rack to pick up tips."
+      },
+      "SHUTTLE_FULL": {
+        "title": "Cannot retrieve labware when shuttle is occupied",
+        "body": "Shuttle must be empty in order to retrieve labware from the stacker."
+      },
+      "HOPPER_EMPTY": {
+        "title": "Cannot retrieve labware from empty stacker",
+        "body": "Refill the stacker."
+      },
+      "SHUTTLE_EMPTY": {
+        "title": "Cannot store labware when shuttle is empty",
+        "body": "There is no labware on the shuttle to store into the stacker."
+      },
+      "MISMATCHED_STACKER_LABWARE_TYPE": {
+        "title": "Cannot store or refill multiple labware types in the stacker",
+        "body": "The stacker can only store a single labware at a time."
       }
     },
     "warning": {

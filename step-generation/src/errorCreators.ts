@@ -192,6 +192,35 @@ export const flexStackerNoGripper = (): CommandCreatorError => {
   }
 }
 
+export const flexStackerHopperEmpty = (): CommandCreatorError => {
+  return {
+    type: 'HOPPER_EMPTY',
+    message: 'Cannot retrieve labware from empty stacker',
+  }
+}
+
+export const flexStackerShuttleFull = (): CommandCreatorError => {
+  return {
+    type: 'SHUTTLE_FULL',
+    message:
+      'Shuttle must be empty in order to retrieve labware from the stacker',
+  }
+}
+
+export const flexStackerShuttleEmpty = (): CommandCreatorError => {
+  return {
+    type: 'SHUTTLE_EMPTY',
+    message: 'Shuttle must have labware in order to store it in the stacker',
+  }
+}
+
+export const flexStackerLabwareTypeMismatch = (): CommandCreatorError => {
+  return {
+    type: 'MISMATCHED_STACKER_LABWARE_TYPE',
+    message: 'The stacker can only store a single type of labware at a time',
+  }
+}
+
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',
