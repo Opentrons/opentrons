@@ -27,7 +27,7 @@
       "type": "object",
       "required": [
         "annotationType",
-        "commandKeys",
+        "annotationId",
         "params",
         "machineReadableName"
       ],
@@ -87,7 +87,7 @@
       "description": "Annotates a group of atomic commands in some manner that Opentrons software does not anticipate or originate",
       "allOf": [{ "$ref": "#/$defs/baseAnnotation" }],
       "type": "object",
-      "required": ["annotationType", "commandKeys"],
+      "required": ["annotationType", "annotationId"],
       "properties": {
         "annotationType": {
           "type": "string",
@@ -99,6 +99,7 @@
   },
   "oneOf": [
     { "$ref": "#/$defs/secondOrderCommand" },
+    { "$ref": "#/$defs/userCommand" },
     { "$ref": "#/$defs/custom" }
   ]
 }
