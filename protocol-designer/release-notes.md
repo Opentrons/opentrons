@@ -57,7 +57,7 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 ### New Features
 
-- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 μL). This release also adds liquid class transfer support for the pipette.
+- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 µL). This release also adds liquid class transfer support for the pipette.
 - Use Opentrons Tough Auto-Sealing Lids on compatible labware in the Thermocycler Module.
 - Add new lids to Protocol Designer protocols, including the Opentrons Tough Universal Lid and Opentrons Tough Auto-Sealing Lid. Tip rack lids are also available for Flex tip racks.
 - Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Heater-Shaker Adapter Type B.
