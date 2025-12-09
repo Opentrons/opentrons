@@ -132,7 +132,7 @@ async def add_camera_settings(
     ),
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_201_CREATED: {"model": SimpleBody[CameraSettings]},
+        status.HTTP_201_CREATED: {"model": SimpleBody[CameraCaptureImageSettings]},
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
         status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
