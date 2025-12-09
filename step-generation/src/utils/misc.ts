@@ -1385,9 +1385,9 @@ export const labwareMatchesLabwareInHopper = (
 
 export const spaceInHopper = (
   stackerState: FlexStackerModuleState | null
-) : boolean => {
+): boolean => {
   const maximumAllowedLabware = stackerState?.maxPoolCount ?? 0
   const labwareStored = stackerState?.labwareInHopper
   const numberOfLabwareStored = labwareStored?.length ?? 0
-  return (numberOfLabwareStored + 1) < maximumAllowedLabware
+  return numberOfLabwareStored + 1 < maximumAllowedLabware
 }

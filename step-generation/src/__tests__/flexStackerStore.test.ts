@@ -218,7 +218,7 @@ describe('flexStackerStore', () => {
       type: 'MISMATCHED_STACKER_LABWARE_TYPE',
     })
   })
-  it ('raises an error if the hopper is full', () => {
+  it('raises an error if the hopper is full', () => {
     vi.mocked(flexStackerStateGetter).mockReturnValue({
       labwareOnShuttle: {
         primaryLabwareId: 'mockLabwareId',
@@ -232,10 +232,10 @@ describe('flexStackerStore', () => {
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 10,
+      maxPoolCount: 1,
       storedLabwareDetails: {
         moduleId,
-        initialCount: 10,
+        initialCount: 1,
         primaryLabware: {
           loadName: 'fixture_96_plate',
           namespace: 'opentrons',
@@ -269,5 +269,4 @@ describe('flexStackerStore', () => {
       type: 'HOPPER_FULL',
     })
   })
-
 })

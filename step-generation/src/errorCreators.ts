@@ -221,6 +221,12 @@ export const flexStackerLabwareTypeMismatch = (): CommandCreatorError => {
   }
 }
 
+export const flexStackerHopperFull = (): CommandCreatorError => {
+  return {
+    type: 'HOPPER_FULL',
+    message: 'The hopper has reached capacity',
+  }
+}
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',
