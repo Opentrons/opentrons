@@ -25,6 +25,7 @@ import {
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { AbsorbanceReaderSummary } from './AbsorbanceReaderSummary'
+import { FlexStackerSummary } from './FlexStackerSummary'
 import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
@@ -341,6 +342,14 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         />
       )
       break
+    }
+    case 'flexStacker': {
+      stepSummaryContent = (
+        <FlexStackerSummary
+          currentStep={currentStep}
+          labwareEntities={labwareEntities}
+        />
+      )
     }
 
     default:

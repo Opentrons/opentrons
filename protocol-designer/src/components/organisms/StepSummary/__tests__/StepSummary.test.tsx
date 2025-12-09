@@ -137,4 +137,33 @@ describe('StepSummary', () => {
     screen.getByText('mockNickName to')
     screen.getByText('mockNickName')
   })
+  it('renders flex stacker retrieve command summary', () => {
+    let baseStackerProps
+    baseStackerProps = {
+      currentStep: {
+        id: 'retrieve',
+        stepType: 'flexStacker',
+        flexStackerFormType: 'retrieve',
+        fillLabwareUri: 'mockUri',
+        fillQuantity: 3,
+      },
+      labwareEntities: {
+        someId: {
+          labwareDefURI: 'mockUri',
+          def: { metadata: { displayName: 'mockUri' } },
+        },
+      },
+    } as ComponentProps<typeof StepSummary>
+    render(baseStackerProps)
+    screen.getByText('Retrieving mockUri from stacker')
+  })
+  it('renders flex stacker store command summary', () => {
+    screen.getByText('Storing mockUri from shuttle into stacker')
+  })
+  it('renders flex stacker retrieve command summary', () => {
+    screen.getByText('Refilling stacker with Quantity: 3 of mockUri')
+  })
+  it('renders flex stacker empty command summary', () => {
+    screen.getByText('Emptying stacker of all labware')
+  })
 })
