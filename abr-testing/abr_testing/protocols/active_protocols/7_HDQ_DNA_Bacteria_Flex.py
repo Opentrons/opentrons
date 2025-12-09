@@ -565,7 +565,7 @@ def run(protocol: ProtocolContext) -> None:
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
             helpers.send_slack_error_message_with_log(

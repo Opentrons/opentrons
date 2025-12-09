@@ -225,6 +225,8 @@ def run(ctx: ProtocolContext) -> None:
         move_plates_to_deck_fill_and_store(
             stacker_nest96deep, ctx, p96, water, reservoir
         )
+        if not ctx.is_simulating():
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not ctx.is_simulating():
             helpers.send_slack_error_message_with_log(

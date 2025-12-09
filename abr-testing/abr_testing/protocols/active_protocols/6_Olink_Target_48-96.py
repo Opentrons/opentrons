@@ -523,7 +523,8 @@ def run(protocol: ProtocolContext) -> None:
             height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
             liquid_heights[ifp_plate_well.well_name] = height
         protocol.comment(str(liquid_heights))
-
+        if not protocol.is_simulating():
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
             helpers.send_slack_error_message_with_log(
