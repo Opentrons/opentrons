@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { ViewportList } from 'react-viewport-list'
 import { css } from 'styled-components'
 
-import { RUN_STATUSES_TERMINAL } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -25,6 +24,7 @@ import {
 
 import { NAV_BAR_WIDTH } from '/app/App/constants'
 import { Divider } from '/app/atoms/structure'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { CommandIcon } from '/app/molecules/Command'
 import {
   DEFAULT_STATUS_REFETCH_INTERVAL,
@@ -36,7 +36,6 @@ import {
 
 import type { ForwardedRef } from 'react'
 import type { ViewportListRef } from 'react-viewport-list'
-import type { RunStatus } from '@opentrons/api-client'
 import type { RobotType } from '@opentrons/shared-data'
 
 const COLOR_FADE_MS = 500
@@ -60,10 +59,7 @@ export const RunPreviewComponent = (
     refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
   })
   const runStatus = runRecord?.data.status ?? null
-  const isRunTerminal =
-    runStatus != null
-      ? (RUN_STATUSES_TERMINAL as RunStatus[]).includes(runStatus)
-      : false
+  const isRunTerminal = isTerminalRunStatus(runStatus)
   // we only ever want one request done for terminal runs because this is a heavy request
   const {
     data: commandsFromQueryResponse,

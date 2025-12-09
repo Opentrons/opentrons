@@ -3,7 +3,7 @@ import Hls from 'hls.js'
 
 import { useHost } from '@opentrons/react-api-client'
 
-import { isTerminalRunStatus } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/utils'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 
 import type { RefObject } from 'react'
 import type { CameraData, RunStatus } from '@opentrons/api-client'

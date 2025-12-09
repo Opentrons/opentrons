@@ -9,11 +9,11 @@ import {
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
 
-import { TipSvg } from './TipSvg'
-import { getTipSvgInfo } from './utils/getTipSvgInfo'
-import { getWellVolume } from './utils/getWellVolume'
+import { TipSvg } from '../TipSvg'
+import { getTipSvgInfo } from '../utils/getTipSvgInfo'
+import { getWellVolume } from '../utils/getWellVolume'
+import { WellSvg } from '../WellSvg'
 import styles from './wellcontainer.module.css'
-import { WellSvg } from './WellSvg'
 
 import type {
   LabwareWellMap,
@@ -100,43 +100,45 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
         <div className={styles.main_content}>
           <div className={styles.well_detail_svg_positioning}>
             <div className={styles.well_detail_svg_container}>
-              <TipSvg
-                volume={tipCurrentVolume}
-                maxVolume={tipMaxVolume}
-                roundedXPositionPixels={roundedXPositionPixels}
-                bottomPx={bottomPx}
-                color={tipColor}
-                setIsHovered={setIsTipHovered}
-                isHovered={isTipHovered}
-              />
-              {isTipHovered ? (
-                <div className={styles.tip_details_volume}>
-                  <Tag
-                    text={t('well_volume', {
-                      volume: tipCurrentVolume.toString(),
-                    })}
-                    type="flex"
-                  />
-                </div>
-              ) : null}
-              {isWellHovered ? (
-                <div className={styles.well_details_volume}>
-                  <Tag
-                    text={t('well_volume', {
-                      volume: totalVolumeInWell.toString(),
-                    })}
-                    type="flex"
-                  />
-                </div>
-              ) : null}
-              <div className={styles.svg_container}>
-                <WellSvg
-                  volume={totalVolumeInWell}
-                  maxVolume={labwareWellMaxVolume}
-                  color={wellColor}
-                  setIsHovered={setIsWellHovered}
-                  isHovered={isWellHovered}
+              <div className={styles.well_detail_svg_inner}>
+                <TipSvg
+                  volume={tipCurrentVolume}
+                  maxVolume={tipMaxVolume}
+                  roundedXPositionPixels={roundedXPositionPixels}
+                  bottomPx={bottomPx}
+                  color={tipColor}
+                  setIsHovered={setIsTipHovered}
+                  isHovered={isTipHovered}
                 />
+                {isTipHovered ? (
+                  <div className={styles.tip_details_volume}>
+                    <Tag
+                      text={t('well_volume', {
+                        volume: tipCurrentVolume.toString(),
+                      })}
+                      type="flex"
+                    />
+                  </div>
+                ) : null}
+                {isWellHovered ? (
+                  <div className={styles.well_details_volume}>
+                    <Tag
+                      text={t('well_volume', {
+                        volume: totalVolumeInWell.toString(),
+                      })}
+                      type="flex"
+                    />
+                  </div>
+                ) : null}
+                <div className={styles.svg_container}>
+                  <WellSvg
+                    volume={totalVolumeInWell}
+                    maxVolume={labwareWellMaxVolume}
+                    color={wellColor}
+                    setIsHovered={setIsWellHovered}
+                    isHovered={isWellHovered}
+                  />
+                </div>
               </div>
               {labwareDepth !== null && (
                 <div className={styles.well_details_caption_side}>

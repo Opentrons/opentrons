@@ -106,7 +106,7 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
     }
     case STEP_DETAIL_VIEWER_UPDATE:
       updateStepDetailViewerData(action.payload.protocolKey, {
-        slot: action.payload.slot,
+        slot: action.payload.slot ?? undefined,
         command: action.payload.command,
         robotState: action.payload.robotState,
         analysis: action.payload.analysis,
