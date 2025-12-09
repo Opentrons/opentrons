@@ -187,6 +187,10 @@
         "title": "Cannot retrieve labware from empty stacker",
         "body": "Refill the stacker."
       },
+      "HOPPER_FULL": {
+        "title": "Stacker capacity reached",
+        "body": "Edit labware quantities to store or refill more labware into the stacker."
+      },
       "SHUTTLE_EMPTY": {
         "title": "Cannot store labware when shuttle is empty",
         "body": "There is no labware on the shuttle to store into the stacker."

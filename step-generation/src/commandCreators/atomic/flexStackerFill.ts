@@ -1,6 +1,11 @@
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
-import { formatPyStr, spaceInHopper, uuid } from '../../utils'
+import {
+  formatPyStr,
+  labwareMatchesLabwareInHopper,
+  spaceInHopper,
+  uuid,
+} from '../../utils'
 
 import type { FlexStackerFillCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
@@ -12,16 +17,31 @@ export const flexStackerFill: CommandCreator<
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const isSpace = spaceInHopper(flexStackerState)
-
   const pythonArgs = [
     ...(count != null ? [`count=${count}`] : []),
     ...(message != null ? [`message=${formatPyStr(message)}`] : []),
   ]
-  // TODO: add mismatched labware error ?
 
   if (!isSpace) {
     return {
       errors: [errorCreators.flexStackerHopperFull()],
+    }
+  }
+  if (labwareToStore) {
+    for (const labware of labwareToStore) {
+      if (
+        labwareMatchesLabwareInHopper(
+          labware.primaryLabwareId,
+          invariantContext,
+          flexStackerState
+        )
+      ) {
+        continue
+      } else {
+        return {
+          errors: [errorCreators.flexStackerLabwareTypeMismatch()],
+        }
+      }
     }
   }
   return {
