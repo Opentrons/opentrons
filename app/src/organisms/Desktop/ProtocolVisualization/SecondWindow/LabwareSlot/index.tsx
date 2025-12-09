@@ -1,5 +1,3 @@
-import { useTranslation } from 'react-i18next'
-
 import {
   COLORS,
   LabwareRender,
@@ -7,7 +5,6 @@ import {
   RobotInfoLabel,
   RobotWorkSpace,
   StyledText,
-  Tag,
 } from '@opentrons/components'
 import { getLabwareViewBox } from '@opentrons/shared-data'
 import {
@@ -39,9 +36,7 @@ interface LabwareSlotContainerProps {
   pipetteEntities: PipetteEntities
   moduleEntities: ModuleEntities
 }
-export function LabwareSlot(
-  props: LabwareSlotContainerProps
-): JSX.Element {
+export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   const {
     commands,
     liquids,
@@ -52,7 +47,6 @@ export function LabwareSlot(
     pipetteEntities,
     moduleEntities,
   } = props
-  const { t } = useTranslation('protocol_visualization')
   const { labware, pipettes, liquidState } = robotState
   const labwareLoadCommand = Object.values(commands).find(
     command =>
@@ -139,7 +133,7 @@ export function LabwareSlot(
       ) : null}
       <div className={styles.container}>
         <div className={styles.header}>
-            {/* header icon part */}
+          {/* header icon part */}
           <div>
             {labware[topLabwareOnSlotId]?.stack
               .filter(item => item !== topLabwareOnSlotId)
@@ -161,20 +155,20 @@ export function LabwareSlot(
                 }
               })}
           </div>
-           {/* header icon part */}
+          {/* header icon part */}
 
           {/* header text part */}
           <div className={styles.header_text}>
             {labwareNickname != null ? (
-            <StyledText desktopStyle="captionSemiBold">
+              <StyledText desktopStyle="captionSemiBold">
                 {labwareNickname}
-            </StyledText>
+              </StyledText>
             ) : null}
             <StyledText desktopStyle="bodyDefaultRegular">
-                {labwareDisplayName}
+              {labwareDisplayName}
             </StyledText>
           </div>
-           {/* header text part */}
+          {/* header text part */}
         </div>
         <div className={styles.body_container}>
           <WellTooltip ingredNames={ingredNames}>

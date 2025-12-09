@@ -114,22 +114,6 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
       ) : null}
       <div className={styles.slot_container}>
         <div className={styles.slot_details}>
-          <div className={styles.command_step_header}>
-            <div className={styles.slot_detail_header}>
-              <RobotInfoLabel
-                deckLabel={slotId === 'fixedTrash' ? t('fixedTrash') : slotId}
-              />
-              {moduleOnSlot != null ? (
-                <RobotInfoLabel
-                  iconName={
-                    MODULE_ICON_NAME_BY_TYPE[
-                      moduleEntities[moduleOnSlot[0]].type
-                    ]
-                  }
-                />
-              ) : null}
-            </div>
-          </div>
           {renderLabwareContent()}
           {isTrashOnSlot ? (
             <TipDisposalContainer robotState={robotState} />
