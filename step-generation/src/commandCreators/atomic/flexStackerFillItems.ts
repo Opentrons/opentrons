@@ -1,4 +1,5 @@
 import {
+  formatPyStr,
   getChunkForIndentingLists,
   INDENT,
   indentPyLines,
@@ -11,7 +12,7 @@ import type { CommandCreator } from '../../types'
 export const flexStackerFillItems: CommandCreator<
   FlexStackerFillItemsCreateCommand['params']
 > = (args, invariantContext) => {
-  const { moduleId, labware } = args
+  const { moduleId, labware, message } = args
   const modulePythonName = invariantContext.moduleEntities[moduleId].pythonName
   const labwarePythonNames = labware.map(
     lw => invariantContext.labwareEntities[lw].pythonName
@@ -28,8 +29,12 @@ export const flexStackerFillItems: CommandCreator<
       : `\n${indentedLabwarePythonNames}\n`
 
   // TODO: add error creators
-  const pythonArgs =
-    labware.length > 0 ? `labware=[${pythonLabwareNames}],\n` : ''
+
+  const pythonArgs = [
+    ...(labware.length > 0 ? `labware=[${pythonLabwareNames}],\n` : []),
+    ...(message != null ? [`message=${formatPyStr(message)},\n`] : []),
+  ].join('')
+
   return {
     commands: [
       {
@@ -38,6 +43,7 @@ export const flexStackerFillItems: CommandCreator<
         params: {
           moduleId,
           labware,
+          message,
         },
       },
     ],

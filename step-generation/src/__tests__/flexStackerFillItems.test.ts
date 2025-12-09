@@ -91,11 +91,12 @@ mock_flex_stacker_1.fill_items(
 )`.trimStart(),
     })
   })
-  it('creates flex stacker fill command with 5 labware', () => {
+  it('creates flex stacker fill command with 5 labware and a message', () => {
     const result = flexStackerFillItems(
       {
         moduleId,
         labware: [labwareId, labwareId2, labwareId3, labwareId4, labwareId5],
+        message: 'a fill message',
       },
       invariantContext,
       robotState
@@ -114,6 +115,7 @@ mock_flex_stacker_1.fill_items(
               labwareId4,
               labwareId5,
             ],
+            message: 'a fill message',
           },
         },
       ],
@@ -123,6 +125,7 @@ mock_flex_stacker_1.fill_items(
         mock_labware_1, mock_labware_2, mock_labware_3, mock_labware_4,
         mock_labware_5
     ],
+    message="a fill message",
 )`.trimStart(),
     })
   })

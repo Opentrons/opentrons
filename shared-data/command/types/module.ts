@@ -502,16 +502,19 @@ export interface FlexStackerSetStoredLabwareItemsCreateCommand
   params: FlexStackerSetStoredLabwareItemsParams
 }
 
+interface FlexStackerSetStoredLabwareResults {
+  primaryLabwareDefinition: LabwareDefinition
+  lidLabwareDefinition?: LabwareDefinition | null
+  adapterLabwareDefinition?: LabwareDefinition | null
+  count: number
+  storedLabware: FlexStackerStoredLabwareGroup[]
+}
+
 export interface FlexStackerSetStoredLabwareItemsRunTimeCommand
   extends FlexStackerSetStoredLabwareItemsCreateCommand,
     CommonCommandRunTimeInfo {
-  result?: {
-    primaryLabwareDefinition: LabwareDefinition
-    lidLabwareDefinition?: LabwareDefinition | null
-    adapterLabwareDefinition?: LabwareDefinition | null
-    count: number
-    storedLabware: FlexStackerStoredLabwareGroup[]
-  } & StackerStoredLabwareLocationSequences
+  result?: FlexStackerSetStoredLabwareResults &
+    StackerStoredLabwareLocationSequences
 }
 
 export interface FlexStackerRetrieveCreateCommand
@@ -546,6 +549,7 @@ export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
 export interface FlexStackerFillItemsParams {
   moduleId: string
   labware: string[]
+  message?: string
 }
 
 export interface FlexStackerFillItemsCreateCommand
