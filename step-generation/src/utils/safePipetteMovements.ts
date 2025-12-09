@@ -346,14 +346,8 @@ export const getIsSafePipetteMovement = (args: {
   }
 
   const tiprackId = tipState.pipettes[pipetteId]?.tiprackURI
-  const tiprackEntityId =
-    tiprackId != null
-      ? Object.keys(labwareEntities).find(lwKey => lwKey.includes(tiprackId))
-      : null
   const tiprackTipLength =
-    tiprackEntityId != null
-      ? labwareEntities[tiprackEntityId].def.parameters.tipLength
-      : 0
+    tiprackId != null ? labwareEntities[tiprackId].def.parameters.tipLength : 0
   const stagingAreaSlots = Object.values(stagingAreaEntities).map(
     stagingArea => stagingArea.location as string
   )
@@ -389,8 +383,7 @@ export const getIsSafePipetteMovement = (args: {
   if (!isWithinPipetteExtents) {
     return false
   }
-  const tiprackEntity =
-    tiprackEntityId != null ? labwareEntities[tiprackEntityId] : null
+  const tiprackEntity = tiprackId != null ? labwareEntities[tiprackId] : null
   const tipOverlapOnNozzle =
     tiprackEntity != null
       ? getTipOverlap({
