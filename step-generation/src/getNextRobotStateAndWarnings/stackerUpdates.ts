@@ -7,7 +7,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { getLargestStackInSlot, uuid } from '../utils'
+import { uuid } from '../utils'
 
 import type {
   FlexStackerEmptyParams,

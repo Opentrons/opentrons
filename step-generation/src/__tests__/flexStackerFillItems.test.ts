@@ -4,12 +4,12 @@ import {
   fixture96Plate,
   FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
 
 import { flexStackerFillItems } from '../commandCreators/atomic/flexStackerFillItems'
 import { getInitialRobotStateStandard, makeContext } from '../fixtures'
 
+import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../types'
 
 const moduleId = 'flexStackerId'
