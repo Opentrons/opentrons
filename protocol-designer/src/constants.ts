@@ -163,3 +163,6 @@ export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
 export const MINIMUM_LIQUID_CLASS_VOLUME = 1
 
 export const ACCEPTED_PROTOCOL_FILE_TYPES = '.json,.py'
+
+export const HOPPER_LABWARE_X_OFFSET = 178
+export const HOPPER_ZOOM_OFFSET_POSTITION = 230

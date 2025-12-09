@@ -63,7 +63,7 @@ const TOP_SLOT_Y_POSITION_2_BUTTONS = 35
 const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 interface SlotOverflowMenuProps {
-  //   can be off-deck id or deck slot
+  //   can be off-deck id or deck slot or flexStackerAddressableArea
   location: DeckSlotId | string
   setShowMenuList: (value: SetStateAction<boolean>) => void
   addEquipment: (slotId: string) => void
