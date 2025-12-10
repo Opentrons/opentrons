@@ -24,7 +24,7 @@ dependencies = [
     "pydantic-settings>=2,<3",
     "opentrons_shared_data==0.0.0",
     "typing-extensions>=4.0.0,<5",
-    "numpy==1.22.3",
+    "numpy==1.24.6",
     "python-can==4.2.2",
 ]
 

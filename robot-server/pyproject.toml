@@ -54,7 +54,7 @@ dev = [
     "idna==3.3",
     "mock~=5.0.1",
     "mypy==1.11.0",
-    "numpy==1.22.3",
+    "numpy==1.24.6",
     "pyusb==1.2.1",
     "pytest>=7,<8",
     "pytest-asyncio>=0.23.0,<2",
