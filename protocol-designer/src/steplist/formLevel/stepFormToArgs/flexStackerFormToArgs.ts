@@ -25,6 +25,7 @@ export const flexStackerFormToArgs = (
         commandCreatorFnName: 'flexStackerFillItems',
         fillLabwareUri: fillLabwareUri,
         fillQuantity: fillQuantity,
+        interventionMessage: interventionMessage,
       }
     case 'retrieve':
       return {

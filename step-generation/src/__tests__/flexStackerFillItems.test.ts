@@ -8,6 +8,7 @@ import {
 } from '@opentrons/shared-data'
 
 import { flexStackerFillItems } from '../commandCreators/atomic/flexStackerFillItems'
+import { HOPPER_STACKER_LOCATION } from '../constants'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
@@ -74,6 +75,53 @@ describe('flexStackerFillItems', () => {
         pythonName: 'mock_labware_5',
       },
     }
+    robotState.modules = {
+      [moduleId]: {
+        slot: 'D4',
+        moduleState: {} as any,
+      },
+    }
+    robotState.labware = {
+      [labwareId]: {
+        stack: [labwareId, HOPPER_STACKER_LOCATION, moduleId, 'D4'],
+      },
+      [labwareId2]: {
+        stack: [labwareId2, labwareId, HOPPER_STACKER_LOCATION, moduleId, 'D4'],
+      },
+      [labwareId3]: {
+        stack: [
+          labwareId3,
+          labwareId2,
+          labwareId,
+          HOPPER_STACKER_LOCATION,
+          moduleId,
+          'D4',
+        ],
+      },
+      [labwareId4]: {
+        stack: [
+          labwareId4,
+          labwareId3,
+          labwareId2,
+          labwareId,
+          HOPPER_STACKER_LOCATION,
+          moduleId,
+          'D4',
+        ],
+      },
+      [labwareId5]: {
+        stack: [
+          labwareId5,
+          labwareId4,
+          labwareId3,
+          labwareId2,
+          labwareId,
+          HOPPER_STACKER_LOCATION,
+          moduleId,
+          'D4',
+        ],
+      },
+    }
     vi.mocked(flexStackerStateGetter).mockReturnValue({
       labwareOnShuttle: {
         primaryLabwareId: 'mockLabwareId',
@@ -103,10 +151,26 @@ describe('flexStackerFillItems', () => {
     } as FlexStackerModuleState)
   })
   it('creates flex stacker fill command with 1 labware', () => {
+    invariantContext.labwareEntities = {
+      [labwareId]: {
+        id: labwareId,
+        def: fixture96Plate as LabwareDefinition2,
+        labwareDefURI: 'mockURI',
+        pythonName: 'mock_labware_1',
+      },
+    }
+    robotState.labware = {
+      [labwareId]: {
+        stack: [labwareId, HOPPER_STACKER_LOCATION, moduleId, 'D4'],
+      },
+    }
     const result = flexStackerFillItems(
       {
         moduleId,
-        labware: [labwareId],
+        commandCreatorFnName: 'flexStackerFillItems',
+        interventionMessage: null,
+        fillLabwareUri: 'mock uri',
+        fillQuantity: 1,
       },
       invariantContext,
       robotState
@@ -132,8 +196,10 @@ mock_flex_stacker_1.fill_items(
     const result = flexStackerFillItems(
       {
         moduleId,
-        labware: [labwareId, labwareId2, labwareId3, labwareId4, labwareId5],
-        message: 'a fill message',
+        commandCreatorFnName: 'flexStackerFillItems',
+        interventionMessage: 'a fill message',
+        fillLabwareUri: 'mock uri',
+        fillQuantity: 5,
       },
       invariantContext,
       robotState
@@ -193,14 +259,21 @@ mock_flex_stacker_1.fill_items(
         },
       },
       labware: {
-        labware1: { stack: ['labware1', 'D1'] },
-        labware2: { stack: ['labware2', 'D2'] },
+        labware1: {
+          stack: ['labware1', HOPPER_STACKER_LOCATION, moduleId, 'D3'],
+        },
+        labware2: {
+          stack: ['labware2', HOPPER_STACKER_LOCATION, moduleId, 'D3'],
+        },
       },
     }
     const result = flexStackerFillItems(
       {
         moduleId,
-        labware: ['labware1', 'labware2'],
+        interventionMessage: null,
+        commandCreatorFnName: 'flexStackerFillItems',
+        fillLabwareUri: 'mock uri',
+        fillQuantity: 1,
       },
       mismatchInvariantContext,
       mismatchRobotState
@@ -238,7 +311,13 @@ mock_flex_stacker_1.fill_items(
       type: FLEX_STACKER_MODULE_TYPE,
     } as FlexStackerModuleState)
     const result = flexStackerFillItems(
-      { moduleId, labware: [] },
+      {
+        moduleId,
+        interventionMessage: null,
+        commandCreatorFnName: 'flexStackerFillItems',
+        fillLabwareUri: 'mock uri',
+        fillQuantity: 1,
+      },
       invariantContext,
       robotState
     )

@@ -106,12 +106,12 @@ export const commandCreatorFromStepArgs = (
     case 'flexStackerEmpty':
       return StepGeneration.curryCommandCreator(
         StepGeneration.flexStackerEmpty,
-        { ...args, strategy: 'logical' }
+        { ...args, strategy: 'manualWithPause' }
       )
     case 'flexStackerFillItems':
       return StepGeneration.curryCommandCreator(
-        StepGeneration.flexStackerFill,
-        { ...args, strategy: 'manualWithPause' }
+        StepGeneration.flexStackerFillItems,
+        args
       )
     case 'flexStackerRetrieve':
       return StepGeneration.curryCommandCreator(

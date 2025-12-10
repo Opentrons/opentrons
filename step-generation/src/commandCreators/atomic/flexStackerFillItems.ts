@@ -1,8 +1,10 @@
+import { HOPPER_STACKER_LOCATION } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
   formatPyStr,
   getChunkForIndentingLists,
+  getSlotInLocationStack,
   INDENT,
   indentPyLines,
   labwareMatchesLabwareInHopper,
@@ -10,18 +12,30 @@ import {
   uuid,
 } from '../../utils'
 
-import type { FlexStackerFillItemsCreateCommand } from '@opentrons/shared-data'
-import type { CommandCreator } from '../../types'
+import type { CommandCreator, FlexStackerFillItemsArgs } from '../../types'
 
-export const flexStackerFillItems: CommandCreator<
-  FlexStackerFillItemsCreateCommand['params']
-> = (args, invariantContext, robotState) => {
-  const { moduleId, labware, message } = args
+export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
+  args,
+  invariantContext,
+  robotState
+) => {
+  // NOTE: fillLabwareUri, fillQuantity will be wired up when we emit setStoredLabware
+  // midway through the protocol
+  const { moduleId, interventionMessage } = args
+  const { labwareEntities, moduleEntities } = invariantContext
+  const moduleSlot = robotState.modules[moduleId].slot
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
+  const labwareOnHopper = Object.entries(robotState.labware)
+    .filter(
+      ([id, { stack }]) =>
+        stack.includes(HOPPER_STACKER_LOCATION) &&
+        getSlotInLocationStack(stack) === moduleSlot
+    )
+    .map(labwareState => labwareState[0])
   const isSpace = spaceInHopper(flexStackerState)
-  const modulePythonName = invariantContext.moduleEntities[moduleId].pythonName
-  const labwarePythonNames = labware.map(
-    lw => invariantContext.labwareEntities[lw].pythonName
+  const modulePythonName = moduleEntities[moduleId].pythonName
+  const labwarePythonNames = labwareOnHopper.map(
+    lwId => labwareEntities[lwId].pythonName
   )
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
 
@@ -29,7 +43,7 @@ export const flexStackerFillItems: CommandCreator<
     .map(chunk => INDENT + chunk.join(', '))
     .join(',\n')
 
-  const pythonLabwareNames =
+  const formattedPythonLabwareNames =
     labwarePythonNames.length < 4
       ? labwarePythonNames.join(', ')
       : `\n${indentedLabwarePythonNames}\n`
@@ -38,9 +52,9 @@ export const flexStackerFillItems: CommandCreator<
     return {
       errors: [errorCreators.flexStackerHopperFull()],
     }
-  } else if (labware.length > 0) {
-    const allMatch = labware.every(lw =>
-      labwareMatchesLabwareInHopper(lw, invariantContext, flexStackerState)
+  } else if (labwareOnHopper.length > 0) {
+    const allMatch = labwareOnHopper.every(labware =>
+      labwareMatchesLabwareInHopper(labware, invariantContext, flexStackerState)
     )
     if (!allMatch) {
       return {
@@ -50,8 +64,12 @@ export const flexStackerFillItems: CommandCreator<
   }
 
   const pythonArgs = [
-    ...(labware.length > 0 ? `labware=[${pythonLabwareNames}],\n` : []),
-    ...(message != null ? [`message=${formatPyStr(message)},\n`] : []),
+    ...(labwareOnHopper.length > 0
+      ? `labware=[${formattedPythonLabwareNames}],\n`
+      : []),
+    ...(interventionMessage != null
+      ? [`message=${formatPyStr(interventionMessage)},\n`]
+      : []),
   ].join('')
 
   return {
@@ -61,8 +79,8 @@ export const flexStackerFillItems: CommandCreator<
         key: uuid(),
         params: {
           moduleId,
-          labware,
-          message,
+          labware: labwareOnHopper,
+          message: interventionMessage ?? undefined,
         },
       },
     ],
