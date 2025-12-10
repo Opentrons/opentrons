@@ -57,7 +57,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Lint
         run: make -C shared-data lint-py
 
@@ -70,7 +70,6 @@ jobs:
         os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
         python: ['3.12']
 
-        python: ['3.10']
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v4'
@@ -170,7 +169,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'shared-data'
-          python-version: '3.10'
+          python-version: '3.12'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:

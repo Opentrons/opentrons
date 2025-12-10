@@ -61,7 +61,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
@@ -144,7 +144,7 @@ jobs:
         uses: './.github/actions/python/setup-uv'
         with:
           project: 'package-testing'
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Run the tests
         if: ${{ matrix.os != 'windows-2022' }}
         shell: bash
@@ -200,7 +200,7 @@ jobs:
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
-          python-version: '3.10'
+          python-version: '3.12'
       - name: 'build api distributables'
         shell: bash
         run: make -C api sdist wheel

@@ -7,7 +7,7 @@ inputs:
   python-version:
     description: 'Python version to install via setup-uv'
     required: false
-    default: '3.10'
+    default: '3.12'
   install-system-deps:
     description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
     required: false
