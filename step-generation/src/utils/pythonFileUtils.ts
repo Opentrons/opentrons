@@ -297,11 +297,11 @@ export function getLoadLabware(
       // 2nd item in stack is the slot the labware is on
       const labwareSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[labwareSlot] != null
-      const onAdapter = allLabwareEntities[labwareSlot] != null
+      const onLabware = allLabwareEntities[labwareSlot] != null
 
       let parentName: string
       let locationArg: string | undefined
-      if (onAdapter && !isLabwareOnHopper) {
+      if (onLabware && !isLabwareOnHopper) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
         parentName = moduleEntities[labwareSlot].pythonName
