@@ -1390,3 +1390,12 @@ export const labwareMatchesLabwareInHopper = (
   const labwareToBeStored = def.parameters.loadName
   return loadedLabware === labwareToBeStored
 }
+
+export const spaceInHopper = (
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const maximumAllowedLabware = stackerState?.maxPoolCount ?? 0
+  const labwareStored = stackerState?.labwareInHopper
+  const numberOfLabwareStored = labwareStored?.length ?? 0
+  return maximumAllowedLabware > numberOfLabwareStored
+}
