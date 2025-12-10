@@ -325,6 +325,7 @@ export const useLabwareDropdownOptions = (
       const isOnShuttle = stackerModuleIds.some(stackerModule =>
         fullStackFromLabwares.includes(stackerModule.slot)
       )
+      console.log('isOnShuttle', isOnShuttle)
       const isLabwareLidCombo =
         (fullStackFromLabwares[1] === labwareId &&
           labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
