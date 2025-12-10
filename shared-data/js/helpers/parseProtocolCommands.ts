@@ -367,26 +367,60 @@ export function parseLiquidsInLoadOrder(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
   )
-  const loadedLiquids = liquids.map((liquid, index) => {
-    return {
-      ...liquid,
-      displayColor:
-        liquid.displayColor ??
-        DEFAULT_LIQUID_COLORS[index % DEFAULT_LIQUID_COLORS.length],
+
+  // Assign default colors to liquids
+  const loadedLiquids = liquids.map((liquid, index) => ({
+    ...liquid,
+    displayColor:
+      liquid.displayColor ??
+      DEFAULT_LIQUID_COLORS[index % DEFAULT_LIQUID_COLORS.length],
+  }))
+
+  // Map: labwareId -> well -> set of liquid IDs loaded there
+  const wellToLiquids: Record<string, Record<string, Set<string>>> = {}
+
+  loadLiquidCommands.forEach(cmd => {
+    const labwareId = cmd.params.labwareId
+    if (!wellToLiquids[labwareId]) wellToLiquids[labwareId] = {}
+
+    for (const well of Object.keys(cmd.params.volumeByWell)) {
+      if (!wellToLiquids[labwareId][well])
+        wellToLiquids[labwareId][well] = new Set()
+      wellToLiquids[labwareId][well].add(cmd.params.liquidId)
     }
   })
 
-  return reduce<LoadLiquidRunTimeCommand, ParsedLiquid[]>(
-    loadLiquidCommands,
-    (acc, command) => {
-      const liquid = loadedLiquids.find(
-        liquid => liquid.id === command.params.liquidId
-      )
-      if (liquid != null && !acc.some(item => item === liquid)) acc.push(liquid)
-      return acc
-    },
-    []
-  )
+  const acc: ParsedLiquid[] = []
+
+  // Add normal liquids first
+  loadedLiquids.forEach(liquid => {
+    if (!acc.some(l => l.id === liquid.id)) acc.push(liquid)
+  })
+
+  // Detect wells with >1 liquid and add mixedLiquid
+  const mixedLiquids: ParsedLiquid[] = []
+
+  Object.entries(wellToLiquids).forEach(([labwareId, wellMap]) => {
+    Object.entries(wellMap).forEach(([well, liquidIds]) => {
+      if (liquidIds.size > 1) {
+        const liquidNames = Array.from(liquidIds)
+          .map(id => loadedLiquids.find(l => l.id === id)?.displayName || id)
+          .join(', ')
+
+        // Check if mixedLiquid for this labware/well combination already exists
+        if (!mixedLiquids.some(l => l.id === `mixed-${labwareId}-${well}`)) {
+          mixedLiquids.push({
+            id: `mixed-${labwareId}-${well}`,
+            displayColor: '#737578',
+            displayName: `${liquidIds.size} liquids`,
+            description: liquidNames,
+          })
+        }
+      }
+    })
+  })
+
+  return [...acc, ...mixedLiquids]
 }
 
 interface LabwareLiquidInfo {
