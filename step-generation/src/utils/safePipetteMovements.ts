@@ -12,6 +12,7 @@ import {
   OT2_ROBOT_TYPE,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
 import { EMPTY, OT2_TC_SLOTS } from '../constants'
@@ -355,7 +356,7 @@ export const getIsSafePipetteMovement = (args: {
     )
   const thermocyclerOffset = isOnFlexThermocycler
     ? (deckDefinition.locations.addressableAreas.find(
-        addressableArea => addressableArea.id === 'thermocyclerModuleV2'
+        addressableArea => addressableArea.id === THERMOCYCLER_MODULE_V2
       )?.offsetFromCutoutFixture ?? [0, 0, 0])
     : [0, 0, 0]
   const fullOffset = [

@@ -469,6 +469,7 @@ export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
   )
 }
 
+// hard-coding in V1 robot definitions following pattern with deck definitions
 export const getRobotDefFromRobotType = (
   robotType: RobotType
 ): RobotDefinition => {
