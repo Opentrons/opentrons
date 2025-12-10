@@ -36,6 +36,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
       <StyledText
         desktopStyle="bodyDefaultSemiBold"
         oddStyle="bodyTextSemiBold"
+        padding={`${SPACING.spacing8}`}
       >
         {optionName}
       </StyledText>
