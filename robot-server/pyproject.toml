@@ -40,7 +40,7 @@ dependencies = [
 dev = [
     "atomicwrites==1.4.0; sys_platform=='win32'",
     "colorama==0.4.4; sys_platform=='win32'",
-    "aiohttp==3.8.1",
+    "aiohttp==3.12.14",
     "black==22.3.0",
     "build~=1.2.0",
     "click==8.1.2",
@@ -54,7 +54,7 @@ dev = [
     "idna==3.3",
     "mock~=5.0.1",
     "mypy==1.11.0",
-    "numpy==1.24.6",
+    "numpy>=1.26.3,<2",
     "pyusb==1.2.1",
     "pytest>=7,<8",
     "pytest-asyncio>=0.23.0,<2",
