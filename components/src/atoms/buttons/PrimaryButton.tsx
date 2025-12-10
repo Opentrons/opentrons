@@ -18,8 +18,7 @@ export const PrimaryButton = styled(Btn)`
 
   ${styleProps}
 
-  &:hover,
-  &:focus {
+  &:hover {
     background-color: ${COLORS.blue55};
     box-shadow: none;
   }

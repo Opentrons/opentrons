@@ -6,6 +6,7 @@ import {
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
+  SPACING,
 } from '@opentrons/components'
 
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
@@ -58,6 +59,7 @@ export function SelectCustomLabware(
     <ListButton
       key={`ListButton_${CUSTOM_CATEGORY}`}
       type="noActive"
+      padding={SPACING.spacing12}
       onClick={() => {
         handleCategoryClick(CUSTOM_CATEGORY)
       }}

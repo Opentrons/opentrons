@@ -18,6 +18,7 @@ This release adds support for manual tip selection and camera steps in Protocol 
 
 - Choose between automatic and manual tip tracking for transfer and mix steps in your protocols. In manual tip tracking, Protocol Designer lets you select the tip rack and individual tips the pipette will pick up to transfer or mix liquid.
 - Manual tip tracking in Protocol Designer enables reusing tips more than once in a protocol.
+- Pick up individual tips with Flex 96-channel and Flex or OT-2 8-channel pipettes.
 - Add a camera step in any Protocol Designer protocol. The Flex or OT-2's built-in camera can take a still image of your robot deck at any point during the protocol. Access your images in the Recent Protocol Runs section of the Opentrons App's robot details page.
 
 ### Improved Features
@@ -56,7 +57,7 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 ### New Features
 
-- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 μL). This release also adds liquid class transfer support for the pipette.
+- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 µL). This release also adds liquid class transfer support for the pipette.
 - Use Opentrons Tough Auto-Sealing Lids on compatible labware in the Thermocycler Module.
 - Add new lids to Protocol Designer protocols, including the Opentrons Tough Universal Lid and Opentrons Tough Auto-Sealing Lid. Tip rack lids are also available for Flex tip racks.
 - Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Heater-Shaker Adapter Type B.

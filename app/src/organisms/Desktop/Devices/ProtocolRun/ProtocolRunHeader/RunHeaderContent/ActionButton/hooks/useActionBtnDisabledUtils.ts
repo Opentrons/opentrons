@@ -3,6 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
 
 import {
+  isCancellableStatus,
+  isDisabledStatus,
+  isStartRunStatus,
+} from '/app/local-resources/runs/utils'
+import {
   useCurrentRunId,
   useModuleCalibrationStatus,
   useRunCalibrationStatus,
@@ -10,11 +15,6 @@ import {
 } from '/app/resources/runs'
 
 import { useIsDoorOpen } from '../../../hooks'
-import {
-  isCancellableStatus,
-  isDisabledStatus,
-  isStartRunStatus,
-} from '../../../utils'
 import { useIsFixtureMismatch } from './useIsFixtureMismatch'
 
 import type { BaseActionButtonProps } from '..'
@@ -61,9 +61,11 @@ export function useActionBtnDisabledUtils(
   const isFixtureMismatch = useIsFixtureMismatch(runId, robotName)
   const isResetRunLoading = isResetRunLoadingRef.current
   const isCurrentRun = useCurrentRunId() === runId
-  const isCalibrationComplete = !useRunCalibrationStatus(robotName, runId)
-    .complete
-  const isModuleCalibrationComplete = !useModuleCalibrationStatus(
+  const isCalibrationComplete = useRunCalibrationStatus(
+    robotName,
+    runId
+  ).complete
+  const isModuleCalibrationComplete = useModuleCalibrationStatus(
     robotName,
     runId
   ).complete

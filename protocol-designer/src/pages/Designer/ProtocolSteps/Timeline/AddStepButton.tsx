@@ -27,6 +27,7 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getIsLid,
   getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
@@ -133,6 +134,7 @@ export function AddStepButton({
     'magnet',
     'temperature',
     'thermocycler',
+    'flexStacker',
   ]
   const isStepTypeEnabled: Record<
     Exclude<StepType, 'manualIntervention'>,
@@ -149,6 +151,7 @@ export function AddStepButton({
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
     absorbanceReader: getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE),
+    flexStacker: getIsModuleOnDeck(modules, FLEX_STACKER_MODULE_TYPE),
   }
 
   const addStep = (stepType: StepType): ReturnType<any> =>
