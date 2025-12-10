@@ -17,15 +17,15 @@ export const flexStackerFormToArgs = (
       return {
         moduleId: moduleId!,
         commandCreatorFnName: 'flexStackerEmpty',
-        interventionMessage: interventionMessage,
+        interventionMessage,
       }
     case 'fill':
       return {
         moduleId: moduleId!,
         commandCreatorFnName: 'flexStackerFillItems',
-        fillLabwareUri: fillLabwareUri,
-        fillQuantity: fillQuantity,
-        interventionMessage: interventionMessage,
+        fillLabwareUri,
+        fillQuantity,
+        interventionMessage,
       }
     case 'retrieve':
       return {

@@ -4,11 +4,11 @@ import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
   formatPyStr,
   getChunkForIndentingLists,
+  getIsSpaceInHopper,
   getSlotInLocationStack,
   INDENT,
   indentPyLines,
   labwareMatchesLabwareInHopper,
-  spaceInHopper,
   uuid,
 } from '../../utils'
 
@@ -32,7 +32,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
         getSlotInLocationStack(stack) === moduleSlot
     )
     .map(labwareState => labwareState[0])
-  const isSpace = spaceInHopper(flexStackerState)
+  const isSpace = getIsSpaceInHopper(flexStackerState)
   const modulePythonName = moduleEntities[moduleId].pythonName
   const labwarePythonNames = labwareOnHopper.map(
     lwId => labwareEntities[lwId].pythonName
