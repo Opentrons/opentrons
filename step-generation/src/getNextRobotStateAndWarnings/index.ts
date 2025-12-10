@@ -46,6 +46,7 @@ import {
   forThermocyclerDeactivateBlock,
   forThermocyclerDeactivateLid,
   forThermocyclerOpenLid,
+  forThermocyclerRunExtendedProfile,
   forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
@@ -315,6 +316,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'thermocycler/runProfile':
       forThermocyclerRunProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'thermocycler/runExtendedProfile':
+      forThermocyclerRunExtendedProfile(
         command.params,
         invariantContext,
         robotStateAndWarnings
