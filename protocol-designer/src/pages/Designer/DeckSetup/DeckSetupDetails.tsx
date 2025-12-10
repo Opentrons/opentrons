@@ -13,7 +13,13 @@ import {
   isAddressableAreaStandardSlot,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  getIsSlotAHopper,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
+
+import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -53,6 +59,7 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 import type {
+  HopperLocationMapKey,
   ModuleTemporalProperties,
   ThermocyclerModuleState,
 } from '@opentrons/step-generation'
@@ -86,6 +93,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     showGen1MultichannelCollisionWarnings,
     stagingAreaCutoutIds,
   } = props
+  const { labware: activeLabware } = activeDeckSetup
   const robotType = useSelector(getRobotType)
   const slotIdsBlockedBySpanning = getSlotIdsBlockedBySpanningForThermocycler(
     activeDeckSetup,
@@ -118,7 +126,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     draggedLabware,
   })
   const swapBlockedAdapter = getSwapBlockedAdapter({
-    labwareById: activeDeckSetup.labware,
+    labwareById: activeLabware,
     hoveredLabware,
     draggedLabware,
   })
@@ -134,6 +142,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     createdModuleForSlot,
     preSelectedFixture,
     slotPosition,
+    isSlotAHopper,
   } = useMemo(() => {
     return getSlotInformation({
       deckSetup: activeDeckSetup,
@@ -142,8 +151,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     })
   }, [activeDeckSetup, selectedZoomInSlot])
 
-  const createdTopLabwareForSlot =
-    activeDeckSetup.labware[createdStackForSlot[0]]
+  const createdTopLabwareForSlot = activeLabware[createdStackForSlot[0]]
   const amount = createdStackForSlot?.length ?? 1
   //  initiate the slot's info
   useEffect(() => {
@@ -171,11 +179,22 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     selectedZoomInSlot,
   ])
 
-  const allLabware = Object.values(activeDeckSetup.labware)
+  const allLabware = Object.values(activeLabware)
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
-  const menuListSlotPosition = getPositionFromSlotId(menuListId ?? '', deckDef)
-
+  const isMenuListIdForHopper =
+    menuListId != null && getIsSlotAHopper(menuListId)
+  const adjustedMenuListId = isMenuListIdForHopper
+    ? FAKE_HOPPER_LOCATION_MAP[menuListId as HopperLocationMapKey]
+    : menuListId
+  const menuListSlotPosition =
+    adjustedMenuListId != null
+      ? getPositionFromSlotId(
+          adjustedMenuListId as string,
+          deckDef,
+          ...(isMenuListIdForHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
+        )
+      : null
   const multichannelWarningSlotIds: AddressableAreaName[] =
     showGen1MultichannelCollisionWarnings
       ? getSlotsWithCollisions(deckDef, allModules)
@@ -186,7 +205,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       ? getAdjacentLabware(
           preSelectedFixture,
           selectedSlot.cutout,
-          activeDeckSetup.labware
+          activeLabware
         )
       : null
 
@@ -245,10 +264,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           }
         }
 
-        const { topMostId, rightBelowTopId } = getLabwaresOnModuleFromStack(
-          moduleOnDeck.id,
-          allLabware
-        )
+        const { topMostId, rightBelowTopId, hopperTopMostId } =
+          getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabware)
         const labwareInterfaceBoundingBox = {
           xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
           yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
@@ -273,11 +290,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               }
             : tempInnerProps
         const labwareOnModule =
-          topMostId != null ? activeDeckSetup.labware[topMostId] : null
+          topMostId != null ? activeLabware[topMostId] : null
         const labwareRightBelowTopMostLabware =
-          rightBelowTopId != null
-            ? activeDeckSetup.labware[rightBelowTopId]
-            : null
+          rightBelowTopId != null ? activeLabware[rightBelowTopId] : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
@@ -299,6 +314,34 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   : 'offsetToSlot'
               }
             >
+              {hopperTopMostId != null ? (
+                <>
+                  <LabwareOnDeck
+                    x={HOPPER_LABWARE_X_OFFSET}
+                    y={0}
+                    labwareOnDeck={activeLabware[hopperTopMostId]}
+                  />
+                  <HighlightLabware
+                    labwareOnDeck={activeLabware[hopperTopMostId]}
+                    position={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                    isZoomed={selectedZoomInSlot != null}
+                  />
+                  <LabwareControls
+                    terminalItemId={terminalItemId}
+                    itemId={`hopper${slotId}`}
+                    setHover={setHover}
+                    setShowMenuListForId={setShowMenuListForId}
+                    hover={hover}
+                    slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]} // Module Component already handles nested positioning
+                    setHoveredLabware={setHoveredLabware}
+                    setDraggedLabware={setDraggedLabware}
+                    //  TODO: disallow the ability to drag/drop labware from the hopper and shuttle
+                    swapBlocked={false}
+                    labwareOnDeck={activeLabware[hopperTopMostId]}
+                    isSelected={selectedZoomInSlot != null}
+                  />
+                </>
+              ) : null}
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
                 <>
@@ -381,6 +424,26 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   addEquipment={addEquipment}
                 />
               ) : null}
+              {hopperTopMostId == null &&
+              moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE ? (
+                <SlotControls
+                  terminalItemId={terminalItemId}
+                  itemId={`hopper${slotId}`}
+                  key={`${moduleOnDeck.slot}_flexHopper`}
+                  slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                  slotBoundingBox={labwareInterfaceBoundingBox}
+                  moduleType={moduleOnDeck.type}
+                  handleDragHover={handleHoverEmptySlot}
+                  slotId={moduleOnDeck.id}
+                  hover={hover}
+                  setHover={setHover}
+                  setShowMenuListForId={setShowMenuListForId}
+                  isSelected={selectedZoomInSlot != null}
+                  deckDef={deckDef}
+                  stagingAreaAddressableAreas={[]}
+                  addEquipment={addEquipment}
+                />
+              ) : null}
             </Module>
           </Fragment>
         ) : null
@@ -431,6 +494,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           const moduleOnSlot = Object.values(activeDeckSetup.modules).find(
             module => module.slot === addressableArea.id
           )
+
           return (
             <SlotControls
               terminalItemId={terminalItemId}
@@ -465,7 +529,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         }
         const slot = getSlotInLocationStack(labware.stack)
         const labwareAmount = labware.stack.reduce(
-          (amount, item) => amount + (activeDeckSetup.labware[item] ? 1 : 0),
+          (amount, item) => amount + (activeLabware[item] ? 1 : 0),
           0
         )
         const isTopLabware = labware.stack[0] === labware.id
@@ -649,6 +713,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         deckDef={deckDef}
         robotType={robotType}
         slotPosition={slotPosition}
+        isSlotAHopper={isSlotAHopper}
       />
 
       {/* slot overflow menu */}

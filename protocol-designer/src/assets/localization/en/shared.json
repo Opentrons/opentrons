@@ -122,6 +122,7 @@
   "slot_detail": "Slot Detail",
   "software_manual": "Software manual",
   "source_well": "Source well",
+  "stacker": "Stacker {{slot}}",
   "stagingArea": "Staging area",
   "start_point": "Edit {{prefix}} start point",
   "step_count": "Step {{current}}",

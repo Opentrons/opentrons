@@ -150,6 +150,7 @@ describe('well selection should update', () => {
       mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
       mix_touchTip_mmFromTop: null,
       mix_touchTip_checkbox: false,
+      tips_selected: [],
     })
   })
   it('select labware with multiple wells', () => {
@@ -163,6 +164,7 @@ describe('well selection should update', () => {
       mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
       mix_touchTip_mmFromTop: null,
       mix_touchTip_checkbox: false,
+      tips_selected: [],
     })
   })
 })

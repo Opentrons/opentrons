@@ -96,7 +96,7 @@ const PopulatedPreview = (props: {
       {() => (
         <LabwareRender
           definition={definition}
-          positioningMode="offsetInSlot"
+          positioningMode="passThrough"
           gRef={gRef}
         />
       )}

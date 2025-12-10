@@ -37,6 +37,7 @@ import {
 import {
   CLEAN,
   EMPTY,
+  HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
   ZERO_OFFSET,
@@ -1103,23 +1104,26 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           conditioningByVolume
         ) ?? 0)
       : 0
+
+  const isCustomTiprack = tiprackDefinition?.namespace !== 'opentrons'
   const isMultiDispenseAvailable =
-    conditioningByVolume != null &&
-    disposalByVolume != null &&
-    maxWorkingVolume >=
-      minVolumeForMultiAspirateDispense +
-        conditioningVolumeForMultiAspirateDispense +
-        (linearInterpolate(
-          minVolumeForMultiAspirateDispense,
-          disposalByVolume
-        ) ?? 0) +
-        // don't take air gap into account if conditioning volume is present
-        (conditioningVolumeForMultiAspirateDispense === 0
-          ? (linearInterpolate(
-              minVolumeForMultiAspirateDispense,
-              aspirateAirGapByVolume
-            ) ?? 0)
-          : 0)
+    isCustomTiprack ||
+    (conditioningByVolume != null &&
+      disposalByVolume != null &&
+      maxWorkingVolume >=
+        minVolumeForMultiAspirateDispense +
+          conditioningVolumeForMultiAspirateDispense +
+          (linearInterpolate(
+            minVolumeForMultiAspirateDispense,
+            disposalByVolume
+          ) ?? 0) +
+          // don't take air gap into account if conditioning volume is present
+          (conditioningVolumeForMultiAspirateDispense === 0
+            ? (linearInterpolate(
+                minVolumeForMultiAspirateDispense,
+                aspirateAirGapByVolume
+              ) ?? 0)
+            : 0))
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
@@ -1363,6 +1367,10 @@ export const getLabwareIdOnHopper = (
   const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
   const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
   return labwareIdOnModule
+}
+
+export const getIsSlotAHopper = (slot: string): boolean => {
+  return HOPPER_FAKE_LOCATIONS.includes(slot)
 }
 
 export const getLabwareIdOnShuttle = (

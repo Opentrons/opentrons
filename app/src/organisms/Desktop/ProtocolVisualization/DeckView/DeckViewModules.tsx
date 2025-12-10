@@ -1,6 +1,11 @@
 import { Fragment } from 'react'
 
-import { COLORS, Module, StyledText } from '@opentrons/components'
+import {
+  CenterLabwareInModuleChildSlot,
+  COLORS,
+  Module,
+  StyledText,
+} from '@opentrons/components'
 import {
   getModuleDef,
   getPositionFromSlotId,
@@ -107,24 +112,33 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                 }
                 targetSlotId={slot}
                 targetDeckId={deckDef.otId}
-                childrenPositioningMode="offsetToSlot"
+                childrenPositioningMode="passThrough"
                 setSelectedSlot={setSelectedSlot}
                 setHoveredSlot={setHoveredSlot}
               >
                 {labwareLoadedOnModuleId != null ? (
                   <>
-                    <LabwareOnDeck
-                      robotState={robotState}
-                      labwareDef={
+                    <CenterLabwareInModuleChildSlot
+                      deckId={deckDef.otId}
+                      slotId={slot}
+                      moduleDefinition={moduleDef}
+                      labwareDefinition={
                         labwareEntitiesExtended[labwareLoadedOnModuleId].def
                       }
-                      liquids={liquids}
-                      labwareId={labwareLoadedOnModuleId}
-                      x={0}
-                      y={0}
-                      setSelectedSlot={setSelectedSlot}
-                      setHoveredSlot={setHoveredSlot}
-                    />
+                    >
+                      <LabwareOnDeck
+                        robotState={robotState}
+                        labwareDef={
+                          labwareEntitiesExtended[labwareLoadedOnModuleId].def
+                        }
+                        liquids={liquids}
+                        labwareId={labwareLoadedOnModuleId}
+                        x={0}
+                        y={0}
+                        setSelectedSlot={setSelectedSlot}
+                        setHoveredSlot={setHoveredSlot}
+                      />
+                    </CenterLabwareInModuleChildSlot>
                     {moduleType === THERMOCYCLER_MODULE_TYPE ? (
                       <DeckViewOverlay
                         key={slot}
