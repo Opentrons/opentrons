@@ -322,10 +322,9 @@ export const useLabwareDropdownOptions = (
       )
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const topId = fullStackFromLabwares[0]
-      const isOnShuttle = stackerModuleIds.some(stackerModule =>
+      const isOnStacker = stackerModuleIds.some(stackerModule =>
         fullStackFromLabwares.includes(stackerModule.slot)
       )
-      console.log('isOnShuttle', isOnShuttle)
       const isLabwareLidCombo =
         (fullStackFromLabwares[1] === labwareId &&
           labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
@@ -355,7 +354,7 @@ export const useLabwareDropdownOptions = (
 
       //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
-        (type === 'labware' && isOnShuttle) ||
+        (type === 'labware' && isOnStacker) ||
         isAdapter ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||
