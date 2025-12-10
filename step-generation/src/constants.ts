@@ -13,6 +13,7 @@ import type {
   AddressableOffsetVector,
   ModuleModel,
   ModuleType,
+  OT2AddressableAreaName,
 } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
@@ -95,6 +96,8 @@ export const AUTOMATIC: 'automatic' = 'automatic'
 export const MANUAL: 'manual' = 'manual'
 
 export const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
+
+export const OT2_TC_SLOTS: OT2AddressableAreaName[] = ['7', '8', '10', '11']
 
 export const HOPPER_STACKER_LOCATION = 'hopper'
 

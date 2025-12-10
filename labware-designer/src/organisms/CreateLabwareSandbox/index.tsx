@@ -200,6 +200,8 @@ export function CreateLabwareSandbox(): JSX.Element {
           </Flex>
           <Flex maxHeight="84vh">
             {viewOnDeck ? (
+              // todo(mm, 2025-12-03): Can this be replaced with BaseDeck so we don't
+              // have to duplicate the labware positioning math here?
               <RobotWorkSpace deckDef={DECK_DEFINITION} showDeckLayers>
                 {() => {
                   const slotOrigin = getPositionFromSlotId(
