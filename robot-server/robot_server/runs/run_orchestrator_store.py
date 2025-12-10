@@ -62,6 +62,7 @@ from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     CameraSettings,
 )
+from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 
 _log = logging.getLogger(__name__)
@@ -483,6 +484,20 @@ class RunOrchestratorStore:
     ) -> CameraSettings:
         """Add new camera enablement settings to state."""
         return self.run_orchestrator.add_camera_enablement_settings(enablement_settings)
+
+    def add_camera_capture_image_settings(
+        self, capture_image_settings: CameraCaptureImageSettings
+    ) -> None:
+        """Add new camera capture image settings to state."""
+        self.run_orchestrator.add_camera_capture_image_settings(
+            camera_id=capture_image_settings.cameraId,
+            resolution=capture_image_settings.resolution,
+            zoom=capture_image_settings.zoom,
+            pan=capture_image_settings.pan,
+            contrast=capture_image_settings.contrast,
+            brightness=capture_image_settings.brightness,
+            saturation=capture_image_settings.saturation,
+        )
 
     async def add_command_and_wait_for_interval(
         self,

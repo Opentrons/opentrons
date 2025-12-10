@@ -7,7 +7,7 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 import dataclasses
 from datetime import datetime
 from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -245,6 +245,19 @@ class AddCameraSettingsAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class AddCameraCaptureImageSettingsAction:
+    """Add Camera capture image settings to be used in place of the system default settings."""
+
+    camera_id: Optional[str] = None
+    resolution: Optional[Tuple[int, int]] = None
+    zoom: Optional[float] = None
+    pan: Optional[Tuple[int, int]] = None
+    contrast: Optional[float] = None
+    brightness: Optional[float] = None
+    saturation: Optional[float] = None
+
+
+@dataclasses.dataclass(frozen=True)
 class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
@@ -314,6 +327,7 @@ Action = Union[
     AddLabwareDefinitionAction,
     AddModuleAction,
     AddCameraSettingsAction,
+    AddCameraCaptureImageSettingsAction,
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddLiquidAction,
