@@ -87,7 +87,7 @@ Flex pipettes only accept tips with capacities less than or equal to the pipette
 | Pipette capacity | Compatible tips             |
 | :--------------- | :-------------------------- |
 | 1–50 µL          | 50 µL tips only             |
-| 5–1000 µL        | 50 μL, 200 μL, and 1000 µL tips |
+| 5–1000 µL        | 50 µL, 200 µL, and 1000 µL tips |
 
 For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate. See [Pipette specifications][pipette-specifications] for examples. 
 

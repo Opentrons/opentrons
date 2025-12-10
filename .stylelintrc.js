@@ -9,6 +9,24 @@ module.exports = {
     'docs/**',
     'components/lib/**',
     'components-testing/pack/**',
+    'shared-data/**',
+    'api-client/**',
+    'react-api-client/**',
+    'step-generation/**',
+    'labware-library/cypress/**',
+    'scripts/**',
+    'hardware-testing/**',
+    'discovery-client/**',
+    'usb-bridge/**',
+    'app-shell/**',
+    'app-shell-odd/**',
+    '__mocks__/**',
+    'protocol-designer/fixtures/**',
+    'protocol-designer/benchmarks/**',
+    'components/src/__mocks__/**',
+    'labware-library/cypress.config.js',
+    'app/scripts/**',
+    'e2e-testing/**',
   ],
 
   rules: {
@@ -19,6 +37,23 @@ module.exports = {
       true,
       {
         ignorePseudoClasses: ['export', 'import', 'global', 'local'],
+      },
+    ],
+
+    // number max precision
+    'number-max-precision': [
+      4,
+      {
+        ignoreProperties: [
+          'transition',
+          'width',
+          'height',
+          'max-height',
+          'max-width',
+          'min-width',
+          'min-height',
+          'flex',
+        ],
       },
     ],
 
@@ -46,10 +81,6 @@ module.exports = {
           'lost-unit',
           'lost-utility',
           'lost-waffle',
-
-          // TODO(kk, 2025-11-10) remove when #19993 is merged to edge
-          'container-type',
-          'container-name',
         ],
       },
     ],
@@ -65,9 +96,6 @@ module.exports = {
           // TODO(mc, 2018-02-09): use stylelint-config-lost once stylelint-
           // config-css-modules at-rule-no-unknown no longer conflicts
           'lost',
-
-          // TODO(kk, 2025-11-10) remove when #19993 is merged to edge
-          'container',
         ],
       },
     ],

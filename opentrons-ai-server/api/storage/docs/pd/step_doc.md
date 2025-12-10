@@ -3825,29 +3825,29 @@ Pipette:
 - Left mount: p1000 single channel Flex pipette
 
 Labware:
-- Tiprack-1: Opentrons Flex 96 Filter Tip Rack 1000 μL (Slot D1)
-- Tiprack-2: Opentrons Flex 96 Filter Tip Rack 1000 μL (Slot C1)
-- Plate: NEST 96 Well Plate 200 μL Flat (Slot D3)
+- Tiprack-1: Opentrons Flex 96 Filter Tip Rack 1000 µL (Slot D1)
+- Tiprack-2: Opentrons Flex 96 Filter Tip Rack 1000 µL (Slot C1)
+- Plate: NEST 96 Well Plate 200 µL Flat (Slot D3)
 - Reservoir: NEST 12 Well Reservoir 15 mL (Slot D2)
 
 
 Liquids:
 - Diluent liquid (green, 12 mL in reservoir well A1)
-- Sample liquid (red, 150 μL in each well of column 1 of the plate)
+- Sample liquid (red, 150 µL in each well of column 1 of the plate)
 
 Steps:
-1. Distribute 100 μL of diluent from reservoir well A1 to all wells in columns 2-11 of the plate (with 10 μL air gap during aspiration and 5 μL disposal volume)
+1. Distribute 100 µL of diluent from reservoir well A1 to all wells in columns 2-11 of the plate (with 10 µL air gap during aspiration and 5 µL disposal volume)
 
 2. Perform serial dilutions for Row A:
- - Transfer 50 μL from A1 to A2, mix 5× with 75 μL
- - Transfer 50 μL from A2 to A3, mix 5× with 75 μL
+ - Transfer 50 µL from A1 to A2, mix 5× with 75 µL
+ - Transfer 50 µL from A2 to A3, mix 5× with 75 µL
  - Continue this pattern through A10 to A11
- - Use 10 μL air gap during aspiration
+ - Use 10 µL air gap during aspiration
  - Change tip once for the entire row
 
 3-9. Repeat the same serial dilution pattern for Rows B through H (one row at a time)
 
-10. Add 100 μL blank (diluent) to the last column (column 12) of the plate
+10. Add 100 µL blank (diluent) to the last column (column 12) of the plate
 ```
 
 Output protocol:

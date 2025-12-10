@@ -29,14 +29,15 @@
 
 .well_details_caption_bottom {
   position: absolute;
-  right: 3.6rem;
-  bottom: 0.5rem;
+  bottom: 0;
+  left: 35%;
+  width: 100%;
 }
 
 .well_details_caption_side {
   position: absolute;
-  top: 4.6rem;
-  right: 0.8rem;
+  top: 50%;
+  right: 10%;
 }
 
 .well_details_volume {
@@ -77,12 +78,32 @@
   .main_content {
     padding: var(--spacing-12);
   }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 50%;
+    right: 10%;
+  }
 }
 
 /* Width 300px up to 449px */
 @container well-view-slot-container (min-width: 300px) and (max-width: 449px) {
   .main_content {
     padding: var(--spacing-20);
+  }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 50%;
+    right: 10%;
   }
 }
 
@@ -91,11 +112,31 @@
   .main_content {
     padding: var(--spacing-32);
   }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 45%;
+    right: 10%;
+  }
 }
 
 /* Width 600px and up */
 @container well-view-slot-container (min-width: 600px) {
   .main_content {
     padding: var(--spacing-40);
+  }
+
+  .well_details_caption_bottom {
+    bottom: 0;
+    left: 35%;
+  }
+
+  .well_details_caption_side {
+    top: 45%;
+    right: 10%;
   }
 }

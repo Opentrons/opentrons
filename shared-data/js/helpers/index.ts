@@ -2,7 +2,9 @@ import uniq from 'lodash/uniq'
 
 import standardOt2DeckDef from '../../deck/definitions/5/ot2_standard.json'
 import standardFlexDeckDef from '../../deck/definitions/5/ot3_standard.json'
-import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
+import standardOt2RobotDef from '../../robot/definitions/1/ot2.json'
+import standardFlexRobotDef from '../../robot/definitions/1/ot3.json'
+import { FLEX_ROBOT_TYPE, OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import { getAllLiquidClassDefs } from '../liquidClasses'
 import { getSchema2Dimensions } from './positionMath'
 
@@ -12,6 +14,7 @@ import type {
   LabwareDefinition,
   LiquidClass,
   ModuleModel,
+  RobotDefinition,
   RobotType,
   ThermalAdapterName,
 } from '../types'
@@ -42,6 +45,7 @@ export * from './linearInterpolate'
 export * from './liquidClasses'
 export * from './getAddressableAreasInProtocol'
 export * from './getFlexSurroundingSlots'
+export * from './getOt2SurroundingSlots'
 export * from './getSimplestFlexDeckConfig'
 export * from './formatRunTimeParameterDefaultValue'
 export * from './formatRunTimeParameterValue'
@@ -463,4 +467,13 @@ export const getSortedLiquidClassDefs = (): Record<string, LiquidClass> => {
       valueA.displayName.localeCompare(valueB.displayName)
     )
   )
+}
+
+// hard-coding in V1 robot definitions following pattern with deck definitions
+export const getRobotDefFromRobotType = (
+  robotType: RobotType
+): RobotDefinition => {
+  return (
+    robotType === FLEX_ROBOT_TYPE ? standardFlexRobotDef : standardOt2RobotDef
+  ) as RobotDefinition
 }

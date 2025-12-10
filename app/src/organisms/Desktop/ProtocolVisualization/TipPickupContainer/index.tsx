@@ -69,7 +69,7 @@ export function TipPickupContainer(
             <g>
               <LabwareRender
                 definition={def}
-                positioningMode="offsetInSlot"
+                positioningMode="passThrough"
                 missingTips={missingTips}
                 tipStatusByWellName={tipStatusByWellName}
               />

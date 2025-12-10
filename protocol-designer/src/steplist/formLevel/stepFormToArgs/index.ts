@@ -4,6 +4,7 @@ import { castField } from '../../../steplist/fieldLevel'
 import { absorbanceReaderFormToArgs } from './absorbanceReaderFormToArgs'
 import { cameraFormToArgs } from './cameraFormToArgs'
 import { commentFormToArgs } from './commentFormToArgs'
+import { flexStackerFormToArgs } from './flexStackerFormToArgs'
 import { heaterShakerFormToArgs } from './heaterShakerFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
 import { mixFormToArgs } from './mixFormToArgs'
@@ -84,6 +85,9 @@ export const stepFormToArgs = (
     case 'absorbanceReader': {
       stepArgs = absorbanceReaderFormToArgs(_castForm(hydratedForm))
       break
+    }
+    case 'flexStacker': {
+      stepArgs = flexStackerFormToArgs(_castForm(hydratedForm))
     }
   }
 

@@ -1,8 +1,8 @@
 /* top navbar styles */
-@import '@opentrons/components/styles';
-@import '../../styles/breakpoints.module.css';
-@import '../../styles/shadows.module.css';
-@import '../../styles/spacing.module.css';
+@import url('@opentrons/components/styles');
+@import url('../../styles/breakpoints.module.css');
+@import url('../../styles/shadows.module.css');
+@import url('../../styles/spacing.module.css');
 
 .nav {
   position: fixed;
