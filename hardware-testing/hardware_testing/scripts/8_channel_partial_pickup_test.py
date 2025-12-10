@@ -599,7 +599,7 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot["deck_slot"][self.tiprack_slot][Axis.Y.name] = tiprack_point.y
         self.deck_slot["deck_slot"][self.tiprack_slot]["Z"] = tiprack_point.z
         self._save_config(
-            self.calibration_path + self.calibration_file, str(self.deck_slot)
+            self.calibration_path + self.calibration_file, json.dumps(self.deck_slot)
         )
         self.tiprack_position = tiprack_point
         await asyncio.sleep(1)
@@ -626,7 +626,7 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot["deck_slot"][self.trash_slot][Axis.Y.name] = drop_tip_point.y
         self.deck_slot["deck_slot"][self.trash_slot]["Z"] = drop_tip_point.z
         self._save_config(
-            self.calibration_path + self.calibration_file, str(self.deck_slot)
+            self.calibration_path + self.calibration_file, json.dumps(self.deck_slot)
         )
         self.drop_position = drop_tip_point
 
@@ -650,7 +650,7 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot["deck_slot"][self.gauge_slot][Axis.Y.name] = gauge_point.y
         self.deck_slot["deck_slot"][self.gauge_slot]["Z"] = gauge_point.z
         self._save_config(
-            self.calibration_path + self.calibration_file, str(self.deck_slot)
+            self.calibration_path + self.calibration_file, json.dumps(self.deck_slot)
         )
         self.gauge_position = gauge_point
 
@@ -674,7 +674,7 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot["deck_slot"][self.trough_slot][Axis.Y.name] = trough_point.y
         self.deck_slot["deck_slot"][self.trough_slot]["Z"] = trough_point.z
         self._save_config(
-            self.calibration_path + self.calibration_file, str(self.deck_slot)
+            self.calibration_path + self.calibration_file, json.dumps(self.deck_slot)
         )
         self.trough_position = trough_point
         self.feel_position = Point(
@@ -705,7 +705,7 @@ class Eight_Channel_Partial_Pickup_Test:
         self.deck_slot["deck_slot"][self.center_slot][Axis.Y.name] = hole_plate_point.y
         self.deck_slot["deck_slot"][self.center_slot]["Z"] = hole_plate_point.z
         self._save_config(
-            self.calibration_path + self.calibration_file, str(self.deck_slot)
+            self.calibration_path + self.calibration_file, json.dumps(self.deck_slot)
         )
         self.hole_plate_position = hole_plate_point
 
