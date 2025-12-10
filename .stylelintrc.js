@@ -26,6 +26,7 @@ module.exports = {
     'components/src/__mocks__/**',
     'labware-library/cypress.config.js',
     'app/scripts/**',
+    'e2e-testing/**',
   ],
 
   rules: {
@@ -80,10 +81,6 @@ module.exports = {
           'lost-unit',
           'lost-utility',
           'lost-waffle',
-
-          // TODO(kk, 2025-11-10) remove when #19993 is merged to edge
-          'container-type',
-          'container-name',
         ],
       },
     ],
@@ -99,9 +96,6 @@ module.exports = {
           // TODO(mc, 2018-02-09): use stylelint-config-lost once stylelint-
           // config-css-modules at-rule-no-unknown no longer conflicts
           'lost',
-
-          // TODO(kk, 2025-11-10) remove when #19993 is merged to edge
-          'container',
         ],
       },
     ],
