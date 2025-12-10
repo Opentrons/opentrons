@@ -9,7 +9,7 @@ Your protocol timeline includes steps the robot will peform in your protocol. To
 Transfer steps move liquid from one well or group of wells to another. Adding a transfer step opens a four-part form. In the first, select basic settings for your liquid transfer: 
 
 * The pipette to perform the transfer and the tip rack it will use. 
-* The number of multi-channel pipette nozzles to use. For more, see [partial tip pickup](transfer.md#partial-tip-use).
+* The number of multi-channel pipette nozzles to use. For more, see [partial tip pickup](transfer.md#partial-tip-pickup).
 * Source and destination labware, including wells. 
 * Pipette path, or motion the pipette uses to perform the transfer. 
 * The volume of liquid to transfer.  
