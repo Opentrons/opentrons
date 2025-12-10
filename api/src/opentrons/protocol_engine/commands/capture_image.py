@@ -150,7 +150,6 @@ def _revert_image_parameters(
         if image_params.saturation is not None
         else SATURATION_DEFAULT
     )
-    # todo (chb, 2025-10-29): Eventually we will have override defaults that can be passed into the Camera state, load those if they exist
 
     return CaptureImageResult(
         fileId=file_id,

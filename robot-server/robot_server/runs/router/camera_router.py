@@ -27,6 +27,7 @@ from ..run_models import Run
 from ..run_orchestrator_store import RunOrchestratorStore
 from ..dependencies import get_run_orchestrator_store
 from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
+from opentrons.config import IS_ROBOT
 
 from robot_server.service.legacy.models.settings import (
     CameraEnable,
@@ -154,7 +155,8 @@ async def add_camera_capture_image_settings(
         robot_type: Used to validate robot type for live stream service.
         camera_provider: Access to the camera settings and related services.
     """
-    if not camera.camera_exists():
+    if IS_ROBOT and not camera.camera_exists():
+        # todo(chb): Eventually we'll have mulitple camera ids that can be sent, so this should be able to verify more than just the default
         raise LegacyErrorResponse(
             message="Video device is unavailable.",
             errorCode=ErrorCodes.GENERAL_ERROR.value.code,
