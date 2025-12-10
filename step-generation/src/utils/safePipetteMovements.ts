@@ -8,6 +8,7 @@ import {
   getModuleDef,
   getOt2SurroundingSlots,
   getPositionFromSlotId,
+  getRobotDefFromRobotType,
   OT2_ROBOT_TYPE,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
@@ -36,8 +37,6 @@ import type {
   TipState,
 } from '../types'
 
-const A12_column_front_left_bound = { x: -11.03, y: 2 }
-const A12_column_back_right_bound = { x: 526.77, y: 506.2 }
 export const PRIMARY_NOZZLE = 'A12'
 const FLEX_TC_LID_COLLISION_ZONE = {
   back_left: { x: -43.25, y: 454.9, z: 211.91 },
@@ -63,26 +62,6 @@ export interface Point {
   x: number
   y: number
   z?: number
-}
-
-//  check if nozzle(s) are inbounds
-const getIsWithinPipetteExtents = (
-  location: Point,
-  nozzleConfiguration: NozzleConfigurationStyle,
-  primaryNozzle: string
-): boolean => {
-  if (nozzleConfiguration === 'COLUMN' && primaryNozzle === 'A12') {
-    const isWithinBounds =
-      A12_column_front_left_bound.x <= location.x &&
-      location.x <= A12_column_back_right_bound.x &&
-      A12_column_front_left_bound.y <= location.y &&
-      location.y <= A12_column_back_right_bound.y
-
-    return isWithinBounds
-  } else {
-    // TODO: Handle other configurations such as 8-channel partial tip, and eventually all pipettes.
-    return true
-  }
 }
 
 // return pipette bounds at a sepcific position
@@ -287,7 +266,7 @@ const getWellPosition = (
   labwareEntity: LabwareEntity,
   wellName: string,
   wellLocationOffset: Point,
-  addressableAreaOffset: CoordinateTuple | null,
+  addressableAreaOffset: CoordinateTuple,
   hasTip: boolean
 ): Point => {
   const { wells } = labwareEntity.def
@@ -368,12 +347,27 @@ export const getIsSafePipetteMovement = (args: {
   const addressableAreaOffset = getPositionFromSlotId(
     labwareSlot,
     deckDefinition
-  )
+  ) ?? [0, 0, 0]
+  const isOnFlexThermocycler =
+    robotType === FLEX_ROBOT_TYPE &&
+    labwareState[labwareId].stack.some(
+      item => moduleEntities[item]?.type === THERMOCYCLER_MODULE_TYPE
+    )
+  const thermocyclerOffset = isOnFlexThermocycler
+    ? (deckDefinition.locations.addressableAreas.find(
+        addressableArea => addressableArea.id === 'thermocyclerModuleV2'
+      )?.offsetFromCutoutFixture ?? [0, 0, 0])
+    : [0, 0, 0]
+  const fullOffset = [
+    thermocyclerOffset[0] + addressableAreaOffset[0],
+    thermocyclerOffset[1] + addressableAreaOffset[1],
+    thermocyclerOffset[2] + addressableAreaOffset[2],
+  ]
   const wellTargetPoint = getWellPosition(
     labwareEntities[labwareId],
     wellTargetName,
     wellLocationOffset,
-    addressableAreaOffset,
+    fullOffset as CoordinateTuple,
     pipetteHasTip
   )
 
@@ -385,14 +379,6 @@ export const getIsSafePipetteMovement = (args: {
       channels,
     })
 
-  const isWithinPipetteExtents = getIsWithinPipetteExtents(
-    wellTargetPoint,
-    nozzleConfiguration,
-    primaryNozzle
-  )
-  if (!isWithinPipetteExtents) {
-    return false
-  }
   const tiprackEntity = tiprackId != null ? labwareEntities[tiprackId] : null
   const tipOverlapOnNozzle =
     tiprackEntity != null
@@ -409,6 +395,14 @@ export const getIsSafePipetteMovement = (args: {
     primaryNozzle,
     tipOverlapOnNozzle
   )
+  const isWithinPipetteExtents = getIsMovementWithinDeckExtents({
+    channels,
+    boundingBox: pipetteBoundsAtWellLocation,
+    robotType,
+  })
+  if (!isWithinPipetteExtents) {
+    return false
+  }
   const surroundingSlots =
     robotType === OT2_ROBOT_TYPE
       ? getOt2SurroundingSlots(labwareSlot as OT2AddressableAreaName)
@@ -651,4 +645,45 @@ const getOverlapKeyForPipetteSpecs = (
   }
   // default
   return 'Full'
+}
+
+const getIsMovementWithinDeckExtents = (args: {
+  channels: PipetteChannels
+  boundingBox: Point[]
+  robotType: RobotType
+}): boolean => {
+  const { channels, boundingBox, robotType } = args
+  const robotDef = getRobotDefFromRobotType(robotType)
+  const { paddingOffsets } = robotDef
+  const { front, rear, leftSide, rightSide } = paddingOffsets
+  const [xExtent, yExtent] = robotDef.extents
+  const [backLeftBound, frontRightBound] = boundingBox
+  const { x: pipetteLeftBound, y: pipetteBackBound } = backLeftBound
+  const { x: pipetteRightBound, y: pipetteFrontBound } = frontRightBound
+
+  if (channels === 96) {
+    // check left
+    if (pipetteRightBound < leftSide) {
+      return false
+    }
+    // check right
+    const rightLimit = xExtent + rightSide
+    if (pipetteLeftBound > rightLimit) {
+      return false
+    }
+  }
+
+  // 8- and 96-channel pipettes
+  if (channels !== 1) {
+    // check front
+    if (pipetteBackBound < front) {
+      return false
+    }
+    // check rear
+    const rearLimit = yExtent + rear
+    if (pipetteFrontBound > rearLimit) {
+      return false
+    }
+  }
+  return true
 }
