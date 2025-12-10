@@ -58,10 +58,6 @@ export const consolidateSharedWells = (
   overlappingWells.forEach(well => {
     const entries = wellToLabwareVolumes[well]
     const labwareId = entries[0].labwareId // assume all entries are same labware?
-
-    // Collect contributing liquid names
-    const description = entries.map(e => e.liquidId).join(', ')
-
     const mixedId = `mixed-${labwareId}-${well}`
 
     mixedLiquids[mixedId] = [
