@@ -5,8 +5,8 @@ import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
+import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
 import { TipDisposalContainer } from '../TipDisposalContainer'
-import { TipPickupContainer } from '../TipPickupContainer'
 import styles from './slotdetails.module.css'
 
 import type {
@@ -75,7 +75,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
     switch (labwareType) {
       case 'tiprack':
         return (
-          <TipPickupContainer
+          <TipPickupSlot
             tiprackEntity={labwareEntities[topMostLabwareOnSlot]}
             robotState={robotState}
           />
