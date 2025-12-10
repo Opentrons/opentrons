@@ -30,7 +30,7 @@ export {
   dropTipInPlace,
   engageMagnet,
   flexStackerEmpty,
-  flexStackerFill,
+  flexStackerFillItems,
   flexStackerRetrieve,
   flexStackerStore,
   moveLabware,

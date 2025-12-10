@@ -20,7 +20,7 @@ import { dropTip } from './dropTip'
 import { dropTipInPlace } from './dropTipInPlace'
 import { engageMagnet } from './engageMagnet'
 import { flexStackerEmpty } from './flexStackerEmpty'
-import { flexStackerFill } from './flexStackerFill'
+import { flexStackerFillItems } from './flexStackerFillItems'
 import { flexStackerRetrieve } from './flexStackerRetrieve'
 import { flexStackerStore } from './flexStackerStore'
 import { liquidProbe } from './liquidProbe'
@@ -57,7 +57,7 @@ export {
   dropTipInPlace,
   engageMagnet,
   flexStackerEmpty,
-  flexStackerFill,
+  flexStackerFillItems,
   flexStackerRetrieve,
   flexStackerStore,
   liquidProbe,
