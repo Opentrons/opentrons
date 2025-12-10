@@ -74,6 +74,33 @@ describe('flexStackerFillItems', () => {
         pythonName: 'mock_labware_5',
       },
     }
+    vi.mocked(flexStackerStateGetter).mockReturnValue({
+      labwareOnShuttle: {
+        primaryLabwareId: 'mockLabwareId',
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      },
+      labwareInHopper: [
+        {
+          primaryLabwareId: 'mockLabwareId',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+      ],
+      maxPoolCount: 10,
+      storedLabwareDetails: {
+        moduleId,
+        initialCount: 1,
+        primaryLabware: {
+          loadName: 'fixture_96_plate',
+          namespace: 'opentrons',
+          version: 1,
+        },
+        lidLabware: null,
+        adapterLabware: null,
+      },
+      type: FLEX_STACKER_MODULE_TYPE,
+    } as FlexStackerModuleState)
   })
   it('creates flex stacker fill command with 1 labware', () => {
     const result = flexStackerFillItems(

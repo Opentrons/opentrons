@@ -38,8 +38,7 @@ export const flexStackerFillItems: CommandCreator<
     return {
       errors: [errorCreators.flexStackerHopperFull()],
     }
-  }
-  if (labware.length > 0) {
+  } else if (labware.length > 0) {
     const allMatch = labware.every(lw =>
       labwareMatchesLabwareInHopper(lw, invariantContext, flexStackerState)
     )
