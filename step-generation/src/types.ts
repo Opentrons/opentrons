@@ -634,31 +634,31 @@ export interface CaptureImageArgs extends CommonArgs {
   saturation: number
 }
 
-export interface FlexStackerEmpty extends CommonArgs {
+export interface FlexStackerEmptyArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerEmpty'
   interventionMessage: string | null
 }
-export interface FlexStackerFillItems extends CommonArgs {
+export interface FlexStackerFillItemsArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerFillItems'
   fillLabwareUri: string | null
   fillQuantity: number | null
 }
-export interface FlexStackerStore extends CommonArgs {
+export interface FlexStackerStoreArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerStore'
 }
-export interface FlexStackerRetrieve extends CommonArgs {
+export interface FlexStackerRetrieveArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerRetrieve'
 }
 
 export type FlexStackerArgs =
-  | FlexStackerEmpty
-  | FlexStackerFillItems
-  | FlexStackerRetrieve
-  | FlexStackerStore
+  | FlexStackerEmptyArgs
+  | FlexStackerFillItemsArgs
+  | FlexStackerRetrieveArgs
+  | FlexStackerStoreArgs
 
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
