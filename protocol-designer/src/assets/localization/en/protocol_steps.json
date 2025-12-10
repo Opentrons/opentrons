@@ -89,9 +89,9 @@
       "quantity": "Quantity: {{count}}"
     },
     "empty": "Emptying stacker of all labware",
-    "fill": "Refilling stacker with Quantity: {{quantity}} of {{labware_name}}",
-    "retrieve": "Retrieving {{labware_name}} from stacker",
-    "store": "Storing {{labware_name}} from shuttle into stacker"
+    "fill": "<text>Refilling stacker with Quantity: </text> <tag2/> <text>of</text> <tag/>",
+    "retrieve": "<text>Retrieving</text> <tag/> <text>from stacker</text>",
+    "store": "<text>Storing</text> <tag/> <text>from shuttle into stacker</text>"
   },
   "flexStacker": "Stacker",
   "flow_rate_builder": "Flow rate builder",

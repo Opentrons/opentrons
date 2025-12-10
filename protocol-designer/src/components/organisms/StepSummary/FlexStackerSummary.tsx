@@ -8,18 +8,22 @@ interface FlexStackerSummaryProps {
   labwareEntities: LabwareEntities
 }
 
-export function FlexStackerSummary(props: FlexStackerSummaryProps) {
+export function FlexStackerSummary(
+  props: FlexStackerSummaryProps
+): JSX.Element | null {
   const { currentStep, labwareEntities } = props
   const { fillLabwareUri, fillQuantity, flexStackerFormType } = currentStep
   const labwareName = Object.values(labwareEntities).find(
     lw => lw.labwareDefURI === fillLabwareUri
   )?.def.metadata.displayName
   let stepSummaryContent: JSX.Element | null = null
+
   switch (flexStackerFormType) {
     case 'empty': {
       stepSummaryContent = (
         <StyledTrans i18nKey="protocol_steps:flex_stacker.empty" />
       )
+      break
     }
     case 'fill': {
       stepSummaryContent = (

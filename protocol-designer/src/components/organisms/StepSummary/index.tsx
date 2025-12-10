@@ -350,6 +350,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           labwareEntities={labwareEntities}
         />
       )
+      break
     }
 
     default:
