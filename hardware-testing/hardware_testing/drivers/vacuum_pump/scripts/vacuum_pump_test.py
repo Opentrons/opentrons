@@ -118,7 +118,7 @@ async def vario_command_loop(pump):
 async def main(args) -> None:
     t = Timer()
     if args.pump == "Opentrons":
-        pump = await vacuum_pump.OpentronsVacuum.create('COM11', 9600, loop=asyncio.get_running_loop())
+        pump = await vacuum_pump.OpentronsVacuum.create('COM3', 9600, loop=asyncio.get_running_loop())
     elif args.pump == "Vario":
         pump = await vacuum_pump.VarioPump.create('COM5', 19200, loop=asyncio.get_running_loop())
     else:

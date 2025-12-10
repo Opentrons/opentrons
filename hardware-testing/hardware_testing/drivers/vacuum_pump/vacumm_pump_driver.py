@@ -279,6 +279,8 @@ class OpentronsVacuum():
         end_time = time.perf_counter() + timeout
         while time.perf_counter() < end_time:
             try:
+                await asyncio.to_thread(self.connection.reset_input_buffer)
+                await asyncio.to_thread(self.connection.reset_output_buffer)
                 line = await self._readline()
             except PermissionError:
                 # Already handled in _readline, treat as empty and continue
