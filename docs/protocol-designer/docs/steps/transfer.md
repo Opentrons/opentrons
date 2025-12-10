@@ -35,7 +35,7 @@ In the third form, click the aspirate and dispense tabs to access additional set
 * **Tip position**: where the robot aspirates or dispenses in your labware. 
 * Other pipetting settings like submerge and retract speed, mix, delay, blowout, and air gap.  
 
-If you chose to apply a liquid class to your transfer step, each tab already contains values, like flow rate, optimized to transfer your liquid. In this form, you're able to enter custom values in the valid range for settings like tip position. Default values and ranges change depending on the combination of pipette and tips selected to perform the transfer. Click at the bottom of either tab to remove your custom settings at any time. 
+If you chose to apply a liquid class to your transfer step, each tab already contains values, like flow rate, optimized to transfer your liquid. In this form, you're able to enter custom values in the valid range for settings like tip position. Default values and ranges change depending on the combination of pipette and tips selected to perform the transfer. Click at the bottom of either tab to **Reset aspirate settings** or **Reset dispense settings**. 
 
 Click the default well order or tip position to open the menu and edit. Here, graphics show the order the robot moves from well to well, and where in each well the robot aspirates or dispenses liquid. You can choose a custom well order and adjust the X, Y, and Z tip positions within the valid range for your chosen labware. 
 
@@ -48,9 +48,9 @@ The default tip position value of 0 represents the middle of the well for both X
 
 For an aspirate or dispense, Protocol Designer lets you customize submerge and retract settings:
 
-- the **speed** the pipette will submerge into or retract from the liquid. 
-- whether the pipette should **delay** before submerging or retracting.
-- the **start point** in the labware to begin the submerge or retract from. 
+- The *speed* the pipette will submerge into or retract from the liquid. 
+- Whether the pipette should *delay* before submerging or retracting.
+- The *start point* in the labware to begin the submerge or retract from. 
 
 Additional advanced pipetting settings are available in the Aspirate and Dispense tabs. These are listed in the order in which the robot performs them. Protocol Designer supports the following advanced settings: 
 
@@ -94,20 +94,20 @@ Next, choose a tip drop location to dispose of used tips before clicking **Conti
 
 You can also customize tip tracking settings in your Protocol Designer protocols. When you select automatic tip tracking, Protocol Designer keeps track of which tips have been picked up and used. You can click **manual tip tracking** to manually select the tips the pipette will use in your transfer step. Tips in your tip rack are labeled as:
 
-* **New** tips haven't been used yet.
-* **Used** tips have been used and returned to the tip rack.
-* **Selected** tips will be used in your transfer. Tips are numbered to show how many will be picked up at once.
-* Tips labeled **no tip** have been discarded and are missing from the tip rack.
-* **Inaccessible** tips can't be picked up by your chosen pipette.
+* **New**: Tips that haven't been used yet.
+* **Used**: Tips that have been picked up and returned to the tip rack.
+* **Selected**: Tips to be used in your transfer. Tips are numbered to show how many will be picked up at once.
+* **No tip**: An empty location in the tip rack. This means the tip from that location has been picked up and discarded. 
+* **Inaccessible**: Tips that can't be picked up by your chosen pipette or partial nozzle configuration.
 
 <figure class="screenshot" markdown>
   ![Manual tip selection](../images/tip_selection.png)
   <figcaption>Click to select tips for your transfer step.</figcaption>
 </figure> 
 
-Protocol Designer includes warnings if your tip selections might be incompatible with other parts of your protocol, especially in partial tip use. See below for more.
+Protocol Designer includes warnings if your tip selections might be incompatible with other parts of your protocol, especially in partial tip pickup. See below for more.
 
-## Partial tip use
+## Partial tip pickup
 
 You can use partial tip pickup to use less tips than a Flex or OT-2 multi-channel pipette can pick up at once: 
 
@@ -119,7 +119,7 @@ When you add a transfer or mix step, start by selecting **column** or **single**
 !!! Note
     You'll need to place tip racks directly on the starting deck for partial tip pickup with the Flex 96-channel pipette. 
 
-    When you select the Flex 96-channel pipette, Protocol Designer automatically places your first tip rack on the deck with a 96-channel tip rack adapter, required for picking up a full rack of tips. Add a second tip rack directly on the deck to enable partial tip use.
+    When you select the Flex 96-channel pipette, Protocol Designer automatically places your first tip rack on the deck with a 96-channel tip rack adapter, required for picking up a full rack of tips. Add a second tip rack directly on the deck to enable partial tip pickup.
 
 In the fourth form, you can choose between automatic and manual tip tracking for your multi-channel pipette. Protocol Designer includes warnings, both in the tip selection form and as a step error, if your partial tip selections could cause pipette collisions. 
 
@@ -128,7 +128,7 @@ In the fourth form, you can choose between automatic and manual tip tracking for
   <figcaption>Labware in adjacent slots can cause pipette collisions.</figcaption>
 </figure> 
 
-Partial tip pickups require the pipette to hover above adjacent slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision. Despite the tip rack being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
+Partial tip pickup requires the pipette to hover above adjacent slots. Here, Protocol Designer won't allow you to select tips for manual tip tracking, because the tip racks in adjacent deck slots could cause a pipette collision. Despite the tip rack being full of pipette tips, the "not enough tips" warning tells you that there aren't enough pipette tips that the pipette can pick up safely. This also results in a pipette collision error. 
 
 We always recommend resolving all errors before exporting your protocol and running it on a robot. 
 
