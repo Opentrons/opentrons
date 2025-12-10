@@ -75,7 +75,7 @@ This example measures the liquid height in well A2 of a plate and then immediate
 
 To ensure the pipette stays submerged while aspirating, set ``target="end"`` for the aspirate or use multiple location parameters. For more, see :ref:`well-meniscus`. 
 
-!!! note:: 
+.. note:: 
     ``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes.
 
 Use the ``location`` and ``end_location`` parameters in combination to direct the pipette to move to specific locations while aspirating::
@@ -192,7 +192,7 @@ This example measures the liquid height in well B1 of a plate and then immediate
 
 To ensure the pipette begins the dispense at the liquid meniscus, set ``target="start"``. See :ref:`well-meniscus` for more details on pipetting relative to the liquid meniscus. 
 
-!!! note::
+.. note::
     ``measure_liquid_height()`` works best with a new pipette tip each time. To save time and tips throughout your protocol, use ``Labware.load_liquid`` instead to specify starting liquid volumes. 
 
 

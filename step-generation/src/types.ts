@@ -634,6 +634,32 @@ export interface CaptureImageArgs extends CommonArgs {
   saturation: number
 }
 
+export interface FlexStackerEmptyArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerEmpty'
+  interventionMessage: string | null
+}
+export interface FlexStackerFillItemsArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerFillItems'
+  fillLabwareUri: string | null
+  fillQuantity: number | null
+}
+export interface FlexStackerStoreArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerStore'
+}
+export interface FlexStackerRetrieveArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerRetrieve'
+}
+
+export type FlexStackerArgs =
+  | FlexStackerEmptyArgs
+  | FlexStackerFillItemsArgs
+  | FlexStackerRetrieveArgs
+  | FlexStackerStoreArgs
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
@@ -654,6 +680,7 @@ export type CommandCreatorArgs =
   | HeaterShakerArgs
   | MoveLabwareArgs
   | CommentArgs
+  | FlexStackerArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
