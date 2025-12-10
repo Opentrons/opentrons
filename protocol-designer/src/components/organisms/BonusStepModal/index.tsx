@@ -18,8 +18,11 @@ import {
 
 import type { PropsWithChildren } from 'react'
 
-interface HandleClickProps {
+interface HandleSkipPauseClickProps {
   handleSkipPauseClick: () => void
+}
+
+interface HandleAddPauseClickProps {
   handleAddPauseClick: () => void
 }
 
@@ -32,18 +35,19 @@ type BonusStepModalProps =
         | 'explainWaitForThermocyclerBlockTemp'
         | 'explainWaitForThermocyclerLidTemp'
       displayTemperature: string
-    } & HandleClickProps)
+    } & HandleAddPauseClickProps)
   | ({
       modalType: 'explainWaitForThermocyclerProfile'
       displayTemperature?: null
-    } & HandleClickProps)
+    } & HandleAddPauseClickProps)
   | ({
       // "Would you like to add a ___ step"
       // todo(mm, 2025-09-26): Delete this modal type when enableConcurrentModuleActions FF is deleted
       modalType: 'optionallyWaitForTemp'
       displayTemperature: string
       displayModule: string
-    } & HandleClickProps)
+    } & HandleAddPauseClickProps &
+      HandleSkipPauseClickProps)
 
 export type BonusStepModalType = BonusStepModalProps['modalType']
 
@@ -52,13 +56,18 @@ export type BonusStepModalType = BonusStepModalProps['modalType']
  * would you like to also add a pause step."
  */
 export const BonusStepModal = (props: BonusStepModalProps): JSX.Element => {
-  const { modalType, handleSkipPauseClick, handleAddPauseClick } = props
+  const { modalType } = props
   const { t } = useTranslation()
   const [rememberDismissal, setRememberDismissal] = useState(false)
 
   // todo(mm, 2025-09-26): Delete this modal type when enableConcurrentModuleActions FF is deleted
   if (modalType === 'optionallyWaitForTemp') {
-    const { displayModule, displayTemperature } = props
+    const {
+      displayModule,
+      displayTemperature,
+      handleSkipPauseClick,
+      handleAddPauseClick,
+    } = props
     return (
       <Modal
         marginLeft="0"
@@ -102,6 +111,8 @@ export const BonusStepModal = (props: BonusStepModalProps): JSX.Element => {
       </Modal>
     )
   } else {
+    const { displayTemperature, handleAddPauseClick } = props
+
     const titleKey: string = (() => {
       switch (modalType) {
         case 'explainWaitForTemperatureModuleTemp':
@@ -117,7 +128,7 @@ export const BonusStepModal = (props: BonusStepModalProps): JSX.Element => {
         // default omitted, for exhaustiveness checking.
       }
     })()
-    const title = t(titleKey, { temperature: props.displayTemperature })
+    const title = t(titleKey, { temperature: displayTemperature })
 
     const bodyParagraphsKey: string = (() => {
       switch (modalType) {
@@ -139,7 +150,7 @@ export const BonusStepModal = (props: BonusStepModalProps): JSX.Element => {
       <Trans
         t={t}
         i18nKey={bodyParagraphsKey}
-        values={{ temperature: props.displayTemperature }}
+        values={{ temperature: displayTemperature }}
         components={{ p: <BodyParagraph /> }}
       />
     )

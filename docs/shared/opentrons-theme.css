@@ -90,3 +90,10 @@ article ul li::marker {
   font-style: normal;
   color: #737578;
 }
+
+/* Tab bar link to opentrons.com */
+
+.md-tabs__list li:last-child {
+  margin-left: auto;
+  padding-right: 0;
+}

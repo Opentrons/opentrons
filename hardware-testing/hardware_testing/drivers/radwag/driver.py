@@ -121,14 +121,14 @@ class RadwagScale(RadwagScaleBase):
     def _read_response(
         self, command: RadwagCommand, timeout: Optional[float] = None
     ) -> RadwagResponse:
+        prev_timeout: float = float(self._connection.timeout or 0.0)
         if timeout is not None:
-            prev_timeout = float(self._connection.timeout)
             self._connection.timeout = timeout
             response = self._connection.readline()
             self._connection.timeout = prev_timeout
         else:
             response = self._connection.readline()
-        self._raw_log.write(f"{datetime.datetime.now()} <-- {response}\n")
+        self._raw_log.write(f"{datetime.datetime.now()} <-- {response!r}\n")
         data = radwag_response_parse(response.decode("utf-8"), command)
         return data
 

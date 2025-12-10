@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubCameraSettingsValues } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 import { CameraControls } from '..'
 import { CameraControlsHome } from '../CameraControlsHome'
@@ -13,9 +13,7 @@ import { ZoomSettingsView } from '../ZoomSettingsView'
 
 import type { CameraControlsProps } from '..'
 
-vi.mock(
-  '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
-)
+vi.mock('/app/local-resources/images/hooks/useCameraSettingsValues')
 vi.mock('../CameraControlsHome')
 vi.mock('../CameraTileSetting')
 vi.mock('../ZoomSettingsView')
@@ -32,9 +30,10 @@ describe('CameraControls', () => {
   beforeEach(() => {
     mockProps = {
       toggleShowControls: vi.fn(),
+      runId: 'run-id',
     }
-    vi.mocked(useStubCameraSettingsValues).mockReturnValue({
-      zoom: '1x',
+    vi.mocked(useCameraSettingsValues).mockReturnValue({
+      zoom: 1,
       brightness: 50,
       contrast: 50,
       saturation: 50,
@@ -80,7 +79,7 @@ describe('CameraControls', () => {
     screen.getByText('MOCK_ZOOM_SETTINGS_VIEW')
     expect(vi.mocked(ZoomSettingsView)).toHaveBeenCalledWith(
       expect.objectContaining({
-        zoomValue: '1x',
+        zoomValue: 1,
         adjustZoom: expect.any(Function),
         returnToHomeView: expect.any(Function),
       }),
@@ -102,6 +101,7 @@ describe('CameraControls', () => {
         subtext: 'Adjust the overall lightness or darkness.',
         adjustValue: expect.any(Function),
         returnToHomeView: expect.any(Function),
+        isLoading: false,
       }),
       {}
     )

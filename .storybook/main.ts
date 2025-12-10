@@ -1,6 +1,6 @@
-const path = require('path')
+import type { StorybookConfig } from '@storybook/react-vite'
 
-module.exports = {
+const config: StorybookConfig = {
   stories: [
     '../components/**/*.stories.@(js|jsx|ts|tsx)',
     '../app/**/*.stories.@(js|jsx|ts|tsx)',
@@ -19,24 +19,22 @@ module.exports = {
     'storybook-addon-pseudo-states',
   ],
 
-  staticDirs: ['../app/src/assets'],
-
   framework: {
     name: '@storybook/react-vite',
-    options: {},
+    options: {
+      builder: {
+        // Storybook would normally find the Vite config automatically.
+        // That doesn't work for us because we have one monorepo-wide Storybook
+        // installation, while each project has its own local Vite config.
+        // So we treat Storybook as its own Vite project with its own config.
+        viteConfigPath: '.storybook/vite.config.mjs',
+      },
+    },
   },
 
   docs: {
     autodocs: true,
   },
-
-  async viteFinal(config) {
-    config.resolve = config.resolve || {}
-    config.resolve.alias = config.resolve.alias || {}
-
-    // Add the same alias as in app/vite.config.mts to support /app/ imports
-    config.resolve.alias['/app/'] = path.resolve(__dirname, '../app/src/') + '/'
-
-    return config
-  },
 }
+
+export default config

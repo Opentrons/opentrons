@@ -21,6 +21,10 @@ import type {
   ABSORBANCE_READER_INITIALIZE_MODE_SINGLE,
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
+  FLEX_STACKER_EMPTY,
+  FLEX_STACKER_FILL,
+  FLEX_STACKER_RETRIEVE,
+  FLEX_STACKER_STORE,
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
@@ -163,6 +167,7 @@ export type StepType =
   | 'absorbanceReader'
   | 'camera'
   | 'comment'
+  | 'flexStacker'
   | 'heaterShaker'
   | 'magnet'
   | 'manualIntervention'
@@ -172,20 +177,22 @@ export type StepType =
   | 'pause'
   | 'temperature'
   | 'thermocycler'
+  | 'flexStacker'
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
   camera: 'camera',
   comment: 'comment',
+  flexStacker: 'ot-flex-stacker',
+  heaterShaker: 'ot-heater-shaker',
+  magnet: 'ot-magnet-v2',
+  manualIntervention: 'pause-circle',
+  mix: 'mix',
   moveLabware: 'ot-move',
   moveLiquid: 'transfer',
-  mix: 'mix',
   pause: 'pause-circle',
-  manualIntervention: 'pause-circle',
-  magnet: 'ot-magnet-v2',
   temperature: 'ot-temperature-v2',
   thermocycler: 'ot-thermocycler',
-  heaterShaker: 'ot-heater-shaker',
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
@@ -498,6 +505,22 @@ export interface HydratedAbsorbanceReaderFormData extends AnnotationFields {
   wavelengths: string[]
 }
 
+export type FlexStackerFormType =
+  | typeof FLEX_STACKER_RETRIEVE
+  | typeof FLEX_STACKER_STORE
+  | typeof FLEX_STACKER_FILL
+  | typeof FLEX_STACKER_EMPTY
+
+export interface HydratedFlexStackerFormData extends AnnotationFields {
+  stepType: 'flexStacker'
+  id: string
+  fillLabwareUri: string | null
+  fillQuantity: number | null
+  flexStackerFormType: FlexStackerFormType | null
+  interventionMessage: string | null
+  moduleId: string
+}
+
 // fields used in TipPositionInput
 export type TipZOffsetFields =
   | 'aspirate_mmFromBottom'
@@ -607,6 +630,7 @@ export type CountPerStepType = Partial<Record<StepType, number>>
 export type HydratedFormData =
   | HydratedAbsorbanceReaderFormData
   | HydratedCameraFormData
+  | HydratedFlexStackerFormData
   | HydratedCommentFormData
   | HydratedHeaterShakerFormData
   | HydratedMagnetFormData
@@ -616,3 +640,4 @@ export type HydratedFormData =
   | HydratedPauseFormData
   | HydratedTemperatureFormData
   | HydratedThermocyclerFormData
+  | HydratedFlexStackerFormData

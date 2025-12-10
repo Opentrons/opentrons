@@ -189,6 +189,13 @@ describe('replaceTip', () => {
           tipracks: {
             [tiprack1Id]: {
               A1: EMPTY,
+              B1: EMPTY,
+              C1: EMPTY,
+              D1: EMPTY,
+              E1: EMPTY,
+              F1: EMPTY,
+              G1: EMPTY,
+              H1: EMPTY,
             },
           },
           pipettes: {

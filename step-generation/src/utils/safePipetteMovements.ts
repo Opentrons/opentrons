@@ -5,12 +5,14 @@ import {
   getAddressableAreaFromSlotId,
   getDeckDefFromRobotType,
   getFlexSurroundingSlots,
+  getOt2SurroundingSlots,
   getPositionFromSlotId,
+  OT2_ROBOT_TYPE,
   SINGLE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { EMPTY } from '../constants'
+import { EMPTY, OT2_TC_SLOTS } from '../constants'
 import { getFullStackFromLabwares, getSlotInLocationStack } from './misc'
 
 import type {
@@ -19,7 +21,9 @@ import type {
   LabwareDefinition,
   ModuleModel,
   NozzleConfigurationStyle,
+  OT2AddressableAreaName,
   PipetteChannels,
+  RobotType,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -188,11 +192,26 @@ const getSlotHasPotentialCollidingObject = (
   pipetteBounds: Point[],
   slotInfo: SlotInfo[],
   robotState: RobotState,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  robotType: RobotType
 ): boolean => {
+  const isThermocyclerOnDeck = Object.values(
+    invariantContext.moduleEntities
+  ).some(({ type }) => type === THERMOCYCLER_MODULE_TYPE)
   for (const slot of slotInfo) {
     const slotBounds = slot.addressableArea?.boundingBox
     const slotPosition = slot.position
+
+    // explicit OT-2 check for if the pipette will enter the space above a thermocycler-occupied slot
+    const willCollideWithThermocycler =
+      isThermocyclerOnDeck &&
+      robotType === OT2_ROBOT_TYPE &&
+      slot.addressableArea?.id != null &&
+      OT2_TC_SLOTS.includes(slot.addressableArea.id as OT2AddressableAreaName)
+
+    if (willCollideWithThermocycler) {
+      return true
+    }
 
     // If slotPosition or slotBounds is null, continue to the next iteration
     if (slotPosition == null || slotBounds == null) {
@@ -296,7 +315,6 @@ export const getIsSafePipetteMovement = (args: {
     primaryNozzle: primaryNozzleOverride,
     nozzleConfiguration: nozzleConfigurationOverride,
   } = args
-  const deckDefinition = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const {
     pipetteEntities,
     labwareEntities,
@@ -308,6 +326,13 @@ export const getIsSafePipetteMovement = (args: {
   const pipetteEntity = pipetteEntities[pipetteId]
   const nozzleConfiguration =
     nozzleConfigurationOverride ?? robotState.pipettes[pipetteId]?.nozzles
+  const { spec: pipetteSpecs } = pipetteEntity ?? {}
+
+  // NOTE: I don't like this, but step-generation is currently blind to robot type, so we'll infer from the pipette specs
+  const displayCategory = pipetteSpecs?.displayCategory
+  const isFlexPipette = displayCategory === 'FLEX'
+  const robotType = isFlexPipette ? FLEX_ROBOT_TYPE : OT2_ROBOT_TYPE
+  const deckDefinition = getDeckDefFromRobotType(robotType)
 
   //  early exit if labwareId is a trashBin or wasteChute or if no nozzle is provided
   if (
@@ -319,14 +344,10 @@ export const getIsSafePipetteMovement = (args: {
     return true
   }
 
-  const tiprackURI = tipState.pipettes[pipetteId]?.tiprackURI
-  const tiprackEntityId =
-    tiprackURI != null
-      ? Object.keys(labwareEntities).find(lwKey => lwKey.includes(tiprackURI))
-      : null
+  const tiprackEntityId = tipState.pipettes[pipetteId]?.tiprackURI
   const tiprackTipLength =
     tiprackEntityId != null
-      ? labwareEntities[tiprackEntityId].def.parameters.tipLength
+      ? labwareEntities[tiprackEntityId]?.def.parameters.tipLength
       : 0
   const stagingAreaSlots = Object.values(stagingAreaEntities).map(
     stagingArea => stagingArea.location as string
@@ -369,10 +390,10 @@ export const getIsSafePipetteMovement = (args: {
     wellTargetPoint,
     primaryNozzle
   )
-  const surroundingSlots = getFlexSurroundingSlots(
-    labwareSlot,
-    stagingAreaSlots
-  )
+  const surroundingSlots =
+    robotType === OT2_ROBOT_TYPE
+      ? getOt2SurroundingSlots(labwareSlot as OT2AddressableAreaName)
+      : getFlexSurroundingSlots(labwareSlot, stagingAreaSlots)
   const slotInfos: SlotInfo[] = surroundingSlots.map(slot => {
     const addressableArea = getAddressableAreaFromSlotId(slot, deckDefinition)
     const position = getPositionFromSlotId(slot, deckDefinition)
@@ -390,7 +411,8 @@ export const getIsSafePipetteMovement = (args: {
       pipetteBoundsAtWellLocation,
       slotInfos,
       robotState,
-      invariantContext
+      invariantContext,
+      robotType
     )
   )
 }

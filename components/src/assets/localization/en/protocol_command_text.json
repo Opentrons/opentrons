@@ -93,6 +93,7 @@
   "pickup_tip": "Picking up tip(s) from {{well_range}} of {{labware}} in {{labware_location}}",
   "prepare_to_aspirate": "Preparing {{pipette}} to aspirate",
   "pressurizing_to_dispense": "Pressurize pipette to dispense {{volume}} µL from resin tip at {{flow_rate}} µL/sec",
+  "quantity": "Quantity: {{count}}",
   "reloading_labware": "Reloading {{labware}}",
   "return_tip": "Returning tip to {{well_name}} of {{labware}} in {{labware_location}}",
   "right": "Right",

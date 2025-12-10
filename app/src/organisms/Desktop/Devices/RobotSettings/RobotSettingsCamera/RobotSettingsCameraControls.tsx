@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
+import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { TertiaryButton } from '/app/atoms/buttons'
@@ -14,7 +15,7 @@ import type { JSX } from 'react'
 export function RobotSettingsCameraControls(): JSX.Element {
   const { t } = useTranslation('device_settings')
   const [showControls, setShowControls] = useState(false)
-
+  const { createCameraImageSettings } = useCreateCameraImageSettings()
   const toggleControls = (): void => {
     setShowControls(!showControls)
   }
@@ -41,7 +42,10 @@ export function RobotSettingsCameraControls(): JSX.Element {
       </div>
       {showControls &&
         createPortal(
-          <CameraControls onClose={toggleControls} />,
+          <CameraControls
+            onClose={toggleControls}
+            postCameraImageSettings={createCameraImageSettings}
+          />,
           getTopPortalEl()
         )}
     </div>

@@ -40,7 +40,7 @@ interface PipetteCardProps {
   pipetteId?: AttachedPipette['id'] | null
   mount: Mount
   robotName: string
-  isRobotBusy: boolean
+  isRunActive: boolean
   isEstopNotDisengaged: boolean
 }
 
@@ -54,7 +54,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
     mount,
     robotName,
     pipetteId,
-    isRobotBusy,
+    isRunActive,
     isEstopNotDisengaged,
   } = props
   const {
@@ -212,7 +212,7 @@ export const PipetteCard = (props: PipetteCardProps): JSX.Element => {
               handleSettingsSlideout={handleSettingsSlideout}
               handleAboutSlideout={handleAboutSlideout}
               pipetteSettings={settings}
-              isRunActive={isRobotBusy}
+              isRunActive={isRunActive}
             />
           </Box>
           {menuOverlay}

@@ -39,7 +39,6 @@ describe('Controls', () => {
       isPlaying: false,
       commands: [],
       groupedCommands: null,
-      spotlightWindowData: {} as any, // TODO (kk, 2025-11-10): update this later
       milliSecondsPerFrame: 2000,
       setMilliSecondsPerFrame: vi.fn(),
     }

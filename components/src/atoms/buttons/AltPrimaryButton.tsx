@@ -16,18 +16,17 @@ export const AltPrimaryButton = styled(Btn)`
 
   ${styleProps}
 
-  &:focus {
+  &:hover {
+    box-shadow: 0 0 0;
     background-color: ${COLORS.grey35};
-    box-shadow: none;
   }
 
   &:active {
     background-color: ${COLORS.grey40};
   }
 
-  &:hover {
-    box-shadow: 0 0 0;
-    background-color: ${COLORS.grey35};
+  &:active:hover {
+    background-color: ${COLORS.grey40};
   }
 
   &:disabled {
