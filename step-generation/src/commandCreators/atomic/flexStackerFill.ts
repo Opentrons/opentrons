@@ -1,21 +1,46 @@
-import { formatPyStr, uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import { flexStackerStateGetter } from '../../robotStateSelectors'
+import {
+  formatPyStr,
+  labwareMatchesLabwareInHopper,
+  spaceInHopper,
+  uuid,
+} from '../../utils'
 
 import type { FlexStackerFillCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
 export const flexStackerFill: CommandCreator<
   FlexStackerFillCreateCommand['params']
-> = (args, invariantContext) => {
+> = (args, invariantContext, robotState) => {
   const { moduleId, message, count, labwareToStore } = args
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
-
-  // TODO: add error creators
-
+  const flexStackerState = flexStackerStateGetter(robotState, moduleId)
+  const isSpace = spaceInHopper(flexStackerState)
   const pythonArgs = [
     ...(count != null ? [`count=${count}`] : []),
     ...(message != null ? [`message=${formatPyStr(message)}`] : []),
   ]
 
+  if (!isSpace) {
+    return {
+      errors: [errorCreators.flexStackerHopperFull()],
+    }
+  }
+  if (labwareToStore) {
+    const allMatch = labwareToStore.every(labware =>
+      labwareMatchesLabwareInHopper(
+        labware.primaryLabwareId,
+        invariantContext,
+        flexStackerState
+      )
+    )
+    if (!allMatch) {
+      return {
+        errors: [errorCreators.flexStackerLabwareTypeMismatch()],
+      }
+    }
+  }
   return {
     commands: [
       {

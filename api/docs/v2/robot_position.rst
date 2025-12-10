@@ -117,6 +117,8 @@ Here, the pipette tip stays at 1 mm below the liquid meniscus, regardless of cha
     Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette. 
 
 .. versionadded:: 2.23
+.. versionchanged:: 2.27
+    Use the optional ``end_location`` parameter to pipette relative to the liquid meniscus as it changes.  
 
 .. _new-default-op-positions:
 

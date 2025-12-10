@@ -5,8 +5,8 @@ import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
 import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
-import { TipDisposalContainer } from '../TipDisposalContainer'
 import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
+import { TipDisposalContainer } from '../TipDisposalContainer'
 import styles from './slotdetails.module.css'
 
 import type {

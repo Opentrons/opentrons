@@ -3,6 +3,7 @@ import uuidv1 from 'uuid/v4'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getLabwareDefURI,
   getTiprackVolume,
@@ -12,7 +13,9 @@ import {
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
 } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getSlotInLocationStack,
+  HOPPER_STACKER_LOCATION,
   PROTOCOL_CONTEXT_NAME,
 } from '@opentrons/step-generation'
 
@@ -30,6 +33,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
+  HopperLocationMapKey,
   LabwareEntities,
   PipetteEntities,
 } from '@opentrons/step-generation'
@@ -357,33 +361,51 @@ export const getMaxConditioningVolume = (args: {
   )
 }
 
-// for stacking
+//  for stacking
 export function getLocationStackTopToBottom(
   labwareId: string,
   labwareLocationUpdate: Record<string, string>,
-  moduleLocationUpdate: Record<string, string>
+  moduleLocationUpdate: Record<string, string>,
+  moduleEntities: ModuleEntities
 ): string[] {
-  const stack = []
-  let current = labwareId
-
-  //  while parent still exists
-  while (true) {
+  const stack: string[] = []
+  const visited = new Set<string>()
+  let current: string | undefined = labwareId
+  while (current != null) {
+    // Cycle detection: if we've seen this node before, break to prevent infinite loop
+    if (visited.has(current)) {
+      break
+    }
+    visited.add(current)
     stack.push(current)
-    const parent =
-      labwareLocationUpdate[current] || moduleLocationUpdate[current]
-    if (!parent) break
+    const slot: string | undefined = labwareLocationUpdate[current]
+    const parent: string | undefined = slot ?? moduleLocationUpdate[current]
+    const isOnHopper =
+      moduleEntities[slot] != null &&
+      moduleEntities[slot].type === FLEX_STACKER_MODULE_TYPE
+    if (isOnHopper) {
+      // Hopper stack shape: [labware, hopper, moduleId, slot]
+      // So when the node is on the hopper, insert the hopper marker once
+      stack.push(HOPPER_STACKER_LOCATION)
+    }
     current = parent
   }
-
   return stack
 }
 
 export const getLabwaresOnModuleFromStack = (
   moduleId: string,
   labware: LabwareOnDeck[]
-): { topMostId: string | null; rightBelowTopId: string | null } => {
-  // all stacks involving this module
-  const allStacks = labware.filter(lw => lw.stack.includes(moduleId))
+): {
+  topMostId: string | null
+  rightBelowTopId: string | null
+  hopperTopMostId: string | null
+} => {
+  // all stacks involving this module and not on the hopper if its a flex stacker
+  const allStacks = labware.filter(
+    ({ stack }) =>
+      stack.includes(moduleId) && !stack.includes(HOPPER_STACKER_LOCATION)
+  )
   const largestStack = allStacks.sort(
     (a, b) => b.stack.length - a.stack.length
   )[0]
@@ -391,18 +413,35 @@ export const getLabwaresOnModuleFromStack = (
   const isTopMostIdALid = labware.find(
     lw => lw.id === topMostId && lw.def.allowedRoles?.includes('lid')
   )
+  // all stacks involving the hopper if there is one
+  const allStacksOnHopper = labware.filter(
+    ({ stack }) =>
+      stack.includes(moduleId) && stack.includes(HOPPER_STACKER_LOCATION)
+  )
+  const largestStackOnHopper = allStacksOnHopper.sort(
+    (a, b) => b.stack.length - a.stack.length
+  )[0]
   return {
     topMostId: largestStack?.stack[0],
     rightBelowTopId: isTopMostIdALid ? largestStack?.stack[1] : null,
+    hopperTopMostId: largestStackOnHopper?.stack[0],
   }
 }
 
 export const getFullStackFromLabwaresOnDeck = (
   labwareOnDeck: LabwareOnDeck[],
-  slot: DeckSlotId
+  slot: DeckSlotId,
+  onHopper: boolean
 ): string[] => {
+  const slotInStack = onHopper
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
   return labwareOnDeck
-    .filter(lw => lw.stack.includes(slot))
+    .filter(
+      ({ stack }) =>
+        stack.includes(slotInStack as string) &&
+        onHopper === stack.includes(HOPPER_STACKER_LOCATION)
+    )
     .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
 }
 

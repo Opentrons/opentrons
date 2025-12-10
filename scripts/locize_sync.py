@@ -27,6 +27,7 @@ import os
 import shutil
 import subprocess
 import sys
+from contextlib import contextmanager
 from pathlib import Path
 
 from rich.console import Console
@@ -43,6 +44,37 @@ COMPONENTS_LOCALIZATION = REPO_ROOT / "components" / "src" / "assets" / "localiz
 
 # Languages to sync
 LANGUAGES = ["en", "zh"]
+
+
+@contextmanager
+def preserve_non_json_localization_files(root: Path):
+    """Keep files such as TypeScript exports intact while Locize CLI runs."""
+
+    preserved_files: dict[Path, bytes] = {}
+
+    if root.exists():
+        preserved_files = {
+            path: path.read_bytes()
+            for path in root.rglob("*")
+            if path.is_file() and path.suffix.lower() != ".json"
+        }
+
+    if preserved_files:
+        console.print(
+            f"[dim]Preserving {len(preserved_files)} non-JSON localization file(s) during Locize command.[/]"
+        )
+
+    try:
+        yield
+    finally:
+        for path, content in preserved_files.items():
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+
+        if preserved_files:
+            console.print(
+                "[dim]Restored non-JSON localization file(s) after Locize command.[/]"
+            )
 
 
 def check_environment():
@@ -281,7 +313,8 @@ def push_local(api_key, project_id, dry_run=False):
     if dry_run:
         console.print("[dim]Executing with --dry=true to preview changes...[/]\n")
 
-    result = subprocess.run(cmd, cwd=REPO_ROOT)
+    with preserve_non_json_localization_files(APP_LOCALIZATION):
+        result = subprocess.run(cmd, cwd=REPO_ROOT)
 
     if result.returncode != 0:
         console.print("[bold red]✗ Error:[/] Failed to push translations to Locize")
@@ -334,7 +367,8 @@ def download_remote(api_key, project_id, dry_run=False):
     if dry_run:
         console.print("[dim]Executing with --dry=true to preview changes...[/]\n")
 
-    result = subprocess.run(cmd, cwd=REPO_ROOT)
+    with preserve_non_json_localization_files(APP_LOCALIZATION):
+        result = subprocess.run(cmd, cwd=REPO_ROOT)
 
     if result.stdout:
         console.print("\n[bold cyan]📄 stdout:[/]")
