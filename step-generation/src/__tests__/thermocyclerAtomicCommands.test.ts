@@ -4,15 +4,14 @@ import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerClos
 import { thermocyclerDeactivateBlock } from '../commandCreators/atomic/thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../commandCreators/atomic/thermocyclerDeactivateLid'
 import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenLid'
-import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
+import { thermocyclerRunExtendedProfile } from '../commandCreators/atomic/thermocyclerRunExtendedProfile'
 import { thermocyclerSetTargetBlockTemperature } from '../commandCreators/atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../commandCreators/atomic/thermocyclerSetTargetLidTemperature'
 import { getSuccessResult } from '../fixtures'
 
+import type { TCExtendedProfileParams } from '@opentrons/shared-data'
 import type {
-  AtomicProfileStep,
   ModuleOnlyParams,
-  TCProfileParams,
   TemperatureParams,
 } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type { CommandCreator, ModuleEntities } from '../types'
@@ -26,9 +25,9 @@ const getRobotInitialState = (): any => {
 let invariantContext: any = {}
 const module: ModuleOnlyParams['module'] = 'someTCModuleId'
 const temperature: TemperatureParams['temperature'] = 42
-const holdTime: AtomicProfileStep['holdTime'] = 10
-const volume: TCProfileParams['volume'] = 10
-const profile = [
+const holdTime = 10
+const volume = 10
+const profileElements: TCExtendedProfileParams['profileElements'] = [
   {
     celsius: temperature,
     holdSeconds: holdTime,
@@ -96,13 +95,13 @@ describe('thermocycler atomic commands', () => {
       },
     },
   ]
-  const testCasesRunProfile = [
+  const testCasesRunExtendedProfile = [
     {
-      commandCreator: thermocyclerRunProfile,
-      expectedType: 'thermocycler/runProfile',
+      commandCreator: thermocyclerRunExtendedProfile,
+      expectedType: 'thermocycler/runExtendedProfile',
       params: {
         moduleId: module,
-        profile,
+        profileElements,
         blockMaxVolumeUl: volume,
       },
     },
@@ -141,5 +140,5 @@ describe('thermocycler atomic commands', () => {
   testCasesSetBlock.forEach(testParams)
   testCasesWithTempParam.forEach(testParams)
   testCasesModuleOnly.forEach(testParams)
-  testCasesRunProfile.forEach(testParams)
+  testCasesRunExtendedProfile.forEach(testParams)
 })
