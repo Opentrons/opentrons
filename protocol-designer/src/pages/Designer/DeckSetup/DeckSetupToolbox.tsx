@@ -83,7 +83,7 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] =
     useState<boolean>(false)
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
-
+  console.log('selectedTopLabware', selectedTopLabware)
   const {
     createdAdapterForSlot,
     createdModuleForSlot,

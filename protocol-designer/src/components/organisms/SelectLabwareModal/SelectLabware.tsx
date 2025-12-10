@@ -9,6 +9,10 @@ import {
   ListButtonAccordionContainer,
   SPACING,
 } from '@opentrons/components'
+import {
+  FLEX_STACKER_MODULE_V1,
+  getModuleMaxFillHeight,
+} from '@opentrons/shared-data'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
@@ -24,7 +28,7 @@ import { getStackerDefinitions } from '../../../pages/Designer/DeckSetup/utils'
 import { TIPRACK_LID_LOADNAME } from '../../../pages/Designer/utils'
 import { SelectLabwareOnAdapter } from './SelectLabwareOnAdapter'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
-import { getIsNestedDefinitionALid } from './utils'
+import { getHopperStackLimit, getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -37,7 +41,7 @@ interface SelectLabwareProps {
   slot: string
   handleCategoryClick: (category: string, expand?: boolean) => void
   areCategoriesExpanded: CategoryExpand
-  onFlexStacker: boolean
+  isOnHopper: boolean
   filteredLabwareByCategory: Record<string, LabwareInfo[]>
   searchFilter: (termToCheck: string) => boolean
   getIsLabwareFiltered: (labwareDef: LabwareDefinition2) => boolean
@@ -48,7 +52,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
     slot,
     handleCategoryClick,
     areCategoriesExpanded,
-    onFlexStacker,
+    isOnHopper,
     filteredLabwareByCategory,
     universalLid,
     getIsLabwareFiltered,
@@ -124,7 +128,10 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                   isExpanded={areCategoriesExpanded[category]}
                 >
                   {filteredLabwareByCategory[category]?.map(({ def, uri }) => {
-                    const loadName = def.parameters.loadName
+                    const { parameters, dimensions } = def
+                    const { loadName, isTiprack } = parameters
+                    const { zDimension } = dimensions
+
                     const isAdapter = def.allowedRoles?.includes('adapter')
                     const stackingLabwareDefUris = getStackerDefinitions(
                       {
@@ -135,13 +142,19 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                       loadName,
                       category
                     )
+                    const hopperStackLimit = getHopperStackLimit(zDimension)
+
                     const stackingProps: StackingProps | null =
-                      stackingLabwareDefUris.length === 1 && slot !== 'offDeck'
+                      isOnHopper ||
+                      (stackingLabwareDefUris.length === 1 &&
+                        slot !== 'offDeck')
                         ? {
                             inputTitle: t('labware_quantity'),
                             errorMessage: t('unsupported_range'),
                             inputCaption: t('valid_range', {
-                              max: defs[stackingLabwareDefUris[0]].stackLimit,
+                              max: isOnHopper
+                                ? hopperStackLimit
+                                : defs[stackingLabwareDefUris[0]].stackLimit,
                             }),
                             definition: defs[stackingLabwareDefUris[0]],
                             inputFieldValue: selectedTopLabware.amount ?? 0,
@@ -157,27 +170,32 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                                 .displayName,
                             }),
                             checked: selectedLidLabware != null,
-                            onCheckboxChange: () => {
-                              dispatch(
-                                selectLid({
-                                  labwareDefURI:
-                                    selectedLidLabware ===
-                                    stackingLabwareDefUris[0]
-                                      ? null
-                                      : stackingLabwareDefUris[0],
-                                })
-                              )
-                            },
+                            onCheckboxChange:
+                              !isTiprack && isOnHopper
+                                ? undefined
+                                : () => {
+                                    dispatch(
+                                      selectLid({
+                                        labwareDefURI:
+                                          selectedLidLabware ===
+                                          stackingLabwareDefUris[0]
+                                            ? null
+                                            : stackingLabwareDefUris[0],
+                                      })
+                                    )
+                                  },
                           }
                         : null
-
                     return searchFilter(def.metadata.displayName) &&
                       !getIsLabwareFiltered(def) ? (
                       <Fragment key={`${category}_${loadName}`}>
                         <CustomizeExpandButton
+                          customStackLimit={
+                            isOnHopper ? hopperStackLimit : undefined
+                          }
                           isNestedDefALid={getIsNestedDefinitionALid(def)}
                           allowInputField={
-                            onFlexStacker || lidLoadNames.includes(loadName)
+                            isOnHopper || lidLoadNames.includes(loadName)
                           }
                           stackingProps={stackingProps ?? undefined}
                           id={`${category}_${loadName}`}
@@ -207,7 +225,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                           isAdapter={isAdapter ?? false}
                           category={category}
                           loadName={loadName}
-                          lidURIs={stackingLabwareDefUris}
+                          lidURIs={isOnHopper ? [] : stackingLabwareDefUris}
                         />
                       </Fragment>
                     ) : null

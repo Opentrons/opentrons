@@ -12,7 +12,7 @@ import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectLid, selectTopLabware } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { CUSTOM_CATEGORY } from '../../../pages/Designer/DeckSetup/constants'
-import { getIsNestedDefinitionALid } from './utils'
+import { getHopperStackLimit, getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -25,7 +25,7 @@ interface SelectCustomLabwareProps {
   slot: string
   handleCategoryClick: (category: string, expand?: boolean) => void
   areCategoriesExpanded: CategoryExpand
-  onFlexStacker: boolean
+  isOnHopper: boolean
   filteredLabwareByCategory: Record<string, LabwareInfo[]>
   universalLid?: [string, LabwareDefinition2]
 }
@@ -36,7 +36,7 @@ export function SelectCustomLabware(
     slot,
     handleCategoryClick,
     areCategoriesExpanded,
-    onFlexStacker,
+    isOnHopper,
     filteredLabwareByCategory,
     universalLid,
   } = props
@@ -68,6 +68,10 @@ export function SelectCustomLabware(
           isExpanded={areCategoriesExpanded[CUSTOM_CATEGORY]}
         >
           {filteredLabwareByCategory[CUSTOM_CATEGORY].map(({ uri }, index) => {
+            const isTiprack = customLabwareDefs[uri].parameters.isTiprack
+            const zDimension = customLabwareDefs[uri].dimensions.zDimension
+            const hopperStackLimit = getHopperStackLimit(zDimension)
+
             const lidProps: StackingProps | null =
               slot !== 'offDeck' &&
               universalLid != null &&
@@ -81,25 +85,35 @@ export function SelectCustomLabware(
                     }),
                     inputFieldValue: 1,
                     onInputFieldChange: () => {},
-                    inputCaption: '',
-                    checked: selectedLidLabware != null,
-                    onCheckboxChange: () => {
-                      dispatch(
-                        selectLid({
-                          labwareDefURI:
-                            selectedLidLabware === universalLid[0] ? null : uri,
+                    inputCaption: isOnHopper
+                      ? t('valid_range', {
+                          max: hopperStackLimit,
                         })
-                      )
-                    },
+                      : undefined,
+                    checked: selectedLidLabware != null,
+                    onCheckboxChange:
+                      !isTiprack && isOnHopper
+                        ? undefined
+                        : () => {
+                            dispatch(
+                              selectLid({
+                                labwareDefURI:
+                                  selectedLidLabware === universalLid[0]
+                                    ? null
+                                    : uri,
+                              })
+                            )
+                          },
                   }
                 : null
 
             return (
               <CustomizeExpandButton
+                customStackLimit={isOnHopper ? hopperStackLimit : undefined}
                 isNestedDefALid={getIsNestedDefinitionALid(
                   customLabwareDefs[uri]
                 )}
-                allowInputField={onFlexStacker}
+                allowInputField={isOnHopper}
                 key={`${index}_${uri}`}
                 id={`${index}_${uri}`}
                 buttonText={customLabwareDefs[uri].metadata.displayName}
