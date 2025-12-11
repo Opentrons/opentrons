@@ -1,81 +1,56 @@
 """Push one or more folders to one or more robots."""
 import subprocess
 import json
-from typing import List
 from multiprocessing import Process, Queue
 
-global folders
-# Opentrons folders that can be pushed to robot
-folders = [
-    "abr-testing",
-    "hardware-testing",
-    "abr-testing + hardware-testing",
-    "other",
-]
 
-
-def push_subroutine(cmd: str, queue: Queue) -> None:
+def push_subroutine(cmd: list[str], queue: Queue) -> None:
     """Pushes specified folder to specified robot."""
+    message = f'folder {cmd[2]} to ip {cmd[-1].split("=")[1]}'
     try:
         subprocess.run(cmd)
-        queue.put(f"{cmd}: SUCCESS!\n")
-    except Exception:
-        queue.put(f"{cmd}: FAILED\n")
+        queue.put(f"SUCCESS: sent {message}!\n")
+    except Exception as e:
+        print("Failed to push folder:", e)
+        queue.put(f"FAILURE: could not send {message}.\n")
 
 
-def main(folder_to_push: str, robot_to_push: str) -> int:
-    """Main process!"""
-    cmd = "make -C {folder} push-ot3 host={ip}"
-    robot_ip_path = ""
-    push_cmd = ""
-    processes: List[Process] = []
-    queue: Queue = Queue()
-    folder_int = int(folder_to_push)
-    if folders[folder_int].lower() == "abr-testing + hardware-testing":
-        if robot_to_push.lower() == "all":
-            robot_ip_path = input("Path to robot ips: ")
-            with open(robot_ip_path, "r") as ip_file:
-                robot_json = json.load(ip_file)
-                robot_ips_dict = robot_json.get("ip_address_list")
-                robot_ips = list(robot_ips_dict.keys())
-                ip_file.close()
-        else:
-            robot_ips = [robot_to_push]
-        for folder_name in folders[:-2]:
-            # Push abr-testing and hardware-testing folders to all robots
-            for robot in robot_ips:
-                push_cmd = cmd.format(folder=folder_name, ip=robot)
-                process = Process(
-                    target=push_subroutine,
-                    args=(
-                        push_cmd,
-                        queue,
-                    ),
-                )
-                process.start()
-                processes.append(process)
+def get_robot_ips() -> set[str]:
+    """Get robot ips from the user."""
+    user_input = input("Type in robots ip (type all for all): ")
+    if user_input.lower() == "all":
+        robot_ip_path = input("Path to robot ips: ")
+        with open(robot_ip_path, "r") as ip_file:
+            robot_json = json.load(ip_file)
+            robot_ips_dict = robot_json.get("ip_address_list")
+            return set(robot_ips_dict.keys())
     else:
+        return {user_input}
 
-        if folder_int == (len(folders) - 1):
-            folder_name = input("Which folder? ")
-        else:
-            folder_name = folders[folder_int]
-        if robot_to_push.lower() == "all":
-            robot_ip_path = input("Path to robot ips: ")
-            with open(robot_ip_path, "r") as ip_file:
-                robot_json = json.load(ip_file)
-                robot_ips = robot_json.get("ip_address_list")
-            ip_file.close()
-        else:
-            robot_ips = [robot_to_push]
 
-        # Push folder to robots
+def get_folder_names() -> set[str]:
+    """Get folder names from the user."""
+    folder_input = input("Type in folder names separated by commas: ")
+    folder_names = {name.strip() for name in folder_input.split(",")}
+    return folder_names
+
+
+def main(folder_to_push: set[str], robot_ips: set[str]) -> int:
+    """Builds commands to push folders to specified robots."""
+    processes: list[Process] = []
+    queue: Queue = Queue()
+    for folder_name in folder_to_push:
         for robot in robot_ips:
-            push_cmd = cmd.format(folder=folder_name, ip=robot)
-            process = Process(target=push_subroutine, args=(push_cmd, queue))
+            push_cmd = ["make", "-C", folder_name, "push-ot3", f"host={robot}"]
+            process = Process(
+                target=push_subroutine,
+                args=(
+                    push_cmd,
+                    queue,
+                ),
+            )
             process.start()
             processes.append(process)
-
     for process in processes:
         process.join()
         result = queue.get()
@@ -84,8 +59,8 @@ def main(folder_to_push: str, robot_to_push: str) -> int:
 
 
 if __name__ == "__main__":
-    for i, folder in enumerate(folders):
-        print(f"{i}) {folder}")
-    folder_to_push = input("Please Select a Folder to Push: ")
-    robot_to_push = input("Type in robots ip (type all for all): ")
+    print("Welcome to the batch Opentrons robot push-folder tool.")
+    print("This tool has been tested on the abr-testing & hardware-testing repos.")
+    folder_to_push = get_folder_names()
+    robot_to_push = get_robot_ips()
     print(main(folder_to_push, robot_to_push))
