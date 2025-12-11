@@ -4439,7 +4439,7 @@
         "flowRate": 15.12,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "volume": 13.333333333333332,
+        "volume": 13.333333333333334,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -4457,7 +4457,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "volume": 13.333333333333332
+        "volume": 13.333333333333334
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -4538,7 +4538,7 @@
         "flowRate": 15.12,
         "labwareId": "UUID",
         "pipetteId": "UUID",
-        "volume": 14.333333333333332,
+        "volume": 14.333333333333334,
         "wellLocation": {
           "offset": {
             "x": 0.0,
@@ -4556,7 +4556,7 @@
           "y": 0.0,
           "z": 0.0
         },
-        "volume": 14.333333333333332
+        "volume": 14.333333333333334
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

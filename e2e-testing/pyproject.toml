@@ -7,7 +7,7 @@ name = "e2e-testing"
 version = "0.1.0"
 description = "E2E tests for Opentrons Protocol Designer"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "mypy>=1.13.0",
     "playwright>=1.55.0",
@@ -27,7 +27,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 120
-target-version = "py310"
+target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]

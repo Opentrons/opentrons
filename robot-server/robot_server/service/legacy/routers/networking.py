@@ -248,7 +248,7 @@ async def get_eap_options() -> EapOptions:
                     name=o.get("name"),  # type: ignore[arg-type]
                     displayName=o.get("displayName"),  # type: ignore[arg-type]
                     required=o.get("required"),  # type: ignore[arg-type]
-                    type=EapConfigOptionType(o.get("type")),
+                    type=EapConfigOptionType(o.get("type")),  # type: ignore[arg-type]
                 )
                 for o in m.args()
             ],

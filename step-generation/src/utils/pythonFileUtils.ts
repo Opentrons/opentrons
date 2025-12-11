@@ -12,6 +12,7 @@ import {
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
 
+import { HOPPER_STACKER_LOCATION } from '../constants'
 import { getLiquidClassName } from './liquidClassUtils'
 import { getSlotInLocationStack } from './misc'
 import {
@@ -47,8 +48,8 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-export const PAPI_VERSION = '2.27' // latest version from api/src/opentrons/protocols/api_support/definitions.py from the RS release branch
-export const PD_APPLICATION_VERSION = '8.7.0' // latest PD version to insert into DESIGNER_APPLICATION blob
+export const PAPI_VERSION = '2.28' // latest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
+export const PD_APPLICATION_VERSION = '8.8.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
   return ['import json', 'from opentrons import protocol_api, types'].join('\n')
@@ -279,7 +280,6 @@ export function getLoadLabware(
   const lidEntities = Object.values(allLabwareEntities).filter(lw =>
     lw.def.allowedRoles?.includes('lid')
   )
-
   const pythonLabware = Object.values(labwareEntities)
     .reduce<string[]>((acc, labware) => {
       const { id, def, pythonName } = labware
@@ -291,21 +291,26 @@ export function getLoadLabware(
       const hasNickname =
         labwareNicknamesById[id] != null &&
         labwareNicknamesById[id] !== metadata.displayName
+      const isLabwareOnHopper = labwareRobotState[id].stack.includes(
+        HOPPER_STACKER_LOCATION
+      )
       // 2nd item in stack is the slot the labware is on
       const labwareSlot = labwareRobotState[id].stack[1]
       const onModule = moduleEntities[labwareSlot] != null
-      const onAdapter = allLabwareEntities[labwareSlot] != null
+      const onLabware = allLabwareEntities[labwareSlot] != null
 
       let parentName: string
       let locationArg: string | undefined
-      if (onAdapter) {
+      if (onLabware && !isLabwareOnHopper) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
         parentName = moduleEntities[labwareSlot].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
         locationArg = `location=${
-          labwareSlot === 'offDeck' ? OFF_DECK : formatPyStr(labwareSlot)
+          labwareSlot === 'offDeck' || isLabwareOnHopper
+            ? OFF_DECK
+            : formatPyStr(labwareSlot)
         }`
       }
       const labelArg = hasNickname
@@ -579,8 +584,7 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
-    // TODO: call this when we have a way to get the labware on the shuttle location
-    // getSetStoredLabware(moduleEntities, labwareEntities, labware),
+    getSetStoredLabware(moduleEntities, labwareEntities, labware),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -636,27 +640,30 @@ export const getSetStoredLabware = (
     const { id, type, pythonName } = module
 
     if (type === FLEX_STACKER_MODULE_TYPE) {
-      const labwareOnModule = Object.entries(labware).find(([_, labware]) =>
-        labware.stack?.includes(id)
+      const labwaresOnHopper = Object.entries(labware).filter(
+        ([_, labware]) =>
+          labware.stack.includes(id) &&
+          labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
-      if (labwareOnModule == null) {
+      if (labwaresOnHopper.length === 0) {
         return ''
       } else {
-        // Count only labware items (excluding slot, module, and adapters)
-        const labwareCount = labwareOnModule[1].stack.filter(
-          itemId =>
-            itemId in labwareEntities &&
-            !labwareEntities[itemId].def.allowedRoles?.includes('adapter') &&
-            !labwareEntities[itemId].def.allowedRoles?.includes('lid')
-        ).length
-        const labwareEntity = labwareEntities[labwareOnModule[0]]
-        const setStoredLabwareArgs = [
-          `loadName=${formatPyStr(labwareEntity.def.parameters.loadName)}`,
-          `namespace=${formatPyStr(labwareEntity.def.namespace)}`,
-          `version=${labwareEntity.def.version}`,
-          `count=${labwareCount}`,
-        ].join(',\n')
-        return `${pythonName} = ${PROTOCOL_CONTEXT_NAME}.set_stored_labware(\n${indentPyLines(setStoredLabwareArgs)})`
+        const labwarePythonNames = Object.values(labwaresOnHopper).map(
+          labware => labwareEntities[labware[0]].pythonName
+        )
+        const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
+
+        const indentedLabwarePythonNames = labwareChunks
+          .map(chunk => INDENT + chunk.join(', '))
+          .join(',\n')
+
+        const pythonLabwareNames =
+          labwarePythonNames.length < 4
+            ? labwarePythonNames.join(', ')
+            : `\n${indentedLabwarePythonNames}\n`
+        const pythonArgs = `labware=[${pythonLabwareNames}],\n`
+
+        return `${pythonName}.set_stored_labware_items(\n${indentPyLines(pythonArgs)})`
       }
     }
   })

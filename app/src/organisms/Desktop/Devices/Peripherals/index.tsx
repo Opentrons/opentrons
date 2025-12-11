@@ -21,11 +21,13 @@ export function Peripherals({
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('peripherals')}
       </StyledText>
-      <CameraCard
-        isFlex={isFlex}
-        robotName={robotName}
-        isRobotBusy={isRobotBusy}
-      />
+      <div className={styles.card_column}>
+        <CameraCard
+          isFlex={isFlex}
+          robotName={robotName}
+          isRobotBusy={isRobotBusy}
+        />
+      </div>
     </div>
   )
 }

@@ -58,7 +58,7 @@
 
 .hover_shadow:hover {
   border-radius: var(--border-radius-8);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgb(0 0 0 / 20%);
 }
 
 .styled_icon {
@@ -139,7 +139,6 @@
 
 .attachments_container {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   gap: var(--spacing-8);
 }

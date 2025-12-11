@@ -382,7 +382,16 @@ export const savedStepForms = (
           allLabware,
           latestDefs
         )
-        acc[updatedLabwareId] = location
+        // The `location` can be a labwareId too, so update its version as well.
+        // (We only recently realized that we need to update `location`, so there are
+        // probably saved protocols out there where we hadn't updated `location` and
+        // it refers to a labwareId that doesn't exist in metadata.labware.)
+        const [locationUUID, locationDefURI] = location.split(':')
+        const updatedLocation =
+          locationDefURI && locationDefURI in allLabware
+            ? `${locationUUID}:${getMigratedURI(locationDefURI, allLabware, latestDefs)}`
+            : location
+        acc[updatedLabwareId] = updatedLocation
         return acc
       }, {})
 

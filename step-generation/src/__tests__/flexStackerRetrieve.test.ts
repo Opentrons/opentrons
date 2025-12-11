@@ -111,7 +111,7 @@ describe('flexStackerRetrieve', () => {
           },
         },
       ],
-      python: 'wellPlate_1 = mock_flex_stacker_1.retrieve()',
+      python: 'mock_flex_stacker_1.retrieve()',
     })
   })
   it('raises an error if the hopper is empty', () => {

@@ -1,5 +1,5 @@
 """Definition of CAN messages."""
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Type, Any
 import threading
 from typing_extensions import Literal
@@ -56,7 +56,7 @@ class BaseMessage(object):
 class EmptyPayloadMessage(BaseMessage):
     """Base class of a message that has an empty payload."""
 
-    payload: payloads.EmptyPayload = payloads.EmptyPayload()
+    payload: payloads.EmptyPayload = field(default_factory=payloads.EmptyPayload)
     payload_type: Type[payloads.EmptyPayload] = payloads.EmptyPayload
 
 

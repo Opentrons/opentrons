@@ -10,12 +10,11 @@ export const flexStackerRetrieve: CommandCreator<
 > = (args, invariantContext, robotState) => {
   const { moduleId } = args
   const { modules, labware } = robotState
-  const { moduleEntities, labwareEntities } = invariantContext
+  const { moduleEntities } = invariantContext
   const modulePythonName = moduleEntities[moduleId].pythonName
   const moduleLocation = modules[moduleId].slot
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const labwareIdOnHopper = getLabwareIdOnHopper(labware, moduleLocation)
-  const labwarePythonName = labwareEntities[labwareIdOnHopper]?.pythonName
 
   if (flexStackerState !== null && getLabwareIdOnShuttle(flexStackerState)) {
     return {
@@ -37,6 +36,6 @@ export const flexStackerRetrieve: CommandCreator<
         },
       },
     ],
-    python: `${labwarePythonName} = ${modulePythonName}.retrieve()`,
+    python: `${modulePythonName}.retrieve()`,
   }
 }
