@@ -582,7 +582,7 @@ name = "exceptiongroup"
 version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/50/79/66800aadf48771f6b62f7eb014e352e5d06856655206165d775e675a02c9/exceptiongroup-1.3.1.tar.gz", hash = "sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219", size = 30371, upload-time = "2025-11-21T23:01:54.787Z" }
 wheels = [
@@ -1449,7 +1449,7 @@ dev = [
     { name = "sphinx-tabs", specifier = ">=3.4.1,<4" },
     { name = "sphinxext-opengraph", specifier = "==0.8.1" },
     { name = "twine", specifier = "==4.0.0" },
-    { name = "typeguard", specifier = "==4.1.5" },
+    { name = "typeguard", specifier = "~=4.4.4" },
     { name = "types-mock", specifier = "~=5.1.0" },
     { name = "types-setuptools", specifier = "==57.0.2" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -1551,7 +1551,7 @@ dev = [
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=3.5.0" },
     { name = "twine", specifier = "==4.0.0" },
-    { name = "typeguard", specifier = "~=4.1.5" },
+    { name = "typeguard", specifier = "~=4.4.4" },
     { name = "types-pillow" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
     { name = "wheel", specifier = "==0.37.1" },
@@ -2464,14 +2464,14 @@ wheels = [
 
 [[package]]
 name = "typeguard"
-version = "4.1.5"
+version = "4.4.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
+    { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/90/fb/e5d68ef7b0bca67d06bb4a15f9317decbd1a3f323c3d89221d2ca4c11512/typeguard-4.1.5.tar.gz", hash = "sha256:ea0a113bbc111bcffc90789ebb215625c963411f7096a7e9062d4e4630c155fd", size = 69228, upload-time = "2023-09-11T07:31:40.91Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c7/68/71c1a15b5f65f40e91b65da23b8224dad41349894535a97f63a52e462196/typeguard-4.4.4.tar.gz", hash = "sha256:3a7fd2dffb705d4d0efaed4306a704c89b9dee850b688f060a8b1615a79e5f74", size = 75203, upload-time = "2025-06-18T09:56:07.624Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/18/01/5fc45558268ced46d86292763477996a3cdd505567cd590a688e8cdc386e/typeguard-4.1.5-py3-none-any.whl", hash = "sha256:8923e55f8873caec136c892c3bed1f676eae7be57cdb94819281b3d3bc9c0953", size = 34179, upload-time = "2023-09-11T07:31:39.282Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/a9/e3aee762739c1d7528da1c3e06d518503f8b6c439c35549b53735ba52ead/typeguard-4.4.4-py3-none-any.whl", hash = "sha256:b5f562281b6bfa1f5492470464730ef001646128b180769880468bd84b68b09e", size = 34874, upload-time = "2025-06-18T09:56:05.999Z" },
 ]
 
 [[package]]

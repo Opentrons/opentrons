@@ -49,7 +49,7 @@ dev = [
     "pytest>=8.4.0,<9",
     "pytest-cov==4.1.0",
     "pytest-xdist~=3.5.0",
-    "typeguard~=4.1.5",
+    "typeguard~=4.4.4",
     "typing-extensions>=4.0.0,<5",
     "atomicwrites==1.4.0; sys_platform == 'win32'",
     "colorama==0.4.4; sys_platform == 'win32'",
