@@ -20,7 +20,7 @@ export function FlexStackerSummary(
   const { currentStep, labwareEntities } = props
   const { fillLabwareUri, fillQuantity, flexStackerFormType } = currentStep
   const labwareName = Object.values(labwareEntities).find(
-    lw => lw.labwareDefURI === fillLabwareUri
+    ({ labwareDefURI }) => labwareDefURI === fillLabwareUri
   )?.def.metadata.displayName
   let stepSummaryContent: JSX.Element | null = null
 
