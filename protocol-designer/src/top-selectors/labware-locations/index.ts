@@ -5,6 +5,7 @@ import {
   FLEX_MODULE_ADDRESSABLE_AREAS,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_ADDRESSABLE_AREAS,
+  FLEX_STACKER_MODULE_TYPE,
   getDeckDefFromRobotType,
   getModuleDisplayName,
   isAddressableAreaStandardSlot,
@@ -233,6 +234,8 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
 
       const unoccupiedModuleOptions = Object.entries(modules).reduce<Option[]>(
         (acc, [modId, modOnDeck]) => {
+          const isModuleIsAStacker =
+            modOnDeck.moduleState.type === FLEX_STACKER_MODULE_TYPE
           const moduleHasLabware = Object.entries(labware).some(
             ([_, lwOnDeck]) =>
               lwOnDeck.stack[lwOnDeck.stack.length - 2] === modId
@@ -249,7 +252,9 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
             : [
                 ...acc,
                 {
-                  name: getModuleDisplayName(moduleEntities[modId].model),
+                  name: isModuleIsAStacker
+                    ? slot
+                    : getModuleDisplayName(moduleEntities[modId].model),
                   value: modId,
                   deckLabel: tcLocations != null ? tcLocations : slot,
                 },

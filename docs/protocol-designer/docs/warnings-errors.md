@@ -39,4 +39,4 @@ When designing your protocol, consider the order the labware and modules should 
   <figcaption>Labware can't be moved to the Heater-Shaker module when the labware latch is closed.</figcaption>
 </figure>
 
-For example, the labware latch of the Heater-Shaker needs to be open to move labware to and from the module. Before heating or shaking, the latch needs to be closed. To resolve this errors, add a Heater-Shaker step to open the labware latch or drag and drop to change the order of steps. 
+For example, the labware latch of the Heater-Shaker needs to be open to move labware to and from the module. Before heating or shaking, the latch needs to be closed. To resolve this error, add a Heater-Shaker step to open the labware latch or drag and drop to change the order of steps. 

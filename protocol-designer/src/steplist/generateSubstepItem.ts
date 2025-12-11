@@ -363,7 +363,7 @@ export function generateSubstepItem(
       lidTargetTempHold,
       message,
       meta,
-      profileSteps,
+      profileElements,
       profileTargetLidTemp,
       profileVolume,
     } = stepArgs
@@ -375,7 +375,7 @@ export function generateSubstepItem(
       lidTargetTempHold,
       message,
       meta,
-      profileSteps,
+      profileElements,
       profileTargetLidTemp,
       profileVolume,
     }

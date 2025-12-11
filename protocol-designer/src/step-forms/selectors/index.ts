@@ -54,6 +54,7 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
+import type { BonusStepModalType } from '/protocol-designer/components/organisms'
 import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   FormData,
@@ -294,7 +295,8 @@ const _getInitialDeckSetup = (
           stack: getLocationStackTopToBottom(
             labwareId,
             labwareLocations,
-            moduleLocations
+            moduleLocations,
+            moduleEntities
           ),
           ...labwareEntities[labwareId],
         }
@@ -818,28 +820,54 @@ export const getArgsAndErrorsByStepId: Selector<
     )
   }
 )
-export const getUnsavedFormIsPristineSetTempForm = createSelector(
+
+export const getBonusStepModalType = createSelector(
   getUnsavedForm,
   getCurrentFormIsPresaved,
-  (unsavedForm, isPresaved): boolean => {
-    const isSetTempForm =
+  featureFlagSelectors.getEnableConcurrentModuleActions,
+  (
+    unsavedForm,
+    currentFormIsPresaved,
+    enableConcurrentModuleActions
+  ): BonusStepModalType | null => {
+    // NOTE: This logic to decide whether a bonus step is warranted should be kept in
+    // sync with saveStepForm().
+
+    const isTempModSetTempForm =
       unsavedForm?.stepType === 'temperature' &&
       unsavedForm?.targetTemperature != null
-    return isPresaved && isSetTempForm
-  }
-)
-
-export const getUnsavedFormIsPristineHeaterShakerForm = createSelector(
-  getUnsavedForm,
-  getCurrentFormIsPresaved,
-  (unsavedForm, isPresaved): boolean => {
-    const isSetHsTempForm =
+    const isHSSetTempForm =
       unsavedForm?.stepType === 'heaterShaker' &&
-      unsavedForm?.targetHeaterShakerTemperature != null
+      unsavedForm?.targetHeaterShakerTemperature != null &&
+      unsavedForm?.heaterShakerSetTimer !== true
+    const isTCProfileForm =
+      unsavedForm?.stepType === 'thermocycler' &&
+      unsavedForm?.thermocyclerFormType === 'thermocyclerProfile'
 
-    return isPresaved && isSetHsTempForm
+    const isFirstTimeSavingThisForm = currentFormIsPresaved
+
+    // todo(mm, 2025-11-24): These should also be conditional on "Don't show again"
+    // not having been clicked before. https://opentrons.atlassian.net/browse/EXEC-1925
+    if (isTempModSetTempForm && isFirstTimeSavingThisForm) {
+      return enableConcurrentModuleActions
+        ? 'explainWaitForTemperatureModuleTemp'
+        : 'optionallyWaitForTemp'
+    } else if (isHSSetTempForm && isFirstTimeSavingThisForm) {
+      return enableConcurrentModuleActions
+        ? 'explainWaitForHeaterShakerTemp'
+        : 'optionallyWaitForTemp'
+    } else if (
+      enableConcurrentModuleActions &&
+      isTCProfileForm &&
+      isFirstTimeSavingThisForm
+    ) {
+      return 'explainWaitForThermocyclerProfile'
+    } else {
+      return null
+    }
   }
 )
+
 export const getFormLevelWarningsForUnsavedForm: Selector<
   BaseState,
   FormWarning[]
@@ -857,6 +885,7 @@ export const getFormLevelWarningsForUnsavedForm: Selector<
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
 )
+
 export const getFormLevelWarningsPerStep: Selector<
   BaseState,
   Record<string, FormWarning[]>

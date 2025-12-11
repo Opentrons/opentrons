@@ -29,7 +29,7 @@ export function FixtureOption(props: FixtureOptionProps): JSX.Element {
   return (
     <ListItem
       type="default"
-      padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
+      padding={`${SPACING.spacing16} ${SPACING.spacing12}`}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >

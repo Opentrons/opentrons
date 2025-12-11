@@ -30,6 +30,7 @@ import { forDisengageMagnet, forEngageMagnet } from './magnetUpdates'
 import {
   forFlexStackerEmpty,
   forFlexStackerFill,
+  forFlexStackerFillItems,
   forFlexStackerRetrieve,
   forFlexStackerStore,
 } from './stackerUpdates'
@@ -46,6 +47,7 @@ import {
   forThermocyclerDeactivateBlock,
   forThermocyclerDeactivateLid,
   forThermocyclerOpenLid,
+  forThermocyclerRunExtendedProfile,
   forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
@@ -124,8 +126,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'createTimer':
     case 'waitForTasks':
       break
-    // setStoredLabware is handled in the python file while adding a labware on the stacker. no need to update state
+    // setStoredLabware and setStoredLabwareItems handled in the python file while adding a labware on the stacker. no need to update state
     case 'flexStacker/setStoredLabware':
+    case 'flexStacker/setStoredLabwareItems':
       break
     // unsafe commands, no need to update state
     case 'flexStacker/prepareShuttle':
@@ -141,6 +144,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'flexStacker/fill':
       forFlexStackerFill(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'flexStacker/fillItems':
+      forFlexStackerFillItems(
         command.params,
         invariantContext,
         robotStateAndWarnings
@@ -315,6 +325,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
 
     case 'thermocycler/runProfile':
       forThermocyclerRunProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'thermocycler/runExtendedProfile':
+      forThermocyclerRunExtendedProfile(
         command.params,
         invariantContext,
         robotStateAndWarnings

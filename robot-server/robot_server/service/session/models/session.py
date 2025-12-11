@@ -1,10 +1,11 @@
 from datetime import datetime
-from enum import Enum
 
 import typing
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
+
+from opentrons_shared_data.util import StrEnum
 
 from robot_server.robot.calibration.check.models import (
     CalibrationCheckSessionStatus,
@@ -24,7 +25,7 @@ from robot_server.service.json_api import (
 )
 
 
-class SessionType(str, Enum):
+class SessionType(StrEnum):
     """The available session types"""
 
     calibration_check = "calibrationCheck"

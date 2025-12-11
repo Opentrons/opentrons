@@ -13,10 +13,13 @@ import {
 import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
-import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
-import { stepDetailViewerOpenAction } from '/app/redux/shell'
+import {
+  stepDetailViewerOpenAction,
+  stepDetailViewerUpdateAction,
+} from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
+import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
@@ -100,6 +103,11 @@ export function VisualizerContainer(
     setIsPlaying(prev => !prev)
   }
 
+  const { robotState } = frame
+  const selectedRunTimeCommand = commands.find(
+    command => command.id === selectedCommandId
+  )
+
   useEffect(() => {
     if (!isPlaying) return
 
@@ -119,10 +127,38 @@ export function VisualizerContainer(
     }
   }, [isPlaying, commands, milliSecondsPerFrame])
 
-  const { robotState } = frame
-  const selectedRunTimeCommand = commands.find(
-    command => command.id === selectedCommandId
-  )
+  //  update the data for the spotlight window
+  //  whenever the command index changes
+  useEffect(() => {
+    if (selectedCommandId == null) return
+
+    const nextIndex = commands.findIndex(c => c.id === selectedCommandId)
+    if (nextIndex < 0) return
+
+    const nextSpotlight = {
+      protocolKey,
+      slot: selectedSlot,
+      command: commands[nextIndex],
+      robotState,
+      invariantContext: invariantContext,
+      analysis,
+      liquids,
+    }
+
+    if (nextSpotlight.slot != null && nextSpotlight.command != null) {
+      dispatch(stepDetailViewerUpdateAction(nextSpotlight))
+    }
+  }, [
+    selectedCommandId,
+    selectedSlot,
+    protocolKey,
+    robotState,
+    invariantContext,
+    analysis,
+    liquids,
+    commands,
+  ])
+
   const isThermocyclerAttached = Object.keys(robotState.modules).some(
     id => invariantContext.moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
   )
@@ -258,15 +294,6 @@ export function VisualizerContainer(
           isPlaying={isPlaying}
           commands={filteredCommands}
           groupedCommands={groupedCommands}
-          spotlightWindowData={{
-            protocolKey,
-            slot: selectedSlot,
-            command: selectedRunTimeCommand,
-            robotState,
-            invariantContext,
-            analysis,
-            liquids,
-          }}
           milliSecondsPerFrame={milliSecondsPerFrame}
           setMilliSecondsPerFrame={setMilliSecondsPerFrame}
         />

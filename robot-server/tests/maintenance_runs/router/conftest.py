@@ -8,6 +8,7 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
+from robot_server.runs.run_data_manager import RunDataManager
 from opentrons.protocol_engine import ProtocolEngine
 from robot_server.deck_configuration.store import DeckConfigurationStore
 
@@ -28,8 +29,14 @@ def mock_protocol_engine(decoy: Decoy) -> ProtocolEngine:
 
 @pytest.fixture
 def mock_maintenance_run_data_manager(decoy: Decoy) -> MaintenanceRunDataManager:
-    """Get a mock RunDataManager."""
+    """Get a mock MaintenanceRunDataManager."""
     return decoy.mock(cls=MaintenanceRunDataManager)
+
+
+@pytest.fixture
+def mock_run_data_manager(decoy: Decoy) -> RunDataManager:
+    """Get a mock RunDataManager."""
+    return decoy.mock(cls=RunDataManager)
 
 
 @pytest.fixture

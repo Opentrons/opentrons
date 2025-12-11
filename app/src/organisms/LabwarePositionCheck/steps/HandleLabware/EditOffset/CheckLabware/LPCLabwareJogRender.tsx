@@ -4,6 +4,7 @@ import { css } from 'styled-components'
 
 import {
   ALIGN_CENTER,
+  CenterLabwareInSlot,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -41,10 +42,10 @@ export function LPCLabwareJogRender({
     <Flex css={RENDER_CONTAINER_STYLE}>
       <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
         {() => (
-          <>
+          <CenterLabwareInSlot definition={itemLwDef}>
             <LabwareRender
               definition={itemLwDef}
-              positioningMode="offsetInSlot"
+              positioningMode="passThrough"
               wellStroke={{ A1: COLORS.blue50 }}
               wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
               highlightedWellLabels={{ wells: ['A1'] }}
@@ -56,7 +57,7 @@ export function LPCLabwareJogRender({
               pipetteName={pipetteName}
               usingMetalProbe={true}
             />
-          </>
+          </CenterLabwareInSlot>
         )}
       </RobotWorkSpace>
       <LevelWithLabware runId={runId} />

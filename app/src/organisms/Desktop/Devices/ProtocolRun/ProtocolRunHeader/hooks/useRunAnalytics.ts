@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import {
   SOURCE_RUN_RECORD,
   useCameraAnalytics,
@@ -15,8 +16,6 @@ import {
   useIsRunCurrent,
   useNotifyRunQuery,
 } from '/app/resources/runs'
-
-import { isTerminalRunStatus } from '../utils'
 
 interface UseRunAnalyticsProps {
   runId: string

@@ -17,6 +17,5 @@ const AltPrimaryButtonComponent: FC<ComponentProps<'button'> & StyleProps> = ({
   return <Btn {...props} className={combinedClassName} />
 }
 
-export const AltPrimaryButton: FC<
-  ComponentProps<'button'> & StyleProps
-> = withStyleProps(AltPrimaryButtonComponent)
+export const AltPrimaryButton: FC<ComponentProps<'button'> & StyleProps> =
+  withStyleProps(AltPrimaryButtonComponent)

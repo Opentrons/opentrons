@@ -8,7 +8,6 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
-  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -43,6 +42,7 @@ import {
 } from '@opentrons/react-api-client'
 
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
@@ -126,11 +126,6 @@ export function RunSummary(): JSX.Element {
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
   const robotType = useRobotType(robotName)
-  const onCloneRunSuccess = (): void => {
-    if (isQuickTransfer) {
-      deleteRun(runId)
-    }
-  }
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(
     runId,
@@ -146,7 +141,7 @@ export function RunSummary(): JSX.Element {
     }
   }, [isRunCurrent, enteredER])
 
-  const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
+  const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
@@ -177,11 +172,7 @@ export function RunSummary(): JSX.Element {
     runId,
     { cursor: 0, pageLength: 100 },
     {
-      enabled:
-        runStatus != null &&
-        // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus) &&
-        isRunCurrent,
+      enabled: isTerminalRunStatus(runStatus) && isRunCurrent,
     }
   )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.

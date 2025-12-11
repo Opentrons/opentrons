@@ -34,7 +34,14 @@ import {
   dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { CLEAN, EMPTY, STAGING_AREA_SLOTS, ZERO_OFFSET } from '../constants'
+import {
+  CLEAN,
+  EMPTY,
+  HOPPER_FAKE_LOCATIONS,
+  HOPPER_STACKER_LOCATION,
+  STAGING_AREA_SLOTS,
+  ZERO_OFFSET,
+} from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
 import { reduceCommandCreators, uuid } from './index'
 
@@ -56,6 +63,7 @@ import type {
 import type {
   CommandCreator,
   CurriedCommandCreator,
+  FlexStackerModuleState,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -1096,23 +1104,26 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           conditioningByVolume
         ) ?? 0)
       : 0
+
+  const isCustomTiprack = tiprackDefinition?.namespace !== 'opentrons'
   const isMultiDispenseAvailable =
-    conditioningByVolume != null &&
-    disposalByVolume != null &&
-    maxWorkingVolume >=
-      minVolumeForMultiAspirateDispense +
-        conditioningVolumeForMultiAspirateDispense +
-        (linearInterpolate(
-          minVolumeForMultiAspirateDispense,
-          disposalByVolume
-        ) ?? 0) +
-        // don't take air gap into account if conditioning volume is present
-        (conditioningVolumeForMultiAspirateDispense === 0
-          ? (linearInterpolate(
-              minVolumeForMultiAspirateDispense,
-              aspirateAirGapByVolume
-            ) ?? 0)
-          : 0)
+    isCustomTiprack ||
+    (conditioningByVolume != null &&
+      disposalByVolume != null &&
+      maxWorkingVolume >=
+        minVolumeForMultiAspirateDispense +
+          conditioningVolumeForMultiAspirateDispense +
+          (linearInterpolate(
+            minVolumeForMultiAspirateDispense,
+            disposalByVolume
+          ) ?? 0) +
+          // don't take air gap into account if conditioning volume is present
+          (conditioningVolumeForMultiAspirateDispense === 0
+            ? (linearInterpolate(
+                minVolumeForMultiAspirateDispense,
+                aspirateAirGapByVolume
+              ) ?? 0)
+            : 0))
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
@@ -1344,4 +1355,47 @@ export function createStagingAreaForInvariantContext(
     }
   }
   return {}
+}
+
+export const getLabwareIdOnHopper = (
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  moduleSlotLocation: string
+): string => {
+  const largestStackInSlot = getLargestStackInSlot(labware, moduleSlotLocation)
+  const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
+  const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
+  return labwareIdOnModule
+}
+
+export const getIsSlotAHopper = (slot: string): boolean => {
+  return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getLabwareIdOnShuttle = (
+  stackerState: FlexStackerModuleState
+): string | null => {
+  return stackerState.labwareOnShuttle?.primaryLabwareId ?? null
+}
+
+export const labwareMatchesLabwareInHopper = (
+  labwareId: string,
+  invariantContext: InvariantContext,
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const loadedLabware =
+    stackerState?.storedLabwareDetails?.primaryLabware.loadName
+  const def = invariantContext.labwareEntities[labwareId].def
+  const labwareToBeStored = def.parameters.loadName
+  return loadedLabware === labwareToBeStored
+}
+
+export const getIsSpaceInHopper = (
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const maximumAllowedLabware = stackerState?.maxPoolCount ?? 0
+  const labwareStored = stackerState?.labwareInHopper
+  const numberOfLabwareStored = labwareStored?.length ?? 0
+  return maximumAllowedLabware > numberOfLabwareStored
 }

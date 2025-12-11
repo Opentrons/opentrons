@@ -33,9 +33,10 @@ export interface BaseState {
 }
 export type GetState = () => BaseState
 export type Selector<T> = (arg: BaseState) => T
-// eslint-disable-next-line no-use-before-define
 export type ThunkDispatch<A> = (action: A | ThunkAction<A>) => A
 
+// todo(mm, 2025-10-15): Replace with Redux's native ThunkAction. This type definition
+// predates our use of TypeScript and may predate TypeScript support in Redux.
 export type ThunkAction<A> =
   | ((dispatch: ThunkDispatch<A>, getState: GetState) => A)
   | ((dispatch: ThunkDispatch<A>, getState: GetState) => void)

@@ -17,7 +17,9 @@ To start, the deck includes your chosen modules and fixtures. Click **Deck hardw
 
 ## Liquids
 
-Next, click **Liquids** in the upper left. First, define a liquid to use in your protocol with a name, description, and color. You can also define the liquid as an Opentrons-verified liquid class to apply optimized pipetting settings during transfer and mix steps. You'll be able to add liquids to labware already on the robot deck.
+Next, click **Liquids** in the upper left. First, define a liquid to use in your protocol with a name, description, and color. You can also define the liquid as an Opentrons-verified liquid class to apply optimized pipetting settings during transfer and mix steps. 
+
+You'll also be able to add liquids to labware already on the robot deck.
 
 ## Labware
 
@@ -68,8 +70,8 @@ Use the toggle switch at the upper right of the protocol starting deck if you ne
 
 After adding labware, drag and drop to move to another slot. Click the deck slot for additional editing options: 
 
-* Duplicate labware to add the same selection to another open deck slot. 
-* Rename any labware (with the exception of tip racks) to make them easier to identify throughout your protocol. 
+* Choose **Edit labware** to replace, rename, or delete labware in a slot. You can rename any labware (with the exception of tip racks) to make them easier to identify throughout your protocol. 
+* Click **Duplicate labware** to add the slot's adapters, labware, lids, and liquids to another open deck slot. 
 * Clear all hardware and labware from any slot. 
 
 Edit staging areas by clicking any deck slot in row 3 or 4. To edit a Thermocycler Module, click deck slot B1 on the Flex or 7 on the OT-2. A trash bin or waste chute is always required on the deck. On the OT-2, the trash bin is always placed in slot 12. 

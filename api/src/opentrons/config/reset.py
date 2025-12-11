@@ -1,11 +1,12 @@
 import logging
 import os
 import shutil
-from enum import Enum
 from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.robot.types import RobotTypeEnum
+
 from opentrons.config import IS_ROBOT
 from opentrons.calibration_storage import (
     delete_robot_deck_attitude,
@@ -30,7 +31,7 @@ class CommonResetOption(NamedTuple):
     description: str
 
 
-class ResetOptionId(str, Enum):
+class ResetOptionId(StrEnum):
     """The available reset options"""
 
     boot_scripts = "bootScripts"

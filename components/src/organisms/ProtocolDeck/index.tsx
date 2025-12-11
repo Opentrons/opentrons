@@ -18,7 +18,8 @@ import {
 } from '@opentrons/shared-data'
 
 import {
-  AlignControlToModule,
+  AlignToModuleChildSlot,
+  CenterLabwareInSlot,
   LabwareInfoOverlay,
   LabwareRender,
   STACKER_HOPPER_LABWARE_X_OFFSET,
@@ -95,7 +96,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
             : undefined,
         moduleChildren: showLabwareLabels ? (
           topLabwareDefinition != null && topLabwareInfo != null ? (
-            <AlignControlToModule
+            <AlignToModuleChildSlot
               deckId={deckDef.otId}
               slotId={slotName}
               moduleDefinition={moduleDefinition}
@@ -111,7 +112,7 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
                     : 0
                 }
               />
-            </AlignControlToModule>
+            </AlignToModuleChildSlot>
           ) : null
         ) : null,
       }
@@ -141,10 +142,12 @@ export function ProtocolDeck(props: ProtocolDeckProps): JSX.Element | null {
           labwareChildren: (
             <>
               {matchingLidDef != null ? (
-                <LabwareRender
-                  definition={matchingLidDef}
-                  positioningMode="passThrough"
-                />
+                <CenterLabwareInSlot definition={matchingLidDef}>
+                  <LabwareRender
+                    definition={matchingLidDef}
+                    positioningMode="passThrough"
+                  />
+                </CenterLabwareInSlot>
               ) : null}
               {showLabwareLabels ? (
                 <LabwareInfoOverlay

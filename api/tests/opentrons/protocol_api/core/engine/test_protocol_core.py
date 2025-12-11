@@ -2043,3 +2043,30 @@ def test_get_labware_location_off_deck(
     )
 
     assert subject.get_labware_location(mock_labware_core) is OFF_DECK
+
+
+def test_capture_image_with_run_specific_defaults(
+    decoy: Decoy,
+    subject: ProtocolCore,
+    mock_engine_client: EngineClient,
+) -> None:
+    """It should handle the core execution for capture image using the run specific image settings."""
+    decoy.when(mock_engine_client.state.camera.get_resolution()).then_return((10, 20))
+    decoy.when(mock_engine_client.state.camera.get_zoom()).then_return(1.5)
+    decoy.when(mock_engine_client.state.camera.get_contrast()).then_return(25)
+    decoy.when(mock_engine_client.state.camera.get_brightness()).then_return(75)
+    decoy.when(mock_engine_client.state.camera.get_saturation()).then_return(99)
+    subject.capture_image()
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.CaptureImageParams(
+                fileName=None,
+                resolution=(10, 20),
+                zoom=1.5,
+                contrast=25,
+                brightness=75,
+                saturation=99,
+            )
+        )
+    )

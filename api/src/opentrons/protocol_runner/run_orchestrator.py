@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping
+from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping, Tuple
 
 from anyio import move_on_after
 
@@ -381,6 +381,21 @@ class RunOrchestrator:
     ) -> CameraSettings:
         """Add new camera enablement settings."""
         return self._protocol_engine.add_camera_enablement_settings(enablement_settings)
+
+    def add_camera_capture_image_settings(
+        self,
+        camera_id: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        pan: Optional[Tuple[int, int]] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Add new camera capture image settings."""
+        self._protocol_engine.add_camera_capture_image_settings_to_state(
+            camera_id, resolution, zoom, pan, contrast, brightness, saturation
+        )
 
     async def add_command_and_wait_for_interval(
         self,

@@ -3,6 +3,10 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[requires]
+python_version = "3.12"
+
+
 [dev-packages]
 mypy = "==1.11.0"
 flake8 = "~=7.0.0"
@@ -14,7 +18,7 @@ wheel = "==0.37.1"
 pytest = "<9,>=8.4.0"
 pytest-cov = "==4.1.0"
 pytest-xdist = "~=3.5.0 "
-typeguard = "~=4.1.5"
+typeguard = "~=4.4.4"
 # specify typing-extensions explicitly to force lockfile inclusion on Python >= 3.8
 typing-extensions = ">=4.0.0,<5"
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
@@ -30,7 +34,7 @@ pillow = "*"
 opentrons-shared-data = { editable = true, path = "." }
 jsonschema = "==4.21.1"
 pydantic = "==2.11.7"
-numpy = "==1.22.3"
+numpy = "==1.26.4"
 # transitive dependency. 3.22 introduces a build plugin called coherent.licensed that
 # is not safe to have installed when another project is being built.
 zipp = "==3.21.0"

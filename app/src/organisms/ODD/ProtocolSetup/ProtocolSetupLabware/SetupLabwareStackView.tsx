@@ -20,8 +20,7 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareDefinitionsByURIForProtocol,
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
+  getLabwareViewBox,
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
@@ -92,9 +91,7 @@ export function SetupLabwareStackView({
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =
     labwareDefinitionsByURI[selectedLabware.definitionUri]
-  const labwareCornerOffsetFromSlot =
-    getSchema2CornerOffsetFromSlot(labwareDefinition)
-  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
 
   return (
     <>
@@ -181,7 +178,7 @@ export function SetupLabwareStackView({
             </StyledText>
           ) : null}
           <LabwareThumbnail
-            viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
+            viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
           >
             <g
               onClick={() => {
@@ -193,7 +190,7 @@ export function SetupLabwareStackView({
             >
               <LabwareRender
                 definition={labwareDefinition}
-                positioningMode="offsetInSlot"
+                positioningMode="passThrough"
                 wellFill={wellFill}
               />
             </g>

@@ -13,6 +13,7 @@ on:
       - '.github/workflows/utils.js'
       - 'scripts/static-deploy/**'
       - 'scripts/git-version-v2.mjs'
+      - 'vitest.config.*'
   push:
     branches:
       - 'edge'
@@ -53,7 +54,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
         run: make setup
@@ -131,7 +132,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
         run: |
@@ -196,7 +197,7 @@ jobs:
           if [[ "${{ needs.deploy-ll.result }}" == "failure" ]]; then
             failed_jobs+=("deploy-ll")
           fi
-          
+
           IFS=','
           echo "failed_jobs=${failed_jobs[*]}" >> $GITHUB_OUTPUT
 
