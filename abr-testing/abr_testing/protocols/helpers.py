@@ -643,7 +643,24 @@ def get_last_image_capture() -> str:
     return image_path
 
 
-def create_robot_log_zip() -> str:
+def convert_m3u8_to_mp4(m3u8_path: str, mp4_path: str) -> None:
+    """Convert m3u8 video to mp4 format."""
+    subprocess.run(
+        f'ffmpeg -i "{m3u8_path}" -t 3 -c:v mpeg4 -c:a aac -movflags +faststart "{mp4_path}" -y',
+        shell=True,
+        check=True,
+    )
+
+
+def get_livestream_video() -> str:
+    """Get livestream video of last 3 seconds of run."""
+    video_path = "/var/www/localhost/html/stream/hls/stream.m3u8"
+    new_video_path = "/data/testing_data/livestream_video.mp4"
+    convert_m3u8_to_mp4(video_path, new_video_path)
+    return new_video_path
+
+
+def create_robot_log_zip() -> Tuple[str, str]:
     """Create a zip file of logs saved locally on robot."""
     storage_directory = "/data/testing_data"
     result = subprocess.run(
@@ -653,7 +670,7 @@ def create_robot_log_zip() -> str:
         text=True,
     )
     ip = result.stdout.strip()
-    return get_logs(storage_directory, ip)
+    return get_logs(storage_directory, ip), ip
 
 
 def send_slack_error_message_with_log(
@@ -661,10 +678,10 @@ def send_slack_error_message_with_log(
     protocol_name: str,
     error_str: str,
 ) -> None:
-    """Send error slack message with log files attached."""
-    log_path = create_robot_log_zip()
-    image_path = get_last_image_capture()
-    slack_bot.send_error_message(protocol_name, error_str, [log_path, image_path])
+    """Send error slack message with log files and video clip attached."""
+    log_path, ip = create_robot_log_zip()
+    video_path = get_livestream_video()
+    slack_bot.send_error_message(protocol_name, error_str, ip, [log_path, video_path])
 
 
 def send_slack_message_with_image(slack_bot: slack.Slack, protocol_name: str) -> None:

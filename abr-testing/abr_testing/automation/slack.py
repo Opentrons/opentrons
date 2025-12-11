@@ -103,7 +103,8 @@ class Slack:
             self.send_slack_message(message)
 
     def send_run_started_message(
-        self, protocol_name: str, user_id: Optional[str] = None
+        self,
+        protocol_name: str,
     ) -> None:
         """Send run started message."""
         message = f"Protocol: {protocol_name} has started."
@@ -113,10 +114,10 @@ class Slack:
         self,
         protocol_name: str,
         error_str: str,
+        ip: str,
         file_paths: list[str] | None = None,
-        user_id: Optional[str] = None,
     ) -> None:
         """Send error message to Slack, optionally tagging a user."""
-        message = f"Protocol: {protocol_name} ended in error: {error_str}"
+        message = f"Protocol {protocol_name} on IP: {ip} ended in error: {error_str}"
         self.icon_emoji = ":alert:"
         self.send_slack_message(message, file_paths)
