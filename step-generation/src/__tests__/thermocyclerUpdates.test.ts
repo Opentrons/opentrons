@@ -254,9 +254,10 @@ describe('thermocycler state updaters', () => {
         blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {},
-      expectedUpdate: {},
+      expectedUpdate: { numProfilesStarted: 1 },
       fn: forThermocyclerRunProfile,
-      testName: 'forThermocyclerRunProfile should not make any updates',
+      testName:
+        'forThermocyclerRunProfile should not make any block or lid updates',
     },
     {
       params: {
@@ -288,6 +289,7 @@ describe('thermocycler state updaters', () => {
           type: 'blockTargetTemp',
           blockTargetTemp: 20,
         },
+        numProfilesStarted: 1,
       },
       fn: forThermocyclerRunProfile,
       testName:
@@ -302,9 +304,10 @@ describe('thermocycler state updaters', () => {
         blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {},
-      expectedUpdate: {},
+      expectedUpdate: { numProfilesStarted: 1 },
       fn: forThermocyclerRunExtendedProfile,
-      testName: 'forThermocyclerRunExtendedProfile should not make any updates',
+      testName:
+        'forThermocyclerRunExtendedProfile should not make any block or lid updates',
     },
     {
       params: {
@@ -341,6 +344,7 @@ describe('thermocycler state updaters', () => {
           type: 'blockTargetTemp',
           blockTargetTemp: 40,
         },
+        numProfilesStarted: 1,
       },
       fn: forThermocyclerRunExtendedProfile,
       testName:

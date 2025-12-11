@@ -186,4 +186,6 @@ export const forThermocyclerRunExtendedProfile = (
       blockTargetTemp: lastStep.celsius,
     }
   }
+
+  moduleState.numProfilesStarted++
 }
