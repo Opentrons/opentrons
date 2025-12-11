@@ -10,16 +10,16 @@ import type { ThermocyclerModuleState } from '@opentrons/step-generation'
 export function PriorThermocyclerState(props: {
   priorState: ThermocyclerModuleState
 }): JSX.Element {
-  const { blockTargetTemp, lidTargetTemp, lidOpen } = props.priorState
+  const { currentBlockActivity, lidTargetTemp, lidOpen } = props.priorState
   const { t } = useTranslation()
   return (
     <StepFormStatusList>
       <StepFormStatus
         label={t('protocol_steps:thermocycler_module.prior_state.block_label')}
         value={
-          blockTargetTemp != null
+          currentBlockActivity.type === 'blockTargetTemp'
             ? t('protocol_steps:thermocycler_module.prior_state.block_value', {
-                value: blockTargetTemp,
+                value: currentBlockActivity.blockTargetTemp,
               })
             : t(
                 'protocol_steps:thermocycler_module.prior_state.block_value_off'

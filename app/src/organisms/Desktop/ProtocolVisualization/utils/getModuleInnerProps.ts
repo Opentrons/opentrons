@@ -16,7 +16,10 @@ export const getModuleInnerProps = (
     }
     return {
       lidMotorState,
-      blockTargetTemp: moduleState.blockTargetTemp,
+      blockTargetTemp:
+        moduleState.currentBlockActivity.type === 'blockTargetTemp'
+          ? moduleState.currentBlockActivity.blockTargetTemp
+          : null,
     }
   } else if (
     'targetTemperature' in moduleState &&

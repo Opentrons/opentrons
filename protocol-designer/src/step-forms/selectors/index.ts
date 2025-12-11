@@ -207,6 +207,8 @@ export const getAdditionalEquipment: Selector<
 
 export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
   createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
+
+// todo(mm, 2025-12-11): step-generation has these same constants. Can we reuse them?
 const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
   type: MAGNETIC_MODULE_TYPE,
   engaged: false,
@@ -218,9 +220,10 @@ const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
 }
 const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
   type: THERMOCYCLER_MODULE_TYPE,
-  blockTargetTemp: null,
+  currentBlockActivity: { type: 'blockDeactivated' },
   lidTargetTemp: null,
   lidOpen: null,
+  numProfilesStarted: 0,
 }
 const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
   type: HEATERSHAKER_MODULE_TYPE,

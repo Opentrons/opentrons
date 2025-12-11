@@ -13,13 +13,13 @@ import type {
   ModuleType,
   NozzleConfigurationStyle,
   TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntity,
   ModuleEntity,
   PipetteEntity,
+  ThermocyclerModuleState as SG_ThermocyclerModuleState,
   TemperatureStatus,
   TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
@@ -53,14 +53,11 @@ export interface TemperatureModuleState {
   status: TemperatureStatus
   targetTemperature: number | null
 }
-export interface ThermocyclerModuleState {
-  type: typeof THERMOCYCLER_MODULE_TYPE
-  blockTargetTemp: number | null
-  // null means block is deactivated
-  lidTargetTemp: number | null
-  // null means lid is deactivated
-  lidOpen: boolean | null // if false, closed. If null, unknown
-}
+// The Thermocycler module state type is especially complicated, so let's steal it from
+// step-generation instead of duplicatively writing it out here.
+// todo(mm, 2025-12-11): In general, does protocol-designer need its own declarations,
+// for these module types, or can we just directly reuse the types in step-generation?
+export type ThermocyclerModuleState = SG_ThermocyclerModuleState
 export interface HeaterShakerModuleState {
   type: typeof HEATERSHAKER_MODULE_TYPE
   targetTemp: number | null

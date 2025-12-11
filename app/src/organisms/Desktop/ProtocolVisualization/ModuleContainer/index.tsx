@@ -37,14 +37,16 @@ export function ModuleContainer({
 
   switch (moduleState.type) {
     case THERMOCYCLER_MODULE_TYPE: {
-      const { blockTargetTemp, lidOpen, lidTargetTemp } = moduleState
+      const { currentBlockActivity, lidOpen, lidTargetTemp } = moduleState
 
       moduleDetails = (
         <div className={styles.module_details_status_container}>
           <ModuleStatusContainer title="target_block_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
-              {blockTargetTemp != null
-                ? t('temperature', { temp: blockTargetTemp })
+              {currentBlockActivity.type === 'blockTargetTemp'
+                ? t('temperature', {
+                    temp: currentBlockActivity.blockTargetTemp,
+                  })
                 : t('deactivated')}
             </StyledText>
           </ModuleStatusContainer>

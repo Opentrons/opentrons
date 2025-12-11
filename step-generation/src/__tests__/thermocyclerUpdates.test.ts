@@ -84,7 +84,8 @@ beforeEach(() => {
       type: THERMOCYCLER_MODULE_TYPE,
       lidOpen: true,
       lidTargetTemp: null,
-      blockTargetTemp: null,
+      currentBlockActivity: { type: 'blockDeactivated' },
+      numProfilesStarted: 0,
     },
   }
 })
@@ -105,10 +106,15 @@ describe('thermocycler state updaters', () => {
           celsius: 42,
         },
         moduleStateBefore: {
-          blockTargetTemp: null,
+          currentBlockActivity: {
+            type: 'blockDeactivated',
+          },
         },
         expectedUpdate: {
-          blockTargetTemp: 42,
+          currentBlockActivity: {
+            type: 'blockTargetTemp',
+            blockTargetTemp: 42,
+          },
         },
         fn: forThermocyclerSetTargetBlockTemperature,
         testName:
@@ -138,12 +144,18 @@ describe('thermocycler state updaters', () => {
       },
       moduleStateBefore: {
         lidTargetTemp: 41,
-        blockTargetTemp: 42,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
         lidOpen: true,
       },
       expectedUpdate: {
         lidTargetTemp: 41,
-        blockTargetTemp: 42,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
         lidOpen: true,
       },
       fn: forThermocyclerAwaitBlockTemperature,
@@ -156,12 +168,18 @@ describe('thermocycler state updaters', () => {
       },
       moduleStateBefore: {
         lidTargetTemp: 41,
-        blockTargetTemp: 42,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
         lidOpen: true,
       },
       expectedUpdate: {
         lidTargetTemp: 41,
-        blockTargetTemp: 42,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
         lidOpen: true,
       },
       fn: forThermocyclerAwaitLidTemperature,
@@ -174,10 +192,15 @@ describe('thermocycler state updaters', () => {
         moduleId,
       },
       moduleStateBefore: {
-        blockTargetTemp: 42,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
       },
       expectedUpdate: {
-        blockTargetTemp: null,
+        currentBlockActivity: {
+          type: 'blockDeactivated',
+        },
       },
       fn: forThermocyclerDeactivateBlock,
       testName:
@@ -255,10 +278,16 @@ describe('thermocycler state updaters', () => {
         blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {
-        blockTargetTemp: 42,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 42,
+        },
       },
       expectedUpdate: {
-        blockTargetTemp: 20,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 20,
+        },
       },
       fn: forThermocyclerRunProfile,
       testName:
@@ -302,10 +331,16 @@ describe('thermocycler state updaters', () => {
         blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {
-        blockTargetTemp: 0,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 0,
+        },
       },
       expectedUpdate: {
-        blockTargetTemp: 40,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 40,
+        },
       },
       fn: forThermocyclerRunExtendedProfile,
       testName:
