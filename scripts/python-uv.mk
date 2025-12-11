@@ -13,9 +13,6 @@ define uv_sync_dev
 	$(UV) sync --frozen --group dev --python $(UV_PYTHON)
 endef
 
-poetry := poetry
-poetry_run := $(poetry) run
-
 pypi_upload_url := https://upload.pypi.org/legacy/
 pypi_test_upload_url := https://test.pypi.org/legacy/
 
@@ -53,11 +50,6 @@ endef
 # parameter 4: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
 define python_package_version
 $(shell $(python) $(if $(4),$(4),../scripts/python_build_utils.py) $(1) $(2) normalize_version $(if $(3),-e $(3)))
-endef
-
-# This is the poetry version of python_get_wheelname. Arguments are identical.
-define poetry_python_get_wheelname
-$(3)-$(call python_package_version,$(1),$(2),$(4),$(5))-py3-none-any.whl
 endef
 
 # get the name of the wheel that setup.py will build
