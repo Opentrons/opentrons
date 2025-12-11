@@ -234,6 +234,14 @@ export interface StepDetailViewerUpdateAction {
   }
 }
 
+export interface StepDetailViewerCloseAction {
+  type: 'shell:STEP_DETAIL_VIEWER_CLOSE'
+  payload: { protocolKey: string }
+  meta: {
+    shell: true
+  }
+}
+
 export type ShellAction =
   | UiInitializedAction
   | ShellUpdateAction
@@ -252,6 +260,8 @@ export type ShellAction =
   | CameraStreamOpenAction
   | CameraPhotoOpenAction
   | StepDetailViewerOpenAction
+  | StepDetailViewerUpdateAction
+  | StepDetailViewerCloseAction
 
 export type IPCSafeFormDataEntry =
   | {
