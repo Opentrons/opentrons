@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 
-import { getThermocyclerProfileRepetitionsForPython } from '../thermocyclerProfileConversions'
+import {
+  getThermocyclerProfileRepetitionsForPython,
+  unrollThermocyclerProfile,
+} from '../thermocyclerProfileConversions'
 
 describe('getThermocyclerProfileRepetitionsForPython', () => {
   it('has 123 repetitions', () => {
@@ -56,5 +59,53 @@ describe('getThermocyclerProfileRepetitionsForPython', () => {
       repeatingProfileSteps: [],
       numRepetitions: 1,
     })
+  })
+})
+
+describe('unrollThermocyclerProfile', () => {
+  it('unrolls cycles and atomic steps into a list of atomic steps', () => {
+    expect(
+      unrollThermocyclerProfile([
+        { holdSeconds: 10, celsius: 100 },
+        {
+          repetitions: 2,
+          steps: [
+            { holdSeconds: 20, celsius: 200 },
+            { holdSeconds: 30, celsius: 300 },
+          ],
+        },
+        { holdSeconds: 40, celsius: 400 },
+      ])
+    ).toStrictEqual([
+      { holdSeconds: 10, celsius: 100 },
+      { holdSeconds: 20, celsius: 200 },
+      { holdSeconds: 30, celsius: 300 },
+      { holdSeconds: 20, celsius: 200 },
+      { holdSeconds: 30, celsius: 300 },
+      { holdSeconds: 40, celsius: 400 },
+    ])
+  })
+
+  it('skips 0-repetition cycles', () => {
+    expect(
+      unrollThermocyclerProfile([
+        { holdSeconds: 10, celsius: 100 },
+        {
+          repetitions: 0,
+          steps: [
+            { holdSeconds: 20, celsius: 200 },
+            { holdSeconds: 30, celsius: 300 },
+          ],
+        },
+        { holdSeconds: 40, celsius: 400 },
+      ])
+    ).toStrictEqual([
+      { holdSeconds: 10, celsius: 100 },
+      { holdSeconds: 40, celsius: 400 },
+    ])
+  })
+
+  it('handles empty input', () => {
+    expect(unrollThermocyclerProfile([])).toStrictEqual([])
   })
 })
