@@ -4,6 +4,7 @@ import reduce from 'lodash/reduce'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getIsLid,
   getIsTiprack,
@@ -295,9 +296,12 @@ export const useLabwareDropdownOptions = (
   const { t } = useTranslation(['shared', 'protocol_steps'])
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const { labware: deckSetupLabware } = activeDeckSetup
+  const { labware: deckSetupLabware, modules } = activeDeckSetup
   const nicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)
+  const stackerModuleIds = Object.values(modules).filter(
+    module => module.type === FLEX_STACKER_MODULE_TYPE
+  )
   const labwareOptions = reduce(
     labwareEntities,
     (
@@ -318,6 +322,9 @@ export const useLabwareDropdownOptions = (
       )
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const topId = fullStackFromLabwares[0]
+      const isOnStacker = stackerModuleIds.some(stackerModule =>
+        fullStackFromLabwares.includes(stackerModule.slot)
+      )
       const isLabwareLidCombo =
         (fullStackFromLabwares[1] === labwareId &&
           labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
@@ -347,6 +354,7 @@ export const useLabwareDropdownOptions = (
 
       //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
+        (type === 'labware' && isOnStacker) ||
         isAdapter ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||

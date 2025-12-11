@@ -247,15 +247,16 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     )
     tiprackURI = userSelectedTipRackURI
   }
-
   if (tiprackEntity == null) {
-    errors.push(
-      errorCreators.labwareDoesNotExist({
-        actionName,
-        labware: tiprackURI,
-      })
-    )
+    if (changeTip === 'never') {
+      errors.push(errorCreators.noTipOnPipette({ actionName, pipette }))
+    } else {
+      errors.push(
+        errorCreators.labwareDoesNotExist({ actionName, labware: tiprackURI })
+      )
+    }
   }
+
   const { def: tiprackDefinition = null } = tiprackEntity ?? {}
   const {
     spec: pipetteSpecs,

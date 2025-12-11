@@ -634,6 +634,33 @@ export interface CaptureImageArgs extends CommonArgs {
   saturation: number
 }
 
+export interface FlexStackerEmptyArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerEmpty'
+  interventionMessage: string | null
+}
+export interface FlexStackerFillItemsArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerFillItems'
+  fillLabwareUri: string | null
+  fillQuantity: number | null
+  interventionMessage: string | null
+}
+export interface FlexStackerStoreArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerStore'
+}
+export interface FlexStackerRetrieveArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerRetrieve'
+}
+
+export type FlexStackerArgs =
+  | FlexStackerEmptyArgs
+  | FlexStackerFillItemsArgs
+  | FlexStackerRetrieveArgs
+  | FlexStackerStoreArgs
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
@@ -654,6 +681,7 @@ export type CommandCreatorArgs =
   | HeaterShakerArgs
   | MoveLabwareArgs
   | CommentArgs
+  | FlexStackerArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -708,6 +736,7 @@ export interface TimelineFrame {
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
+        /** TODO: tiprackURI is a misnomer: it's a labwareId, not a URI */
         tiprackURI: string | null
       }
     }
@@ -744,6 +773,7 @@ export type ErrorType =
   | 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
   | 'EQUIPMENT_DOES_NOT_EXIST'
+  | 'FLEX_STACKER_NO_GRIPPER'
   | 'GRIPPER_REQUIRED'
   | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
@@ -753,6 +783,8 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'HOPPER_EMPTY'
+  | 'HOPPER_FULL'
+  | 'INCOMPLETE_PICKUP'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'
   | 'LABWARE_DISCARDED_IN_TRASH'
@@ -788,7 +820,7 @@ export type ErrorType =
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
-  | 'FLEX_STACKER_NO_GRIPPER'
+  | 'TOO_MANY_TIPS'
 
 export interface CommandCreatorError {
   message: string

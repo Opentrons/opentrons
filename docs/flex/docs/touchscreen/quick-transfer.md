@@ -70,7 +70,7 @@ After making instrument and well selections, you'll set the transfer volume and 
 
 ## Transfer volumes and name
 
-You'll set the amount of liquid to transfer (in μL) after specifying the source and destination wells. You'll also have a chance to name the transfer after setting the transfer volume. A good, concise name helps you find a quick transfer in a list of saved or pinned transfers and indicates what it does.
+You'll set the amount of liquid to transfer (in µL) after specifying the source and destination wells. You'll also have a chance to name the transfer after setting the transfer volume. A good, concise name helps you find a quick transfer in a list of saved or pinned transfers and indicates what it does.
 
 ## Advanced settings
 
@@ -80,7 +80,8 @@ If your quick transfer will apply liquid class settings, values for your chosen 
 
 | Setting {style="width: 25%;"} | Description |
 |----------|-------------|
-| Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in μL/s.|
+| Aspirate and dispense flow rates | Set how quickly the pipette will aspirate or dispense, in µL/s.|
+| Pipette path           | Choose how the pipette moves between wells. Options include:<br><ul><li>single transfer (1 well to 1 well)</li><li>multi-aspirate (many wells to 1 well)</li><li>multi-dispense (1 well to many wells)</li></ul> |
 | Tip position           | Change where in the well the pipette aspirates or dispenses. By default, the robot positions the tip 1 mm from the bottom center of a well. |
 | Pre-wet tip            | Pre-wet the pipette tip by aspirating and dispensing ⅔ of the tip's maximum volume. |
 | Mix                    | Aspirate and dispense repeatedly from a single location. Used to mix the contents of a well together. |

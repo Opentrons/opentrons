@@ -704,7 +704,7 @@ Total number of labware: 86
       - flex_96channel_1000
         - high volume: 5–1000 µL
       - flex_96channel_200
-        - low volume: 1–200 μL
+        - low volume: 1–200 µL
   
   
 

@@ -221,6 +221,12 @@ export const flexStackerLabwareTypeMismatch = (): CommandCreatorError => {
   }
 }
 
+export const flexStackerHopperFull = (): CommandCreatorError => {
+  return {
+    type: 'HOPPER_FULL',
+    message: 'The hopper has reached capacity',
+  }
+}
 export const heaterShakerIsShaking = (): CommandCreatorError => {
   return {
     type: 'HEATER_SHAKER_IS_SHAKING',
@@ -421,5 +427,19 @@ export const stackTooHigh = (args: { slot: string }): CommandCreatorError => {
   return {
     type: 'STACK_TOO_HIGH',
     message: `The stack on slot ${args.slot} is too high`,
+  }
+}
+
+export const tooManyTips = (): CommandCreatorError => {
+  return {
+    type: 'TOO_MANY_TIPS',
+    message: 'Action will pick up too many tips',
+  }
+}
+
+export const incompletePickup = (): CommandCreatorError => {
+  return {
+    type: 'INCOMPLETE_PICKUP',
+    message: 'At least one of the selected tips is empty',
   }
 }

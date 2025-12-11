@@ -1,7 +1,8 @@
 """Getters for Protocol Engine motion planning."""
 from dataclasses import dataclass
-from enum import Enum
 from typing import List, Optional
+
+from opentrons_shared_data.util import StrEnum
 
 from opentrons.types import Point
 from opentrons.motion_planning.types import MoveType
@@ -20,7 +21,7 @@ class EdgeList:
     back: Point
 
 
-class EdgePathType(str, Enum):
+class EdgePathType(StrEnum):
     """Types of well edge point paths for touch tip."""
 
     LEFT = "left"

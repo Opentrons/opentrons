@@ -1104,23 +1104,26 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           conditioningByVolume
         ) ?? 0)
       : 0
+
+  const isCustomTiprack = tiprackDefinition?.namespace !== 'opentrons'
   const isMultiDispenseAvailable =
-    conditioningByVolume != null &&
-    disposalByVolume != null &&
-    maxWorkingVolume >=
-      minVolumeForMultiAspirateDispense +
-        conditioningVolumeForMultiAspirateDispense +
-        (linearInterpolate(
-          minVolumeForMultiAspirateDispense,
-          disposalByVolume
-        ) ?? 0) +
-        // don't take air gap into account if conditioning volume is present
-        (conditioningVolumeForMultiAspirateDispense === 0
-          ? (linearInterpolate(
-              minVolumeForMultiAspirateDispense,
-              aspirateAirGapByVolume
-            ) ?? 0)
-          : 0)
+    isCustomTiprack ||
+    (conditioningByVolume != null &&
+      disposalByVolume != null &&
+      maxWorkingVolume >=
+        minVolumeForMultiAspirateDispense +
+          conditioningVolumeForMultiAspirateDispense +
+          (linearInterpolate(
+            minVolumeForMultiAspirateDispense,
+            disposalByVolume
+          ) ?? 0) +
+          // don't take air gap into account if conditioning volume is present
+          (conditioningVolumeForMultiAspirateDispense === 0
+            ? (linearInterpolate(
+                minVolumeForMultiAspirateDispense,
+                aspirateAirGapByVolume
+              ) ?? 0)
+            : 0))
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
@@ -1386,4 +1389,13 @@ export const labwareMatchesLabwareInHopper = (
   const def = invariantContext.labwareEntities[labwareId].def
   const labwareToBeStored = def.parameters.loadName
   return loadedLabware === labwareToBeStored
+}
+
+export const getIsSpaceInHopper = (
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const maximumAllowedLabware = stackerState?.maxPoolCount ?? 0
+  const labwareStored = stackerState?.labwareInHopper
+  const numberOfLabwareStored = labwareStored?.length ?? 0
+  return maximumAllowedLabware > numberOfLabwareStored
 }

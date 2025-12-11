@@ -10,6 +10,7 @@ from opentrons_shared_data.module.types import (
     ModuleType as SharedDataModuleType,
     ModuleOrientation,
 )
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.deck.types import SlotDefV3
 from opentrons_shared_data.labware.types import LocatingFeatures
 
@@ -73,7 +74,7 @@ DeckConfigurationType = List[
 # TODO(mm, 2023-05-10): Deduplicate with constants in
 # opentrons.protocols.api_support.deck_type
 # and consider moving to shared-data.
-class DeckType(str, Enum):
+class DeckType(StrEnum):
     """Types of deck available."""
 
     OT2_STANDARD = "ot2_standard"
