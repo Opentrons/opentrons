@@ -1,5 +1,5 @@
-""" Tests for behaviors specific to the OT3 hardware controller.
-"""
+"""Tests for behaviors specific to the OT3 hardware controller."""
+
 import asyncio
 from typing import (
     AsyncIterator,
@@ -1141,7 +1141,7 @@ async def test_liquid_probe_mount_moves(
 
     with patch.object(
         hardware_backend, "liquid_probe", AsyncMock(spec=hardware_backend.liquid_probe)
-    ):
+    ) as mock_backend_probe:
         fake_max_z_dist = 10.0
         config = ot3_hardware.config.liquid_sense
         mount_speed = config.mount_speed
@@ -1169,6 +1169,7 @@ async def test_liquid_probe_mount_moves(
             probe_start_pos.y,
             probe_start_pos.z + probe_pass_z_offset_mm,
         )
+        mock_backend_probe.return_value = 10
         await ot3_hardware.liquid_probe(mount, fake_max_z_dist)
         expected_moves = [
             call(mount, safe_plunger_pos),

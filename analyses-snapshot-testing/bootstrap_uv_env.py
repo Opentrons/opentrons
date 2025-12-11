@@ -2,7 +2,7 @@
 
 This script must be run from the analyses-snapshot-testing directory (cwd contains pyproject.toml).
 It will:
-  1) Ensure uv is available and create/sync a uv venv (Python 3.10 by default) for this project via `uv venv` and `uv sync`.
+  1) Ensure uv is available and create/sync a uv venv (Python 3.12 by default) for this project via `uv venv` and `uv sync`.
   2) Parse ../api and ../shared-data Pipfiles for production [packages] exact pins and install them in this venv via `uv pip install ...`.
   3) Install ../api and ../shared-data themselves editable into the same venv.
 

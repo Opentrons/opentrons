@@ -100,7 +100,7 @@ async def ffmpeg_capture_image_bytes(
         return stdout
     else:
         log.error(
-            f"Failed to capture an image with camera, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to capture an image with camera, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
         return CameraError(
             message="Failed to return bytes from FFMPEG image capture.",

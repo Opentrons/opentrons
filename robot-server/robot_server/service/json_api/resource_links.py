@@ -1,6 +1,8 @@
 import typing
-from enum import Enum
+
 from pydantic import BaseModel, Field
+
+from opentrons_shared_data.util import StrEnum
 
 
 class ResourceLink(BaseModel):
@@ -13,7 +15,7 @@ class ResourceLink(BaseModel):
     )
 
 
-class ResourceLinkKey(str, Enum):
+class ResourceLinkKey(StrEnum):
     # The key indicating the link to own resource
     self = "self"
     protocols = "protocols"

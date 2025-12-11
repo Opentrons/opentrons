@@ -202,7 +202,7 @@ def _exc_harvest_predicate(v: Any) -> bool:
         return False
     # on python 3.11 and up we can check if things are method wrappers, which basic builtin
     # dunders like __add__ are, but until then we can't and also don't know this is real
-    if sys.version_info.minor >= 11 and inspect.ismethodwrapper(v):  # type: ignore[attr-defined]
+    if sys.version_info.minor >= 11 and inspect.ismethodwrapper(v):
         return False
     return True
 

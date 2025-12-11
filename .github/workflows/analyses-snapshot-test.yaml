@@ -42,9 +42,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
       - name: Setup the project
@@ -97,9 +97,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
       - name: Setup the project
@@ -134,9 +134,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
       - name: Setup UV
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: './analyses-snapshot-testing/uv.lock'
       - name: Setup the project

@@ -1,10 +1,9 @@
-from enum import Enum
 import logging
-
 from typing import Optional, List, Dict, Any, Union, Tuple
 
 from pydantic import field_validator, BaseModel, Field, create_model
 
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.pipette import model_constants
 from opentrons.config.reset import ResetOptionId
 
@@ -71,7 +70,7 @@ class AdvancedSettingRequest(BaseModel):
     )
 
 
-class LogLevels(str, Enum):
+class LogLevels(StrEnum):
     _level_id: int
 
     """Valid log levels"""
@@ -133,7 +132,7 @@ class FactoryResetOptions(BaseModel):
 RobotConfigs = Dict[str, Any]
 
 
-class PipetteSettingsFieldType(str, Enum):
+class PipetteSettingsFieldType(StrEnum):
     """The type of the property"""
 
     float = "float"
@@ -304,7 +303,7 @@ class LiveStreamData(BaseModel):
     rtmp: str = Field(..., description="URL for the RTMP raw stream in FLV format.")
 
 
-class StreamStatusType(str, Enum):
+class StreamStatusType(StrEnum):
     """Status types of the Opentrons Live Stream Service.
 
     * `"ON"`: Start the live stream.

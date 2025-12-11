@@ -58,7 +58,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
         run: make setup
@@ -161,7 +161,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
         run: |

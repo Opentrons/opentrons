@@ -6,9 +6,9 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 
 import dataclasses
 from datetime import datetime
-from enum import Enum
 from typing import List, Optional, Union, Tuple
 
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -41,7 +41,7 @@ class PlayAction:
     requested_at: datetime
 
 
-class PauseSource(str, Enum):
+class PauseSource(StrEnum):
     """The source of a PauseAction.
 
     Attributes:
