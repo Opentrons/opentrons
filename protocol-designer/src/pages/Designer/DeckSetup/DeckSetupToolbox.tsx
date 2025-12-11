@@ -83,7 +83,7 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] =
     useState<boolean>(false)
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
-  console.log('selectedTopLabware', selectedTopLabware)
+  console.log('selectedLidLabware', selectedLidLabware)
   const {
     createdAdapterForSlot,
     createdModuleForSlot,
@@ -163,6 +163,18 @@ export function DeckSetupToolbox(
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
     if (hasModule && !isOnShuttle) {
+      const topURI = selectedTopLabware.labwareDefURI?.toString()
+      const lidURI = selectedLidLabware?.toString()
+      const amount = selectedTopLabware.amount
+
+      // const interleaved =
+      //   topURI == null
+      //     ? []
+      //     : Array.from(
+      //         { length: amount * (lidURI ? 2 : 1) },
+      //         (_, i) => (i % 2 === 0 ? topURI : lidURI!)
+      //       );
+
       dispatch(
         createContainerAboveModule({
           slot: isHopperSlot
@@ -171,9 +183,17 @@ export function DeckSetupToolbox(
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
             ...(selectedTopLabware.labwareDefURI != null
-              ? [selectedTopLabware.labwareDefURI]
+              ? Array.from(
+                  {
+                    length:
+                      selectedTopLabware.amount * (selectedLidLabware ? 2 : 1),
+                  },
+                  (_, i) =>
+                    i % 2 === 0
+                      ? selectedTopLabware.labwareDefURI!.toString()
+                      : selectedLidLabware!.toString()
+                )
               : []),
-            ...(selectedLidLabware != null ? [selectedLidLabware] : []),
           ],
         })
       )

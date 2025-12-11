@@ -20,7 +20,10 @@ import {
   Tag,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
+import {
+  getLiquidIdsOnLabware,
+  HOPPER_STACKER_LOCATION,
+} from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
@@ -55,6 +58,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     deckSetupLabware,
     labware
   )
+  const isOnHopper = labware.stack.includes(HOPPER_STACKER_LOCATION)
   const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
@@ -64,7 +68,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     allWellContentsForActiveItem != null
       ? allWellContentsForActiveItem[labware.id]
       : null
-  const displayName = labware.def.metadata.displayName
+  const displayName = def.metadata.displayName
   const nickName = nickNames[labware.id]
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
@@ -72,10 +76,10 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const isNicknameDifferent = nickName !== displayName
   const liquidIds = getLiquidIdsOnLabware(wellContents)
   const canModifyQuantity =
-    labware.def.stackLimit != null && labware.def.stackLimit > 1
+    isOnHopper || (def.stackLimit != null && def.stackLimit > 1)
 
   let editButton: null | string = null
-  if (isLid && canModifyQuantity) {
+  if (isOnHopper || (isLid && canModifyQuantity)) {
     editButton = t('edit_quantity')
   } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
     editButton = t('edit_liquid_and_quantity')
@@ -100,6 +104,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           }}
           labwareId={labware.id}
           allLabwareIdsOnStack={allLabwareIdsOnStack}
+          isOnHopper={isOnHopper}
         />
       ) : null}
       <Box position={POSITION_RELATIVE}>

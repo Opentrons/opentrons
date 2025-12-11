@@ -37,8 +37,10 @@ import {
 import {
   CLEAN,
   EMPTY,
+  FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
+  HopperLocationMapKey,
   STAGING_AREA_SLOTS,
   ZERO_OFFSET,
 } from '../constants'
@@ -1005,12 +1007,17 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
+  const isOnHopper = getIsSlotAHopper(slot)
+  const mappedLocation = isOnHopper
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
   return (
     Object.values(labware)
       .filter(
         lw =>
-          lw.stack.includes(slot) &&
-          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
+          lw.stack.includes(mappedLocation) &&
+          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
+          lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
       )
       .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
   )

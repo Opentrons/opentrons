@@ -25,6 +25,7 @@ import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import { maskToPositiveInteger } from '/protocol-designer/steplist/fieldLevel/processing'
 
 import { getMainPagePortalEl } from '../Portal'
+import { getHopperStackLimit } from '../SelectLabwareModal/utils'
 
 import type { ThunkDispatch } from '/protocol-designer/types'
 
@@ -32,16 +33,20 @@ interface EditLabwareQuantityModalProps {
   allLabwareIdsOnStack: string[]
   labwareId: string
   onClose: () => void
+  isOnHopper: boolean
 }
 export function EditLabwareQuantityModal(
   props: EditLabwareQuantityModalProps
 ): JSX.Element {
-  const { onClose, allLabwareIdsOnStack, labwareId } = props
+  const { onClose, allLabwareIdsOnStack, labwareId, isOnHopper } = props
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const labwareEntities = useSelector(getLabwareEntities)
   const { labwareDefURI, def } = labwareEntities[labwareId]
-  const stackingLimit = def.stackLimit ?? 0
+  const zHeight = def.dimensions.zDimension
+  const stackingLimit = isOnHopper
+    ? getHopperStackLimit(zHeight)
+    : (def.stackLimit ?? 0)
   const initialQuantity = allLabwareIdsOnStack.length
   const [quantity, setQuantity] = useState<string>(initialQuantity.toString())
   const [showError, setError] = useState<boolean>(false)
