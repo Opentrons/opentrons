@@ -163,17 +163,24 @@ export function DeckSetupToolbox(
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
     if (hasModule && !isOnShuttle) {
-      const topURI = selectedTopLabware.labwareDefURI?.toString()
-      const lidURI = selectedLidLabware?.toString()
-      const amount = selectedTopLabware.amount
-
-      // const interleaved =
-      //   topURI == null
-      //     ? []
-      //     : Array.from(
-      //         { length: amount * (lidURI ? 2 : 1) },
-      //         (_, i) => (i % 2 === 0 ? topURI : lidURI!)
-      //       );
+      const labwareLidCombo =
+        selectedLidLabware != null && selectedTopLabware.labwareDefURI != null
+          ? Array.from(
+              {
+                length: selectedTopLabware.amount * 2,
+              },
+              (_, index) =>
+                index % 2 === 0
+                  ? selectedTopLabware.labwareDefURI!.toString()
+                  : selectedLidLabware!.toString()
+            )
+          : []
+      const topLabwareOnly =
+        selectedTopLabware.labwareDefURI != null && selectedLidLabware == null
+          ? Array(selectedTopLabware.amount).fill(
+              selectedTopLabware.labwareDefURI.toString()
+            )
+          : []
 
       dispatch(
         createContainerAboveModule({
@@ -182,18 +189,8 @@ export function DeckSetupToolbox(
             : slot,
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
-            ...(selectedTopLabware.labwareDefURI != null
-              ? Array.from(
-                  {
-                    length:
-                      selectedTopLabware.amount * (selectedLidLabware ? 2 : 1),
-                  },
-                  (_, i) =>
-                    i % 2 === 0
-                      ? selectedTopLabware.labwareDefURI!.toString()
-                      : selectedLidLabware!.toString()
-                )
-              : []),
+            ...labwareLidCombo,
+            ...topLabwareOnly,
           ],
         })
       )
