@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getThermocyclerProfileRepetitionsForPython } from '../getThermocyclerProfileRepetitionsForPython'
+import { getThermocyclerProfileRepetitionsForPython } from '../thermocyclerProfileConversions'
 
 describe('getThermocyclerProfileRepetitionsForPython', () => {
   it('has 123 repetitions', () => {
