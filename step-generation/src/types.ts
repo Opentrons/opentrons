@@ -634,6 +634,33 @@ export interface CaptureImageArgs extends CommonArgs {
   saturation: number
 }
 
+export interface FlexStackerEmptyArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerEmpty'
+  interventionMessage: string | null
+}
+export interface FlexStackerFillItemsArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerFillItems'
+  fillLabwareUri: string | null
+  fillQuantity: number | null
+  interventionMessage: string | null
+}
+export interface FlexStackerStoreArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerStore'
+}
+export interface FlexStackerRetrieveArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerRetrieve'
+}
+
+export type FlexStackerArgs =
+  | FlexStackerEmptyArgs
+  | FlexStackerFillItemsArgs
+  | FlexStackerRetrieveArgs
+  | FlexStackerStoreArgs
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
@@ -654,6 +681,7 @@ export type CommandCreatorArgs =
   | HeaterShakerArgs
   | MoveLabwareArgs
   | CommentArgs
+  | FlexStackerArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -755,6 +783,7 @@ export type ErrorType =
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
   | 'HOPPER_EMPTY'
+  | 'HOPPER_FULL'
   | 'INCOMPLETE_PICKUP'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'

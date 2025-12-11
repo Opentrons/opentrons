@@ -314,6 +314,10 @@
         "body": "This step tries to use labware in the Thermocycler. Open the lid before this step.",
         "title": "Thermocycler lid closed"
       },
+      "HOPPER_FULL": {
+        "title": "Stacker capacity reached",
+        "body": "Edit labware quantities to store or refill more labware into the stacker."
+      },
       "TIPRACK_LID_NOT_ALLOWED_ON_DECK": {
         "body": "The tip rack lid is not allowed directly on a deck slot.",
         "title": "Invalid tip rack lid position"

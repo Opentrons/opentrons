@@ -19,6 +19,10 @@ import { dispenseInPlace } from './dispenseInPlace'
 import { dropTip } from './dropTip'
 import { dropTipInPlace } from './dropTipInPlace'
 import { engageMagnet } from './engageMagnet'
+import { flexStackerEmpty } from './flexStackerEmpty'
+import { flexStackerFillItems } from './flexStackerFillItems'
+import { flexStackerRetrieve } from './flexStackerRetrieve'
+import { flexStackerStore } from './flexStackerStore'
 import { liquidProbe } from './liquidProbe'
 import { moveLabware } from './moveLabware'
 import { moveToAddressableArea } from './moveToAddressableArea'
@@ -52,6 +56,10 @@ export {
   dropTip,
   dropTipInPlace,
   engageMagnet,
+  flexStackerEmpty,
+  flexStackerFillItems,
+  flexStackerRetrieve,
+  flexStackerStore,
   liquidProbe,
   moveLabware,
   moveToAddressableArea,

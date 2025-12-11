@@ -1,6 +1,7 @@
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
+  getIsSpaceInHopper,
   getLabwareIdOnShuttle,
   labwareMatchesLabwareInHopper,
   uuid,
@@ -16,6 +17,7 @@ export const flexStackerStore: CommandCreator<
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const labwareId = flexStackerState?.labwareOnShuttle?.primaryLabwareId ?? null
+  const isSpace = getIsSpaceInHopper(flexStackerState)
   if (flexStackerState !== null && !getLabwareIdOnShuttle(flexStackerState)) {
     return {
       errors: [errorCreators.flexStackerShuttleEmpty()],
@@ -32,6 +34,11 @@ export const flexStackerStore: CommandCreator<
   ) {
     return {
       errors: [errorCreators.flexStackerLabwareTypeMismatch()],
+    }
+  }
+  if (!isSpace) {
+    return {
+      errors: [errorCreators.flexStackerHopperFull()],
     }
   }
   return {
