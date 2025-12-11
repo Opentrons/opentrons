@@ -37,6 +37,24 @@ dependencies = [
 ]
 
 [dependency-groups]
+# Robot dependencies - exact versions for robot deployment
+robot = [
+    "opentrons==0.0.0",
+    "opentrons-shared-data==0.0.0",
+    "server-utils==0.0.0",
+    "anyio==4.9.0",
+    "fastapi==0.100.0",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.6",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "uvicorn==0.27.0.post1",
+    "wsproto==1.2.0",
+    "systemd-python==234; sys_platform == 'linux'",
+    "sqlalchemy==1.4.51",
+    "paho-mqtt==1.6.1",
+    "aiohttp==3.12.14",
+]
 dev = [
     "atomicwrites==1.4.0; sys_platform=='win32'",
     "colorama==0.4.4; sys_platform=='win32'",
