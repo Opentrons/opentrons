@@ -444,7 +444,10 @@ export const getUnoccupiedStackOptions = (args: {
         isNotCurrentLabwareStack &&
         !isInTrash
       ) {
-        const similarLabwareStackIds = (deckSetupLabware, labwareOnDeck)
+        const similarLabwareStackIds = getAllLabwareIdsOfCertainURIOnStack(
+          deckSetupLabware,
+          labwareOnDeck
+        )
         return [
           ...acc,
           {
