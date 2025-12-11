@@ -264,7 +264,6 @@ export function VisualizerContainer(
 
   useEffect(() => {
     return () => {
-      console.log('aaa')
       dispatch(stepDetailViewerCloseAction({ protocolKey }))
     }
   }, [dispatch, protocolKey])

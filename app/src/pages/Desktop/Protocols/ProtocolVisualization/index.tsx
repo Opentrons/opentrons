@@ -34,7 +34,6 @@ export function ProtocolVisualization(): JSX.Element {
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
     <div className={styles.top_container}>
       <VisualizerContainer
-        // key={protocolKey}
         analysis={storedProtocol.mostRecentAnalysis}
         groupedCommands={groupedCommands}
         protocolKey={protocolKey}
