@@ -64,7 +64,6 @@ export const createContainer: (
   | OpenIngredientSelectorAction
 > = args => (dispatch, getState) => {
   const { labwareDefURIStack, slot, updateSelectedLabwareId } = args
-  console.log('labwareDefURIStack', labwareDefURIStack)
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
