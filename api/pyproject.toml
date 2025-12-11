@@ -46,7 +46,7 @@ robot = [
     "pydantic-settings==2.4.0",
     "anyio==4.9.0",
     "numpy==1.26.4",
-    "packaging==22.0",
+    "packaging==25.0",
     "pyusb==1.2.1",
     "zipp==3.21.0",
     "opentrons-hardware==0.0.0",
