@@ -535,6 +535,16 @@ export interface WaitForTemperatureArgs extends CommonArgs {
   message?: string
 }
 
+export interface WaitForModuleTaskArgs extends CommonArgs {
+  commandCreatorFnName: 'waitForModuleTask'
+
+  /** This step will wait for this to happen before moving on. */
+  // Note: Leaving room for this to become a union with stuff like 'temperatureModuleReachedTarget'.
+  waitCondition: 'thermocyclerProfileComplete'
+
+  moduleId: string
+}
+
 export type EngageMagnetArgs = CommonArgs & {
   height: number
   moduleId: string
@@ -742,6 +752,7 @@ export type CommandCreatorArgs =
   | DistributeArgs
   | MixArgs
   | PauseArgs
+  | WaitForModuleTaskArgs
   | TransferArgs
   | EngageMagnetArgs
   | DisengageMagnetArgs
@@ -867,6 +878,7 @@ export type ErrorType =
   | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
+  | 'MISSING_PROFILE_STEP'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
