@@ -560,7 +560,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
         )
         helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
-        protocol.capture_image(filename="protocol_finished")
+        protocol.capture_image(filename="end_of_run")
 
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)

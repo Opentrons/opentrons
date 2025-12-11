@@ -1473,7 +1473,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.comment("==============================================")
         protocol.comment("--> Report")
         protocol.comment("==============================================")
-
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
             helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:

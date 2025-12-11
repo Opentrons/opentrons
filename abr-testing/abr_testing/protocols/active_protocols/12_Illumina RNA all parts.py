@@ -2885,7 +2885,7 @@ def run(protocol: ProtocolContext) -> None:
                     use_gripper=True,
                 )
                 stacker_50_2.store()
-
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
             helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:

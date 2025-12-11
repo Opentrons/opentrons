@@ -657,7 +657,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.plate_reader_actions(
             protocol, plate_reader, hellma_plate, plate_name_str
         )
-
+        protocol.capture_image(filename="end_of_run")
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():

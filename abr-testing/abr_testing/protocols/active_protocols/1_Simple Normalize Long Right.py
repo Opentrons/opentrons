@@ -304,6 +304,7 @@ def run(protocol: ProtocolContext) -> None:
         helpers.find_liquid_height_of_all_wells(
             protocol, p1000_single, [waste_reservoir["A1"]]
         )
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
             helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
