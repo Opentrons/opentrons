@@ -1,73 +1,36 @@
-import { absorbanceReaderCloseLid } from './absorbanceReaderCloseLid'
-import { absorbanceReaderInitialize } from './absorbanceReaderInitialize'
-import { absorbanceReaderOpenLid } from './absorbanceReaderOpenLid'
-import { absorbanceReaderRead } from './absorbanceReaderRead'
-import { airGapInPlace } from './airGapInPlace'
-import { aspirate } from './aspirate'
-import { aspirateInPlace } from './aspirateInPlace'
-import { blowOutInPlace } from './blowOutInPlace'
-import { blowOutInWell } from './blowOutInWell'
-import { captureImage } from './captureImage'
-import { comment } from './comment'
-import { configureForVolume } from './configureForVolume'
-import { configureNozzleLayout } from './configureNozzleLayout'
-import { deactivateTemperature } from './deactivateTemperature'
-import { delay } from './delay'
-import { disengageMagnet } from './disengageMagnet'
-import { dispense } from './dispense'
-import { dispenseInPlace } from './dispenseInPlace'
-import { dropTip } from './dropTip'
-import { dropTipInPlace } from './dropTipInPlace'
-import { engageMagnet } from './engageMagnet'
-import { flexStackerEmpty } from './flexStackerEmpty'
-import { flexStackerFillItems } from './flexStackerFillItems'
-import { flexStackerRetrieve } from './flexStackerRetrieve'
-import { flexStackerStore } from './flexStackerStore'
-import { liquidProbe } from './liquidProbe'
-import { moveLabware } from './moveLabware'
-import { moveToAddressableArea } from './moveToAddressableArea'
-import { moveToAddressableAreaForDropTip } from './moveToAddressableAreaForDropTip'
-import { moveToWell } from './moveToWell'
-import { pickUpTip } from './pickUpTip'
-import { prepareToAspirate } from './prepareToAspirate'
-import { setTemperature } from './setTemperature'
-import { touchTip } from './touchTip'
-import { waitForTemperature } from './waitForTemperature'
-
-export {
-  absorbanceReaderCloseLid,
-  absorbanceReaderInitialize,
-  absorbanceReaderOpenLid,
-  absorbanceReaderRead,
-  airGapInPlace,
-  aspirate,
-  aspirateInPlace,
-  blowOutInPlace,
-  blowOutInWell,
-  captureImage,
-  comment,
-  configureForVolume,
-  configureNozzleLayout,
-  deactivateTemperature,
-  delay,
-  dispense,
-  dispenseInPlace,
-  disengageMagnet,
-  dropTip,
-  dropTipInPlace,
-  engageMagnet,
-  flexStackerEmpty,
-  flexStackerFillItems,
-  flexStackerRetrieve,
-  flexStackerStore,
-  liquidProbe,
-  moveLabware,
-  moveToAddressableArea,
-  moveToAddressableAreaForDropTip,
-  moveToWell,
-  pickUpTip,
-  prepareToAspirate,
-  setTemperature,
-  touchTip,
-  waitForTemperature,
-}
+export { absorbanceReaderCloseLid } from './absorbanceReaderCloseLid'
+export { absorbanceReaderInitialize } from './absorbanceReaderInitialize'
+export { absorbanceReaderOpenLid } from './absorbanceReaderOpenLid'
+export { absorbanceReaderRead } from './absorbanceReaderRead'
+export { airGapInPlace } from './airGapInPlace'
+export { aspirate } from './aspirate'
+export { aspirateInPlace } from './aspirateInPlace'
+export { blowOutInPlace } from './blowOutInPlace'
+export { blowOutInWell } from './blowOutInWell'
+export { captureImage } from './captureImage'
+export { comment } from './comment'
+export { configureForVolume } from './configureForVolume'
+export { configureNozzleLayout } from './configureNozzleLayout'
+export { deactivateTemperature } from './deactivateTemperature'
+export { delay } from './delay'
+export { disengageMagnet } from './disengageMagnet'
+export { dispense } from './dispense'
+export { dispenseInPlace } from './dispenseInPlace'
+export { dropTip } from './dropTip'
+export { dropTipInPlace } from './dropTipInPlace'
+export { engageMagnet } from './engageMagnet'
+export { flexStackerEmpty } from './flexStackerEmpty'
+export { flexStackerFillItems } from './flexStackerFillItems'
+export { flexStackerRetrieve } from './flexStackerRetrieve'
+export { flexStackerStore } from './flexStackerStore'
+export { liquidProbe } from './liquidProbe'
+export { moveLabware } from './moveLabware'
+export { moveToAddressableArea } from './moveToAddressableArea'
+export { moveToAddressableAreaForDropTip } from './moveToAddressableAreaForDropTip'
+export { moveToWell } from './moveToWell'
+export { pickUpTip } from './pickUpTip'
+export { prepareToAspirate } from './prepareToAspirate'
+export { setTemperature } from './setTemperature'
+export { touchTip } from './touchTip'
+export { waitForTemperature } from './waitForTemperature'
+export { thermocyclerRunExtendedProfile } from './thermocyclerRunExtendedProfile'

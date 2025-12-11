@@ -15,11 +15,13 @@ import {
   forThermocyclerDeactivateBlock as _forThermocyclerDeactivateBlock,
   forThermocyclerDeactivateLid as _forThermocyclerDeactivateLid,
   forThermocyclerOpenLid as _forThermocyclerOpenLid,
+  forThermocyclerRunExtendedProfile as _forThermocyclerRunExtendedProfile,
   forThermocyclerRunProfile as _forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
 } from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
 
+import type { TCExtendedProfileParams } from '@opentrons/shared-data'
 import type {
   ModuleOnlyParams,
   TCProfileParams,
@@ -60,6 +62,10 @@ const forThermocyclerOpenLid = makeImmutableStateUpdater(
 const forThermocyclerRunProfile = makeImmutableStateUpdater(
   _forThermocyclerRunProfile
 )
+const forThermocyclerRunExtendedProfile = makeImmutableStateUpdater(
+  _forThermocyclerRunExtendedProfile
+)
+
 const moduleId = 'thermocyclerModuleId'
 let invariantContext: InvariantContext
 let lidOpenRobotState: RobotState
@@ -217,7 +223,7 @@ describe('thermocycler state updaters', () => {
       testName: 'forThermocyclerOpenLid should set lidOpen to true',
     },
   ]
-  const profileCases: TestCases<TCProfileParams> = [
+  const runProfileCases: TestCases<TCProfileParams> = [
     {
       params: {
         moduleId,
@@ -228,34 +234,6 @@ describe('thermocycler state updaters', () => {
       expectedUpdate: {},
       fn: forThermocyclerRunProfile,
       testName: 'forThermocyclerRunProfile should not make any updates',
-    },
-    {
-      params: {
-        moduleId,
-        profile: [
-          {
-            holdSeconds: 10,
-            celsius: 50,
-          },
-          {
-            holdSeconds: 10,
-            celsius: 30,
-          },
-          {
-            holdSeconds: 10,
-            celsius: 0,
-          },
-        ],
-        blockMaxVolumeUl: 10,
-      },
-      moduleStateBefore: {
-        blockTargetTemp: 42,
-      },
-      expectedUpdate: {
-        blockTargetTemp: 0,
-      },
-      fn: forThermocyclerRunProfile,
-      testName: 'forThermocyclerRunProfile should set blockTargetTemp to 0',
     },
     {
       params: {
@@ -283,27 +261,55 @@ describe('thermocycler state updaters', () => {
         blockTargetTemp: 20,
       },
       fn: forThermocyclerRunProfile,
-      testName: 'forThermocyclerRunProfile should set blockTargetTemp to 20',
+      testName:
+        'forThermocyclerRunProfile should set blockTargetTemp from the last profile step',
+    },
+  ]
+  const runExtendedProfileCases: TestCases<TCExtendedProfileParams> = [
+    {
+      params: {
+        moduleId,
+        profileElements: [],
+        blockMaxVolumeUl: 10,
+      },
+      moduleStateBefore: {},
+      expectedUpdate: {},
+      fn: forThermocyclerRunExtendedProfile,
+      testName: 'forThermocyclerRunExtendedProfile should not make any updates',
     },
     {
       params: {
         moduleId,
-        profile: [
+        profileElements: [
           {
             holdSeconds: 10,
-            celsius: 30,
+            celsius: 50,
+          },
+          {
+            steps: [
+              {
+                holdSeconds: 10,
+                celsius: 30,
+              },
+              {
+                holdSeconds: 10,
+                celsius: 40,
+              },
+            ],
+            repetitions: 2,
           },
         ],
         blockMaxVolumeUl: 10,
       },
       moduleStateBefore: {
-        blockTargetTemp: 42,
+        blockTargetTemp: 0,
       },
       expectedUpdate: {
-        blockTargetTemp: 30,
+        blockTargetTemp: 40,
       },
-      fn: forThermocyclerRunProfile,
-      testName: 'forThermocyclerRunProfile should set blockTargetTemp to 30',
+      fn: forThermocyclerRunExtendedProfile,
+      testName:
+        'forThermocyclerRunExtendedProfile should set blockTargetTemp from the last profile step',
     },
   ]
 
@@ -343,5 +349,6 @@ describe('thermocycler state updaters', () => {
   blockTempTestCase.forEach(runTest)
   temperatureParamsCases.forEach(runTest)
   moduleOnlyParamsCases.forEach(runTest)
-  profileCases.forEach(runTest)
+  runProfileCases.forEach(runTest)
+  runExtendedProfileCases.forEach(runTest)
 })

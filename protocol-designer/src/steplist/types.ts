@@ -154,7 +154,7 @@ export interface ThermocyclerProfileSubstepItem {
   lidTargetTempHold: number | null
   message?: string
   meta: ThermocyclerProfileStepArgs['meta']
-  profileSteps: ThermocyclerProfileStepArgs['profileSteps']
+  profileElements: ThermocyclerProfileStepArgs['profileElements']
   profileTargetLidTemp: number | null
   profileVolume: number
 }
