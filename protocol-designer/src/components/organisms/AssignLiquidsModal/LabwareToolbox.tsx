@@ -18,17 +18,16 @@ import {
   multipleIngredientsSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
-import {
-  getInitialDeckSetup,
-  getLabwareEntities,
-} from '/protocol-designer/step-forms/selectors'
+import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 
 import { LabwareButtonBasket } from '../../molecules'
+import { useKitchen } from '../Kitchen/useKitchen'
+import { getHopperStackLimit } from '../SelectLabwareModal/utils'
 import styles from './labwareToolbox.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { LabwareEntities } from '@opentrons/step-generation'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
 export interface LiquidInfo {
@@ -39,8 +38,9 @@ export interface LiquidInfo {
 }
 
 interface LabwareStackToolboxData {
-  labwareEntities: LabwareEntities
-  labware: Record<string, any>
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
   labwareId: string | null
   allWellContents: Record<string, any>
 }
@@ -60,22 +60,27 @@ export function LabwareStackToolbox({
 }: LabwareStackToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
+  const { makeSnackbar } = useKitchen()
 
-  const { labware, labwareId, allWellContents, labwareEntities } = data
-
+  const { labware, labwareId, allWellContents } = data
   const labwareStack: string[] =
     labwareId != null ? (labware[labwareId]?.stack ?? []) : []
-
+  const filteredLabwareStack = labwareStack.filter(id => labware[id] != null)
+  const zHeight =
+    labwareId != null ? labware[labwareId].def.dimensions.zDimension : 0
+  const hopperStackLimit = getHopperStackLimit(zHeight)
   const handleAddAnotherLabware = (): void => {
-    dispatch(
-      createContainer({
-        labwareDefURIStack: [
-          labwareEntities[labwareId ?? '']?.labwareDefURI ?? '',
-        ],
-        slot: labwareId ?? '',
-        updateSelectedLabwareId: true,
-      })
-    )
+    if (filteredLabwareStack.length < hopperStackLimit) {
+      dispatch(
+        createContainer({
+          labwareDefURIStack: [labware[labwareId ?? '']?.labwareDefURI ?? ''],
+          slot: labwareId ?? '',
+          updateSelectedLabwareId: true,
+        })
+      )
+    } else {
+      makeSnackbar(t('no_more_space_in_slot') as string)
+    }
   }
 
   const handleSelectAllLabware = (): void => {
@@ -147,10 +152,10 @@ export function LabwareStackToolbox({
         </StyledText>
       }
     >
-      {labwareStack.length > 0 ? (
+      {filteredLabwareStack.length > 0 ? (
         <div className={styles.container}>
           <LabwareButtonBasket
-            stackOfLabware={labwareStack}
+            stackOfLabware={filteredLabwareStack}
             labware={labware}
             setSelectedLabware={handleAssignToLabware}
             selectedLabware={selectedLabwareIds}
@@ -182,7 +187,6 @@ export function LabwareStackToolboxContainer({
   setShowLiquidLayoutOverlay,
 }: LabwareStackToolboxContainerProps): JSX.Element {
   // All selectors moved here
-  const labwareEntities = useSelector(getLabwareEntities)
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const { labware } = useSelector(getInitialDeckSetup)
   const allWellContents = useSelector(
@@ -190,7 +194,6 @@ export function LabwareStackToolboxContainer({
   )
 
   const data: LabwareStackToolboxData = {
-    labwareEntities,
     labwareId: labwareId ?? null,
     labware,
     allWellContents,

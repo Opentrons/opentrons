@@ -21,6 +21,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
+  getFullStackFromLabwares,
   getLiquidIdsOnLabware,
   HOPPER_STACKER_LOCATION,
 } from '@opentrons/step-generation'
@@ -31,7 +32,6 @@ import { openIngredientSelector } from '/protocol-designer/labware-ingred/action
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
-import { getAllLabwareIdsOfCertainURIOnStack } from '/protocol-designer/utils'
 
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
@@ -42,11 +42,12 @@ import type { ThunkDispatch } from '/protocol-designer/types'
 interface LabwareCardProps {
   labware: LabwareOnDeck
   quantity: number
+  location: string // slotId, off-deck, fake hopper location
   lidId?: string
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidId, quantity } = props
+  const { labware, lidId, quantity, location } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
@@ -54,9 +55,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const enableStacking = useSelector(getEnableStacking)
   const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
-  const allLabwareIdsOnStack = getAllLabwareIdsOfCertainURIOnStack(
-    deckSetupLabware,
-    labware
+  const largestStack = getFullStackFromLabwares(deckSetupLabware, location)
+  const isLabwareCardForAdapter = labware.def.allowedRoles?.includes('adapter')
+  const filteredStack = largestStack.filter(
+    id =>
+      deckSetupLabware[id] != null &&
+      (isLabwareCardForAdapter
+        ? deckSetupLabware[id].def.allowedRoles?.includes('adapter')
+        : !deckSetupLabware[id].def.allowedRoles?.includes('adapter'))
   )
   const isOnHopper = labware.stack.includes(HOPPER_STACKER_LOCATION)
   const nickNames = useSelector(getLabwareNicknamesById)
@@ -79,7 +85,10 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     isOnHopper || (def.stackLimit != null && def.stackLimit > 1)
 
   let editButton: null | string = null
-  if (isOnHopper || (isLid && canModifyQuantity)) {
+  if (
+    (isOnHopper && def.parameters.isTiprack) ||
+    (isLid && canModifyQuantity)
+  ) {
     editButton = t('edit_quantity')
   } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
     editButton = t('edit_liquid_and_quantity')
@@ -103,7 +112,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             setShowQuantityModal(false)
           }}
           labwareId={labware.id}
-          allLabwareIdsOnStack={allLabwareIdsOnStack}
+          allLabwareIdsOnStack={filteredStack}
           isOnHopper={isOnHopper}
         />
       ) : null}
@@ -111,7 +120,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         {showOverflowMenu ? (
           <LabwareCardOverflowMenu
             setShowOverflowMenu={setShowOverflowMenu}
-            labwareIds={allLabwareIdsOnStack}
+            labwareIds={filteredStack}
             lidId={lidId}
           />
         ) : null}

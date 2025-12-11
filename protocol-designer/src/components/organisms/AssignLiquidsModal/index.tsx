@@ -33,7 +33,10 @@ import {
 import { LiquidButton } from '/protocol-designer/components/molecules'
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
-import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
+import {
+  LabwareOnDeck,
+  selectors as stepFormSelectors,
+} from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
@@ -50,7 +53,10 @@ import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
-import type { ContentsByWell } from '@opentrons/step-generation'
+import type {
+  ContentsByWell,
+  LabwareEntities,
+} from '@opentrons/step-generation'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -59,8 +65,10 @@ interface AssignLiquidsModalData {
   nickNames: Record<string, string>
   labwareId: string | null
   selectedWells: WellGroup
-  labware: Record<string, any>
-  labwareEntities: Record<string, any>
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
+  labwareEntities: LabwareEntities
   allWellContents: Record<string, any>
   liquidNamesById: Record<string, string>
   liquidDisplayColors: Record<string, string>

@@ -24,6 +24,19 @@ const render = (props: ComponentProps<typeof EditLabwareQuantityModal>) => {
   })[0]
 }
 
+const labwareEntity1 = {
+  id: 'mockId',
+  labwareDefURI: 'mockURI',
+  pythonName: 'mockPythonName',
+  def: { ...fixture96Plate, stackLimit: 3 } as LabwareDefinition2,
+}
+const labwareEntity2 = {
+  id: 'mockId2',
+  labwareDefURI: 'mockURI',
+  pythonName: 'mockPythonName2',
+  def: { ...fixture96Plate, stackLimit: 3 } as LabwareDefinition2,
+}
+
 describe('EditLabwareQuantityModal', () => {
   let props: ComponentProps<typeof EditLabwareQuantityModal>
 
@@ -33,14 +46,10 @@ describe('EditLabwareQuantityModal', () => {
       onClose: vi.fn(),
       labwareId: 'mockId',
       allLabwareIdsOnStack: ['mockId'],
+      isOnHopper: false,
     }
     vi.mocked(getLabwareEntities).mockReturnValue({
-      mockId: {
-        id: 'mockId',
-        labwareDefURI: 'mockDefUri',
-        pythonName: 'mockPythonName',
-        def: { ...fixture96Plate, stackLimit: 3 } as LabwareDefinition2,
-      },
+      mockId: labwareEntity1,
     })
   })
 
@@ -61,6 +70,10 @@ describe('EditLabwareQuantityModal', () => {
     expect(props.onClose).toHaveBeenCalled()
   })
   it('renders changes the quantity from 2 to 1', () => {
+    vi.mocked(getLabwareEntities).mockReturnValue({
+      mockId: labwareEntity1,
+      mockId2: labwareEntity2,
+    })
     props.allLabwareIdsOnStack = ['mockId', 'mockId2']
     render(props)
     const input = screen.getByRole('textbox')
@@ -72,6 +85,10 @@ describe('EditLabwareQuantityModal', () => {
     expect(props.onClose).toHaveBeenCalled()
   })
   it('renders the error copy when you try to confirm', () => {
+    vi.mocked(getLabwareEntities).mockReturnValue({
+      mockId: labwareEntity1,
+      mockId2: labwareEntity2,
+    })
     props.allLabwareIdsOnStack = ['mockId', 'mockId2']
     render(props)
     const input = screen.getByRole('textbox')

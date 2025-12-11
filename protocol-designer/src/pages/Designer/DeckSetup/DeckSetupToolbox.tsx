@@ -83,7 +83,6 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] =
     useState<boolean>(false)
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
-  console.log('selectedLidLabware', selectedLidLabware)
   const {
     createdAdapterForSlot,
     createdModuleForSlot,
@@ -355,10 +354,15 @@ export function DeckSetupToolbox(
                     ? {}
                     : { lidId: createdLidForSlot?.id })}
                   quantity={createdStackForSlot.length}
+                  location={slot}
                 />
               ) : null}
               {createdAdapterForSlot != null ? (
-                <LabwareCard labware={createdAdapterForSlot} quantity={1} />
+                <LabwareCard
+                  labware={createdAdapterForSlot}
+                  quantity={1}
+                  location={slot}
+                />
               ) : null}
               {slotFull ? (
                 <StyledText

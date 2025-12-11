@@ -47,7 +47,17 @@ export function EditLabwareQuantityModal(
   const stackingLimit = isOnHopper
     ? getHopperStackLimit(zHeight)
     : (def.stackLimit ?? 0)
-  const initialQuantity = allLabwareIdsOnStack.length
+  const labwareOfPrimaryURIOnStack = allLabwareIdsOnStack.filter(id =>
+    id.includes(labwareDefURI)
+  )
+  const initialQuantity = labwareOfPrimaryURIOnStack.length
+  const labwareDefURIsInStack = new Set(
+    allLabwareIdsOnStack.map(
+      labwareId => labwareEntities[labwareId].labwareDefURI
+    )
+  )
+  const labwareDefURIsInStackArray = Array.from(labwareDefURIsInStack)
+  const hasLidInStack = labwareDefURIsInStackArray.length > 1
   const [quantity, setQuantity] = useState<string>(initialQuantity.toString())
   const [showError, setError] = useState<boolean>(false)
   const saveQuantity = (quantity: string): void => {
@@ -62,9 +72,14 @@ export function EditLabwareQuantityModal(
       }
     })
     // recreate the stack
-    const arrayOfLabwareDefURI = Array(parseInt(quantity) - 1).fill(
-      labwareDefURI
-    )
+    const count = parseInt(quantity) - 1
+    const arrayOfLabwareDefURI = hasLidInStack
+      ? Array.from({ length: count * 2 }, (_, index) =>
+          index % 2 === 0
+            ? labwareDefURIsInStackArray[0]
+            : labwareDefURIsInStackArray[1]
+        )
+      : Array.from({ length: count }, () => labwareDefURI)
     if (arrayOfLabwareDefURI.length > 0) {
       dispatch(
         createContainer({
