@@ -4,7 +4,8 @@ import io
 import tempfile
 from typing import Annotated
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Response
+from fastapi.responses import FileResponse
 from starlette import status
 from starlette.background import BackgroundTask
 from starlette.responses import StreamingResponse
@@ -12,12 +13,14 @@ from opentrons.system import camera
 from opentrons.system.camera import StreamConfigurationKeys
 from robot_server.errors.error_responses import LegacyErrorResponse
 from opentrons_shared_data.errors import ErrorCodes
+from robot_server.errors.error_responses import ErrorBody
 from robot_server.service.legacy.models.settings import (
     CameraEnable,
     LiveStreamData,
     LiveStreamSettings,
     Resolution,
     StreamStatusType,
+    CameraCaptureImageSettings,
 )
 from robot_server.service.json_api import RequestModel
 from opentrons.config import IS_ROBOT
@@ -30,7 +33,9 @@ from robot_server.camera.settings.store import (
     CameraSettingStore,
     get_camera_setting_store,
 )
-
+from opentrons.protocol_engine.resources.camera_provider import ImageParameters
+from robot_server.persistence.fastapi_dependencies import get_images_directory
+from robot_server.data_files.models import FileNotFound
 
 log = logging.getLogger(__name__)
 
@@ -41,6 +46,9 @@ JPG = "image/jpg"
 # todo(chb, 2025-09-19): This temporary for an initial implementation while we determine if some units will ship without cameras
 DEFAULT_CAMERA_ID = "ot_system_camera"
 DEFAULT_CAMERA_PATH = f"/dev/{DEFAULT_CAMERA_ID}"
+
+# Default Preview Image Filename
+PREVIEW_IMAGE = "preview_image.jpeg"
 
 
 @router.post(
@@ -150,6 +158,84 @@ async def get_camera(
 
 
 # todo(chb, 2025-09-08): Implement POST/GET /camera/picture/settings for picture taking settings when in protocol run
+
+
+@router.post(
+    "/camera/capturePreviewImage",
+    description="Return a preview image based on provided capture image settings.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
+    },
+)
+async def post_camera_preview_image(
+    request_body: RequestModel[CameraCaptureImageSettings],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+    images_directory: Annotated[Path, Depends(get_images_directory)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
+) -> Response:
+    """
+    Return a preview image based on the provided capture image settings.
+    """
+    _validate_camera_present()
+
+    if not camera_settings_store.get_camera_enabled():
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str("Cannot capture preview photo, camera is disabled."),
+        )
+
+    image_data = await camera.image_capture(
+        robot_type=robot_type,
+        parameters=ImageParameters(
+            resolution=request_body.data.resolution,
+            zoom=request_body.data.zoom,
+            pan=request_body.data.pan,
+            contrast=(
+                (request_body.data.contrast / 100) * 2.0
+                if request_body.data.contrast is not None
+                else None
+            ),
+            brightness=(
+                int(((request_body.data.brightness * 256) // 100) - 128) * -1
+                if request_body.data.brightness is not None
+                else None
+            ),
+            saturation=(
+                (request_body.data.saturation / 100) * 2.0
+                if request_body.data.saturation is not None
+                else None
+            ),
+        ),
+    )
+
+    file_path = images_directory / PREVIEW_IMAGE
+
+    if isinstance(image_data, bytes):
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+        with open(file=file_path, mode="wb") as f:
+            f.write(image_data)
+
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(
+                f"Preview image capture failed with the following: {image_data.message}"
+            ),
+        )
+
+    if not file_path.exists():
+        raise FileNotFound(detail=f"Preview image file not found.").as_error(
+            status.HTTP_404_NOT_FOUND
+        )
+
+    return FileResponse(
+        path=file_path,
+        media_type="image/jpeg",
+        filename=PREVIEW_IMAGE,
+    )
 
 
 @router.post(
