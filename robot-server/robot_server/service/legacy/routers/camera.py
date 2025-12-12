@@ -227,7 +227,7 @@ async def post_camera_preview_image(
         )
 
     if not file_path.exists():
-        raise FileNotFound(detail=f"Preview image file not found.").as_error(
+        raise FileNotFound(detail="Preview image file not found.").as_error(
             status.HTTP_404_NOT_FOUND
         )
 
