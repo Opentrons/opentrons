@@ -5,10 +5,11 @@ import subprocess
 
 def edit_livestream_length(ip: str, time: str) -> None:
     """SSH into robot and increase livestream time."""
+    key = "hls_playlist_length"
     ssh_command = f"""
     ssh root@{ip} '
         mount -o remount,rw / &&
-        sed -i "96s/.*/            hls_playlist_length {time}s;/" /etc/nginx/nginx.conf &&
+        sed -i "s/{key} *[0-9][0-9]*s;/{key} {time}s/g" /etc/nginx/nginx.conf &&
         systemctl daemon-reload &&
         systemctl restart nginx
     '
