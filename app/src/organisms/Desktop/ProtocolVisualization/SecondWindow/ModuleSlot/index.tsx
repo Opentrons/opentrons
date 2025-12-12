@@ -37,15 +37,19 @@ export function ModuleSlot({
 
   switch (moduleState.type) {
     case THERMOCYCLER_MODULE_TYPE: {
-      const { blockTargetTemp, lidOpen, lidTargetTemp } = moduleState
+      const { currentBlockActivity, lidOpen, lidTargetTemp } = moduleState
 
       moduleDetails = (
         <div className={styles.module_details_status_container}>
           <ModuleStatusContainer title="target_block_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
-              {blockTargetTemp != null
-                ? t('temperature', { temp: blockTargetTemp })
-                : t('deactivated')}
+              {currentBlockActivity.type === 'blockTargetTemp'
+                ? t('temperature', {
+                    temp: currentBlockActivity.blockTargetTemp,
+                  })
+                : currentBlockActivity.type === 'profile'
+                  ? t('deactivated') // todo(mm, 2025-12-12): As a placeholder, this is showing the block as 'deactivated' when there's a profile ongoing.
+                  : t('deactivated')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="target_lid_temperature">
