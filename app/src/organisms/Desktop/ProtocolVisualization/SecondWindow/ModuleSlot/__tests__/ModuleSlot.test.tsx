@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 
 import {
   ABSORBANCE_READER_TYPE,
