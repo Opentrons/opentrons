@@ -134,24 +134,31 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       <div className={styles.container}>
         <div className={styles.header}>
           {/* header icon part */}
-          <div>
+          <div className={styles.header_icon}>
             {labware[topLabwareOnSlotId]?.stack
               .filter(item => item !== topLabwareOnSlotId)
               .reverse()
-              .map(item => {
+              .map((item, index) => {
                 if (moduleEntities[item] != null) {
                   return (
                     <RobotInfoLabel
-                      key={item}
+                      key={`${item}-${index}`}
                       iconName={
                         MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
                       }
                     />
                   )
                 } else if (labware[item] != null) {
-                  return <RobotInfoLabel key={item} iconName="stacked" />
+                  return (
+                    <RobotInfoLabel
+                      key={`${item}-${index}`}
+                      iconName="stacked"
+                    />
+                  )
                 } else {
-                  return <RobotInfoLabel key={item} deckLabel={slot} />
+                  return (
+                    <RobotInfoLabel key={`${item}-${index}`} deckLabel={slot} />
+                  )
                 }
               })}
           </div>

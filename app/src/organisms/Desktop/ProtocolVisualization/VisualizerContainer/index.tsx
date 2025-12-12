@@ -261,6 +261,12 @@ export function VisualizerContainer(
     }
   }, [])
 
+  useEffect(() => {
+    return () => {
+      dispatch(stepDetailViewerCloseAction())
+    }
+  }, [dispatch])
+
   return (
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
