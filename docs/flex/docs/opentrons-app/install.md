@@ -47,12 +47,28 @@ The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 !!! note
     Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
-## Downgrading
+## Downgrading software
 
+Reinstalling an earlier version of the robot software on your Flex should be a rare event. You should only do this when directed to by Opentrons Support. You can [download previously released Opentrons software](https://github.com/Opentrons/opentrons/releases) from Github.
+<!-- not sure where to put the Github link -->
 
+!!!tip
+    Make sure your Flex is idle before starting the software downgrade process. Some required App features are not available while the robot is running a protocol.
 
+### Part 1: Downloading robot software
 
+1. On the Github releases page, find the earlier version of the robot software you want to use. We recommend only rolling back to a version that's as closest to the latest release as possible.
 
+2. In the Assets section of a release, click the small triangle (&rtrif;) to expand a list of compressed software files available for download.
 
+    ![Image showing expanded section with software versions](../images/app-software-releases.png)
+
+3. Click the compressed file named `ot3-system-<version number>.zip` to download and save it to your computer. For example, to get robot software version 8.6, you'd click the file `ot3-system-8.6.0.zip`. In this file naming convention, `ot3` refers to Flex.
+
+### Part 2: Installing the earlier version
+
+4. In the App, find the robot you want to work with from the Devices tab.
+
+5. 
 
 
