@@ -47,7 +47,7 @@ The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 !!! note
     Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
-## Downgrading software
+## Downgrading Flex software
 
 Reinstalling an earlier version of the robot software on your Flex should be a rare event. You should only do this when directed to by Opentrons Support. You can [download previously released Opentrons software](https://github.com/Opentrons/opentrons/releases) from Github.
 <!-- not sure where to put the Github link -->
@@ -55,7 +55,7 @@ Reinstalling an earlier version of the robot software on your Flex should be a r
 !!!tip
     Make sure your Flex is idle before starting the software downgrade process. Some required App features are not available while the robot is running a protocol.
 
-### Part 1: Downloading robot software
+### Part 1: Downloading the earlier software version
 
 1. On the Github releases page, find the earlier version of the robot software you want to use. We recommend only rolling back to a version that's as closest to the latest release as possible.
 
@@ -69,6 +69,17 @@ Reinstalling an earlier version of the robot software on your Flex should be a r
 
 4. In the App, find the robot you want to work with from the Devices tab.
 
-5. 
+5. 3 dot menu > robot settings > ???
 
+6. Click **Browse file system** and find the downloaded robot software file.
+
+7. Click the file and then click **Open**. This starts the software upload process. It could take 15–20 minutes to install the previous software version.
+
+### After downgrading
+
+The App will notify you after the installation successfully completes. You should also check the touchscreen on the Flex before using it. The touchscreen might show your Flex going through additional firmware checks and updates that the App does not. The Flex will restart after it completes its firmware checks and any other update processes. After restarting, your Flex will have returned to running on an earlier version of the robot operating system.
+
+## Downgrading App software
+
+check image and anchor links. there are warnings. Need to repoint.
 
