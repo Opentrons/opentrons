@@ -7,7 +7,7 @@ title: "Opentrons Flex: Controlling Modules"
 Use the Opentrons App to view the status of modules connected to your Flex and control them outside of protocols. Click **Devices** and then click on your Flex to view its robot details page. Under Instruments and Modules, there is a card for each attached module. The card shows the type of module, what USB port it is connected to, and its current status.
 
 <figure markdown>
-![Card showing the status of a Heater-Shaker module, including a banner showing that it is currently hot.](images/app-module-status.png "Heater-Shaker status card")
+![Card showing the status of a Heater-Shaker module, including a banner showing that it is currently hot.](../images/app-module-status.png "Heater-Shaker status card")
 <figcaption>Module card for the Heater-Shaker Module.</figcaption>
 </figure>
 

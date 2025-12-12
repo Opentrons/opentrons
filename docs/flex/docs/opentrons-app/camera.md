@@ -27,7 +27,7 @@ The camera is turned off by default. To turn on the camera and access its featur
 You can also see the camera's status, and turn it on and off, from the Peripherals section of the details page for your Flex. Click the three-dot menu (⋮) to enable or disable the camera. This example shows a Flex with its camera enabled.
 
 <figure class="screenshot" markdown>
-  ![Details page showing enabled camera](./images/robot-details.png)
+  ![Details page showing enabled camera](../images/robot-details.png)
 </figure>
 
 ### Downloading images

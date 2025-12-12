@@ -4,7 +4,7 @@ title: "Opentrons Flex: Transferring Protocols"
 
 ## Transferring protocols to Flex
 
-Every protocol will begin as a file on your computer, regardless of what method of [protocol development](protocols/index.md) you use. You need to import the protocol into the Opentrons App and then transfer it to your Flex. When transferring a protocol, you can choose to begin run setup immediately or later.
+Every protocol will begin as a file on your computer, regardless of what method of [protocol development](../protocols/index.md) you use. You need to import the protocol into the Opentrons App and then transfer it to your Flex. When transferring a protocol, you can choose to begin run setup immediately or later.
 
 ### Import a protocol
 
@@ -13,7 +13,7 @@ When you first launch the Opentrons App, you will see the Protocols screen. (Cli
 The Opentrons App will analyze your protocol as soon as you import it. *Protocol analysis* is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, a warning banner will appear on the protocol's card. Correct the errors and re-import the protocol. If there are no errors, your protocol is ready to transfer to Flex.
 
 <figure class="screenshot" markdown>
-![Expanded three-dot menu for a protocol, showing these options: Start setup, Reanalyze, Send to Opentrons Flex, Show in folder, and Delete](images/app-protocol-menu.png "Screenshot")
+![Expanded three-dot menu for a protocol, showing these options: Start setup, Reanalyze, Send to Opentrons Flex, Show in folder, and Delete](../images/app-protocol-menu.png "Screenshot")
 <figcaption>Actions available in the three-dot menu (⋮) for imported protocols.</figcaption>
 </figure>
 
@@ -26,11 +26,11 @@ Click the three-dot menu (⋮) on your protocol and choose **Start setup**. Choo
 
 If you stay in the app, expand the sections under the Setup tab and follow the instructions in each one: Robot Calibration, Module Setup (if your protocol uses modules), Labware Position Check (recommended), and Labware Setup. Then click :material-play-circle: **Start run** to to begin the protocol.
 
-If you move to the touchscreen, follow the steps in the [Protocol Setup section](touchscreen/protocol-setup.md).
+If you move to the touchscreen, follow the steps in the [Protocol Setup section](../touchscreen/protocol-setup.md).
 
 ### Run later
 
-Click the three-dot menu (⋮) on your protocol and choose **Send to Opentrons Flex**. Choose a connected and available Flex from the list to transfer the protocol. A message indicating a successful transfer will pop up both in the app and on the touchscreen. To set up your protocol, you need to move to the touchscreen and follow the steps in the [Protocol Setup section](touchscreen/protocol-setup.md).
+Click the three-dot menu (⋮) on your protocol and choose **Send to Opentrons Flex**. Choose a connected and available Flex from the list to transfer the protocol. A message indicating a successful transfer will pop up both in the app and on the touchscreen. To set up your protocol, you need to move to the touchscreen and follow the steps in the [Protocol Setup section](../touchscreen/protocol-setup.md).
 
 ## Recent protocol runs
 
