@@ -30,6 +30,7 @@ dependencies = [
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "wsproto==1.2.0",
+    "opentrons-hardware[FLEX]==0.0.0",
     "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
