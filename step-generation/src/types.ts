@@ -873,6 +873,7 @@ export type WarningType =
   | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
   | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
   | 'TEMPERATURE_IS_POTENTIALLY_UNREACHABLE'
+  | 'WAITING_FOR_NONEXISTENT_TASK'
 
 export interface CommandCreatorWarning {
   message: string
