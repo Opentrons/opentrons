@@ -1402,9 +1402,9 @@ requires-dist = [
     { name = "importlib-metadata", marker = "python_full_version < '3.8'", specifier = ">=1.0" },
     { name = "jsonschema", specifier = ">=3.0.1,<4.18.0" },
     { name = "numpy", specifier = ">=1.20.0,<2" },
-    { name = "numpy", specifier = ">=1.26.3,<2" },
+    { name = "numpy", specifier = ">=1.26.4,<2" },
     { name = "opentrons-shared-data", editable = "../shared-data" },
-    { name = "packaging", specifier = ">=22.0" },
+    { name = "packaging", specifier = ">=25.0" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2,<3" },
     { name = "pyserial", specifier = ">=3.5" },
@@ -1433,7 +1433,7 @@ dev = [
     { name = "numpy", specifier = "==1.26.4" },
     { name = "numpydoc", specifier = "==0.9.1" },
     { name = "opentrons-hardware", editable = "../hardware" },
-    { name = "packaging", specifier = "==22.0" },
+    { name = "packaging", specifier = "==25.0" },
     { name = "performance-metrics", editable = "../performance-metrics" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
@@ -1461,7 +1461,7 @@ robot = [
     { name = "jsonschema", specifier = "==4.17.3" },
     { name = "numpy", specifier = "==1.26.4" },
     { name = "opentrons-hardware", editable = "../hardware" },
-    { name = "packaging", specifier = "==22.0" },
+    { name = "packaging", specifier = "==25.0" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
     { name = "pyusb", specifier = "==1.2.1" },
@@ -1566,11 +1566,11 @@ robot = [
 
 [[package]]
 name = "packaging"
-version = "22.0"
+version = "25.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6b/f7/c240d7654ddd2d2f3f328d8468d4f1f876865f6b9038b146bec0a6737c65/packaging-22.0.tar.gz", hash = "sha256:2198ec20bd4c017b8f9717e00f0c8714076fc2fd93816750ab48e2c41de2cfd3", size = 125371, upload-time = "2022-12-07T23:18:13.097Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a1/d4/1fc4078c65507b51b96ca8f8c3ba19e6a61c8253c72794544580a7b6c24d/packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f", size = 165727, upload-time = "2025-04-19T11:48:59.673Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8f/7b/42582927d281d7cb035609cd3a543ffac89b74f3f4ee8e1c50914bcb57eb/packaging-22.0-py3-none-any.whl", hash = "sha256:957e2148ba0e1a3b282772e791ef1d8083648bc131c8ab0c1feba110ce1146c3", size = 42619, upload-time = "2022-12-07T23:18:10.23Z" },
+    { url = "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484", size = 66469, upload-time = "2025-04-19T11:48:57.875Z" },
 ]
 
 [[package]]

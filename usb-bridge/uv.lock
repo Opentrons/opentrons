@@ -747,6 +747,10 @@ dev = [
     { name = "pytest-xdist" },
     { name = "types-mock" },
 ]
+robot = [
+    { name = "pyserial" },
+    { name = "pyudev" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -776,6 +780,10 @@ dev = [
     { name = "pytest-watch", specifier = "~=4.2.0" },
     { name = "pytest-xdist", specifier = "~=2.5.0" },
     { name = "types-mock", specifier = "~=5.1.0" },
+]
+robot = [
+    { name = "pyserial", specifier = "==3.5" },
+    { name = "pyudev", specifier = "==0.23.2" },
 ]
 
 [[package]]

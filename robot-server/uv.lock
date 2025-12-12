@@ -1031,9 +1031,10 @@ requires-dist = [
     { name = "click", specifier = ">=8.0.0,<9" },
     { name = "importlib-metadata", marker = "python_full_version < '3.8'", specifier = ">=1.0" },
     { name = "jsonschema", specifier = ">=3.0.1,<4.18.0" },
-    { name = "numpy", specifier = ">=1.26.3,<2" },
+    { name = "numpy", specifier = ">=1.20.0,<2" },
+    { name = "numpy", specifier = ">=1.26.4,<2" },
     { name = "opentrons-shared-data", editable = "../shared-data" },
-    { name = "packaging", specifier = ">=22.0" },
+    { name = "packaging", specifier = ">=25.0" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2,<3" },
     { name = "pyserial", specifier = ">=3.5" },
@@ -1062,7 +1063,7 @@ dev = [
     { name = "numpy", specifier = "==1.26.4" },
     { name = "numpydoc", specifier = "==0.9.1" },
     { name = "opentrons-hardware", editable = "../hardware" },
-    { name = "packaging", specifier = "==22.0" },
+    { name = "packaging", specifier = "==25.0" },
     { name = "performance-metrics", editable = "../performance-metrics" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
@@ -1078,7 +1079,7 @@ dev = [
     { name = "sphinx-tabs", specifier = ">=3.4.1,<4" },
     { name = "sphinxext-opengraph", specifier = "==0.8.1" },
     { name = "twine", specifier = "==4.0.0" },
-    { name = "typeguard", specifier = "==4.1.5" },
+    { name = "typeguard", specifier = "~=4.4.4" },
     { name = "types-mock", specifier = "~=5.1.0" },
     { name = "types-setuptools", specifier = "==57.0.2" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -1090,7 +1091,7 @@ robot = [
     { name = "jsonschema", specifier = "==4.17.3" },
     { name = "numpy", specifier = "==1.26.4" },
     { name = "opentrons-hardware", editable = "../hardware" },
-    { name = "packaging", specifier = "==22.0" },
+    { name = "packaging", specifier = "==25.0" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
     { name = "pyusb", specifier = "==1.2.1" },
@@ -1146,6 +1147,7 @@ dev = [
 name = "opentrons-shared-data"
 source = { editable = "../shared-data" }
 dependencies = [
+    { name = "jsonschema" },
     { name = "numpy" },
     { name = "pydantic" },
     { name = "typing-extensions" },
@@ -1153,8 +1155,9 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "jsonschema", specifier = ">=4.0.0,<5" },
     { name = "numpy", specifier = "~=1.26.4" },
-    { name = "pydantic", specifier = "~=2.11.7" },
+    { name = "pydantic", specifier = ">=2.0.0,<3.0.0" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
 ]
 
@@ -1178,7 +1181,7 @@ dev = [
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=3.5.0" },
     { name = "twine", specifier = "==4.0.0" },
-    { name = "typeguard", specifier = "~=4.1.5" },
+    { name = "typeguard", specifier = "~=4.4.4" },
     { name = "types-pillow" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
     { name = "wheel", specifier = "==0.37.1" },
@@ -1893,6 +1896,23 @@ dev = [
     { name = "types-requests" },
     { name = "zipp" },
 ]
+robot = [
+    { name = "aiohttp" },
+    { name = "anyio" },
+    { name = "fastapi" },
+    { name = "opentrons" },
+    { name = "opentrons-shared-data" },
+    { name = "paho-mqtt" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "python-dotenv" },
+    { name = "python-multipart" },
+    { name = "server-utils" },
+    { name = "sqlalchemy" },
+    { name = "systemd-python", marker = "sys_platform == 'linux'" },
+    { name = "uvicorn" },
+    { name = "wsproto" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -1949,6 +1969,23 @@ dev = [
     { name = "types-paho-mqtt", specifier = "==1.6.0.20240106" },
     { name = "types-requests", specifier = "~=2.27.1" },
     { name = "zipp", specifier = "==3.21.0" },
+]
+robot = [
+    { name = "aiohttp", specifier = "==3.12.14" },
+    { name = "anyio", specifier = "==4.9.0" },
+    { name = "fastapi", specifier = "==0.100.0" },
+    { name = "opentrons", editable = "../api" },
+    { name = "opentrons-shared-data", editable = "../shared-data" },
+    { name = "paho-mqtt", specifier = "==1.6.1" },
+    { name = "pydantic", specifier = "==2.11.7" },
+    { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "python-dotenv", specifier = "==1.0.1" },
+    { name = "python-multipart", specifier = "==0.0.6" },
+    { name = "server-utils", editable = "../server-utils" },
+    { name = "sqlalchemy", specifier = "==1.4.51" },
+    { name = "systemd-python", marker = "sys_platform == 'linux'", specifier = "==234" },
+    { name = "uvicorn", specifier = "==0.27.0.post1" },
+    { name = "wsproto", specifier = "==1.2.0" },
 ]
 
 [[package]]
