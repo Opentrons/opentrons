@@ -296,7 +296,10 @@ class ProtocolEditorPage(BasePage):
 
     def configure_transfer_source(self) -> None:
         """Configure the source for a transfer step."""
-        self.page.locator(".Flex-sc-1qhp8l7-0.InputField___StyledFlex2-sc-1gyyvht-3").first.click()
+        # Use name attribute selector instead of brittle CSS classes
+        source_wells_input = self.page.locator('input[name="aspirate_wells"]').first
+        self.wait_for_visible(source_wells_input)
+        source_wells_input.click()
         self.page.locator("circle").first.click()
         self.click_button("Save")
 

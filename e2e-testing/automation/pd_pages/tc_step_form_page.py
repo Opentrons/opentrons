@@ -209,21 +209,23 @@ class ThermocyclerProfileModal(BasePage):
             cycle_index: The index of the cycle (0-based).
             count: The cycle count as a string (e.g., "2").
         """
-        # Find the cycle container and locate the "Number of cycles" input
+        # Find the cycle container using test ID
         cycle_container = self.page.get_by_test_id("thermocyclerCycle").nth(cycle_index)
+        self.wait_for_visible(cycle_container)
 
-        # Click on the "Number of cycles" area
-        num_cycles_div = cycle_container.locator("div").filter(has_text="Number of cycles").nth(3)
-        num_cycles_div.click()
+        # Find the input field within the cycle container
+        # The InputField component renders as a textbox, so we look for it within the container
+        # First try to find by role="textbox" within the container
+        cycles_input = cycle_container.get_by_role("textbox").last
+        if cycles_input.count() == 0:
+            # Fallback: find input element directly within the container
+            cycles_input = cycle_container.locator("input[type='text']").last
+        if cycles_input.count() == 0:
+            # Last resort: find any input within the container
+            cycles_input = cycle_container.locator("input").last
 
-        # Find the input within the cycles section using a shorter variable name
-        cycles_input_selector = (
-            "div:nth-child(3) > div > "
-            ".Flex-sc-1qhp8l7-0.InputField___StyledFlex-sc-1gyyvht-2 > "
-            ".Flex-sc-1qhp8l7-0 > "
-            ".InputField__StyledInput-sc-1gyyvht-0"
-        )
-        cycles_input = self.page.locator(cycles_input_selector)
+        self.wait_for_visible(cycles_input)
+        cycles_input.click()
         cycles_input.fill(count)
 
     # ========== Cycle Steps ==========
