@@ -47,7 +47,9 @@ export function ModuleContainer({
                 ? t('temperature', {
                     temp: currentBlockActivity.blockTargetTemp,
                   })
-                : t('deactivated')}
+                : currentBlockActivity.type === 'profile'
+                  ? t('deactivated') // todo(mm, 2025-12-12): As a placeholder, this is showing the block as 'deactivated' when there's a profile ongoing.
+                  : t('deactivated')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="target_lid_temperature">

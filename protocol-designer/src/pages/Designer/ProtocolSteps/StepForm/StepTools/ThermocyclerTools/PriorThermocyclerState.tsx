@@ -12,19 +12,37 @@ export function PriorThermocyclerState(props: {
 }): JSX.Element {
   const { currentBlockActivity, lidTargetTemp, lidOpen } = props.priorState
   const { t } = useTranslation()
+
+  let blockValueText
+  switch (currentBlockActivity.type) {
+    // The 'profile' case shouldn't actually be reachable. It would mean this component
+    // is being rendered in a point in the timeline where a profile is ongoing, which
+    // would mean a Thermocycler form is being rendered at a point in yhr yimrlinr
+    // where a profile is ongoing, which would mean a Thermocycler profile has a
+    // Thermocycler step nested within it, which shouldn't be possible.
+    case 'blockDeactivated':
+    case 'profile':
+      blockValueText = t(
+        'protocol_steps:thermocycler_module.prior_state.block_value_off'
+      )
+      break
+    case 'blockTargetTemp':
+      blockValueText = t(
+        'protocol_steps:thermocycler_module.prior_state.block_value',
+        {
+          value: currentBlockActivity.blockTargetTemp,
+        }
+      )
+      break
+    default:
+      currentBlockActivity satisfies never
+  }
+
   return (
     <StepFormStatusList>
       <StepFormStatus
         label={t('protocol_steps:thermocycler_module.prior_state.block_label')}
-        value={
-          currentBlockActivity.type === 'blockTargetTemp'
-            ? t('protocol_steps:thermocycler_module.prior_state.block_value', {
-                value: currentBlockActivity.blockTargetTemp,
-              })
-            : t(
-                'protocol_steps:thermocycler_module.prior_state.block_value_off'
-              )
-        }
+        value={blockValueText}
       />
       <StepFormStatus
         label={t('protocol_steps:thermocycler_module.prior_state.lid_label')}
