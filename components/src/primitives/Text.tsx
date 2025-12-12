@@ -22,8 +22,7 @@ const TextComponent = ({
   })
 }
 
-export const Text: FC<
-  ComponentProps<'p'> & StyleProps & { as?: string }
-> = withStyleProps(TextComponent) as FC<
-  ComponentProps<'p'> & StyleProps & { as?: string }
->
+export const Text: FC<ComponentProps<'p'> & StyleProps & { as?: string }> =
+  withStyleProps(TextComponent) as FC<
+    ComponentProps<'p'> & StyleProps & { as?: string }
+  >

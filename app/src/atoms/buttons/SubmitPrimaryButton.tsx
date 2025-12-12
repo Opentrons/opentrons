@@ -16,6 +16,5 @@ const BaseSubmitInput: FC<ComponentProps<'input'> & StyleProps> = ({
   return <input {...props} type="submit" className={combinedClassName} />
 }
 
-export const SubmitPrimaryButton: FC<
-  ComponentProps<'input'> & StyleProps
-> = withStyleProps(BaseSubmitInput)
+export const SubmitPrimaryButton: FC<ComponentProps<'input'> & StyleProps> =
+  withStyleProps(BaseSubmitInput)

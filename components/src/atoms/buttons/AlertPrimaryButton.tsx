@@ -16,6 +16,5 @@ const AlertPrimaryButtonComponent: FC<
   return <Btn {...props} className={combinedClassName} />
 }
 
-export const AlertPrimaryButton: FC<
-  ComponentProps<'button'> & StyleProps
-> = withStyleProps(AlertPrimaryButtonComponent)
+export const AlertPrimaryButton: FC<ComponentProps<'button'> & StyleProps> =
+  withStyleProps(AlertPrimaryButtonComponent)
