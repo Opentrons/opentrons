@@ -4,7 +4,6 @@ import type {
   CutoutId,
   FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
-  FlexStackerSetStoredLabwareParams,
   FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
@@ -12,6 +11,7 @@ import type {
   ModuleModel,
   ModuleType,
   NozzleConfigurationStyle,
+  StackerStoredLabwareDefinitionURIs,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -74,7 +74,7 @@ export interface MagneticBlockState {
 export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
   maxPoolCount: number
-  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  storedLabwareDetails: StackerStoredLabwareDefinitionURIs | null
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
 }

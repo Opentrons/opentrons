@@ -1,13 +1,17 @@
+import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+
 import { createContainer } from '../../labware-ingred/actions'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
 import { uuid } from '../../utils'
+import { updateStackerModuleState } from './modules'
 
 import type {
   DeckSlotId,
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
+import type { FlexStackerModuleState } from '@opentrons/step-generation'
 import type { FormData } from '../../form-types'
 import type {
   CreateContainerAction,
@@ -17,11 +21,18 @@ import type {
 } from '../../labware-ingred/actions'
 import type { ChangeSavedStepFormAction } from '../../steplist/actions'
 import type { ThunkAction } from '../../types'
-import type { CreateModuleAction } from './modules'
+import type {
+  CreateModuleAction,
+  UpdateStackerModuleStateAction,
+} from './modules'
 
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId
-  labwareDefURIStack: string[]
+  labwareDefURIGroup: {
+    adapterDefURI: string | null
+    topLabwareDefURI: string | null
+    lidDefURI: string | null
+  }
 }
 
 export const createContainerAboveModule: (
@@ -31,21 +42,65 @@ export const createContainerAboveModule: (
   | RenameLabwareAction
   | ZoomedIntoSlotAction
   | OpenIngredientSelectorAction
+  | UpdateStackerModuleStateAction
 > = args => (dispatch, getState) => {
-  const { slot, labwareDefURIStack } = args
+  const { slot, labwareDefURIGroup } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
 
-  const moduleId = Object.values(modules).find(
-    module => module.slot === slot
-  )?.id
-  dispatch(
-    createContainer({
-      slot: moduleId,
-      labwareDefURIStack,
-    })
-  )
+  const module = Object.values(modules).find(module => module.slot === slot)
+  const moduleId = module?.id
+  const { adapterDefURI, topLabwareDefURI, lidDefURI } = labwareDefURIGroup
+  const labwareDefURIStack = [
+    ...(adapterDefURI != null ? [adapterDefURI] : []),
+    ...(topLabwareDefURI != null ? [topLabwareDefURI] : []),
+    ...(lidDefURI != null ? [lidDefURI] : []),
+  ]
+  const primaryLabwareUuid = topLabwareDefURI != null ? uuid() : null
+  const adapterLabwareUuid = adapterDefURI != null ? uuid() : null
+  const lidLabwareUuid = lidDefURI != null ? uuid() : null
+
+  const uuids = [adapterLabwareUuid, primaryLabwareUuid, lidLabwareUuid].filter(
+    id => id != null
+  ) as string[]
+
+  if (moduleId) {
+    dispatch(
+      createContainer({
+        slot: moduleId,
+        labwareDefURIStack,
+        uuids,
+      })
+    )
+
+    // Check if the module is a FlexStackerModule and update its state
+    if (module?.type === FLEX_STACKER_MODULE_TYPE) {
+      const currentModuleState = module.moduleState as FlexStackerModuleState
+      if (currentModuleState.type === FLEX_STACKER_MODULE_TYPE) {
+        dispatch(
+          updateStackerModuleState({
+            moduleId: module.id,
+            moduleState: {
+              ...currentModuleState,
+              labwareOnShuttle: {
+                primaryLabwareId: `${primaryLabwareUuid}:${topLabwareDefURI}`,
+                adapterLabwareId:
+                  adapterLabwareUuid != null
+                    ? `${adapterLabwareUuid}:${adapterDefURI}`
+                    : null,
+                lidLabwareId:
+                  lidLabwareUuid != null
+                    ? `${lidLabwareUuid}:${lidDefURI}`
+                    : null,
+              },
+            },
+          })
+        )
+      }
+    }
+    console.log(getState())
+  }
 }
 
 interface ModuleAndChangeFormArgs {

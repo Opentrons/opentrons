@@ -1,5 +1,6 @@
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
@@ -17,6 +18,7 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
+  FlexStackerModuleState,
   HeaterShakerModuleState,
   MagneticBlockState,
   MagneticModuleState,
@@ -70,7 +72,14 @@ const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
   type: 'magneticBlockType',
 }
 
-// @ts-expect-error Flex stacker not yet supported in step-generation
+export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
+  type: FLEX_STACKER_MODULE_TYPE,
+  maxPoolCount: 0,
+  storedLabwareDetails: null,
+  labwareInHopper: null,
+  labwareOnShuttle: null,
+}
+
 export const MODULE_INITIAL_STATE_BY_TYPE: {
   [moduleType in ModuleType]: ModuleState
 } = {
@@ -80,6 +89,7 @@ export const MODULE_INITIAL_STATE_BY_TYPE: {
   [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
   [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
+  [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_MODULE_INITIAL_STATE,
 }
 export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
 export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'

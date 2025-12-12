@@ -79,6 +79,7 @@ export interface CreateContainerArgs {
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
   updateSelectedLabwareId?: boolean
+  uuids?: string[]
 }
 
 export interface CreateContainerAction {

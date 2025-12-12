@@ -60,15 +60,9 @@ describe('flexStackerStore', () => {
       ],
       maxPoolCount: 10,
       storedLabwareDetails: {
-        moduleId,
-        initialCount: 5,
-        primaryLabware: {
-          loadName: 'fixture_96_plate',
-          namespace: 'opentrons',
-          version: 1,
-        },
-        lidLabware: null,
-        adapterLabware: null,
+        primaryLabwareURI: 'mockURI',
+        lidLabwareURI: null,
+        adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
     } as FlexStackerModuleState)
@@ -167,15 +161,9 @@ describe('flexStackerStore', () => {
       ],
       maxPoolCount: 10,
       storedLabwareDetails: {
-        moduleId,
-        initialCount: 5,
-        primaryLabware: {
-          loadName: 'wellPlate_1',
-          namespace: 'opentrons',
-          version: 1,
-        },
-        lidLabware: null,
-        adapterLabware: null,
+        primaryLabwareURI: 'mockURI',
+        lidLabwareURI: null,
+        adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
     })
@@ -234,15 +222,9 @@ describe('flexStackerStore', () => {
       ],
       maxPoolCount: 1,
       storedLabwareDetails: {
-        moduleId,
-        initialCount: 1,
-        primaryLabware: {
-          loadName: 'fixture_96_plate',
-          namespace: 'opentrons',
-          version: 1,
-        },
-        lidLabware: null,
-        adapterLabware: null,
+        primaryLabwareURI: 'mockURI',
+        lidLabwareURI: null,
+        adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
     } as FlexStackerModuleState)

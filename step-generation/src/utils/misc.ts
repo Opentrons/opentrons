@@ -1384,11 +1384,10 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
-  const loadedLabware =
-    stackerState?.storedLabwareDetails?.primaryLabware.loadName
-  const def = invariantContext.labwareEntities[labwareId].def
-  const labwareToBeStored = def.parameters.loadName
-  return loadedLabware === labwareToBeStored
+  const loadedLabware = stackerState?.storedLabwareDetails?.primaryLabwareURI
+  const labwareToBeStoredEntity = invariantContext.labwareEntities[labwareId]
+  const { labwareDefURI: labwareURIToBeStored } = labwareToBeStoredEntity ?? {}
+  return loadedLabware === labwareURIToBeStored
 }
 
 export const getIsSpaceInHopper = (

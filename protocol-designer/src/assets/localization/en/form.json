@@ -412,6 +412,51 @@
         "unknown": "unknown"
       }
     },
+    "flex_stacker": {
+      "fields": {
+        "fillQuantity": {
+          "caption": "Valid range between 1 and {{max}}",
+          "title": "Number of labware to refill"
+        },
+        "flexStackerFormType": {
+          "empty": {
+            "subtext": "Manually empty all labware from the stacker",
+            "title": "Empty"
+          },
+          "fill": {
+            "subtext": "Manually fill the stacker with more labware",
+            "title": "Refill"
+          },
+          "retrieve": {
+            "subtext": "Retrieve labware from the stacker onto the shuttle",
+            "title": "Retrieve"
+          },
+          "store": {
+            "subtext": "Store labware currently on the shuttle into the stacker",
+            "title": "Store"
+          }
+        },
+        "interventionMessage": {
+          "title": "Message to display (optional)"
+        }
+      },
+      "hopper": {
+        "full": "Stacker full",
+        "labware_filled": "{{amount}}/{{total}} labware filled"
+      },
+      "module": "Module",
+      "module_controls": {
+        "title": "Module controls",
+        "tooltip": "Only one type of labware can be stored in the stacker at any time"
+      },
+      "no_labware_on_shuttle": "No labware on shuttle",
+      "no_labware_on_stacker": "No labware on stacker",
+      "quantity": "Quantity: {{count}}",
+      "selected_labware": "Selected labware",
+      "shuttle": "Shuttle",
+      "stacker": "Stacker",
+      "with_tiprack_lid": "With tip rack lid"
+    },
     "labwareLabel": {
       "aspirate": "source",
       "dispense": "destination",

@@ -152,7 +152,7 @@ export const forFlexStackerRetrieve = (
       )
       return
     }
-    if (moduleState.storedLabwareDetails?.primaryLabware == null) {
+    if (moduleState.storedLabwareDetails?.primaryLabwareURI == null) {
       console.error(
         'Cannot retrieve labware bc there is no stored labware details or primary labware'
       )
@@ -195,7 +195,7 @@ export const forFlexStackerStore = (
     if (moduleLocation == null) {
       console.error('Cannot store labware bc there is no module location')
     }
-    if (moduleState.storedLabwareDetails?.primaryLabware == null) {
+    if (moduleState.storedLabwareDetails?.primaryLabwareURI == null) {
       console.error('Cannot store labware bc there is no labware stored')
     }
     if (

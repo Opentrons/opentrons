@@ -137,18 +137,12 @@ describe('flexStackerFillItems', () => {
       ],
       maxPoolCount: 10,
       storedLabwareDetails: {
-        moduleId,
-        initialCount: 1,
-        primaryLabware: {
-          loadName: 'fixture_96_plate',
-          namespace: 'opentrons',
-          version: 1,
-        },
-        lidLabware: null,
-        adapterLabware: null,
+        primaryLabwareURI: 'mockURI',
+        lidLabwareURI: null,
+        adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
-    } as FlexStackerModuleState)
+    })
   })
   it('creates flex stacker fill command with 1 labware', () => {
     invariantContext.labwareEntities = {
@@ -298,18 +292,12 @@ mock_flex_stacker_1.fill_items(
       ],
       maxPoolCount: 1,
       storedLabwareDetails: {
-        moduleId,
-        initialCount: 1,
-        primaryLabware: {
-          loadName: 'fixture_96_plate',
-          namespace: 'opentrons',
-          version: 1,
-        },
-        lidLabware: null,
-        adapterLabware: null,
+        primaryLabwareURI: 'mockURI',
+        lidLabwareURI: null,
+        adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
-    } as FlexStackerModuleState)
+    })
     const result = flexStackerFillItems(
       {
         moduleId,
