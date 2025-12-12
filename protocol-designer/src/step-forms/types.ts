@@ -1,35 +1,17 @@
 import type { Mount } from '@opentrons/components'
 import type {
-  ABSORBANCE_READER_TYPE,
   CutoutId,
-  FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
-  FlexStackerSetStoredLabwareParams,
-  FlexStackerStoredLabwareGroup,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  MAGNETIC_MODULE_TYPE,
   ModuleModel,
   ModuleType,
   NozzleConfigurationStyle,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
-  AbsorbanceReaderState,
   AdditionalEquipmentEntity,
-  FlexStackerModuleState,
-  HeaterShakerModuleState,
-  Initialization,
   LabwareEntity,
-  MagneticBlockState,
-  MagneticModuleState,
   ModuleEntity,
   ModuleTemporalProperties,
   PipetteEntity,
-  TemperatureModuleState,
-  TemperatureStatus,
-  ThermocyclerModuleState,
   TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../types'
