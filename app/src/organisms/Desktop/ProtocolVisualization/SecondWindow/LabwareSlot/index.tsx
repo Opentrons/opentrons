@@ -134,7 +134,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       <div className={styles.container}>
         <div className={styles.header}>
           {/* header icon part */}
-          <div className={styles.header_icon}>
+          <div className={styles.header_icons}>
             {labware[topLabwareOnSlotId]?.stack
               .filter(item => item !== topLabwareOnSlotId)
               .reverse()
