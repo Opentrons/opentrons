@@ -341,3 +341,30 @@ class ProtocolEditorPage(BasePage):
             "Volume per well",
         ]:
             self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
+
+    def expect_move_labware_form(self) -> None:
+        """Verify the move labware step form fields are visible."""
+
+        for text in [
+            "Use gripper"
+            "Select labware",
+            "New location",
+        ]:
+            self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
+
+    def toggle_checkbox(self, field_name: str) -> None:
+        """Toggle a checkbox-like control by its field name."""
+        
+        self.page.get_by_role("checkbox", name=field_name, exact=True).click()
+
+    def move_labware(self, labware: str, new_location: str) -> None:
+        """Select labware and new location to move the labware."""
+
+        self.page.locator("#stepFormTools svg").first.click()
+        self.page.get_by_test_id("dropdownMenu").first.click()
+        self.page.get_by_role("button", name=labware).click()
+        self.page.get_by_test_id("dropdownMenu").nth(1).click()
+        self.page.locator("#stepFormTools").get_by_role("button", name=new_location).click() or self.page.get_by_role("button", name=new_location).click()
+        self.page.get_by_role("button", name="Save").click()
+
+        # self.page.get_by_role("button", name=new_location).click()
