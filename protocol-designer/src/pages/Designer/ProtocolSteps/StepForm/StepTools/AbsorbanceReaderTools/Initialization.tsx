@@ -36,11 +36,11 @@ import { maskToInteger } from '/protocol-designer/steplist/fieldLevel/processing
 import type { TFunction } from 'i18next'
 import type { Dispatch, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
-import type { Initialization } from '@opentrons/step-generation'
+import type { Initialization as InitializationState } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldProps, FieldPropsByName } from '../../types'
 
-type InitializationMode = Initialization['mode']
+type InitializationMode = InitializationState['mode']
 
 const MAX_WAVELENGTHS = 6
 const CUSTOM_OPTION: DropdownOption = { name: 'Other', value: '' }
