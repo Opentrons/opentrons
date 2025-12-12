@@ -68,7 +68,6 @@ export function ModuleSlot({
     }
     case HEATERSHAKER_MODULE_TYPE: {
       const { targetSpeed, targetTemp, latchOpen } = moduleState
-      console.log('moduleState', moduleState)
       moduleDetails = (
         <div className={styles.module_details_status_container}>
           <ModuleStatusContainer title="target_temperature">
