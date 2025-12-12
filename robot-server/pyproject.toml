@@ -41,6 +41,7 @@ dependencies = [
 # Robot dependencies - exact versions for robot deployment
 robot = [
     "opentrons==0.0.0",
+    "opentrons-hardware[FLEX]==0.0.0",
     "opentrons-shared-data==0.0.0",
     "server-utils==0.0.0",
     "anyio==4.9.0",
