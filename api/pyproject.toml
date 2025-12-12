@@ -47,7 +47,7 @@ robot = [
     "packaging==25.0",
     "pyusb==1.2.1",
     "zipp==3.21.0",
-    "opentrons-hardware==0.0.0",
+    "opentrons-hardware[FLEX]==0.0.0",
 ]
 # Dev dependencies - from Pipfile [dev-packages]
 # Robot group is always included in dev to ensure dev environment matches robot
