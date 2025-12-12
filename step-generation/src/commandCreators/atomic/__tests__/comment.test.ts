@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { comment } from '../comment'
 import { getSuccessResult } from '../../../fixtures'
+import { comment } from '../comment'
 
 describe('comment', () => {
   it('should generate comment command', () => {

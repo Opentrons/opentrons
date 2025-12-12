@@ -7,7 +7,6 @@ import {
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
 
-import { heaterShakerOpenLatch } from '../heaterShakerOpenLatch'
 import {
   DEFAULT_PIPETTE,
   getErrorResult,
@@ -15,6 +14,7 @@ import {
   makeContext,
 } from '../../../fixtures'
 import { getIsTallLabwareEastWestOfHeaterShaker } from '../../../utils'
+import { heaterShakerOpenLatch } from '../heaterShakerOpenLatch'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

@@ -7,13 +7,13 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { flexStackerStore } from '../flexStackerStore'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
   makeContext,
 } from '../../../fixtures'
 import { flexStackerStateGetter } from '../../../robotStateSelectors'
+import { flexStackerStore } from '../flexStackerStore'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {

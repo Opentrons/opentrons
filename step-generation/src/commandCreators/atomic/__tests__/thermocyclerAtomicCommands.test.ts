@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { getSuccessResult } from '../../../fixtures'
 import { thermocyclerCloseLid } from '../thermocyclerCloseLid'
 import { thermocyclerDeactivateBlock } from '../thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../thermocyclerDeactivateLid'
@@ -7,7 +8,6 @@ import { thermocyclerOpenLid } from '../thermocyclerOpenLid'
 import { thermocyclerRunExtendedProfile } from '../thermocyclerRunExtendedProfile'
 import { thermocyclerSetTargetBlockTemperature } from '../thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../thermocyclerSetTargetLidTemperature'
-import { getSuccessResult } from '../../../fixtures'
 
 import type { TCExtendedProfileParams } from '@opentrons/shared-data'
 import type {

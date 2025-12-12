@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { delay } from '../delay'
 import { getSuccessResult } from '../../../fixtures'
+import { delay } from '../delay'
 
 const getRobotInitialState = (): any => {
   // This particular state shouldn't matter for delay

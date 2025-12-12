@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { HEATERSHAKER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { setTemperature } from '../setTemperature'
 import { getStateAndContextTempTCModules } from '../../../fixtures'
+import { setTemperature } from '../setTemperature'
 
 import type { TemperatureParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

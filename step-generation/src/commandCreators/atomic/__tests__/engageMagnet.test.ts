@@ -5,8 +5,8 @@ import {
   MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { engageMagnet } from '../engageMagnet'
 import { getInitialRobotStateStandard, makeContext } from '../../../fixtures'
+import { engageMagnet } from '../engageMagnet'
 
 import type { InvariantContext, RobotState } from '../../../types'
 

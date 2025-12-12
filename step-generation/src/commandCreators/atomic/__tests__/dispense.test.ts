@@ -3,7 +3,6 @@ import { when } from 'vitest-when'
 
 import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
-import { dispense } from '../dispense'
 import {
   DEFAULT_PIPETTE,
   getErrorResult,
@@ -25,9 +24,10 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
 } from '../../../utils'
+import { dispense } from '../dispense'
 
-import type { DispenseAtomicCommandParams } from '../dispense'
 import type { InvariantContext, RobotState } from '../../../types'
+import type { DispenseAtomicCommandParams } from '../dispense'
 
 vi.mock('../../../utils/absorbanceReaderCollision')
 vi.mock('../../../utils/thermocyclerPipetteCollision')

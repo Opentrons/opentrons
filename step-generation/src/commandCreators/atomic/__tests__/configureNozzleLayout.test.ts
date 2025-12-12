@@ -2,8 +2,8 @@ import { describe, expect, it } from 'vitest'
 
 import { ALL, COLUMN, fixtureP100096V2Specs } from '@opentrons/shared-data'
 
-import { configureNozzleLayout } from '../configureNozzleLayout'
 import { getSuccessResult } from '../../../fixtures'
+import { configureNozzleLayout } from '../configureNozzleLayout'
 
 const getRobotInitialState = (): any => {
   return {}

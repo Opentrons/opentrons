@@ -8,9 +8,9 @@ import {
   SOURCE_LABWARE,
   TROUGH_LABWARE,
 } from '../../fixtures'
-import { forAspirate as _forAspirate } from '../forAspirate'
 import { AIR, createTipLiquidState } from '../../utils/misc'
 import * as warningCreators from '../../warningCreators'
+import { forAspirate as _forAspirate } from '../forAspirate'
 
 import type { AspDispAirgapParams } from '@opentrons/shared-data'
 import type {

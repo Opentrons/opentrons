@@ -21,8 +21,6 @@ import {
 } from '@opentrons/shared-data'
 import * as SharedData from '@opentrons/shared-data'
 
-import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../../constants'
-import { DEFAULT_CONFIG } from '../../fixtures'
 import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
@@ -30,6 +28,8 @@ import {
   pipetteAdjacentHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
 } from '..'
+import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../../constants'
+import { DEFAULT_CONFIG } from '../../fixtures'
 import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../heaterShakerCollision'
 import {
   AIR,

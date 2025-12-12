@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest'
 
 import { WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
+import { delayLocationHelper } from '..'
 import {
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
   SOURCE_LABWARE,
 } from '../../fixtures'
-import { delayLocationHelper } from '..'
 
 import type { InvariantContext, RobotState } from '../../types'
 

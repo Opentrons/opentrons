@@ -7,7 +7,10 @@ import {
 
 import { absorbanceReaderCloseRead } from '../../../commandCreators'
 import { getInitialRobotStateStandard, makeContext } from '../../../fixtures'
-import { getErrorResult, getSuccessResult } from '../../../fixtures/commandFixtures'
+import {
+  getErrorResult,
+  getSuccessResult,
+} from '../../../fixtures/commandFixtures'
 import {
   absorbanceReaderStateGetter,
   getModuleState,

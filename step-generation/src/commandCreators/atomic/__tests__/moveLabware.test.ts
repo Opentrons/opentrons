@@ -8,7 +8,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { moveLabware } from '..'
-import { TIPRACK_LID_LOADNAME } from '../moveLabware'
 import {
   DEST_LABWARE,
   getErrorResult,
@@ -20,6 +19,7 @@ import {
   SOURCE_LABWARE,
   TIPRACK_1,
 } from '../../../fixtures'
+import { TIPRACK_LID_LOADNAME } from '../moveLabware'
 
 import type {
   LabwareDefinition2,

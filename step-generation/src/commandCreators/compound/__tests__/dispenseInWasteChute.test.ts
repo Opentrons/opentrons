@@ -7,7 +7,11 @@ import {
   makeContext,
 } from '../../../fixtures'
 
-import type { InvariantContext, PipetteEntities, RobotState } from '../../../types'
+import type {
+  InvariantContext,
+  PipetteEntities,
+  RobotState,
+} from '../../../types'
 
 vi.mock('../../../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 

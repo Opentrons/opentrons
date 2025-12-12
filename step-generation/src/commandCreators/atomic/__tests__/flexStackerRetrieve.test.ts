@@ -6,7 +6,6 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { flexStackerRetrieve } from '../flexStackerRetrieve'
 import { HOPPER_STACKER_LOCATION } from '../../../constants'
 import {
   getErrorResult,
@@ -14,6 +13,7 @@ import {
   makeContext,
 } from '../../../fixtures'
 import { flexStackerStateGetter } from '../../../robotStateSelectors'
+import { flexStackerRetrieve } from '../flexStackerRetrieve'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {

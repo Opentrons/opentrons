@@ -10,8 +10,8 @@ import {
   SOURCE_LABWARE,
 } from '../../../fixtures'
 
-import type { AirGapInWellType } from '../airGapInWell'
 import type { InvariantContext, RobotState } from '../../../types'
+import type { AirGapInWellType } from '../airGapInWell'
 
 describe('airGapInWell', () => {
   let invariantContext: InvariantContext

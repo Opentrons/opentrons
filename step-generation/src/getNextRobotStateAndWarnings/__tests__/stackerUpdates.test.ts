@@ -8,13 +8,13 @@ import {
 } from '@opentrons/shared-data'
 
 import { getInitialRobotStateStandard, makeContext } from '../../fixtures'
+import { getModuleState } from '../../robotStateSelectors'
 import {
   forFlexStackerEmpty,
   forFlexStackerFill,
   forFlexStackerRetrieve,
   forFlexStackerStore,
 } from '../stackerUpdates'
-import { getModuleState } from '../../robotStateSelectors'
 
 import type { FlexStackerModuleState } from '../../types'
 

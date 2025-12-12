@@ -15,12 +15,12 @@ import {
   makeContext,
   SOURCE_LABWARE,
 } from '../../fixtures'
-import { dispenseUpdateLiquidState } from '../dispenseUpdateLiquidState'
 import { createEmptyLiquidState, createTipLiquidState } from '../../utils'
+import { dispenseUpdateLiquidState } from '../dispenseUpdateLiquidState'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { DispenseUpdateLiquidStateArgs } from '../dispenseUpdateLiquidState'
 import type { InvariantContext, RobotState } from '../../types'
+import type { DispenseUpdateLiquidStateArgs } from '../dispenseUpdateLiquidState'
 
 const fixture96Plate = _fixture96Plate as LabwareDefinition2
 const fixture12Trough = _fixture12Trough as LabwareDefinition2

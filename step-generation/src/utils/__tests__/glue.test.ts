@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { DEFAULT_CONFIG } from '../../fixtures'
-import {
-  getNextRobotStateAndWarnings,
-  getNextRobotStateAndWarningsSingleCommand,
-} from '../../getNextRobotStateAndWarnings'
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
   curryWithoutPython,
   reduceCommandCreators,
 } from '..'
+import { DEFAULT_CONFIG } from '../../fixtures'
+import {
+  getNextRobotStateAndWarnings,
+  getNextRobotStateAndWarningsSingleCommand,
+} from '../../getNextRobotStateAndWarnings'
 
 import type { InvariantContext } from '../../types'
 

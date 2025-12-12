@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest'
 
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
-import { thermocyclerProfileStep } from '../thermocyclerProfileStep'
 import {
   getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../../../fixtures'
+import { thermocyclerProfileStep } from '../thermocyclerProfileStep'
 
 import type { CreateCommand } from '@opentrons/shared-data/command'
 import type {

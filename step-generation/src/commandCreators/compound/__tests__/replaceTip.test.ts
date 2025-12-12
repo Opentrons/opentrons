@@ -9,7 +9,6 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { replaceTip } from '../replaceTip'
 import { EMPTY, FIXED_TRASH_ID } from '../../../constants'
 import {
   DEFAULT_PIPETTE,
@@ -25,6 +24,7 @@ import {
   pickUpTipHelper,
   PIPETTE_96,
 } from '../../../fixtures'
+import { replaceTip } from '../replaceTip'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

@@ -6,7 +6,6 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { distribute } from '../distribute'
 import { FIXED_TRASH_ID, MANUAL } from '../../../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -37,9 +36,14 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../../utils/misc'
+import { distribute } from '../distribute'
 
 import type { CreateCommand, LabwareDefinition2 } from '@opentrons/shared-data'
-import type { DistributeArgs, InvariantContext, RobotState } from '../../../types'
+import type {
+  DistributeArgs,
+  InvariantContext,
+  RobotState,
+} from '../../../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

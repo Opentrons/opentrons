@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { expectTimelineError } from '../../../__utils__/testMatchers'
-import { blowOutInWell } from '../blowOutInWell'
 import {
   DEFAULT_PIPETTE,
   getErrorResult,
@@ -12,6 +11,7 @@ import {
   makeContext,
   SOURCE_LABWARE,
 } from '../../../fixtures'
+import { blowOutInWell } from '../blowOutInWell'
 
 import type { BlowoutParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

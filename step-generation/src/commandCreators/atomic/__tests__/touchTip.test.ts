@@ -1,7 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { expectTimelineError } from '../../../__utils__/testMatchers'
-import { touchTip } from '../touchTip'
 import {
   DEFAULT_PIPETTE,
   getErrorResult,
@@ -11,6 +10,7 @@ import {
   makeContext,
   SOURCE_LABWARE,
 } from '../../../fixtures'
+import { touchTip } from '../touchTip'
 
 import type { InvariantContext, RobotState } from '../../../types'
 

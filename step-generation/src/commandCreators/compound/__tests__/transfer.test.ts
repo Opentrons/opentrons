@@ -13,7 +13,6 @@ import {
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
-import { transfer } from '../transfer'
 import { CLEAN, FIXED_TRASH_ID, MANUAL } from '../../../constants'
 import {
   aspirateHelperLiquidClass,
@@ -34,6 +33,7 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   SOURCE_WELL_BLOWOUT_DESTINATION,
 } from '../../../utils/misc'
+import { transfer } from '../transfer'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState, TransferArgs } from '../../../types'

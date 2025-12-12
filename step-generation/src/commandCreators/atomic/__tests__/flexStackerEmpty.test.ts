@@ -5,13 +5,13 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { flexStackerEmpty } from '../flexStackerEmpty'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
   makeContext,
 } from '../../../fixtures'
 import { flexStackerStateGetter } from '../../../robotStateSelectors'
+import { flexStackerEmpty } from '../flexStackerEmpty'
 
 import type {
   FlexStackerModuleState,

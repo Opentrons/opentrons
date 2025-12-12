@@ -7,7 +7,6 @@ import {
   FLEX_STACKER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import { flexStackerFillItems } from '../flexStackerFillItems'
 import { HOPPER_STACKER_LOCATION } from '../../../constants'
 import {
   getErrorResult,
@@ -15,6 +14,7 @@ import {
   makeContext,
 } from '../../../fixtures'
 import { flexStackerStateGetter } from '../../../robotStateSelectors'
+import { flexStackerFillItems } from '../flexStackerFillItems'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {

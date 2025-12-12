@@ -10,8 +10,8 @@ import {
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { CLEAN } from '../../constants'
 import { getIsSafePipetteMovement } from '..'
+import { CLEAN } from '../../constants'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../types'

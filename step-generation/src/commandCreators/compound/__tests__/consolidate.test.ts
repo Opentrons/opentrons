@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { fixtureTiprack300ul, getLabwareDefURI } from '@opentrons/shared-data'
 
-import { consolidate } from '../consolidate'
 import { FIXED_TRASH_ID, MANUAL } from '../../../constants'
 import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
@@ -29,13 +28,18 @@ import {
   SOURCE_LABWARE,
 } from '../../../fixtures'
 import { DEST_WELL_BLOWOUT_DESTINATION } from '../../../utils'
+import { consolidate } from '../consolidate'
 
 import type {
   AspDispAirgapParams,
   CreateCommand,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
-import type { ConsolidateArgs, InvariantContext, RobotState } from '../../../types'
+import type {
+  ConsolidateArgs,
+  InvariantContext,
+  RobotState,
+} from '../../../types'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

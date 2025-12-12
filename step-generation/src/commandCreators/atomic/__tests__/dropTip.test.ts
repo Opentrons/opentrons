@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { dropTip } from '../dropTip'
 import {
   DEFAULT_PIPETTE,
   getErrorResult,
@@ -9,6 +8,7 @@ import {
   makeState,
   makeStateArgsStandard,
 } from '../../../fixtures'
+import { dropTip } from '../dropTip'
 
 import type { InvariantContext, RobotState } from '../../../types'
 

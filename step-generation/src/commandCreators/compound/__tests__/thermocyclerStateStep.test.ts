@@ -1,8 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { thermocyclerStateStep } from '../thermocyclerStateStep'
-import { getStateAndContextTempTCModules, getSuccessResult } from '../../../fixtures'
+import {
+  getStateAndContextTempTCModules,
+  getSuccessResult,
+} from '../../../fixtures'
 import { thermocyclerStateDiff as actualThermocyclerStateDiff } from '../../../utils/thermocyclerStateDiff'
+import { thermocyclerStateStep } from '../thermocyclerStateStep'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 import type {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { deactivateTemperature } from '../deactivateTemperature'
 import { getStateAndContextTempTCModules } from '../../../fixtures'
+import { deactivateTemperature } from '../deactivateTemperature'
 
 import type { ModuleOnlyParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

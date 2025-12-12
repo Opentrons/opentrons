@@ -7,10 +7,17 @@ import {
 
 import { heaterShaker } from '../../../commandCreators'
 import { getInitialRobotStateStandard, makeContext } from '../../../fixtures'
-import { getErrorResult, getSuccessResult } from '../../../fixtures/commandFixtures'
+import {
+  getErrorResult,
+  getSuccessResult,
+} from '../../../fixtures/commandFixtures'
 import { getModuleState } from '../../../robotStateSelectors'
 
-import type { HeaterShakerArgs, InvariantContext, RobotState } from '../../../types'
+import type {
+  HeaterShakerArgs,
+  InvariantContext,
+  RobotState,
+} from '../../../types'
 
 vi.mock('../../../robotStateSelectors')
 

@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { blowOutInPlace } from '../blowOutInPlace'
 import {
   DEFAULT_PIPETTE,
   getRobotStateWithTipStandard,
   getSuccessResult,
   makeContext,
 } from '../../../fixtures'
+import { blowOutInPlace } from '../blowOutInPlace'
 
 import type { BlowoutInPlaceParams } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

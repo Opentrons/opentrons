@@ -5,13 +5,13 @@ import {
   ABSORBANCE_READER_V1,
 } from '@opentrons/shared-data'
 
-import { absorbanceReaderOpenLid } from '../absorbanceReaderOpenLid'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
   makeContext,
 } from '../../../fixtures'
 import { absorbanceReaderStateGetter } from '../../../robotStateSelectors'
+import { absorbanceReaderOpenLid } from '../absorbanceReaderOpenLid'
 
 import type {
   AbsorbanceReaderState,

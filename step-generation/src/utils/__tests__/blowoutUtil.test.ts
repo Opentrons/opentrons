@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import {
+  DEST_WELL_BLOWOUT_DESTINATION,
+  mixBlowoutLocationHelper,
+  SOURCE_WELL_BLOWOUT_DESTINATION,
+} from '..'
 import { blowOutInWell } from '../../commandCreators/atomic'
 import { blowOutInWasteChute } from '../../commandCreators/compound'
 import {
@@ -11,11 +16,6 @@ import {
   makeContext,
   SOURCE_LABWARE,
 } from '../../fixtures'
-import {
-  DEST_WELL_BLOWOUT_DESTINATION,
-  mixBlowoutLocationHelper,
-  SOURCE_WELL_BLOWOUT_DESTINATION,
-} from '..'
 import { curryCommandCreator } from '../curryCommandCreator'
 
 import type { BlowoutParams } from '@opentrons/shared-data'

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { captureImage } from '../captureImage'
 import { getSuccessResult } from '../../../fixtures'
+import { captureImage } from '../captureImage'
 
 import type { Height, Width } from '@opentrons/shared-data'
 

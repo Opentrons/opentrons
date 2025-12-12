@@ -7,7 +7,6 @@ import {
   getLabwareDefURI,
 } from '@opentrons/shared-data'
 
-import { mix } from '../mix'
 import { MANUAL } from '../../../constants'
 import {
   blowoutHelper,
@@ -26,6 +25,7 @@ import {
   replaceTipCommands,
   SOURCE_LABWARE,
 } from '../../../fixtures'
+import { mix } from '../mix'
 
 import type {
   AspDispAirgapParams,

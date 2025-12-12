@@ -6,13 +6,13 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { thermocyclerCloseLid } from '../thermocyclerCloseLid'
 import {
   getErrorResult,
   getInitialRobotStateStandard,
   getSuccessResult,
   makeContext,
 } from '../../../fixtures'
+import { thermocyclerCloseLid } from '../thermocyclerCloseLid'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

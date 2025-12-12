@@ -4,7 +4,6 @@ import { when } from 'vitest-when'
 import { getPipetteSpecsV2, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { expectTimelineError } from '../../../__utils__/testMatchers'
-import { moveToWell } from '../moveToWell'
 import {
   DEFAULT_PIPETTE,
   getErrorResult,
@@ -25,6 +24,7 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
 } from '../../../utils'
+import { moveToWell } from '../moveToWell'
 
 import type { WellOrigin } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from '../../../types'

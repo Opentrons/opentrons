@@ -9,6 +9,7 @@ import {
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
 
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '..'
 import { AUTOMATIC } from '../../constants'
 import {
   DEFAULT_PIPETTE,
@@ -16,7 +17,6 @@ import {
   getFlowRateAndOffsetParamsTransferLike,
   SOURCE_LABWARE,
 } from '../../fixtures'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '..'
 import { getCustomLiquidClassProperties } from '../liquidClassUtils'
 
 import type {

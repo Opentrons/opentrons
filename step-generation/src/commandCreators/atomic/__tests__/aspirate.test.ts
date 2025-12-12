@@ -10,7 +10,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { expectTimelineError } from '../../../__utils__/testMatchers'
-import { aspirate } from '../aspirate'
 import {
   DEFAULT_PIPETTE,
   getErrorResult,
@@ -31,6 +30,7 @@ import {
   pipetteIntoHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
 } from '../../../utils'
+import { aspirate } from '../aspirate'
 
 import type {
   AspDispAirgapParams,
