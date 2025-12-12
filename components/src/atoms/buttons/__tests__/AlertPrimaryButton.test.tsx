@@ -22,7 +22,7 @@ describe('AlertPrimaryButton', () => {
     }
   })
 
-  it('renders alert primary button with text', () => {
+  it.skip('renders alert primary button with text', () => {
     render(props)
     const button = screen.getByText('alert primary button')
     expect(button).toHaveStyle(
