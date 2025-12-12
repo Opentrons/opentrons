@@ -143,7 +143,7 @@ export const SetupModuleAndDeck = ({
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >
-          {t('proceed_to_labware_position_check')}
+          {t('proceed_to_labware_offsets_setup_step')}
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 ||
