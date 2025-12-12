@@ -27,12 +27,10 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_V1,
   getAreSlotsHorizontallyAdjacent,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
   getLabwareDefURI,
-  getModuleMaxFillHeight,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,

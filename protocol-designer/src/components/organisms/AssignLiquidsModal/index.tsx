@@ -33,10 +33,7 @@ import {
 import { LiquidButton } from '/protocol-designer/components/molecules'
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
-import {
-  LabwareOnDeck,
-  selectors as stepFormSelectors,
-} from '/protocol-designer/step-forms'
+import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
@@ -57,6 +54,7 @@ import type {
   ContentsByWell,
   LabwareEntities,
 } from '@opentrons/step-generation'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
 const CONTAINER_WIDTH = '49.8125rem'
 

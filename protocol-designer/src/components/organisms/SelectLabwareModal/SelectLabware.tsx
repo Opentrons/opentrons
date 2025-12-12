@@ -9,10 +9,6 @@ import {
   ListButtonAccordionContainer,
   SPACING,
 } from '@opentrons/components'
-import {
-  FLEX_STACKER_MODULE_V1,
-  getModuleMaxFillHeight,
-} from '@opentrons/shared-data'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
