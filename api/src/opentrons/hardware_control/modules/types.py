@@ -1,5 +1,4 @@
 from __future__ import annotations
-from enum import Enum
 from dataclasses import dataclass
 from typing import (
     Dict,
@@ -18,6 +17,8 @@ from typing import (
 )
 from typing_extensions import TypedDict
 from pathlib import Path
+
+from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers.flex_stacker.types import (
     LimitSwitchStatus,
@@ -184,7 +185,7 @@ class LiveData(TypedDict):
     data: ModuleData | None
 
 
-class ModuleType(str, Enum):
+class ModuleType(StrEnum):
     THERMOCYCLER: ThermocyclerModuleType = "thermocyclerModuleType"
     TEMPERATURE: TemperatureModuleType = "temperatureModuleType"
     MAGNETIC: MagneticModuleType = "magneticModuleType"
@@ -231,34 +232,34 @@ class ModuleType(str, Enum):
             )
 
 
-class MagneticModuleModel(str, Enum):
+class MagneticModuleModel(StrEnum):
     MAGNETIC_V1: str = "magneticModuleV1"
     MAGNETIC_V2: str = "magneticModuleV2"
 
 
-class TemperatureModuleModel(str, Enum):
+class TemperatureModuleModel(StrEnum):
     TEMPERATURE_V1: str = "temperatureModuleV1"
     TEMPERATURE_V2: str = "temperatureModuleV2"
 
 
-class ThermocyclerModuleModel(str, Enum):
+class ThermocyclerModuleModel(StrEnum):
     THERMOCYCLER_V1: str = "thermocyclerModuleV1"
     THERMOCYCLER_V2: str = "thermocyclerModuleV2"
 
 
-class HeaterShakerModuleModel(str, Enum):
+class HeaterShakerModuleModel(StrEnum):
     HEATER_SHAKER_V1: str = "heaterShakerModuleV1"
 
 
-class MagneticBlockModel(str, Enum):
+class MagneticBlockModel(StrEnum):
     MAGNETIC_BLOCK_V1: str = "magneticBlockV1"
 
 
-class AbsorbanceReaderModel(str, Enum):
+class AbsorbanceReaderModel(StrEnum):
     ABSORBANCE_READER_V1: str = "absorbanceReaderV1"
 
 
-class FlexStackerModuleModel(str, Enum):
+class FlexStackerModuleModel(StrEnum):
     FLEX_STACKER_V1: str = "flexStackerModuleV1"
 
 
@@ -327,12 +328,12 @@ ModuleModel = Union[
 ]
 
 
-class MagneticStatus(str, Enum):
+class MagneticStatus(StrEnum):
     ENGAGED = "engaged"
     DISENGAGED = "disengaged"
 
 
-class TemperatureStatus(str, Enum):
+class TemperatureStatus(StrEnum):
     HOLDING = "holding at target"
     COOLING = "cooling"
     HEATING = "heating"
@@ -340,7 +341,7 @@ class TemperatureStatus(str, Enum):
     ERROR = "error"
 
 
-class SpeedStatus(str, Enum):
+class SpeedStatus(StrEnum):
     HOLDING = "holding at target"
     ACCELERATING = "speeding up"
     DECELERATING = "slowing down"
@@ -348,33 +349,33 @@ class SpeedStatus(str, Enum):
     ERROR = "error"
 
 
-class HeaterShakerStatus(str, Enum):
+class HeaterShakerStatus(StrEnum):
     IDLE = "idle"
     RUNNING = "running"
     ERROR = "error"
 
 
-class AbsorbanceReaderStatus(str, Enum):
+class AbsorbanceReaderStatus(StrEnum):
     IDLE = "idle"
     MEASURING = "measuring"
     ERROR = "error"
 
 
-class LidStatus(str, Enum):
+class LidStatus(StrEnum):
     ON = "on"
     OFF = "off"
     UNKNOWN = "unknown"
     ERROR = "error"
 
 
-class FlexStackerStatus(str, Enum):
+class FlexStackerStatus(StrEnum):
     IDLE = "idle"
     DISPENSING = "dispensing"
     STORING = "storing"
     ERROR = "error"
 
 
-class PlatformState(str, Enum):
+class PlatformState(StrEnum):
     UNKNOWN = "unknown"
     EXTENDED = "extended"
     RETRACTED = "retracted"
@@ -390,7 +391,7 @@ class PlatformState(str, Enum):
         return cls.UNKNOWN
 
 
-class StackerAxisState(str, Enum):
+class StackerAxisState(StrEnum):
     UNKNOWN = "unknown"
     EXTENDED = "extended"
     RETRACTED = "retracted"
@@ -416,7 +417,7 @@ class StackerAxisState(str, Enum):
         return cls.UNKNOWN
 
 
-class LatchState(str, Enum):
+class LatchState(StrEnum):
     CLOSED = "closed"
     OPENED = "opened"
 
@@ -426,7 +427,7 @@ class LatchState(str, Enum):
         return cls.CLOSED if state == StackerAxisState.EXTENDED else cls.OPENED
 
 
-class HopperDoorState(str, Enum):
+class HopperDoorState(StrEnum):
     CLOSED = "closed"
     OPENED = "opened"
 

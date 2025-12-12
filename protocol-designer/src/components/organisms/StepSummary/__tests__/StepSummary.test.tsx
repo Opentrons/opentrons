@@ -30,6 +30,7 @@ const render = (props: ComponentProps<typeof StepSummary>) => {
 
 describe('StepSummary', () => {
   let props: ComponentProps<typeof StepSummary>
+  let baseStackerProps: ComponentProps<typeof StepSummary>
 
   beforeEach(() => {
     props = {
@@ -43,6 +44,23 @@ describe('StepSummary', () => {
       },
       stepDetails: 'mockDetails',
     }
+    baseStackerProps = {
+      currentStep: {
+        id: 'retrieve',
+        stepType: 'flexStacker',
+        flexStackerFormType: 'retrieve',
+        fillLabwareUri: 'mockUri',
+        fillQuantity: 3,
+      },
+      labwareEntities: {
+        someId: {
+          labwareDefURI: 'mockUri',
+          def: { metadata: { displayName: 'mockUri' } },
+        },
+      },
+      stepDetails: 'mockDetails',
+    } as ComponentProps<typeof StepSummary>
+
     vi.mocked(getLabwareNicknamesById).mockReturnValue({
       labware: 'mockNickName',
     })
@@ -136,5 +154,55 @@ describe('StepSummary', () => {
     screen.getByText('from')
     screen.getByText('mockNickName to')
     screen.getByText('mockNickName')
+  })
+  it('renders flex stacker retrieve command summary', () => {
+    render(baseStackerProps)
+    screen.getByText('Retrieving')
+    screen.getByText('ANSI 96 Standard Microplate')
+    screen.getByText('from stacker')
+  })
+
+  it('renders flex stacker store command summary', () => {
+    render({
+      ...baseStackerProps,
+      currentStep: {
+        ...baseStackerProps.currentStep,
+        id: 'store',
+        flexStackerFormType: 'store',
+        stepType: 'flexStacker',
+      },
+    })
+    screen.getByText('Storing')
+    screen.getByText('ANSI 96 Standard Microplate')
+    screen.getByText('from shuttle into stacker')
+  })
+
+  it('renders flex stacker fill command summary', () => {
+    render({
+      ...baseStackerProps,
+      currentStep: {
+        ...baseStackerProps.currentStep,
+        id: 'fill',
+        flexStackerFormType: 'fill',
+        stepType: 'flexStacker',
+      },
+    })
+    screen.getByText('Refilling stacker with Quantity:')
+    screen.getByText('3')
+    screen.getByText('of')
+    screen.getByText('ANSI 96 Standard Microplate')
+  })
+
+  it('renders flex stacker empty command summary', () => {
+    render({
+      ...baseStackerProps,
+      currentStep: {
+        ...baseStackerProps.currentStep,
+        id: 'empty',
+        flexStackerFormType: 'empty',
+        stepType: 'flexStacker',
+      },
+    })
+    screen.getByText('Emptying stacker of all labware')
   })
 })

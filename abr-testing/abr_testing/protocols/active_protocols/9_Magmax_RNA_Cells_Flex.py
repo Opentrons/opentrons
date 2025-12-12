@@ -74,6 +74,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     )
     helpers.create_probe_liquid_height_parameter(parameters)
     helpers.create_meniscus_z_parameter(parameters)
+    helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -89,6 +90,7 @@ def run(protocol: ProtocolContext) -> None:
     lysis_vol = 140.0
     stop_vol = 100.0
     elution_vol = 55.0
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     pipette_mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
@@ -657,14 +659,14 @@ def run(protocol: ProtocolContext) -> None:
         helpers.plate_reader_actions(
             protocol, plate_reader, hellma_plate, plate_name_str
         )
-
+        protocol.capture_image(filename="end_of_run")
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

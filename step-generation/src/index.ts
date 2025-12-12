@@ -21,7 +21,7 @@ export {
   dropTipInWasteChute,
   engageMagnet,
   flexStackerEmpty,
-  flexStackerFill,
+  flexStackerFillItems,
   flexStackerRetrieve,
   flexStackerStore,
   heaterShaker,

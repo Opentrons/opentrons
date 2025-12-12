@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"
 
 [dev-packages]
 # pytest dependencies on windows, spec'd here to force lockfile inclusion
@@ -41,7 +41,6 @@ pytest-lazy-fixtures = "<2,>=1.1.4"
 
 [packages]
 anyio = "==4.9.0"
-aiohttp = "==3.8.1"
 fastapi = "==0.100.0"
 python-dotenv = "==1.0.1"
 python-multipart = "==0.0.6"
@@ -52,7 +51,7 @@ wsproto = "==1.2.0"
 systemd-python = { version = "==234", markers="sys_platform == 'linux'" }
 idna = "==3.3"
 click = "==8.1.2"
-numpy = "==1.22.3"
+numpy = "==1.26.4"
 # breaking changes above this version of sqlalchemy
 sqlalchemy = "==1.4.51"
 opentrons-hardware = {editable = true, path='../hardware', extras=['FLEX']}

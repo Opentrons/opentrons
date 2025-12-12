@@ -1193,11 +1193,21 @@ class ProtocolCore(
         self._engine_client.execute_command(
             cmd.CaptureImageParams(
                 fileName=filename,
-                resolution=resolution,
-                zoom=zoom,
-                contrast=contrast,
-                brightness=brightness,
-                saturation=saturation,
+                resolution=resolution
+                if resolution is not None
+                else self._engine_client.state.camera.get_resolution(),
+                zoom=zoom
+                if zoom is not None
+                else self._engine_client.state.camera.get_zoom(),
+                contrast=contrast
+                if contrast is not None
+                else self._engine_client.state.camera.get_contrast(),
+                brightness=brightness
+                if brightness is not None
+                else self._engine_client.state.camera.get_brightness(),
+                saturation=saturation
+                if saturation is not None
+                else self._engine_client.state.camera.get_saturation(),
             )
         )
 

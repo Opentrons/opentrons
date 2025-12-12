@@ -4,6 +4,7 @@ import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
 
+import type { TCExtendedProfileParams } from '@opentrons/shared-data/command'
 import type {
   ModuleOnlyParams,
   TCProfileParams,
@@ -47,6 +48,7 @@ export const forThermocyclerSetTargetBlockTemperature = (
 
   moduleState.blockTargetTemp = celsius
 }
+
 export const forThermocyclerSetTargetLidTemperature = (
   params: TemperatureParams,
   invariantContext: InvariantContext,
@@ -59,6 +61,9 @@ export const forThermocyclerSetTargetLidTemperature = (
 
   moduleState.lidTargetTemp = celsius
 }
+
+// todo(mm, 2025-12-09): This refers to a command from legacy JSON protocols, predating Protocol Engine.
+// Does step-generation actually need to support this, or can we delete it?
 export const forThermocyclerAwaitBlockTemperature = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -66,6 +71,9 @@ export const forThermocyclerAwaitBlockTemperature = (
 ): void => {
   // nothing to be done
 }
+
+// todo(mm, 2025-12-09): This refers to a command from legacy JSON protocols, predating Protocol Engine.
+// Does step-generation actually need to support this, or can we delete it?
 export const forThermocyclerAwaitLidTemperature = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -73,6 +81,9 @@ export const forThermocyclerAwaitLidTemperature = (
 ): void => {
   // nothing to be done
 }
+
+// todo(mm, 2025-12-09): This refers to a command from legacy JSON protocols, predating Protocol Engine.
+// Does step-generation actually need to support this, or can we delete it?
 export const forThermocyclerAwaitProfileComplete = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -80,6 +91,7 @@ export const forThermocyclerAwaitProfileComplete = (
 ): void => {
   // nothing to be done
 }
+
 export const forThermocyclerDeactivateBlock = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -92,6 +104,7 @@ export const forThermocyclerDeactivateBlock = (
 
   moduleState.blockTargetTemp = null
 }
+
 export const forThermocyclerDeactivateLid = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -104,6 +117,7 @@ export const forThermocyclerDeactivateLid = (
 
   moduleState.lidTargetTemp = null
 }
+
 export const forThermocyclerCloseLid = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -116,6 +130,7 @@ export const forThermocyclerCloseLid = (
 
   moduleState.lidOpen = false
 }
+
 export const forThermocyclerOpenLid = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
@@ -128,17 +143,39 @@ export const forThermocyclerOpenLid = (
 
   moduleState.lidOpen = true
 }
+
 export const forThermocyclerRunProfile = (
   params: TCProfileParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, profile } = params
+  // runProfile is equivalent to runExtendedProfile, just a different param shape.
+  const { profile, ...rest } = params
+  forThermocyclerRunExtendedProfile(
+    {
+      profileElements: profile,
+      ...rest,
+    },
+    invariantContext,
+    robotStateAndWarnings
+  )
+}
+
+export const forThermocyclerRunExtendedProfile = (
+  params: TCExtendedProfileParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void => {
+  const { moduleId, profileElements } = params
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
-  if (profile.length > 0) {
-    moduleState.blockTargetTemp = last(profile)!.celsius
+  const flatSteps = profileElements.flatMap(element =>
+    'steps' in element ? element.steps : element
+  )
+  const lastStep = last(flatSteps)
+  if (lastStep != null) {
+    moduleState.blockTargetTemp = lastStep.celsius
   }
 }

@@ -253,15 +253,17 @@ describe('thermocyclerFormToArgs', () => {
         blockTargetTempHold: null,
         lidOpenHold: true,
         lidTargetTempHold: 5,
-        profileSteps: [
+        profileElements: [
           // top-level step
-          { temperature: 5, holdTime: 50 },
-          // cycle rep 1
-          { temperature: 12, holdTime: 62 },
-          { temperature: 99, holdTime: 45 },
-          // cycle rep 2
-          { temperature: 12, holdTime: 62 },
-          { temperature: 99, holdTime: 45 },
+          { celsius: 5, holdSeconds: 50 },
+          {
+            // cycle
+            steps: [
+              { celsius: 12, holdSeconds: 62 },
+              { celsius: 99, holdSeconds: 45 },
+            ],
+            repetitions: 2,
+          },
         ],
         profileTargetLidTemp: 40,
         profileVolume: 4,
@@ -368,15 +370,17 @@ describe('thermocyclerFormToArgs', () => {
         blockTargetTempHold: 0,
         lidOpenHold: true,
         lidTargetTempHold: 5,
-        profileSteps: [
+        profileElements: [
           // top-level step
-          { temperature: 5, holdTime: 50 },
-          // cycle rep 1
-          { temperature: 12, holdTime: 62 },
-          { temperature: 99, holdTime: 45 },
-          // cycle rep 2
-          { temperature: 12, holdTime: 62 },
-          { temperature: 99, holdTime: 45 },
+          { celsius: 5, holdSeconds: 50 },
+          // cycle
+          {
+            steps: [
+              { celsius: 12, holdSeconds: 62 },
+              { celsius: 99, holdSeconds: 45 },
+            ],
+            repetitions: 2,
+          },
         ],
         profileTargetLidTemp: 40,
         profileVolume: 4,

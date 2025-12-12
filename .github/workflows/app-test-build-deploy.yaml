@@ -52,22 +52,59 @@ env:
   _APP_DEPLOY_FOLDER_OT3: app
 
 jobs:
-  js-unit-test:
+  js-unit-test-shards:
     # unit tests for the app's view layer (not the node layer)
     runs-on: 'ubuntu-24.04'
     name: 'opentrons app frontend unit tests'
-    timeout-minutes: 60
+    # these tests take > 30 minutes with a single runner, so split into multiple shards
+    # https://vitest.dev/guide/improving-performance.html#sharding
+    strategy:
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    env:
+      SHARD_TOTAL: 8
+    timeout-minutes: 15 # if tests take longer than this, add more shards
     steps:
       - uses: 'actions/checkout@v4'
       - uses: ./.github/actions/js/setup
-      - name: 'test frontend packages'
+      - name: 'Test frontend packages ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
+        # The run produces 2 outputs that we'll upload to temporary storage on Github:
+        # the vitest report in .vitest-reports/ and the coverage report in coverage/
         run: |
-          make -C app test-cov
+          make -C app test-cov test_opts="--shard=${{matrix.shard}}/${{env.SHARD_TOTAL}} --reporter=blob --reporter=default"
+          mv coverage/lcov.info coverage/lcov-shard-${{matrix.shard}}.info
+      - name: 'Upload frontend test shard result ${{matrix.shard}}/${{env.SHARD_TOTAL}}'
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-unit-test-result-shard-${{matrix.shard}}
+          path: |
+            .vitest-reports/*
+            coverage/lcov-shard-*.info
+          include-hidden-files: true
+          retention-days: 1
+
+  js-unit-test:
+    needs: [js-unit-test-shards]
+    runs-on: 'ubuntu-24.04'
+    name: 'opentrons app frontend unit test merge shard results'
+    steps:
+      - uses: 'actions/checkout@v4'
+      - uses: ./.github/actions/js/setup
+      - name: 'Download frontend test result shards'
+        uses: actions/download-artifact@v4
+        with:
+          pattern: frontend-unit-test-result-shard-*
+          merge-multiple: true
+      - name: 'Merge frontend test report shards'
+        run: yarn vitest --merge-reports
+      - name: 'Merge frontend test coverage shards'
+        run: cat ./coverage/lcov-shard-*.info > ./coverage/lcov.info
       - name: 'Upload coverage report'
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage/lcov.info
           flags: app
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   backend-unit-test:
     strategy:
@@ -87,7 +124,7 @@ jobs:
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: check make version
         run: make --version
       - name: 'test native(er) packages'
@@ -210,7 +247,7 @@ jobs:
       - uses: ./.github/actions/js/setup
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: check make version
         run: make --version
       - name: 'Configure Windows code signing environment'

@@ -19,11 +19,11 @@ import type {
   PipetteV2Specs,
   PositionReference,
   ShakeSpeedParams,
+  TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   Width,
 } from '@opentrons/shared-data'
-import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AUTOMATIC,
   CLEAN,
@@ -567,7 +567,7 @@ export interface ThermocyclerProfileStepArgs extends CommonArgs {
   lidOpenHold: boolean
   lidTargetTempHold: number | null
   message?: string
-  profileSteps: AtomicProfileStep[]
+  profileElements: TCExtendedProfileParams['profileElements']
   profileTargetLidTemp: number
   profileVolume: number
   meta?: {
@@ -644,6 +644,7 @@ export interface FlexStackerFillItemsArgs extends CommonArgs {
   commandCreatorFnName: 'flexStackerFillItems'
   fillLabwareUri: string | null
   fillQuantity: number | null
+  interventionMessage: string | null
 }
 export interface FlexStackerStoreArgs extends CommonArgs {
   moduleId: string

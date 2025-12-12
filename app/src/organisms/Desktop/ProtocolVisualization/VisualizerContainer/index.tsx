@@ -14,6 +14,7 @@ import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/Comma
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
 import {
+  stepDetailViewerCloseAction,
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
 } from '/app/redux/shell'
@@ -263,9 +264,9 @@ export function VisualizerContainer(
 
   useEffect(() => {
     return () => {
-      dispatch(stepDetailViewerCloseAction())
+      dispatch(stepDetailViewerCloseAction({ protocolKey }))
     }
-  }, [dispatch])
+  }, [dispatch, protocolKey])
 
   return (
     <div ref={containerRef} className={styles.layout_container}>

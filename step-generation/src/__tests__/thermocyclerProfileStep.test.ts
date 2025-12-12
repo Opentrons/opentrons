@@ -9,7 +9,7 @@ import {
   getSuccessResult,
 } from '../fixtures'
 
-import type { CreateCommand } from '@opentrons/shared-data/protocol/types/schemaV6'
+import type { CreateCommand } from '@opentrons/shared-data/command'
 import type {
   ThermocyclerModuleState,
   ThermocyclerProfileStepArgs,
@@ -34,7 +34,15 @@ describe('thermocyclerProfileStep', () => {
         lidTargetTempHold: null,
         lidOpenHold: true,
         moduleId: thermocyclerId,
-        profileSteps: [],
+        profileElements: [
+          {
+            repetitions: 4,
+            steps: [
+              { celsius: 30, holdSeconds: 10 },
+              { celsius: 40, holdSeconds: 20 },
+            ],
+          },
+        ],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
@@ -55,11 +63,19 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
-            profile: [],
+            profileElements: [
+              {
+                repetitions: 4,
+                steps: [
+                  { celsius: 30, holdSeconds: 10 },
+                  { celsius: 40, holdSeconds: 20 },
+                ],
+              },
+            ],
             blockMaxVolumeUl: 42,
           },
         },
@@ -91,9 +107,10 @@ mock_thermocycler.close_lid()
 mock_thermocycler.set_lid_temperature(55)
 mock_thermocycler.execute_profile(
     [
-
+        {"temperature": 30, "hold_time_seconds": 10},
+        {"temperature": 40, "hold_time_seconds": 20},
     ],
-    1,
+    4,
     block_max_volume=42,
 )
 mock_thermocycler.open_lid()
@@ -115,17 +132,17 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         lidTargetTempHold: null,
         lidOpenHold: true,
         moduleId: thermocyclerId,
-        profileSteps: [{ temperature: 61, holdTime: 99 }],
+        profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
       expected: [
         {
-          commandType: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ celsius: 61, holdSeconds: 99 }],
+            profileElements: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
           },
         },
@@ -179,7 +196,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         lidTargetTempHold: null,
         lidOpenHold: true,
         moduleId: thermocyclerId,
-        profileSteps: [{ temperature: 61, holdTime: 99 }],
+        profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
@@ -192,11 +209,11 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           },
         },
         {
-          commandType: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ celsius: 61, holdSeconds: 99 }],
+            profileElements: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
           },
         },
@@ -251,17 +268,17 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         lidTargetTempHold: null,
         lidOpenHold: true,
         moduleId: thermocyclerId,
-        profileSteps: [{ temperature: 61, holdTime: 99 }],
+        profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
       expected: [
         {
-          commandType: 'thermocycler/runProfile',
+          commandType: 'thermocycler/runExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
-            profile: [{ celsius: 61, holdSeconds: 99 }],
+            profileElements: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
           },
         },
@@ -346,7 +363,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       lidTargetTempHold: null,
       lidOpenHold: true,
       moduleId: 'badModuleId',
-      profileSteps: [],
+      profileElements: [],
       profileTargetLidTemp: 55,
       profileVolume: 42,
     }

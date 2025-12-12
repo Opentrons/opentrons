@@ -20,6 +20,8 @@ from opentrons.protocol_engine.state.inner_well_math_utils import (
 
 from typing import List, Tuple
 
+import pytest
+
 ninety_six_faster_than_em_point = 62
 
 
@@ -97,22 +99,28 @@ def _get_z_speed(nozzles_per_well: int) -> float:
     return DEFAULT_MAX_SPEEDS.low_throughput[OT3AxisKind.Z]
 
 
-def test_all_labware() -> None:
+@pytest.mark.parametrize(
+    "labware",
+    [
+        pytest.param(lw, id=f"{lw.namespace}.{lw.parameters.loadName}.{lw.version}")
+        for lw in _get_all_labware()
+    ],
+)
+def test_all_labware(labware: LabwareDefinition) -> None:
     """Run the test."""
-    for labware in _get_all_labware():
-        nozzles_per_well = _get_max_nozzles_per_well(labware)
-        max_tip_size = 1000
-        max_flow_rate, pip_dead_height = _get_max_flow_rate(nozzles_per_well)
-        for well in _get_each_well_type(labware):
-            dead_volume = _get_dead_volume(well, pip_dead_height)
-            max_delta_h = _get_height_from_volume(
-                well, dead_volume + (nozzles_per_well * max_tip_size)
-            )
-            delta_t = max_tip_size / max_flow_rate
-            max_z_speed = _get_z_speed(nozzles_per_well)
-            """
-            print(
-                f"max z speed {max_z_speed:3d} needed z speed {(max_delta_h / delta_t):5.2f} nozzles {nozzles_per_well:2d} {labware.metadata.displayName} "
-            )
-            """
-            assert max_delta_h / delta_t <= max_z_speed
+    nozzles_per_well = _get_max_nozzles_per_well(labware)
+    max_tip_size = 1000
+    max_flow_rate, pip_dead_height = _get_max_flow_rate(nozzles_per_well)
+    for well in _get_each_well_type(labware):
+        dead_volume = _get_dead_volume(well, pip_dead_height)
+        max_delta_h = _get_height_from_volume(
+            well, dead_volume + (nozzles_per_well * max_tip_size)
+        )
+        delta_t = max_tip_size / max_flow_rate
+        max_z_speed = _get_z_speed(nozzles_per_well)
+        """
+        print(
+            f"max z speed {max_z_speed:3d} needed z speed {(max_delta_h / delta_t):5.2f} nozzles {nozzles_per_well:2d} {labware.metadata.displayName} "
+        )
+        """
+        assert max_delta_h / delta_t <= max_z_speed

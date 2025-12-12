@@ -43,12 +43,14 @@ describe('flexStackerFormToArgs', () => {
       flexStackerFormType: 'fill' as FlexStackerFormType,
       fillLabwareUri: 'labware',
       fillQuantity: 1,
+      interventionMessage: 'fill message',
     }
     const expected = {
       moduleId: 'moduleId',
       commandCreatorFnName: 'flexStackerFillItems',
       fillLabwareUri: 'labware',
       fillQuantity: 1,
+      interventionMessage: 'fill message',
     }
     expect(flexStackerFormToArgs(formData)).toEqual(expected)
   })
