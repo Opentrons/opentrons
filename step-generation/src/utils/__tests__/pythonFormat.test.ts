@@ -4,7 +4,7 @@ import {
   formatPyStr,
   formatPyValue,
   formatPyWellLocation,
-} from '../utils/pythonFormat'
+} from '../pythonFormat'
 
 describe('pythonFormat utils', () => {
   it('format string', () => {

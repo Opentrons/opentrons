@@ -9,15 +9,15 @@ import {
   POSITION_REFERENCE_TOP,
 } from '@opentrons/shared-data'
 
-import { AUTOMATIC } from '../constants'
+import { AUTOMATIC } from '../../constants'
 import {
   DEFAULT_PIPETTE,
   DEST_LABWARE,
   getFlowRateAndOffsetParamsTransferLike,
   SOURCE_LABWARE,
-} from '../fixtures'
-import { SOURCE_WELL_BLOWOUT_DESTINATION } from '../utils'
-import { getCustomLiquidClassProperties } from '../utils/liquidClassUtils'
+} from '../../fixtures'
+import { SOURCE_WELL_BLOWOUT_DESTINATION } from '..'
+import { getCustomLiquidClassProperties } from '../liquidClassUtils'
 
 import type {
   ByTipTypeSetting,

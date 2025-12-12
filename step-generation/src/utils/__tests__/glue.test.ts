@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { DEFAULT_CONFIG } from '../fixtures'
+import { DEFAULT_CONFIG } from '../../fixtures'
 import {
   getNextRobotStateAndWarnings,
   getNextRobotStateAndWarningsSingleCommand,
-} from '../getNextRobotStateAndWarnings'
+} from '../../getNextRobotStateAndWarnings'
 import {
   commandCreatorsTimeline,
   curryCommandCreator,
   curryWithoutPython,
   reduceCommandCreators,
-} from '../utils'
+} from '..'
 
-import type { InvariantContext } from '../types'
+import type { InvariantContext } from '../../types'
 
-vi.mock('../getNextRobotStateAndWarnings')
+vi.mock('../../getNextRobotStateAndWarnings')
 
 let invariantContext: InvariantContext
 

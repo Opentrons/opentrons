@@ -10,11 +10,11 @@ import {
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { CLEAN } from '../constants'
-import { getIsSafePipetteMovement } from '../utils'
+import { CLEAN } from '../../constants'
+import { getIsSafePipetteMovement } from '..'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../../types'
 
 const mockLabwareId = 'labwareId'
 const mockPipId = 'pip'

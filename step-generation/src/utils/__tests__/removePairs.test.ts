@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { removePairs } from '../utils/removePairs'
+import { removePairs } from '../removePairs'
 
 const twoThenThree = (
   a: number | undefined,

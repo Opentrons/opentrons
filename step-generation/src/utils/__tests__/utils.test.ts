@@ -1,3 +1,5 @@
+// todo(mm, 2025-12-12): Rename this file to something that reflects the part of utils/ that it's testing.
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
@@ -19,16 +21,16 @@ import {
 } from '@opentrons/shared-data'
 import * as SharedData from '@opentrons/shared-data'
 
-import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../constants'
-import { DEFAULT_CONFIG } from '../fixtures'
+import { FIXED_TRASH_ID, TEMPERATURE_DEACTIVATED } from '../../constants'
+import { DEFAULT_CONFIG } from '../../fixtures'
 import {
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getIsTallLabwareEastWestOfHeaterShaker,
   pipetteAdjacentHeaterShakerWhileShaking,
   thermocyclerPipetteCollision,
-} from '../utils'
-import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../utils/heaterShakerCollision'
+} from '..'
+import { getIsHeaterShakerNorthSouthOfNonTiprackWithMultiChannelPipette } from '../heaterShakerCollision'
 import {
   AIR,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -39,18 +41,18 @@ import {
   repeatArray,
   SOURCE_WELL_BLOWOUT_DESTINATION,
   splitLiquid,
-} from '../utils/misc'
-import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
+} from '../misc'
+import { thermocyclerStateDiff } from '../thermocyclerStateDiff'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { RobotState } from '../'
+import type { RobotState } from '../..'
 import type {
   LabwareEntities,
   LabwareEntity,
   ThermocyclerModuleState,
   ThermocyclerStateStepArgs,
-} from '../types'
-import type { Diff } from '../utils/thermocyclerStateDiff'
+} from '../../types'
+import type { Diff } from '../thermocyclerStateDiff'
 
 vi.mock('@opentrons/shared-data', async importOriginal => {
   const actualSharedData = await importOriginal<typeof SharedData>()

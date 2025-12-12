@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
-import { AIR, swatchColors } from '../utils'
+import { AIR, swatchColors } from '..'
 
 vi.spyOn(console, 'warn').mockImplementation(() => {})
 

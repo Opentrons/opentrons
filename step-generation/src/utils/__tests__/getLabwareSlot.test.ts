@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getLabwareSlot } from '../utils'
+import { getLabwareSlot } from '..'
 
 describe('getLabwareSlot', () => {
   it('should return the slot the labware is in when it is NOT on top of a module', () => {

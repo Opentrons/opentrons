@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { blowOutInWell } from '../commandCreators/atomic'
-import { blowOutInWasteChute } from '../commandCreators/compound'
+import { blowOutInWell } from '../../commandCreators/atomic'
+import { blowOutInWasteChute } from '../../commandCreators/compound'
 import {
   BLOWOUT_FLOW_RATE,
   BLOWOUT_OFFSET_FROM_TOP_MM,
@@ -10,18 +10,18 @@ import {
   getInitialRobotStateStandard,
   makeContext,
   SOURCE_LABWARE,
-} from '../fixtures'
+} from '../../fixtures'
 import {
   DEST_WELL_BLOWOUT_DESTINATION,
   mixBlowoutLocationHelper,
   SOURCE_WELL_BLOWOUT_DESTINATION,
-} from '../utils'
-import { curryCommandCreator } from '../utils/curryCommandCreator'
+} from '..'
+import { curryCommandCreator } from '../curryCommandCreator'
 
 import type { BlowoutParams } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../../types'
 
-vi.mock('../utils/curryCommandCreator')
+vi.mock('../curryCommandCreator')
 
 let blowoutArgs: {
   pipette: BlowoutParams['pipetteId']

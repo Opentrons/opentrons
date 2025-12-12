@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { _stripNoOpMixCommands } from '../utils/stripNoOpCommands'
+import { _stripNoOpMixCommands } from '../stripNoOpCommands'
 
 import type { CreateCommand } from '@opentrons/shared-data'
 

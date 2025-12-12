@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
-import { makeContext, makeState } from '../fixtures'
-import { createEmptyLiquidState } from '../utils'
+import { makeContext, makeState } from '..'
+import { createEmptyLiquidState } from '../../utils'
 
 describe('snapshot tests', () => {
   it('makeContext', () => {

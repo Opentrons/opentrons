@@ -20,10 +20,9 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 
-import { HOPPER_STACKER_LOCATION } from '../constants'
+import { HOPPER_STACKER_LOCATION } from '../../constants'
 import {
   formatChangeTipArg,
-  formatPyStr,
   getDefineLiquids,
   getLoadAdapters,
   getLoadLabware,
@@ -38,7 +37,8 @@ import {
   PAPI_VERSION,
   pythonMetadata,
   pythonRequirements,
-} from '../utils'
+} from '../pythonFileUtils'
+import { formatPyStr } from '../pythonFormat'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -51,7 +51,7 @@ import type {
   TimelineFrame,
   TrashBinEntities,
   WasteChuteEntities,
-} from '../types'
+} from '../../types'
 
 // The labware fixtures use namespace "fixture", with is treated as custom labware.
 // Modify the labware fixtures to change them to the "opentrons" namespace.

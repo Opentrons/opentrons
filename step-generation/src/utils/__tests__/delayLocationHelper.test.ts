@@ -7,10 +7,10 @@ import {
   getSuccessResult,
   makeContext,
   SOURCE_LABWARE,
-} from '../fixtures'
-import { delayLocationHelper } from '../utils'
+} from '../../fixtures'
+import { delayLocationHelper } from '..'
 
-import type { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../../types'
 
 const mockWasteChuteId = 'wasteChuteId'
 let invariantContext: InvariantContext = {

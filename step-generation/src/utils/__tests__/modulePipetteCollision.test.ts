@@ -6,10 +6,10 @@ import {
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 
-import { getInitialRobotStateStandard, makeContext } from '../fixtures'
-import { modulePipetteCollision } from '../utils/modulePipetteCollision'
+import { getInitialRobotStateStandard, makeContext } from '../../fixtures'
+import { modulePipetteCollision } from '../modulePipetteCollision'
 
-import type { InvariantContext, RobotState } from '../types'
+import type { InvariantContext, RobotState } from '../../types'
 
 let invariantContext: InvariantContext
 let robotState: RobotState
