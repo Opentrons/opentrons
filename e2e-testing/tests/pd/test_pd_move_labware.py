@@ -39,102 +39,110 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     editor.expect_move_labware_form()
     editor.toggle_checkbox("Use gripper")
 
-    page.locator("#stepFormTools svg").first.click()
+    ####NOTE: playwright is having trouble finding the new location labware when using it's full name
     editor.move_labware("A3 Opentrons Tough PCR Auto-Sealing Lid", "B1 Opentrons Tough 96 Well")
-    # page.get_by_role("button", name="A3 Opentrons Tough PCR Auto-").click()
-    # page.get_by_test_id("dropdownMenu").nth(1).click()
-    # page.get_by_role("button", name="B1 Opentrons Tough 96 Well").click()
-    page.get_by_role("button", name="Save").click()
+
+    # page.get_by_role("button", name="Save").click()
+    # page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+
 
     # Add Manual Move to move PCR Lid to Deck
     editor.open_add_step_menu()
     editor.verify_add_step_menu_options()
     editor.select_step_type("Move")
     editor.toggle_checkbox("Use gripper")
-    page.get_by_test_id("dropdownMenu").first.click()
-    page.get_by_role("button", name="A1+B1 Opentrons Tough PCR").click()
-    page.get_by_test_id("dropdownMenu").nth(1).click()
-    page.get_by_role("button", name="A3").click()
-    page.get_by_role("button", name="Save").click()
-    page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+    # page.get_by_test_id("dropdownMenu").first.click()
+    # page.get_by_role("button", name="A1+B1 Opentrons Tough PCR").click()
+    # page.get_by_test_id("dropdownMenu").nth(1).click()
+    # page.get_by_role("button", name="A3").click()
+    # page.get_by_role("button", name="Save").click()
+    # page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+    editor.move_labware("A1+B1 Opentrons Tough PCR Auto-Sealing Lid", "A3")
 
-    # # Add Gripper Move to move PCR Lid to Waste Chute
-    # editor.open_add_step_menu()
-    # editor.verify_add_step_menu_options()
-    # editor.select_step_type("Move")
+    # Add Gripper Move to move PCR Lid to Waste Chute
+    editor.open_add_step_menu()
+    editor.verify_add_step_menu_options()
+    editor.select_step_type("Move")
     # page.get_by_test_id("dropdownMenu").first.click()
     # page.get_by_role("button", name="A3 Opentrons Tough PCR Auto-").click()
     # page.get_by_test_id("dropdownMenu").nth(1).click()
     # page.get_by_role("button", name="D3 Waste Chute in D3").click()
     # page.get_by_role("button", name="Save").click()
-    # page.get_by_role("button", name="Confirm").click()
+    editor.move_labware("A3 Opentrons Tough PCR Auto-Sealing Lid", "D3 Waste Chute in D3")
+    page.get_by_role("button", name="Confirm").click()
 
-    # # Add Manual Move to move Universal Lid to off-deck
-    # editor.open_add_step_menu()
-    # editor.verify_add_step_menu_options()
-    # editor.select_step_type("Move")
-    # editor.toggle_checkbox("Use gripper")
+    # Add Manual Move to move Universal Lid to off-deck
+    editor.open_add_step_menu()
+    editor.verify_add_step_menu_options()
+    editor.select_step_type("Move")
+    editor.toggle_checkbox("Use gripper")
     # page.get_by_test_id("dropdownMenu").first.click()
     # page.get_by_role("button", name="B2 Opentrons Tough Universal").click()
     # page.get_by_test_id("dropdownMenu").nth(1).click()
     # page.locator("#stepFormTools").get_by_role("button", name="Off-deck").click()
     # page.get_by_role("button", name="Save").click()
     # page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+    editor.move_labware("B2 Opentrons Tough Universal Lid", "Off-deck")
 
-    # # Add Manual Move to move Universal Lid to Temperature Module
-    # editor.open_add_step_menu()
-    # editor.verify_add_step_menu_options()
-    # editor.select_step_type("Move")
-    # page.get_by_test_id("dropdownMenu").first.click()
-    # editor.toggle_checkbox("Use gripper")
+    # Add Manual Move to move Universal Lid to Temperature Module
+    editor.open_add_step_menu()
+    editor.verify_add_step_menu_options()
+    editor.select_step_type("Move")
+    page.get_by_test_id("dropdownMenu").first.click()
+    editor.toggle_checkbox("Use gripper")
     # page.get_by_test_id("dropdownMenu").first.click()
     # page.get_by_role("button", name="offDeck Opentrons Tough").click()
     # page.get_by_test_id("dropdownMenu").nth(1).click()
     # page.get_by_role("button", name="D1 Opentrons Tough 96 Well").click()
     # page.get_by_role("button", name="Save").click()
+    editor.move_labware("Offdeck Opentrons Tough Universal Lid", "D1 Opentrons Tough 96 Well")
 
-    # # Add Gripper Move to move Universal Lid to Universal Lid Stack
-    # editor.open_add_step_menu()
-    # editor.verify_add_step_menu_options()
-    # editor.select_step_type("Move")
+    # Add Gripper Move to move Universal Lid to Universal Lid Stack
+    editor.open_add_step_menu()
+    editor.verify_add_step_menu_options()
+    editor.select_step_type("Move")
     # page.get_by_test_id("dropdownMenu").first.click()
     # page.get_by_role("button", name="D1 Opentrons Tough Universal").click()
     # page.get_by_test_id("dropdownMenu").nth(1).click()
     # page.get_by_role("button", name="B2 Opentrons Tough Universal").click()
     # page.get_by_role("button", name="Save").click()
     # page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+    editor.move_labware("D1 Opentrons Tough Universal Lid", "B2 Opentrons Tough Universal Lid")
 
-    # # Add Gripper Move to move Universal Lid to Waste Chute
-    # editor.open_add_step_menu()
-    # editor.verify_add_step_menu_options()
-    # editor.select_step_type("Move")
+    # Add Gripper Move to move Universal Lid to Waste Chute
+    editor.open_add_step_menu()
+    editor.verify_add_step_menu_options()
+    editor.select_step_type("Move")
     # page.get_by_test_id("dropdownMenu").first.click()
     # page.get_by_role("button", name="B2 Opentrons Tough Universal").click()
     # page.get_by_text("Choose option").click()
     # page.get_by_role("button", name="D3 Waste Chute in D3").click()
     # page.get_by_role("button", name="Save").click()
+    editor.move_labware("B2 Opentrons Tough Universal Lid", "D3 Waste Chute in D3")
 
-    # # Add Gripper Move to move PCR Plate on Temperature Module to Waste Chute
-    # editor.open_add_step_menu()
-    # editor.verify_add_step_menu_options()
-    # editor.select_step_type("Move")
+    # Add Gripper Move to move PCR Plate on Temperature Module to Waste Chute
+    editor.open_add_step_menu()
+    editor.verify_add_step_menu_options()
+    editor.select_step_type("Move")
     # page.get_by_test_id("dropdownMenu").first.click()
     # page.get_by_role("button", name="D1 Opentrons Tough 96 Well").click()
     # page.get_by_test_id("dropdownMenu").nth(1).click()
     # page.get_by_role("button", name="D3 Waste Chute in D3").click()
     # page.get_by_role("button", name="Save").click()
     # page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+    editor.move_labware("D1 Opentrons Tough 96 Well", "D3 Waste Chute in D3")
 
-    # # Add Manual Move to move 12 Well Reservoir to Off-deck
-    # editor.open_add_step_menu()
-    # editor.verify_add_step_menu_options()
-    # editor.select_step_type("Move")
-    # editor.toggle_checkbox("Use gripper")
+    # Add Manual Move to move 12 Well Reservoir to Off-deck
+    editor.open_add_step_menu()
+    editor.verify_add_step_menu_options()
+    editor.select_step_type("Move")
+    editor.toggle_checkbox("Use gripper")
     # page.get_by_test_id("dropdownMenu").first.click()
     # page.get_by_role("button", name="D2 Opentrons Tough 22mL 12").click()
     # page.get_by_test_id("dropdownMenu").nth(1).click()
     # page.locator("#stepFormTools").get_by_role("button", name="Off-deck").click()
     # page.get_by_role("button", name="Save").click()
+    editor.move_labware("D2 Opentrons Tough 22mL 12 Well Reservoir", "Off-deck")
 
 
 ###########################################################################
