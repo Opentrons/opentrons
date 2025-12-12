@@ -63,6 +63,7 @@ RUN = 1
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     helpers.create_hs_speed_parameter(parameters)
+    helpers.create_error_capture_duration_duration(parameters)
     helpers.create_dot_bottom_parameter(parameters)
     helpers.create_disposable_lid_parameter(parameters)
     helpers.create_tc_lid_deck_riser_parameter(parameters)
@@ -75,6 +76,7 @@ def add_parameters(parameters: ParameterContext) -> None:
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
@@ -1090,10 +1092,10 @@ def run(protocol: ProtocolContext) -> None:
 
         protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)
