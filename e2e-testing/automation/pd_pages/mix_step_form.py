@@ -271,7 +271,7 @@ class MixStepForm(BasePage):
         # Now wait for the dropdown to appear in the DOM
         # The dropdown has testId="blowout_location_dropdownMenu" (field name + _dropdownMenu)
         dropdown_locator = self.page.locator('[data-testid="blowout_location_dropdownMenu"]')
-        
+
         # Wait for the dropdown to be attached to the DOM with a longer timeout
         # This handles the case where the checkbox was just toggled and the DOM is updating
         try:
@@ -283,7 +283,7 @@ class MixStepForm(BasePage):
         except Exception:
             # If waiting for attached fails, try alternative approaches
             pass
-        
+
         # Fallback: Try using the dropdown_by_title helper which finds dropdowns by their label text
         try:
             dropdown = self._dropdown_by_title("Blowout location")
@@ -292,7 +292,7 @@ class MixStepForm(BasePage):
             return
         except (ValueError, AssertionError):
             pass
-        
+
         # Last resort: try any dropdown ending with _dropdownMenu, but wait for it
         dropdown = self.page.locator('[data-testid$="_dropdownMenu"]').last
         try:
@@ -302,7 +302,7 @@ class MixStepForm(BasePage):
             return
         except Exception:
             pass
-        
+
         # Provide helpful error message with available dropdown test IDs
         try:
             available_test_ids = self.page.locator('[data-testid*="dropdown"]').evaluate_all(
@@ -310,7 +310,7 @@ class MixStepForm(BasePage):
             )
         except Exception:
             available_test_ids = []
-        
+
         raise AssertionError(
             f"Could not find blowout location dropdown. "
             f"Available dropdown test IDs: {available_test_ids}. "
@@ -415,11 +415,18 @@ class MixStepForm(BasePage):
 
         normalized = " ".join(title.split())
         xpath_queries = [
-            "xpath=//*[normalize-space()='%s']/parent::*/following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
+            (
+                "xpath=//*[normalize-space()='%s']/parent::*/"
+                "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
+            )
             % normalized,
-            "xpath=//*[normalize-space()='%s']/ancestor::*[@data-testid][1]//div[contains(@data-testid, 'dropdownMenu')][1]"
+            (
+                "xpath=//*[normalize-space()='%s']/ancestor::*[@data-testid][1]//"
+                "div[contains(@data-testid, 'dropdownMenu')][1]"
+            )
             % normalized,
-            "xpath=//*[normalize-space()='%s']/following::div[contains(@data-testid, 'dropdownMenu')][1]" % normalized,
+            "xpath=//*[normalize-space()='%s']/following::div[contains(@data-testid, 'dropdownMenu')][1]"
+            % normalized,
         ]
         if title == "Tip handling":
             xpath_queries.append(
