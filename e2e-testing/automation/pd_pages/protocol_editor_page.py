@@ -360,11 +360,13 @@ class ProtocolEditorPage(BasePage):
     def move_labware(self, labware: str, new_location: str) -> None:
         """Select labware and new location to move the labware."""
 
-        self.page.locator("#stepFormTools svg").first.click()
         self.page.get_by_test_id("dropdownMenu").first.click()
         self.page.get_by_role("button", name=labware).click()
         self.page.get_by_test_id("dropdownMenu").nth(1).click()
-        self.page.locator("#stepFormTools").get_by_role("button", name=new_location).click() or self.page.get_by_role("button", name=new_location).click()
-        self.page.get_by_role("button", name="Save").click()
 
-        # self.page.get_by_role("button", name=new_location).click()
+        if new_location == "Off-deck":
+            self.page.locator("#stepFormTools").get_by_role("button", name="Off-deck").click()
+        else:
+            self.page.get_by_role("button", name=new_location).click()
+        self.page.get_by_role("button", name="Save").click()
+        self.page.locator("div").filter(has_text="Move has been saved").nth(3).click()
