@@ -12,6 +12,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 
 from typing import List
+from abr_testing.protocols import helpers
 
 metadata = {
     "protocolName": "Flex Stacker Stamping Protocol",
@@ -71,6 +72,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=40,
         minimum=1,
     )
+    helpers.create_error_capture_duration_duration(parameters)
 
 
 def move_plates_to_deck_fill_and_store(
@@ -129,11 +131,9 @@ def unload_tipracks_from_stacker(
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
     ctx.capture_image(filename="start_of_run")
-
+    length = ctx.params.error_capture_duration  # type: ignore[attr-defined]
     use_temp_mod = ctx.params.use_temp_mod  # type: ignore[attr-defined]
     if not ctx.is_simulating():
-        from abr_testing.protocols import helpers
-
         helpers.comment_protocol_version(ctx, "03")
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -231,7 +231,7 @@ def run(ctx: ProtocolContext) -> None:
             helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not ctx.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

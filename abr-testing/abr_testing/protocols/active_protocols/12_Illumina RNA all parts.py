@@ -66,11 +66,13 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Use temperature module in protocol",
         default=True,
     )
+    helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
 
     helpers.comment_protocol_version(protocol, "03")
 
@@ -2890,7 +2892,7 @@ def run(protocol: ProtocolContext) -> None:
             helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)
