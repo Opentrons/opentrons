@@ -1,6 +1,6 @@
 import { createElement } from 'react'
 
-import { isntStyleProp, styleProps } from '../primitives'
+import { isntStyleProp, styleProps } from '../primitives/style-props'
 
 import type { ComponentProps, ComponentType } from 'react'
 import type { StyleProps } from '../primitives/types'
