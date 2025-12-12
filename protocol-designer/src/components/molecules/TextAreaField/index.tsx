@@ -89,9 +89,7 @@ export interface TextAreaFieldProps {
   /** if true, clear out value and add '-' placeholder */
   isIndeterminate?: boolean
   /** horizontal text alignment for title, textarea, and (sub)captions */
-  textAlign?:
-    | typeof TYPOGRAPHY.textAlignLeft
-    | typeof TYPOGRAPHY.textAlignCenter
+  textAlign?: 'left' | 'center'
   /** react useRef to control textarea field instead of react event */
   ref?: MutableRefObject<HTMLTextAreaElement | null>
   /** optional IconName to display icon aligned to left of textarea field */
@@ -118,7 +116,7 @@ export const TextAreaField = forwardRef<
 >((props, ref): JSX.Element => {
   const {
     placeholder,
-    textAlign = TYPOGRAPHY.textAlignLeft,
+    textAlign = 'left',
     title,
     tooltipText,
     error,
@@ -133,6 +131,7 @@ export const TextAreaField = forwardRef<
     leftIcon,
     caption,
     resize = 'none',
+    id,
     ...textAreaProps
   } = props
 
@@ -158,7 +157,7 @@ export const TextAreaField = forwardRef<
           >
             <StyledText
               desktopStyle="bodyDefaultRegular"
-              htmlFor={props.id}
+              htmlFor={id}
               css={TITLE_STYLE(textAlign)}
             >
               {title}
@@ -300,7 +299,9 @@ const FORM_BOTTOM_SPACE_STYLE = css`
   padding-top: ${SPACING.spacing4};
 `
 
-const TITLE_STYLE = (textAlign: string): FlattenSimpleInterpolation => css`
+const TITLE_STYLE = (
+  textAlign: 'left' | 'center'
+): FlattenSimpleInterpolation => css`
   color: ${COLORS.grey60};
   padding-bottom: ${SPACING.spacing4};
   text-align: ${textAlign};

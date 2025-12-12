@@ -304,6 +304,7 @@ export interface Props extends ComponentProps<typeof Text> {
   oddStyle?: ODDStyles
   desktopStyle?: HelixStyles // ToDo (kk 9/14/25): may need to change the name
   children?: ReactNode
+  htmlFor?: string
 }
 export const ODD_STYLES = Object.keys(ODDStyleMap)
 export const HELIX_STYLES = Object.keys(helixProductStyleMap)
@@ -331,7 +332,7 @@ const DesktopStyledText: (props: Props) => JSX.Element = styled(
     }
 
     return (
-      !customProps.includes(prop as typeof customProps[number]) &&
+      !customProps.includes(prop as (typeof customProps)[number]) &&
       defaultValidatorFn(prop)
     )
   },

@@ -57,6 +57,8 @@ export interface FlexboxProps {
   justifySelf?: string
   flexDirection?: string
   flexWrap?: string
+  flexShrink?: string | number
+  flexGrow?: string | number
   whiteSpace?: string
 }
 
@@ -121,11 +123,11 @@ export interface StyleProps
 
 export type PrimitiveComponent<
   Instance extends keyof JSX.IntrinsicElements | ComponentType<any>,
-  Props extends StyleProps = StyleProps
+  Props extends StyleProps = StyleProps,
 > = ComponentType<
   Instance extends keyof JSX.IntrinsicElements
     ? JSX.IntrinsicElements[Instance] & Props
     : Instance extends ComponentType<infer P>
-    ? P & Props
-    : Props
+      ? P & Props
+      : Props
 >
