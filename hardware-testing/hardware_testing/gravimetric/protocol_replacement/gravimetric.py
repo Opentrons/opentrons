@@ -1336,16 +1336,20 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 actual_disp_list_channel: List[float] = []
 
                 for trial in range(fixture_settings.trials):
-                    if fixture_settings.cavity_test and trial != 0 and trial % 15 == 0:
+                    if fixture_settings.cavity_test and trial != 0 and trial % 7 == 0:
                         pick_up_tip_for_channel(fixture_settings, tips[0], 0)
-                        print_info("calculating evap.")
-                        (
-                            blank_measurments,
-                            avg_asp_evap,
-                            avg_disp_evap,
-                        ) = calculate_evaporation(
-                            ctx, fixture_settings, liq, tips.pop(0)
-                        )
+                        recalculate_evap = False # Change to True if want to recalculate evaporation every cavity
+                        if recalculate_evap:
+                            print_info("calculating evap.")
+                            (
+                                blank_measurments,
+                                avg_asp_evap,
+                                avg_disp_evap,
+                            ) = calculate_evaporation(
+                                ctx, fixture_settings, liq, tips.pop(0)
+                            )
+                        else:
+                            fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
                         remove_tip(fixture_settings)
                     print_header(
                         f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
