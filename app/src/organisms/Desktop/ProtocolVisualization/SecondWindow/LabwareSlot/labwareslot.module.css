@@ -11,6 +11,12 @@
   gap: var(--spacing-4);
 }
 
+.header_icons {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
 .header_text {
   display: flex;
   flex-direction: column;

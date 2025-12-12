@@ -15,9 +15,9 @@ Welcome to the v8.8.0 release of the Opentrons App! This release includes concur
 - Choose to run module actions like setting temperatures, setting shake speed, or running a Thermocycler Module profile without pausing other protocol steps until they're complete. You can run these concurrent module actions with multiple Temperature, Heater-Shaker, or Thermocycler Modules, or simultaneously perform pipetting actions.
 - Use the Flex and OT-2's cameras to capture images. Manage camera use, images, and live view from the Opentrons App:
   - Enable or disable the camera. The camera can capture images of the deck during a protocol or take an image when an error occurs.
-  - Turn on a live view of the Flex or OT-2 deck during your protocol run.
+  - Turn on a live view of the deck during your protocol run (Flex only).
   - View, download, or delete images after a protocol run.
-- Choose to return tips to the tip rack in a Quick Transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol.
+- Choose to return tips to the tip rack in a quick transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol.
 
 ### Bug Fixes
 

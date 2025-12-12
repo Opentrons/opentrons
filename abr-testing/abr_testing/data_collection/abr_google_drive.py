@@ -139,6 +139,7 @@ def create_data_dictionary(
                 plate_reader_dict = read_robot_logs.plate_reader_commands(
                     file_results, hellma_plate_standards, hellma_plate_orientation
                 )
+                image_capture_dict = read_robot_logs.count_image_capture(file_results)
                 notes = {"Note1": "", "Jira Link": issue_url}
                 liquid_height = read_robot_logs.get_liquid_waste_height(file_results)
                 plate_measure = {
@@ -161,6 +162,7 @@ def create_data_dictionary(
                     **plate_reader_dict,
                     **fs_dict,
                     **pipette_dict,
+                    **image_capture_dict,
                     **plate_measure,
                 }
                 headers = list(row_2.keys())
