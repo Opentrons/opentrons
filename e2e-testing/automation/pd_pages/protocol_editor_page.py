@@ -346,7 +346,7 @@ class ProtocolEditorPage(BasePage):
         """Verify the move labware step form fields are visible."""
 
         for text in [
-            "Use gripper"
+            "Use gripper",
             "Select labware",
             "New location",
         ]:
@@ -354,7 +354,7 @@ class ProtocolEditorPage(BasePage):
 
     def toggle_checkbox(self, field_name: str) -> None:
         """Toggle a checkbox-like control by its field name."""
-        
+
         self.page.get_by_role("checkbox", name=field_name, exact=True).click()
 
     def move_labware(self, labware: str, new_location: str) -> None:
