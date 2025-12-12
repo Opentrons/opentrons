@@ -10,11 +10,9 @@ export const consolidateSharedWells = (
     volume: number
     liquidId: string
   }
-
-  // Map from well name -> all labware/volume/liquid entries that occupy that well
   const wellToLabwareVolumes: Record<string, WellVolumeEntry[]> = {}
 
-  // Step 1: Track all wells with their labware, volume, and source liquid
+  // Track all wells with their labware, volume, and source liquid
   for (const [liquidId, labwareArray] of Object.entries(
     liquidsByIdForLabware
   )) {
@@ -30,47 +28,60 @@ export const consolidateSharedWells = (
     }
   }
 
-  // Step 2: Identify overlapping wells
-  const overlappingWells = Object.entries(wellToLabwareVolumes)
-    .filter(([, entries]) => entries.length > 1)
-    .map(([well]) => well)
+  // Identify overlapping wells
+  const overlappingWells = Object.entries(wellToLabwareVolumes).filter(
+    ([, entries]) => entries.length > 1
+  )
+  const consolidatedWells: LabwareByLiquidId = {}
 
-  if (overlappingWells.length === 0) return liquidsByIdForLabware
+  for (const [well, entries] of overlappingWells) {
+    let totalVolume = 0
+    let labwareIdName = ''
+    const liquidIds = entries.map(e => e.liquidId).sort()
+    const mixedLiquidId = `mixed-${liquidIds.join('-')}`
 
-  // Step 3: Remove overlapping wells from original liquids
-  const cleanedLiquids: LabwareByLiquidId = {}
+    for (const entry of entries) {
+      totalVolume += entry.volume
+      labwareIdName = entry.labwareId
+    }
+    if (!consolidatedWells[mixedLiquidId]) {
+      consolidatedWells[mixedLiquidId] = [
+        {
+          labwareId: labwareIdName,
+          volumeByWell: {},
+        },
+      ]
+    }
+    const existingEntry = consolidatedWells[mixedLiquidId][0]
+    existingEntry.volumeByWell[well] = totalVolume
+  }
+  // Remove consolidated wells from the original liquids
+  const cleanedOriginal: LabwareByLiquidId = {}
+
   for (const [liquidId, labwareArray] of Object.entries(
     liquidsByIdForLabware
   )) {
-    cleanedLiquids[liquidId] = labwareArray.map(labware => {
-      const newVolumeByWell = Object.fromEntries(
-        Object.entries(labware.volumeByWell).filter(
-          ([well]) => !overlappingWells.includes(well)
-        )
-      )
-      return { ...labware, volumeByWell: newVolumeByWell }
-    })
+    for (const labware of labwareArray) {
+      const remainingWells: Record<string, number> = {}
+
+      for (const [well, volume] of Object.entries(labware.volumeByWell)) {
+        const isOverlapping = overlappingWells.some(([ow]) => ow === well)
+        if (!isOverlapping) {
+          remainingWells[well] = volume
+        }
+      }
+      if (Object.keys(remainingWells).length > 0) {
+        if (!cleanedOriginal[liquidId]) cleanedOriginal[liquidId] = []
+        cleanedOriginal[liquidId].push({
+          labwareId: labware.labwareId,
+          volumeByWell: remainingWells,
+        })
+      }
+    }
   }
-
-  // Step 4: Build mixedLiquids per overlapping well
-  const mixedLiquids: LabwareByLiquidId = {}
-
-  overlappingWells.forEach(well => {
-    const entries = wellToLabwareVolumes[well]
-    const labwareId = entries[0].labwareId // assume all entries are same labware?
-    const mixedId = `mixed-${labwareId}-${well}`
-
-    mixedLiquids[mixedId] = [
-      {
-        labwareId,
-        volumeByWell: { [well]: entries.reduce((sum, e) => sum + e.volume, 0) },
-      },
-    ]
-  })
-
   return {
-    ...cleanedLiquids,
-    ...mixedLiquids,
+    ...cleanedOriginal,
+    ...consolidatedWells,
   }
 }
 
