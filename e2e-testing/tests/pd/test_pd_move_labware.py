@@ -15,16 +15,16 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     """Test manual and gripper move functionality with Lids and Labware.
     
     This test tests moving labware using the gripper and manual moves for the flex:
-    1. Import protocol with labware and lids on deck
-    2. Add manual move step to move Opentrons Tough PCR Auto-Sealing Lid from the Deck to the Thermocycler
-    3. Add gripper move step to move Opentrons Tough Universal Lid from the Deck to the Waste Chute
-    4. Add manual move step to move the Opentrons Tough Universal Lid from the Deck to off-deck
-    5. Add manual move step to move the Opentrons Tough Universal Lid from off-deck to the Temperature Module
-    6. Add gripper move step to move the Opentrons Tough Universal Lid from the Temperature Module to the Deck
-    7. Add gripper move step to move the Opentrons Tough Universal Lid from the Deck to the Waste Chute
-    8. Add manual move step to move the Opentrons Tough PCR Plate from the Temperature Module to off-deck
-    9. Add gripper move step to move the Opentrons Tough 12 Well Reservoir from the Deck to the Waste Chute
-    10. Save protocol
+    1. Import protocol with labware and lids on deck DONE
+    2. Add manual move step to move Opentrons Tough PCR Auto-Sealing Lid from the Deck to the Thermocycler DONE
+    3. Add manual move step to move Opentrons Tough PCR Auto-Sealing Lid from the Thermocycler to the Deck DONE
+    4. Add gripper move step to move Opentrons Tough PCR Auto-Sealing Lid from the Deck to the Waste Chute DONE
+    5. Add manual move step to move the Opentrons Tough Universal Lid from the Deck to off-deck
+    6. Add manual move step to move the Opentrons Tough Universal Lid from off-deck to the Temperature Module
+    7. Add gripper move step to move the Opentrons Tough Universal Lid from the Temperature Module to the Deck (Lid Stack)
+    8. Add gripper move step to move the Opentrons Tough Universal Lid from the Deck to the Waste Chute
+    9. Add manual move step to move the Opentrons Tough PCR Plate from the Temperature Module to the Waste Chute
+    10. Add gripper move step to move the Opentrons Tough 12 Well Reservoir from the Deck to Off-deck
 
     """
     # Import setup protocol and open editor
