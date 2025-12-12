@@ -416,22 +416,23 @@ class MixStepForm(BasePage):
         normalized = " ".join(title.split())
         xpath_queries = [
             (
-                "xpath=//*[normalize-space()='%s']/parent::*/"
+                f"xpath=//*[normalize-space()='{normalized}']/parent::*/"
                 "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
-            )
-            % normalized,
+            ),
             (
-                "xpath=//*[normalize-space()='%s']/ancestor::*[@data-testid][1]//"
+                f"xpath=//*[normalize-space()='{normalized}']/ancestor::*[@data-testid][1]//"
                 "div[contains(@data-testid, 'dropdownMenu')][1]"
-            )
-            % normalized,
-            "xpath=//*[normalize-space()='%s']/following::div[contains(@data-testid, 'dropdownMenu')][1]"
-            % normalized,
+            ),
+            (
+                f"xpath=//*[normalize-space()='{normalized}']/following::div[contains(@data-testid, 'dropdownMenu')][1]"
+            ),
         ]
         if title == "Tip handling":
             xpath_queries.append(
-                "xpath=//*[normalize-space()='Tip handling']/parent::*/"
-                "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
+                (
+                    "xpath=//*[normalize-space()='Tip handling']/parent::*/"
+                    "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
+                )
             )
 
         for query in xpath_queries:
