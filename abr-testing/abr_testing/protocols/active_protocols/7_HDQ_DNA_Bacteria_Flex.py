@@ -59,16 +59,19 @@ def add_parameters(parameters: ParameterContext) -> None:
     helpers.create_deactivate_modules_parameter(parameters)
     helpers.create_probe_liquid_height_parameter(parameters)
     helpers.create_meniscus_z_parameter(parameters)
+    helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
+
     helpers.comment_protocol_version(protocol, "05")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
@@ -560,15 +563,15 @@ def run(protocol: ProtocolContext) -> None:
             protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
         )
         helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
-        protocol.capture_image(filename="protocol_finished")
+        protocol.capture_image(filename="end_of_run")
 
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)
