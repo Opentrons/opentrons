@@ -33,6 +33,7 @@ export interface CreateContainerAboveModuleArgs {
     topLabwareDefURI: string | null
     lidDefURI: string | null
   }
+  isOnShuttle?: boolean
 }
 
 export const createContainerAboveModule: (
@@ -44,7 +45,7 @@ export const createContainerAboveModule: (
   | OpenIngredientSelectorAction
   | UpdateStackerModuleStateAction
 > = args => (dispatch, getState) => {
-  const { slot, labwareDefURIGroup } = args
+  const { slot, labwareDefURIGroup, isOnShuttle = false } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
@@ -78,28 +79,57 @@ export const createContainerAboveModule: (
     if (module?.type === FLEX_STACKER_MODULE_TYPE) {
       const currentModuleState = module.moduleState as FlexStackerModuleState
       if (currentModuleState.type === FLEX_STACKER_MODULE_TYPE) {
-        dispatch(
-          updateStackerModuleState({
-            moduleId: module.id,
-            moduleState: {
-              ...currentModuleState,
-              labwareOnShuttle: {
-                primaryLabwareId: `${primaryLabwareUuid}:${topLabwareDefURI}`,
-                adapterLabwareId:
-                  adapterLabwareUuid != null
-                    ? `${adapterLabwareUuid}:${adapterDefURI}`
-                    : null,
-                lidLabwareId:
-                  lidLabwareUuid != null
-                    ? `${lidLabwareUuid}:${lidDefURI}`
-                    : null,
+        // handle shuttle state update
+        if (isOnShuttle) {
+          dispatch(
+            updateStackerModuleState({
+              moduleId: module.id,
+              moduleState: {
+                ...currentModuleState,
+                labwareOnShuttle: {
+                  primaryLabwareId: `${primaryLabwareUuid}:${topLabwareDefURI}`,
+                  adapterLabwareId:
+                    adapterLabwareUuid != null
+                      ? `${adapterLabwareUuid}:${adapterDefURI}`
+                      : null,
+                  lidLabwareId:
+                    lidLabwareUuid != null
+                      ? `${lidLabwareUuid}:${lidDefURI}`
+                      : null,
+                },
               },
-            },
-          })
-        )
+            })
+          )
+        } else {
+          // handle hopper state update
+          const update = {
+            primaryLabwareId: `${primaryLabwareUuid}:${topLabwareDefURI}`,
+            adapterLabwareId:
+              adapterLabwareUuid != null
+                ? `${adapterLabwareUuid}:${adapterDefURI}`
+                : null,
+            lidLabwareId:
+              lidLabwareUuid != null ? `${lidLabwareUuid}:${lidDefURI}` : null,
+          }
+          if (topLabwareDefURI != null) {
+            dispatch(
+              updateStackerModuleState({
+                moduleId: module.id,
+                moduleState: {
+                  ...currentModuleState,
+                  storedLabwareDetails: {
+                    primaryLabwareURI: topLabwareDefURI,
+                    adapterLabwareURI: adapterDefURI,
+                    lidLabwareURI: lidDefURI,
+                  },
+                  labwareInHopper: [update],
+                },
+              })
+            )
+          }
+        }
       }
     }
-    console.log(getState())
   }
 }
 

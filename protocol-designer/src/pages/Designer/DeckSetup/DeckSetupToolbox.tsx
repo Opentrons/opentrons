@@ -22,13 +22,12 @@ import {
 import {
   ABSORBANCE_READER_V1,
   FLEX_STACKER_MODULE_TYPE,
+  getModuleType,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
 } from '@opentrons/step-generation'
-
-import { updateStackerModuleState } from '/protocol-designer/step-forms/actions'
 
 import {
   LINK_BUTTON_STYLE,
@@ -157,8 +156,10 @@ export function DeckSetupToolbox(
     const hasModule = selectedModuleModel != null
     const isHopperSlot = getIsSlotAHopper(slot)
     // TODO (nd: 12/12/2025): add back this check in a refactor to properly dispatch stacker state updates
-    // const isOnShuttle =
-    //   !isHopperSlot && selectedModuleModel === FLEX_STACKER_MODULE_V1
+    const isOnShuttle =
+      !isHopperSlot &&
+      selectedModuleModel != null &&
+      getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
 
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
@@ -177,31 +178,9 @@ export function DeckSetupToolbox(
             topLabwareDefURI: selectedTopLabware.labwareDefURI,
             lidDefURI: selectedLidLabware,
           },
+          isOnShuttle,
         })
       )
-      // update configured module labware
-      if (createdModuleForSlot != null) {
-        const { moduleState } = createdModuleForSlot
-        if (
-          moduleState.type === FLEX_STACKER_MODULE_TYPE &&
-          selectedTopLabware.labwareDefURI != null &&
-          isHopperSlot
-        ) {
-          dispatch(
-            updateStackerModuleState({
-              moduleId: createdModuleForSlot?.id,
-              moduleState: {
-                ...moduleState,
-                storedLabwareDetails: {
-                  primaryLabwareURI: selectedTopLabware.labwareDefURI,
-                  adapterLabwareURI: selectedAdapterDefURI,
-                  lidLabwareURI: selectedLidLabware,
-                },
-              },
-            })
-          )
-        }
-      }
     } else {
       dispatch(
         createContainer({
