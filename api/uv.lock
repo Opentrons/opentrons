@@ -1358,7 +1358,7 @@ dev = [
     { name = "mypy" },
     { name = "numpy" },
     { name = "numpydoc" },
-    { name = "opentrons-hardware" },
+    { name = "opentrons-hardware", extra = ["flex"] },
     { name = "packaging" },
     { name = "performance-metrics" },
     { name = "pydantic" },
@@ -1386,7 +1386,7 @@ robot = [
     { name = "anyio" },
     { name = "jsonschema" },
     { name = "numpy" },
-    { name = "opentrons-hardware" },
+    { name = "opentrons-hardware", extra = ["flex"] },
     { name = "packaging" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -1432,7 +1432,7 @@ dev = [
     { name = "mypy", specifier = "==1.11.0" },
     { name = "numpy", specifier = "==1.26.4" },
     { name = "numpydoc", specifier = "==0.9.1" },
-    { name = "opentrons-hardware", editable = "../hardware" },
+    { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
     { name = "packaging", specifier = "==25.0" },
     { name = "performance-metrics", editable = "../performance-metrics" },
     { name = "pydantic", specifier = "==2.11.7" },
@@ -1460,7 +1460,7 @@ robot = [
     { name = "anyio", specifier = "==4.9.0" },
     { name = "jsonschema", specifier = "==4.17.3" },
     { name = "numpy", specifier = "==1.26.4" },
-    { name = "opentrons-hardware", editable = "../hardware" },
+    { name = "opentrons-hardware", extras = ["flex"], editable = "../hardware" },
     { name = "packaging", specifier = "==25.0" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
@@ -1479,6 +1479,11 @@ dependencies = [
     { name = "pyserial" },
     { name = "python-can" },
     { name = "typing-extensions" },
+]
+
+[package.optional-dependencies]
+flex = [
+    { name = "python-can" },
 ]
 
 [package.metadata]
