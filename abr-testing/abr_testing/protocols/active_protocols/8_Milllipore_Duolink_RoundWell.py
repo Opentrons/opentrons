@@ -65,12 +65,6 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=96,
     )
     parameters.add_bool(
-        variable_name="dry_run",
-        display_name="Dry Run",
-        description="Skip incubation steps and return tips",
-        default=False,
-    )
-    parameters.add_bool(
         variable_name="heat_on_deck",
         display_name="Incubation on Deck",
         description="Use Heater-Shaker Module?",
@@ -144,7 +138,6 @@ def transfer(
     start: Union[Well, List[Well]],
     dest_wells: List[Well],
     vol: float,
-    dry_run: bool,
 ) -> None:
     """Transfer volume `vol` from `start` to each well in `dest_wells`.
 
@@ -164,10 +157,9 @@ def transfer(
             pip.dispense(10, dst.top(z=0))
             pip.dispense(vol, dst.top(z=-2).move(Point(x=D_1K, y=D_1K)))
             pip.blow_out()
-            if dry_run:
-                pip.return_tip()
-            else:
-                pip.drop_tip()
+
+            pip.return_tip()
+
         pip.flow_rate.dispense = DEFAULT_RATE
         return
 
@@ -186,10 +178,7 @@ def transfer(
             pip.dispense(vol, dst.top(z=-2).move(Point(x=D_1K, y=D_1K)))
             pip.move_to(dst.top(z=0))
         pip.blow_out()
-        if dry_run:
-            pip.return_tip()
-        else:
-            pip.drop_tip()
+        pip.return_tip()
         pip.flow_rate.dispense = DEFAULT_RATE
         return
 
@@ -200,7 +189,6 @@ def discard(
     wells: List[Well],
     vol: float,
     waste: Well,
-    dry_run: bool,
 ) -> None:
     """Discard liquid."""
     for well in wells:
@@ -211,10 +199,8 @@ def discard(
         pip.flow_rate.aspirate = DEFAULT_RATE
         pip.dispense(vol + 20, waste.top(z=-5))
         pip.blow_out()
-        if dry_run:
-            pip.return_tip()
-        else:
-            pip.drop_tip()
+        pip.return_tip()
+
     pip.reset_tipracks()
 
 
@@ -224,7 +210,6 @@ def discard(
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
     num_sample = ctx.params.num_sample  # type: ignore[attr-defined]
-    dry_run = ctx.params.dry_run  # type: ignore[attr-defined]
     length = ctx.params.error_capture_duration  # type: ignore[attr-defined]
     heat_on_deck = ctx.params.heat_on_deck  # type: ignore[attr-defined]
     use_lid = ctx.params.use_lid  # type: ignore[attr-defined]
@@ -301,41 +286,63 @@ def run(ctx: ProtocolContext) -> None:
             if num_well_last_col > 0
             else []
         )
-
         # ----------------------------
+        # Define liquids
+        # ----------------------------
+        vol_ab = 40 * num_col_full + 40
+        vol_ab_plus_one = 40 * (num_col_full + 1) + 40
+        def_ab = ctx.define_liquid(
+            name="ANTIBODY SOLUTION", description="", display_color="#98FB98"
+        )  # green
+        if num_well_last_col > 0:
+            [
+                reagent_plate.rows()[row][0].load_liquid(
+                    liquid=def_ab, volume=vol_ab_plus_one
+                )
+                for row in range(num_well_last_col)
+            ]
+        [
+            reagent_plate.rows()[row][0].load_liquid(liquid=def_ab, volume=vol_ab)
+            for row in range(num_well_last_col, 8)
+        ]
+
+        vol_re = 40 * num_col_total + 40
+        def_block = ctx.define_liquid(
+            name="BLOCKING SOLUTION", description="", display_color="#FFC300"
+        )  # yellow
+        [
+            reagent_plate.rows()[row][1].load_liquid(liquid=def_block, volume=vol_re)
+            for row in range(8)
+        ]
         # Day 1: Blocking and Primary Ab
         # ----------------------------
         block = reagent_plate.rows()[0][1]
         ab = reagent_plate.rows()[0][0]
 
         # transfer blocking (uses 1000uL tips we already assigned)
-        transfer(p1k_8, block, rxn_full, VOL_BLOCK, dry_run)
+        transfer(p1k_8, block, rxn_full, VOL_BLOCK)
         if num_well_last_col:
             # pairwise remainder: p1k_1 is assigned 1k tipracks too
-            transfer(
-                p1k_1, [block] * len(rxn_remainder), rxn_remainder, VOL_BLOCK, dry_run
-            )
+            transfer(p1k_1, [block] * len(rxn_remainder), rxn_remainder, VOL_BLOCK)
 
         if use_lid:
             cover_plate(ctx, "C4", working_plate)
         if heat_on_deck:
-            heat_plate(
-                hs, ctx, working_plate, hs_adapter, MIN_BLOCK if not dry_run else 0.1
-            )
+            heat_plate(hs, ctx, working_plate, hs_adapter, MIN_BLOCK)
         if use_lid:
             remove_lid(ctx, "C4", working_plate)
 
         # BEFORE discarding, switch the 8-channel pipette to 200 uL tipracks
         p1k_8.tip_racks = tips_200  # << CHANGED: switch to 200 uL tips for discard
-        discard(ctx, p1k_8, rxn_total, VOL_BLOCK, waste, dry_run)
+        discard(ctx, p1k_8, rxn_total, VOL_BLOCK, waste)
 
         # restore 1000 uL tipracks for transfers
         p1k_8.tip_racks = tips_1k  # << CHANGED
         p1k_1.tip_racks = tips_1k  # ensure 1ch still set
 
-        transfer(p1k_8, ab, rxn_full, VOL_AB, dry_run)
+        transfer(p1k_8, ab, rxn_full, VOL_AB)
         if num_well_last_col:
-            transfer(p1k_1, [ab] * len(rxn_remainder), rxn_remainder, VOL_AB, dry_run)
+            transfer(p1k_1, [ab] * len(rxn_remainder), rxn_remainder, VOL_AB)
 
         # ----------------------------
         # Day 2: PLA Probe, Ligation, Amplification, DAPI, AF
@@ -348,28 +355,20 @@ def run(ctx: ProtocolContext) -> None:
             # transfer reagent -> use 1k tipracks
             p1k_8.tip_racks = tips_1k
             p1k_1.tip_racks = tips_1k
-            transfer(p1k_8, reagent, rxn_full, vol, dry_run)
+            transfer(p1k_8, reagent, rxn_full, vol)
             if num_well_last_col:
-                transfer(
-                    p1k_1, [reagent] * len(rxn_remainder), rxn_remainder, vol, dry_run
-                )
+                transfer(p1k_1, [reagent] * len(rxn_remainder), rxn_remainder, vol)
 
             if use_lid:
                 cover_plate(ctx, "C4", working_plate)
             if heat_on_deck:
-                heat_plate(
-                    hs,
-                    ctx,
-                    working_plate,
-                    hs_adapter,
-                    min_incub if not dry_run else 0.1,
-                )
+                heat_plate(hs, ctx, working_plate, hs_adapter, min_incub)
             if use_lid:
                 remove_lid(ctx, "C4", working_plate)
 
             # discard uses 200uL tips
             p1k_8.tip_racks = tips_200
-            discard(ctx, p1k_8, rxn_total, vol, waste, dry_run)
+            discard(ctx, p1k_8, rxn_total, vol, waste)
     except Exception as e:
         if not ctx.is_simulating():
             helpers.send_slack_error_message_with_attachments(
