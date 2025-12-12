@@ -1,3 +1,5 @@
+import { getIsTiprack } from '@opentrons/shared-data'
+
 import type {
   FlexStackerModuleState,
   LabwareEntities,
@@ -6,7 +8,7 @@ import type {
 export const getStoredLabwareInfo = (
   stackerState: FlexStackerModuleState,
   labwareEntities: LabwareEntities
-): { primaryText: string; hasLid: boolean } | null => {
+): { primaryText: string; hasLid: boolean; isTiprack: boolean } | null => {
   const { storedLabwareDetails } = stackerState ?? {}
   if (storedLabwareDetails == null) {
     return null
@@ -20,5 +22,6 @@ export const getStoredLabwareInfo = (
   }
   const { displayName } = primaryLabwareEntity.def.metadata
   const hasLid = lidLabwareURI != null
-  return { primaryText: displayName, hasLid }
+  const isTiprack = getIsTiprack(primaryLabwareEntity.def)
+  return { primaryText: displayName, hasLid, isTiprack }
 }

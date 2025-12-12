@@ -17,13 +17,7 @@ import {
 } from '/protocol-designer/constants'
 
 import styles from './flexstackertools.module.css'
-import { getIsStackerRetrieveEnabled } from './utils.ts/getIsStackerRetrieveEnabled'
-import { getIsStackerStoreEnabled } from './utils.ts/getIsStackerStoreEnabled'
 
-import type {
-  FlexStackerModuleState,
-  LabwareEntities,
-} from '@opentrons/step-generation'
 import type {
   FlexStackerFormType,
   FormData,
@@ -33,19 +27,19 @@ import type { FieldPropsByName } from '../../types'
 interface StackerControlsProps {
   formData: FormData
   propsForFields: FieldPropsByName
-  moduleState: FlexStackerModuleState
-  labwareEntities: LabwareEntities
+  isStackerStoreEnabled: boolean
+  isStackerRetrieveEnabled: boolean
 }
 
 export function StackerControls(props: StackerControlsProps): JSX.Element {
-  const { formData, propsForFields, moduleState, labwareEntities } = props
+  const {
+    formData,
+    propsForFields,
+    isStackerStoreEnabled,
+    isStackerRetrieveEnabled,
+  } = props
   const { t } = useTranslation('form')
   const [targetProps, tooltipProps] = useHoverTooltip({})
-  const isStackerStoreEnabled = getIsStackerStoreEnabled(
-    moduleState,
-    labwareEntities
-  )
-  const isStackerRetrieveEnabled = getIsStackerRetrieveEnabled(moduleState)
   const handleRadioButtonChange = (value: FlexStackerFormType): void => {
     propsForFields.flexStackerFormType.updateValue(value)
   }

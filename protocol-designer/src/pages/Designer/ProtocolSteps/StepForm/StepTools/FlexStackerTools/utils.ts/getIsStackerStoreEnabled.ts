@@ -1,3 +1,5 @@
+import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
+
 import type {
   FlexStackerModuleState,
   LabwareEntities,
@@ -16,7 +18,8 @@ export const getIsStackerStoreEnabled = (
   stackerState: FlexStackerModuleState,
   labwareEntities: LabwareEntities
 ): boolean => {
-  const { labwareOnShuttle, storedLabwareDetails } = stackerState ?? {}
+  const { labwareOnShuttle, storedLabwareDetails, labwareInHopper } =
+    stackerState ?? {}
   if (labwareOnShuttle == null) {
     return false
   }
@@ -35,5 +38,22 @@ export const getIsStackerStoreEnabled = (
       return shuttleEntityURI === configuredURI
     }
   )
-  return isValid
+  const maxPoolCount =
+    storedLabwareDetails.primaryLabwareURI != null
+      ? getMaxPoolCount({
+          labwareDefinitions: {
+            primary:
+              labwareEntities[storedLabwareDetails.primaryLabwareURI]?.def,
+            adapter:
+              labwareEntities[storedLabwareDetails.adapterLabwareURI ?? '']
+                ?.def,
+            lid: labwareEntities[storedLabwareDetails.lidLabwareURI ?? '']?.def,
+          },
+          model: FLEX_STACKER_MODULE_V1,
+        })
+      : 0
+  const isFull =
+    labwareInHopper != null && labwareInHopper.length >= maxPoolCount
+
+  return isValid && !isFull
 }

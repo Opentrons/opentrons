@@ -455,7 +455,7 @@
       "selected_labware": "Selected labware",
       "shuttle": "Shuttle",
       "stacker": "Stacker",
-      "with_tiprack_lid": "With tip rack lid"
+      "with_lid": { "standard": "With lid", "tiprack": "With tiprack lid" }
     },
     "labwareLabel": {
       "aspirate": "source",

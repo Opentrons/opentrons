@@ -1,24 +1,25 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { Chip, Divider, InfoScreen, StyledText } from '@opentrons/components'
 import {
-  Chip,
-  Divider,
-  InfoScreen,
-  ListItem,
-  StyledText,
-  Tag,
-} from '@opentrons/components'
-import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
+  FLEX_STACKER_MODULE_V1,
+  getIsTiprack,
+  getMaxPoolCount,
+} from '@opentrons/shared-data'
 import { flexStackerStateGetter } from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import {
   FLEX_STACKER_EMPTY,
   FLEX_STACKER_FILL,
+  FLEX_STACKER_RETRIEVE,
   FLEX_STACKER_STORE,
 } from '/protocol-designer/constants'
+import { FlexStackerFormType } from '/protocol-designer/form-types'
 import {
+  getCurrentFormIsPresaved,
   getLabwareEntities,
   getModuleEntities,
 } from '/protocol-designer/step-forms/selectors'
@@ -30,7 +31,10 @@ import { hoverSelection } from '/protocol-designer/ui/steps/actions/actions'
 import { EmptySettings } from './EmptySettings'
 import styles from './flexstackertools.module.css'
 import { RefillSettings } from './RefillSettings'
+import { StackerContentItem } from './StackerContentItem'
 import { StackerControls } from './StackerControls'
+import { getIsStackerRetrieveEnabled } from './utils.ts/getIsStackerRetrieveEnabled'
+import { getIsStackerStoreEnabled } from './utils.ts/getIsStackerStoreEnabled'
 import { getStoredLabwareDefinitions } from './utils.ts/getStoredLabwareDefinitions'
 import { getStoredLabwareInfo } from './utils.ts/getStoredLabwareInfo'
 
@@ -40,6 +44,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
   const { formData, propsForFields } = props
   const { t } = useTranslation('form')
   const dispatch = useDispatch()
+  const isFormPresaved = useSelector(getCurrentFormIsPresaved)
 
   const robotState = useSelector(getRobotStateAtActiveItem)
   const flexStackerOptions = useSelector(getFlexStackerLabwareOptions)
@@ -56,6 +61,28 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
     robotState != null ? flexStackerStateGetter(robotState, moduleId) : null
   const { labwareInHopper, labwareOnShuttle, storedLabwareDetails } =
     moduleState ?? {}
+
+  const isStackerStoreEnabled =
+    moduleState != null &&
+    getIsStackerStoreEnabled(moduleState, labwareEntities)
+  const isStackerRetrieveEnabled =
+    moduleState != null ? getIsStackerRetrieveEnabled(moduleState) : false
+  const firstFormTypeOption = ((): FlexStackerFormType => {
+    if (isStackerStoreEnabled) {
+      return FLEX_STACKER_STORE
+    } else if (isStackerRetrieveEnabled) {
+      return FLEX_STACKER_RETRIEVE
+    } else {
+      return FLEX_STACKER_FILL
+    }
+  })()
+
+  // preselect the first form option on mount if the form is presaved
+  useEffect(() => {
+    if (isFormPresaved) {
+      propsForFields.flexStackerFormType.updateValue(firstFormTypeOption)
+    }
+  }, [])
 
   const numLabwareInHopper =
     labwareInHopper != null ? labwareInHopper.length : 0
@@ -81,6 +108,13 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
     moduleState != null
       ? getStoredLabwareInfo(moduleState, labwareEntities)
       : null
+  const isShuttleLabwareTiprack =
+    labwareOnShuttle != null &&
+    getIsTiprack(labwareEntities[labwareOnShuttle.primaryLabwareId]?.def)
+  const showHopperContent =
+    storedLabwareInfo != null &&
+    labwareInHopper != null &&
+    labwareInHopper.length > 0
   return (
     <div className={styles.tools_container}>
       <DropdownStepFormField
@@ -101,7 +135,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('step_edit_form.flex_stacker.stacker')}
           </StyledText>
-          {storedLabwareDetails != null ? (
+          {showHopperContent ? (
             <Chip
               text={
                 isHopperFull
@@ -116,24 +150,13 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
             />
           ) : null}
         </div>
-        {storedLabwareInfo != null ? (
-          <ListItem type="default" className={styles.list_item}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {storedLabwareInfo.primaryText}
-            </StyledText>
-            {storedLabwareInfo.hasLid ? (
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {t('step_edit_form.flex_stacker.with_tiprack_lid')}
-              </StyledText>
-            ) : null}
-            <Tag
-              text={t('step_edit_form.flex_stacker.quantity', {
-                count: numLabwareInHopper,
-              })}
-              type="default"
-              shrinkToContent
-            />
-          </ListItem>
+        {showHopperContent ? (
+          <StackerContentItem
+            primaryLabwareName={storedLabwareInfo.primaryText}
+            hasLid={storedLabwareInfo.hasLid}
+            isTiprack={storedLabwareInfo.isTiprack}
+            quantity={numLabwareInHopper}
+          />
         ) : (
           <InfoScreen
             content={t('step_edit_form.flex_stacker.no_labware_on_stacker')}
@@ -146,13 +169,15 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
           {t('step_edit_form.flex_stacker.shuttle')}
         </StyledText>
         {labwareOnShuttle != null ? (
-          <ListItem type="default" className={styles.list_item}>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {nicknamesById[labwareOnShuttle.primaryLabwareId] ??
-                labwareEntities[labwareOnShuttle.primaryLabwareId]?.def.metadata
-                  .displayName}
-            </StyledText>
-          </ListItem>
+          <StackerContentItem
+            primaryLabwareName={
+              nicknamesById[labwareOnShuttle.primaryLabwareId] ??
+              labwareEntities[labwareOnShuttle.primaryLabwareId]?.def.metadata
+                .displayName
+            }
+            hasLid={labwareOnShuttle.lidLabwareId != null}
+            isTiprack={isShuttleLabwareTiprack}
+          />
         ) : (
           <InfoScreen
             content={t('step_edit_form.flex_stacker.no_labware_on_shuttle')}
@@ -164,8 +189,8 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         <StackerControls
           formData={formData}
           propsForFields={propsForFields}
-          moduleState={moduleState}
-          labwareEntities={labwareEntities}
+          isStackerStoreEnabled={isStackerStoreEnabled}
+          isStackerRetrieveEnabled={isStackerRetrieveEnabled}
         />
       ) : null}
       {formData.flexStackerFormType !== FLEX_STACKER_STORE &&
@@ -176,6 +201,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         <RefillSettings
           propsForFields={propsForFields}
           moduleState={moduleState}
+          maxPoolCount={maxPoolCount}
         />
       ) : null}
       {formData.flexStackerFormType === FLEX_STACKER_EMPTY ? (
