@@ -415,24 +415,16 @@ class MixStepForm(BasePage):
 
         normalized = " ".join(title.split())
         xpath_queries = [
-            (
-                f"xpath=//*[normalize-space()='{normalized}']/parent::*/"
-                "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
-            ),
-            (
-                f"xpath=//*[normalize-space()='{normalized}']/ancestor::*[@data-testid][1]//"
-                "div[contains(@data-testid, 'dropdownMenu')][1]"
-            ),
-            (
-                f"xpath=//*[normalize-space()='{normalized}']/following::div[contains(@data-testid, 'dropdownMenu')][1]"
-            ),
+            f"xpath=//*[normalize-space()='{normalized}']/parent::*/"
+            f"following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]",
+            f"xpath=//*[normalize-space()='{normalized}']/ancestor::*[@data-testid][1]//"
+            f"div[contains(@data-testid, 'dropdownMenu')][1]",
+            f"xpath=//*[normalize-space()='{normalized}']/following::div[contains(@data-testid, 'dropdownMenu')][1]",
         ]
         if title == "Tip handling":
             xpath_queries.append(
-                (
-                    "xpath=//*[normalize-space()='Tip handling']/parent::*/"
-                    "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
-                )
+                "xpath=//*[normalize-space()='Tip handling']/parent::*/"
+                "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
             )
 
         for query in xpath_queries:
