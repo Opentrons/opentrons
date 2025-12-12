@@ -219,6 +219,7 @@ def run(ctx: ProtocolContext) -> None:
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     try:
+        ctx.capture_image(filename="start_of_run")
         num_col_full = num_sample // 8
         num_well_last_col = num_sample % 8
         num_col_total = num_col_full + (1 if num_well_last_col > 0 else 0)
@@ -227,12 +228,12 @@ def run(ctx: ProtocolContext) -> None:
         # Load labware
         # ----------------------------
         working_plate = ctx.load_labware(
-            "corning_96_wellplate_360ul_flat", "C2", "ASSAY PLATE"
+            "milliplex_r_96_well_microtiter_plate", "C2", "ASSAY PLATE"
         )
         waste_res = ctx.load_labware("nest_1_reservoir_290ml", "D2", "LIQUID WASTE")
         waste = waste_res.wells()[0]
         ctx.load_trash_bin("A3")
-        ctx.load_lid_stack("corning_96_wellplate_360ul_lid", "C4", 1)
+        ctx.load_lid_stack("opentrons_tough_universal_lid", "C4", 1)
 
         if use_temp:
             temp_mod: TemperatureModuleContext = ctx.load_module(
@@ -252,7 +253,7 @@ def run(ctx: ProtocolContext) -> None:
         hs: HeaterShakerContext = ctx.load_module(
             "heaterShakerModuleV1", "D1"
         )  # type: ignore[assignment]
-        hs_adapter = hs.load_adapter("opentrons_universal_flat_adapter")
+        hs_adapter = hs.load_adapter("opentrons_universal_flat_adapter_type_b")
 
         # ---- LOAD TIPRACKS INTO VARIABLES (important) ----
         tips_1k = [
@@ -369,6 +370,7 @@ def run(ctx: ProtocolContext) -> None:
             # discard uses 200uL tips
             p1k_8.tip_racks = tips_200
             discard(ctx, p1k_8, rxn_total, vol, waste)
+            ctx.capture_image(filename="end_of_run")
     except Exception as e:
         if not ctx.is_simulating():
             helpers.send_slack_error_message_with_attachments(
