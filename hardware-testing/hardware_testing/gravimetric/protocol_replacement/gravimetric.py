@@ -174,6 +174,7 @@ class FixtureSettings:
     retract_discontinuity: float
     disc_ver_cuttoff: int
     lld_every_tip: bool
+    touch_blank: bool
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -256,6 +257,7 @@ class FixtureSettings:
         disc_ver_cuttoff = int(lookup_key("disc_ver_cuttoff", csv_params)[0])
         gantry_speed = int(lookup_key("gantry_speed", csv_params)[0])
         lld_every_tip = bool(lookup_key("lld_every_tip", csv_params)[0] == "TRUE")
+        touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
@@ -435,6 +437,7 @@ class FixtureSettings:
             retract_discontinuity=retract_discontinuity,
             disc_ver_cuttoff=disc_ver_cuttoff,
             lld_every_tip=lld_every_tip,
+            touch_blank=touch_blank,
         )
 
     def validate_settings(self) -> bool:
@@ -886,6 +889,7 @@ def aspirate_with_liquid_class(
         ],
         volume_for_pipette_mode_configuration=None,
     )
+    fixture_settings.recorder.clear_sample_tag()
     reset_retract_discontinuity(fixture_settings)
     return contents
 
@@ -918,6 +922,7 @@ def dispense_with_liquid_class(
         add_final_air_gap=final_air_gap,
         trash_location=fixture_settings.pipette.trash_container,
     )
+    fixture_settings.recorder.clear_sample_tag()
     reset_retract_discontinuity(fixture_settings)
 
 
@@ -939,6 +944,26 @@ def run_blank_test(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
     offset = _get_offset_for_channel(fixture_settings, channel, 10)
+    if fixture_settings.ctx.is_simulating():
+        liquid_height = 10
+    else:
+        liquid_height = fixture_settings.liquid_source.current_liquid_height()
+    fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)
+    fixture_settings.pipette.move_to(fixture_settings.pipette._last_tip_picked_up_from.top(10))
+    retracted_offset = _get_offset_for_channel(
+        fixture_settings, channel, fixture_settings.retracted_offset
+    )
+    well_top = fixture_settings.liquid_source.top().point
+    above_scale = Point(
+        well_top.x,
+        well_top.y + retracted_offset.y,
+        fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
+    )
+    if fixture_settings.touch_blank:
+        blank_move_to_height = liquid_height - fixture_settings.submerge_depth
+    else:
+        blank_move_to_height = liquid_height - fixture_settings.submerge_depth
+    fixture_settings.pipette.move_to(Location(above_scale, None))
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
     transfer_properties.aspirate.aspirate_position.position_reference = (
@@ -963,6 +988,8 @@ def run_blank_test(
         channel=channel,
         blank=True,
     )
+    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(blank_move_to_height))
+    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(liquid_height + 3))
     print_info("aspirating")
     contents = aspirate_with_liquid_class(
         fixture_settings,
@@ -983,6 +1010,8 @@ def run_blank_test(
         blank=True,
     )
     print_info("dispensing.")
+    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(blank_move_to_height))
+    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(liquid_height + 3))
     dispense_with_liquid_class(
         fixture_settings,
         tip,
@@ -1185,6 +1214,8 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         calculate_change_in_volume(blank[1], blank[2], liq)
         for blank in blank_measurments
     ]
+    for i in range(len(asp_evaps)):
+        print(f"Trial {i+1} evap: aspirate {asp_evaps[i]} dispense {disp_evaps[i]}")
     avg_asp_evap = sum(asp_evaps) / len(asp_evaps)
     avg_disp_evap = sum(disp_evaps) / len(disp_evaps)
     report.store_average_evaporation(
@@ -1419,6 +1450,7 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
 def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
+    error: Optional[Exception] = None
     try:
         _store_config_as_old_style(fixture_settings)
         if _should_alter_discontinuity(fixture_settings):
@@ -1428,9 +1460,12 @@ def run(ctx: ProtocolContext) -> None:
         _run(ctx, fixture_settings)
     except Exception as e:
         print_error(f"error during run {e}")
+        error = e
     finally:
         if fixture_settings.recorder is not None:
             print_info("ending recording")
             fixture_settings.recorder.stop()
             fixture_settings.recorder.deactivate()
             set_output_file(None)
+    if error:
+        raise error
