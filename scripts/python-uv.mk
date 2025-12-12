@@ -1,7 +1,7 @@
 # UV is required for Python dependency management
 UV ?= uv
 UV_PYTHON = 3.12
-
+export UV_PYTHON
 # Python/pip/pytest commands using UV
 python := $(UV) run --python $(UV_PYTHON) python
 pip := $(UV) run --python $(UV_PYTHON) pip
