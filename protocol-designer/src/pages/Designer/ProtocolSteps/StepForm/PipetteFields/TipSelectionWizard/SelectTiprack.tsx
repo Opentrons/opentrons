@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import { StyledText } from '@opentrons/components'
 import {
@@ -9,6 +10,7 @@ import {
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
 import { LabwareLabel } from '/protocol-designer/pages/Designer/LabwareLabel'
+import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 
 import { BaseDeckTipSelection } from './BaseDeckTipSelection'
 import { TiprackSelectHover } from './TiprackSelectHover'
@@ -17,17 +19,26 @@ import { getIsTiprackSelectable } from './utils'
 
 import type { TipSelectionBaseProps } from './types'
 
-export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
+interface SelectTiprackProps extends TipSelectionBaseProps {
+  validTiprackIds: string[]
+}
+
+export function SelectTiprack(props: SelectTiprackProps): JSX.Element {
   const {
     selectedTiprackId,
     setSelectedTiprackId,
     formTiprackUri,
     activeDeckSetup,
     deckDef,
+    pipetteSpecs,
+    nozzles,
+    validTiprackIds,
   } = props
   const { t } = useTranslation('tip_selection')
   const { labware: allLabware } = activeDeckSetup
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const { labwareEntities } = useSelector(getInvariantContext)
+
   const controls = (
     <>
       {Object.values(allLabware).map(labware => {
@@ -49,10 +60,14 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
           console.warn(`no slot ${slot} for labware ${id}!`)
           return null
         }
-        const isTiprackSelectable = getIsTiprackSelectable(
+        const isTiprackSelectable = getIsTiprackSelectable({
           labware,
-          formTiprackUri
-        )
+          formTiprackUri,
+          pipetteSpecs,
+          nozzles,
+          labwareEntities,
+          validTiprackIds,
+        })
         return isTiprackSelectable ? (
           <>
             {id === selectedTiprackId ? (
@@ -84,7 +99,9 @@ export function SelectTiprack(props: TipSelectionBaseProps): JSX.Element {
       <StyledText desktopStyle="headingSmallBold">
         {t('select_tiprack')}
       </StyledText>
-      <BaseDeckTipSelection hoveredId={hoveredId} controls={controls} />
+      <div className={styles.select_tips_deck_container}>
+        <BaseDeckTipSelection hoveredId={hoveredId} controls={controls} />
+      </div>
     </div>
   )
 }

@@ -19,7 +19,14 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ABSORBANCE_READER_V1 } from '@opentrons/shared-data'
+import {
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
+} from '@opentrons/shared-data'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  getIsSlotAHopper,
+} from '@opentrons/step-generation'
 
 import {
   LINK_BUTTON_STYLE,
@@ -44,6 +51,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
@@ -145,14 +153,21 @@ export function DeckSetupToolbox(
   const handleConfirm = (): void => {
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
+    const isHopperSlot = getIsSlotAHopper(slot)
+    const isOnShuttle =
+      !isHopperSlot && selectedModuleModel === FLEX_STACKER_MODULE_V1
+
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
     }
-    if (hasModule) {
+    //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
+    if (hasModule && !isOnShuttle) {
       dispatch(
         createContainerAboveModule({
-          slot,
+          slot: isHopperSlot
+            ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+            : slot,
           labwareDefURIStack: [
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
             ...(selectedTopLabware.labwareDefURI != null
@@ -217,6 +232,11 @@ export function DeckSetupToolbox(
     }
   }
 
+  const displaySlot = getIsSlotAHopper(slot)
+    ? t('shared:stacker', {
+        slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
+      })
+    : slot
   return (
     <>
       {showSelectLabwareModal ? (
@@ -248,7 +268,7 @@ export function DeckSetupToolbox(
               deckLabel={
                 slot === 'offDeck' || deckSetup.labware[slot] != null
                   ? i18n.format(t('off_deck_title'), 'upperCase')
-                  : slot
+                  : displaySlot
               }
             />
             <StyledText desktopStyle="bodyLargeSemiBold">
@@ -310,7 +330,7 @@ export function DeckSetupToolbox(
                 <LabwareCard
                   labware={
                     deckSetup.labware[
-                      createdStackForSlot[createdStackForSlot.length - 1]
+                      createdStackForSlot[0] // select top most labware in the stack
                     ]
                   }
                   {...(createdLidForSlot != null &&

@@ -9,7 +9,9 @@ import type {
   RobotMassStorageDeviceEnumerated,
   RobotMassStorageDeviceRemoved,
   SendLogAction,
+  StepDetailViewerCloseAction,
   StepDetailViewerOpenAction,
+  StepDetailViewerUpdateAction,
   UiInitializedAction,
   UpdateBrightnessAction,
   UsbRequestsAction,
@@ -37,6 +39,10 @@ export const SEND_FILE_PATHS: 'shell:SEND_FILE_PATHS' = 'shell:SEND_FILE_PATHS'
 export const CAMERA_STREAM_OPEN = 'shell:CAMERA_STREAM_OPEN' as const
 export const CAMERA_PHOTO_OPEN = 'shell:CAMERA_PHOTO_OPEN' as const
 export const STEP_DETAIL_VIEWER_OPEN = 'shell:STEP_DETAIL_VIEWER_OPEN' as const
+export const STEP_DETAIL_VIEWER_UPDATE =
+  'shell:STEP_DETAIL_VIEWER_UPDATE' as const
+export const STEP_DETAIL_VIEWER_CLOSE =
+  'shell:STEP_DETAIL_VIEWER_CLOSE' as const
 
 export const uiInitialized = (): UiInitializedAction => ({
   type: UI_INITIALIZED,
@@ -131,10 +137,11 @@ export const notifySubscribeAction = (
 
 export const cameraStreamOpenAction = (
   hostname: string,
-  robotName: string
+  robotName: string,
+  windowTitle: string
 ): CameraStreamOpenAction => ({
   type: CAMERA_STREAM_OPEN,
-  payload: { hostname, robotName },
+  payload: { hostname, robotName, windowTitle },
   meta: { shell: true },
 })
 
@@ -147,9 +154,25 @@ export const cameraPhotoOpenAction = (
 })
 
 export const stepDetailViewerOpenAction = (
-  protocolKey: string
+  payload: StepDetailViewerOpenAction['payload']
 ): StepDetailViewerOpenAction => ({
   type: STEP_DETAIL_VIEWER_OPEN,
-  payload: { protocolKey },
+  payload,
+  meta: { shell: true },
+})
+
+export const stepDetailViewerUpdateAction = (
+  payload: StepDetailViewerUpdateAction['payload']
+): StepDetailViewerUpdateAction => ({
+  type: STEP_DETAIL_VIEWER_UPDATE,
+  payload,
+  meta: { shell: true },
+})
+
+export const stepDetailViewerCloseAction = (
+  payload: StepDetailViewerCloseAction['payload']
+): StepDetailViewerCloseAction => ({
+  type: STEP_DETAIL_VIEWER_CLOSE,
+  payload,
   meta: { shell: true },
 })

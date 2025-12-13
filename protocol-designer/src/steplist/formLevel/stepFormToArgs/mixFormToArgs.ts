@@ -1,4 +1,5 @@
 import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
+import { AUTOMATIC } from '@opentrons/step-generation'
 
 import {
   DEFAULT_CHANGE_TIP_OPTION,
@@ -7,7 +8,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getMatchingTipLiquidSpecs } from '../../../utils'
-import { getOrderedWells } from '../../utils'
+import { getOrderedWells } from '../../utils/getOrderedWells'
 import { getMixDelayData } from './getDelayData'
 
 import type { MixArgs } from '@opentrons/step-generation'
@@ -36,9 +37,12 @@ export const mixFormToArgs = (
     blowout_z_offset,
     pushOut_checkbox,
     pushOut_volume,
+    tip_tracking,
+    tips_selected,
+    tiprack_selected,
   } = castFormData
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    pipette,
+    pipette?.spec,
     castFormData.volume,
     castFormData.tipRack
   )
@@ -111,7 +115,7 @@ export const mixFormToArgs = (
     offsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
-    tipRack: castFormData.tipRack,
+    tipRack: castFormData.tipRack?.tiprackDefURI,
     dispenseDelaySeconds,
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation: dropTip_location,
@@ -122,5 +126,8 @@ export const mixFormToArgs = (
     positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     finalPushOut:
       pushOut_checkbox && pushOut_volume != null ? pushOut_volume : 0,
+    tipTracking: tip_tracking ?? AUTOMATIC,
+    tipsSelected: tips_selected ?? [],
+    tiprackSelected: tiprack_selected ?? null,
   }
 }

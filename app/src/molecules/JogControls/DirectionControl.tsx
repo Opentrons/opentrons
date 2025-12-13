@@ -1,6 +1,7 @@
 // jog controls component
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import styled, { css } from 'styled-components'
 
 import {
@@ -28,9 +29,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { TouchControlButton } from '/app/atoms/buttons/TouchControlButton'
+import { getIsOnDevice } from '/app/redux/config'
+
 import { HORIZONTAL_PLANE, VERTICAL_PLANE } from './constants'
 import { ControlContainer } from './ControlContainer'
-import { TouchControlButton } from './TouchControlButton'
 
 import type { CSSProperties } from 'styled-components'
 import type { MouseEvent } from 'react'
@@ -454,7 +457,7 @@ export function TouchDirectionControl(
     initialPlane ?? planes[0]
   )
   const { i18n, t } = useTranslation(['robot_calibration'])
-
+  const isOnDevice = useSelector(getIsOnDevice)
   return (
     <Flex
       flex="1"
@@ -474,26 +477,13 @@ export function TouchDirectionControl(
             return (
               <TouchControlButton
                 key={plane}
-                selected={selected}
+                isActive={selected}
                 onClick={() => {
                   setCurrentPlane(plane)
                 }}
-              >
-                <Flex
-                  flexDirection={DIRECTION_COLUMN}
-                  alignItems={ALIGN_FLEX_START}
-                  justifyContent={JUSTIFY_CENTER}
-                  height="74px"
-                >
-                  <LegacyStyledText
-                    as="p"
-                    fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-                    color={selected ? COLORS.white : COLORS.black90}
-                  >
-                    {CONTROLS_CONTENTS_BY_PLANE[plane].title}
-                  </LegacyStyledText>
-                </Flex>
-              </TouchControlButton>
+                isOnDevice={isOnDevice}
+                title={CONTROLS_CONTENTS_BY_PLANE[plane].title}
+              />
             )
           })}
         </Flex>

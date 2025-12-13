@@ -1,4 +1,4 @@
-import { AlignControlToModule, BaseDeck, Flex } from '@opentrons/components'
+import { AlignToModuleChildSlot, BaseDeck, Flex } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
   getDeckDefFromRobotType,
@@ -37,7 +37,7 @@ export function ModulesAndDeckMapView({
       moduleModel: module.moduleDef.model,
       moduleLocation: { slotName: module.slotName },
       moduleChildren: (
-        <AlignControlToModule
+        <AlignToModuleChildSlot
           deckId={deckDef.otId}
           slotId={module.slotName}
           moduleDefinition={module.moduleDef}
@@ -48,7 +48,7 @@ export function ModulesAndDeckMapView({
             physicalPort={parseModuleUSBPort(module.attachedModuleMatch)}
             runId={runId}
           />
-        </AlignControlToModule>
+        </AlignToModuleChildSlot>
       ),
     })
   )

@@ -4,18 +4,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubPreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/useStubPreviewImage'
+import { usePreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import { CameraControlsHome } from '../CameraControlsHome'
 import { ImagePreviewModal } from '../ImagePreviewModal'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { CameraControlsHomeProps } from '../CameraControlsHome'
 
 vi.mock(
-  '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/useStubPreviewImage'
+  '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 )
 vi.mock('/app/organisms/ODD/ChildNavigation')
 vi.mock('../ImagePreviewModal')
@@ -28,11 +28,11 @@ const render = (props: CameraControlsHomeProps) => {
 
 describe('CameraControlsHome', () => {
   let mockProps: CameraControlsHomeProps
-  let mockSettings: UseStubCameraSettingsValuesResult
+  let mockSettings: UseCameraSettingsValuesResult
 
   beforeEach(() => {
     mockSettings = {
-      zoom: '1x',
+      zoom: 1,
       brightness: 50,
       contrast: 50,
       saturation: 50,
@@ -47,7 +47,7 @@ describe('CameraControlsHome', () => {
       toggleShowControls: vi.fn(),
       settings: mockSettings,
     }
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: undefined,
       takePhoto: vi.fn(),
@@ -95,7 +95,7 @@ describe('CameraControlsHome', () => {
   it('renders zoom setting button with moderate zoom text', () => {
     const propsWithModerateZoom = {
       ...mockProps,
-      settings: { ...mockSettings, zoom: '1.5x' as const },
+      settings: { ...mockSettings, zoom: 1.5 },
     }
     render(propsWithModerateZoom)
 
@@ -105,7 +105,7 @@ describe('CameraControlsHome', () => {
   it('renders zoom setting button with maximum zoom text', () => {
     const propsWithMaxZoom = {
       ...mockProps,
-      settings: { ...mockSettings, zoom: '2x' as const },
+      settings: { ...mockSettings, zoom: 2 },
     }
     render(propsWithMaxZoom)
 
@@ -191,7 +191,7 @@ describe('CameraControlsHome', () => {
 
   it('calls takePhoto when preview button is clicked', () => {
     const mockTakePhoto = vi.fn()
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: undefined,
       takePhoto: mockTakePhoto,
@@ -212,7 +212,7 @@ describe('CameraControlsHome', () => {
 
   it('shows ImagePreviewModal after taking photo', () => {
     const mockTakePhoto = vi.fn()
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: '/path/to/image.jpg',
       takePhoto: mockTakePhoto,
@@ -232,7 +232,7 @@ describe('CameraControlsHome', () => {
   })
 
   it('shows spinner icon when loading and no image path', () => {
-    vi.mocked(useStubPreviewImage).mockReturnValue({
+    vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: true,
       imgPath: undefined,
       takePhoto: vi.fn(),

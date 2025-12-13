@@ -9,6 +9,7 @@
   "loading_data": "正在加载数据...",
   "modules": "模块",
   "no_data": "无数据",
+  "peripherals": "外设",
   "protocol_analysis_failure": "协议分析失败。",
   "protocol_analysis_outdated": "协议分析已过期。",
   "protocol_deleted": "协议已删除",

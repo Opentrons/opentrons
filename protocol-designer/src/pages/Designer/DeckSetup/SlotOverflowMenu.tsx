@@ -63,7 +63,7 @@ const TOP_SLOT_Y_POSITION_2_BUTTONS = 35
 const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 interface SlotOverflowMenuProps {
-  //   can be off-deck id or deck slot
+  //   can be off-deck id or deck slot or flexStackerAddressableArea
   location: DeckSlotId | string
   setShowMenuList: (value: SetStateAction<boolean>) => void
   addEquipment: (slotId: string) => void
@@ -138,12 +138,7 @@ export function SlotOverflowMenu(
       makeSnackbar(t('deck_slots_full') as string)
       return
     }
-
-    labwareStackOnSlot.forEach(labware => {
-      if (!deckSetupLabware[labware].def.allowedRoles?.includes('adapter')) {
-        dispatch(duplicateLabware(deckSetupLabware[labware].id))
-      }
-    })
+    dispatch(duplicateLabware(labwareStackOnSlot))
     setShowMenuList(false)
   }
 

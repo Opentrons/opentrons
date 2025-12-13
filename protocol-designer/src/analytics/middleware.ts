@@ -29,13 +29,13 @@ import type {
   NormalizedPipetteById,
   TransferArgs,
 } from '@opentrons/step-generation'
-import type { SetFeatureFlagAction } from '../feature-flags/actions'
 import type { FormData, StepIdType, StepType } from '../form-types'
 import type { RenameStepAction } from '../labware-ingred/actions'
 import type { LocationUpdate } from '../load-file/migration/utils/getAdditionalEquipmentLocationUpdate'
 import type { CreatePipettesAction } from '../step-forms/actions'
 import type { StepArgsAndErrors } from '../steplist'
 import type { BaseState } from '../types'
+import type { DuplicateSelectedStepsAction } from '../ui/steps'
 import type { SaveStepFormAction } from '../ui/steps/actions/thunks'
 import type { AnalyticsEventAction } from './actions'
 import type { AnalyticsEvent } from './mixpanel'
@@ -297,10 +297,13 @@ export const reduxActionToAnalyticsEvent = (
       properties: {},
     }
   }
-  if (action.type === 'DUPLICATE_MULTIPLE_STEPS') {
-    return {
-      name: 'duplicateMultipleSteps',
-      properties: {},
+  if (action.type === 'DUPLICATE_SELECTED_STEPS') {
+    const a: DuplicateSelectedStepsAction = action
+    if (a.payload.steps.length > 1) {
+      return {
+        name: 'duplicateMultipleSteps',
+        properties: {},
+      }
     }
   }
   if (action.type === 'LOAD_FILE') {
@@ -402,15 +405,6 @@ export const reduxActionToAnalyticsEvent = (
     }
   }
 
-  if (action.type === 'SET_FEATURE_FLAGS') {
-    const a: SetFeatureFlagAction = action
-    if (a.payload.OT_PD_ALLOW_ALL_TIPRACKS === true) {
-      return {
-        name: 'allowAllTipracks',
-        properties: {},
-      }
-    }
-  }
   if (action.type === 'CREATE_PIPETTES') {
     const a: CreatePipettesAction = action
 

@@ -8,7 +8,6 @@ import { handleActions } from 'redux-actions'
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
   getAllDefinitions,
-  getAllLabwareDefs,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -83,7 +82,6 @@ import type {
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteMultipleStepsAction,
-  DeleteStepAction,
   FormPatch,
   PopulateFormAction,
   ReorderStepsAction,
@@ -92,8 +90,7 @@ import type { Action } from '../../types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type {
   AddStepAction,
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
+  DuplicateSelectedStepsAction,
   ReorderSelectedStepAction,
   SelectMultipleStepsAction,
   SelectStepAction,
@@ -130,7 +127,6 @@ export type UnsavedFormActions =
   | PopulateFormAction
   | CancelStepFormAction
   | SaveStepFormAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | CreateModuleAction
   | DeleteModuleAction
@@ -196,7 +192,6 @@ export const unsavedForm = (
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'CREATE_DECK_FIXTURE':
     case 'DELETE_DECK_FIXTURE':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
@@ -260,7 +255,6 @@ export const initialSavedStepFormsState: SavedStepFormState = {
 export type SavedStepFormsActions =
   | SaveStepFormAction
   | SaveStepFormsMultiAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | LoadFileAction
   | CreateContainerAction
@@ -269,8 +263,7 @@ export type SavedStepFormsActions =
   | DeletePipettesAction
   | CreateModuleAction
   | DeleteModuleAction
-  | DuplicateStepAction
-  | DuplicateMultipleStepsAction
+  | DuplicateSelectedStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
   | SwapSlotContentsAction
@@ -365,10 +358,6 @@ export const savedStepForms = (
       )
     }
 
-    case 'DELETE_STEP': {
-      return omit(savedStepForms, action.payload)
-    }
-
     case 'DELETE_MULTIPLE_STEPS': {
       return omit(savedStepForms, action.payload)
     }
@@ -392,7 +381,16 @@ export const savedStepForms = (
           allLabware,
           latestDefs
         )
-        acc[updatedLabwareId] = location
+        // The `location` can be a labwareId too, so update its version as well.
+        // (We only recently realized that we need to update `location`, so there are
+        // probably saved protocols out there where we hadn't updated `location` and
+        // it refers to a labwareId that doesn't exist in metadata.labware.)
+        const [locationUUID, locationDefURI] = location.split(':')
+        const updatedLocation =
+          locationDefURI && locationDefURI in allLabware
+            ? `${locationUUID}:${getMigratedURI(locationDefURI, allLabware, latestDefs)}`
+            : location
+        acc[updatedLabwareId] = updatedLocation
         return acc
       }, {})
 
@@ -577,7 +575,6 @@ export const savedStepForms = (
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
-
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
@@ -607,7 +604,7 @@ export const savedStepForms = (
       const moduleId = action.payload.id
       // If module is going into a slot occupied by a labware,
       // move the labware on top of the new module
-      const labwareLocationUpdate =
+      const labwareLocationUpdate: Record<string, string> =
         labwareOccupyingDestination == null
           ? prevInitialDeckSetupStep.labwareLocationUpdate
           : {
@@ -743,16 +740,16 @@ export const savedStepForms = (
           // remove instances of labware from all manualIntervention steps
           const updatedLabwareLocation = Object.entries(
             savedForm.labwareLocationUpdate as Record<string, string>
-          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
+          ).reduce((acc: Record<string, string>, [labwareId, location]) => {
             if (labwareId === labwareIdToDelete) {
               return acc
             }
 
             // If labware is on an adapter and adapter was deleted, update labwareId's location
             const newLocationId =
-              locationId === labwareIdToDelete
+              location === labwareIdToDelete
                 ? savedForm.labwareLocationUpdate[labwareIdToDelete]
-                : locationId
+                : location
 
             acc[labwareId] = newLocationId
             return acc
@@ -853,6 +850,7 @@ export const savedStepForms = (
             form.stepType === 'heaterShaker' ||
             form.stepType === 'absorbanceReader' ||
             form.stepType === 'thermocycler' ||
+            form.stepType === 'flexStacker' ||
             form.stepType === 'pause') &&
           form.moduleId === moduleId
         ) {
@@ -936,28 +934,12 @@ export const savedStepForms = (
       }
     }
 
-    case 'DUPLICATE_STEP': {
-      // @ts-expect-error(sa, 2021-6-10): if  stepId is null, we will end up in situation where the entry for duplicateStepId
-      // will be {[duplicateStepId]: {id: duplicateStepId}}, which will be missing the rest of the properties from FormData
-      return {
-        ...savedStepForms,
-        [action.payload.duplicateStepId]: {
-          ...cloneDeep(
-            action.payload.stepId != null
-              ? savedStepForms[action.payload.stepId]
-              : {}
-          ),
-          id: action.payload.duplicateStepId,
-        },
-      }
-    }
-
-    case 'DUPLICATE_MULTIPLE_STEPS': {
+    case 'DUPLICATE_SELECTED_STEPS': {
       return action.payload.steps.reduce(
-        (acc, { stepId, duplicateStepId }) => ({
+        (acc, { originalStepId, duplicateStepId }) => ({
           ...acc,
           [duplicateStepId]: {
-            ...cloneDeep(savedStepForms[stepId]),
+            ...cloneDeep(savedStepForms[originalStepId]),
             id: duplicateStepId,
           },
         }),
@@ -1053,7 +1035,7 @@ type BatchEditFormActions =
   | SaveStepFormsMultiAction
   | SelectStepAction
   | SelectMultipleStepsAction
-  | DuplicateMultipleStepsAction
+  | DuplicateSelectedStepsAction
   | DeleteMultipleStepsAction
 export const batchEditFormChanges = (
   state: BatchEditFormChangesState = {},
@@ -1067,7 +1049,7 @@ export const batchEditFormChanges = (
     case 'SELECT_STEP':
     case 'SAVE_STEP_FORMS_MULTI':
     case 'SELECT_MULTIPLE_STEPS':
-    case 'DUPLICATE_MULTIPLE_STEPS':
+    case 'DUPLICATE_SELECTED_STEPS':
     case 'DELETE_MULTIPLE_STEPS':
     case 'RESET_BATCH_EDIT_FIELD_CHANGES': {
       return {}
@@ -1183,7 +1165,7 @@ export const labwareInvariantProperties: Reducer<
           const latestLabwareId =
             latestDefURI != null
               ? `${labwareIdString}:${latestDefURI}`
-              : labwareDefURI
+              : `${labwareIdString}:${labwareDefURI}`
 
           acc[latestLabwareId] = {
             labwareDefURI: latestDefURI ?? labwareDefURI,
@@ -1323,7 +1305,7 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const allLabwareDefs = getAllLabwareDefs()
+      const allLabwareDefs = getAllDefinitions()
       const latestDefs = getOnlyLatestDefs()
       const pipettes = Object.entries(metadata.pipettes).reduce(
         (
@@ -1589,8 +1571,6 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
 
       return state
     },
-    DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
-      state.filter(stepId => stepId !== action.payload),
     DELETE_MULTIPLE_STEPS: (
       state: OrderedStepIdsState,
       action: DeleteMultipleStepsAction
@@ -1615,32 +1595,10 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
         ...stepsWithoutSelectedStep.slice(nextIndex),
       ]
     },
-    DUPLICATE_STEP: (
+    DUPLICATE_SELECTED_STEPS: (
       state: OrderedStepIdsState,
-      action: DuplicateStepAction
-    ): OrderedStepIdsState => {
-      const { stepId, duplicateStepId } = action.payload
-      const selectedIndex = state.findIndex(s => s === stepId)
-      return [
-        ...state.slice(0, selectedIndex + 1),
-        duplicateStepId,
-        ...state.slice(selectedIndex + 1, state.length),
-      ]
-    },
-    DUPLICATE_MULTIPLE_STEPS: (
-      state: OrderedStepIdsState,
-      action: DuplicateMultipleStepsAction
-    ): OrderedStepIdsState => {
-      const duplicateStepIds = action.payload.steps.map(
-        ({ duplicateStepId }) => duplicateStepId
-      )
-      const { indexToInsert } = action.payload
-      return [
-        ...state.slice(0, indexToInsert),
-        ...duplicateStepIds,
-        ...state.slice(indexToInsert, state.length),
-      ]
-    },
+      action: DuplicateSelectedStepsAction
+    ): OrderedStepIdsState => action.payload.newStepOrder,
     REORDER_STEPS: (
       state: OrderedStepIdsState,
       action: ReorderStepsAction
@@ -1670,7 +1628,6 @@ export type PresavedStepFormState = {
 export type PresavedStepFormAction =
   | AddStepAction
   | CancelStepFormAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | SaveStepFormAction
   | SelectTerminalItemAction
@@ -1690,7 +1647,6 @@ export const presavedStepForm = (
       return action.payload === PRESAVED_STEP_ID ? state : null
 
     case 'CANCEL_STEP_FORM':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SELECT_STEP':

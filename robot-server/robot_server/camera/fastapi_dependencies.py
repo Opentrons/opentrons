@@ -28,4 +28,5 @@ async def get_camera_provider(
     """Return the engine `CameraProvider` which accepts callbacks from CameraProviderWrapper."""
     return CameraProvider(
         camera_settings_callback=camera_provider_wrapper.get_camera_settings,
+        image_capture_callback=camera_provider_wrapper.process_image_capture,
     )

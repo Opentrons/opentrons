@@ -1,3 +1,6 @@
+import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+
 import {
   ALIGN_CENTER,
   BORDERS,
@@ -11,14 +14,17 @@ import { useEstopQuery } from '@opentrons/react-api-client'
 
 import { Divider } from '/app/atoms/structure'
 import { EstopBanner } from '/app/organisms/Desktop/Devices/EstopBanner'
-import { InputDevices } from '/app/organisms/Desktop/Devices/InputDevices'
 import { InstrumentsAndModules } from '/app/organisms/Desktop/Devices/InstrumentsAndModules'
+import { Peripherals } from '/app/organisms/Desktop/Devices/Peripherals'
 import { RecentProtocolRuns } from '/app/organisms/Desktop/Devices/RecentProtocolRuns'
 import { RobotOverview } from '/app/organisms/Desktop/Devices/RobotOverview'
 import { DeviceDetailsDeckConfiguration } from '/app/organisms/DeviceDetailsDeckConfiguration'
 import { DISENGAGED, useEstopContext } from '/app/organisms/EmergencyStop'
-import { useIsFlex } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
+import {
+  useIsFlex,
+  useIsRobotBusy,
+  useIsRobotViewable,
+} from '/app/redux-resources/robots'
 
 interface DeviceDetailsComponentProps {
   robotName: string
@@ -27,12 +33,25 @@ interface DeviceDetailsComponentProps {
 export function DeviceDetailsComponent({
   robotName,
 }: DeviceDetailsComponentProps): JSX.Element {
+  const location = useLocation()
   const isFlex = useIsFlex(robotName)
-  const isCameraEnabled = useFeatureFlag('camera')
   const { data: estopStatus, error: estopError } = useEstopQuery({
     enabled: isFlex,
   })
   const { isEmergencyStopModalDismissed } = useEstopContext()
+  const isRobotViewable = useIsRobotViewable(robotName)
+  const isRobotBusy = useIsRobotBusy({ poll: true })
+
+  // If we are explicitly redirected to an anchor link on this page,
+  // scroll to it.
+  useEffect(() => {
+    if (location.hash) {
+      const element = document.querySelector(location.hash)
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }
+  }, [location])
 
   return (
     <Box
@@ -61,16 +80,25 @@ export function DeviceDetailsComponent({
         width="100%"
       >
         <RobotOverview robotName={robotName} />
-        <InstrumentsAndModules robotName={robotName} />
-        {isCameraEnabled && (
+        <InstrumentsAndModules
+          robotName={robotName}
+          isRobotViewable={isRobotViewable}
+        />
+        {isRobotViewable && (
           <>
             <Divider width="100%" />
-            <InputDevices isFlex={isFlex} robotName={robotName} />
+            <Peripherals
+              isFlex={isFlex}
+              robotName={robotName}
+              isRobotBusy={isRobotBusy}
+            />
           </>
         )}
       </Flex>
       {isFlex ? <DeviceDetailsDeckConfiguration robotName={robotName} /> : null}
-      <RecentProtocolRuns robotName={robotName} />
+      <Flex id="recent-protocol-runs">
+        <RecentProtocolRuns robotName={robotName} />
+      </Flex>
     </Box>
   )
 }

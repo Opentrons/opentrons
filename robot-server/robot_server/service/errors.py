@@ -3,7 +3,7 @@
 # Note: (2024-07-18): this file does not actually seem to be safe to delete
 from dataclasses import dataclass, asdict
 from enum import Enum
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Dict, Optional, Sequence, Tuple, TypeVar, Type
 from starlette import status as status_codes
 
 from opentrons_shared_data.errors import ErrorCodes
@@ -25,9 +25,16 @@ class ErrorCreateDef:
     error_code: str
 
 
+_ED = TypeVar("_ED", bound="ErrorDef")
+
+
 class ErrorDef(ErrorCreateDef, Enum):
-    """An enumeration of ErrorCreateDef Error definitions for use by
-    RobotServerError"""
+    """An enumeration of ErrorCreateDef Error definitions for use by RobotServerError."""
+
+    def __new__(cls: Type[_ED], dc_inst: ErrorCreateDef) -> _ED:
+        obj = object.__new__(cls)
+        obj._value_ = type(dc_inst)(**asdict(dc_inst))
+        return obj
 
     def __init__(self, e: Any) -> None:
         super().__init__(**(asdict(e)))

@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -32023,7 +32026,16 @@
     "description": "Protocol to measure hydrogen peroxide levels from THP-1 cells using the OT-2",
     "protocolName": "Amplex Red Hydrogen Peroxide Assay"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "3"
+      },
+      "model": "temperatureModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

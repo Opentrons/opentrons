@@ -31,4 +31,4 @@ Click **Deck hardware** in the left sidebar, then click :material-plus-circle: o
 | Waste Chute | <ul><li>Only 1 waste chute</li><li>Slot D3</li></ul> | Not compatible |
 | Staging area | <ul><li>Up to 4 staging areas</li><li>Slots A4-D4</li></ul> | Not compatible |
 
-You can create additional space on the Flex deck by adding as many as four staging areas, creating slots A4-D4. 
+You can create additional space on the Flex deck by adding as many as four staging areas in slots A4-D4. 

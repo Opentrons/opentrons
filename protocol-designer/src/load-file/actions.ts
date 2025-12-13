@@ -2,7 +2,7 @@ import { CUSTOM_LABWARE_DICT_NAME } from '@opentrons/step-generation'
 
 import { selectors as fileDataSelectors } from '../file-data'
 import { migration } from './migration'
-import { saveFile, saveJSONFile } from './utils'
+import { saveFile } from './utils'
 
 import type { SyntheticEvent } from 'react'
 import type { PDProtocolFile, PythonDesignerApplication } from '../file-types'
@@ -167,19 +167,4 @@ export const saveProtocolFile: () => ThunkAction<SaveProtocolFileAction> =
       .replace(/\s+/g, '_')
       .replace(/[^\p{L}\p{N}_]/gu, '')}.py`
     saveFile(fileData, fileName)
-  }
-
-// Eventually this will be deprecated:
-export const saveJSONProtocolFile: () => ThunkAction<SaveProtocolFileAction> =
-  () => (dispatch, getState) => {
-    // dispatching this should update the state, eg lastModified timestamp
-    dispatch({
-      type: 'SAVE_PROTOCOL_FILE',
-    })
-    const state = getState()
-    const fileData = fileDataSelectors.createJSONFile(state)
-    const protocolName =
-      fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
-    const fileName = `${protocolName}.json`
-    saveJSONFile(fileData, fileName)
   }

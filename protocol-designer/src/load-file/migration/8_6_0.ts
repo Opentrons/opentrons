@@ -1,4 +1,8 @@
-import { AUTOMATIC } from '@opentrons/step-generation'
+import {
+  ETHANOL_LIQUID_CLASS_NAME,
+  GLYCEROL_LIQUID_CLASS_NAME,
+  WATER_LIQUID_CLASS_NAME,
+} from '@opentrons/shared-data'
 
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'
 
@@ -6,11 +10,26 @@ import type { ProtocolFile } from '@opentrons/shared-data'
 import type { PDMetadata } from '/protocol-designer/file-types'
 import type { DesignerApplicationData } from './utils/getLoadLiquidCommands'
 
+// deprecated liquid class names!
+const WATER_LIQUID_CLASS_NAME_V1 = 'waterV1'
+const GLYCEROL_LIQUID_CLASS_NAME_V1 = 'glycerol50V1'
+const ETHANOL_LIQUID_CLASS_NAME_V1 = 'ethanol80V1'
+
 const getNormalizedTime = (time: string): string => {
   const timeParts = time.split(':').map(Number)
   const missing = 3 - timeParts.length
   const normalized = [...Array(missing).fill(0), ...timeParts]
   return normalized.join(':')
+}
+
+const getMigratedLiquidClassNames = (liquidClass: string): string => {
+  if (liquidClass === WATER_LIQUID_CLASS_NAME_V1) {
+    return WATER_LIQUID_CLASS_NAME
+  } else if (liquidClass === GLYCEROL_LIQUID_CLASS_NAME_V1) {
+    return GLYCEROL_LIQUID_CLASS_NAME
+  } else if (liquidClass === ETHANOL_LIQUID_CLASS_NAME_V1) {
+    return ETHANOL_LIQUID_CLASS_NAME
+  } else return liquidClass
 }
 
 export const migrateFile = (
@@ -45,12 +64,19 @@ export const migrateFile = (
       //  fixes a bug where the aspirate/dispense z-offset in the commands was
       //  defaulting to 1mm but the form fields were null
       if (form.stepType === 'moveLiquid') {
-        const { aspirate_mmFromBottom, dispense_mmFromBottom } = form
+        const {
+          id,
+          aspirate_mmFromBottom,
+          dispense_mmFromBottom,
+          liquidClass,
+        } = form
 
         return {
           ...acc,
           [id]: {
             ...form,
+            //  migrate from old liquidClass name
+            liquidClass: getMigratedLiquidClassNames(liquidClass as string),
             aspirate_mmFromBottom:
               aspirate_mmFromBottom != null
                 ? aspirate_mmFromBottom
@@ -59,14 +85,19 @@ export const migrateFile = (
               dispense_mmFromBottom != null
                 ? dispense_mmFromBottom
                 : DEFAULT_MM_OFFSET_FROM_BOTTOM,
-            tip_tracking: AUTOMATIC,
           },
         }
       }
+
       if (form.stepType === 'mix') {
+        const { id, liquidClass } = form
         return {
           ...acc,
-          [id]: { ...form, tip_tracking: AUTOMATIC },
+          [id]: {
+            ...form,
+            //  migrate from old liquidClass name
+            liquidClass: getMigratedLiquidClassNames(liquidClass as string),
+          },
         }
       }
       return acc

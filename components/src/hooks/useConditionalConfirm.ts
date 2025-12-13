@@ -1,5 +1,11 @@
 import { useState } from 'react'
 
+export interface UseConditionalConfirmResult<T extends any[]> {
+  confirm: (...args: T) => void
+  showConfirmation: boolean
+  cancel: () => unknown
+}
+
 /**
  * useConditionalConfirm is intended for cases where we want to block and defer
  * a particular user action until the user clicks "ok" in any kind of "are you sure?"
@@ -34,17 +40,6 @@ import { useState } from 'react'
  *  )
  * }
  * ```
- */
-
-export interface UseConditionalConfirmResult<T extends any[]> {
-  confirm: (...args: T) => void
-  showConfirmation: boolean
-  cancel: () => unknown
-}
-
-/**
- * Provides conditional confirmation logic, allowing certain actions to be blocked
- * until explicitly confirmed.
  */
 export const useConditionalConfirm = <T extends any[]>(
   handleContinue: (...args: T) => any,

@@ -25,7 +25,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.26",
+    "apiLevel": "2.27",
 }
 
 
@@ -63,6 +63,7 @@ RUN = 1
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
     helpers.create_hs_speed_parameter(parameters)
+    helpers.create_error_capture_duration_duration(parameters)
     helpers.create_dot_bottom_parameter(parameters)
     helpers.create_disposable_lid_parameter(parameters)
     helpers.create_tc_lid_deck_riser_parameter(parameters)
@@ -74,6 +75,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     disposable_lid = protocol.params.disposable_lid  # type: ignore[attr-defined]
@@ -82,7 +85,7 @@ def run(protocol: ProtocolContext) -> None:
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "04")
+    helpers.comment_protocol_version(protocol, "05")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -291,14 +294,18 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 if STEP_HYB == 1:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    thermocycler.set_block_temperature(4)
-                    thermocycler.set_lid_temperature(100)
-                    temp_block.set_temperature(4)
+                    tc_block_task = thermocycler.start_set_block_temperature(4)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(100)
+                    temp_block_task = temp_block.start_set_temperature(4)
+                    protocol.wait_for_tasks(
+                        [tc_block_task, tc_lid_task, temp_block_task]
+                    )
                 else:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    thermocycler.set_block_temperature(58)
-                    thermocycler.set_lid_temperature(58)
-                    heatershaker.set_and_wait_for_temperature(58)
+                    tc_block_task = thermocycler.start_set_block_temperature(58)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
+                    hs_task = heatershaker.set_target_temperature(58)
+                    protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
             heatershaker.close_labware_latch()
 
             # Sample Plate contains 30ul  of DNA
@@ -426,11 +433,10 @@ def run(protocol: ProtocolContext) -> None:
 
                 if DRYRUN is False:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    thermocycler.set_block_temperature(58)
-                    thermocycler.set_lid_temperature(58)
-
-                if DRYRUN is False:
-                    heatershaker.set_and_wait_for_temperature(58)
+                    tc_block_task = thermocycler.start_set_block_temperature(58)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
+                    hs_task = heatershaker.set_target_temperature(58)
+                    protocol.wait_for_tasks([tc_block_task, tc_lid_task, hs_task])
 
                 protocol.comment("--> Transfer Hybridization")
                 TransferSup = 100
@@ -1083,11 +1089,13 @@ def run(protocol: ProtocolContext) -> None:
             )
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
+
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

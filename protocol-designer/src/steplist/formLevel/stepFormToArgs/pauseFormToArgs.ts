@@ -1,5 +1,6 @@
 import {
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '../../../constants'
@@ -62,6 +63,13 @@ export const pauseFormToArgs = (
           seconds,
         },
       }
+
+    case PAUSE_UNTIL_TC_PROFILE_COMPLETE:
+      // todo(mm, 2025-10-15): Implement this.
+      console.warn(
+        'pauseFormToArgs() does not yet implement PAUSE_UNTIL_TC_PROFILE_COMPLETE.'
+      )
+      return null
 
     default:
       return null

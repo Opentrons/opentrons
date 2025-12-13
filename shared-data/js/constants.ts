@@ -70,6 +70,9 @@ export const GRIPPER_MODELS = [
 export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
+// robot camera name
+export const OT_SYSTEM_CAMERA = 'ot_system_camera'
+
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
 export const GEN2: 'GEN2' = 'GEN2'
@@ -586,6 +589,25 @@ export const FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A4_ADDRESSABLE_AREA,
   B4_ADDRESSABLE_AREA,
   C4_ADDRESSABLE_AREA,
+  D4_ADDRESSABLE_AREA,
+]
+
+export const ALL_FLEX_ADDRESSABLE_AREAS_SORTED: AddressableAreaName[] = [
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  A4_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  B4_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  C4_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
   D4_ADDRESSABLE_AREA,
 ]
 

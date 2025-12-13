@@ -12,16 +12,17 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForAddressableArea,
+  getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  getFlexHoverDimensions,
+  getModuleType,
+  getOT2HoverDimensions,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '../../step-forms/selectors'
-import {
-  getFlexHoverDimensions,
-  getOT2HoverDimensions,
-} from '../Designer/DeckSetup/utils'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -48,9 +49,19 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
     module => module.slot === slotId && module.type === THERMOCYCLER_MODULE_TYPE
   )
   const tcSlots = robotType === FLEX_ROBOT_TYPE ? ['A1'] : ['8', '10', '11']
-  const stagingAreaLocations = Object.values(additionalEquipmentOnDeck)
+  const columnFourLocations = Object.values(additionalEquipmentOnDeck)
     .filter(ae => ae.name === 'stagingArea')
     ?.map(ae => ae.location as string)
+
+  Object.values(modules).reduce<string[]>((acc, module) => {
+    if (getModuleType(module.model) === FLEX_STACKER_MODULE_TYPE) {
+      const cutoutForStacker = getCutoutIdForSlotName(module.slot, deckDef)
+      if (cutoutForStacker != null) {
+        acc.push(cutoutForStacker)
+      }
+    }
+    return acc
+  }, columnFourLocations)
 
   const cutoutId =
     getCutoutIdForAddressableArea(
@@ -78,7 +89,7 @@ export function SlotHover(props: SlotHoverProps): JSX.Element | null {
 
   if (robotType === FLEX_ROBOT_TYPE) {
     const { width, height, x, y } = getFlexHoverDimensions(
-      stagingAreaLocations,
+      columnFourLocations,
       cutoutId,
       slotId,
       hasTCOnSlot != null,

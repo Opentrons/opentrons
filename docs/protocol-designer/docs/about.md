@@ -22,7 +22,7 @@ Newly designed or modified protocol files created in Protocol Designer require O
 
 ## Protocol Designer Settings
 
-Click the settings icon in the upper right to access Protocol Designer settings. Here, you can view this software manual and release notes in the App Info links. 
+Click the :material-cog: in the upper right to access Protocol Designer settings. Here, you can view this software manual and release notes in the App Info links. 
 
 Protocol Designer shows hints, tips, and timeline editing suggestions to help you fix protocol warnings and errors. You can restore all hints and tips shown during protocol editing and toggle timeline editing guidance on and off. 
 

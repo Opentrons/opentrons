@@ -1173,6 +1173,44 @@ class ProtocolCore(
             return OffDeckType.WASTE_CHUTE
         return OffDeckType.OFF_DECK
 
+    def capture_image(
+        self,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using a camera.
+        Args:
+            resolution: Width by height resolution in pixels for the image to be captured with.
+            zoom: Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.
+            contrast: The contrast to use when processing an image. Scale is 0% to 100%
+            brightness: The brightness to use when processing an image. Scale is 0% to 100%.
+            saturation: The saturation to use when processing an image. Scale is 0% to 100%.
+        """
+        self._engine_client.execute_command(
+            cmd.CaptureImageParams(
+                fileName=filename,
+                resolution=resolution
+                if resolution is not None
+                else self._engine_client.state.camera.get_resolution(),
+                zoom=zoom
+                if zoom is not None
+                else self._engine_client.state.camera.get_zoom(),
+                contrast=contrast
+                if contrast is not None
+                else self._engine_client.state.camera.get_contrast(),
+                brightness=brightness
+                if brightness is not None
+                else self._engine_client.state.camera.get_brightness(),
+                saturation=saturation
+                if saturation is not None
+                else self._engine_client.state.camera.get_saturation(),
+            )
+        )
+
     def _convert_labware_location(
         self,
         location: Union[

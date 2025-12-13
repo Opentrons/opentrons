@@ -19,6 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
   ErrorRecoveryFlows,
@@ -43,13 +44,11 @@ import {
 } from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import {
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
   useRunTimestamps,
 } from '/app/resources/runs'
 
@@ -61,8 +60,8 @@ import type {
   RunningProtocolCommandListProps,
 } from '/app/organisms/ODD/RunningProtocol'
 
-const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
+const RUN_STATUS_REFETCH_INTERVAL = 5000
 
 export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
@@ -95,15 +94,19 @@ export function RunningProtocol(): JSX.Element {
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === lastRunCommand?.key
   )
-  const runStatus = useRunStatus(runId, {
+
+  const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
-  const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const runStatus = runRecord?.data.status ?? null
+
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
+
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
@@ -114,7 +117,6 @@ export function RunningProtocol(): JSX.Element {
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(runId, robotName)
   const robotAnalyticsData = useRobotAnalyticsData(robotName)
   const robotType = useRobotType(robotName)
-  const isCameraEnabled = useFeatureFlag('camera')
   const { isERActive, failedCommand, runLwDefsByUri } = useErrorRecoveryFlows(
     runId,
     runStatus
@@ -136,9 +138,7 @@ export function RunningProtocol(): JSX.Element {
     }
 
     const currentIndex = SCREEN_ORDER.indexOf(currentOption)
-    const maxIndex = isCameraEnabled
-      ? SCREEN_ORDER.length - 1
-      : SCREEN_ORDER.length - 2
+    const maxIndex = SCREEN_ORDER.length - 1
     let newIndex: number
 
     if (swipeType === 'swipe-left') {
@@ -272,16 +272,14 @@ export function RunningProtocol(): JSX.Element {
                   : styles.bullet_inactive
               )}
             />
-            {isCameraEnabled ? (
-              <div
-                className={clsx(
-                  styles.bullet,
-                  currentOption === 'ImageGallery'
-                    ? styles.bullet_active
-                    : styles.bullet_inactive
-                )}
-              />
-            ) : null}
+            <div
+              className={clsx(
+                styles.bullet,
+                currentOption === 'ImageGallery'
+                  ? styles.bullet_active
+                  : styles.bullet_inactive
+              )}
+            />
           </div>
         </div>
       </div>
@@ -296,6 +294,8 @@ function CurrentOptionView({
   currentOption,
   ...rest
 }: CurrentOptionViewProps): JSX.Element {
+  useToastOnErrorImage(rest.runId)
+
   switch (currentOption) {
     case 'CurrentRunningProtocolCommand':
       return <CurrentRunningProtocolCommand {...rest} />
@@ -311,7 +311,10 @@ function CurrentOptionView({
     case 'ImageGallery':
       return (
         <>
-          <ImageGalleryList {...rest} />
+          <ImageGalleryList
+            {...rest}
+            protocolAnalysis={rest.robotSideAnalysis}
+          />
           <div className={styles.gradient_overlay} />
         </>
       )

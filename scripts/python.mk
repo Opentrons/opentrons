@@ -7,7 +7,7 @@ OT_PYTHON ?= python
 # Python version to use for a project's virtual environment.
 # Defaults to Python 3.7, which is the version that runs on the OT-2.
 # https://pipenv.pypa.io/en/latest/basics/#specifying-versions-of-python
-OT_VIRTUALENV_VERSION ?= 3.10
+OT_VIRTUALENV_VERSION ?= 3.12
 
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 pipenv := $(pipenv_envvars) $(OT_PYTHON) -m pipenv

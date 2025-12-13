@@ -1,4 +1,7 @@
-import { getLabwareDefIsStandard } from '@opentrons/shared-data'
+import {
+  getLabwareDefIsStandard,
+  locationIsOffDeck,
+} from '@opentrons/shared-data'
 
 import { getLabwareCompatibleWithModule } from '../../utils/labwareModuleCompatibility'
 
@@ -19,8 +22,7 @@ const getMoveLabwareError = (
   if (
     labware == null ||
     newLocation == null ||
-    newLocation === 'offDeck' ||
-    newLocation === 'systemLocation' ||
+    locationIsOffDeck(newLocation) ||
     !getLabwareDefIsStandard(labware?.def)
   )
     return null
@@ -34,10 +36,21 @@ const getMoveLabwareError = (
     const adapterLoadName =
       invariantContext.labwareEntities[newLocation.labwareId].def.parameters
         .loadName
-    errorString =
-      labware?.def.stackingOffsetWithLabware?.[adapterLoadName] == null
-        ? 'Labware incompatible with this adapter'
-        : null
+
+    if (labware?.def.parameters.loadName === 'opentrons_tough_universal_lid') {
+      errorString = null
+    } else if (
+      labware?.def.compatibleParentLabware?.some(
+        loadName => loadName === adapterLoadName
+      )
+    ) {
+      errorString = null
+    } else {
+      errorString =
+        labware?.def.stackingOffsetWithLabware?.[adapterLoadName] == null
+          ? 'Labware incompatible with this adapter'
+          : null
+    }
   }
   return errorString
 }
@@ -64,7 +77,7 @@ export const getMoveLabwareFormErrors = (
         {
           title: errorString,
           dependentProfileFields: ['newLocation'],
-          location: 'field',
+          location: ['field'],
           showOnReopen: true,
         },
       ] as ProfileFormError[])

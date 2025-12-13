@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping
+from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping, Tuple
 
 from anyio import move_on_after
 
@@ -12,7 +12,6 @@ from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.robot.types import RobotType
-from opentrons.system import camera
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
@@ -44,8 +43,9 @@ from ..protocol_engine.types import (
     CSVRuntimeParamPaths,
     CommandAnnotation,
     ModuleModel,
+    CommandPreconditions,
 )
-from ..protocol_engine.resources.camera_provider import CameraProvider
+from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
@@ -194,8 +194,6 @@ class RunOrchestrator:
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType] = None,
     ) -> RunResult:
         """Start the run."""
-        if self._camera_provider:
-            await camera.update_live_stream_status(True, self._camera_provider)
         if self._protocol_runner:
             return await self._protocol_runner.run(
                 deck_configuration=deck_configuration,
@@ -223,9 +221,6 @@ class RunOrchestrator:
                 set_run_status=False,
                 post_run_hardware_state=PostRunHardwareState.STAY_ENGAGED_IN_PLACE,
             )
-        # Shut down the live stream, if there is one
-        if self._camera_provider:
-            await camera.update_live_stream_status(False, self._camera_provider)
 
     def resume_from_recovery(self, reconcile_false_positive: bool) -> None:
         """Resume the run from recovery."""
@@ -249,6 +244,10 @@ class RunOrchestrator:
     def get_state_summary(self) -> StateSummary:
         """Get protocol run data."""
         return self._protocol_engine.state_view.get_summary()
+
+    def get_preconditions(self) -> CommandPreconditions:
+        """Get the preconditions of a protocol run."""
+        return self._protocol_engine.state_view.preconditions.get_precondition()
 
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
@@ -375,6 +374,28 @@ class RunOrchestrator:
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a new labware definition to state."""
         return self._protocol_engine.add_labware_definition(definition)
+
+    def add_camera_enablement_settings(
+        self,
+        enablement_settings: CameraSettings,
+    ) -> CameraSettings:
+        """Add new camera enablement settings."""
+        return self._protocol_engine.add_camera_enablement_settings(enablement_settings)
+
+    def add_camera_capture_image_settings(
+        self,
+        camera_id: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        pan: Optional[Tuple[int, int]] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Add new camera capture image settings."""
+        self._protocol_engine.add_camera_capture_image_settings_to_state(
+            camera_id, resolution, zoom, pan, contrast, brightness, saturation
+        )
 
     async def add_command_and_wait_for_interval(
         self,

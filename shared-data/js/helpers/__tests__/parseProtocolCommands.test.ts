@@ -246,6 +246,35 @@ describe('parseInitialLoadedLabwareByAdapter', () => {
         startedAt: '2022-04-01T15:46:01.745870+00:00',
         completedAt: '2022-04-01T15:46:01.745870+00:00',
       },
+      {
+        createdAt: '2022-04-01T15:46:01.745870+00:00',
+        commandType: 'moveLabware',
+        key: 'commands.MOVE_LABWARE-1',
+        status: 'succeeded',
+        params: {
+          labwareId: 'labware-2',
+          newLocation: 'wasteChuteLocation',
+          strategy: 'usingGripper',
+        },
+        result: {
+          offsetId: '',
+          eventualDestinationLocationSequence: [
+            { kind: 'notOnDeck', logicalLocationName: 'wasteChuteLocation' },
+          ],
+          immediateDestinationLocationSequence: [
+            { kind: 'notOnDeck', logicalLocationName: 'wasteChuteLocation' },
+          ],
+          originLocationSequence: [
+            {
+              kind: 'onAddressableArea',
+              addressableAreaName: 'temperatureModuleV1A1',
+            },
+          ],
+        },
+        error: null,
+        startedAt: '2022-04-01T15:46:01.745870+00:00',
+        completedAt: '2022-04-01T15:46:01.745870+00:00',
+      },
     ] as any as RunTimeCommand[]
     const labware2 = 'labware-2'
 

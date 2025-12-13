@@ -13,13 +13,30 @@ interface RobotCoordinateSpaceWithRefProps extends ComponentProps<typeof Svg> {
   viewBox?: string | null
   deckDef?: DeckDefinition
   zoomed?: boolean
+  adjustViewboxForStacker?: boolean
   children?: (props: RobotCoordinateSpaceWithRefRenderProps) => ReactNode
+}
+
+// manual visual adjustments for flex stacker deck view to fit properly and
+// in the center of the frame
+const STACKER_VIEWBOX_ADJUSTMENTS = {
+  viewBoxOriginX: 260,
+  viewBoxOriginY: -25,
+  deckXDimension: -255,
+  deckYDimension: 105,
 }
 
 export function RobotCoordinateSpaceWithRef(
   props: RobotCoordinateSpaceWithRefProps
 ): JSX.Element | null {
-  const { children, deckDef, viewBox, zoomed = false, ...restProps } = props
+  const {
+    children,
+    deckDef,
+    viewBox,
+    adjustViewBoxForStacker = false,
+    zoomed = false,
+    ...restProps
+  } = props
   const wrapperRef = useRef<SVGSVGElement>(null)
 
   if (deckDef == null && viewBox == null) return null
@@ -34,7 +51,21 @@ export function RobotCoordinateSpaceWithRef(
       (acc, deckSlot) => ({ ...acc, [deckSlot.id]: deckSlot }),
       {}
     )
-    wholeDeckViewBox = `${viewBoxOriginX} ${viewBoxOriginY} ${deckXDimension} ${deckYDimension}`
+    const base = [
+      viewBoxOriginX,
+      viewBoxOriginY,
+      deckXDimension,
+      deckYDimension,
+    ] as const
+    const adj = [
+      base[0] + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginX,
+      base[1] + STACKER_VIEWBOX_ADJUSTMENTS.viewBoxOriginY,
+      base[2] + STACKER_VIEWBOX_ADJUSTMENTS.deckXDimension,
+      base[3] + STACKER_VIEWBOX_ADJUSTMENTS.deckYDimension,
+    ] as const
+
+    const adjustedViewBox = adjustViewBoxForStacker ? adj : base
+    wholeDeckViewBox = `${adjustedViewBox[0]} ${adjustedViewBox[1]} ${adjustedViewBox[2]} ${adjustedViewBox[3]}`
   }
 
   return (

@@ -36,16 +36,16 @@ const LISTITEM_PROPS_BY_TYPE: Record<
   { backgroundColor: string; color?: string }
 > = {
   error: {
-    backgroundColor: COLORS.red35,
+    backgroundColor: COLORS.red30,
   },
   default: {
     backgroundColor: COLORS.grey20,
   },
   success: {
-    backgroundColor: COLORS.green35,
+    backgroundColor: COLORS.green30,
   },
   warning: {
-    backgroundColor: COLORS.yellow35,
+    backgroundColor: COLORS.yellow30,
   },
   unavailable: {
     backgroundColor: COLORS.grey20,

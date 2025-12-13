@@ -16,6 +16,7 @@ from typing import (
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Extents
 from opentrons_shared_data.labware.types import LocatingFeatures
 
@@ -30,7 +31,7 @@ from .labware_movement import LabwareMovementOffsetData
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.types.ModuleModel
-class ModuleModel(str, Enum):
+class ModuleModel(StrEnum):
     """All available modules' models."""
 
     TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
@@ -279,14 +280,14 @@ class ModuleOffsetData:
     location: DeckSlotLocation
 
 
-class StackerFillEmptyStrategy(str, Enum):
+class StackerFillEmptyStrategy(StrEnum):
     """Strategy to use for filling or emptying a stacker."""
 
     MANUAL_WITH_PAUSE = "manualWithPause"
     LOGICAL = "logical"
 
 
-class StackerLabwareMovementStrategy(str, Enum):
+class StackerLabwareMovementStrategy(StrEnum):
     """Strategy to retrieve or store labware."""
 
     AUTOMATIC = "automatic"
@@ -303,14 +304,14 @@ class StackerStoredLabwareGroup(BaseModel):
 
 @dataclass
 class StackerPoolDefinition:
-    """Represents an internal configuraiton of stored labware."""
+    """Represents an internal configuration of stored labware."""
 
     primaryLabwareDefinition: LabwareDefinition
     adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
     lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
 
 
-class IdentifyColor(str, Enum):
+class IdentifyColor(StrEnum):
     """Module identify color."""
 
     WHITE = "white"

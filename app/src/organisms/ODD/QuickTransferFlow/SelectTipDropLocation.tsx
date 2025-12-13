@@ -9,6 +9,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_SINGLE_SLOT_BY_CUTOUT_ID,
+  getLabwareDefURI,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
@@ -41,8 +42,10 @@ export function SelectTipDropLocation({
   const { i18n, t } = useTranslation(['quick_transfer', 'shared'])
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
   const [selectedTipDropLocation, setSelectedTipDropLocation] = useState<
-    CutoutConfig | undefined
-  >()
+    CutoutConfig | string | undefined
+  >(undefined)
+
+  const isTipRackReturnEnabled = state.tipRack != null && state.pipette != null
 
   const tipDropLocationOptions = deckConfig.filter(
     cutoutConfig =>
@@ -54,6 +57,12 @@ export function SelectTipDropLocation({
       cutoutId: 'cutoutA3',
       cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
     })
+  }
+
+  const handleSelectTipRack = (): void => {
+    if (state.tipRack != null) {
+      setSelectedTipDropLocation(getLabwareDefURI(state.tipRack))
+    }
   }
 
   const handleClickNext = (): void => {
@@ -88,7 +97,11 @@ export function SelectTipDropLocation({
         {tipDropLocationOptions.map(option => (
           <RadioButton
             key={option.cutoutId}
-            isSelected={selectedTipDropLocation?.cutoutId === option.cutoutId}
+            isSelected={
+              selectedTipDropLocation != null &&
+              typeof selectedTipDropLocation !== 'string' &&
+              selectedTipDropLocation?.cutoutId === option.cutoutId
+            }
             onChange={() => {
               setSelectedTipDropLocation(option)
             }}
@@ -105,6 +118,19 @@ export function SelectTipDropLocation({
             )}
           />
         ))}
+        {isTipRackReturnEnabled && state.tipRack != null ? (
+          <RadioButton
+            key="tiprack"
+            isSelected={
+              selectedTipDropLocation != null &&
+              typeof selectedTipDropLocation === 'string' &&
+              selectedTipDropLocation === getLabwareDefURI(state.tipRack)
+            }
+            buttonLabel={t('tip_rack')}
+            buttonValue={getLabwareDefURI(state.tipRack)}
+            onChange={handleSelectTipRack}
+          />
+        ) : null}
       </Flex>
     </Flex>
   )

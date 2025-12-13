@@ -5,11 +5,15 @@ import { Flex } from '../../primitives'
 import { ALIGN_CENTER, DIRECTION_COLUMN, JUSTIFY_CENTER } from '../../styles'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants/index'
 
+import type { IconName } from '../../icons'
+
 interface InfoScreenProps {
   content: string
   subContent?: string
   backgroundColor?: string
   height?: string
+  /* Optional icon name override. Defaults to `ot-alert`. */
+  iconName?: IconName
 }
 
 export function InfoScreen({
@@ -17,6 +21,7 @@ export function InfoScreen({
   subContent,
   backgroundColor = COLORS.grey30,
   height = '100%',
+  iconName,
 }: InfoScreenProps): JSX.Element {
   return (
     <Flex
@@ -32,10 +37,11 @@ export function InfoScreen({
       data-testid="InfoScreen"
     >
       <Icon
-        name="ot-alert"
+        name={iconName ?? 'ot-alert'}
         size="1.25rem"
         color={COLORS.grey60}
         aria-label="alert"
+        spin={iconName === 'ot-spinner'}
       />
       <Flex
         flexDirection={DIRECTION_COLUMN}

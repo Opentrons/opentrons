@@ -4,21 +4,22 @@ import { useTranslation } from 'react-i18next'
 import { Icon, ListButton, StyledText } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
+import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { useStubPreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/useStubPreviewImage'
+import { usePreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
 import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
 // eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import type { UseStubCameraSettingsValuesResult } from '/app/organisms/Desktop/Camera/CameraControls/hooks/useStubCameraSettingsValues'
+import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { ActiveControlView } from '.'
 
 export interface CameraControlsHomeProps {
   setActiveSubView: (view: ActiveControlView) => void
   toggleShowControls: () => void
-  settings: UseStubCameraSettingsValuesResult
+  settings: UseCameraSettingsValuesResult
 }
 
 export function CameraControlsHome({
@@ -27,7 +28,7 @@ export function CameraControlsHome({
   settings,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { isLoading, imgPath, takePhoto } = useStubPreviewImage()
+  const { isLoading, imgPath, takePhoto } = usePreviewImage()
 
   const [showModal, setShowModal] = useState(false)
 
@@ -42,7 +43,8 @@ export function CameraControlsHome({
   }
 
   const buildZoomText = (): string => {
-    switch (settings.zoom) {
+    const zoomString = zoomNumberToString(settings.zoom)
+    switch (zoomString) {
       case '1x':
         return t('default_zoom')
       case '1.5x':

@@ -11,6 +11,7 @@ import type {
   RunTimeCommand,
   RunTimeParameter,
 } from '@opentrons/shared-data'
+import type { CameraData } from '../camera'
 import type {
   ErrorDetails,
   LabwareOffsetLocationSequence,
@@ -64,11 +65,13 @@ export interface LegacyGoodRunData {
   modules: LoadedModule[]
   protocolId?: string
   labwareOffsets?: LabwareOffset[]
+  cameraSettings?: CameraData
 }
 
 export interface KnownGoodRunData extends LegacyGoodRunData {
   ok: true
   runTimeParameters: RunTimeParameter[]
+  /** @deprecated Prefer using bindings for /dataFiles/:runId/all */
   outputFileIds: string[]
 }
 

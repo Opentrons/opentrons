@@ -33,6 +33,7 @@ dependencies = [
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
+    "aiohttp==3.12.14"
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']

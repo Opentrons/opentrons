@@ -11,9 +11,12 @@ import { SetupRunCameraControls } from '../SetupRunCameraControls'
 vi.mock('/app/organisms/Desktop/Camera/CameraControls')
 
 const render = () => {
-  return renderWithProviders(<SetupRunCameraControls />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <SetupRunCameraControls cameraConfirmed={false} runId={'runid'} />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('SetupRunCameraControls', () => {
@@ -30,7 +33,7 @@ describe('SetupRunCameraControls', () => {
   it('renders image and video settings section', () => {
     render()
 
-    screen.getByText('Image and Video Settings')
+    screen.getByText('Image and video settings')
     screen.getByText(
       'Configure the camera’s zoom, brightness, contrast, and saturation.'
     )

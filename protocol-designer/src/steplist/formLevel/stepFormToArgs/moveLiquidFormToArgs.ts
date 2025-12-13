@@ -5,8 +5,10 @@ import {
   WATER_LIQUID_CLASS_NAME,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   DEST_WELL_BLOWOUT_DESTINATION,
   getTransferPlanAndReferenceVolumes,
+  MANUAL,
 } from '@opentrons/step-generation'
 
 import {
@@ -14,7 +16,7 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
 } from '../../../constants'
 import { getMatchingTipLiquidSpecs } from '../../../utils'
-import { getOrderedWells } from '../../utils'
+import { getOrderedWells } from '../../utils/getOrderedWells'
 import { getMoveLiquidDelayData } from './getDelayData'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -77,15 +79,11 @@ const getCheckedPath = (
 ): PathOption => {
   const { pipette, tipRack, volume } = castFormData
   const { spec: pipetteSpecs } = pipette
-  const tiprackEntity = Object.values(contextualState.labwareEntities).find(
-    lw => lw.labwareDefURI === tipRack
-  )
   // should not hit
-  if (tiprackEntity == null) {
-    console.error('Tiprack for transfer has no associated labware entity.')
+  if (tipRack == null) {
+    console.error('Transfer has no associated tipRack.')
     return path
   }
-  const { labwareDefURI: tiprackDefUri, def: tiprackDef } = tiprackEntity
   const allLiquidClassDefs = getAllLiquidClassDefs()
   const liquidClassValuesForTip = allLiquidClassDefs[
     castFormData.liquidClass === NONE_LIQUID_CLASS_NAME ||
@@ -96,7 +94,7 @@ const getCheckedPath = (
     .find(
       ({ pipetteModel }) => (pipetteModel = getFlexNameConversion(pipetteSpecs))
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri)
+    ?.byTipType.find(({ tiprack }) => tiprack === tipRack?.tiprackDefURI)
 
   // be permissive with path if no liquid class tip values found
   if (liquidClassValuesForTip == null) {
@@ -115,7 +113,7 @@ const getCheckedPath = (
     path === 'multiAspirate'
       ? getTransferPlanAndReferenceVolumes({
           pipetteSpecs,
-          tiprackDefinition: tiprackDef,
+          tiprackDefinition: tipRack,
           volume,
           path,
           numAspirateWells: castFormData.aspirate_wells.length,
@@ -127,7 +125,7 @@ const getCheckedPath = (
         })
       : getTransferPlanAndReferenceVolumes({
           pipetteSpecs,
-          tiprackDefinition: tiprackDef,
+          tiprackDefinition: tipRack,
           volume,
           path,
           numAspirateWells: castFormData.aspirate_wells.length,
@@ -177,6 +175,9 @@ export const moveLiquidFormToArgs = (
     dispense_y_position,
     pushOut_checkbox,
     pushOut_volume,
+    tip_tracking,
+    tips_selected,
+    tiprack_selected,
   } = castFormData
   let sourceWells = getOrderedWells(
     castFormData.aspirate_wells,
@@ -295,7 +296,7 @@ export const moveLiquidFormToArgs = (
     'dispense_airGap_volume'
   )
   const matchingTipLiquidSpecs = getMatchingTipLiquidSpecs(
-    castFormData.pipette,
+    castFormData.pipette?.spec,
     castFormData.volume,
     tipRack
   )
@@ -311,7 +312,7 @@ export const moveLiquidFormToArgs = (
     volume,
     sourceLabware: sourceLabware.id,
     destLabware: destLabware.id,
-    tipRack,
+    tipRack: tipRack?.tiprackDefURI,
     aspirateFlowRateUlSec:
       castFormData.aspirate_flowRate ||
       matchingTipLiquidSpecs.defaultAspirateFlowRate.default,
@@ -387,6 +388,9 @@ export const moveLiquidFormToArgs = (
       castFormData.liquidClass === NONE_LIQUID_CLASS_NAME // transform "none" (needed in step form) to null
         ? null
         : (castFormData.liquidClass ?? null),
+    tipTracking: tip_tracking ?? AUTOMATIC,
+    tipsSelected: tips_selected ?? [],
+    tiprackSelected: tiprack_selected ?? null,
   }
   console.assert(
     sourceWellsUnordered.length > 0,
@@ -407,6 +411,19 @@ export const moveLiquidFormToArgs = (
   console.assert(
     !(path === 'multiDispense' && destWells == null),
     'cannot distribute when destWells is null'
+  )
+
+  console.assert(
+    !(tiprack_selected != null && tip_tracking === MANUAL),
+    'expected tiprack_selected to be set when tip_tracking is manual'
+  )
+
+  console.assert(
+    !(
+      (tips_selected == null || tips_selected.length === 0) &&
+      tip_tracking === MANUAL
+    ),
+    'expected tips_selected to be set when tip_tracking is manual'
   )
 
   const checkedPath = getCheckedPath(castFormData, contextualState, path)

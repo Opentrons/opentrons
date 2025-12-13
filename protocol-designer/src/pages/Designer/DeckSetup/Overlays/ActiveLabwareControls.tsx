@@ -15,7 +15,6 @@ import { getFullStackFromLabwares } from '@opentrons/step-generation'
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
 import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
-import { getIsAdapterFromDef } from '/protocol-designer/utils'
 
 import { DECK_CONTROLS_STYLE } from '../constants'
 
@@ -47,9 +46,7 @@ export function ActiveLabwareControls(
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
   const filteredStack = fullStack.filter(
-    item =>
-      activeDeckSetup.labware[item] != null &&
-      !getIsAdapterFromDef(activeDeckSetup.labware[item].def)
+    item => activeDeckSetup.labware[item] != null
   )
 
   if (

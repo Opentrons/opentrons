@@ -18,12 +18,7 @@ import {
 
 import { PrepareLabware } from './PrepareLabware'
 
-import type { LoadedPipette } from '@opentrons/shared-data'
 import type { LPCWizardContentProps } from '/app/organisms/LabwarePositionCheck/types'
-import type {
-  OffsetLocationDetails,
-  SelectedLwOverview,
-} from '/app/redux/protocol-runs'
 
 export function EditOffset(props: LPCWizardContentProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
@@ -81,12 +76,9 @@ export function EditOffsetContent(props: EditOffsetContentProps): JSX.Element {
   const currentSubStep = useSelector(selectCurrentSubstep(props.runId))
 
   const isOnDevice = useSelector(getIsOnDevice)
-  const selectedLwInfo = useSelector(
-    selectSelectedLwOverview(props.runId)
-  ) as SelectedLwOverview
-  const offsetLocationDetails =
-    selectedLwInfo.offsetLocationDetails as OffsetLocationDetails
-  const pipette = useSelector(selectActivePipette(props.runId)) as LoadedPipette
+  const selectedLwInfo = useSelector(selectSelectedLwOverview(props.runId))!
+  const offsetLocationDetails = selectedLwInfo.offsetLocationDetails!
+  const pipette = useSelector(selectActivePipette(props.runId))!
 
   const handleAddConfirmedWorkingVector = (): void => {
     void toggleRobotMoving(true)

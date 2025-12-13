@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -9194,7 +9197,16 @@
     "description": "Protocol to transfect A549 cells using the OT-2",
     "protocolName": "Transfection using Lipofectamine 3000 and Fugene HD Reagent"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "1"
+      },
+      "model": "heaterShakerModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

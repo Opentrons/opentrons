@@ -1,6 +1,7 @@
 import flatMap from 'lodash/flatMap'
 
 import {
+  ALL,
   getByVolumeValue,
   getIsTiprack,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
@@ -8,14 +9,17 @@ import {
   WELL_ORIGIN_BOTTOM,
 } from '@opentrons/shared-data'
 
+import { MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import {
   curryCommandCreator,
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
+  getDefaultPrimaryNozzle,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
+  getTargetTipsFromWellSets,
   indentPyLines,
   mixBlowoutLocationHelper,
   reduceCommandCreators,
@@ -274,6 +278,9 @@ export const mix: CommandCreator<MixArgs> = (
     yOffset,
     finalPushOut,
     nozzles,
+    tipsSelected,
+    tiprackSelected,
+    tipTracking,
   } = data
 
   const aspirateDelaySeconds = data.aspirateDelaySeconds ?? 0
@@ -389,6 +396,25 @@ export const mix: CommandCreator<MixArgs> = (
         ]
       : []
 
+  const pipetteSpecs = invariantContext.pipetteEntities[pipette].spec
+  const shouldSelectManualTips =
+    tipTracking === MANUAL &&
+    tiprackSelected != null &&
+    tipsSelected != null &&
+    tipsSelected.length > 0
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
+  const targetTips = shouldSelectManualTips
+    ? getTargetTipsFromWellSets({
+        wellSets: tipsSelected,
+        nozzles: nozzles ?? ALL,
+        channels: pipetteSpecs.channels,
+        primaryNozzle,
+      })
+    : null
+
   // Command generation
   const commandCreators = flatMap(
     wells,
@@ -396,6 +422,7 @@ export const mix: CommandCreator<MixArgs> = (
       let tipCommands: CurriedCommandCreator[] = []
 
       if (changeTip === 'always' || (changeTip === 'once' && wellIndex === 0)) {
+        const nextTip = targetTips?.shift()
         tipCommands = [
           curryCommandCreator(replaceTip, {
             pipette,
@@ -406,6 +433,16 @@ export const mix: CommandCreator<MixArgs> = (
                 : dropTipLocation,
             tipRack,
             ...(nozzles != null ? { nozzles } : {}),
+            ...(tipTracking === MANUAL &&
+            nextTip != null &&
+            tiprackSelected != null
+              ? {
+                  tipSelectionArgs: {
+                    tipRackId: tiprackSelected,
+                    tipWell: nextTip,
+                  },
+                }
+              : {}),
             isFromMixCommand: true,
           }),
         ]

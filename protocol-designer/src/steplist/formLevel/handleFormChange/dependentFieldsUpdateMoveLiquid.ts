@@ -12,7 +12,7 @@ import {
   getMinPipetteVolume,
   getPipetteCapacity,
 } from '../../../pipettes/pipetteData'
-import { getWellRatio } from '../../utils'
+import { getWellRatio } from '../../utils/getWellRatio'
 import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
@@ -223,7 +223,8 @@ const updatePatchOnPipetteChange = (
         'dispense_mix_volume',
         'disposalVolume_volume',
         'aspirate_mmFromBottom',
-        'dispense_mmFromBottom'
+        'dispense_mmFromBottom',
+        'tips_selected'
       ),
       nozzles,
       aspirate_airGap_volume: airGapVolume,
@@ -256,7 +257,9 @@ const updatePatchOnTiprackChange = (
         'dispense_flowRate',
         'aspirate_mix_volume',
         'dispense_mix_volume',
-        'disposalVolume_volume'
+        'disposalVolume_volume',
+        'tips_selected',
+        'tiprack_selected'
       ),
       aspirate_airGap_volume: airGapVolume,
       dispense_airGap_volume: airGapVolume,
@@ -646,8 +649,8 @@ export function updatePatchBlowoutFields(
     if (shouldResetBlowoutLocation) {
       return { ...patch, ...getDefaultFields('blowout_location') }
     }
+    return { ...patch, ...getDefaultFields('tips_selected') }
   }
-
   return patch
 }
 
@@ -662,7 +665,7 @@ const updatePatchOnNozzleChange = (
   ) {
     return {
       ...patch,
-      ...getDefaultFields('aspirate_wells', 'dispense_wells'),
+      ...getDefaultFields('aspirate_wells', 'dispense_wells', 'tips_selected'),
     }
   }
   return patch
@@ -701,6 +704,70 @@ const updatePatchOnPathChange = (
         'conditioning_checkbox',
         'conditioning_volume'
       ),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnNozzlesChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'nozzles')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tiprack_selected', 'tips_selected', 'tip_tracking'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnChangeTipChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (fieldHasChanged(rawForm, patch, 'changeTip')) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnWellsSelectedChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  if (
+    fieldHasChanged(rawForm, patch, 'aspirate_wells') ||
+    fieldHasChanged(rawForm, patch, 'dispense_wells')
+  ) {
+    return {
+      ...patch,
+      ...getDefaultFields('tips_selected'),
+    }
+  }
+  return patch
+}
+
+const updatePatchOnVolumeChange = (
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch => {
+  const relevantFields = [
+    'volume',
+    'conditioning_volume',
+    'disposalVolume_volume',
+    'aspirate_airGap_volume',
+    'dispense_airGap_volume,',
+  ]
+  for (const field of relevantFields) {
+    if (fieldHasChanged(rawForm, patch, field)) {
+      return {
+        ...patch,
+        ...getDefaultFields('tips_selected'),
+      }
     }
   }
   return patch
@@ -751,5 +818,9 @@ export function dependentFieldsUpdateMoveLiquid(
       updatePatchOnNozzleChange(chainPatch, rawForm, pipetteEntities),
     chainPatch => updatePatchOnConditioningVolumeChange(chainPatch, rawForm),
     chainPatch => updatePatchOnPathChange(chainPatch, rawForm, pipetteEntities),
+    chainPatch => updatePatchOnNozzlesChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnChangeTipChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnWellsSelectedChange(chainPatch, rawForm),
+    chainPatch => updatePatchOnVolumeChange(chainPatch, rawForm),
   ])
 }

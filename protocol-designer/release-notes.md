@@ -8,6 +8,47 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.7.0
+
+**Welcome to Protocol Designer 8.7.0!**
+
+This release adds support for manual tip selection and camera steps in Protocol Designer, and includes feature improvements and bug fixes.
+
+### New Features
+
+- Choose between automatic and manual tip tracking for transfer and mix steps in your protocols. In manual tip tracking, Protocol Designer lets you select the tip rack and individual tips the pipette will pick up to transfer or mix liquid.
+- Manual tip tracking in Protocol Designer enables reusing tips more than once in a protocol.
+- Pick up individual tips with Flex 96-channel and Flex or OT-2 8-channel pipettes.
+- Add a camera step in any Protocol Designer protocol. The Flex or OT-2's built-in camera can take a still image of your robot deck at any point during the protocol. Access your images in the Recent Protocol Runs section of the Opentrons App's robot details page.
+
+### Improved Features
+
+- Protocol Designer only shows compatible deck and labware locations to move a lid to.
+- Add Opentrons Tough Universal Lids to an available Opentrons Flex Deck Riser placed on the deck.
+- Move a tip rack lid to any tip rack on the deck without a lid.
+- When adding labware, click to add a tip rack lid to a Flex 96-channel tip rack adapter with a tip rack inside.
+- When you click **Duplicate labware**, Protocol Designer duplicates all labware, adapters, lids, and liquids in the deck slot.
+
+### Bug Fixes
+
+- Protocol Designer updates maximum flow rates to the latest version when you import an older protocol.
+
+## Opentrons Protocol Designer Changes in 8.6.3
+
+**Welcome to Protocol Designer 8.6.3!**
+
+This hotfix release addresses the following bugs:
+
+- Protocol Designer no longer crashes when uploading protocols containing custom labware.
+- Protocol Designer allows scrolling to view details of a transfer step using a "consolidate" pipette path.
+- Eliminates some crashes when deleting liquids that are already used in the protocol.
+
+## Opentrons Protocol Designer Changes in 8.6.1
+
+**Welcome to Protocol Designer 8.6.1!**
+
+This hotfix release updates user information for protocol generation and software versions.
+
 ## Opentrons Protocol Designer Changes in 8.6.0
 
 **Welcome to Protocol Designer 8.6.0!**
@@ -16,7 +57,7 @@ This release adds support for new instruments, labware, and hardware,enables lim
 
 ### New Features
 
-- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 μL). This release also adds liquid class transfer support for the pipette.
+- Transfer as little as 1 µL in a protocol with the Opentrons Flex 96-Channel Pipette (1–200 µL). This release also adds liquid class transfer support for the pipette.
 - Use Opentrons Tough Auto-Sealing Lids on compatible labware in the Thermocycler Module.
 - Add new lids to Protocol Designer protocols, including the Opentrons Tough Universal Lid and Opentrons Tough Auto-Sealing Lid. Tip rack lids are also available for Flex tip racks.
 - Secure lidded labware properly on the Heater-Shaker Module with the new Opentrons Universal Flat Heater-Shaker Adapter Type B.
@@ -32,6 +73,10 @@ This release adds support for new instruments, labware, and hardware,enables lim
 ### Bug Fixes
 
 - Protocol Designer now raises an error when moving labware to a deleted module.
+
+### Known Issues
+
+- Stacking Opentrons Tough 96 Well Plates (200 µL Full Skirt) during a move step causes protocol analysis failures in the Opentrons App.
 
 ## Opentrons Protocol Designer Changes in 8.5.6
 
@@ -67,10 +112,6 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
-- Crashes and protocol loss no longer occur when:
-  - deleting a pipette involved in a mix step.
-  - deleting a Protocol Designer step title.
-  - checking labware details after deleting a liquid.
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.

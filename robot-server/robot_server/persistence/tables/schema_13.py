@@ -25,13 +25,6 @@ class ProtocolKindSQLEnum(enum.Enum):
     QUICK_TRANSFER = "quick-transfer"
 
 
-class DataFileSourceSQLEnum(enum.Enum):
-    """The source this data file is from."""
-
-    UPLOADED = "uploaded"
-    GENERATED = "generated"
-
-
 class CommandStatusSQLEnum(enum.Enum):
     """Command status sql enum."""
 
@@ -192,6 +185,18 @@ run_table = sqlalchemy.Table(
         sqlalchemy.String,
         nullable=True,
     ),
+    sqlalchemy.Column(
+        "input_file_ids",
+        # Stores a JSON array of input_ids from input_data_files table
+        sqlalchemy.String,
+        nullable=True,
+    ),
+    sqlalchemy.Column(
+        "output_file_ids",
+        # Stores a JSON array of output_ids from output_data_files table
+        sqlalchemy.String,
+        nullable=True,
+    ),
 )
 
 
@@ -272,6 +277,7 @@ run_command_table = sqlalchemy.Table(
 )
 
 
+# stores the metadata describing the physical file
 data_files_table = sqlalchemy.Table(
     "data_files",
     metadata,
@@ -286,6 +292,29 @@ data_files_table = sqlalchemy.Table(
         nullable=False,
     ),
     sqlalchemy.Column(
+        "path",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "stored",
+        sqlalchemy.Boolean,
+        nullable=False,
+        default=True,
+    ),
+    sqlalchemy.Column(
+        "generated",
+        sqlalchemy.Boolean,
+        nullable=False,
+        index=True,
+    ),
+    sqlalchemy.Column(
+        "mime_type",
+        sqlalchemy.String,
+        nullable=False,
+        index=True,
+    ),
+    sqlalchemy.Column(
         "file_hash",
         sqlalchemy.String,
         nullable=False,
@@ -295,23 +324,59 @@ data_files_table = sqlalchemy.Table(
         UTCDateTime,
         nullable=False,
     ),
+)
+
+# table for data files serving as input to a run
+input_data_files_table = sqlalchemy.Table(
+    "input_data_files",
+    metadata,
     sqlalchemy.Column(
-        "source",
-        sqlalchemy.Enum(
-            DataFileSourceSQLEnum,
-            values_callable=lambda obj: [e.value for e in obj],
-            validate_strings=True,
-            # create_constraint=False to match the underlying SQL, which omits
-            # the constraint because of a bug in the migration that introduced this
-            # column. This is not intended to ever have values other than those in
-            # DataFileSourceSQLEnum.
-            create_constraint=False,
-        ),
-        # nullable=True to match the underlying SQL, which is nullable because of a bug
-        # in the migration that introduced this column. This is not intended to ever be
-        # null in practice.
-        nullable=True,
+        "file_id",
+        sqlalchemy.String,
+        sqlalchemy.ForeignKey("data_files.id"),
+        nullable=False,
+        index=True,
     ),
+    sqlalchemy.Column(
+        "run_id",
+        sqlalchemy.String,
+        sqlalchemy.ForeignKey("run.id"),
+        nullable=False,
+        index=True,
+    ),
+    sqlalchemy.PrimaryKeyConstraint("file_id", "run_id"),
+)
+
+
+# data files generated as output during a run
+output_data_files_table = sqlalchemy.Table(
+    "output_data_files",
+    metadata,
+    sqlalchemy.Column(
+        "run_id",
+        sqlalchemy.String,
+        sqlalchemy.ForeignKey("run.id"),
+        nullable=False,
+        index=True,
+    ),
+    sqlalchemy.Column(
+        "command_id",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "prev_command_id",
+        sqlalchemy.String,
+        nullable=False,
+    ),
+    sqlalchemy.Column(
+        "file_id",
+        sqlalchemy.String,
+        sqlalchemy.ForeignKey("data_files.id"),
+        nullable=False,
+        index=True,
+    ),
+    sqlalchemy.PrimaryKeyConstraint("file_id", "run_id"),
 )
 
 

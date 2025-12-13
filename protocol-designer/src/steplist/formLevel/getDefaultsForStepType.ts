@@ -56,6 +56,8 @@ export function getDefaultsForStepType(
         times: null,
         tipRack: null,
         tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: undefined,
         wells: [],
       }
@@ -149,9 +151,21 @@ export function getDefaultsForStepType(
         pushOut_volume: null,
         tipRack: null,
         tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: null,
       }
 
+    case 'camera':
+      return {
+        home_before: false,
+        filename: null,
+        resolution: null,
+        zoom: null,
+        contrast: null,
+        brightness: null,
+        saturation: null,
+      }
     case 'comment':
       return {
         message: null,
@@ -236,6 +250,14 @@ export function getDefaultsForStepType(
         referenceWavelength: null,
         referenceWavelengthActive: false,
         wavelengths: [Object.keys(ABSORBANCE_READER_COLOR_BY_WAVELENGTH)[0]], // default to first known wavelength
+      }
+    case 'flexStacker':
+      return {
+        fillLabwareUri: null,
+        fillQuantity: null,
+        flexStackerFormType: null,
+        interventionMessage: null,
+        moduleId: null,
       }
     default:
       return {}

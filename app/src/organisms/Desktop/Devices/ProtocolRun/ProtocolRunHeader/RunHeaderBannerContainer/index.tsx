@@ -1,19 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 
-import {
-  ALIGN_CENTER,
-  Banner,
-  Box,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  JUSTIFY_SPACE_BETWEEN,
-  Link,
-  SPACING,
-  StyledText,
-  TEXT_DECORATION_UNDERLINE,
-} from '@opentrons/components'
+import { Banner, DIRECTION_COLUMN, Flex, SPACING } from '@opentrons/components'
+
+import { DataFilesInfoBanner } from '/app/organisms/Desktop/Devices/ProtocolRun/ProtocolRunHeader/RunHeaderBannerContainer/DataFilesInfoBanner'
 
 import { useIsDoorOpen } from '../hooks'
 import { getShowGenericRunHeaderBanners } from './getShowGenericRunHeaderBanners'
@@ -34,19 +23,20 @@ export type RunHeaderBannerContainerProps = ProtocolRunHeaderProps & {
   isResetRunLoading: boolean
   runErrors: UseRunErrorsResult
   runHeaderModalContainerUtils: UseRunHeaderModalContainerResult
-  hasDownloadableFiles: boolean
+  hasImages: boolean
+  hasCsvFiles: boolean
 }
 
 // Holds all the various banners that render in ProtocolRunHeader.
 export function RunHeaderBannerContainer(
   props: RunHeaderBannerContainerProps
 ): JSX.Element | null {
-  const navigate = useNavigate()
   const {
     runStatus,
     enteredER,
     runHeaderModalContainerUtils,
-    hasDownloadableFiles,
+    hasImages,
+    hasCsvFiles,
     robotName,
   } = props
   const { analysisErrorModalUtils } = runHeaderModalContainerUtils
@@ -55,7 +45,6 @@ export function RunHeaderBannerContainer(
   const doorStatus = useIsDoorOpen(robotName)
 
   const {
-    showRunCanceledBanner,
     showDoorOpenBeforeRunBanner,
     showDoorOpenDuringRunBanner,
     showStackerDoorOpenBeforeRunBanner,
@@ -92,16 +81,11 @@ export function RunHeaderBannerContainer(
   const terminalBannerType = useTerminalRunBannerContainer(props)
 
   return (
-    <Box>
+    <Flex gap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
       {analysisErrorModalUtils.showModal ? (
         <ProtocolAnalysisErrorBanner
           errors={analysisErrorModalUtils.modalProps.errors}
         />
-      ) : null}
-      {showRunCanceledBanner ? (
-        <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
-          {t('run_canceled')}
-        </Banner>
       ) : null}
       {doorBannerText ? (
         <Banner type="warning" iconMarginLeft={SPACING.spacing4}>
@@ -114,36 +98,13 @@ export function RunHeaderBannerContainer(
           {...props}
         />
       ) : null}
-      {hasDownloadableFiles ? (
-        <Banner type="informing" marginTop={SPACING.spacing16}>
-          <Flex
-            width="100%"
-            flexDirection={DIRECTION_ROW}
-            justifyContent={JUSTIFY_SPACE_BETWEEN}
-            alignItems={ALIGN_CENTER}
-          >
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText
-                desktopStyle="captionSemiBold"
-                marginBottom={SPACING.spacing4}
-              >
-                {t('download_files')}
-              </StyledText>
-              <StyledText desktopStyle="captionRegular">
-                {t('files_available_robot_details')}
-              </StyledText>
-            </Flex>
-            <Link
-              textDecoration={TEXT_DECORATION_UNDERLINE}
-              onClick={() => {
-                navigate(`/devices/${robotName}`)
-              }}
-            >
-              {t('device_details')}
-            </Link>
-          </Flex>
-        </Banner>
+      {hasImages || hasCsvFiles ? (
+        <DataFilesInfoBanner
+          hasImages={hasImages}
+          hasCsvFiles={hasCsvFiles}
+          robotName={robotName}
+        />
       ) : null}
-    </Box>
+    </Flex>
   )
 }

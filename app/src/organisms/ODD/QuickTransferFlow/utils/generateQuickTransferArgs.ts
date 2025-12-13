@@ -10,6 +10,7 @@ import {
   WASTE_CHUTE_FIXTURES,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   getSlotInLocationStack,
   makeInitialRobotState,
 } from '@opentrons/step-generation'
@@ -57,7 +58,8 @@ function getOrderedWells(
 }
 
 export function getInvariantContextAndRobotState(
-  quickTransferState: QuickTransferSummaryState
+  quickTransferState: QuickTransferSummaryState,
+  deckConfig: DeckConfiguration
 ): { invariantContext: InvariantContext; robotState: RobotState } {
   const tipRackDefURI = getLabwareDefURI(quickTransferState.tipRack)
   let pipetteName = quickTransferState.pipette.model
@@ -174,9 +176,48 @@ export function getInvariantContextAndRobotState(
   let trashBinEntities: TrashBinEntities = {}
   let wasteChuteEntities: WasteChuteEntities = {}
 
+  // If the drop tip location is the tip rack, still a protocols needs to define a trash bin entity
+  const dropTipIsTiprack =
+    typeof quickTransferState.dropTipLocation === 'string' &&
+    quickTransferState.dropTipLocation ===
+      getLabwareDefURI(quickTransferState.tipRack)
+
+  if (dropTipIsTiprack) {
+    // check deck config for trash bin and waste chute
+    const installedTrashBin = deckConfig.find(
+      config => config.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+    )
+    const installedWasteChute = deckConfig.find(config =>
+      WASTE_CHUTE_FIXTURES.includes(config.cutoutFixtureId)
+    )
+    const trashBinLocation =
+      installedTrashBin != null ? installedTrashBin.cutoutId : 'cutoutA3'
+    const trashId = `${uuid()}_trashBin`
+    const wasteChuteId = `${uuid()}_wasteChute`
+
+    if (installedTrashBin != null) {
+      trashBinEntities = {
+        [trashId]: {
+          id: trashId,
+          location: trashBinLocation,
+          pythonName: pythonTrashBinName,
+        },
+      }
+    } else if (installedWasteChute != null) {
+      wasteChuteEntities = {
+        [wasteChuteId]: {
+          id: wasteChuteId,
+          location: installedWasteChute.cutoutId,
+          pythonName: pythonWasteChuteName,
+        },
+      }
+    }
+  }
+
   if (
+    typeof quickTransferState.dropTipLocation !== 'string' &&
     quickTransferState.dropTipLocation.cutoutFixtureId ===
-    TRASH_BIN_ADAPTER_FIXTURE
+      TRASH_BIN_ADAPTER_FIXTURE
   ) {
     const trashLocation = quickTransferState.dropTipLocation.cutoutId
     const trashId = `${uuid()}_trashBin`
@@ -213,6 +254,7 @@ export function getInvariantContextAndRobotState(
   }
 
   if (
+    typeof quickTransferState.dropTipLocation !== 'string' &&
     WASTE_CHUTE_FIXTURES.includes(
       quickTransferState.dropTipLocation.cutoutFixtureId
     )
@@ -305,53 +347,76 @@ export function generateQuickTransferArgs(
       }
     }
   }
-  const { invariantContext, robotState } =
-    getInvariantContextAndRobotState(quickTransferState)
+  const { invariantContext, robotState } = getInvariantContextAndRobotState(
+    quickTransferState,
+    deckConfig
+  )
 
   let blowoutLocation: string | undefined
+  const blowOutDispenseLocation =
+    quickTransferState.path === 'multiDispense'
+      ? quickTransferState.disposalVolumeDispenseSettings?.blowOutLocation
+      : quickTransferState.blowOutDispense?.location
+
   if (
-    quickTransferState?.blowOutDispense?.location != null &&
-    quickTransferState.blowOutDispense.location !== 'source_well' &&
-    quickTransferState.blowOutDispense.location !== 'dest_well' &&
-    'cutoutId' in quickTransferState.blowOutDispense.location
+    blowOutDispenseLocation != null &&
+    blowOutDispenseLocation !== 'source_well' &&
+    blowOutDispenseLocation !== 'dest_well' &&
+    typeof blowOutDispenseLocation === 'object' &&
+    'cutoutId' in blowOutDispenseLocation
   ) {
     const trashBinEntity = Object.values(
       invariantContext.trashBinEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOutDispense
-        ?.location as CutoutConfig
+      const blowoutObject = blowOutDispenseLocation as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const wasteChuteEntity = Object.values(
       invariantContext.wasteChuteEntities
     ).find(entity => {
-      const blowoutObject = quickTransferState.blowOutDispense
-        ?.location as CutoutConfig
+      const blowoutObject = blowOutDispenseLocation as CutoutConfig
       return entity.location === blowoutObject.cutoutId
     })
     const entity = trashBinEntity != null ? trashBinEntity : wasteChuteEntity
     blowoutLocation = entity?.id
   } else {
-    blowoutLocation = quickTransferState.blowOutDispense?.location
+    blowoutLocation = blowOutDispenseLocation as string | undefined
   }
 
   const dropTipTrashBinLocationEntity = Object.values(
     invariantContext.trashBinEntities
   ).find(
-    entity => entity.location === quickTransferState.dropTipLocation.cutoutId
+    entity =>
+      typeof quickTransferState.dropTipLocation !== 'string' &&
+      entity.location === quickTransferState.dropTipLocation.cutoutId
   )
   const dropTipWasteChuteLocationEntity = Object.values(
     invariantContext.wasteChuteEntities
   ).find(
-    entity => entity.location === quickTransferState.dropTipLocation.cutoutId
+    entity =>
+      typeof quickTransferState.dropTipLocation !== 'string' &&
+      entity.location === quickTransferState.dropTipLocation.cutoutId
   )
-  const dropTipLocation =
-    dropTipTrashBinLocationEntity?.id ??
-    dropTipWasteChuteLocationEntity?.id ??
-    ''
+
+  const dropTipIsTiprack =
+    typeof quickTransferState.dropTipLocation === 'string' &&
+    quickTransferState.dropTipLocation ===
+      getLabwareDefURI(quickTransferState.tipRack)
+
+  const dropTipLocation = (() => {
+    if (dropTipIsTiprack) {
+      return quickTransferState.dropTipLocation as string
+    }
+    if (dropTipTrashBinLocationEntity?.id != null) {
+      return dropTipTrashBinLocationEntity.id
+    }
+    if (dropTipWasteChuteLocationEntity?.id != null) {
+      return dropTipWasteChuteLocationEntity.id
+    }
+    return ''
+  })()
 
   const pipetteEntity = Object.values(invariantContext.pipetteEntities)[0]
-
   const sourceLabwareId = Object.keys(robotState.labware).find(
     labwareId =>
       getSlotInLocationStack(robotState.labware[labwareId].stack) === 'C2'
@@ -386,15 +451,18 @@ export function generateQuickTransferArgs(
     stepId: 1,
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
-    sourceLabware: sourceLabwareEntity?.id as string,
-    destLabware: destLabwareEntity?.id as string,
+    sourceLabware: sourceLabwareEntity?.id!,
+    destLabware: destLabwareEntity?.id!,
     tipRack: pipetteEntity.tiprackDefURI[0],
     aspirateFlowRateUlSec: quickTransferState.aspirateFlowRate,
     dispenseFlowRateUlSec: quickTransferState.dispenseFlowRate,
     aspirateOffsetFromBottomMm: quickTransferState.tipPositionAspirate,
     dispenseOffsetFromBottomMm: quickTransferState.tipPositionDispense,
     blowoutLocation,
-    blowoutFlowRateUlSec: quickTransferState.blowOutDispense?.flowRate ?? 0,
+    blowoutFlowRateUlSec:
+      quickTransferState.path === 'multiDispense'
+        ? (quickTransferState.disposalVolumeDispenseSettings?.flowRate ?? 0)
+        : (quickTransferState.blowOutDispense?.flowRate ?? 0),
     blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,
@@ -485,6 +553,10 @@ export function generateQuickTransferArgs(
       quickTransferState.touchTipAspirate ?? null,
     touchTipAfterDispenseMmFromEdge:
       quickTransferState.touchTipDispense ?? null,
+    // Tip selection not currently allowed in Quick Transfer, so we set to automatic
+    tipTracking: AUTOMATIC,
+    tipsSelected: [],
+    tiprackSelected: null,
   }
 
   switch (quickTransferState.path) {

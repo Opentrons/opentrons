@@ -34,9 +34,16 @@ import {
   dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { CLEAN, EMPTY, ZERO_OFFSET } from '../constants'
+import {
+  CLEAN,
+  EMPTY,
+  HOPPER_FAKE_LOCATIONS,
+  HOPPER_STACKER_LOCATION,
+  STAGING_AREA_SLOTS,
+  ZERO_OFFSET,
+} from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
-import { reduceCommandCreators } from './index'
+import { reduceCommandCreators, uuid } from './index'
 
 import type {
   AddressableAreaName,
@@ -44,6 +51,10 @@ import type {
   CutoutFixtureId,
   CutoutId,
   LabwareDefinition2,
+  LabwareLocationSequence,
+  LoadLabwareRunTimeCommand,
+  LoadLidParams,
+  LoadLidStackRunTimeCommand,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
@@ -52,6 +63,7 @@ import type {
 import type {
   CommandCreator,
   CurriedCommandCreator,
+  FlexStackerModuleState,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -62,6 +74,7 @@ import type {
   PipetteEntity,
   RobotState,
   SourceAndDest,
+  StagingAreaEntities,
   TrashBinEntities,
   TrashBinEntity,
   WasteChuteEntities,
@@ -919,6 +932,20 @@ export const getIsLabwareCompatibleWithStack = (
     )?.length
     isAboveStackLimit =
       isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+
+    // This is an exception to allow universal lids to be placed on any labware except
+    // tube racks, aluminum blocks, tip racks, or other lids.
+    const isUniversalLid =
+      movingLabwareEntity.def.parameters.loadName ===
+      'opentrons_tough_universal_lid'
+    const isLabwareOnSlotTuberack =
+      topLabwareEntity.def.metadata.displayCategory === 'tubeRack'
+    const isLabwareOnSlotAluminumBlock =
+      topLabwareEntity.def.metadata.displayCategory === 'aluminumBlock'
+    const isLabwareOnSlotTiprack = topLabwareEntity.def.parameters.isTiprack
+    const allowedRoles = topLabwareEntity.def.allowedRoles ?? []
+    const isLidRole = allowedRoles.includes('lid')
+
     isCompatible =
       // check compatible labware key
       movingLabwareEntity.def.compatibleParentLabware?.some(
@@ -927,7 +954,15 @@ export const getIsLabwareCompatibleWithStack = (
       // check stacking offset map for legacy compatibility
       Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
         lw => lw === loadNameToCheck
-      )
+      ) ||
+      (isUniversalLid &&
+        !isLabwareOnSlotTuberack &&
+        !isLabwareOnSlotAluminumBlock &&
+        !isLabwareOnSlotTiprack &&
+        (topLabwareEntity.def.parameters.loadName ===
+          'opentrons_tough_universal_lid' ||
+          !isLidRole))
+
     // check compatibility with module
   } else if (topIdInStack in moduleEntities) {
     const topModuleEntity = moduleEntities[topIdInStack]
@@ -1069,23 +1104,26 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           conditioningByVolume
         ) ?? 0)
       : 0
+
+  const isCustomTiprack = tiprackDefinition?.namespace !== 'opentrons'
   const isMultiDispenseAvailable =
-    conditioningByVolume != null &&
-    disposalByVolume != null &&
-    maxWorkingVolume >=
-      minVolumeForMultiAspirateDispense +
-        conditioningVolumeForMultiAspirateDispense +
-        (linearInterpolate(
-          minVolumeForMultiAspirateDispense,
-          disposalByVolume
-        ) ?? 0) +
-        // don't take air gap into account if conditioning volume is present
-        (conditioningVolumeForMultiAspirateDispense === 0
-          ? (linearInterpolate(
-              minVolumeForMultiAspirateDispense,
-              aspirateAirGapByVolume
-            ) ?? 0)
-          : 0)
+    isCustomTiprack ||
+    (conditioningByVolume != null &&
+      disposalByVolume != null &&
+      maxWorkingVolume >=
+        minVolumeForMultiAspirateDispense +
+          conditioningVolumeForMultiAspirateDispense +
+          (linearInterpolate(
+            minVolumeForMultiAspirateDispense,
+            disposalByVolume
+          ) ?? 0) +
+          // don't take air gap into account if conditioning volume is present
+          (conditioningVolumeForMultiAspirateDispense === 0
+            ? (linearInterpolate(
+                minVolumeForMultiAspirateDispense,
+                aspirateAirGapByVolume
+              ) ?? 0)
+            : 0))
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
@@ -1263,4 +1301,101 @@ export const getIsRetractSafeForAirGap = (args: {
   }
   const retractZOffsetFromTop = retractMmFromBottom - wellDepth
   return retractZOffsetFromTop >= SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM
+}
+
+export const getStackForLabwareLocation = (
+  locationSequence: LabwareLocationSequence
+): string[] =>
+  locationSequence.reduce<string[]>((acc, item) => {
+    const { kind } = item
+    if (kind === 'onCutoutFixture') {
+      return acc
+    }
+    if (kind === 'onLabware') {
+      return [...acc, item.labwareId]
+    }
+    if (kind === 'onModule' || kind === 'inStackerHopper') {
+      return [...acc, item.moduleId]
+    }
+    if (kind === 'onAddressableArea') {
+      return [...acc, item.addressableAreaName]
+    }
+    return [...acc, item.logicalLocationName]
+  }, [])
+
+const FOURTH_COLUMN_TO_CUTOUT_MAP = {
+  A4: 'cutoutA3',
+  B4: 'cutoutB3',
+  C4: 'cutoutC3',
+  D4: 'cutoutD3',
+}
+
+export function createStagingAreaForInvariantContext(
+  params:
+    | LoadLidStackRunTimeCommand['params']
+    | LoadLabwareRunTimeCommand['params']
+    | LoadLidParams
+): StagingAreaEntities {
+  if (
+    params.location !== 'offDeck' &&
+    params.location !== 'systemLocation' &&
+    params.location !== 'wasteChuteLocation' &&
+    'addressableAreaName' in params.location &&
+    STAGING_AREA_SLOTS.includes(params.location.addressableAreaName)
+  ) {
+    const id = uuid()
+    const addressableAreaName = params.location.addressableAreaName
+    const location =
+      FOURTH_COLUMN_TO_CUTOUT_MAP[
+        addressableAreaName as keyof typeof FOURTH_COLUMN_TO_CUTOUT_MAP
+      ] ?? addressableAreaName // fallback if the addressableArea name doesn't match the map, but shoudln't run into this
+
+    return {
+      [id]: { id, location },
+    }
+  }
+  return {}
+}
+
+export const getLabwareIdOnHopper = (
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  moduleSlotLocation: string
+): string => {
+  const largestStackInSlot = getLargestStackInSlot(labware, moduleSlotLocation)
+  const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
+  const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
+  return labwareIdOnModule
+}
+
+export const getIsSlotAHopper = (slot: string): boolean => {
+  return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getLabwareIdOnShuttle = (
+  stackerState: FlexStackerModuleState
+): string | null => {
+  return stackerState.labwareOnShuttle?.primaryLabwareId ?? null
+}
+
+export const labwareMatchesLabwareInHopper = (
+  labwareId: string,
+  invariantContext: InvariantContext,
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const loadedLabware =
+    stackerState?.storedLabwareDetails?.primaryLabware.loadName
+  const def = invariantContext.labwareEntities[labwareId].def
+  const labwareToBeStored = def.parameters.loadName
+  return loadedLabware === labwareToBeStored
+}
+
+export const getIsSpaceInHopper = (
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const maximumAllowedLabware = stackerState?.maxPoolCount ?? 0
+  const labwareStored = stackerState?.labwareInHopper
+  const numberOfLabwareStored = labwareStored?.length ?? 0
+  return maximumAllowedLabware > numberOfLabwareStored
 }

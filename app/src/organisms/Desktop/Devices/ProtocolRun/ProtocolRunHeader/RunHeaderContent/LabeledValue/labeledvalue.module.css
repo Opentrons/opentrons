@@ -1,0 +1,6 @@
+.container {
+  display: flex;
+  min-width: 10.625rem;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}

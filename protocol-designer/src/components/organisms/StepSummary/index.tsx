@@ -25,6 +25,7 @@ import {
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { AbsorbanceReaderSummary } from './AbsorbanceReaderSummary'
+import { FlexStackerSummary } from './FlexStackerSummary'
 import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
@@ -163,6 +164,12 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             />
           </div>
         )
+      break
+    }
+    case 'camera': {
+      stepSummaryContent = (
+        <StyledTrans i18nKey={'protocol_steps:camera.capture_image'} />
+      )
       break
     }
 
@@ -332,6 +339,15 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           currentStep={currentStep}
           labwareNicknamesById={labwareNicknamesById}
           labwareState={labwareState}
+        />
+      )
+      break
+    }
+    case 'flexStacker': {
+      stepSummaryContent = (
+        <FlexStackerSummary
+          currentStep={currentStep}
+          labwareEntities={labwareEntities}
         />
       )
       break

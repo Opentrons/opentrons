@@ -8,14 +8,13 @@ import {
   Box,
   COLORS,
   DIRECTION_ROW,
-  Divider,
   Flex,
   LegacyStyledText,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import { NavTab } from '/app/molecules/NavTab'
+import { RoundTab } from '/app/molecules/RoundTab'
 import { FeatureFlags } from '/app/organisms/Desktop/AppSettings/FeatureFlags'
 import * as Config from '/app/redux/config'
 
@@ -48,14 +47,8 @@ export function AppSettings(): JSX.Element {
 
   return (
     <Flex paddingX={SPACING.spacing16} paddingY={SPACING.spacing16}>
-      <Box
-        backgroundColor={COLORS.white}
-        height="100%"
-        width="100%"
-        borderRadius={BORDERS.borderRadius8}
-        minHeight="95%"
-      >
-        <Box padding={SPACING.spacing16} paddingBottom="0">
+      <Box width="100%" borderRadius={BORDERS.borderRadius8}>
+        <Box padding={SPACING.spacing16} paddingBottom={SPACING.spacing16}>
           <LegacyStyledText
             css={TYPOGRAPHY.h1Default}
             paddingBottom={SPACING.spacing24}
@@ -65,21 +58,38 @@ export function AppSettings(): JSX.Element {
           <Flex
             alignItems={ALIGN_START}
             flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing20}
+            gridGap={SPACING.spacing4}
           >
-            <NavTab to="/app-settings/general" tabName={t('general')} />
-            <NavTab to="/app-settings/privacy" tabName={t('privacy')} />
-            <NavTab to="/app-settings/advanced" tabName={t('advanced')} />
+            <RoundTab
+              to="/app-settings/general"
+              tabName={t('general')}
+              disabled={false}
+            />
+            <RoundTab
+              to="/app-settings/privacy"
+              tabName={t('privacy')}
+              disabled={false}
+            />
+            <RoundTab
+              to="/app-settings/advanced"
+              tabName={t('advanced')}
+              disabled={false}
+            />
             {devToolsOn && (
-              <NavTab
+              <RoundTab
                 to="/app-settings/feature-flags"
                 tabName={t('feature_flags')}
+                disabled={false}
               />
             )}
           </Flex>
         </Box>
-        <Divider marginY="0" />
-        {appSettingsContent}
+        <Box
+          backgroundColor={COLORS.white}
+          borderRadius={BORDERS.borderRadius8}
+        >
+          {appSettingsContent}
+        </Box>
       </Box>
     </Flex>
   )

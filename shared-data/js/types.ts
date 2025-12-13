@@ -49,6 +49,18 @@ export interface RobotDefinition {
   displayName: string
   robotType: RobotType
   models: string[]
+  extents: CoordinateTuple
+  paddingOffsets: {
+    rear: number
+    front: number
+    leftSide: number
+    rightSide: number
+  }
+  mountOffsets: {
+    left: CoordinateTuple
+    right: CoordinateTuple
+    gripper?: CoordinateTuple
+  }
 }
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
@@ -346,6 +358,9 @@ export interface LabwareDefinition3 {
 // I'm pretty sure nothing in the frontend needs to deal with it anymore.
 export type LabwareDefinition = LabwareDefinition2 | LabwareDefinition3
 
+export interface LabwareDefinitionsByURI {
+  [defURI: string]: LabwareDefinition
+}
 export interface LabwareDef2ByDefURI {
   [defUri: string]: LabwareDefinition2
 }
@@ -566,6 +581,7 @@ export interface ModuleDimensions {
   labwareInterfaceXDimension?: number
   labwareInterfaceYDimension?: number
   lidHeight?: number
+  maxStackerFillHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
@@ -1033,6 +1049,11 @@ export type RunTimeParameter =
   | NumberParameter
   | CsvFileParameter
 
+export interface CommandPreconditions {
+  isCameraUsed: boolean
+}
+export type CameraId = 'ot_system_camera'
+
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
@@ -1047,6 +1068,7 @@ export interface CompletedProtocolAnalysis {
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
   commandAnnotations?: CommandAnnotation[]
+  commandPreconditions?: CommandPreconditions
 }
 
 export interface ResourceFile {

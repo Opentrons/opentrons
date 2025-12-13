@@ -194,7 +194,8 @@ export function DefineLiquidsModal(
         onClose={onClose}
       >
         <form
-          onSubmit={() => {
+          onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault()
             void handleSubmit(handleLiquidEdits)()
           }}
         >

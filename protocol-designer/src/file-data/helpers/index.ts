@@ -30,7 +30,11 @@ export const commandCreatorFromStepArgs = (
         args
       )
     }
-
+    case 'captureImage':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.captureImage,
+        args
+      )
     case 'engageMagnet':
       return StepGeneration.curryCommandCreator(
         StepGeneration.engageMagnet,
@@ -99,9 +103,29 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.absorbanceReaderCloseInitialize,
         args
       )
+    case 'flexStackerEmpty':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerEmpty,
+        { ...args, strategy: 'manualWithPause' }
+      )
+    case 'flexStackerFillItems':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerFillItems,
+        args
+      )
+    case 'flexStackerRetrieve':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerRetrieve,
+        args
+      )
+    case 'flexStackerStore':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerStore,
+        { ...args, strategy: 'automatic' }
+      )
   }
   // @ts-expect-error we've exhausted all command creators, but keeping this console warn
-  // for when we impelement the next command creator
+  // for when we implement the next command creator
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
 }

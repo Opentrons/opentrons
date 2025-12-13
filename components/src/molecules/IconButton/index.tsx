@@ -2,7 +2,6 @@ import clsx from 'classnames'
 
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Btn } from '../../primitives'
 import styles from './iconbutton.module.css'
 
 import type { IconName } from '../../icons'
@@ -62,6 +61,10 @@ interface IconButtonProps {
    * The function to call when the button is clicked.
    */
   onClick: () => void
+  /**
+   * Accessible label for the button.
+   */
+  ariaLabel?: string
 }
 
 /**
@@ -80,27 +83,29 @@ export function NewIconButton({
   iconColor,
   size,
   onClick,
+  ariaLabel,
 }: IconButtonProps): JSX.Element {
   const colors = COLOR_VARIANTS[variant]
 
   const buttonClassName = clsx(styles.icon_button, styles[`variant_${variant}`])
 
-  const buttonStyle = {
-    '--variant-default': colors.default, // color for background and outline
-    '--variant-active': colors.active, // color for background when clicked
-    '--variant-hover': colors.hover, // color for background when hovered
-  } as const
+  const buttonStyle: React.CSSProperties = {
+    // @ts-expect-error: CSS custom properties are not recognized by React.CSSProperties
+    '--variant-default': colors.default,
+    '--variant-active': colors.active,
+    '--variant-hover': colors.hover,
+    width: size,
+    height: size,
+  }
 
   return (
-    <Btn
+    <button
       className={buttonClassName}
       onClick={onClick}
-      backgroundColor={colors.default}
-      width={size}
-      height={size}
       style={buttonStyle}
+      aria-label={ariaLabel}
     >
       <Icon name={iconName} size={iconSize} color={iconColor} />
-    </Btn>
+    </button>
   )
 }

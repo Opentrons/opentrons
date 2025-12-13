@@ -441,6 +441,14 @@ from .identify_module import (
     IdentifyModuleCommandType,
 )
 
+from .capture_image import (
+    CaptureImage,
+    CaptureImageParams,
+    CaptureImageCreate,
+    CaptureImageResult,
+    CaptureImageCommandType,
+)
+
 Command = Annotated[
     Union[
         AirGapInPlace,
@@ -494,6 +502,7 @@ Command = Annotated[
         SealPipetteToTip,
         PressureDispense,
         UnsealPipetteFromTip,
+        CaptureImage,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
@@ -602,6 +611,7 @@ CommandParams = Union[
     SealPipetteToTipParams,
     PressureDispenseParams,
     UnsealPipetteFromTipParams,
+    CaptureImageParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
@@ -708,6 +718,7 @@ CommandType = Union[
     SealPipetteToTipCommandType,
     PressureDispenseCommandType,
     UnsealPipetteFromTipCommandType,
+    CaptureImageCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
@@ -815,6 +826,7 @@ CommandCreate = Annotated[
         SealPipetteToTipCreate,
         PressureDispenseCreate,
         UnsealPipetteFromTipCreate,
+        CaptureImageCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
@@ -930,6 +942,7 @@ CommandResult = Union[
     SealPipetteToTipResult,
     PressureDispenseResult,
     UnsealPipetteFromTipResult,
+    CaptureImageResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,

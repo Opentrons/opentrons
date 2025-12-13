@@ -4,56 +4,35 @@ import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
+import * as featureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
+import * as tutorialSelectors from '/protocol-designer/tutorial/selectors'
 import * as utils from '/protocol-designer/utils'
 
-import { getMultiSelectLastSelected } from '../../selectors'
-import { deselectAllSteps, selectAllSteps } from '../actions'
 import {
-  duplicateMultipleSteps,
-  duplicateStep,
-  saveHeaterShakerFormWithAddedPauseUntilTemp,
-  saveSetTempFormWithAddedPauseUntilTemp,
-} from '../thunks'
+  getMultiSelectItemIds,
+  getMultiSelectLastSelected,
+  getSelectedStepId,
+} from '../../selectors'
+import { deselectAllSteps, selectAllSteps } from '../actions'
+import { duplicateSelectedSteps, saveStepForm } from '../thunks'
 
-import type { RobotState, Timeline } from '@opentrons/step-generation/src/types'
+import type { Timeline } from '@opentrons/step-generation/src/types'
+import type { FormData } from '/protocol-designer/form-types'
+import type {
+  DuplicateSelectedStepsAction,
+  SelectMultipleStepsAction,
+  SelectStepAction,
+} from '../types'
 
 vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/feature-flags/selectors')
+vi.mock('/protocol-designer/tutorial/selectors')
 vi.mock('../../selectors')
 vi.mock('/protocol-designer/file-data/selectors')
 
 const mockStore = legacy_configureStore([thunk] as any)
-
-const initialRobotState: RobotState = {
-  labware: {
-    fixedTrash: {
-      stack: ['fixedTrash', '12'],
-    },
-    tiprackId: {
-      stack: ['tiprackId', '1'],
-    },
-    plateId: {
-      stack: ['plateId', '7'],
-    },
-  },
-  modules: {},
-  pipettes: {
-    pipetteId: {
-      mount: 'left',
-    },
-  },
-  liquidState: {
-    pipettes: {},
-    labware: {},
-    trashBins: {},
-    wasteChute: {},
-  },
-  tipState: {
-    pipettes: {},
-    tipracks: {},
-  },
-}
 
 describe('steps actions', () => {
   describe('selectAllSteps', () => {
@@ -145,408 +124,346 @@ describe('steps actions', () => {
       consoleWarnSpy.mockRestore()
     })
   })
-  describe('duplicateStep', () => {
-    afterEach(() => {
-      vi.restoreAllMocks()
-    })
-    it('should duplicate a step with a new step id', () => {
-      vi.spyOn(utils, 'uuid').mockReturnValue('duplicate_id')
-      const store: any = mockStore()
-      store.dispatch(duplicateStep('id_1'))
-      expect(store.getActions()).toEqual([
-        {
-          type: 'DUPLICATE_STEP',
-          payload: {
-            stepId: 'id_1',
-            duplicateStepId: 'duplicate_id',
-          },
-        },
-      ])
-    })
-  })
-  describe('duplicateMultipleSteps', () => {
-    let ids
+  describe('duplicateSelectedSteps', () => {
     beforeEach(() => {
-      ids = ['id_1', 'id_2', 'id_3']
-      when(vi.mocked(stepFormSelectors.getOrderedStepIds))
+      when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
         .calledWith(expect.anything())
-        .thenReturn(ids)
-      when(vi.mocked(getMultiSelectLastSelected))
-        .calledWith(expect.anything())
-        .thenReturn('id_3')
+        .thenReturn({
+          topLevelItems: [
+            {
+              type: 'standaloneStep',
+              stepId: 'id_1',
+            },
+            {
+              type: 'thermocyclerProfileGroup',
+              thermocyclerProfileStepId: 'id_2',
+              concurrentSteps: [
+                {
+                  type: 'standaloneStep',
+                  stepId: 'id_3',
+                },
+              ],
+              waitForThermocyclerProfileStepId: 'id_4',
+            },
+            {
+              type: 'standaloneStep',
+              stepId: 'id_5',
+            },
+          ],
+        })
     })
     afterEach(() => {
       vi.resetAllMocks()
       vi.restoreAllMocks()
     })
-    it('should duplicate multiple steps with a new step ids, and select the new duplicated steps', () => {
-      vi.spyOn(utils, 'uuid')
-        .mockReturnValueOnce('dup_1')
-        .mockReturnValueOnce('dup_2')
-        .mockReturnValueOnce('dup_3')
+    it('should duplicate a single-selected step', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn('id_3')
+      when(vi.mocked(getMultiSelectItemIds))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+      when(vi.mocked(getMultiSelectLastSelected))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+      vi.spyOn(utils, 'uuid').mockReturnValueOnce('dup')
       const store: any = mockStore()
-      store.dispatch(duplicateMultipleSteps(['id_1', 'id_2', 'id_3']))
-      const duplicateStepsAction = {
-        type: 'DUPLICATE_MULTIPLE_STEPS',
+      store.dispatch(duplicateSelectedSteps())
+      const expectedDuplicateAction: DuplicateSelectedStepsAction = {
+        type: 'DUPLICATE_SELECTED_STEPS',
         payload: {
           steps: [
             {
-              stepId: 'id_1',
-              duplicateStepId: 'dup_1',
-            },
-            {
-              stepId: 'id_2',
-              duplicateStepId: 'dup_2',
-            },
-            {
-              stepId: 'id_3',
-              duplicateStepId: 'dup_3',
+              originalStepId: 'id_3',
+              duplicateStepId: 'dup',
             },
           ],
-          indexToInsert: 3,
+          newStepOrder: ['id_1', 'id_2', 'id_3', 'dup', 'id_4', 'id_5'],
         },
       }
-      const selectMultipleStepsAction = {
-        type: 'SELECT_MULTIPLE_STEPS',
-        payload: {
-          stepIds: ['dup_1', 'dup_2', 'dup_3'],
-          lastSelected: 'dup_3',
-        },
+      const expectedSelectAction: SelectStepAction = {
+        type: 'SELECT_STEP',
+        payload: 'dup',
       }
       expect(store.getActions()).toEqual([
-        duplicateStepsAction,
-        selectMultipleStepsAction,
+        expectedDuplicateAction,
+        expectedSelectAction,
       ])
     })
-    it('should duplicate multiple steps with a new step ids, and select the new duplicated steps even when provided in a non linear order', () => {
+    it('should duplicate multi-selected steps', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+      when(vi.mocked(getMultiSelectItemIds))
+        .calledWith(expect.anything())
+        .thenReturn(['id_2', 'id_3'])
+      when(vi.mocked(getMultiSelectLastSelected))
+        .calledWith(expect.anything())
+        .thenReturn('id_3')
       vi.spyOn(utils, 'uuid')
-        .mockReturnValueOnce('dup_1')
-        .mockReturnValueOnce('dup_2')
-        .mockReturnValueOnce('dup_3')
+        .mockReturnValueOnce('dup_of_2')
+        .mockReturnValueOnce('dup_of_3')
+        .mockReturnValueOnce('dup_of_4')
       const store: any = mockStore()
-      store.dispatch(duplicateMultipleSteps(['id_3', 'id_1', 'id_2']))
-      const duplicateStepsAction = {
-        type: 'DUPLICATE_MULTIPLE_STEPS',
+      store.dispatch(duplicateSelectedSteps())
+      const expectedDuplicateAction: DuplicateSelectedStepsAction = {
+        type: 'DUPLICATE_SELECTED_STEPS',
         payload: {
           steps: [
             {
-              stepId: 'id_1',
-              duplicateStepId: 'dup_1',
+              originalStepId: 'id_2',
+              duplicateStepId: 'dup_of_2',
             },
             {
-              stepId: 'id_2',
-              duplicateStepId: 'dup_2',
+              originalStepId: 'id_3',
+              duplicateStepId: 'dup_of_3',
             },
             {
-              stepId: 'id_3',
-              duplicateStepId: 'dup_3',
+              originalStepId: 'id_4',
+              duplicateStepId: 'dup_of_4',
             },
           ],
-          indexToInsert: 3,
+          newStepOrder: [
+            'id_1',
+            'id_2',
+            'id_3',
+            'id_4',
+            'dup_of_2',
+            'dup_of_3',
+            'dup_of_4',
+            'id_5',
+          ],
         },
       }
-      const selectMultipleStepsAction = {
+      const expectedSelectAction: SelectMultipleStepsAction = {
         type: 'SELECT_MULTIPLE_STEPS',
         payload: {
-          stepIds: ['dup_1', 'dup_2', 'dup_3'],
-          lastSelected: 'dup_3',
+          // dup_of_4 is the new "wait for profile to complete" step, which is hidden
+          // in the UI and should not be selected.
+          stepIds: ['dup_of_2', 'dup_of_3'],
+          lastSelected: 'dup_of_3',
         },
       }
       expect(store.getActions()).toEqual([
-        duplicateStepsAction,
-        selectMultipleStepsAction,
+        expectedDuplicateAction,
+        expectedSelectAction,
       ])
     })
   })
 
-  describe('saveHeaterShakerFormWithAddedPauseUntilTemp', () => {
-    const mockRobotStateTimeline: Timeline = {
-      timeline: [
-        {
-          commands: [
-            {
-              commandType: 'heaterShaker/waitForTemperature',
-
-              params: {
-                moduleId: 'heaterShakerId',
-              },
-            },
-          ],
-          robotState: initialRobotState,
-          warnings: [],
-        },
-      ],
-      errors: null,
-    }
-
+  describe('saveStepForm', () => {
     beforeEach(() => {
-      when(vi.mocked(stepFormSelectors.getUnsavedForm))
-        .calledWith(expect.anything())
-        .thenReturn({
-          stepType: 'heaterShaker',
-          targetHeaterShakerTemperature: '10',
-        } as any)
+      vi.mocked(getRobotStateTimeline).mockReturnValue({
+        timeline: [],
+        errors: null,
+      } as Timeline)
+      vi.mocked(tutorialSelectors.shouldShowCoolingHint).mockReturnValue(false)
+      vi.mocked(tutorialSelectors.shouldShowWasteChuteHint).mockReturnValue(
+        false
+      )
       vi.mocked(
-        stepFormSelectors.getUnsavedFormIsPristineHeaterShakerForm
+        featureFlagSelectors.getEnableConcurrentModuleActions
       ).mockReturnValue(true)
-      vi.mocked(getRobotStateTimeline).mockReturnValue(mockRobotStateTimeline)
     })
 
     afterEach(() => {
+      vi.resetAllMocks()
       vi.restoreAllMocks()
     })
 
-    it('should save heater shaker step with a pause until temp is reached', () => {
-      const HsStepWithPause = [
+    describe('temperature module form', () => {
+      it.each([
         {
-          payload: {
+          description:
+            'should add bonus step when enableConcurrentModuleActions is false and userWantsBonusStep is true',
+          isPresaved: true,
+          userWantsBonusStep: true,
+          shouldAddBonusStep: true,
+          expectedPauseTemperature: 25,
+        },
+        {
+          description:
+            'should NOT add bonus step when userWantsBonusStep is false',
+          isPresaved: true,
+          userWantsBonusStep: false,
+          shouldAddBonusStep: false,
+        },
+        {
+          description: 'should add bonus step when userWantsBonusStep is true',
+          isPresaved: true,
+          userWantsBonusStep: true,
+          shouldAddBonusStep: true,
+        },
+      ])(
+        '$description',
+        ({
+          isPresaved,
+          userWantsBonusStep,
+          shouldAddBonusStep,
+          expectedPauseTemperature,
+        }) => {
+          const temperatureForm: FormData = {
+            id: 'step_123',
+            stepType: 'temperature',
+            targetTemperature: 25,
+            moduleId: 'temperatureId',
+          }
+
+          when(vi.mocked(stepFormSelectors.getUnsavedForm))
+            .calledWith(expect.anything())
+            .thenReturn(temperatureForm)
+          when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
+            .calledWith(expect.anything())
+            .thenReturn(isPresaved)
+
+          const store: any = mockStore()
+          store.dispatch(saveStepForm({ userWantsBonusStep }))
+
+          const actions = store.getActions()
+          expect(actions[0]).toEqual({
+            type: 'SAVE_STEP_FORM',
+            payload: temperatureForm,
+          })
+          if (shouldAddBonusStep) {
+            expect(actions[1].type).toStrictEqual('ADD_STEP')
+            expect(actions[2].payload.update.pauseAction).toStrictEqual(
+              'untilTemperature'
+            )
+            if (expectedPauseTemperature !== undefined) {
+              expect(actions[3].payload.update.moduleId).toStrictEqual(
+                'temperatureId'
+              )
+              expect(actions[4].payload.update.pauseTemperature).toStrictEqual(
+                expectedPauseTemperature
+              )
+              expect(actions[5].type).toStrictEqual('SAVE_STEP_FORM')
+            }
+          } else {
+            expect(actions.length).toStrictEqual(1)
+          }
+        }
+      )
+    })
+
+    describe('heater shaker form', () => {
+      it.each([
+        {
+          description: 'should add bonus step when userWantsBonusStep is true',
+          userWantsBonusStep: true,
+          shouldAddBonusStep: true,
+          expectedPauseTemperature: '10',
+        },
+        {
+          description:
+            'should NOT add bonus step when userWantsBonusStep is false',
+          userWantsBonusStep: false,
+          shouldAddBonusStep: false,
+        },
+      ])(
+        '$description',
+        ({
+          userWantsBonusStep,
+          shouldAddBonusStep,
+          expectedPauseTemperature,
+        }) => {
+          const heaterShakerForm: FormData = {
+            id: 'step_123',
             stepType: 'heaterShaker',
             targetHeaterShakerTemperature: '10',
-          },
-          type: 'SAVE_STEP_FORM',
-        },
+            moduleId: 'heaterShakerId',
+          }
 
-        {
-          meta: {
-            robotStateTimeline: {
-              errors: null,
-              timeline: [
-                {
-                  commands: [
-                    {
-                      commandType: 'heaterShaker/waitForTemperature',
-                      params: {
-                        moduleId: 'heaterShakerId',
-                      },
-                    },
-                  ],
-                  robotState: {
-                    labware: {
-                      fixedTrash: {
-                        stack: ['fixedTrash', '12'],
-                      },
-                      tiprackId: {
-                        stack: ['tiprackId', '1'],
-                      },
-                      plateId: {
-                        stack: ['plateId', '7'],
-                      },
-                    },
-                    liquidState: {
-                      labware: {},
-                      pipettes: {},
-                      trashBins: {},
-                      wasteChute: {},
-                    },
-                    modules: {},
-                    pipettes: {
-                      pipetteId: {
-                        mount: 'left',
-                      },
-                    },
-                    tipState: {
-                      pipettes: {},
-                      tipracks: {},
-                    },
-                  },
-                  warnings: [],
-                },
-              ],
-            },
-          },
-          payload: {
-            id: '__presaved_step__',
-            stepType: 'pause',
-          },
-          type: 'ADD_STEP',
-        },
-        {
-          payload: {
-            update: {
-              pauseAction: 'untilTemperature',
-            },
-          },
-          type: 'CHANGE_FORM_INPUT',
-        },
-        {
-          payload: {
-            update: {
-              moduleId: undefined,
-            },
-          },
-          type: 'CHANGE_FORM_INPUT',
-        },
-        {
-          payload: {
-            update: {
-              pauseTemperature: '10',
-            },
-          },
-          type: 'CHANGE_FORM_INPUT',
-        },
-        {
-          payload: {
-            stepType: 'heaterShaker',
-            targetHeaterShakerTemperature: '10',
-          },
-          type: 'SAVE_STEP_FORM',
-        },
-      ]
+          when(vi.mocked(stepFormSelectors.getUnsavedForm))
+            .calledWith(expect.anything())
+            .thenReturn(heaterShakerForm)
+          when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
+            .calledWith(expect.anything())
+            .thenReturn(true)
 
-      const store: any = mockStore()
-      store.dispatch(saveHeaterShakerFormWithAddedPauseUntilTemp())
+          const store: any = mockStore()
+          store.dispatch(saveStepForm({ userWantsBonusStep }))
 
-      expect(store.getActions()).toEqual(HsStepWithPause)
-    })
-  })
-
-  describe('saveSetTempFormWithAddedPauseUntilTemp', () => {
-    const mockRobotStateTimeline: Timeline = {
-      timeline: [
-        {
-          commands: [
-            {
-              commandType: 'temperatureModule/setTargetTemperature',
-
-              params: {
-                moduleId: 'temperatureId',
-                celsius: 25,
-              },
-            },
-          ],
-          robotState: initialRobotState,
-          warnings: [],
-        },
-      ],
-      errors: null,
-    }
-
-    beforeEach(() => {
-      when(vi.mocked(stepFormSelectors.getUnsavedForm))
-        .calledWith(expect.anything())
-        .thenReturn({
-          stepType: 'temperature',
-          setTemperature: 'true',
-          targetTemperature: 10,
-          moduleId: 'mockTemp',
-        } as any)
-      vi.mocked(
-        stepFormSelectors.getUnsavedFormIsPristineSetTempForm
-      ).mockReturnValue(true)
-      vi.mocked(getRobotStateTimeline).mockReturnValue(mockRobotStateTimeline)
+          const actions = store.getActions()
+          expect(actions[0]).toEqual({
+            type: 'SAVE_STEP_FORM',
+            payload: heaterShakerForm,
+          })
+          if (shouldAddBonusStep) {
+            expect(actions[1].type).toStrictEqual('ADD_STEP')
+            expect(actions[2].payload.update.pauseAction).toStrictEqual(
+              'untilTemperature'
+            )
+            if (expectedPauseTemperature !== undefined) {
+              expect(actions[3].payload.update.moduleId).toStrictEqual(
+                'heaterShakerId'
+              )
+              expect(actions[4].payload.update.pauseTemperature).toStrictEqual(
+                expectedPauseTemperature
+              )
+              expect(actions[5].type).toStrictEqual('SAVE_STEP_FORM')
+            }
+          }
+        }
+      )
     })
 
-    afterEach(() => {
-      vi.restoreAllMocks()
-    })
+    describe('thermocycler profile form', () => {
+      it.each([
+        {
+          description:
+            'should automatically add bonus step when enableConcurrentModuleActions is true',
+          enableConcurrentModuleActions: true,
+          shouldAddBonusStep: true,
+        },
+        {
+          description:
+            'should NOT add bonus step when enableConcurrentModuleActions is false',
+          enableConcurrentModuleActions: false,
+          shouldAddBonusStep: false,
+        },
+      ])(
+        '$description',
+        ({ enableConcurrentModuleActions, shouldAddBonusStep }) => {
+          const thermocyclerForm: FormData = {
+            id: 'step_123',
+            stepType: 'thermocycler',
+            thermocyclerFormType: 'thermocyclerProfile',
+            moduleId: 'thermocyclerId',
+          }
 
-    it('should save temperature step with a pause until temp is reached', () => {
-      const temperatureStepWithPause = [
-        {
-          payload: {
-            setTemperature: 'true',
-            stepType: 'temperature',
-            targetTemperature: 10,
-            moduleId: 'mockTemp',
-          },
-          type: 'SAVE_STEP_FORM',
-        },
+          when(vi.mocked(stepFormSelectors.getUnsavedForm))
+            .calledWith(expect.anything())
+            .thenReturn(thermocyclerForm)
+          when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
+            .calledWith(expect.anything())
+            .thenReturn(true)
+          when(vi.mocked(featureFlagSelectors.getEnableConcurrentModuleActions))
+            .calledWith(expect.anything())
+            .thenReturn(enableConcurrentModuleActions)
 
-        {
-          meta: {
-            robotStateTimeline: {
-              errors: null,
-              timeline: [
-                {
-                  commands: [
-                    {
-                      commandType: 'temperatureModule/setTargetTemperature',
-                      params: {
-                        moduleId: 'temperatureId',
-                        celsius: 25,
-                      },
-                    },
-                  ],
-                  robotState: {
-                    labware: {
-                      plateId: {
-                        stack: ['plateId', '7'],
-                      },
-                      tiprackId: {
-                        stack: ['tiprackId', '1'],
-                      },
+          const store: any = mockStore()
+          store.dispatch(saveStepForm())
 
-                      fixedTrash: {
-                        stack: ['fixedTrash', '12'],
-                      },
-                    },
-                    liquidState: {
-                      labware: {},
-                      pipettes: {},
-                      trashBins: {},
-                      wasteChute: {},
-                    },
-                    modules: {},
-                    pipettes: {
-                      pipetteId: {
-                        mount: 'left',
-                      },
-                    },
-                    tipState: {
-                      pipettes: {},
-                      tipracks: {},
-                    },
-                  },
-                  warnings: [],
-                },
-              ],
-            },
-          },
-          payload: {
-            id: '__presaved_step__',
-            stepType: 'pause',
-          },
-          type: 'ADD_STEP',
-        },
-        {
-          payload: {
-            update: {
-              pauseAction: 'untilTemperature',
-            },
-          },
-          type: 'CHANGE_FORM_INPUT',
-        },
-        {
-          payload: {
-            update: {
-              moduleId: 'mockTemp',
-            },
-          },
-          type: 'CHANGE_FORM_INPUT',
-        },
-        {
-          payload: {
-            update: {
-              pauseTemperature: 10,
-            },
-          },
-          type: 'CHANGE_FORM_INPUT',
-        },
-        {
-          payload: {
-            setTemperature: 'true',
-            stepType: 'temperature',
-            targetTemperature: 10,
-            moduleId: 'mockTemp',
-          },
-          type: 'SAVE_STEP_FORM',
-        },
-      ]
+          const actions = store.getActions()
+          expect(actions[0]).toEqual({
+            type: 'SAVE_STEP_FORM',
+            payload: thermocyclerForm,
+          })
 
-      const store: any = mockStore()
-      store.dispatch(saveSetTempFormWithAddedPauseUntilTemp())
-
-      expect(store.getActions()).toEqual(temperatureStepWithPause)
+          if (shouldAddBonusStep) {
+            expect(actions[1].type).toStrictEqual('ADD_STEP')
+            expect(actions[2].payload.update.pauseAction).toStrictEqual(
+              'untilThermocyclerProfileComplete'
+            )
+            expect(actions[3].payload.update.moduleId).toStrictEqual(
+              'thermocyclerId'
+            )
+            expect(actions[4].type).toStrictEqual('SAVE_STEP_FORM')
+          } else {
+            expect(actions.length).toStrictEqual(1)
+          }
+        }
+      )
     })
   })
 })

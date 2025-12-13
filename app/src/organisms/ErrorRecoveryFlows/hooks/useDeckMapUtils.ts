@@ -10,6 +10,7 @@ import {
   getModuleType,
   getPositionFromSlotId,
   getSimplestDeckConfigForProtocol,
+  locationIsOffDeck,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
@@ -22,7 +23,7 @@ import type {
   CutoutConfigProtocolSpec,
   DeckDefinition,
   LabwareDefinition,
-  LabwareDefinitionsByUri,
+  LabwareDefinitionsByURI,
   LabwareLocation,
   LoadedLabware,
   LoadedModule,
@@ -414,7 +415,7 @@ export function getRunCurrentLabwareInfo({
 
 const getLabwareDefinition = (
   labware: LoadedLabware,
-  protocolLabwareDefinitionsByUri: LabwareDefinitionsByUri
+  protocolLabwareDefinitionsByUri: LabwareDefinitionsByURI
 ): LabwareDefinition => {
   if (labware.id === 'fixedTrash') {
     return getFixedTrashLabwareDefinition()
@@ -445,11 +446,7 @@ export function getSlotNameAndLwLocFrom(
     getModuleType(onModuleModel) === FLEX_STACKER_MODULE_TYPE
       ? (labwareLocationObject?.slotName.charAt(0) ?? null)
       : (labwareLocationObject?.slotName ?? null)
-  if (
-    location == null ||
-    location === 'offDeck' ||
-    location === 'systemLocation'
-  ) {
+  if (location == null || locationIsOffDeck(location)) {
     return [null, null]
   } else if (excludeModules && onModuleModel != null) {
     return [null, null]

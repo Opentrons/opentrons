@@ -3,10 +3,11 @@
 # python-opentrons-system-server
 #
 ################################################################################
+OT_PYTHON := python3
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
 define OTSYSTEMSERVER_CALL_PBU
-	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py system-server $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
+	$(shell python3 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py system-server $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
 
 PYTHON_OPENTRONS_SYSTEM_SERVER_VERSION = $(call OTSYSTEMSERVER_CALL_PBU,get_version)
@@ -45,4 +46,3 @@ export OPENTRONS_GIT_DIR=$(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)
 # because our directory layout doesn’t conform to buildroot’s expectation of
 # having the directory name be the package name
 $(eval $(call inner-python-package,$(ot_system_server_name),$(call UPPERCASE,$(ot_system_server_name)),$(call UPPERCASE,$(ot_system_server_name)),target))
-

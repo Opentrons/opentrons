@@ -21,7 +21,7 @@ metadata = {
 }
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.26",
+    "apiLevel": "2.27",
 }
 
 
@@ -66,11 +66,15 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Use temperature module in protocol",
         default=True,
     )
+    helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    helpers.comment_protocol_version(protocol, "02")
+    protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
+
+    helpers.comment_protocol_version(protocol, "03")
 
     # ======================== DOWNLOADED PARAMETERS ========================
     global REUSE_ANY_50_TIPS  # T/F Whether or not Reusing any p50
@@ -2053,10 +2057,11 @@ def run(protocol: ProtocolContext) -> None:
                     thermocycler.execute_profile(
                         steps=profile_TAGSTOP, repetitions=1, block_max_volume=100
                     )
-                    thermocycler.set_block_temperature(62)
+                    block_task = thermocycler.start_set_block_temperature(62)
                     if HYBRID_PAUSE:
                         protocol.comment("HYBRIDIZATION PAUSED")
-                    thermocycler.set_block_temperature(10)
+                    protocol.wait_for_tasks([block_task])
+                    thermocycler.start_set_block_temperature(10)
                 thermocycler.open_lid()
             else:
                 protocol.comment(
@@ -2071,8 +2076,9 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
                 if ONDECK_THERMO:
-                    thermocycler.set_block_temperature(58)
-                    thermocycler.set_lid_temperature(58)
+                    tc_block_task = thermocycler.start_set_block_temperature(58)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(58)
+                    protocol.wait_for_tasks([tc_block_task, tc_lid_task])
             # ============================================================================================
             protocol.comment("MOVING: tiprack_50_X = SCP_Position --> D4")
             protocol.move_labware(
@@ -2543,8 +2549,9 @@ def run(protocol: ProtocolContext) -> None:
             if ONDECK_THERMO:
                 if DRYRUN is False:
                     protocol.comment("SETTING THERMO to Room Temp")
-                    thermocycler.set_block_temperature(4)
-                    thermocycler.set_lid_temperature(100)
+                    tc_block_task = thermocycler.start_set_block_temperature(4)
+                    tc_lid_task = thermocycler.start_set_lid_temperature(100)
+                    protocol.wait_for_tasks([tc_block_task, tc_lid_task])
                 thermocycler.close_lid()
                 if DRYRUN is False:
                     profile_PCR_1: List[ThermocyclerStep] = [
@@ -2880,12 +2887,12 @@ def run(protocol: ProtocolContext) -> None:
                     use_gripper=True,
                 )
                 stacker_50_2.store()
-
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

@@ -4,6 +4,7 @@ type SecondaryWindowType =
   | 'camera-stream'
   | 'camera-photo'
   | 'step-detail-viewer'
+  | 'step-detail-data-updated'
 
 export interface SecondaryWindowDetails {
   type: SecondaryWindowType

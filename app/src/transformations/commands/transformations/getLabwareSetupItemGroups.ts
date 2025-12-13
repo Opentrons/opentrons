@@ -1,6 +1,9 @@
 import partition from 'lodash/partition'
 
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  locationIsOnModule,
+} from '@opentrons/shared-data'
 
 import type {
   LabwareDefinition,
@@ -39,11 +42,7 @@ export function getLabwareSetupItemGroups(
         if (definition == null) return acc
         let moduleModel = null
         let moduleLocation = null
-        if (
-          location !== 'offDeck' &&
-          location !== 'systemLocation' &&
-          'moduleId' in location
-        ) {
+        if (locationIsOnModule(location)) {
           const loadModuleCommand = commands.find(
             (c): c is LoadModuleRunTimeCommand =>
               c.commandType === 'loadModule' &&

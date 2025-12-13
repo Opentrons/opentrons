@@ -81,7 +81,7 @@ const mapModTypeToStepTypeOt2: Record<OT2ModuleType, StepType> = {
   thermocyclerModuleType: 'thermocycler',
 }
 
-const THERMOCYCLER_SLOTS = ['8', '9', '10', '11']
+const THERMOCYCLER_SLOTS = ['7', '8', '10', '11']
 
 const OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST: string[] = [
   'calibrationMarkings',
@@ -169,11 +169,15 @@ export function Ot2Modules(): JSX.Element {
           COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType]
         ).includes(lw.def.parameters.loadName)
     )?.def.metadata.displayName
-    const incompatibleLabwareSlots = Object.values(labware)
-      .filter(lw =>
-        THERMOCYCLER_SLOTS.includes(getSlotInLocationStack(lw.stack))
-      )
-      ?.map(lw => getSlotInLocationStack(lw.stack))
+    const incompatibleLabwareSlots = [
+      ...new Set(
+        Object.values(labware)
+          .filter(lw =>
+            THERMOCYCLER_SLOTS.includes(getSlotInLocationStack(lw.stack))
+          )
+          .map(lw => getSlotInLocationStack(lw.stack))
+      ),
+    ]
     if (somethingInSlotModule) {
       makeSnackbar(t('protocol_overview:conflict_on_slot_module') as string)
     } else if (

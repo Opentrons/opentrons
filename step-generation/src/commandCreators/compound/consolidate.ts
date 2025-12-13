@@ -18,6 +18,7 @@ import {
   WELL_ORIGIN_TOP,
 } from '@opentrons/shared-data'
 
+import { MANUAL } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { getNextTiprack } from '../../robotStateSelectors'
 import {
@@ -26,9 +27,11 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
+  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
+  getTargetTipsFromWellSets,
   getTransferPlanAndReferenceVolumes,
   indentPyLines,
   PROTOCOL_CONTEXT_NAME,
@@ -62,6 +65,7 @@ import type {
   CommandCreatorError,
   ConsolidateArgs,
   CurriedCommandCreator,
+  LabwareEntity,
 } from '../../types'
 
 export const consolidate: CommandCreator<ConsolidateArgs> = (
@@ -135,7 +139,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     pushOut,
     sourceLabware,
     sourceWells,
-    tipRack,
+    tipRack: userSelectedTipRackURI, // the tiprack the user selected, not necessarily the one used for this step
+    tipTracking,
+    tiprackSelected,
+    tipsSelected,
     touchTipAfterAspirate,
     touchTipAfterAspirateMmFromEdge,
     touchTipAfterAspirateOffsetMmFromTop,
@@ -225,19 +232,32 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     errors.push(errorCreators.dropTipLocationDoesNotExist())
   }
 
-  const tiprack = Object.values(labwareEntities).find(
-    ({ labwareDefURI }) => labwareDefURI === tipRack
-  )
-  if (tiprack == null) {
-    errors.push(
-      errorCreators.labwareDoesNotExist({
-        actionName,
-        labware: tipRack,
-      })
+  let tiprackEntity: LabwareEntity | undefined, tiprackURI: string
+  // TODO: We currently ask users to select a tip rack even if the tip handling policy
+  // for this step is `never`, in which case we must ignore the tip rack the user selected
+  // and use the tip rack from the previous step where we actually picked up the tip.
+  if (changeTip === 'never') {
+    const prevTiprackID = prevRobotState.tipState.pipettes[pipette]?.tiprackURI
+    // pipettes[pipette].tiprackURI is a misnomer: it's an labwareID, not a URI
+    tiprackEntity = invariantContext.labwareEntities[prevTiprackID ?? '']
+    tiprackURI = tiprackEntity?.labwareDefURI
+  } else {
+    tiprackEntity = Object.values(labwareEntities).find(
+      ({ labwareDefURI }) => labwareDefURI === userSelectedTipRackURI
     )
+    tiprackURI = userSelectedTipRackURI
   }
-  const { def: tiprackDefinition = null, labwareDefURI: tiprackDefUri } =
-    tiprack ?? {}
+  if (tiprackEntity == null) {
+    if (changeTip === 'never') {
+      errors.push(errorCreators.noTipOnPipette({ actionName, pipette }))
+    } else {
+      errors.push(
+        errorCreators.labwareDoesNotExist({ actionName, labware: tiprackURI })
+      )
+    }
+  }
+
+  const { def: tiprackDefinition = null } = tiprackEntity ?? {}
   const {
     spec: pipetteSpecs,
     name: pipetteName,
@@ -253,7 +273,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ({ pipetteModel }) =>
           pipetteModel === getFlexNameConversion(pipetteSpecs)
       )
-      ?.byTipType.find(({ tiprack }) => tiprack === tiprackDefUri) ?? null
+      ?.byTipType.find(({ tiprack }) => tiprack === tiprackURI) ?? null
   const { aspirate } = liquidClassValuesForTip ?? {}
   const { multiWellHandling } = getTransferPlanAndReferenceVolumes({
     pipetteSpecs,
@@ -271,12 +291,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const { numWellsToFitInTip } = multiWellHandling
 
   if (
-    // these conditions should never be true— they are checked in moveLiquidFormToArgs
+    // We stop users from selecting the consolidate path if we can't fit > 1 chunk into
+    // the tip, but older protocols can have consolidate selected and trigger this error
     !multiWellHandling.isSupported ||
     numWellsToFitInTip == null ||
     numWellsToFitInTip === 1
   ) {
-    errors.push(errorCreators.multiDispenseValuesNotFound())
+    errors.push(errorCreators.multiAspirateVolumeTooHigh())
   }
 
   if (isMultiChannelPipette && nozzles !== ALL) {
@@ -340,7 +361,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   }
   const { tipracks } = getNextTiprack(
     pipette,
-    tipRack,
+    tiprackURI,
     invariantContext,
     prevRobotState,
     ...(nozzles != null ? [nozzles] : [])
@@ -350,7 +371,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: volume,
       liquidHandlingAction: 'aspirate',
       byVolumeProperty: 'correctionByVolume',
@@ -364,6 +385,11 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
   const trashPipetteName =
     trashBinEntities[dropTipLocation]?.pythonName ??
     wasteChuteEntities[dropTipLocation]?.pythonName
+  const blowoutTrashPythonName =
+    blowoutLocation == null
+      ? null
+      : (trashBinEntities[blowoutLocation]?.pythonName ??
+        wasteChuteEntities[blowoutLocation]?.pythonName)
   const sourceLabwarePythonName = labwareEntities[sourceLabware].pythonName
   const destLabwarePythonName = labwareEntities[destLabware]?.pythonName
   const pythonSourceWells = sourceWells
@@ -384,13 +410,40 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       pipetteName: isFlexPipette(pipetteName)
         ? getFlexNameConversion(pipetteSpecs)
         : pipetteName,
-      tiprackUri: tipRack,
+      tiprackUri: tiprackURI,
       liquidClassValuesForTip,
     })}`,
   ]
   const customLiquidClass = `${PROTOCOL_CONTEXT_NAME}.define_liquid_class(\n${indentPyLines(
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
+
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? ALL,
+    channels: pipetteSpecs.channels,
+  })
+
+  const shouldSelectManualTips =
+    tipTracking === MANUAL &&
+    tiprackSelected != null &&
+    tipsSelected != null &&
+    tipsSelected.length > 0
+  const targetTips = shouldSelectManualTips
+    ? getTargetTipsFromWellSets({
+        wellSets: tipsSelected,
+        nozzles: nozzles ?? ALL,
+        channels: pipetteSpecs.channels,
+        primaryNozzle,
+      })
+    : null
+
+  const tiprackName =
+    tiprackSelected != null
+      ? labwareEntities[tiprackSelected]?.pythonName
+      : null
+  const fullTipWellsToPickupString = targetTips
+    ?.map(targetTip => `${tiprackName}[${formatPyStr(targetTip)}]`)
+    .join(', ')
 
   const pythonArgs = [
     `volume=${volume}`,
@@ -400,8 +453,13 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     ...(isReturnTip
-      ? [`return_tip=True`]
-      : [`trash_location=${trashPipetteName}`, `keep_last_tip=True`]),
+      ? [
+          'return_tip=True',
+          ...(blowoutTrashPythonName != null
+            ? [`trash_location=${blowoutTrashPythonName}`]
+            : []),
+        ]
+      : [`trash_location=${trashPipetteName}`, 'keep_last_tip=True']),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [
@@ -412,6 +470,9 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         ]
       : []),
     `liquid_class=${customLiquidClass}`,
+    ...(targetTips != null && tiprackName != null
+      ? [`tips=[${fullTipWellsToPickupString}]`]
+      : []),
   ]
   const pythonCommandCreator: CurriedCommandCreator = () => ({
     commands: [],
@@ -466,7 +527,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: dispenseAirGapVolume,
       liquidHandlingAction: 'aspirate',
       byVolumeProperty: 'correctionByVolume',
@@ -485,7 +546,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: aspirateAirGapVolume,
       liquidHandlingAction: 'aspirate',
       byVolumeProperty: 'flowRateByVolume',
@@ -495,7 +556,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: aspirateAirGapVolume,
       liquidHandlingAction: 'singleDispense',
       byVolumeProperty: 'flowRateByVolume',
@@ -505,7 +566,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: dispenseAirGapVolume,
       liquidHandlingAction: 'aspirate',
       byVolumeProperty: 'flowRateByVolume',
@@ -515,7 +576,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     getByVolumeValue({
       liquidClass,
       pipetteSpecs,
-      tiprackDefUri: tipRack,
+      tiprackDefUri: tiprackURI,
       targetVolume: dispenseAirGapVolume,
       liquidHandlingAction: 'singleDispense',
       byVolumeProperty: 'flowRateByVolume',
@@ -615,19 +676,31 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         // path is in ['always', 'once', 'never']
         changeTip === 'always' || (changeTip === 'once' && isFirstChunk)
 
-      const tipCommands = changeTipNow
-        ? [
-            curryCommandCreator(replaceTip, {
-              pipette,
-              dropTipLocation:
-                isReturnTip && fallBackTrashLikeId != null
-                  ? fallBackTrashLikeId
-                  : dropTipLocation,
-              tipRack,
-              ...(nozzles != null ? { nozzles } : {}),
-            }),
-          ]
-        : []
+      let tipCommands: CurriedCommandCreator[] = []
+      if (changeTipNow) {
+        const nextTip = targetTips?.shift()
+        tipCommands = [
+          curryCommandCreator(replaceTip, {
+            pipette,
+            dropTipLocation:
+              isReturnTip && fallBackTrashLikeId != null
+                ? fallBackTrashLikeId
+                : dropTipLocation,
+            tipRack: tiprackURI,
+            ...(nozzles != null ? { nozzles } : {}),
+            ...(tipTracking === MANUAL &&
+            nextTip != null &&
+            tiprackSelected != null
+              ? {
+                  tipSelectionArgs: {
+                    tipRackId: tiprackSelected,
+                    tipWell: nextTip,
+                  },
+                }
+              : {}),
+          }),
+        ]
+      }
 
       // Aspirate commands for all source wells in the chunk
       const aspirateCommands = flatMap(
@@ -687,7 +760,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             getByVolumeValue({
               liquidClass,
               pipetteSpecs,
-              tiprackDefUri: tipRack,
+              tiprackDefUri: tiprackURI,
               targetVolume: airGapInTip,
               liquidHandlingAction: 'singleDispense',
               byVolumeProperty: 'correctionByVolume',
@@ -724,6 +797,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                             dispenseCorrectionVolumeForDispenseAirGap,
                         }
                       : {}),
+                    isAirGap: true,
                     pushOut: 0,
                   }),
                   ...delayAfterDispenseCommands,
@@ -823,7 +897,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             getByVolumeValue({
               liquidClass,
               pipetteSpecs,
-              tiprackDefUri: tipRack,
+              tiprackDefUri: tiprackURI,
               targetVolume: aspirateAirGapVolume,
               liquidHandlingAction: 'aspirate',
               byVolumeProperty: 'correctionByVolume',
@@ -923,7 +997,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         getByVolumeValue({
           liquidClass,
           pipetteSpecs,
-          tiprackDefUri: tipRack,
+          tiprackDefUri: tiprackURI,
           targetVolume: aspirateAirGapVolume,
           liquidHandlingAction: 'singleDispense',
           byVolumeProperty: 'correctionByVolume',
@@ -938,6 +1012,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
                 flowRate: aspirateAirGapDispenseFlowRate,
                 pushOut: 0,
                 correctionVolume: dispenseCorrectionVolumeForAspirateAirGap,
+                isAirGap: true,
               }),
               ...delayAfterDispenseCommands,
             ]
@@ -986,7 +1061,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
         getByVolumeValue({
           liquidClass,
           pipetteSpecs,
-          tiprackDefUri: tipRack,
+          tiprackDefUri: tiprackURI,
           targetVolume: totalSampleDispenseVolume,
           liquidHandlingAction: 'singleDispense',
           byVolumeProperty: 'correctionByVolume',
@@ -1009,7 +1084,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? getByVolumeValue({
               liquidClass,
               pipetteSpecs,
-              tiprackDefUri: tipRack,
+              tiprackDefUri: tiprackURI,
               targetVolume: mixInDestination.volume,
               liquidHandlingAction: 'aspirate',
               byVolumeProperty: 'flowRateByVolume',
@@ -1021,7 +1096,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? getByVolumeValue({
               liquidClass,
               pipetteSpecs,
-              tiprackDefUri: tipRack,
+              tiprackDefUri: tiprackURI,
               targetVolume: mixInDestination.volume,
               liquidHandlingAction: 'singleDispense',
               byVolumeProperty: 'flowRateByVolume',
@@ -1041,7 +1116,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
               finalPushOut: pushOut,
               invariantContext,
               liquidClass,
-              tiprack: tipRack,
+              tiprack: tiprackURI,
               generatePython: false,
             })
           : []
@@ -1106,7 +1181,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
           ? [
               curryWithoutPython(dropTip, {
                 pipette,
-                dropTipLocation: tipRack,
+                dropTipLocation: tiprackURI,
                 isReturnTip,
               }),
             ]
