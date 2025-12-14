@@ -40,7 +40,6 @@ import {
   FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
-  HopperLocationMapKey,
   STAGING_AREA_SLOTS,
   ZERO_OFFSET,
 } from '../constants'
@@ -62,6 +61,7 @@ import type {
   PositionReference,
   RobotType,
 } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '../constants'
 import type {
   CommandCreator,
   CurriedCommandCreator,

@@ -85,7 +85,7 @@ export function LabwareStackToolbox({
 
   const handleSelectAllLabware = (): void => {
     const currentLiquidContents = labwareId && allWellContents[labwareId]
-    const allEqual = labwareStack.every(
+    const allEqual = filteredLabwareStack.every(
       item =>
         JSON.stringify(allWellContents[item]) ===
         JSON.stringify(currentLiquidContents)
@@ -95,7 +95,7 @@ export function LabwareStackToolbox({
       setShowLiquidLayoutOverlay(true)
       return
     }
-    dispatch(multipleIngredientsSelector(labwareStack))
+    dispatch(multipleIngredientsSelector(filteredLabwareStack))
   }
 
   const handleAssignToLabware = (
@@ -108,7 +108,7 @@ export function LabwareStackToolbox({
       JSON.stringify(allWellContents[newItem]) !==
         JSON.stringify(allWellContents[labwareId])
     ) {
-      console.error('selected labware have different liquid layouts')
+      // selected labware have different liquid layouts
       setShowLiquidLayoutOverlay(true)
     } else if (event.metaKey || event.ctrlKey) {
       dispatch(multipleIngredientsSelector([...selectedLabwareIds, newItem]))
