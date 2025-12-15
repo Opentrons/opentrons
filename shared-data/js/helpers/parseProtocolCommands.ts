@@ -350,6 +350,7 @@ export interface LiquidsById {
     displayName: string
     description: string
     displayColor?: string
+    totalLiquids?: number
   }
 }
 
@@ -357,6 +358,7 @@ export interface LiquidsById {
 // it will always have a displayColor
 export interface ParsedLiquid extends Omit<Liquid, 'displayColor'> {
   displayColor: string
+  totalLiquids?: number
 }
 
 export function parseLiquidsInLoadOrder(
@@ -421,8 +423,9 @@ export function parseLiquidsInLoadOrder(
           mixedMap.set(key, {
             id: mixedId,
             displayColor: MIXED_WELL_COLOR,
-            displayName: totalLiquids,
             description: liquidNames.join(', '),
+            totalLiquids: totalLiquids,
+            displayName: null,
           })
         }
       }

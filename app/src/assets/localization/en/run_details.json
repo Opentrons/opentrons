@@ -203,7 +203,6 @@
   "thumbnail": "Thumbnail",
   "timestamp": "Timestamp",
   "total_elapsed_time": "Total elapsed time",
-  "total_liquids": "{{totalLiquids}} liquids",
   "total_step_count": "{{count}} step total",
   "total_step_count_plural": "{{count}} steps total",
   "unable_to_determine_steps": "Unable to determine steps",

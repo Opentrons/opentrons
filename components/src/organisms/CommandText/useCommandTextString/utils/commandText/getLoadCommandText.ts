@@ -130,14 +130,12 @@ export const getLoadCommandText = ({
       const { liquidId, labwareId } = command.params
       const displayName = getLiquidDisplayName(
         commandTextData?.liquids ?? [],
-        liquidId
+        liquidId,
+        t
       )
-      const checkedDisplayName =
-        typeof displayName === 'number'
-          ? t('total_liquids', { totalLiquids: displayName })
-          : displayName
+
       return t('load_liquids_info_protocol_setup', {
-        liquid: checkedDisplayName != null ? checkedDisplayName : null,
+        liquid: displayName,
         labware:
           commandTextData != null
             ? getLabwareName({

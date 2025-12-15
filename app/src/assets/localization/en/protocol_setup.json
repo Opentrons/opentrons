@@ -170,6 +170,7 @@
   "liquids_not_in_the_protocol": "no liquids are specified for this protocol.",
   "liquids_ready": "Liquids ready",
   "list_view": "List View",
+  "liquids_count": "{{totalLiquids}} liquids",
   "loading_data": "Loading data...",
   "loading_labware_offsets": "Loading labware offsets",
   "loading_protocol_details": "Loading details...",

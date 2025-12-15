@@ -58,19 +58,21 @@ const LIQUID_CARD_ODD_STYLE = css`
 `
 interface LiquidDetailCardProps {
   liquidId: string
-  displayName: string | number
+  displayName: string | null
   description: string | null
   displayColor: string
   volumeByWell: { [well: string]: number }
   setSelectedValue: Dispatch<SetStateAction<string | undefined>>
   selectedValue: string | undefined
   labwareWellOrdering: string[][]
+  totalLiquids?: number
 }
 
 export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   const {
     liquidId,
     displayName,
+    totalLiquids,
     description,
     displayColor,
     volumeByWell,
@@ -80,11 +82,10 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   } = props
   const trackEvent = useTrackEvent()
   const isOnDevice = useSelector(getIsOnDevice)
-  const { t } = useTranslation('run_details')
-  const checkedDisplayName =
-    typeof displayName === 'number'
-      ? t('liquids_count', { totalLiquids: displayName })
-      : displayName
+  const { t } = useTranslation('protocol_setup')
+  const newDisplayName = totalLiquids
+    ? t('liquids_count', { totalLiquids: totalLiquids })
+    : displayName
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.blue30 : COLORS.blue10};
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blue50};
@@ -135,7 +136,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing12}
         >
-          {checkedDisplayName}
+          {newDisplayName}
         </LegacyStyledText>
         <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize22}
@@ -234,7 +235,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing8}
         >
-          {checkedDisplayName}
+          {newDisplayName}
         </LegacyStyledText>
         <LegacyStyledText as="p" color={COLORS.grey50}>
           {description != null ? description : null}
