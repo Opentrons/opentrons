@@ -210,7 +210,7 @@ function SuccessOrError({ errorMessage }: SuccessOrErrorProps): JSX.Element {
   else
     renderedImg = (
       <Icon
-        name="alert-circle"
+        name="ot-alert"
         height="40px"
         color={COLORS.red50}
         margin={SPACING.spacing24}

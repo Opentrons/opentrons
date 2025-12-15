@@ -73,7 +73,7 @@ describe('InterventionModal', () => {
     const { container } = render(props)
     // eslint-disable-next-line testing-library/no-node-access, testing-library/no-container
     const icon = container.querySelector(
-      '[aria-roledescription="alert-circle"]'
+      '[aria-roledescription="ot-alert"]'
     )
     expect(icon).not.toBeNull()
   })
@@ -81,7 +81,7 @@ describe('InterventionModal', () => {
     const { container } = render({ ...props, iconName: undefined })
     // eslint-disable-next-line testing-library/no-node-access, testing-library/no-container
     const icon = container.querySelector(
-      '[aria-roledescription="alert-circle"]'
+      '[aria-roledescription="ot-alert"]'
     )
     expect(icon).toBeNull()
   })

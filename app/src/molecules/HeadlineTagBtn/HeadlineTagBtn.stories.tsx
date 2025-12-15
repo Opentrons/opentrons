@@ -43,7 +43,7 @@ const Template: Story<HeadlineTagBtnStoryProps> = args => {
     <Tag
       text={tagText}
       type="default"
-      iconName="alert-circle"
+      iconName="ot-alert"
       iconPosition="left"
       shrinkToContent={true}
     />

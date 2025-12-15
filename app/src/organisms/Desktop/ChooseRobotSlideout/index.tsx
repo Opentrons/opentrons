@@ -281,7 +281,7 @@ export function ChooseRobotSlideout(
           height={SIZE_4}
           gridGap={SPACING.spacing8}
         >
-          <Icon name="alert-circle" size={SIZE_1} />
+          <Icon name="ot-alert" size={SIZE_1} />
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('no_available_robots_found')}
           </LegacyStyledText>

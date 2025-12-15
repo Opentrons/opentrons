@@ -589,7 +589,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
                 : COLORS.grey60
           }
           marginRight={SPACING.spacing8}
-          name="alert-circle"
+          name="ot-alert"
           id={`RunSetupCard_${props.stepKey}_missingHardwareIcon`}
         />
         <StyledText
@@ -617,7 +617,7 @@ function StepRightElement(props: StepRightElementProps): JSX.Element | null {
           size="1rem"
           color={COLORS.grey60}
           marginRight={SPACING.spacing8}
-          name="alert-circle"
+          name="ot-alert"
           id={`RunSetupCard_${props.stepKey}_incompleteIcon`}
         />
         <StyledText

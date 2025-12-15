@@ -130,7 +130,7 @@ export function RecoveryTakeoverDesktop({
       <Flex css={BANNER_TEXT_CONTAINER_STYLE}>
         <Flex css={BANNER_TEXT_CONTENT_STYLE}>
           <Icon
-            name="alert-circle"
+            name="ot-alert"
             color={COLORS.red50}
             size={SPACING.spacing40}
           />
