@@ -37,7 +37,7 @@
   "source_well_view": "Source well view",
   "speed": "{{speed}} RPM",
   "status": "Status",
-  "step_error":"Step error",
+  "step_error": "Step error",
   "step": "Step {{number}}",
   "target_block_temperature": "Target block temperature",
   "target_lid_temperature": "Target lid temperature",

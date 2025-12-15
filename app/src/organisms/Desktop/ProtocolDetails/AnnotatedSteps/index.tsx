@@ -181,7 +181,12 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 >
                   <div className={styles.annotated_steps_header}>
                     <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
-                    <StyledText desktopStyle='captionSemiBold' color={COLORS.red60}>{t('step_error')}</StyledText>
+                    <StyledText
+                      desktopStyle="captionSemiBold"
+                      color={COLORS.red60}
+                    >
+                      {t('step_error')}
+                    </StyledText>
                   </div>
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {error.detail}
