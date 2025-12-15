@@ -9,6 +9,7 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
@@ -30,6 +31,7 @@ vi.mock('/app/redux/discovery/selectors')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux/protocol-runs')
 vi.mock('@opentrons/react-api-client')
+vi.mock('/app/redux-resources/robots')
 
 const render = (props: SetupCameraProps) => {
   return renderWithProviders(<SetupCamera {...props} />, {
@@ -75,14 +77,25 @@ describe('SetupCamera', () => {
     vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
       addCameraSettingsToRun: mockAddCameraToRun,
     } as any)
+    vi.mocked(useIsFlex).mockReturnValue(true)
   })
 
-  it('renders camera status section', () => {
+  it('renders camera status section for the Flex', () => {
     render(mockProps)
 
     screen.getByText('Camera Status')
     screen.getByText(
-      'The deck camera offers live video monitoring during protocol runs and supports image capture—either manually, automatically, or in response to runtime errors for easier troubleshooting.'
+      'The deck camera offers live video monitoring during protocol runs and can capture images manually, automatically, or when an error occurs for easier troubleshooting.'
+    )
+  })
+
+  it('renders camera status section for the OT-2', () => {
+    vi.mocked(useIsFlex).mockReturnValue(false)
+    render(mockProps)
+
+    screen.getByText('Camera Status')
+    screen.getByText(
+      'The deck camera can capture images manually, automatically, or when an error occurs for easier troubleshooting.'
     )
   })
 
