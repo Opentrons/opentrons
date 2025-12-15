@@ -6,7 +6,7 @@ You can perform most functions of Flex either from the [touchscreen](touchscreen
 
 ## App installation
 
-Download the Opentrons App at <https://opentrons.com/ot-app/>. The app requires Windows 10, macOS 10.10, or Ubuntu 12.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
+Download the Opentrons App at <https://opentrons.com/ot-app/>. The latest version of the app requires Windows 10, macOS 10.16, or Ubuntu 20.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
 
 ### Windows
 

@@ -34,6 +34,27 @@ def retrieve_version_file(
         return ""
 
 
+def retrieve_protocol_images(run_id: str, robot_ip: str, storage: str) -> str:
+    """Save all capture images for a run."""
+    save_dir = Path(f"{storage}")
+    new_save_dir = Path(f"{storage}/{run_id}")
+    command = ["scp", "-r", f"root@{robot_ip}:/data/images/{run_id}/", save_dir]
+    zip_path = f"storage_directory/{run_id}_images.zip"
+    try:
+        subprocess.run(command, check=True)  # type: ignore
+        shutil.make_archive(
+            base_name=str(zip_path).replace(".zip", ""),
+            format="zip",
+            root_dir=save_dir,
+        )
+        subprocess.run(["rm", "-r", new_save_dir], check=True)
+        print("Image folder transfered successful!")
+        return str(zip_path)
+    except subprocess.CalledProcessError as e:
+        print(f"Error during file transfer: {e}")
+    return ""
+
+
 def retrieve_protocol_file(protocol_id: str, robot_ip: str, storage: str) -> Path | str:
     """Find and copy protocol file on robot with error handling."""
     # List folders in the robot's directory
@@ -653,6 +674,7 @@ if __name__ == "__main__":
     saved_file_path_calibration, calibration = read_robot_logs.get_calibration_offsets(
         ip, storage_directory
     )
+    image_files = retrieve_protocol_images(one_run, ip, storage_directory)
 
     print(f"Making ticket for {summary}.")
     # TODO: make argument or see if I can get rid of with using board_id.
@@ -684,6 +706,7 @@ if __name__ == "__main__":
         protocol_file_path,
         version_file_path,
         log_zip_path,
+        image_files,
     ]
     error_folder_path = os.path.join(storage_directory, issue_key)
     os.makedirs(error_folder_path, exist_ok=True)

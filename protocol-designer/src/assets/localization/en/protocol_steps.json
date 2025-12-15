@@ -87,7 +87,11 @@
       "labware_filled": "{{amount}}/{{total}} labware filled",
       "no_labware": "No labware stored on stacker",
       "quantity": "Quantity: {{count}}"
-    }
+    },
+    "empty": "Emptying stacker of all labware",
+    "fill": "<text>Refilling stacker with Quantity: </text> <tag2/> <text>of</text> <tag/>",
+    "retrieve": "<text>Retrieving</text> <tag/> <text>from stacker</text>",
+    "store": "<text>Storing</text> <tag/> <text>from shuttle into stacker</text>"
   },
   "flexStacker": "Stacker",
   "flow_rate_builder": "Flow rate builder",

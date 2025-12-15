@@ -11,6 +11,7 @@
 import {
   CAMERA_PHOTO_OPEN,
   CAMERA_STREAM_OPEN,
+  STEP_DETAIL_VIEWER_CLOSE,
   STEP_DETAIL_VIEWER_OPEN,
   STEP_DETAIL_VIEWER_UPDATE,
 } from '../constants'
@@ -113,6 +114,17 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
         liquids: action.payload.liquids,
       })
       return null
+
+    case STEP_DETAIL_VIEWER_CLOSE: {
+      const windowId = getWindowIdStepDetailViewer(action.payload.protocolKey)
+      const existingWindow = secondaryWindows.get(windowId)
+      if (existingWindow != null && !existingWindow.isDestroyed()) {
+        existingWindow.close()
+      }
+      secondaryWindows.delete(windowId)
+      return null
+    }
+
     default:
       return null
   }

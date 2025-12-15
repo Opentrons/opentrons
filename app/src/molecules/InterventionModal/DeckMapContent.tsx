@@ -31,11 +31,10 @@ import type {
 
 export type MapKind = 'intervention' | 'deck-config'
 
-export interface InterventionStyleDeckMapContentProps
-  extends Pick<
-    ComponentProps<typeof BaseDeck>,
-    'deckConfig' | 'robotType' | 'labwareOnDeck' | 'modulesOnDeck'
-  > {
+export interface InterventionStyleDeckMapContentProps extends Pick<
+  ComponentProps<typeof BaseDeck>,
+  'deckConfig' | 'robotType' | 'labwareOnDeck' | 'modulesOnDeck'
+> {
   kind: 'intervention'
   highlightLabwareEventuallyIn: string[]
 }
