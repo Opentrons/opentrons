@@ -136,7 +136,7 @@ export default defineConfig(async () => {
     },
     resolve: {
       conditions: ['browser'],
-       // For unknown reasons, PD whitescreens on launch unless we have this.
+      // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
         // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
@@ -158,7 +158,7 @@ export default defineConfig(async () => {
   }
 })
 
-function getFeatureFlagEnvVars() {
+function getFeatureFlagEnvVars(): Record<string, string | undefined> {
   // If we change the prefix to something like "OT_PD_FF_...", we could automatically
   // scrape process.env instead of having this explicit list. We don't want to scrape
   // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
