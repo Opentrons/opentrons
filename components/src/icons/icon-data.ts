@@ -513,7 +513,7 @@ export const ICON_DATA_BY_NAME = {
     viewBox: '0 0 48 48',
   },
   play: {
-    path: 'M 5.25 2.25 L 18.75 12.125 L 5.25 21.75 Z',
+    path: 'M7.25 2.25L20.75 12.125L7.25 21.75V2.25Z',
     viewBox: '0 0 24 24',
   },
   'play-circle': {

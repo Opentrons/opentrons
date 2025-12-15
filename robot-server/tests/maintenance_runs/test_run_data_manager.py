@@ -34,6 +34,8 @@ from robot_server.service.notifications import (
 )
 
 from opentrons.protocol_engine import Liquid
+from opentrons.protocol_engine.resources import CameraProvider
+from robot_server.camera.provider import CameraProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -103,11 +105,26 @@ def subject(
     )
 
 
+@pytest.fixture()
+def mock_camera_provider_wrapper(decoy: Decoy) -> CameraProviderWrapper:
+    """Return a mock CameraProviderWrapper."""
+    return decoy.mock(cls=CameraProviderWrapper)
+
+
+@pytest.fixture()
+def mock_camera_provider(
+    decoy: Decoy, mock_camera_provider_wrapper: CameraProviderWrapper
+) -> CameraProvider:
+    """Return a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
+
+
 async def test_create(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should create an engine and a persisted run resource."""
     run_id = "hello world"
@@ -131,6 +148,7 @@ async def test_create(
         labware_offsets=[],
         deck_configuration=[],
         notify_publishers=mock_notify_publishers,
+        camera_provider=mock_camera_provider,
     )
 
     assert result == MaintenanceRun(
@@ -155,6 +173,7 @@ async def test_create_with_options(
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
     engine_state_summary: StateSummary,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should handle creation with labware offsets."""
     run_id = "hello world"
@@ -185,6 +204,7 @@ async def test_create_with_options(
         labware_offsets=[labware_offset],
         deck_configuration=[],
         notify_publishers=mock_notify_publishers,
+        camera_provider=mock_camera_provider,
     )
 
     assert result == MaintenanceRun(
@@ -208,6 +228,7 @@ async def test_create_engine_error(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
     subject: MaintenanceRunDataManager,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should not create a resource if engine creation fails."""
     run_id = "hello world"
@@ -233,6 +254,7 @@ async def test_create_engine_error(
             labware_offsets=[],
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            camera_provider=mock_camera_provider,
         )
 
 
@@ -294,6 +316,7 @@ async def test_get_run_not_current(
 async def test_delete_current_run(
     decoy: Decoy,
     mock_maintenance_run_orchestrator_store: MaintenanceRunOrchestratorStore,
+    mock_camera_provider: CameraProvider,
     subject: MaintenanceRunDataManager,
 ) -> None:
     """It should delete the current run from the engine."""
@@ -302,7 +325,9 @@ async def test_delete_current_run(
         run_id
     )
 
-    await subject.delete(run_id=run_id)
+    await subject.delete(
+        run_id=run_id, camera_settings=None, camera_provider=mock_camera_provider
+    )
 
     decoy.verify(
         await mock_maintenance_run_orchestrator_store.clear(),

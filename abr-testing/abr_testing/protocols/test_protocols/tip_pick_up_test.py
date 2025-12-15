@@ -60,7 +60,7 @@ def run(protocol: ProtocolContext) -> None:
                 pipette.reset_tipracks()
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
+            helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)

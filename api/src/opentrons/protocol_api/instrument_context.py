@@ -242,14 +242,14 @@ class InstrumentContext(publisher.CommandPublisher):
         :param flow_rate: The absolute flow rate in µL/s. If ``flow_rate`` is specified,
                           ``rate`` must not be set.
         :type flow_rate: float
-        :param end_location: Tells the robot to move between location and end_location
-            while aspirating liquid. When this argument is used the location and
-            end_location must both be :py:class:`.Location`.
+        :param end_location: Tells the robot to move from the specified ``location`` to the specified ``end_location``
+            while aspirating liquid. When this argument is used, the ``location`` and
+            ``end_location`` must both be a :py:class:`.Location`.
         :type end_location: :py:class:`.Location`
-        :param movement_delay: Delay the x/y/z movement during a dynamic aspirate.
-            This option is only valid when using end_location. When this argument
-            is used, the x/y/z movement will wait movement_delay seconds after the pipette
-            starts to aspirate before moving. This may help when dispensing very viscous liquids
+        :param movement_delay: Time in seconds to delay after the pipette starts aspirating and before it begins moving from  ``location`` to ``end_location``.
+            This option is only valid when using ``end_location``. When this argument
+            is used, the pipette will wait the specified time after the pipette
+            starts to aspirate before moving. This may help when aspirating very viscous liquids
             that need to build up some pressure before liquid starts to flow.
         :type movement_delay: float
         :returns: This instance.
@@ -263,6 +263,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. versionchanged:: 2.24
             Added the ``flow_rate`` parameter.
+        .. versionchanged:: 2.27
+            Added the ``end_location`` and ``movement_delay`` parameters.
         """
         if flow_rate is not None:
             if self.api_version < APIVersion(2, 24):
@@ -479,13 +481,13 @@ class InstrumentContext(publisher.CommandPublisher):
                           ``rate`` must not be set.
         :type flow_rate: float
 
-        :param end_location: Tells the robot to move between location and end_location
-            while dispensing liquid held in the pipette. When this argument is used
-            the location and end_location must both be a :py:class:`.Location`.
+        :param end_location: Tells the robot to move from the specified ``location`` to the specified ``end_location``
+            while dispensing liquid held in the pipette. When this argument is used,
+            the ``location`` and ``end_location`` must both be a :py:class:`.Location`.
         :type end_location: :py:class:`.Location`
-        :param movement_delay: Delay the x/y/z movement during a dynamic dispense.
-            This option is only valid when using end_location. When this argument
-            is used, the x/y/z movement will wait movement_delay seconds after the pipette
+        :param movement_delay: Time in seconds to delay after the pipette starts dispensing and before it begins moving from  ``location`` to ``end_location``.
+            This option is only valid when using ``end_location``. When this argument
+            is used, the pipette will wait the specified time after the pipette
             starts to dispense before moving. This may help when dispensing very viscous liquids
             that need to build up some pressure before liquid starts to flow.
         :type movement_delay: float
@@ -510,6 +512,9 @@ class InstrumentContext(publisher.CommandPublisher):
         .. versionchanged:: 2.24
             ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
             into a trash bin or waste chute.
+
+        .. versionchanged:: 2.27
+            Added the ``end_location`` and ``movement_delay`` parameters.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -849,7 +854,7 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         Mix a volume of liquid by repeatedly aspirating and dispensing it in a multiple locations.
 
-        See :ref:`dynamic_mix` for examples.
+        See :ref:`dynamic-mix` for examples.
 
         :param repetitions: Number of times to mix (default is 1).
         :param volume: The volume to mix, measured in µL. If unspecified, defaults
@@ -860,13 +865,13 @@ class InstrumentContext(publisher.CommandPublisher):
                        it will behave the same as a volume of ``None``/unspecified: mix
                        the full working volume of the pipette. On API levels at or above 2.16,
                        no liquid will be mixed.
-        :param aspirate_start_location: The :py:class:`~.types.Location` where the pipette will aspirate from.
-        :param aspirate_end_location: The :py:class:`~.types.Location` If this argument is supplied
-                    the pipette will move between aspirate_start_location and aspirate_end_location
+        :param aspirate_start_location: The :py:class:`~.types.Location` where the pipette will start aspirating from.
+        :param aspirate_end_location: A :py:class:`~.types.Location`. If specified,
+                    the pipette will move between the ``aspirate_start_location`` and the ``aspirate_end_location``
                     while performing the aspirate.
-        :param dispense_start_location: The :py:class:`~.types.Location` where the pipette will dispense to.
-        :param dispense_end_location: The :py:class:`~.types.Location` If this argument is supplied
-                    the pipette will move between dispense_start_location and dispense_end_location
+        :param dispense_start_location: The :py:class:`~.types.Location` where the pipette will start dispensing to.
+        :param dispense_end_location: A :py:class:`~.types.Location`. If specified,
+                    the pipette will move between the ``dispense_start_location`` and the ``dispense_end_location``
                     while performing the dispense.
         :param rate: How quickly the pipette aspirates and dispenses liquid while
                      mixing. The aspiration flow rate is calculated as ``rate``
@@ -884,10 +889,10 @@ class InstrumentContext(publisher.CommandPublisher):
                                pipette will not push out after earlier repetitions. If
                                not specified or ``None``, the pipette will push out the
                                default non-zero amount. See :ref:`push-out-dispense`.
-        :param movement_delay: Delay the x/y/z movement during a dynamic mix.
-            This option is only valid when using aspirate_end_location or dispense_end_location.
-            When this argument is used, the x/y/z movement will wait movement_delay seconds
-            after the pipette starts to aspirate/dispense before moving. This may help when mixing
+        :param movement_delay: Time in seconds to delay after the pipette starts aspirating or dispensing and before it begins moving from the ``aspirate_start_location`` or ``dispense_start_location`` to the ``aspirate_end_location`` or ``dispense_end_location``.
+            This option is only valid when using ``aspirate_end_location`` or ``dispense_end_location``.
+            When this argument is used, the pipette will wait the specified time
+            after the pipette starts to aspirate or dispense before moving. This may help when mixing
             very viscous liquids that need to build up some pressure before liquid starts to flow.
         :type movement_delay: float
         :raises: ``UnexpectedTipRemovalError`` -- If no tip is attached to the pipette.
@@ -895,10 +900,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
         .. note::
 
-            All the arguments of ``mix`` are optional. However, if you omit one of them,
-            all subsequent arguments must be passed as keyword arguments. For instance,
-            ``pipette.mix(1, location=wellplate['A1'])`` is a valid call, but
-            ``pipette.mix(1, wellplate['A1'])`` is not.
+            The ``aspirate_start_location`` and ``dispense_start_location`` arguments of ``dynamic_mix`` are required.
 
         """
         _log.debug(
@@ -2267,9 +2269,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                tips=[tip._core for tip in transfer_args.tips]
-                if transfer_args.tips is not None
-                else None,
+                tips=(
+                    [tip._core for tip in transfer_args.tips]
+                    if transfer_args.tips is not None
+                    else None
+                ),
             )
 
         return self
@@ -2441,9 +2445,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                tips=[tip._core for tip in transfer_args.tips]
-                if transfer_args.tips is not None
-                else None,
+                tips=(
+                    [tip._core for tip in transfer_args.tips]
+                    if transfer_args.tips is not None
+                    else None
+                ),
             )
 
         return self
@@ -2615,9 +2621,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 trash_location=transfer_args.trash_location,
                 return_tip=return_tip,
                 keep_last_tip=verified_keep_last_tip,
-                tips=[tip._core for tip in transfer_args.tips]
-                if transfer_args.tips is not None
-                else None,
+                tips=(
+                    [tip._core for tip in transfer_args.tips]
+                    if transfer_args.tips is not None
+                    else None
+                ),
             )
 
         return self

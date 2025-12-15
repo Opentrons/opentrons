@@ -1,19 +1,32 @@
 .container {
-  padding: 0 var(--spacing-16) var(--spacing-8);
+  padding: 0 0 var(--spacing-16);
+  container-name: controls-container;
+  container-type: inline-size;
 }
 
 .controls_container {
   position: relative;
   width: 100%;
-  padding: 0 var(--spacing-16);
+  min-width: 9.25rem; /* 148px */
+  padding: var(--spacing-16);
   border-radius: var(--border-radius-8);
   background-color: var(--white);
+  container-name: controls-container;
+  container-type: inline-size;
 }
 
 .all_controls_info {
   display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-20);
+  flex-direction: column;
+  gap: var(--spacing-16);
+}
+
+@container controls-container (min-width: 410px) {
+  .all_controls_info {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .controls_info {
@@ -31,11 +44,19 @@
   width: max-content;
 }
 
-.buttons {
+.buttons_container {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: var(--spacing-8);
+}
+
+@container controls-container (min-width: 284px) {
+  .buttons_container {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
 }
 
 .per_step_button_wrapper {

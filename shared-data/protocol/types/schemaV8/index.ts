@@ -53,6 +53,11 @@ export interface CommandV14Mixin {
   commands: CreateCommand[]
 }
 
+export interface CommandV15Mixin {
+  commandSchemaId: 'opentronsCommandSchemaV15'
+  commands: CreateCommand[]
+}
+
 export interface CommandAnnotationsStructure {
   commandAnnotationSchemaId: string
   commandAnnotations: any[]

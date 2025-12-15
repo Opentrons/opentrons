@@ -16,7 +16,7 @@ metadata = {
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.26"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 open_location: Any = "A4"
 
@@ -80,16 +80,19 @@ def add_parameters(p: ParameterContext) -> None:
         default=False,
         description="ON - protocol will use the waste chute.",
     )
+    helpers.create_error_capture_duration_duration(p)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
     global open_location
+    protocol.capture_image(filename="start_of_run")
 
     # Import Parameters
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
     ep_to_sample_plate = protocol.params.ep_to_sample_plate  # type: ignore[attr-defined]
     mm_col = protocol.params.mm_col  # type: ignore[attr-defined]
@@ -102,7 +105,7 @@ def run(protocol: ProtocolContext) -> None:
         open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
 
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
@@ -297,7 +300,8 @@ def run(protocol: ProtocolContext) -> None:
             for i in range(2 if ninety_six else 1):
                 pip.aspirate(
                     49 - pip.current_volume,
-                    src.meniscus(z=-1, target="end"),
+                    location=src.meniscus(z=-1, target="start"),
+                    end_location=src.meniscus(z=-1, target="end"),
                     rate=0.2,
                 )  # aspirate extra (backlash compensation)
                 protocol.delay(seconds=delay_time)
@@ -322,9 +326,11 @@ def run(protocol: ProtocolContext) -> None:
             for i in range(length):
                 volume = 9.1 + i * 0.15
                 protocol.comment(f"\nVOLUME: {volume}")
+                pip.prepare_to_aspirate()
                 pip.aspirate(
                     volume + 1.5 if i == 0 else volume,
-                    src.meniscus(z=-1, target="end"),
+                    location=src.meniscus(z=-1, target="start"),
+                    end_location=src.meniscus(z=-1, target="end"),
                     rate=0.35,
                 )
                 protocol.delay(seconds=delay_time)
@@ -333,7 +339,8 @@ def run(protocol: ProtocolContext) -> None:
                 pip.move_to(destination[i].top(10))
                 pip.dispense(
                     volume,
-                    destination[i].meniscus(z=-1, target="end"),
+                    location=destination[i].meniscus(z=-1, target="start"),
+                    end_location=destination[i].meniscus(z=-1, target="end"),
                     rate=0.2 if volume <= 5 else 1,
                     push_out=0,
                 )
@@ -354,7 +361,11 @@ def run(protocol: ProtocolContext) -> None:
             pip.configure_nozzle_layout(style=ALL)
             pip.configure_for_volume(volume)
             pip.pick_up_tip(full_tips)
-            pip.aspirate(volume, src.meniscus(z=-1, target="end"))
+            pip.aspirate(
+                volume,
+                location=src.meniscus(z=-1, target="start"),
+                end_location=src.meniscus(z=-1, target="end"),
+            )
             protocol.delay(seconds=delay_time)
             pip.dispense(
                 volume, destination.meniscus(z=-1, target="end")
@@ -372,9 +383,19 @@ def run(protocol: ProtocolContext) -> None:
             pip.pick_up_tip(
                 col_tips[0].wells()[5 * 8 if mmx_to_sample_plate else 6 * 8]
             )
-            pip.aspirate(volume, src.meniscus(z=-1, target="end"), rate=0.2)
+            pip.aspirate(
+                volume,
+                location=src.meniscus(z=-1, target="start"),
+                end_location=src.meniscus(z=-1, target="end"),
+                rate=0.2,
+            )
             protocol.delay(seconds=delay_time)
-            pip.dispense(volume, destination.meniscus(z=-1, target="end"), rate=0.2)
+            pip.dispense(
+                volume,
+                location=destination.meniscus(z=-1, target="start"),
+                end_location=destination.meniscus(z=-1, target="end"),
+                rate=0.2,
+            )
             pip.blow_out(destination.meniscus(z=2, target="end"))
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
@@ -438,12 +459,15 @@ def run(protocol: ProtocolContext) -> None:
                 pip.pick_up_tip(ifp_tips.pop(0))
             pip.aspirate(
                 volume + 4,
-                src[i].meniscus(z=-1, target="end"),
+                location=src[i].meniscus(z=-1, target="start"),
+                end_location=src[i].meniscus(z=-1, target="end"),
                 rate=0.2 if volume <= 5 else 1,
             )
             protocol.delay(seconds=delay_time)
             pip.dispense(
-                2, src[i].meniscus(z=-1, target="end")
+                2,
+                location=src[i].meniscus(z=-1, target="start"),
+                end_location=src[i].meniscus(z=-1, target="end"),
             )  # compensate for backlash
             # Retract
             pip.dispense(
@@ -501,10 +525,12 @@ def run(protocol: ProtocolContext) -> None:
             height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
             liquid_heights[ifp_plate_well.well_name] = height
         protocol.comment(str(liquid_heights))
-
+        protocol.capture_image(filename="end_of_run")
+        if not protocol.is_simulating():
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

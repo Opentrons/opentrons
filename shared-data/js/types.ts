@@ -49,6 +49,18 @@ export interface RobotDefinition {
   displayName: string
   robotType: RobotType
   models: string[]
+  extents: CoordinateTuple
+  paddingOffsets: {
+    rear: number
+    front: number
+    leftSide: number
+    rightSide: number
+  }
+  mountOffsets: {
+    left: CoordinateTuple
+    right: CoordinateTuple
+    gripper?: CoordinateTuple
+  }
 }
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
@@ -458,8 +470,10 @@ export interface CutoutFixture {
   height: number
 }
 
-export interface FakeCutoutFixture
-  extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
+export interface FakeCutoutFixture extends Omit<
+  CutoutFixture,
+  'id' | 'providesAddressableAreas'
+> {
   id: CutoutFixtureIdsWithFakes
   providesAddressableAreas: Record<
     CutoutId,
@@ -495,8 +509,10 @@ export interface AddressableArea {
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 
-export interface FakeAddressableArea
-  extends Omit<AddressableArea, 'id' | 'areaType'> {
+export interface FakeAddressableArea extends Omit<
+  AddressableArea,
+  'id' | 'areaType'
+> {
   id: AddressableAreaNamesWithFakes
   areaType: AreaTypeWithFakes
 }
@@ -526,11 +542,10 @@ export interface DeckLocations {
   legacyFixtures: LegacyFixture[]
 }
 
-export interface DeckLocationsWithFakes
-  extends Omit<
-    DeckLocations,
-    'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
-  > {
+export interface DeckLocationsWithFakes extends Omit<
+  DeckLocations,
+  'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
+> {
   addressableAreas: AddressableAreaWithFakes[]
 }
 
@@ -544,17 +559,16 @@ export interface DeckDefinition {
   cutoutFixtures: CutoutFixture[]
 }
 
-export interface DeckDefinitionWithFakes
-  extends Omit<
-    DeckDefinition,
-    | 'locations'
-    | 'cutoutFixtures'
-    | 'otId'
-    | 'cornerOffsetFromOrigin'
-    | 'dimensions'
-    | 'metadata'
-    | 'robot'
-  > {
+export interface DeckDefinitionWithFakes extends Omit<
+  DeckDefinition,
+  | 'locations'
+  | 'cutoutFixtures'
+  | 'otId'
+  | 'cornerOffsetFromOrigin'
+  | 'dimensions'
+  | 'metadata'
+  | 'robot'
+> {
   locations: DeckLocationsWithFakes
   cutoutFixtures: CutoutFixtureWithFakes[]
 }
@@ -569,6 +583,7 @@ export interface ModuleDimensions {
   labwareInterfaceXDimension?: number
   labwareInterfaceYDimension?: number
   lidHeight?: number
+  maxStackerFillHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
@@ -902,20 +917,17 @@ interface BaseLiquidHandlingProperties<RetractType> {
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-export interface AspirateProperties
-  extends BaseLiquidHandlingProperties<RetractAspirate> {
+export interface AspirateProperties extends BaseLiquidHandlingProperties<RetractAspirate> {
   aspiratePosition: TipPosition
   preWet: boolean
   mix: MixProperties
 }
-export interface SingleDispenseProperties
-  extends BaseLiquidHandlingProperties<RetractDispense> {
+export interface SingleDispenseProperties extends BaseLiquidHandlingProperties<RetractDispense> {
   dispensePosition: TipPosition
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-export interface MultiDispenseProperties
-  extends BaseLiquidHandlingProperties<RetractDispense> {
+export interface MultiDispenseProperties extends BaseLiquidHandlingProperties<RetractDispense> {
   dispensePosition: TipPosition
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
@@ -1039,6 +1051,7 @@ export type RunTimeParameter =
 export interface CommandPreconditions {
   isCameraUsed: boolean
 }
+export type CameraId = 'ot_system_camera'
 
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {

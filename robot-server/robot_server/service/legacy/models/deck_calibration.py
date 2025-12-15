@@ -1,10 +1,12 @@
 import typing
 from datetime import datetime
-from enum import Enum
 
+from pydantic import BaseModel, Field
+
+from opentrons_shared_data.util import StrEnum
 from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control.util import DeckTransformState
-from pydantic import BaseModel, Field
+
 from robot_server.service.shared_models import calibration as cal_model
 
 
@@ -52,7 +54,7 @@ class InstrumentCalibrationStatus(BaseModel):
     left: InstrumentOffset
 
 
-class MatrixType(str, Enum):
+class MatrixType(StrEnum):
     """The deck calibration matrix type"""
 
     affine = "affine"

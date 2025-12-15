@@ -1,11 +1,8 @@
-import {
-  RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR,
-  RUN_STATUS_AWAITING_RECOVERY_PAUSED,
-  RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-} from '@opentrons/api-client'
+import { RUN_STATUS_BLOCKED_BY_OPEN_DOOR } from '@opentrons/api-client'
+
+import { isCancellableStatus } from '/app/local-resources/runs/utils'
 
 import { NOT_CONFIGURED } from '../../../../../DoorOpenControl/useIsDoorOpen'
-import { isCancellableStatus } from '../utils'
 
 import type { RunHeaderBannerContainerProps } from '.'
 import type { DoorResult } from '../../../../../DoorOpenControl/useIsDoorOpen'
@@ -32,11 +29,7 @@ export function getShowGenericRunHeaderBanners({
   enteredER,
 }: ShowGenericRunHeaderBannersParams): ShowGenericRunHeaderBannersResult {
   const beforeRunCondition =
-    doorStatus.isDoorOpen &&
-    isCancellableStatus(runStatus) &&
-    runStatus !== RUN_STATUS_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_BLOCKED_BY_OPEN_DOOR &&
-    runStatus !== RUN_STATUS_AWAITING_RECOVERY_PAUSED
+    doorStatus.isDoorOpen && isCancellableStatus(runStatus)
 
   const showDoorOpenBeforeRunBanner =
     doorStatus.moduleDoorLocation === null && beforeRunCondition

@@ -11,6 +11,7 @@
 import {
   CAMERA_PHOTO_OPEN,
   CAMERA_STREAM_OPEN,
+  STEP_DETAIL_VIEWER_CLOSE,
   STEP_DETAIL_VIEWER_OPEN,
   STEP_DETAIL_VIEWER_UPDATE,
 } from '../constants'
@@ -106,13 +107,24 @@ function detailsByActionType(action: Action): SecondaryWindowDetails | null {
     }
     case STEP_DETAIL_VIEWER_UPDATE:
       updateStepDetailViewerData(action.payload.protocolKey, {
-        slot: action.payload.slot,
+        slot: action.payload.slot ?? undefined,
         command: action.payload.command,
         robotState: action.payload.robotState,
         analysis: action.payload.analysis,
         liquids: action.payload.liquids,
       })
       return null
+
+    case STEP_DETAIL_VIEWER_CLOSE: {
+      const windowId = getWindowIdStepDetailViewer(action.payload.protocolKey)
+      const existingWindow = secondaryWindows.get(windowId)
+      if (existingWindow != null && !existingWindow.isDestroyed()) {
+        existingWindow.close()
+      }
+      secondaryWindows.delete(windowId)
+      return null
+    }
+
     default:
       return null
   }
@@ -137,7 +149,7 @@ function openWindow(details: SecondaryWindowDetails): void {
   const newWindow = createUi()
   secondaryWindows.set(windowId, newWindow)
 
-  newWindow.webContents.once('did-finish-load', () => {
+  newWindow.webContents.on('did-finish-load', () => {
     log.debug(`Did finish load for ${type}`)
     newWindow.webContents.send('window-type', 'secondary')
   })

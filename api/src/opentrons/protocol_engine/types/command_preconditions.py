@@ -1,9 +1,10 @@
 """Protocol Engine types dealing with command preconditions."""
-from enum import Enum
 from pydantic import Field, BaseModel
 
+from opentrons_shared_data.util import StrEnum
 
-class PreconditionTypes(str, Enum):
+
+class PreconditionTypes(StrEnum):
     """Precondition types used for identification during state update."""
 
     IS_CAMERA_USED = "isCameraUsed"

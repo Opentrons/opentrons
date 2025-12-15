@@ -63,7 +63,7 @@ Certain features are only available in Python protocols, either because they are
 
 ### Partial tip pickup
 
-The Python API supports the most partial tip pickup configurations. Currently, Protocol Designer only supports column pickup with the 96-channel pipette. The `InstrumentContext.configure_nozzle_layout()` method supports these additional layouts:
+The Python API supports the most partial tip pickup configurations. The `InstrumentContext.configure_nozzle_layout()` method supports multiple layouts:
 
 - Row pickup with the 96-channel pipette.
 
@@ -72,6 +72,8 @@ The Python API supports the most partial tip pickup configurations. Currently, P
 - Single tip pickup with all multi-channel pipettes.
 
 Certain configurations allow changing which nozzles are used. For example, you can pick up a column of tips with either the left or right edge of the 96-channel pipette.
+
+Protocol Designer supports some partial tip use, like single tip pickup and 96-channel column pickup, but doesn't let you change which nozzles are used.
 
 ### Runtime parameters
 
@@ -89,9 +91,19 @@ Unlike other protocol commands, robot motor control commands execute movements i
 
 Sensors in Flex pipettes can detect the level of liquid in a well. You can use this feature to target a [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html?highlight=liquid+level#meniscus) while aspirating, dispensing, or mixing in a Python protocol. 
 
-### Non-blocking commands
+### Dynamic pipetting
 
-Some module commands that take a long time to complete (such as heating from ambient temperature to a high temperature) can be run in a *non-blocking* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. Non-blocking commands are currently supported on the [Heater-Shaker Module](https://docs.opentrons.com/v2/modules/heater_shaker.html#non-blocking-commands).
+Starting in API version 2.27, use start and end location parameters to control pipette movements during liquid transfers: 
+
+- Continuously target the [liquid meniscus](https://docs.opentrons.com/v2/robot_position.html#meniscus) as it changes while pipetting liquid.
+- Change the pipette's position within a well while aspirating, dispensing, or mixing.
+- Mix in different locations in labware using the [dynamic mix](https://docs.opentrons.com/v2/basic_commands/liquids.html#dynamic-mix) method.
+
+### Concurrent commands
+
+Some module commands that take a long time to complete (such as executing a Thermocycler profile or heating to a high temperature) can be run in a *concurrent* manner. This lets your protocol save time by continuing on to other pipetting tasks instead of waiting for the command to complete. 
+
+As of API version 2.27, concurrent commands are currently supported on the [Heater-Shaker](https://docs.opentrons.com/v2/modules/heater_shaker.html#heating-and-shaking), [Temperature](https://docs.opentrons.com/v2/modules/temperature_module.hmtl#temperature-control), and [Thermocyler](https://docs.opentrons.com/v2/modules/thermocycler.html) Modules. You can also run multiple modules at the same time. See [Concurrent Module Actions](https://docs.opentrons.com/v2/modules/concurrent_module.html) for more.
 
 ### Python packages
 

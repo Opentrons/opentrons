@@ -51,8 +51,8 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-python@v3'
         with:
-          python-version: '3.10'
-      - uses: 'actions/setup-node@v4'
+          python-version: '3.12'
+      - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.21.1'
       - uses: './.github/actions/python/setup'

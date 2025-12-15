@@ -2,6 +2,8 @@ import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
+  FlexStackerSetStoredLabwareParams,
+  FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   Height,
   LabwareDefinition2,
@@ -17,11 +19,11 @@ import type {
   PipetteV2Specs,
   PositionReference,
   ShakeSpeedParams,
+  TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   Width,
 } from '@opentrons/shared-data'
-import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AUTOMATIC,
   CLEAN,
@@ -106,9 +108,13 @@ export interface AbsorbanceReaderState {
   initialization: Initialization | null
 }
 
-export interface FlexStackerState {
+export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  //  TODO: extend this state
+  maxPoolCount: number
+  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  // labware in hopper is the bottom up
+  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
+  labwareOnShuttle: FlexStackerStoredLabwareGroup | null
 }
 
 export type ModuleState =
@@ -118,7 +124,7 @@ export type ModuleState =
   | HeaterShakerModuleState
   | MagneticBlockState
   | AbsorbanceReaderState
-  | FlexStackerState
+  | FlexStackerModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
@@ -561,7 +567,7 @@ export interface ThermocyclerProfileStepArgs extends CommonArgs {
   lidOpenHold: boolean
   lidTargetTempHold: number | null
   message?: string
-  profileSteps: AtomicProfileStep[]
+  profileElements: TCExtendedProfileParams['profileElements']
   profileTargetLidTemp: number
   profileVolume: number
   meta?: {
@@ -628,6 +634,33 @@ export interface CaptureImageArgs extends CommonArgs {
   saturation: number
 }
 
+export interface FlexStackerEmptyArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerEmpty'
+  interventionMessage: string | null
+}
+export interface FlexStackerFillItemsArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerFillItems'
+  fillLabwareUri: string | null
+  fillQuantity: number | null
+  interventionMessage: string | null
+}
+export interface FlexStackerStoreArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerStore'
+}
+export interface FlexStackerRetrieveArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerRetrieve'
+}
+
+export type FlexStackerArgs =
+  | FlexStackerEmptyArgs
+  | FlexStackerFillItemsArgs
+  | FlexStackerRetrieveArgs
+  | FlexStackerStoreArgs
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
@@ -648,6 +681,7 @@ export type CommandCreatorArgs =
   | HeaterShakerArgs
   | MoveLabwareArgs
   | CommentArgs
+  | FlexStackerArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }
@@ -702,6 +736,7 @@ export interface TimelineFrame {
     pipettes: {
       [pipetteId: string]: {
         hasTip: boolean
+        /** TODO: tiprackURI is a misnomer: it's a labwareId, not a URI */
         tiprackURI: string | null
       }
     }
@@ -738,6 +773,7 @@ export type ErrorType =
   | 'CLOSING_THERMOCYCLER_WITH_INVALID_LABWARE_LID'
   | 'DROP_TIP_LOCATION_DOES_NOT_EXIST'
   | 'EQUIPMENT_DOES_NOT_EXIST'
+  | 'FLEX_STACKER_NO_GRIPPER'
   | 'GRIPPER_REQUIRED'
   | 'HEATER_SHAKER_EAST_WEST_LATCH_OPEN'
   | 'HEATER_SHAKER_EAST_WEST_MULTI_CHANNEL'
@@ -746,6 +782,9 @@ export type ErrorType =
   | 'HEATER_SHAKER_LATCH_OPEN'
   | 'HEATER_SHAKER_NORTH_SOUTH__OF_NON_TIPRACK_WITH_MULTI_CHANNEL'
   | 'HEATER_SHAKER_NORTH_SOUTH_EAST_WEST_SHAKING'
+  | 'HOPPER_EMPTY'
+  | 'HOPPER_FULL'
+  | 'INCOMPLETE_PICKUP'
   | 'INSUFFICIENT_TIPS'
   | 'INVALID_SLOT'
   | 'LABWARE_DISCARDED_IN_TRASH'
@@ -753,11 +792,13 @@ export type ErrorType =
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
+  | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
-  | 'MULTI_DISPENSE_VALUES_NOT_FOUND'
+  | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
+  | 'MULTI_DISPENSE_VOLUME_TOO_HIGH'
   | 'NEXT_TIPRACK_HAS_LID'
   | 'NO_TIP_ON_PIPETTE'
   | 'NO_TIP_SELECTED'
@@ -770,6 +811,8 @@ export type ErrorType =
   | 'RETRACT_BELOW_ASPIRATE'
   | 'RETRACT_BELOW_DISPENSE'
   | 'RETURN_TIP_UNAVAILABLE'
+  | 'SHUTTLE_FULL'
+  | 'SHUTTLE_EMPTY'
   | 'STACK_TOO_HIGH'
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
@@ -777,6 +820,7 @@ export type ErrorType =
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'
+  | 'TOO_MANY_TIPS'
 
 export interface CommandCreatorError {
   message: string

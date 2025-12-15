@@ -81635,7 +81635,24 @@
     "author": "Opentrons <protocols@opentrons.com>",
     "protocolName": "Zymo Direct-zol96 Magbead RNA"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "6"
+      },
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "1"
+      },
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

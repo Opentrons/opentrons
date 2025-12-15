@@ -3,6 +3,11 @@
   "all_tips_selected": "All tips selected",
   "click_to_select": "Click to select tips in {{labwareName}}",
   "continue": "Continue",
+  "error_banner": {
+    "incompletePickup": "Selection will not pickup enough tips",
+    "pickupsRequired": "Not enough tips selected ({{count}} pickups remaining)",
+    "tooManyTips": "Selection will pickup too many tips"
+  },
   "go_back": "Go back",
   "legend": {
     "inaccessible_tip": "Inaccessible tip",
@@ -24,7 +29,12 @@
   "select_tiprack": "Select a tip rack to pick up tips from",
   "select_tips": "Select tips",
   "select_tips_for_tracking": "Select tips for manual tip tracking",
-  "tip_accessible": { "deselect": "Deselect tip", "select": "Select tip" },
+  "tip_accessible": {
+    "deselect_multiple": "Deselect tips",
+    "deselect_one": "Deselect tip",
+    "select_multiple": "Select tips",
+    "select_one": "Select tip"
+  },
   "tip_inaccessible": {
     "collision": "Selection will cause a collision",
     "incomplete": "Selection will be incomplete",

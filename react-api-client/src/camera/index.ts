@@ -1,2 +1,4 @@
-export * from './useCamera'
 export * from './useUpdateCamera'
+export * from './useCamera'
+export * from './useCameraImageSettings'
+export * from './useUpdateCameraImageSettings'

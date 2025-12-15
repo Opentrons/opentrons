@@ -6,12 +6,15 @@ import { useNavigate } from 'react-router-dom'
 import {
   Chip,
   Divider,
+  Flex,
+  Icon,
   MenuItem,
   OverflowBtn,
   StyledText,
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
+import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
@@ -82,6 +85,7 @@ export function CameraCard({
   const navigateToUsageSettings = (): void => {
     navigate(`/devices/${robotName}/robot-settings/camera`)
   }
+  const { createCameraImageSettings } = useCreateCameraImageSettings()
 
   return (
     <div className={styles.card_container}>
@@ -97,15 +101,21 @@ export function CameraCard({
             >
               {t('on_deck')}
             </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('camera')}
-            </StyledText>
+            <div className={styles.card_photo_content_container}>
+              <Icon className={styles.icon_container} name="camera" />
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {isFlex ? t('branded:flex_camera') : t('ot2_camera')}
+              </StyledText>
+            </div>
           </div>
-          {isCameraEnabled ? (
-            <Chip type="success" hasIcon={false} text={t('enabled')} />
-          ) : (
-            <Chip type="neutral" hasIcon={false} text={t('disabled')} />
-          )}
+          <Flex width="fit-content">
+            <Chip
+              type={isCameraEnabled ? 'success' : 'neutral'}
+              hasIcon={false}
+              text={isCameraEnabled ? t('enabled') : t('disabled')}
+              chipSize="small"
+            />
+          </Flex>
         </div>
       </div>
       <div className={styles.card_overflow_btn}>
@@ -132,7 +142,10 @@ export function CameraCard({
       )}
       {showControls &&
         createPortal(
-          <CameraControls onClose={toggleControls} />,
+          <CameraControls
+            onClose={toggleControls}
+            postCameraImageSettings={createCameraImageSettings}
+          />,
           getTopPortalEl()
         )}
     </div>

@@ -131,7 +131,7 @@ def test_configure_virtual_pipette_for_volume(
         volume_mode=VolumeModes.default,
         available_volume_modes_min_vol={
             VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 1.0,
+            VolumeModes.lowVolumeDefault: 0.5,
         },
     )
     subject_instance.configure_virtual_pipette_for_volume(
@@ -143,7 +143,7 @@ def test_configure_virtual_pipette_for_volume(
     assert result2 == LoadedStaticPipetteData(
         model="p50_single_v3.6",
         display_name="Flex 1-Channel 50 µL",
-        min_volume=1,
+        min_volume=0.5,
         max_volume=30,
         channels=1,
         nozzle_offset_z=-259.15,
@@ -173,7 +173,7 @@ def test_configure_virtual_pipette_for_volume(
         volume_mode=VolumeModes.lowVolumeDefault,
         available_volume_modes_min_vol={
             VolumeModes.default: 5.0,
-            VolumeModes.lowVolumeDefault: 1.0,
+            VolumeModes.lowVolumeDefault: 0.5,
         },
     )
 

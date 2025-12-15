@@ -12,6 +12,7 @@ on:
       - 'components/**'
       - 'shared-data/**'
       - '.github/workflows/opentrons-ai-client-test.yml'
+      - 'vitest.config.*'
     branches:
       - '**'
     tags:
@@ -24,6 +25,7 @@ on:
       - 'components/**'
       - 'shared-data/**'
       - '.github/workflows/opentrons-ai-client-test.yml'
+      - 'vitest.config.*'
   workflow_dispatch:
 
 concurrency:
@@ -40,7 +42,7 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.21.1'
       - name: 'install udev'

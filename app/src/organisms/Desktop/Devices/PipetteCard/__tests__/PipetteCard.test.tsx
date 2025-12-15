@@ -45,7 +45,7 @@ describe('PipetteCard', () => {
       mount: LEFT,
       robotName: mockRobotName,
       pipetteId: 'id',
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     vi.mocked(PipetteOverflowMenu).mockReturnValue(
@@ -72,7 +72,7 @@ describe('PipetteCard', () => {
       mount: LEFT,
       robotName: mockRobotName,
       pipetteId: 'id',
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -86,7 +86,7 @@ describe('PipetteCard', () => {
       mount: RIGHT,
       robotName: mockRobotName,
       pipetteId: 'id',
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -98,7 +98,7 @@ describe('PipetteCard', () => {
       pipetteModelSpecs: null,
       mount: RIGHT,
       robotName: mockRobotName,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -110,7 +110,7 @@ describe('PipetteCard', () => {
       pipetteModelSpecs: null,
       mount: LEFT,
       robotName: mockRobotName,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -122,7 +122,7 @@ describe('PipetteCard', () => {
       pipetteModelSpecs: mockLeftSpecs,
       mount: LEFT,
       robotName: mockRobotName,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -133,7 +133,7 @@ describe('PipetteCard', () => {
       pipetteModelSpecs: mockRightSpecs,
       mount: RIGHT,
       robotName: mockRobotName,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)

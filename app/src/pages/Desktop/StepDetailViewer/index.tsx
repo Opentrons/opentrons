@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
-import { SlotDetails } from '../Protocols/ProtocolVisualization/SlotDetails'
+import { SlotDetails } from '/app/organisms/Desktop/ProtocolVisualization/SlotDetails'
+
+import { SkeletonForSlotDetail } from './SkeletonForSlotDetail'
 
 import type {
   Liquid,
@@ -74,7 +76,7 @@ export function StepDetailViewer(): JSX.Element {
   }, [protocolKey])
 
   if (loading) {
-    return <div>loading</div>
+    return <SkeletonForSlotDetail />
   }
   if (!data) {
     return <div>no data found</div>

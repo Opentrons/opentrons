@@ -6,6 +6,7 @@ from decoy import Decoy
 
 from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import types as pe_types
+from opentrons.protocol_engine import StateSummary, EngineStatus
 
 from robot_server.errors.error_responses import ApiError
 from robot_server.service.json_api import (
@@ -26,6 +27,7 @@ from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
+from robot_server.runs.run_data_manager import RunDataManager
 
 from robot_server.maintenance_runs.router.base_router import (
     create_run,
@@ -37,6 +39,11 @@ from robot_server.maintenance_runs.router.base_router import (
 )
 
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+    CameraSettings,
+)
+from robot_server.camera.provider import CameraProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -54,11 +61,26 @@ def labware_offset_create() -> pe_types.LegacyLabwareOffsetCreate:
     )
 
 
+@pytest.fixture()
+def mock_camera_provider_wrapper(decoy: Decoy) -> CameraProviderWrapper:
+    """Return a mock CameraProviderWrapper."""
+    return decoy.mock(cls=CameraProviderWrapper)
+
+
+@pytest.fixture()
+def mock_camera_provider(
+    decoy: Decoy, mock_camera_provider_wrapper: CameraProviderWrapper
+) -> CameraProvider:
+    """Return a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
+
+
 async def test_create_run(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
     labware_offset_create: pe_types.LabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -90,6 +112,7 @@ async def test_create_run(
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
             notify_publishers=mock_notify_publishers,
+            camera_provider=mock_camera_provider,
         )
     ).then_return(expected_response)
 
@@ -103,6 +126,7 @@ async def test_create_run(
         is_ok_to_create_maintenance_run=True,
         deck_configuration_store=mock_deck_configuration_store,
         notify_publishers=mock_notify_publishers,
+        camera_provider=mock_camera_provider,
         check_estop=True,
     )
 
@@ -114,6 +138,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
     mock_deck_configuration_store: DeckConfigurationStore,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should respond with a conflict error if protocol run is active during maintenance run creation."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -130,6 +155,7 @@ async def test_create_maintenance_run_with_protocol_run_conflict(
             deck_configuration_store=mock_deck_configuration_store,
             check_estop=True,
             notify_publishers=mock_notify_publishers,
+            camera_provider=mock_camera_provider,
         )
     assert exc_info.value.status_code == 409
     assert exc_info.value.content["errors"][0]["id"] == "ProtocolRunIsActive"
@@ -266,13 +292,79 @@ async def test_get_no_current_run(
 async def test_delete_run_by_id(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
+    mock_run_data_manager: RunDataManager,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should be able to remove a run by ID."""
     result = await remove_run(
-        runId="run-id", run_data_manager=mock_maintenance_run_data_manager
+        runId="run-id",
+        maintenance_run_data_manager=mock_maintenance_run_data_manager,
+        run_data_manager=mock_run_data_manager,
+        camera_provider=mock_camera_provider,
     )
 
-    decoy.verify(await mock_maintenance_run_data_manager.delete("run-id"), times=1)
+    decoy.verify(
+        await mock_maintenance_run_data_manager.delete(
+            "run-id", None, camera_provider=mock_camera_provider
+        ),
+        times=1,
+    )
+
+    assert result.content == SimpleEmptyBody()
+    assert result.status_code == 200
+
+
+async def test_delete_run_by_id_with_external_run(
+    decoy: Decoy,
+    mock_maintenance_run_data_manager: MaintenanceRunDataManager,
+    mock_run_data_manager: RunDataManager,
+    mock_camera_provider: CameraProvider,
+) -> None:
+    """It should pass in external camera settings if an external run exists when deleting a maintenance run."""
+    assert mock_run_data_manager.current_run_id is not None
+    decoy.when(
+        mock_run_data_manager._get_good_state_summary(
+            mock_run_data_manager.current_run_id
+        )
+    ).then_return(
+        StateSummary(
+            status=EngineStatus.IDLE,
+            errors=[],
+            labware=[],
+            pipettes=[],
+            modules=[],
+            labwareOffsets=[],
+            liquids=[],
+            wells=[],
+            files=[],
+            liquidClasses=[],
+            tasks=[],
+            cameraSettings=CameraSettings(
+                cameraEnabled=True,
+                liveStreamEnabled=True,
+                errorRecoveryCameraEnabled=True,
+            ),
+        )
+    )
+    result = await remove_run(
+        runId="run-id",
+        maintenance_run_data_manager=mock_maintenance_run_data_manager,
+        run_data_manager=mock_run_data_manager,
+        camera_provider=mock_camera_provider,
+    )
+
+    decoy.verify(
+        await mock_maintenance_run_data_manager.delete(
+            "run-id",
+            CameraSettings(
+                cameraEnabled=True,
+                liveStreamEnabled=True,
+                errorRecoveryCameraEnabled=True,
+            ),
+            camera_provider=mock_camera_provider,
+        ),
+        times=1,
+    )
 
     assert result.content == SimpleEmptyBody()
     assert result.status_code == 200
@@ -281,15 +373,22 @@ async def test_delete_run_by_id(
 async def test_delete_run_with_bad_id(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
+    mock_run_data_manager: RunDataManager,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should 404 if the run ID does not exist."""
-    decoy.when(await mock_maintenance_run_data_manager.delete("run-id")).then_raise(
-        MaintenanceRunNotFoundError("uh oh")
-    )
+    decoy.when(
+        await mock_maintenance_run_data_manager.delete(
+            "run-id", None, camera_provider=mock_camera_provider
+        )
+    ).then_raise(MaintenanceRunNotFoundError("uh oh"))
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(
-            runId="run-id", run_data_manager=mock_maintenance_run_data_manager
+            runId="run-id",
+            maintenance_run_data_manager=mock_maintenance_run_data_manager,
+            run_data_manager=mock_run_data_manager,
+            camera_provider=mock_camera_provider,
         )
 
     assert exc_info.value.status_code == 404
@@ -299,15 +398,22 @@ async def test_delete_run_with_bad_id(
 async def test_delete_active_run(
     decoy: Decoy,
     mock_maintenance_run_data_manager: MaintenanceRunDataManager,
+    mock_run_data_manager: RunDataManager,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_maintenance_run_data_manager.delete("run-id")).then_raise(
-        RunConflictError("oh no")
-    )
+    decoy.when(
+        await mock_maintenance_run_data_manager.delete(
+            "run-id", None, camera_provider=mock_camera_provider
+        )
+    ).then_raise(RunConflictError("oh no"))
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(
-            runId="run-id", run_data_manager=mock_maintenance_run_data_manager
+            runId="run-id",
+            maintenance_run_data_manager=mock_maintenance_run_data_manager,
+            run_data_manager=mock_run_data_manager,
+            camera_provider=mock_camera_provider,
         )
 
     assert exc_info.value.status_code == 409

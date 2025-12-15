@@ -2,9 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { DIRECTION_COLUMN, Divider, Flex, SPACING } from '@opentrons/components'
-import { FLEX_96_CHANNEL_PIPETTES } from '@opentrons/shared-data'
 
-import { getEnablePartialTipSupport } from '/protocol-designer/feature-flags/selectors'
 import {
   getAdditionalEquipmentEntities,
   getPipetteEntities,
@@ -34,18 +32,15 @@ export function FirstStepMoveLiquidTools({
 }: FirstStepMoveLiquidToolsProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
   const pipettes = useSelector(getPipetteEntities)
-  const enablePartialTip = useSelector(getEnablePartialTipSupport)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
 
   const { pipette, tipRack } = propsForFields
-  const is96Channel =
-    pipette.value != null &&
-    FLEX_96_CHANNEL_PIPETTES.includes(pipettes[String(pipette.value)].name)
-  const is8Channel =
-    propsForFields.pipette.value != null &&
-    pipettes[String(propsForFields.pipette.value)].spec.channels === 8
+  const channels =
+    pipette.value != null
+      ? pipettes[String(pipette.value)]?.spec.channels
+      : null
   const isDisposalLocation =
     additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
       ?.name === 'wasteChute' ||
@@ -59,8 +54,7 @@ export function FirstStepMoveLiquidTools({
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
-      {propsForFields.pipette.value != null &&
-      (is96Channel || (is8Channel && enablePartialTip)) ? (
+      {channels != null && channels !== 1 ? (
         <>
           <Divider marginY="0" />
           <PartialTipField
@@ -126,7 +120,7 @@ export function FirstStepMoveLiquidTools({
         title={t('pipette_path')}
       />
       <Divider marginY="0" />
-      <VolumeField {...propsForFields.volume} />
+      <VolumeField fieldProps={propsForFields.volume} path={formData.path} />
     </Flex>
   )
 }

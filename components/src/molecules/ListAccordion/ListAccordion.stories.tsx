@@ -46,11 +46,10 @@ export default {
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-interface ListAccordionStoryProps
-  extends Omit<
-    ComponentProps<typeof ListAccordionComponent>,
-    'headerChild' | 'children'
-  > {
+interface ListAccordionStoryProps extends Omit<
+  ComponentProps<typeof ListAccordionComponent>,
+  'headerChild' | 'children'
+> {
   tagCount: number
   headerText: string
 }

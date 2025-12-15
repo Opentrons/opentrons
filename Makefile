@@ -58,9 +58,7 @@ setup: setup-js setup-py
 .PHONY: setup-py-toolchain
 setup-py-toolchain:
 	$(OT_PYTHON) -m pip install --upgrade pip
-	$(OT_PYTHON) -m pip install pipenv==2023.12.1
-# this needs to be installed AFTER pipenv or pipenv will update this to the bad version
-	$(OT_PYTHON) -m pip install virtualenv==20.30.0
+	$(OT_PYTHON) -m pip install pipenv==2025.0.4
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
@@ -196,7 +194,6 @@ test-windows: test-js test-py-windows
 .PHONY: test-e2e
 test-e2e:
 	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
-	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
 PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
 WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR)/python)
@@ -209,6 +206,9 @@ test-py-windows: $(WINDOWS_PYTHON_TEST_TARGETS)
 
 %-py-test:
 	$(MAKE) -C $* test
+
+shared-data-py-test:
+	$(MAKE) -C shared-data test-py
 
 .PHONY: test-js
 test-js: test-js-internal

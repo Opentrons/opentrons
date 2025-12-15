@@ -366,7 +366,10 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
 // returns the position associated with a slot id
 export function getPositionFromSlotId(
   slotId: string,
-  deckDef: DeckDefinition
+  deckDef: DeckDefinition,
+  //  PD needs this in order to position zooming into the slot
+  //  the hopper doesn't have its own AddressableAreaName
+  hopperAdjustedOffset?: number
 ): CoordinateTuple | null {
   const cutoutWithSlot =
     deckDef.robot.model === FLEX_ROBOT_TYPE
@@ -384,7 +387,9 @@ export function getPositionFromSlotId(
   const slotPosition: CoordinateTuple | null =
     cutoutPosition != null
       ? [
-          cutoutPosition[0] + offsetFromCutoutFixture[0],
+          cutoutPosition[0] +
+            offsetFromCutoutFixture[0] +
+            (hopperAdjustedOffset != null ? hopperAdjustedOffset : 0),
           cutoutPosition[1] + offsetFromCutoutFixture[1],
           cutoutPosition[2] + offsetFromCutoutFixture[2],
         ]
@@ -868,6 +873,7 @@ export function getFixtureDisplayName(
   }
 }
 
+// TODO: Move to helpers/deckDeclarationHelpers.ts
 export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_1,
   ADDRESSABLE_AREA_2,
@@ -882,6 +888,7 @@ export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_11,
 ]
 
+// TODO: Move to helpers
 export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,

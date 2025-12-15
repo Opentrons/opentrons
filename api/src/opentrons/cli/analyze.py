@@ -6,7 +6,6 @@ from anyio import run
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from enum import Enum
 from pathlib import Path
 from pydantic import BaseModel
 from typing import (
@@ -61,6 +60,8 @@ from opentrons.protocol_engine import (
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
 from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
+
+from opentrons_shared_data.util import StrEnum
 
 from opentrons_shared_data.robot.types import RobotType
 
@@ -510,7 +511,7 @@ class PythonConfig(BaseModel):
     apiVersion: APIVersion
 
 
-class AnalysisResult(str, Enum):
+class AnalysisResult(StrEnum):
     """Result of a completed protocol analysis.
 
     The result indicates whether the protocol is expected to run successfully.

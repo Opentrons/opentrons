@@ -67,7 +67,7 @@ export function SelectTips(
     numTotalPickups: number
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
-    setShowPickupsRequiredBanner: Dispatch<SetStateAction<boolean>>
+    setShowErrorBanner: Dispatch<SetStateAction<boolean>>
     primaryNozzle: string
     tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
@@ -87,7 +87,7 @@ export function SelectTips(
     selectedTips,
     setSelectedTips,
     numTotalPickups,
-    setShowPickupsRequiredBanner,
+    setShowErrorBanner,
     tipAccessibilityStatus,
     nozzles,
     primaryNozzle,
@@ -160,16 +160,6 @@ export function SelectTips(
   }
 
   const handleClickWell = (wellName: string): void => {
-    if (
-      tipState?.[wellName] === 'EMPTY' ||
-      !tipAccessibileStatusByWellName[wellName].isAccessible ||
-      (allWellsAffectedByHover.includes(wellName) &&
-        !areAllHoveredWellsAccessibleAndOccupied)
-    ) {
-      return
-    }
-    setShowPickupsRequiredBanner(false)
-
     const prevSelectedTipsByIndex = selectedTips.reduce<Record<string, number>>(
       (acc, tipList, index) => {
         const innerAcc = tipList.reduce((acc, tip) => {
@@ -179,6 +169,18 @@ export function SelectTips(
       },
       {}
     )
+
+    if (
+      // always allow tip unselection
+      !(wellName in prevSelectedTipsByIndex) &&
+      (tipState?.[wellName] === 'EMPTY' ||
+        !tipAccessibileStatusByWellName[wellName].isAccessible ||
+        (allWellsAffectedByHover.includes(wellName) &&
+          !areAllHoveredWellsAccessibleAndOccupied))
+    ) {
+      return
+    }
+    setShowErrorBanner(false)
 
     if (channels === 1 || nozzles === SINGLE) {
       if (wellName in prevSelectedTipsByIndex) {
@@ -274,7 +276,13 @@ export function SelectTips(
                 status = rawState === NO ? NO : INACCESSIBLE
               }
               if (selectedTips.flat().some(tip => tip === wellName)) {
-                status = rawState === USED ? SELECTED_USED : SELECTED
+                const isAccessible =
+                  tipAccessibileStatusByWellName[wellName].isAccessible
+                if (!isAccessible) {
+                  status = SELECTED_ERROR
+                } else {
+                  status = rawState === USED ? SELECTED_USED : SELECTED
+                }
               } else if (allWellsAffectedByHover.includes(wellName)) {
                 if (
                   areAllHoveredWellsAccessibleAndOccupied &&
@@ -327,6 +335,7 @@ export function SelectTips(
             inaccessibleReason={hoveredWellsInaccessibilityStatus}
             primaryNozzle={primaryNozzle}
             enclosingViewbox={viewBox}
+            nozzles={nozzles}
           />
         ) : null}
       </>

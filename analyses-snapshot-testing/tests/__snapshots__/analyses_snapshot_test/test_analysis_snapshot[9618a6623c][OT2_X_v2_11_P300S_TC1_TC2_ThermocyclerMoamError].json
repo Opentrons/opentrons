@@ -2656,7 +2656,7 @@
           "errorInfo": {
             "args": "('thermocyclerModuleV2 in slot 7 prevents thermocyclerModuleV1 from using slot 7.',)",
             "class": "DeckConflictError",
-            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_11_P300S_TC1_TC2_ThermocyclerMoamError.py\", line N, in run\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n\n  File \"<PATH>\", line N, in load_module\n    module_core = self._core.load_module(\n\n  File \"<PATH>\", line N, in load_module\n    self._deck_layout[resolved_location] = geometry\n\n  File \"<PATH>\", line N, in __setitem__\n    deck_conflict.check(\n\n  File \"<PATH>\", line N, in check\n    raise DeckConflictError(\n"
+            "traceback": "  File \"<PATH>\", line N, in exec_run\n    exec(\"run(__context)\", new_globs)\n\n  File \"<string>\", line N, in <module>\n\n  File \"OT2_X_v2_11_P300S_TC1_TC2_ThermocyclerMoamError.py\", line N, in run\n\n  File \"<PATH>\", line N, in _check_version_wrapper\n    return decorated_obj(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in load_module\n    module_core = self._core.load_module(\n                  ^^^^^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in load_module\n    self._deck_layout[resolved_location] = geometry\n    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n\n  File \"<PATH>\", line N, in __setitem__\n    deck_conflict.check(\n\n  File \"<PATH>\", line N, in check\n    raise DeckConflictError(\n"
           },
           "errorType": "PythonException",
           "id": "UUID",
@@ -2706,7 +2706,16 @@
   "metadata": {
     "apiLevel": "2.11"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "7"
+      },
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

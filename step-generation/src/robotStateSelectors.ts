@@ -5,6 +5,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ALL,
   COLUMN,
+  FLEX_STACKER_MODULE_TYPE,
   getIsLid,
   getLabwareDefIsStandard,
   getLabwareDefURI,
@@ -20,6 +21,7 @@ import { getSlotInLocationStack } from './utils'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
+  FlexStackerModuleState,
   InvariantContext,
   ModuleTemporalProperties,
   RobotState,
@@ -256,15 +258,15 @@ export function getPipetteWithTipMaxVol(
 }
 export function getModuleState(
   robotState: RobotState,
-  module: string
+  moduleId: string
 ): ModuleTemporalProperties['moduleState'] {
-  if (!(module in robotState.modules)) {
+  if (!(moduleId in robotState.modules)) {
     console.warn(
-      `getModuleState expected module id "${module}" to be in robot state`
+      `getModuleState expected module id "${moduleId}" to be in robot state`
     )
   }
 
-  return robotState.modules[module]?.moduleState
+  return robotState.modules[moduleId]?.moduleState
 }
 export const thermocyclerStateGetter = (
   robotState: RobotState,
@@ -283,6 +285,16 @@ export const absorbanceReaderStateGetter = (
 ): AbsorbanceReaderState | null => {
   const hardwareModule = robotState.modules[moduleId]?.moduleState
   return hardwareModule && hardwareModule.type === ABSORBANCE_READER_TYPE
+    ? hardwareModule
+    : null
+}
+
+export const flexStackerStateGetter = (
+  robotState: RobotState,
+  moduleId: string
+): FlexStackerModuleState | null => {
+  const hardwareModule = robotState.modules[moduleId]?.moduleState
+  return hardwareModule && hardwareModule.type === FLEX_STACKER_MODULE_TYPE
     ? hardwareModule
     : null
 }

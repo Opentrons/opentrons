@@ -6,23 +6,29 @@ name: 'JS checks'
 on:
   pull_request:
     paths:
-      - '**/*.js'
-      - './.*.js'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/*.json'
-      - '**/*.css'
-      - '**/*.md'
+      - '**.js'
+      - '**.cjs'
+      - '**.mjs'
+      - '**.ts'
+      - '**.cts'
+      - '**.mts'
+      - '**.tsx'
+      - '**.json'
+      - '**.css'
+      - '**.md'
   push:
     paths:
-      - '**/*.js'
-      - './.*.js'
-      - '**/*.ts'
-      - '**/*.tsx'
-      - '**/*.json'
-      - '**/*.md'
+      - '**.js'
+      - '**.cjs'
+      - '**.mjs'
+      - '**.ts'
+      - '**.cts'
+      - '**.mts'
+      - '**.tsx'
+      - '**.json'
+      - '**.css'
+      - '**.md'
       - '.github/workflows/js-check.yaml'
-      - '**/*.css'
   workflow_dispatch:
 
 concurrency:
@@ -43,7 +49,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.21.1'
       - name: 'set complex environment variables'

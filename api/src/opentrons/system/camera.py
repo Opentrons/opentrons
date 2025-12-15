@@ -3,12 +3,12 @@ import os
 from pathlib import Path
 import logging
 from functools import lru_cache
-from enum import Enum
 from typing import Dict, Optional
 from opentrons.config import ARCHITECTURE, SystemArchitecture, get_opentrons_path
 from opentrons_shared_data.errors.exceptions import CommunicationError
 from opentrons_shared_data.errors.codes import ErrorCodes
 from opentrons.config import IS_ROBOT
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.robot.types import RobotType, RobotTypeEnum
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
@@ -37,6 +37,8 @@ STREAM_CONF_FILE_KEYS = [
 ]
 
 # Camera Parameter Globals
+RESOLUTION_MIN = (320, 240)
+RESOLUTION_MAX = (7680, 4320)
 RESOLUTION_DEFAULT = (1920, 1080)
 ZOOM_MIN = 1.0
 ZOOM_MAX = 2.0
@@ -52,7 +54,7 @@ SATURATION_MAX = 2.0
 SATURATION_DEFAULT = 1.0
 
 
-class StreamConfigurationKeys(str, Enum):
+class StreamConfigurationKeys(StrEnum):
     """The Configuration Key Types."""
 
     BOOT_ID = "BOOT_ID"
@@ -156,7 +158,7 @@ async def update_live_stream_status(
         and camera_enable_settings.liveStreamEnabled
     ):
         # Check to see if the camera device is available
-        raw_device = str(contents["SOURCE"])[1:-1]
+        raw_device = str(contents["SOURCE"])
         if not os.path.exists(raw_device):
             log.error(
                 f"Opentrons Live Stream cannot sample the camera. No video device found with device path: {raw_device}"
@@ -187,7 +189,7 @@ async def stop_live_stream(robot_type: RobotType) -> None:
         log.info("Stopped the opentrons-live-stream service.")
     else:
         log.error(
-            f"Failed to stop opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to stop opentrons-live-stream, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
 
 
@@ -208,7 +210,7 @@ async def restart_live_stream(robot_type: RobotType) -> None:
         log.info("Restarted opentrons-live-stream service.")
     else:
         log.error(
-            f"Failed to restart opentrons-live-stream, returncode:{ subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
+            f"Failed to restart opentrons-live-stream, returncode: {subprocess.returncode}, stdout: {stdout.decode()}, stderr: {stderr.decode()}"
         )
 
 
@@ -277,7 +279,7 @@ def write_stream_configuration_file_data(data: Dict[str, str]) -> None:
         fd.writelines(file_lines)
 
 
-async def image_capture(
+async def image_capture(  # noqa: C901
     robot_type: RobotType, parameters: ImageParameters
 ) -> bytes | CameraError:
     """Process an Image Capture request with a Camera utilizing a given set of parameters."""
@@ -305,8 +307,16 @@ async def image_capture(
         parameters.saturation < SATURATION_MIN or parameters.saturation > SATURATION_MAX
     ):
         potential_invalid_param = "Saturation"
+    elif parameters.resolution is not None and (
+        parameters.resolution[0] < RESOLUTION_MIN[0]
+        or parameters.resolution[1] < RESOLUTION_MIN[1]
+        or parameters.resolution[0] > RESOLUTION_MAX[0]
+        or parameters.resolution[1] > RESOLUTION_MAX[1]
+    ):
+        potential_invalid_param = "Resolution"
     else:
         potential_invalid_param = None
+
     if potential_invalid_param is not None:
         return CameraError(
             message=f"{potential_invalid_param} parameter is outside the boundaries allowed for image capture.",
@@ -363,3 +373,9 @@ def get_boot_id() -> str:
         return Path("/proc/sys/kernel/random/boot_id").read_text().strip()
     else:
         return "SIMULATED_BOOT_ID"
+
+
+def camera_exists() -> bool:
+    """Validate whether or not the camera device exists."""
+    return os.path.exists(DEFAULT_SYSTEM_CAMERA)
+    # todo(chb, 2025-11-10): Eventually when we support multiple cameras this should accept a camera parameter to check for

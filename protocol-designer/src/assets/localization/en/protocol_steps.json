@@ -25,6 +25,9 @@
   "blowout_location": "Blowout location",
   "blowout_position": "Blowout position from top",
   "bottom_of_stack": "Bottom of stack",
+  "camera": {
+    "capture_image": "Capture image of the deck"
+  },
   "captions_for_fields": {
     "blockTargetTemp": "Valid range between 4 and 99 °C",
     "blockTargetTempHold": "Valid range between 4 and 99 °C",
@@ -35,9 +38,6 @@
     "targetSpeed": "Valid range between 200 and 3000 rpm",
     "targetTemperature": "Valid range between 4 and 95 °C",
     "volume": "Recommended between 0.1 and {{max}}"
-  },
-  "camera": {
-    "capture_image": "Capture image of the deck"
   },
   "change_tips": "Change tips",
   "column": "Column",
@@ -67,6 +67,33 @@
   "edit_step": "Edit step",
   "ending_deck": "Ending deck",
   "engage_height": "Engage height",
+  "flex_stacker": {
+    "label": "Flex Stacker",
+    "module_controls": {
+      "empty_label": "Empty",
+      "empty_sublabel": "Manually empty all labware from the stacker",
+      "label": "Module controls",
+      "refill_label": "Refill",
+      "refill_sublabel": "Refill the stacker with labware. Manually fill the stacker with more labware",
+      "retrieve_label": "Retrieve",
+      "retrieve_sublabel": "Retrieve labware from the stacker onto the shuttle"
+    },
+    "shuttle": {
+      "label": "Shuttle",
+      "no_labware": "No labware on shuttle"
+    },
+    "stacker": {
+      "label": "Stacker",
+      "labware_filled": "{{amount}}/{{total}} labware filled",
+      "no_labware": "No labware stored on stacker",
+      "quantity": "Quantity: {{count}}"
+    },
+    "empty": "Emptying stacker of all labware",
+    "fill": "<text>Refilling stacker with Quantity: </text> <tag2/> <text>of</text> <tag/>",
+    "retrieve": "<text>Retrieving</text> <tag/> <text>from stacker</text>",
+    "store": "<text>Storing</text> <tag/> <text>from shuttle into stacker</text>"
+  },
+  "flexStacker": "Stacker",
   "flow_rate_builder": "Flow rate builder",
   "flow_type_title": "{{type}} flow rate",
   "from": "from",
@@ -97,8 +124,8 @@
   },
   "heater_shaker_state": "Heater-Shaker state",
   "in": "in",
-  "into": "into",
   "individual_wells": "Individual wells",
+  "into": "into",
   "labware_in": "Labware in",
   "labware_to": "{{labware}} to",
   "liquids": "{{num}} liquids",
@@ -127,12 +154,12 @@
   "of": "of",
   "off_deck": "Off-Deck",
   "pause": {
+    "forDuration": "For {{duration}}",
+    "pausingForDuration": "<text>Pausing for</text><tag/>",
     "pausingUntilResume": "Pausing until manually told to resume",
     "pausingUntilTemperature": "<text>Pausing until</text><semiBoldText>{{module}}</semiBoldText><text>reaches</text><tag/>",
-    "pausingForDuration": "<text>Pausing for</text><tag/>",
     "untilResume": "Until told to resume",
-    "untilTemperature": "Until {{temperature}} °C reached",
-    "forDuration": "For {{duration}}"
+    "untilTemperature": "Until {{temperature}} °C reached"
   },
   "pipette": "Pipette",
   "pipette_path": "Pipette path",
@@ -173,6 +200,7 @@
   "single": "Single transfer",
   "single_nozzle": "Single",
   "speed": "Speed",
+  "start_point": "{{prefix}} start point",
   "starting_deck": "Starting deck",
   "step_substeps": "{{stepType}} details",
   "submerge": "Submerge",
@@ -197,11 +225,15 @@
       "block_value": "{{value}} °C",
       "block_value_off": "Off",
       "lid_label": "Lid set to",
-      "lid_value": "{{value}} °C",
-      "lid_value_off": "Off",
       "lid_position_label": "Lid position",
+      "lid_position_value_closed": "Closed",
       "lid_position_value_open": "Open",
-      "lid_position_value_closed": "Closed"
+      "lid_value": "{{value}} °C",
+      "lid_value_off": "Off"
+    },
+    "profile_timeline": {
+      "start": "Start profile",
+      "wait_for_complete": "Wait for profile to complete"
     },
     "repeat": "Repeat {{repetitions}} times",
     "substep_settings": "<text>Set block temperature to</text><tagTemperature/><text>for</text><tagDuration/>",
@@ -217,10 +249,6 @@
       "block": "<text>Set thermocycler block to</text><tag/>",
       "lid_position": "<text>Lid position</text><tag/>",
       "lid_temperature": "<text>Set thermocycler lid to</text><tag/>"
-    },
-    "profile_timeline": {
-      "start": "Start profile",
-      "wait_for_complete": "Wait for profile to complete"
     }
   },
   "time": "Time",
@@ -241,7 +269,11 @@
   "unoccupied_stack": "Stack of {{name}}",
   "valid_range": "Must be between 0.1 and {{max}} {{unit}}",
   "view_details": "View details",
-  "volume_per_well": "Volume per well",
+  "volume_per_well": {
+    "multiAspirate": "Aspirate volume per well",
+    "multiDispense": "Dispense volume per well",
+    "single": "Volume per well"
+  },
   "well_name": "Well {{wellName}}",
   "well_order_title": "{{prefix}} well order",
   "well_position": "Well position: X {{x}} Y {{y}} Z {{z}} (mm)",

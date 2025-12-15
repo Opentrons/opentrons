@@ -322,3 +322,25 @@ async def test_plunger_devectorize(
     uv = blend_log[0][0].unit_vector
 
     assert devectorized.max_speed == speed
+
+    # make sure negative directions work
+    origin = {"A": 20}
+    target = {"A": 0}
+    speed = 10
+    devectorized = manager.devectorize_axes(origin, target, speed, ["A"])
+
+    converged, blend_log = manager.plan_motion(
+        origin=origin,
+        target_list=[devectorized],
+        iteration_limit=20,
+    )
+    uv = blend_log[0][0].unit_vector
+
+    assert devectorized.max_speed == speed
+
+    # make sure not to fail if passed a bad target.
+    origin = {"X": 0, "Y": 0, "Z": 0, "A": 0}
+    target = {"X": 5, "Y": 5, "Z": 5, "A": 0}
+    speed = 10
+    devectorized = manager.devectorize_axes(origin, target, speed, ["A"])
+    assert devectorized.max_speed == speed

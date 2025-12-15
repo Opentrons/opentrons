@@ -1,4 +1,3 @@
-# TODO(mc, 2022-04-05): tests in this file sometimes freeze; investigate
 import asyncio
 from typing import AsyncIterator
 
@@ -49,8 +48,10 @@ async def subject(
     """Test subject."""
     p = Proxy("proxy", proxy_listener, setting)
     task = asyncio.get_running_loop().create_task(p.run())
+    await p.wait_ready()
     yield p
-    task.cancel()
+    p.stop()
+
     try:
         await task
     except asyncio.CancelledError:
@@ -173,7 +174,6 @@ async def test_driver_reconnect(
     assert test_data == await driver[0].readline()
 
     driver[1].close()
-
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator[1].write(test_data)
     assert test_data == await driver[0].readline()
@@ -189,6 +189,5 @@ async def test_emulator_disconnects(
     await proxy_listener.wait_count(1)
     driver = await asyncio.open_connection(host="localhost", port=setting.driver_port)
     emulator[1].close()
-
     driver[1].write(b"123\n")
     assert b"" == await driver[0].readline()

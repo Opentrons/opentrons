@@ -1,25 +1,65 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import { Modal, PrimaryButton, StyledText } from '@opentrons/components'
+import {
+  Icon,
+  Modal,
+  PrimaryButton,
+  SecondaryButton,
+  Slider,
+} from '@opentrons/components'
 
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
+import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 import styles from './cameracontrols.module.css'
-import { useStubCameraSettingsValues } from './hooks/useStubCameraSettingsValues'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
-import type { UseStubCameraSettingsValuesResult } from './hooks/useStubCameraSettingsValues'
+import type { AxiosError } from 'axios'
+import type { UseMutateFunction } from 'react-query'
+import type {
+  CameraImageSettings,
+  CameraImageSettingsResponse,
+} from '@opentrons/api-client'
+import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface CameraControlsProps {
   onClose: () => void
+  postCameraImageSettings: UseMutateFunction<
+    CameraImageSettingsResponse,
+    AxiosError,
+    CameraImageSettings
+  >
 }
 
-export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
+export function CameraControls({
+  onClose,
+  postCameraImageSettings,
+}: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-
-  const settings = useStubCameraSettingsValues()
+  const settings = useCameraSettingsValues()
+  const [isLoading, setIsLoading] = useState(false)
+  const handleSave = (): void => {
+    setIsLoading(true)
+    postCameraImageSettings(
+      {
+        zoom: settings.zoom,
+        brightness: settings.brightness,
+        contrast: settings.contrast,
+        saturation: settings.saturation,
+      },
+      {
+        onSuccess: () => {
+          onClose()
+        },
+        onSettled: () => {
+          setIsLoading(false)
+        },
+      }
+    )
+  }
 
   return (
     <Modal onClose={onClose} title={t('camera_controls')} width="46rem">
@@ -33,13 +73,15 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
             onClick={settings.restoreToDefault}
             buttonText={t('restore_to_default')}
           />
-          <PrimaryButton
-            onClick={() => {
-              console.log('Stubbed setting savings...')
-            }}
-          >
-            {t('save')}
-          </PrimaryButton>
+          <div className={styles.buttons}>
+            <SecondaryButton onClick={onClose}>{t('Cancel')}</SecondaryButton>
+            <PrimaryButton onClick={handleSave} disabled={isLoading}>
+              <div className={styles.save_button}>
+                {isLoading && <Icon name="ot-spinner" spin size="1rem" />}
+                {t('save')}
+              </div>
+            </PrimaryButton>
+          </div>
         </div>
       </div>
     </Modal>
@@ -47,7 +89,7 @@ export function CameraControls({ onClose }: CameraControlsProps): JSX.Element {
 }
 
 interface CameraControlSettingsProps {
-  settings: UseStubCameraSettingsValuesResult
+  settings: UseCameraSettingsValuesResult
 }
 
 function CameraControlSettings({
@@ -59,73 +101,26 @@ function CameraControlSettings({
     <div className={styles.settings_container}>
       <ZoomSettings zoom={settings.zoom} adjustZoom={settings.adjustZoom} />
       <Divider />
-      <SliderSetting
+      <Slider
         title={t('brightness')}
         subtext={t('adjust_brightness')}
         adjustValue={settings.adjustBrightness}
         value={settings.brightness}
       />
       <Divider />
-      <SliderSetting
+      <Slider
         title={t('contrast')}
         subtext={t('adjust_contrast')}
         adjustValue={settings.adjustContrast}
         value={settings.contrast}
       />
       <Divider />
-      <SliderSetting
+      <Slider
         title={t('saturation')}
         subtext={t('adjust_saturation')}
         adjustValue={settings.adjustSaturation}
         value={settings.saturation}
       />
-    </div>
-  )
-}
-
-interface SliderSettingProps {
-  title: string
-  subtext: string
-  value: number
-  adjustValue: (value: number) => void
-}
-
-function SliderSetting({
-  value,
-  title,
-  subtext,
-  adjustValue,
-}: SliderSettingProps): JSX.Element {
-  const { t } = useTranslation('device_settings')
-
-  return (
-    <div className={styles.slider_setting_container}>
-      <div className={styles.slider_setting_text_container}>
-        <StyledText desktopStyle="bodyDefaultSemiBold">{title}</StyledText>
-        <StyledText desktopStyle="bodyDefaultRegular">{subtext}</StyledText>
-      </div>
-      <div className={styles.slider_value_container}>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={value}
-          onChange={e => {
-            adjustValue(Number(e.target.value))
-          }}
-          className={styles.slider_basic}
-          // @ts-expect-error Expected. We want to use style here to avoid more complex
-          //  data-attribute CSS calculations.
-          style={{ '--slider-progress': `${value}%` }}
-          aria-label={title}
-        />
-        <StyledText
-          className={styles.slider_percentage}
-          desktopStyle="bodyDefaultSemiBold"
-        >
-          {t('value_percent', { value })}
-        </StyledText>
-      </div>
     </div>
   )
 }
