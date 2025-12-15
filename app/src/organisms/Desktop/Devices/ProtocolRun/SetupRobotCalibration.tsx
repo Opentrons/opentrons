@@ -40,29 +40,6 @@ import type { AnalyticsProtocolProceedButtonText } from '/app/redux/analytics/co
 import type { ProtocolCalibrationStatus } from '/app/redux/calibration/types'
 import type { StepKey } from '/app/redux/protocol-runs'
 
-const determineNextStepButtonKey = (
-  nextStep: StepKey
-): AnalyticsProtocolProceedButtonText => {
-  let nextStepButtonKey: AnalyticsProtocolProceedButtonText
-  switch (nextStep) {
-    case MODULE_SETUP_STEP_KEY:
-      nextStepButtonKey = ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP
-      break
-    case LPC_STEP_KEY:
-      nextStepButtonKey = ANALYTICS_PROCEED_TO_LABWARE_OFFSETS_SETUP_STEP
-      break
-    case LABWARE_SETUP_STEP_KEY:
-      nextStepButtonKey = ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP
-      break
-    case CAMERA_SETUP_STEP_KEY:
-      nextStepButtonKey = ANALYTICS_PROCEED_TO_CAMERA_SETUP_STEP
-      break
-    default:
-      nextStepButtonKey = ANALYTICS_PROTOCOL_PROCEED
-  }
-  return nextStepButtonKey
-}
-
 interface SetupRobotCalibrationProps {
   robotName: string
   runId: string
@@ -79,7 +56,20 @@ export function SetupRobotCalibration({
   calibrationStatus,
 }: SetupRobotCalibrationProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const nextStepButtonKey = determineNextStepButtonKey(nextStep)
+  const nextStepButtonKey: AnalyticsProtocolProceedButtonText = (() => {
+    switch (nextStep) {
+      case MODULE_SETUP_STEP_KEY:
+        return ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP
+      case LPC_STEP_KEY:
+        return ANALYTICS_PROCEED_TO_LABWARE_OFFSETS_SETUP_STEP
+      case LABWARE_SETUP_STEP_KEY:
+        return ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP
+      case CAMERA_SETUP_STEP_KEY:
+        return ANALYTICS_PROCEED_TO_CAMERA_SETUP_STEP
+      default:
+        return ANALYTICS_PROTOCOL_PROCEED
+    }
+  })()
 
   const [targetProps, tooltipProps] = useHoverTooltip()
   const trackEvent = useTrackEvent()
