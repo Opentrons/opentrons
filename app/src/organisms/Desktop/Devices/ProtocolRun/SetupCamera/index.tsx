@@ -16,6 +16,7 @@ import { ToggleButton } from '/app/atoms/buttons'
 import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraControls'
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
+import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 import {
   getCameraUsageState,
@@ -53,6 +54,7 @@ export function SetupCamera({
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
   const { addCameraSettingsToRun } = useAddCameraSettingsToRunMutation()
+  const isFlex = useIsFlex(robotName)
 
   const [isConfirmPending, setIsConfirmPending] = useState(false)
 
@@ -117,6 +119,7 @@ export function SetupCamera({
         toggleCameraEnabled={toggleCameraEnabled}
         isCameraEnabled={cameraEnabled}
         cameraConfirmed={cameraConfirmed}
+        isFlex={isFlex}
       />
       {cameraEnabled && (
         <>
@@ -192,12 +195,14 @@ interface CameraStatusProps {
   toggleCameraEnabled: UseCameraUsageSettingsResult['toggleCameraEnabled']
   isCameraEnabled: UseCameraUsageSettingsResult['isCameraEnabled']
   cameraConfirmed: boolean
+  isFlex: boolean
 }
 
 function CameraStatus({
   toggleCameraEnabled,
   isCameraEnabled,
   cameraConfirmed,
+  isFlex,
 }: CameraStatusProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -215,7 +220,9 @@ function CameraStatus({
           )}
         </div>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('camera_status_description')}
+          {isFlex
+            ? t('camera_status_description_flex')
+            : t('camera_status_description_ot2')}
         </StyledText>
       </div>
       <div className={styles.setting_toggle_container}>
