@@ -1,6 +1,6 @@
 import {
-  ALIGN_CENTER,
   AlertPrimaryButton,
+  ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
@@ -79,9 +79,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
             </SecondaryButton>
           )}
           {primaryButtonProps && (
-            <AlertPrimaryButton
-              onClick={primaryButtonProps?.onClick}
-            >
+            <AlertPrimaryButton onClick={primaryButtonProps?.onClick}>
               {primaryButtonProps?.text}
             </AlertPrimaryButton>
           )}
