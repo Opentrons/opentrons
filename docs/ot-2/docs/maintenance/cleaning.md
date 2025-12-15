@@ -33,32 +33,46 @@ The following table lists the chemicals you can use to clean your OT-2. Diluted 
 
 To clean the exterior and interior frame and window panels of your OT-2:
 
+<div class="instruction-list" markdown>
+
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the exposed and easily accessible surface areas.
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the robot air dry.
 
+</div>
+
 ## Deck cleaning
 
 To clean the deck, deck slots, and trash bin:
+
+<div class="instruction-list" markdown>
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the deck, deck slots, and trash bin. You can remove and empty the trash bin for easier access.
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the deck and/or trash bin air dry. Replace any items that you removed for cleaning.
 
+</div>
+
 ## Gantry cleaning
 
 To clean the gantry:
+
+<div class="instruction-list" markdown>
 
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the horizontal and vertical gantry surfaces, and side rails.
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the gantry air dry.
 
+</div>
+
 ## Pipette cleaning
 
 To clean a single- or multi-channel pipette:
+
+<div class="instruction-list" markdown>
 
 1. Remove the pipette from the gantry.
 2. Dampen a soft, clean cloth or paper towel with a cleaning solution.
@@ -69,6 +83,8 @@ To clean a single- or multi-channel pipette:
 4. Rinse off any remaining residue using a cloth dampened with distilled water.
 5. Let the pipette air dry.
 6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
+
+</div>
 
 <font color="red">placeholder for labeled pipette images</font>
 
@@ -96,12 +112,16 @@ Refer to the following table for recommended cleaning methods, by contamination 
 
 Filtered pipette tips help prevent contaminating the barrel or inside of the pipette. But, you cannot disassemble this instrument if it becomes contaminated. If the inside of your pipette gets contaminated, the following steps may help remove the contamination:
 
+<div class="instruction-list" markdown>
+
 1. Remove the pipette from the gantry.
 2. Inject a small amount of cleaning solution into the barrel using a manual pipette or syringe.
 3. Gently shake the pipette to swirl the cleaning solution.
 4. Rinse with distilled water.
 5. Let the pipette air dry.
 6. Reattach the pipette to the gantry. When prompted, recalibrate the pipette (optional, but recommended).
+
+</div>
 
 ## Replacing pipette O-rings
 
@@ -120,6 +140,8 @@ Each GEN2 multi-channel pipette ships with the special tools and replacement O-r
 
 Follow these instructions to replace the O-rings on your OT-2 multi-channel pipette:
 
+<div class="instruction-list" markdown>
+
 1. Attach the O-ring removal tool to the pipette nozzle. Labels on either side of the tool help you match it to the pipette model.
 
     - Use the 20M side for a P20 pipette.
@@ -128,6 +150,8 @@ Follow these instructions to replace the O-rings on your OT-2 multi-channel pipe
 2. Rotate and pull the tool gently to remove the O-ring. The O-ring may break during removal, which is common.
 
 3. Place the wide base of the conical O-ring installation tool against the pipette nozzle and roll the new O-ring onto the nozzle.
+
+</div>
 
 ## Pipette tip cleaning
 
@@ -150,14 +174,20 @@ Be sure to turn the module's power off before cleaning it. You can clean the top
 
 Once you've prepared the module for cleaning:
 
+<div class="instruction-list" markdown>
+
 1. Dampen a soft, clean cloth or paper towel with a cleaning solution.
 2. Gently wipe off the module's surfaces.
 3. Rinse off any remaining residue using a cloth dampened with distilled water.
 4. Let the module air dry.
 
+</div>
+
 ### Thermocycler seals
 
 To set up the Thermocycler with a clean, reusable rubber seal:
+
+<div class="instruction-list" markdown>
 
 1. Affix a seal to the Thermocycler lid (if one isn't attached already).
 2. Wipe the seal with a 1:10 diluted bleach solution.
@@ -165,6 +195,7 @@ To set up the Thermocycler with a clean, reusable rubber seal:
 4. Let the seal air dry.
 
 <img src="../../images/thermocycler-seal.svg" width="70%" alt="Thermocycler with rubber seal">
+</div>
 
 ## Autoclaving labware
 
