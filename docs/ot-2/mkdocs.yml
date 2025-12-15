@@ -19,7 +19,11 @@ nav:
   - Instruments and Modules: modules.md
   - Labware: labware.md
   - Software: software.md
-  - Maintenance: maintenance.md
+  - Maintenance:
+      - Maintenance: maintenance/index.md
+      - Cleaning: maintenance/cleaning.md
+      - User-level Maintenance Procedures: maintenance/self-service.md
+      - Instrument Services: maintenance/services.md
   - Appendices:
       - Additional Documentation: additional-docs.md
       - Open-Source Software: open-source.md
