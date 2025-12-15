@@ -112,8 +112,7 @@ function robotBusyStatusByNameReducer(
 }
 
 interface ChooseRobotSlideoutProps
-  extends Omit<SlideoutProps, 'children'>,
-    Partial<UseCreateRun> {
+  extends Omit<SlideoutProps, 'children'>, Partial<UseCreateRun> {
   isSelectedRobotOnDifferentSoftwareVersion: boolean
   robotType: RobotType | null
   selectedRobot: Robot | null

@@ -62,13 +62,12 @@ export const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
   targetSpeed: null,
   latchOpen: null,
 }
-
-const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
+export const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
   type: 'absorbanceReaderType',
   lidOpen: null,
   initialization: null,
 }
-const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
+export const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
   type: 'magneticBlockType',
 }
 
@@ -90,7 +89,12 @@ export const MODULE_INITIAL_STATE_BY_TYPE: {
   [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
   [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_MODULE_INITIAL_STATE,
+} as const
+
+MODULE_INITIAL_STATE_BY_TYPE satisfies {
+  [moduleType in ModuleType]: ModuleState
 }
+
 export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
 export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
 export const COLUMN_4_SLOTS = ['A4', 'B4', 'C4', 'D4']

@@ -7,8 +7,9 @@ import type { ComponentProps } from 'react'
 import type { TitleBarProps } from '../structure'
 
 // TODO(mc, 2018-06-20): s/titleBar/titleBarProps
-export interface SpinnerModalPageProps
-  extends ComponentProps<typeof SpinnerModal> {
+export interface SpinnerModalPageProps extends ComponentProps<
+  typeof SpinnerModal
+> {
   /** Props for title bar at top of modal page */
   titleBar: TitleBarProps
 }
