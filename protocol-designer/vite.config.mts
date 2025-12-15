@@ -42,8 +42,10 @@ export default defineConfig(async (): Promise<UserConfig> => {
     await latestLabwareVersions(REQUIRED_APP_VERSION)
 
   return {
+    // this makes imports relative rather than absolute
     base: '',
     build: {
+      // Relative to the root
       outDir: 'dist',
       // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
       // Emit in CI (so action-release can upload) and in local builds.
