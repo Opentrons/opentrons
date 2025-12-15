@@ -3,7 +3,7 @@
 chore-release - Automated multi-repo alpha release tagging script
 
 Usage:
-    ./chore-release [--dry-run]
+    ./chore-release [--dry-run] [--clean-dir CLEAN_DIR]
 
 Examples:
     ./chore-release
@@ -14,7 +14,7 @@ Behavior:
 - Clones ot3-firmware, buildroot, oe-core, opentrons into that directory.
 - Detects the latest `chore_release-X.Y.Z` branch from the opentrons repo.
 - Asks you to confirm using that branch for all repos.
-- Checks out that branch in each repo.
+- Clones each repo directly on that branch (single-branch, shallow clone for speed).
 - For each repo, in this order:
     1. ot3-firmware
     2. buildroot
@@ -42,8 +42,8 @@ from pathlib import Path
 from typing import Optional, Tuple, List
 
 
-# Root directory where clean clones will live
-CLEAN_ROOT = Path("./clean-repos")
+# Default root directory where clean clones will live (overridable via CLI)
+DEFAULT_CLEAN_ROOT = Path("./clean-repos")
 
 # Configuration: repo info, tag patterns, and clone URLs
 # Branch will be determined dynamically as the latest chore_release-X.Y.Z from opentrons
@@ -179,91 +179,93 @@ def parse_chore_release_branch(name: str) -> Optional[Tuple[int, int, int]]:
 
 def find_latest_chore_release_branch(clone_url: str) -> str:
     """
-    Clone opentrons repo to a temp dir, list all remote chore_release-* branches,
-    and return the one with the highest X.Y.Z version.
+    List all remote chore_release-* branches from the opentrons repo and return
+    the one with the highest X.Y.Z version.
     """
-    from tempfile import TemporaryDirectory
-
     print("Finding latest chore_release-* branch from opentrons...")
 
-    with TemporaryDirectory() as tmpdir:
-        tmp_path = Path(tmpdir)
-        run_command(
-            ["git", "clone", "--origin", "origin", clone_url, "tmp-opentrons"],
-            cwd=tmp_path,
-        )
-        repo_path = tmp_path / "tmp-opentrons"
+    # Output lines look like:
+    # <sha>\trefs/heads/chore_release-8.8.0
+    refs = run_command(["git", "ls-remote", "--heads", clone_url, "chore_release-*"])
+    branches: List[str] = []
+    for line in refs.splitlines():
+        parts = line.split()
+        if len(parts) != 2:
+            continue
+        _sha, ref = parts
+        prefix = "refs/heads/"
+        if ref.startswith(prefix):
+            branches.append(ref[len(prefix) :])
 
-        branches_raw = run_command(
-            ["git", "branch", "-r", "--list", "origin/chore_release-*"],
-            cwd=repo_path,
-        )
-        branches = [b.strip() for b in branches_raw.splitlines() if b.strip()]
+    if not branches:
+        print("❌ No remote chore_release-* branches found in opentrons.")
+        sys.exit(1)
 
-        if not branches:
-            print("❌ No remote chore_release-* branches found in opentrons.")
-            sys.exit(1)
+    best_branch = None
+    best_version: Optional[Tuple[int, int, int]] = None
 
-        best_branch = None
-        best_version: Optional[Tuple[int, int, int]] = None
+    for name in branches:
+        ver = parse_chore_release_branch(name)
+        if ver is None:
+            continue
+        if best_version is None or ver > best_version:
+            best_version = ver
+            best_branch = name
 
-        for full in branches:
-            short = full.replace("origin/", "", 1)  # origin/chore_release-8.8.0 → chore_release-8.8.0
-            ver = parse_chore_release_branch(short)
-            if ver is None:
-                continue
-            if best_version is None or ver > best_version:
-                best_version = ver
-                best_branch = short
+    if best_branch is None:
+        print("❌ No valid chore_release-X.Y.Z branches found in opentrons.")
+        sys.exit(1)
 
-        if best_branch is None:
-            print("❌ No valid chore_release-X.Y.Z branches found in opentrons.")
-            sys.exit(1)
-
-        print(f"Detected latest chore release branch: {best_branch}")
-        return best_branch
+    print(f"Detected latest chore release branch: {best_branch}")
+    return best_branch
 
 
-def clone_clean_repos(branch_name: str) -> None:
+def clone_clean_repos(branch_name: str, clean_root: Path) -> None:
     """Delete existing clean-repos dir (if any) and clone all repos fresh on the given branch."""
-    if CLEAN_ROOT.exists():
-        print(f"Removing existing directory: {CLEAN_ROOT}")
-        shutil.rmtree(CLEAN_ROOT)
+    if clean_root.exists():
+        print(f"Removing existing directory: {clean_root}")
+        shutil.rmtree(clean_root)
 
-    CLEAN_ROOT.mkdir(parents=True, exist_ok=True)
-    print(f"Created clean root directory: {CLEAN_ROOT}")
+    clean_root.mkdir(parents=True, exist_ok=True)
+    print(f"Created clean root directory: {clean_root}")
     print(f"Using branch: {branch_name}")
     print()
 
     for repo in REPOS:
-        target_dir = CLEAN_ROOT / repo["dir_name"]
+        target_dir = clean_root / repo["dir_name"]
         print("=" * 60)
         print(f"Cloning {repo['name']} into {target_dir}")
         print("=" * 60)
 
-        run_command(
-            ["git", "clone", "--origin", "origin", repo["clone_url"], str(target_dir)]
-        )
-
-        print(f"Checking out branch '{branch_name}' for {repo['name']}...")
-        run_command(["git", "fetch", "origin"], cwd=target_dir)
         try:
-            run_command(["git", "checkout", branch_name], cwd=target_dir)
+            # Fast clone: single branch, shallow history.
+            run_command(
+                [
+                    "git",
+                    "clone",
+                    "-b",
+                    branch_name,
+                    "--single-branch",
+                    "--depth",
+                    "1",
+                    repo["clone_url"],
+                    str(target_dir),
+                ]
+            )
         except subprocess.CalledProcessError:
             print(f"❌ Branch '{branch_name}' not found in {repo['name']}.")
             sys.exit(1)
-        run_command(["git", "pull", "origin", branch_name], cwd=target_dir)
 
 
-def cleanup_repos() -> None:
+def cleanup_repos(clean_root: Path) -> None:
     """Remove the clean-repos directory."""
-    if CLEAN_ROOT.exists():
+    if clean_root.exists():
         print()
         print("=" * 60)
-        print(f"Cleaning up: Removing {CLEAN_ROOT}")
+        print(f"Cleaning up: Removing {clean_root}")
         print("=" * 60)
-        shutil.rmtree(CLEAN_ROOT)
-        print(f"✅ Removed {CLEAN_ROOT}")
+        shutil.rmtree(clean_root)
+        print(f"✅ Removed {clean_root}")
 
 
 def tag_repo_if_updated(
@@ -332,14 +334,24 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Show what would be tagged/pushed without making changes.",
     )
+    parser.add_argument(
+        "--clean-dir",
+        default=str(DEFAULT_CLEAN_ROOT),
+        help=(
+            "Directory where clean clones will be created. "
+            f"Default: {DEFAULT_CLEAN_ROOT}"
+        ),
+    )
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
+    clean_root = Path(args.clean_dir)
 
     print("Starting alpha release process")
     print(f"Dry run: {args.dry_run}")
+    print(f"Clean dir: {clean_root}")
     print()
 
     try:
@@ -354,12 +366,12 @@ def main():
             sys.exit(0)
 
         # 3) Prepare clean clones on that branch
-        clone_clean_repos(branch_name=latest_branch)
+        clone_clean_repos(branch_name=latest_branch, clean_root=clean_root)
 
         # 4) Tag each repo if updated (in the configured order:
         #    ot3-firmware → buildroot → oe-core → opentrons)
         for repo in REPOS:
-            repo_path = CLEAN_ROOT / repo["dir_name"]
+            repo_path = clean_root / repo["dir_name"]
             tag_repo_if_updated(
                 repo_name=repo["name"],
                 repo_path=repo_path,
@@ -374,7 +386,7 @@ def main():
 
     finally:
         # 5) Always cleanup the repos directory
-        cleanup_repos()
+        cleanup_repos(clean_root=clean_root)
 
 
 if __name__ == "__main__":
