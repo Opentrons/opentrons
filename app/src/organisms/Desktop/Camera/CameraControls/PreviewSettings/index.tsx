@@ -7,8 +7,10 @@ import { Skeleton } from '/app/atoms/Skeleton'
 import { usePreviewImage } from './hooks/usePreviewImage'
 import styles from './previewsettings.module.css'
 
-export function PreviewSettings(): JSX.Element {
-  const { isLoading, imgPath, takePhoto } = usePreviewImage()
+import type { CameraImageSettings } from '@opentrons/api-client'
+
+export function PreviewSettings(settings: CameraImageSettings): JSX.Element {
+  const { isLoading, imgPath, takePhoto } = usePreviewImage(settings)
 
   return (
     <div className={styles.container}>

@@ -28,7 +28,12 @@ export function CameraControlsHome({
   settings,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { isLoading, imgPath, takePhoto } = usePreviewImage()
+  const { isLoading, imgPath, takePhoto } = usePreviewImage({
+    zoom: settings.zoom,
+    brightness: settings.brightness,
+    contrast: settings.contrast,
+    saturation: settings.saturation,
+  })
 
   const [showModal, setShowModal] = useState(false)
 
