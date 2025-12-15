@@ -308,7 +308,6 @@ describe('flex stacker state updates forFlexStackerStore', () => {
   })
 
   it('should store the labware in the stacker', () => {
-    console.log(robotState.modules[FLEX_STACKER_ID].moduleState)
     forFlexStackerStore(
       { moduleId: FLEX_STACKER_ID, strategy: 'automatic' },
       invariantContext,
@@ -321,5 +320,6 @@ describe('flex stacker state updates forFlexStackerStore', () => {
     const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
     expect(moduleState?.labwareOnShuttle).toBeNull()
     expect(moduleState?.labwareInHopper).toHaveLength(4)
+    expect(robotState.labware.tiprack1Id.stack).toEqual(['tiprack1Id', '1'])
   })
 })

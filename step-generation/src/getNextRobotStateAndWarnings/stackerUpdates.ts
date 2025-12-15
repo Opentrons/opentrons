@@ -177,7 +177,10 @@ export const forFlexStackerStore = (
             labwarePoolKey as keyof FlexStackerStoredLabwareGroup
           ]
         if (labwareId != null) {
-          robotState.labware[labwareId].stack = [HOPPER_STACKER_LOCATION]
+          robotState.labware[labwareId].stack = [
+            labwareId,
+            HOPPER_STACKER_LOCATION,
+          ]
         }
       }
     }
