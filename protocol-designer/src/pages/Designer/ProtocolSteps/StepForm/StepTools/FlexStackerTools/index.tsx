@@ -17,7 +17,6 @@ import {
   FLEX_STACKER_RETRIEVE,
   FLEX_STACKER_STORE,
 } from '/protocol-designer/constants'
-import { FlexStackerFormType } from '/protocol-designer/form-types'
 import {
   getCurrentFormIsPresaved,
   getLabwareEntities,
@@ -38,6 +37,7 @@ import { getIsStackerStoreEnabled } from './utils.ts/getIsStackerStoreEnabled'
 import { getStoredLabwareDefinitions } from './utils.ts/getStoredLabwareDefinitions'
 import { getStoredLabwareInfo } from './utils.ts/getStoredLabwareInfo'
 
+import type { FlexStackerFormType } from '/protocol-designer/form-types'
 import type { StepFormProps } from '../../types'
 
 export function FlexStackerTools(props: StepFormProps): JSX.Element {
