@@ -415,7 +415,7 @@ interface StackerStoredLabwareLocationSequences {
   newLidLabwareLocationSequences?: LabwareLocationSequence[] | null
 }
 
-interface StackerStoredLabwareDefinitionURIs {
+export interface StackerStoredLabwareDefinitionURIs {
   primaryLabwareURI: string
   adapterLabwareURI?: string | null
   lidLabwareURI?: string | null
