@@ -37,7 +37,7 @@ export interface CreateContainerAboveModuleArgs {
   isOnShuttle?: boolean
 }
 
-type StackedLabware = {
+interface StackedLabware {
   defURI: string
   uuid: string
   role: 'adapter' | 'primary' | 'lid'
@@ -91,7 +91,7 @@ export const createContainerAboveModule: (
       })
     )
 
-    const getTopByRole = (role: StackedLabware['role']) =>
+    const getTopByRole = (role: StackedLabware['role']): string | null =>
       [...stackedLabware].reverse().find(lw => lw.role === role) ?? null
 
     const topPrimary = getTopByRole('primary')
