@@ -55,7 +55,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
         output: {
           // Manually split out vendor chunks
           manualChunks(id) {
-            if (id.includes('node_modules')) return 'vendor'
+            if (id.includes('node_modules')) {
+              return 'vendor'
+            }
           },
         },
       },
@@ -114,7 +116,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
       },
       ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
     ],
-
     optimizeDeps: {
       esbuildOptions: {
         target: 'es2020',
