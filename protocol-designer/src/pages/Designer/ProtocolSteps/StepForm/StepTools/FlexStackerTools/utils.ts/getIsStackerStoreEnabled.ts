@@ -1,9 +1,6 @@
-import {
-  FLEX_STACKER_MODULE_V1,
-  getMaxPoolCount,
-  LabwareDefinition,
-} from '@opentrons/shared-data'
+import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
 
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type {
   FlexStackerModuleState,
   LabwareEntities,
