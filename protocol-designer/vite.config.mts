@@ -63,14 +63,19 @@ export default defineConfig(async (): Promise<UserConfig> => {
     plugins: [
       react({
         include: '**/*.tsx',
-        babel: { configFile: true },
+        babel: {
+          // Use babel.config.js files 1Code has comments. Press enter to view.
+          configFile: true,
+        },
         jsxRuntime: 'automatic',
       }),
       cssModuleSideEffect(),
       {
         name: 'markdown-loader',
         transform(code, id) {
-          if (id.endsWith('.md')) return `export default ${JSON.stringify(code)}`
+          if (id.endsWith('.md')) {
+            return `export default ${JSON.stringify(code)}`
+          }
         },
       },
 
@@ -98,7 +103,12 @@ export default defineConfig(async (): Promise<UserConfig> => {
       {
         name: 'build-info-generator',
         closeBundle: async () => {
-          const outputPath = path.resolve(__dirname, 'dist', 'info', 'index.html')
+          const outputPath = path.resolve(
+            __dirname,
+            'dist',
+            'info',
+            'index.html'
+          )
           await generateBuildInfoHtml(outputPath)
         },
       },
@@ -106,7 +116,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
     ],
 
     optimizeDeps: {
-      esbuildOptions: { target: 'es2020' },
+      esbuildOptions: {
+        target: 'es2020',
+      },
       // For unknown reasons, PD whitescreens on launch unless we have this.
       include: ['tslib'],
     },
@@ -158,7 +170,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
         '/protocol-designer/': path.resolve('./src/') + '/',
       },
     },
-    server: { port: 5178 },
+    server: {
+      port: 5178,
+    },
   }
 })
 
@@ -185,6 +199,6 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_CAMERA_SUPPORT',
   ])
   return Object.fromEntries(
-    Object.entries(process.env).filter(([key]) => envVarNames.has(key))
+    Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
   )
 }

@@ -18,10 +18,7 @@ const sentryDsn = _OT_PD_SENTRY_DSN_ ?? _OT_PD_SENTRY_DEV_DSN_
 
 // Sentry release is normally the app version, but local builds can override it
 // (e.g. `local-dev`) so locally uploaded sourcemaps resolve against local events.
-const sentryRelease =
-  typeof _OT_PD_SENTRY_RELEASE_ !== 'undefined'
-    ? _OT_PD_SENTRY_RELEASE_
-    : _OT_PD_VERSION_
+const sentryRelease = _OT_PD_SENTRY_RELEASE_ ?? _OT_PD_VERSION_
 
 const resolveSentryEnvironment = ():
   | 'production'
