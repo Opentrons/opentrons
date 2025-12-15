@@ -32,14 +32,12 @@ interface UseErrorRecoveryResultBase {
   failedCommand: FailedCommand | null
   runLwDefsByUri: ReturnType<typeof useRunLoadedLabwareDefinitionsByUri>
 }
-export interface UseErrorRecoveryActiveResult
-  extends UseErrorRecoveryResultBase {
+export interface UseErrorRecoveryActiveResult extends UseErrorRecoveryResultBase {
   isERActive: true
   failedCommand: FailedCommand
   runLwDefsByUri: RunLoadedLabwareDefinitionsByUri
 }
-export interface UseErrorRecoveryInactiveResult
-  extends UseErrorRecoveryResultBase {
+export interface UseErrorRecoveryInactiveResult extends UseErrorRecoveryResultBase {
   isERActive: false
 }
 export type UseErrorRecoveryResult =

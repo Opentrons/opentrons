@@ -21,7 +21,8 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_V1,
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleType,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
@@ -153,8 +154,11 @@ export function DeckSetupToolbox(
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
     const isHopperSlot = getIsSlotAHopper(slot)
+    // TODO (nd: 12/12/2025): add back this check in a refactor to properly dispatch stacker state updates
     const isOnShuttle =
-      !isHopperSlot && selectedModuleModel === FLEX_STACKER_MODULE_V1
+      !isHopperSlot &&
+      selectedModuleModel != null &&
+      getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
 
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
@@ -162,35 +166,18 @@ export function DeckSetupToolbox(
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
     if (hasModule && !isOnShuttle) {
-      const labwareLidCombo =
-        selectedLidLabware != null && selectedTopLabware.labwareDefURI != null
-          ? Array.from(
-              {
-                length: selectedTopLabware.amount * 2,
-              },
-              (_, index) =>
-                index % 2 === 0
-                  ? selectedTopLabware.labwareDefURI!.toString()
-                  : selectedLidLabware!.toString()
-            )
-          : []
-      const topLabwareOnly =
-        selectedTopLabware.labwareDefURI != null && selectedLidLabware == null
-          ? Array(selectedTopLabware.amount).fill(
-              selectedTopLabware.labwareDefURI.toString()
-            )
-          : []
-
       dispatch(
         createContainerAboveModule({
           slot: isHopperSlot
             ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
             : slot,
-          labwareDefURIStack: [
-            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
-            ...labwareLidCombo,
-            ...topLabwareOnly,
-          ],
+          labwareDefURIGroup: {
+            adapterDefURI: selectedAdapterDefURI,
+            topLabwareDefURI: selectedTopLabware.labwareDefURI,
+            lidDefURI: selectedLidLabware,
+          },
+          isOnShuttle,
+          amount: selectedTopLabware.amount,
         })
       )
     } else {

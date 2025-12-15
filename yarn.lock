@@ -3846,7 +3846,7 @@
     "@opentrons/react-api-client" "link:react-api-client"
     "@opentrons/shared-data" "link:shared-data"
     "@opentrons/step-generation" "link:step-generation"
-    "@thi.ng/paths" "1.6.5"
+    "@thi.ng/paths" "5.1.63"
     "@types/uuid" "^3.4.7"
     classnames "2.2.5"
     connected-react-router "6.9.3"
@@ -5914,23 +5914,29 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.6.1.tgz#13e09a32d7a8b7060fe38304788ebf4197cd2149"
   integrity sha512-vq7fv0rnt+QTXgPxr5Hjc210p6YKq2kmdziLgnsZGgLJ9e6VAShx1pACLuRjd/AS/sr7phAR58OIIpf0LlmQNw==
 
-"@thi.ng/checks@^1.5.13":
-  version "1.5.14"
-  resolved "https://registry.yarnpkg.com/@thi.ng/checks/-/checks-1.5.14.tgz#d90b40a5549d3149e62302da30c09f5784814a38"
-  integrity sha512-1ozZoMhv6HGsSsIs9MRWZFJvD0ugDqSHwqWLTVes4kkBWf+SU/bm3O92HCoBVGYpNvIJOOMWcBnBGhrfMKh2hQ==
+"@thi.ng/api@^8.9.22":
+  version "8.12.10"
+  resolved "https://registry.yarnpkg.com/@thi.ng/api/-/api-8.12.10.tgz#701c9da2802d4a82e19353ed6c7a3b4ebb07e886"
+  integrity sha512-JWjQbp6R4uA55CzQdZ2avlWivYZvQYd4IJo7GI+edlQMd9qW59X/jgIDLinOQtdP5e+JygaphPWlKkH3sBazKQ==
 
-"@thi.ng/errors@^0.1.11":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@thi.ng/errors/-/errors-0.1.12.tgz#7789637d5e6fc8a892c97b39013eaa846e783450"
-  integrity sha512-iWuco0HdWXBJYayALO+qwLRVBNOcYrejB176DusDOMYq+od5iESIjDHlrv+WGUaFhnuCuJFCOnZJLlJv67zNfw==
+"@thi.ng/checks@^3.4.22":
+  version "3.8.0"
+  resolved "https://registry.yarnpkg.com/@thi.ng/checks/-/checks-3.8.0.tgz#7580487418f74419cf5dcccb34acb208d445daa8"
+  integrity sha512-iHe53YlKOUIek+SERTs0RK1vZ7NF0Jvn5pT00MTEPTa7JHS1K12yZksTerbPxeVoBooG2gkJcXNBerDGvenIbg==
 
-"@thi.ng/paths@1.6.5":
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/@thi.ng/paths/-/paths-1.6.5.tgz#3a628e40c56761759ef537400410b8f8b6818b47"
-  integrity sha512-eLz0vVOtZ4w7Bm/3kOhnP/TSfBrNtZG+owrwEfVJimAK/AKOh/VNale856XKS5xcz0xEZVv5ueFnWAiXuPTnGA==
+"@thi.ng/errors@^2.4.15":
+  version "2.5.50"
+  resolved "https://registry.yarnpkg.com/@thi.ng/errors/-/errors-2.5.50.tgz#57c2d3edc70c0408076f289612a0624b6cb428a5"
+  integrity sha512-81I9IHwrCAHpfzEVMaJQpRYaq87MvIXi7YQ/wccKSxtiaz4IpB8dz3zwds33Oy9g+v+6nQbahZ02+syhKFYSXQ==
+
+"@thi.ng/paths@5.1.63":
+  version "5.1.63"
+  resolved "https://registry.yarnpkg.com/@thi.ng/paths/-/paths-5.1.63.tgz#6fc0924d4e4f46ea4e5a7fd4f95e79e05a84e41b"
+  integrity sha512-UC0uBpg/meAtzwmobCI7k4ZuKF4ZWfUD179sR/S4ke+PJfCIVEPMbFWLi28CaY6MQ3iMPSKExi99a+dP8IJOiA==
   dependencies:
-    "@thi.ng/checks" "^1.5.13"
-    "@thi.ng/errors" "^0.1.11"
+    "@thi.ng/api" "^8.9.22"
+    "@thi.ng/checks" "^3.4.22"
+    "@thi.ng/errors" "^2.4.15"
 
 "@tootallnate/once@2":
   version "2.0.0"
@@ -12588,18 +12594,6 @@ form-data@2.5.4:
     mime-types "^2.1.35"
     safe-buffer "^5.2.1"
 
-form-data@2.5.4:
-  version "2.5.4"
-  resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.5.4.tgz#7716681ab59ddb36c0a8ffd9e506ea3083e7e8d4"
-  integrity sha512-Y/3MmRiR8Nd+0CUtrbvcKtKzLWiUfpQ7DFVggH8PwmGt/0r7RSy32GuP4hpCJlQNEBusisSx1DLtD8uD386HJQ==
-  dependencies:
-    asynckit "^0.4.0"
-    combined-stream "^1.0.8"
-    es-set-tostringtag "^2.1.0"
-    has-own "^1.0.1"
-    mime-types "^2.1.35"
-    safe-buffer "^5.2.1"
-
 form-data@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/form-data/-/form-data-4.0.0.tgz#93919daeaf361ee529584b9b31664dc12c9fa452"
@@ -18600,10 +18594,10 @@ prepend-http@^2.0.0:
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
   integrity sha512-ravE6m9Atw9Z/jjttRUZ+clIXogdghyZAuWJ3qEzjT+jI/dL1ifAqhZeC5VHzQp1MSt1+jxKkFNemj/iO7tVUA==
 
-prettier@3.6.2:
-  version "3.6.2"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.6.2.tgz#ccda02a1003ebbb2bfda6f83a074978f608b9393"
-  integrity sha512-I7AIg5boAr5R0FFtJ6rCfD+LFsWHp81dolrFD8S79U9tb8Az2nGrJncnMSnys+bpQJfRUzqs9hnA81OAA3hCuQ==
+prettier@3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.7.0.tgz#d6ce84a345ff7e3b663ca104b949a0365df28978"
+  integrity sha512-pBiBj/gjRY9Qpk1b7cDda6Rbwvkaggos779AHQ0Ek/odwDx6xG6DRBxtnp1QmxbuD7pAO8/SQ8vuhtGv9LoLWA==
 
 prettier@^2.8.0:
   version "2.8.8"

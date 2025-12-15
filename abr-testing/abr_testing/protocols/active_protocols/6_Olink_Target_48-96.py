@@ -80,6 +80,7 @@ def add_parameters(p: ParameterContext) -> None:
         default=False,
         description="ON - protocol will use the waste chute.",
     )
+    helpers.create_error_capture_duration_duration(p)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -91,6 +92,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
     ep_to_sample_plate = protocol.params.ep_to_sample_plate  # type: ignore[attr-defined]
     mm_col = protocol.params.mm_col  # type: ignore[attr-defined]
@@ -523,10 +525,12 @@ def run(protocol: ProtocolContext) -> None:
             height = ifp_plate[ifp_plate_well.well_name].current_liquid_height()
             liquid_heights[ifp_plate_well.well_name] = height
         protocol.comment(str(liquid_heights))
-
+        protocol.capture_image(filename="end_of_run")
+        if not protocol.is_simulating():
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

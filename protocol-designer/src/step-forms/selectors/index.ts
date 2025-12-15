@@ -5,17 +5,15 @@ import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
 import {
-  ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import { MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE } from '@opentrons/step-generation'
 
 import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
 import {
@@ -38,16 +36,22 @@ import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 
 import type { Selector } from 'reselect'
 import type { DropdownOption, Mount } from '@opentrons/components'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  ModuleType,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
+  FlexStackerModuleState,
   GripperEntities,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
   LiquidEntities,
   ModuleEntities,
+  ModuleTemporalProperties,
   NormalizedAdditionalEquipmentById,
   PipetteEntities,
   StagingAreaEntities,
@@ -79,22 +83,14 @@ import type {
   SavedStepFormState,
 } from '../reducers'
 import type {
-  AbsorbanceReaderState,
-  FlexStackerModuleState,
   FormPipettesByMount,
-  HeaterShakerModuleState,
   InitialDeckSetup,
   LabwareOnDeck,
-  MagneticBlockState,
-  MagneticModuleState,
   ModuleOnDeck,
   ModulesForEditModulesCard,
-  ModuleTemporalProperties,
   NormalizedLabware,
   NormalizedLabwareById,
   PipetteOnDeck,
-  TemperatureModuleState,
-  ThermocyclerModuleState,
 } from '../types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
@@ -207,35 +203,8 @@ export const getAdditionalEquipment: Selector<
 
 export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
   createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
-const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
-  type: MAGNETIC_MODULE_TYPE,
-  engaged: false,
-}
-const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
-  type: TEMPERATURE_MODULE_TYPE,
-  status: TEMPERATURE_DEACTIVATED,
-  targetTemperature: null,
-}
-const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
-  type: THERMOCYCLER_MODULE_TYPE,
-  blockTargetTemp: null,
-  lidTargetTemp: null,
-  lidOpen: null,
-}
-const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
-  type: HEATERSHAKER_MODULE_TYPE,
-  targetTemp: null,
-  targetSpeed: null,
-  latchOpen: null,
-}
-const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
-  type: MAGNETIC_BLOCK_TYPE,
-}
-const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
-  type: ABSORBANCE_READER_TYPE,
-  lidOpen: null,
-  initialization: null,
-}
+
+// todo(mm, 2025-12-12): Temporarily defining FLEX_STACKER_INITIAL_STATE here until step-generation supports it.
 const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   type: FLEX_STACKER_MODULE_TYPE,
   maxPoolCount: 0,
@@ -244,18 +213,14 @@ const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   labwareOnShuttle: null,
 }
 
-const MODULE_INITIAL_STATES_MAP: Record<
-  string,
-  ModuleTemporalProperties['moduleState']
-> = {
-  [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_INITIAL_STATE,
-  [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_INITIAL_STATE,
-  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_INITIAL_STATE,
-  [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
-  [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
-  [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
+const MODULE_INITIAL_STATES_MAP = {
+  ...STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE,
   [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_INITIAL_STATE,
-}
+} as const
+MODULE_INITIAL_STATES_MAP satisfies Record<
+  ModuleType,
+  ModuleTemporalProperties['moduleState']
+>
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -307,7 +272,11 @@ const _getInitialDeckSetup = (
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
         const { id, model, type, pythonName } = moduleEntity
-        const moduleState = MODULE_INITIAL_STATES_MAP[type]
+        const baseModuleState = MODULE_INITIAL_STATES_MAP[type]
+        const moduleStateUpdate =
+          (initialSetupStep && initialSetupStep.moduleStateUpdate) || {}
+        const updatedModuleState = moduleStateUpdate[moduleId]
+        const moduleState = updatedModuleState || baseModuleState
 
         if (moduleState == null) {
           console.error(`Unknown module type: ${type}`)
