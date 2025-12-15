@@ -4,8 +4,10 @@ from typing import Union, Literal
 
 from pydantic import BaseModel, Field
 
+from opentrons_shared_data.util import StrEnum
 
-class WellOrigin(str, Enum):
+
+class WellOrigin(StrEnum):
     """Origin of WellLocation offset.
 
     Props:
@@ -21,7 +23,7 @@ class WellOrigin(str, Enum):
     MENISCUS = "meniscus"
 
 
-class PickUpTipWellOrigin(str, Enum):
+class PickUpTipWellOrigin(StrEnum):
     """The origin of a PickUpTipWellLocation offset.
 
     Props:
@@ -35,7 +37,7 @@ class PickUpTipWellOrigin(str, Enum):
     CENTER = "center"
 
 
-class DropTipWellOrigin(str, Enum):
+class DropTipWellOrigin(StrEnum):
     """The origin of a DropTipWellLocation offset.
 
     Props:

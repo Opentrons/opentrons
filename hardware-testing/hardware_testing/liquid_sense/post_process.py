@@ -153,13 +153,13 @@ def process_csv_directory(  # noqa: C901
                 [
                     "50ul",
                     f"A{pressures_start_line-1}",
-                    f"{COL_TRIAL_CONVERSION[trials]}{pressures_start_line + max_results_len -1}",
+                    f"{COL_TRIAL_CONVERSION[trials]}{pressures_start_line + max_results_len - 1}",
                     "200ul",
                     f"A{pressures_start_line+max_results_len-1}",
-                    f"{COL_TRIAL_CONVERSION[trials]}{pressures_start_line +(2*max_results_len)-1}",
+                    f"{COL_TRIAL_CONVERSION[trials]}{pressures_start_line + (2 * max_results_len) - 1}",
                     "10000ul",
                     f"A{pressures_start_line+(2*max_results_len-1)}",
-                    f"{COL_TRIAL_CONVERSION[trials]}{pressures_start_line + (3*max_results_len)-1}",
+                    f"{COL_TRIAL_CONVERSION[trials]}{pressures_start_line + (3 * max_results_len) - 1}",
                 ]
             )
 

@@ -56,7 +56,7 @@ jobs:
           node-version: '22.12.0'
       - uses: 'actions/setup-python@v3'
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -71,9 +71,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
-        # TODO(mc, 2022-02-24): expand this matrix to 3.8 and 3.9,
-        # preferably in a nightly cronjob on edge or something
-        python: ['3.10']
+        python: ['3.12']
 
     runs-on: '${{ matrix.os }}'
     steps:
@@ -174,7 +172,7 @@ jobs:
           sudo apt-get update && sudo apt-get install libudev-dev
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - uses: './.github/actions/python/setup'
         with:
           project: 'shared-data'

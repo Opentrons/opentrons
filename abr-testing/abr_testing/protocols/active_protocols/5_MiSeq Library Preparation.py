@@ -28,6 +28,7 @@ requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
     helpers.create_dot_bottom_parameter(parameters)
+    helpers.create_error_capture_duration_duration(parameters)
     helpers.create_deactivate_modules_parameter(parameters)
     helpers.create_probe_liquid_height_parameter(parameters)
     helpers.create_meniscus_z_parameter(parameters)
@@ -42,6 +43,7 @@ def run(protocol: ProtocolContext) -> None:
     """Protocol."""
     # Load Parameters
     protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     column_tip_pick_up = protocol.params.column_tip_pickup  # type: ignore[attr-defined]
@@ -354,11 +356,12 @@ def run(protocol: ProtocolContext) -> None:
             thermocycler.deactivate_block()
         # Pause for plate removal
         protocol.comment("Protocol complete!")
+        protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

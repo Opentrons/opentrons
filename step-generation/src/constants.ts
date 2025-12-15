@@ -13,6 +13,7 @@ import type {
   AddressableOffsetVector,
   ModuleModel,
   ModuleType,
+  OT2AddressableAreaName,
 } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
@@ -59,27 +60,34 @@ export const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
   targetSpeed: null,
   latchOpen: null,
 }
-
-const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
+export const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
   type: 'absorbanceReaderType',
   lidOpen: null,
   initialization: null,
 }
-const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
+export const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
   type: 'magneticBlockType',
 }
 
-// @ts-expect-error Flex stacker not yet supported in step-generation
-export const MODULE_INITIAL_STATE_BY_TYPE: {
-  [moduleType in ModuleType]: ModuleState
-} = {
+export const MODULE_INITIAL_STATE_BY_TYPE = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_INITIAL_STATE,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_INITIAL_STATE,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_INITIAL_STATE,
   [HEATERSHAKER_MODULE_TYPE]: HEATERSHAKER_MODULE_INITIAL_STATE,
   [ABSORBANCE_READER_TYPE]: ABSORBANCE_READER_INITIAL_STATE,
   [MAGNETIC_BLOCK_TYPE]: MAGNETIC_BLOCK_INITIAL_STATE,
+} as const
+
+// @ts-expect-error Flex stacker not yet supported in step-generation
+// todo(mm, 2025-12-12): protocol-designer defines its own FLEX_STACKER_INITIAL_STATE.
+// Delete that one when we define one here.
+MODULE_INITIAL_STATE_BY_TYPE satisfies {
+  [moduleType in ModuleType]: ModuleState
 }
+MODULE_INITIAL_STATE_BY_TYPE satisfies {
+  [moduleType in Exclude<ModuleType, 'flexStackerModuleType'>]: ModuleState
+}
+
 export const OT_2_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_1100ml_fixed/1'
 export const FLEX_TRASH_DEF_URI = 'opentrons/opentrons_1_trash_3200ml_fixed/1'
 export const COLUMN_4_SLOTS = ['A4', 'B4', 'C4', 'D4']
@@ -96,4 +104,22 @@ export const MANUAL: 'manual' = 'manual'
 
 export const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
+export const OT2_TC_SLOTS: OT2AddressableAreaName[] = ['7', '8', '10', '11']
+
 export const HOPPER_STACKER_LOCATION = 'hopper'
+
+export const HOPPER_FAKE_LOCATIONS = [
+  'hopperA4',
+  'hopperB4',
+  'hopperC4',
+  'hopperD4',
+]
+
+export const FAKE_HOPPER_LOCATION_MAP = {
+  hopperA4: 'A4',
+  hopperB4: 'B4',
+  hopperC4: 'C4',
+  hopperD4: 'D4',
+}
+
+export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP

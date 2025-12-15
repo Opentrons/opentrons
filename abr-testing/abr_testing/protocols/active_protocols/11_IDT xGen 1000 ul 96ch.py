@@ -27,6 +27,7 @@ def add_parameters(parameters: ParameterContext) -> None:
     helpers.create_deactivate_modules_parameter(parameters)
     helpers.create_dry_run_parameter(parameters)
     helpers.create_dot_bottom_parameter(parameters)
+    helpers.create_error_capture_duration_duration(parameters)
     parameters.add_str(
         display_name="Frag Mode",
         variable_name="FRAG_MODE",
@@ -62,7 +63,7 @@ def run(protocol: ProtocolContext) -> None:
     # ======================== DOWNLOADED PARAMETERS ========================
     global COLUMNS  # Number of Columns of Samples
     # =================== LOADING THE RUNTIME PARAMETERS ====================
-
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     DRYRUN = protocol.params.dry_run  # type: ignore[attr-defined]
     FRAG_MODE = protocol.params.FRAG_MODE  # type: ignore[attr-defined]
     FRAGTIME = protocol.params.FRAGTIME  # type: ignore[attr-defined]
@@ -1476,12 +1477,13 @@ def run(protocol: ProtocolContext) -> None:
         protocol.comment("==============================================")
         protocol.comment("--> Report")
         protocol.comment("==============================================")
+        protocol.capture_image(filename="end_of_run")
 
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Union, Optional
+from ..util import StrEnum
 
 
 @dataclass(frozen=True)
@@ -16,7 +17,7 @@ class RunFileNameMetadata:
     protocol_name: Optional[str]
 
 
-class MimeType(str, Enum):
+class MimeType(StrEnum):
     """File mime types."""
 
     TEXT_CSV = "text/csv"

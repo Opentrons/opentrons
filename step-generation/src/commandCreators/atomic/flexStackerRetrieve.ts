@@ -1,4 +1,6 @@
-import { getLabwareIdOnHopper, uuid } from '../../utils'
+import * as errorCreators from '../../errorCreators'
+import { flexStackerStateGetter } from '../../robotStateSelectors'
+import { getLabwareIdOnHopper, getLabwareIdOnShuttle, uuid } from '../../utils'
 
 import type { FlexStackerRetrieveCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
@@ -8,13 +10,22 @@ export const flexStackerRetrieve: CommandCreator<
 > = (args, invariantContext, robotState) => {
   const { moduleId } = args
   const { modules, labware } = robotState
-  const { moduleEntities, labwareEntities } = invariantContext
+  const { moduleEntities } = invariantContext
   const modulePythonName = moduleEntities[moduleId].pythonName
   const moduleLocation = modules[moduleId].slot
-  const labwareIdOnModule = getLabwareIdOnHopper(labware, moduleLocation)
-  const labwarePythonName = labwareEntities[labwareIdOnModule]?.pythonName
-  //  TODO: add error creator if there is no labware in the hopper
+  const flexStackerState = flexStackerStateGetter(robotState, moduleId)
+  const labwareIdOnHopper = getLabwareIdOnHopper(labware, moduleLocation)
 
+  if (flexStackerState !== null && getLabwareIdOnShuttle(flexStackerState)) {
+    return {
+      errors: [errorCreators.flexStackerShuttleFull()],
+    }
+  }
+  if (!labwareIdOnHopper) {
+    return {
+      errors: [errorCreators.flexStackerHopperEmpty()],
+    }
+  }
   return {
     commands: [
       {
@@ -25,6 +36,6 @@ export const flexStackerRetrieve: CommandCreator<
         },
       },
     ],
-    python: `${labwarePythonName} = ${modulePythonName}.retrieve()`,
+    python: `${modulePythonName}.retrieve()`,
   }
 }

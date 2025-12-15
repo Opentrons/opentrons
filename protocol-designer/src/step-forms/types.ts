@@ -1,26 +1,17 @@
 import type { Mount } from '@opentrons/components'
 import type {
-  ABSORBANCE_READER_TYPE,
   CutoutId,
-  FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
-  FlexStackerSetStoredLabwareParams,
-  FlexStackerStoredLabwareGroup,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  MAGNETIC_MODULE_TYPE,
   ModuleModel,
   ModuleType,
   NozzleConfigurationStyle,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntity,
   ModuleEntity,
+  ModuleTemporalProperties,
   PipetteEntity,
-  TemperatureStatus,
   TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../types'
@@ -43,64 +34,6 @@ export interface FormModule {
 }
 export type FormModules = Record<number, FormModule>
 export type ModuleEntities = Record<string, ModuleEntity>
-// NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
-export interface MagneticModuleState {
-  type: typeof MAGNETIC_MODULE_TYPE
-  engaged: boolean
-}
-export interface TemperatureModuleState {
-  type: typeof TEMPERATURE_MODULE_TYPE
-  status: TemperatureStatus
-  targetTemperature: number | null
-}
-export interface ThermocyclerModuleState {
-  type: typeof THERMOCYCLER_MODULE_TYPE
-  blockTargetTemp: number | null
-  // null means block is deactivated
-  lidTargetTemp: number | null
-  // null means lid is deactivated
-  lidOpen: boolean | null // if false, closed. If null, unknown
-}
-export interface HeaterShakerModuleState {
-  type: typeof HEATERSHAKER_MODULE_TYPE
-  targetTemp: number | null
-  targetSpeed: number | null
-  latchOpen: boolean | null
-}
-export interface MagneticBlockState {
-  type: typeof MAGNETIC_BLOCK_TYPE
-}
-
-export interface FlexStackerModuleState {
-  type: typeof FLEX_STACKER_MODULE_TYPE
-  maxPoolCount: number
-  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
-  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
-  labwareOnShuttle: FlexStackerStoredLabwareGroup | null
-}
-export type InitializationMode = 'single' | 'multi'
-export interface Initialization {
-  mode: InitializationMode
-  wavelengths: number[]
-  referenceWavelength?: number
-}
-
-export interface AbsorbanceReaderState {
-  type: typeof ABSORBANCE_READER_TYPE
-  lidOpen: boolean | null
-  initialization: Initialization | null
-}
-export interface ModuleTemporalProperties {
-  slot: DeckSlot
-  moduleState:
-    | MagneticModuleState
-    | TemperatureModuleState
-    | ThermocyclerModuleState
-    | HeaterShakerModuleState
-    | MagneticBlockState
-    | AbsorbanceReaderState
-    | FlexStackerModuleState
-}
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
   Record<ModuleType, ModuleOnDeck[] | null | undefined>

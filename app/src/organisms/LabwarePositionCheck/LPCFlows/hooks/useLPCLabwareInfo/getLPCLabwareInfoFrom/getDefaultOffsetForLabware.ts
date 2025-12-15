@@ -19,8 +19,7 @@ import type {
 } from '/app/redux/protocol-runs'
 import type { GetLPCLabwareInfoForURI } from '.'
 
-interface GetDefaultOffsetDetailsForLabwareParams
-  extends GetLPCLabwareInfoForURI {
+interface GetDefaultOffsetDetailsForLabwareParams extends GetLPCLabwareInfoForURI {
   locationSpecificOffsetDetails: LocationSpecificOffsetDetails[]
 }
 
@@ -62,8 +61,7 @@ export function getDefaultOffsetDetailsForLabware(
   }
 }
 
-interface GetStackingInfoParams
-  extends GetDefaultOffsetDetailsForLabwareParams {
+interface GetStackingInfoParams extends GetDefaultOffsetDetailsForLabwareParams {
   aLabwareId: string
 }
 

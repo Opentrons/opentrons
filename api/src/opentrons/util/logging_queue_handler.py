@@ -20,7 +20,7 @@ class CustomQueueHandler(logging.handlers.QueueHandler):
     """
 
     def __init__(
-        self, *, queue: Queue[logging.LogRecord], extra: dict[str, object] | None = None
+        self, queue: Queue[logging.LogRecord], extra: dict[str, object] | None = None
     ) -> None:
         """Construct the handler.
 
