@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import {
+  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -9,7 +10,6 @@ import {
   LegacyStyledText,
   Link,
   Modal,
-  AlertPrimaryButton,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'

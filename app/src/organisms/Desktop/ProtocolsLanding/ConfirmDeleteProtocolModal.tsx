@@ -44,9 +44,7 @@ export function ConfirmDeleteProtocolModal(
           >
             {t('shared:cancel')}
           </Link>
-          <AlertPrimaryButton
-            onClick={props.handleClickDelete}
-          >
+          <AlertPrimaryButton onClick={props.handleClickDelete}>
             {t('yes_delete_this_protocol')}
           </AlertPrimaryButton>
         </Flex>
