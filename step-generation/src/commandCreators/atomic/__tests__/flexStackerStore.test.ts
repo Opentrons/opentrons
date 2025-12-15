@@ -24,7 +24,6 @@ import type {
 
 const moduleId = 'flexStackerId'
 vi.mock('../../../robotStateSelectors')
-
 describe('flexStackerStore', () => {
   let invariantContext: InvariantContext
   let robotState: RobotState
@@ -38,6 +37,7 @@ describe('flexStackerStore', () => {
       pythonName: 'mock_flex_stacker_1',
     }
     invariantContext.labwareEntities = {
+      ...invariantContext.labwareEntities,
       mockLabwareId: {
         id: 'mockLabwareId',
         labwareDefURI: 'mockURI',
@@ -209,20 +209,60 @@ describe('flexStackerStore', () => {
   it('raises an error if the hopper is full', () => {
     vi.mocked(flexStackerStateGetter).mockReturnValue({
       labwareOnShuttle: {
-        primaryLabwareId: 'mockLabwareId',
+        primaryLabwareId: 'tiprack1Id',
         adapterLabwareId: null,
         lidLabwareId: null,
       },
       labwareInHopper: [
         {
-          primaryLabwareId: 'mockLabwareId',
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
           adapterLabwareId: null,
           lidLabwareId: null,
         },
       ],
       maxPoolCount: 1,
       storedLabwareDetails: {
-        primaryLabwareURI: 'mockURI',
+        primaryLabwareURI: 'fixture/fixture_tiprack_300_ul/1',
         lidLabwareURI: null,
         adapterLabwareURI: null,
       },

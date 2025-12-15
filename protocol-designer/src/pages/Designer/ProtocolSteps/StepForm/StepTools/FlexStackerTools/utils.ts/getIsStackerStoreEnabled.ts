@@ -1,4 +1,8 @@
-import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_V1,
+  getMaxPoolCount,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
 
 import type {
   FlexStackerModuleState,
@@ -35,19 +39,31 @@ export const getIsStackerStoreEnabled = (
         ]
       const shuttleEntityURI =
         labwareEntities[shuttleLabwareId]?.labwareDefURI ?? null
-      return shuttleEntityURI === configuredURI
+      return shuttleEntityURI === storedLabwareDetails[configuredURI]
     }
   )
+  const primaryStoredLabwareDefinition = getLabwareDefinitionFromURI(
+    labwareEntities,
+    storedLabwareDetails.primaryLabwareURI
+  )
+  const adapterStoredLabwareDefinition = getLabwareDefinitionFromURI(
+    labwareEntities,
+    storedLabwareDetails.adapterLabwareURI ?? ''
+  )
+  const lidLabwareDefinition = getLabwareDefinitionFromURI(
+    labwareEntities,
+    storedLabwareDetails.lidLabwareURI ?? ''
+  )
+  if (primaryStoredLabwareDefinition == null) {
+    return false
+  }
   const maxPoolCount =
-    storedLabwareDetails.primaryLabwareURI != null
+    primaryStoredLabwareDefinition != null
       ? getMaxPoolCount({
           labwareDefinitions: {
-            primary:
-              labwareEntities[storedLabwareDetails.primaryLabwareURI]?.def,
-            adapter:
-              labwareEntities[storedLabwareDetails.adapterLabwareURI ?? '']
-                ?.def,
-            lid: labwareEntities[storedLabwareDetails.lidLabwareURI ?? '']?.def,
+            primary: primaryStoredLabwareDefinition,
+            adapter: adapterStoredLabwareDefinition,
+            lid: lidLabwareDefinition,
           },
           model: FLEX_STACKER_MODULE_V1,
         })
@@ -57,3 +73,11 @@ export const getIsStackerStoreEnabled = (
 
   return isValid && !isFull
 }
+
+const getLabwareDefinitionFromURI = (
+  labwareEntities: LabwareEntities,
+  labwareURI: string
+): LabwareDefinition | null =>
+  Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === labwareURI
+  )?.def ?? null

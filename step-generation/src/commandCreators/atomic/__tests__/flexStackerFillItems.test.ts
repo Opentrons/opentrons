@@ -44,6 +44,7 @@ describe('flexStackerFillItems', () => {
       pythonName: 'mock_flex_stacker_1',
     }
     invariantContext.labwareEntities = {
+      ...invariantContext.labwareEntities,
       [labwareId]: {
         id: labwareId,
         def: fixture96Plate as LabwareDefinition2,
@@ -279,20 +280,60 @@ mock_flex_stacker_1.fill_items(
   it('raises an error if the hopper is full', () => {
     vi.mocked(flexStackerStateGetter).mockReturnValue({
       labwareOnShuttle: {
-        primaryLabwareId: 'mockLabwareId',
+        primaryLabwareId: 'tiprack1Id',
         adapterLabwareId: null,
         lidLabwareId: null,
       },
       labwareInHopper: [
         {
-          primaryLabwareId: 'mockLabwareId',
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
           adapterLabwareId: null,
           lidLabwareId: null,
         },
       ],
       maxPoolCount: 1,
       storedLabwareDetails: {
-        primaryLabwareURI: 'mockURI',
+        primaryLabwareURI: 'fixture/fixture_tiprack_300_ul/1',
         lidLabwareURI: null,
         adapterLabwareURI: null,
       },
