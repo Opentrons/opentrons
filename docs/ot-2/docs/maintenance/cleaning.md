@@ -213,36 +213,57 @@ Along with routine cleaning, Opentrons also recommends the following optional pr
     <tr>
       <td>Quarterly</td>
       <td>Robot calibration health check</td>
-      <td>Perform if movement appears to be malfunctioning or incorrect. Or after deck calibration, pipette offset calibration, or tip length calibration.</td>
+      <td>Perform if:
+        <ul>
+          <li>Movement appears to be malfunctioning or incorrect.</li>
+          <li>After deck, instrument, or tip length calibration.
+        </ul></td>
     </tr>
     <tr>
       <td rowspan="4">Every six months</td>
       <td>Deck calibration</td>
-      <td>If OT-2's Calibration Health Check shows inaccurate calibration results. Or if installing a new pipette. Or if pipette positioning appears to cause crashing into the deck or labware.</td>
+      <td>Perform:
+        <ul>
+          <li>If a calibration health check shows inaccurate calibration results.
+          <li>After installing a new pipette.</li>
+          <li>If a pipette positioning crashes into the deck or labware.</li>
+        </ul>
+      </td>
     </tr>
     <tr>
       <td>Pipette Offset</td>
-      <td>If OT-2's Calibration Health Check shows inaccurate calibration results. Or if installing a new pipette. Or if pipette positioning appears to cause crashing into the deck or labware.</td>
+      <td>Perform:
+        <ul>
+          <li>If a calibration health check shows inaccurate calibration results.
+          <li>After installing a new pipette.</li>
+          <li>If a pipette positioning crashes into the deck or labware.</li>
+        </ul>
+      </td>
     </tr>
     <tr>
       <td>Tip Length Calibration</td>
-      <td>If installing a new pipette.</td>
+      <td>After installing a new pipette.</td>
     </tr>
     <tr>
       <td>Labware Position Check</td>
-      <td>If liquid handler positioning to any designated labware appears to be offset. Or if installing and using new types of labware from previous runs.</td>
+      <td>Perform:
+        <ul>
+          <li>If a pipette appears to be misaligned with labware.</li>
+          <li>After installing and using new types of labware with a previous protocol run.</li>
+        </ul>
+      </td>
     </tr>
     <tr>
       <td rowspan="3">Yearly</td>
-      <td>Pipette Replacement</td>
-      <td>If pipette aspirate or dispense actions appear to show any signs of malfunction or pipetting inaccuracy.</td>
+      <td>Pipette replacement</td>
+      <td>Replace if the pipette malfunctions during aspirate/dispense procedures.</td>
     </tr>
     <tr>
-      <td>Air Clean Electronics Board</td>
-      <td>If noticeable dust and debris have accumulated on the black electronics cover.</td>
+      <td>Inspect and clean circuit boards</td>
+      <td>Use compressed air to blow accumulated dust off the rear circuit boards.</td>
     </tr>
     <tr>
-      <td>Replace 8-Channel GEN2 pipette O-rings</td>
+      <td>Replace 8-channel GEN2 pipette O-rings</td>
       <td>If you notice any nicks or tears on the O-rings.</td>
     </tr>
   </tbody>
