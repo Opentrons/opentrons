@@ -50,6 +50,7 @@ export default defineConfig(async () => {
       rollupOptions: {
         external: ['react/compiler-runtime'],
         output: {
+          // Manually split out vendor chunks
           manualChunks(id) {
             if (id.includes('node_modules')) return 'vendor'
           },
@@ -116,6 +117,7 @@ export default defineConfig(async () => {
         ],
       },
     },
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
     define: {
       _FF_ENV_VARS_: getFeatureFlagEnvVars(),
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
@@ -134,8 +136,13 @@ export default defineConfig(async () => {
     },
     resolve: {
       conditions: ['browser'],
+       // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
+        // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+        // files being processed with the wrong config (the config from the
+        // consuming project vs. the config from the source project).
+        // Can these be replaced with regular package.json dependencies?
         '@opentrons/components/styles/global': path.resolve(
           '../components/src/styles/global.css'
         ),
@@ -152,6 +159,10 @@ export default defineConfig(async () => {
 })
 
 function getFeatureFlagEnvVars() {
+  // If we change the prefix to something like "OT_PD_FF_...", we could automatically
+  // scrape process.env instead of having this explicit list. We don't want to scrape
+  // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
+  // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
   const envVarNames = new Set([
     'OT_PD_PRERELEASE_MODE',
     'OT_PD_DISABLE_MODULE_RESTRICTIONS',
