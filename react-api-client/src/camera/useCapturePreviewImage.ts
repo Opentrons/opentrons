@@ -1,63 +1,35 @@
-import { useMutation, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 
 import { createCapturePreviewImage } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
-import type { AxiosError } from 'axios'
-import type {
-  UseMutateFunction,
-  UseMutationOptions,
-  UseMutationResult,
-} from 'react-query'
+import type { AxiosError, AxiosRequestConfig } from 'axios'
+import type { UseQueryOptions, UseQueryResult } from 'react-query'
 import type {
   CameraImageSettings,
-  CameraImageSettingsResponse,
+  DownloadedImageFileResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
 
-export type UseCapturePreviewImageMutationResult = UseMutationResult<
-  CameraImageSettingsResponse,
-  AxiosError<ErrorResponse>,
-  CameraImageSettings
-> & {
-  createCapturePreviewImage: UseMutateFunction<
-    CameraImageSettingsResponse,
-    AxiosError<ErrorResponse>,
-    CameraImageSettings
-  >
-}
-
 export function useCapturePreviewImage(
-  options: UseMutationOptions<
-    CameraImageSettingsResponse,
-    AxiosError<ErrorResponse>,
-    CameraImageSettings
-  > = {}
-): UseCapturePreviewImageMutationResult {
+  cameraImageSettings: CameraImageSettings,
+  axiosConfig?: AxiosRequestConfig,
+  options?: UseQueryOptions<
+    DownloadedImageFileResponse,
+    AxiosError<ErrorResponse>
+  >
+): UseQueryResult<DownloadedImageFileResponse, AxiosError<ErrorResponse>> {
   const host = useHost()
-  const queryClient = useQueryClient()
 
-  const mutation = useMutation<
-    CameraImageSettingsResponse,
-    AxiosError<ErrorResponse>,
-    CameraImageSettings
-  >(
-    [host, 'camera', 'capturePreviewImage'],
-    (data: CameraImageSettings) =>
-      createCapturePreviewImage(host!, data).then(response => {
-        queryClient
-          .invalidateQueries([host, 'camera', 'capturePreviewImage'])
-          .catch(e => {
-            throw e
-          })
-        return response.data
-      }),
-    options
+  return useQuery<DownloadedImageFileResponse, AxiosError<ErrorResponse>>(
+    [host, 'camera', 'capturePreviewImage', cameraImageSettings],
+    () =>
+      createCapturePreviewImage(host!, cameraImageSettings, axiosConfig).then(
+        response => response.data
+      ),
+    {
+      ...options,
+    }
   )
-
-  return {
-    ...mutation,
-    createCapturePreviewImage: mutation.mutate,
-  }
 }

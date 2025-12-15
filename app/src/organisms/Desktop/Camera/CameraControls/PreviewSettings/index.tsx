@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Icon, SecondaryButton, StyledText } from '@opentrons/components'
 
 import { Skeleton } from '/app/atoms/Skeleton'
+import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
-import { usePreviewImage } from './hooks/usePreviewImage'
 import styles from './previewsettings.module.css'
 
 import type { CameraImageSettings } from '@opentrons/api-client'
