@@ -164,7 +164,7 @@ To set up the Thermocycler with a clean, reusable rubber seal:
 3. Rinse the seal with molecular biology grade water.
 4. Let the seal air dry.
 
-![Thermocycler with labeled seal](../images/thermocycler-seal.svg)
+<img src="../../images/thermocycler-seal.svg" width="70%" alt="Thermocycler with rubber seal">
 
 ## Autoclaving labware
 
@@ -185,39 +185,39 @@ Along with routine cleaning, Opentrons also recommends the following optional pr
   <tbody>
     <tr>
       <td rowspan="2">Daily</td>
-      <td>Empty Trash Bin</td>
-      <td>If the trash bin reaches capacity.</td>
+      <td>Empty trash bin</td>
+      <td>When the trash bin reaches capacity.</td>
     </tr>
     <tr>
-      <td>Inspect the Deck</td>
-      <td>N/A</td>
+      <td>Inspect the deck</td>
+      <td>Check for physical damage and clean spills and other residue.</td>
     </tr>
     <tr>
       <td rowspan="2">Weekly</td>
       <td>Pipette visual check</td>
-      <td>If pipette aspirate or dispense actions appear to show any signs of malfunction or pipetting inaccuracy.</td>
+      <td>Inspect the pipette for obvious damage if it aspireates or dispenses inaccurately or shows other signs of malfunction.</td>
     </tr>
     <tr>
-      <td>OT-2, Module, and Pipette Cleaning</td>
-      <td>Immediately after contamination or spillage occurs, or if the pipette and/or module look dirty.</td>
+      <td>Robot, module, and pipette cleaning</td>
+      <td>Clean if accessories appear dirty or immediately after contamination.</td>
     </tr>
     <tr>
       <td rowspan="2">Monthly</td>
-      <td>Check Single-Channel Pipette's Ejection Mechanism</td>
-      <td>If the pipette does not eject/pick up tips consistently.</td>
+      <td>Ejection mechanism check</td>
+      <td>Make sure your single-channel pipette can pick up and eject tips consistently.</td>
     </tr>
     <tr>
-      <td>Power Cycle OT-2 and Modules</td>
-      <td>N/A</td>
+      <td>Power cycle OT-2 and modules</td>
+      <td>It really isn't a bad idea to try turning it off and then on again.</td>
     </tr>
     <tr>
       <td>Quarterly</td>
-      <td>Robot Calibration Health Check</td>
-      <td>If movement appears to be malfunctioning or incorrect. Or after deck calibration, pipette offset calibration, or tip length calibration.</td>
+      <td>Robot calibration health check</td>
+      <td>Perform if movement appears to be malfunctioning or incorrect. Or after deck calibration, pipette offset calibration, or tip length calibration.</td>
     </tr>
     <tr>
       <td rowspan="4">Every six months</td>
-      <td>Deck Calibration</td>
+      <td>Deck calibration</td>
       <td>If OT-2's Calibration Health Check shows inaccurate calibration results. Or if installing a new pipette. Or if pipette positioning appears to cause crashing into the deck or labware.</td>
     </tr>
     <tr>
