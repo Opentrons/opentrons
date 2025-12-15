@@ -35,7 +35,7 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
           color={COLORS.yellow50}
           width="45px"
           marginRight={SPACING.spacing12}
-          aria-label="alert-circle_icon"
+          aria-label="ot-alert_icon"
         />
         <LegacyStyledText as="p">
           <Trans
