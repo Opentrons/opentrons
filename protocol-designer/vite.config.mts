@@ -104,6 +104,7 @@ export default defineConfig(async () => {
 
     optimizeDeps: {
       esbuildOptions: { target: 'es2020' },
+      // For unknown reasons, PD whitescreens on launch unless we have this.
       include: ['tslib'],
     },
     css: {
