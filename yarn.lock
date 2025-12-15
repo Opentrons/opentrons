@@ -5919,33 +5919,15 @@
   resolved "https://registry.yarnpkg.com/@thi.ng/api/-/api-8.12.10.tgz#701c9da2802d4a82e19353ed6c7a3b4ebb07e886"
   integrity sha512-JWjQbp6R4uA55CzQdZ2avlWivYZvQYd4IJo7GI+edlQMd9qW59X/jgIDLinOQtdP5e+JygaphPWlKkH3sBazKQ==
 
-"@thi.ng/checks@^1.5.13":
-  version "1.5.14"
-  resolved "https://registry.yarnpkg.com/@thi.ng/checks/-/checks-1.5.14.tgz#d90b40a5549d3149e62302da30c09f5784814a38"
-  integrity sha512-1ozZoMhv6HGsSsIs9MRWZFJvD0ugDqSHwqWLTVes4kkBWf+SU/bm3O92HCoBVGYpNvIJOOMWcBnBGhrfMKh2hQ==
-
 "@thi.ng/checks@^3.4.22":
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/@thi.ng/checks/-/checks-3.8.0.tgz#7580487418f74419cf5dcccb34acb208d445daa8"
   integrity sha512-iHe53YlKOUIek+SERTs0RK1vZ7NF0Jvn5pT00MTEPTa7JHS1K12yZksTerbPxeVoBooG2gkJcXNBerDGvenIbg==
 
-"@thi.ng/errors@^0.1.11":
-  version "0.1.12"
-  resolved "https://registry.yarnpkg.com/@thi.ng/errors/-/errors-0.1.12.tgz#7789637d5e6fc8a892c97b39013eaa846e783450"
-  integrity sha512-iWuco0HdWXBJYayALO+qwLRVBNOcYrejB176DusDOMYq+od5iESIjDHlrv+WGUaFhnuCuJFCOnZJLlJv67zNfw==
-
 "@thi.ng/errors@^2.4.15":
   version "2.5.50"
   resolved "https://registry.yarnpkg.com/@thi.ng/errors/-/errors-2.5.50.tgz#57c2d3edc70c0408076f289612a0624b6cb428a5"
   integrity sha512-81I9IHwrCAHpfzEVMaJQpRYaq87MvIXi7YQ/wccKSxtiaz4IpB8dz3zwds33Oy9g+v+6nQbahZ02+syhKFYSXQ==
-
-"@thi.ng/paths@1.6.5":
-  version "1.6.5"
-  resolved "https://registry.yarnpkg.com/@thi.ng/paths/-/paths-1.6.5.tgz#3a628e40c56761759ef537400410b8f8b6818b47"
-  integrity sha512-eLz0vVOtZ4w7Bm/3kOhnP/TSfBrNtZG+owrwEfVJimAK/AKOh/VNale856XKS5xcz0xEZVv5ueFnWAiXuPTnGA==
-  dependencies:
-    "@thi.ng/checks" "^1.5.13"
-    "@thi.ng/errors" "^0.1.11"
 
 "@thi.ng/paths@5.1.63":
   version "5.1.63"
