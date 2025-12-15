@@ -448,15 +448,15 @@ export const LabwareCreator = (props: LabwareCreatorProps): JSX.Element => {
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
             values.labwareType === 'wellPlate' ||
-              values.labwareType === 'reservoir' ||
-              values.labwareType === 'tipRack' ||
-              (values.labwareType === 'tubeRack' &&
-                values.tubeRackInsertLoadName) ||
-              (values.labwareType === 'aluminumBlock' &&
-                values.aluminumBlockType === '24well') ||
-              (values.labwareType === 'aluminumBlock' &&
-                values.aluminumBlockType === '96well' &&
-                values.aluminumBlockChildType)
+            values.labwareType === 'reservoir' ||
+            values.labwareType === 'tipRack' ||
+            (values.labwareType === 'tubeRack' &&
+              values.tubeRackInsertLoadName) ||
+            (values.labwareType === 'aluminumBlock' &&
+              values.aluminumBlockType === '24well') ||
+            (values.labwareType === 'aluminumBlock' &&
+              values.aluminumBlockType === '96well' &&
+              values.aluminumBlockChildType)
           )
 
           const labwareTypeChildFields = (
