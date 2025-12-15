@@ -1362,6 +1362,14 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 print_info(str(tips))
+                """
+                Leaving this here as a comment in case we other solutions don'twork.
+                if channel == 7:
+                    # we're doing an 8 channel test and just swapped over to the front channel.
+                    pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
+                    fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+                    remove_tip(fixture_settings)
+                """
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
 
