@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_FLEX_END,
@@ -45,10 +44,7 @@ export function ConfirmDeleteProtocolModal(
           >
             {t('shared:cancel')}
           </Link>
-          <AlertPrimaryButton
-            backgroundColor={COLORS.red50}
-            onClick={props.handleClickDelete}
-          >
+          <AlertPrimaryButton onClick={props.handleClickDelete}>
             {t('yes_delete_this_protocol')}
           </AlertPrimaryButton>
         </Flex>
