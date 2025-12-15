@@ -72,17 +72,13 @@ describe('InterventionModal', () => {
   it('renders an icon if an icon is specified', () => {
     const { container } = render(props)
     // eslint-disable-next-line testing-library/no-node-access, testing-library/no-container
-    const icon = container.querySelector(
-      '[aria-roledescription="ot-alert"]'
-    )
+    const icon = container.querySelector('[aria-roledescription="ot-alert"]')
     expect(icon).not.toBeNull()
   })
   it('does not render an icon if no icon is specified', () => {
     const { container } = render({ ...props, iconName: undefined })
     // eslint-disable-next-line testing-library/no-node-access, testing-library/no-container
-    const icon = container.querySelector(
-      '[aria-roledescription="ot-alert"]'
-    )
+    const icon = container.querySelector('[aria-roledescription="ot-alert"]')
     expect(icon).toBeNull()
   })
 
