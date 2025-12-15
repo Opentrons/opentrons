@@ -272,7 +272,11 @@ const _getInitialDeckSetup = (
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
         const { id, model, type, pythonName } = moduleEntity
-        const moduleState = MODULE_INITIAL_STATES_MAP[type]
+        const baseModuleState = MODULE_INITIAL_STATES_MAP[type]
+        const moduleStateUpdate =
+          (initialSetupStep && initialSetupStep.moduleStateUpdate) || {}
+        const updatedModuleState = moduleStateUpdate[moduleId]
+        const moduleState = updatedModuleState || baseModuleState
 
         if (moduleState == null) {
           console.error(`Unknown module type: ${type}`)

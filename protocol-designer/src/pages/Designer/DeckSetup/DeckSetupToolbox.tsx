@@ -21,7 +21,8 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_V1,
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleType,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
@@ -154,27 +155,30 @@ export function DeckSetupToolbox(
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
     const isHopperSlot = getIsSlotAHopper(slot)
+    // TODO (nd: 12/12/2025): add back this check in a refactor to properly dispatch stacker state updates
     const isOnShuttle =
-      !isHopperSlot && selectedModuleModel === FLEX_STACKER_MODULE_V1
+      !isHopperSlot &&
+      selectedModuleModel != null &&
+      getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
 
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
-    if (hasModule && !isOnShuttle) {
+    // TODO (nd: 12/11/2025): refactor how we create labware stacks in the hopper
+    if (hasModule) {
       dispatch(
         createContainerAboveModule({
           slot: isHopperSlot
             ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
             : slot,
-          labwareDefURIStack: [
-            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
-            ...(selectedTopLabware.labwareDefURI != null
-              ? [selectedTopLabware.labwareDefURI]
-              : []),
-            ...(selectedLidLabware != null ? [selectedLidLabware] : []),
-          ],
+          labwareDefURIGroup: {
+            adapterDefURI: selectedAdapterDefURI,
+            topLabwareDefURI: selectedTopLabware.labwareDefURI,
+            lidDefURI: selectedLidLabware,
+          },
+          isOnShuttle,
         })
       )
     } else {

@@ -49,7 +49,6 @@ export function getResultingTimelineFrameFromRunCommands(
           ...acc,
           [command.result.moduleId]: {
             slot: command.params.location.slotName,
-            // @ts-expect-error MODULE_INITIAL_STATE_BY_TYPE doesn't have an entry for the stacker yet.
             moduleState: MODULE_INITIAL_STATE_BY_TYPE[moduleType],
           },
         }

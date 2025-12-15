@@ -1,7 +1,7 @@
 export { AbsorbanceReaderTools } from './AbsorbanceReaderTools'
-export { FlexStackerToolsContainer } from './FlexStackerTools'
 export { CameraTools } from './CameraTools'
 export { CommentTools } from './CommentTools'
+export { FlexStackerTools } from './FlexStackerTools'
 export { HeaterShakerTools } from './HeaterShakerTools'
 export { MagnetTools } from './MagnetTools'
 export { MixTools } from './MixTools'

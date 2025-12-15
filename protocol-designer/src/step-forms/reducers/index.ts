@@ -106,6 +106,7 @@ import type {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
   SubstituteStepFormPipettesAction,
+  UpdateStackerModuleStateAction,
 } from '../actions'
 import type {
   CreateDeckFixtureAction,
@@ -244,6 +245,7 @@ export const initialDeckSetupStepForm: FormData = {
   labwareLocationUpdate: {},
   pipetteLocationUpdate: {},
   moduleLocationUpdate: {},
+  moduleStateUpdate: {},
   trashBinLocationUpdate: {},
   wasteChuteLocationUpdate: {},
   stagingAreaLocationUpdate: {},
@@ -263,6 +265,7 @@ export type SavedStepFormsActions =
   | DeletePipettesAction
   | CreateModuleAction
   | DeleteModuleAction
+  | UpdateStackerModuleStateAction
   | DuplicateSelectedStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
@@ -642,6 +645,23 @@ export const savedStepForms = (
           return { ...savedForm, moduleId }
         }
 
+        return savedForm
+      })
+    }
+
+    case 'UPDATE_STACKER_MODULE_STATE': {
+      const prevInitialDeckSetupStep =
+        savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            moduleStateUpdate: {
+              ...(prevInitialDeckSetupStep.moduleStateUpdate || {}),
+              [action.payload.moduleId]: action.payload.moduleState,
+            },
+          }
+        }
         return savedForm
       })
     }
