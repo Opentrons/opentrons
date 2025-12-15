@@ -42,7 +42,7 @@ export function LPCProbeNotAttached(props: LPCWizardContentProps): JSX.Element {
       contentStyle={isOnDevice ? CHILDREN_CONTAINER_STYLE : undefined}
     >
       <Flex css={CONTAINER_STYLE}>
-        <Icon name="alert-circle" css={ICON_STYLE} color={COLORS.red50} />
+        <Icon name="ot-alert" css={ICON_STYLE} color={COLORS.red50} />
         <Flex css={COPY_CONTAINER_STYLE}>
           <StyledText
             oddStyle="level3HeaderBold"
