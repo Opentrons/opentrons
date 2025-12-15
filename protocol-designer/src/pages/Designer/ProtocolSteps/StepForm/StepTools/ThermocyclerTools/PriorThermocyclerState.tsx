@@ -17,7 +17,7 @@ export function PriorThermocyclerState(props: {
   switch (currentBlockActivity.type) {
     // The 'profile' case shouldn't actually be reachable. It would mean this component
     // is being rendered in a point in the timeline where a profile is ongoing, which
-    // would mean a Thermocycler form is being rendered at a point in yhr yimrlinr
+    // would mean a Thermocycler form is being rendered at a point in the timeline
     // where a profile is ongoing, which would mean a Thermocycler profile has a
     // Thermocycler step nested within it, which shouldn't be possible.
     case 'blockDeactivated':
