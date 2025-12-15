@@ -296,7 +296,7 @@ class FixtureSettings:
         source_well = ctx.load_labware(labware_on_scale, slot_scale)[
             labware_on_scale_well_name
         ]
-        liquid_class = ctx.get_liquid_class(liquid_name)
+        liquid_class = ctx.get_liquid_class(liquid_name, version=3)
         liquid = ctx.define_liquid(liquid_name, liquid_desc, liquid_col)
         source_well.load_liquid(liquid, liquid_vol_estimate)
 
