@@ -1,7 +1,7 @@
 // set of functions that parse details out of a protocol record and its internals
 import reduce from 'lodash/reduce'
 
-import { DEFAULT_LIQUID_COLORS } from '../constants'
+import { DEFAULT_LIQUID_COLORS, MIXED_WELL_COLOR } from '../constants'
 import { getModuleType } from '../modules'
 import { getLabwareDefURI } from './getLabwareDefURI'
 import { getModuleDeckLabel } from './getModuleDeckLabel'
@@ -386,7 +386,9 @@ export function parseLiquidsInLoadOrder(
     if (!seenLiquids.has(liquidId)) {
       seenLiquids.add(liquidId)
       const liquid = loadedLiquids.find(l => l.id === liquidId)
-      if (liquid) acc.push(liquid)
+      if (liquid) {
+        acc.push(liquid)
+      }
     }
 
     // Track well-to-liquid mapping for mixed liquids
@@ -415,11 +417,11 @@ export function parseLiquidsInLoadOrder(
           )
 
           const mixedId = `mixed-${sortedIds.join('-')}`
-
+          const totalLiquids = liquidNames.length
           mixedMap.set(key, {
             id: mixedId,
-            displayColor: '#737578',
-            displayName: `${liquidNames.length} liquids`,
+            displayColor: MIXED_WELL_COLOR,
+            displayName: totalLiquids,
             description: liquidNames.join(', '),
           })
         }

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 import { css } from 'styled-components'
 
@@ -57,7 +58,7 @@ const LIQUID_CARD_ODD_STYLE = css`
 `
 interface LiquidDetailCardProps {
   liquidId: string
-  displayName: string
+  displayName: string | number
   description: string | null
   displayColor: string
   volumeByWell: { [well: string]: number }
@@ -79,7 +80,11 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
   } = props
   const trackEvent = useTrackEvent()
   const isOnDevice = useSelector(getIsOnDevice)
-
+  const { t } = useTranslation('run_details')
+  const checkedDisplayName =
+    typeof displayName === 'number'
+      ? t('liquids_count', { totalLiquids: displayName })
+      : displayName
   const ACTIVE_STYLE = css`
     background-color: ${isOnDevice ? COLORS.blue30 : COLORS.blue10};
     border: ${isOnDevice ? SPACING.spacing4 : `1px`} solid ${COLORS.blue50};
@@ -130,7 +135,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing12}
         >
-          {displayName}
+          {checkedDisplayName}
         </LegacyStyledText>
         <LegacyStyledText
           fontSize={TYPOGRAPHY.fontSize22}
@@ -229,7 +234,7 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing8}
         >
-          {displayName}
+          {checkedDisplayName}
         </LegacyStyledText>
         <LegacyStyledText as="p" color={COLORS.grey50}>
           {description != null ? description : null}

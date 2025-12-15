@@ -3,7 +3,7 @@ import type { Liquid } from '@opentrons/shared-data'
 export function getLiquidDisplayName(
   liquids: Liquid[],
   liquidId: string
-): string {
+): string | number {
   const liquidDisplayName = liquids.find(
     liquid => liquid.id === liquidId
   )?.displayName

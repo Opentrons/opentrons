@@ -20,6 +20,7 @@
   "imported": "{{filename}} imported.",
   "invalid_labware_def": "Invalid labware definition",
   "labware": "labware",
+  "total_liquids": "{{totalLiquids}} liquids",
   "last_updated": "Last updated",
   "open_labware_creator": "Open Labware Creator",
   "show_in_folder": "Show in folder",

@@ -829,7 +829,7 @@ export interface LoadedModule {
 }
 export interface Liquid {
   id: string
-  displayName: string
+  displayName: string | number
   description: string
   displayColor?: string
 }

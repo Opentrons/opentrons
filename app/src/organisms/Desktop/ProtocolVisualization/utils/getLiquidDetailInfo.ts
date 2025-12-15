@@ -12,7 +12,7 @@ import type { ContentsByWell } from '@opentrons/step-generation'
 interface LiquidDetailInfo {
   totalVolume: number
   color: string
-  displayName: string
+  displayName: string | number
 }
 
 export const getLiquidDetailInfo = (

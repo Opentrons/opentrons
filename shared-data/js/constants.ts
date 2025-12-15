@@ -799,6 +799,7 @@ export const DEFAULT_LIQUID_COLORS = [
   springGreen,
   tartRed,
 ]
+export const MIXED_WELL_COLOR = '#737578'
 export const DEPRECATED_WHALE_GREY = '#9395a0'
 
 // this can't go in @opentrons/components because its used in a utility

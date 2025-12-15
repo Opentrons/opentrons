@@ -117,7 +117,11 @@ export function LabwareSlotContainer(
   const labwareViewBox = getLabwareViewBox(labwareDef)
   const ingredNames = liquids.reduce(
     (acc: Record<string, string>, { id, displayName }) => {
-      acc[id] = displayName
+      const checkedDisplayName =
+        typeof displayName === 'number'
+          ? t('labware', { totalLiquids: displayName })
+          : displayName
+      acc[id] = checkedDisplayName
       return acc
     },
     {}
