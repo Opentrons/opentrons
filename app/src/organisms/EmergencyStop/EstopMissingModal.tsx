@@ -55,11 +55,10 @@ export function EstopMissingModal({
   )
 }
 
-interface EstopMissingTouchscreenModalProps
-  extends Omit<
-    EstopMissingModalProps,
-    'isDismissedModal' | 'setIsDismissedModal'
-  > {}
+interface EstopMissingTouchscreenModalProps extends Omit<
+  EstopMissingModalProps,
+  'isDismissedModal' | 'setIsDismissedModal'
+> {}
 
 function TouchscreenModal({
   robotName,
@@ -88,8 +87,10 @@ function TouchscreenModal({
   )
 }
 
-interface EstopMissingDesktopModalProps
-  extends Omit<EstopMissingModalProps, 'isDismissedModal'> {}
+interface EstopMissingDesktopModalProps extends Omit<
+  EstopMissingModalProps,
+  'isDismissedModal'
+> {}
 
 function DesktopModal({
   robotName,

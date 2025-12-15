@@ -384,8 +384,10 @@ export function ModuleWizardFlows(
   }
 }
 
-interface ModuleWizardFlowsPropsWithHost
-  extends Omit<ModuleWizardFlowsProps, 'closeFlow'> {
+interface ModuleWizardFlowsPropsWithHost extends Omit<
+  ModuleWizardFlowsProps,
+  'closeFlow'
+> {
   host: HostConfig
 }
 
