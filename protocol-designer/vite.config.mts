@@ -34,7 +34,8 @@ const hasSentryCreds =
 // CI should use getsentry/action-release for releases/sourcemaps.
 const enableSentryLocalPlugin = !isCI && hasSentryCreds
 
-export default defineConfig(async () => {
+// eslint-disable-next-line import/no-default-export
+export default defineConfig(async (): Promise<UserConfig> => {
   const OT_PD_VERSION = await getVersion()
   const OT_PD_BUILD_DATE = new Date().toUTCString()
   const OT_PD_LATEST_LABWARE_VERSIONS =
