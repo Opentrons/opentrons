@@ -26,7 +26,7 @@ export const PipetteNotAttachedErrorModal = (
     <OddModal
       header={{
         title: t('branded:attach_a_pipette'),
-        iconName: 'alert-circle',
+        iconName: 'ot-alert',
         iconColor: COLORS.red50,
       }}
     >

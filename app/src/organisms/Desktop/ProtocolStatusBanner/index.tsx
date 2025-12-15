@@ -7,7 +7,7 @@ import type { IconProps } from '@opentrons/components'
 export function ProtocolStatusBanner(): JSX.Element {
   const { t } = useTranslation('protocol_list')
 
-  const alertIcon: IconProps = { name: 'alert-circle' }
+  const alertIcon: IconProps = { name: 'ot-alert' }
   return (
     <Banner
       type="warning"

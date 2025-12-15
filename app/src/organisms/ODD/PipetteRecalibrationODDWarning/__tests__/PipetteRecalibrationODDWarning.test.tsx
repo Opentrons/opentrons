@@ -15,7 +15,7 @@ const render = () => {
 describe('PipetteRecalibrationODDWarning', () => {
   it('should render text, button and icon', () => {
     render()
-    screen.getByLabelText('alert-circle_icon')
+    screen.getByLabelText('ot-alert_icon')
     screen.getByText(
       'The attached pipettes have very different calibration values. When properly calibrated, the values should be similar.'
     )

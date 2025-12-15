@@ -113,7 +113,7 @@ export function RecoveryDoorOpen({
       >
         <Icon
           css={ICON_STYLE}
-          name="alert-circle"
+          name="ot-alert"
           data-testid="recovery_door_alert_icon"
         />
         <Flex css={TEXT_STYLE}>

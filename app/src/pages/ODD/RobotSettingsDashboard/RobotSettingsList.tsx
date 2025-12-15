@@ -262,7 +262,7 @@ function FeatureFlags(): JSX.Element {
         >
           <div className={styles.feature_flag_content}>
             <Icon
-              name="alert-circle"
+              name="ot-alert"
               className={styles.icon_large}
               color="#171717"
             />

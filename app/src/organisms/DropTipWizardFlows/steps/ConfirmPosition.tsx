@@ -89,7 +89,7 @@ export function ConfirmPosition({
             : INTERVENTION_CONTAINER_STYLE
         }
       >
-        <Icon name="alert-circle" css={ICON_STYLE} />
+        <Icon name="ot-alert" css={ICON_STYLE} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {currentRoute === DT_ROUTES.BLOWOUT
             ? t('confirm_blowout_location')
