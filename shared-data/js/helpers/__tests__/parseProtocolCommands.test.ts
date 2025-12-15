@@ -496,9 +496,10 @@ describe('parseLiquidsInLoadOrder', () => {
       },
       {
         id: 'mixed-0-1',
-        displayName: '2 liquids',
+        displayName: null,
         description: 'Water, Saline',
         displayColor: '#737578',
+        totalLiquids: 2,
       },
     ]
     expect(
