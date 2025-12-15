@@ -155,7 +155,7 @@ export function DeviceResetSlideout({
           marginBottom={SPACING.spacing24}
         >
           <Icon
-            name="alert-circle"
+            name="ot-alert"
             size="1rem"
             marginRight={SPACING.spacing8}
             color={COLORS.yellow60}

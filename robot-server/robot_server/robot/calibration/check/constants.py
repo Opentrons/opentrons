@@ -1,7 +1,8 @@
 from typing import Dict, Union
 from typing_extensions import Literal
 
-from enum import Enum
+from opentrons_shared_data.util import StrEnum
+
 from opentrons.types import Point
 
 from robot_server.robot.calibration.constants import (
@@ -12,7 +13,7 @@ from robot_server.robot.calibration.constants import (
 )
 
 
-class CalibrationCheckState(str, Enum):
+class CalibrationCheckState(StrEnum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     inspectingTip = "inspectingTip"

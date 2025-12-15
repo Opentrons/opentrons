@@ -13,7 +13,7 @@ interface RobotCoordinateSpaceWithRefProps extends ComponentProps<typeof Svg> {
   viewBox?: string | null
   deckDef?: DeckDefinition
   zoomed?: boolean
-  adjustViewboxForStacker?: boolean
+  adjustViewBoxForStacker?: boolean
   children?: (props: RobotCoordinateSpaceWithRefRenderProps) => ReactNode
 }
 

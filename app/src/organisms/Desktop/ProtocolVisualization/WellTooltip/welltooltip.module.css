@@ -4,10 +4,10 @@
   width: max-content;
   padding: var(--spacing-8);
   border-radius: var(--border-radius-8);
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgb(0 0 0 / 90%);
   box-shadow:
-    0 3px 6px rgba(0, 0, 0, 0.13),
-    0 3px 6px rgba(0, 0, 0, 0.23);
+    0 3px 6px rgb(0 0 0 / 13%),
+    0 3px 6px rgb(0 0 0 / 23%);
   color: white;
   cursor: pointer;
   font-size: var(--font-size-caption);

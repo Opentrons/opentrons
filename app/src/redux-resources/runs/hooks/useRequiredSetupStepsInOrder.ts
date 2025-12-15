@@ -50,7 +50,8 @@ const NO_ANALYSIS_STEPS_IN_ORDER = [
 
 const keysInOrder = (
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null,
-  noLwOffsetsInRun: boolean
+  noLwOffsetsInRun: boolean,
+  noLabwareOrLiquidsInRun: boolean
 ): UseRequiredSetupStepsInOrderReturn => {
   const orderedSteps =
     protocolAnalysis == null ? NO_ANALYSIS_STEPS_IN_ORDER : ALL_STEPS_IN_ORDER
@@ -68,6 +69,11 @@ const keysInOrder = (
           ) {
             return false
           } else if (stepKey === LPC_STEP_KEY && noLwOffsetsInRun) {
+            return false
+          } else if (
+            stepKey === LABWARE_SETUP_STEP_KEY &&
+            noLabwareOrLiquidsInRun
+          ) {
             return false
           } else {
             return true
@@ -95,8 +101,16 @@ export function useRequiredSetupStepsInOrder({
   const noLwOffsetsInRun =
     useSelector(selectTotalCountLocationSpecificOffsets(runId)) === 0
 
+  const noLabwareOrLiquidsInRun =
+    protocolAnalysis?.labware.length === 0 &&
+    protocolAnalysis?.liquids.length === 0
+
   useEffect(() => {
-    const applicable = keysInOrder(protocolAnalysis, noLwOffsetsInRun)
+    const applicable = keysInOrder(
+      protocolAnalysis,
+      noLwOffsetsInRun,
+      noLabwareOrLiquidsInRun
+    )
     dispatch(
       updateRunSetupStepsRequired(runId, {
         ...ALL_STEPS_IN_ORDER.reduce<

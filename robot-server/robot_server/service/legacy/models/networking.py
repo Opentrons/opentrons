@@ -1,5 +1,4 @@
 import typing
-from enum import Enum
 
 from pydantic import (
     field_validator,
@@ -9,10 +8,12 @@ from pydantic import (
     Field,
     SecretStr,
 )
+
+from opentrons_shared_data.util import StrEnum
 from opentrons.system import wifi
 
 
-class ConnectivityStatus(str, Enum):
+class ConnectivityStatus(StrEnum):
     full = "full"
     limited = "limited"
     none = "none"
@@ -20,7 +21,7 @@ class ConnectivityStatus(str, Enum):
     unknown = "unknown"
 
 
-class ConnectionType(str, Enum):
+class ConnectionType(StrEnum):
     wifi = "wifi"
     ethernet = "ethernet"
 
@@ -85,7 +86,7 @@ class NetworkingStatus(BaseModel):
     )
 
 
-class NetworkingSecurityType(str, Enum):
+class NetworkingSecurityType(StrEnum):
     """Top-level type of network security"""
 
     wpa_eap = "wpa-eap"
@@ -297,7 +298,7 @@ class WifiKeyFiles(BaseModel):
     )
 
 
-class EapConfigOptionType(str, Enum):
+class EapConfigOptionType(StrEnum):
     string = "string"
     password = "password"
     file = "file"

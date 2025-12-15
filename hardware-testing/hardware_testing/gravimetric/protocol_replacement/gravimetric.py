@@ -1329,7 +1329,6 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             for channel in fixture_settings.channels:
                 _configure_tip_count(fixture_settings, channel)
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
-                channel_aspriate_dict: Dict[int, List[float]]
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 print_info(str(tips))
                 actual_asp_list_channel: List[float] = []

@@ -6,7 +6,7 @@ You can perform most functions of Flex either from the [touchscreen](touchscreen
 
 ## App installation
 
-Download the Opentrons App at <https://opentrons.com/ot-app/>. The app requires Windows 10, macOS 10.10, or Ubuntu 12.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
+Download the Opentrons App at <https://opentrons.com/ot-app/>. The latest version of the app requires Windows 10, macOS 10.16, or Ubuntu 20.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
 
 ### Windows
 
@@ -97,6 +97,38 @@ Click the three-dot menu (⋮) on the module card to choose from available comma
 | **Temperature**   | <ul><li>Set module temperature / Deactivate module</li></ul>                            |
 | **Thermocycler**  | <ul><li>Set lid temperature / Deactivate lid</li><li>Open lid / Close lid</li><li>Set block temperature / Deactivate block</li></ul> |
 
+## Camera features and controls
+
+Every Flex comes equipped with a built-in 2-megapixel camera that can capture full HD still images and provides video of the deck and working area. Starting in robot software version 8.8, you can control the camera in the Opentrons App and from the touchscreen. When enabled, the camera provides:
+
+- Live, in-app monitoring during protocol runs.
+- Automatic image capture at protocol-defined intervals.
+- Automatic image capture in response to a crash or runtime error.
+- The ability to download all still images in a single, compressed file (`.zip` format) after a protocol run.
+
+### Controls
+
+The camera is turned off by default. To turn on the camera and access its features:
+
+<div class="instruction-list" markdown>
+
+1. From the Opentrons App, click **Devices** and locate your robot.
+2. For your selected robot, click the three-dot menu (⋮) and then click **Robot settings**.
+3. Click the **Camera** tab to open the camera settings.
+4. Click the Camera slider to enable or disable the camera.
+
+</div>
+
+You can also see the camera's status, and turn it on and off, from the Peripherals section of the details page for your Flex. Click the three-dot menu (⋮) to enable or disable the camera. This example shows a Flex with its camera enabled.
+
+<figure class="screenshot" markdown>
+  ![Details page showing enabled camera](./images/robot-details.png)
+</figure>
+
+### Downloading images
+
+All protocol images are available for download in the Recent Protocol Runs section of the robot details page.
+
 ## Recent protocol runs
 
 The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
@@ -113,5 +145,7 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 !!! note
     If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
+
+- **Download image files:** Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.
 
 Flex *will not* retain information about more than 20 runs on the robot. Proceeding to the Run Setup screen generates an entry in the list and counts towards the maximum of 20 runs, even if you never begin the protocol.

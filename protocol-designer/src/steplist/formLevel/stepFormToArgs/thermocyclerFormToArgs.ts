@@ -1,6 +1,7 @@
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../constants'
 import { PROFILE_STEP } from '../../../form-types'
 
+import type { AtomicProfileStep } from '@opentrons/shared-data'
 import type {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
@@ -12,41 +13,30 @@ import type {
 } from '../../../form-types'
 import type { GetCastFormData } from '../../fieldLevel'
 
-type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
-
-const _flattenProfileSteps = (args: {
+const _convertToProfileElements = (args: {
   orderedProfileItems: string[]
   profileItemsById: Record<string, ProfileItem>
-}): FlatProfileSteps => {
+}): ThermocyclerProfileStepArgs['profileElements'] => {
   const { orderedProfileItems, profileItemsById } = args
-  const steps: FlatProfileSteps = []
 
-  const addStep = (step: ProfileStepItem): void => {
+  const convertStep = (step: ProfileStepItem): AtomicProfileStep => {
     const durationMinutes = Number(step.durationMinutes) || 0
     const durationSeconds = Number(step.durationSeconds) || 0
-    steps.push({
-      temperature: Number(step.temperature),
-      holdTime: durationMinutes * 60 + durationSeconds,
-    })
-  }
-
-  for (const itemId of orderedProfileItems) {
-    const item = profileItemsById[itemId]
-
-    if (item.type === PROFILE_STEP) {
-      addStep(item)
-    } else {
-      const repetitions = Number(item.repetitions)
-
-      for (let i = 0; i < repetitions; i++) {
-        for (const step of item.steps) {
-          addStep(step)
-        }
-      }
+    return {
+      celsius: Number(step.temperature),
+      holdSeconds: durationMinutes * 60 + durationSeconds,
     }
   }
 
-  return steps
+  return orderedProfileItems.map(itemId => {
+    const item = profileItemsById[itemId]
+    return item.type === PROFILE_STEP
+      ? convertStep(item)
+      : {
+          steps: item.steps.map(convertStep),
+          repetitions: Number(item.repetitions),
+        }
+  })
 }
 
 export const thermocyclerFormToArgs = (
@@ -78,7 +68,7 @@ export const thermocyclerFormToArgs = (
     }
 
     case THERMOCYCLER_PROFILE: {
-      const profileSteps = _flattenProfileSteps({
+      const profileElements = _convertToProfileElements({
         orderedProfileItems: castFormData.orderedProfileItems,
         profileItemsById: castFormData.profileItemsById,
       })
@@ -106,7 +96,7 @@ export const thermocyclerFormToArgs = (
             (itemId: string | number) => castFormData.profileItemsById[itemId]
           ),
         },
-        profileSteps,
+        profileElements,
         profileTargetLidTemp: Number(castFormData.profileTargetLidTemp),
         profileVolume: Number(castFormData.profileVolume),
         description: stepDetails,

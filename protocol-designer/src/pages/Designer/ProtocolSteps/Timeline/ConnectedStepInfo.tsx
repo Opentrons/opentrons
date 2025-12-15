@@ -250,7 +250,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         onClick={confirm}
         hovered={hoveredStep === stepId && !hoveredSubstep}
         onMouseEnter={handleMouseEnter}
-        iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
+        iconName={hasError || hasWarnings ? 'ot-alert' : iconName}
         stepNumber={stepNumber}
         text={text}
         subtext={subtext}

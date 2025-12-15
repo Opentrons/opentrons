@@ -9,11 +9,18 @@
   gap: var(--spacing-16);
 }
 
+.card_column {
+  display: flex;
+  flex: 0.5;
+  gap: var(--spacing-8);
+}
+
 .card_container {
   display: flex;
-  width: 19.969rem;
+  flex: 0.5;
   border-radius: var(--border-radius-8);
   background-color: var(--grey-10);
+  gap: var(--spacing-8);
 }
 
 .card_content_container {
@@ -26,7 +33,7 @@
 .card_content_text_container {
   display: flex;
   flex-direction: column;
-  padding-right: var(--spacing-24);
+  padding-right: var(--spacing-26);
   gap: var(--spacing-8);
 }
 
@@ -57,7 +64,7 @@
   flex-direction: column;
   border-radius: var(--border-radius-4);
   background-color: var(--white);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
   white-space: nowrap;
 }
 

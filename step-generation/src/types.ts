@@ -2,7 +2,6 @@ import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
-  FlexStackerSetStoredLabwareParams,
   FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   Height,
@@ -19,11 +18,12 @@ import type {
   PipetteV2Specs,
   PositionReference,
   ShakeSpeedParams,
+  StackerStoredLabwareDefinitionURIs,
+  TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   Width,
 } from '@opentrons/shared-data'
-import type { AtomicProfileStep } from '@opentrons/shared-data/protocol/types/schemaV4'
 import type {
   AUTOMATIC,
   CLEAN,
@@ -111,7 +111,7 @@ export interface AbsorbanceReaderState {
 export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
   maxPoolCount: number
-  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  storedLabwareDetails: StackerStoredLabwareDefinitionURIs | null
   // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
@@ -567,7 +567,7 @@ export interface ThermocyclerProfileStepArgs extends CommonArgs {
   lidOpenHold: boolean
   lidTargetTempHold: number | null
   message?: string
-  profileSteps: AtomicProfileStep[]
+  profileElements: TCExtendedProfileParams['profileElements']
   profileTargetLidTemp: number
   profileVolume: number
   meta?: {
@@ -634,6 +634,33 @@ export interface CaptureImageArgs extends CommonArgs {
   saturation: number
 }
 
+export interface FlexStackerEmptyArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerEmpty'
+  interventionMessage: string | null
+}
+export interface FlexStackerFillItemsArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerFillItems'
+  fillLabwareUri: string | null
+  fillQuantity: number | null
+  interventionMessage: string | null
+}
+export interface FlexStackerStoreArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerStore'
+}
+export interface FlexStackerRetrieveArgs extends CommonArgs {
+  moduleId: string
+  commandCreatorFnName: 'flexStackerRetrieve'
+}
+
+export type FlexStackerArgs =
+  | FlexStackerEmptyArgs
+  | FlexStackerFillItemsArgs
+  | FlexStackerRetrieveArgs
+  | FlexStackerStoreArgs
+
 export type CommandCreatorArgs =
   | AbsorbanceReaderInitializeArgs
   | AbsorbanceReaderReadArgs
@@ -654,6 +681,7 @@ export type CommandCreatorArgs =
   | HeaterShakerArgs
   | MoveLabwareArgs
   | CommentArgs
+  | FlexStackerArgs
 
 export interface LocationLiquidState {
   [ingredGroup: string]: { volume: number }

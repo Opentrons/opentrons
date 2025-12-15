@@ -26,8 +26,10 @@ interface CommonSettingProps {
   isMultiTransfer: boolean
 }
 
-interface SettingComponentProps
-  extends Omit<CommonSettingProps, 'isMultiTransfer'> {}
+interface SettingComponentProps extends Omit<
+  CommonSettingProps,
+  'isMultiTransfer'
+> {}
 
 interface DispenseSettingDetailProps extends Omit<CommonSettingProps, 'kind'> {
   selectedSetting: DispenseSettingOption | null

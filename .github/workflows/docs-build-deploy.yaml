@@ -47,7 +47,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           enable-cache: true
           cache-dependency-glob: './docs/uv.lock'
       - name: Setup Docs Dependencies
@@ -83,7 +83,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           enable-cache: true
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
@@ -115,7 +115,7 @@ jobs:
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
           enable-cache: true
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy

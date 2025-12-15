@@ -4,11 +4,13 @@ Command type definitions.
 Definitions should be grouped into thematic namespaces.
 """
 import typing
-from enum import Enum
+
 from typing_extensions import Self
 
+from opentrons_shared_data.util import StrEnum
 
-class CommandDefinition(str, Enum):
+
+class CommandDefinition(StrEnum):
     _localname: str
 
     """The base of command definition enumerations."""

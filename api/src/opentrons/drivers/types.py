@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from typing import Any, Dict, List, NamedTuple, Optional
 from enum import Enum
+from opentrons_shared_data.util import StrEnum
 
 
 class MoveSplit(NamedTuple):
@@ -32,7 +33,7 @@ class RPM:
     target: Optional[int]
 
 
-class HeaterShakerLabwareLatchStatus(str, Enum):
+class HeaterShakerLabwareLatchStatus(StrEnum):
     """Heater-shaker labware latch status"""
 
     OPENING = "opening"
@@ -50,7 +51,7 @@ class PlateTemperature(Temperature):
     hold: Optional[float]
 
 
-class ThermocyclerLidStatus(str, Enum):
+class ThermocyclerLidStatus(StrEnum):
     """Thermocycler lid status."""
 
     UNKNOWN = "unknown"
@@ -60,7 +61,7 @@ class ThermocyclerLidStatus(str, Enum):
     MAX = "max"
 
 
-class AbsorbanceReaderLidStatus(str, Enum):
+class AbsorbanceReaderLidStatus(StrEnum):
     """Absorbance reader lid status."""
 
     UNKNOWN = "unknown"
@@ -68,7 +69,7 @@ class AbsorbanceReaderLidStatus(str, Enum):
     OFF = "off"
 
 
-class AbsorbanceReaderPlatePresence(str, Enum):
+class AbsorbanceReaderPlatePresence(StrEnum):
     """Absorbance reader plate presence."""
 
     UNKNOWN = "unknown"
@@ -76,7 +77,7 @@ class AbsorbanceReaderPlatePresence(str, Enum):
     ABSENT = "absent"
 
 
-class AbsorbanceReaderDeviceState(str, Enum):
+class AbsorbanceReaderDeviceState(StrEnum):
     """Absorbance reader device state."""
 
     UNKNOWN = "unknown"

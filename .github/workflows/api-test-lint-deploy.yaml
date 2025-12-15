@@ -60,7 +60,7 @@ jobs:
           node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -74,7 +74,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
-        python: ['3.10']
+        python: ['3.12']
         with-ot-hardware: ['true', 'false']
         exclude:
           - os: 'windows-2022'
@@ -129,10 +129,16 @@ jobs:
 
   test-package:
     name: 'installed package tests on ${{ matrix.os }}'
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
       matrix:
         os: ['ubuntu-24.04', 'macos-latest', 'windows-2022']
+        python: ['3.10', '3.11', '3.12', '3.13']
+        exclude:
+          # numpy 1.26.4 does not have a precompiled wheel for 3.13, and building it locally gives
+          # a bad object that crashes a bunch
+          - os: 'windows-2022'
+            python: '3.13'
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v4'
@@ -143,7 +149,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.10'
+          python-version: ${{matrix.python}}
       - name: Set up package-testing
         id: setup
         if: ${{ matrix.os != 'windows-2022' }}
@@ -172,7 +178,7 @@ jobs:
         id: results
         uses: actions/upload-artifact@v4
         with:
-          name: package-test-results-${{ matrix.os }}
+          name: package-test-results-${{ matrix.os }}-${{ matrix.python }}
           path: package-testing/results
       - name: Set job summary
         if: ${{ always() }}
@@ -204,7 +210,7 @@ jobs:
           node-version: '22.12.0'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:

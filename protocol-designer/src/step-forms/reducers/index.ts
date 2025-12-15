@@ -106,6 +106,7 @@ import type {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
   SubstituteStepFormPipettesAction,
+  UpdateStackerModuleStateAction,
 } from '../actions'
 import type {
   CreateDeckFixtureAction,
@@ -244,6 +245,7 @@ export const initialDeckSetupStepForm: FormData = {
   labwareLocationUpdate: {},
   pipetteLocationUpdate: {},
   moduleLocationUpdate: {},
+  moduleStateUpdate: {},
   trashBinLocationUpdate: {},
   wasteChuteLocationUpdate: {},
   stagingAreaLocationUpdate: {},
@@ -263,6 +265,7 @@ export type SavedStepFormsActions =
   | DeletePipettesAction
   | CreateModuleAction
   | DeleteModuleAction
+  | UpdateStackerModuleStateAction
   | DuplicateSelectedStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
@@ -646,6 +649,23 @@ export const savedStepForms = (
       })
     }
 
+    case 'UPDATE_STACKER_MODULE_STATE': {
+      const prevInitialDeckSetupStep =
+        savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            moduleStateUpdate: {
+              ...(prevInitialDeckSetupStep.moduleStateUpdate || {}),
+              [action.payload.moduleId]: action.payload.moduleState,
+            },
+          }
+        }
+        return savedForm
+      })
+    }
+
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
       return mapValues(savedStepForms, (savedForm: FormData): FormData => {
@@ -873,8 +893,8 @@ export const savedStepForms = (
         const prevStepForm = savedStepForms[stepId]
         const shouldSubstitute = Boolean(
           prevStepForm && // pristine forms will not exist in savedStepForms
-            prevStepForm.pipette &&
-            prevStepForm.pipette in substitutionMap
+          prevStepForm.pipette &&
+          prevStepForm.pipette in substitutionMap
         )
         if (!shouldSubstitute) return acc
         const updatedFields = handleFormChange(

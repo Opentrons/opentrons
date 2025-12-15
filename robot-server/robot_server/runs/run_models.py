@@ -2,10 +2,10 @@
 
 from datetime import datetime
 
-from enum import Enum
 from pydantic import BaseModel, Field
 from typing import List, Optional, Literal, Dict
 
+from opentrons_shared_data.util import StrEnum
 from opentrons.protocol_engine import (
     CommandStatus,
     CommandIntent,
@@ -31,6 +31,7 @@ from opentrons.protocol_engine.types import (
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
 from opentrons_shared_data.errors import GeneralError
+
 from robot_server.service.json_api import ResourceModel
 from robot_server.errors.error_responses import ErrorDetails
 from .action_models import RunAction
@@ -307,7 +308,7 @@ class LabwareDefinitionSummary(BaseModel):
     )
 
 
-class NozzleLayoutConfig(str, Enum):
+class NozzleLayoutConfig(StrEnum):
     """Possible valid nozzle configurations."""
 
     COLUMN = "column"

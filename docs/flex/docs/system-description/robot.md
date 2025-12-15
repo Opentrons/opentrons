@@ -13,7 +13,7 @@ The *frame* of the Opentrons Flex robot provides rigidity and structural support
 
 The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
 
-White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can photograph the deck and working area for recording and tracking protocol execution.
+White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can [photograph the deck](../opentrons-app.md#camera-features-and-controls) and working area for recording and tracking protocol execution.
 
 ## Deck and working area
 
@@ -63,6 +63,18 @@ Fixtures are hardware items that replace standard deck slots. They let you custo
 Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
 You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section](../touchscreen/deck-config.md) of the Touchscreen chapter for more information.
+
+## Camera
+
+The camera is mounted on the interior frame of the robot, in the upper corner of the enclosure near the front door.
+
+![Image showing robot front and interior camera](../images/camera-location.png)
+
+This fixed location gives you a wide-angle field of view of attached instruments, deck-mounted modules, and labware.
+
+![Default camera view](../images/camera-default.png)
+
+For information about using the camera, see [Camera features and controls](../opentrons-app.md#camera-features-and-controls).
 
 ## Waste chute
 
