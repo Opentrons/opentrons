@@ -11,8 +11,7 @@ export interface SetStatusBarCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface SetStatusBarRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    SetStatusBarCreateCommand {
+  extends CommonCommandRunTimeInfo, SetStatusBarCreateCommand {
   result?: any
 }
 

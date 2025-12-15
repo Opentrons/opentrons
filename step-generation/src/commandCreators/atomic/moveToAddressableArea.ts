@@ -11,8 +11,10 @@ import type {
 } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-interface MoveToAddressableAreaAtomicParams
-  extends Omit<MoveToAddressableAreaParams, 'addressableAreaName'> {
+interface MoveToAddressableAreaAtomicParams extends Omit<
+  MoveToAddressableAreaParams,
+  'addressableAreaName'
+> {
   fixtureId: string
 }
 export const moveToAddressableArea: CommandCreator<
