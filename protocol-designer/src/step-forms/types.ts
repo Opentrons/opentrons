@@ -1,26 +1,17 @@
 import type { Mount } from '@opentrons/components'
 import type {
-  ABSORBANCE_READER_TYPE,
   CutoutId,
-  FLEX_STACKER_MODULE_TYPE,
   FlexModuleCutoutFixtureId,
-  FlexStackerSetStoredLabwareParams,
-  FlexStackerStoredLabwareGroup,
-  HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
-  MAGNETIC_MODULE_TYPE,
   ModuleModel,
   ModuleType,
   NozzleConfigurationStyle,
-  TEMPERATURE_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
   LabwareEntity,
   ModuleEntity,
+  ModuleTemporalProperties,
   PipetteEntity,
-  ThermocyclerModuleState as SG_ThermocyclerModuleState,
-  TemperatureStatus,
   TOUCHED_PIPETTABLE_LABWARE,
 } from '@opentrons/step-generation'
 import type { DeckSlot } from '../types'
@@ -43,61 +34,6 @@ export interface FormModule {
 }
 export type FormModules = Record<number, FormModule>
 export type ModuleEntities = Record<string, ModuleEntity>
-// NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
-export interface MagneticModuleState {
-  type: typeof MAGNETIC_MODULE_TYPE
-  engaged: boolean
-}
-export interface TemperatureModuleState {
-  type: typeof TEMPERATURE_MODULE_TYPE
-  status: TemperatureStatus
-  targetTemperature: number | null
-}
-// The Thermocycler module state type is especially complicated, so let's steal it from
-// step-generation instead of duplicatively writing it out here.
-// todo(mm, 2025-12-11): In general, does protocol-designer need its own declarations,
-// for these module types, or can we just directly reuse the types in step-generation?
-export type ThermocyclerModuleState = SG_ThermocyclerModuleState
-export interface HeaterShakerModuleState {
-  type: typeof HEATERSHAKER_MODULE_TYPE
-  targetTemp: number | null
-  targetSpeed: number | null
-  latchOpen: boolean | null
-}
-export interface MagneticBlockState {
-  type: typeof MAGNETIC_BLOCK_TYPE
-}
-
-export interface FlexStackerModuleState {
-  type: typeof FLEX_STACKER_MODULE_TYPE
-  maxPoolCount: number
-  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
-  labwareInHopper: FlexStackerStoredLabwareGroup[] | null
-  labwareOnShuttle: FlexStackerStoredLabwareGroup | null
-}
-export type InitializationMode = 'single' | 'multi'
-export interface Initialization {
-  mode: InitializationMode
-  wavelengths: number[]
-  referenceWavelength?: number
-}
-
-export interface AbsorbanceReaderState {
-  type: typeof ABSORBANCE_READER_TYPE
-  lidOpen: boolean | null
-  initialization: Initialization | null
-}
-export interface ModuleTemporalProperties {
-  slot: DeckSlot
-  moduleState:
-    | MagneticModuleState
-    | TemperatureModuleState
-    | ThermocyclerModuleState
-    | HeaterShakerModuleState
-    | MagneticBlockState
-    | AbsorbanceReaderState
-    | FlexStackerModuleState
-}
 export type ModuleOnDeck = ModuleEntity & ModuleTemporalProperties
 export type ModulesForEditModulesCard = Partial<
   Record<ModuleType, ModuleOnDeck[] | null | undefined>

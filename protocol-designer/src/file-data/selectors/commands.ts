@@ -14,11 +14,11 @@ import {
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 
+import type { ModuleTemporalProperties } from '@opentrons/step-generation'
 import type { StepIdType } from '../../form-types'
 import type {
   LabwareTemporalProperties,
   ModuleOnDeck,
-  ModuleTemporalProperties,
   PipetteOnDeck,
   PipetteTemporalProperties,
 } from '../../step-forms'

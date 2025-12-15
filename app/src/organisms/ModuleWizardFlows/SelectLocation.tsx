@@ -58,8 +58,7 @@ export const BODY_STYLE = css`
     line-height: 1.75rem;
   }
 `
-export interface SelectLocationProps
-  extends ModuleSetupWizardMaybePipetteStepProps {
+export interface SelectLocationProps extends ModuleSetupWizardMaybePipetteStepProps {
   deckConfig: DeckConfiguration
   createMaintenanceRun: CreateMaintenanceRunType
   isLoadedInRun: boolean

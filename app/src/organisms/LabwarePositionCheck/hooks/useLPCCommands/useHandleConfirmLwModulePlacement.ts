@@ -14,8 +14,7 @@ import type {
 import type { OffsetLocationDetails } from '/app/redux/protocol-runs'
 import type { UseLPCCommandWithChainRunChildProps } from './types'
 
-export interface UseHandleConfirmPlacementProps
-  extends UseLPCCommandWithChainRunChildProps {
+export interface UseHandleConfirmPlacementProps extends UseLPCCommandWithChainRunChildProps {
   setErrorMessage: (msg: string | null) => void
 }
 

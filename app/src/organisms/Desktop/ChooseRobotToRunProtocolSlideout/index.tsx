@@ -52,8 +52,7 @@ interface ChooseRobotToRunProtocolSlideoutProps extends StyleProps {
   showSlideout: boolean
 }
 
-interface ChooseRobotToRunProtocolSlideoutComponentProps
-  extends ChooseRobotToRunProtocolSlideoutProps {
+interface ChooseRobotToRunProtocolSlideoutComponentProps extends ChooseRobotToRunProtocolSlideoutProps {
   selectedRobot: Robot | null
   setSelectedRobot: (robot: Robot | null) => void
 }

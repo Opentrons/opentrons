@@ -873,8 +873,8 @@ export const savedStepForms = (
         const prevStepForm = savedStepForms[stepId]
         const shouldSubstitute = Boolean(
           prevStepForm && // pristine forms will not exist in savedStepForms
-            prevStepForm.pipette &&
-            prevStepForm.pipette in substitutionMap
+          prevStepForm.pipette &&
+          prevStepForm.pipette in substitutionMap
         )
         if (!shouldSubstitute) return acc
         const updatedFields = handleFormChange(
