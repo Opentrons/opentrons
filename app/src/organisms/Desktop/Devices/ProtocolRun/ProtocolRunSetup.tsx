@@ -218,7 +218,8 @@ export function ProtocolRunSetup({
   const ot2DeckHardwareDescription = hasModules
     ? t('install_modules', { count: modules.length })
     : t('no_deck_hardware_specified')
-
+  const modulesOrFixturesReady =
+    calibrationStatusModules.complete && !isMissingModule && !isFixtureMismatch
   const isCameraRequired =
     protocolAnalysis?.commandPreconditions?.isCameraUsed ?? false
   const isCameraConfirmed =
@@ -252,6 +253,18 @@ export function ProtocolRunSetup({
   if (robot == null) {
     return null
   }
+  const applicableSteps: StepKey[] = (() => {
+    const [firstStep, ...restSteps] = orderedApplicableSteps
+
+    return !modulesOrFixturesReady
+      ? ([firstStep, MODULE_SETUP_STEP_KEY, ...restSteps] as StepKey[])
+      : [...orderedApplicableSteps]
+  })()
+
+  const filteredNextStep =
+    applicableSteps[
+      applicableSteps.findIndex(step => step === ROBOT_CALIBRATION_STEP_KEY) + 1
+    ]
 
   const StepDetailMap: Record<
     StepKey,
@@ -267,13 +280,7 @@ export function ProtocolRunSetup({
         <SetupRobotCalibration
           robotName={robotName}
           runId={runId}
-          nextStep={
-            orderedApplicableSteps[
-              orderedApplicableSteps.findIndex(
-                v => v === ROBOT_CALIBRATION_STEP_KEY
-              ) + 1
-            ]
-          }
+          nextStep={filteredNextStep}
           expandStep={setExpandedStepKey}
           calibrationStatus={calibrationStatusRobot}
         />
@@ -314,10 +321,7 @@ export function ProtocolRunSetup({
       descriptionElement: null,
       rightElProps: {
         stepKey: MODULE_SETUP_STEP_KEY,
-        complete:
-          calibrationStatusModules.complete &&
-          !isMissingModule &&
-          !isFixtureMismatch,
+        complete: modulesOrFixturesReady,
         completeText: isFlex
           ? t('modules_and_fixtures_ready')
           : t('modules_ready'),
