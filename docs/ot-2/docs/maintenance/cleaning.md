@@ -4,7 +4,7 @@ title: "Opentrons OT-2: Cleaning"
 
 Routine cleaning helps keep your OT-2 free of contaminants that can affect your protocols. Cleaning also gives you a chance to inspect the robot for wear and damage. Review this section for information and instructions on how to clean your robot.
 
-If you have any questions about cleaning your OT-2 or its related components, contact the support team at <support@opentrons.com>.
+If you have any questions about cleaning your OT-2 or its related components, contact Opentrons Support at <support@opentrons.com>.
 
 ## Before you begin
 
@@ -242,8 +242,8 @@ Along with routine cleaning, Opentrons also recommends the following optional pr
       <td>If noticeable dust and debris have accumulated on the black electronics cover.</td>
     </tr>
     <tr>
-      <td>Replace the O-rings on your 8-Channel GEN2 pipette</td>
-      <td>Replace the rubber O-ring wrapped around the outside of each channel if you notice any nicks or tears.</td>
+      <td>Replace 8-Channel GEN2 pipette O-rings</td>
+      <td>If you notice any nicks or tears on the O-rings.</td>
     </tr>
   </tbody>
 </table>

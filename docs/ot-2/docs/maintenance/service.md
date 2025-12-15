@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Instrument Services"
 ---
 
-Opentrons offers multiple levels of service for the OT-2 and related hardware, including options for maintenance and repairs.. See the [Instrument Services section](https://opentrons.com/instrument-services) of our website for contact information and details about our service contract offerings.
+Opentrons offers multiple levels of service for the OT-2 and related hardware, including options for maintenance and repairs. See the [Instrument Services section](https://opentrons.com/instrument-services) of our website for contact information and details about our service contract offerings.
 
 ## Opentrons services
 

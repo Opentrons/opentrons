@@ -65,7 +65,7 @@ After installing a new board, follow up with Opentrons Support for further troub
 
 The two PCBAs mounted inside the back panel of the OT-2 provide other command, control, network, and power distribution functions. The information in this section explains how to:
 
-- Remove the back panel cover and identifies the main components in this area.
+- Remove the back panel cover and identify the main components in this area.
 - Disconnect, remove, and replace the PCBAs housed in this location.
 
 This procedure requires the following tools:
@@ -83,7 +83,7 @@ This procedure requires the following tools:
 
     ![Rear panel boards](../images/ot2-rear-panels.png)
 
-3. Use a T10 Torx, to remove the screws that hold the PCBAs to the robot and remove the board you want to work with or replace.
+3. Use a T10 Torx screwdriver to remove the screws that hold the PCBAs to the robot and remove the board you want to work with or replace.
 
 4. Hold the new board in place.
 
