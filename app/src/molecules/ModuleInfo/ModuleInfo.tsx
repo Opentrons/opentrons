@@ -75,7 +75,7 @@ export const ModuleInfo = (props: ModuleInfoProps): JSX.Element => {
         {!runHasStarted && moduleModel !== MAGNETIC_BLOCK_V1 ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <Icon
-              name={isAttached ? 'ot-check' : 'alert-circle'}
+              name={isAttached ? 'ot-check' : 'ot-alert'}
               color={isAttached ? COLORS.green50 : COLORS.yellow50}
               key="icon"
               size="10px"

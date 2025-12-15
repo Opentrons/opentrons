@@ -39,7 +39,7 @@ describe('InterventionModal', () => {
     props = {
       iconHeading: 'mock intervention icon heading',
       children: 'mock intervention children',
-      iconName: 'alert-circle',
+      iconName: 'ot-alert',
       type: 'intervention-required',
     }
     when(vi.mocked(getIsOnDevice)).calledWith(MOCK_STATE).thenReturn(false)
