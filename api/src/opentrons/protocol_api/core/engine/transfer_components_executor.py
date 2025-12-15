@@ -977,7 +977,7 @@ def _match_absolute_point(
     well_volume_difference: float,
     position_reference: PositionReference,
     offset: Coordinate,
-    mount: Mount
+    mount: Mount,
 ) -> Point:
     match position_reference:
         case PositionReference.WELL_TOP:
@@ -1014,6 +1014,7 @@ def _match_absolute_point(
             raise ValueError(f"Unknown position reference {position_reference}")
     return reference_point + Point(offset.x, offset.y, offset.z)
 
+
 def absolute_point_from_position_reference_and_offset(
     well: WellCore,
     well_volume_difference: float,
@@ -1032,7 +1033,9 @@ def absolute_point_from_position_reference_and_offset(
     expected to be a -ve value while for a dispense, it will be a +ve value.
     """
     try:
-        return _match_absolute_point(well, well_volume_difference, position_reference, offset, mount)
+        return _match_absolute_point(
+            well, well_volume_difference, position_reference, offset, mount
+        )
     except (
         errors.LiquidHeightUnknownError,
         errors.IncompleteWellDefinitionError,
@@ -1043,4 +1046,10 @@ def absolute_point_from_position_reference_and_offset(
             # No fallback so raise the error
             raise e
         pass
-    return _match_absolute_point(well, well_volume_difference, fallback_position_reference, fallback_offset, mount)
+    return _match_absolute_point(
+        well,
+        well_volume_difference,
+        fallback_position_reference,
+        fallback_offset,
+        mount,
+    )
