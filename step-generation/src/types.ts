@@ -79,6 +79,7 @@ export interface TemperatureModuleState {
   status: TemperatureStatus
   targetTemperature: number | null
 }
+
 export interface ThermocyclerModuleState {
   type: typeof THERMOCYCLER_MODULE_TYPE
 
@@ -86,31 +87,9 @@ export interface ThermocyclerModuleState {
 
   /** What the thermal block is currently doing. */
   currentBlockActivity:
-    | {
-        /**
-         * A profile has been started on this Thermocycler
-         * and not yet awaited, so it's possibly still ongoing.
-         */
-        type: 'profile'
-        /** The steps of the profile that's currently running. */
-        profileElements: TCExtendedProfileParams['profileElements']
-        /**
-         * The ID of the concurrent task that represents this profile.
-         *
-         * `null` for unknown. Theoretically, the task ID is always knowable,
-         * but sometimes it's only available from a startRunExtendedProfile result,
-         * and step-generation only has access to the startRunExtendedProfile params.
-         */
-        taskId: string | null
-      }
-    | {
-        /** The thermal block is targeting a constant temperature, outside of a profile. */
-        type: 'blockTargetTemp'
-        blockTargetTemp: number
-      }
-    | {
-        type: 'blockDeactivated'
-      }
+    | ProfileBlockActivity
+    | TargetTempBlockActivity
+    | DeactivatedBlockActivity
 
   /** If false, closed. If null, unknown. */
   lidOpen: boolean | null
@@ -119,12 +98,41 @@ export interface ThermocyclerModuleState {
   numProfilesStarted: number
 }
 
+/**
+ * A profile has been started on this Thermocycler
+ * and not yet awaited, so it's possibly still ongoing.
+ */
+export interface ProfileBlockActivity {
+  type: 'profile'
+  /** The steps of the profile that's currently running. */
+  profileElements: TCExtendedProfileParams['profileElements']
+  /**
+   * The ID of the concurrent task that represents this profile.
+   *
+   * `null` for unknown. Theoretically, the task ID is always knowable,
+   * but sometimes it's only available from a startRunExtendedProfile result,
+   * and step-generation only has access to the startRunExtendedProfile params.
+   */
+  taskId: string | null
+}
+
+/** The thermal block is targeting a constant temperature, outside of a profile. */
+export interface TargetTempBlockActivity {
+  type: 'blockTargetTemp'
+  blockTargetTemp: number
+}
+
+export interface DeactivatedBlockActivity {
+  type: 'blockDeactivated'
+}
+
 export interface HeaterShakerModuleState {
   type: typeof HEATERSHAKER_MODULE_TYPE
   targetTemp: number | null
   targetSpeed: number | null
   latchOpen: boolean | null
 }
+
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }
