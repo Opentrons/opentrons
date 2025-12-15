@@ -37,6 +37,11 @@ from opentrons.protocol_engine.resources.camera_provider import ImageParameters
 from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.data_files.models import FileNotFound
 
+from robot_server.runs.run_models import Run
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
+from robot_server.runs.dependencies import get_run_orchestrator_store
+from robot_server.runs.router.base_router import get_run_data_from_url
+
 log = logging.getLogger(__name__)
 
 router = APIRouter()
@@ -172,6 +177,10 @@ async def post_camera_preview_image(
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
     ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
     images_directory: Annotated[Path, Depends(get_images_directory)],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> Response:
@@ -180,10 +189,21 @@ async def post_camera_preview_image(
     """
     _validate_camera_present()
 
-    if not camera_settings_store.get_camera_enabled():
+    if run.current is True:
+        if (
+            run_orchestrator_store.get_state_summary().cameraSettings is not None
+            and run_orchestrator_store.get_state_summary().cameraSettings.cameraEnabled
+            is False
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=str("Cannot capture preview photo, camera is disabled in run."),
+            )
+
+    elif not camera_settings_store.get_camera_enabled():
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str("Cannot capture preview photo, camera is disabled."),
+            detail=str("Cannot capture preview photo, camera is disabled on robot."),
         )
 
     image_data = await camera.image_capture(
@@ -212,24 +232,24 @@ async def post_camera_preview_image(
 
     file_path = images_directory / PREVIEW_IMAGE
 
-    if isinstance(image_data, bytes):
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    if IS_ROBOT:
+        if isinstance(image_data, bytes):
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
-        with open(file=file_path, mode="wb") as f:
-            f.write(image_data)
+            with open(file=file_path, mode="wb") as f:
+                f.write(image_data)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=str(
+                    f"Preview image capture failed with the following: {image_data.message}"
+                ),
+            )
 
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=str(
-                f"Preview image capture failed with the following: {image_data.message}"
-            ),
-        )
-
-    if not file_path.exists():
-        raise FileNotFound(detail="Preview image file not found.").as_error(
-            status.HTTP_404_NOT_FOUND
-        )
+        if not file_path.exists():
+            raise FileNotFound(detail="Preview image file not found.").as_error(
+                status.HTTP_404_NOT_FOUND
+            )
 
     return FileResponse(
         path=file_path,
