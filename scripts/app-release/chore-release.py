@@ -79,11 +79,10 @@ REPOS = [
 ]
 
 
-def run_command(cmd: List[str], cwd: Optional[Path] = None, check: bool = True) -> str:
+def run_command(cmd: List[str], check: bool = True) -> str:
     """Run a shell command and return stdout (stripped)."""
     result = subprocess.run(
         cmd,
-        cwd=cwd,
         capture_output=True,
         text=True,
     )
@@ -96,14 +95,15 @@ def run_command(cmd: List[str], cwd: Optional[Path] = None, check: bool = True) 
         )
     return result.stdout.strip()
 
+def git(repo_path: Path, args: List[str], check: bool = True) -> str:
+    """Run a git command scoped to a repo via `git -C <path> ...`."""
+    return run_command(["git", "-C", str(repo_path), *args], check=check)
+
 
 def get_last_tag(repo_path: Path, tag_pattern: str) -> Optional[str]:
     """Get the most recent tag matching the pattern."""
     try:
-        tags = run_command(
-            ["git", "tag", "-l", tag_pattern, "--sort=-version:refname"],
-            cwd=repo_path,
-        )
+        tags = git(repo_path, ["tag", "-l", tag_pattern, "--sort=-version:refname"])
         if tags:
             return tags.split("\n")[0]
         return None
@@ -114,10 +114,7 @@ def get_last_tag(repo_path: Path, tag_pattern: str) -> Optional[str]:
 def count_commits_since_tag(repo_path: Path, tag: str) -> int:
     """Count commits between tag and HEAD."""
     try:
-        count = run_command(
-            ["git", "rev-list", f"{tag}..HEAD", "--count"],
-            cwd=repo_path,
-        )
+        count = git(repo_path, ["rev-list", f"{tag}..HEAD", "--count"])
         return int(count)
     except (subprocess.CalledProcessError, ValueError):
         return 0
@@ -287,7 +284,7 @@ def tag_repo_if_updated(
         sys.exit(1)
 
     print("Fetching tags...")
-    run_command(["git", "fetch", "--tags", "origin"], cwd=repo_path)
+    git(repo_path, ["fetch", "--tags", "origin"])
 
     last_tag = get_last_tag(repo_path, tag_pattern)
 
@@ -315,8 +312,8 @@ def tag_repo_if_updated(
             print(f"  git push origin {new_tag}")
         else:
             print(f"Tagging HEAD as {new_tag}...")
-            run_command(["git", "tag", new_tag], cwd=repo_path)
-            run_command(["git", "push", "origin", new_tag], cwd=repo_path)
+            git(repo_path, ["tag", new_tag])
+            git(repo_path, ["push", "origin", new_tag])
             print(f"✅ Tagged and pushed {new_tag} for {repo_name}")
     else:
         print(f"No new commits since {last_tag}. Skipping tag for {repo_name}.")
