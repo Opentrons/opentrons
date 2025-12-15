@@ -12,7 +12,7 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 **Welcome to Protocol Designer 8.7.1!**
 
-This hotfix release includes internal updates for bug tracking.
+This hotfix release includes internal updates for debugging.
 
 ## Opentrons Protocol Designer Changes in 8.7.0
 
