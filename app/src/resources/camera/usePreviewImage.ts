@@ -22,7 +22,6 @@ export function usePreviewImage(
     },
     onError: error => {
       console.error('Failed to capture preview image', error)
-      setIsLoading(false)
     },
   })
 
