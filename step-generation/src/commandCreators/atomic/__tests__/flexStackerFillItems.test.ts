@@ -136,7 +136,6 @@ describe('flexStackerFillItems', () => {
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 10,
       storedLabwareDetails: {
         primaryLabwareURI: 'mockURI',
         lidLabwareURI: null,
@@ -331,7 +330,6 @@ mock_flex_stacker_1.fill_items(
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 1,
       storedLabwareDetails: {
         primaryLabwareURI: 'fixture/fixture_tiprack_300_ul/1',
         lidLabwareURI: null,

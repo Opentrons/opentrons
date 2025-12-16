@@ -44,7 +44,6 @@ const mockRobotState = makeInitialRobotState({
       moduleState: {
         type: FLEX_STACKER_MODULE_TYPE,
         storedLabwareDetails: null,
-        maxPoolCount: 6,
         labwareInHopper: [],
         labwareOnShuttle: null,
       },

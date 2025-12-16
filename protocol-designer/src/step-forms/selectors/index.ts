@@ -207,7 +207,6 @@ export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
 // todo(mm, 2025-12-12): Temporarily defining FLEX_STACKER_INITIAL_STATE here until step-generation supports it.
 const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   type: FLEX_STACKER_MODULE_TYPE,
-  maxPoolCount: 0,
   storedLabwareDetails: null,
   labwareInHopper: null,
   labwareOnShuttle: null,
