@@ -3,9 +3,12 @@ import last from 'lodash/last'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 import { getModuleState } from '../robotStateSelectors'
-import { unrollThermocyclerProfile } from '../utils'
+import { unrollThermocyclerProfile, uuid } from '../utils'
 
-import type { TCExtendedProfileParams } from '@opentrons/shared-data/command'
+import type {
+  TCExtendedProfileParams,
+  TCStartExtendedProfileParams,
+} from '@opentrons/shared-data'
 import type {
   ModuleOnlyParams,
   TCProfileParams,
@@ -172,22 +175,36 @@ export const forThermocyclerRunExtendedProfile = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  const { moduleId, profileElements } = params
+  // The state update for a blocking runExtendedProfile is equivalent to a nonblocking
+  // startRunExtendedProfile followed by an immediate waitForTasks.
+  const taskId = uuid()
+  forThermocyclerStartRunExtendedProfile(
+    { ...params, taskId },
+    invariantContext,
+    robotStateAndWarnings
+  )
+  handleWaitForTaskForThermocyclers(
+    taskId,
+    invariantContext,
+    robotStateAndWarnings
+  )
+}
+
+export const forThermocyclerStartRunExtendedProfile = (
+  params: TCStartExtendedProfileParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void => {
+  const { moduleId, taskId, profileElements } = params
   const { robotState } = robotStateAndWarnings
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
-  const lastBlockTemp = lastBlockTempFromProfile(profileElements)
-
-  moduleState.currentBlockActivity =
-    lastBlockTemp != null
-      ? {
-          type: 'blockTargetTemp',
-          blockTargetTemp: lastBlockTemp,
-        }
-      : {
-          type: 'blockDeactivated',
-        }
+  moduleState.currentBlockActivity = {
+    type: 'profile',
+    profileElements,
+    taskId: taskId ?? null,
+  }
   moduleState.numProfilesStarted++
 }
 

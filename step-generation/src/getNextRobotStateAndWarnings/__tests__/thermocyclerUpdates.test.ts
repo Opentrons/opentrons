@@ -20,10 +20,12 @@ import {
   forThermocyclerRunProfile as _forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
+  forThermocyclerStartRunExtendedProfile as _forThermocyclerStartRunExtendedProfile,
 } from '../thermocyclerUpdates'
 
 import type {
   TCExtendedProfileParams,
+  TCStartExtendedProfileParams,
   WaitForTasksParams,
 } from '@opentrons/shared-data'
 import type {
@@ -70,6 +72,9 @@ const forThermocyclerRunProfile = makeImmutableStateUpdater(
 )
 const forThermocyclerRunExtendedProfile = makeImmutableStateUpdater(
   _forThermocyclerRunExtendedProfile
+)
+const forThermocyclerStartRunExtendedProfile = makeImmutableStateUpdater(
+  _forThermocyclerStartRunExtendedProfile
 )
 
 const moduleId = 'thermocyclerModuleId'
@@ -358,6 +363,39 @@ describe('thermocycler state updaters', () => {
         'forThermocyclerRunExtendedProfile should set blockTargetTemp from the last profile step',
     },
   ]
+  const startRunExtendedProfileCases: TestCases<TCStartExtendedProfileParams> =
+    [
+      {
+        params: {
+          moduleId,
+          profileElements: [
+            {
+              holdSeconds: 10,
+              celsius: 20,
+            },
+          ],
+          blockMaxVolumeUl: 10,
+          taskId: 'test-task-id',
+        },
+        moduleStateBefore: {},
+        expectedUpdate: {
+          currentBlockActivity: {
+            type: 'profile',
+            profileElements: [
+              {
+                holdSeconds: 10,
+                celsius: 20,
+              },
+            ],
+            taskId: 'test-task-id',
+          },
+          numProfilesStarted: 1,
+        },
+        fn: forThermocyclerStartRunExtendedProfile,
+        testName:
+          'forThermocyclerStartRunExtendedProfile should populate currentBlockActivity with information about the profile',
+      },
+    ]
   const waitForTasksCases: TestCases<WaitForTasksParams> = [
     {
       fn: forWaitForTasks,
@@ -467,5 +505,6 @@ describe('thermocycler state updaters', () => {
   moduleOnlyParamsCases.forEach(runTest)
   runProfileCases.forEach(runTest)
   runExtendedProfileCases.forEach(runTest)
+  startRunExtendedProfileCases.forEach(runTest)
   waitForTasksCases.forEach(runTest)
 })

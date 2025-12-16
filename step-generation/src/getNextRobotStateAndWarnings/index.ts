@@ -52,6 +52,7 @@ import {
   forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
+  forThermocyclerStartRunExtendedProfile,
 } from './thermocyclerUpdates'
 
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -332,6 +333,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'thermocycler/runExtendedProfile':
       forThermocyclerRunExtendedProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'thermocycler/startRunExtendedProfile':
+      forThermocyclerStartRunExtendedProfile(
         command.params,
         invariantContext,
         robotStateAndWarnings
