@@ -278,18 +278,6 @@ importers:
       portfinder:
         specifier: ^1.0.13
         version: 1.0.38(supports-color@6.1.0)
-      postcss-apply:
-        specifier: 0.12.0
-        version: 0.12.0
-      postcss-color-mod-function:
-        specifier: 3.0.3
-        version: 3.0.3
-      postcss-import:
-        specifier: 16.0.0
-        version: 16.0.0(postcss@8.5.6)
-      postcss-preset-env:
-        specifier: 9.3.0
-        version: 9.3.0(postcss@8.5.6)
       prettier:
         specifier: 3.7.0
         version: 3.7.0
@@ -4127,13 +4115,22 @@ packages:
     resolution: {integrity: sha512-JWjQbp6R4uA55CzQdZ2avlWivYZvQYd4IJo7GI+edlQMd9qW59X/jgIDLinOQtdP5e+JygaphPWlKkH3sBazKQ==}
     engines: {node: '>=18'}
 
+  '@thi.ng/checks@1.5.14':
+    resolution: {integrity: sha512-1ozZoMhv6HGsSsIs9MRWZFJvD0ugDqSHwqWLTVes4kkBWf+SU/bm3O92HCoBVGYpNvIJOOMWcBnBGhrfMKh2hQ==}
+
   '@thi.ng/checks@3.8.0':
     resolution: {integrity: sha512-iHe53YlKOUIek+SERTs0RK1vZ7NF0Jvn5pT00MTEPTa7JHS1K12yZksTerbPxeVoBooG2gkJcXNBerDGvenIbg==}
     engines: {node: '>=18'}
 
+  '@thi.ng/errors@0.1.12':
+    resolution: {integrity: sha512-iWuco0HdWXBJYayALO+qwLRVBNOcYrejB176DusDOMYq+od5iESIjDHlrv+WGUaFhnuCuJFCOnZJLlJv67zNfw==}
+
   '@thi.ng/errors@2.5.50':
     resolution: {integrity: sha512-81I9IHwrCAHpfzEVMaJQpRYaq87MvIXi7YQ/wccKSxtiaz4IpB8dz3zwds33Oy9g+v+6nQbahZ02+syhKFYSXQ==}
     engines: {node: '>=18'}
+
+  '@thi.ng/paths@1.6.5':
+    resolution: {integrity: sha512-eLz0vVOtZ4w7Bm/3kOhnP/TSfBrNtZG+owrwEfVJimAK/AKOh/VNale856XKS5xcz0xEZVv5ueFnWAiXuPTnGA==}
 
   '@thi.ng/paths@5.1.63':
     resolution: {integrity: sha512-UC0uBpg/meAtzwmobCI7k4ZuKF4ZWfUD179sR/S4ke+PJfCIVEPMbFWLi28CaY6MQ3iMPSKExi99a+dP8IJOiA==}
@@ -16947,9 +16944,19 @@ snapshots:
 
   '@thi.ng/api@8.12.10': {}
 
+  '@thi.ng/checks@1.5.14': {}
+
   '@thi.ng/checks@3.8.0': {}
 
+  '@thi.ng/errors@0.1.12': {}
+
   '@thi.ng/errors@2.5.50': {}
+
+  '@thi.ng/paths@1.6.5':
+    dependencies:
+      '@thi.ng/api': 8.12.10
+      '@thi.ng/checks': 3.8.0
+      '@thi.ng/errors': 2.5.50
 
   '@thi.ng/paths@5.1.63':
     dependencies:
