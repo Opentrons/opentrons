@@ -1,12 +1,12 @@
 ---
-test_name:  Test enable/disable OEM Mode
+test_name: Test enable/disable OEM Mode
 marks:
   - usefixtures:
-    - run_server
+      - run_server
 stages:
   - name: PUT first request
     request: &enable_oem_mode_first
-      url: "{host:s}:{port:d}/system/oem_mode/enable"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/enable'
       json:
         enable: true
       method: PUT
@@ -16,7 +16,7 @@ stages:
       status_code: 200
   - name: PUT second request
     request: &enable_oem_mode_second
-      url: "{host:s}:{port:d}/system/oem_mode/enable"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/enable'
       json:
         enable: false
       method: PUT
@@ -26,7 +26,7 @@ stages:
       status_code: 200
   - name: PUT third request
     request: &enable_oem_mode_third
-      url: "{host:s}:{port:d}/system/oem_mode/enable"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/enable'
       json:
         wrong_key: false
       method: PUT
@@ -43,13 +43,13 @@ marks:
 stages:
   - name: Enable OEM Mode
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/enable"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/enable'
       method: PUT
       json:
-        "enable": true
+        'enable': true
   - name: Upload PNG Image
     request: &upload_splash_first
-      url: "{host:s}:{port:d}/system/oem_mode/upload_splash"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/upload_splash'
       method: POST
       files:
         file: 'tests/integration/resources/oem_mode_custom.png'
@@ -61,18 +61,18 @@ test_name: Dont process upload_splash request if oem mode is disabled
 
 marks:
   - usefixtures:
-    - run_server
+      - run_server
 
 stages:
   - name: Disable OEM Mode
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/enable"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/enable'
       method: PUT
       json:
-        "enable": false
+        'enable': false
   - name: Upload PNG Image
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/upload_splash"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/upload_splash'
       method: POST
       files:
         file: 'tests/integration/resources/oem_mode_custom.png'
@@ -80,13 +80,13 @@ stages:
       status_code: 403
   - name: Enable OEM Mode
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/enable"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/enable'
       method: PUT
       json:
-        "enable": true
+        'enable': true
   - name: Upload PNG Image
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/upload_splash"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/upload_splash'
       method: POST
       files:
         file: 'tests/integration/resources/oem_mode_custom.png'
@@ -97,18 +97,18 @@ test_name: Validate the image before processing
 
 marks:
   - usefixtures:
-    - run_server
+      - run_server
 
 stages:
   - name: Enable OEM Mode
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/enable"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/enable'
       method: PUT
       json:
-        "enable": true
+        'enable': true
   - name: Upload non-PNG Image
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/upload_splash"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/upload_splash'
       method: POST
       files:
         file: 'tests/integration/resources/oem_mode_wrong_image_type.jpeg'
@@ -116,7 +116,7 @@ stages:
       status_code: 415
   - name: Upload a PNG Image
     request:
-      url: "{host:s}:{port:d}/system/oem_mode/upload_splash"
+      url: '{host:s}:{run_server.port:d}/system/oem_mode/upload_splash'
       method: POST
       files:
         file: 'tests/integration/resources/oem_mode_custom.png'
