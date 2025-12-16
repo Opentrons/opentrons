@@ -268,11 +268,9 @@ async def test_camera_preview_image(
     mock_camera_setting_store: CameraSettingStore,
     mock_run_data_manager: RunDataManager,
 ):
-    """
-    Test that we can send a POST request for a preview image with a collection of image settings.
-    """
+    """Test that we can send a POST request for a preview image with a collection of image settings."""
     with tempfile.NamedTemporaryFile() as conf:
-        response = await post_camera_preview_image(
+        await post_camera_preview_image(
             request_body=RequestModel(
                 data=CameraCaptureImageSettings(
                     cameraId=None,

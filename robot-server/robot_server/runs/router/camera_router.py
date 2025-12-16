@@ -24,10 +24,6 @@ from robot_server.camera.fastapi_dependencies import (
     get_camera_provider,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
-from robot_server.camera.settings.store import (
-    CameraSettingStore,
-    get_camera_setting_store,
-)
 from opentrons.protocol_engine.resources.camera_provider import ImageParameters
 from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.data_files.models import FileNotFound
@@ -204,9 +200,7 @@ async def post_camera_preview_image(
     images_directory: Annotated[Path, Depends(get_images_directory)],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> Response:
-    """
-    Return a preview image based on the provided capture image settings and run specific enablement.
-    """
+    """Return a preview image based on the provided capture image settings and run specific enablement."""
     if IS_ROBOT and not camera.camera_exists():
         # todo(chb): Eventually we'll have mulitple camera ids that can be sent, so this should be able to verify more than just the default
         raise LegacyErrorResponse(

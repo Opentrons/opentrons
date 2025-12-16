@@ -11,19 +11,11 @@ from robot_server.runs.router.camera_router import (
     add_camera_capture_image_settings,
     post_camera_preview_image,
 )
-
-from robot_server.service.legacy.models.settings import (
-    CameraCaptureImageSettings,
-)
-
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from opentrons.protocol_engine import EngineStatus
 from opentrons.protocol_engine.resources.camera_provider import ImageParameters
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
-from robot_server.camera.settings.store import CameraSettingStore
-from opentrons.protocol_engine.resources.camera_provider import CameraSettings
-from opentrons.protocol_engine import StateSummary
 from opentrons.system import camera
 
 
@@ -91,31 +83,11 @@ async def test_camera_settings(
 
 async def test_camera_preview_image(
     decoy: Decoy,
-    mock_camera_setting_store: CameraSettingStore,
     run: Run,
-):
-    """
-    Test that we can request a preview image with a collection of image settings based on run specific enablement.
-    """
+) -> None:
+    """Test that we can request a preview image with a collection of image settings based on run specific enablement."""
     with tempfile.NamedTemporaryFile() as conf:
-        decoy.when(mock_run_orchestrator_store.get_state_summary()).then_return(
-            StateSummary(
-                status="idle",
-                errors=[],
-                hasEverEnteredErrorRecovery=False,
-                labware=[],
-                pipettes=[],
-                modules=[],
-                labwareOffsets=[],
-                cameraSettings=CameraSettings(
-                    cameraEnabled=True,
-                    liveStreamEnabled=False,
-                    errorRecoveryCameraEnabled=False,
-                ),
-            )
-        )
-
-        response = await post_camera_preview_image(
+        await post_camera_preview_image(
             request_body=RequestModel(
                 data=CameraCaptureImageSettings(
                     cameraId=None,
@@ -127,7 +99,6 @@ async def test_camera_preview_image(
                     saturation=75.0,
                 )
             ),
-            camera_settings_store=mock_camera_setting_store,
             run=run,
             images_directory=Path(conf.name),
             robot_type="OT-3 Standard",
