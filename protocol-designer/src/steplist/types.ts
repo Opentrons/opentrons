@@ -148,16 +148,10 @@ export interface HeaterShakerSubstepItem {
 
 export interface ThermocyclerProfileSubstepItem {
   substepType: typeof THERMOCYCLER_PROFILE
-  blockTargetTempHold: number | null
-  labwareNickname: string | null | undefined
-  lidOpenHold: boolean
-  lidTargetTempHold: number | null
-  message?: string
-  meta: ThermocyclerProfileStepArgs['meta']
-  profileElements: ThermocyclerProfileStepArgs['profileElements']
-  profileTargetLidTemp: number | null
-  profileVolume: number
+  // No data in here because the UI gets it from other places instead of the substep
+  // machinery. We merely need to make sure the substep exists.
 }
+
 export interface ThermocyclerStateSubstepItem {
   substepType: typeof THERMOCYCLER_STATE
   labwareNickname: string | null | undefined
@@ -166,6 +160,7 @@ export interface ThermocyclerStateSubstepItem {
   lidOpen: boolean
   message?: string
 }
+
 export type SubstepItemData =
   | SourceDestSubstepItem
   | PauseSubstepItem
