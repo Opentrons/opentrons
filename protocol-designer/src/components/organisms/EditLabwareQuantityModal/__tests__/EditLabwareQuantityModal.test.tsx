@@ -5,6 +5,7 @@ import { fixture96Plate } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   createContainer,
   deleteContainer,
@@ -15,7 +16,6 @@ import { EditLabwareQuantityModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 vi.mock('/protocol-designer/labware-ingred/actions')
 vi.mock('/protocol-designer/step-forms/selectors')
