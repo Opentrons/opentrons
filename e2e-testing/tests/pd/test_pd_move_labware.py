@@ -4,12 +4,10 @@ import pytest
 from playwright.sync_api import Page, expect
 
 from automation.pd_pages import LandingPage, ProtocolEditorPage
-from utility import troubleshoot_and_pause
 
 PROTOCOL_PATH = "fixtures/protocol/9/PD_Move_Lids_Setup.py"
 
 
-@troubleshoot_and_pause
 @pytest.mark.pdE2E
 @pytest.mark.slow
 def test_move_labware_flex(page: Page, base_url: str) -> None:
