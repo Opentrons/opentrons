@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import os
 import sys
@@ -1027,12 +1027,12 @@ def run_blank_test(
     )
     offset = _get_offset_for_channel(fixture_settings, channel, 10)
     if fixture_settings.ctx.is_simulating():
-        liquid_height = 10
+        liquid_height = 10.0
     else:
-        liquid_height = fixture_settings.liquid_source.current_liquid_height()
-    fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)
+        liquid_height = fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
+    fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)  # type: ignore[arg-type]
     fixture_settings.pipette.move_to(
-        fixture_settings.pipette._last_tip_picked_up_from.top(10)
+        fixture_settings.pipette._last_tip_picked_up_from.top(10)  # type: ignore[union-attr]
     )
     retracted_offset = _get_offset_for_channel(
         fixture_settings, channel, fixture_settings.retracted_offset
