@@ -70,7 +70,6 @@ describe('FlexStackerTools', () => {
         [mockStackerId]: {
           moduleState: {
             type: FLEX_STACKER_MODULE_TYPE,
-            maxPoolCount: 6,
             storedLabwareDetails: {
               primaryLabwareURI: 'mockLabwareURI',
               lidLabwareURI: 'mockLidLabwareURI',
@@ -117,7 +116,6 @@ describe('FlexStackerTools', () => {
         [mockStackerId]: {
           moduleState: {
             type: FLEX_STACKER_MODULE_TYPE,
-            maxPoolCount: 6,
             storedLabwareDetails: {
               primaryLabwareURI: 'fixture/fixture_flex_96_tiprack_1000ul/1',
               lidLabwareURI: null,
@@ -148,7 +146,6 @@ describe('FlexStackerTools', () => {
         [mockStackerId]: {
           moduleState: {
             type: FLEX_STACKER_MODULE_TYPE,
-            maxPoolCount: 6,
             storedLabwareDetails: null,
             labwareInHopper: [],
             labwareOnShuttle: null,
@@ -167,7 +164,6 @@ describe('FlexStackerTools', () => {
         [mockStackerId]: {
           moduleState: {
             type: FLEX_STACKER_MODULE_TYPE,
-            maxPoolCount: 6,
             storedLabwareDetails: null,
             labwareInHopper: [],
             labwareOnShuttle: {
@@ -191,7 +187,6 @@ describe('FlexStackerTools', () => {
         [mockStackerId]: {
           moduleState: {
             type: FLEX_STACKER_MODULE_TYPE,
-            maxPoolCount: 6,
             storedLabwareDetails: null,
             labwareInHopper: [],
             labwareOnShuttle: null,
