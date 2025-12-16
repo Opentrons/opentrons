@@ -33,3 +33,4 @@ build = "~=1.2.0"
 
 [packages]
 idna = "==3.3"
+setuptools = "==80.9.0"

@@ -9,6 +9,7 @@ python_version = "3.12"
 [packages]
 typing-extensions = ">=4.0.0,<5"
 otupdate = {path = ".", editable = true}
+setuptools = "==80.9.0"
 
 [dev-packages]
 flake8 = "~=7.0.0"
