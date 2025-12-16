@@ -4,7 +4,6 @@ import type {
   CommentArgs,
   MoveLabwareArgs,
   PauseArgs,
-  ThermocyclerProfileStepArgs,
 } from '@opentrons/step-generation'
 import type { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 import type { StepIdType } from '../form-types'
