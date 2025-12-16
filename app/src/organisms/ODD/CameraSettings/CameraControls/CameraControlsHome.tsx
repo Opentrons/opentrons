@@ -6,13 +6,11 @@ import { Icon, ListButton, StyledText } from '@opentrons/components'
 import { MediumButton } from '/app/atoms/buttons'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { ActiveControlView } from '.'
 

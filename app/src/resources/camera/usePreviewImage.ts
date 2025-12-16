@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useCapturePreviewImage } from '@opentrons/react-api-client'
 
@@ -15,8 +15,15 @@ export interface UsePreviewImageResult {
 export function usePreviewImage(
   settings: CameraImageSettings
 ): UsePreviewImageResult {
-  const { data, refetch, isFetching } = useCapturePreviewImage(settings, {
-    responseType: 'blob',
+  const [isLoading, setIsLoading] = useState(false)
+  const { data, refetch } = useCapturePreviewImage(settings, {
+    onSettled: () => {
+      setIsLoading(false)
+    },
+    onError: error => {
+      console.error('Failed to capture preview image', error)
+      setIsLoading(false)
+    },
   })
 
   const imgPath = useMemo(() => {
@@ -32,7 +39,7 @@ export function usePreviewImage(
 
   return {
     imgPath,
-    isLoading: isFetching,
+    isLoading,
     takePhoto,
   }
 }
