@@ -48,7 +48,6 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
             lidLabwareId: null,
           },
         ],
-        maxPoolCount: 6,
         storedLabwareDetails: {
           primaryLabwareURI: LABWARE_ID,
         },
@@ -124,7 +123,6 @@ describe('flex stacker state updates forFlexStackerFill', () => {
             lidLabwareId: null,
           },
         ],
-        maxPoolCount: 6,
         storedLabwareDetails: {
           primaryLabwareURI: LABWARE_ID,
         },
@@ -169,7 +167,6 @@ describe('flex stacker state updates forFlexStackerFill', () => {
       strategy: 'logical' as const,
     }
     forFlexStackerFill(props, invariantContext, { robotState, warnings: [] })
-
     const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
     expect(moduleState?.labwareInHopper).toHaveLength(3)
   })
@@ -195,7 +192,6 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
             lidLabwareId: null,
           },
         ],
-        maxPoolCount: 6,
         storedLabwareDetails: {
           primaryLabwareURI: LABWARE_ID,
         },
@@ -230,7 +226,6 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
             lidLabwareId: null,
           },
         ],
-        maxPoolCount: 6,
         storedLabwareDetails: {
           primaryLabwareURI: LABWARE_ID,
         },
@@ -290,7 +285,6 @@ describe('flex stacker state updates forFlexStackerStore', () => {
             lidLabwareId: null,
           },
         ],
-        maxPoolCount: 6,
         storedLabwareDetails: {
           primaryLabwareURI: LABWARE_ID,
         },

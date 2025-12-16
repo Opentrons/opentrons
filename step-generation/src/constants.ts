@@ -73,7 +73,6 @@ export const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
 
 export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
   type: FLEX_STACKER_MODULE_TYPE,
-  maxPoolCount: 0,
   storedLabwareDetails: null,
   labwareInHopper: null,
   labwareOnShuttle: null,
