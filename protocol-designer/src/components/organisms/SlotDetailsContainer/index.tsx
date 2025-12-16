@@ -107,7 +107,11 @@ export function SlotDetailsContainer(
   } else if (fullStackFromLabwares?.length > 0) {
     fullStackFromLabwares.forEach(id => {
       if (deckSetupLabwares[id] != null) {
-        labwares.push(nickNames[id])
+        if (isSlotAHopper) {
+          labwares.push(deckSetupLabwares[id].def.metadata.displayName)
+        } else {
+          labwares.push(nickNames[id])
+        }
       }
     })
   }
