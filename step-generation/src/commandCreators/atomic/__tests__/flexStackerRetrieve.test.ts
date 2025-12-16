@@ -172,7 +172,6 @@ describe('flexStackerRetrieve', () => {
         lidLabwareId: null,
       },
       labwareInHopper: null,
-      maxPoolCount: 10,
       storedLabwareDetails: null,
       type: FLEX_STACKER_MODULE_TYPE,
     })

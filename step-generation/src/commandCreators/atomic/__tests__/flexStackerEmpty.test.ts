@@ -43,7 +43,6 @@ describe('flexStackerEmpty', () => {
       slot: 'D3',
       moduleState: {
         type: FLEX_STACKER_MODULE_TYPE,
-        maxPoolCount: 6,
         storedLabwareDetails: null,
         labwareOnShuttle: null,
         labwareInHopper: null,

@@ -58,7 +58,6 @@ describe('flexStackerStore', () => {
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 10,
       storedLabwareDetails: {
         primaryLabwareURI: 'mockURI',
         lidLabwareURI: null,
@@ -107,7 +106,6 @@ describe('flexStackerStore', () => {
     vi.mocked(flexStackerStateGetter).mockReturnValue({
       labwareOnShuttle: null,
       labwareInHopper: null,
-      maxPoolCount: 10,
       storedLabwareDetails: null,
       type: FLEX_STACKER_MODULE_TYPE,
     })
@@ -159,7 +157,6 @@ describe('flexStackerStore', () => {
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 10,
       storedLabwareDetails: {
         primaryLabwareURI: 'mockURI',
         lidLabwareURI: null,
@@ -260,7 +257,6 @@ describe('flexStackerStore', () => {
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 1,
       storedLabwareDetails: {
         primaryLabwareURI: 'fixture/fixture_tiprack_300_ul/1',
         lidLabwareURI: null,
