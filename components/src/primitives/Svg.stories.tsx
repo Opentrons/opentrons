@@ -1,36 +1,40 @@
+import { createElement } from 'react'
+
 import { Svg as SvgComponent } from './Svg'
 
-import type { Meta, Story } from '@storybook/react'
-import type * as React from 'react'
+import type { Meta, StoryObj } from '@storybook/react'
 
-export default {
+const meta: Meta<typeof SvgComponent> = {
   title: 'Library/Atoms/Svg',
-} as Meta
+  component: SvgComponent,
+}
 
-const Template: Story<React.ComponentProps<typeof SvgComponent>> = args => (
-  <SvgComponent {...args} />
-)
-export const Svg = Template.bind({})
-Svg.args = {
-  svgWidth: '300',
-  svgHeight: '300',
-  children: [
-    <rect
-      key="rect"
-      height="40"
-      width="40"
-      x="50"
-      y="50"
-      fill="red"
-      stroke="rebeccapurple"
-    />,
-    <circle
-      key="circle"
-      cx="140"
-      cy="140"
-      r="40"
-      fill="green"
-      stroke="black"
-    />,
-  ],
+export default meta
+
+type Story = StoryObj<typeof SvgComponent>
+
+export const Svg: Story = {
+  args: {
+    svgWidth: '300',
+    svgHeight: '300',
+    children: [
+      createElement('rect', {
+        key: 'rect',
+        height: '40',
+        width: '40',
+        x: '50',
+        y: '50',
+        fill: 'red',
+        stroke: 'rebeccapurple',
+      }),
+      createElement('circle', {
+        key: 'circle',
+        cx: '140',
+        cy: '140',
+        r: '40',
+        fill: 'green',
+        stroke: 'black',
+      }),
+    ],
+  },
 }

@@ -92,13 +92,11 @@ export function SetupPipetteCalibrationItem({
     subText = t('attach_pipette_calibration')
     button = (
       <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
-        <TertiaryButton
-          as={RRDLink}
-          to={deviceDetailsUrl}
-          id="PipetteCalibration_attachPipetteButton"
-        >
-          {t('attach_pipette_cta')}
-        </TertiaryButton>
+        <RRDLink to={deviceDetailsUrl}>
+          <TertiaryButton id="PipetteCalibration_attachPipetteButton">
+            {t('attach_pipette_cta')}
+          </TertiaryButton>
+        </RRDLink>
       </Flex>
     )
   } else {

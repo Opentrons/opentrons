@@ -143,7 +143,7 @@ const ModalArea = styled.div<
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     border-radius: ${BORDERS.borderRadius16};
   }
-  ${styleProps};
+  ${styleProps as any};
 `
 
 const Footer = styled.div`

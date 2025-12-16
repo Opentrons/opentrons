@@ -9,7 +9,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-export const QuaternaryButton = styled(NewSecondaryBtn)`
+export const QuaternaryButton: typeof NewSecondaryBtn = styled(NewSecondaryBtn)`
   background-color: ${COLORS.white};
   border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
@@ -21,7 +21,7 @@ export const QuaternaryButton = styled(NewSecondaryBtn)`
   white-space: nowrap;
   ${TYPOGRAPHY.labelSemiBold}
 
-  ${styleProps}
+  ${styleProps as any}
 
   &:hover {
     opacity: 70%;

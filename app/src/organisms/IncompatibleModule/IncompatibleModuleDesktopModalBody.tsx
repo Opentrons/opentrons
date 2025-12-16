@@ -51,7 +51,7 @@ export function IncompatibleModuleDesktopModalBody({
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing12}
           maxHeight="196px"
-          as="ul"
+          // as="ul"
         >
           {modules.map(module => (
             <li key={module.id}>

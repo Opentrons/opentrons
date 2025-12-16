@@ -54,8 +54,11 @@ class MixStepForm(BasePage):
     def select_labware(self, option_text: str) -> None:
         """Select the labware entry shown in the dropdown."""
 
-        dropdown = self.page.get_by_test_id("dropdownMenu").first
-        self.wait_for_visible(dropdown)
+        # Try field-specific test ID first (labware_dropdownMenu), then fallback to generic
+        dropdown = self.page.get_by_test_id("labware_dropdownMenu").first
+        if dropdown.count() == 0:
+            dropdown = self.page.get_by_test_id("dropdownMenu").first
+        self.wait_for_visible(dropdown, timeout=10000)
         dropdown.click()
 
         listbox = self.page.locator("div[role='listbox']").last
@@ -171,24 +174,61 @@ class MixStepForm(BasePage):
 
         modal = self._modal_area()
         modal.locator('[data-testid="TipPositionModal_x_custom_input"]').fill(x)
-        modal.locator("#TipPositionModal_y_custom_input").fill(y)
-        modal.locator("#TipPositionModal_z_custom_input").fill(z)
+        modal.locator('[data-testid="TipPositionModal_y_custom_input"]').fill(y)
+        modal.locator('[data-testid="TipPositionModal_z_custom_input"]').fill(z)
 
     def toggle_checkbox(self, index: int = 0) -> None:
         """Toggle a checkbox-like control by index among visible controls."""
 
+        # Try switch first (ToggleButton components)
         switch = self.page.get_by_role("switch").nth(index)
         if switch.count() > 0:
+            self.wait_for_visible(switch)
             switch.click()
             return
 
+        # Try checkbox role (Checkbox component from @opentrons/components)
         checkbox = self.page.get_by_role("checkbox").nth(index)
         if checkbox.count() > 0:
+            self.wait_for_visible(checkbox)
             checkbox.click()
             return
 
-        checkbox = self.page.locator('[class*="Checkbox___StyledFlex3"]').nth(index)
-        checkbox.click()
+        # Try CheckboxExpandStepFormField - these use ListButton with a Btn containing Check icon
+        # The inner Btn has a testId like "delay_checkbox", "blowout_checkbox", etc.
+        checkbox_buttons = self.page.locator('[data-testid*="checkbox"]')
+        if checkbox_buttons.count() > index:
+            checkbox_button = checkbox_buttons.nth(index)
+            self.wait_for_visible(checkbox_button)
+            checkbox_button.click()
+            return
+
+        # Fallback: CheckboxExpandStepFormField wraps everything in a ListButton that's also clickable
+        # Find ListButtons that contain checkbox-related text (Delay, Push out, Blowout, etc.)
+        # These are the clickable containers for CheckboxExpandStepFormField
+        # Look for buttons containing text that matches checkbox labels
+        checkbox_texts = ["Delay", "Push out", "Blowout", "Touch tip", "Air gap", "Mix"]
+        for text in checkbox_texts:
+            buttons_with_text = self.page.locator("button").filter(has_text=text)
+            if buttons_with_text.count() > index:
+                list_button = buttons_with_text.nth(index)
+                self.wait_for_visible(list_button)
+                list_button.click()
+                return
+
+        # Last resort: try to find input[type="checkbox"] (CheckboxField component)
+        checkbox_input = self.page.locator('input[type="checkbox"]').nth(index)
+        if checkbox_input.count() > 0:
+            self.wait_for_visible(checkbox_input)
+            checkbox_input.click()
+            return
+
+        raise AssertionError(
+            f"Could not find checkbox or switch at index {index}. "
+            f"Found {self.page.get_by_role('switch').count()} switches, "
+            f"{self.page.get_by_role('checkbox').count()} checkboxes, "
+            f"{self.page.locator('[data-testid*="checkbox"]').count()} checkbox test IDs."
+        )
 
     def fill_delay_seconds(self, value: str) -> None:
         """Fill whichever delay seconds input is present."""
@@ -210,12 +250,77 @@ class MixStepForm(BasePage):
     def open_blowout_location_dropdown(self) -> None:
         """Open the blowout location dropdown menu."""
 
-        self.page.locator('[data-testid="dropdownMenu"]').last.click()
+        # First, ensure the blowout checkbox is checked (dropdown only appears when checked)
+        # The checkbox has testId="blowout_checkbox"
+        blowout_checkbox_button = self.page.get_by_test_id("blowout_checkbox").first
+        if blowout_checkbox_button.count() > 0:
+            # Check if checkbox is already checked by looking for the checked state
+            # If not checked, click it to enable the dropdown
+            try:
+                # Try to find if the checkbox area is expanded (dropdown should be visible)
+                dropdown_check = self.page.locator('[data-testid="blowout_location_dropdownMenu"]')
+                if dropdown_check.count() == 0:
+                    # Checkbox is not checked, click it to enable
+                    self.wait_for_visible(blowout_checkbox_button)
+                    blowout_checkbox_button.click()
+                    # Wait a moment for React to update the DOM
+                    self.page.wait_for_timeout(500)
+            except Exception:
+                pass
+
+        # Now wait for the dropdown to appear in the DOM
+        # The dropdown has testId="blowout_location_dropdownMenu" (field name + _dropdownMenu)
+        dropdown_locator = self.page.locator('[data-testid="blowout_location_dropdownMenu"]')
+
+        # Wait for the dropdown to be attached to the DOM with a longer timeout
+        # This handles the case where the checkbox was just toggled and the DOM is updating
+        try:
+            dropdown_locator.wait_for(state="attached", timeout=15000)
+            dropdown = dropdown_locator.first
+            self.wait_for_visible(dropdown, timeout=10000)
+            dropdown.click()
+            return
+        except Exception:
+            # If waiting for attached fails, try alternative approaches
+            pass
+
+        # Fallback: Try using the dropdown_by_title helper which finds dropdowns by their label text
+        try:
+            dropdown = self._dropdown_by_title("Blowout location")
+            self.wait_for_visible(dropdown, timeout=10000)
+            dropdown.click()
+            return
+        except (ValueError, AssertionError):
+            pass
+
+        # Last resort: try any dropdown ending with _dropdownMenu, but wait for it
+        dropdown = self.page.locator('[data-testid$="_dropdownMenu"]').last
+        try:
+            dropdown.wait_for(state="attached", timeout=10000)
+            self.wait_for_visible(dropdown, timeout=10000)
+            dropdown.click()
+            return
+        except Exception:
+            pass
+
+        # Provide helpful error message with available dropdown test IDs
+        try:
+            available_test_ids = self.page.locator('[data-testid*="dropdown"]').evaluate_all(
+                "elements => elements.map(el => el.getAttribute('data-testid'))"
+            )
+        except Exception:
+            available_test_ids = []
+
+        raise AssertionError(
+            f"Could not find blowout location dropdown. "
+            f"Available dropdown test IDs: {available_test_ids}. "
+            f"Make sure the blowout checkbox is checked first (call toggle_checkbox() before this method)."
+        )
 
     def open_blowout_position_modal(self) -> None:
         """Open the blowout position modal."""
 
-        self.page.locator("#TipPositionField_blowout_z_offset").click()
+        self.page.locator("[data-testid='TipPositionField_blowout_z_offset']").click()
 
     def set_blowout_position(self, value: str) -> None:
         """Adjust the blowout Z offset inside the modal."""
@@ -297,26 +402,29 @@ class MixStepForm(BasePage):
 
         if label.count() > 0:
             first_label = label.first
+            # Use contains() to match both 'dropdownMenu' and 'xxx_dropdownMenu' test IDs
             candidates.extend(
                 [
-                    first_label.locator("xpath=../following-sibling::*[@data-testid='dropdownMenu']"),
-                    first_label.locator("xpath=../../following-sibling::*[@data-testid='dropdownMenu']"),
-                    first_label.locator("xpath=ancestor::*[@data-testid][1]//div[@data-testid='dropdownMenu']"),
+                    first_label.locator("xpath=../following-sibling::*[contains(@data-testid, 'dropdownMenu')]"),
+                    first_label.locator("xpath=../../following-sibling::*[contains(@data-testid, 'dropdownMenu')]"),
+                    first_label.locator(
+                        "xpath=ancestor::*[@data-testid][1]//div[contains(@data-testid, 'dropdownMenu')]"
+                    ),
                 ]
             )
 
         normalized = " ".join(title.split())
         xpath_queries = [
-            "xpath=//*[normalize-space()='%s']/parent::*/following-sibling::*[@data-testid='dropdownMenu'][1]"
-            % normalized,
-            "xpath=//*[normalize-space()='%s']/ancestor::*[@data-testid][1]//div[@data-testid='dropdownMenu'][1]"
-            % normalized,
-            "xpath=//*[normalize-space()='%s']/following::div[@data-testid='dropdownMenu'][1]" % normalized,
+            f"xpath=//*[normalize-space()='{normalized}']/parent::*/"
+            f"following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]",
+            f"xpath=//*[normalize-space()='{normalized}']/ancestor::*[@data-testid][1]//"
+            f"div[contains(@data-testid, 'dropdownMenu')][1]",
+            f"xpath=//*[normalize-space()='{normalized}']/following::div[contains(@data-testid, 'dropdownMenu')][1]",
         ]
         if title == "Tip handling":
             xpath_queries.append(
                 "xpath=//*[normalize-space()='Tip handling']/parent::*/"
-                "following-sibling::*[@data-testid='dropdownMenu'][1]"
+                "following-sibling::*[contains(@data-testid, 'dropdownMenu')][1]"
             )
 
         for query in xpath_queries:
