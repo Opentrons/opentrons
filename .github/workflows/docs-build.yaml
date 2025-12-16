@@ -102,7 +102,7 @@ jobs:
       - build
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 5
-    if: always() && needs.build.result == 'success' && needs.determine-deploy-config.result == 'success'
+    if: always() && needs.build.result == 'success' && needs.determine-deploy-config.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       id-token: write
       contents: read
