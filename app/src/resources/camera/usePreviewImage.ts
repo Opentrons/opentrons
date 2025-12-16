@@ -45,11 +45,6 @@ export function usePreviewImage(
       },
     }
   )
-  console.log(
-    '🚀 ~ usePreviewImage ~ previewWithRunQuery:',
-    previewWithRunQuery
-  )
-  console.log('🚀 ~ usePreviewImage ~ runId:', runId)
 
   const { data, refetch } = runId == null ? previewQuery : previewWithRunQuery
   const imgPath = useMemo(() => {
