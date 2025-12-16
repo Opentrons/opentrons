@@ -112,12 +112,14 @@ describe('SetupRobotCalibration', () => {
 
   it('changes Proceed CTA copy based on next step', () => {
     render({ nextStep: 'labware_liquids_setup_step' })
-    screen.getByRole('button', { name: 'Proceed to labware' })
+    screen.getByRole('button', { name: 'Proceed to labware & liquids' })
   })
 
   it('calls the expandStep function and tracks the analytics event on click', () => {
     render()
-    fireEvent.click(screen.getByRole('button', { name: 'Proceed to modules' }))
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Proceed to deck hardware' })
+    )
     expect(mockExpandStep).toHaveBeenCalled()
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
@@ -127,7 +129,9 @@ describe('SetupRobotCalibration', () => {
 
   it('does not call the expandStep function on click if calibration is not complete', () => {
     render({ calibrationStatus: { complete: false } })
-    const button = screen.getByRole('button', { name: 'Proceed to modules' })
+    const button = screen.getByRole('button', {
+      name: 'Proceed to deck hardware',
+    })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()
@@ -136,7 +140,9 @@ describe('SetupRobotCalibration', () => {
   it('does not call the expandStep function on click if run has started', () => {
     when(vi.mocked(useRunHasStarted)).calledWith(RUN_ID).thenReturn(true)
     render()
-    const button = screen.getByRole('button', { name: 'Proceed to modules' })
+    const button = screen.getByRole('button', {
+      name: 'Proceed to deck hardware',
+    })
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(mockExpandStep).not.toHaveBeenCalled()
