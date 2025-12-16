@@ -11,7 +11,6 @@ import type {
   ModuleModel,
   ModuleType,
 } from '@opentrons/shared-data'
-import type { FlexStackerModuleState } from '@opentrons/step-generation'
 import type { FormData } from '../../form-types'
 import type {
   CreateContainerAction,
@@ -33,14 +32,14 @@ export interface CreateContainerAboveModuleArgs {
     topLabwareDefURI: string | null
     lidDefURI: string | null
   }
-  amount: number
-  isOnShuttle?: boolean
-}
-
-interface StackedLabware {
-  defURI: string
-  uuid: string
-  role: 'adapter' | 'primary' | 'lid'
+  stackerInfo?:
+    | {
+        stackerPosition: 'shuttle'
+      }
+    | {
+        stackerPosition: 'hopper'
+        amount: number
+      }
 }
 
 export const createContainerAboveModule: (
@@ -52,37 +51,50 @@ export const createContainerAboveModule: (
   | OpenIngredientSelectorAction
   | UpdateStackerModuleStateAction
 > = args => (dispatch, getState) => {
-  const { slot, labwareDefURIGroup, isOnShuttle = false, amount } = args
+  const { slot, labwareDefURIGroup, stackerInfo } = args
   const state = getState()
   const deckSetup = getDeckSetupForActiveItem(state)
   const modules = deckSetup.modules
 
   const module = Object.values(modules).find(module => module.slot === slot)
-  const moduleId = module?.id
+  if (module == null) {
+    return
+  }
+  const { id: moduleId, type: moduleType } = module
   const { adapterDefURI, topLabwareDefURI, lidDefURI } = labwareDefURIGroup
-  const baseStack: Array<Omit<StackedLabware, 'uuid'>> = [
-    ...(adapterDefURI != null
-      ? [{ defURI: adapterDefURI, role: 'adapter' as const }]
-      : []),
-    ...(topLabwareDefURI != null
-      ? [{ defURI: topLabwareDefURI, role: 'primary' as const }]
-      : []),
-    ...(lidDefURI != null ? [{ defURI: lidDefURI, role: 'lid' as const }] : []),
+  const labwareDefURIStack = [
+    ...(adapterDefURI != null ? [adapterDefURI] : []),
+    ...(topLabwareDefURI != null ? [topLabwareDefURI] : []),
+    ...(lidDefURI != null ? [lidDefURI] : []),
   ]
 
-  const labwareGroups: StackedLabware[][] = Array.from({ length: amount }).map(
-    () =>
-      baseStack.map(item => ({
-        ...item,
-        uuid: uuid(),
-      }))
-  )
-  const stackedLabware = labwareGroups.flat()
+  if (moduleType !== FLEX_STACKER_MODULE_TYPE) {
+    dispatch(
+      createContainer({
+        slot: moduleId,
+        labwareDefURIStack,
+      })
+    )
+    return
+  }
 
-  const labwareDefURIStack = stackedLabware.map(info => info.defURI)
-  const uuids = stackedLabware.map(info => info.uuid)
-
-  if (moduleId) {
+  // Check if the module is a FlexStackerModule and update its state
+  if (
+    stackerInfo == null ||
+    module.moduleState.type !== FLEX_STACKER_MODULE_TYPE
+  ) {
+    console.error('expected stackerInfo to be passed')
+    return
+  }
+  const currentModuleState = module.moduleState
+  const primaryLabwareUuid = topLabwareDefURI != null ? uuid() : null
+  const adapterLabwareUuid = adapterDefURI != null ? uuid() : null
+  const lidLabwareUuid = lidDefURI != null ? uuid() : null
+  const uuids = [adapterLabwareUuid, primaryLabwareUuid, lidLabwareUuid].filter(
+    id => id != null
+  ) as string[]
+  if (stackerInfo.stackerPosition === 'shuttle') {
+    // create containers
     dispatch(
       createContainer({
         slot: moduleId,
@@ -91,74 +103,72 @@ export const createContainerAboveModule: (
       })
     )
 
-    const getTopByRole = (role: StackedLabware['role']): StackedLabware | null  =>
-      [...stackedLabware].reverse().find(lw => lw.role === role) ?? null
-
-    const topPrimary = getTopByRole('primary')
-    const topAdapter = getTopByRole('adapter')
-    const topLid = getTopByRole('lid')
-
-    // Check if the module is a FlexStackerModule and update its state
-    if (module?.type === FLEX_STACKER_MODULE_TYPE) {
-      const currentModuleState = module.moduleState as FlexStackerModuleState
-      if (currentModuleState.type === FLEX_STACKER_MODULE_TYPE) {
-        // handle shuttle state update
-        if (isOnShuttle) {
-          if (topPrimary != null) {
-            dispatch(
-              updateStackerModuleState({
-                moduleId: module.id,
-                moduleState: {
-                  ...currentModuleState,
-                  labwareOnShuttle: {
-                    primaryLabwareId: `${topPrimary.uuid}:${topPrimary.defURI}`,
-                    adapterLabwareId:
-                      topAdapter != null
-                        ? `${topAdapter.uuid}:${topAdapter.defURI}`
-                        : null,
-                    lidLabwareId:
-                      topLid != null ? `${topLid.uuid}:${topLid.defURI}` : null,
-                  },
-                },
-              })
-            )
-          } else {
-            console.error(
-              'expected to find a topPrimary labware in createContainer thunk for updating flex stacker state but could not'
-            )
-          }
-        } else {
-          // handle hopper state update
-          if (topPrimary != null) {
-            dispatch(
-              updateStackerModuleState({
-                moduleId: module.id,
-                moduleState: {
-                  ...currentModuleState,
-                  storedLabwareDetails: {
-                    primaryLabwareURI: topPrimary.defURI,
-                    adapterLabwareURI: topAdapter?.defURI ?? null,
-                    lidLabwareURI: topLid?.defURI ?? null,
-                  },
-                  labwareInHopper: [
-                    {
-                      primaryLabwareId: `${topPrimary.uuid}:${topPrimary.defURI}`,
-                      adapterLabwareId:
-                        topAdapter != null
-                          ? `${topAdapter.uuid}:${topAdapter.defURI}`
-                          : null,
-                      lidLabwareId:
-                        topLid != null
-                          ? `${topLid.uuid}:${topLid.defURI}`
-                          : null,
-                    },
-                  ],
-                },
-              })
-            )
-          }
+    // handle shuttle state update
+    dispatch(
+      updateStackerModuleState({
+        moduleId: module.id,
+        moduleState: {
+          ...currentModuleState,
+          labwareOnShuttle: {
+            primaryLabwareId: `${primaryLabwareUuid}:${topLabwareDefURI}`,
+            adapterLabwareId:
+              adapterLabwareUuid != null
+                ? `${adapterLabwareUuid}:${adapterDefURI}`
+                : null,
+            lidLabwareId:
+              lidLabwareUuid != null ? `${lidLabwareUuid}:${lidDefURI}` : null,
+          },
+        },
+      })
+    )
+  } else {
+    // create containers
+    if (topLabwareDefURI != null) {
+      Array.from({ length: stackerInfo.amount }).forEach(() => {
+        // create containers for the labware
+        const primaryLabwareUuid = topLabwareDefURI != null ? uuid() : null
+        const adapterLabwareUuid = adapterDefURI != null ? uuid() : null
+        const lidLabwareUuid = lidDefURI != null ? uuid() : null
+        const uuids = [
+          adapterLabwareUuid,
+          primaryLabwareUuid,
+          lidLabwareUuid,
+        ].filter(id => id != null) as string[]
+        const hopperUpdate = {
+          primaryLabwareId: `${primaryLabwareUuid}:${topLabwareDefURI}`,
+          adapterLabwareId:
+            adapterLabwareUuid != null
+              ? `${adapterLabwareUuid}:${adapterDefURI}`
+              : null,
+          lidLabwareId:
+            lidLabwareUuid != null ? `${lidLabwareUuid}:${lidDefURI}` : null,
         }
-      }
+        dispatch(
+          createContainer({
+            slot: moduleId,
+            labwareDefURIStack,
+            uuids,
+          })
+        )
+        // handle hopper state update
+        dispatch(
+          updateStackerModuleState({
+            moduleId: module.id,
+            moduleState: {
+              ...currentModuleState,
+              storedLabwareDetails: {
+                primaryLabwareURI: topLabwareDefURI,
+                adapterLabwareURI: adapterDefURI,
+                lidLabwareURI: lidDefURI,
+              },
+              labwareInHopper:
+                currentModuleState.labwareInHopper != null
+                  ? [...currentModuleState.labwareInHopper, hopperUpdate]
+                  : [hopperUpdate],
+            },
+          })
+        )
+      })
     }
   }
 }
