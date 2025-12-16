@@ -12,6 +12,7 @@ import {
   StyledText,
   Toolbox,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
 
 import {
   createContainer,
@@ -23,7 +24,6 @@ import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-co
 
 import { LabwareButtonBasket } from '../../molecules'
 import { useKitchen } from '../Kitchen/useKitchen'
-import { getHopperStackLimit } from '../SelectLabwareModal/utils'
 import styles from './labwareToolbox.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -66,18 +66,27 @@ export function LabwareStackToolbox({
   const labwareStack: string[] =
     labwareId != null ? (labware[labwareId]?.stack ?? []) : []
   const filteredLabwareStack = labwareStack.filter(id => labware[id] != null)
-  const zHeight =
-    labwareId != null ? labware[labwareId].def.dimensions.zDimension : 0
-  const hopperStackLimit = getHopperStackLimit(zHeight)
-  const handleAddAnotherLabware = (): void => {
-    if (filteredLabwareStack.length < hopperStackLimit) {
-      dispatch(
-        createContainer({
-          labwareDefURIStack: [labware[labwareId ?? '']?.labwareDefURI ?? ''],
-          slot: labwareId ?? '',
-          updateSelectedLabwareId: true,
+  const hopperStackLimit =
+    labwareId != null
+      ? getMaxPoolCount({
+          labwareDefinitions: {
+            primary: labware[labwareId].def,
+            adapter: null,
+            lid: null,
+          },
+          model: FLEX_STACKER_MODULE_V1,
         })
-      )
+      : 0
+  const handleAddAnotherLabware = (): void => {
+    if (filteredLabwareStack.length < hopperStackLimit && labwareId != null) {
+      if (labware[labwareId].labwareDefURI)
+        dispatch(
+          createContainer({
+            labwareDefURIStack: [labware[labwareId]?.labwareDefURI ?? ''],
+            slot: labwareId,
+            updateSelectedLabwareId: true,
+          })
+        )
     } else {
       makeSnackbar(t('no_more_space_in_slot') as string)
     }

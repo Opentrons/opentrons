@@ -27,10 +27,12 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_V1,
   getAreSlotsHorizontallyAdjacent,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
   getLabwareDefURI,
+  getMaxPoolCount,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
@@ -61,7 +63,6 @@ import {
 import { getMainPagePortalEl } from '../Portal'
 import { SelectCustomLabware } from './SelectCustomLabware'
 import { SelectLabware } from './SelectLabware'
-import { getHopperStackLimit } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { DeckSlotId, LabwareDefinition2 } from '@opentrons/shared-data'
@@ -289,8 +290,14 @@ export function SelectLabwareModal(
       customLabwareDefs[selectedTopLabware.labwareDefURI]
 
     const amount = selectedTopLabware.amount ?? 0
-    const zHeight = selectedLabwareDef.dimensions.zDimension
-    const hopperStackLimit = getHopperStackLimit(zHeight)
+    const hopperStackLimit = getMaxPoolCount({
+      labwareDefinitions: {
+        primary: selectedLabwareDef,
+        adapter: null,
+        lid: null,
+      },
+      model: FLEX_STACKER_MODULE_V1,
+    })
     const stackLimit = isOnHopper
       ? hopperStackLimit
       : (selectedLabwareDef.stackLimit ?? STACK_LIMIT)

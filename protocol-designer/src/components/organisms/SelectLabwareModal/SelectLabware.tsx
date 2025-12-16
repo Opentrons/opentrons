@@ -9,6 +9,7 @@ import {
   ListButtonAccordionContainer,
   SPACING,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
@@ -24,7 +25,7 @@ import { getStackerDefinitions } from '../../../pages/Designer/DeckSetup/utils'
 import { TIPRACK_LID_LOADNAME } from '../../../pages/Designer/utils'
 import { SelectLabwareOnAdapter } from './SelectLabwareOnAdapter'
 import { SelectLidOnLabware } from './SelectLidOnLabware'
-import { getHopperStackLimit, getIsNestedDefinitionALid } from './utils'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -124,9 +125,8 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                   isExpanded={areCategoriesExpanded[category]}
                 >
                   {filteredLabwareByCategory[category]?.map(({ def, uri }) => {
-                    const { parameters, dimensions } = def
+                    const { parameters } = def
                     const { loadName, isTiprack } = parameters
-                    const { zDimension } = dimensions
 
                     const isAdapter = def.allowedRoles?.includes('adapter')
                     const stackingLabwareDefUris = getStackerDefinitions(
@@ -138,7 +138,14 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                       loadName,
                       category
                     )
-                    const hopperStackLimit = getHopperStackLimit(zDimension)
+                    const hopperStackLimit = getMaxPoolCount({
+                      labwareDefinitions: {
+                        primary: def,
+                        adapter: null,
+                        lid: universalLid?.[1] ?? null,
+                      },
+                      model: FLEX_STACKER_MODULE_V1,
+                    })
 
                     const stackingProps: StackingProps | null =
                       isOnHopper ||

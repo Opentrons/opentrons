@@ -8,12 +8,13 @@ import {
   ListButtonAccordionContainer,
   SPACING,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
 
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { selectLid, selectTopLabware } from '../../../labware-ingred/actions'
 import { selectors } from '../../../labware-ingred/selectors'
 import { CUSTOM_CATEGORY } from '../../../pages/Designer/DeckSetup/constants'
-import { getHopperStackLimit, getIsNestedDefinitionALid } from './utils'
+import { getIsNestedDefinitionALid } from './utils'
 
 import type { ChangeEvent } from 'react'
 import type { StackingProps } from '@opentrons/components'
@@ -71,8 +72,14 @@ export function SelectCustomLabware(
         >
           {filteredLabwareByCategory[CUSTOM_CATEGORY].map(({ uri }, index) => {
             const isTiprack = customLabwareDefs[uri].parameters.isTiprack
-            const zDimension = customLabwareDefs[uri].dimensions.zDimension
-            const hopperStackLimit = getHopperStackLimit(zDimension)
+            const hopperStackLimit = getMaxPoolCount({
+              labwareDefinitions: {
+                primary: customLabwareDefs[uri],
+                adapter: null,
+                lid: universalLid?.[1] ?? null,
+              },
+              model: FLEX_STACKER_MODULE_V1,
+            })
 
             const lidProps: StackingProps | null =
               slot !== 'offDeck' &&

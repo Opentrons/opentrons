@@ -91,7 +91,7 @@ export const createContainerAboveModule: (
       })
     )
 
-    const getTopByRole = (role: StackedLabware['role']): string | null =>
+    const getTopByRole = (role: StackedLabware['role']): StackedLabware | null  =>
       [...stackedLabware].reverse().find(lw => lw.role === role) ?? null
 
     const topPrimary = getTopByRole('primary')

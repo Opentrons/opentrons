@@ -15,8 +15,10 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
 
 import { HandleEnter } from '/protocol-designer/components/atoms'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   createContainer,
   deleteContainer,
@@ -25,7 +27,6 @@ import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
 import { maskToPositiveInteger } from '/protocol-designer/steplist/fieldLevel/processing'
 
 import { getMainPagePortalEl } from '../Portal'
-import { getHopperStackLimit } from '../SelectLabwareModal/utils'
 
 import type { ThunkDispatch } from '/protocol-designer/types'
 
@@ -42,11 +43,8 @@ export function EditLabwareQuantityModal(
   const { t } = useTranslation(['starting_deck_state', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const labwareEntities = useSelector(getLabwareEntities)
+  const labwareDefsByUri = useSelector(getLabwareDefsByURI)
   const { labwareDefURI, def } = labwareEntities[labwareId]
-  const zHeight = def.dimensions.zDimension
-  const stackingLimit = isOnHopper
-    ? getHopperStackLimit(zHeight)
-    : (def.stackLimit ?? 0)
   const labwareOfPrimaryURIOnStack = allLabwareIdsOnStack.filter(id =>
     id.includes(labwareDefURI)
   )
@@ -58,6 +56,23 @@ export function EditLabwareQuantityModal(
   )
   const labwareDefURIsInStackArray = Array.from(labwareDefURIsInStack)
   const hasLidInStack = labwareDefURIsInStackArray.length > 1
+  const labwareDefinitionsInGroup = labwareDefURIsInStackArray.map(
+    uri => labwareDefsByUri[uri]
+  )
+  const lidDefinition = labwareDefinitionsInGroup.find(def =>
+    def.allowedRoles?.includes('lid')
+  )
+  const stackingLimit = isOnHopper
+    ? getMaxPoolCount({
+        labwareDefinitions: {
+          primary: def,
+          adapter: null,
+          lid: lidDefinition ?? null,
+        },
+        model: FLEX_STACKER_MODULE_V1,
+      })
+    : (def.stackLimit ?? 0)
+
   const [quantity, setQuantity] = useState<string>(initialQuantity.toString())
   const [showError, setError] = useState<boolean>(false)
   const saveQuantity = (quantity: string): void => {
