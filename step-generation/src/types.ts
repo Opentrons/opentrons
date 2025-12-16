@@ -176,6 +176,7 @@ export interface LabwareEntity {
   def: LabwareDefinition2
   pythonName: string
 }
+
 export interface LabwareEntities {
   [labwareId: string]: LabwareEntity
 }
@@ -600,19 +601,50 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
-export interface ThermocyclerProfileStepArgs extends CommonArgs {
-  moduleId: string
+export type ThermocyclerProfileStepArgs = CommonArgs & {
   commandCreatorFnName: THERMOCYCLER_PROFILE
-  blockTargetTempHold: number | null
-  lidOpenHold: boolean
-  lidTargetTempHold: number | null
-  message?: string
+
+  moduleId: string
+
   profileElements: TCExtendedProfileParams['profileElements']
   profileTargetLidTemp: number
   profileVolume: number
+
   meta?: {
     rawProfileItems: ProfileItem[]
   }
+
+  message?: string
+} & (
+    | BlockingThermocyclerProfileStepArgs
+    | ConcurrentThermocyclerProfileStepArgs
+  )
+
+/**
+ * Emits a blocking Thermocycler profile step. The entire profile will complete
+ * before the protocol moves on to the next step.
+ *
+ * In this mode, we can do some extra things immediately after the profile ends,
+ * like open the lid or set final temperatures. ("Hold" steps.)
+ */
+interface BlockingThermocyclerProfileStepArgs {
+  concurrent: false
+  blockTargetTempHold: number | null
+  lidOpenHold: boolean
+  lidTargetTempHold: number | null
+}
+
+/**
+ * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
+ * step immediately after the profile starts, and the profile will continue in the
+ * background.
+ *
+ * Because of limitations in Protocol Engine and the Python Protocol API, this mode lacks
+ * support for running "hold" steps immediately after the profile ends, so those
+ * properties are omitted here.
+ */
+interface ConcurrentThermocyclerProfileStepArgs {
+  concurrent: true
 }
 
 export interface ThermocyclerStateStepArgs extends CommonArgs {
