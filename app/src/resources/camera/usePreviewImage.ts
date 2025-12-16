@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react'
 
-import { useCapturePreviewImage } from '@opentrons/react-api-client'
+import {
+  useAddCapturePreviewImageToRun,
+  useCapturePreviewImage,
+} from '@opentrons/react-api-client'
 
 import { MIME_TYPES } from '../dataFiles/constants'
 
@@ -13,10 +16,13 @@ export interface UsePreviewImageResult {
 }
 
 export function usePreviewImage(
-  settings: CameraImageSettings
+  settings: CameraImageSettings,
+  runId: string | null
 ): UsePreviewImageResult {
   const [isLoading, setIsLoading] = useState(false)
-  const { data, refetch } = useCapturePreviewImage(settings, {
+
+  const previewQuery = useCapturePreviewImage(settings, {
+    enabled: runId == null,
     onSettled: () => {
       setIsLoading(false)
     },
@@ -24,12 +30,35 @@ export function usePreviewImage(
       console.error('Failed to capture preview image', error)
     },
   })
+  console.log('🚀 ~ usePreviewImage ~ previewQuery:', previewQuery)
 
+  const previewWithRunQuery = useAddCapturePreviewImageToRun(
+    settings,
+    runId ?? '',
+    {
+      enabled: runId != null,
+      onSettled: () => {
+        setIsLoading(false)
+      },
+      onError: error => {
+        console.error(`Failed to capture preview image in run ${runId}`, error)
+      },
+    }
+  )
+  console.log(
+    '🚀 ~ usePreviewImage ~ previewWithRunQuery:',
+    previewWithRunQuery
+  )
+  console.log('🚀 ~ usePreviewImage ~ runId:', runId)
+
+  const { data, refetch } = runId == null ? previewQuery : previewWithRunQuery
   const imgPath = useMemo(() => {
-    if (data == null) return undefined
-
-    const blob = new Blob([data], { type: MIME_TYPES.IMAGE })
-    return URL.createObjectURL(blob)
+    if (data == null) {
+      return undefined
+    } else {
+      const blob = new Blob([data], { type: MIME_TYPES.IMAGE })
+      return URL.createObjectURL(blob)
+    }
   }, [data])
 
   const takePhoto = (): void => {

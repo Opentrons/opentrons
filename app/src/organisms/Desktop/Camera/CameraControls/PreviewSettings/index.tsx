@@ -9,8 +9,16 @@ import styles from './previewsettings.module.css'
 
 import type { CameraImageSettings } from '@opentrons/api-client'
 
-export function PreviewSettings(settings: CameraImageSettings): JSX.Element {
-  const { isLoading, imgPath, takePhoto } = usePreviewImage(settings)
+interface PreviewSettingsProps {
+  settings: CameraImageSettings
+  runId: string | null
+}
+
+export function PreviewSettings({
+  settings,
+  runId,
+}: PreviewSettingsProps): JSX.Element {
+  const { isLoading, imgPath, takePhoto } = usePreviewImage(settings, runId)
 
   return (
     <div className={styles.container}>

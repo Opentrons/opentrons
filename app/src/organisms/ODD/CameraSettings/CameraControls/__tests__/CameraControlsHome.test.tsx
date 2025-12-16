@@ -44,6 +44,7 @@ describe('CameraControlsHome', () => {
       setActiveSubView: vi.fn(),
       toggleShowControls: vi.fn(),
       settings: mockSettings,
+      runId: 'run-id-123',
     }
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,

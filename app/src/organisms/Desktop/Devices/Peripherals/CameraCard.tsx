@@ -144,6 +144,7 @@ export function CameraCard({
         createPortal(
           <CameraControls
             onClose={toggleControls}
+            runId={null}
             postCameraImageSettings={createCameraImageSettings}
           />,
           getTopPortalEl()
