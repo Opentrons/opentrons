@@ -96,7 +96,7 @@ jobs:
           pattern: frontend-unit-test-result-shard-*
           merge-multiple: true
       - name: 'Merge frontend test report shards'
-        run: yarn vitest --merge-reports
+        run: pnpm vitest --merge-reports
       - name: 'Merge frontend test coverage shards'
         run: cat ./coverage/lcov-shard-*.info > ./coverage/lcov.info
       - name: 'Upload coverage report'
