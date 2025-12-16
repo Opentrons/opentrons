@@ -10,7 +10,7 @@ export const getPipetteCapacity = (
   const maxVolume = pipetteEntity.spec.liquids.default.maxVolume
   const tipRackDefs = pipetteEntity.tiprackLabwareDef
   const chosenTipRack = tipRackDefs.find(
-    def => getLabwareDefURI(def) == tipRackDefUri
+    def => getLabwareDefURI(def) === tipRackDefUri
   )
   // TODO: Figure out why we're crashing in getTiprackVolume() because we can't
   // find the tiprack def. Maybe tipRackDefUri is null, or tipRackDefs is empty?
