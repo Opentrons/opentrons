@@ -288,9 +288,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dispatchAnalyticsEvent(FORM_WARNINGS_EVENT, visibleFormWarningsTypes)
     dispatchAnalyticsEvent(FORM_ERRORS_EVENT, visibleFormErrorsTypes)
   }, [visibleFormWarningsTypes, visibleFormErrorsTypes])
-  const moduleEntities = Object.entries(useSelector(getModuleEntities))
-  const stackerModules = moduleEntities.filter(([_, value]) => {
-    return value.type === FLEX_STACKER_MODULE_TYPE
+  const moduleEntities = Object.values(useSelector(getModuleEntities))
+  const stackerModules = moduleEntities.filter(moduleEntity => {
+    return moduleEntity.type === FLEX_STACKER_MODULE_TYPE
   })
   const numberOfStackersLoaded: AnalyticsEvent = {
     name: 'loadFlexStacker',

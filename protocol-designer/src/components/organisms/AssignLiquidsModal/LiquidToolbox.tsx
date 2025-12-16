@@ -280,18 +280,18 @@ function LiquidToolbox({
   const canEdit = !showLiquidLayoutOverlay && (hasLiquids || hasSelection)
   const { labware, modules } = useSelector(getInitialDeckSetup)
   const stackerModuleIds = Object.entries(modules).reduce<string[]>(
-    (result, [key, value]) => {
-      return value.type === FLEX_STACKER_MODULE_TYPE
-        ? result.concat(key)
-        : result
+    (stackerIds, [moduleId, moduleOnDeck]) => {
+      return moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
+        ? stackerIds.concat(moduleId)
+        : stackerIds
     },
     []
   )
 
   const labwareOnStackerWithLiquid = Object.entries(labware).filter(
-    ([, labwareDef]) =>
-      labwareDef.stack != null &&
-      stackerModuleIds.some(stacker => labwareDef.stack.includes(stacker))
+    ([, labwareInfo]) =>
+      labwareInfo.stack != null &&
+      stackerModuleIds.some(stackerId => labwareInfo.stack.includes(stackerId))
   )
   const handleConfirmClick = (): void => {
     if (labwareOnStackerWithLiquid.length > 0) {
