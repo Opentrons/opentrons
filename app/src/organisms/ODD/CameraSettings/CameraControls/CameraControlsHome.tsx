@@ -5,14 +5,12 @@ import { Icon, ListButton, StyledText } from '@opentrons/components'
 
 import { MediumButton } from '/app/atoms/buttons'
 import { zoomNumberToString } from '/app/local-resources/images/utils/cameraUtils'
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
-import { usePreviewImage } from '/app/organisms/Desktop/Camera/CameraControls/PreviewSettings/hooks/usePreviewImage'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
+import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
 import styles from '../preferences.module.css'
 import { ImagePreviewModal } from './ImagePreviewModal'
 
-// eslint-disable-next-line opentrons/no-imports-across-applications -- For active dev only
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 import type { ActiveControlView } from '.'
 
@@ -28,7 +26,12 @@ export function CameraControlsHome({
   settings,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { isLoading, imgPath, takePhoto } = usePreviewImage()
+  const { isLoading, imgPath, takePhoto } = usePreviewImage({
+    zoom: settings.zoom,
+    brightness: settings.brightness,
+    contrast: settings.contrast,
+    saturation: settings.saturation,
+  })
 
   const [showModal, setShowModal] = useState(false)
 

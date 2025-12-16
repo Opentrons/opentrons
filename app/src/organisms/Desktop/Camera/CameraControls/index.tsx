@@ -66,7 +66,12 @@ export function CameraControls({
       <div className={styles.container}>
         <div className={styles.content_container}>
           <CameraControlSettings settings={settings} />
-          <PreviewSettings />
+          <PreviewSettings
+            zoom={settings.zoom}
+            brightness={settings.brightness}
+            contrast={settings.contrast}
+            saturation={settings.saturation}
+          />
         </div>
         <div className={styles.footer_container}>
           <TextOnlyButton
