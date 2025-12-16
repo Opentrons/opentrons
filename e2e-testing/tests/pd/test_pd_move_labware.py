@@ -68,7 +68,6 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     editor.open_add_step_menu()
     editor.verify_add_step_menu_options()
     editor.select_step_type("Move")
-    page.get_by_test_id("dropdownMenu").first.click()
     editor.toggle_checkbox("Use gripper")
 
     ####NOTE: Offdeck is incorrect and likely a bug, but leaving for the purpose of running tests

@@ -55,9 +55,9 @@ const DeckLabelSetComponent = (
         <StyledBox
           width={width}
           height={height}
-          isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
+          $isZoomed={deckLabels.length > 0 ? deckLabels[0].isZoomed : true}
           data-testid="DeckLabeSet"
-          showBorder={showBorder}
+          $showBorder={showBorder}
         />
         {showModuleIcon && (
           <IconWrapper leftPosition={width - 16}>
@@ -90,19 +90,17 @@ export const DeckLabelSet = forwardRef<HTMLDivElement, DeckLabelSetProps>(
 )
 
 interface StyledBoxProps {
-  isZoomed: boolean
-  showBorder: boolean
+  $isZoomed: boolean
+  $showBorder: boolean
 }
 
-const StyledBox = styled(Box).withConfig({
-  shouldForwardProp: prop => prop !== 'isZoomed' && prop !== 'showBorder',
-})<StyledBoxProps>`
+const StyledBox = styled(Box)<StyledBoxProps>`
   border-radius: ${BORDERS.borderRadius4};
-  border: ${({ isZoomed, showBorder }) => {
-    if (!showBorder) {
+  border: ${({ $isZoomed, $showBorder }) => {
+    if (!$showBorder) {
       return 'none'
     }
-    const width = isZoomed ? '1.5px' : '3px'
+    const width = $isZoomed ? '1.5px' : '3px'
     return `${width} solid ${COLORS.blue50}`
   }};
 `
