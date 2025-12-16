@@ -2,7 +2,7 @@
 
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional, Union, AsyncGenerator, Callable
+from typing import Dict, Optional, Union, AsyncGenerator, Callable, Tuple
 
 from opentrons_shared_data.errors import (
     ErrorCodes,
@@ -58,6 +58,7 @@ from .actions import (
     AddLabwareDefinitionAction,
     AddLiquidAction,
     AddCameraSettingsAction,
+    AddCameraCaptureImageSettingsAction,
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddModuleAction,
@@ -654,6 +655,23 @@ class ProtocolEngine:
         camera_settings = self.state_view.camera.get_enablement_settings()
         assert camera_settings is not None
         return camera_settings
+
+    def add_camera_capture_image_settings_to_state(
+        self,
+        camera_id: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        pan: Optional[Tuple[int, int]] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Add new camera capture image settings to the engine state."""
+        self._action_dispatcher.dispatch(
+            AddCameraCaptureImageSettingsAction(
+                camera_id, resolution, zoom, pan, contrast, brightness, saturation
+            )
+        )
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
         """Add a labware definition to the state for subsequent labware loads."""

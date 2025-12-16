@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next'
 import {
   AlertPrimaryButton,
   ALIGN_CENTER,
-  COLORS,
   DIRECTION_COLUMN,
   Flex,
   Icon,
@@ -106,7 +105,6 @@ export function ConfirmCancelModal(
             </Link>
           )}
           <AlertPrimaryButton
-            backgroundColor={COLORS.red50}
             onClick={cancelRun}
             disabled={isCanceling}
             minWidth="8rem"

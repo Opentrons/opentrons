@@ -1,4 +1,4 @@
-@import '@opentrons/components/styles';
+@import url('@opentrons/components/styles');
 
 .upload_group {
   width: 75%;
@@ -12,7 +12,7 @@
 
 .file_input {
   position: fixed;
-  clip: rect(1px 1px 1px 1px);
+  clip-path: rect(1px 1px 1px 1px);
 }
 
 .upload_button {

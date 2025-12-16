@@ -391,6 +391,9 @@ export const getFormErrors = (
         moduleEntities,
         labwareEntities
       )
+    default:
+      stepType satisfies never // if TypeScript complains here, you missed a stepType above
+      throw new Error(`Unknown step type: ${stepType}`)
   }
 }
 

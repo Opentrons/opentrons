@@ -62,7 +62,7 @@ import {
   AbsorbanceReaderTools,
   CameraTools,
   CommentTools,
-  FlexStackerToolsContainer,
+  FlexStackerTools,
   HeaterShakerTools,
   MagnetTools,
   MixTools,
@@ -108,7 +108,7 @@ const STEP_FORM_MAP: StepFormMap = {
   comment: CommentTools,
   camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
-  flexStacker: FlexStackerToolsContainer,
+  flexStacker: FlexStackerTools,
 }
 
 // used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings

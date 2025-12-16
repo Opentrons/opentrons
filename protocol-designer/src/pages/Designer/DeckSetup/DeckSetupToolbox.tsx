@@ -19,7 +19,15 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { ABSORBANCE_READER_V1 } from '@opentrons/shared-data'
+import {
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleType,
+} from '@opentrons/shared-data'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  getIsSlotAHopper,
+} from '@opentrons/step-generation'
 
 import {
   LINK_BUTTON_STYLE,
@@ -44,6 +52,7 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
@@ -145,21 +154,31 @@ export function DeckSetupToolbox(
   const handleConfirm = (): void => {
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
+    const isHopperSlot = getIsSlotAHopper(slot)
+    // TODO (nd: 12/12/2025): add back this check in a refactor to properly dispatch stacker state updates
+    const isOnShuttle =
+      !isHopperSlot &&
+      selectedModuleModel != null &&
+      getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
     }
+    //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
+    // TODO (nd: 12/11/2025): refactor how we create labware stacks in the hopper
     if (hasModule) {
       dispatch(
         createContainerAboveModule({
-          slot,
-          labwareDefURIStack: [
-            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
-            ...(selectedTopLabware.labwareDefURI != null
-              ? [selectedTopLabware.labwareDefURI]
-              : []),
-            ...(selectedLidLabware != null ? [selectedLidLabware] : []),
-          ],
+          slot: isHopperSlot
+            ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+            : slot,
+          labwareDefURIGroup: {
+            adapterDefURI: selectedAdapterDefURI,
+            topLabwareDefURI: selectedTopLabware.labwareDefURI,
+            lidDefURI: selectedLidLabware,
+          },
+          isOnShuttle,
         })
       )
     } else {
@@ -217,6 +236,11 @@ export function DeckSetupToolbox(
     }
   }
 
+  const displaySlot = getIsSlotAHopper(slot)
+    ? t('shared:stacker', {
+        slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
+      })
+    : slot
   return (
     <>
       {showSelectLabwareModal ? (
@@ -248,7 +272,7 @@ export function DeckSetupToolbox(
               deckLabel={
                 slot === 'offDeck' || deckSetup.labware[slot] != null
                   ? i18n.format(t('off_deck_title'), 'upperCase')
-                  : slot
+                  : displaySlot
               }
             />
             <StyledText desktopStyle="bodyLargeSemiBold">

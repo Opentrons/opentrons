@@ -16,9 +16,10 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
 
+import { CenterLabwareInModuleChildSlot } from '../alignment'
 import { LabwareRender } from '../Labware'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
-import { AlignLabwareToModule, Module as ModuleComponent } from './'
+import { Module as ModuleComponent } from './'
 
 import type { Meta, StoryFn } from '@storybook/react'
 import type { LabwareDefinition, ModuleModel } from '@opentrons/shared-data'
@@ -79,7 +80,7 @@ const Template: StoryFn<{
         childrenPositioningMode="passThrough"
       >
         {labwareDef != null ? (
-          <AlignLabwareToModule
+          <CenterLabwareInModuleChildSlot
             deckId={null}
             slotId={null}
             moduleDefinition={moduleDef}
@@ -89,7 +90,7 @@ const Template: StoryFn<{
               definition={labwareDef}
               positioningMode="passThrough"
             />
-          </AlignLabwareToModule>
+          </CenterLabwareInModuleChildSlot>
         ) : null}
       </ModuleComponent>
     </RobotCoordinateSpace>

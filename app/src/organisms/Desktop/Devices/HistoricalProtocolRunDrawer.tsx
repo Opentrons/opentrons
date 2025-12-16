@@ -37,7 +37,6 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { LegacyOffsetVector } from '/app/molecules/LegacyOffsetVector'
 import { downloadFile } from '/app/organisms/Desktop/Devices/utils'
 import {
   SOURCE_RUN_RECORD,
@@ -47,6 +46,7 @@ import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 
+import { OffsetTag } from '../../LabwarePositionCheck'
 import { DownloadCsvFileLink } from './DownloadCsvFileLink'
 import { useDeckCalibrationData } from './hooks'
 
@@ -267,7 +267,6 @@ export function HistoricalProtocolRunDrawer(
                 THERMOCYCLER_MODULE_TYPE
                 ? thermocyclerLocation
                 : offset.location.slotName
-
             return (
               <Flex
                 key={`labware_offset_${index}`}
@@ -302,12 +301,13 @@ export function HistoricalProtocolRunDrawer(
                     />
                   )}
                 </Flex>
-                <Box width="25%">
-                  <LegacyOffsetVector
-                    {...offset.vector}
-                    fontSize={TYPOGRAPHY.fontSizeLabel}
-                    as="p"
-                  />
+                <Box width="26%">
+                  <Flex
+                    flexDirection={DIRECTION_COLUMN}
+                    gridGap={SPACING.spacing8}
+                  >
+                    <OffsetTag kind="vector" {...offset.vector} />
+                  </Flex>
                 </Box>
               </Flex>
             )
@@ -392,7 +392,7 @@ function ImagesFileDataRow({
   const { data: imagesZipFile, isLoading } = useAllRunImagesRaw(run.id)
   const formattedRunTs = format(new Date(run.createdAt), 'yyyyMMdd-HHmmss')
   const buildImagesZipName = (): string =>
-    `${robotName}_${protocolName}_${formattedRunTs}_${t('images')}.zip`
+    `${robotName}_${protocolName}_${formattedRunTs}.zip`
 
   return (
     <Flex

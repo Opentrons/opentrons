@@ -31,11 +31,10 @@ export default {
   parameters: VIEWPORT.touchScreenViewport,
 } as Meta
 
-interface TextListTableContentStoryProps
-  extends Omit<
-    ComponentProps<typeof TextListTableContentComponent>,
-    'children'
-  > {
+interface TextListTableContentStoryProps extends Omit<
+  ComponentProps<typeof TextListTableContentComponent>,
+  'children'
+> {
   rowCount: number
 }
 

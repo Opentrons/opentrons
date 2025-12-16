@@ -6,9 +6,11 @@ import reduce from 'lodash/reduce'
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
+  getMaxPoolCount,
   getMmFromBottom,
   getWellNamePerMultiTip,
   linearInterpolate,
@@ -37,6 +39,7 @@ import {
 import {
   CLEAN,
   EMPTY,
+  HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
   ZERO_OFFSET,
@@ -62,6 +65,7 @@ import type {
 import type {
   CommandCreator,
   CurriedCommandCreator,
+  FlexStackerModuleState,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -1102,23 +1106,26 @@ export const getTransferPlanAndReferenceVolumes = (args: {
           conditioningByVolume
         ) ?? 0)
       : 0
+
+  const isCustomTiprack = tiprackDefinition?.namespace !== 'opentrons'
   const isMultiDispenseAvailable =
-    conditioningByVolume != null &&
-    disposalByVolume != null &&
-    maxWorkingVolume >=
-      minVolumeForMultiAspirateDispense +
-        conditioningVolumeForMultiAspirateDispense +
-        (linearInterpolate(
-          minVolumeForMultiAspirateDispense,
-          disposalByVolume
-        ) ?? 0) +
-        // don't take air gap into account if conditioning volume is present
-        (conditioningVolumeForMultiAspirateDispense === 0
-          ? (linearInterpolate(
-              minVolumeForMultiAspirateDispense,
-              aspirateAirGapByVolume
-            ) ?? 0)
-          : 0)
+    isCustomTiprack ||
+    (conditioningByVolume != null &&
+      disposalByVolume != null &&
+      maxWorkingVolume >=
+        minVolumeForMultiAspirateDispense +
+          conditioningVolumeForMultiAspirateDispense +
+          (linearInterpolate(
+            minVolumeForMultiAspirateDispense,
+            disposalByVolume
+          ) ?? 0) +
+          // don't take air gap into account if conditioning volume is present
+          (conditioningVolumeForMultiAspirateDispense === 0
+            ? (linearInterpolate(
+                minVolumeForMultiAspirateDispense,
+                aspirateAirGapByVolume
+              ) ?? 0)
+            : 0))
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
@@ -1362,4 +1369,62 @@ export const getLabwareIdOnHopper = (
   const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
   const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
   return labwareIdOnModule
+}
+
+export const getIsSlotAHopper = (slot: string): boolean => {
+  return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getLabwareIdOnShuttle = (
+  stackerState: FlexStackerModuleState
+): string | null => {
+  return stackerState.labwareOnShuttle?.primaryLabwareId ?? null
+}
+
+export const labwareMatchesLabwareInHopper = (
+  labwareId: string,
+  invariantContext: InvariantContext,
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  const loadedLabware = stackerState?.storedLabwareDetails?.primaryLabwareURI
+  const labwareToBeStoredEntity = invariantContext.labwareEntities[labwareId]
+  const { labwareDefURI: labwareURIToBeStored } = labwareToBeStoredEntity ?? {}
+  return loadedLabware == null || loadedLabware === labwareURIToBeStored
+}
+
+export const getIsSpaceInHopper = (
+  stackerState: FlexStackerModuleState | null,
+  labwareEntities: LabwareEntities
+): boolean => {
+  const { storedLabwareDetails } = stackerState ?? {}
+  if (storedLabwareDetails == null) {
+    return true
+  }
+  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    storedLabwareDetails
+  const primaryLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === primaryLabwareURI
+  )
+  const adapterLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === adapterLabwareURI
+  )
+  const lidLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === lidLabwareURI
+  )
+  if (primaryLabwareEntity == null) {
+    console.error('Primary labware entity not found')
+    return false
+  }
+
+  const maximumAllowedLabware = getMaxPoolCount({
+    labwareDefinitions: {
+      primary: primaryLabwareEntity.def,
+      adapter: adapterLabwareEntity?.def ?? null,
+      lid: lidLabwareEntity?.def ?? null,
+    },
+    model: FLEX_STACKER_MODULE_V1,
+  })
+  const labwareStored = stackerState?.labwareInHopper
+  const numberOfLabwareStored = labwareStored?.length ?? 0
+  return maximumAllowedLabware > numberOfLabwareStored
 }

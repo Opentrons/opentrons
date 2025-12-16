@@ -1,0 +1,61 @@
+.list_item {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16);
+}
+
+.padding_x {
+  padding: 0 var(--spacing-16);
+}
+
+.radio_button_container {
+  display: flex;
+  flex-direction: column;
+  padding: 0; /* ensure padding exists before gap if needed */
+  gap: var(--spacing-4);
+}
+
+.refill_settings_container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16);
+  gap: var(--spacing-12);
+}
+
+.selected_labware_container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
+}
+
+.shuttle_stacker_container {
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-16);
+  gap: var(--spacing-8);
+}
+
+.space_between {
+  justify-content: space-between;
+}
+
+.title {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-8);
+}
+
+.title_container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tools_container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-16) 0;
+  gap: var(--spacing-12);
+}

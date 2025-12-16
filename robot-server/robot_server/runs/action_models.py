@@ -1,12 +1,13 @@
 """Request and response models for controlling runs with actions."""
 from datetime import datetime
-from enum import Enum
 from pydantic import BaseModel, Field
+
+from opentrons_shared_data.util import StrEnum
 
 from robot_server.service.json_api import ResourceModel
 
 
-class RunActionType(str, Enum):
+class RunActionType(StrEnum):
     """The type of the run control action, which determines behavior.
 
     * `"play"`: Start the run, or resume it after it's been paused.

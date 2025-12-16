@@ -13,13 +13,14 @@ import {
 import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/CommandSteps'
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
-import { StepDetailContainer } from '/app/organisms/Desktop/ProtocolVisualization/StepDetailContainer'
 import {
+  stepDetailViewerCloseAction,
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
 } from '/app/redux/shell'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
+import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
@@ -260,6 +261,12 @@ export function VisualizerContainer(
       window.removeEventListener('mouseup', handleMouseUpRef.current)
     }
   }, [])
+
+  useEffect(() => {
+    return () => {
+      dispatch(stepDetailViewerCloseAction({ protocolKey }))
+    }
+  }, [dispatch, protocolKey])
 
   return (
     <div ref={containerRef} className={styles.layout_container}>

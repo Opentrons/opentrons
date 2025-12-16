@@ -6,7 +6,7 @@
   background-color: var(--grey-30);
 }
 
-@media (width: 1024px) and (height: 600px) {
+@media (width = 1024px) and (height = 600px) {
   .step_meter_container {
     height: var(--spacing-12);
   }

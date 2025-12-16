@@ -27,8 +27,12 @@ from ..run_models import Run
 from ..run_orchestrator_store import RunOrchestratorStore
 from ..dependencies import get_run_orchestrator_store
 from .base_router import RunNotFound, RunStopped, RunNotIdle, get_run_data_from_url
+from opentrons.config import IS_ROBOT
 
-from robot_server.service.legacy.models.settings import CameraEnable
+from robot_server.service.legacy.models.settings import (
+    CameraEnable,
+    CameraCaptureImageSettings,
+)
 
 log = logging.getLogger(__name__)
 camera_router = LightRouter()
@@ -114,5 +118,62 @@ async def add_camera_settings(
                 errorRecoveryCameraEnabled=response_data.errorRecoveryCameraEnabled,
             )
         ),
+        status_code=status.HTTP_201_CREATED,
+    )
+
+
+@PydanticResponse.wrap_route(
+    camera_router.post,
+    path="/runs/{runId}/camera/cameraSettings",
+    summary="Add run specific camera capture image settings to be used in place of the system image capture defaults.",
+    description=(
+        "Add run-specific camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's `data` will be the image capture settings provided once set."
+    ),
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_201_CREATED: {"model": SimpleBody[CameraCaptureImageSettings]},
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[RunNotFound]},
+        status.HTTP_409_CONFLICT: {"model": ErrorBody[Union[RunStopped, RunNotIdle]]},
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def add_camera_capture_image_settings(
+    request_body: RequestModel[CameraCaptureImageSettings],
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
+) -> PydanticResponse[SimpleBody[CameraCaptureImageSettings]]:
+    """Add run specific camera capture image settings to be used in place of the global camera image capture settings.
+
+    Args:
+        request_body: New camera capture image settings from request body.
+        run_orchestrator_store: Engine storage interface.
+        run: Run response data by ID from URL; ensures 404 if run not found.
+        robot_type: Used to validate robot type for live stream service.
+        camera_provider: Access to the camera settings and related services.
+    """
+    if IS_ROBOT and not camera.camera_exists():
+        # todo(chb): Eventually we'll have mulitple camera ids that can be sent, so this should be able to verify more than just the default
+        raise LegacyErrorResponse(
+            message="Video device is unavailable.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+    if run.current is False:
+        raise RunStopped(detail=f"Run {run.id} is not the current run").as_error(
+            status.HTTP_409_CONFLICT
+        )
+
+    run_orchestrator_store.add_camera_capture_image_settings(
+        capture_image_settings=request_body.data
+    )
+    log.info(
+        f'Added unique camera capture image settings "{request_body.data}" to run "{run.id}".'
+    )
+
+    return await PydanticResponse.create(
+        content=SimpleBody.model_construct(data=request_body.data),
         status_code=status.HTTP_201_CREATED,
     )

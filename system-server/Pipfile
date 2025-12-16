@@ -49,4 +49,4 @@ build = "~=1.2.0"
 pytest-lazy-fixtures = "<2,>=1.1.4"
 
 [requires]
-python_version = "3.10"
+python_version = "3.12"
