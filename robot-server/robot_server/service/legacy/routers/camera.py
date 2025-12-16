@@ -10,7 +10,7 @@ from starlette import status
 from starlette.background import BackgroundTask
 from starlette.responses import StreamingResponse
 from opentrons.system import camera
-from opentrons.system.camera import StreamConfigurationKeys
+from opentrons.system.camera import StreamConfigurationKeys, PREVIEW_IMAGE
 from robot_server.errors.error_responses import LegacyErrorResponse
 from opentrons_shared_data.errors import ErrorCodes
 from robot_server.errors.error_responses import ErrorBody
@@ -51,9 +51,6 @@ JPG = "image/jpg"
 # todo(chb, 2025-09-19): This temporary for an initial implementation while we determine if some units will ship without cameras
 DEFAULT_CAMERA_ID = "ot_system_camera"
 DEFAULT_CAMERA_PATH = f"/dev/{DEFAULT_CAMERA_ID}"
-
-# Default Preview Image Filename
-PREVIEW_IMAGE = "preview_image.jpeg"
 
 
 @router.post(
@@ -174,12 +171,9 @@ async def get_camera(
 )
 async def post_camera_preview_image(
     request_body: RequestModel[CameraCaptureImageSettings],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
     camera_settings_store: Annotated[
         CameraSettingStore, Depends(get_camera_setting_store)
-    ],
-    run: Annotated[Run, Depends(get_run_data_from_url)],
-    run_orchestrator_store: Annotated[
-        RunOrchestratorStore, Depends(get_run_orchestrator_store)
     ],
     images_directory: Annotated[Path, Depends(get_images_directory)],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
@@ -187,20 +181,18 @@ async def post_camera_preview_image(
     """
     Return a preview image based on the provided capture image settings.
     """
+    if run_data_manager.current_run_id is not None and (
+        run_data_manager.get(run_data_manager.current_run_id).status
+        not in [EngineStatus.STOPPED, EngineStatus.FAILED, EngineStatus.SUCCEEDED]
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str("Cannot capture preview photo, run is active."),
+        )
+
     _validate_camera_present()
 
-    if run.current is True:
-        if (
-            run_orchestrator_store.get_state_summary().cameraSettings is not None
-            and run_orchestrator_store.get_state_summary().cameraSettings.cameraEnabled
-            is False
-        ):
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=str("Cannot capture preview photo, camera is disabled in run."),
-            )
-
-    elif not camera_settings_store.get_camera_enabled():
+    if not camera_settings_store.get_camera_enabled():
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=str("Cannot capture preview photo, camera is disabled on robot."),

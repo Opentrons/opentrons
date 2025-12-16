@@ -1,45 +1,20 @@
 import os
 from mock import patch
-from datetime import datetime
 import pytest
 import tempfile
 from pathlib import Path
 from opentrons.system import camera
 from decoy import Decoy
-from robot_server.runs.run_models import Run
-from opentrons.protocol_engine import EngineStatus, StateSummary
 from opentrons.protocol_engine.resources.camera_provider import ImageParameters
 from robot_server.runs.run_data_manager import (
     RunStore,
     RunOrchestratorStore,
+    RunDataManager,
 )
 from robot_server.service.json_api import RequestModel
 from robot_server.service.legacy.routers.camera import post_camera_preview_image
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 from robot_server.camera.settings.store import CameraSettingStore
-from opentrons.protocol_engine.resources.camera_provider import CameraSettings
-
-
-@pytest.fixture()
-def run() -> Run:
-    """Get a fixture Run response data."""
-    return Run(
-        id="run-id",
-        createdAt=datetime(year=2021, month=1, day=1),
-        status=EngineStatus.IDLE,
-        current=True,
-        actions=[],
-        errors=[],
-        pipettes=[],
-        labware=[],
-        modules=[],
-        labwareOffsets=[],
-        protocolId=None,
-        liquids=[],
-        liquidClasses=[],
-        outputFileIds=[],
-        hasEverEnteredErrorRecovery=False,
-    )
 
 
 @pytest.fixture
@@ -105,6 +80,12 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_run_orchestrator_store(decoy: Decoy) -> RunOrchestratorStore:
     """Get a mock EngineStore interface."""
     return decoy.mock(cls=RunOrchestratorStore)
+
+
+@pytest.fixture()
+def mock_run_data_manager(decoy: Decoy) -> RunDataManager:
+    """Get a mock EngineStore interface."""
+    return decoy.mock(cls=RunDataManager)
 
 
 @pytest.fixture
@@ -285,30 +266,12 @@ async def test_camera_stream_settings_ot2(api_client_camera_overrides, decoy: De
 async def test_camera_preview_image(
     decoy: Decoy,
     mock_camera_setting_store: CameraSettingStore,
-    mock_run_orchestrator_store: RunOrchestratorStore,
-    run: Run,
+    mock_run_data_manager: RunDataManager,
 ):
     """
     Test that we can send a POST request for a preview image with a collection of image settings.
     """
     with tempfile.NamedTemporaryFile() as conf:
-        decoy.when(mock_run_orchestrator_store.get_state_summary()).then_return(
-            StateSummary(
-                status="idle",
-                errors=[],
-                hasEverEnteredErrorRecovery=False,
-                labware=[],
-                pipettes=[],
-                modules=[],
-                labwareOffsets=[],
-                cameraSettings=CameraSettings(
-                    cameraEnabled=True,
-                    liveStreamEnabled=False,
-                    errorRecoveryCameraEnabled=False,
-                ),
-            )
-        )
-
         response = await post_camera_preview_image(
             request_body=RequestModel(
                 data=CameraCaptureImageSettings(
@@ -322,8 +285,7 @@ async def test_camera_preview_image(
                 )
             ),
             camera_settings_store=mock_camera_setting_store,
-            run=run,
-            run_orchestrator_store=mock_run_orchestrator_store,
+            run_data_manager=mock_run_data_manager,
             images_directory=Path(conf.name),
             robot_type="OT-3 Standard",
         )

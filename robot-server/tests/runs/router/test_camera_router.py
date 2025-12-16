@@ -1,11 +1,16 @@
 """Tests for camera /runs/{runId}/camera routes."""
 import pytest
 from datetime import datetime
+from pathlib import Path
+import tempfile
 from decoy import Decoy
 
 from robot_server.service.json_api import RequestModel
 
-from robot_server.runs.router.camera_router import add_camera_capture_image_settings
+from robot_server.runs.router.camera_router import (
+    add_camera_capture_image_settings,
+    post_camera_preview_image,
+)
 
 from robot_server.service.legacy.models.settings import (
     CameraCaptureImageSettings,
@@ -14,6 +19,12 @@ from robot_server.service.legacy.models.settings import (
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from opentrons.protocol_engine import EngineStatus
+from opentrons.protocol_engine.resources.camera_provider import ImageParameters
+from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+from robot_server.camera.settings.store import CameraSettingStore
+from opentrons.protocol_engine.resources.camera_provider import CameraSettings
+from opentrons.protocol_engine import StateSummary
+from opentrons.system import camera
 
 
 @pytest.fixture()
@@ -76,3 +87,62 @@ async def test_camera_settings(
 
     assert result.content.data == image_settings
     assert result.status_code == 201
+
+
+async def test_camera_preview_image(
+    decoy: Decoy,
+    mock_camera_setting_store: CameraSettingStore,
+    run: Run,
+):
+    """
+    Test that we can request a preview image with a collection of image settings based on run specific enablement.
+    """
+    with tempfile.NamedTemporaryFile() as conf:
+        decoy.when(mock_run_orchestrator_store.get_state_summary()).then_return(
+            StateSummary(
+                status="idle",
+                errors=[],
+                hasEverEnteredErrorRecovery=False,
+                labware=[],
+                pipettes=[],
+                modules=[],
+                labwareOffsets=[],
+                cameraSettings=CameraSettings(
+                    cameraEnabled=True,
+                    liveStreamEnabled=False,
+                    errorRecoveryCameraEnabled=False,
+                ),
+            )
+        )
+
+        response = await post_camera_preview_image(
+            request_body=RequestModel(
+                data=CameraCaptureImageSettings(
+                    cameraId=None,
+                    resolution=(720, 1280),
+                    zoom=1.5,
+                    pan=(0, 0),
+                    contrast=25.0,
+                    brightness=50.0,
+                    saturation=75.0,
+                )
+            ),
+            camera_settings_store=mock_camera_setting_store,
+            run=run,
+            images_directory=Path(conf.name),
+            robot_type="OT-3 Standard",
+        )
+        decoy.verify(
+            await camera.image_capture(
+                robot_type="OT-3 Standard",
+                parameters=ImageParameters(
+                    resolution=(720, 1280),
+                    zoom=1.5,
+                    pan=(0, 0),
+                    contrast=0.5,
+                    brightness=0,
+                    saturation=1.5,
+                ),
+            ),
+            times=1,
+        )

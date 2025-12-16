@@ -1,9 +1,11 @@
 """Router for /runs endpoints dealing with run specific camera settings and behavior."""
 
 import logging
+import os
 from typing import Annotated, Union
-
-from fastapi import Depends, status
+from pathlib import Path
+from fastapi import Depends, status, HTTPException, Response
+from fastapi.responses import FileResponse
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
@@ -22,6 +24,13 @@ from robot_server.camera.fastapi_dependencies import (
     get_camera_provider,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from robot_server.camera.settings.store import (
+    CameraSettingStore,
+    get_camera_setting_store,
+)
+from opentrons.protocol_engine.resources.camera_provider import ImageParameters
+from robot_server.persistence.fastapi_dependencies import get_images_directory
+from robot_server.data_files.models import FileNotFound
 
 from ..run_models import Run
 from ..run_orchestrator_store import RunOrchestratorStore
@@ -33,6 +42,7 @@ from robot_server.service.legacy.models.settings import (
     CameraEnable,
     CameraCaptureImageSettings,
 )
+from opentrons.protocol_engine import EngineStatus
 
 log = logging.getLogger(__name__)
 camera_router = LightRouter()
@@ -176,4 +186,92 @@ async def add_camera_capture_image_settings(
     return await PydanticResponse.create(
         content=SimpleBody.model_construct(data=request_body.data),
         status_code=status.HTTP_201_CREATED,
+    )
+
+
+@PydanticResponse.wrap_route(
+    camera_router.post,
+    path="/runs/{runId}/camera/capturePreviewImage",
+    summary="Capture a preview image based on provided settings and the run specific camera enablement.",
+    description="Return a preview image based on provided capture image settings.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
+    },
+)
+async def post_camera_preview_image(
+    request_body: RequestModel[CameraCaptureImageSettings],
+    run: Annotated[Run, Depends(get_run_data_from_url)],
+    images_directory: Annotated[Path, Depends(get_images_directory)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
+) -> Response:
+    """
+    Return a preview image based on the provided capture image settings and run specific enablement.
+    """
+    if IS_ROBOT and not camera.camera_exists():
+        # todo(chb): Eventually we'll have mulitple camera ids that can be sent, so this should be able to verify more than just the default
+        raise LegacyErrorResponse(
+            message="Video device is unavailable.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    if run.status not in [
+        EngineStatus.IDLE,
+        EngineStatus.STOPPED,
+        EngineStatus.FAILED,
+        EngineStatus.SUCCEEDED,
+    ]:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str("Cannot capture preview photo, run is not inactive."),
+        )
+
+    image_data = await camera.image_capture(
+        robot_type=robot_type,
+        parameters=ImageParameters(
+            resolution=request_body.data.resolution,
+            zoom=request_body.data.zoom,
+            pan=request_body.data.pan,
+            contrast=(
+                (request_body.data.contrast / 100) * 2.0
+                if request_body.data.contrast is not None
+                else None
+            ),
+            brightness=(
+                int(((request_body.data.brightness * 256) // 100) - 128) * -1
+                if request_body.data.brightness is not None
+                else None
+            ),
+            saturation=(
+                (request_body.data.saturation / 100) * 2.0
+                if request_body.data.saturation is not None
+                else None
+            ),
+        ),
+    )
+
+    file_path = images_directory / camera.PREVIEW_IMAGE
+
+    if IS_ROBOT:
+        if isinstance(image_data, bytes):
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+            with open(file=file_path, mode="wb") as f:
+                f.write(image_data)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=str(
+                    f"Preview image capture failed with the following: {image_data.message}"
+                ),
+            )
+
+        if not file_path.exists():
+            raise FileNotFound(detail="Preview image file not found.").as_error(
+                status.HTTP_404_NOT_FOUND
+            )
+
+    return FileResponse(
+        path=file_path,
+        media_type="image/jpeg",
+        filename=camera.PREVIEW_IMAGE,
     )
