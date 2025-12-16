@@ -335,10 +335,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]} // Module Component already handles nested positioning
                     setHoveredLabware={setHoveredLabware}
                     setDraggedLabware={setDraggedLabware}
-                    //  TODO: disallow the ability to drag/drop labware from the hopper and shuttle
                     swapBlocked={false}
                     labwareOnDeck={activeLabware[hopperTopMostId]}
                     isSelected={selectedZoomInSlot != null}
+                    allModules={allModules}
                   />
                 </>
               ) : null}
@@ -392,6 +392,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                       }
                       labwareOnDeck={labwareOnModule}
                       isSelected={selectedZoomInSlot != null}
+                      allModules={allModules}
                     />
                   )}
                   <ActiveLabwareControls
@@ -609,6 +610,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 }
                 labwareOnDeck={labware}
                 isSelected={selectedZoomInSlot != null}
+                allModules={allModules}
               />
             )}
             <ActiveLabwareControls
@@ -688,6 +690,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               labwareOnDeck={labware}
               isSelected={selectedZoomInSlot != null}
               terminalItemId={terminalItemId}
+              allModules={allModules}
             />
             <ActiveLabwareControls
               slotPosition={[0, 0, 0]}

@@ -31,7 +31,7 @@ export function LabwareButtonBasket(
           labware[item] ? (
             <LabwareButton
               key={`${item}_${index}`}
-              numberInStack={stackOfLabware.length - 1 - index}
+              numberInStack={stackOfLabware.length - index}
               displayName={labware[item].def.metadata.displayName}
               isSelected={selectedLabware.includes(item)}
               onClick={(id, event) => {
