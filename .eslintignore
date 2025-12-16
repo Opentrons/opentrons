@@ -12,7 +12,6 @@
 **/CHANGELOG.md
 !api/release-notes.md
 !app-shell/build/release-notes.md
-**/.yarn-cache/**
 
 # components library
 storybook-static
