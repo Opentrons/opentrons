@@ -70,14 +70,14 @@ export const createContainerAboveModule: (
     ...(lidDefURI != null ? [{ defURI: lidDefURI, role: 'lid' as const }] : []),
   ]
 
-  const stackedLabware: StackedLabware[] = Array.from({
-    length: amount,
-  }).flatMap(() =>
-    baseStack.map(item => ({
-      ...item,
-      uuid: uuid(),
-    }))
+  const labwareGroups: StackedLabware[][] = Array.from({ length: amount }).map(
+    () =>
+      baseStack.map(item => ({
+        ...item,
+        uuid: uuid(),
+      }))
   )
+  const stackedLabware = labwareGroups.flat()
 
   const labwareDefURIStack = stackedLabware.map(info => info.defURI)
   const uuids = stackedLabware.map(info => info.uuid)
