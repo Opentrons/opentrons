@@ -15,9 +15,11 @@ import { EditLabwareQuantityModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 vi.mock('/protocol-designer/labware-ingred/actions')
 vi.mock('/protocol-designer/step-forms/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
 const render = (props: ComponentProps<typeof EditLabwareQuantityModal>) => {
   return renderWithProviders(<EditLabwareQuantityModal {...props} />, {
     i18nInstance: i18n,
@@ -50,6 +52,9 @@ describe('EditLabwareQuantityModal', () => {
     }
     vi.mocked(getLabwareEntities).mockReturnValue({
       mockId: labwareEntity1,
+    })
+    vi.mocked(getLabwareDefsByURI).mockReturnValue({
+      mockURI: { ...fixture96Plate, stackLimit: 3 } as LabwareDefinition2,
     })
   })
 
