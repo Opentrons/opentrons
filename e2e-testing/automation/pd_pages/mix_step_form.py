@@ -227,7 +227,7 @@ class MixStepForm(BasePage):
             f"Could not find checkbox or switch at index {index}. "
             f"Found {self.page.get_by_role('switch').count()} switches, "
             f"{self.page.get_by_role('checkbox').count()} checkboxes, "
-            f"{self.page.locator('[data-testid*=\"checkbox\"]').count()} checkbox test IDs."
+            f"{self.page.locator('[data-testid*="checkbox"]').count()} checkbox test IDs."
         )
 
     def fill_delay_seconds(self, value: str) -> None:
