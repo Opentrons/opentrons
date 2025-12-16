@@ -44,6 +44,7 @@ describe('flexStackerFillItems', () => {
       pythonName: 'mock_flex_stacker_1',
     }
     invariantContext.labwareEntities = {
+      ...invariantContext.labwareEntities,
       [labwareId]: {
         id: labwareId,
         def: fixture96Plate as LabwareDefinition2,
@@ -135,20 +136,13 @@ describe('flexStackerFillItems', () => {
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 10,
       storedLabwareDetails: {
-        moduleId,
-        initialCount: 1,
-        primaryLabware: {
-          loadName: 'fixture_96_plate',
-          namespace: 'opentrons',
-          version: 1,
-        },
-        lidLabware: null,
-        adapterLabware: null,
+        primaryLabwareURI: 'mockURI',
+        lidLabwareURI: null,
+        adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
-    } as FlexStackerModuleState)
+    })
   })
   it('creates flex stacker fill command with 1 labware', () => {
     invariantContext.labwareEntities = {
@@ -285,31 +279,64 @@ mock_flex_stacker_1.fill_items(
   it('raises an error if the hopper is full', () => {
     vi.mocked(flexStackerStateGetter).mockReturnValue({
       labwareOnShuttle: {
-        primaryLabwareId: 'mockLabwareId',
+        primaryLabwareId: 'tiprack1Id',
         adapterLabwareId: null,
         lidLabwareId: null,
       },
       labwareInHopper: [
         {
-          primaryLabwareId: 'mockLabwareId',
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+        {
+          primaryLabwareId: 'tiprack1Id',
           adapterLabwareId: null,
           lidLabwareId: null,
         },
       ],
-      maxPoolCount: 1,
       storedLabwareDetails: {
-        moduleId,
-        initialCount: 1,
-        primaryLabware: {
-          loadName: 'fixture_96_plate',
-          namespace: 'opentrons',
-          version: 1,
-        },
-        lidLabware: null,
-        adapterLabware: null,
+        primaryLabwareURI: 'fixture/fixture_tiprack_300_ul/1',
+        lidLabwareURI: null,
+        adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
-    } as FlexStackerModuleState)
+    })
     const result = flexStackerFillItems(
       {
         moduleId,

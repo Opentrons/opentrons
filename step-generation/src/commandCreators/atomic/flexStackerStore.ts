@@ -17,7 +17,10 @@ export const flexStackerStore: CommandCreator<
   const pythonName = invariantContext.moduleEntities[moduleId].pythonName
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const labwareId = flexStackerState?.labwareOnShuttle?.primaryLabwareId ?? null
-  const isSpace = getIsSpaceInHopper(flexStackerState)
+  const isSpace = getIsSpaceInHopper(
+    flexStackerState,
+    invariantContext.labwareEntities
+  )
   if (flexStackerState !== null && !getLabwareIdOnShuttle(flexStackerState)) {
     return {
       errors: [errorCreators.flexStackerShuttleEmpty()],

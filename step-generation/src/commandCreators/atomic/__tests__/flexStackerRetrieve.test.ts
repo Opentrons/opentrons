@@ -45,6 +45,16 @@ describe('flexStackerRetrieve', () => {
     )
   })
   it('creates flex stacker retrieve command', () => {
+    vi.mocked(flexStackerStateGetter).mockReturnValue({
+      labwareInHopper: [
+        {
+          primaryLabwareId: mockLabwareId,
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        },
+      ],
+      type: FLEX_STACKER_MODULE_TYPE,
+    } as FlexStackerModuleState)
     robotState = {
       ...robotState,
       modules: {
@@ -120,7 +130,10 @@ describe('flexStackerRetrieve', () => {
       modules: {
         [mockModuleId]: {
           slot: 'D3',
-          moduleState: {} as any,
+          moduleState: {
+            labwareInHopper: null,
+            type: FLEX_STACKER_MODULE_TYPE,
+          } as FlexStackerModuleState,
         },
       },
       labware: {
@@ -159,7 +172,6 @@ describe('flexStackerRetrieve', () => {
         lidLabwareId: null,
       },
       labwareInHopper: null,
-      maxPoolCount: 10,
       storedLabwareDetails: null,
       type: FLEX_STACKER_MODULE_TYPE,
     })

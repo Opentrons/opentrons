@@ -11,12 +11,14 @@ export interface CameraStatusContainerProps {
   toggleCameraEnabled: () => void
   isCameraEnabled: boolean
   toggleDisabled: boolean
+  isFlex: boolean
 }
 
 export function CameraStatusContainer({
   toggleCameraEnabled,
   isCameraEnabled,
   toggleDisabled,
+  isFlex,
 }: CameraStatusContainerProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -34,7 +36,9 @@ export function CameraStatusContainer({
           )}
         </div>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t('camera_status_description')}
+          {isFlex
+            ? t('camera_status_description_flex')
+            : t('camera_status_description_ot2')}
         </StyledText>
       </div>
       <div className={styles.status_toggle_container}>

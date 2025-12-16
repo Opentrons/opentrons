@@ -207,7 +207,6 @@ export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
 // todo(mm, 2025-12-12): Temporarily defining FLEX_STACKER_INITIAL_STATE here until step-generation supports it.
 const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
   type: FLEX_STACKER_MODULE_TYPE,
-  maxPoolCount: 0,
   storedLabwareDetails: null,
   labwareInHopper: null,
   labwareOnShuttle: null,
@@ -272,7 +271,11 @@ const _getInitialDeckSetup = (
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
         const { id, model, type, pythonName } = moduleEntity
-        const moduleState = MODULE_INITIAL_STATES_MAP[type]
+        const baseModuleState = MODULE_INITIAL_STATES_MAP[type]
+        const moduleStateUpdate =
+          (initialSetupStep && initialSetupStep.moduleStateUpdate) || {}
+        const updatedModuleState = moduleStateUpdate[moduleId]
+        const moduleState = updatedModuleState || baseModuleState
 
         if (moduleState == null) {
           console.error(`Unknown module type: ${type}`)

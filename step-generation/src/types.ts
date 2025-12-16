@@ -2,7 +2,6 @@ import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
   FLEX_STACKER_MODULE_TYPE,
-  FlexStackerSetStoredLabwareParams,
   FlexStackerStoredLabwareGroup,
   HEATERSHAKER_MODULE_TYPE,
   Height,
@@ -19,6 +18,7 @@ import type {
   PipetteV2Specs,
   PositionReference,
   ShakeSpeedParams,
+  StackerStoredLabwareDefinitionURIs,
   TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -110,8 +110,7 @@ export interface AbsorbanceReaderState {
 
 export interface FlexStackerModuleState {
   type: typeof FLEX_STACKER_MODULE_TYPE
-  maxPoolCount: number
-  storedLabwareDetails: FlexStackerSetStoredLabwareParams | null
+  storedLabwareDetails: StackerStoredLabwareDefinitionURIs | null
   // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null

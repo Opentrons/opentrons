@@ -99,6 +99,7 @@ jobs:
       - determine-deploy-config
     timeout-minutes: 5
     runs-on: ubuntu-24.04
+    if: always() && needs.build-docs.result == 'success' && needs.determine-deploy-config.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       id-token: write
       contents: read

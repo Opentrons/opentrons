@@ -32,7 +32,10 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
         getSlotInLocationStack(stack) === moduleSlot
     )
     .map(labwareState => labwareState[0])
-  const isSpace = getIsSpaceInHopper(flexStackerState)
+  const isSpace = getIsSpaceInHopper(
+    flexStackerState,
+    invariantContext.labwareEntities
+  )
   const modulePythonName = moduleEntities[moduleId].pythonName
   const labwarePythonNames = labwareOnHopper.map(
     lwId => labwareEntities[lwId].pythonName
