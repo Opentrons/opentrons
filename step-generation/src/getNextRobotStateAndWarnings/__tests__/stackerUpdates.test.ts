@@ -5,8 +5,10 @@ import {
   getHeightOfLabwareStackFromDefinitions,
   getLabwareOverlapOffset,
   getStackerMaxPoolCountByHeight,
+  SYSTEM_LOCATION,
 } from '@opentrons/shared-data'
 
+import { HOPPER_STACKER_LOCATION } from '../../constants'
 import { getInitialRobotStateStandard, makeContext } from '../../fixtures'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
@@ -55,6 +57,11 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
         labwareOnShuttle: null,
       },
     }
+    robotState.labware = {
+      [LABWARE_ID]: {
+        stack: [LABWARE_ID, HOPPER_STACKER_LOCATION, FLEX_STACKER_ID, '1'],
+      },
+    }
   })
   afterEach(() => {
     vi.restoreAllMocks()
@@ -79,6 +86,11 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
         lidLabwareId: null,
       },
     ])
+    expect(robotState.labware).toEqual({
+      [LABWARE_ID]: {
+        stack: [LABWARE_ID, SYSTEM_LOCATION],
+      },
+    })
   })
 
   it('should remove all items from the stored stacker list if count is null', () => {
@@ -308,6 +320,14 @@ describe('flex stacker state updates forFlexStackerStore', () => {
   })
 
   it('should store the labware in the stacker', () => {
+    robotState.labware = {
+      [LABWARE_ID]: {
+        stack: [LABWARE_ID, SYSTEM_LOCATION],
+      },
+      tiprack4Id: {
+        stack: ['tiprack4Id', FLEX_STACKER_ID, '1'],
+      },
+    }
     forFlexStackerStore(
       { moduleId: FLEX_STACKER_ID, strategy: 'automatic' },
       invariantContext,
@@ -320,6 +340,11 @@ describe('flex stacker state updates forFlexStackerStore', () => {
     const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
     expect(moduleState?.labwareOnShuttle).toBeNull()
     expect(moduleState?.labwareInHopper).toHaveLength(4)
-    expect(robotState.labware.tiprack1Id.stack).toEqual(['tiprack1Id', '1'])
+    expect(robotState.labware.tiprack4Id.stack).toEqual([
+      'tiprack4Id',
+      HOPPER_STACKER_LOCATION,
+      FLEX_STACKER_ID,
+      '1',
+    ])
   })
 })

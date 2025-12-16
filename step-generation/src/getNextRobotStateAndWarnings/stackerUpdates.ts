@@ -3,6 +3,7 @@ import {
   getHeightOfLabwareStackFromDefinitions,
   getLabwareOverlapOffset,
   getStackerMaxPoolCountByHeight,
+  SYSTEM_LOCATION,
 } from '@opentrons/shared-data'
 
 import { HOPPER_STACKER_LOCATION } from '../constants'
@@ -29,6 +30,11 @@ export const forFlexStackerEmpty = (
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
+  const labwareInHopper = Object.entries(robotState.labware).filter(
+    ([, labware]) =>
+      labware.stack.includes(HOPPER_STACKER_LOCATION) &&
+      labware.stack.includes(moduleId)
+  )
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   if (moduleState != null && moduleState.labwareInHopper != null) {
     if (params.count != null) {
@@ -40,6 +46,12 @@ export const forFlexStackerEmpty = (
       moduleState.labwareInHopper = []
     }
   }
+  labwareInHopper.forEach(([labwareId]) => {
+    robotState.labware[labwareId] = {
+      ...robotState.labware[labwareId],
+      stack: [labwareId, SYSTEM_LOCATION],
+    }
+  })
 }
 
 export const forFlexStackerFillItems = (
@@ -159,8 +171,8 @@ export const forFlexStackerStore = (
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
+  const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
-
   if (moduleState != null) {
     const { labwareOnShuttle } = moduleState
     if (labwareOnShuttle != null) {
@@ -180,6 +192,8 @@ export const forFlexStackerStore = (
           robotState.labware[labwareId].stack = [
             labwareId,
             HOPPER_STACKER_LOCATION,
+            moduleId,
+            moduleSlot,
           ]
         }
       }
