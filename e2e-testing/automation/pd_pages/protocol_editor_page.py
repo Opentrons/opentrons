@@ -360,9 +360,9 @@ class ProtocolEditorPage(BasePage):
     def move_labware(self, labware: str, new_location: str) -> None:
         """Select labware and new location to move the labware."""
 
-        self.page.get_by_test_id("dropdownMenu").first.click()
+        self.page.get_by_test_id("labware_dropdownMenu").first.click()
         self.page.get_by_role("button", name=labware).click()
-        self.page.get_by_test_id("dropdownMenu").nth(1).click()
+        self.page.get_by_test_id("newLocation_dropdownMenu").first.click()
 
         if new_location == "Off-deck":
             self.page.locator("#stepFormTools").get_by_role("button", name="Off-deck").click()

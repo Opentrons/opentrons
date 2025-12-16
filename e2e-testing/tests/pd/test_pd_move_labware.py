@@ -4,10 +4,12 @@ import pytest
 from playwright.sync_api import Page, expect
 
 from automation.pd_pages import LandingPage, ProtocolEditorPage
+from utility import troubleshoot_and_pause
 
 PROTOCOL_PATH = "fixtures/protocol/9/PD_Move_Lids_Setup.py"
 
 
+@troubleshoot_and_pause
 @pytest.mark.pdE2E
 @pytest.mark.slow
 def test_move_labware_flex(page: Page, base_url: str) -> None:
@@ -68,7 +70,6 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     editor.open_add_step_menu()
     editor.verify_add_step_menu_options()
     editor.select_step_type("Move")
-    page.get_by_test_id("dropdownMenu").first.click()
     editor.toggle_checkbox("Use gripper")
 
     ####NOTE: Offdeck is incorrect and likely a bug, but leaving for the purpose of running tests
