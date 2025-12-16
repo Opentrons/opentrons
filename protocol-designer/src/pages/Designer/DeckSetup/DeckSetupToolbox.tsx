@@ -21,7 +21,8 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_V1,
-  FLEX_STACKER_MODULE_V1,
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleType,
 } from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
@@ -52,6 +53,7 @@ import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
+import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
@@ -83,7 +85,6 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] =
     useState<boolean>(false)
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
-
   const {
     createdAdapterForSlot,
     createdModuleForSlot,
@@ -154,27 +155,39 @@ export function DeckSetupToolbox(
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
     const isHopperSlot = getIsSlotAHopper(slot)
-    const isOnShuttle =
-      !isHopperSlot && selectedModuleModel === FLEX_STACKER_MODULE_V1
+    const isModuleStacker =
+      selectedModuleModel != null &&
+      getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+    const isOnShuttle = !isHopperSlot && isModuleStacker
 
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
-    if (hasModule && !isOnShuttle) {
+    if (hasModule) {
+      let flexStackerInfo: CreateContainerAboveModuleArgs['stackerInfo']
+      if (isModuleStacker) {
+        flexStackerInfo = isOnShuttle
+          ? {
+              stackerPosition: 'shuttle',
+            }
+          : {
+              stackerPosition: 'hopper',
+              amount: selectedTopLabware.amount,
+            }
+      }
       dispatch(
         createContainerAboveModule({
           slot: isHopperSlot
             ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
             : slot,
-          labwareDefURIStack: [
-            ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
-            ...(selectedTopLabware.labwareDefURI != null
-              ? [selectedTopLabware.labwareDefURI]
-              : []),
-            ...(selectedLidLabware != null ? [selectedLidLabware] : []),
-          ],
+          labwareDefURIGroup: {
+            adapterDefURI: selectedAdapterDefURI,
+            topLabwareDefURI: selectedTopLabware.labwareDefURI,
+            lidDefURI: selectedLidLabware,
+          },
+          stackerInfo: flexStackerInfo,
         })
       )
     } else {
@@ -338,10 +351,15 @@ export function DeckSetupToolbox(
                     ? {}
                     : { lidId: createdLidForSlot?.id })}
                   quantity={createdStackForSlot.length}
+                  location={slot}
                 />
               ) : null}
               {createdAdapterForSlot != null ? (
-                <LabwareCard labware={createdAdapterForSlot} quantity={1} />
+                <LabwareCard
+                  labware={createdAdapterForSlot}
+                  quantity={1}
+                  location={slot}
+                />
               ) : null}
               {slotFull ? (
                 <StyledText

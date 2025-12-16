@@ -60,7 +60,7 @@ export function GalleryContainerOverflowMenu({
     }
   })()
   const buildImagesZipName = (): string =>
-    `${robotName}_${protocolName}_${formattedRunTs}_${t('images')}.zip`
+    `${robotName}_${protocolName}_${formattedRunTs}.zip`
 
   const onDownloadZip = (): void => {
     setShowOverflowMenu(false)

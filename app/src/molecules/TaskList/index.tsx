@@ -255,7 +255,7 @@ function SubTask({
             >
               {markedBad === true && (
                 <Icon
-                  name="alert-circle"
+                  name="ot-alert"
                   backgroundColor={COLORS.yellow20}
                   color={COLORS.yellow50}
                   height="1rem"
@@ -399,7 +399,7 @@ function Task({
               >
                 {markedBad === true && (
                   <Icon
-                    name="alert-circle"
+                    name="ot-alert"
                     backgroundColor={COLORS.yellow20}
                     color={COLORS.yellow50}
                     height="1rem"

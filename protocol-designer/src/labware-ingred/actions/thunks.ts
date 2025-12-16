@@ -11,6 +11,7 @@ import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 
 import type { LabwareEntities } from '@opentrons/step-generation'
 import type { NormalizedLabware, NormalizedLabwareById } from '../../step-forms'
+import type { UpdateStackerModuleStateAction } from '../../step-forms/actions/modules'
 import type { ThunkAction } from '../../types'
 import type {
   CreateContainerAction,
@@ -35,6 +36,7 @@ export const renameLabware: (
   | RenameLabwareAction
   | ZoomedIntoSlotAction
   | OpenIngredientSelectorAction
+  | UpdateStackerModuleStateAction
 > = args => (dispatch, getState) => {
   const { labwareId } = args
   const allNicknamesById =
@@ -62,8 +64,9 @@ export const createContainer: (
   | RenameLabwareAction
   | ZoomedIntoSlotAction
   | OpenIngredientSelectorAction
+  | UpdateStackerModuleStateAction
 > = args => (dispatch, getState) => {
-  const { labwareDefURIStack, slot, updateSelectedLabwareId } = args
+  const { labwareDefURIStack, slot, updateSelectedLabwareId, uuids } = args
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const robotType = getRobotType(state)
@@ -74,8 +77,10 @@ export const createContainer: (
     getNextAvailableDeckSlot(initialDeckSetup, robotType, labwareDefForOt2HS)
   if (availableSlot) {
     let currentSlot = availableSlot
-    labwareDefURIStack.forEach(labwareUri => {
-      const id = `${uuid()}:${labwareUri}`
+    labwareDefURIStack.forEach((labwareUri, index) => {
+      const lwUuid =
+        uuids != null && uuids.length > index ? uuids[index] : uuid()
+      const id = `${lwUuid}:${labwareUri}`
       const labwareDef =
         labwareDefSelectors.getLabwareDefsByURI(state)[labwareUri]
       const labwareDisplayCategory = labwareDef.metadata.displayCategory

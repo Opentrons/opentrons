@@ -109,7 +109,8 @@ export interface TransitionProps {
 }
 
 export interface StyleProps
-  extends ColorProps,
+  extends
+    ColorProps,
     TypographyProps,
     SpacingProps,
     BorderProps,

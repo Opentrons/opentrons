@@ -16,6 +16,10 @@ let isSentryInitialized = false
 // Development can still fall back to the dev DSN if it is configured locally.
 const sentryDsn = _OT_PD_SENTRY_DSN_ ?? _OT_PD_SENTRY_DEV_DSN_
 
+// Sentry release is normally the app version, but local builds can override it
+// (e.g. `local-dev`) so locally uploaded sourcemaps resolve against local events.
+const sentryRelease = _OT_PD_SENTRY_RELEASE_ ?? _OT_PD_VERSION_
+
 const resolveSentryEnvironment = ():
   | 'production'
   | 'staging'
@@ -47,7 +51,7 @@ export const initializeSentry = (state: BaseState): void => {
       init({
         dsn: sentryDsn,
         environment: resolveSentryEnvironment(),
-        release: _OT_PD_VERSION_,
+        release: sentryRelease,
         integrations: [
           captureConsoleIntegration({ levels: ['assert'] }),
           replayIntegration(),

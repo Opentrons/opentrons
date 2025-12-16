@@ -6,9 +6,11 @@ import reduce from 'lodash/reduce'
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
+  getMaxPoolCount,
   getMmFromBottom,
   getWellNamePerMultiTip,
   linearInterpolate,
@@ -37,6 +39,7 @@ import {
 import {
   CLEAN,
   EMPTY,
+  FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
@@ -60,6 +63,7 @@ import type {
   PositionReference,
   RobotType,
 } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '../constants'
 import type {
   CommandCreator,
   CurriedCommandCreator,
@@ -1005,12 +1009,17 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
+  const isOnHopper = getIsSlotAHopper(slot)
+  const mappedLocation = isOnHopper
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
   return (
     Object.values(labware)
       .filter(
         lw =>
-          lw.stack.includes(slot) &&
-          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
+          lw.stack.includes(mappedLocation) &&
+          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
+          lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
       )
       .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
   )
@@ -1384,17 +1393,44 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
-  const loadedLabware =
-    stackerState?.storedLabwareDetails?.primaryLabware.loadName
-  const def = invariantContext.labwareEntities[labwareId].def
-  const labwareToBeStored = def.parameters.loadName
-  return loadedLabware === labwareToBeStored
+  const loadedLabware = stackerState?.storedLabwareDetails?.primaryLabwareURI
+  const labwareToBeStoredEntity = invariantContext.labwareEntities[labwareId]
+  const { labwareDefURI: labwareURIToBeStored } = labwareToBeStoredEntity ?? {}
+  return loadedLabware == null || loadedLabware === labwareURIToBeStored
 }
 
 export const getIsSpaceInHopper = (
-  stackerState: FlexStackerModuleState | null
+  stackerState: FlexStackerModuleState | null,
+  labwareEntities: LabwareEntities
 ): boolean => {
-  const maximumAllowedLabware = stackerState?.maxPoolCount ?? 0
+  const { storedLabwareDetails } = stackerState ?? {}
+  if (storedLabwareDetails == null) {
+    return true
+  }
+  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    storedLabwareDetails
+  const primaryLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === primaryLabwareURI
+  )
+  const adapterLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === adapterLabwareURI
+  )
+  const lidLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === lidLabwareURI
+  )
+  if (primaryLabwareEntity == null) {
+    console.error('Primary labware entity not found')
+    return false
+  }
+
+  const maximumAllowedLabware = getMaxPoolCount({
+    labwareDefinitions: {
+      primary: primaryLabwareEntity.def,
+      adapter: adapterLabwareEntity?.def ?? null,
+      lid: lidLabwareEntity?.def ?? null,
+    },
+    model: FLEX_STACKER_MODULE_V1,
+  })
   const labwareStored = stackerState?.labwareInHopper
   const numberOfLabwareStored = labwareStored?.length ?? 0
   return maximumAllowedLabware > numberOfLabwareStored

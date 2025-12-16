@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, List, Optional, Dict
+from typing import Any, List, Optional, Dict, Union
 from typing_extensions import Literal
 
 from pydantic import BaseModel, Field, ConfigDict
@@ -50,7 +50,10 @@ class ProtocolSchemaV8(BaseModel):
     labwareDefinitions: Dict[str, LabwareDefinition]
     commandSchemaId: CommandSchemaId
     commands: List[Command]
-    commandAnnotationSchemaId: Literal["opentronsCommandAnnotationSchemaV1"]
+    commandAnnotationSchemaId: Union[
+        Literal["opentronsCommandAnnotationSchemaV1"],
+        Literal["opentronsCommandAnnotationSchemaV2"],
+    ]
     commandAnnotations: List[CommandAnnotation]
     designerApplication: Optional[DesignerApplication] = None
     model_config = ConfigDict(populate_by_name=True)

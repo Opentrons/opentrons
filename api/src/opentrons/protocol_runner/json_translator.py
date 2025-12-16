@@ -304,7 +304,7 @@ class JsonTranslator:
         """Translate command annotations in json protocol schema v8."""
         if isinstance(protocol, (ProtocolSchemaV6, ProtocolSchemaV7)):
             return []
-        else:
+        elif protocol.commandAnnotationSchemaId == "opentronsCommandAnnotationSchemaV1":
             command_annotations: List[CommandAnnotation] = [
                 CommandAnnotationAdapter.validate_python(
                     command_annotation.model_dump(),
@@ -312,3 +312,5 @@ class JsonTranslator:
                 for command_annotation in protocol.commandAnnotations
             ]
             return command_annotations
+        else:
+            return []

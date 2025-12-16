@@ -63,7 +63,7 @@ export function IncompatibleModuleDesktopModalBody({
                 paddingBottom={SPACING.spacing12}
               >
                 <Icon
-                  name="alert-circle"
+                  name="ot-alert"
                   size={SPACING.spacing32}
                   color={COLORS.red50}
                 />

@@ -28,7 +28,7 @@ export function ErrorInfo({
   return (
     <>
       <Flex css={CONTAINER_STYLE}>
-        <Icon name="alert-circle" css={ICON_STYLE} color={COLORS.red50} />
+        <Icon name="ot-alert" css={ICON_STYLE} color={COLORS.red50} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {errorDetails?.header ?? t('error_dropping_tips')}
         </StyledText>

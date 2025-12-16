@@ -125,10 +125,10 @@ function LiquidToolbox({
 
   const selectionHasLiquids = Boolean(
     labwareId != null &&
-      liquidLocations[labwareId] != null &&
-      Object.keys(selectedWellGroups).some(
-        well => liquidLocations[labwareId][well]
-      )
+    liquidLocations[labwareId] != null &&
+    Object.keys(selectedWellGroups).some(
+      well => liquidLocations[labwareId][well]
+    )
   )
 
   const getInitialValues: () => ValidFormValues = () => {
