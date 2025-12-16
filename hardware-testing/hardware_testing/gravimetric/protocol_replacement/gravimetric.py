@@ -1031,7 +1031,9 @@ def run_blank_test(
     else:
         liquid_height = fixture_settings.liquid_source.current_liquid_height()
     fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)
-    fixture_settings.pipette.move_to(fixture_settings.pipette._last_tip_picked_up_from.top(10))
+    fixture_settings.pipette.move_to(
+        fixture_settings.pipette._last_tip_picked_up_from.top(10)
+    )
     retracted_offset = _get_offset_for_channel(
         fixture_settings, channel, fixture_settings.retracted_offset
     )
@@ -1070,8 +1072,12 @@ def run_blank_test(
         channel=channel,
         blank=True,
     )
-    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(blank_move_to_height))
-    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(liquid_height + 3))
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(blank_move_to_height)
+    )
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(liquid_height + 3)
+    )
     print_info("aspirating")
     contents = aspirate_with_liquid_class(
         fixture_settings,
@@ -1092,8 +1098,12 @@ def run_blank_test(
         blank=True,
     )
     print_info("dispensing.")
-    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(blank_move_to_height))
-    fixture_settings.pipette.move_to(fixture_settings.liquid_source.bottom(liquid_height + 3))
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(blank_move_to_height)
+    )
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(liquid_height + 3)
+    )
     dispense_with_liquid_class(
         fixture_settings,
         tip,
