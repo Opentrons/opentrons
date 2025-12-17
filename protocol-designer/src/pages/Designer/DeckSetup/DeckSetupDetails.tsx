@@ -340,6 +340,14 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                     isSelected={selectedZoomInSlot != null}
                     allModules={allModules}
                   />
+                  <ActiveLabwareControls
+                    itemId={`hopper${slotId}`}
+                    slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+                    hover={hover}
+                    setHover={setHover}
+                    slotBoundingBox={labwareInterfaceBoundingBox}
+                    terminalItemId={terminalItemId}
+                  />
                 </>
               ) : null}
               {labwareOnModule != null &&
