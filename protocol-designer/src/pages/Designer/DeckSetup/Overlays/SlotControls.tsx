@@ -114,7 +114,8 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
           )
 
           return (
-            getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
+            moduleType !== FLEX_STACKER_MODULE_TYPE &&
+            (getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware)
           )
         }
         return !hasTrashAndNotD4
@@ -148,7 +149,6 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
     return null
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
-
   // when dragging labware over a slot many times quickly
   // labwareOnDeck could be null/undefined and cause the white screen
   const isCustomLabware =

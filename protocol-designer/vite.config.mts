@@ -20,13 +20,19 @@ const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'protocol-designer',
 })
 
-// Sentry and sourcemaps are disabled in local development
 const isCI = process.env.CI === 'true'
-const enableSentry =
-  isCI &&
+
+const hasSentryCreds =
   !!process.env.SENTRY_AUTH_TOKEN &&
   !!process.env.SENTRY_ORG &&
   !!process.env.SENTRY_PROJECT
+
+// Local opt-in only: devs can enable the plugin by exporting SENTRY_* env vars.
+// When enabled locally, the plugin will upload sourcemaps under the `local-dev`
+// release name. The runtime SDK is configured to report the same release so local
+// events can resolve uploaded sourcemaps.
+// CI should use getsentry/action-release for releases/sourcemaps.
+const enableSentryLocalPlugin = !isCI && hasSentryCreds
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(async (): Promise<UserConfig> => {
@@ -34,15 +40,16 @@ export default defineConfig(async (): Promise<UserConfig> => {
   const OT_PD_BUILD_DATE = new Date().toUTCString()
   const OT_PD_LATEST_LABWARE_VERSIONS =
     await latestLabwareVersions(REQUIRED_APP_VERSION)
-  const mode = process.env.NODE_ENV ?? 'development'
+
   return {
     // this makes imports relative rather than absolute
     base: '',
     build: {
       // Relative to the root
       outDir: 'dist',
-      // sourcemap is only enabled in CI
-      sourcemap: enableSentry ? 'hidden' : false,
+      // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
+      // Emit in CI (so action-release can upload) and in local builds.
+      sourcemap: true,
       rollupOptions: {
         external: ['react/compiler-runtime'],
         output: {
@@ -59,7 +66,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       react({
         include: '**/*.tsx',
         babel: {
-          // Use babel.config.js files
+          // Use babel.config.js files 1Code has comments. Press enter to view.
           configFile: true,
         },
         jsxRuntime: 'automatic',
@@ -73,23 +80,23 @@ export default defineConfig(async (): Promise<UserConfig> => {
           }
         },
       },
-      ...(enableSentry
+
+      ...(enableSentryLocalPlugin
         ? [
             sentryVitePlugin({
-              org: process.env.SENTRY_ORG!,
-              project: process.env.SENTRY_PROJECT!,
-              authToken: process.env.SENTRY_AUTH_TOKEN!,
+              org: process.env.SENTRY_ORG,
+              project: process.env.SENTRY_PROJECT,
+              authToken: process.env.SENTRY_AUTH_TOKEN,
               telemetry: false,
               reactComponentAnnotation: { enabled: true },
-              sourcemaps: {
-                assets: ['./dist/**'],
-                ignore: ['./node_modules/**'],
-                // optional: rewrite paths if needed
-              },
-              // optional: release detection (match Sentry release to app version/commit)
+
+              // Local opt-in behavior:
+              // - Upload sourcemaps via the plugin (requires SENTRY_* env vars)
+              // - Use the `local-dev` release name
+              // CI continues to upload via getsentry/action-release.
               release: {
-                name: process.env.SENTRY_RELEASE || process.env.GIT_COMMIT_SHA,
-                // set commit SHA environment in CI
+                name: 'local-dev',
+                inject: false,
               },
             }),
           ]
@@ -133,11 +140,12 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
       _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
       _OT_PD_LATEST_LABWARE_VERSIONS_: OT_PD_LATEST_LABWARE_VERSIONS,
-      _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(
-        process.env.OT_PD_MIXPANEL_DEV_ID
-      ),
+      _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
       _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
       _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
+      _OT_PD_SENTRY_RELEASE_: JSON.stringify(
+        enableSentryLocalPlugin ? 'local-dev' : OT_PD_VERSION
+      ),
       _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
       _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
       _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),

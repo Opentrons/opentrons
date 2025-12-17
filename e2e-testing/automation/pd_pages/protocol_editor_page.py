@@ -296,7 +296,7 @@ class ProtocolEditorPage(BasePage):
 
     def configure_transfer_source(self) -> None:
         """Configure the source for a transfer step."""
-        self.page.locator(".Flex-sc-1qhp8l7-0.InputField___StyledFlex2-sc-1gyyvht-3").first.click()
+        self.page.locator('input[name="aspirate_wells"]').click()
         self.page.locator("circle").first.click()
         self.click_button("Save")
 
@@ -360,9 +360,9 @@ class ProtocolEditorPage(BasePage):
     def move_labware(self, labware: str, new_location: str) -> None:
         """Select labware and new location to move the labware."""
 
-        self.page.get_by_test_id("dropdownMenu").first.click()
+        self.page.get_by_test_id("labware_dropdownMenu").first.click()
         self.page.get_by_role("button", name=labware).click()
-        self.page.get_by_test_id("dropdownMenu").nth(1).click()
+        self.page.get_by_test_id("newLocation_dropdownMenu").first.click()
 
         if new_location == "Off-deck":
             self.page.locator("#stepFormTools").get_by_role("button", name="Off-deck").click()

@@ -39,6 +39,7 @@ import {
 import {
   CLEAN,
   EMPTY,
+  FAKE_HOPPER_LOCATION_MAP,
   HOPPER_FAKE_LOCATIONS,
   HOPPER_STACKER_LOCATION,
   STAGING_AREA_SLOTS,
@@ -62,6 +63,7 @@ import type {
   PositionReference,
   RobotType,
 } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '../constants'
 import type {
   CommandCreator,
   CurriedCommandCreator,
@@ -1007,12 +1009,17 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
+  const isOnHopper = getIsSlotAHopper(slot)
+  const mappedLocation = isOnHopper
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
   return (
     Object.values(labware)
       .filter(
         lw =>
-          lw.stack.includes(slot) &&
-          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
+          lw.stack.includes(mappedLocation) &&
+          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
+          lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
       )
       .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
   )

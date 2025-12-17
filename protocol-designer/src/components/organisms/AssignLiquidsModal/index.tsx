@@ -50,7 +50,11 @@ import { LiquidToolboxContainer } from './LiquidToolbox'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { WellGroup } from '@opentrons/components'
-import type { ContentsByWell } from '@opentrons/step-generation'
+import type {
+  ContentsByWell,
+  LabwareEntities,
+} from '@opentrons/step-generation'
+import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -59,8 +63,10 @@ interface AssignLiquidsModalData {
   nickNames: Record<string, string>
   labwareId: string | null
   selectedWells: WellGroup
-  labware: Record<string, any>
-  labwareEntities: Record<string, any>
+  labware: {
+    [labwareId: string]: LabwareOnDeck
+  }
+  labwareEntities: LabwareEntities
   allWellContents: Record<string, any>
   liquidNamesById: Record<string, string>
   liquidDisplayColors: Record<string, string>

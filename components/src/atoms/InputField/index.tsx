@@ -59,7 +59,7 @@ export interface InputFieldProps {
     | typeof LEGACY_INPUT_TYPE_PASSWORD
     | typeof INPUT_TYPE_NUMBER
   /** mouse click handler */
-  onClick?: (event: MouseEvent<HTMLInputElement>) => unknown
+  onClick?: (event: MouseEvent<HTMLElement>) => unknown
   /** focus handler */
   onFocus?: (event: FocusEvent<HTMLInputElement>) => unknown
   /** blur handler */
@@ -111,6 +111,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       onDelete,
       borderRadius,
       padding,
+      id,
+      disabled,
+      error,
       ...inputProps
     } = props
     const hasError = props.error != null
@@ -234,6 +237,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       color: ${COLORS.grey60};
       padding-bottom: ${SPACING.spacing4};
       text-align: ${textAlign};
+      font-size: ${TYPOGRAPHY.fontSizeH3};
+      line-height: ${TYPOGRAPHY.lineHeight20};
+      font-weight: ${TYPOGRAPHY.fontWeightRegular};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         font-size: ${TYPOGRAPHY.fontSize22};
         font-weight: ${TYPOGRAPHY.fontWeightRegular};
@@ -283,13 +289,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                htmlFor={props.id}
-                css={TITLE_STYLE}
-              >
+              <label htmlFor={id} css={TITLE_STYLE}>
                 {title}
-              </StyledText>
+              </label>
               {tooltipText != null ? (
                 <>
                   <Flex {...targetProps}>
@@ -308,7 +310,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             width="100%"
             flexDirection={DIRECTION_COLUMN}
             css={OUTER_CSS}
-            onClick={!props.disabled ? props.onClick : null}
+            onClick={props.disabled === true ? undefined : props.onClick}
           >
             <Flex
               tabIndex={tabIndex}
@@ -338,6 +340,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
                   event.currentTarget.blur()
                 }} // prevent value change with scrolling
                 type={props.type}
+                disabled={disabled}
                 ref={ref}
               />
               {props.units != null ? (

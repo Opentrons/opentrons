@@ -53,6 +53,7 @@ import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { HopperLocationMapKey } from '@opentrons/step-generation'
+import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
 import type { ThunkDispatch } from '../../../types'
 
 interface DeckSetupToolsProps {
@@ -84,7 +85,6 @@ export function DeckSetupToolbox(
   const [showSelectLabwareModal, setShowSelectLabwareModal] =
     useState<boolean>(false)
   const isOnPlateReader = selectedModuleModel === ABSORBANCE_READER_V1
-
   const {
     createdAdapterForSlot,
     createdModuleForSlot,
@@ -155,19 +155,28 @@ export function DeckSetupToolbox(
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
     const isHopperSlot = getIsSlotAHopper(slot)
-    // TODO (nd: 12/12/2025): add back this check in a refactor to properly dispatch stacker state updates
-    const isOnShuttle =
-      !isHopperSlot &&
+    const isModuleStacker =
       selectedModuleModel != null &&
       getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+    const isOnShuttle = !isHopperSlot && isModuleStacker
 
     //  handle clear for if you are changing the adapter/labware combo
     if (!isOffDeck) {
       handleClear()
     }
     //  NOTE: labware on the Flex Stacker shuttle is not on any module ;)
-    // TODO (nd: 12/11/2025): refactor how we create labware stacks in the hopper
     if (hasModule) {
+      let flexStackerInfo: CreateContainerAboveModuleArgs['stackerInfo']
+      if (isModuleStacker) {
+        flexStackerInfo = isOnShuttle
+          ? {
+              stackerPosition: 'shuttle',
+            }
+          : {
+              stackerPosition: 'hopper',
+              amount: selectedTopLabware.amount,
+            }
+      }
       dispatch(
         createContainerAboveModule({
           slot: isHopperSlot
@@ -178,7 +187,7 @@ export function DeckSetupToolbox(
             topLabwareDefURI: selectedTopLabware.labwareDefURI,
             lidDefURI: selectedLidLabware,
           },
-          isOnShuttle,
+          stackerInfo: flexStackerInfo,
         })
       )
     } else {
@@ -342,10 +351,15 @@ export function DeckSetupToolbox(
                     ? {}
                     : { lidId: createdLidForSlot?.id })}
                   quantity={createdStackForSlot.length}
+                  location={slot}
                 />
               ) : null}
               {createdAdapterForSlot != null ? (
-                <LabwareCard labware={createdAdapterForSlot} quantity={1} />
+                <LabwareCard
+                  labware={createdAdapterForSlot}
+                  quantity={1}
+                  location={slot}
+                />
               ) : null}
               {slotFull ? (
                 <StyledText
