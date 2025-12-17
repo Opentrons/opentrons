@@ -191,10 +191,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const menuListSlotPosition =
     adjustedMenuListId != null
       ? getPositionFromSlotId(
-          adjustedMenuListId as string,
-          deckDef,
-          ...(isMenuListIdForHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
-        )
+        adjustedMenuListId as string,
+        deckDef,
+        ...(isMenuListIdForHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
+      )
       : null
   const multichannelWarningSlotIds: AddressableAreaName[] =
     showGen1MultichannelCollisionWarnings
@@ -204,10 +204,10 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const adjacentLabware =
     preSelectedFixture != null && selectedSlot.cutout != null
       ? getAdjacentLabware(
-          preSelectedFixture,
-          selectedSlot.cutout,
-          activeLabware
-        )
+        preSelectedFixture,
+        selectedSlot.cutout,
+        activeLabware
+      )
       : null
 
   // make sure the top labware (lid) is rendered first in the stack if
@@ -275,20 +275,20 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         const isLabwareOccludedByThermocyclerLid =
           moduleOnDeck.type === THERMOCYCLER_MODULE_TYPE &&
           (moduleOnDeck.moduleState as ThermocyclerModuleState).lidOpen !==
-            true &&
+          true &&
           terminalItemId !== START_TERMINAL_ITEM_ID
 
         const tempInnerProps = getModuleInnerProps(moduleOnDeck.moduleState)
         const innerProps =
           moduleOnDeck.type === THERMOCYCLER_MODULE_TYPE
             ? {
-                ...tempInnerProps,
-                lidMotorState:
-                  (tempInnerProps as ThermocyclerVizProps).lidMotorState !==
+              ...tempInnerProps,
+              lidMotorState:
+                (tempInnerProps as ThermocyclerVizProps).lidMotorState !==
                   'open'
-                    ? 'closed'
-                    : 'open',
-              }
+                  ? 'closed'
+                  : 'open',
+            }
             : tempInnerProps
         const labwareOnModule =
           topMostId != null ? activeLabware[topMostId] : null
@@ -337,7 +337,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 />
               ) : null}
               {labwareOnModule != null &&
-              !isLabwareOccludedByThermocyclerLid ? (
+                !isLabwareOccludedByThermocyclerLid ? (
                 <>
                   {labwareRightBelowTopMostLabware != null ? (
                     <LabwareOnDeck
@@ -420,7 +420,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                 />
               ) : null}
               {hopperTopMostId == null &&
-              moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE ? (
+                moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE ? (
                 <SlotControls
                   terminalItemId={terminalItemId}
                   itemId={`hopper${slotId}`}
@@ -554,8 +554,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
               labwareOnDeck={labware}
             />
             {labwareAmount > 1 &&
-            isTopLabware &&
-            showDeckLabwareSetWithTiprackLid ? (
+              isTopLabware &&
+              showDeckLabwareSetWithTiprackLid ? (
               <DeckLabelSet
                 deckLabels={[]}
                 x={slotPosition[0]}
@@ -701,20 +701,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           </Fragment>
         )
       })}
-
-      {/* special-cased hopper labware based on module states */}
-      {/* <HopperTopLabwareRenders
-        labwaresOnDeck={activeLabware}
-        modules={allModules}
-        deckDef={deckDef}
-        terminalItemId={terminalItemId}
-        setHover={setHover}
-        setShowMenuListForId={setShowMenuListForId}
-        hover={hover}
-        setHoveredLabware={setHoveredLabware}
-        setDraggedLabware={setDraggedLabware}
-        selectedZoomInSlot={selectedZoomInSlot}
-      /> */}
 
       {/* highlight items from Protocol steps */}
       <HighlightItems robotType={robotType} deckDef={deckDef} />

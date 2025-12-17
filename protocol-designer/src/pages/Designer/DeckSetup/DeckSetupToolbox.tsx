@@ -111,9 +111,9 @@ export function DeckSetupToolbox(
         moduleModel: createdModuleForSlot?.model,
         fixture:
           createdFixtureForSlots != null &&
-          Object.values(createdFixtureForSlots).some(
-            fixture => fixture.name === 'stagingArea'
-          )
+            Object.values(createdFixtureForSlots).some(
+              fixture => fixture.name === 'stagingArea'
+            )
             ? 'stagingArea'
             : undefined,
         lidDefURI: null,
@@ -170,12 +170,12 @@ export function DeckSetupToolbox(
       if (isModuleStacker) {
         flexStackerInfo = isOnShuttle
           ? {
-              stackerPosition: 'shuttle',
-            }
+            stackerPosition: 'shuttle',
+          }
           : {
-              stackerPosition: 'hopper',
-              amount: selectedTopLabware.amount,
-            }
+            stackerPosition: 'hopper',
+            amount: selectedTopLabware.amount,
+          }
       }
       dispatch(
         createContainerAboveModule({
@@ -198,8 +198,8 @@ export function DeckSetupToolbox(
             ...(selectedAdapterDefURI != null ? [selectedAdapterDefURI] : []),
             ...(selectedTopLabware.labwareDefURI != null
               ? Array(selectedTopLabware.amount).fill(
-                  selectedTopLabware.labwareDefURI.toString()
-                )
+                selectedTopLabware.labwareDefURI.toString()
+              )
               : []),
             ...(selectedLidLabware != null ? [selectedLidLabware] : []),
           ],
@@ -219,9 +219,9 @@ export function DeckSetupToolbox(
   const positionStyles =
     position === POSITION_FIXED
       ? {
-          right: SPACING.spacing12,
-          top: `calc(${NAV_BAR_HEIGHT_REM}rem + ${SPACING.spacing12})`,
-        }
+        right: SPACING.spacing12,
+        top: `calc(${NAV_BAR_HEIGHT_REM}rem + ${SPACING.spacing12})`,
+      }
       : {}
 
   const handleConfirmDeleteEntityInUseModal = (): void => {
@@ -247,8 +247,8 @@ export function DeckSetupToolbox(
 
   const displaySlot = getIsSlotAHopper(slot)
     ? t('shared:stacker', {
-        slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
-      })
+      slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
+    })
     : slot
   return (
     <>
@@ -343,11 +343,11 @@ export function DeckSetupToolbox(
                 <LabwareCard
                   labware={
                     deckSetup.labware[
-                      createdStackForSlot[0] // select top most labware in the stack
+                    createdStackForSlot[0] // select top most labware in the stack
                     ]
                   }
                   {...(createdLidForSlot != null &&
-                  createdStackForSlot.includes(createdLidForSlot?.id)
+                    createdStackForSlot.includes(createdLidForSlot?.id)
                     ? {}
                     : { lidId: createdLidForSlot?.id })}
                   quantity={createdStackForSlot.length}
