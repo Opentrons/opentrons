@@ -82,7 +82,7 @@ describe('AssignLiquidsModal', () => {
           },
         },
         labwareEntities: {
-          mockLabwareId: { def: fixture96Plate as LabwareDefinition2 },
+          mockLabwareId: { def: fixture96Plate as LabwareDefinition2 } as any,
         },
         allWellContents: {},
         liquidNamesById: {},
@@ -108,7 +108,8 @@ describe('AssignLiquidsModal', () => {
     ]
     props.assignLiquidsModalData.labware.labware2 = {
       def: fixture96Plate as LabwareDefinition2,
-    }
+      labwareDefURI: 'mockURI',
+    } as any
     render(props)
 
     screen.getByText('mock LabwareStackToolbox')

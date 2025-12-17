@@ -6,8 +6,9 @@ import { RESPONSIVENESS, TYPOGRAPHY } from '../../ui-style-constants'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 import type { ComponentProps, ReactNode } from 'react'
 
-export interface LegacyProps extends ComponentProps<typeof Text> {
+export interface LegacyProps extends Omit<ComponentProps<typeof Text>, 'as'> {
   children?: ReactNode
+  as?: keyof JSX.IntrinsicElements | React.ComponentType<any> // Note this would be temporary
 }
 
 const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {

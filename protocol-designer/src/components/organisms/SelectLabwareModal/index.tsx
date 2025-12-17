@@ -27,16 +27,18 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   getAreSlotsHorizontallyAdjacent,
   getIsLabwareAboveHeight,
   getLabwareDefIsStandard,
   getLabwareDefURI,
+  getMaxPoolCount,
   getModuleType,
   HEATERSHAKER_MODULE_TYPE,
   MAX_LABWARE_HEIGHT_EAST_WEST_HEATER_SHAKER_MM,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -146,7 +148,7 @@ export function SelectLabwareModal(
   const modulesById = deckSetup.modules
   const moduleType =
     selectedModuleModel != null ? getModuleType(selectedModuleModel) : null
-  const onFlexStacker = moduleType === FLEX_STACKER_MODULE_TYPE
+  const isOnHopper = getIsSlotAHopper(slot)
   const initialModules: ModuleOnDeck[] = Object.keys(modulesById).map(
     moduleId => modulesById[moduleId]
   )
@@ -288,7 +290,17 @@ export function SelectLabwareModal(
       customLabwareDefs[selectedTopLabware.labwareDefURI]
 
     const amount = selectedTopLabware.amount ?? 0
-    const stackLimit = selectedLabwareDef.stackLimit ?? STACK_LIMIT // the range is 1-5
+    const hopperStackLimit = getMaxPoolCount({
+      labwareDefinitions: {
+        primary: selectedLabwareDef,
+        adapter: null,
+        lid: null,
+      },
+      model: FLEX_STACKER_MODULE_V1,
+    })
+    const stackLimit = isOnHopper
+      ? hopperStackLimit
+      : (selectedLabwareDef.stackLimit ?? STACK_LIMIT)
 
     if (amount < 1 || amount > stackLimit) {
       return false
@@ -430,7 +442,7 @@ export function SelectLabwareModal(
             slot={slot}
             handleCategoryClick={handleCategoryClick}
             areCategoriesExpanded={areCategoriesExpanded}
-            onFlexStacker={onFlexStacker}
+            isOnHopper={isOnHopper}
             filteredLabwareByCategory={filteredLabwareByCategory}
             universalLid={universalLid}
           />
@@ -444,7 +456,7 @@ export function SelectLabwareModal(
               slot={slot}
               handleCategoryClick={handleCategoryClick}
               areCategoriesExpanded={areCategoriesExpanded}
-              onFlexStacker={onFlexStacker}
+              isOnHopper={isOnHopper}
               filteredLabwareByCategory={filteredLabwareByCategory}
               searchFilter={searchFilter}
               getIsLabwareFiltered={getIsLabwareFiltered}
