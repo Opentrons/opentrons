@@ -82,10 +82,10 @@ export function RobotStatusHeader(props: RobotStatusHeaderProps): JSX.Element {
         onClick={(e: MouseEvent) => {
           e.stopPropagation()
         }}
+        gridGap={SPACING.spacing8}
       >
         <LegacyStyledText
           as="label"
-          paddingRight={SPACING.spacing8}
           overflowWrap={OVERFLOW_WRAP_ANYWHERE}
         >
           {`${truncateString(displayName, 68)}; ${i18n.format(
