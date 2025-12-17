@@ -15,13 +15,7 @@ export function PriorThermocyclerState(props: {
 
   let blockValueText
   switch (currentBlockActivity.type) {
-    // The 'profile' case shouldn't actually be reachable. It would mean this component
-    // is being rendered in a point in the timeline where a profile is ongoing, which
-    // would mean a Thermocycler form is being rendered at a point in the timeline
-    // where a profile is ongoing, which would mean a Thermocycler profile has a
-    // Thermocycler step nested within it, which shouldn't be possible.
     case 'blockDeactivated':
-    case 'profile':
       blockValueText = t(
         'protocol_steps:thermocycler_module.prior_state.block_value_off'
       )
@@ -32,6 +26,16 @@ export function PriorThermocyclerState(props: {
         {
           value: currentBlockActivity.blockTargetTemp,
         }
+      )
+      break
+    case 'profile':
+      // We can only get here if the user is trying to construct an invalid timeline,
+      // trying to do something new with a Thermocycler while it already has a profile
+      // ongoing.
+      //
+      // We're saying the block is "off" because we lack more specialized copy.
+      blockValueText = t(
+        'protocol_steps:thermocycler_module.prior_state.block_value_off'
       )
       break
     default:
