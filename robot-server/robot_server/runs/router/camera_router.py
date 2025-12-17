@@ -185,12 +185,15 @@ async def add_camera_capture_image_settings(
     )
 
 
-@PydanticResponse.wrap_route(
-    camera_router.post,
+@camera_router.post(
     path="/runs/{runId}/camera/capturePreviewImage",
     summary="Capture a preview image based on provided settings and the run specific camera enablement.",
     description="Return a preview image based on provided capture image settings.",
     responses={
+        status.HTTP_200_OK: {
+            "content": {"image/jpeg": {}},
+            "description": "Preview image taken with specific settings.",
+        },
         status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
     },
 )
@@ -199,7 +202,7 @@ async def post_camera_preview_image(
     run: Annotated[Run, Depends(get_run_data_from_url)],
     images_directory: Annotated[Path, Depends(get_images_directory)],
     robot_type: Annotated[RobotType, Depends(get_robot_type)],
-) -> Response:
+) -> FileResponse:
     """Return a preview image based on the provided capture image settings and run specific enablement."""
     if IS_ROBOT and not camera.camera_exists():
         # todo(chb): Eventually we'll have mulitple camera ids that can be sent, so this should be able to verify more than just the default
