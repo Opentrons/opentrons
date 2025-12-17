@@ -41,14 +41,8 @@ const ICON_NAME_BY_COMMAND_TYPE: {
   moveLabware: 'move-xy',
 }
 export function Tick(props: TickProps): JSX.Element {
-  const {
-    index,
-    count,
-    range,
-    firstCommandType,
-    makeHandleJumpToStep,
-    total,
-  } = props
+  const { index, count, range, firstCommandType, makeHandleJumpToStep, total } =
+    props
   const { t } = useTranslation('run_details')
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -58,12 +52,12 @@ export function Tick(props: TickProps): JSX.Element {
   const commandTKey =
     firstCommandType in TRANSLATION_KEY_BY_COMMAND_TYPE &&
     TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] != null
-      ? TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] ?? null
+      ? (TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] ?? null)
       : null
   const iconName =
     firstCommandType in ICON_NAME_BY_COMMAND_TYPE &&
     ICON_NAME_BY_COMMAND_TYPE[firstCommandType] != null
-      ? ICON_NAME_BY_COMMAND_TYPE[firstCommandType] ?? null
+      ? (ICON_NAME_BY_COMMAND_TYPE[firstCommandType] ?? null)
       : null
   return (
     <Flex

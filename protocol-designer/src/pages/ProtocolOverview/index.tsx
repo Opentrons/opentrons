@@ -20,6 +20,8 @@ import {
 } from '@opentrons/components'
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
+import { PeripheralsInfo } from '/protocol-designer/pages/ProtocolOverview/PeripheralsInfo'
+
 import { COLUMN_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import {
@@ -27,10 +29,6 @@ import {
   EditProtocolMetadataModal,
 } from '../../components/organisms'
 import { MaterialsListModal } from '../../components/organisms/MaterialsListModal'
-import {
-  getEnableJsonExport,
-  getEnableTimelineScrubber,
-} from '../../feature-flags/selectors'
 import { selectors as fileSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { actions as loadFileActions } from '../../load-file'
@@ -45,7 +43,6 @@ import { HardwareInfo } from './HardwareInfo'
 import { InstrumentsInfo } from './InstrumentsInfo'
 import { LiquidDefinitions } from './LiquidDefinitions'
 import { ProtocolMetadata } from './ProtocolMetadata'
-import { ScrubberContainer } from './ScrubberContainer'
 import { StartingDeck } from './StartingDeck'
 import { StepsInfo } from './StepsInfo'
 
@@ -77,15 +74,10 @@ export function ProtocolOverview(): JSX.Element {
     'modules',
   ])
   const navigate = useNavigate()
-  const [
-    showEditInstrumentsModal,
-    setShowEditInstrumentsModal,
-  ] = useState<boolean>(false)
-  const enableJsonExport = useSelector(getEnableJsonExport)
-  const enableTimelineScrubber = useSelector(getEnableTimelineScrubber)
-  const [showEditMetadataModal, setShowEditMetadataModal] = useState<boolean>(
-    false
-  )
+  const [showEditInstrumentsModal, setShowEditInstrumentsModal] =
+    useState<boolean>(false)
+  const [showEditMetadataModal, setShowEditMetadataModal] =
+    useState<boolean>(false)
   const formValues = useSelector(fileSelectors.getFileMetadata)
   const robotType = useSelector(fileSelectors.getRobotType)
   const initialDeckSetup = useSelector(getInitialDeckSetup)
@@ -96,9 +88,8 @@ export function ProtocolOverview(): JSX.Element {
   const hasCommands = timeline.length > 0
 
   const dispatch: ThunkDispatch<any> = useDispatch()
-  const [showMaterialsListModal, setShowMaterialsListModal] = useState<boolean>(
-    false
-  )
+  const [showMaterialsListModal, setShowMaterialsListModal] =
+    useState<boolean>(false)
   const savedStepForms = useSelector(stepFormSelectors.getSavedStepForms)
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const liquids = useSelector(getLiquidEntities)
@@ -119,31 +110,28 @@ export function ProtocolOverview(): JSX.Element {
     pipettes,
   } = initialDeckSetup
 
-  const {
-    handleExportClick,
-    exportWarningModalElement,
-  } = useProtocolExportHandler({
-    hasCommands,
-    onConfirmExport: () => {
-      dispatch(loadFileActions.saveProtocolFile())
-    },
-  })
+  const { handleExportClick, exportWarningModalElement } =
+    useProtocolExportHandler({
+      hasCommands,
+      onConfirmExport: () => {
+        dispatch(loadFileActions.saveProtocolFile())
+      },
+    })
 
   const pipettesOnDeck = Object.values(pipettes)
-  const {
-    protocolName,
-    description,
-    created,
-    lastModified,
-    author,
-  } = formValues
+  const { protocolName, description, created, lastModified, author } =
+    formValues
   const metaDataInfo = [
-    { description },
-    { author },
-    { created: created != null ? format(created, DATE_ONLY_FORMAT) : t('na') },
+    { title: 'description', value: description ?? null },
+    { title: 'author', value: author ?? null },
     {
-      modified:
-        lastModified != null ? format(lastModified, DATETIME_FORMAT) : t('na'),
+      title: 'created',
+      value: created != null ? format(created, DATE_ONLY_FORMAT) : null,
+    },
+    {
+      title: 'modified',
+      value:
+        lastModified != null ? format(lastModified, DATETIME_FORMAT) : null,
     },
   ]
 
@@ -225,21 +213,6 @@ export function ProtocolOverview(): JSX.Element {
               whiteSpace={NO_WRAP}
               height="3.5rem"
             />
-            {enableJsonExport ? (
-              <LargeButton
-                buttonType="stroke"
-                buttonText="Export JSON"
-                onClick={() => {
-                  dispatch(loadFileActions.saveJSONProtocolFile())
-                }}
-                whiteSpace={NO_WRAP}
-                height="3.5rem"
-                iconName="arrow-right"
-                css={css`
-                  border: 2px solid ${COLORS.blue50};
-                `}
-              />
-            ) : null}
           </Flex>
         </Flex>
         <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
@@ -264,6 +237,7 @@ export function ProtocolOverview(): JSX.Element {
               modules={Object.values(modulesOnDeck)}
               additionalEquipment={additionalEquipmentOnDeck}
             />
+            <PeripheralsInfo robotType={robotType} />
             <LiquidDefinitions
               allIngredientGroupFields={allIngredientGroupFields}
             />
@@ -274,7 +248,6 @@ export function ProtocolOverview(): JSX.Element {
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
           >
-            {enableTimelineScrubber ? <ScrubberContainer /> : null}
             <StartingDeck
               robotType={robotType}
               setShowMaterialsListModal={setShowMaterialsListModal}

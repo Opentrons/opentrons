@@ -21,11 +21,13 @@ import {
 
 import { TertiaryButton } from '/app/atoms/buttons'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { getRobotUpdateDisplayInfo } from '/app/redux/robot-update'
 import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import { remote } from '/app/redux/shell/remote'
 
 import type { ChangeEventHandler, MouseEventHandler } from 'react'
+import type { Run } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
 const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
@@ -37,13 +39,13 @@ const HIDDEN_CSS = css`
 interface UpdateRobotSoftwareProps {
   robotName: string
   onUpdateStart: () => void
-  isRobotBusy: boolean
+  currentRun: Run | null
 }
 
 export function UpdateRobotSoftware({
   robotName,
   onUpdateStart,
-  isRobotBusy,
+  currentRun,
 }: UpdateRobotSoftwareProps): JSX.Element {
   const { t } = useTranslation(['device_settings', 'branded'])
   const { updateFromFileDisabledReason } = useSelector((state: State) => {
@@ -53,6 +55,8 @@ export function UpdateRobotSoftware({
   const [updateButtonProps, updateButtonTooltipProps] = useHoverTooltip()
   const inputRef = useRef<HTMLInputElement>(null)
   const dispatchStartRobotUpdate = useDispatchStartRobotUpdate()
+  const isRunActive =
+    currentRun != null && !isTerminalRunStatus(currentRun.data.status)
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = event => {
     const { files } = event.target
@@ -98,7 +102,7 @@ export function UpdateRobotSoftware({
           marginLeft={SPACING_AUTO}
           id="AdvancedSettings_softwareUpdateButton"
           {...updateButtonProps}
-          disabled={updateDisabled || isRobotBusy}
+          disabled={updateDisabled || isRunActive}
           onClick={handleClick}
         >
           {t('browse_file_system')}

@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -68904,7 +68907,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -68957,7 +68960,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -69010,7 +69013,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -69063,7 +69066,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -69116,7 +69119,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -72266,7 +72269,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -72319,7 +72322,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -72372,7 +72375,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -72425,7 +72428,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -74349,7 +74352,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -75452,7 +75455,7 @@
       "displayName": "A1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
@@ -75503,7 +75506,7 @@
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
@@ -75806,54 +75809,54 @@
       "displayName": "water",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/2",
       "displayName": "water",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/2",
       "displayName": "water",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/3",
       "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/2",
       "displayName": "ethanol",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/2",
       "displayName": "ethanol",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/2",
       "displayName": "ethanol",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/3",
       "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_1_reservoir_290ml/2",

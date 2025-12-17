@@ -65,8 +65,8 @@ export function fieldsToLabware(
     // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",
     // it doesn't imply anything about having multiple grids or not.
     const format = 'irregular'
-    let quirks: string[] = []
-
+    let quirks: string[] =
+      fields.hasLpcQuirk === 'true' ? ['noLabwarePositionCheck'] : []
     const heightOrDiameter =
       fields.wellShape === 'circular'
         ? fields.wellDiameter
@@ -110,9 +110,9 @@ export function fieldsToLabware(
       const zValue = parseFloat(String(z))
       const adapterHeight =
         adapterDefinitions != null
-          ? Object.values(adapterDefinitions).find(
+          ? (Object.values(adapterDefinitions).find(
               definition => definition.parameters.loadName === loadName
-            )?.dimensions.zDimension ?? 0
+            )?.dimensions.zDimension ?? 0)
           : 0
 
       stackingOffsetWithLabware[loadName] = {

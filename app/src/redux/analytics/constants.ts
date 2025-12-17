@@ -11,8 +11,13 @@ export const ANALYTICS_U2E_DRIVE_ALERT_DISMISSED = 'u2eDriverAlertDismissed'
 export const ANALYTICS_U2E_DRIVE_LINK_CLICKED = 'u2eDriverLinkClicked'
 export const ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP =
   'proceed_to_module_setup_step'
+export const ANALYTICS_PROCEED_TO_LABWARE_OFFSETS_SETUP_STEP =
+  'proceed_to_labware_offsets_setup_step'
 export const ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP =
   'proceed_to_labware_setup_step'
+export const ANALYTICS_PROCEED_TO_CAMERA_SETUP_STEP =
+  'proceed_to_camera_setup_step'
+export const ANALYTICS_PROTOCOL_PROCEED = 'proceed'
 export const ANALYTICS_HIGHLIGHT_LIQUID_IN_DETAIL_MODAL =
   'highlightLiquidInDetailModal'
 export const ANALYTICS_EXPAND_LIQUID_SETUP_ROW = 'expandLiquidSetupRow'
@@ -41,6 +46,17 @@ export const ANALYTICS_ODD_APP_ERROR = 'oddError'
 export const ANALYTICS_DESKTOP_APP_ERROR = 'desktopAppError'
 export const ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR =
   'notificationPortBlockError'
+
+const ANALYTICS_PROTOCOL_PROCEED_BUTTON_TEXT = [
+  ANALYTICS_PROCEED_TO_CAMERA_SETUP_STEP,
+  ANALYTICS_PROCEED_TO_LABWARE_OFFSETS_SETUP_STEP,
+  ANALYTICS_PROCEED_TO_LABWARE_SETUP_STEP,
+  ANALYTICS_PROCEED_TO_MODULE_SETUP_STEP,
+  ANALYTICS_PROTOCOL_PROCEED,
+] as const
+
+export type AnalyticsProtocolProceedButtonText =
+  (typeof ANALYTICS_PROTOCOL_PROCEED_BUTTON_TEXT)[number]
 
 export const ANALYTICS_PROTOCOL_RUN_ACTION = {
   AGAIN: 'runAgain',
@@ -131,3 +147,20 @@ export const ANALYTICS_LPC_OFFSET_SOURCE_RESOLUTION: 'lpcOffsetSourceResolution'
 
 export const ANALYTICS_MODULE_COMMAND_COMPLETED = 'moduleEventCompleted'
 export const ANALYTICS_MODULE_COMMAND_ERROR = 'moduleCommandError'
+
+/**
+ * Camera Action Analytics
+ */
+
+export const ANALYTICS_CAMERA_ENABLEMENT_KIND: 'cameraEnablementType' =
+  'cameraEnablementType'
+export const ANALYTICS_CAMERA_SETTINGS_KIND: 'cameraSettingsKind' =
+  'cameraSettingsKind'
+
+export const ANALYTICS_IMAGE_CAPTURE_KIND: 'cameraImageCaptureKind' =
+  'cameraImageCaptureKind'
+export const ANALYTICS_LIVE_FEED_KIND: 'cameraLiveFeed' = 'cameraLiveFeed'
+export const ANALYTICS_PHOTO_ACCESS: 'cameraPhotoAccessKind' =
+  'cameraPhotoAccessKind'
+export const ANALYTICS_LIVE_FEED_DURATION: 'cameraLiveFeedDuration' =
+  'cameraLiveFeedDuration'

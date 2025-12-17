@@ -63,12 +63,10 @@ export function ProtocolInstrumentMountItem(
 ): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const { mount, attachedInstrument, speccedName } = props
-  const [showPipetteWizardFlow, setShowPipetteWizardFlow] = useState<boolean>(
-    false
-  )
-  const [showGripperWizardFlow, setShowGripperWizardFlow] = useState<boolean>(
-    false
-  )
+  const [showPipetteWizardFlow, setShowPipetteWizardFlow] =
+    useState<boolean>(false)
+  const [showGripperWizardFlow, setShowGripperWizardFlow] =
+    useState<boolean>(false)
   const memoizedAttachedGripper = useMemo(
     () =>
       attachedInstrument?.instrumentType === 'gripper' && attachedInstrument.ok
@@ -106,8 +104,9 @@ export function ProtocolInstrumentMountItem(
     attachedInstrument?.data?.calibratedOffset?.last_modified != null
 
   const gripperDisplayName = useGripperDisplayName(speccedName as GripperModel)
-  const pipetteDisplayName = usePipetteNameSpecs(speccedName as PipetteName)
-    ?.displayName
+  const pipetteDisplayName = usePipetteNameSpecs(
+    speccedName as PipetteName
+  )?.displayName
 
   return (
     <>

@@ -100,20 +100,16 @@ export function ChooseProtocolSlideoutComponent(
   const logger = useLogger(new URL('', import.meta.url).pathname)
   const [targetProps, tooltipProps] = useTooltip()
   const [targetPropsHover, tooltipPropsHover] = useHoverTooltip()
-  const [
-    showRestoreValuesTooltip,
-    setShowRestoreValuesTooltip,
-  ] = useState<boolean>(false)
+  const [showRestoreValuesTooltip, setShowRestoreValuesTooltip] =
+    useState<boolean>(false)
 
   const { robot, showSlideout, onCloseClick } = props
   const { name } = robot
   const robotType = useRobotType(name)
   const isFlex = robotType === FLEX_ROBOT_TYPE
 
-  const [
-    selectedProtocol,
-    setSelectedProtocol,
-  ] = useState<StoredProtocolData | null>(null)
+  const [selectedProtocol, setSelectedProtocol] =
+    useState<StoredProtocolData | null>(null)
   const [runTimeParametersOverrides, setRunTimeParametersOverrides] = useState<
     RunTimeParameter[]
   >([])
@@ -139,7 +135,8 @@ export function ChooseProtocolSlideoutComponent(
     setRunTimeParametersOverrides(
       selectedProtocol?.mostRecentAnalysis?.runTimeParameters ?? []
     )
-  }, [selectedProtocol])
+  }, [selectedProtocol?.protocolKey])
+
   useEffect(() => {
     setHasParamError(errors.length > 0)
     setHasMissingFileParam(
@@ -454,7 +451,7 @@ export function ChooseProtocolSlideoutComponent(
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
-                  gridgap={SPACING.spacing8}
+                  gridGap={SPACING.spacing8}
                   key={runtimeParam.variableName}
                 >
                   <Flex
@@ -503,7 +500,7 @@ export function ChooseProtocolSlideoutComponent(
                                 <LinkComponent
                                   color={COLORS.blue55}
                                   role="button"
-                                  to=""
+                                  // to=""
                                 />
                               ),
                             }}
@@ -818,7 +815,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   <>
                     <Box flex="1 1 auto" />
                     <Icon
-                      name="alert-circle"
+                      name="ot-alert"
                       size="1.25rem"
                       color={
                         runCreationError != null
@@ -922,7 +919,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         }
       `}
     >
-      <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
+      <Icon size="1.25rem" name="ot-alert" color={COLORS.grey30} />
       <LegacyStyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

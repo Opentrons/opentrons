@@ -19,7 +19,7 @@ describe('useUpdateDeckConfig', () => {
     vi.mocked(useDispatch).mockReturnValue(mockDispatch)
     vi.mocked(updateLPCDeck).mockImplementation(
       (runId: string, deckConfig: any) =>
-        ({ type: 'UPDATE_LPC_DECK', runId, deckConfig } as any)
+        ({ type: 'UPDATE_LPC_DECK', runId, deckConfig }) as any
     )
   })
 

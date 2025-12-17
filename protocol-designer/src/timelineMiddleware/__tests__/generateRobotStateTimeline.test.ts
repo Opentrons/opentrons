@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   fixtureTiprack300ul,
@@ -6,6 +6,7 @@ import {
   POSITION_REFERENCE_BOTTOM,
 } from '@opentrons/shared-data'
 import {
+  AUTOMATIC,
   DEFAULT_PIPETTE,
   DEST_LABWARE,
   FIXED_TRASH_ID,
@@ -23,8 +24,9 @@ import type { StepArgsAndErrorsById } from '../../steplist'
 vi.mock('../../labware-defs/utils')
 
 describe('generateRobotStateTimeline', () => {
-  it('performs eager tip dropping', () => {
-    const allStepArgsAndErrors: StepArgsAndErrorsById = {
+  let allStepArgsAndErrors: StepArgsAndErrorsById
+  beforeEach(() => {
+    allStepArgsAndErrors = {
       a: {
         errors: false,
         stepArgs: {
@@ -97,6 +99,9 @@ describe('generateRobotStateTimeline', () => {
           touchTipAfterDispenseMmFromEdge: 0,
           dispenseSubmergeDelay: null,
           dispenseRetractDelay: null,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
       },
       b: {
@@ -171,6 +176,9 @@ describe('generateRobotStateTimeline', () => {
           touchTipAfterDispenseMmFromEdge: 0,
           dispenseSubmergeDelay: null,
           dispenseRetractDelay: null,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
       },
       c: {
@@ -203,9 +211,15 @@ describe('generateRobotStateTimeline', () => {
           finalPushOut: 0,
           zOffset: 0,
           positionReference: POSITION_REFERENCE_BOTTOM,
+          tipTracking: AUTOMATIC,
+          tipsSelected: [],
+          tiprackSelected: null,
         },
       },
     }
+  })
+
+  it('performs eager tip dropping', () => {
     const orderedStepIds = ['a', 'b', 'c']
     const invariantContext = makeContext()
     const initialRobotState = getInitialRobotStateStandard(invariantContext)
@@ -293,6 +307,56 @@ describe('generateRobotStateTimeline', () => {
       `
 mock_pipette.transfer_with_liquid_class(...)
 mock_pipette.drop_tip()
+`.trim(),
+      // Step b:
+      `
+mock_pipette_p300_multi.transfer_with_liquid_class(...)
+mock_pipette_p300_multi.drop_tip()
+`.trim(),
+      // Step c:
+      `
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(...)
+mock_pipette.drop_tip()
+mock_pipette.pick_up_tip(location=mock_tip_rack_1)
+mock_pipette.mix(...)
+mock_pipette.drop_tip()
+`.trim(),
+    ])
+  })
+
+  it('does not perform eager tip dropping if the step returns tip', () => {
+    allStepArgsAndErrors = {
+      ...allStepArgsAndErrors,
+      a: {
+        ...allStepArgsAndErrors.a,
+        stepArgs: {
+          ...allStepArgsAndErrors.a.stepArgs,
+          dropTipLocation: getLabwareDefURI(
+            fixtureTiprack300ul as LabwareDefinition2
+          ),
+        },
+      },
+    } as StepArgsAndErrorsById
+    const orderedStepIds = ['a', 'b', 'c']
+    const invariantContext = makeContext()
+    const initialRobotState = getInitialRobotStateStandard(invariantContext)
+    const result = generateRobotStateTimeline({
+      allStepArgsAndErrors,
+      orderedStepIds,
+      initialRobotState,
+      invariantContext,
+    })
+    expect(result.errors).toBe(null)
+
+    // The regex elides all the indented arguments in the Python code
+    const pythonCommandsOverview = result.timeline.map(frame =>
+      frame.python?.replaceAll(/(\n\s+.*)+\n/g, '...')
+    )
+    expect(pythonCommandsOverview).toEqual([
+      // Step a:
+      `
+mock_pipette.transfer_with_liquid_class(...)
 `.trim(),
       // Step b:
       `

@@ -51,15 +51,12 @@ export function LabwareCardOverflowMenu(
   const { t } = useTranslation('starting_deck_state')
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const [showNotCompatibleModal, setShowNotCompatibleModal] = useState<boolean>(
-    false
-  )
+  const [showNotCompatibleModal, setShowNotCompatibleModal] =
+    useState<boolean>(false)
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const [
-    showDeleteEntityInUseModal,
-    setShowDeleteEntityInUseModal,
-  ] = useState<boolean>(false)
+  const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] =
+    useState<boolean>(false)
   const [showNickNameModal, setShowNickNameModal] = useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -73,9 +70,8 @@ export function LabwareCardOverflowMenu(
     },
   })
   const topLabwareId = labwareIds[0]
-  const isAdapter = deckSetupLabware[topLabwareId].def.allowedRoles?.includes(
-    'adapter'
-  )
+  const isAdapter =
+    deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter')
   const slotName = getSlotInLocationStack(deckSetupLabware[topLabwareId].stack)
   const fullStack = getFullStackFromLabwares(
     deckSetupLabware,

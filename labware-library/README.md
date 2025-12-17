@@ -58,17 +58,12 @@ make -C labware-library serve PORT=9091
 This project (along with our other front-end projects) uses [vite][] to generate artifacts.
 
 - Entry point is [`labware-library/src/index.tsx`][entry]
-- [Handlebars][] HTML template is [`labware-library/src/index.hbs`][template]
-  - Post-build, the site is crawled and prerendered with [react-snap][]
 - Global CSS is [`labware-library/src/global.module.css`][global-style]
   - All other CSS is used via [CSS Modules][]
 - All artifacts will be output to `labware-library/dist`
 
-[handlebars]: https://handlebarsjs.com/
 [css modules]: https://github.com/css-modules/css-modules
-[react-snap]: https://github.com/stereobooster/react-snap
-[entry]: ./src/index.js
-[template]: ./src/index.hbs
+[entry]: ./src/index.tsx
 [global-style]: ./src/global.module.css
 [vite]: https://vitejs.dev/
 

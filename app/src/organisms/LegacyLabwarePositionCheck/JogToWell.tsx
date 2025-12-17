@@ -7,6 +7,7 @@ import styled, { css } from 'styled-components'
 import {
   ALIGN_CENTER,
   ALIGN_FLEX_START,
+  CenterLabwareInSlot,
   COLORS,
   DIRECTION_COLUMN,
   Flex,
@@ -84,9 +85,8 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
     shouldUseMetalProbe,
   } = props
 
-  const [joggedPosition, setJoggedPosition] = useState<VectorOffset>(
-    initialPosition
-  )
+  const [joggedPosition, setJoggedPosition] =
+    useState<VectorOffset>(initialPosition)
   const isOnDevice = useSelector(getIsOnDevice)
   const [showFullJogControls, setShowFullJogControls] = useState(false)
   useEffect(() => {
@@ -149,10 +149,10 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
         <Flex flex="1" alignItems={ALIGN_CENTER} gridGap={SPACING.spacing20}>
           <RobotWorkSpace viewBox={DECK_MAP_VIEWBOX}>
             {() => (
-              <>
+              <CenterLabwareInSlot definition={labwareDef}>
                 <LabwareRender
                   definition={labwareDef}
-                  positioningMode="offsetInSlot"
+                  positioningMode="passThrough"
                   wellStroke={wellStroke}
                   wellLabelOption={WELL_LABEL_OPTIONS.SHOW_LABEL_OUTSIDE}
                   highlightedWellLabels={{ wells: wellsToHighlight }}
@@ -164,7 +164,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   pipetteName={pipetteName}
                   usingMetalProbe={shouldUseMetalProbe}
                 />
-              </>
+              </CenterLabwareInSlot>
             )}
           </RobotWorkSpace>
           <Flex css={LEVEL_CONTAINER_STYLE}>

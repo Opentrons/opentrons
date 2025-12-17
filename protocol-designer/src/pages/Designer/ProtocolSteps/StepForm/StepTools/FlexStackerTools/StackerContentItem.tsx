@@ -1,0 +1,41 @@
+import { useTranslation } from 'react-i18next'
+
+import { ListItem, StyledText, Tag } from '@opentrons/components'
+
+import styles from './flexstackertools.module.css'
+
+interface StackerContentItemProps {
+  primaryLabwareName: string
+  hasLid: boolean
+  isTiprack: boolean
+  quantity?: number
+}
+export function StackerContentItem(
+  props: StackerContentItemProps
+): JSX.Element {
+  const { primaryLabwareName, hasLid, isTiprack, quantity } = props
+  const { t } = useTranslation('form')
+  return (
+    <ListItem type="default" className={styles.list_item}>
+      <StyledText desktopStyle="bodyDefaultRegular">
+        {primaryLabwareName}
+      </StyledText>
+      {hasLid != null ? (
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t(
+            `step_edit_form.flex_stacker.with_lid.${isTiprack ? 'tiprack' : 'standard'}`
+          )}
+        </StyledText>
+      ) : null}
+      {quantity != null ? (
+        <Tag
+          text={t('step_edit_form.flex_stacker.quantity', {
+            count: quantity,
+          })}
+          type="default"
+          shrinkToContent
+        />
+      ) : null}
+    </ListItem>
+  )
+}

@@ -134,6 +134,7 @@ export function EditInstrumentsModal(
         mount,
         selectedPipette as PipetteName,
         selectedTips,
+        labware,
         leftPipette,
         rightPipette
       )
@@ -191,7 +192,6 @@ export function EditInstrumentsModal(
           />
         ) : (
           <PipetteConfiguration
-            has96Channel={has96Channel}
             robotType={robotType}
             selectedPipette={selectedPipette}
             leftPipette={leftPipette}

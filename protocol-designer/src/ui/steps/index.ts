@@ -4,7 +4,6 @@ import * as _thunks from './actions/thunks'
 export { rootReducer } from './reducers'
 export {
   rootSelector,
-  getSelectedStepTitleInfo,
   getSelectedStepId,
   getMultiSelectItemIds,
   getIsMultiSelectMode,
@@ -16,7 +15,6 @@ export {
   getActiveItem,
   getHoveredSubstep,
   getWellSelectionLabwareKey,
-  getCollapsedSteps,
 } from './selectors'
 export * from './actions/types'
 export const actions = { ..._actions, ..._thunks }

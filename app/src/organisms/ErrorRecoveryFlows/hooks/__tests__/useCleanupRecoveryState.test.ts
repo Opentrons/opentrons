@@ -15,8 +15,8 @@ describe('useCleanupRecoveryState', () => {
       stashedMapRef: {
         current: {
           route: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.ROUTE,
-          step:
-            RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS.RETRY_SAME_TIPS,
+          step: RECOVERY_MAP.MANUAL_FILL_AND_RETRY_SAME_TIPS.STEPS
+            .RETRY_SAME_TIPS,
         },
       },
       setRM: mockSetRM,

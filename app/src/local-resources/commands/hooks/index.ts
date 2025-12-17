@@ -5,5 +5,6 @@ export type {
   GetCommandText,
   GetCommandTextResult,
   GetTCRunExtendedProfileCommandTextResult,
+  GetTCStartRunExtendedProfileCommandTextResult,
   GetTCRunProfileCommandTextResult,
 } from '@opentrons/components'

@@ -45,6 +45,23 @@ def csv_file_different_delimiter() -> bytes:
     return b"x:y:z\na,:1,:2\nb,:3,:4\nc,:5,:6"
 
 
+@pytest.fixture()
+def csv_file_long() -> bytes:
+    """A long CSV file from a customer that caused the sniffer to fail when it only looked at the first 1024 bytes."""
+    return b"""
+Source Labware,Source Slot,Source Well,Source Height,Dest Labware,Dest Slot,Dest Well,Volume
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical,0,A1,0,opentrons_24_aluminumblock_nest_0.5ml_screwcap,0,A1,100
+""".strip()
+
+
 @pytest.fixture
 def csv_file_basic_trailing_empty() -> Tuple[bytes, List[List[str]]]:
     """A basic CSV file with quotes around strings and a trailing newline."""
@@ -100,6 +117,19 @@ def test_csv_parameter(
             subject.file
     assert subject.contents == '"x","y","z"\n"a",1,2\n"b",3,4\n"c",5,6'
     assert subject.parse_as_csv()[0] == ["x", "y", "z"]
+
+
+def test_csv_parameter_long_file(
+    decoy: Decoy, api_version: APIVersion, csv_file_long: bytes
+) -> None:
+    """It should detect the CSV dialect for files of unlimited length."""
+    # The previous implementation of parse_as_csv() passed only the first 1024 bytes of
+    # the CSV file to the dialect sniffer, chopping up a line an unfortunate position,
+    # causing the sniffer to fail with "Could not determine delimiter".
+    subject = CSVParameter(csv_file_long, api_version)
+    parsed_rows = subject.parse_as_csv()
+    assert len(parsed_rows) == 10
+    assert len(parsed_rows[0]) == 8
 
 
 @pytest.mark.parametrize(

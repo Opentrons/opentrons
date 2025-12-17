@@ -82,11 +82,8 @@ function processMixpanelData(data) {
   const systemMemory = []
 
   data.forEach(entry => {
-    const {
-      systemUptimeHrs,
-      systemAvailMemMb,
-      processesDetails,
-    } = entry.properties
+    const { systemUptimeHrs, systemAvailMemMb, processesDetails } =
+      entry.properties
     const uptime = parseFloat(systemUptimeHrs)
 
     // Validate uptime before adding any measurements

@@ -85,12 +85,10 @@ function TouchscreenModal({
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
 
-  const {
-    handlePlaceReaderLid,
-    isValidPlateReaderMove,
-  } = usePlacePlateReaderLid({
-    onSettled: closeModal,
-  })
+  const { handlePlaceReaderLid, isValidPlateReaderMove } =
+    usePlacePlateReaderLid({
+      onSettled: closeModal,
+    })
   const modalHeader: OddModalHeaderBaseProps = {
     title: t('estop_pressed'),
     iconName: 'ot-alert',
@@ -112,7 +110,7 @@ function TouchscreenModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
-        <LegacyStyledText as="p" fontWeight>
+        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
           {t('branded:estop_pressed_description')}
         </LegacyStyledText>
         <ListItem
@@ -159,12 +157,10 @@ function DesktopModal({
   const { t } = useTranslation('device_settings')
   const [isResuming, setIsResuming] = useState<boolean>(false)
   const { acknowledgeEstopDisengage } = useAcknowledgeEstopDisengageMutation()
-  const {
-    handlePlaceReaderLid,
-    isValidPlateReaderMove,
-  } = usePlacePlateReaderLid({
-    onSettled: closeModal,
-  })
+  const { handlePlaceReaderLid, isValidPlateReaderMove } =
+    usePlacePlateReaderLid({
+      onSettled: closeModal,
+    })
 
   const modalProps: ModalProps = {
     type: 'error',

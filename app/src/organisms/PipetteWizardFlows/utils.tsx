@@ -1,7 +1,7 @@
 import { css } from 'styled-components'
 
 import { AnimationVideo, SPACING } from '@opentrons/components'
-import { LEFT, RIGHT } from '@opentrons/shared-data'
+import { LEFT, RIGHT, WASTE_CHUTE_CUTOUT } from '@opentrons/shared-data'
 
 import attachLeft18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_L.webm'
 import attachRight18 from '/app/assets/videos/pipette-wizard-flows/Pipette_Attach_1_8_R.webm'
@@ -24,8 +24,19 @@ import zAxisDetach96 from '/app/assets/videos/pipette-wizard-flows/Pipette_Zaxis
 
 import { FLOWS, SECTIONS } from './constants'
 
+import type { Dispatch, SetStateAction } from 'react'
+import type { UseQueryResult } from 'react-query'
+import type {
+  CreateCommand,
+  DeckConfiguration,
+  MotorAxes,
+} from '@opentrons/shared-data'
 import type { AttachedPipettesFromInstrumentsQuery } from '/app/resources/instruments'
-import type { PipetteWizardFlow, PipetteWizardStep } from './types'
+import type {
+  PipetteWizardFlow,
+  PipetteWizardStep,
+  PipetteWizardStepProps,
+} from './types'
 
 export function getIsGantryEmpty(
   attachedPipette: AttachedPipettesFromInstrumentsQuery
@@ -37,6 +48,85 @@ interface PipetteAnimationProps {
   pipetteWizardStep: PipetteWizardStep
   channel?: number
 }
+
+export function startCalibrationOnClick(
+  props: PipetteWizardStepProps,
+  setShowUnableToDetect: Dispatch<SetStateAction<boolean>>,
+  pipetteId: string
+): () => void {
+  const { chainRunCommands, proceed, setShowErrorMessage, mount } = props
+  return () => {
+    const axes: MotorAxes = mount === LEFT ? ['leftZ'] : ['rightZ']
+    const verifyCommands: CreateCommand[] = [
+      {
+        commandType: 'verifyTipPresence',
+        params: {
+          pipetteId,
+          expectedState: 'present',
+          followSingularSensor: 'primary',
+        },
+      },
+    ]
+    const homeCommands: CreateCommand[] = [
+      {
+        commandType: 'home',
+        params: { axes },
+      },
+      {
+        commandType: 'home',
+        params: { skipIfMountPositionOk: mount },
+      },
+      {
+        commandType: 'calibration/calibratePipette',
+        params: { mount },
+      },
+      {
+        commandType: 'calibration/moveToMaintenancePosition',
+        params: { mount },
+      },
+    ]
+
+    chainRunCommands?.(verifyCommands, false)
+      .then(() => {
+        chainRunCommands?.(homeCommands, false)
+          .then(() => {
+            proceed()
+          })
+          .catch(error => {
+            setShowErrorMessage(error.message as string)
+          })
+      })
+      .catch(() => {
+        setShowUnableToDetect?.(true)
+      })
+  }
+}
+
+export function isWasteChuteOnDeck(
+  deckConfig?: UseQueryResult<DeckConfiguration>
+): boolean {
+  return !!deckConfig?.data?.find(
+    fixture =>
+      fixture.cutoutId === WASTE_CHUTE_CUTOUT &&
+      fixture.cutoutFixtureId?.includes('wasteChute')
+  )
+}
+
+export function is96Channel(
+  instrument: AttachedPipettesFromInstrumentsQuery
+): boolean {
+  const left_instrument = instrument[LEFT]
+  const right_instrument = instrument[RIGHT]
+  if (
+    left_instrument?.data?.channels === 96 ||
+    right_instrument?.data?.channels === 96
+  ) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export function getPipetteAnimations(
   props: PipetteAnimationProps
 ): JSX.Element {

@@ -56,12 +56,12 @@ jobs:
       relative_artifact_dir: ${{ steps.deploy-config.outputs.RELATIVE_ARTIFACT_DIR }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
         run: make setup
@@ -80,12 +80,12 @@ jobs:
           fetch-depth: 0
       - uses: ./.github/actions/git/resolve-tag
       - uses: ./.github/actions/environment/complex-variables
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - uses: 'actions/setup-python@v3'
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
@@ -105,20 +105,20 @@ jobs:
       - build
     runs-on: 'ubuntu-24.04'
     timeout-minutes: 5
-    if: always() && needs.build.result == 'success' && needs.determine-deploy-config.result == 'success'
+    if: always() && needs.build.result == 'success' && needs.determine-deploy-config.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     permissions:
       id-token: write
       contents: read
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - uses: ./.github/actions/git/resolve-tag
       - name: Setup UV
         uses: astral-sh/setup-uv@v6
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: Setup Deploy Dependencies
         working-directory: scripts/static-deploy
         run: |
@@ -128,7 +128,7 @@ jobs:
         with:
           aws-region: us-east-2
           audience: sts.amazonaws.com
-          role-to-assume: ${{ secrets.DOCS_SANDBOX_ROLE }}
+          role-to-assume: ${{ secrets.STATIC_DEPLOYMENT_ROLE }}
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:

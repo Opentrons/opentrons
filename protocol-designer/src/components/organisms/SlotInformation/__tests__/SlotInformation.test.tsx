@@ -46,7 +46,7 @@ describe('SlotInformation', () => {
     }
   })
 
-  it('should render DeckInfoLabel and title', () => {
+  it('should render RobotInfoLabel and title', () => {
     render(props)
     screen.getByText('A1')
     screen.getByText('Slot Detail')

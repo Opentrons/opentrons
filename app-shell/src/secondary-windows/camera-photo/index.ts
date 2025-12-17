@@ -9,6 +9,9 @@ import {
 import type { Logger } from 'winston'
 import type { SecondaryWindowDetails } from '../types'
 
+const WINDOW_DEFAULT_WIDTH_PX = 876
+const WINDOW_DEFAULT_HEIGHT_PX = 524
+
 interface CameraPhotoDetails extends SecondaryWindowDetails {
   type: 'camera-photo'
 }
@@ -17,7 +20,6 @@ interface OpenCameraPhotoParams {
   robotName: string
   windowTitle: string
   photoUrl: string
-  dimensions: { width: number; height: number }
   log: Logger
 }
 
@@ -47,7 +49,6 @@ function createCameraPhotoUi({
   log,
   robotName,
   windowTitle,
-  dimensions,
   photoUrl,
 }: OpenCameraPhotoParams): BrowserWindow {
   log.debug('Creating camera photo window', {
@@ -56,13 +57,18 @@ function createCameraPhotoUi({
 
   const cameraPhotoWindow = new BrowserWindow({
     ...SECONDARY_WINDOW_OPTS,
-    width: dimensions.width,
-    height: dimensions.height,
+    width: WINDOW_DEFAULT_WIDTH_PX,
+    height: WINDOW_DEFAULT_HEIGHT_PX,
     minWidth: 100,
     minHeight: 100,
   }).once('ready-to-show', () => {
     log.debug('Camera photo window ready to show')
     cameraPhotoWindow.setTitle(windowTitle)
+    // TODO(jh, 10-29-25): We should set the aspect ratio based on the default
+    //  pic dimensions themselves.
+    cameraPhotoWindow.setAspectRatio(
+      WINDOW_DEFAULT_WIDTH_PX / WINDOW_DEFAULT_HEIGHT_PX
+    )
     cameraPhotoWindow.show()
   })
 

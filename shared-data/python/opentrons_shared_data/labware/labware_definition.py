@@ -22,6 +22,8 @@ from pydantic import (
 )
 from typing_extensions import Annotated, Literal
 
+from ..util import StrEnum
+
 from .types import LocatingFeatures
 from .constants import (
     Conical,
@@ -93,7 +95,7 @@ class BrandData(BaseModel):
     links: list[str] | None = None
 
 
-class DisplayCategory(str, Enum):
+class DisplayCategory(StrEnum):
     tipRack = "tipRack"
     tubeRack = "tubeRack"
     reservoir = "reservoir"
@@ -106,13 +108,17 @@ class DisplayCategory(str, Enum):
     system = "system"
 
 
-class LabwareRole(str, Enum):
+class LabwareRole(StrEnum):
     labware = "labware"
     fixture = "fixture"
     adapter = "adapter"
     maintenance = "maintenance"
     lid = "lid"
     system = "system"
+
+
+class Quirks(Enum):
+    disableGeometryBasedGripCheck = "disableGeometryBasedGripCheck"
 
 
 class Metadata(BaseModel):

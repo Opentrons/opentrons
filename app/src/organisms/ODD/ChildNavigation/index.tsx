@@ -40,6 +40,7 @@ export interface ChildNavigationProps extends StyleProps {
   buttonType?: SmallButtonTypes
   buttonIsDisabled?: boolean
   iconName?: IconName
+  backIconName?: IconName
   iconPlacement?: IconPlacement
   secondaryButtonProps?: ComponentProps<typeof SmallButton>
   ariaDisabled?: boolean
@@ -53,6 +54,7 @@ export function ChildNavigation({
   onClickButton,
   buttonType = 'primary',
   iconName,
+  backIconName,
   iconPlacement,
   secondaryButtonProps,
   buttonIsDisabled,
@@ -79,7 +81,11 @@ export function ChildNavigation({
             onClick={onClickBack}
             data-testid="ChildNavigation_Back_Button"
           >
-            <Icon name="back" size="3rem" color={COLORS.black90} />
+            <Icon
+              name={backIconName || 'back'}
+              size="3rem"
+              color={COLORS.black90}
+            />
           </IconButton>
         ) : null}
         <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>

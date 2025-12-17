@@ -49,6 +49,7 @@ from opentrons.protocol_engine.types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
     LoadableLabwareLocation,
+    WASTE_CHUTE_LOCATION,
     NonStackedLocation,
 )
 from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
@@ -499,13 +500,28 @@ class ProtocolCore(
             )
         # if this is a labware with a lid, we just need to find its lid_id
         else:
-            lid = self._engine_client.state.labware.get_lid_by_labware_id(
-                labware.labware_id
+            # we need to check to see if this labware is hosting a lid stack
+            potential_lid_stack = (
+                self._engine_client.state.labware.get_next_child_labware(
+                    labware.labware_id
+                )
             )
-            if lid is not None:
-                lid_id = lid.id
+            if potential_lid_stack and labware_validation.is_lid_stack(
+                self._engine_client.state.labware.get_load_name(potential_lid_stack)
+            ):
+                lid_id = self._engine_client.state.labware.get_highest_child_labware(
+                    labware.labware_id
+                )
             else:
-                raise ValueError("Cannot move a lid off of a labware with no lid.")
+                lid = self._engine_client.state.labware.get_lid_by_labware_id(
+                    labware.labware_id
+                )
+                if lid is not None:
+                    lid_id = lid.id
+                else:
+                    raise ValueError(
+                        f"Cannot move a lid off of {labware.get_display_name()} because it has no lid."
+                    )
 
         _pick_up_offset = (
             LabwareOffsetVector(
@@ -609,6 +625,9 @@ class ProtocolCore(
         )
 
         # Handle leftover empty lid stack if there is one
+        potential_lid_stack = self._engine_client.state.labware.get_next_child_labware(
+            labware.labware_id
+        )
         if (
             labware_validation.is_lid_stack(labware.load_name)
             and self._engine_client.state.labware.get_highest_child_labware(
@@ -620,6 +639,25 @@ class ProtocolCore(
             self._engine_client.execute_command(
                 cmd.MoveLabwareParams(
                     labwareId=labware.labware_id,
+                    newLocation=SYSTEM_LOCATION,
+                    strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
+                    pickUpOffset=None,
+                    dropOffset=None,
+                )
+            )
+        elif (
+            potential_lid_stack
+            and labware_validation.is_lid_stack(
+                self._engine_client.state.labware.get_load_name(potential_lid_stack)
+            )
+            and self._engine_client.state.labware.get_highest_child_labware(
+                potential_lid_stack
+            )
+            == potential_lid_stack
+        ):
+            self._engine_client.execute_command(
+                cmd.MoveLabwareParams(
+                    labwareId=potential_lid_stack,
                     newLocation=SYSTEM_LOCATION,
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
@@ -1131,8 +1169,47 @@ class ProtocolCore(
             return self._module_cores_by_id[labware_location.moduleId]
         elif isinstance(labware_location, OnLabwareLocation):
             return self._labware_cores_by_id[labware_location.labwareId]
-
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            return OffDeckType.WASTE_CHUTE
         return OffDeckType.OFF_DECK
+
+    def capture_image(
+        self,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using a camera.
+        Args:
+            resolution: Width by height resolution in pixels for the image to be captured with.
+            zoom: Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.
+            contrast: The contrast to use when processing an image. Scale is 0% to 100%
+            brightness: The brightness to use when processing an image. Scale is 0% to 100%.
+            saturation: The saturation to use when processing an image. Scale is 0% to 100%.
+        """
+        self._engine_client.execute_command(
+            cmd.CaptureImageParams(
+                fileName=filename,
+                resolution=resolution
+                if resolution is not None
+                else self._engine_client.state.camera.get_resolution(),
+                zoom=zoom
+                if zoom is not None
+                else self._engine_client.state.camera.get_zoom(),
+                contrast=contrast
+                if contrast is not None
+                else self._engine_client.state.camera.get_contrast(),
+                brightness=brightness
+                if brightness is not None
+                else self._engine_client.state.camera.get_brightness(),
+                saturation=saturation
+                if saturation is not None
+                else self._engine_client.state.camera.get_saturation(),
+            )
+        )
 
     def _convert_labware_location(
         self,
@@ -1168,6 +1245,8 @@ class ProtocolCore(
             return ModuleLocation(moduleId=location.module_id)
         elif location is OffDeckType.OFF_DECK:
             return OFF_DECK_LOCATION
+        elif location is OffDeckType.WASTE_CHUTE:
+            return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
         elif isinstance(location, StagingSlotName):

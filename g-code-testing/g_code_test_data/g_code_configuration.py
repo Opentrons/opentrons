@@ -31,24 +31,26 @@ from pydantic import (
 )
 
 BUCKET_NAME = "g-code-comparison"
-COMPARISON_FILES_FOLDER_PATH = os.path.join(os.path.dirname(__file__), 'comparison_files')
+COMPARISON_FILES_FOLDER_PATH = os.path.join(
+    os.path.dirname(__file__), "comparison_files"
+)
 
 
 class SharedFunctionsMixin:
     """Functions that GCodeConfirmConfig classes share."""
+
     def add_mark(self, user_mark: Mark) -> None:
         self.marks.append(user_mark)
 
 
-
 class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     path: str
-    name: Optional[Annotated[str, StringConstraints(pattern=r'^[a-z0-9_]*$')]] = None
+    name: Optional[Annotated[str, StringConstraints(pattern=r"^[a-z0-9_]*$")]] = None
     settings: Settings
     results_dir: ClassVar[str] = "protocols"
-    driver: str = 'protocol'
+    driver: str = "protocol"
     marks: List[Mark] = [pytest.mark.g_code_confirm]
-    versions: Set[Union[APIVersion,int]] = Field(..., min_length=1)
+    versions: Set[Union[APIVersion, int]] = Field(..., min_length=1)
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @model_validator(mode="after")
@@ -61,9 +63,8 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
 
     def _get_full_path(self, version: APIVersion):
         return os.path.join(
-            COMPARISON_FILES_FOLDER_PATH,
-            self.get_comparison_file_path(version)
-            )
+            COMPARISON_FILES_FOLDER_PATH, self.get_comparison_file_path(version)
+        )
 
     def get_configuration_paths(self, version: APIVersion) -> str:
         """Get the configuration file path."""
@@ -77,12 +78,14 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         """Pull comparison file and print it's content."""
         file_path = self._get_full_path(version)
         file = open(file_path, "r")
-        return ''.join(file.readlines()).strip()
+        return "".join(file.readlines()).strip()
 
     async def update_comparison(self, version: APIVersion) -> str:
         """Run config and override the comparison file with output."""
-        Path(os.path.dirname(self._get_full_path(version))).mkdir(parents=True, exist_ok=True)
-        with open(self._get_full_path(version), 'w') as file:
+        Path(os.path.dirname(self._get_full_path(version))).mkdir(
+            parents=True, exist_ok=True
+        )
+        with open(self._get_full_path(version), "w") as file:
             file.write(await self.execute(version))
         return "File uploaded successfully"
 
@@ -90,21 +93,25 @@ class ProtocolGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
         return os.path.exists(self._get_full_path(version))
 
     async def execute(self, version: APIVersion):
-        async with GCodeEngine(self.settings).run_protocol(self.path, version) as program:
+        async with GCodeEngine(self.settings).run_protocol(
+            self.path, version
+        ) as program:
             return program.get_text_explanation(SupportedTextModes.CONCISE)
 
 
 class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
-    name: Annotated[str, StringConstraints(pattern=r'^[a-z0-9_]*$')]
+    name: Annotated[str, StringConstraints(pattern=r"^[a-z0-9_]*$")]
     executable: Callable
     settings: Settings
     results_dir: ClassVar[str] = "http"
-    driver: str = 'http'
+    driver: str = "http"
     marks: List[Mark] = [pytest.mark.g_code_confirm]
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def _get_full_path(self) -> str:
-        return os.path.join(COMPARISON_FILES_FOLDER_PATH, self.get_comparison_file_path())
+        return os.path.join(
+            COMPARISON_FILES_FOLDER_PATH, self.get_comparison_file_path()
+        )
 
     def comparison_file_exists(self) -> bool:
         return os.path.exists(self._get_full_path())
@@ -120,14 +127,14 @@ class HTTPGCodeConfirmConfig(BaseModel, SharedFunctionsMixin):
     def get_comparison_file(self) -> str:
         """Pull comparison file and print it's content."""
         file = open(self._get_full_path(), "r")
-        return ''.join(file.readlines()).strip()
+        return "".join(file.readlines()).strip()
 
     async def update_comparison(self) -> str:
         """Run config and override the comparison file with output."""
-        with open(self._get_full_path(), 'w') as file:
+        with open(self._get_full_path(), "w") as file:
             file.write(await self.execute())
         return "File uploaded successfully"
 
-    def execute(self):
-        with GCodeEngine(self.settings).run_http(self.executable) as program:
+    async def execute(self):
+        async with GCodeEngine(self.settings).run_http(self.executable) as program:
             return program.get_text_explanation(SupportedTextModes.CONCISE)

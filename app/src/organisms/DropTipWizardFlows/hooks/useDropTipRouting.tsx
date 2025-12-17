@@ -109,7 +109,7 @@ export function useDropTipRouting(
       if (step == null || isStepNotInRoute) {
         setDropTipFlowsMap({
           currentRoute: route,
-          currentStep: head(route) as DropTipFlowsStep,
+          currentStep: head(route)!,
           currentStepIdx: 0,
         })
         if (isStepNotInRoute) {

@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -10955,7 +10958,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 58.0
+        "targetBlockTemperature": 58.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -10986,7 +10990,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 58.0
+        "targetLidTemperature": 58.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11016,7 +11021,9 @@
         "celsius": 58.0,
         "moduleId": "UUID"
       },
-      "result": {},
+      "result": {
+        "taskId": "UUID"
+      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -11131,7 +11138,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 58.0
+        "targetBlockTemperature": 58.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11162,7 +11170,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 58.0
+        "targetLidTemperature": 58.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -11192,7 +11201,9 @@
         "celsius": 58.0,
         "moduleId": "UUID"
       },
-      "result": {},
+      "result": {
+        "taskId": "UUID"
+      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -38103,7 +38114,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 10.0
+        "targetBlockTemperature": 10.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

@@ -8,8 +8,7 @@ import {
   LegacyStyledText,
   SPACING,
 } from '@opentrons/components'
-
-import { labwareImages } from '/app/local-resources/labware'
+import { labwareImages } from '@opentrons/shared-data'
 
 import type { SelectOption } from '@opentrons/components'
 
@@ -41,7 +40,7 @@ export function ChosenTipRackRender(
           max-width: 7rem;
           max-height: 3.7rem;
         `}
-        src={imageSrc}
+        src={imageSrc[0]}
         alt={`${String(displayName)} image`}
       />
       <Box>

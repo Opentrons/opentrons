@@ -17,11 +17,8 @@ export function StackerHomeShuttle(props: RecoveryContentProps): JSX.Element {
 
   const { routeUpdateActions, recoveryCommands, recoveryMap } = props
   const { step } = recoveryMap
-  const {
-    proceedNextStep,
-    goBackPrevStep,
-    handleMotionRouting,
-  } = routeUpdateActions
+  const { proceedNextStep, goBackPrevStep, handleMotionRouting } =
+    routeUpdateActions
   const { homeShuttle } = recoveryCommands
 
   const buildTitle = (): string => {

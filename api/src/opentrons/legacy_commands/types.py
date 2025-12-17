@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing_extensions import Literal, Final, TypedDict
-from typing import Optional, List, Sequence, TYPE_CHECKING, Union
+from typing import Optional, List, Sequence, TYPE_CHECKING, Union, Tuple
 from opentrons.hardware_control.modules import ThermocyclerStep
 
 if TYPE_CHECKING:
@@ -25,6 +25,7 @@ PAUSE: Final = "command.PAUSE"
 RESUME: Final = "command.RESUME"
 COMMENT: Final = "command.COMMENT"
 MOVE_LABWARE: Final = "command.MOVE_LABWARE"
+CAPTURE_IMAGE: Final = "command.CAPTURE_IMAGE"
 
 # Pipette #
 
@@ -64,6 +65,7 @@ HEATER_SHAKER_WAIT_FOR_TEMPERATURE: Final = "command.HEATER_SHAKER_WAIT_FOR_TEMP
 HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED: Final = (
     "command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"
 )
+HEATER_SHAKER_SET_SHAKE_SPEED: Final = "command.HEATER_SHAKER_SET_SHAKE_SPEED"
 HEATER_SHAKER_OPEN_LABWARE_LATCH: Final = "command.HEATER_SHAKER_OPEN_LABWARE_LATCH"
 HEATER_SHAKER_CLOSE_LABWARE_LATCH: Final = "command.HEATER_SHAKER_CLOSE_LABWARE_LATCH"
 HEATER_SHAKER_DEACTIVATE_SHAKER: Final = "command.HEATER_SHAKER_DEACTIVATE_SHAKER"
@@ -80,12 +82,15 @@ TEMPDECK_AWAIT_TEMP: Final = "command.TEMPDECK_AWAIT_TEMP"
 THERMOCYCLER_OPEN: Final = "command.THERMOCYCLER_OPEN"
 THERMOCYCLER_CLOSE: Final = "command.THERMOCYCLER_CLOSE"
 THERMOCYCLER_SET_BLOCK_TEMP: Final = "command.THERMOCYCLER_SET_BLOCK_TEMP"
+THERMOCYCLER_START_SET_BLOCK_TEMP: Final = "command.THERMOCYCLER_START_SET_BLOCK_TEMP"
 THERMOCYCLER_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_EXECUTE_PROFILE"
+THERMOCYCLER_START_EXECUTE_PROFILE: Final = "command.THERMOCYCLER_START_EXECUTE_PROFILE"
 THERMOCYCLER_DEACTIVATE: Final = "command.THERMOCYCLER_DEACTIVATE"
 THERMOCYCLER_WAIT_FOR_HOLD: Final = "command.THERMOCYCLER_WAIT_FOR_HOLD"
 THERMOCYCLER_WAIT_FOR_TEMP: Final = "command.THERMOCYCLER_WAIT_FOR_TEMP"
 THERMOCYCLER_WAIT_FOR_LID_TEMP: Final = "command.THERMOCYCLER_WAIT_FOR_LID_TEMP"
 THERMOCYCLER_SET_LID_TEMP: Final = "command.THERMOCYCLER_SET_LID_TEMP"
+THERMOCYCLER_START_SET_LID_TEMP: Final = "command.THERMOCYCLER_START_SET_LID_TEMP"
 THERMOCYCLER_DEACTIVATE_LID: Final = "command.THERMOCYCLER_DEACTIVATE_LID"
 THERMOCYCLER_DEACTIVATE_BLOCK: Final = "command.THERMOCYCLER_DEACTIVATE_BLOCK"
 
@@ -192,6 +197,15 @@ class HeaterShakerSetAndWaitForShakeSpeedPayload(TextOnlyPayload):
 class HeaterShakerSetAndWaitForShakeSpeedCommand(TypedDict):
     name: Literal["command.HEATER_SHAKER_SET_AND_WAIT_FOR_SHAKE_SPEED"]
     payload: HeaterShakerSetAndWaitForShakeSpeedPayload
+
+
+class HeaterShakerSetShakeSpeedPayload(TextOnlyPayload):
+    pass
+
+
+class HeaterShakerSetShakeSpeedCommand(TypedDict):
+    name: Literal["command.HEATER_SHAKER_SET_SHAKE_SPEED"]
+    payload: HeaterShakerSetShakeSpeedPayload
 
 
 class HeaterShakerOpenLabwareLatchPayload(TextOnlyPayload):
@@ -303,6 +317,15 @@ class ThermocyclerSetBlockTempCommand(TypedDict):
     payload: ThermocyclerSetBlockTempCommandPayload
 
 
+class ThermocyclerStartSetBlockTempCommandPayload(TextOnlyPayload):
+    temperature: float
+
+
+class ThermocyclerStartSetBlockTempCommand(TypedDict):
+    name: Literal["command.THERMOCYCLER_START_SET_BLOCK_TEMP"]
+    payload: ThermocyclerStartSetBlockTempCommandPayload
+
+
 class ThermocyclerExecuteProfileCommandPayload(TextOnlyPayload):
     steps: List[ThermocyclerStep]
 
@@ -310,6 +333,15 @@ class ThermocyclerExecuteProfileCommandPayload(TextOnlyPayload):
 class ThermocyclerExecuteProfileCommand(TypedDict):
     name: Literal["command.THERMOCYCLER_EXECUTE_PROFILE"]
     payload: ThermocyclerExecuteProfileCommandPayload
+
+
+class ThermocyclerStartExecuteProfileCommandPayload(TextOnlyPayload):
+    steps: List[ThermocyclerStep]
+
+
+class ThermocyclerStartExecuteProfileCommand(TypedDict):
+    name: Literal["command.THERMOCYCLER_START_EXECUTE_PROFILE"]
+    payload: ThermocyclerStartExecuteProfileCommandPayload
 
 
 class ThermocyclerWaitForHoldCommandPayload(TextOnlyPayload):
@@ -337,6 +369,15 @@ class ThermocyclerSetLidTempCommandPayload(TextOnlyPayload):
 class ThermocyclerSetLidTempCommand(TypedDict):
     name: Literal["command.THERMOCYCLER_SET_LID_TEMP"]
     payload: ThermocyclerSetLidTempCommandPayload
+
+
+class ThermocyclerStartSetLidTempCommandPayload(TextOnlyPayload):
+    pass
+
+
+class ThermocyclerStartSetLidTempCommand(TypedDict):
+    name: Literal["command.THERMOCYCLER_START_SET_LID_TEMP"]
+    payload: ThermocyclerStartSetLidTempCommandPayload
 
 
 class ThermocyclerDeactivateLidCommandPayload(TextOnlyPayload):
@@ -425,6 +466,7 @@ class AspirateDispenseCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     location: Location
     volume: float
     rate: float
+    end_location: Optional[Location]
 
 
 class AspirateCommand(TypedDict):
@@ -498,6 +540,21 @@ class MixCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
 class MixCommand(TypedDict):
     name: Literal["command.MIX"]
     payload: MixCommandPayload
+
+
+class DynamicMixCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
+    aspirate_start_location: Location
+    dispense_start_location: Location
+    aspirate_end_location: Union[None, Location]
+    dispense_end_location: Union[None, Location]
+    volume: float
+    repetitions: int
+    movement_delay: float
+
+
+class DynamicMixCommand(TypedDict):
+    name: Literal["command.MIX"]
+    payload: DynamicMixCommandPayload
 
 
 class BlowOutCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
@@ -595,6 +652,14 @@ class MoveLabwareCommandPayload(TextOnlyPayload):
     pass
 
 
+class CaptureImageCommandPayload(TextOnlyPayload):
+    resolution: Optional[Tuple[int, int]]
+    zoom: Optional[float]
+    contrast: Optional[float]
+    brightness: Optional[float]
+    saturation: Optional[float]
+
+
 class LiquidClassCommandPayload(TextOnlyPayload, SingleInstrumentPayload):
     liquid_class: LiquidClass
     volume: float
@@ -648,6 +713,11 @@ class ConfigureNozzleLayoutPayload(TypedDict, TextOnlyPayload):
 class MoveLabwareCommand(TypedDict):
     name: Literal["command.MOVE_LABWARE"]
     payload: MoveLabwareCommandPayload
+
+
+class CaptureImageCommand(TypedDict):
+    name: Literal["command.CAPTURE_IMAGE"]
+    payload: CaptureImageCommandPayload
 
 
 class SealCommand(TypedDict):
@@ -749,6 +819,7 @@ Command = Union[
     BlowOutCommand,
     BlowOutInDisposalLocationCommand,
     MixCommand,
+    DynamicMixCommand,
     TransferCommand,
     DistributeCommand,
     ConsolidateCommand,
@@ -759,6 +830,7 @@ Command = Union[
     HeaterShakerSetTargetTemperatureCommand,
     HeaterShakerWaitForTemperatureCommand,
     HeaterShakerSetAndWaitForShakeSpeedCommand,
+    HeaterShakerSetShakeSpeedCommand,
     HeaterShakerOpenLabwareLatchCommand,
     HeaterShakerCloseLabwareLatchCommand,
     HeaterShakerDeactivateShakerCommand,
@@ -769,10 +841,13 @@ Command = Union[
     ThermocyclerDeactivateBlockCommand,
     ThermocyclerDeactivateLidCommand,
     ThermocyclerSetLidTempCommand,
+    ThermocyclerStartSetLidTempCommand,
     ThermocyclerWaitForTempCommand,
     ThermocyclerWaitForHoldCommand,
     ThermocyclerExecuteProfileCommand,
+    ThermocyclerStartExecuteProfileCommand,
     ThermocyclerSetBlockTempCommand,
+    ThermocyclerStartSetBlockTempCommand,
     ThermocyclerOpenCommand,
     TempdeckDeactivateCommand,
     TempdeckAwaitTempCommand,
@@ -795,6 +870,7 @@ Command = Union[
     PressurizeCommand,
     ConfigureForVolumeCommand,
     ConfigureNozzleLayoutCommand,
+    CaptureImageCommand,
     # Robot commands
     RobotMoveToCommand,
     RobotMoveAxisToCommand,
@@ -819,6 +895,7 @@ CommandPayload = Union[
     HeaterShakerSetTargetTemperaturePayload,
     HeaterShakerWaitForTemperaturePayload,
     HeaterShakerSetAndWaitForShakeSpeedPayload,
+    HeaterShakerSetShakeSpeedPayload,
     HeaterShakerOpenLabwareLatchPayload,
     HeaterShakerCloseLabwareLatchPayload,
     HeaterShakerDeactivateShakerPayload,
@@ -830,6 +907,7 @@ CommandPayload = Union[
     ThermocyclerWaitForHoldCommandPayload,
     ThermocyclerWaitForTempCommandPayload,
     ThermocyclerSetLidTempCommandPayload,
+    ThermocyclerStartSetLidTempCommandPayload,
     ThermocyclerDeactivateLidCommandPayload,
     ThermocyclerDeactivateBlockCommandPayload,
     ThermocyclerDeactivateCommandPayload,
@@ -844,6 +922,7 @@ CommandPayload = Union[
     BlowOutCommandPayload,
     BlowOutInDisposalLocationCommandPayload,
     MixCommandPayload,
+    DynamicMixCommandPayload,
     TransferCommandPayload,
     DistributeCommandPayload,
     ConsolidateCommandPayload,
@@ -851,7 +930,9 @@ CommandPayload = Union[
     DispenseInDisposalLocationCommandPayload,
     HomeCommandPayload,
     ThermocyclerExecuteProfileCommandPayload,
+    ThermocyclerStartExecuteProfileCommandPayload,
     ThermocyclerSetBlockTempCommandPayload,
+    ThermocyclerStartSetBlockTempCommandPayload,
     TempdeckAwaitTempCommandPayload,
     TempdeckSetTempCommandPayload,
     PauseCommandPayload,
@@ -865,6 +946,7 @@ CommandPayload = Union[
     PressurizeCommandPayload,
     ConfigureForVolumePayload,
     ConfigureNozzleLayoutPayload,
+    CaptureImageCommandPayload,
     # Robot payloads
     RobotMoveToCommandPayload,
     RobotMoveAxisRelativeCommandPayload,
@@ -935,6 +1017,10 @@ class MixMessage(CommandMessageFields, MixCommand):
     pass
 
 
+class DynamicMixMessage(CommandMessageFields, DynamicMixCommand):
+    pass
+
+
 class TransferMessage(CommandMessageFields, TransferCommand):
     pass
 
@@ -979,6 +1065,12 @@ class HeaterShakerWaitForTemperatureMessage(
 
 class HeaterShakerSetAndWaitForShakeSpeedMessage(
     CommandMessageFields, HeaterShakerSetAndWaitForShakeSpeedCommand
+):
+    pass
+
+
+class HeaterShakerSetShakeSpeedMessage(
+    CommandMessageFields, HeaterShakerSetShakeSpeedCommand
 ):
     pass
 
@@ -1041,6 +1133,18 @@ class ThermocyclerSetLidTempMessage(
     pass
 
 
+class ThermocyclerStartSetLidTempMessage(
+    CommandMessageFields, ThermocyclerStartSetLidTempCommand
+):
+    pass
+
+
+class ThermocyclerStartSetBlockTempMessage(
+    CommandMessageFields, ThermocyclerStartSetBlockTempCommand
+):
+    pass
+
+
 class ThermocyclerWaitForTempMessage(
     CommandMessageFields, ThermocyclerWaitForTempCommand
 ):
@@ -1055,6 +1159,12 @@ class ThermocyclerWaitForHoldMessage(
 
 class ThermocyclerExecuteProfileMessage(
     CommandMessageFields, ThermocyclerExecuteProfileCommand
+):
+    pass
+
+
+class ThermocyclerStartExecuteProfileMessage(
+    CommandMessageFields, ThermocyclerStartExecuteProfileCommand
 ):
     pass
 
@@ -1183,6 +1293,7 @@ CommandMessage = Union[
     HeaterShakerSetTargetTemperatureMessage,
     HeaterShakerWaitForTemperatureMessage,
     HeaterShakerSetAndWaitForShakeSpeedMessage,
+    HeaterShakerSetShakeSpeedMessage,
     HeaterShakerOpenLabwareLatchMessage,
     HeaterShakerCloseLabwareLatchMessage,
     HeaterShakerDeactivateShakerMessage,
@@ -1196,6 +1307,7 @@ CommandMessage = Union[
     ThermocyclerWaitForTempMessage,
     ThermocyclerWaitForHoldMessage,
     ThermocyclerExecuteProfileMessage,
+    ThermocyclerStartExecuteProfileMessage,
     ThermocyclerSetBlockTempMessage,
     ThermocyclerOpenMessage,
     TempdeckSetTempMessage,

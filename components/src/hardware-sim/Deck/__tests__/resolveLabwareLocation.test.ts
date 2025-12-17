@@ -75,37 +75,40 @@ it('should resolve a labware location', () => {
 
   expect(result).toStrictEqual(expectedResult)
 })
+;(['offDeck', 'systemLocation', 'wasteChuteLocation'] as const).forEach(
+  offDeckLocation => {
+    it(`should return offDeck if the labware location is ${offDeckLocation}`, () => {
+      const labwareAUri = 'opentrons/nest_12_reservoir_15ml/1'
+      const labwareBUri = 'opentrons/agilent_1_reservoir_290ml/1'
+      const labwareADefinition = getAllDefinitions()[labwareAUri]
+      const labwareBDefinition = getAllDefinitions()[labwareBUri]
 
-it('should return offDeck if the labware is off-deck', () => {
-  const labwareAUri = 'opentrons/nest_12_reservoir_15ml/1'
-  const labwareBUri = 'opentrons/agilent_1_reservoir_290ml/1'
-  const labwareADefinition = getAllDefinitions()[labwareAUri]
-  const labwareBDefinition = getAllDefinitions()[labwareBUri]
+      const deckDefinition = getDeckDefinitions().ot3_standard
 
-  const deckDefinition = getDeckDefinitions().ot3_standard
+      const result = resolveLabwareLocation({
+        targetLabwareDef: labwareADefinition,
+        targetLabwareLocation: {
+          labwareId: 'labware-b-id',
+        },
+        otherLoadedLabware: [
+          {
+            id: 'labware-b-id',
+            definitionUri: labwareBUri,
+            location: offDeckLocation,
+            loadName: '',
+          },
+        ],
+        deckDef: deckDefinition,
+        otherLabwareDefinitions: [labwareBDefinition],
+        loadedModules: [],
+      })
 
-  const result = resolveLabwareLocation({
-    targetLabwareDef: labwareADefinition,
-    targetLabwareLocation: {
-      labwareId: 'labware-b-id',
-    },
-    otherLoadedLabware: [
-      {
-        id: 'labware-b-id',
-        definitionUri: labwareBUri,
-        location: 'offDeck',
-        loadName: '',
-      },
-    ],
-    deckDef: deckDefinition,
-    otherLabwareDefinitions: [labwareBDefinition],
-    loadedModules: [],
-  })
+      const expectedResult: typeof result = 'offDeck'
 
-  const expectedResult: typeof result = 'offDeck'
-
-  expect(result).toStrictEqual(expectedResult)
-})
+      expect(result).toStrictEqual(expectedResult)
+    })
+  }
+)
 
 it('should return error if something is missing from the input definitions', () => {
   const labwareAUri = 'opentrons/nest_12_reservoir_15ml/1'

@@ -59,7 +59,7 @@ export interface InputFieldProps {
     | typeof LEGACY_INPUT_TYPE_PASSWORD
     | typeof INPUT_TYPE_NUMBER
   /** mouse click handler */
-  onClick?: (event: MouseEvent<HTMLInputElement>) => unknown
+  onClick?: (event: MouseEvent<HTMLElement>) => unknown
   /** focus handler */
   onFocus?: (event: FocusEvent<HTMLInputElement>) => unknown
   /** blur handler */
@@ -111,11 +111,15 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       onDelete,
       borderRadius,
       padding,
+      id,
+      disabled,
+      error,
       ...inputProps
     } = props
     const hasError = props.error != null
-    const value = props.isIndeterminate ?? false ? '' : props.value ?? ''
-    const placeHolder = props.isIndeterminate ?? false ? '-' : props.placeholder
+    const value = (props.isIndeterminate ?? false) ? '' : (props.value ?? '')
+    const placeHolder =
+      (props.isIndeterminate ?? false) ? '-' : props.placeholder
     const [targetProps, tooltipProps] = useHoverTooltip()
 
     const OUTER_CSS = css`
@@ -135,7 +139,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       border-radius: ${borderRadius != null
         ? borderRadius
         : BORDERS.borderRadius4};
-      padding: ${padding != null ? padding : SPACING.spacing8};
+      padding: ${padding ?? SPACING.spacing8};
       border: ${hasBackgroundError
         ? 'none'
         : `1px ${BORDERS.styleSolid}
@@ -233,6 +237,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
       color: ${COLORS.grey60};
       padding-bottom: ${SPACING.spacing4};
       text-align: ${textAlign};
+      font-size: ${TYPOGRAPHY.fontSizeH3};
+      line-height: ${TYPOGRAPHY.lineHeight20};
+      font-weight: ${TYPOGRAPHY.fontWeightRegular};
       @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
         font-size: ${TYPOGRAPHY.fontSize22};
         font-weight: ${TYPOGRAPHY.fontWeightRegular};
@@ -273,7 +280,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
         fontSize={TYPOGRAPHY.fontSizeP}
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={props.error != null ? COLOR_WARNING_DARK : COLORS.black90}
-        opacity={props.disabled ?? false ? 0.5 : ''}
+        opacity={(props.disabled ?? false) ? 0.5 : ''}
       >
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
           {title != null ? (
@@ -282,13 +289,9 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
               gridGap={SPACING.spacing8}
               alignItems={ALIGN_CENTER}
             >
-              <StyledText
-                desktopStyle="bodyDefaultRegular"
-                htmlFor={props.id}
-                css={TITLE_STYLE}
-              >
+              <label htmlFor={id} css={TITLE_STYLE}>
                 {title}
-              </StyledText>
+              </label>
               {tooltipText != null ? (
                 <>
                   <Flex {...targetProps}>
@@ -307,7 +310,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
             width="100%"
             flexDirection={DIRECTION_COLUMN}
             css={OUTER_CSS}
-            onClick={!props.disabled ? props.onClick : null}
+            onClick={props.disabled === true ? undefined : props.onClick}
           >
             <Flex
               tabIndex={tabIndex}
@@ -337,6 +340,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
                   event.currentTarget.blur()
                 }} // prevent value change with scrolling
                 type={props.type}
+                disabled={disabled}
                 ref={ref}
               />
               {props.units != null ? (

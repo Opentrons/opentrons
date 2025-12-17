@@ -840,15 +840,10 @@ def test_deck_conflict_raises_for_bad_pipette_move(
         )
     ).then_return(destination_well_point)
     decoy.when(
-        mock_state_view.labware.get_should_center_column_on_target_well(
+        mock_state_view.motion.get_critical_point_for_wells_in_labware(
             "destination-labware-id"
         )
-    ).then_return(False)
-    decoy.when(
-        mock_state_view.labware.get_should_center_pipette_on_target_well(
-            "destination-labware-id"
-        )
-    ).then_return(False)
+    ).then_return(None)
     decoy.when(
         mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id="pipette-id",
@@ -1013,10 +1008,10 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
     ).then_return(destination_well_point)
 
     decoy.when(
-        mock_state_view.labware.get_should_center_column_on_target_well(
+        mock_state_view.motion.get_critical_point_for_wells_in_labware(
             "destination-labware-id"
         )
-    ).then_return(True)
+    ).then_return(CriticalPoint.Y_CENTER)
     decoy.when(
         mock_state_view.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id="pipette-id",

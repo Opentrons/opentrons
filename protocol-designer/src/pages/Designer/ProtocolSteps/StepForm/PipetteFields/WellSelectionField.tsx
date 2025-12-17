@@ -138,7 +138,7 @@ export const WellSelectionField = (
           value={
             disabled || primaryWellCount == null
               ? t('step_edit_form.wellSelectionLabel.choose_wells')
-              : primaryWellCount ?? errorToShow
+              : (primaryWellCount ?? errorToShow)
           }
           onClick={handleOpen}
           hasBackgroundError={hasFormError}

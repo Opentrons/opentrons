@@ -197,7 +197,7 @@ function installDevtools(): void {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const devtools = require('electron-devtools-installer')
   const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
-  const install = devtools.default
+  const install = devtools.installExtensions
   const forceReinstall = config.reinstallDevtools
 
   log.debug('Installing devtools')

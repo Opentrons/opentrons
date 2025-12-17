@@ -1,5 +1,5 @@
 from datetime import timedelta
-from typing import Optional
+from typing import Optional, Tuple
 from . import types as command_types
 from opentrons.protocol_api.tasks import Task
 
@@ -52,6 +52,38 @@ def move_labware(text: str) -> command_types.MoveLabwareCommand:
     return {
         "name": command_types.MOVE_LABWARE,
         "payload": {"text": text},
+    }
+
+
+def capture_image(
+    resolution: Optional[Tuple[int, int]],
+    zoom: Optional[float],
+    contrast: Optional[float],
+    brightness: Optional[float],
+    saturation: Optional[float],
+) -> command_types.CaptureImageCommand:
+    text = "Capturing an image"
+    if resolution:
+        text += f" with resolution {resolution[0]}x{resolution[1]}"
+    if zoom:
+        text += f" zoom of {zoom}X"
+    if contrast:
+        text += f" contrast of {contrast}%"
+    if brightness:
+        text += f" brightness of {brightness}%"
+    if saturation:
+        text += f" saturation of {saturation}%"
+    text += "."
+    return {
+        "name": command_types.CAPTURE_IMAGE,
+        "payload": {
+            "text": text,
+            "resolution": resolution,
+            "zoom": zoom,
+            "contrast": contrast,
+            "brightness": brightness,
+            "saturation": saturation,
+        },
     }
 
 

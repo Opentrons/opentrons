@@ -24,9 +24,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": [
-      "**"
-    ]
+    "nohoist": ["**"]
   },
   "devDependencies": {
     "@opentrons/app": "link:../app"
@@ -36,7 +34,6 @@
     "@opentrons/shared-data": "link:../shared-data",
     "@sentry/electron": "7.0.0",
     "@sentry/vite-plugin": "4.3.0",
-    "@thi.ng/paths": "1.6.5",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
     "@types/lodash": "^4.14.191",
@@ -44,11 +41,11 @@
     "@types/uuid": "^3.4.7",
     "ajv": "6.12.3",
     "dateformat": "3.0.3",
-    "electron-devtools-installer": "3.2.0",
+    "electron-devtools-installer": "4.0.0",
     "electron-store": "5.1.1",
     "electron-updater": "6.3.9",
     "execa": "4.0.0",
-    "form-data": "2.5.0",
+    "form-data": "2.5.4",
     "fs-extra": "10.0.0",
     "get-stream": "5.1.0",
     "lodash": "4.17.21",

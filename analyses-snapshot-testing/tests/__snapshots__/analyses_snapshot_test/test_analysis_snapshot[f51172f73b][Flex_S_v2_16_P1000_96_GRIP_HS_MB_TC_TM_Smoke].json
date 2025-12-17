@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -9200,7 +9203,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -24135,7 +24138,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 75.0
+        "targetBlockTemperature": 75.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -24166,7 +24170,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 80.0
+        "targetLidTemperature": 80.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -24254,7 +24259,9 @@
         "celsius": 75.0,
         "moduleId": "UUID"
       },
-      "result": {},
+      "result": {
+        "taskId": "UUID"
+      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -24515,7 +24522,7 @@
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",

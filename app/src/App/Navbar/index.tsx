@@ -41,7 +41,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         {navRoutes.map(({ name, navLinkTo }: RouteProps) => (
           <NavLink
             key={name}
-            to={navLinkTo as string}
+            to={navLinkTo!}
             className={({ isActive }) =>
               `${styles.navbar_link} ${isActive ? 'active' : ''}`
             }
@@ -57,7 +57,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
           role="button"
           data-testid="Navbar_settingsLink"
           className={styles.nav_icon_link}
-          onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
             debouncedNavigate('/app-settings')
           }}

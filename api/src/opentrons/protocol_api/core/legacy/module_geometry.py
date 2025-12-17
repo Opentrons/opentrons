@@ -9,12 +9,12 @@ by :py:mod:`.module_contexts`)
 from __future__ import annotations
 
 import logging
-from enum import Enum
 from typing import TYPE_CHECKING, Optional
 
 import numpy as np
 from numpy.typing import NDArray
 
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data import module
 from opentrons_shared_data.module.types import ModuleDefinitionV3
 from opentrons_shared_data.module import OLD_TC_GEN2_LABWARE_OFFSET
@@ -41,7 +41,7 @@ if TYPE_CHECKING:
 _log = logging.getLogger(__name__)
 
 
-class ThermocyclerConfiguration(str, Enum):
+class ThermocyclerConfiguration(StrEnum):
     FULL = "full"
     SEMI = "semi"
 

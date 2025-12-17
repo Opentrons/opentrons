@@ -285,6 +285,19 @@ class LegacyThermocyclerCore(
         """Set the target temperature for the heated lid, in °C."""
         self._sync_module_hardware.set_target_lid_temperature(celsius=celsius)
 
+    def start_set_target_lid_temperature(self, celsius: float) -> LegacyTaskCore:
+        """Set the target temperature for the heated lid, in °C."""
+        assert False, "start_set_target_lid_temperature only supported on engine core"
+
+    def start_set_target_block_temperature(
+        self,
+        celsius: float,
+        ramp_rate: Optional[float],
+        block_max_volume: Optional[float] = None,
+    ) -> LegacyTaskCore:
+        """Set the target temperature for the heated block, in °C."""
+        assert False, "start_set_target_block_temperature only supported on engine core"
+
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
         self._sync_module_hardware.wait_for_lid_target()
@@ -299,6 +312,15 @@ class LegacyThermocyclerCore(
         self._sync_module_hardware.cycle_temperatures(
             steps=steps, repetitions=repetitions, volume=block_max_volume
         )
+
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> LegacyTaskCore:
+        """Start a Thermocycler Profile."""
+        assert False, "start_execute_profile only supported on engine core"
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
@@ -417,9 +439,10 @@ class LegacyHeaterShakerCore(
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
     _geometry: HeaterShakerGeometry
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> LegacyTaskCore:
         """Set the labware plate's target temperature in °C."""
         self._sync_module_hardware.start_set_temperature(celsius)
+        return LegacyTaskCore()
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
@@ -445,6 +468,10 @@ class LegacyHeaterShakerCore(
             raise CannotPerformModuleAction(
                 "Cannot start shaking unless labware latch is closed."
             )
+
+    def set_shake_speed(self, rpm: int) -> LegacyTaskCore:
+        """Set heatershaker speed."""
+        assert False, "set_shake_speed only supported on engine core."
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""

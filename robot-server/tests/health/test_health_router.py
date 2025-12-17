@@ -1,23 +1,61 @@
 """Tests for the /health router."""
 import pytest
 from typing import Dict, Iterator
+from pathlib import Path
 from mock import MagicMock, patch
-from starlette.testclient import TestClient
+from decoy import Decoy
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION, MIN_SUPPORTED_VERSION
+from opentrons_shared_data.robot.types import RobotType
 
-from robot_server.health.router import ComponentVersions, get_versions, _get_version
+from robot_server.health.router import (
+    ComponentVersions,
+    get_versions,
+    _get_version,
+    get_health,
+)
+from robot_server.disk_monitor.monitor import DiskMonitor
 
 
-def test_get_health(
-    api_client: TestClient, hardware: MagicMock, versions: MagicMock
+@pytest.fixture
+def images_directory(tmp_path: Path) -> Path:
+    """Return a directory for storing camera capture files."""
+    subdirectory = tmp_path / "images"
+    subdirectory.mkdir()
+    return subdirectory
+
+
+@pytest.fixture
+def disk_monitor(decoy: Decoy) -> DiskMonitor:
+    """Get a mocked out DiskMonitor interface."""
+    mock = decoy.mock(cls=DiskMonitor)
+    decoy.when(mock.get_available_disk_space_mb()).then_return(1000.0)
+    decoy.when(mock.get_images_directory_size_mb()).then_return(500.0)
+    return mock
+
+
+async def test_get_health(
+    hardware: MagicMock,
+    disk_monitor: DiskMonitor,
+    images_directory: Path,
 ) -> None:
-    """Test GET /health."""
+    """Test get_health function."""
     hardware.fw_version = "FW111"
     hardware.board_revision = "BR2.1"
     hardware.get_serial_number.return_value = "mytestserial"
-    versions.return_value = ComponentVersions(
+
+    versions = ComponentVersions(
         api_version="mytestapiversion", system_version="mytestsystemversion"
+    )
+
+    robot_type: RobotType = "OT-2 Standard"
+
+    result = await get_health(
+        hardware=hardware,
+        sql_engine=MagicMock(),
+        versions=versions,
+        robot_type=robot_type,
+        disk_monitor=disk_monitor,
     )
 
     expected = {
@@ -43,24 +81,37 @@ def test_get_health(
             "systemTime": "/system/time",
         },
         "robot_serial": "mytestserial",
+        "disk_details": {
+            "systemAvailableMb": 1000.0,
+            "imagesDirectorySizeMb": 500.0,
+        },
     }
 
-    resp = api_client.get("/health")
-    text = resp.json()
-
-    assert resp.status_code == 200
-    assert text == expected
+    assert result.model_dump(mode="json", exclude_none=True) == expected
 
 
-def test_get_health_with_none_version(
-    api_client: TestClient, hardware: MagicMock, versions: MagicMock
+async def test_get_health_with_none_version(
+    hardware: MagicMock,
+    disk_monitor: DiskMonitor,
+    images_directory: Path,
 ) -> None:
-    """Test GET /health with no serial number."""
+    """Test get_health function with no serial number."""
     hardware.fw_version = "FW111"
     hardware.board_revision = "BR2.1"
     hardware.get_serial_number.return_value = None
-    versions.return_value = ComponentVersions(
+
+    versions = ComponentVersions(
         api_version="mytestapiversion", system_version="mytestsystemversion"
+    )
+
+    robot_type: RobotType = "OT-2 Standard"
+
+    result = await get_health(
+        hardware=hardware,
+        sql_engine=MagicMock(),
+        versions=versions,
+        robot_type=robot_type,
+        disk_monitor=disk_monitor,
     )
 
     expected = {
@@ -85,13 +136,13 @@ def test_get_health_with_none_version(
             "apiSpec": "/openapi.json",
             "systemTime": "/system/time",
         },
+        "disk_details": {
+            "systemAvailableMb": 1000.0,
+            "imagesDirectorySizeMb": 500.0,
+        },
     }
 
-    resp = api_client.get("/health")
-    text = resp.json()
-
-    assert resp.status_code == 200
-    assert text == expected
+    assert result.model_dump(mode="json", exclude_none=True) == expected
 
 
 @pytest.fixture

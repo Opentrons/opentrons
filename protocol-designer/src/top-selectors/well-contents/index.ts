@@ -13,38 +13,42 @@ import { getSelectedWells } from '../../well-selection/selectors'
 import { timelineFrameBeforeActiveItem } from '../timelineFrames'
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
-import { getWellContentsAllLabware } from './getWellContentsAllLabware'
+import {
+  getWellContentsAllLabware,
+  getWellContentsForLabwareStack,
+} from './getWellContentsAllLabware'
 
 import type * as StepGeneration from '@opentrons/step-generation'
 import type { WellContentsByLabware } from '../../labware-ingred/types'
 import type { Selector } from '../../types'
 
-export { getWellContentsAllLabware }
+export { getWellContentsAllLabware, getWellContentsForLabwareStack }
 export type { WellContentsByLabware }
 
-export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware | null> = createSelector(
-  stepFormSelectors.getLabwareEntities,
-  timelineFrameBeforeActiveItem,
-  (labwareEntities, timelineFrame) => {
-    if (timelineFrame == null) return null
-    const liquidState = timelineFrame.robotState.liquidState.labware
-    const wellContentsByLabwareId = mapValues(
-      liquidState,
-      (
-        labwareLiquids: StepGeneration.SingleLabwareLiquidState,
-        labwareId: string
-      ) => {
-        if (labwareEntities[labwareId] == null) return null
-        return _wellContentsForLabware(
-          labwareLiquids,
-          labwareEntities[labwareId].def
-        )
-      }
-    )
+export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware | null> =
+  createSelector(
+    stepFormSelectors.getLabwareEntities,
+    timelineFrameBeforeActiveItem,
+    (labwareEntities, timelineFrame) => {
+      if (timelineFrame == null) return null
+      const liquidState = timelineFrame.robotState.liquidState.labware
+      const wellContentsByLabwareId = mapValues(
+        liquidState,
+        (
+          labwareLiquids: StepGeneration.SingleLabwareLiquidState,
+          labwareId: string
+        ) => {
+          if (labwareEntities[labwareId] == null) return null
+          return _wellContentsForLabware(
+            labwareLiquids,
+            labwareEntities[labwareId].def
+          )
+        }
+      )
 
-    return wellContentsByLabwareId
-  }
-)
+      return wellContentsByLabwareId
+    }
+  )
 // @ts-expect-error(sa, 2021-6-22): min could return undefined
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
   getSelectedWells,
@@ -74,11 +78,11 @@ interface CommonWellValues {
 
 /** Returns the common single ingredient group of selected wells,
  * or null if there is not a single common ingredient group */
-export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
+export const getSelectedWellsCommonValues = createSelector(
   getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
-  (selectedWells, labwareId, allIngreds) => {
+  (selectedWells, labwareId, allIngreds): CommonWellValues => {
     if (!labwareId)
       return {
         ingredientId: null,
@@ -132,9 +136,8 @@ export const getSelectedWellsCommonIngredId: Selector<
   getSelectedWellsCommonValues,
   commonValues => commonValues.ingredientId || null
 )
-export const getSelectedWellsCommonVolume: Selector<
-  number | null | undefined
-> = createSelector(
-  getSelectedWellsCommonValues,
-  commonValues => commonValues.volume || null
-)
+export const getSelectedWellsCommonVolume: Selector<number | null | undefined> =
+  createSelector(
+    getSelectedWellsCommonValues,
+    commonValues => commonValues.volume || null
+  )

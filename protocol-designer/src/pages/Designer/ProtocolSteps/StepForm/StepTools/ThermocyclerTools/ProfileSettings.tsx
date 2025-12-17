@@ -19,7 +19,7 @@ interface ProfileSettingsProps {
 export function ProfileSettings(props: ProfileSettingsProps): JSX.Element {
   const { propsForFields } = props
 
-  const { i18n, t } = useTranslation(['application', 'form'])
+  const { t } = useTranslation(['application', 'form'])
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
@@ -27,7 +27,7 @@ export function ProfileSettings(props: ProfileSettingsProps): JSX.Element {
       padding={`0 ${SPACING.spacing16}`}
     >
       <StyledText desktopStyle="bodyDefaultSemiBold">
-        {i18n.format(t('stepType.profile_settings'), 'capitalize')}
+        {t('stepType.profile')}
       </StyledText>
       <InputStepFormField
         {...propsForFields.profileVolume}

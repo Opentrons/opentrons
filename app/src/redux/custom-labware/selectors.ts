@@ -29,45 +29,39 @@ const _getFileBaseName = (filePath: string): string => {
   return filePath.split('/').reverse()[0]
 }
 
-export const getCustomLabwareDirectory: (
-  state: State
-) => string = createSelector(
-  getConfig,
-  config => config?.labware.directory ?? ''
-)
+export const getCustomLabwareDirectory: (state: State) => string =
+  createSelector(getConfig, config => config?.labware.directory ?? '')
 
 //  @ts-expect-error(sa, 2021-05-11): TODO filesByName[name] might be undefined because filesByName is typed as a partial type
-export const getCustomLabware: (
-  state: State
-) => CheckedLabwareFile[] = createSelector(
-  state => state.labware.filenames,
-  state => state.labware.filesByName,
-  (filenames, filesByName) =>
-    sortBy(
-      filenames.map(name => filesByName[name]),
-      ['definition.metadata.displayCategory', 'definition.metadata.displayName']
-    )
-)
+export const getCustomLabware: (state: State) => CheckedLabwareFile[] =
+  createSelector(
+    state => state.labware.filenames,
+    state => state.labware.filesByName,
+    (filenames, filesByName) =>
+      sortBy(
+        filenames.map(name => filesByName[name]),
+        [
+          'definition.metadata.displayCategory',
+          'definition.metadata.displayName',
+        ]
+      )
+  )
 
-export const getValidCustomLabware: (
-  state: State
-) => ValidLabwareFile[] = createSelector(getCustomLabware, labware =>
-  labware.filter((f): f is ValidLabwareFile => f.type === VALID_LABWARE_FILE)
-)
+export const getValidCustomLabware: (state: State) => ValidLabwareFile[] =
+  createSelector(getCustomLabware, labware =>
+    labware.filter((f): f is ValidLabwareFile => f.type === VALID_LABWARE_FILE)
+  )
 
-export const getValidCustomLabwareFiles: (
-  state: State
-) => File[] = createSelector(getValidCustomLabware, labware => {
-  const labwareFiles = labware.map(lw => {
-    const jsonDefinition = JSON.stringify(lw.definition)
-    return new File([jsonDefinition], _getFileBaseName(lw.filename))
+export const getValidCustomLabwareFiles: (state: State) => File[] =
+  createSelector(getValidCustomLabware, labware => {
+    const labwareFiles = labware.map(lw => {
+      const jsonDefinition = JSON.stringify(lw.definition)
+      return new File([jsonDefinition], _getFileBaseName(lw.filename))
+    })
+    return labwareFiles
   })
-  return labwareFiles
-})
 
-export const getAddLabwareFailure: (
-  state: State
-) => {
+export const getAddLabwareFailure: (state: State) => {
   file: FailedLabwareFile | null
   errorMessage: string | null
 } = createSelector(
@@ -76,9 +70,9 @@ export const getAddLabwareFailure: (
   (file, errorMessage) => ({ file, errorMessage })
 )
 
-export const getAddNewLabwareName: (
-  state: State
-) => { filename: string | null } = createSelector(
+export const getAddNewLabwareName: (state: State) => {
+  filename: string | null
+} = createSelector(
   state => state.labware.newLabwareName,
   filename => ({ filename })
 )

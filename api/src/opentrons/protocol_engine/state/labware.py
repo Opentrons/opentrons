@@ -52,6 +52,7 @@ from ..types import (
     LabwareOffsetLocationSequence,
     LegacyLabwareOffsetLocation,
     InStackerHopperLocation,
+    WASTE_CHUTE_LOCATION,
     LabwareLocation,
     LoadedLabware,
     ModuleLocation,
@@ -343,14 +344,18 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
         self, labware_id: str, new_location: LabwareLocation, new_offset_id: str | None
     ) -> None:
         self._state.labware_by_id[labware_id].offsetId = new_offset_id
-
         if isinstance(new_location, AddressableAreaLocation) and (
-            fixture_validation.is_gripper_waste_chute(new_location.addressableAreaName)
-            or fixture_validation.is_trash(new_location.addressableAreaName)
+            fixture_validation.is_trash(new_location.addressableAreaName)
         ):
-            # If a labware has been moved into a waste chute it's been chuted away and is now technically off deck
+            # TODO (RC, 2025-10-07: create a specific trash off deck location)
+            # If a labware has been moved into trash and is now technically off deck
             new_location = OFF_DECK_LOCATION
-
+        elif isinstance(
+            new_location, AddressableAreaLocation
+        ) and fixture_validation.is_gripper_waste_chute(
+            new_location.addressableAreaName
+        ):
+            new_location = WASTE_CHUTE_LOCATION
         self._state.labware_by_id[labware_id].location = new_location
 
     def _set_labware_location(self, state_update: update_types.StateUpdate) -> None:
@@ -483,7 +488,6 @@ class LabwareView:
     ) -> Optional[LoadedLabware]:
         """Get the labware located in a given slot, if any."""
         loaded_labware = list(self._state.labware_by_id.values())
-
         for labware in loaded_labware:
             if (
                 isinstance(labware.location, DeckSlotLocation)

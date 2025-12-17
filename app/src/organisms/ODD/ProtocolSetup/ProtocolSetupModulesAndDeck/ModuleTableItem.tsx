@@ -6,11 +6,11 @@ import {
   BORDERS,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -34,11 +34,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import { getModuleTooHot } from '/app/transformations/modules'
 
 import type { TFunction } from 'i18next'
-import type {
-  AttachedModule,
-  CommandData,
-  HostConfig,
-} from '@opentrons/api-client'
+import type { AttachedModule, CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfig,
   CutoutFixtureId,
@@ -126,7 +122,7 @@ export function ModuleTableItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
 
   const { makeSnackbar } = useToaster()
 
@@ -164,13 +160,10 @@ export function ModuleTableItem({
     calibrationStatus
   )
 
-  const [showHomeStackerWarning, setShowHomeStackerWarning] = useState<boolean>(
-    false
-  )
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
+  const [showHomeStackerWarning, setShowHomeStackerWarning] =
+    useState<boolean>(false)
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
 
   const homeStackerWarningModal = (): JSX.Element => {
     return (
@@ -323,7 +316,7 @@ export function ModuleTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} flex="2 0 0">
-          <DeckInfoLabel
+          <RobotInfoLabel
             deckLabel={getModuleDeckLabel(
               module.moduleDef.moduleType,
               module.slotName

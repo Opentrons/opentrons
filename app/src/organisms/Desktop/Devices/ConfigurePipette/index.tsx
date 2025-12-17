@@ -21,13 +21,8 @@ interface Props {
 }
 
 export function ConfigurePipette(props: Props): JSX.Element {
-  const {
-    updateSettings,
-    updateError,
-    isUpdateLoading,
-    formId,
-    settings,
-  } = props
+  const { updateSettings, updateError, isUpdateLoading, formId, settings } =
+    props
   const { t } = useTranslation('device_details')
 
   const groupLabels = [

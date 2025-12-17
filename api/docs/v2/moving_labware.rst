@@ -96,6 +96,7 @@ You can manually move any standard or custom labware. Using the gripper to move 
     * - Opentrons labware lids 
       - 
           * ``opentrons_tough_pcr_auto_sealing_lid``
+          * ``opentrons_tough_universal_lid``
           * ``opentrons_flex_tiprack_lid``
     
 You can move compatible Opentrons lids manually or with the Flex Gripper, but some restrictions apply. For more information, see :ref:`moving-lids`.
@@ -157,7 +158,7 @@ Always specify ``use_gripper=True`` when moving labware into the waste chute. Th
 Moving Lids
 ===========
 
-You can use :py:meth:`.ProtocolContext.move_lid` to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler) and the Opentrons Flex Tip Rack Lid.
+You can use :py:meth:`.ProtocolContext.move_lid` to move labware lids around the deck manually or using the Flex Gripper. Currently supported lids include the Opentrons Tough Universal Lid, the Opentrons Tough PCR Auto-Sealing Lid (for use with the Thermocycler), and the Opentrons Flex Tip Rack Lid.
 
 You can move the auto-sealing lids between deck slots, lid stacks, or compatible labware loaded in your protocol. This example loads a stack of lids and then moves one to a PCR plate on the Thermocycler.
 

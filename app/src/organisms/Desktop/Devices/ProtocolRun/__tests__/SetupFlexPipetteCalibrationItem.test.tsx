@@ -21,7 +21,7 @@ vi.mock('/app/resources/runs')
 vi.mock('/app/resources/analysis')
 
 const RUN_ID = '1'
-const modifiedSimpleV6Protocol = ({
+const modifiedSimpleV6Protocol = {
   ..._uncastedModifiedSimpleV6Protocol,
   pipettes: [
     {
@@ -29,7 +29,7 @@ const modifiedSimpleV6Protocol = ({
       pipetteName: 'p10_single',
     },
   ],
-} as any) as CompletedProtocolAnalysis
+} as any as CompletedProtocolAnalysis
 
 describe('SetupFlexPipetteCalibrationItem', () => {
   const render = ({

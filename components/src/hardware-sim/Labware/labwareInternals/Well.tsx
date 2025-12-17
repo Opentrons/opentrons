@@ -72,6 +72,5 @@ export function WellComponent(props: WellProps): JSX.Element {
   )
 }
 
-export const Well: MemoExoticComponent<typeof WellComponent> = memo(
-  WellComponent
-)
+export const Well: MemoExoticComponent<typeof WellComponent> =
+  memo(WellComponent)

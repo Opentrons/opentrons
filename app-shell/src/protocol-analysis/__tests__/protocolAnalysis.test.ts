@@ -44,9 +44,9 @@ const flush = (): Promise<void> =>
   new Promise(resolve => setTimeout(resolve, 0))
 
 describe('analyzeProtocolSource', () => {
-  const mockMainWindow = ({
+  const mockMainWindow = {
     browserWindow: true,
-  } as unknown) as electron.BrowserWindow
+  } as unknown as electron.BrowserWindow
   let dispatch = vi.fn()
   let handleAction: Dispatch
 

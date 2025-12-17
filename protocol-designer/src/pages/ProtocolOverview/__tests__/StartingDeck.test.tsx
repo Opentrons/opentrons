@@ -27,7 +27,8 @@ const mockSetShowMaterialsListModal = vi.fn()
 
 const render = (props: ComponentProps<typeof StartingDeck>) => {
   return (
-    renderWithProviders(<StartingDeck {...props} />), { i18nInstance: i18n }
+    renderWithProviders(<StartingDeck {...props} />),
+    { i18nInstance: i18n }
   )
 }
 

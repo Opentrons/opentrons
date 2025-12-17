@@ -61,14 +61,14 @@ describe('HandleLabware', () => {
       ...mockLPCContentProps,
     }
 
-    vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-      HANDLE_LW_SUBSTEP.LIST
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      () => () => HANDLE_LW_SUBSTEP.LIST
     )
   })
 
   it('renders LPCLabwareList when on list substep', () => {
-    vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-      HANDLE_LW_SUBSTEP.LIST
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      () => () => HANDLE_LW_SUBSTEP.LIST
     )
 
     render(props)
@@ -79,8 +79,8 @@ describe('HandleLabware', () => {
   })
 
   it('renders LPCLabwareDetails when on details substep', () => {
-    vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-      HANDLE_LW_SUBSTEP.DETAILS
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      () => () => HANDLE_LW_SUBSTEP.DETAILS
     )
 
     render(props)
@@ -91,8 +91,8 @@ describe('HandleLabware', () => {
   })
 
   it('renders EditOffset when on prepare labware substep', () => {
-    vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-      HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      () => () => HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
     )
 
     render(props)
@@ -103,8 +103,8 @@ describe('HandleLabware', () => {
   })
 
   it('renders EditOffset when on check labware substep', () => {
-    vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-      HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      () => () => HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
     )
 
     render(props)
@@ -115,8 +115,8 @@ describe('HandleLabware', () => {
   })
 
   it('falls back to LPCLabwareList for unknown substep', () => {
-    vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-      'unknown-substep' as any
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      () => () => 'unknown-substep' as any
     )
 
     render(props)

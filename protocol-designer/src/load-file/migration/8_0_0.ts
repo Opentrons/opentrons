@@ -60,17 +60,18 @@ export const migrateFile = (
       command.commandType === 'loadPipette'
   )?.params.pipetteId
 
-  const trashMoveToAddressableAreaCommand: MoveToAddressableAreaCreateCommand[] = [
-    {
-      key: uuid(),
-      commandType: 'moveToAddressableArea',
-      params: {
-        addressableAreaName: trashAddressableArea,
-        pipetteId: pipetteId ?? '',
-        offset: { x: 0, y: 0, z: 0 },
+  const trashMoveToAddressableAreaCommand: MoveToAddressableAreaCreateCommand[] =
+    [
+      {
+        key: uuid(),
+        commandType: 'moveToAddressableArea',
+        params: {
+          addressableAreaName: trashAddressableArea,
+          pipetteId: pipetteId ?? '',
+          offset: { x: 0, y: 0, z: 0 },
+        },
       },
-    },
-  ]
+    ]
 
   const migrateCommands = (
     v7Commands: CreateCommandV7[]

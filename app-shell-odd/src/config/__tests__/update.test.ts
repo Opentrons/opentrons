@@ -6,11 +6,11 @@ import { getNextValue, shouldUpdate } from '../update'
 
 import type { Config } from '../types'
 
-const CONFIG = ({
+const CONFIG = {
   devtools: false,
   alerts: { ignored: ['someAlert'] },
   devInternal: {},
-} as unknown) as Config
+} as unknown as Config
 
 describe('config updates', () => {
   describe('shouldUpdate', () => {

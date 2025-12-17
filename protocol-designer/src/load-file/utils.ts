@@ -1,17 +1,7 @@
 import { saveAs } from 'file-saver'
 
-import type { ProtocolFile } from '@opentrons/shared-data'
 import type { PDPythonFile } from '../file-types'
 
-export const saveJSONFile = (
-  fileData: ProtocolFile,
-  fileName: string
-): void => {
-  const blob = new Blob([JSON.stringify(fileData, null, 2)], {
-    type: 'application/json',
-  })
-  saveAs(blob, fileName)
-}
 export const saveFile = (file: PDPythonFile, fileName: string): void => {
   const fileData = file.pythonProtocol
   const stringifiedBlob = JSON.stringify(file.designerApplication)

@@ -337,6 +337,26 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             )
         )
 
+    def start_set_target_block_temperature(
+        self,
+        celsius: float,
+        ramp_rate: Optional[float],
+        block_max_volume: Optional[float] = None,
+    ) -> EngineTaskCore:
+        """Start setting the target temperature for the well block, in °C."""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.thermocycler.SetTargetBlockTemperatureParams(
+                moduleId=self.module_id,
+                celsius=celsius,
+                blockMaxVolumeUl=block_max_volume,
+                ramp_rate=ramp_rate,
+            )
+        )
+        block_temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return block_temperature_task
+
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
         self._engine_client.execute_command(
@@ -350,6 +370,18 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
                 moduleId=self.module_id, celsius=celsius
             )
         )
+
+    def start_set_target_lid_temperature(self, celsius: float) -> EngineTaskCore:
+        """Start setting the target temperature for the heated lid, in °C."""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.thermocycler.SetTargetLidTemperatureParams(
+                moduleId=self.module_id, celsius=celsius
+            )
+        )
+        lid_temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return lid_temperature_task
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""
@@ -424,6 +456,42 @@ class ThermocyclerModuleCore(ModuleCore, AbstractThermocyclerCore[LabwareCore]):
             return self._execute_profile_post_221(steps, repetitions, block_max_volume)
         else:
             return self._execute_profile_pre_221(steps, repetitions, block_max_volume)
+
+    def start_execute_profile(
+        self,
+        steps: List[ThermocyclerStep],
+        repetitions: int,
+        block_max_volume: Optional[float] = None,
+    ) -> EngineTaskCore:
+        """Start the execution of a hermocycler profile and return a task."""
+        self._repetitions = repetitions
+        self._step_count = len(steps)
+        engine_steps: List[
+            Union[cmd.thermocycler.ProfileStep, cmd.thermocycler.ProfileCycle]
+        ] = [
+            cmd.thermocycler.ProfileCycle(
+                repetitions=repetitions,
+                steps=[
+                    cmd.thermocycler.ProfileStep(
+                        celsius=step["temperature"],
+                        holdSeconds=step["hold_time_seconds"],
+                        rampRate=step["ramp_rate"],
+                    )
+                    for step in steps
+                ],
+            )
+        ]
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.thermocycler.StartRunExtendedProfileParams(
+                moduleId=self.module_id,
+                profileElements=engine_steps,
+                blockMaxVolumeUl=block_max_volume,
+            )
+        )
+        start_execute_profile_result = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return start_execute_profile_result
 
     def deactivate_lid(self) -> None:
         """Turn off the heated lid."""
@@ -516,13 +584,17 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
 
     _sync_module_hardware: SynchronousAdapter[hw_modules.HeaterShaker]
 
-    def set_target_temperature(self, celsius: float) -> None:
+    def set_target_temperature(self, celsius: float) -> EngineTaskCore:
         """Set the labware plate's target temperature in °C."""
-        self._engine_client.execute_command(
+        result = self._engine_client.execute_command_without_recovery(
             cmd.heater_shaker.SetTargetTemperatureParams(
                 moduleId=self.module_id, celsius=celsius
             )
         )
+        temperature_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return temperature_task
 
     def wait_for_target_temperature(self) -> None:
         """Wait for the labware plate's target temperature to be reached."""
@@ -537,6 +609,16 @@ class HeaterShakerModuleCore(ModuleCore, AbstractHeaterShakerCore[LabwareCore]):
                 moduleId=self.module_id, rpm=rpm
             )
         )
+
+    def set_shake_speed(self, rpm: int) -> EngineTaskCore:
+        """Set the shaker's target shake speed and wait for it to spin up."""
+        result = self._engine_client.execute_command_without_recovery(
+            cmd.heater_shaker.SetShakeSpeedParams(moduleId=self.module_id, rpm=rpm)
+        )
+        shake_task = EngineTaskCore(
+            engine_client=self._engine_client, task_id=result.taskId
+        )
+        return shake_task
 
     def open_labware_latch(self) -> None:
         """Open the labware latch."""

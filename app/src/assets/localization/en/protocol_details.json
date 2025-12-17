@@ -12,6 +12,7 @@
   "creation_method": "creation method",
   "csv_file": "CSV file",
   "csv_file_type_required": "CSV file type required",
+  "date_added": "date added",
   "deck": "deck",
   "deck_view": "Deck View",
   "default_value": "Default Value",
@@ -97,5 +98,6 @@
   "value_out_of_range": "Value must be between {{min}}-{{max}}",
   "view_run_details": "View run details",
   "view_unavailable_robots": "View unavailable robots on the Devices page",
+  "visualize": "Visualize",
   "with_lid_name": "with {{lid}}"
 }

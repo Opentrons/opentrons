@@ -51,7 +51,7 @@ export function IncompatibleModuleDesktopModalBody({
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing12}
           maxHeight="196px"
-          as="ul"
+          // as="ul"
         >
           {modules.map(module => (
             <li key={module.id}>
@@ -63,7 +63,7 @@ export function IncompatibleModuleDesktopModalBody({
                 paddingBottom={SPACING.spacing12}
               >
                 <Icon
-                  name="alert-circle"
+                  name="ot-alert"
                   size={SPACING.spacing32}
                   color={COLORS.red50}
                 />

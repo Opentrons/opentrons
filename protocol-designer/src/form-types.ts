@@ -1,13 +1,17 @@
 import type { IconName } from '@opentrons/components'
 import type {
+  Height,
   LabwareLocation,
   NozzleConfigurationStyle,
   PositionReference,
+  Width,
 } from '@opentrons/shared-data'
 import type {
   ChangeTipOptions,
   LabwareEntity,
   PipetteEntity,
+  TipRackWithDef,
+  TipTrackingOption,
   TrashBinEntity,
   WasteChuteEntity,
 } from '@opentrons/step-generation'
@@ -17,7 +21,12 @@ import type {
   ABSORBANCE_READER_INITIALIZE_MODE_SINGLE,
   ABSORBANCE_READER_LID,
   ABSORBANCE_READER_READ,
+  FLEX_STACKER_EMPTY,
+  FLEX_STACKER_FILL,
+  FLEX_STACKER_RETRIEVE,
+  FLEX_STACKER_STORE,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from './constants'
@@ -156,7 +165,9 @@ export type StepFieldName = string
 // TODO Ian 2019-01-16 factor out to some constants.js ? See #2926
 export type StepType =
   | 'absorbanceReader'
+  | 'camera'
   | 'comment'
+  | 'flexStacker'
   | 'heaterShaker'
   | 'magnet'
   | 'manualIntervention'
@@ -166,19 +177,22 @@ export type StepType =
   | 'pause'
   | 'temperature'
   | 'thermocycler'
+  | 'flexStacker'
 
 export const stepIconsByType: Record<StepType, IconName> = {
   absorbanceReader: 'ot-absorbance',
+  camera: 'camera',
   comment: 'comment',
+  flexStacker: 'ot-flex-stacker',
+  heaterShaker: 'ot-heater-shaker',
+  magnet: 'ot-magnet-v2',
+  manualIntervention: 'pause-circle',
+  mix: 'mix',
   moveLabware: 'ot-move',
   moveLiquid: 'transfer',
-  mix: 'mix',
   pause: 'pause-circle',
-  manualIntervention: 'pause-circle',
-  magnet: 'ot-magnet-v2',
   temperature: 'ot-temperature-v2',
   thermocycler: 'ot-thermocycler',
-  heaterShaker: 'ot-heater-shaker',
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
@@ -200,9 +214,13 @@ export type HydratedPauseFormData = AnnotationFields & {
     | typeof PAUSE_UNTIL_RESUME
     | typeof PAUSE_UNTIL_TIME
     | typeof PAUSE_UNTIL_TEMP
+    | typeof PAUSE_UNTIL_TC_PROFILE_COMPLETE
   pauseMessage?: string
+  /** If `PAUSE_UNTIL_TEMP`, the temperature to wait for. */
   pauseTemperature?: string
+  /** If `PAUSE_UNTIL_TIME`, how long to wait. */
   pauseTime?: string
+  /** If `PAUSE_UNTIL_TEMP` or `PAUSE_UNTIL_TC_PROFILE_COMPLETE`, the module to wait for. */
   moduleId?: string
 }
 export interface FormData {
@@ -280,12 +298,13 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   liquidClassesSupported: boolean
   nozzles: NozzleConfigurationStyle | null
   path: PathOption
+  // the existing code claims that pipette and tipRack are not nullable, but they are:
   pipette: PipetteEntity
-  tipRack: string
+  tipRack: TipRackWithDef
   volume: number
   pushOut_volume: number | null
   pushOut_checkbox: boolean
-  aspirate_airGap_volume?: number | null
+  aspirate_airGap_volume?: string | null
   aspirate_delay_seconds?: number | null
   aspirate_flowRate?: number | null
   aspirate_mix_times?: number | null
@@ -314,7 +333,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   blowout_location?: string | null
   conditioning_checkbox: boolean | null
   conditioning_volume: number | null
-  dispense_airGap_volume?: number | null
+  dispense_airGap_volume?: string | null
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
   dispense_mix_times?: number | null
@@ -338,12 +357,15 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dispense_x_position?: number | null
   dispense_y_position?: number | null
   dispense_position_reference: PositionReference
-  disposalVolume_volume?: number | null
+  disposalVolume_volume?: string | null
   dropTip_wellNames?: string[] | null
   pickUpTip_location?: string | null
   pickUpTip_wellNames?: string[] | null
   preWetTip?: boolean | null
   liquidClass?: string | null // a liquid class name like "water" or "none" or null
+  tips_selected?: string[][] | null
+  tip_tracking?: TipTrackingOption | null
+  tiprack_selected?: string | null
 }
 
 export interface HydratedMoveLabwareFormData extends AnnotationFields {
@@ -358,6 +380,18 @@ export interface HydratedCommentFormData extends AnnotationFields {
   id: string
   stepType: 'comment'
   message: string
+}
+
+export interface HydratedCameraFormData extends AnnotationFields {
+  id: string
+  stepType: 'camera'
+  homeBefore: boolean
+  fileName: string
+  resolution: [Width, Height]
+  zoom: number
+  contrast: number
+  brightness: number
+  saturation: number
 }
 
 export interface HydratedMixFormData extends AnnotationFields {
@@ -375,7 +409,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   nozzles: NozzleConfigurationStyle | null
   pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
-  tipRack: string
+  tipRack: TipRackWithDef
   volume: number
   wells: string[]
   aspirate_delay_seconds?: number | null
@@ -397,6 +431,9 @@ export interface HydratedMixFormData extends AnnotationFields {
   pushOut_checkbox: boolean
   times?: number | null
   liquidClass?: string | null
+  tips_selected?: string[][] | null
+  tip_tracking?: TipTrackingOption | null
+  tiprack_selected?: string | null
 }
 export type MagnetAction = 'engage' | 'disengage'
 export type HydratedMagnetFormData = AnnotationFields & {
@@ -466,6 +503,22 @@ export interface HydratedAbsorbanceReaderFormData extends AnnotationFields {
   referenceWavelength: string | null
   referenceWavelengthActive: boolean
   wavelengths: string[]
+}
+
+export type FlexStackerFormType =
+  | typeof FLEX_STACKER_RETRIEVE
+  | typeof FLEX_STACKER_STORE
+  | typeof FLEX_STACKER_FILL
+  | typeof FLEX_STACKER_EMPTY
+
+export interface HydratedFlexStackerFormData extends AnnotationFields {
+  stepType: 'flexStacker'
+  id: string
+  fillLabwareUri: string | null
+  fillQuantity: number | null
+  flexStackerFormType: FlexStackerFormType | null
+  interventionMessage: string | null
+  moduleId: string
 }
 
 // fields used in TipPositionInput
@@ -576,6 +629,8 @@ export type CountPerStepType = Partial<Record<StepType, number>>
 
 export type HydratedFormData =
   | HydratedAbsorbanceReaderFormData
+  | HydratedCameraFormData
+  | HydratedFlexStackerFormData
   | HydratedCommentFormData
   | HydratedHeaterShakerFormData
   | HydratedMagnetFormData
@@ -585,3 +640,4 @@ export type HydratedFormData =
   | HydratedPauseFormData
   | HydratedTemperatureFormData
   | HydratedThermocyclerFormData
+  | HydratedFlexStackerFormData

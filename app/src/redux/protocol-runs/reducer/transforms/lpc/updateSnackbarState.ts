@@ -21,19 +21,16 @@ export function updateSnackbarState(
       const { offsetLocationDetails } = state.labwareInfo.selectedLabware ?? {
         offsetLocationDetails: null,
       }
-      const {
-        defaultOffsetDetails,
-        locationSpecificOffsetDetails,
-      } = state.labwareInfo.labware[offsetLocationDetails?.definitionUri ?? '']
+      const { defaultOffsetDetails, locationSpecificOffsetDetails } =
+        state.labwareInfo.labware[offsetLocationDetails?.definitionUri ?? '']
       const {
         workingOffset: defaultWorkingOffset,
         existingOffset: defaultExistingOffset,
       } = defaultOffsetDetails
-      const {
-        workingOffset: lsWorkingOffset,
-      } = locationSpecificOffsetDetails.find(detail =>
-        isEqual(detail.locationDetails, offsetLocationDetails)
-      ) ?? { workingOffset: null, existingOffset: null }
+      const { workingOffset: lsWorkingOffset } =
+        locationSpecificOffsetDetails.find(detail =>
+          isEqual(detail.locationDetails, offsetLocationDetails)
+        ) ?? { workingOffset: null, existingOffset: null }
 
       if (offsetLocationDetails?.kind === OFFSET_KIND_DEFAULT) {
         const vectorExists =

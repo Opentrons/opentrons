@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
@@ -21,7 +21,7 @@ import {
 import { getModalPortalEl } from '/app/App/portal'
 import { ExternalLink } from '/app/atoms/Link/ExternalLink'
 import { Divider } from '/app/atoms/structure'
-import { useIsFlex, useIsRobotBusy } from '/app/redux-resources/robots'
+import { useIsFlex } from '/app/redux-resources/robots'
 import {
   getRobotAddressesByName,
   HEALTH_STATUS_OK,
@@ -38,7 +38,7 @@ import type { Dispatch, State } from '/app/redux/types'
 
 interface NetworkingProps {
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 const HELP_CENTER_URL =
@@ -48,12 +48,11 @@ const LIST_REFRESH_MS = 10000
 
 export function RobotSettingsNetworking({
   robotName,
-  updateRobotStatus,
+  isRobotBusy,
 }: NetworkingProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const wifiList = useWifiList(robotName, LIST_REFRESH_MS)
   const dispatch = useDispatch<Dispatch>()
-  const isRobotBusy = useIsRobotBusy({ poll: true })
   const isFlex = useIsFlex(robotName)
 
   const [showDisconnectModal, setShowDisconnectModal] = useState<boolean>(false)
@@ -87,10 +86,6 @@ export function RobotSettingsNetworking({
     usbAddress != null && usbAddress.healthStatus === HEALTH_STATUS_OK
 
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
-
-  useEffect(() => {
-    updateRobotStatus(isRobotBusy)
-  }, [isRobotBusy, updateRobotStatus])
 
   return (
     <>

@@ -50,8 +50,8 @@ export function RunFailedModal({
       commandErrorList == null || commandErrorList?.data.length === 0
         ? t('run_failed_modal_title')
         : runStatus === RUN_STATUS_SUCCEEDED
-        ? t('warning_details')
-        : t('error_details'),
+          ? t('warning_details')
+          : t('error_details'),
   }
 
   const highestPriorityError = getHighestPriorityError(errors ?? [])
@@ -89,12 +89,12 @@ export function RunFailedModal({
                 errorCode: errors[0].errorCode,
               })
             : runStatus === RUN_STATUS_SUCCEEDED
-            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
-                count: errors.length,
-              })
-            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
-                count: errors.length,
-              })}
+              ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                  count: errors.length,
+                })
+              : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                  count: errors.length,
+                })}
         </LegacyStyledText>
         <div className={styles.error_container}>
           <div className={styles.error_list}>
@@ -129,8 +129,8 @@ export function RunFailedModal({
               highestPriorityError
                 ? [highestPriorityError]
                 : commandErrorList?.data && commandErrorList?.data.length > 0
-                ? commandErrorList?.data
-                : []
+                  ? commandErrorList?.data
+                  : []
             }
             isSingleError={!!highestPriorityError}
           />

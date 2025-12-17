@@ -34,5 +34,7 @@ export const selectActivePipetteChannelCount = (
   createSelector(
     (state: State) => selectActivePipette(runId)(state)?.pipetteName,
     pipetteName =>
-      pipetteName != null ? getPipetteNameSpecs(pipetteName)?.channels ?? 1 : 1
+      pipetteName != null
+        ? (getPipetteNameSpecs(pipetteName)?.channels ?? 1)
+        : 1
   )

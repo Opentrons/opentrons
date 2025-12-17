@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import {
   COLORS,
@@ -7,6 +8,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 
+import { ProtocolAnalysisErrorModal } from '../../Devices/ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals'
 import { AnnotatedGroup } from './AnnotatedGroup'
 import styles from './annotatedsteps.module.css'
 import { IndividualCommand } from './IndividualCommand'
@@ -34,6 +36,9 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     setSelectedCommand,
     handlePause,
   } = props
+  const { t } = useTranslation('protocol_visualization')
+  const [showErrorDetailsModal, setShowErrorDetailsModal] =
+    useState<boolean>(false)
   const [scrollTargetId, setScrollTargetId] = useState<string | null>(null)
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
@@ -83,91 +88,120 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
 
   let commandNumber = 0
 
+  // temporarily filter out loadCommands and home commands for the PV MVP
+  const filteredCommands = analysis.commands.filter(
+    command =>
+      !command.commandType.includes('load') && command.commandType !== 'home'
+  )
+
   return (
-    <div className={styles.annotated_steps_container}>
-      <div className={styles.annotated_steps_wrap}>
-        {groupedCommandsHighlightedInfo != null &&
-        groupedCommandsHighlightedInfo.length > 0
-          ? groupedCommandsHighlightedInfo.map((group, index) => {
-              const nextIndex = groupedCommandsHighlightedInfo[index + 1]
-              const nextIsGrouped =
-                nextIndex != null && 'annotationIndex' in nextIndex
+    <>
+      {showErrorDetailsModal ? (
+        <ProtocolAnalysisErrorModal
+          errors={analysis?.errors}
+          onClose={() => {
+            setShowErrorDetailsModal(false)
+          }}
+        />
+      ) : null}
+      <div className={styles.annotated_steps_container}>
+        <div className={styles.annotated_steps_wrap}>
+          {groupedCommandsHighlightedInfo != null &&
+          groupedCommandsHighlightedInfo.length > 0
+            ? groupedCommandsHighlightedInfo.map((group, index) => {
+                const nextIndex = groupedCommandsHighlightedInfo[index + 1]
+                const nextIsGrouped =
+                  nextIndex != null && 'annotationIndex' in nextIndex
 
-              if ('annotationIndex' in group) {
-                const subCommandStartNumber = commandNumber + 1 // Starting number for this group
-                commandNumber += group.subCommands.length
+                if ('annotationIndex' in group) {
+                  const subCommandStartNumber = commandNumber + 1 // Starting number for this group
+                  commandNumber += group.subCommands.length
 
-                return (
-                  <AnnotatedGroup
-                    key={`group_${group.annotationIndex}_${index}`}
-                    scrollTargetId={scrollTargetId}
-                    analysis={analysis}
-                    annotationType={
-                      annotations[group.annotationIndex]?.machineReadableName
-                    }
-                    subCommands={group.subCommands}
-                    commandStartNumber={subCommandStartNumber}
-                    allRunDefs={allRunDefs}
-                    setSelectedCommand={setSelectedCommand}
-                    handlePause={handlePause}
-                  />
-                )
-              } else {
+                  return (
+                    <AnnotatedGroup
+                      key={`group_${group.annotationIndex}_${index}`}
+                      scrollTargetId={scrollTargetId}
+                      analysis={analysis}
+                      annotationType={
+                        annotations[group.annotationIndex]?.machineReadableName
+                      }
+                      subCommands={group.subCommands}
+                      commandStartNumber={subCommandStartNumber}
+                      allRunDefs={allRunDefs}
+                      setSelectedCommand={setSelectedCommand}
+                      handlePause={handlePause}
+                    />
+                  )
+                } else {
+                  const currentCommandNumber = ++commandNumber
+
+                  return (
+                    <IndividualCommand
+                      scrollTargetId={scrollTargetId}
+                      fromGroup={nextIsGrouped}
+                      key={group.command.id}
+                      command={group.command}
+                      isHighlighted={group.isHighlighted}
+                      analysis={analysis}
+                      allRunDefs={allRunDefs}
+                      setSelectedCommand={setSelectedCommand}
+                      commandNumber={currentCommandNumber}
+                    />
+                  )
+                }
+              })
+            : filteredCommands.map(command => {
                 const currentCommandNumber = ++commandNumber
-
                 return (
                   <IndividualCommand
                     scrollTargetId={scrollTargetId}
-                    fromGroup={nextIsGrouped}
-                    key={group.command.id}
-                    command={group.command}
-                    isHighlighted={group.isHighlighted}
+                    fromGroup={false}
+                    key={`individual_${command.id}`}
+                    command={command}
+                    commandNumber={currentCommandNumber}
+                    isHighlighted={
+                      currentCommandIndex != null &&
+                      filteredCommands[currentCommandIndex]?.id === command.id
+                    }
                     analysis={analysis}
                     allRunDefs={allRunDefs}
                     setSelectedCommand={setSelectedCommand}
-                    commandNumber={currentCommandNumber}
                   />
                 )
-              }
-            })
-          : analysis.commands.map((command, index) => {
-              const currentCommandNumber = ++commandNumber
-
-              return (
-                <IndividualCommand
-                  scrollTargetId={scrollTargetId}
-                  fromGroup={false}
-                  key={`individual_${command.id}`}
-                  command={command}
-                  commandNumber={currentCommandNumber}
-                  isHighlighted={index === currentCommandIndex}
-                  analysis={analysis}
-                  allRunDefs={allRunDefs}
-                  setSelectedCommand={setSelectedCommand}
-                />
-              )
-            })}
-        {analysis?.errors.length > 0 ? (
-          <div className={styles.annotated_steps_error_container}>
-            {analysis?.errors.map(error => (
-              <div
-                className={styles.annotated_steps_error_header}
-                key={error.id}
-              >
-                <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
+              })}
+          {analysis?.errors.length > 0 ? (
+            <div className={styles.annotated_steps_error_wrapper}>
+              {analysis?.errors.map(error => (
+                <div
+                  className={styles.annotated_steps_error_container}
+                  key={error.id}
+                  onClick={() => {
+                    setShowErrorDetailsModal(true)
+                  }}
+                >
+                  <div className={styles.annotated_steps_header}>
+                    <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
+                    <StyledText
+                      desktopStyle="captionSemiBold"
+                      color={COLORS.red60}
+                    >
+                      {t('step_error')}
+                    </StyledText>
+                  </div>
+                  <StyledText desktopStyle="bodyDefaultRegular">
+                    {error.detail}
+                  </StyledText>
+                </div>
+              ))}
+              <div className={styles.annotated_steps_final_command}>
                 <StyledText desktopStyle="bodyDefaultRegular">
-                  {error.detail}
+                  {t('unable_to_show_steps_past_errors')}
                 </StyledText>
               </div>
-            ))}
-            <div className={styles.annotated_steps_final_command}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                Unable to show steps past errors
-              </StyledText>
             </div>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   )
 }

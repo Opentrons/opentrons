@@ -11,6 +11,7 @@ from .home_functionality_def import HomeGCodeFunctionalityDef
 from .open_labware_latch_functionality_def import OpenLabwareLatchGCodeFunctionalityDef
 from .set_rpm_functionality_def import SetRPMGCodeFunctionalityDef
 from .set_temperature_functionality_def import SetTempGCodeFunctionalityDef
+from .get_error_status_functionality_def import GetErrorStatusFunctionalityDef
 
 __all__ = [
     "CloseLabwareLatchGCodeFunctionalityDef",
@@ -22,4 +23,5 @@ __all__ = [
     "OpenLabwareLatchGCodeFunctionalityDef",
     "SetRPMGCodeFunctionalityDef",
     "SetTempGCodeFunctionalityDef",
+    "GetErrorStatusFunctionalityDef",
 ]

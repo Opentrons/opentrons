@@ -16,7 +16,7 @@ import { useDispatchStartRobotUpdate } from '/app/redux/robot-update/hooks'
 import {
   INIT_STATUS,
   useRobotInitializationStatus,
-} from '/app/resources/health/hooks'
+} from '/app/resources/health/useRobotInitializationStatus'
 
 import {
   RobotUpdateProgressModal,
@@ -33,7 +33,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('../useRobotUpdateInfo')
 vi.mock('/app/redux/robot-update')
 vi.mock('/app/redux/robot-update/hooks')
-vi.mock('/app/resources/health/hooks')
+vi.mock('/app/resources/health/useRobotInitializationStatus')
 
 const render = (props: ComponentProps<typeof RobotUpdateProgressModal>) => {
   return renderWithProviders(<RobotUpdateProgressModal {...props} />, {

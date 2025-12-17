@@ -1,4 +1,5 @@
 import {
+  FLEX_96_CHANNEL_PIPETTES,
   getLabwareDefURI,
   getLabwareDisplayName,
   getPipetteSpecsV2,
@@ -30,7 +31,9 @@ export function getTiprackOptions(
   const defaultTipracks = pipetteSpecs?.liquids.default.defaultTipracks ?? []
   const displayCategory = pipetteSpecs?.displayCategory ?? ''
   const isFlexPipette =
-    displayCategory === 'FLEX' || selectedPipetteName === 'p1000_96'
+    displayCategory === 'FLEX' ||
+    (selectedPipetteName != null &&
+      FLEX_96_CHANNEL_PIPETTES.includes(selectedPipetteName))
 
   const tiprackOptionsMap = Object.values(allLabware)
     .filter(def => def.metadata.displayCategory === 'tipRack')

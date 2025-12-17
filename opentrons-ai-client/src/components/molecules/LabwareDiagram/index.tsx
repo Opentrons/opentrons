@@ -1,6 +1,6 @@
 import { css } from 'styled-components'
 
-import { labwareImages } from './labware-images'
+import { labwareImages } from '@opentrons/shared-data'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'
 

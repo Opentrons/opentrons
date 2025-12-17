@@ -50,6 +50,13 @@ Holding the Thermocycler below ambient temperature for extended periods can caus
 !!!warning
     Do not set the plate temperature below the ambient temperature for over two hours: condensation could affect performance or damage the module.
 
+If condensation affects your Thermocycler, use the module's heating capabilities to evaporate excess internal or external moisture. Either create and run a protocol or use the module controls in the Opentrons App. To help remove condensation, we recommend operating the Thermocycler for either:
+
+- 1 hour at 95 °C
+- 2 hours at 75 °C
+
+Contact [Opentrons Support](https://opentrons.com/opentrons-support) if condensation causes a module failure, as indicated by a pulsing orange [status light](product-specs.md#led-status-light).
+
 ### Software Requirements
 
 The Thermocycler requires version 6.2.0 (or higher) of the Opentrons App and robot software. You can download the Opentrons App for Mac, Windows, or Linux at <https://opentrons.com/ot-app>.

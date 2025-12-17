@@ -1,0 +1,372 @@
+"""Protocol editor page object."""
+
+import re
+from typing import Sequence
+
+from playwright.sync_api import Page, TimeoutError, expect
+
+from .base_page import BasePage
+
+
+class ProtocolEditorPage(BasePage):
+    """Main protocol editor page for adding labware and steps."""
+
+    def __init__(self, page: Page) -> None:
+        super().__init__(page)
+
+    def add_labware_to_slot(self, slot: str) -> None:
+        """Add labware to a specific slot.
+
+        Args:
+            slot: Slot identifier like "D2"
+        """
+
+        slot_region = self.page.locator(f"[data-testid='{slot}']").first
+        if slot_region.count() == 0:
+            test_ids = self.page.locator("[data-testid]").evaluate_all(
+                "elements => elements.map(el => el.getAttribute('data-testid'))"
+            )
+            related_ids = self.page.locator("[data-testid*='" + slot + "']").evaluate_all(
+                "elements => elements.map(el => el.getAttribute('data-testid'))"
+            )
+            raise AssertionError(f"Slot '{slot}' not found. Available test ids: {test_ids}. Related ids: {related_ids}")
+        add_button = slot_region.get_by_role("button", name="Add labware", exact=False)
+        if add_button.count() == 0:
+            add_button = slot_region.get_by_role("button", name="Edit labware", exact=False)
+            if add_button.count() == 0:
+                text_trigger = slot_region.get_by_text("Add labware", exact=False)
+                if text_trigger.count() > 0:
+                    self.wait_for_visible(text_trigger.first)
+                    text_trigger.first.click()
+                else:
+                    self.wait_for_visible(slot_region)
+                    slot_region.click()
+            else:
+                self.wait_for_visible(add_button.first)
+                add_button.first.click()
+        else:
+            self.wait_for_visible(add_button.first)
+            add_button.first.click()
+
+        self._ensure_labware_tab_active()
+        self._open_select_labware_modal()
+
+    def open_slot_tools(self, slot: str) -> None:
+        """Open the overflow tools menu for a deck slot."""
+
+        slot_region = self.page.get_by_test_id(slot)
+        trigger_anchor = slot_region.locator("a[role='button']").first
+        if trigger_anchor.count() > 0:
+            trigger_anchor.click()
+        trigger = slot_region.locator("[data-testid='SlotOverflowMenu_openTools']").first
+        if trigger.count() == 0:
+            trigger = self.page.get_by_test_id("SlotOverflowMenu_openTools").first
+        self.wait_for_visible(trigger)
+        trigger.click()
+
+    def _ensure_labware_tab_active(self) -> None:
+        """Ensure the labware tab in the toolbox is active."""
+
+        labware_tab = self.page.get_by_role("button", name="Labware", exact=False)
+        if labware_tab.count() == 0:
+            return
+        self.wait_for_visible(labware_tab.first)
+        labware_tab.first.click()
+
+    def _open_select_labware_modal(self) -> None:
+        """Open the labware selection modal if the trigger is available."""
+
+        selector_button = self.page.locator("[data-testid='EmptySelectorButton_click']").first
+        search_input = self.page.locator("input[placeholder='Search labware']").first
+        modal = self.page.get_by_role("dialog", name="Add labware", exact=False)
+        if modal.count() > 0 and modal.is_visible():
+            return
+        if search_input.count() > 0 and search_input.is_visible():
+            return
+        if selector_button.count() > 0:
+            self.wait_for_visible(selector_button)
+            selector_button.click(force=True)
+
+        if search_input.count() > 0:
+            search_input.wait_for(state="visible", timeout=5000)
+
+    def select_labware_category(self, category_index: int = 2) -> None:
+        """Select a labware category from the list.
+
+        Args:
+            category_index: Index of the category button (default: 2)
+        """
+        self.page.get_by_test_id("ListButton_noActive").nth(category_index).click()
+
+    def select_labware_category_by_name(self, category_name: str) -> None:
+        """Select a labware category by its visible label."""
+
+        category = self.page.get_by_role("button", name=category_name, exact=False)
+        if category.count() == 0:
+            category = self.page.get_by_text(category_name, exact=False)
+        self.wait_for_visible(category.first)
+        category.first.click()
+
+    def select_labware_by_name(self, labware_name: str) -> None:
+        """Select a specific labware by its name.
+
+        Args:
+            labware_name: Name of the labware, e.g., "Axygen 96 Well Plate 500 µL"
+        """
+        search_input = self.page.locator("input[placeholder='Search labware']").first
+        if search_input.count() > 0:
+            search_input.fill(labware_name)
+        else:
+            self._expand_labware_category("Well plates")
+
+        filter_label = self.page.locator("label").filter(has_text="Only display recommended labware").first
+        if filter_label.count() > 0:
+            checkbox = filter_label.locator("input[type='checkbox']").first
+            if checkbox.count() > 0 and checkbox.is_checked():
+                filter_label.click()
+
+        pattern = re.compile(re.escape(labware_name), re.IGNORECASE)
+        target = self.page.locator("label").filter(has_text=pattern).first
+
+        try:
+            target.wait_for(state="visible", timeout=5000)
+        except TimeoutError as error:
+            category_button = (
+                self.page.locator("[data-testid='ListButton_noActive']")
+                .filter(has_text=re.compile("Well plates", re.IGNORECASE))
+                .first
+            )
+            if category_button.count() > 0:
+                category_button.click()
+                try:
+                    target.wait_for(state="visible", timeout=5000)
+                except TimeoutError as retry_error:
+                    visible_options = self.page.locator("label").all_inner_texts()
+                    raise AssertionError(
+                        f"Labware '{labware_name}' was not found in the selection modal. "
+                        f"Available options: {visible_options}"
+                    ) from retry_error
+            else:
+                visible_options = self.page.locator("label").all_inner_texts()
+                raise AssertionError(
+                    f"Labware '{labware_name}' was not found in the selection modal. "
+                    f"Available options: {visible_options}"
+                ) from error
+
+        target.click()
+        self.click_test_id("SelectLabwareModal_confirm")
+
+        modal = self.page.get_by_role("dialog", name="Add labware", exact=False)
+        if modal.count() > 0:
+            modal.wait_for(state="hidden", timeout=5000)
+
+    def _expand_labware_category(self, category_name: str) -> None:
+        """Expand a labware category if it is collapsed."""
+
+        category_button = self.page.get_by_text(category_name, exact=False)
+        if category_button.count() == 0:
+            return
+        category_button.first.click()
+
+    def edit_liquid(self) -> None:
+        """Open the liquid editing interface."""
+        self.page.get_by_text("Edit liquid").wait_for(state="visible", timeout=10000)
+        self.page.get_by_text("Edit liquid").click()
+
+    def select_first_well(self) -> None:
+        """Select the first well in the labware."""
+        self.page.locator("circle").first.click()
+
+    def select_wells(self, wells: Sequence[str]) -> None:
+        """Select each well in the provided sequence."""
+
+        for well in wells:
+            locator = self.page.locator(f"circle[data-wellname='{well}']").first
+            self.wait_for_visible(locator)
+            locator.click()
+
+    def click_add_liquid_button(self) -> None:
+        """Open the Add liquid panel for the selected labware."""
+
+        button = self.page.get_by_test_id("LabwareCard_addLiquid_button")
+        self.wait_for_visible(button.first)
+        button.first.click()
+
+    def open_liquid_tab(self) -> None:
+        """Switch to the Liquids tab within the labware panel."""
+
+        tab = self.page.get_by_role("button", name="Liquids", exact=False)
+        if tab.count() == 0:
+            return
+        self.wait_for_visible(tab.first)
+        tab.first.click()
+
+    def expect_liquid_panel(self) -> None:
+        """Ensure the liquid management panel is displayed."""
+
+        for text in ["Liquid", "Add liquid"]:
+            self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
+
+    def define_liquid(self, name: str) -> None:
+        """Define a new liquid with a name.
+
+        Args:
+            name: Name of the liquid, e.g., "Water"
+        """
+        self.click_button("Define a liquid")
+        self.page.locator('input[name="displayName"]').click()
+        self.page.locator('input[name="displayName"]').fill(name)
+        self.page.get_by_label("ModalShell_ModalArea").get_by_role("button", name="Save").click()
+
+    def assign_liquid_to_wells(self, liquid_name: str, volume: str) -> None:
+        """Assign a liquid to selected wells with a specific volume.
+
+        Args:
+            liquid_name: Name of the liquid
+            volume: Volume in µL as a string
+        """
+        self.click_test_id("dropdownMenu")
+        self.click_button(liquid_name)
+        self.page.get_by_role("textbox").click()
+        self.page.get_by_role("textbox").fill(volume)
+        self.click_button("Save")
+
+    def confirm_toolbox(self) -> None:
+        """Click the shared toolbox confirmation button."""
+
+        button = self.page.get_by_test_id("Toolbox_confirmButton")
+        self.wait_for_visible(button.first)
+        button.first.click()
+
+    def close_toolbox(self) -> None:
+        """Close the deck setup toolbox if it is open."""
+
+        close_button = self.page.get_by_test_id("Toolbox_closeButton").first
+        if close_button.count() == 0:
+            return
+        self.wait_for_visible(close_button)
+        close_button.click()
+        try:
+            close_button.wait_for(state="hidden", timeout=5000)
+        except Exception:
+            pass
+
+    def confirm_liquid_setup(self) -> None:
+        """Confirm the liquid setup and close the modal."""
+        self.confirm_toolbox()
+
+    def add_step(self, step_type: str = "Transfer") -> None:
+        """Add a new protocol step.
+
+        Args:
+            step_type: Type of step to add, e.g., "Transfer", "Mix", etc.
+        """
+        self.open_add_step_menu()
+        self.select_step_type(step_type)
+
+    def open_add_step_menu(self) -> None:
+        """Open the step selection menu."""
+
+        self.click_button("Add Step")
+
+    def verify_add_step_menu_options(self) -> None:
+        """Verify the standard step options are visible."""
+
+        menu_buttons = self.page.locator("button[class*='AddStepOverflowButton__MenuButton']")
+        if menu_buttons.count() == 0:
+            raise AssertionError("Add step menu is not open or contains no options")
+        available = menu_buttons.all_inner_texts()
+        guaranteed_options = ["Move", "Transfer", "Mix", "Pause", "Heater-Shaker"]
+        for option in guaranteed_options:
+            try:
+                expect(menu_buttons.filter(has_text=option)).to_be_visible()
+            except AssertionError as error:
+                raise AssertionError(f"Expected '{option}' in add step menu. Available options: {available}") from error
+
+        module_specific_options = ["Thermocycler", "Temperature"]
+        if not any(option in available for option in module_specific_options):
+            raise AssertionError(
+                f"Expected a thermocycler or temperature step option to be present. Available options: {available}"
+            )
+
+    def select_step_type(self, step_type: str) -> None:
+        """Select a step type from the open step menu."""
+
+        self.page.get_by_role("button", name=step_type, exact=True).click()
+
+    def configure_transfer_source(self) -> None:
+        """Configure the source for a transfer step."""
+        self.page.locator('input[name="aspirate_wells"]').click()
+        self.page.locator("circle").first.click()
+        self.click_button("Save")
+
+    def configure_transfer_destination(self, labware_name: str | None = None, well_index: int = 17) -> None:
+        """Configure the destination for a transfer step.
+
+        Args:
+            labware_name: Name of destination labware (if needed for sandbox)
+            well_index: Index of the destination well
+        """
+        if self.is_sandbox and labware_name:
+            self.page.get_by_text("Choose option").click()
+            self.click_button(labware_name)
+
+        # Select dispense wells
+        if self.is_sandbox:
+            self.page.locator('input[name="dispense_wells"]').click()
+        else:
+            self.page.locator("[name='dispense_wells']").click()
+
+        self.page.locator(f"circle:nth-child({well_index})").first.click()
+        self.click_button("Save")
+
+    def set_transfer_volume(self, volume: str) -> None:
+        """Set the volume for a transfer step.
+
+        Args:
+            volume: Volume in µL as a string
+        """
+        self.page.locator('input[name="volume"]').click()
+        self.page.locator('input[name="volume"]').fill(volume)
+        self.click_button("Continue")
+        self.click_button("Continue")
+
+    def expect_transfer_form(self) -> None:
+        """Verify the transfer step form fields are visible."""
+
+        for text in [
+            "Source labware",
+            "Select source wells",
+            "Destination labware",
+            "Volume per well",
+        ]:
+            self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
+
+    def expect_move_labware_form(self) -> None:
+        """Verify the move labware step form fields are visible."""
+
+        for text in [
+            "Use gripper",
+            "Select labware",
+            "New location",
+        ]:
+            self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
+
+    def toggle_checkbox(self, field_name: str) -> None:
+        """Toggle a checkbox-like control by its field name."""
+
+        self.page.get_by_role("checkbox", name=field_name, exact=True).click()
+
+    def move_labware(self, labware: str, new_location: str) -> None:
+        """Select labware and new location to move the labware."""
+
+        self.page.get_by_test_id("labware_dropdownMenu").first.click()
+        self.page.get_by_role("button", name=labware).click()
+        self.page.get_by_test_id("newLocation_dropdownMenu").first.click()
+
+        if new_location == "Off-deck":
+            self.page.locator("#stepFormTools").get_by_role("button", name="Off-deck").click()
+        else:
+            self.page.get_by_role("button", name=new_location).click()
+        self.page.get_by_role("button", name="Save").click()
+        self.page.locator("div").filter(has_text="Move has been saved").nth(3).click()

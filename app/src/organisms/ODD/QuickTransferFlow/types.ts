@@ -27,8 +27,13 @@ export interface QuickTransferWizardState {
   // Note added for liquid classes in Quick Transfer
   path?: PathOption
   changeTip?: ChangeTipOptions
-  dropTipLocation?: CutoutConfig
+  dropTipLocation?: CutoutConfig | string
   liquidClassName?: string
+  disposalVolumeDispenseSettings?: {
+    volume: number
+    blowOutLocation: BlowOutLocation
+    flowRate: number
+  }
 }
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 export type ChangeTipOptions =
@@ -39,8 +44,10 @@ export type ChangeTipOptions =
   | 'perSource'
 export type FlowRateKind = 'aspirate' | 'dispense' | 'blowout'
 export type BlowOutLocation = 'source_well' | 'dest_well' | CutoutConfig
-export type AspirateSettingOption = typeof ASPIRATE_SETTING_OPTIONS[keyof typeof ASPIRATE_SETTING_OPTIONS]
-export type DispenseSettingOption = typeof DISPENSE_SETTING_OPTIONS[keyof typeof DISPENSE_SETTING_OPTIONS]
+export type AspirateSettingOption =
+  (typeof ASPIRATE_SETTING_OPTIONS)[keyof typeof ASPIRATE_SETTING_OPTIONS]
+export type DispenseSettingOption =
+  (typeof DISPENSE_SETTING_OPTIONS)[keyof typeof DISPENSE_SETTING_OPTIONS]
 export interface SettingItem {
   option: string
   copy: string
@@ -111,14 +118,13 @@ export interface QuickTransferSummaryState {
   }
   touchTipDispense?: number // specifies the tip position from the top of the well
   touchTipDispenseSpeed?: number
-  disposalVolume?: number
   blowOutDispense?: {
     location?: BlowOutLocation
     flowRate?: number
   }
   airGapDispense?: number
   changeTip: ChangeTipOptions
-  dropTipLocation: CutoutConfig
+  dropTipLocation: CutoutConfig | string
   liquidClassName: string
   conditionAspirate?: number
   disposalVolumeDispenseSettings?: {
@@ -186,8 +192,6 @@ interface SetDispenseFlowRateAction {
 interface SetPipettePath {
   type: typeof ACTIONS.SET_PIPETTE_PATH
   path: PathOption
-  disposalVolume?: number
-  blowOutLocation?: BlowOutLocation
 }
 interface SetAspirateTipPosition {
   type: typeof ACTIONS.SET_ASPIRATE_TIP_POSITION
@@ -288,7 +292,7 @@ interface SetChangeTip {
 }
 interface SetDropTipLocation {
   type: typeof ACTIONS.SET_DROP_TIP_LOCATION
-  location: CutoutConfig
+  location: CutoutConfig | string
 }
 
 interface SetLiquidClassAction {

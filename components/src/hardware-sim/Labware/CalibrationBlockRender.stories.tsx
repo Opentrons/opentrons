@@ -21,9 +21,8 @@ const meta: Meta<typeof CalibrationBlockRender> = {
   decorators: [
     (Story, context) => {
       const { labwareDef } = context.args
-      const { minX, minY, xDimension, yDimension } = getLabwareViewBox(
-        labwareDef
-      )
+      const { minX, minY, xDimension, yDimension } =
+        getLabwareViewBox(labwareDef)
       const viewBox = `${minX} ${minY} ${xDimension} ${yDimension}`
 
       return (

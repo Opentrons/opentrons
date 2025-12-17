@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -10731,7 +10734,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -13341,7 +13344,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 38.0
+        "targetBlockTemperature": 38.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13372,7 +13376,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 38.0
+        "targetLidTemperature": 38.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -13423,7 +13428,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -13612,7 +13617,9 @@
         "celsius": 38.0,
         "moduleId": "UUID"
       },
-      "result": {},
+      "result": {
+        "taskId": "UUID"
+      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -14759,7 +14766,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -14862,7 +14869,7 @@
       "definitionUri": "opentrons/opentrons_tough_pcr_auto_sealing_lid/1",
       "id": "UUID",
       "loadName": "opentrons_tough_pcr_auto_sealing_lid",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_96_well_aluminum_block/1",
@@ -14917,13 +14924,13 @@
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",

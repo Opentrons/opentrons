@@ -42,9 +42,7 @@ const receiveActionFromShellEpic: Epic = () =>
     (_: unknown, incoming: Action) => incoming
   ).pipe<Action>(
     tap(incoming => {
-      log.debug('Received action from main via IPC', {
-        actionType: incoming.type,
-      })
+      log.debug(`Received action from main via IPC: ${incoming.type}`)
     })
   )
 

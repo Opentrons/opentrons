@@ -22,6 +22,7 @@ import { getDismissedHints } from '../../../tutorial/selectors'
 import { ProtocolOverview } from '../index'
 import { InstrumentsInfo } from '../InstrumentsInfo'
 import { LiquidDefinitions } from '../LiquidDefinitions'
+import { PeripheralsInfo } from '../PeripheralsInfo'
 import { ProtocolMetadata } from '../ProtocolMetadata'
 import { StartingDeck } from '../StartingDeck'
 import { StepsInfo } from '../StepsInfo'
@@ -41,6 +42,7 @@ vi.mock('../LiquidDefinitions')
 vi.mock('../InstrumentsInfo')
 vi.mock('../StepsInfo')
 vi.mock('../StartingDeck')
+vi.mock('../PeripheralsInfo')
 
 const mockNavigate = vi.fn()
 
@@ -94,6 +96,7 @@ describe('ProtocolOverview', () => {
     vi.mocked(ProtocolMetadata).mockReturnValue(
       <div>mock ProtocolMetadata</div>
     )
+    vi.mocked(PeripheralsInfo).mockReturnValue(<div>mock Peripherals</div>)
     vi.mocked(StartingDeck).mockReturnValue(<div>mock StartingDeck</div>)
   })
 
@@ -112,6 +115,9 @@ describe('ProtocolOverview', () => {
 
     //   liquids
     screen.getByText('mock LiquidDefinitions')
+
+    //   peripherals
+    screen.getByText('mock Peripherals')
 
     //  steps
     screen.getByText('mock StepsInfo')

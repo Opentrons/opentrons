@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -15626,7 +15629,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 100.0
+        "targetLidTemperature": 100.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -15658,7 +15662,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 95.0
+        "targetBlockTemperature": 95.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16747,7 +16752,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 95.0
+        "targetBlockTemperature": 95.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16779,7 +16785,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 92.6
+        "targetBlockTemperature": 92.6,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16811,7 +16818,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 90.19999999999999
+        "targetBlockTemperature": 90.19999999999999,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16843,7 +16851,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 87.79999999999998
+        "targetBlockTemperature": 87.79999999999998,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16875,7 +16884,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 85.39999999999998
+        "targetBlockTemperature": 85.39999999999998,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16907,7 +16917,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 82.99999999999997
+        "targetBlockTemperature": 82.99999999999997,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16939,7 +16950,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 80.59999999999997
+        "targetBlockTemperature": 80.59999999999997,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16971,7 +16983,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 78.19999999999996
+        "targetBlockTemperature": 78.19999999999996,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17003,7 +17016,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 75.79999999999995
+        "targetBlockTemperature": 75.79999999999995,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17035,7 +17049,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 73.39999999999995
+        "targetBlockTemperature": 73.39999999999995,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17067,7 +17082,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 70.99999999999994
+        "targetBlockTemperature": 70.99999999999994,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17099,7 +17115,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 68.59999999999994
+        "targetBlockTemperature": 68.59999999999994,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17131,7 +17148,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 66.19999999999993
+        "targetBlockTemperature": 66.19999999999993,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17163,7 +17181,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 63.79999999999993
+        "targetBlockTemperature": 63.79999999999993,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17195,7 +17214,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 61.399999999999935
+        "targetBlockTemperature": 61.399999999999935,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17227,7 +17247,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 58.999999999999936
+        "targetBlockTemperature": 58.999999999999936,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17259,7 +17280,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 56.59999999999994
+        "targetBlockTemperature": 56.59999999999994,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17291,7 +17313,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 54.19999999999994
+        "targetBlockTemperature": 54.19999999999994,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17323,7 +17346,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 51.79999999999994
+        "targetBlockTemperature": 51.79999999999994,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17355,7 +17379,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 49.39999999999994
+        "targetBlockTemperature": 49.39999999999994,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17387,7 +17412,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 46.99999999999994
+        "targetBlockTemperature": 46.99999999999994,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17419,7 +17445,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 44.599999999999945
+        "targetBlockTemperature": 44.599999999999945,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17451,7 +17478,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 42.199999999999946
+        "targetBlockTemperature": 42.199999999999946,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17483,7 +17511,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 39.79999999999995
+        "targetBlockTemperature": 39.79999999999995,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17515,7 +17544,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 37.39999999999995
+        "targetBlockTemperature": 37.39999999999995,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17547,7 +17577,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 37.0
+        "targetBlockTemperature": 37.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -17593,7 +17624,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 20.0
+        "targetBlockTemperature": 20.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -18602,7 +18634,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -20257,7 +20290,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26204,7 +26238,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 100.0
+        "targetLidTemperature": 100.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26236,7 +26271,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 94.0
+        "targetBlockTemperature": 94.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -27387,7 +27423,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -29137,7 +29174,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -29196,7 +29234,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 40.0
+        "targetLidTemperature": 40.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -30158,7 +30197,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -38279,7 +38319,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 100.0
+        "targetLidTemperature": 100.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -38311,7 +38352,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 37.0
+        "targetBlockTemperature": 37.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

@@ -3,7 +3,11 @@ import dns from 'dns'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 import electronDebug from 'electron-debug'
-import * as electronDevtoolsInstaller from 'electron-devtools-installer'
+import {
+  installExtension,
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer'
 
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
 import {
@@ -67,11 +71,20 @@ interface HandlerSet {
 // Handler caching using window ID as key
 const handlerSets = new Map<string, HandlerSet>()
 
-// prepended listener is important here to work around Electron issue
-// https://github.com/electron/electron/issues/19468#issuecomment-623529556
-app.prependOnceListener('ready', startUp)
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-if (config.devtools) app.once('ready', installDevtools)
+app
+  .whenReady()
+  .then(async () => {
+    startUp()
+
+    if (config.devtools) {
+      await installDevtools()
+
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.openDevTools({ mode: 'detach' })
+      }
+    }
+  })
+  .catch(err => log.error('Startup failed', { err }))
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
@@ -207,36 +220,23 @@ function createRendererLogger(): Logger {
   return logger
 }
 
-function installDevtools(): Promise<Logger> {
-  const extensions = [
-    electronDevtoolsInstaller.REACT_DEVELOPER_TOOLS,
-    electronDevtoolsInstaller.REDUX_DEVTOOLS,
-  ]
-  // @ts-expect-error the types for electron-devtools-installer are not correct
-  // when importing the default export via commmon JS. the installer is actually nested in
-  // another default object
-  const install = electronDevtoolsInstaller.default?.default
-  const forceReinstall = config.reinstallDevtools
+async function installDevtools(): Promise<void> {
+  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]
 
-  log.debug('Installing devtools')
+  log.debug('Installing devtools with v4 API')
 
-  if (typeof install === 'function') {
-    return install(extensions, {
+  try {
+    await installExtension(extensions, {
       loadExtensionOptions: { allowFileAccess: true },
-      forceDownload: forceReinstall,
+      forceDownload: config.reinstallDevtools,
     })
-      .then(() => log.debug('Devtools extensions installed'))
-      .catch((error: unknown) => {
-        log.warn('Failed to install devtools extensions', {
-          forceReinstall,
-          error,
-        })
-      })
-  } else {
-    log.warn('could not resolve electron dev tools installer')
-    return Promise.reject(
-      new Error('could not resolve electron dev tools installer')
-    )
+
+    log.debug('Devtools extensions installed')
+  } catch (error) {
+    log.warn('Failed to install devtools extensions', {
+      forceReinstall: config.reinstallDevtools,
+      error,
+    })
   }
 }
 

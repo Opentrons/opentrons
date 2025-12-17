@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
+import clsx from 'clsx'
 
 import {
   RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
@@ -18,6 +19,7 @@ import {
   useRunActionMutations,
 } from '@opentrons/react-api-client'
 
+import { useToastOnErrorImage } from '/app/local-resources/images/hooks/useToastOnErrorImage'
 import { useIsDoorOpen } from '/app/organisms/DoorOpenControl/useIsDoorOpen'
 import {
   ErrorRecoveryFlows,
@@ -30,6 +32,7 @@ import {
 import { OpenDoorAlertModal } from '/app/organisms/ODD/OpenDoorAlertModal'
 import {
   CurrentRunningProtocolCommand,
+  ImageGalleryList,
   RunningProtocolCommandList,
   RunningProtocolSkeleton,
 } from '/app/organisms/ODD/RunningProtocol'
@@ -46,7 +49,6 @@ import {
   useLastRunCommand,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
   useRunTimestamps,
 } from '/app/resources/runs'
 
@@ -58,16 +60,18 @@ import type {
   RunningProtocolCommandListProps,
 } from '/app/organisms/ODD/RunningProtocol'
 
-const RUN_STATUS_REFETCH_INTERVAL = 5000
 const LIVE_RUN_COMMANDS_POLL_MS = 3000
+const RUN_STATUS_REFETCH_INTERVAL = 5000
 
 export type ScreenOption =
   | 'CurrentRunningProtocolCommand'
   | 'RunningProtocolCommandList'
+  | 'ImageGallery'
 
 const SCREEN_ORDER: ScreenOption[] = [
   'CurrentRunningProtocolCommand',
   'RunningProtocolCommandList',
+  'ImageGallery',
 ]
 
 export function RunningProtocol(): JSX.Element {
@@ -77,10 +81,8 @@ export function RunningProtocol(): JSX.Element {
   const [currentOption, setCurrentOption] = useState<ScreenOption>(
     'CurrentRunningProtocolCommand'
   )
-  const [
-    showConfirmCancelRunModal,
-    setShowConfirmCancelRunModal,
-  ] = useState<boolean>(false)
+  const [showConfirmCancelRunModal, setShowConfirmCancelRunModal] =
+    useState<boolean>(false)
   const lastAnimatedCommand = useRef<string | null>(null)
   const { ref, style, swipeType, setSwipeType } = useSwipe()
   const robotSideAnalysis = useMostRecentCompletedAnalysis(runId)
@@ -92,15 +94,19 @@ export function RunningProtocol(): JSX.Element {
   const currentRunCommandIndex = robotSideAnalysis?.commands.findIndex(
     c => c.key === lastRunCommand?.key
   )
-  const runStatus = useRunStatus(runId, {
+
+  const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    staleTime: Infinity,
     refetchInterval: RUN_STATUS_REFETCH_INTERVAL,
   })
-  const { startedAt, stoppedAt, completedAt } = useRunTimestamps(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
+  const runStatus = runRecord?.data.status ?? null
+
   const protocolId = runRecord?.data.protocolId ?? null
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
   })
+
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
@@ -116,17 +122,15 @@ export function RunningProtocol(): JSX.Element {
     runStatus
   )
   const doorStatus = useIsDoorOpen(robotName)
-  const {
-    showModal: showIntervention,
-    modalProps: interventionProps,
-  } = useInterventionModal({
-    runStatus,
-    lastRunCommand,
-    runData: runRecord?.data ?? null,
-    robotName,
-    analysis: robotSideAnalysis,
-    doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
-  })
+  const { showModal: showIntervention, modalProps: interventionProps } =
+    useInterventionModal({
+      runStatus,
+      lastRunCommand,
+      runData: runRecord?.data ?? null,
+      robotName,
+      analysis: robotSideAnalysis,
+      doorIsOpen: runStatus === RUN_STATUS_BLOCKED_BY_OPEN_DOOR,
+    })
 
   useEffect(() => {
     if (swipeType === '') {
@@ -134,10 +138,11 @@ export function RunningProtocol(): JSX.Element {
     }
 
     const currentIndex = SCREEN_ORDER.indexOf(currentOption)
+    const maxIndex = SCREEN_ORDER.length - 1
     let newIndex: number
 
     if (swipeType === 'swipe-left') {
-      newIndex = Math.min(currentIndex + 1, SCREEN_ORDER.length - 1)
+      newIndex = Math.min(currentIndex + 1, maxIndex)
     } else if (swipeType === 'swipe-right') {
       newIndex = Math.max(currentIndex - 1, 0)
     } else {
@@ -252,18 +257,28 @@ export function RunningProtocol(): JSX.Element {
           )}
           <div className={styles.navigation_dots}>
             <div
-              className={`${styles.bullet} ${
+              className={clsx(
+                styles.bullet,
                 currentOption === 'CurrentRunningProtocolCommand'
                   ? styles.bullet_active
                   : styles.bullet_inactive
-              }`}
+              )}
             />
             <div
-              className={`${styles.bullet} ${
+              className={clsx(
+                styles.bullet,
                 currentOption === 'RunningProtocolCommandList'
                   ? styles.bullet_active
                   : styles.bullet_inactive
-              }`}
+              )}
+            />
+            <div
+              className={clsx(
+                styles.bullet,
+                currentOption === 'ImageGallery'
+                  ? styles.bullet_active
+                  : styles.bullet_inactive
+              )}
             />
           </div>
         </div>
@@ -279,6 +294,8 @@ function CurrentOptionView({
   currentOption,
   ...rest
 }: CurrentOptionViewProps): JSX.Element {
+  useToastOnErrorImage(rest.runId)
+
   switch (currentOption) {
     case 'CurrentRunningProtocolCommand':
       return <CurrentRunningProtocolCommand {...rest} />
@@ -287,6 +304,17 @@ function CurrentOptionView({
       return (
         <>
           <RunningProtocolCommandList {...rest} />
+          <div className={styles.gradient_overlay} />
+        </>
+      )
+
+    case 'ImageGallery':
+      return (
+        <>
+          <ImageGalleryList
+            {...rest}
+            protocolAnalysis={rest.robotSideAnalysis}
+          />
           <div className={styles.gradient_overlay} />
         </>
       )

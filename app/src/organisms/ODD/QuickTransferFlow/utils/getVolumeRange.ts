@@ -2,9 +2,10 @@ import { getSelectedWellCount } from './'
 
 import type { QuickTransferWizardState } from '../types'
 
-export function getVolumeRange(
-  state: QuickTransferWizardState
-): { min: number; max: number } {
+export function getVolumeRange(state: QuickTransferWizardState): {
+  min: number
+  max: number
+} {
   if (
     state.pipette == null ||
     state.tipRack == null ||

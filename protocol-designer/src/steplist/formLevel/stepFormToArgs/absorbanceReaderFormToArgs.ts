@@ -6,9 +6,10 @@ import {
 
 import type { AbsorbanceReaderArgs } from '@opentrons/step-generation'
 import type { HydratedAbsorbanceReaderFormData } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
 export const absorbanceReaderFormToArgs = (
-  hydratedFormData: HydratedAbsorbanceReaderFormData
+  castFormData: GetCastFormData<HydratedAbsorbanceReaderFormData>
 ): AbsorbanceReaderArgs | null => {
   const {
     absorbanceReaderFormType,
@@ -21,7 +22,7 @@ export const absorbanceReaderFormToArgs = (
     wavelengths,
     stepDetails,
     stepName,
-  } = hydratedFormData
+  } = castFormData
 
   const baseValues = { description: stepDetails, name: stepName }
   const lidAction = lidOpen
@@ -33,7 +34,11 @@ export const absorbanceReaderFormToArgs = (
         (mode === 'single' ? [wavelengths[0]] : wavelengths) ?? // only take first wavelength in single mode
         []
       return {
-        moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: moduleId!,
         commandCreatorFnName: 'absorbanceReaderInitialize',
         measureMode: mode,
         sampleWavelengths: rawWavelengths?.map(wavelength =>
@@ -48,14 +53,22 @@ export const absorbanceReaderFormToArgs = (
       }
     case ABSORBANCE_READER_READ:
       return {
-        moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: moduleId!,
         commandCreatorFnName: 'absorbanceReaderRead',
         fileName: fileName ?? null,
         ...baseValues,
       }
     case ABSORBANCE_READER_LID:
       return {
-        moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: moduleId!,
         commandCreatorFnName: lidAction,
         ...baseValues,
       }

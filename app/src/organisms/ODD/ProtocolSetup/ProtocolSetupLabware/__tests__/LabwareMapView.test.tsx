@@ -92,7 +92,7 @@ describe('LabwareMapView', () => {
       .thenReturn(<div>mock base deck</div>)
     render({
       handleLabwareClick: vi.fn(),
-      mostRecentAnalysis: ({} as unknown) as CompletedProtocolAnalysis,
+      mostRecentAnalysis: {} as unknown as CompletedProtocolAnalysis,
       startingDeck: {
         A1: [
           {

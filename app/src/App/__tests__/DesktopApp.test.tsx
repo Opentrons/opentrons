@@ -20,7 +20,7 @@ import { ProtocolsLanding } from '/app/pages/Desktop/Protocols/ProtocolsLanding'
 // prettier-ignore
 import { AlertsModal } from '/app/organisms/Desktop/Alerts/AlertsModal';
 
-import { ProtocolPreview } from '/app/pages/Desktop/Protocols/ProtocolPreview'
+import { ProtocolVisualization } from '/app/pages/Desktop/Protocols/ProtocolVisualization'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
 
@@ -44,7 +44,7 @@ vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
-vi.mock('/app/pages/Desktop/Protocols/ProtocolPreview')
+vi.mock('/app/pages/Desktop/Protocols/ProtocolVisualization')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -71,7 +71,9 @@ describe('DesktopApp', () => {
     vi.mocked(ProtocolRunDetails).mockReturnValue(
       <div>Mock ProtocolRunDetails</div>
     )
-    vi.mocked(ProtocolPreview).mockReturnValue(<div>Mock Preview</div>)
+    vi.mocked(ProtocolVisualization).mockReturnValue(
+      <div>Mock Visualization</div>
+    )
     vi.mocked(RobotSettings).mockReturnValue(<div>Mock RobotSettings</div>)
     vi.mocked(GeneralSettings).mockReturnValue(<div>Mock AppSettings</div>)
     vi.mocked(Breadcrumbs).mockReturnValue(<div>Mock Breadcrumbs</div>)
@@ -80,11 +82,9 @@ describe('DesktopApp', () => {
     )
     vi.mocked(AlertsModal).mockReturnValue(<></>)
     vi.mocked(useIsFlex).mockReturnValue(true)
-    vi.mocked(
-      LocalizationProvider
-    ).mockImplementation((props: LocalizationProviderProps) => (
-      <>{props.children}</>
-    ))
+    vi.mocked(LocalizationProvider).mockImplementation(
+      (props: LocalizationProviderProps) => <>{props.children}</>
+    )
     when(vi.mocked(useFeatureFlag)).calledWith('reactScan').thenReturn(false)
   })
   afterEach(() => {
@@ -130,9 +130,16 @@ describe('DesktopApp', () => {
     screen.getByText('Mock ProtocolsLanding')
   })
 
-  it('renders a ProtocolsTimeline component from /preview', () => {
-    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/preview`)
-    screen.getByText('Mock Preview')
+  it('renders a ProtocolsTimeline component from /visualization', () => {
+    render(`/protocols/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/visualization`)
+    screen.getByText('Mock Visualization')
+  })
+
+  it('renders a ProtocolsTimeline component from /visualization', () => {
+    render(
+      `/devices/otie/95e67900-bc9f-4fbf-92c6-cc4d7226a51b/mockDecodedTimestamp/6b94f0a9-e91e-4202-b25f-ab13beab4bca/visualization`
+    )
+    screen.getByText('Mock Visualization')
   })
 
   it('renders a ProtocolRunDetails component from /devices/:robotName/protocol-runs/:runId/:protocolRunDetailsTab', () => {

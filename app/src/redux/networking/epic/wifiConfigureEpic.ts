@@ -19,7 +19,9 @@ import type {
   PostWifiConfigureSuccessAction,
 } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<PostWifiConfigureAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  PostWifiConfigureAction
+> = action => ({
   method: POST,
   path: Constants.WIFI_CONFIGURE_PATH,
   body: action.payload.options,

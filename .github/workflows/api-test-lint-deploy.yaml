@@ -55,12 +55,12 @@ jobs:
       - uses: 'actions/checkout@v4'
         with:
           fetch-depth: 0
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - uses: './.github/actions/python/setup'
         with:
@@ -74,7 +74,7 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022', 'ubuntu-24.04', 'macos-latest']
-        python: ['3.10']
+        python: ['3.12']
         with-ot-hardware: ['true', 'false']
         exclude:
           - os: 'windows-2022'
@@ -92,9 +92,9 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: ${{ matrix.python }}
@@ -129,10 +129,16 @@ jobs:
 
   test-package:
     name: 'installed package tests on ${{ matrix.os }}'
-    timeout-minutes: 5
+    timeout-minutes: 10
     strategy:
       matrix:
         os: ['ubuntu-24.04', 'macos-latest', 'windows-2022']
+        python: ['3.10', '3.11', '3.12', '3.13']
+        exclude:
+          # numpy 1.26.4 does not have a precompiled wheel for 3.13, and building it locally gives
+          # a bad object that crashes a bunch
+          - os: 'windows-2022'
+            python: '3.13'
     runs-on: '${{ matrix.os }}'
     steps:
       - uses: 'actions/checkout@v4'
@@ -143,7 +149,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.10'
+          python-version: ${{matrix.python}}
       - name: Set up package-testing
         id: setup
         if: ${{ matrix.os != 'windows-2022' }}
@@ -172,7 +178,7 @@ jobs:
         id: results
         uses: actions/upload-artifact@v4
         with:
-          name: package-test-results-${{ matrix.os }}
+          name: package-test-results-${{ matrix.os }}-${{ matrix.python }}
           path: package-testing/results
       - name: Set job summary
         if: ${{ always() }}
@@ -186,6 +192,9 @@ jobs:
     needs: [test]
     runs-on: 'ubuntu-24.04'
     if: github.event_name == 'push'
+    permissions:
+      id-token: write # Required for OIDC
+      contents: read # Required for checkout
     steps:
       - uses: 'actions/checkout@v4'
         with:
@@ -196,12 +205,12 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - uses: 'actions/setup-python@v4'
         with:
-          python-version: '3.10'
+          python-version: '3.12'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
@@ -211,6 +220,10 @@ jobs:
       - uses: './.github/actions/python/setup'
         with:
           project: 'api'
+      - name: 'build api distributables'
+        shell: bash
+        run: make -C api sdist wheel
+
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'
@@ -221,8 +234,7 @@ jobs:
           password: '${{ secrets.TEST_PYPI_DEPLOY_TOKEN_OPENTRONS }}'
       - if: startsWith(env.OT_TAG, 'v')
         name: 'upload to real pypi'
-        uses: './.github/actions/python/pypi-deploy'
+        uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          project: 'api'
-          repository_url: 'https://upload.pypi.org/legacy/'
-          password: '${{ secrets.PYPI_DEPLOY_TOKEN_OPENTRONS }}'
+          packages-dir: api/dist/
+          repository-url: https://upload.pypi.org/legacy/

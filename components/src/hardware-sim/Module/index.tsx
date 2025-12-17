@@ -11,7 +11,7 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 
-import { AlignControlToModule } from '../..'
+import { AlignToModuleChildSlot } from '../..'
 import {
   ALIGN_CENTER,
   C_DARK_GRAY,
@@ -38,7 +38,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { FlexDirection } from '../Deck'
 
-export * from './alignToModule'
 export * from './Thermocycler'
 
 interface Props {
@@ -60,16 +59,16 @@ interface Props {
    *
    * `passThrough` - The SVG origin of each child will be at the origin of the module,
    *   which is the front-left (-x, -y) corner of the slot that the module is in.
-   *   From there, use a helper component like `AlignLabwareToModule` or
-   *   `AlignControlToModule` to move the child where you want it.
+   *   From there, use a helper component like `CenterLabwareInModuleChildSlot` or
+   *   `AlignToModuleChildSlot` to move the child where you want it.
    *
    * `offsetToSlot - The SVG origin of each child will be at the "labware mating interface"
    *   of the module, which is the front-left (-x, -y) corner of the slot on top of the
    *   module.
    *
-   *   This is deprecated because it can't scale to support labware schema 3's many
-   *   ideas of how labware can fit on things. This will not position a child labware
-   *   properly if it has labware schema 3.
+   *   This is deprecated for separation of responsibilities, and because it's easier
+   *   to support labware schema 3's unpredictable labware origins with `passThrough`'s
+   *   way of doing things.
    *
    * todo(mm, 2025-07-21):
    * 1. Migrate all existing call sites to use "passThrough".
@@ -151,15 +150,12 @@ export const Module = (props: Props): JSX.Element => {
 
   const transformsForLocation =
     targetSlotId != null && targetDeckId != null
-      ? def.slotTransforms[targetDeckId]?.[targetSlotId] ?? {}
+      ? (def.slotTransforms[targetDeckId]?.[targetSlotId] ?? {})
       : {}
 
   // apply translation to compensate for the offset of the overall module's
   // left-bottom-front corner, from the footprint's left-bottom-front corner (slot interface)
-  const [
-    [slotTranslateX],
-    [slotTranslateY],
-  ] = multiplyMatrices(
+  const [[slotTranslateX], [slotTranslateY]] = multiplyMatrices(
     transformsForLocation.cornerOffsetFromSlot ?? IDENTITY_AFFINE_TRANSFORM,
     [
       [def.cornerOffsetFromSlot.x],
@@ -252,13 +248,13 @@ export const Module = (props: Props): JSX.Element => {
       </g>
       {renderStatusInfo()}
       {childrenPositioningMode === 'offsetToSlot' ? (
-        <AlignControlToModule
+        <AlignToModuleChildSlot
           moduleDefinition={def}
           slotId={targetSlotId}
           deckId={targetDeckId}
         >
           {children}
-        </AlignControlToModule>
+        </AlignToModuleChildSlot>
       ) : (
         children
       )}

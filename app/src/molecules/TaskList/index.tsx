@@ -148,8 +148,8 @@ function ProgressTrackerItem({
                     isTaskListComplete || isPastSubTask
                       ? COLORS.blue50
                       : subTask.isComplete === true
-                      ? COLORS.grey40
-                      : 'initial'
+                        ? COLORS.grey40
+                        : 'initial'
                   }
                   border={TASK_CONNECTOR_STYLE}
                   borderColor={isFutureSubTask ? COLORS.grey40 : COLORS.blue50}
@@ -169,8 +169,8 @@ function ProgressTrackerItem({
                     isFinalSubTaskOfTaskList
                       ? COLORS.transparent
                       : isTaskListComplete || isPastSubTask
-                      ? COLORS.blue50
-                      : COLORS.grey40
+                        ? COLORS.blue50
+                        : COLORS.grey40
                   }
                   marginTop={`-${SPACING.spacing8}`}
                   marginBottom={
@@ -255,7 +255,7 @@ function SubTask({
             >
               {markedBad === true && (
                 <Icon
-                  name="alert-circle"
+                  name="ot-alert"
                   backgroundColor={COLORS.yellow20}
                   color={COLORS.yellow50}
                   height="1rem"
@@ -399,7 +399,7 @@ function Task({
               >
                 {markedBad === true && (
                   <Icon
-                    name="alert-circle"
+                    name="ot-alert"
                     backgroundColor={COLORS.yellow20}
                     color={COLORS.yellow50}
                     height="1rem"

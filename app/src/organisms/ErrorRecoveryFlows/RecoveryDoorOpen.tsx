@@ -38,10 +38,8 @@ export function RecoveryDoorOpen({
   recoveryCommands,
   currentRecoveryOptionUtils,
 }: RecoveryContentProps): JSX.Element {
-  const {
-    resumeRecovery,
-    isResumeRecoveryLoading,
-  } = recoveryActionMutationUtils
+  const { resumeRecovery, isResumeRecoveryLoading } =
+    recoveryActionMutationUtils
   const { stashedMap, proceedToRouteAndStep } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { t } = useTranslation('error_recovery')
@@ -115,7 +113,7 @@ export function RecoveryDoorOpen({
       >
         <Icon
           css={ICON_STYLE}
-          name="alert-circle"
+          name="ot-alert"
           data-testid="recovery_door_alert_icon"
         />
         <Flex css={TEXT_STYLE}>
