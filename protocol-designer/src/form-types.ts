@@ -485,6 +485,7 @@ export interface HydratedThermocyclerFormData extends AnnotationFields {
   profileTargetLidTemp: string | null
   profileVolume: string | null
 
+  // https://opentrons.atlassian.net/browse/EXEC-2141
   /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
   blockIsActiveHold: boolean
   /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
