@@ -60,7 +60,6 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 import type {
-  FlexStackerModuleState,
   HopperLocationMapKey,
   ModuleTemporalProperties,
   ThermocyclerModuleState,
