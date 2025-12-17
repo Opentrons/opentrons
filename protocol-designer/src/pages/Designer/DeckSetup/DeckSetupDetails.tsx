@@ -39,6 +39,7 @@ import {
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
+import { HopperLabwareRenders } from './HopperLabwareRenders'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 import { SelectedItems } from './SelectedItems'
@@ -59,6 +60,7 @@ import type {
   DeckSlotId,
 } from '@opentrons/shared-data'
 import type {
+  FlexStackerModuleState,
   HopperLocationMapKey,
   ModuleTemporalProperties,
   ThermocyclerModuleState,
@@ -294,6 +296,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         const labwareRightBelowTopMostLabware =
           rightBelowTopId != null ? activeLabware[rightBelowTopId] : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
+        const labwareInHopper =
+          'labwareInHopper' in moduleOnDeck.moduleState
+            ? moduleOnDeck.moduleState.labwareInHopper
+            : null
+        const topLabwareGroup =
+          labwareInHopper?.[labwareInHopper.length - 1] ?? null
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
           <Fragment key={moduleOnDeck.id}>
@@ -314,33 +322,20 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   : 'offsetToSlot'
               }
             >
-              {hopperTopMostId != null ? (
-                <>
-                  <LabwareOnDeck
-                    x={HOPPER_LABWARE_X_OFFSET}
-                    y={0}
-                    labwareOnDeck={activeLabware[hopperTopMostId]}
-                  />
-                  <HighlightLabware
-                    labwareOnDeck={activeLabware[hopperTopMostId]}
-                    position={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
-                    isZoomed={selectedZoomInSlot != null}
-                  />
-                  <LabwareControls
-                    terminalItemId={terminalItemId}
-                    itemId={`hopper${slotId}`}
-                    setHover={setHover}
-                    setShowMenuListForId={setShowMenuListForId}
-                    hover={hover}
-                    slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]} // Module Component already handles nested positioning
-                    setHoveredLabware={setHoveredLabware}
-                    setDraggedLabware={setDraggedLabware}
-                    swapBlocked={false}
-                    labwareOnDeck={activeLabware[hopperTopMostId]}
-                    isSelected={selectedZoomInSlot != null}
-                    allModules={allModules}
-                  />
-                </>
+              {topLabwareGroup ? (
+                <HopperLabwareRenders
+                  labwaresOnDeck={activeLabware}
+                  slot={moduleOnDeck.slot}
+                  topLabwareGroup={topLabwareGroup}
+                  allModules={allModules}
+                  terminalItemId={terminalItemId}
+                  setHover={setHover}
+                  setShowMenuListForId={setShowMenuListForId}
+                  hover={hover}
+                  setHoveredLabware={setHoveredLabware}
+                  setDraggedLabware={setDraggedLabware}
+                  selectedZoomInSlot={selectedZoomInSlot}
+                />
               ) : null}
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (
@@ -707,6 +702,20 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           </Fragment>
         )
       })}
+
+      {/* special-cased hopper labware based on module states */}
+      {/* <HopperTopLabwareRenders
+        labwaresOnDeck={activeLabware}
+        modules={allModules}
+        deckDef={deckDef}
+        terminalItemId={terminalItemId}
+        setHover={setHover}
+        setShowMenuListForId={setShowMenuListForId}
+        hover={hover}
+        setHoveredLabware={setHoveredLabware}
+        setDraggedLabware={setDraggedLabware}
+        selectedZoomInSlot={selectedZoomInSlot}
+      /> */}
 
       {/* highlight items from Protocol steps */}
       <HighlightItems robotType={robotType} deckDef={deckDef} />

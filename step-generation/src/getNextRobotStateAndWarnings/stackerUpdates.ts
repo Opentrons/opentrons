@@ -5,7 +5,10 @@ import {
   getStackerMaxPoolCountByHeight,
 } from '@opentrons/shared-data'
 
-import { HOPPER_STACKER_LOCATION } from '../constants'
+import {
+  BOTTOM_UP_LABWARE_POOL_KEYS,
+  HOPPER_STACKER_LOCATION,
+} from '../constants'
 import { flexStackerStateGetter } from '../robotStateSelectors'
 import { uuid } from '../utils'
 
@@ -18,9 +21,6 @@ import type {
   FlexStackerStoredLabwareGroup,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
-
-const BOTTOM_UP_LABWARE_POOL_KEYS: Array<keyof FlexStackerStoredLabwareGroup> =
-  ['adapterLabwareId', 'adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
 
 export const forFlexStackerEmpty = (
   params: FlexStackerEmptyCreateCommand['params'],
