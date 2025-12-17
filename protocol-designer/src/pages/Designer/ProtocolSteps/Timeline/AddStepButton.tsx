@@ -32,6 +32,7 @@ import {
   getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  SYSTEM_LOCATION,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -112,6 +113,7 @@ export function AddStepButton({
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
+    const isInaccessible = slot === SYSTEM_LOCATION
     const isLidOnSlot = labwareDef != null ? getIsLid(labwareDef) : false
     const isStackerInSlot = Object.values(modules).some(
       module =>
@@ -119,6 +121,7 @@ export function AddStepButton({
         moduleAtLastState[module.id].slot === slot
     )
     return (
+      !isInaccessible &&
       labwareDef != null &&
       slot !== OFFDECK &&
       !getIsTiprack(labwareDef) &&
