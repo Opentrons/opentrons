@@ -182,6 +182,7 @@ export const forFlexStackerStore = (
       ]
       moduleState.labwareOnShuttle = null
 
+      // build trivial stacks for stored labware group elements
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareOnShuttle[
