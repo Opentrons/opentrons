@@ -17,6 +17,6 @@ export interface CreateCameraData {
   data: CameraData
 }
 
-export type DownloadedPreviewImageFileResponse = Blob
+export type DownloadedPreviewImageFileResponse = Blob | null
 export type CameraResponse = CameraData
 export type CameraImageSettingsResponse = CameraImageSettings

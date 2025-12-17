@@ -49,7 +49,7 @@ describe('CameraControlsHome', () => {
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: undefined,
-      takePhoto: vi.fn(),
+      photoTaken: vi.fn(),
     })
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAVIGATION</div>)
     vi.mocked(ImagePreviewModal).mockReturnValue(
@@ -193,7 +193,7 @@ describe('CameraControlsHome', () => {
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: undefined,
-      takePhoto: mockTakePhoto,
+      photoTaken: mockTakePhoto,
     })
     vi.mocked(ChildNavigation).mockImplementation(({ onClickButton }) => (
       <button onClick={onClickButton} data-testid="preview-button">
@@ -214,7 +214,7 @@ describe('CameraControlsHome', () => {
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
       imgPath: '/path/to/image.jpg',
-      takePhoto: mockTakePhoto,
+      photoTaken: mockTakePhoto,
     })
     vi.mocked(ChildNavigation).mockImplementation(({ onClickButton }) => (
       <button onClick={onClickButton} data-testid="preview-button">
@@ -234,7 +234,7 @@ describe('CameraControlsHome', () => {
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: true,
       imgPath: undefined,
-      takePhoto: vi.fn(),
+      photoTaken: vi.fn(),
     })
 
     render(mockProps)

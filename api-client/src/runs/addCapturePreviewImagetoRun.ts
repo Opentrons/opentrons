@@ -10,8 +10,8 @@ import type { HostConfig } from '../types'
 
 export function addCapturePreviewImageToRun(
   config: HostConfig,
-  data: CameraImageSettings,
   runId: string,
+  data: CameraImageSettings,
   axiosConfig?: AxiosRequestConfig
 ): ResponsePromise<DownloadedPreviewImageFileResponse> {
   return request<

@@ -1,35 +1,58 @@
-import { useQuery } from 'react-query'
+import { useMutation, useQueryClient } from 'react-query'
 
 import { addCapturePreviewImageToRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
 import type { AxiosError } from 'axios'
-import type { UseQueryOptions, UseQueryResult } from 'react-query'
+import type { UseMutateFunction, UseMutationResult } from 'react-query'
 import type {
   CameraImageSettings,
-  DownloadedImageFileResponse,
+  DownloadedPreviewImageFileResponse,
   ErrorResponse,
 } from '@opentrons/api-client'
 
-export function useAddCapturePreviewImageToRun(
-  cameraImageSettings: CameraImageSettings,
-  runId: string,
-  options?: UseQueryOptions<
-    DownloadedImageFileResponse,
-    AxiosError<ErrorResponse>
-  >
-): UseQueryResult<DownloadedImageFileResponse, AxiosError<ErrorResponse>> {
-  const host = useHost()
+export interface AddCapturePreviewImageToRunParams {
+  runId: string
+  settings: CameraImageSettings
+}
 
-  return useQuery<DownloadedImageFileResponse, AxiosError<ErrorResponse>>(
-    [host, 'runs', runId, 'camera', 'capturePreviewImage', cameraImageSettings],
-    () =>
-      addCapturePreviewImageToRun(host!, cameraImageSettings, runId, {
-        responseType: 'blob',
-      }).then(response => response.data),
-    {
-      ...options,
-    }
+export type UseAddCapturePreviewImageToRunMutationResult = UseMutationResult<
+  DownloadedPreviewImageFileResponse,
+  AxiosError<ErrorResponse>,
+  AddCapturePreviewImageToRunParams
+> & {
+  addCapturePreviewImageToRun: UseMutateFunction<
+    DownloadedPreviewImageFileResponse,
+    AxiosError<ErrorResponse>,
+    AddCapturePreviewImageToRunParams
+  >
+}
+export function useCapturePreviewImageToRun(): UseAddCapturePreviewImageToRunMutationResult {
+  const host = useHost()
+  const queryClient = useQueryClient()
+
+  const mutation = useMutation<
+    DownloadedPreviewImageFileResponse,
+    AxiosError<ErrorResponse>,
+    AddCapturePreviewImageToRunParams
+  >(({ runId, settings }) =>
+    addCapturePreviewImageToRun(host!, runId, settings)
+      .then(response => {
+        queryClient
+          .invalidateQueries([host, 'runs', runId])
+          .catch((e: Error) => {
+            console.error(`error invalidating runs query: ${e.message}`)
+          })
+        return response.data
+      })
+      .catch((e: Error) => {
+        console.error(`error capturing preview image on run: ${e.message}`)
+        throw e
+      })
   )
+  return {
+    ...mutation,
+    addCapturePreviewImageToRun: mutation.mutateAsync,
+  }
 }
