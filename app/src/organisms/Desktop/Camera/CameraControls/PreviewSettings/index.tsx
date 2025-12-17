@@ -18,7 +18,7 @@ export function PreviewSettings({
   settings,
   runId,
 }: PreviewSettingsProps): JSX.Element {
-  const { isLoading, imgPath, photoTaken } = usePreviewImage(settings, runId)
+  const { isLoading, imgPath, takePhoto } = usePreviewImage(settings, runId)
 
   return (
     <div className={styles.container}>
@@ -26,7 +26,7 @@ export function PreviewSettings({
         <PreviewImage imgPath={imgPath} />
         <PreviewImageBtn
           hasPreviewImg={imgPath != null}
-          onClick={photoTaken}
+          onClick={takePhoto}
           isLoading={isLoading}
         />
       </div>
@@ -34,11 +34,7 @@ export function PreviewSettings({
   )
 }
 
-function PreviewImage({
-  imgPath,
-}: {
-  imgPath: string | undefined
-}): JSX.Element {
+function PreviewImage({ imgPath }: { imgPath: string | null }): JSX.Element {
   if (imgPath != null) {
     return (
       <img

@@ -28,7 +28,7 @@ export function CameraControlsHome({
   runId,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { isLoading, imgPath, photoTaken } = usePreviewImage(
+  const { isLoading, imgPath, takePhoto } = usePreviewImage(
     {
       zoom: settings.zoom,
       brightness: settings.brightness,
@@ -45,7 +45,7 @@ export function CameraControlsHome({
   }
   const onTakePhoto = (): void => {
     if (!isLoading) {
-      photoTaken()
+      takePhoto()
       setShowModal(true)
     }
   }

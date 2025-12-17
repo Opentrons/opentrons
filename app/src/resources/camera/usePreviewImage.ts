@@ -8,9 +8,9 @@ import {
 import type { CameraImageSettings } from '@opentrons/api-client'
 
 export interface UsePreviewImageResult {
-  imgPath: string | undefined
+  imgPath: string | null
   isLoading: boolean
-  photoTaken: () => Promise<void>
+  takePhoto: () => void
 }
 
 export function usePreviewImage(
@@ -18,31 +18,43 @@ export function usePreviewImage(
   runId: string | null
 ): UsePreviewImageResult {
   const [imageBlob, setImageBlob] = useState<Blob | null>(null)
-
+  const callbacks = {
+    onSettled: (blob?: Blob) => {
+      if (blob != null) {
+        setImageBlob(blob)
+      }
+    },
+    onError: (error: unknown) => {
+      console.error('Failed to capture preview image', error)
+    },
+  }
   const captureImagePreview = useCapturePreviewImage()
-  const captureImagePreviewForRun = useCapturePreviewImageToRun()
+  const captureImagePreviewForRun = useCapturePreviewImageToRun(runId ?? '')
 
   const captureImage =
     runId == null ? captureImagePreview : captureImagePreviewForRun
 
-  const photoTaken = async (): Promise<void> => {
-    const blob = await captureImage.mutateAsync({
-      settings,
-      runId: runId ?? '',
-    })
-
-    setImageBlob(blob)
+  const takePhoto = (): void => {
+    captureImage?.mutate(
+      {
+        settings,
+        runId: runId ?? '',
+      },
+      { ...callbacks }
+    )
   }
 
-  const imgPath = useMemo((): string | undefined => {
-    if (imageBlob == null) return undefined
+  const imgPath = useMemo((): string | null => {
+    if (imageBlob == null) {
+      return null
+    }
 
     return URL.createObjectURL(imageBlob)
   }, [imageBlob])
 
   useEffect(() => {
     return () => {
-      if (imgPath !== undefined) {
+      if (imgPath !== null) {
         URL.revokeObjectURL(imgPath)
       }
     }
@@ -51,6 +63,6 @@ export function usePreviewImage(
   return {
     imgPath,
     isLoading: captureImage.isLoading,
-    photoTaken,
+    takePhoto,
   }
 }

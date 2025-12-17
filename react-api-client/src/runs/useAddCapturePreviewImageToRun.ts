@@ -28,7 +28,9 @@ export type UseAddCapturePreviewImageToRunMutationResult = UseMutationResult<
     AddCapturePreviewImageToRunParams
   >
 }
-export function useCapturePreviewImageToRun(): UseAddCapturePreviewImageToRunMutationResult {
+export function useCapturePreviewImageToRun(
+  runId: string
+): UseAddCapturePreviewImageToRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
 
@@ -36,11 +38,17 @@ export function useCapturePreviewImageToRun(): UseAddCapturePreviewImageToRunMut
     DownloadedPreviewImageFileResponse,
     AxiosError<ErrorResponse>,
     AddCapturePreviewImageToRunParams
-  >(({ runId, settings }) =>
+  >(({ settings }) =>
     addCapturePreviewImageToRun(host!, runId, settings)
       .then(response => {
         queryClient
-          .invalidateQueries([host, 'runs', runId])
+          .invalidateQueries([
+            host,
+            'runs',
+            runId,
+            'camera',
+            'capturePreviewImage',
+          ])
           .catch((e: Error) => {
             console.error(`error invalidating runs query: ${e.message}`)
           })
