@@ -370,3 +370,11 @@ class ProtocolEditorPage(BasePage):
             self.page.get_by_role("button", name=new_location).click()
         self.page.get_by_role("button", name="Save").click()
         self.page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+
+    def drag_and_drop(self, source_step: str, target_step: str) -> None:
+        """Drag a step and drop it to another step to reorder. We expect the source step to be moved above target step."""
+
+        self.page.locator(source_step).hover()
+        self.page.mouse.down()
+        self.page.locator(target_step).hover()
+        self.page.mouse.up()
