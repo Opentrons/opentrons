@@ -43,6 +43,7 @@ import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
+  HydratedFlexStackerFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -123,6 +124,13 @@ const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
   location: ['form'],
   showOnReopen: true,
 })
+
+const QUANTITY_OUT_OF_RANGE: FormError = {
+  title: 'Value falls outside fo expected range',
+  dependentFields: ['fillQuantity'],
+  location: ['form'],
+  showOnReopen: true,
+}
 
 const WELL_RATIO_MOVE_LIQUID: FormError = {
   title: 'Well selection must be 1 to many, many to 1, or N to N',
@@ -734,6 +742,19 @@ export const pauseForTimeOrUntilTold = (
   } else {
     // user did not select a pause type
     return PAUSE_TYPE_REQUIRED
+  }
+}
+export const verifyLabwareQuantity = (
+  fields: HydratedFlexStackerFormData
+): FormError | null => {
+  const { fillQuantity, flexStackerFormType } = fields
+  if (
+    (fillQuantity === 0 || fillQuantity === null) &&
+    flexStackerFormType === 'fill'
+  ) {
+    return QUANTITY_OUT_OF_RANGE
+  } else {
+    return null
   }
 }
 export const wellRatioMoveLiquid = (
