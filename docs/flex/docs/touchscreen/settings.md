@@ -5,11 +5,18 @@ title: "Opentrons Flex: Settings"
 The Settings screen lists all the ways you can customize the behavior of your Flex.
 
 <figure class="screenshot" markdown>
+![Sample of touchscreen settings](../images/touchscreen-settings-fade.png)
+<figcaption>Examples of some setting options and features.</figcaption>
+</figure>
+
+<!--
+<figure class="screenshot" markdown>
 ![List of all settings on Flex.](../images/touchscreen-settings.png "Flex settings")
 <figcaption>All settings available on Flex. On the touchscreen, scroll the list to see all the settings.</figcaption>
 </figure>
+-->
 
-Although they are presented in a single list, they roughly break down into four categories.
+Your Flex will show these released options in a single list. These settings roughly break down into the following categories.
 
 ## Setup
 
