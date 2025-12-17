@@ -55,6 +55,7 @@ dev = [
     "mock~=5.1.0",
     "types-mock~=5.1.0",
     "build~=1.2.0",
+    "setuptools==80.9.0",
 ]
 
 [project.urls]

@@ -745,6 +745,7 @@ dev = [
     { name = "pytest-cov" },
     { name = "pytest-watch" },
     { name = "pytest-xdist" },
+    { name = "setuptools" },
     { name = "types-mock" },
 ]
 robot = [
@@ -779,6 +780,7 @@ dev = [
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-watch", specifier = "~=4.2.0" },
     { name = "pytest-xdist", specifier = "~=2.5.0" },
+    { name = "setuptools", specifier = "==80.9.0" },
     { name = "types-mock", specifier = "~=5.1.0" },
 ]
 robot = [
@@ -1110,6 +1112,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f8/fa/ae6c1a1a75f19560bbd875a579b2ca9b32deeae6a4c4a1997f4ec69a013e/pyudev-0.23.2.tar.gz", hash = "sha256:32ae3585b320a51bc283e0a04000fd8a25599edb44541e2f5034f6afee5d15cc", size = 87199, upload-time = "2022-02-04T20:16:52.133Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/95/4c67255c65da9c939903cb95c57bd1ad7c920a7b711066aaa56cd7d149ab/pyudev-0.23.2-py3-none-any.whl", hash = "sha256:50d94bef0669f9aabd323a2259be67e8d49b9ebab9eae27b2cf8262767f9a2ae", size = 63903, upload-time = "2022-02-04T20:16:50.509Z" },
+]
+
+[[package]]
+name = "setuptools"
+version = "80.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c", size = 1319958, upload-time = "2025-05-27T00:56:51.443Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/dc/17031897dae0efacfea57dfd3a82fdd2a2aeb58e0ff71b77b87e44edc772/setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922", size = 1201486, upload-time = "2025-05-27T00:56:49.664Z" },
 ]
 
 [[package]]

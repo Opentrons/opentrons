@@ -58,6 +58,8 @@ dev = [
     "build~=1.2.0",
     "pillow",
     "types-Pillow",
+    "setuptools==80.9.0",
+    "zipp==3.21.0",
 ]
 
 [project.urls]

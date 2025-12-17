@@ -1555,6 +1555,7 @@ dev = [
     { name = "pytest-clarity", specifier = "~=1.0.0" },
     { name = "pytest-cov", specifier = "==4.1.0" },
     { name = "pytest-xdist", specifier = "~=3.5.0" },
+    { name = "setuptools", specifier = "==80.9.0" },
     { name = "twine", specifier = "==4.0.0" },
     { name = "typeguard", specifier = "~=4.4.4" },
     { name = "types-pillow" },
