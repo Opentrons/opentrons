@@ -137,7 +137,11 @@ export const SlotDetailModal = (
         padding={SPACING.spacing16}
         height="28rem"
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24} height={"28rem"}>
+        <Flex
+          flexDirection={DIRECTION_ROW}
+          gridGap={SPACING.spacing24}
+          height={'28rem'}
+        >
           {stackOfLabware.length > 1 ? (
             <LabwareButtonBasket
               stackOfLabware={stackOfLabware}
