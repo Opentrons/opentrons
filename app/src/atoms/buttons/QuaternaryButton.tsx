@@ -2,8 +2,8 @@ import styled from 'styled-components'
 
 import {
   BORDERS,
-  COLORS,
   Btn,
+  COLORS,
   SPACING,
   styleProps,
   TYPOGRAPHY,
