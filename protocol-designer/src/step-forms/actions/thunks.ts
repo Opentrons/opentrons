@@ -97,7 +97,7 @@ export const createContainerAboveModule: (
     // create containers
     dispatch(
       createContainer({
-        slot: moduleId,
+        slot, // shuttle stacks ignore the moduleId and pretend they are on a column 4 slot
         labwareDefURIStack,
         uuids,
       })
