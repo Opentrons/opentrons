@@ -42,7 +42,7 @@ export function usePreviewImage(
 
   useEffect(() => {
     return () => {
-      if (imgPath != undefined) {
+      if (imgPath !== undefined) {
         URL.revokeObjectURL(imgPath)
       }
     }
