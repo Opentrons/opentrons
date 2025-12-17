@@ -97,7 +97,7 @@ export const createContainerAboveModule: (
     // create containers
     dispatch(
       createContainer({
-        slot: moduleId,
+        slot, // shuttle stacks ignore the moduleId and pretend they are on a column 4 slot
         labwareDefURIStack,
         uuids,
       })
@@ -124,7 +124,8 @@ export const createContainerAboveModule: (
   } else {
     // create containers
     if (topLabwareDefURI != null) {
-      Array.from({ length: stackerInfo.amount }).forEach(() => {
+      let accumulatedModuleState = currentModuleState
+      for (let _ = 0; _ < stackerInfo.amount; _++) {
         // create containers for the labware
         const primaryLabwareUuid = topLabwareDefURI != null ? uuid() : null
         const adapterLabwareUuid = adapterDefURI != null ? uuid() : null
@@ -150,25 +151,27 @@ export const createContainerAboveModule: (
             uuids,
           })
         )
+        // Build up the state incrementally
+        accumulatedModuleState = {
+          ...accumulatedModuleState,
+          storedLabwareDetails: {
+            primaryLabwareURI: topLabwareDefURI,
+            adapterLabwareURI: adapterDefURI,
+            lidLabwareURI: lidDefURI,
+          },
+          labwareInHopper:
+            accumulatedModuleState.labwareInHopper != null
+              ? [...accumulatedModuleState.labwareInHopper, hopperUpdate]
+              : [hopperUpdate],
+        }
         // handle hopper state update
         dispatch(
           updateStackerModuleState({
             moduleId: module.id,
-            moduleState: {
-              ...currentModuleState,
-              storedLabwareDetails: {
-                primaryLabwareURI: topLabwareDefURI,
-                adapterLabwareURI: adapterDefURI,
-                lidLabwareURI: lidDefURI,
-              },
-              labwareInHopper:
-                currentModuleState.labwareInHopper != null
-                  ? [...currentModuleState.labwareInHopper, hopperUpdate]
-                  : [hopperUpdate],
-            },
+            moduleState: accumulatedModuleState,
           })
         )
-      })
+      }
     }
   }
 }

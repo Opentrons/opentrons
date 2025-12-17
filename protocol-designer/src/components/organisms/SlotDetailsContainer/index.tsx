@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleDisplayName,
+} from '@opentrons/shared-data'
 import {
   FAKE_HOPPER_LOCATION_MAP,
   getIsSlotAHopper,
@@ -50,7 +53,16 @@ export function SlotDetailsContainer(
     labware: deckSetupLabwares,
     additionalEquipmentOnDeck,
   } = deckSetup
+  const stackerModuleState = Object.values(deckSetupModules).find(
+    module =>
+      module.type === FLEX_STACKER_MODULE_TYPE &&
+      module.slot === adjustedSlotToFindModule
+  )?.moduleState
 
+  const labwareInHopper =
+    stackerModuleState != null && 'labwareInHopper' in stackerModuleState
+      ? stackerModuleState.labwareInHopper
+      : null
   const offDeckLabwareNickName =
     offDeckLabwareId != null ? nickNames[offDeckLabwareId] : null
 
@@ -104,18 +116,23 @@ export function SlotDetailsContainer(
   const labwares: string[] = []
   if (offDeckLabwareNickName != null) {
     labwares.push(offDeckLabwareNickName)
+  } else if (labwareInHopper != null) {
+    const labwareIds: string[] = labwareInHopper.flatMap(
+      ({ primaryLabwareId, adapterLabwareId, lidLabwareId }) =>
+        [primaryLabwareId, adapterLabwareId, lidLabwareId].filter(
+          (id): id is string => id != null
+        )
+    )
+    labwareIds.forEach(id => {
+      labwares.push(deckSetupLabwares[id].def.metadata.displayName)
+    })
   } else if (fullStackFromLabwares?.length > 0) {
     fullStackFromLabwares.forEach(id => {
       if (deckSetupLabwares[id] != null) {
-        if (isSlotAHopper) {
-          labwares.push(deckSetupLabwares[id].def.metadata.displayName)
-        } else {
-          labwares.push(nickNames[id])
-        }
+        labwares.push(nickNames[id])
       }
     })
   }
-
   return (
     <SlotInformation
       location={slot}
