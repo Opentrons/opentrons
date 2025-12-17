@@ -35,7 +35,8 @@ interface ChipProps extends StyleProps {
 const CHIP_PROPS_BY_TYPE: Record<
   ChipType,
   {
-    backgroundColor: string
+    backgroundColor30: string
+    backgroundColor35: string
     borderRadius: string
     iconColor?: string
     iconName?: IconName
@@ -43,32 +44,37 @@ const CHIP_PROPS_BY_TYPE: Record<
   }
 > = {
   error: {
-    backgroundColor: COLORS.red35,
+    backgroundColor30: COLORS.red30,
+    backgroundColor35: COLORS.red35,
     borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.red60,
     textColor: COLORS.red60,
   },
   info: {
-    backgroundColor: COLORS.blue35,
+    backgroundColor30: COLORS.blue30,
+    backgroundColor35: COLORS.blue35,
     borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.blue60,
     textColor: COLORS.blue60,
   },
   neutral: {
-    backgroundColor: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+    backgroundColor30: `${COLORS.black90}${COLORS.opacity20HexCode}`,
+    backgroundColor35: `${COLORS.black90}${COLORS.opacity20HexCode}`,
     borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.grey60,
     textColor: COLORS.grey60,
   },
   success: {
-    backgroundColor: COLORS.green35,
+    backgroundColor30: COLORS.green30,
+    backgroundColor35: COLORS.green35,
     borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.green60,
     iconName: 'ot-check',
     textColor: COLORS.green60,
   },
   warning: {
-    backgroundColor: COLORS.yellow35,
+    backgroundColor30: COLORS.yellow30,
+    backgroundColor35: COLORS.yellow35,
     borderRadius: BORDERS.borderRadiusFull,
     iconColor: COLORS.yellow60,
     textColor: COLORS.yellow60,
@@ -86,12 +92,13 @@ export function Chip(props: ChipProps): JSX.Element {
     pulseIcon = false,
     ...styleProps
   } = props
+  const chipProps = CHIP_PROPS_BY_TYPE[type]
   const backgroundColor =
     background === false
       ? COLORS.transparent
-      : CHIP_PROPS_BY_TYPE[type].backgroundColor
-  const icon = iconName ?? CHIP_PROPS_BY_TYPE[type].iconName ?? 'ot-alert'
-  const iconColor = CHIP_PROPS_BY_TYPE[type].iconColor
+      : chipProps.backgroundColor30
+  const icon = iconName ?? chipProps.iconName ?? 'ot-alert'
+  const iconColor = chipProps.iconColor
   const getIconSize = (iconName: string | undefined): string => {
     switch (iconName) {
       case 'connection-status':
@@ -102,20 +109,23 @@ export function Chip(props: ChipProps): JSX.Element {
         return '0.75rem'
     }
   }
-  const smallSize = getIconSize(iconName)
+  const smallSize = getIconSize(icon)
 
   return (
     <Flex
       alignItems={ALIGN_CENTER}
       backgroundColor={backgroundColor}
-      borderRadius={CHIP_PROPS_BY_TYPE[type].borderRadius}
+      borderRadius={chipProps.borderRadius}
       flexDirection={DIRECTION_ROW}
       height={FLEX_MAX_CONTENT}
-      css={
-        chipSize === 'medium'
+      css={css`
+        ${chipSize === 'medium'
           ? MEDIUM_CONTAINER_STYLE(background)
-          : SMALL_CONTAINER_STYLE(background)
-      }
+          : SMALL_CONTAINER_STYLE(background)}
+        ${background !== false
+          ? BACKGROUND_COLOR_STYLE(type)
+          : ''}
+      `}
       data-testid={`Chip_${type}`}
       {...styleProps}
     >
@@ -123,7 +133,7 @@ export function Chip(props: ChipProps): JSX.Element {
         <Icon
           name={icon}
           color={iconColor}
-          aria-label={`icon_${text}`}
+          data-testid={`icon_${text}`}
           css={ICON_STYLE(chipSize, smallSize)}
         >
           {pulseIcon ? (
@@ -140,7 +150,7 @@ export function Chip(props: ChipProps): JSX.Element {
       ) : null}
       <LegacyStyledText
         css={TEXT_STYLE(chipSize)}
-        color={CHIP_PROPS_BY_TYPE[type].textColor}
+        color={chipProps.textColor}
       >
         {text}
       </LegacyStyledText>
@@ -187,11 +197,11 @@ const MEDIUM_CONTAINER_STYLE = (
   background?: boolean
 ): FlattenSimpleInterpolation => css`
   padding: ${SPACING.spacing2} ${background === false ? 0 : SPACING.spacing8};
-  grid-gap: ${SPACING.spacing4};
+  gap: ${SPACING.spacing4};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing8} ${background === false ? 0 : SPACING.spacing16};
-    grid-gap: ${SPACING.spacing8};
+    gap: ${SPACING.spacing8};
   }
 `
 
@@ -199,10 +209,18 @@ const SMALL_CONTAINER_STYLE = (
   background?: boolean
 ): FlattenSimpleInterpolation => css`
   padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing6};
-  grid-gap: ${SPACING.spacing4};
+  gap: ${SPACING.spacing4};
 
   @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
     padding: ${SPACING.spacing4} ${background === false ? 0 : SPACING.spacing8};
-    grid-gap: ${SPACING.spacing4};
+    gap: ${SPACING.spacing4};
+  }
+`
+
+const BACKGROUND_COLOR_STYLE = (
+  type: ChipType
+): FlattenSimpleInterpolation => css`
+  @media ${RESPONSIVENESS.touchscreenMediaQuerySpecs} {
+    background-color: ${CHIP_PROPS_BY_TYPE[type].backgroundColor35};
   }
 `
