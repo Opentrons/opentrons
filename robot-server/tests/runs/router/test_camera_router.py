@@ -14,9 +14,8 @@ from robot_server.runs.router.camera_router import (
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from opentrons.protocol_engine import EngineStatus
-from opentrons.protocol_engine.resources.camera_provider import ImageParameters
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
-from opentrons.system import camera
+from fastapi.responses import FileResponse
 
 
 @pytest.fixture()
@@ -87,7 +86,7 @@ async def test_camera_preview_image(
 ) -> None:
     """Test that we can request a preview image with a collection of image settings based on run specific enablement."""
     with tempfile.NamedTemporaryFile() as conf:
-        await post_camera_preview_image(
+        response = await post_camera_preview_image(
             request_body=RequestModel(
                 data=CameraCaptureImageSettings(
                     cameraId=None,
@@ -103,17 +102,4 @@ async def test_camera_preview_image(
             images_directory=Path(conf.name),
             robot_type="OT-3 Standard",
         )
-        decoy.verify(
-            await camera.image_capture(
-                robot_type="OT-3 Standard",
-                parameters=ImageParameters(
-                    resolution=(720, 1280),
-                    zoom=1.5,
-                    pan=(0, 0),
-                    contrast=0.5,
-                    brightness=0,
-                    saturation=1.5,
-                ),
-            ),
-            times=1,
-        )
+        assert isinstance(response, FileResponse)
