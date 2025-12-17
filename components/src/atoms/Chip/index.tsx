@@ -102,7 +102,7 @@ export function Chip(props: ChipProps): JSX.Element {
         return '0.75rem'
     }
   }
-  const smallSize = getIconSize(iconName)
+  const smallSize = getIconSize(icon)
 
   return (
     <Flex
