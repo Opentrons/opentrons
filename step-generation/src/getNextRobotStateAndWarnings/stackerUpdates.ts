@@ -21,7 +21,7 @@ import type {
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 const BOTTOM_UP_LABWARE_POOL_KEYS: Array<keyof FlexStackerStoredLabwareGroup> =
-  ['adapterLabwareId', 'adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
+  ['adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
 
 export const forFlexStackerEmpty = (
   params: FlexStackerEmptyCreateCommand['params'],
@@ -182,25 +182,20 @@ export const forFlexStackerStore = (
       ]
       moduleState.labwareOnShuttle = null
 
-      // build trivial stacks for stored labware group elements
-      let previousTopLabwareId: string | null = null
-
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareOnShuttle[
             labwarePoolKey as keyof FlexStackerStoredLabwareGroup
           ]
 
-        if (labwareId == null) continue
-
-        const baseStack =
-          previousTopLabwareId != null
-            ? robotState.labware[previousTopLabwareId].stack
-            : [HOPPER_STACKER_LOCATION, moduleId, moduleSlot]
-
-        robotState.labware[labwareId].stack = [labwareId, ...baseStack]
-
-        previousTopLabwareId = labwareId
+        if (labwareId != null) {
+          robotState.labware[labwareId].stack = [
+            labwareId,
+            HOPPER_STACKER_LOCATION,
+            moduleId,
+            moduleSlot,
+          ]
+        }
       }
     }
   }
