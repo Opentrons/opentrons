@@ -13,3 +13,10 @@ packages:
   - 'api-client'
   - 'react-api-client'
   - 'usb-bridge/node-client'
+
+onlyBuiltDependencies:
+  - electron
+  - electron-winstaller
+  - esbuild
+  - '@serialport/bindings-cpp'
+  - usb
