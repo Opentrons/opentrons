@@ -22,7 +22,7 @@ export type UseAddCapturePreviewImageToRunMutationResult = UseMutationResult<
   AxiosError<ErrorResponse>,
   AddCapturePreviewImageToRunParams
 > & {
-  addCapturePreviewImageToRun: UseMutateFunction<
+  createCapturePreviewImageToRun: UseMutateFunction<
     DownloadedPreviewImageFileResponse,
     AxiosError<ErrorResponse>,
     AddCapturePreviewImageToRunParams
@@ -61,6 +61,6 @@ export function useCapturePreviewImageToRun(
   )
   return {
     ...mutation,
-    addCapturePreviewImageToRun: mutation.mutateAsync,
+    createCapturePreviewImageToRun: mutation.mutateAsync,
   }
 }

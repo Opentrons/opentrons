@@ -28,17 +28,21 @@ export function usePreviewImage(
       console.error('Failed to capture preview image', error)
     },
   }
-  const captureImagePreview = useCapturePreviewImage()
-  const captureImagePreviewForRun = useCapturePreviewImageToRun(runId ?? '')
+  const { createCapturePreviewImage } = useCapturePreviewImage()
+  const { createCapturePreviewImageToRun } = useCapturePreviewImageToRun(
+    runId ?? ''
+  )
 
   const captureImage =
-    runId == null ? captureImagePreview : captureImagePreviewForRun
+    runId == null ? createCapturePreviewImage : createCapturePreviewImageToRun
 
   const takePhoto = (): void => {
-    captureImage?.mutate(
+    captureImage(
       {
-        settings,
-        runId: runId ?? '',
+        zoom: settings.zoom,
+        brightness: settings.brightness,
+        contrast: settings.contrast,
+        saturation: settings.saturation,
       },
       { ...callbacks }
     )
