@@ -1044,7 +1044,8 @@ def run_blank_test(
         fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
     )
     if fixture_settings.touch_blank:
-        blank_move_to_height = liquid_height - fixture_settings.submerge_depth
+        # submerge depth is negative so adding it will drop it into the liquid
+        blank_move_to_height = liquid_height + fixture_settings.submerge_depth
     else:
         blank_move_to_height = liquid_height - fixture_settings.submerge_depth
     fixture_settings.pipette.move_to(Location(above_scale, None))
