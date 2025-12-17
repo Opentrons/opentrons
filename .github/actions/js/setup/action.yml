@@ -22,8 +22,8 @@ runs:
     - name: 'Setup Node'
       uses: actions/setup-node@v4
       with:
-        node-version: '22.12.0'
-        cache: 'pnpm' # This works now because pnpm is installed
+        node-version: '22.21.1'
+        cache: 'pnpm'
 
     - name: 'Setup Python'
       uses: actions/setup-python@v4
