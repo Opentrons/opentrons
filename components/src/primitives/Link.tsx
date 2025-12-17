@@ -22,7 +22,12 @@ const LinkComponent = ({
     {...props}
     {...(external === true && { target: '_blank', rel: 'noopener noreferrer' })}
     // eslint-disable-next-line react/forbid-dom-props
-    style={{ textDecoration: 'none', cursor: 'pointer', ...props.style }}
+    style={{
+      whiteSpace: 'nowrap',
+      textDecoration: 'none',
+      cursor: 'pointer',
+      ...props.style,
+    }}
   />
 )
 
