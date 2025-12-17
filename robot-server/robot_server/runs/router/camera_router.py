@@ -4,7 +4,7 @@ import logging
 import os
 from typing import Annotated, Union
 from pathlib import Path
-from fastapi import Depends, status, HTTPException, Response
+from fastapi import Depends, status, HTTPException
 from fastapi.responses import FileResponse
 from server_utils.fastapi_utils.light_router import LightRouter
 
