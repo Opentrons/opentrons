@@ -163,7 +163,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
         <NavIconLink
           role="button"
           data-testid="Navbar_settingsLink"
-          onClick={(e: MouseEvent<HTMLButtonElement>) => {
+          onClick={(e: MouseEvent<HTMLAnchorElement>) => {
             e.preventDefault()
             debouncedNavigate('/app-settings')
           }}

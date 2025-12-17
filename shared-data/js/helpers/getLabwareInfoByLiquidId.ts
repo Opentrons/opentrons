@@ -8,7 +8,11 @@ export interface LabwareByLiquidId {
     volumeByWell: { [well: string]: number }
   }>
 }
-
+interface WellVolumeEntry {
+  labwareId: string
+  volume: number
+  liquidId: string
+}
 export function getLabwareInfoByLiquidId(
   commands: RunTimeCommand[]
 ): LabwareByLiquidId {
@@ -21,27 +25,96 @@ export function getLabwareInfoByLiquidId(
         )
       : []
 
-  return reduce<LoadLiquidRunTimeCommand, LabwareByLiquidId>(
+  const initialLabwareByLiquidId = reduce<
+    LoadLiquidRunTimeCommand,
+    LabwareByLiquidId
+  >(
     loadLiquidCommands,
     (acc, command) => {
-      if (!(command.params.liquidId in acc)) {
-        acc[command.params.liquidId] = []
-      }
-      const labwareId = command.params.labwareId
-      const volumeByWell = command.params.volumeByWell
-      const labwareIndex = acc[command.params.liquidId].findIndex(
+      const { liquidId, labwareId, volumeByWell } = command.params
+      if (!(liquidId in acc)) acc[liquidId] = []
+
+      const labwareIndex = acc[liquidId].findIndex(
         i => i.labwareId === labwareId
       )
       if (labwareIndex >= 0) {
-        acc[command.params.liquidId][labwareIndex].volumeByWell = {
-          ...acc[command.params.liquidId][labwareIndex].volumeByWell,
+        acc[liquidId][labwareIndex].volumeByWell = {
+          ...acc[liquidId][labwareIndex].volumeByWell,
           ...volumeByWell,
         }
       } else {
-        acc[command.params.liquidId].push({ labwareId, volumeByWell })
+        acc[liquidId].push({ labwareId, volumeByWell })
       }
       return acc
     },
     {}
   )
+
+  const consolidateSharedWells = (
+    liquidsByIdForLabware: LabwareByLiquidId
+  ): LabwareByLiquidId => {
+    const wellToLabwareVolumes: Record<string, WellVolumeEntry[]> = {}
+
+    // Track all wells with their labware, volume, and source liquid
+    Object.entries(liquidsByIdForLabware).forEach(
+      ([liquidId, labwareArray]) => {
+        labwareArray.forEach(labware => {
+          Object.entries(labware.volumeByWell).forEach(([well, volume]) => {
+            wellToLabwareVolumes[well] ??= []
+            wellToLabwareVolumes[well].push({
+              labwareId: labware.labwareId,
+              volume,
+              liquidId,
+            })
+          })
+        })
+      }
+    )
+
+    // Identify overlapping wells
+    const overlappingWells = Object.entries(wellToLabwareVolumes).filter(
+      ([, entries]) => entries.length > 1
+    )
+    const consolidatedWells: LabwareByLiquidId = {}
+
+    overlappingWells.forEach(([well, entries]) => {
+      const totalVolume = entries.reduce((sum, entry) => sum + entry.volume, 0)
+      const labwareIdName = entries[0].labwareId
+      const liquidIds = entries.map(e => e.liquidId).sort()
+      const mixedLiquidId = `mixed-${liquidIds.join('-')}`
+
+      consolidatedWells[mixedLiquidId] ??= [
+        { labwareId: labwareIdName, volumeByWell: {} },
+      ]
+      consolidatedWells[mixedLiquidId][0].volumeByWell[well] = totalVolume
+    })
+    // Remove consolidated wells from the original liquids
+    const cleanedOriginal: LabwareByLiquidId = {}
+    const overlappingWellSet = new Set(overlappingWells.map(([well]) => well))
+
+    Object.entries(liquidsByIdForLabware).forEach(
+      ([liquidId, labwareArray]) => {
+        labwareArray.forEach(labware => {
+          const remainingWells = Object.fromEntries(
+            Object.entries(labware.volumeByWell).filter(
+              ([well]) => !overlappingWellSet.has(well)
+            )
+          )
+
+          if (Object.keys(remainingWells).length > 0) {
+            cleanedOriginal[liquidId] ??= []
+            cleanedOriginal[liquidId].push({
+              labwareId: labware.labwareId,
+              volumeByWell: remainingWells,
+            })
+          }
+        })
+      }
+    )
+    return {
+      ...cleanedOriginal,
+      ...consolidatedWells,
+    }
+  }
+  return consolidateSharedWells(initialLabwareByLiquidId)
 }

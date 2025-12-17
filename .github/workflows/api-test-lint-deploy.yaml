@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.12'
@@ -94,7 +94,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: ${{ matrix.python }}
@@ -207,7 +207,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - uses: 'actions/setup-python@v4'
         with:
           python-version: '3.12'

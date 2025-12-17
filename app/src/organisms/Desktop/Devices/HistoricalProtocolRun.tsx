@@ -11,9 +11,9 @@ import {
   Flex,
   Icon,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
   OVERFLOW_HIDDEN,
   SPACING,
+  StyledText,
 } from '@opentrons/components'
 
 import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
@@ -31,6 +31,8 @@ const PROTOCOL_NAME_STYLE = css`
   white-space: nowrap;
   text-overflow: ellipsis;
 `
+
+const COLUMNS = '25% 27% 5% 14% 14% 12%'
 
 interface HistoricalProtocolRunProps {
   run: RunData
@@ -85,32 +87,33 @@ export function HistoricalProtocolRun(
         }}
         cursor="pointer"
       >
-        <Flex width="88%" gridGap={SPACING.spacing20}>
-          <LegacyStyledText
-            as="p"
-            width="25%"
+        <Flex
+          width="88%"
+          display="grid"
+          gridTemplateColumns={COLUMNS}
+          gap={SPACING.spacing20}
+        >
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
             data-testid={`RecentProtocolRuns_Run_${protocolKey}`}
           >
             {runDisplayName}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="p"
-            width="27%"
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
             data-testid={`RecentProtocolRuns_Protocol_${protocolKey}`}
             css={PROTOCOL_NAME_STYLE}
           >
             {protocolName}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="p"
-            width="5%"
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
             data-testid={`RecentProtocolRuns_Files_${protocolKey}`}
           >
             {countRunDataFiles}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="p"
-            width="14%"
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
             data-testid={`RecentProtocolRuns_Status_${protocolKey}`}
           >
             {runStatus === 'running' ? (
@@ -123,14 +126,13 @@ export function HistoricalProtocolRun(
               />
             ) : null}
             {runStatus != null ? t(`status_${runStatus}`) : ''}
-          </LegacyStyledText>
-          <LegacyStyledText
-            as="p"
-            width="14%"
+          </StyledText>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
             data-testid="RecentProtocolRuns_Duration"
           >
             {duration}
-          </LegacyStyledText>
+          </StyledText>
         </Flex>
         <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing8}>
           <Box>
