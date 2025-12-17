@@ -135,7 +135,7 @@ export const SlotDetailModal = (
       <Box
         backgroundColor={COLORS.grey10}
         padding={SPACING.spacing16}
-        height={'28rem'}
+        height='28rem'
       >
         <Flex
           flexDirection={DIRECTION_ROW}
