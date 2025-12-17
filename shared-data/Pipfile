@@ -29,6 +29,7 @@ black = "==22.3.0"
 pytest-clarity = "~=1.0.0"
 build = "~=1.2.0"
 pillow = "*"
+setuptools = "==80.9.0"
 
 [packages]
 opentrons-shared-data = { editable = true, path = "." }
