@@ -1,0 +1,24 @@
+# python -m venv .wasmenv
+# source .wasmenv/bin/activate
+# pip install --index-url https://pythonindex.wasix.org/simple --extra-index-url https://pypi.org/simple --platform wasix_wasm32 --only-binary=:all: --target .wasmenv/lib/python3.13/site-packages --upgrade -r requirements.txt -v
+# sed -i '' 's/^del sys, warnings, os/del sys, warnings/' .wasmenv/lib/python3.13/site-packages/numpy/__init__.py
+# find .wasmenv/lib -name tests -type d | xargs rm -r
+
+# Used by analysis:
+typing-extensions>=4.0.0,<5
+packaging>=25.0
+pydantic>=2.0.0,<3
+pyserial>=3.5
+numpy>=1.20.0,<2
+pydantic-settings>=2,<3
+click>=8.0.0,<9
+anyio>=4.9.0,<5.0.0
+jsonschema>=3.0.1,<4.18.0
+
+# Not used by analysis, but in pyproject.toml:
+aionotify==0.3.1
+pyusb==1.2.1
+
+# For web server:
+fastapi
+uvicorn

@@ -17,7 +17,6 @@ from typing import Any, Dict, Optional, Union, List, Tuple, cast, AsyncIterator
 
 from math import isclose
 
-from opentrons.drivers.serial_communication import get_ports_by_name
 from serial.serialutil import SerialException  # type: ignore[import-untyped]
 
 from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
@@ -404,6 +403,8 @@ class SmoothieDriver:
 
     @staticmethod
     def get_port() -> str:
+        from opentrons.drivers.serial_communication import get_ports_by_name
+
         """Determine the port to connect to."""
         # Check if smoothie emulator is to be used
         port = environ.get("OT_SMOOTHIE_EMULATOR_URI")

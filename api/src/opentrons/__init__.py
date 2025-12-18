@@ -5,7 +5,6 @@ import logging
 import re
 from typing import Any, List, Tuple
 
-from opentrons.drivers.serial_communication import get_ports_by_name
 from opentrons.hardware_control import (
     API as HardwareAPI,
     ThreadManager,
@@ -76,6 +75,9 @@ def _find_smoothie_file() -> Tuple[Path, str]:
 
 
 def _get_motor_control_serial_port() -> Any:
+    # serial tries to import fcntl, which is not available in wasm runtime
+    from opentrons.drivers.serial_communication import get_ports_by_name
+
     port = os.environ.get("OT_SMOOTHIE_EMULATOR_URI")
 
     if port is None:
