@@ -166,7 +166,9 @@ export function DefineLiquidsModal(
     ),
   ]
 
-  const handleClickLiquidIcon = (e: MouseEvent<HTMLButtonElement | HTMLDivElement>): void => {
+  const handleClickLiquidIcon = (
+    e: MouseEvent<HTMLButtonElement | HTMLDivElement>
+  ): void => {
     e.preventDefault()
     setShowColorPicker(prev => !prev)
   }
