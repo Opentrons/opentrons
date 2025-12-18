@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { Banner, COLORS, ListItem, StyledText } from '@opentrons/components'
+import { COLORS, ListItem, StyledText } from '@opentrons/components'
 import { getIsTiprack } from '@opentrons/shared-data'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
@@ -69,18 +69,6 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
           />
           <MessageField fieldProps={propsForFields.interventionMessage} />
         </div>
-      ) : null}
-      {propsForFields.fillLabwareUri.errorToShow ? (
-        <Banner type="error">
-          <div>
-            <StyledText desktopStyle="bodyDefaultSemiBold">
-              {propsForFields.fillLabwareUri.errorToShow}
-            </StyledText>
-            <StyledText desktopStyle="bodyDefaultRegular">
-              {t('step_edit_form.flex_stacker.no_labware_selected_body')}
-            </StyledText>
-          </div>
-        </Banner>
       ) : null}
     </div>
   )

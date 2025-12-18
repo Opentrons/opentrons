@@ -135,7 +135,7 @@ const QUANTITY_OUT_OF_RANGE: FormError = {
 const LABWARE_NOT_LOADED: FormError = {
   title: 'Stacker labware not defined',
   body: 'Add labware to the stacker in the starting deck so that you can refill it later.',
-  dependentFields: ['fillLabwareUri'],
+  dependentFields: ['flexStackerFormType'],
   location: ['field'],
   showOnReopen: true,
 }
@@ -755,12 +755,10 @@ export const pauseForTimeOrUntilTold = (
 export const verifyLabwareQuantity = (
   fields: HydratedFlexStackerFormData
 ): FormError | null => {
-  const { fillQuantity, flexStackerFormType, fillLabwareUri } = fields
-
+  const { fillQuantity, flexStackerFormType } = fields
   if (
     flexStackerFormType === 'fill' &&
-    (fillQuantity === 0 || fillQuantity === null) &&
-    fillLabwareUri !== null
+    (fillQuantity === 0 || fillQuantity === null)
   ) {
     return QUANTITY_OUT_OF_RANGE
   } else {
@@ -771,9 +769,8 @@ export const verifyLabwareQuantity = (
 export const labwareNotLoaded = (
   fields: HydratedFlexStackerFormData
 ): FormError | null => {
-  const { flexStackerFormType, fillLabwareUri } = fields
-  console.log('🚀 ~ labwareNotLoaded ~ fillLabwareUri:', fillLabwareUri)
-  if (flexStackerFormType === 'fill' && fillLabwareUri === null) {
+  const { flexStackerFormType } = fields
+  if (flexStackerFormType === null) {
     return LABWARE_NOT_LOADED
   } else {
     return null

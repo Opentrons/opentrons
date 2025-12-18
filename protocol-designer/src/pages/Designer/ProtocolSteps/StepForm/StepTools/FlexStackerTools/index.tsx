@@ -2,7 +2,13 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { Chip, Divider, InfoScreen, StyledText } from '@opentrons/components'
+import {
+  Banner,
+  Chip,
+  Divider,
+  InfoScreen,
+  StyledText,
+} from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_V1,
   getIsTiprack,
@@ -79,7 +85,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
 
   // preselect the first form option on mount if the form is presaved
   useEffect(() => {
-    if (isFormPresaved) {
+    if (isFormPresaved && storedLabwareDetails != null) {
       propsForFields.flexStackerFormType.updateValue(firstFormTypeOption)
     }
   }, [])
@@ -115,6 +121,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
     storedLabwareInfo != null &&
     labwareInHopper != null &&
     labwareInHopper.length > 0
+  const isLabwareLoadedInHopper = propsForFields.flexStackerFormType.value
   return (
     <div className={styles.tools_container}>
       <DropdownStepFormField
@@ -185,7 +192,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
         )}
       </div>
       <Divider marginY="0" />
-      {moduleState != null ? (
+      {moduleState != null && isLabwareLoadedInHopper !== null ? (
         <StackerControls
           formData={formData}
           propsForFields={propsForFields}
@@ -207,6 +214,20 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
       ) : null}
       {formData.flexStackerFormType === FLEX_STACKER_EMPTY ? (
         <EmptySettings propsForFields={propsForFields} />
+      ) : null}
+      {propsForFields.flexStackerFormType.errorToShow ? (
+        <div className={styles.shuttle_stacker_container}>
+          <Banner type="error">
+            <div className={styles.radio_button_container}>
+              <StyledText desktopStyle="bodyDefaultSemiBold">
+                {propsForFields.flexStackerFormType.errorToShow}
+              </StyledText>
+              <StyledText desktopStyle="bodyDefaultRegular">
+                {t('step_edit_form.flex_stacker.no_labware_selected_body')}
+              </StyledText>
+            </div>
+          </Banner>
+        </div>
       ) : null}
     </div>
   )
