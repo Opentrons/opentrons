@@ -756,9 +756,10 @@ export const verifyLabwareQuantity = (
   fields: HydratedFlexStackerFormData
 ): FormError | null => {
   const { fillQuantity, flexStackerFormType } = fields
+  const numericalFillQuantity = Number(fillQuantity)
   if (
     flexStackerFormType === 'fill' &&
-    (fillQuantity === 0 || fillQuantity === null)
+    (numericalFillQuantity === 0 || numericalFillQuantity === null)
   ) {
     return QUANTITY_OUT_OF_RANGE
   } else {
