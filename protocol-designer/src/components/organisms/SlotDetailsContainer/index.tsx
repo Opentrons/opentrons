@@ -116,7 +116,7 @@ export function SlotDetailsContainer(
   const labwares: string[] = []
   if (offDeckLabwareNickName != null) {
     labwares.push(offDeckLabwareNickName)
-  } else if (labwareInHopper != null) {
+  } else if (labwareInHopper != null && isSlotAHopper) {
     const labwareIds: string[] = labwareInHopper.flatMap(
       ({ primaryLabwareId, adapterLabwareId, lidLabwareId }) =>
         [primaryLabwareId, adapterLabwareId, lidLabwareId].filter(
