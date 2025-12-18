@@ -409,6 +409,8 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
+
+//# Fixture Replacement Region
 export const getCutoutFixtureReplacementIfNeeded = (
   cutoutFixtureId: CutoutFixtureId,
   cutoutId: CutoutId,
@@ -533,6 +535,8 @@ export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
     return acc
   }, [])
 }
+
+//#endregion
 
 export const filterAAByAreaType = (
   cutoutFixtures: CutoutConfigMap[],
