@@ -30,8 +30,6 @@ def test_drag_drop_steps(page: Page, base_url: str) -> None:
 
     ## Drag Move Labware Step down the Step Form, from step 7 (index 6) to step 11 (becomes step 10)
     editor.drag_and_drop(6, 11)
-    page.wait_for_timeout(10000)
-
 
 
 ###########################################################################
