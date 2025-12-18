@@ -29,6 +29,7 @@ interface StackerControlsProps {
   propsForFields: FieldPropsByName
   isStackerStoreEnabled: boolean
   isStackerRetrieveEnabled: boolean
+  numLabwareInHopper: number
 }
 
 export function StackerControls(props: StackerControlsProps): JSX.Element {
@@ -37,6 +38,7 @@ export function StackerControls(props: StackerControlsProps): JSX.Element {
     propsForFields,
     isStackerStoreEnabled,
     isStackerRetrieveEnabled,
+    numLabwareInHopper,
   } = props
   const { t } = useTranslation('form')
   const [targetProps, tooltipProps] = useHoverTooltip({})
@@ -114,23 +116,25 @@ export function StackerControls(props: StackerControlsProps): JSX.Element {
           }}
           largeDesktopBorderRadius
         />
-        <RadioButton
-          buttonLabel={t(
-            'step_edit_form.flex_stacker.fields.flexStackerFormType.empty.title'
-          )}
-          buttonValue={FLEX_STACKER_EMPTY}
-          buttonSubLabel={{
-            label: t(
-              'step_edit_form.flex_stacker.fields.flexStackerFormType.empty.subtext'
-            ),
-            align: 'vertical',
-          }}
-          isSelected={formData.flexStackerFormType === FLEX_STACKER_EMPTY}
-          onChange={() => {
-            handleRadioButtonChange(FLEX_STACKER_EMPTY)
-          }}
-          largeDesktopBorderRadius
-        />
+        {numLabwareInHopper > 0 ? (
+          <RadioButton
+            buttonLabel={t(
+              'step_edit_form.flex_stacker.fields.flexStackerFormType.empty.title'
+            )}
+            buttonValue={FLEX_STACKER_EMPTY}
+            buttonSubLabel={{
+              label: t(
+                'step_edit_form.flex_stacker.fields.flexStackerFormType.empty.subtext'
+              ),
+              align: 'vertical',
+            }}
+            isSelected={formData.flexStackerFormType === FLEX_STACKER_EMPTY}
+            onChange={() => {
+              handleRadioButtonChange(FLEX_STACKER_EMPTY)
+            }}
+            largeDesktopBorderRadius
+          />
+        ) : null}
       </div>
     </div>
   )

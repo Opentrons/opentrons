@@ -191,6 +191,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
           propsForFields={propsForFields}
           isStackerStoreEnabled={isStackerStoreEnabled}
           isStackerRetrieveEnabled={isStackerRetrieveEnabled}
+          numLabwareInHopper={numLabwareInHopper}
         />
       ) : null}
       {formData.flexStackerFormType !== FLEX_STACKER_STORE &&
