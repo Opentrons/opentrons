@@ -10,7 +10,6 @@ export const migrateFile = (
     throw Error('The designerApplication key in your file is corrupt.')
   }
   const savedStepForms = designerApplication.data.savedStepForms
-
   const updatedInitialStep = Object.values(savedStepForms).reduce(
     (acc, form) => {
       const { id } = form
@@ -34,7 +33,7 @@ export const migrateFile = (
       data: {
         ...designerApplication.data,
         savedStepForms: {
-          ...designerApplication.data.savedStepForms,
+          ...savedStepForms,
           ...updatedInitialStep,
         },
       },
