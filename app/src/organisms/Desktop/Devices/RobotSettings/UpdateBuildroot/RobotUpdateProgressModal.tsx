@@ -183,7 +183,11 @@ function RobotUpdateProgressFooter({
   const { t } = useTranslation('device_settings')
 
   return (
-    <Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_FLEX_END}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      justifyContent={JUSTIFY_FLEX_END}
+      padding={`${SPACING.spacing16} 0`}
+    >
       <NewPrimaryBtn
         onClick={closeUpdateBuildroot}
         marginRight={SPACING.spacing12}
