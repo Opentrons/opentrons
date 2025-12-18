@@ -94,9 +94,7 @@ export function Chip(props: ChipProps): JSX.Element {
   } = props
   const chipProps = CHIP_PROPS_BY_TYPE[type]
   const backgroundColor =
-    background === false
-      ? COLORS.transparent
-      : chipProps.backgroundColor30
+    background === false ? COLORS.transparent : chipProps.backgroundColor30
   const icon = iconName ?? chipProps.iconName ?? 'ot-alert'
   const iconColor = chipProps.iconColor
   const getIconSize = (iconName: string | undefined): string => {
@@ -122,9 +120,7 @@ export function Chip(props: ChipProps): JSX.Element {
         ${chipSize === 'medium'
           ? MEDIUM_CONTAINER_STYLE(background)
           : SMALL_CONTAINER_STYLE(background)}
-        ${background !== false
-          ? BACKGROUND_COLOR_STYLE(type)
-          : ''}
+        ${background !== false ? BACKGROUND_COLOR_STYLE(type) : ''}
       `}
       data-testid={`Chip_${type}`}
       {...styleProps}
@@ -148,10 +144,7 @@ export function Chip(props: ChipProps): JSX.Element {
           ) : null}
         </Icon>
       ) : null}
-      <LegacyStyledText
-        css={TEXT_STYLE(chipSize)}
-        color={chipProps.textColor}
-      >
+      <LegacyStyledText css={TEXT_STYLE(chipSize)} color={chipProps.textColor}>
         {text}
       </LegacyStyledText>
     </Flex>
