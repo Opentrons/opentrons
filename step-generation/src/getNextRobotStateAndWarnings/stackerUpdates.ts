@@ -73,11 +73,11 @@ export const forFlexStackerFillItems = (
     moduleState.storedLabwareDetails
 
   // group labware IDs by primaryyyy (each primary = one hopper position)
-  const groups: {
+  const groups: Array<{
     primary: string
     adapter: string | null
     lid: string | null
-  }[] = []
+  }> = []
 
   for (const labwareId of labware) {
     const defURI = labwareEntities[labwareId].labwareDefURI

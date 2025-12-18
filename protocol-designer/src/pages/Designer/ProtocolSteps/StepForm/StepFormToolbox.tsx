@@ -59,7 +59,6 @@ import { actions } from '/protocol-designer/steplist'
 import { maskField } from '/protocol-designer/steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
 import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
-import { ThunkDispatch } from '/protocol-designer/types'
 import {
   hoverSelection,
   selectDropdownItem,
@@ -99,6 +98,7 @@ import type {
 } from '/protocol-designer/form-types'
 import type { FormWarningType } from '/protocol-designer/steplist'
 import type { StepFieldName } from '/protocol-designer/steplist/fieldLevel'
+import type { ThunkDispatch } from '/protocol-designer/types'
 import type { FocusHandlers, LiquidHandlingTab, StepFormProps } from './types'
 
 type StepFormMap = {
