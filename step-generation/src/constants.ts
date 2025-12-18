@@ -12,6 +12,8 @@ import {
 
 import type {
   AddressableOffsetVector,
+  DeckSlotId,
+  FlexStackerStoredLabwareGroup,
   ModuleModel,
   ModuleType,
   OT2AddressableAreaName,
@@ -129,3 +131,17 @@ export const FAKE_HOPPER_LOCATION_MAP = {
 }
 
 export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP
+
+export const BOTTOM_UP_LABWARE_POOL_KEYS: Array<
+  keyof FlexStackerStoredLabwareGroup
+> = ['adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
+
+export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
+  DeckSlotId,
+  string
+> = {
+  A4: 'hopperA4',
+  B4: 'hopperB4',
+  C4: 'hopperC4',
+  D4: 'hopperD4',
+}
