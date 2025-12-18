@@ -128,7 +128,15 @@ const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
 const QUANTITY_OUT_OF_RANGE: FormError = {
   title: 'Value falls outside fo expected range',
   dependentFields: ['fillQuantity'],
-  location: ['form'],
+  location: ['field'],
+  showOnReopen: true,
+}
+
+const LABWARE_NOT_LOADED: FormError = {
+  title: 'Stacker labware not defined',
+  body: 'Add labware to the stacker in the starting deck so that you can refill it later.',
+  dependentFields: ['fillLabwareUri'],
+  location: ['field'],
   showOnReopen: true,
 }
 
@@ -747,16 +755,31 @@ export const pauseForTimeOrUntilTold = (
 export const verifyLabwareQuantity = (
   fields: HydratedFlexStackerFormData
 ): FormError | null => {
-  const { fillQuantity, flexStackerFormType } = fields
+  const { fillQuantity, flexStackerFormType, fillLabwareUri } = fields
+
   if (
+    flexStackerFormType === 'fill' &&
     (fillQuantity === 0 || fillQuantity === null) &&
-    flexStackerFormType === 'fill'
+    fillLabwareUri !== null
   ) {
     return QUANTITY_OUT_OF_RANGE
   } else {
     return null
   }
 }
+
+export const labwareNotLoaded = (
+  fields: HydratedFlexStackerFormData
+): FormError | null => {
+  const { flexStackerFormType, fillLabwareUri } = fields
+  console.log('🚀 ~ labwareNotLoaded ~ fillLabwareUri:', fillLabwareUri)
+  if (flexStackerFormType === 'fill' && fillLabwareUri === null) {
+    return LABWARE_NOT_LOADED
+  } else {
+    return null
+  }
+}
+
 export const wellRatioMoveLiquid = (
   fields: HydratedMoveLiquidFormData
 ): FormError | null => {

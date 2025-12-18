@@ -38,6 +38,7 @@ import {
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
+  labwareNotLoaded,
   labwareToMoveRequired,
   lidTargetTempHoldRange,
   lidTargetTempRange,
@@ -74,6 +75,7 @@ import {
   tiprackRequired,
   tipSelectionRequired,
   transferVolumeMin,
+  verifyLabwareQuantity,
   volumeRequired,
   volumeTooHigh,
   wavelengthOutOfRange,
@@ -293,7 +295,7 @@ const stepFormHelperMap: {
     getErrors: composeErrors(),
   },
   flexStacker: {
-    getErrors: composeErrors(),
+    getErrors: composeErrors(verifyLabwareQuantity, labwareNotLoaded),
   },
 }
 
