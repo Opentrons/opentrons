@@ -79,7 +79,7 @@ const allMigrationsByVersion: MigrationsByVersion = {
   // @ts-expect-error
   '8.7.0': migrateFileEightSeven,
   // @ts-expect-error
-  '8.8.0': migrateFileEightSeven,
+  '8.8.0': migrateFileEightEight,
 }
 export const migration = (
   file: any
