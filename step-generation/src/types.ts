@@ -155,6 +155,7 @@ export interface FlexStackerModuleState {
   // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
+  labwareFillQueue: string[] | null // flat list, bottom up
 }
 
 export type ModuleState =

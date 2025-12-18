@@ -22,7 +22,6 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
-import { FlexStackerModuleState } from '@opentrons/step-generation'
 
 import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import {
@@ -38,7 +37,6 @@ import { FormAlerts } from '/protocol-designer/components/organisms'
 import { AdvancedSettingsUpdateConfirmationModal } from '/protocol-designer/components/organisms/AdvancedSettingsUpdateConfirmationModal'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { RenameStepModal } from '/protocol-designer/components/organisms/RenameStepModal'
-import { FLEX_STACKER_FILL } from '/protocol-designer/constants'
 import { getFormWarningsForSelectedStep } from '/protocol-designer/dismiss/selectors'
 import {
   getRobotStateTimeline,
@@ -46,7 +44,6 @@ import {
 } from '/protocol-designer/file-data/selectors'
 import { stepIconsByType } from '/protocol-designer/form-types'
 import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
-import { createContainer } from '/protocol-designer/labware-ingred/actions'
 import {
   getAdditionalEquipmentEntities,
   getCurrentFormIsPresaved,
@@ -60,7 +57,6 @@ import {
 import { actions } from '/protocol-designer/steplist'
 import { maskField } from '/protocol-designer/steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
-import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
 import {
   hoverSelection,
@@ -68,6 +64,7 @@ import {
 } from '/protocol-designer/ui/steps/actions/actions'
 
 import { useAbsorbanceReaderCommandType } from './hooks'
+import { useFillStackerLabware } from './hooks/useFillStackerLabware'
 import {
   AbsorbanceReaderTools,
   CameraTools,
@@ -95,7 +92,6 @@ import type { ComponentType } from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type {
   FormData,
-  HydratedFlexStackerFormData,
   HydratedFormData,
   StepType,
 } from '/protocol-designer/form-types'
@@ -198,6 +194,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const savedStepForm = useSelector(getSavedStepForms)[formData.id]
   const robotType = useSelector(getRobotType)
+  const fillStackerLabware = useFillStackerLabware(formData)
 
   // state used to track fields that have been confirmed through the modal but before saving the step form
   const [confirmedFieldUpdates, setConfirmedFieldUpdates] = useState<
@@ -388,43 +385,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       if (stackerModules.length > 0) {
         dispatch(analyticsEvent(numberOfStackersLoaded))
       }
-      if (
-        formData.stepType === 'flexStacker' &&
-        formData.flexStackerFormType === FLEX_STACKER_FILL
-      ) {
-        const { fillQuantity, moduleId } =
-          formData as HydratedFlexStackerFormData
-        const moduleState = initialDeckSetup.modules[moduleId]
-          .moduleState as FlexStackerModuleState
-        const { primaryLabwareURI, lidLabwareURI, adapterLabwareURI } =
-          moduleState.storedLabwareDetails ?? {}
-        Array.from({ length: fillQuantity ?? 1 }).forEach(() => {
-          if (lidLabwareURI != null) {
-            dispatch(
-              createContainer({
-                labwareDefURIStack: [lidLabwareURI],
-                slot: 'offDeck',
-              })
-            )
-          }
-          if (adapterLabwareURI != null) {
-            dispatch(
-              createContainer({
-                labwareDefURIStack: [adapterLabwareURI],
-                slot: 'offDeck',
-              })
-            )
-          }
-          if (primaryLabwareURI != null) {
-            dispatch(
-              createContainer({
-                labwareDefURIStack: [primaryLabwareURI],
-                slot: 'offDeck',
-              })
-            )
-          }
-        })
-      }
+      fillStackerLabware?.() // will no-op if not a fill step for a stacker form
     } else {
       setShowFormErrors(true)
       if (tab === 'aspirate' && isDispenseError && !isAspirateError) {

@@ -204,17 +204,8 @@ export const getAdditionalEquipment: Selector<
 export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
   createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
 
-// todo(mm, 2025-12-12): Temporarily defining FLEX_STACKER_INITIAL_STATE here until step-generation supports it.
-const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
-  type: FLEX_STACKER_MODULE_TYPE,
-  storedLabwareDetails: null,
-  labwareInHopper: null,
-  labwareOnShuttle: null,
-}
-
 const MODULE_INITIAL_STATES_MAP = {
   ...STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE,
-  [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_INITIAL_STATE,
 } as const
 MODULE_INITIAL_STATES_MAP satisfies Record<
   ModuleType,

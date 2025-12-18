@@ -4,7 +4,6 @@ import {
   formatPyStr,
   getChunkForIndentingLists,
   getIsSpaceInHopper,
-  getSlotInLocationStack,
   INDENT,
   indentPyLines,
   labwareMatchesLabwareInHopper,
@@ -18,21 +17,14 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   invariantContext,
   robotState
 ) => {
-  const { moduleId, interventionMessage, fillPrimaryLabwareUri, fillQuantity } = args
+  const { moduleId, interventionMessage, fillQuantity } = args
   const { labwareEntities, moduleEntities } = invariantContext
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
-  const offDeckLabware = Object.entries(robotState.labware)
-    .filter(
-      ([id, { stack }]) =>
-        getSlotInLocationStack(stack) === 'offDeck' &&
-        // todo: we need to include the lid in here too :(
-        fillPrimaryLabwareUri === labwareEntities[id].labwareDefURI
-    )
-    .map(labwareState => labwareState[0])
-    const labwareOffdeckForHopperFill = fillQuantity != null
-  ? offDeckLabware.slice(0, fillQuantity)
-  : offDeckLabware
-
+  const labwareOffdeckForHopperFill =
+  flexStackerState?.labwareFillQueue ?? []
+  fillQuantity != null
+    ? labwareOffdeckForHopperFill.slice(0, fillQuantity)
+    : labwareOffdeckForHopperFill
   const isSpace = getIsSpaceInHopper(
     flexStackerState,
     invariantContext.labwareEntities

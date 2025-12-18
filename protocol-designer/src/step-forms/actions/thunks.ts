@@ -1,4 +1,5 @@
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+import { FlexStackerModuleState } from '@opentrons/step-generation'
 
 import { createContainer } from '../../labware-ingred/actions'
 import { changeSavedStepForm } from '../../steplist/actions'
@@ -10,6 +11,7 @@ import type {
   DeckSlotId,
   ModuleModel,
   ModuleType,
+  StackerStoredLabwareDefinitionURIs,
 } from '@opentrons/shared-data'
 import type { FormData } from '../../form-types'
 import type {
@@ -217,3 +219,63 @@ export const createModuleEntityAndChangeForm: (
       )
     })
   }
+
+interface CreateLabwareAndQueueForHopperArgs {
+  storedLabwareGroup: StackerStoredLabwareDefinitionURIs
+  amount: number
+  moduleId: string
+}
+
+export const createLabwareAndQueueForHopper: (
+  args: CreateLabwareAndQueueForHopperArgs
+) => ThunkAction<
+  | CreateContainerAction
+  | RenameLabwareAction
+  | ZoomedIntoSlotAction
+  | OpenIngredientSelectorAction
+  | UpdateStackerModuleStateAction
+> = args => (dispatch, getState) => {
+  const { storedLabwareGroup, amount, moduleId } = args
+  const state = getState()
+  const deckSetup = getDeckSetupForActiveItem(state)
+  const { modules } = deckSetup
+  const module = modules[moduleId]
+  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    storedLabwareGroup
+
+  const urisBottomUp = [
+    ...(adapterLabwareURI != null ? [adapterLabwareURI] : []),
+    primaryLabwareURI,
+    ...(lidLabwareURI != null ? [lidLabwareURI] : []),
+  ]
+
+  // enforce module is stacker
+  if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
+    // create containers, mapping uris from bottom up, non-null only
+    const runningQueue: string[] = []
+    for (let i = 0; i < amount; i++) {
+      for (const uri of urisBottomUp) {
+        const labwareUuid = uuid()
+        dispatch(
+          createContainer({
+            labwareDefURIStack: [uri],
+            slot: 'offDeck',
+            uuids: [labwareUuid],
+          })
+        )
+        runningQueue.push(labwareUuid) // bottom up already
+      }
+    }
+    // push new labware IDs on queue for fill
+    dispatch(
+      updateStackerModuleState({
+        moduleId: module.id,
+        moduleState: {
+          ...module.moduleState,
+          labwareFillQueue: runningQueue,
+        },
+      })
+    )
+  }
+
+}
