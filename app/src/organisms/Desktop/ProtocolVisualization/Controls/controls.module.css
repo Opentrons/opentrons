@@ -36,8 +36,14 @@
 }
 
 .heading_text {
-  font-size: var(--font-size-28);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  font-size: 18px;
   font-weight: var(--font-weight-bold);
+  -webkit-line-clamp: 2;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
 }
 
 .max_content_size {
@@ -59,6 +65,12 @@
   }
 }
 
+@container controls-container (min-width: 680px) {
+  .heading_text {
+    font-size: 26px;
+  }
+}
+
 .per_step_button_wrapper {
   position: relative;
 }
@@ -77,14 +89,13 @@
   position: relative;
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background:
-    linear-gradient(
-      to right,
-      var(--blue-50) 0%,
-      var(--blue-50) var(--progress, 0%),
-      #ccc var(--progress, 0%),
-      #ccc 100%
-    );
+  background: linear-gradient(
+    to right,
+    var(--blue-50) 0%,
+    var(--blue-50) var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
 }
 
 .range_input::-webkit-slider-thumb {
@@ -100,14 +111,13 @@
 .range_input::-moz-range-track {
   height: var(--spacing-4);
   border-radius: var(--border-radius-2);
-  background:
-    linear-gradient(
-      to right,
-      var(--blue-50) 0%,
-      var(--blue-50) var(--progress, 0%),
-      #ccc var(--progress, 0%),
-      #ccc 100%
-    );
+  background: linear-gradient(
+    to right,
+    var(--blue-50) 0%,
+    var(--blue-50) var(--progress, 0%),
+    #ccc var(--progress, 0%),
+    #ccc 100%
+  );
 }
 
 .range_input::-moz-range-thumb {
