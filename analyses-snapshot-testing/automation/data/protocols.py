@@ -289,14 +289,17 @@ class Protocols:
         file_stem="Flex_S_2_7_96_partial_select_tips", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_S_2_7_Camera: Protocol = Protocol(file_stem="Flex_S_2_7_Camera", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER)
-    Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_Overrides_SmokeTestWith2Stackers: Protocol = Protocol(
-        file_stem="Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_Overrides_SmokeTestWith2Stackers",
-        file_extension="py",
-        robot="Flex",
-        folder=PROTOCOLS_FOLDER,
+    Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers: Protocol = Protocol(
+        file_stem="Flex_S_2_7_P200_96_GRIP_HS_MB_TC_TM_SmokeTestWith2Stackers", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_S_2_7_concurrent_modules_demo: Protocol = Protocol(
         file_stem="Flex_S_2_7_concurrent_modules_demo", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_2_7_p1000_dynamic_demo: Protocol = Protocol(
+        file_stem="Flex_S_2_7_p1000_dynamic_demo", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
+    )
+    Flex_S_P1000_dynamic_mix: Protocol = Protocol(
+        file_stem="Flex_S_P1000_dynamic_mix", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
     Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x: Protocol = Protocol(
         file_stem="Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x", file_extension="json", robot="Flex", folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER
