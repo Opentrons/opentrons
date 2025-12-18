@@ -719,20 +719,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         )
       })}
 
-      {/* special-cased hopper labware based on module states */}
-      {/* <HopperTopLabwareRenders
-        labwaresOnDeck={activeLabware}
-        modules={allModules}
-        deckDef={deckDef}
-        terminalItemId={terminalItemId}
-        setHover={setHover}
-        setShowMenuListForId={setShowMenuListForId}
-        hover={hover}
-        setHoveredLabware={setHoveredLabware}
-        setDraggedLabware={setDraggedLabware}
-        selectedZoomInSlot={selectedZoomInSlot}
-      /> */}
-
       {/* highlight items from Protocol steps */}
       <HighlightItems robotType={robotType} deckDef={deckDef} />
 
