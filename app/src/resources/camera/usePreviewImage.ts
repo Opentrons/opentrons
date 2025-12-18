@@ -18,7 +18,7 @@ export function usePreviewImage(
   runId: string | null
 ): UsePreviewImageResult {
   const [imageBlob, setImageBlob] = useState<Blob | null>(null)
-  const callbacks = {
+  const capturePreviewImageCbs = {
     onSettled: (blob?: Blob) => {
       if (blob != null) {
         setImageBlob(blob)
@@ -33,11 +33,14 @@ export function usePreviewImage(
 
   const takePhoto = (): void => {
     if (runId == null) {
-      capturePreviewImage.createCapturePreviewImage({ settings }, callbacks)
+      capturePreviewImage.createCapturePreviewImage(
+        { settings },
+        capturePreviewImageCbs
+      )
     } else {
       capturePreviewImageToRun.createCapturePreviewImageToRun(
         { runId, settings },
-        callbacks
+        capturePreviewImageCbs
       )
     }
   }
