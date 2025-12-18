@@ -247,9 +247,26 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
             } else if (moduleState.lidOpen === false) {
               lidMotorState = 'closed'
             }
+
+            let blockTargetTemp
+            switch (moduleState.currentBlockActivity.type) {
+              case 'blockTargetTemp':
+                blockTargetTemp =
+                  moduleState.currentBlockActivity.blockTargetTemp
+                break
+              case 'blockDeactivated':
+                blockTargetTemp = null
+                break
+              case 'profile':
+                blockTargetTemp = null
+                break
+              default:
+                moduleState.currentBlockActivity satisfies never
+            }
+
             return {
               lidMotorState,
-              blockTargetTemp: moduleState.blockTargetTemp,
+              blockTargetTemp,
             }
           } else if (
             'targetTemperature' in moduleState &&
