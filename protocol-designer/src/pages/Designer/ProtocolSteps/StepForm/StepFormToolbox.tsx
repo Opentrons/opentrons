@@ -22,6 +22,7 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   OT2_ROBOT_TYPE,
 } from '@opentrons/shared-data'
+import { FlexStackerModuleState } from '@opentrons/step-generation'
 
 import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import {
@@ -51,6 +52,7 @@ import {
   getCurrentFormIsPresaved,
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
+  getInitialDeckSetup,
   getInvariantContext,
   getModuleEntities,
   getSavedStepForms,
@@ -58,6 +60,7 @@ import {
 import { actions } from '/protocol-designer/steplist'
 import { maskField } from '/protocol-designer/steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
 import {
   hoverSelection,
@@ -168,7 +171,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     const maskedValue = maskField(name, value)
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }
-
+  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const { pipetteEntities } = useSelector(getInvariantContext)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
@@ -389,35 +392,37 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
         formData.stepType === 'flexStacker' &&
         formData.flexStackerFormType === FLEX_STACKER_FILL
       ) {
-        const {
-          fillQuantity,
-          fillPrimaryLabwareUri,
-          fillLidLabwareUri,
-          fillAdapterLabwareUri,
-        } = formData as HydratedFlexStackerFormData
+        const { fillQuantity, moduleId } =
+          formData as HydratedFlexStackerFormData
+        const moduleState = initialDeckSetup.modules[moduleId]
+          .moduleState as FlexStackerModuleState
+        const { primaryLabwareURI, lidLabwareURI, adapterLabwareURI } =
+          moduleState.storedLabwareDetails ?? {}
         Array.from({ length: fillQuantity ?? 1 }).forEach(() => {
-          if (fillLidLabwareUri != null) {
+          if (lidLabwareURI != null) {
             dispatch(
               createContainer({
-                labwareDefURIStack: [fillLidLabwareUri],
+                labwareDefURIStack: [lidLabwareURI],
                 slot: 'offDeck',
               })
             )
           }
-          if (fillAdapterLabwareUri != null) {
+          if (adapterLabwareURI != null) {
             dispatch(
               createContainer({
-                labwareDefURIStack: [fillAdapterLabwareUri],
+                labwareDefURIStack: [adapterLabwareURI],
                 slot: 'offDeck',
               })
             )
           }
-          dispatch(
-            createContainer({
-              labwareDefURIStack: [fillPrimaryLabwareUri],
-              slot: 'offDeck',
-            })
-          )
+          if (primaryLabwareURI != null) {
+            dispatch(
+              createContainer({
+                labwareDefURIStack: [primaryLabwareURI],
+                slot: 'offDeck',
+              })
+            )
+          }
         })
       }
     } else {
