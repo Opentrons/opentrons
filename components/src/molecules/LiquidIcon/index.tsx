@@ -6,12 +6,14 @@ import { Btn, Flex } from '../../primitives'
 import { FLEX_MAX_CONTENT } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 
+import type { MouseEvent } from 'react'
+
 type LiquidIconSize = 'xSmall' | 'small' | 'medium'
 
 export interface LiquidIconProps {
   color: string
   size?: LiquidIconSize
-  onClick?: () => void
+  onClick?: (e: MouseEvent<HTMLButtonElement | HTMLDivElement>) => void
   hasError?: boolean
 }
 

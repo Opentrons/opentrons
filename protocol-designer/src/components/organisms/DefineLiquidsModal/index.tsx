@@ -166,6 +166,11 @@ export function DefineLiquidsModal(
     ),
   ]
 
+  const handleClickLiquidIcon = (e: MouseEvent<HTMLButtonElement | HTMLDivElement>): void => {
+    e.preventDefault()
+    setShowColorPicker(prev => !prev)
+  }
+
   return (
     <HandleEnter
       onEnter={() => {
@@ -272,10 +277,7 @@ export function DefineLiquidsModal(
                   </StyledText>
 
                   <LiquidIcon
-                    onClick={(e: MouseEvent<HTMLDivElement>) => {
-                      e.preventDefault()
-                      setShowColorPicker(prev => !prev)
-                    }}
+                    onClick={handleClickLiquidIcon}
                     color={color}
                     size="medium"
                   />
