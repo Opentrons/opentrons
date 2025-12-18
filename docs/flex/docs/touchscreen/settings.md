@@ -2,15 +2,12 @@
 title: "Opentrons Flex: Settings"
 ---
 
-The Settings screen provides additional controls you can use to customize the behavior of your Flex.
+The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.
 
 <figure class="screenshot" markdown>
 ![Sample of touchscreen settings](../images/touchscreen-settings-fade.png)
-<figcaption>Examples of some setting options and features.</figcaption>
+<figcaption>Examples of some configurable options and features.</figcaption>
 </figure>
-
-
-The Settings screen will shows all available features in a single list. Tap a setting to toggle it on or off, or to open a another screen that displays related adjustment controls.
 
 The following sections summarize the currently available settings.
 
@@ -78,7 +75,7 @@ Batch delete certain types of information from the robot, such as calibrations, 
 
 ### Disable Stacker sensors for labware detection in z- and x-axis.
 
-&mdash;
+<font color="red">PLACEHOLDER FOR DESCRIPTION</font>
 
 ### Home Gantry on Restart
 
@@ -86,7 +83,7 @@ By default, the gantry moves to its home position any time you turn on Flex. Onl
 
 ### Recovery Mode
 
-Turns [error recovery][error-recovery] on and off. Error recovery mode let's you pause and fix a problem if something unexpected happens during a protocol run.
+Turns [error recovery][error-recovery] on and off. Error recovery mode pauses the active protocol and gives you a chance to fix a problem if something unexpected happens during the run.
 
 ### Update Channel
 
