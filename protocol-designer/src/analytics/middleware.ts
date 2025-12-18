@@ -233,8 +233,7 @@ export const reduxActionToAnalyticsEvent = (
           return {
             name: 'flexStackerFillItemsStep',
             properties: {
-              primaryLabwareUri: args.fillPrimaryLabwareUri,
-              lidLabwareUri: args.fillLidLabwareUri,
+              labwareUri: args.fillLabwareUri,
             },
           }
         case 'flexStackerStore':

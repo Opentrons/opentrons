@@ -112,6 +112,7 @@ describe('flexStackerFillItems', () => {
         adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
+      labwareFillQueue: null,
     })
   })
   it('creates flex stacker fill command with 1 labware', () => {
@@ -133,9 +134,7 @@ describe('flexStackerFillItems', () => {
         moduleId,
         commandCreatorFnName: 'flexStackerFillItems',
         interventionMessage: null,
-        fillPrimaryLabwareUri: 'mockURI',
-        fillLidLabwareUri: null,
-        fillAdapterLabwareUri: null,
+        fillLabwareUri: 'mockURI',
         fillQuantity: 1,
       },
       invariantContext,
@@ -164,9 +163,7 @@ mock_flex_stacker_1.fill_items(
         moduleId,
         commandCreatorFnName: 'flexStackerFillItems',
         interventionMessage: 'a fill message',
-        fillPrimaryLabwareUri: 'mockURI',
-        fillLidLabwareUri: null,
-        fillAdapterLabwareUri: null,
+        fillLabwareUri: 'mockURI',
         fillQuantity: 5,
       },
       invariantContext,
@@ -313,15 +310,14 @@ mock_flex_stacker_1.fill_items(
         adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
+      labwareFillQueue: null,
     })
     const result = flexStackerFillItems(
       {
         moduleId,
         interventionMessage: null,
         commandCreatorFnName: 'flexStackerFillItems',
-        fillPrimaryLabwareUri: 'mockURI',
-        fillLidLabwareUri: null,
-        fillAdapterLabwareUri: null,
+        fillLabwareUri: 'mockURI',
         fillQuantity: 1,
       },
       invariantContext,

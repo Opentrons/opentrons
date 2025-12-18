@@ -240,9 +240,7 @@ describe('getDefaultsForStepType', () => {
   describe('flex stacker step', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('flexStacker')).toEqual({
-        fillPrimaryLabwareUri: null,
-        fillAdapterLabwareUri: null,
-        fillLidLabwareUri: null,
+        fillLabwareUri: null,
         fillQuantity: null,
         flexStackerFormType: null,
         interventionMessage: null,

@@ -321,13 +321,13 @@ const _patchHeaterShakerModuleId =
     return null
   }
 
-const _patchFlexStackerFields =
+const _patchFlexStackerModuleId =
   (args: {
     initialDeckSetup: InitialDeckSetup
     stepType: StepType
   }): FormUpdater =>
   () => {
-    const { initialDeckSetup, stepType,  } = args
+    const { initialDeckSetup, stepType } = args
     const numOfModules =
       Object.values(initialDeckSetup.modules).filter(
         module => module.type === FLEX_STACKER_MODULE_TYPE
@@ -341,14 +341,10 @@ const _patchFlexStackerFields =
       if (moduleId == null) {
         return null
       }
-      const moduleState = initialDeckSetup.modules[moduleId].moduleState as FlexStackerModuleState
       // get labware details in hopper at moment
 
       return {
         moduleId,
-        fillPrimaryLabwareUri:  moduleState.storedLabwareDetails?.primaryLabwareURI,
-        fillLidLabwareUri:  moduleState.storedLabwareDetails?.lidLabwareURI ?? null,
-        fillAdapterLabwareUri: moduleState.storedLabwareDetails?.adapterLabwareURI ?? null
       }
     }
     return null
@@ -540,7 +536,7 @@ export const createPresavedStepForm = ({
     robotStateTimeline,
   })
 
-  const updateFlexStackerModuleId = _patchFlexStackerFields({
+  const updateFlexStackerModuleId = _patchFlexStackerModuleId({
     initialDeckSetup,
     stepType,
   })
