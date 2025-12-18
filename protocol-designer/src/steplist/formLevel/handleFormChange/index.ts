@@ -1,4 +1,5 @@
 import { dependentFieldsUpdateAbsorbanceReader } from './dependentFieldsUpdateAbsorbanceReader'
+import { dependentFieldsUpdateFlexStacker } from './dependentFieldsUpdateFlexStacker'
 import { dependentFieldsUpdateHeaterShaker } from './dependentFieldsUpdateHeaterShaker'
 import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
 import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
@@ -70,7 +71,13 @@ export function handleFormChange(
     )
     return { ...patch, ...dependentFieldsPatch }
   }
-
+  if (rawForm.stepType === 'flexStacker') {
+    const dependentFieldsPatch = dependentFieldsUpdateFlexStacker(
+      patch,
+      rawForm
+    )
+    return { ...patch, ...dependentFieldsPatch }
+  }
   if (rawForm.stepType === 'pause') {
     const dependentFieldsPatch = dependentFieldsUpdatePause(patch, rawForm)
     return { ...patch, ...dependentFieldsPatch }
