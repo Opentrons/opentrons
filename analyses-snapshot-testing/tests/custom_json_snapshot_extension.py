@@ -40,6 +40,12 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
             "stackLabwareId",
             "lid_id",
             "taskId",
+            "dispenseWhileTracking",
+            "aspirateWhileTracking",
+            "moveToWell",
+            "liquidProbe",
+            "moveToAddressableAreaForDropTip",
+            "captureImage",
         ]
         self.timestamp_keys_to_replace = [
             "createdAt",
