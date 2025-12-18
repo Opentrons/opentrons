@@ -298,9 +298,7 @@ class Protocols:
     Flex_S_2_7_p1000_dynamic_demo: Protocol = Protocol(
         file_stem="Flex_S_2_7_p1000_dynamic_demo", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
     )
-    Flex_S_P1000_dynamic_mix: Protocol = Protocol(
-        file_stem="Flex_S_P1000_dynamic_mix", file_extension="py", robot="Flex", folder=PROTOCOLS_FOLDER
-    )
+
     Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x: Protocol = Protocol(
         file_stem="Flex_S_PD_8_4_2_Illumina_DNA_Prep_48x", file_extension="json", robot="Flex", folder=PROTOCOL_DESIGNER_PROTOCOLS_FOLDER
     )
