@@ -28,24 +28,18 @@ export function usePreviewImage(
       console.error('Failed to capture preview image', error)
     },
   }
-  const { createCapturePreviewImage } = useCapturePreviewImage()
-  const { createCapturePreviewImageToRun } = useCapturePreviewImageToRun(
-    runId ?? ''
-  )
-
-  const captureImage =
-    runId == null ? createCapturePreviewImage : createCapturePreviewImageToRun
+  const capturePreviewImage = useCapturePreviewImage()
+  const capturePreviewImageToRun = useCapturePreviewImageToRun(runId ?? '')
 
   const takePhoto = (): void => {
-    captureImage(
-      {
-        zoom: settings.zoom,
-        brightness: settings.brightness,
-        contrast: settings.contrast,
-        saturation: settings.saturation,
-      },
-      { ...callbacks }
-    )
+    if (runId == null) {
+      capturePreviewImage.createCapturePreviewImage({ settings }, callbacks)
+    } else {
+      capturePreviewImageToRun.createCapturePreviewImageToRun(
+        { runId, settings },
+        callbacks
+      )
+    }
   }
 
   const imgPath = useMemo((): string | null => {
@@ -66,7 +60,10 @@ export function usePreviewImage(
 
   return {
     imgPath,
-    isLoading: captureImage.isLoading,
+    isLoading:
+      runId == null
+        ? capturePreviewImage.isLoading
+        : capturePreviewImageToRun.isLoading,
     takePhoto,
   }
 }
