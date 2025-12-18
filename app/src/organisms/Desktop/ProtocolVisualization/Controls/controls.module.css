@@ -42,6 +42,7 @@
   font-size: 18px;
   font-weight: var(--font-weight-bold);
   -webkit-line-clamp: 2;
+  line-height: var(--line-height-24);
   overflow-wrap: break-word;
   text-overflow: ellipsis;
 }
@@ -68,6 +69,7 @@
 @container controls-container (min-width: 680px) {
   .heading_text {
     font-size: 26px;
+    line-height: 32px;
   }
 }
 
