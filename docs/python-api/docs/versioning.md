@@ -68,6 +68,7 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 | API Version | Introduced in Robot Software |
 |-------------|------------------------------|
+| 2.27        | 8.8.0                        |
 | 2.26        | 8.7.0                        |
 | 2.25        | 8.6.0                        |
 | 2.24        | 8.5.0                        |
@@ -98,6 +99,19 @@ This table lists the correspondence between Protocol API versions and robot soft
 | 1.0         | 3.0.0                        |
 
 ## Changes in API versions
+
+### Version 2.27
+
+- Adds [`concurrent module commands`](concurrent-module.md) to perform Temperature, Heater-Shaker, or Thermocycler Module actions alonside other protocol steps: 
+  - [`TemperatureModuleContext.start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]
+  - [`HeaterShakerContext.set_shake_speed`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]
+  - [`ThermocyclerContext.start_set_block_temperature`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature],[`ThermocycylerContext.start_set_lid_temperature`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature], and [`ThermocyclerContext.start_execute_profile`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]
+- Control pipette movement while aspirating or dispensing: 
+  - Use the `end_location` and `movement_delay` parameters to control pipette movement while [`aspirating`](aspirate-building-block) or [`dispensing`](ispense-building-block). 
+  - Pipette relative to the [`liquid meniscus`](meniscus) as liquid level changes. 
+  - Set locations to start and end aspirating and dispensing in a [`dynamic mix`](dynamic-mix). 
+- Take images using the Flex or OT-2's built-in camera with the new [`ProtocolContext.capture_image()`][opentrons.protocol_api.ProtocolContext.capture_image] method. 
+- Use the `tips` parameter to select tips to use during a [`transfer_with_liquid_class`][opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class]. 
 
 ### Version 2.26
 
