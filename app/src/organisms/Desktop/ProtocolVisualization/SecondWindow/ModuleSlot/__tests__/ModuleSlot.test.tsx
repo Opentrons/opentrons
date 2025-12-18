@@ -78,9 +78,13 @@ describe('ModuleSlot', () => {
       ),
       moduleRobotState: createMockRobotState({
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: 95,
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 95,
+        },
         lidTargetTemp: 105,
         lidOpen: false,
+        numProfilesStarted: 0,
       }).modules,
     }
     render(props)
