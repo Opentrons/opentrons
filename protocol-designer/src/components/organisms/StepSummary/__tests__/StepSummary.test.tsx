@@ -49,7 +49,7 @@ describe('StepSummary', () => {
         id: 'retrieve',
         stepType: 'flexStacker',
         flexStackerFormType: 'retrieve',
-        fillLabwareUri: 'mockUri',
+        fillPrimaryLabwareUri: 'mockUri',
         fillQuantity: 3,
       },
       labwareEntities: {

@@ -682,7 +682,9 @@ export interface FlexStackerEmptyArgs extends CommonArgs {
 export interface FlexStackerFillItemsArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerFillItems'
-  fillLabwareUri: string | null
+  fillPrimaryLabwareUri: string
+  fillLidLabwareUri: string | null
+  fillAdapterLabwareUri: string | null
   fillQuantity: number | null
   interventionMessage: string | null
 }

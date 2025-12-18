@@ -171,6 +171,7 @@ describe('getDefaultsForStepType', () => {
         labwareLocationUpdate: {},
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -239,7 +240,9 @@ describe('getDefaultsForStepType', () => {
   describe('flex stacker step', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('flexStacker')).toEqual({
-        fillLabwareUri: null,
+        fillPrimaryLabwareUri: null,
+        fillAdapterLabwareUri: null,
+        fillLidLabwareUri: null,
         fillQuantity: null,
         flexStackerFormType: null,
         interventionMessage: null,

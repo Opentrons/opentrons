@@ -14,7 +14,9 @@ describe('flexStackerFormToArgs', () => {
     baseFormData = {
       stepType: 'flexStacker',
       id: 'stacker-id',
-      fillLabwareUri: null,
+      fillPrimaryLabwareUri: 'mock uri',
+      fillAdapterLabwareUri: null,
+      fillLidLabwareUri: null,
       fillQuantity: null,
       flexStackerFormType: null,
       interventionMessage: null,
@@ -41,14 +43,15 @@ describe('flexStackerFormToArgs', () => {
     const formData = {
       ...baseFormData,
       flexStackerFormType: 'fill' as FlexStackerFormType,
-      fillLabwareUri: 'labware',
       fillQuantity: 1,
       interventionMessage: 'fill message',
     }
     const expected = {
       moduleId: 'moduleId',
       commandCreatorFnName: 'flexStackerFillItems',
-      fillLabwareUri: 'labware',
+      fillPrimaryLabwareUri: 'mock uri',
+      fillAdapterLabwareUri: null,
+      fillLidLabwareUri: null,
       fillQuantity: 1,
       interventionMessage: 'fill message',
     }

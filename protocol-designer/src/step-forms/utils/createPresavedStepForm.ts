@@ -33,6 +33,7 @@ import {
 import type {
   AbsorbanceReaderState,
   AdditionalEquipmentEntities,
+  FlexStackerModuleState,
   LabwareEntities,
   PipetteEntities,
   RobotState,
@@ -320,16 +321,13 @@ const _patchHeaterShakerModuleId =
     return null
   }
 
-const _patchFlexStackerModuleId =
+const _patchFlexStackerFields =
   (args: {
     initialDeckSetup: InitialDeckSetup
-    orderedStepIds: OrderedStepIdsState
-    savedStepForms: SavedStepFormState
     stepType: StepType
-    robotStateTimeline: Timeline
   }): FormUpdater =>
   () => {
-    const { initialDeckSetup, stepType } = args
+    const { initialDeckSetup, stepType,  } = args
     const numOfModules =
       Object.values(initialDeckSetup.modules).filter(
         module => module.type === FLEX_STACKER_MODULE_TYPE
@@ -340,13 +338,17 @@ const _patchFlexStackerModuleId =
       const moduleId =
         getModuleOnDeckByType(initialDeckSetup, FLEX_STACKER_MODULE_TYPE)?.id ??
         null
-
       if (moduleId == null) {
         return null
       }
+      const moduleState = initialDeckSetup.modules[moduleId].moduleState as FlexStackerModuleState
       // get labware details in hopper at moment
+
       return {
         moduleId,
+        fillPrimaryLabwareUri:  moduleState.storedLabwareDetails?.primaryLabwareURI,
+        fillLidLabwareUri:  moduleState.storedLabwareDetails?.lidLabwareURI ?? null,
+        fillAdapterLabwareUri: moduleState.storedLabwareDetails?.adapterLabwareURI ?? null
       }
     }
     return null
@@ -538,12 +540,9 @@ export const createPresavedStepForm = ({
     robotStateTimeline,
   })
 
-  const updateFlexStackerModuleId = _patchFlexStackerModuleId({
+  const updateFlexStackerModuleId = _patchFlexStackerFields({
     initialDeckSetup,
-    orderedStepIds,
-    savedStepForms,
     stepType,
-    robotStateTimeline,
   })
 
   const updateThermocyclerFields = _patchThermocyclerFields({

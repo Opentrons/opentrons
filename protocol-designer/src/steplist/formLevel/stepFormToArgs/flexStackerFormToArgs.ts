@@ -6,7 +6,9 @@ export const flexStackerFormToArgs = (
   castFormData: GetCastFormData<HydratedFlexStackerFormData>
 ): FlexStackerArgs | null => {
   const {
-    fillLabwareUri,
+    fillPrimaryLabwareUri,
+    fillLidLabwareUri,
+    fillAdapterLabwareUri,
     flexStackerFormType,
     interventionMessage,
     moduleId,
@@ -23,7 +25,9 @@ export const flexStackerFormToArgs = (
       return {
         moduleId: moduleId!,
         commandCreatorFnName: 'flexStackerFillItems',
-        fillLabwareUri,
+        fillPrimaryLabwareUri,
+        fillLidLabwareUri,
+        fillAdapterLabwareUri,
         fillQuantity,
         interventionMessage,
       }

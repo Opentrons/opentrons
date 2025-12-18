@@ -37,6 +37,7 @@ import { FormAlerts } from '/protocol-designer/components/organisms'
 import { AdvancedSettingsUpdateConfirmationModal } from '/protocol-designer/components/organisms/AdvancedSettingsUpdateConfirmationModal'
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { RenameStepModal } from '/protocol-designer/components/organisms/RenameStepModal'
+import { FLEX_STACKER_FILL } from '/protocol-designer/constants'
 import { getFormWarningsForSelectedStep } from '/protocol-designer/dismiss/selectors'
 import {
   getRobotStateTimeline,
@@ -44,6 +45,7 @@ import {
 } from '/protocol-designer/file-data/selectors'
 import { stepIconsByType } from '/protocol-designer/form-types'
 import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
+import { createContainer } from '/protocol-designer/labware-ingred/actions'
 import {
   getAdditionalEquipmentEntities,
   getCurrentFormIsPresaved,
@@ -57,6 +59,7 @@ import { actions } from '/protocol-designer/steplist'
 import { maskField } from '/protocol-designer/steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
 import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
+import { ThunkDispatch } from '/protocol-designer/types'
 import {
   hoverSelection,
   selectDropdownItem,
@@ -90,6 +93,7 @@ import type { ComponentType } from 'react'
 import type { AnalyticsEvent } from '/protocol-designer/analytics/mixpanel'
 import type {
   FormData,
+  HydratedFlexStackerFormData,
   HydratedFormData,
   StepType,
 } from '/protocol-designer/form-types'
@@ -153,7 +157,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     'protocol_steps',
     'tooltip',
   ])
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any>>()
   const { makeSnackbar } = useKitchen()
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const [analyticsStartTime] = useState<Date>(new Date())
@@ -380,6 +384,41 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       dispatch(hoverSelection({ id: null, text: null }))
       if (stackerModules.length > 0) {
         dispatch(analyticsEvent(numberOfStackersLoaded))
+      }
+      if (
+        formData.stepType === 'flexStacker' &&
+        formData.flexStackerFormType === FLEX_STACKER_FILL
+      ) {
+        const {
+          fillQuantity,
+          fillPrimaryLabwareUri,
+          fillLidLabwareUri,
+          fillAdapterLabwareUri,
+        } = formData as HydratedFlexStackerFormData
+        Array.from({ length: fillQuantity ?? 1 }).forEach(() => {
+          if (fillLidLabwareUri != null) {
+            dispatch(
+              createContainer({
+                labwareDefURIStack: [fillLidLabwareUri],
+                slot: 'offDeck',
+              })
+            )
+          }
+          if (fillAdapterLabwareUri != null) {
+            dispatch(
+              createContainer({
+                labwareDefURIStack: [fillAdapterLabwareUri],
+                slot: 'offDeck',
+              })
+            )
+          }
+          dispatch(
+            createContainer({
+              labwareDefURIStack: [fillPrimaryLabwareUri],
+              slot: 'offDeck',
+            })
+          )
+        })
       }
     } else {
       setShowFormErrors(true)

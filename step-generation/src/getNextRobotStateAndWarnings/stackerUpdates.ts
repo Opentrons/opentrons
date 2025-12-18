@@ -53,22 +53,120 @@ export const forFlexStackerEmpty = (
     }
   })
 }
-
 export const forFlexStackerFillItems = (
   params: FlexStackerFillItemsParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  // TODO: we need to update both the labwareInHopper key and all the robotState.labware entities currently in the hopper
-  // const { robotState } = robotStateAndWarnings
-  // const { moduleId, labware } = params
-  // const slot = robotState.modules[moduleId].slot
-  // const moduleState = _getStackerModuleState(robotState, moduleId)
-  // const largestStackInSlot = getLargestStackInSlot(robotState.labware, slot)
-  // if (moduleState != null) {
-  //   moduleState.labwareInHopper = [labware, ...moduleState.labwareInHopper]
-  // }
+  const { robotState } = robotStateAndWarnings
+  const { labwareEntities } = invariantContext
+  const { moduleId, labware } = params
+
+  const moduleSlot = robotState.modules[moduleId].slot
+  const moduleState = flexStackerStateGetter(robotState, moduleId)
+
+  if (moduleState == null || moduleState.storedLabwareDetails == null) {
+    return
+  }
+
+  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    moduleState.storedLabwareDetails
+
+  // group labware IDs by primaryyyy (each primary = one hopper position)
+  const groups: {
+    primary: string
+    adapter: string | null
+    lid: string | null
+  }[] = []
+
+  for (const labwareId of labware) {
+    const defURI = labwareEntities[labwareId].labwareDefURI
+
+    if (defURI === primaryLabwareURI) {
+      groups.push({
+        primary: labwareId,
+        adapter: null,
+        lid: null,
+      })
+    } else if (defURI === adapterLabwareURI) {
+      const lastGroup = groups[groups.length - 1]
+      if (lastGroup) {
+        lastGroup.adapter = labwareId
+      }
+    } else if (defURI === lidLabwareURI) {
+      const lastGroup = groups[groups.length - 1]
+      if (lastGroup) {
+        lastGroup.lid = labwareId
+      }
+    }
+  }
+
+  // rebuild ALL stacks (bottom-up)
+  const baseStack = [HOPPER_STACKER_LOCATION, moduleId, moduleSlot]
+
+  for (const group of groups) {
+    const bottomUpStack = [
+      group.adapter,
+      group.primary,
+      group.lid,
+      ...baseStack,
+    ].filter((v): v is string => v != null)
+
+    // primary
+    robotState.labware[group.primary] = {
+      ...robotState.labware[group.primary],
+      stack: bottomUpStack.slice(bottomUpStack.indexOf(group.primary)),
+    }
+
+    // adapter
+    if (group.adapter != null) {
+      robotState.labware[group.adapter] = {
+        ...robotState.labware[group.adapter],
+        stack: bottomUpStack.slice(bottomUpStack.indexOf(group.adapter)),
+      }
+    }
+
+    // lid
+    if (group.lid != null) {
+      robotState.labware[group.lid] = {
+        ...robotState.labware[group.lid],
+        stack: bottomUpStack.slice(bottomUpStack.indexOf(group.lid)),
+      }
+    }
+  }
+
+  // Rebuild labwareInHopper
+  const existingGroups = moduleState.labwareInHopper ?? []
+
+  const newGroups: FlexStackerStoredLabwareGroup[] = groups.map(group => ({
+    primaryLabwareId: group.primary,
+    adapterLabwareId: group.adapter,
+    lidLabwareId: group.lid,
+  }))
+  
+  // index existing groups by primaryLabwareId
+  const existingByPrimary = new Map(
+    existingGroups.map(g => [g.primaryLabwareId, g])
+  )
+  
+  // merge: new groups override existing ones with same primary
+  const merged: FlexStackerStoredLabwareGroup[] = []
+  
+  for (const newGroup of newGroups) {
+    merged.push(newGroup)
+    existingByPrimary.delete(newGroup.primaryLabwareId)
+  }
+  
+  // append remaining old groups (preserve their order)
+  for (const oldGroup of existingGroups) {
+    if (existingByPrimary.has(oldGroup.primaryLabwareId)) {
+      merged.push(oldGroup)
+    }
+  }
+  
+  moduleState.labwareInHopper = merged
 }
+
 
 export const forFlexStackerFill = (
   params: FlexStackerFillParams,

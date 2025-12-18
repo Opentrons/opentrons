@@ -191,6 +191,7 @@ export function getDefaultsForStepType(
         labwareLocationUpdate: {},
         moduleLocationUpdate: {},
         pipetteLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -253,7 +254,9 @@ export function getDefaultsForStepType(
       }
     case 'flexStacker':
       return {
-        fillLabwareUri: null,
+        fillPrimaryLabwareUri: null,
+        fillLidLabwareUri: null,
+        fillAdapterLabwareUri: null,
         fillQuantity: null,
         flexStackerFormType: null,
         interventionMessage: null,
