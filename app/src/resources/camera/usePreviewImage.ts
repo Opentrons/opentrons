@@ -1,44 +1,72 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
-import { useCapturePreviewImage } from '@opentrons/react-api-client'
-
-import { MIME_TYPES } from '../dataFiles/constants'
+import {
+  useCapturePreviewImage,
+  useCapturePreviewImageToRun,
+} from '@opentrons/react-api-client'
 
 import type { CameraImageSettings } from '@opentrons/api-client'
 
 export interface UsePreviewImageResult {
-  imgPath: string | undefined
+  imgPath: string | null
   isLoading: boolean
   takePhoto: () => void
 }
 
 export function usePreviewImage(
-  settings: CameraImageSettings
+  settings: CameraImageSettings,
+  runId: string | null
 ): UsePreviewImageResult {
-  const [isLoading, setIsLoading] = useState(false)
-  const { data, refetch } = useCapturePreviewImage(settings, {
-    onSettled: () => {
-      setIsLoading(false)
+  const [imageBlob, setImageBlob] = useState<Blob | null>(null)
+  const capturePreviewImageCbs = {
+    onSettled: (blob?: Blob) => {
+      if (blob != null) {
+        setImageBlob(blob)
+      }
     },
-    onError: error => {
+    onError: (error: unknown) => {
       console.error('Failed to capture preview image', error)
     },
-  })
-
-  const imgPath = useMemo(() => {
-    if (data == null) return undefined
-
-    const blob = new Blob([data], { type: MIME_TYPES.IMAGE })
-    return URL.createObjectURL(blob)
-  }, [data])
+  }
+  const capturePreviewImage = useCapturePreviewImage()
+  const capturePreviewImageToRun = useCapturePreviewImageToRun(runId ?? '')
 
   const takePhoto = (): void => {
-    refetch()
+    if (runId == null) {
+      capturePreviewImage.createCapturePreviewImage(
+        { settings },
+        capturePreviewImageCbs
+      )
+    } else {
+      capturePreviewImageToRun.createCapturePreviewImageToRun(
+        { runId, settings },
+        capturePreviewImageCbs
+      )
+    }
   }
+
+  const imgPath = useMemo((): string | null => {
+    if (imageBlob == null) {
+      return null
+    }
+
+    return URL.createObjectURL(imageBlob)
+  }, [imageBlob])
+
+  useEffect(() => {
+    return () => {
+      if (imgPath !== null) {
+        URL.revokeObjectURL(imgPath)
+      }
+    }
+  }, [imgPath])
 
   return {
     imgPath,
-    isLoading,
+    isLoading:
+      runId == null
+        ? capturePreviewImage.isLoading
+        : capturePreviewImageToRun.isLoading,
     takePhoto,
   }
 }

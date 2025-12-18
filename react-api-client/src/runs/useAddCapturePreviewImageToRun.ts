@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from 'react-query'
 
-import { createCapturePreviewImage } from '@opentrons/api-client'
+import { addCapturePreviewImageToRun } from '@opentrons/api-client'
 
 import { useHost } from '../api'
 
@@ -12,48 +12,55 @@ import type {
   ErrorResponse,
 } from '@opentrons/api-client'
 
-export interface AddCapturePreviewImageParams {
+export interface AddCapturePreviewImageToRunParams {
+  runId: string
   settings: CameraImageSettings
 }
 
-export type UseAddCapturePreviewImageMutationResult = UseMutationResult<
+export type UseAddCapturePreviewImageToRunMutationResult = UseMutationResult<
   DownloadedPreviewImageFileResponse,
   AxiosError<ErrorResponse>,
-  AddCapturePreviewImageParams
+  AddCapturePreviewImageToRunParams
 > & {
-  createCapturePreviewImage: UseMutateFunction<
+  createCapturePreviewImageToRun: UseMutateFunction<
     DownloadedPreviewImageFileResponse,
     AxiosError<ErrorResponse>,
-    AddCapturePreviewImageParams
+    AddCapturePreviewImageToRunParams
   >
 }
-
-export function useCapturePreviewImage(): UseAddCapturePreviewImageMutationResult {
+export function useCapturePreviewImageToRun(
+  runId: string
+): UseAddCapturePreviewImageToRunMutationResult {
   const host = useHost()
   const queryClient = useQueryClient()
+
   const mutation = useMutation<
     DownloadedPreviewImageFileResponse,
     AxiosError<ErrorResponse>,
-    AddCapturePreviewImageParams
+    AddCapturePreviewImageToRunParams
   >(({ settings }) =>
-    createCapturePreviewImage(host!, settings)
+    addCapturePreviewImageToRun(host!, runId, settings)
       .then(response => {
         queryClient
-          .invalidateQueries([host, 'camera', 'capturePreviewImage'])
+          .invalidateQueries([
+            host,
+            'runs',
+            runId,
+            'camera',
+            'capturePreviewImage',
+          ])
           .catch((e: Error) => {
-            console.error(`error invalidating camera query: ${e.message}`)
+            console.error(`error invalidating runs query: ${e.message}`)
           })
         return response.data
       })
       .catch((e: Error) => {
-        console.error(
-          `error capturing preview image in camera settings: ${e.message}`
-        )
+        console.error(`error capturing preview image on run: ${e.message}`)
         throw e
       })
   )
   return {
     ...mutation,
-    createCapturePreviewImage: mutation.mutateAsync,
+    createCapturePreviewImageToRun: mutation.mutateAsync,
   }
 }
