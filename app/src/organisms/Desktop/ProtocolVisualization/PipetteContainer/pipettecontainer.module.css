@@ -20,4 +20,5 @@
   width: 100%;
   align-items: center;
   justify-content: space-between;
+  gap: var(--spacing-12);
 }
