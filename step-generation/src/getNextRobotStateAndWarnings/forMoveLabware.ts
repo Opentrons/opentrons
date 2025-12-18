@@ -106,12 +106,13 @@ export function forMoveLabware(
         }
       }
       if (stackFromTargetUp.length === 3) {
-        // updating each element of the shuttle group
+        // updating each element of the shuttle group (adapter + primary + lid)
         for (let i = 0; i < BOTTOM_UP_LABWARE_POOL_KEYS.length; i++) {
           const key = BOTTOM_UP_LABWARE_POOL_KEYS[i]
           moduleState.labwareOnShuttle![key] = stackFromTargetUp[i]
         }
       } else if (stackFromTargetUp.length === 2) {
+        // either adapter + primary or primary + lid
         const keysToUpdate = stackFromTargetUp.some(id =>
           invariantContext.labwareEntities[id].def.allowedRoles?.some(
             role => role === 'lid'
@@ -126,6 +127,7 @@ export function forMoveLabware(
           ] = stackFromTargetUp[i]
         }
       } else if (stackFromTargetUp.length === 1) {
+        // primary labware only
         moduleState.labwareOnShuttle!.primaryLabwareId = stackFromTargetUp[0]
       }
     }
