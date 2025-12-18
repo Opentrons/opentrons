@@ -33,6 +33,7 @@ import {
 import type {
   AbsorbanceReaderState,
   AdditionalEquipmentEntities,
+  FlexStackerModuleState,
   LabwareEntities,
   PipetteEntities,
   RobotState,
@@ -335,6 +336,7 @@ const _patchFlexStackerModuleId =
         module => module.type === FLEX_STACKER_MODULE_TYPE
       )?.length ?? 1
     const hasFlexStackerModuleId = stepType === 'flexStacker'
+
     // pre-select form type if module is set
     if (hasFlexStackerModuleId && numOfModules === 1) {
       const moduleId =
@@ -344,9 +346,12 @@ const _patchFlexStackerModuleId =
       if (moduleId == null) {
         return null
       }
+      const moduleState = initialDeckSetup.modules[moduleId]
+        .moduleState as FlexStackerModuleState
       // get labware details in hopper at moment
       return {
         moduleId,
+        fillLabwareUri: moduleState.storedLabwareDetails?.primaryLabwareURI,
       }
     }
     return null
