@@ -9,10 +9,13 @@
 .left_column {
   position: relative;
   display: flex;
-  min-width: 9.25rem; /* 148px */
-  max-width: 37.5rem; /* 600px */
+  min-width: 37.5rem; /* 600px */
+
+  /* height: 100%; */
   flex-direction: column;
   flex-shrink: 0;
+  border-radius: var(--border-radius-8);
+  background-color: var(--white);
   overflow-y: auto;
 }
 
