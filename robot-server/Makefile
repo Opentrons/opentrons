@@ -1,7 +1,7 @@
 # opentrons robot server makefile
 
 include ../scripts/push.mk
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 
 SHX := npx shx
 REDOC := npx @redocly/cli
@@ -55,12 +55,12 @@ clean_all_cmd = $(clean_cmd) dist
 # todo(mm, 2021-07-08): Figure out how to run the server with Python development
 # mode enabled, to expose more errors and warnings.
 #   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
-#     doesn't work because it applies the variable to the whole `pipenv run`
+#     doesn't work because it applies the variable to the whole `uv run`
 #     command, and we only want our inner server process running under dev mode,
-#     not the outer pipenv process.
+#     not the outer uv process.
 #   * Adding PYTHONDEVMODE=1 to the .env file specified by
 #     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
-#   * Doing `pipenv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
+#   * Doing `uv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
 #     probably POSIX-only.
 dev_port ?= "31950"
 dev_host ?= "localhost"
@@ -69,16 +69,21 @@ run_dev ?= uvicorn "robot_server.app:app" --host $(dev_host) --port $(dev_port) 
 .PHONY: all
 all: clean wheel
 
+
+
 .PHONY: setup
 setup:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip list
+
+.PHONY: setup-py
+setup-py: setup
 
 .PHONY: setup-ot2
 setup-ot2:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip uninstall -y python-can
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip uninstall python-can
+	@$(UV) pip list
 
 .PHONY: clean
 clean:
@@ -87,7 +92,7 @@ clean:
 
 .PHONY: teardown
 teardown:
-	-$(pipenv) --rm
+	$(SHX) rm -rf .venv
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
@@ -107,7 +112,7 @@ test:
 test-cov:
 	$(pytest) $(tests) $(test_opts) $(cov_opts)
 
-.PHONT: test-fast
+.PHONY: test-fast
 test-fast:
 	$(pytest) $(tests) $(test_opts) -m 'not slow'
 
@@ -123,7 +128,7 @@ format:
 
 .PHONY: _dev
 _dev:
-	$(pipenv) run $(run_dev)
+	$(UV) run $(run_dev)
 
 .PHONY: dev
 dev: dev-ot2
@@ -140,18 +145,18 @@ dev-ot2: _dev
 .PHONY: dev-with-emulator
 dev-with-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator.env
 dev-with-emulator:
-	$(pipenv) run $(run_dev)
+	$(UV) run $(run_dev)
 
 
 .PHONY: dev-with-ot3-emulator
 dev-with-ot3-emulator: export OT_ROBOT_SERVER_DOT_ENV_PATH ?= emulator_ot3.env
 dev-with-ot3-emulator:
-	$(pipenv) run $(run_dev)
+	$(UV) run $(run_dev)
 
 
 .PHONY: local-shell
 local-shell:
-	$(pipenv) shell
+	$(UV) shell
 
 .PHONY: push
 push: wheel

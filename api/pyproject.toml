@@ -19,6 +19,7 @@ description = "The Opentrons API is a simple framework designed to make writing 
 
 dependencies = [
    "opentrons-shared-data==0.0.0",
+    "numpy>=1.26.4,<2",
     "aionotify==0.3.1",
     "anyio>=4.9.0,<5.0.0",
     "jsonschema>=3.0.1,<4.18.0",
@@ -30,14 +31,63 @@ dependencies = [
     "click>=8.0.0,<9",
     "pyusb==1.2.1",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
-    "packaging>=21.0",
+    "packaging>=25.0",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
 
-[project.optional-dependencies]
-"ot2-hardware" = ["opentrons-hardware==0.0.0"]
-"flex-hardware" = ["opentrons-hardware[FLEX]==0.0.0"]
+[dependency-groups]
+# Robot dependencies - exact versions from Pipfile [packages] for robot deployment
+robot = [
+    "jsonschema==4.17.3",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.4.0",
+    "anyio==4.9.0",
+    "numpy==1.26.4",
+    "packaging==25.0",
+    "pyusb==1.2.1",
+    "zipp==3.21.0",
+    "opentrons-hardware[FLEX]==0.0.0",
+]
+# Dev dependencies - from Pipfile [dev-packages]
+# Robot group is always included in dev to ensure dev environment matches robot
+dev = [
+    {include-group = "robot"},
+    "atomicwrites==1.4.0; sys_platform == 'win32'",
+    "colorama==0.4.4; sys_platform == 'win32'",
+    "coverage==7.4.1",
+    "mypy==1.11.0",
+    "numpydoc==0.9.1",
+    "pytest>=8,<9",
+    "pytest-asyncio>=0.23.0,<2",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=2.5.0",
+    "sphinx==5.0.1",
+    "twine==4.0.0",
+    "wheel==0.37.0",
+    "typeguard~=4.4.4",
+    "sphinx-substitution-extensions==2020.9.30.0",
+    "sphinxext-opengraph==0.8.1",
+    "sphinx-tabs>=3.4.1,<4",
+    "mock==5.1.0",
+    "flake8==7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "decoy>=2.2.0,<3",
+    "black==22.3.0",
+    "types-mock~=5.1.0",
+    "types-setuptools==57.0.2",
+    "typing-extensions>=4.0.0,<5",
+    "pytest-profiling~=1.7.0",
+    "jinja2>=2.3,<3.1",
+    "hypothesis>=6.96.1,<7",
+    "pytest-lazy-fixtures>=1.1.4,<2",
+    "build~=1.2.0",
+    # performance_metrics is needed for type checking (used in TYPE_CHECKING blocks)
+    # even though it's optional at runtime
+    "performance_metrics==0.0.0",
+]
 
 
 [project.scripts]
@@ -54,7 +104,17 @@ requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency
 build-backend = 'hatchling.build'
 
 [tool.hatch.metadata.hooks.dependency-coversion]
-override-versions-of=['opentrons-shared-data', 'opentrons-hardware', 'opentrons-hardware["FLEX"]']
+override-versions-of=['opentrons-shared-data', 'opentrons-hardware']
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
+# The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
+# during builds, but for local dev, uv uses these paths directly.
+opentrons-shared-data = { path = "../shared-data", editable = true }
+opentrons-hardware = { path = "../hardware", editable = true }
+performance-metrics = { path = "../performance-metrics", editable = true }
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="src/opentrons/_version.py"

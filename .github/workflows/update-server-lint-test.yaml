@@ -47,11 +47,7 @@ jobs:
       - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.21.1'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.12'
-
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'update-server'
       - name: Lint
@@ -68,10 +64,7 @@ jobs:
       - uses: 'actions/setup-node@v6'
         with:
           node-version: '22.21.1'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.12'
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'update-server'
       - name: Test

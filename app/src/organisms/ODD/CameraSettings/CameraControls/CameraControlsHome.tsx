@@ -18,20 +18,25 @@ export interface CameraControlsHomeProps {
   setActiveSubView: (view: ActiveControlView) => void
   toggleShowControls: () => void
   settings: UseCameraSettingsValuesResult
+  runId: string | null
 }
 
 export function CameraControlsHome({
   setActiveSubView,
   toggleShowControls,
   settings,
+  runId,
 }: CameraControlsHomeProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const { isLoading, imgPath, takePhoto } = usePreviewImage({
-    zoom: settings.zoom,
-    brightness: settings.brightness,
-    contrast: settings.contrast,
-    saturation: settings.saturation,
-  })
+  const { isLoading, imgPath, takePhoto } = usePreviewImage(
+    {
+      zoom: settings.zoom,
+      brightness: settings.brightness,
+      contrast: settings.contrast,
+      saturation: settings.saturation,
+    },
+    runId
+  )
 
   const [showModal, setShowModal] = useState(false)
 
