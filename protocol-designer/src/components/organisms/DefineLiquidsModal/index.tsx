@@ -43,6 +43,7 @@ import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
 
 import type { ThunkDispatch } from 'redux-thunk'
+import type { MouseEvent } from 'react'
 import type { Ingredient } from '@opentrons/step-generation'
 import type { BaseState } from '/protocol-designer/types'
 
@@ -271,7 +272,8 @@ export function DefineLiquidsModal(
                   </StyledText>
 
                   <LiquidIcon
-                    onClick={() => {
+                    onClick={(e: MouseEvent<HTMLDivElement>) => {
+                      e.preventDefault()
                       setShowColorPicker(prev => !prev)
                     }}
                     color={color}
