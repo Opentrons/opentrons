@@ -247,7 +247,7 @@ export const forFlexStackerRetrieve = (
       labwareInHopper.shift()
 
       // build labware stacks on the deck
-      const runningStack = [moduleId, moduleSlot]
+      const runningStack = [moduleSlot]
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareGroupOnShuttle[

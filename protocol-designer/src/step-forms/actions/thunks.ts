@@ -263,7 +263,7 @@ export const createLabwareAndQueueForHopper: (
             uuids: [labwareUuid],
           })
         )
-        runningQueue.push(labwareUuid) // bottom up already
+        runningQueue.push(`${labwareUuid}:${uri}`) // bottom up already
       }
     }
     // push new labware IDs on queue for fill
