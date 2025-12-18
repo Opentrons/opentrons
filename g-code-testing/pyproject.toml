@@ -5,7 +5,8 @@ build-backend = "hatchling.build"
 [project]
 name = "g-code-testing"
 description = "Library to run emulated OT-2 and gather its G-Code output"
-requires-python = ">=3.7"
+readme = "README.md"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },
@@ -18,14 +19,46 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
     "opentrons==0.0.0",
     "robot-server==0.0.0",
+    "anyio==4.9.0",
+    "pydantic==2.11.7",
+    "systemd-python==234; sys_platform=='linux'",
 ]
 dynamic = ["version", "hatch-dependency-coversion"]
+
+[dependency-groups]
+dev = [
+    "diff-match-patch==20230430",
+    "pytest>=8,<9",
+    "pytest-asyncio<2,>=1",
+    "pytest-aiohttp==1.0.5",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=2.5.0",
+    "mock~=5.1.0",
+    "types-mock~=5.1.0",
+    "mypy==1.8.0",
+    "flake8~=7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "black==22.3.0",
+    "pyusb==1.2.1",
+    "build~=1.2.0",
+]
+
+# uv: global settings and dependency tweaks
+[tool.uv]
+# Provide static metadata so uv can resolve systemd-python without building its sdist on
+# macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+    ] },
+]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/g-code-testing"
@@ -63,3 +96,12 @@ include = ['g_code_parsing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.fla
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'g_code_parsing/LICENSE'
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
+# The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
+# during builds, but for local dev, uv uses these paths directly.
+opentrons = { path = "../api", editable = true }
+robot-server = { path = "../robot-server", editable = true }
