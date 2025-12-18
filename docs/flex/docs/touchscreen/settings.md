@@ -75,6 +75,10 @@ If you opt out of automatic data sharing, you can still download Flex log files 
 !!! note
     There are separate privacy controls in the Opentrons App. Turning sharing on or off from the touchscreen only affects data collected and sent by the robot. Your laptop or desktop computer will still automatically share data if this feature is enabled in the Opentrons App.
 
+## Camera
+
+Every Flex comes equipped with a [built-in camera][camera-features-and-controls], which is off by default. Camera options include on/off settings for still photograph, video, and on-error image capture.
+
 ## Advanced
 
 You shouldn't need these settings for everyday operation, but they may be useful for troubleshooting or testing pre-release features.
