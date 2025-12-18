@@ -322,10 +322,47 @@ class ProtocolEditorPage(BasePage):
         self.page.get_by_role("button", name="Save").click()
         self.page.locator("div").filter(has_text="Move has been saved").nth(3).click()
 
-    def drag_and_drop(self, source_step: str, target_step: str) -> None:
-        """Drag a step and drop it to another step to reorder. We expect the source step to be moved above target step."""
+    def drag_and_drop(self, from_index: int, to_num: int) -> None:
+        """Drag and drop a step from one position to another in the step list.
 
-        self.page.locator(source_step).hover()
-        self.page.mouse.down()
-        self.page.locator(target_step).hover()
-        self.page.mouse.up()
+        IMPORTANT NOTE ON PARAMETERS:
+
+        Args:
+            from_index: ALWAYS the index of the source step 
+            to_num: num is dependent on the direction you are moving the source step.
+                If you are moving DOWN the list, to_num is the STEP NUMBER.
+                If you are moving UP the list, to_num is the INDEX.
+        """
+
+        steps = self.page.locator('div[draggable="true"]')
+
+        source = steps.nth(from_index)
+        target = steps.nth(to_num)
+
+        source.scroll_into_view_if_needed()
+        target.scroll_into_view_if_needed()
+
+        source_box = source.bounding_box()
+        target_box = target.bounding_box()
+
+        start_x = source_box["x"] + source_box["width"] / 2
+        start_y = source_box["y"] + source_box["height"] / 2
+        end_y = target_box["y"] + target_box["height"] / 2
+
+        mouse = self.page.mouse
+
+        ## Move mouse to source
+        mouse.move(start_x, start_y)
+        mouse.down()
+
+        source.dispatch_event("dragstart")
+
+        ## NOTE: Future work? we can manipulate this move so that if the (end_y - start_y) is positive or negative we can
+        #  adjust the percentage the mouse moves to the target which may fix the issue of step versus index for target number
+        mouse.move(start_x, start_y + (end_y - start_y), steps=20)
+
+        target.dispatch_event("drop")
+        source.dispatch_event("dragend")
+
+        mouse.up()
+        self.page.wait_for_timeout(150)
