@@ -77,6 +77,8 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '8.6.0': migrateFileEightSix,
   // @ts-expect-error
   '8.7.0': migrateFileEightSeven,
+  // todo(mm, 2025-12-19): After v8.8.0 is in its own release branch, add v8.9.0 here,
+  // probably at the same time as removing the concurrent module actions feature flag.
 }
 export const migration = (
   file: any
