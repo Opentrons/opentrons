@@ -3,6 +3,7 @@ import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
 import { HighlightLabware } from '../HighlightLabware'
 import { LabwareControls } from './Overlays'
+import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type {
@@ -59,6 +60,11 @@ export function HopperLabwareRenders(
   } = props
   const { primaryLabwareId, adapterLabwareId, lidLabwareId } = topLabwareGroup
   const primaryLabware = labwaresOnDeck[primaryLabwareId]
+  const labwareInterfaceBoundingBox = {
+    xDimension: primaryLabware.def.dimensions.xDimension,
+    yDimension: primaryLabware.def.dimensions.yDimension,
+    zDimension: 0,
+  }
   if (primaryLabware == null) {
     return null
   }
@@ -101,6 +107,14 @@ export function HopperLabwareRenders(
         labwareOnDeck={primaryLabware}
         isSelected={selectedZoomInSlot != null}
         allModules={allModules}
+      />
+      <ActiveLabwareControls
+        itemId={`hopper${slot}`}
+        slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
+        hover={hover}
+        setHover={setHover}
+        slotBoundingBox={labwareInterfaceBoundingBox}
+        terminalItemId={terminalItemId}
       />
     </>
   )
