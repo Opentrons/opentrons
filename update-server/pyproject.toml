@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "otupdate"
 description = "A server to update software and firmware on Opentrons robots"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },
@@ -19,13 +19,38 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
+    "typing-extensions>=4.0.0,<5",
     "aiohttp==3.12.14",
 ]
 dynamic = ['version']
+
+[dependency-groups]
+# Robot dependencies - exact versions for robot deployment
+robot = [
+    "aiohttp==3.12.14",
+]
+dev = [
+    "flake8~=7.0.0",
+    "flake8-annotations~=3.0.1",
+    "flake8-docstrings~=1.7.0",
+    "flake8-noqa~=1.4.0",
+    "pytest>=8,<9",
+    "pytest-watch~=4.2.0",
+    "pytest-cov==4.1.0",
+    "pytest-aiohttp==1.0.5",
+    "coverage==7.4.1",
+    "atomicwrites==1.4.0; sys_platform=='win32'",
+    "colorama==0.4.4; sys_platform=='win32'",
+    "mypy==1.11.0",
+    "black==22.3.0",
+    "decoy<3,>=2.2.0",
+    "build~=1.2.0",
+    "setuptools==80.9.0",
+]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/update-server"
