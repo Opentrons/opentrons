@@ -55,9 +55,9 @@ const LabwareThumbnail = styled.svg`
   flex-shrink: 0;
 `
 
-export const SlotDetailModal = (
+export function SlotDetailModal(
   props: SlotDetailModalProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const {
     closeModal,
     slotName,
