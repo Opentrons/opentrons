@@ -96,6 +96,6 @@ extra_css:
 
 extra:
   apiLevel: 2.27
-  robot_stack_version: 8.7.0
+  robot_stack_version: 8.8.0
 
 copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'
