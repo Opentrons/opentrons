@@ -31,7 +31,9 @@ export function DraggableSidebar({
 }: DraggableSidebarProps): JSX.Element {
   const sidebarRef = useRef<HTMLDivElement>(null)
   const [isResizing, setIsResizing] = useState(false)
-  const [sidebarWidth, setSidebarWidth] = useState(INITIAL_SIDEBAR_WIDTH)
+  const [sidebarWidth, setSidebarWidth] = useState<number>(
+    INITIAL_SIDEBAR_WIDTH
+  )
 
   const startResizing = useCallback(() => {
     setIsResizing(true)

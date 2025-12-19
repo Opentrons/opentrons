@@ -66,7 +66,7 @@ export function FirstStepMixTools({
         hasFormError={propsForFields.wells.errorToShow != null}
       />
       <Divider marginY="0" />
-      <VolumeField {...propsForFields.volume} />
+      <VolumeField fieldProps={propsForFields.volume} />
       <Divider marginY="0" />
       <InputStepFormField
         {...propsForFields.times}

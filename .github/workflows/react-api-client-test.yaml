@@ -9,12 +9,14 @@ on:
       - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
+      - 'vitest.config.*'
   push:
     paths:
       - 'react-api-client/**'
       - 'api-client/**'
       - 'package.json'
       - '.github/workflows/react-api-client-test.yaml'
+      - 'vitest.config.*'
     branches:
       - '*'
   workflow_dispatch:
@@ -37,9 +39,9 @@ jobs:
     runs-on: 'ubuntu-24.04'
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.21.1'
       - name: 'install libudev for usb-detection'
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved

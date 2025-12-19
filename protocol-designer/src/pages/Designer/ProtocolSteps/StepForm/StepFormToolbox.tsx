@@ -17,7 +17,11 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import {
@@ -46,6 +50,7 @@ import {
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
   getInvariantContext,
+  getModuleEntities,
   getSavedStepForms,
 } from '/protocol-designer/step-forms/selectors'
 import { actions } from '/protocol-designer/steplist'
@@ -62,6 +67,7 @@ import {
   AbsorbanceReaderTools,
   CameraTools,
   CommentTools,
+  FlexStackerTools,
   HeaterShakerTools,
   MagnetTools,
   MixTools,
@@ -107,6 +113,7 @@ const STEP_FORM_MAP: StepFormMap = {
   comment: CommentTools,
   camera: CameraTools,
   absorbanceReader: AbsorbanceReaderTools,
+  flexStacker: FlexStackerTools,
 }
 
 // used to inform StepFormToolbox when to prompt user confirmation for overriding advanced settings
@@ -281,7 +288,16 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dispatchAnalyticsEvent(FORM_WARNINGS_EVENT, visibleFormWarningsTypes)
     dispatchAnalyticsEvent(FORM_ERRORS_EVENT, visibleFormErrorsTypes)
   }, [visibleFormWarningsTypes, visibleFormErrorsTypes])
-
+  const moduleEntities = Object.values(useSelector(getModuleEntities))
+  const stackerModules = moduleEntities.filter(moduleEntity => {
+    return moduleEntity.type === FLEX_STACKER_MODULE_TYPE
+  })
+  const numberOfStackersLoaded: AnalyticsEvent = {
+    name: 'loadFlexStacker',
+    properties: {
+      numberOfStackers: stackerModules.length,
+    },
+  }
   if (!ToolsComponent) {
     // early-exit if step form doesn't exist, this is a good check for when new steps
     // are added
@@ -336,6 +352,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       })
     }
   }
+
   const handleSaveClick = (): void => {
     if (canSave) {
       const duration = new Date().getTime() - analyticsStartTime.getTime()
@@ -361,6 +378,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       dispatch(analyticsEvent(stepDuration))
       dispatch(selectDropdownItem({ selection: null, mode: 'clear' }))
       dispatch(hoverSelection({ id: null, text: null }))
+      if (stackerModules.length > 0) {
+        dispatch(analyticsEvent(numberOfStackersLoaded))
+      }
     } else {
       setShowFormErrors(true)
       if (tab === 'aspirate' && isDispenseError && !isAspirateError) {
@@ -535,7 +555,10 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
               desktopStyle="bodyLargeSemiBold"
               css={LINE_CLAMP_TEXT_STYLE(2, true)}
             >
-              {capitalizeFirstLetter(String(formData.stepName))}
+              {/* TODO: use  module object from form.json instead */}
+              {formData.stepType === 'flexStacker'
+                ? t(`protocol_steps:${formData.stepType}`)
+                : capitalizeFirstLetter(String(formData.stepName))}
             </StyledText>
           </Flex>
         }

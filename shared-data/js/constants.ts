@@ -70,6 +70,9 @@ export const GRIPPER_MODELS = [
 export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
+// robot camera name
+export const OT_SYSTEM_CAMERA = 'ot_system_camera'
+
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
 export const GEN2: 'GEN2' = 'GEN2'
@@ -796,6 +799,7 @@ export const DEFAULT_LIQUID_COLORS = [
   springGreen,
   tartRed,
 ]
+export const MIXED_WELL_COLOR = '#737578'
 export const DEPRECATED_WHALE_GREY = '#9395a0'
 
 // this can't go in @opentrons/components because its used in a utility
@@ -848,3 +852,7 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FAKE_FIXTURE_IDS,
   ...STAGING_AREA_FIXTURES,
 ]
+
+// a labware location when something has been used already on the deck
+// and moves to a new location that isn't accessible on or off the deck
+export const SYSTEM_LOCATION = 'systemLocation'

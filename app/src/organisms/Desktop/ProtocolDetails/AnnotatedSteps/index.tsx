@@ -170,17 +170,23 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
                 )
               })}
           {analysis?.errors.length > 0 ? (
-            <div className={styles.annotated_steps_error_container}>
+            <div className={styles.annotated_steps_error_wrapper}>
               {analysis?.errors.map(error => (
                 <div
-                  className={styles.annotated_steps_error_header}
+                  className={styles.annotated_steps_error_container}
                   key={error.id}
                   onClick={() => {
                     setShowErrorDetailsModal(true)
                   }}
                 >
-                  <div className={styles.annotated_steps_icon}>
+                  <div className={styles.annotated_steps_header}>
                     <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
+                    <StyledText
+                      desktopStyle="captionSemiBold"
+                      color={COLORS.red60}
+                    >
+                      {t('step_error')}
+                    </StyledText>
                   </div>
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {error.detail}

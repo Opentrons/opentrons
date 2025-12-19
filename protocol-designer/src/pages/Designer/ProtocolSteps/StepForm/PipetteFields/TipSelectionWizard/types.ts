@@ -50,3 +50,8 @@ export interface AccessibilityStatus {
   isAccessible: boolean
   inaccessibleReason?: InaccessibleReason
 }
+
+export type TipSelectionBannerReason =
+  | 'incompletePickup'
+  | 'pickupsRequired'
+  | 'tooManyTips'

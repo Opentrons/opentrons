@@ -1,22 +1,28 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
-import { reduce } from 'lodash'
+import reduce from 'lodash/reduce'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getIsLid,
   getIsTiprack,
   getPositionFromSlotId,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  SYSTEM_LOCATION,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,
+  getIsSlotAHopper,
   getSlotInLocationStack,
 } from '@opentrons/step-generation'
+
+import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 
 import { getRobotType } from '../../file-data/selectors'
 import { getLabwareEntities } from '../../step-forms/selectors'
@@ -39,6 +45,7 @@ import type {
 import type {
   AdditionalEquipmentName,
   DeckSlot,
+  HopperLocationMapKey,
   LabwareEntities,
   LabwareEntity,
   RobotState,
@@ -65,6 +72,7 @@ interface SlotInformation {
   createdStackForSlot: string[]
   matchingLabwareFor4thColumn: LabwareOnDeck | null
   slotPosition: CoordinateTuple | null
+  isSlotAHopper: boolean
   createdModuleForSlot?: ModuleOnDeck
   createdAdapterForSlot?: LabwareOnDeck
   createdFixtureForSlots?: AdditionalEquipment[]
@@ -95,17 +103,25 @@ export const getSlotInformation = (
     .filter(def => def.allowedRoles?.includes('lid'))
     ?.map(def => def.parameters.loadName)
   const offDeckLabware = deckSetupLabware[slot]
+  const isSlotAHopper = getIsSlotAHopper(slot)
+  const adjustedSlot = isSlotAHopper
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
   const slotPosition =
     deckDef != null && offDeckLabware == null
-      ? (getPositionFromSlotId(slot, deckDef) ?? null)
+      ? getPositionFromSlotId(
+          adjustedSlot as string,
+          deckDef,
+          ...(isSlotAHopper ? [HOPPER_LABWARE_X_OFFSET] : [])
+        )
       : null
   const createdModuleForSlot = Object.values(deckSetupModules).find(
-    module => module.slot === slot
+    module => module.slot === adjustedSlot
   )
-
   const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabware),
-    slot
+    slot,
+    isSlotAHopper
   )
   const labwareStackOnSlot =
     fullStackFromLabwares?.filter(
@@ -192,6 +208,7 @@ export const getSlotInformation = (
     createdFixtureForSlots,
     preSelectedFixture,
     slotPosition: slotPosition,
+    isSlotAHopper,
     matchingLabwareFor4thColumn: matchingLabware,
     createdStackForSlot:
       slot === 'offDeck'
@@ -280,9 +297,12 @@ export const useLabwareDropdownOptions = (
   const { t } = useTranslation(['shared', 'protocol_steps'])
   const labwareEntities = useSelector(getLabwareEntities)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const { labware: deckSetupLabware } = activeDeckSetup
+  const { labware: deckSetupLabware, modules } = activeDeckSetup
   const nicknamesById = useSelector(getLabwareNicknamesById)
   const robotType = useSelector(getRobotType)
+  const stackerModuleIds = Object.values(modules).filter(
+    module => module.type === FLEX_STACKER_MODULE_TYPE
+  )
   const labwareOptions = reduce(
     labwareEntities,
     (
@@ -294,7 +314,7 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
-
+      const isInaccessible = deckSlot === SYSTEM_LOCATION
       const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
@@ -303,6 +323,9 @@ export const useLabwareDropdownOptions = (
       )
       const isTopOfStack = fullStackFromLabwares[0] === labwareId
       const topId = fullStackFromLabwares[0]
+      const isOnStacker = stackerModuleIds.some(stackerModule =>
+        fullStackFromLabwares.includes(stackerModule.slot)
+      )
       const isLabwareLidCombo =
         (fullStackFromLabwares[1] === labwareId &&
           labwareEntities[topId]?.def.allowedRoles?.includes('lid') &&
@@ -332,6 +355,8 @@ export const useLabwareDropdownOptions = (
 
       //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
+        isInaccessible ||
+        (type === 'labware' && isOnStacker) ||
         isAdapter ||
         isLabwareInTrash ||
         (type === 'labware' && (isTiprack || isLid)) ||

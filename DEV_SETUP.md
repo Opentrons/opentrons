@@ -12,8 +12,9 @@ You will need the following tools installed to develop on the Opentrons platform
 - git
 - curl
 - ssh
-- Python v3.10
+- Python v3.12.12
 - Node.js v22.12.0
+- [uv][] (Python package manager) - required for all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`)
 
 ### macOS
 
@@ -22,6 +23,7 @@ On macOS, we rely on:
 - [Homebrew][brew] to install general dependencies, like `git`
 - [Node Version Switcher][nvs] to install and manage Node.js
 - [pyenv][] to install and manage Python
+- [uv][] to manage Python dependencies for all Python projects
 
 The setup below is compatible with both Intel and ARM (e.g. M1) machines. It assumes you are using the system default shell of `zsh`.
 
@@ -124,10 +126,10 @@ Close and re-open your terminal to verify that `pyenv` is installed
 pyenv --version
 ```
 
-Now, install the required version of Python. Use the latest available version of `3.10.x`, which is `3.10.13` at the time of writing.
+Now, install the required version of Python. Use the latest available version of `3.12.x`, which is `3.12.12` at the time of writing.
 
 ```shell
-pyenv install 3.10.13
+pyenv install 3.12.12
 ```
 
 If your `pyenv` command isn't working, confirm that your shell is set up properly. If you print out the contents of `~/.zprofile` and `~/.zshrc`, you should see something similar to the following:
@@ -148,7 +150,29 @@ eval "$(pyenv init -)"
 # ...
 ```
 
-#### 3. Install `jpeg` if on ARM Mac (M1/M2/M3)
+#### 3. Install `uv`
+
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+
+Install `uv` using the official installer:
+
+```shell
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Close and re-open your terminal to verify that `uv` is installed:
+
+```shell
+uv --version
+```
+
+If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.zprofile`:
+
+```shell
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zprofile
+```
+
+#### 4. Install `jpeg` if on ARM Mac (M series)
 
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 
@@ -165,6 +189,7 @@ On Windows, we rely on:
 - [scoop][] to install general dependencies and Python
 - [Node Version Switcher][nvs] to install and manage Node.js
 - [Visual Studio][visual studio] to run electron-rebuild
+- [uv][] to manage Python dependencies for all Python projects
 
 #### 0. Install `scoop` and general dependencies
 
@@ -172,7 +197,23 @@ On Windows, we rely on:
 
 #### 2. Install Python
 
-#### 3. Install build tools via Visual Studio Installer
+#### 3. Install `uv`
+
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+
+Install `uv` using the official installer:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Close and re-open your terminal to verify that `uv` is installed:
+
+```powershell
+uv --version
+```
+
+#### 4. Install build tools via Visual Studio Installer
 
 ### Linux
 
@@ -186,6 +227,28 @@ Linux setup is broadly similar to macOS setup, but it will depend heavily on you
 
 #### 2. Install `pyenv` and Python
 
+#### 3. Install `uv`
+
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+
+Install `uv` using the official installer:
+
+```shell
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Close and re-open your terminal to verify that `uv` is installed:
+
+```shell
+uv --version
+```
+
+If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.bashrc` or `~/.profile`:
+
+```shell
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+```
+
 ## Repository Setup
 
 Once your system is set up, you're ready to clone the repository and get the development environment set up.
@@ -198,15 +261,15 @@ cd ./opentrons
 Once you are inside the repository for the first time, you should do two things:
 
 1. Confirm that `nvs` selected the proper version of Node.js to use
-2. Tell `pyenv` to use Python 3.10
-3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.10.13`. Then check `python --version` again.
+2. Tell `pyenv` to use Python 3.12.12
+3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.12.12`. Then check `python --version` again.
 
 ```shell
 # confirm Node v22.12.0 or greater
 node --version
 
 # set Python version, and confirm
-pyenv local 3.10.13
+pyenv local 3.12.12
 python --version
 ```
 
@@ -222,6 +285,8 @@ Finally, you need to download and install all of our various development depende
 make setup
 ```
 
+**Note:** All Python projects in this repository use [uv][] for dependency management. These projects will automatically set up their Python environments using `uv` when you run `make setup`. The `uv` tool creates virtual environments in `.venv` directories within each project and manages dependencies via `pyproject.toml` and `uv.lock` files.
+
 Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide][] for more information. If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
 
 [file an issue]: https://github.com/Opentrons/opentrons/issues
@@ -234,5 +299,5 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [yarn]: https://classic.yarnpkg.com/
-[pipenv]: https://github.com/pypa/pipenv
+[uv]: https://github.com/astral-sh/uv
 [contributing guide]: ./CONTRIBUTING.md

@@ -451,7 +451,7 @@ export function ChooseProtocolSlideoutComponent(
                 <Flex
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
-                  gridgap={SPACING.spacing8}
+                  gridGap={SPACING.spacing8}
                   key={runtimeParam.variableName}
                 >
                   <Flex
@@ -500,7 +500,7 @@ export function ChooseProtocolSlideoutComponent(
                                 <LinkComponent
                                   color={COLORS.blue55}
                                   role="button"
-                                  to=""
+                                  // to=""
                                 />
                               ),
                             }}
@@ -815,7 +815,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
                   <>
                     <Box flex="1 1 auto" />
                     <Icon
-                      name="alert-circle"
+                      name="ot-alert"
                       size="1.25rem"
                       color={
                         runCreationError != null
@@ -919,7 +919,7 @@ function StoredProtocolList(props: StoredProtocolListProps): JSX.Element {
         }
       `}
     >
-      <Icon size="1.25rem" name="alert-circle" color={COLORS.grey30} />
+      <Icon size="1.25rem" name="ot-alert" color={COLORS.grey30} />
       <LegacyStyledText
         as="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}

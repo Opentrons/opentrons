@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch } from 'react-redux'
 
 import {
   Chip,
@@ -12,8 +11,6 @@ import {
   TimelineScrubber,
 } from '@opentrons/components'
 
-import { stepDetailViewerUpdateAction } from '/app/redux/shell'
-
 import styles from './controls.module.css'
 import { PerStepOverflowMenu } from './PerStepOverflowMenu'
 
@@ -23,12 +20,7 @@ import { PerStepOverflowMenu } from './PerStepOverflowMenu'
 // } from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type {
-  Liquid,
-  ProtocolAnalysisOutput,
-  RunTimeCommand,
-} from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+import type { RunTimeCommand } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 interface ControlsProps {
@@ -41,15 +33,6 @@ interface ControlsProps {
   isPlaying: boolean
   commands: RunTimeCommand[]
   groupedCommands: GroupedCommands | null
-  spotlightWindowData: {
-    protocolKey: string
-    robotState: RobotState
-    invariantContext: InvariantContext
-    analysis: ProtocolAnalysisOutput
-    liquids: Liquid[]
-    slot: string | null
-    command?: RunTimeCommand
-  }
   milliSecondsPerFrame: number
   setMilliSecondsPerFrame: Dispatch<SetStateAction<number>>
 }
@@ -64,40 +47,12 @@ export function Controls(props: ControlsProps): JSX.Element {
     isPlaying,
     commands,
     // groupedCommands,
-    spotlightWindowData,
     milliSecondsPerFrame,
     setMilliSecondsPerFrame,
   } = props
   const { t } = useTranslation('protocol_visualization')
-  const dispatch = useDispatch()
 
   const [showPerStepOverflowMenu, setShowPerStepOverflowMenu] = useState(false)
-  // ToDo (kk: 2025-10-03) the following will be used when TimelineScrubber is added to this component
-  // const currentCommandId = commands[currentCommandIndex].id
-  // const nextGroupFirstCommandId = getNextGroupFirstCommandId(
-  //   groupedCommands,
-  //   currentCommandId
-  // )
-  // const previousGroupFirstCommandId = getPreviousGroupFirstCommandId(
-  //   groupedCommands,
-  //   currentCommandId
-  // )
-
-  // const handleBack = (): void => {
-  //   if (previousGroupFirstCommandId != null) {
-  //     setSelectedCommand(previousGroupFirstCommandId)
-  //   } else {
-  //     setSelectedCommand(commands[0].id)
-  //   }
-  // }
-  // const handleForward = (): void => {
-  //   if (nextGroupFirstCommandId != null) {
-  //     setSelectedCommand(nextGroupFirstCommandId)
-  //   } else {
-  //     setSelectedCommand(commands[commands.length - 1].id)
-  //   }
-  // }
-
   const handlePerStepOverflowClick = (): void => {
     setShowPerStepOverflowMenu(
       showPerStepOverflowMenu => !showPerStepOverflowMenu
@@ -114,24 +69,8 @@ export function Controls(props: ControlsProps): JSX.Element {
       numCommandLength - 1
     )
 
-    setSelectedCommand(commands[nextIndex].id)
-
-    if (
-      spotlightWindowData.slot != null &&
-      spotlightWindowData.command != null
-    ) {
-      dispatch(
-        stepDetailViewerUpdateAction({
-          protocolKey: spotlightWindowData.protocolKey,
-          slot: spotlightWindowData.slot,
-          command: spotlightWindowData.command,
-          robotState: spotlightWindowData.robotState,
-          invariantContext: spotlightWindowData.invariantContext,
-          analysis: spotlightWindowData.analysis,
-          liquids: spotlightWindowData.liquids,
-        })
-      )
-    }
+    const nextCommandId = commands[nextIndex].id
+    setSelectedCommand(nextCommandId)
   }
 
   const currentProgress =

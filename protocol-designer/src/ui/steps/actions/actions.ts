@@ -9,7 +9,6 @@ import {
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { getMultiSelectLastSelected } from '../selectors'
-import { resetScrollElements } from '../utils'
 
 import type { Timeline } from '@opentrons/step-generation'
 import type { AnalyticsEventAction } from '../../../analytics/actions'
@@ -142,7 +141,6 @@ export const resetSelectStep =
         mode: 'clear',
       },
     })
-    resetScrollElements()
   }
 
 const setSelection = (
@@ -234,7 +232,6 @@ export const populateForm =
       payload: formData,
     })
     setSelection(formData, dispatch)
-    resetScrollElements()
   }
 
 export const selectStep =

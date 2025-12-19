@@ -9,21 +9,18 @@ import {
   JUSTIFY_CENTER,
   NO_WRAP,
   PrimaryButton,
-  SIZE_1,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
+import { isValidRunAgainStatus } from '/app/local-resources/runs/utils'
 import { useRobotAnalyticsData } from '/app/redux-resources/analytics'
 import { useRobot } from '/app/redux-resources/robots'
 import { getCameraUsageState } from '/app/redux/protocol-runs'
 import { useIsRobotOnWrongVersionOfSoftware } from '/app/redux/robot-update'
 import { useCurrentRunId, useProtocolDetailsForRun } from '/app/resources/runs'
 
-import {
-  getFallbackRobotSerialNumber,
-  isValidRunAgainStatus,
-} from '../../utils'
+import { getFallbackRobotSerialNumber } from '../../utils'
 import { useActionButtonProperties } from './hooks'
 
 import type { MutableRefObject } from 'react'
@@ -89,33 +86,31 @@ export function ActionButton(props: ActionButtonProps): JSX.Element {
       ...props,
     })
   return (
-    <>
-      <PrimaryButton
-        justifyContent={JUSTIFY_CENTER}
-        alignItems={ALIGN_CENTER}
-        boxShadow="none"
-        display={DISPLAY_FLEX}
-        onClick={handleButtonClick}
-        id="ProtocolRunHeader_runControlButton"
-        borderRadius={BORDERS.borderRadiusFull}
-      >
-        {buttonIconName != null ? (
-          <Icon
-            name={buttonIconName}
-            size={SIZE_1}
-            marginRight={SPACING.spacing8}
-            spin={
-              isProtocolNotReady ||
-              runStatus === RUN_STATUS_STOP_REQUESTED ||
-              isResetRunLoadingRef.current ||
-              isClosingCurrentRun
-            }
-          />
-        ) : null}
-        <StyledText as="pSemiBold" whiteSpace={NO_WRAP}>
-          {buttonText}
-        </StyledText>
-      </PrimaryButton>
-    </>
+    <PrimaryButton
+      justifyContent={JUSTIFY_CENTER}
+      alignItems={ALIGN_CENTER}
+      boxShadow="none"
+      display={DISPLAY_FLEX}
+      onClick={handleButtonClick}
+      id="ProtocolRunHeader_runControlButton"
+      borderRadius={BORDERS.borderRadiusFull}
+      gap={buttonIconName != null ? SPACING.spacing8 : 0}
+    >
+      {buttonIconName != null ? (
+        <Icon
+          name={buttonIconName}
+          size="1rem"
+          spin={
+            isProtocolNotReady ||
+            runStatus === RUN_STATUS_STOP_REQUESTED ||
+            isResetRunLoadingRef.current ||
+            isClosingCurrentRun
+          }
+        />
+      ) : null}
+      <StyledText as="pSemiBold" whiteSpace={NO_WRAP}>
+        {buttonText}
+      </StyledText>
+    </PrimaryButton>
   )
 }

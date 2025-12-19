@@ -6,8 +6,7 @@ export type CustomCommandAnnotation = SharedCommandAnnotationProperties & {
 } & {
   annotationType: 'custom'
 }
-export interface SecondOrderCommandAnnotation
-  extends SharedCommandAnnotationProperties {
+export interface SecondOrderCommandAnnotation extends SharedCommandAnnotationProperties {
   annotationType: 'secondOrderCommand'
   machineReadableName: string
   params: { [key: string]: any }

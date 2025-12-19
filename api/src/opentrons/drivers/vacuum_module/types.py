@@ -2,10 +2,12 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Dict
 
+from opentrons_shared_data.util import StrEnum
+
 from opentrons.drivers.command_builder import CommandBuilder
 
 
-class GCODE(str, Enum):
+class GCODE(StrEnum):
 
     GET_RESET_REASON = "M114"
     GET_DEVICE_INFO = "M115"

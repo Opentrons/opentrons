@@ -1,7 +1,7 @@
 // set of functions that parse details out of a protocol record and its internals
 import reduce from 'lodash/reduce'
 
-import { DEFAULT_LIQUID_COLORS } from '../constants'
+import { DEFAULT_LIQUID_COLORS, MIXED_WELL_COLOR } from '../constants'
 import { getModuleType } from '../modules'
 import { getLabwareDefURI } from './getLabwareDefURI'
 import { getModuleDeckLabel } from './getModuleDeckLabel'
@@ -350,6 +350,7 @@ export interface LiquidsById {
     displayName: string
     description: string
     displayColor?: string
+    totalLiquids?: number
   }
 }
 
@@ -357,6 +358,7 @@ export interface LiquidsById {
 // it will always have a displayColor
 export interface ParsedLiquid extends Omit<Liquid, 'displayColor'> {
   displayColor: string
+  totalLiquids?: number
 }
 
 export function parseLiquidsInLoadOrder(
@@ -367,26 +369,69 @@ export function parseLiquidsInLoadOrder(
     (command): command is LoadLiquidRunTimeCommand =>
       command.commandType === 'loadLiquid'
   )
-  const loadedLiquids = liquids.map((liquid, index) => {
-    return {
-      ...liquid,
-      displayColor:
-        liquid.displayColor ??
-        DEFAULT_LIQUID_COLORS[index % DEFAULT_LIQUID_COLORS.length],
+
+  // Assign default colors to liquids
+  const loadedLiquids = liquids.map((liquid, index) => ({
+    ...liquid,
+    displayColor:
+      liquid.displayColor ??
+      DEFAULT_LIQUID_COLORS[index % DEFAULT_LIQUID_COLORS.length],
+  }))
+  const acc: ParsedLiquid[] = []
+  const seenLiquids = new Set<string>()
+  const wellToLiquids: Record<string, Record<string, Set<string>>> = {}
+
+  loadLiquidCommands.forEach(cmd => {
+    const liquidId = cmd.params.liquidId
+
+    // Add base liquids in load order
+    if (!seenLiquids.has(liquidId)) {
+      seenLiquids.add(liquidId)
+      const liquid = loadedLiquids.find(l => l.id === liquidId)
+      if (liquid) {
+        acc.push(liquid)
+      }
+    }
+
+    // Track well-to-liquid mapping for mixed liquids
+    const labwareId = cmd.params.labwareId
+    if (!wellToLiquids[labwareId]) wellToLiquids[labwareId] = {}
+
+    for (const well of Object.keys(cmd.params.volumeByWell)) {
+      if (!wellToLiquids[labwareId][well])
+        wellToLiquids[labwareId][well] = new Set()
+      wellToLiquids[labwareId][well].add(liquidId)
     }
   })
 
-  return reduce<LoadLiquidRunTimeCommand, ParsedLiquid[]>(
-    loadLiquidCommands,
-    (acc, command) => {
-      const liquid = loadedLiquids.find(
-        liquid => liquid.id === command.params.liquidId
-      )
-      if (liquid != null && !acc.some(item => item === liquid)) acc.push(liquid)
-      return acc
-    },
-    []
-  )
+  // Map to track unique mixed combinations
+  const mixedMap = new Map<string, ParsedLiquid>()
+
+  Object.values(wellToLiquids).forEach(wellMap => {
+    Object.values(wellMap).forEach(liquidIds => {
+      if (liquidIds.size > 1) {
+        const sortedIds = Array.from(liquidIds).sort()
+        const key = sortedIds.join('-')
+
+        if (!mixedMap.has(key)) {
+          const liquidNames = sortedIds.map(
+            id => loadedLiquids.find(l => l.id === id)?.displayName || id
+          )
+
+          const mixedId = `mixed-${sortedIds.join('-')}`
+          const totalLiquids = liquidNames.length
+          mixedMap.set(key, {
+            id: mixedId,
+            displayColor: MIXED_WELL_COLOR,
+            description: liquidNames.join(', '),
+            totalLiquids: totalLiquids,
+            displayName: null,
+          })
+        }
+      }
+    })
+  })
+  return [...acc, ...mixedMap.values()]
 }
 
 interface LabwareLiquidInfo {

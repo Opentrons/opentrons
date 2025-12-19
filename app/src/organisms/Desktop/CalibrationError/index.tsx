@@ -94,7 +94,7 @@ export function CalibrationError({
   return (
     <Flex css={CONTAINER_STYLE}>
       <Flex css={CONTENT_CONTAINER_STYLE}>
-        <Icon name="alert-circle" css={ICON_STYLE} color={COLORS.red50} />
+        <Icon name="ot-alert" css={ICON_STYLE} color={COLORS.red50} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {title}
         </StyledText>

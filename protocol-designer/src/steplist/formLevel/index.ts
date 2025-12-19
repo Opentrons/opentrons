@@ -97,6 +97,7 @@ import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCameraFormData,
   HydratedCommentFormData,
+  HydratedFlexStackerFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -137,6 +138,7 @@ interface StepFormDataMap {
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
   camera: HydratedCameraFormData
+  flexStacker: HydratedFlexStackerFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -290,6 +292,9 @@ const stepFormHelperMap: {
   camera: {
     getErrors: composeErrors(),
   },
+  flexStacker: {
+    getErrors: composeErrors(),
+  },
 }
 
 export const getFormErrors = (
@@ -380,6 +385,15 @@ export const getFormErrors = (
         moduleEntities,
         labwareEntities
       )
+    case 'flexStacker':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedFlexStackerFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    default:
+      stepType satisfies never // if TypeScript complains here, you missed a stepType above
+      throw new Error(`Unknown step type: ${stepType}`)
   }
 }
 

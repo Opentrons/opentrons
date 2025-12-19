@@ -1328,7 +1328,7 @@ def test_add_camera_settings(
 ) -> None:
     """It should dispatch an AddCameraSettingsAction action."""
     settings = CameraSettings(
-        cameraEnabled=True, liveStreamEnabled=True, errorRecoveryEnabled=True
+        cameraEnabled=True, liveStreamEnabled=True, errorRecoveryCameraEnabled=True
     )
     decoy.when(subject.state_view.camera.get_enablement_settings()).then_return(
         settings

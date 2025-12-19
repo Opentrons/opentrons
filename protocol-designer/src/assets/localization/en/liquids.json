@@ -36,6 +36,7 @@
   "name": "Name",
   "no_liquids_added": "No liquids added",
   "no_liquids_defined": "No liquids defined",
+  "no_more_space_in_slot": "No more space in slot",
   "save": "Save",
   "save_or_cancel": "Save or cancel changes to proceed",
   "select_all": "Select all",

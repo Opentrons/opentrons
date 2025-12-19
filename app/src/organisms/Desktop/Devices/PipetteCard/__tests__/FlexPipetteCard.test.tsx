@@ -58,7 +58,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     vi.mocked(useCurrentSubsystemUpdateQuery).mockReturnValue({
@@ -110,7 +110,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -136,7 +136,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
 
@@ -164,7 +164,7 @@ describe('FlexPipetteCard', () => {
         },
       } as PipetteData,
       mount: 'left',
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: true,
     }
 
@@ -187,7 +187,7 @@ describe('FlexPipetteCard', () => {
       mount: 'left',
       attachedPipette: null,
       pipetteModelSpecs: null,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -236,7 +236,7 @@ describe('FlexPipetteCard', () => {
       } as any,
       mount: 'left',
       pipetteModelSpecs: null,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)
@@ -256,7 +256,7 @@ describe('FlexPipetteCard', () => {
       } as any,
       mount: 'left',
       pipetteModelSpecs: null,
-      isRobotBusy: false,
+      isRunActive: false,
       isEstopNotDisengaged: false,
     }
     render(props)

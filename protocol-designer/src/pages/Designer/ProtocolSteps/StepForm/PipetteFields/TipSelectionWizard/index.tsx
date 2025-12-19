@@ -13,13 +13,21 @@ import {
   getRobotStateAtActiveItem,
 } from '/protocol-designer/top-selectors/labware-locations'
 
+import {
+  INACCESSIBLE_INCOMPLETE,
+  INACCESSIBLE_TOO_MANY_PICKUPS,
+} from './constants'
 import { SelectTiprack } from './SelectTiprack'
 import { SelectTips } from './SelectTips'
 import { TipSelectionModal } from './TipSelectionModal'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
-import type { AccessibilityStatus, TipSelectionBaseProps } from './types'
+import type {
+  AccessibilityStatus,
+  TipSelectionBannerReason,
+  TipSelectionBaseProps,
+} from './types'
 
 const NUM_TOTAL_STEPS = 2
 
@@ -60,8 +68,9 @@ export function TipSelectionWizard(
   const [selectedTiprackId, setSelectedTiprackId] = useState<string | null>(
     tiprackSelected
   )
-  const [showPickupsRequiredBanner, setShowPickupsRequiredBanner] =
-    useState(false)
+  const [showErrorBanner, setShowErrorBanner] = useState<boolean>(
+    selectedTips.flat().length > 0
+  )
   const robotState = useSelector(getRobotStateAtActiveItem)
   const tipState =
     selectedTiprackId != null
@@ -88,12 +97,46 @@ export function TipSelectionWizard(
     setShowTipSelectionModal(false)
   }
 
+  const selectedTiprackStatus =
+    selectedTiprackId != null ? tipAccessibilityStatus[selectedTiprackId] : {}
+  const isAnySelectedWellTooManyPickups = selectedTips
+    .flat()
+    .some(
+      tip =>
+        selectedTiprackStatus[tip].inaccessibleReason ===
+        INACCESSIBLE_TOO_MANY_PICKUPS
+    )
+  const isAnySelectedWellIncomplete = selectedTips
+    .flat()
+    .some(
+      tip =>
+        selectedTiprackStatus[tip].inaccessibleReason ===
+        INACCESSIBLE_INCOMPLETE
+    )
+
+  const errorReason = ((): TipSelectionBannerReason | null => {
+    if (isAnySelectedWellTooManyPickups) {
+      return 'tooManyTips'
+    }
+    if (isAnySelectedWellIncomplete) {
+      return 'incompletePickup'
+    }
+    if (selectedTips.length !== numPickups) {
+      return 'pickupsRequired'
+    }
+    return null
+  })()
+
   const handleContinue = (): void => {
     if (selectedTiprackId == null) {
       makeSnackbar(t('no_tiprack_selected') as string)
     } else if (currentStepIndex === NUM_TOTAL_STEPS - 1) {
-      if (selectedTips.length !== numPickups) {
-        setShowPickupsRequiredBanner(true)
+      if (
+        selectedTips.length !== numPickups ||
+        isAnySelectedWellTooManyPickups ||
+        isAnySelectedWellIncomplete
+      ) {
+        setShowErrorBanner(true)
       } else {
         handleSave()
       }
@@ -135,7 +178,7 @@ export function TipSelectionWizard(
           primaryNozzle={primaryNozzle}
           selectedTips={selectedTips}
           setSelectedTips={setSelectedTips}
-          setShowPickupsRequiredBanner={setShowPickupsRequiredBanner}
+          setShowErrorBanner={setShowErrorBanner}
           numTotalPickups={numPickups}
           nozzles={nozzles}
           tipAccessibilityStatus={tipAccessibilityStatus}
@@ -162,9 +205,10 @@ export function TipSelectionWizard(
       }
       currentStepIndex={currentStepIndex}
       totalSteps={NUM_TOTAL_STEPS}
-      showPickupsRequiredBanner={showPickupsRequiredBanner}
+      showErrorBanner={showErrorBanner}
       numPickupsRemaining={numPickups - selectedTips.length}
       showReusingTipsBanner={isAnySelectedWellUsed}
+      errorReason={errorReason}
     >
       {currentComponent}
     </TipSelectionModal>

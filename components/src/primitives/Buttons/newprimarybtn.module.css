@@ -1,0 +1,38 @@
+.new_primary_btn {
+  /* Base button variant styles */
+  display: inline-block;
+  padding: var(--spacing-8) var(--spacing-16);
+  border: none;
+  border-color: inherit;
+  border-radius: var(--border-radius-4);
+  background-color: #0070f3;
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 10%),
+    0 1px 2px 0 rgb(0 0 0 /20%);
+  color: var(--white);
+  cursor: pointer;
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-semi-bold);
+  line-height: 1.4;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.new_primary_btn:hover,
+.new_primary_btn:focus {
+  background-color: #0070f3;
+  box-shadow: 0 3px 6px 0 rgb(0 0 0 / 23%);
+}
+
+.new_primary_btn:active {
+  background-color: #004aaa;
+  box-shadow: none;
+}
+
+.new_primary_btn:disabled,
+.new_primary_btn.disabled {
+  background-color: #9ca3af;
+  box-shadow: none;
+  color: var(--white);
+  cursor: default;
+}

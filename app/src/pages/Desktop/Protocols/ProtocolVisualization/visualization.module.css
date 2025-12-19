@@ -143,19 +143,6 @@
   background-color: var(--white);
 }
 
-.command_step_header {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--spacing-16);
-}
-
-.command_step_groups {
-  height: 39rem;
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
-}
-
 .slot_details {
   height: 100vh;
   border-radius: var(--border-radius-8);
@@ -368,7 +355,7 @@
   flex-direction: column;
   border-radius: var(--border-radius-4);
   background-color: var(--white);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
 }
 
 .header {

@@ -222,13 +222,21 @@ export interface StepDetailViewerUpdateAction {
   type: 'shell:STEP_DETAIL_VIEWER_UPDATE'
   payload: {
     protocolKey: string
-    slot: string
+    slot: string | null
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext
     analysis: ProtocolAnalysisOutput
     liquids: Liquid[]
   }
+  meta: {
+    shell: true
+  }
+}
+
+export interface StepDetailViewerCloseAction {
+  type: 'shell:STEP_DETAIL_VIEWER_CLOSE'
+  payload: { protocolKey: string }
   meta: {
     shell: true
   }
@@ -252,6 +260,8 @@ export type ShellAction =
   | CameraStreamOpenAction
   | CameraPhotoOpenAction
   | StepDetailViewerOpenAction
+  | StepDetailViewerUpdateAction
+  | StepDetailViewerCloseAction
 
 export type IPCSafeFormDataEntry =
   | {

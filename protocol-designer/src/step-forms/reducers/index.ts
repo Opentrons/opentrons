@@ -7,6 +7,7 @@ import { handleActions } from 'redux-actions'
 
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
+  FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
@@ -106,6 +107,7 @@ import type {
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
   SubstituteStepFormPipettesAction,
+  UpdateStackerModuleStateAction,
 } from '../actions'
 import type {
   CreateDeckFixtureAction,
@@ -244,6 +246,7 @@ export const initialDeckSetupStepForm: FormData = {
   labwareLocationUpdate: {},
   pipetteLocationUpdate: {},
   moduleLocationUpdate: {},
+  moduleStateUpdate: {},
   trashBinLocationUpdate: {},
   wasteChuteLocationUpdate: {},
   stagingAreaLocationUpdate: {},
@@ -263,6 +266,7 @@ export type SavedStepFormsActions =
   | DeletePipettesAction
   | CreateModuleAction
   | DeleteModuleAction
+  | UpdateStackerModuleStateAction
   | DuplicateSelectedStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
@@ -381,7 +385,16 @@ export const savedStepForms = (
           allLabware,
           latestDefs
         )
-        acc[updatedLabwareId] = location
+        // The `location` can be a labwareId too, so update its version as well.
+        // (We only recently realized that we need to update `location`, so there are
+        // probably saved protocols out there where we hadn't updated `location` and
+        // it refers to a labwareId that doesn't exist in metadata.labware.)
+        const [locationUUID, locationDefURI] = location.split(':')
+        const updatedLocation =
+          locationDefURI && locationDefURI in allLabware
+            ? `${locationUUID}:${getMigratedURI(locationDefURI, allLabware, latestDefs)}`
+            : location
+        acc[updatedLabwareId] = updatedLocation
         return acc
       }, {})
 
@@ -566,7 +579,6 @@ export const savedStepForms = (
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
-
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
@@ -596,7 +608,7 @@ export const savedStepForms = (
       const moduleId = action.payload.id
       // If module is going into a slot occupied by a labware,
       // move the labware on top of the new module
-      const labwareLocationUpdate =
+      const labwareLocationUpdate: Record<string, string> =
         labwareOccupyingDestination == null
           ? prevInitialDeckSetupStep.labwareLocationUpdate
           : {
@@ -634,6 +646,23 @@ export const savedStepForms = (
           return { ...savedForm, moduleId }
         }
 
+        return savedForm
+      })
+    }
+
+    case 'UPDATE_STACKER_MODULE_STATE': {
+      const prevInitialDeckSetupStep =
+        savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            moduleStateUpdate: {
+              ...(prevInitialDeckSetupStep.moduleStateUpdate || {}),
+              [action.payload.moduleId]: action.payload.moduleState,
+            },
+          }
+        }
         return savedForm
       })
     }
@@ -678,7 +707,11 @@ export const savedStepForms = (
                 sourceModuleId
               ) != null
 
-            if (isCompat && !moduleIsOccupied) {
+            if (
+              isCompat &&
+              !moduleIsOccupied &&
+              moduleEntity.type !== FLEX_STACKER_MODULE_TYPE
+            ) {
               // only in this special case, we put module under the labware
               return {
                 ...savedForm,
@@ -732,16 +765,16 @@ export const savedStepForms = (
           // remove instances of labware from all manualIntervention steps
           const updatedLabwareLocation = Object.entries(
             savedForm.labwareLocationUpdate as Record<string, string>
-          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
+          ).reduce((acc: Record<string, string>, [labwareId, location]) => {
             if (labwareId === labwareIdToDelete) {
               return acc
             }
 
             // If labware is on an adapter and adapter was deleted, update labwareId's location
             const newLocationId =
-              locationId === labwareIdToDelete
+              location === labwareIdToDelete
                 ? savedForm.labwareLocationUpdate[labwareIdToDelete]
-                : locationId
+                : location
 
             acc[labwareId] = newLocationId
             return acc
@@ -842,6 +875,7 @@ export const savedStepForms = (
             form.stepType === 'heaterShaker' ||
             form.stepType === 'absorbanceReader' ||
             form.stepType === 'thermocycler' ||
+            form.stepType === 'flexStacker' ||
             form.stepType === 'pause') &&
           form.moduleId === moduleId
         ) {
@@ -864,8 +898,8 @@ export const savedStepForms = (
         const prevStepForm = savedStepForms[stepId]
         const shouldSubstitute = Boolean(
           prevStepForm && // pristine forms will not exist in savedStepForms
-            prevStepForm.pipette &&
-            prevStepForm.pipette in substitutionMap
+          prevStepForm.pipette &&
+          prevStepForm.pipette in substitutionMap
         )
         if (!shouldSubstitute) return acc
         const updatedFields = handleFormChange(

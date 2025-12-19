@@ -1,6 +1,6 @@
 from typing import Dict
 from string import Template
-from enum import Enum
+from enum import StrEnum
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -10,7 +10,7 @@ class EditPIDParamsGCodeFunctionalityDef(GCodeFunctionalityDefBase):
     # Using this list to output string in specific order
     EXPECTED_ARGS = ["P", "I", "D"]
 
-    class ValDefinedMessage(str, Enum):
+    class ValDefinedMessage(StrEnum):
         P = "\n\tKp: $val"
         I = "\n\tKi: $val"  # noqa: E741
         D = "\n\tKd: $val"

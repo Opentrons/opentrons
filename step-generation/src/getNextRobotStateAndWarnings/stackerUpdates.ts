@@ -1,62 +1,73 @@
 import {
-  FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   getHeightOfLabwareStackFromDefinitions,
   getLabwareOverlapOffset,
   getStackerMaxPoolCountByHeight,
+  SYSTEM_LOCATION,
 } from '@opentrons/shared-data'
 
-import { getModuleState } from '../robotStateSelectors'
+import {
+  BOTTOM_UP_LABWARE_POOL_KEYS,
+  HOPPER_STACKER_LOCATION,
+} from '../constants'
+import { flexStackerStateGetter } from '../robotStateSelectors'
 import { uuid } from '../utils'
 
 import type {
-  FlexStackerEmptyParams,
+  FlexStackerEmptyCreateCommand,
+  FlexStackerFillItemsParams,
   FlexStackerFillParams,
+  FlexStackerRetrieveCreateCommand,
+  FlexStackerStoreCreateCommand,
   FlexStackerStoredLabwareGroup,
-  ModuleOnlyParams,
 } from '@opentrons/shared-data'
-import type {
-  FlexStackerModuleState,
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
-
-const _getStackerModuleState = (
-  robotState: RobotState,
-  module: string
-): FlexStackerModuleState | null => {
-  const moduleState = getModuleState(robotState, module)
-
-  if (moduleState.type === FLEX_STACKER_MODULE_TYPE) {
-    return moduleState
-  } else {
-    console.error(
-      `Flex stacker state updater expected ${module} moduleState to be flexStacker, but it was ${moduleState.type}`
-    )
-    return null
-  }
-}
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export const forFlexStackerEmpty = (
-  params: FlexStackerEmptyParams,
+  params: FlexStackerEmptyCreateCommand['params'],
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const { moduleId, count } = params
-  const moduleState = _getStackerModuleState(robotState, moduleId)
-
-  if (moduleState != null) {
-    if (count != null && count > 0) {
-      moduleState.labwareInHopper =
-        moduleState?.labwareInHopper?.splice(
-          moduleState?.labwareInHopper?.length - 1 - count
-        ) ?? null
+  const { moduleId } = params
+  const labwareInHopper = Object.entries(robotState.labware).filter(
+    ([, labware]) =>
+      labware.stack.includes(HOPPER_STACKER_LOCATION) &&
+      labware.stack.includes(moduleId)
+  )
+  const moduleState = flexStackerStateGetter(robotState, moduleId)
+  if (moduleState != null && moduleState.labwareInHopper != null) {
+    if (params.count != null) {
+      moduleState.labwareInHopper = moduleState.labwareInHopper.slice(
+        0,
+        params.count
+      )
     } else {
-      moduleState.labwareInHopper = null
+      moduleState.labwareInHopper = []
     }
   }
+  labwareInHopper.forEach(([labwareId]) => {
+    robotState.labware[labwareId] = {
+      ...robotState.labware[labwareId],
+      stack: [labwareId, SYSTEM_LOCATION],
+    }
+  })
+}
+
+export const forFlexStackerFillItems = (
+  params: FlexStackerFillItemsParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void => {
+  // TODO: we need to update both the labwareInHopper key and all the robotState.labware entities currently in the hopper
+  // const { robotState } = robotStateAndWarnings
+  // const { moduleId, labware } = params
+  // const slot = robotState.modules[moduleId].slot
+  // const moduleState = _getStackerModuleState(robotState, moduleId)
+  // const largestStackInSlot = getLargestStackInSlot(robotState.labware, slot)
+  // if (moduleState != null) {
+  //   moduleState.labwareInHopper = [labware, ...moduleState.labwareInHopper]
+  // }
 }
 
 export const forFlexStackerFill = (
@@ -66,7 +77,7 @@ export const forFlexStackerFill = (
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId, count } = params
-  const moduleState = _getStackerModuleState(robotState, moduleId)
+  const moduleState = flexStackerStateGetter(robotState, moduleId)
   const labwareDefinition =
     invariantContext.labwareEntities[
       moduleState?.labwareInHopper?.[0].primaryLabwareId ?? ''
@@ -115,97 +126,78 @@ export const forFlexStackerFill = (
 }
 
 export const forFlexStackerRetrieve = (
-  params: ModuleOnlyParams,
+  params: FlexStackerRetrieveCreateCommand['params'],
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
-  const moduleState = _getStackerModuleState(robotState, moduleId)
-  if (moduleState != null) {
-    if (moduleState.labwareOnShuttle !== null) {
-      console.error(
-        'Cannot retrieve labware bc there is labware on the shuttle'
-      )
-      return
-    }
-    if (moduleState.labwareInHopper?.length === 0) {
-      console.error(
-        'Cannot retrieve labware bc there is no labware in the stacker'
-      )
-      return
-    }
-    if (moduleState.storedLabwareDetails?.primaryLabware == null) {
-      console.error(
-        'Cannot retrieve labware bc there is no stored labware details or primary labware'
-      )
-      return
-    }
-    const labwareToRetrieve = moduleState?.labwareInHopper?.shift() ?? null
-    moduleState.labwareOnShuttle = labwareToRetrieve ?? null
+  const moduleState = flexStackerStateGetter(robotState, moduleId)
+  const moduleSlot = robotState.modules[moduleId].slot
 
-    if (labwareToRetrieve == null) {
-      console.error(
-        'Cannot retrieve labware bc there is no labware in the stacker'
-      )
-      return
-    }
-    // create labware entity for retrieved labware
-    robotState.labware[labwareToRetrieve?.primaryLabwareId ?? ''] = {
-      ...robotState.labware[labwareToRetrieve?.primaryLabwareId ?? ''],
-      stack:
-        robotState.labware[
-          labwareToRetrieve?.primaryLabwareId ?? ''
-        ]?.stack?.slice(0, -1) ?? [],
+  if (moduleState != null) {
+    const { labwareInHopper, labwareOnShuttle } = moduleState
+    if (
+      labwareInHopper != null &&
+      labwareInHopper.length > 0 &&
+      labwareOnShuttle == null
+    ) {
+      const labwareGroupOnShuttle = labwareInHopper[0]
+      // set the shuttle group
+      moduleState.labwareOnShuttle = labwareGroupOnShuttle
+      // remove the shuttle group from the hopper
+      labwareInHopper.shift()
+
+      // build labware stacks on the deck
+      const runningStack = [moduleId, moduleSlot]
+      for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
+        const labwareId =
+          labwareGroupOnShuttle[
+            labwarePoolKey as keyof FlexStackerStoredLabwareGroup
+          ]
+        if (labwareId != null) {
+          runningStack.unshift(labwareId)
+          robotState.labware[labwareId].stack = runningStack
+        }
+      }
     }
   }
 }
 
 export const forFlexStackerStore = (
-  params: ModuleOnlyParams,
+  params: FlexStackerStoreCreateCommand['params'],
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
-  const moduleState = _getStackerModuleState(robotState, moduleId)
+  const moduleSlot = robotState.modules[moduleId].slot
+  const moduleState = flexStackerStateGetter(robotState, moduleId)
   if (moduleState != null) {
-    if (moduleState.labwareOnShuttle !== null) {
-      console.error('Cannot store labware bc there is labware on the shuttle')
+    const { labwareOnShuttle } = moduleState
+    if (labwareOnShuttle != null) {
+      moduleState.labwareInHopper = [
+        labwareOnShuttle,
+        ...(moduleState.labwareInHopper ?? []),
+      ]
+      moduleState.labwareOnShuttle = null
+
+      // build trivial stacks for stored labware group elements
+      for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
+        const labwareId =
+          labwareOnShuttle[
+            labwarePoolKey as keyof FlexStackerStoredLabwareGroup
+          ]
+
+        if (labwareId != null) {
+          robotState.labware[labwareId].stack = [
+            labwareId,
+            HOPPER_STACKER_LOCATION,
+            moduleId,
+            moduleSlot,
+          ]
+        }
+      }
     }
-    // get module location
-    const moduleLocation = robotState.modules[moduleId]?.slot
-    if (moduleLocation == null) {
-      console.error('Cannot store labware bc there is no module location')
-    }
-    if (moduleState.storedLabwareDetails?.primaryLabware == null) {
-      console.error('Cannot store labware bc there is no labware stored')
-    }
-    if (
-      (moduleState.labwareInHopper?.length ?? 0) + 1 >
-      moduleState.maxPoolCount
-    ) {
-      console.error('Cannot store labware bc there is no space in the stacker')
-    }
-    // TODO: wire up labware id on the shuttle
-    const newLabwareId = uuid()
-    const moduleOnSlot = robotState.modules[moduleId].slot
-    const labwareToStore = Object.entries(robotState.labware).find(
-      ([_, labware]) => labware.stack.includes(moduleOnSlot)
-    )?.[0]
-    if (labwareToStore == null) {
-      console.error('Cannot store labware bc there is no labware on the module')
-    }
-    moduleState.labwareOnShuttle = null
-    moduleState.labwareInHopper = [
-      {
-        primaryLabwareId: newLabwareId,
-        adapterLabwareId: null,
-        lidLabwareId: null,
-      },
-      ...(moduleState.labwareInHopper ?? []),
-    ] as FlexStackerStoredLabwareGroup[]
-    // remove labware from entities
-    // update stack of labware on the module
   }
 }

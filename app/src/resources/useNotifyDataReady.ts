@@ -17,8 +17,10 @@ import type { NotifyResponseData, NotifyTopic } from '/app/redux/shell/types'
 
 export type HTTPRefetchFrequency = 'once' | null
 
-export interface QueryOptionsWithPolling<TData, TError = Error>
-  extends UseQueryOptions<TData, TError> {
+export interface QueryOptionsWithPolling<
+  TData,
+  TError = Error,
+> extends UseQueryOptions<TData, TError> {
   forceHttpPolling?: boolean
 }
 

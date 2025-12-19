@@ -20,6 +20,7 @@ import { useCommandQuery } from '@opentrons/react-api-client'
 
 import { getModalPortalEl } from '/app/App/portal'
 import { ProgressBar } from '/app/atoms/ProgressBar'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import {
   InterventionModal,
   useInterventionModal,
@@ -28,14 +29,13 @@ import { useRunControls } from '/app/organisms/RunTimeControl'
 import { useRobotType } from '/app/redux-resources/robots'
 import { useRunningStepCounts } from '/app/resources/protocols/hooks'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyAllCommandsQuery,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import { useDownloadRunLog } from '../Devices/hooks'
-import { isTerminalRunStatus } from '../Devices/ProtocolRun/ProtocolRunHeader/utils'
 import { useRunProgressCopy } from './hooks'
 import { InterventionTicks } from './InterventionTicks'
 
@@ -50,10 +50,12 @@ export function RunProgressMeter(props: RunProgressMeterProps): JSX.Element {
   const { runId, robotName, makeHandleJumpToStep } = props
   const { t } = useTranslation('run_details')
   const robotType = useRobotType(robotName)
-  const runStatus = useRunStatus(runId)
   const { play } = useRunControls(runId)
-  const { data: runRecord } = useNotifyRunQuery(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
   const runData = runRecord?.data ?? null
+  const runStatus = runData?.status ?? null
 
   const { data: mostRecentCommandData } = useNotifyAllCommandsQuery(runId, {
     pageLength: 1,

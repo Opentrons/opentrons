@@ -69,6 +69,45 @@ Used for Mixpanel in dev (eg via a sandbox URL). Should be provided in the CI bu
 
 If truthy, uses the `GateModal` component in development. The `GateModal` component is always used in production.
 
+### Sentry (error reporting + sourcemaps)
+
+Protocol Designer uses Sentry in two places:
+
+1. **Runtime error reporting** (in the browser) via `@sentry/react`.
+2. **Build-time sourcemap uploading** (optional) via `@sentry/vite-plugin`.
+
+#### Runtime error reporting (browser)
+
+PD will only initialize Sentry if a DSN is provided and the user has opted in.
+
+- `OT_PD_SENTRY_DSN`: production/staging DSN.
+- `OT_PD_SENTRY_DEV_DSN`: development DSN fallback.
+
+#### Local sourcemap upload (opt-in)
+
+By default, local builds do **not** upload sourcemaps. To opt in locally, set the Sentry plugin credentials:
+
+```bash
+SENTRY_AUTH_TOKEN=... \
+SENTRY_ORG=... \
+SENTRY_PROJECT=... \
+make -C protocol-designer build
+```
+
+Notes:
+
+- The plugin is **disabled in CI**; it only runs locally when the `SENTRY_*` env vars are present.
+- Local sourcemaps are uploaded under the Sentry release name `local-dev` so they don’t collide with real releases.
+- The runtime SDK is configured to report `release=local-dev` when local upload is enabled, so local events can resolve the uploaded sourcemaps.
+
+#### CI sourcemap upload (releases)
+
+CI uploads sourcemaps via `getsentry/action-release` (not the Vite plugin). See the workflow at `.github/workflows/pd-test-build-deploy.yaml`.
+
+- Sourcemaps are uploaded from `protocol-designer/dist`.
+- Upload only runs for tagged **staging** or **production** releases.
+- The release name comes from the tag version (e.g. `protocol-designer@8.8.0` → `8.8.0`).
+
 [chrome]: https://www.google.com/chrome/
 [json-schema]: https://json-schema.org/
 [ot-2]: https://opentrons.com/ot-2

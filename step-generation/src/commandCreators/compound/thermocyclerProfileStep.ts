@@ -2,7 +2,7 @@ import * as errorCreators from '../../errorCreators'
 import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
-import { thermocyclerRunProfile } from '../atomic/thermocyclerRunProfile'
+import { thermocyclerRunExtendedProfile } from '../atomic/thermocyclerRunExtendedProfile'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerStateStep } from './thermocyclerStateStep'
 
@@ -20,7 +20,7 @@ export const thermocyclerProfileStep: CommandCreator<
     lidTargetTempHold,
     lidOpenHold,
     moduleId,
-    profileSteps,
+    profileElements,
     profileTargetLidTemp,
     profileVolume,
   } = args
@@ -52,12 +52,9 @@ export const thermocyclerProfileStep: CommandCreator<
   }
 
   commandCreators.push(
-    curryCommandCreator(thermocyclerRunProfile, {
+    curryCommandCreator(thermocyclerRunExtendedProfile, {
       moduleId,
-      profile: profileSteps.map(step => ({
-        celsius: step.temperature,
-        holdSeconds: step.holdTime,
-      })),
+      profileElements,
       blockMaxVolumeUl: profileVolume,
     })
   )
@@ -65,7 +62,7 @@ export const thermocyclerProfileStep: CommandCreator<
   commandCreators.push(
     curryCommandCreator(thermocyclerStateStep, {
       commandCreatorFnName: 'thermocyclerState',
-      moduleId: moduleId,
+      moduleId,
       blockTargetTemp: blockTargetTempHold,
       lidTargetTemp: lidTargetTempHold,
       lidOpen: lidOpenHold,

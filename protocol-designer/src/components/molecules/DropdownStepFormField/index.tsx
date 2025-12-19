@@ -117,6 +117,7 @@ export function DropdownStepFormField(
           onEnter={onEnter}
           onExit={onExit}
           menuPlacement={menuPlacement}
+          testId={fieldName}
         />
       ) : (
         <Flex

@@ -4,6 +4,8 @@ import { BORDERS, COLORS } from '../../helix-design-system'
 import { Btn } from '../../primitives'
 import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
+import type { ComponentProps, ComponentType } from 'react'
+
 const BASE_STYLES = css`
   border-radius: ${BORDERS.borderRadiusFull};
   box-shadow: none;
@@ -81,8 +83,14 @@ const STYLE_MAP = {
   `,
 }
 
-export const TertiaryButton = styled(Btn)<{
-  buttonType: 'primary' | 'secondary' | 'white'
+type ButtonType = 'primary' | 'secondary' | 'white'
+
+export const TertiaryButton: ComponentType<
+  ComponentProps<typeof Btn> & {
+    buttonType: ButtonType
+  }
+> = styled(Btn)<{
+  buttonType: ButtonType
 }>`
   ${BASE_STYLES}
   ${({ buttonType }) => STYLE_MAP[buttonType] || ''}

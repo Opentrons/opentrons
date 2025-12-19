@@ -329,7 +329,7 @@ describe('getTransferPlanAndReferenceVolumes', () => {
   it('should return isSupported false for multiDispense if not enough volume', () => {
     const result = getTransferPlanAndReferenceVolumes({
       pipetteSpecs: MOCK_P10_SPECS,
-      tiprackDefinition: fixtureTiprack10ul,
+      tiprackDefinition: { ...fixtureTiprack10ul, namespace: 'opentrons' },
       volume: 6,
       path: 'multiDispense',
       numAspirateWells: 1,

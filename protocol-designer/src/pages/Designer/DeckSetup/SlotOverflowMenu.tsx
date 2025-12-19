@@ -17,6 +17,7 @@ import {
 } from '@opentrons/components'
 import {
   getFullStackFromLabwares,
+  getIsSlotAHopper,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
 
@@ -63,7 +64,7 @@ const TOP_SLOT_Y_POSITION_2_BUTTONS = 35
 const STAGING_AREA_SLOTS = ['A4', 'B4', 'C4', 'D4']
 
 interface SlotOverflowMenuProps {
-  //   can be off-deck id or deck slot
+  //   can be off-deck id or deck slot or flexStackerAddressableArea or hopper fake slot
   location: DeckSlotId | string
   setShowMenuList: (value: SetStateAction<boolean>) => void
   addEquipment: (slotId: string) => void
@@ -100,7 +101,6 @@ export function SlotOverflowMenu(
     },
   })
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-
   const robotType = useSelector(getRobotType)
 
   const { makeSnackbar } = useKitchen()
@@ -108,6 +108,7 @@ export function SlotOverflowMenu(
   const { labware: deckSetupLabware } = deckSetup
 
   const isOffDeckLocation = deckSetupLabware[location] != null
+
   const fullStackOnSlot = getFullStackFromLabwares(deckSetupLabware, location)
   const labwareStackOnSlot =
     fullStackOnSlot?.filter(id => deckSetupLabware[id] != null) ?? []
@@ -141,7 +142,6 @@ export function SlotOverflowMenu(
     dispatch(duplicateLabware(labwareStackOnSlot))
     setShowMenuList(false)
   }
-
   const isLabwareOnSlotInUse =
     topLabwareOnSlot != null
       ? getIsLabwareOnSlotInUse(savedSteps, topLabwareOnSlot, adapterOnSlot)
@@ -152,7 +152,9 @@ export function SlotOverflowMenu(
       dispatch(deleteContainer({ labwareId: deckSetupLabware[labware].id }))
     })
   }
-  const showDuplicateBtn = !isLabwareAnAdapter && labwareStackOnSlot.length > 0
+  const isOnHopper = getIsSlotAHopper(location)
+  const showDuplicateBtn =
+    !isLabwareAnAdapter && labwareStackOnSlot.length > 0 && !isOnHopper
 
   const canRenameLabwareAndEditLiquids =
     !isLabwareAnAdapter &&

@@ -2,12 +2,13 @@ import typing
 
 from dataclasses import dataclass
 from datetime import datetime
-from enum import Enum
+
+from opentrons_shared_data.util import StrEnum
 
 AttitudeMatrix = typing.List[typing.List[float]]
 
 
-class SourceType(str, Enum):
+class SourceType(StrEnum):
     """Calibration source type"""
 
     default = "default"

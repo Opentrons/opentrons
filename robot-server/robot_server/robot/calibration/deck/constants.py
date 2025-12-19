@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from enum import Enum
 from typing import TYPE_CHECKING
+
+from opentrons_shared_data.util import StrEnum
+
 from robot_server.robot.calibration.constants import (
     STATE_WILDCARD,
     POINT_ONE_ID,
@@ -13,7 +15,7 @@ if TYPE_CHECKING:
     from .dev_types import StatePointMap
 
 
-class DeckCalibrationState(str, Enum):
+class DeckCalibrationState(StrEnum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     preparingPipette = "preparingPipette"

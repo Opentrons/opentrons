@@ -112,8 +112,7 @@ function robotBusyStatusByNameReducer(
 }
 
 interface ChooseRobotSlideoutProps
-  extends Omit<SlideoutProps, 'children'>,
-    Partial<UseCreateRun> {
+  extends Omit<SlideoutProps, 'children'>, Partial<UseCreateRun> {
   isSelectedRobotOnDifferentSoftwareVersion: boolean
   robotType: RobotType | null
   selectedRobot: Robot | null
@@ -282,7 +281,7 @@ export function ChooseRobotSlideout(
           height={SIZE_4}
           gridGap={SPACING.spacing8}
         >
-          <Icon name="alert-circle" size={SIZE_1} />
+          <Icon name="ot-alert" size={SIZE_1} />
           <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
             {t('no_available_robots_found')}
           </LegacyStyledText>
@@ -544,7 +543,7 @@ export function ChooseRobotSlideout(
                   key={runtimeParam.variableName}
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
-                  gridgap={SPACING.spacing8}
+                  gridGap={SPACING.spacing8}
                 >
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
