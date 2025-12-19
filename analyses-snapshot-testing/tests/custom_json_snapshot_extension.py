@@ -40,7 +40,7 @@ class CustomJSONSnapshotExtension(JSONSnapshotExtension):
             "stackLabwareId",
             "lid_id",
             "taskId",
-            "taskIds",
+            "task_ids",
         ]
         self.timestamp_keys_to_replace = [
             "createdAt",
