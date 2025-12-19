@@ -93,8 +93,6 @@ export function Chip(props: ChipProps): JSX.Element {
     ...styleProps
   } = props
   const chipProps = CHIP_PROPS_BY_TYPE[type]
-  const backgroundColor =
-    background === false ? COLORS.transparent : chipProps.backgroundColor30
   const icon = iconName ?? chipProps.iconName ?? 'ot-alert'
   const iconColor = chipProps.iconColor
   const getIconSize = (iconName: string | undefined): string => {
