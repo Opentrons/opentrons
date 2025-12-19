@@ -14,13 +14,13 @@ The Windows version of the Opentrons App is packaged as an installer. To use it:
 
 <div class="instruction-list" markdown>
 
-1. Open the .exe file you downloaded from opentrons.com.
+1. Open the `.exe` file you downloaded from opentrons.com.
 
-2. Follow the instructions in the installer. You can install the app for a single user or all users of the computer.
+2. Follow the instructions in the installer. You can install the App for a single user or all users of the computer.
 
 </div>
 
-The app opens automatically once installed. Grant the app security or firewall permissions, if prompted, to make sure it can launch and communicate with Flex over your network.
+The App opens automatically once installed. Grant it security or firewall permissions, if prompted, to make sure the App can launch and communicate with Flex over your network.
 
 ### macOS
 
@@ -28,7 +28,7 @@ The macOS version of the Opentrons App is packaged as a disk image. To use it:
 
 <div class="instruction-list" markdown>
 
-1.  Open the .dmg file you downloaded from opentrons.com. A window for the disk image will open in Finder.
+1.  Open the `.dmg` file you downloaded from opentrons.com. A window for the disk image will open in Finder.
 
 2.  Drag the Opentrons icon onto the Applications icon in the window.
 
@@ -38,7 +38,7 @@ The macOS version of the Opentrons App is packaged as a disk image. To use it:
 
 </div>
 
-Grant the app security or firewall permissions, if prompted, to make sure it can launch and communicate with Flex over your network.
+Grant the App security or firewall permissions, if prompted, to make sure it can launch and communicate with Flex over your network.
 
 ### Ubuntu
 
@@ -46,16 +46,16 @@ The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 
 <div class="instruction-list" markdown>
 
-1.  Move the .AppImage file you downloaded from opentrons.com to your Desktop or Applications folder.
+1.  Move the `.AppImage` file you downloaded from opentrons.com to your Desktop or Applications folder.
 
-2.  Right-click the .AppImage file and choose **Properties**.
+2.  Right-click the `.AppImage` file and choose **Properties**.
 
 3.  Click the **Permissions** tab. Then check **Allow executing file as a program**. Close the Properties window.
 
-4.  Double-click the .AppImage file.
+4.  Double-click the `.AppImage` file.
 
 !!! note
-    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
+    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with App updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
 </div>
 
