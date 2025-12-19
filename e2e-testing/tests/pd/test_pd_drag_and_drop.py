@@ -15,7 +15,7 @@ def test_drag_drop_steps(page: Page, base_url: str) -> None:
     landing = LandingPage(page)
     editor = ProtocolEditorPage(page)
 
-    ## Page setup and protocol import
+    ## Import setup protocol and open editor
     landing.wait_for_page_load()
     landing.confirm_welcome_modal()
     landing.click_import_existing_protocol()
