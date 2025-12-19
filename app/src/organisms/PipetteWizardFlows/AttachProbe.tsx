@@ -155,10 +155,10 @@ export const AttachProbe = (props: AttachProbeProps): JSX.Element | null => {
           i18nKey={'return_probe_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <LegacyStyledText as="p" />,
+            block: <LegacyStyledText forwardedAs="p" />,
             bold: (
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               />
             ),

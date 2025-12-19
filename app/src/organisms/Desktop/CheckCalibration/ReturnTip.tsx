@@ -59,7 +59,7 @@ export function ReturnTip(props: CalibrationPanelProps): JSX.Element {
       minHeight="32rem"
     >
       <Flex alignSelf={ALIGN_STRETCH}>
-        <LegacyStyledText as="h1">
+        <LegacyStyledText forwardedAs="h1">
           {onFinalPipette
             ? t('return_tip_and_exit')
             : t('return_tip_and_continue')}

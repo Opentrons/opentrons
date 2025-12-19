@@ -41,10 +41,13 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
     <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('error_boundary_desktop_app_description')}
           </LegacyStyledText>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {error.message}
           </LegacyStyledText>
         </Flex>

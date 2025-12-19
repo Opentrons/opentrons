@@ -401,7 +401,7 @@ export function DropdownMenu(props: DropdownMenuProps): JSX.Element {
         )}
       </Flex>
       {caption != null ? (
-        <LegacyStyledText as="label" color={COLORS.grey60}>
+        <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
           {caption}
         </LegacyStyledText>
       ) : null}
