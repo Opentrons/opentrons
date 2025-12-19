@@ -149,12 +149,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             alignItems={ALIGN_FLEX_END}
           >
             <CustomLabwareOverflowMenu filename={filename} />
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText
-                as="label"
-                color={COLORS.grey50}
-                textAlign={TYPOGRAPHY.textAlignRight}
-              >
+            <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>
+              <LegacyStyledText as="label" color={COLORS.grey50}>
                 {t('date_added')}
               </LegacyStyledText>
               <LegacyStyledText
