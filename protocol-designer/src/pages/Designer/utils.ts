@@ -84,6 +84,7 @@ interface SlotInformationProps {
   deckSetup: AllTemporalPropertiesForTimelineFrame
   slot: DeckSlot
   deckDef?: DeckDefinition
+  pendingCreationStateForHopper?: boolean
 }
 
 const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
@@ -92,7 +93,7 @@ const FOURTH_COLUMN_CONVERSION = { A4: 'A3', B4: 'B3', C4: 'C3', D4: 'D3' }
 export const getSlotInformation = (
   props: SlotInformationProps
 ): SlotInformation => {
-  const { slot, deckSetup, deckDef } = props
+  const { slot, deckSetup, deckDef , pendingCreationStateForHopper = false} = props
   const {
     labware: deckSetupLabware,
     modules: deckSetupModules,
@@ -118,11 +119,11 @@ export const getSlotInformation = (
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === adjustedSlot
   )
-  const fullStackFromLabwares = getFullStackFromLabwaresOnDeck(
+  const fullStackFromLabwares =  pendingCreationStateForHopper ? [] : getFullStackFromLabwaresOnDeck(
     Object.values(deckSetupLabware),
     slot,
     isSlotAHopper
-  )
+  ) 
   const labwareStackOnSlot =
     fullStackFromLabwares?.filter(
       id =>

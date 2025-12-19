@@ -17,21 +17,16 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   invariantContext,
   robotState
 ) => {
-  const { moduleId, interventionMessage, fillQuantity } = args
+  const { moduleId, interventionMessage, fill } = args
   const { labwareEntities, moduleEntities } = invariantContext
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
-  const labwareOffdeckForHopperFill =
-  flexStackerState?.labwareFillQueue ?? []
-  fillQuantity != null
-    ? labwareOffdeckForHopperFill.slice(0, fillQuantity)
-    : labwareOffdeckForHopperFill
   const isSpace = getIsSpaceInHopper(
     flexStackerState,
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = labwareOffdeckForHopperFill.map(
-    lwId => labwareEntities[lwId].pythonName
+  const labwarePythonNames = fill.map(
+    lwId => labwareEntities[lwId]?.pythonName
   )
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
 
@@ -48,8 +43,8 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     return {
       errors: [errorCreators.flexStackerHopperFull()],
     }
-  } else if (labwareOffdeckForHopperFill.length > 0) {
-    const allMatch = labwareOffdeckForHopperFill.every(labware =>
+  } else if (fill.length > 0) {
+    const allMatch = fill.every(labware =>
       labwareMatchesLabwareInHopper(labware, invariantContext, flexStackerState)
     )
     if (!allMatch) {
@@ -60,13 +55,14 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   }
 
   const pythonArgs = [
-    ...(labwareOffdeckForHopperFill.length > 0
+    ...(fill.length > 0
       ? `labware=[${formattedPythonLabwareNames}],\n`
       : []),
     ...(interventionMessage != null
       ? [`message=${formatPyStr(interventionMessage)},\n`]
       : []),
   ].join('')
+
   return {
     commands: [
       {
@@ -74,7 +70,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          labware: labwareOffdeckForHopperFill,
+          labware: fill,
           message: interventionMessage ?? undefined,
         },
       },

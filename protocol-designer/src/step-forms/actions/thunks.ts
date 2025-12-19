@@ -1,6 +1,6 @@
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { FlexStackerModuleState } from '@opentrons/step-generation'
 
+import { stackerLabwareCreationFinish, stackerLabwareCreationStart } from '.'
 import { createContainer } from '../../labware-ingred/actions'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
@@ -26,6 +26,7 @@ import type {
   CreateModuleAction,
   UpdateStackerModuleStateAction,
 } from './modules'
+import { FlexStackerModuleState } from '@opentrons/step-generation'
 
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId
@@ -221,61 +222,71 @@ export const createModuleEntityAndChangeForm: (
   }
 
 interface CreateLabwareAndQueueForHopperArgs {
-  storedLabwareGroup: StackerStoredLabwareDefinitionURIs
-  amount: number
+  fill: string[] 
   moduleId: string
 }
 
-export const createLabwareAndQueueForHopper: (
-  args: CreateLabwareAndQueueForHopperArgs
-) => ThunkAction<
-  | CreateContainerAction
-  | RenameLabwareAction
-  | ZoomedIntoSlotAction
-  | OpenIngredientSelectorAction
-  | UpdateStackerModuleStateAction
-> = args => (dispatch, getState) => {
-  const { storedLabwareGroup, amount, moduleId } = args
-  const state = getState()
-  const deckSetup = getDeckSetupForActiveItem(state)
-  const { modules } = deckSetup
-  const module = modules[moduleId]
-  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
-    storedLabwareGroup
+export const createLabwareAndQueueForHopper =
+  (args: CreateLabwareAndQueueForHopperArgs): ThunkAction<any> =>
+  async (dispatch, getState) => {
+    const { fill, moduleId } = args
+    dispatch(stackerLabwareCreationStart())
 
-  const urisBottomUp = [
-    ...(adapterLabwareURI != null ? [adapterLabwareURI] : []),
-    primaryLabwareURI,
-    ...(lidLabwareURI != null ? [lidLabwareURI] : []),
-  ]
+    const state = getState()
+    const deckSetup = getDeckSetupForActiveItem(state)
+    const { modules } = deckSetup
+    const module = modules[moduleId]
 
-  // enforce module is stacker
-  if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
-    // create containers, mapping uris from bottom up, non-null only
-    const runningQueue: string[] = []
-    for (let i = 0; i < amount; i++) {
-      for (const uri of urisBottomUp) {
-        const labwareUuid = uuid()
-        dispatch(
+    if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
+      // collect all container creation promises
+      const containerPromises = fill.map(labwareId => {
+        const [id, uri] = labwareId.split(':')
+        // dispatch can return a promise if createContainer is async
+        return dispatch(
           createContainer({
             labwareDefURIStack: [uri],
             slot: 'offDeck',
-            uuids: [labwareUuid],
+            uuids: [id],
           })
         )
-        runningQueue.push(`${labwareUuid}:${uri}`) // bottom up already
-      }
-    }
-    // push new labware IDs on queue for fill
-    dispatch(
-      updateStackerModuleState({
-        moduleId: module.id,
-        moduleState: {
-          ...module.moduleState,
-          labwareFillQueue: runningQueue,
-        },
       })
-    )
+
+      // wait for all containers to finish
+      await Promise.all(containerPromises)
+    }
+
+    dispatch(stackerLabwareCreationFinish())
   }
 
-}
+
+
+      //   const stackerModuleState =  module.moduleState as FlexStackerModuleState
+    //   const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    //   stackerModuleState.storedLabwareDetails ?? {}
+
+    // const urisBottomUp = [
+    //   ...(adapterLabwareURI != null ? [adapterLabwareURI] : []),
+    //   ...(primaryLabwareURI != null ? [primaryLabwareURI] : []),
+    //   ...(lidLabwareURI != null ? [lidLabwareURI] : []),
+    // ]
+
+    //   const runningQueue: string[] = []
+    //   const containerPromises: Promise<any>[] = []
+
+        // for (let i = 0; i < fillAmount; i++) {
+      //   for (const uri of urisBottomUp) {
+      //     const labwareUuid = uuid()
+      //     containerPromises.push(
+      //       dispatch(
+      //         createContainer({
+      //           labwareDefURIStack: [uri],
+      //           slot: 'offDeck',
+      //           uuids: [labwareUuid],
+      //         })
+      //       )
+      //     )
+      //     runningQueue.push(`${labwareUuid}:${uri}`)
+      //   }
+      // }
+
+      // await Promise.all(containerPromises)

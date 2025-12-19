@@ -106,6 +106,8 @@ import type {
   DeletePipettesAction,
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
+  StackerLabwareCreationFinishAction,
+  StackerLabwareCreationStartAction,
   SubstituteStepFormPipettesAction,
   UpdateStackerModuleStateAction,
 } from '../actions'
@@ -1101,7 +1103,7 @@ export const labwareInvariantProperties: Reducer<
     ) => {
       const { payload } = action
       const { labwareDefURI, id, displayCategory } = payload
-
+      
       const categoryLength = Object.values(state).filter(
         labware => labware.displayCategory === displayCategory
       ).length
@@ -1682,6 +1684,32 @@ export const presavedStepForm = (
       return state
   }
 }
+
+// in stackerLabwareSlice.ts (or wherever your stacker state is)
+export interface StackerLabwareState {
+  pendingCreation: boolean
+}
+
+const initialState: StackerLabwareState = {
+  pendingCreation: false,
+}
+
+export const stackerLabwareReducer = (
+  state: StackerLabwareState = initialState,
+  action: StackerLabwareCreationStartAction | StackerLabwareCreationFinishAction
+): StackerLabwareState => {
+  switch (action.type) {
+    case 'STACKER_LABWARE_CREATION_START':
+      console.log('hit start')
+      return { ...state, pendingCreation: true }
+    case 'STACKER_LABWARE_CREATION_FINISH':
+      console.log('hit finish')
+      return { ...state, pendingCreation: false }
+    default:
+      return state
+  }
+}
+
 export interface RootState {
   unsavedGroup: UnsavedGroupState
   stepGroups: StepGroupsState
@@ -1696,6 +1724,7 @@ export interface RootState {
   unsavedForm: FormState
   batchEditFormChanges: BatchEditFormChangesState
   deckConfiguration: DeckConfigurationState
+  stackerLabwareReducer: StackerLabwareState
 }
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
@@ -1741,5 +1770,6 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
       prevStateFallback.deckConfiguration,
       action
     ),
+    stackerLabwareReducer: stackerLabwareReducer(prevStateFallback.stackerLabwareReducer, action)
   })
 )

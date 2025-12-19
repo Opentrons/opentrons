@@ -70,6 +70,7 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
+import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup
@@ -100,11 +101,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     activeDeckSetup,
     robotType
   )
+  const pendingCreationStateForHopper = useSelector(getPendingCreationState)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const dispatch = useDispatch<any>()
-
   // handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls. But when swapping labware when at least
   // one is on a module, we need to be aware of not only what labware is
@@ -149,6 +150,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       deckSetup: activeDeckSetup,
       slot: selectedZoomInSlot ?? '',
       deckDef,
+      pendingCreationStateForHopper
     })
   }, [activeDeckSetup, selectedZoomInSlot])
 
@@ -180,7 +182,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     selectedZoomInSlot,
   ])
 
-  const allLabware = Object.values(activeLabware)
+  const allLabware = pendingCreationStateForHopper ? [] : Object.values(activeLabware)
+
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =

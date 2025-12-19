@@ -64,7 +64,6 @@ import {
 } from '/protocol-designer/ui/steps/actions/actions'
 
 import { useAbsorbanceReaderCommandType } from './hooks'
-import { useFillStackerLabware } from './hooks/useFillStackerLabware'
 import {
   AbsorbanceReaderTools,
   CameraTools,
@@ -167,7 +166,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     const maskedValue = maskField(name, value)
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }
-  const initialDeckSetup = useSelector(getInitialDeckSetup)
   const { pipetteEntities } = useSelector(getInvariantContext)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
@@ -194,7 +192,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
   const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
   const savedStepForm = useSelector(getSavedStepForms)[formData.id]
   const robotType = useSelector(getRobotType)
-  const fillStackerLabware = useFillStackerLabware(formData)
 
   // state used to track fields that have been confirmed through the modal but before saving the step form
   const [confirmedFieldUpdates, setConfirmedFieldUpdates] = useState<
@@ -385,7 +382,6 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       if (stackerModules.length > 0) {
         dispatch(analyticsEvent(numberOfStackersLoaded))
       }
-      fillStackerLabware?.() // will no-op if not a fill step for a stacker form
     } else {
       setShowFormErrors(true)
       if (tab === 'aspirate' && isDispenseError && !isAspirateError) {

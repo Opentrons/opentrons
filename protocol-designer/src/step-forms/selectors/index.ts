@@ -5,7 +5,6 @@ import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
@@ -13,7 +12,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE } from '@opentrons/step-generation'
+import { MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE, TOUCHED_PIPETTABLE_LABWARE } from '@opentrons/step-generation'
 
 import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
 import {
@@ -44,7 +43,6 @@ import type {
 import type {
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
-  FlexStackerModuleState,
   GripperEntities,
   InvariantContext,
   LabwareEntities,
@@ -94,12 +92,19 @@ import type {
 } from '../types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
+
+
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
   state.labwareIngred
 
 const _getInitialDeckSetupStepFormRootState: (
   arg: RootState
 ) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
+export const getPendingCreationState = (
+  state: BaseState
+): boolean => rootSelector(state).stackerLabwareReducer.pendingCreation
+
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
