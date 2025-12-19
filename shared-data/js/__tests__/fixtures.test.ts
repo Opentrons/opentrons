@@ -30,23 +30,25 @@ import {
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
   getCutoutConfigReplacmentForModule,
-  getCutoutFixtureReplacementIfNeeded,
   getFixtureDisplayName,
   getFlexStackerD3Compatibility,
   getMainAAForAFixture,
   getMainNonComboFixtureId,
   getMainUsbModuleFixtureIdForComboFixture,
-  getReplacementFixtureForFakeFixture,
-  getReplacementFixtureForFixtureRemoval,
   getVisualSlotIdForAA,
   getVisualSlotIdFromAAId,
   getWasteChuteComboFixture,
   isFixtureInUsbModules,
   isModuleAllowedOnAA,
-  replaceCutoutFixtureForFixtureRemoval,
   replaceCutoutFixtureWithComboFixture,
 } from '../fixtures'
 import { getDeckDefFromRobotType } from '../helpers'
+import {
+  getCutoutFixtureReplacementIfNeeded,
+  getReplacementFixtureForFakeFixture,
+  getReplacementFixtureForFixtureRemoval,
+  replaceCutoutFixtureForFixtureRemoval,
+} from '../helpers/deckConfiguration/getFixtureReplacment'
 
 import type { Mock } from 'vitest'
 import type { CutoutConfig, DeckConfiguration } from '..'

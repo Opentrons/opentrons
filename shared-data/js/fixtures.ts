@@ -2,9 +2,6 @@
  * Code to deal with fixtures in the sense of deck configuration.
  * Not to be confused with fixtures in the sense of dummy test data.
  */
-
-import isEqual from 'lodash/isEqual'
-
 import {
   COMBO_FIXTURES,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
@@ -14,10 +11,8 @@ import {
   FLEX_USB_MODULE_FIXTURES,
   THERMOCYCLER_MODULE_CUTOUTS,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES,
-  WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
 import {
   A1_ADDRESSABLE_AREA,
@@ -61,7 +56,6 @@ import {
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
   SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_LEFT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
@@ -79,6 +73,10 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
+import {
+  getReplacementFixtureForFakeFixture,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
+} from './helpers/deckConfiguration/getFixtureReplacment'
 import { getModuleDisplayName } from './modules'
 
 import type { TFunction } from 'i18next'
@@ -409,132 +407,7 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-
 //# Fixture Replacement Region
-export const getCutoutFixtureReplacementIfNeeded = (
-  cutoutFixtureId: CutoutFixtureId,
-  cutoutId: CutoutId,
-  deckDefinition: DeckDefinition
-): CutoutFixtureIdsWithFakes => {
-  if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    if (
-      cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
-      deckDefinition.robot.model === FLEX_ROBOT_TYPE
-    ) {
-      return FAKE_STAGING_AREA_RIGHT_SLOT
-    } else if (
-      cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE &&
-      deckDefinition.robot.model === FLEX_ROBOT_TYPE
-    ) {
-      return FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE
-    } else if (cutoutFixtureId === MAGNETIC_BLOCK_V1) {
-      return 'fakeStagingSlotWithMagBlockV1'
-    }
-  }
-  return cutoutFixtureId
-}
-
-export const getReplacementFixtureForFixtureRemoval = (
-  cutoutFixtureId: CutoutFixtureIdsWithFakes,
-  cutoutId: CutoutId,
-  addressableAreaId?: AddressableAreaNamesWithFakes // nullable for PD
-): CutoutFixtureId => {
-  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (addressableAreaId && SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    const cutoutFixtureReplacment = replaceCutoutFixtureForFixtureRemoval(
-      cutoutFixtureId,
-      cutoutId,
-      addressableAreaId
-    )
-    return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
-  } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-    return SINGLE_LEFT_SLOT_FIXTURE
-  }
-  return SINGLE_CENTER_SLOT_FIXTURE
-}
-
-/**
- * Given a fake cutout fixutre find a replacment to store on the server
- * @param cutoutFixtureId: a cutoutId we wish to replace with a non fake fixture
- * @returns the relevant cutoutFixtureId to store on the server
- */
-export const getReplacementFixtureForFakeFixture = (
-  cutoutFixtureId: CutoutFixtureIdsWithFakes
-): CutoutFixtureId => {
-  if (cutoutFixtureId === FAKE_STAGING_AREA_RIGHT_SLOT) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  }
-  if (cutoutFixtureId === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE) {
-    return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-  }
-  if (cutoutFixtureId === FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE) {
-    return MAGNETIC_BLOCK_V1
-  }
-  return cutoutFixtureId
-}
-/**
- * Given a list of cutout configs replace fixtures with their fake fixtures
- * @param: a list of cutout config from the server
- * @returns: a list of cutout config with relevant AA
- */
-export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
-  cutoutFixtures: CutoutConfig[]
-): CutoutConfigMap[] => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
-    const cutoutFixtureReplacment = getCutoutFixtureReplacementIfNeeded(
-      obj.cutoutFixtureId,
-      obj.cutoutId,
-      deckDef
-    )
-    const aaPerCutoutFixture = getAAWithFakesFromCutoutFixtureId(
-      obj.cutoutId,
-      cutoutFixtureReplacment ?? obj.cutoutFixtureId,
-      deckDef
-    )
-
-    if (WASTE_CHUTE_FIXTURES.includes(obj.cutoutFixtureId)) {
-      acc.push({
-        ...obj,
-        addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
-        cutoutFixtureId: cutoutFixtureReplacment,
-      })
-      const otherWasteChuteAA = aaPerCutoutFixture?.find(
-        aa => getAAByAAId(aa, deckDef).areaType !== 'wasteChute'
-      )
-      if (otherWasteChuteAA != null) {
-        acc.push({
-          ...obj,
-          addressableAreaId: otherWasteChuteAA,
-          cutoutFixtureId: cutoutFixtureReplacment,
-        })
-      }
-    } else if (obj.cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE) {
-      const absorbanceReaderAA = aaPerCutoutFixture?.find(
-        aa => getAAByAAId(aa, deckDef).areaType === 'absorbanceReader'
-      )
-      if (absorbanceReaderAA != null) {
-        acc.push({
-          ...obj,
-          addressableAreaId: absorbanceReaderAA,
-          cutoutFixtureId: cutoutFixtureReplacment,
-        })
-      }
-    } else {
-      aaPerCutoutFixture?.forEach(item => {
-        acc.push({
-          ...obj,
-          addressableAreaId: item,
-          cutoutFixtureId: cutoutFixtureReplacment,
-        })
-      })
-    }
-    return acc
-  }, [])
-}
 
 //#endregion
 
@@ -1587,68 +1460,6 @@ export const replaceCutoutFixtureWithComboFixture = (
     }
   })
 }
-
-/**
- * Given a cutout fixture to remove find what fixture to use instead
- * @param cutoutFixtureRemoved: fixtures to remove
- * @param cutoutId
- * @param addressableAreaId to remove from fixture
- * @returns fixture to replace with
- */
-export const replaceCutoutFixtureForFixtureRemoval = (
-  cutoutFixtureRemoved: CutoutFixtureIdsWithFakes,
-  cutoutId: CutoutId,
-  addressableAreaId: AddressableAreaNamesWithFakes
-): CutoutFixtureIdsWithFakes => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const aaPerFixtureOptions = getAAsToFixtureIdFromDeckDefWithFakes(
-    cutoutId,
-    deckDef
-  )
-  const aaForFixtureRemoval = getAAWithFakesFromCutoutFixtureId(
-    cutoutId,
-    cutoutFixtureRemoved,
-    deckDef
-  )
-  if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
-    if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
-      return WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)
-        ? FLEX_STACKER_V1_FIXTURE
-        : SINGLE_RIGHT_SLOT_FIXTURE
-    } else {
-      return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-    }
-  } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (cutoutFixtureRemoved === FLEX_STACKER_V1_FIXTURE) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (cutoutFixtureRemoved === FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE) {
-    if (getAAByAAId(addressableAreaId, deckDef).areaType === 'flexStacker') {
-      return FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE
-    } else {
-      return FLEX_STACKER_V1_FIXTURE
-    }
-  } else {
-    const updated = aaForFixtureRemoval?.map(aa => {
-      const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-      return aa === addressableAreaId ? getAAWithFakesFromVSId(vsId) : aa
-    })
-    const match = Object.entries(aaPerFixtureOptions).find(([, value]) => {
-      return isEqual(
-        value.sort(),
-        WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)
-          ? aaForFixtureRemoval?.sort()
-          : updated?.sort()
-      )
-    })
-    if (match) {
-      return match[0] as CutoutFixtureIdsWithFakes
-    }
-    // Fallback if no match found
-    return cutoutFixtureRemoved
-  }
-}
-
 /**
  * Check if a flex stacker module can be placed in the D3 cutout with waste chute compatibility
  * @param deckConfigCompatibility: array of deck configuration compatibility items
