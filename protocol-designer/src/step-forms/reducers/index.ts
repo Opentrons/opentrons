@@ -1103,7 +1103,7 @@ export const labwareInvariantProperties: Reducer<
     ) => {
       const { payload } = action
       const { labwareDefURI, id, displayCategory } = payload
-      
+
       const categoryLength = Object.values(state).filter(
         labware => labware.displayCategory === displayCategory
       ).length
@@ -1700,10 +1700,8 @@ export const stackerLabwareReducer = (
 ): StackerLabwareState => {
   switch (action.type) {
     case 'STACKER_LABWARE_CREATION_START':
-      console.log('hit start')
       return { ...state, pendingCreation: true }
     case 'STACKER_LABWARE_CREATION_FINISH':
-      console.log('hit finish')
       return { ...state, pendingCreation: false }
     default:
       return state
@@ -1770,6 +1768,9 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
       prevStateFallback.deckConfiguration,
       action
     ),
-    stackerLabwareReducer: stackerLabwareReducer(prevStateFallback.stackerLabwareReducer, action)
+    stackerLabwareReducer: stackerLabwareReducer(
+      prevStateFallback.stackerLabwareReducer,
+      action
+    ),
   })
 )

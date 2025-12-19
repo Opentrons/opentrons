@@ -25,7 +25,7 @@ import {
 
 import { OFFDECK } from '../../constants'
 import { selectors as fileDataSelectors } from '../../file-data'
-import { getRobotStateTimeline, getRobotType } from '../../file-data/selectors'
+import { getRobotType } from '../../file-data/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getAdditionalEquipmentEntities,
@@ -337,7 +337,7 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
     }
   )
 
-  export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> =
+export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelineFrame> =
   createSelector(
     getRobotStateAtActiveItem,
     getInitialDeckSetup,
@@ -352,25 +352,6 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
           additionalEquipmentOnDeck: {},
         }
       const { pipettes, modules, additionalEquipmentOnDeck } = initialDeckSetup
-      
-      // Find which step created the labware in fill queues
-      // const stepIndex = stepsInOrder.findIndex(s => s === currentStepId)
-      
-      // // Get all labware IDs that shouldn't exist yet at this step
-      // const futureLabwareIds = new Set<string>()
-      // stepsInOrder.forEach((step, idx) => {
-      //   // Only look at steps AFTER current step
-      //   if (idx > stepIndex && savedStepForms[step].stepType === 'flexStacker' && savedStepForms[step].flexStackerFormType === 'fill') {
-      //     const moduleId = savedStepForms[step].moduleId
-      //     const test = timeline.timeline.
-      //     // Get the fill queue from this future step
-      //     const futureQueue = step.moduleStateUpdate?.[step.moduleId]?.labwareFillQueue || []
-      //     futureQueue.forEach((item: string) => {
-      //       const [labwareId] = item.split(':')
-      //       futureLabwareIds.add(labwareId)
-      //     })
-      //   }
-      // })
 
       return {
         pipettes: mapValues(pipettes, (pipEntity, pipId) => ({
@@ -378,12 +359,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
           ...robotState.pipettes[pipId],
         })),
         labware: mapValues(labwareEntities, (lwEntity, lwId) => ({
-            ...lwEntity,
-            ...robotState.labware[lwId],
+          ...lwEntity,
+          ...robotState.labware[lwId],
         })),
         modules: mapValues(modules, (modEntity, modId) => ({
-            ...modEntity,
-            ...robotState.modules[modId],
+          ...modEntity,
+          ...robotState.modules[modId],
         })),
         additionalEquipmentOnDeck: mapValues(
           additionalEquipmentOnDeck,
@@ -394,4 +375,3 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
       }
     }
   )
-  

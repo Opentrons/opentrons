@@ -22,7 +22,6 @@ import type {
   FlexStackerStoredLabwareGroup,
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
-import { current } from 'immer'
 
 export const forFlexStackerEmpty = (
   params: FlexStackerEmptyCreateCommand['params'],
@@ -166,7 +165,6 @@ export const forFlexStackerFillItems = (
   
   moduleState.labwareInHopper = merged
   moduleState.labwareFillQueue = null
-  console.log('moduleState from stackerFill', current(moduleState))
 }
 
 
@@ -234,8 +232,6 @@ export const forFlexStackerRetrieve = (
   const { moduleId } = params
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   const moduleSlot = robotState.modules[moduleId].slot
-  console.log('moduleState from stackerRetireve before', current(moduleState))
-  console.log('robotState.labware from stackerRetireve before', current(robotState.labware))
   if (moduleState != null) {
     const { labwareInHopper, labwareOnShuttle } = moduleState
     if (
@@ -263,9 +259,6 @@ export const forFlexStackerRetrieve = (
       }
     }
   }
-  console.log('robotState.labware from stackerRetireve after', current(robotState.labware))
-  console.log('moduleState from stackerRetireve after', current(moduleState))
-
 }
 
 export const forFlexStackerStore = (

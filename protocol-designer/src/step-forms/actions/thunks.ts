@@ -1,4 +1,5 @@
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+import { FlexStackerModuleState } from '@opentrons/step-generation'
 
 import { stackerLabwareCreationFinish, stackerLabwareCreationStart } from '.'
 import { createContainer } from '../../labware-ingred/actions'
@@ -26,7 +27,6 @@ import type {
   CreateModuleAction,
   UpdateStackerModuleStateAction,
 } from './modules'
-import { FlexStackerModuleState } from '@opentrons/step-generation'
 
 export interface CreateContainerAboveModuleArgs {
   slot: DeckSlotId
@@ -222,7 +222,7 @@ export const createModuleEntityAndChangeForm: (
   }
 
 interface CreateLabwareAndQueueForHopperArgs {
-  fill: string[] 
+  fill: string[]
   moduleId: string
 }
 
@@ -257,36 +257,3 @@ export const createLabwareAndQueueForHopper =
 
     dispatch(stackerLabwareCreationFinish())
   }
-
-
-
-      //   const stackerModuleState =  module.moduleState as FlexStackerModuleState
-    //   const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
-    //   stackerModuleState.storedLabwareDetails ?? {}
-
-    // const urisBottomUp = [
-    //   ...(adapterLabwareURI != null ? [adapterLabwareURI] : []),
-    //   ...(primaryLabwareURI != null ? [primaryLabwareURI] : []),
-    //   ...(lidLabwareURI != null ? [lidLabwareURI] : []),
-    // ]
-
-    //   const runningQueue: string[] = []
-    //   const containerPromises: Promise<any>[] = []
-
-        // for (let i = 0; i < fillAmount; i++) {
-      //   for (const uri of urisBottomUp) {
-      //     const labwareUuid = uuid()
-      //     containerPromises.push(
-      //       dispatch(
-      //         createContainer({
-      //           labwareDefURIStack: [uri],
-      //           slot: 'offDeck',
-      //           uuids: [labwareUuid],
-      //         })
-      //       )
-      //     )
-      //     runningQueue.push(`${labwareUuid}:${uri}`)
-      //   }
-      // }
-
-      // await Promise.all(containerPromises)

@@ -479,7 +479,7 @@ export const hydrateField = (
   value: string,
   allLabwareDefs: LabwareDefByDefURI
 ): unknown => {
-const hydrator =
+  const hydrator =
     // @ts-expect-error - TS doesn't want to let us index stepFieldHelperMap with a
     // name that it doesn't necessarily contain. It's OK here because it'll just
     // return undefined in the worst case, which this line handles.

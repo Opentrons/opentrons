@@ -49,7 +49,6 @@ import {
   getCurrentFormIsPresaved,
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
-  getInitialDeckSetup,
   getInvariantContext,
   getModuleEntities,
   getSavedStepForms,
@@ -96,7 +95,6 @@ import type {
 } from '/protocol-designer/form-types'
 import type { FormWarningType } from '/protocol-designer/steplist'
 import type { StepFieldName } from '/protocol-designer/steplist/fieldLevel'
-import type { ThunkDispatch } from '/protocol-designer/types'
 import type { FocusHandlers, LiquidHandlingTab, StepFormProps } from './types'
 
 type StepFormMap = {
@@ -155,7 +153,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     'protocol_steps',
     'tooltip',
   ])
-  const dispatch = useDispatch<ThunkDispatch<any>>()
+  const dispatch = useDispatch()
   const { makeSnackbar } = useKitchen()
   const toolsComponentRef = useRef<HTMLDivElement | null>(null)
   const [analyticsStartTime] = useState<Date>(new Date())
@@ -166,6 +164,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     const maskedValue = maskField(name, value)
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }
+  
   const { pipetteEntities } = useSelector(getInvariantContext)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities

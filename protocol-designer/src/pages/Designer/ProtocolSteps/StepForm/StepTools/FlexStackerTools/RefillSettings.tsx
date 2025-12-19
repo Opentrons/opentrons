@@ -38,6 +38,8 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   const storedEntityName = storedEntity?.def.metadata.displayName
   const isTiprack = storedEntity != null && getIsTiprack(storedEntity.def)
 
+  // TODO: figure out a way to not need this use Effect. its hard because
+  // you can't rely on generating the uuid in the hydrated form
   useEffect(() => {
     if (!storedEntity?.labwareDefURI || fillQuantityLocalState == null) return
 

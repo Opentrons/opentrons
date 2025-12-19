@@ -20,6 +20,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -70,7 +71,6 @@ import type {
   ModuleOnDeck,
 } from '../../../step-forms'
 import type { DeckSetupTerminalIdType } from '../types'
-import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
 interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   activeDeckSetup: InitialDeckSetup
@@ -150,7 +150,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       deckSetup: activeDeckSetup,
       slot: selectedZoomInSlot ?? '',
       deckDef,
-      pendingCreationStateForHopper
+      pendingCreationStateForHopper,
     })
   }, [activeDeckSetup, selectedZoomInSlot])
 
@@ -182,8 +182,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     selectedZoomInSlot,
   ])
 
-  const allLabware = pendingCreationStateForHopper ? [] : Object.values(activeLabware)
-
+  const allLabware = pendingCreationStateForHopper
+    ? []
+    : Object.values(activeLabware)
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =
