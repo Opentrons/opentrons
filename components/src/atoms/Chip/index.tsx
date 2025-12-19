@@ -112,14 +112,19 @@ export function Chip(props: ChipProps): JSX.Element {
   return (
     <Flex
       alignItems={ALIGN_CENTER}
-      backgroundColor={backgroundColor}
       borderRadius={chipProps.borderRadius}
       flexDirection={DIRECTION_ROW}
       height={FLEX_MAX_CONTENT}
       css={css`
+        background-color: ${background === false
+          ? COLORS.transparent
+          : chipProps.backgroundColor30};
+
         ${chipSize === 'medium'
           ? MEDIUM_CONTAINER_STYLE(background)
           : SMALL_CONTAINER_STYLE(background)}
+
+        /* touchscreen */
         ${background !== false ? BACKGROUND_COLOR_STYLE(type) : ''}
       `}
       data-testid={`Chip_${type}`}
