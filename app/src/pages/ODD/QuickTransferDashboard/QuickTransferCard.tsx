@@ -209,13 +209,16 @@ export function QuickTransferCard(props: {
               size="1.5rem"
               aria-label="failedAnalysis_icon"
             />
-            <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+            <LegacyStyledText
+              forwardedAs="p"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+            >
               {i18n.format(t('failed_analysis'), 'capitalize')}
             </LegacyStyledText>
           </Flex>
         ) : null}
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           opacity={isPendingAnalysis ? 0.7 : 1}
         >
@@ -223,7 +226,7 @@ export function QuickTransferCard(props: {
         </LegacyStyledText>
       </Flex>
       <Flex width="12.5rem" whiteSpace={NO_WRAP}>
-        <LegacyStyledText as="p" color={COLORS.grey60}>
+        <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
           {formatTimeWithUtcLabel(quickTransfer.createdAt)}
         </LegacyStyledText>
         {longpress.isLongPressed && !isFailedAnalysis && (
@@ -259,7 +262,7 @@ export function QuickTransferCard(props: {
                   components={{
                     block: (
                       <LegacyStyledText
-                        as="p"
+                        forwardedAs="p"
                         css={css`
                           display: -webkit-box;
                           -webkit-box-orient: vertical;
@@ -274,7 +277,7 @@ export function QuickTransferCard(props: {
                   }}
                 />
 
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {t('branded:delete_transfer_from_app')}
                 </LegacyStyledText>
               </Flex>

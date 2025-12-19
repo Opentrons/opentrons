@@ -35,7 +35,7 @@ export function ReadMoreContent({
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing16}>
       {isReadMore ? (
-        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+        <LegacyStyledText forwardedAs="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {description.slice(0, 160)}
         </LegacyStyledText>
       ) : (

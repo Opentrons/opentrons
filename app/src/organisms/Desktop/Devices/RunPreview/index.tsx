@@ -138,14 +138,17 @@ export const RunPreviewComponent = (
     >
       <>
         <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('run_preview')}
           </LegacyStyledText>
-          <LegacyStyledText as="label" color={COLORS.grey50}>
+          <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
             {t('steps_total', { count: commands.length })}
           </LegacyStyledText>
         </Flex>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('preview_of_protocol_steps')}
         </LegacyStyledText>
         <Divider marginX={`calc(-1 * ${SPACING.spacing16})`} />
@@ -228,7 +231,7 @@ export const RunPreviewComponent = (
           </PrimaryButton>
         ) : null}
         {currentRunCommandIndex === commands.length - 1 ? (
-          <LegacyStyledText as="h6" color={COLORS.grey60}>
+          <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
             {t('end_of_protocol')}
           </LegacyStyledText>
         ) : null}

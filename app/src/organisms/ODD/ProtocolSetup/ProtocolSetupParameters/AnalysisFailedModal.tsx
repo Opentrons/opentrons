@@ -60,7 +60,7 @@ export function AnalysisFailedModal({
         width="100%"
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('with_the_chosen_value')}
           </LegacyStyledText>
           <Flex
@@ -71,12 +71,12 @@ export function AnalysisFailedModal({
             overflowY="auto"
           >
             {errors.map((error, index) => (
-              <LegacyStyledText key={index} as="p">
+              <LegacyStyledText key={index} forwardedAs="p">
                 {error}
               </LegacyStyledText>
             ))}
           </Flex>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('restart_setup_and_try')}
           </LegacyStyledText>
         </Flex>

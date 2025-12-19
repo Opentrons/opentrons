@@ -28,7 +28,7 @@ export function ProtocolPlayPauseHeader({
   return (
     <div className={styles.container}>
       <div className={styles.status_info}>
-        <LegacyStyledText as="h4" className={styles.status_text}>
+        <LegacyStyledText forwardedAs="h4" className={styles.status_text}>
           {currentRunStatus}
         </LegacyStyledText>
         <LegacyStyledText className={styles.title_text}>
