@@ -55,7 +55,7 @@ setup: setup-js setup-py
 
 # front-end dependencies handled by pnpm
 .PHONY: setup-js
-setup-js: setup-py-toolchain
+setup-js:
 	pnpm config set network-timeout 60000
 	pnpm install
 
