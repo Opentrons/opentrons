@@ -15,7 +15,7 @@ This section covers module tasks and explains how to run multiple module actions
 
 ## Module tasks
 
-When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [Task](opentrons.protocol_api.task) that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the targe temperature or completes another action. 
+When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`task`](opentrons.protocol_api.task) that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the targe temperature or completes another action. 
 
 <table>
     <thead>
@@ -39,107 +39,79 @@ When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protoc
         </tr>
         <tr>
             <td>
-                <img src="../img/lc_icons/delay_after_submerge.png">
-                <p><strong>Delay after submerging</strong></p>
+                Thermocycler Module
             </td>
-            <td>
-                <p>The pipette delays a specified amount of time:</p>
-                <ul>
-                    <li>before submerging into or retracting from liquid.</li>
-                    <li>before or after an aspirate or dispense.</li>
-                    <li>after a push out.</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/mix.png">
-                <p><strong>Mix liquid</strong></p>
-            </td>
-            <td>The pipette mixes liquid inside the well before an aspirate or after a dispense.</td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/prewet_tip.png">
-                <p><strong>Pre-wet tip</strong></p>
-            </td>
-            <td>The pipette pre-wets the attached tip before aspirating liquid.</td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/flow_rate_aspirate.png">
-                <p><strong>Aspirate flow rate</strong></p>
-            </td>
-            <td>
-                <ul>
-                    <li>The pipette aspirates liquid at this speed.</li>
-                    <li>Varies by volume.</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/flow_rate_dispense.png">
-                <p><strong>Dispense flow rate</strong></p>
-            </td>
-            <td>
-                <ul>
-                    <li>The pipette dispenses liquid at this speed.</li>
-                    <li>Varies by volume.</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/retract_position.png">
-                <p><strong>Retract position</strong></p>
-            </td>
-            <td>The pipette retracts from the liquid and moves to this position.</td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/retract_speed.png">
-                <p><strong>Retract speed</strong></p>
-            </td>
-            <td>The pipette retracts from the liquid at the specified speed.</td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/push_out.png">
-                <p><strong>Push out</strong></p>
-            </td>
-            <td>
-                <ul>
-                    <li>The pipette dispenses a small amount of air to ensure all liquid leaves the tip.</li>
-                    <li>Varies by volume.</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/touch_tip.png">
-                <p><strong>Touch tip</strong></p>
-            </td>
-            <td>The pipette touches the attached tip to the sides of a well to remove droplets.</td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/air_gap.png">
-                <p><strong>Air gap</strong></p>
-            </td>
-            <td>
-                <ul>
-                    <li>The pipette aspirates a small amount of air after an aspirate or dispense.</li>
-                    <li>Varies by volume.</li>
-                </ul>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <img src="../img/lc_icons/blow_out.png">
-                <p><strong>Blow out</strong></p>
-            </td>
-            <td>The pipette dispenses a larger amount of air to ensure all liquid leaves the tip.</td>
+            <td><li><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature"><code>start_set_lid_temperature()</code></a><li><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature"><code>start_set_block_temperature()</code></a><li><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_execute_profile"><code>start_execute_profile()</code></a></li></td>
         </tr>
     </tbody>
 </table>
+
+Your protocol can include multiple module tasks that run parallel to one another. The example below has the API create two tasks: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps. 
+
+```python
+temp_mod.start_set_temperature(celsius=4)
+
+profile = [
+    {"temperature":95, "hold_time_seconds":30},
+    {"temperature":57, "hold_time_seconds":30},
+    {"temperature":72, "hold_time_seconds":60}
+]
+tc_mod.start_execute_profile(
+    steps=profile,
+    repetitions=20,
+    block_max_volume=32
+)
+
+pipette.pick_up_tip()
+pipette.aspirate(50, plate["A1"])
+pipette.dispense(50, plate["B1"])
+pipette.drop_tip()
+
+```
+
+Although tasks are created when you use concurrent commands like [`TemperatureModuleContext.start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature] or [`ThermocyclerContext.start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile], there's no need to wait for either task to finish. Here, the robot can continue pipetting while the Temperature Module cools and the Thermocycler profile runs.
+
+## Timing module tasks
+
+Sometimes, the amount of time it takes for a module to finish a task is still important to your protocol. You might need to wait for samples on the Temperature Module to reach a target temperature before moving to the next step. The example below combines a concurrent module command with [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] to prevent the Flex Gripper from moving a plate until the target temperature is reached: 
+
+```python
+temp_adapter = temp_mod.load_adapter("opentrons_96_well_aluminum_block")
+temp_plate = temp_adapter.load_labware("nest_96_wellplate_100ul_pcr_full_skirt")
+heat_task = temp_mod.start_set_temperature(75)
+protocol.wait_for_tasks([heat_task])
+protocol.move_labware(labware=temp_plate, new_location="D3", use_gripper="True")
+```
+
+Let's say your samples have to both reach a target temperature and incubate for a specific amount of time. The example below uses concurrent commands to heat and shake samples, and [`create_timer`][opentrons.protocol_api.ProtocolContext.create_timer] to set an incubation time. 
+
+```python
+
+# set Heater-Shaker temperature and shake speed
+heat_task = hs_mod.start_set_temperature(75)
+hs_mod.set_shake_speed(300)
+
+# wait for module to finish heating
+protocol.wait_for_tasks([heat_task])
+
+# create timer for sample incubation
+hs_timer = create_timer(seconds=300)
+
+# hold samples at target temperature
+protocol.wait_for_tasks([hs_timer])
+hs_mod.deactivate_heater()
+```
+
+Here, the Heater-Shaker Module will heat and shake samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Because the Heater-Shaker could take longer than 5 minutes to reach the target temperature, `wait_for_tasks` ensures the timer starts only after the target temperature is reached. 
+
+!!! note
+    Using the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] method to wait for multiple of the same task on the same module will cause the API to raise an error. For example, if you need to heat a Temperature Module to two separate target temperatures, use [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] twice: 
+
+    ```python
+    heat_task_1 = temp_mod.start_set_temperature(55)
+    protocol.wait_for_tasks([heat_task_1])
+
+    heat_task_2 = temp_mod.start_set_temperature(75)
+    protocol.wait_for_tasks([heat_task_2])
+    ```
+

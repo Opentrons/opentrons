@@ -17,8 +17,8 @@ nav:
       - Magnetic Module: modules/magnetic-module.md
       - Temperature Module: modules/temperature-module.md
       - Thermocycler Module: modules/thermocycler.md
-      - Concurrent Module: modules/concurrent-module.md
-      - Multiple Modules of the Same Type: modules/multiple-same-type.md
+      - Concurrent Module Actions: modules/concurrent-module.md
+      - Loading Multiple Modules of the Same Type: modules/multiple-same-type.md
   - Deck Slots: deck-slots.md
   - Pipettes:
       - Pipettes: pipettes/index.md
