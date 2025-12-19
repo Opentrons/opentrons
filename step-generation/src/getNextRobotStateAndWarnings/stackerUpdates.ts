@@ -164,7 +164,6 @@ export const forFlexStackerFillItems = (
   }
   
   moduleState.labwareInHopper = merged
-  moduleState.labwareFillQueue = null
 }
 
 

@@ -112,7 +112,6 @@ describe('flexStackerFillItems', () => {
         adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareFillQueue: null,
     })
   })
   it('creates flex stacker fill command with 1 labware', () => {
@@ -135,7 +134,7 @@ describe('flexStackerFillItems', () => {
         commandCreatorFnName: 'flexStackerFillItems',
         interventionMessage: null,
         fillLabwareUri: 'mockURI',
-        fillQuantity: 1,
+        fill: [labwareId],
       },
       invariantContext,
       robotState
@@ -164,7 +163,7 @@ mock_flex_stacker_1.fill_items(
         commandCreatorFnName: 'flexStackerFillItems',
         interventionMessage: 'a fill message',
         fillLabwareUri: 'mockURI',
-        fillQuantity: 5,
+        fill: [labwareId, labwareId2, labwareId3, labwareId4, labwareId5],
       },
       invariantContext,
       robotState
@@ -310,7 +309,6 @@ mock_flex_stacker_1.fill_items(
         adapterLabwareURI: null,
       },
       type: FLEX_STACKER_MODULE_TYPE,
-      labwareFillQueue: null,
     })
     const result = flexStackerFillItems(
       {
@@ -318,7 +316,7 @@ mock_flex_stacker_1.fill_items(
         interventionMessage: null,
         commandCreatorFnName: 'flexStackerFillItems',
         fillLabwareUri: 'mockURI',
-        fillQuantity: 1,
+        fill: ['tiprack1Id'],
       },
       invariantContext,
       robotState
