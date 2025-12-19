@@ -32,7 +32,14 @@ export function PipetteContainer({
         <StyledText desktopStyle="captionRegular">
           {pipetteDisplayName}
         </StyledText>
-        {selected ? <Chip text={t('active')} type="success" /> : null}
+        {selected ? (
+          <Chip
+            text={t('active')}
+            type="success"
+            iconName="circle"
+            chipSize="small"
+          />
+        ) : null}
       </div>
     </div>
   )

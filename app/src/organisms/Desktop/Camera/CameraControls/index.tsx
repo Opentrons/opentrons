@@ -27,6 +27,7 @@ import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/
 
 export interface CameraControlsProps {
   onClose: () => void
+  runId: string | null
   postCameraImageSettings: UseMutateFunction<
     CameraImageSettingsResponse,
     AxiosError,
@@ -37,6 +38,7 @@ export interface CameraControlsProps {
 export function CameraControls({
   onClose,
   postCameraImageSettings,
+  runId,
 }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const settings = useCameraSettingsValues()
@@ -60,17 +62,19 @@ export function CameraControls({
       }
     )
   }
-
   return (
     <Modal onClose={onClose} title={t('camera_controls')} width="46rem">
       <div className={styles.container}>
         <div className={styles.content_container}>
           <CameraControlSettings settings={settings} />
           <PreviewSettings
-            zoom={settings.zoom}
-            brightness={settings.brightness}
-            contrast={settings.contrast}
-            saturation={settings.saturation}
+            settings={{
+              zoom: settings.zoom,
+              brightness: settings.brightness,
+              contrast: settings.contrast,
+              saturation: settings.saturation,
+            }}
+            runId={runId}
           />
         </div>
         <div className={styles.footer_container}>

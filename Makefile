@@ -53,26 +53,16 @@ usb_host=$(shell pnpm -s discovery find -i 169.254)
 .PHONY: setup
 setup: setup-js setup-py
 
-# Both the python and JS setup targets depend on a minimal python setup so they can create
-# virtual envs using pipenv.
-.PHONY: setup-py-toolchain
-setup-py-toolchain:
-	$(OT_PYTHON) -m pip install --upgrade pip
-	$(OT_PYTHON) -m pip install pipenv==2025.0.4
-
-# front-end dependecies handled by pnpm
+# front-end dependencies handled by pnpm
 .PHONY: setup-js
-setup-js:
 setup-js: setup-py-toolchain
 	pnpm config set network-timeout 60000
 	pnpm install
-	$(MAKE) -C $(APP_SHELL_DIR) setup
-	$(MAKE) -C $(APP_SHELL_ODD_DIR) setup
 
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
 .PHONY: setup-py
-setup-py: setup-py-toolchain
+setup-py:
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 %-py-setup:

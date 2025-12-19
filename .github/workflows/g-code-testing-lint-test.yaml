@@ -60,10 +60,7 @@ jobs:
           script: |
             const { buildComplexEnvVars } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.12'
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'g-code-testing'
       - name: 'cache pnpm cache'

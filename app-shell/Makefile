@@ -62,22 +62,26 @@ builder := pnpm electron-builder \
 	--config.electronVersion=39.1.2 \
 	--publish never
 
+# Resolve the API python interpreter lazily so `make setup` (and other targets
+# that do not actually launch Electron) do not spin up the uv environment at
+# parse time. The $$() command substitution runs when the recipe executes.
+PYTHON_OVERRIDE_COMMAND = cd ../api && uv run --python 3.10 python -c "import sys, pathlib; print(pathlib.Path(sys.executable).resolve())"
 
-electron := pnpm electron . \
+electron = pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="http:" \
 	--ui.url.path="localhost:$(PORT)" \
-	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
+	--python.pathToPythonOverride=$$($(PYTHON_OVERRIDE_COMMAND))
 
-electron-dist := pnpm electron . \
+electron-dist = pnpm electron . \
 	--devtools \
 	--log.level.console="debug" \
 	--disable_ui.webPreferences.webSecurity \
 	--ui.url.protocol="file:" \
-	--ui.url.path="$(ui_dir)/dist/index.html"
-	--python.pathToPythonOverride=$(shell cd ../api && pipenv --venv)
+	--ui.url.path="$(ui_dir)/dist/index.html" \
+	--python.pathToPythonOverride=$$($(PYTHON_OVERRIDE_COMMAND))
 
 
 # standard targets
