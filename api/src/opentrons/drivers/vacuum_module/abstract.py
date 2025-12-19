@@ -26,29 +26,30 @@ class AbstractVacuumModuleDriver(Protocol):
         """Set Serial Number."""
         ...
 
-    async def enable_pump(self) -> None:
-        """Enable the vacuum pump."""
+    async def enter_programming_mode(self) -> None:
+        """Reboot into programming mode"""
         ...
 
-    async def disable_pump(self) -> None:
-        """Disable the vacuum pump."""
+    async def reset_serial_buffers(self) -> None:
+        """Reset the input and output serial buffers."""
         ...
 
-    async def get_pump_motor_register(self) -> None:
-        """Get the register value of the pump motor driver."""
-        ...
-
-    async def get_pressure_sensor_register(self) -> None:
-        """Get the register value of the pressure sensor driver."""
-        ...
-
-    async def get_pressure_sensor_reading_psi(self) -> float:
-        """Get a reading from the pressure sensor."""
-        ...
-
-    async def set_vacuum_pressure(
+    async def set_led(
         self,
-        guage_pressure_mbar: float,
+        power: float,
+        color: Optional[LEDColor] = None,
+        external: Optional[bool] = None,
+        pattern: Optional[LEDPattern] = None,
+        duration: Optional[int] = None,  # Default firmware duration is 500ms
+        reps: Optional[int] = None,  # Default firmware reps is 0
+    ) -> None:
+        """Set LED Status bar color and pattern."""
+        ...
+
+    async def set_vacuum_state(
+        self,
+        enable_vacuum: bool,
+        guage_pressure_mbar: Optional[float],
         duration: Optional[int],
         rate: Optional[float],
         vent_after: Optional[bool],
@@ -56,7 +57,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
 
-    async def get_pressure_state(self) -> PressureState:
+    async def get_vacuum_state(self) -> PressureState:
         """Get the pressure state."""
         ...
 
@@ -73,39 +74,6 @@ class AbstractVacuumModuleDriver(Protocol):
         """Get the pump state."""
         ...
 
-    async def get_guage_pressure_reading_mbar(self) -> float:
-        """Read each pressure sensor and return the pressure difference."""
-        return 0.0
-
-    # TODO: change pump power to be more specific when we find out how were gonna operate that
-    async def engage_vacuum(self, pump_power: Optional[float] = None) -> None:
-        """Engage the vacuum without regard to chamber pressure."""
-        ...
-
-    async def disengage_vacuum_pump(self) -> None:
-        """Stops the vacuum pump, doesn't vent air or disable the motor."""
-        ...
-
-    async def vent(self, open: bool) -> None:
+    async def set_vent_state(self, state: bool) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
-        ...
-
-    async def set_led(
-        self,
-        power: float,
-        color: Optional[LEDColor] = None,
-        external: Optional[bool] = None,
-        pattern: Optional[LEDPattern] = None,
-        duration: Optional[int] = None,  # Default firmware duration is 500ms
-        reps: Optional[int] = None,  # Default firmware reps is 0
-    ) -> None:
-        """Set LED Status bar color and pattern."""
-        ...
-
-    async def enter_programming_mode(self) -> None:
-        """Reboot into programming mode"""
-        ...
-
-    async def reset_serial_buffers(self) -> None:
-        """Reset the input and output serial buffers."""
         ...

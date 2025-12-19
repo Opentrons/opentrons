@@ -102,6 +102,7 @@ class PressureState:
     pressure_abs_a: float
     pressure_abs_b: float
     pressure_atm: float
+    vacuum_enabled: bool
     vent_state: VentState
 
 

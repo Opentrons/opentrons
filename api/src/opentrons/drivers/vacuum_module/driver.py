@@ -33,6 +33,7 @@ MAX_REPS = 10
 MAX_PUMP_RPM = 3500
 MAX_PUMP_DUTY = 90
 MAX_RAMP_RATE = 10.0  # mbar/s
+MAX_PRESSURE_MBAR = 1013.25
 
 
 class VacuumModuleDriver(AbstractVacuumModuleDriver):
@@ -63,7 +64,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_state(cls, response: str) -> PressureState:
         """Parse the get pressure state."""
-        pattern = r"T:(?P<T>\d.+) C:(?P<C>\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) V:(?P<V>\d)"
+        pattern = r"T:(?P<T>\d.+) C:(?P<C>\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) V:(?P<V>\d)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -74,6 +75,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("A")),
             float(match.group("B")),
             float(match.group("H")),
+            bool(match.group("E")),
             VentState(int(match.group("V"))),
         )
 
@@ -207,42 +209,26 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not re.match(rf"^{GCODE.SET_LED}$", resp):
             raise ValueError(f"Incorrect Response for set led: {resp}")
 
-    async def enable_pump(self) -> None:
-        """Enables the vacuum pump, does not turn it on."""
-        ...
-
-    async def disable_pump(self) -> None:
-        """Disable the vacuum pump, doesn't just turn it off."""
-        ...
-
-    async def get_pump_motor_register(self) -> None:
-        """Get the register value of the pump motor driver."""
-        ...
-
-    async def get_pressure_sensor_register(self) -> None:
-        """Get the register value of the pressure sensor driver."""
-        ...
-
-    async def get_pressure_sensor_reading_psi(self) -> float:
-        """Get a reading from the pressure sensor."""
-        return 0.0
-
-    async def get_gage_pressure_reading_mbarg(self) -> float:
-        """Read each pressure sensor and return the pressure difference."""
-        return 0.0
-
-    async def set_vacuum_pressure(
+    async def set_vacuum_state(
         self,
-        guage_pressure_mbar: float,
+        enable_vacuum: bool,
+        guage_pressure_mbar: Optional[float],
         duration: Optional[int],
         rate: Optional[float],
         vent_after: Optional[bool],
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
 
-        command = GCODE.SET_PRESSURE_STATE.build_command().add_float(
-            "P", guage_pressure_mbar, GCODE_ROUNDING_PRECISION
+        command = GCODE.SET_PRESSURE_STATE.build_command().add_int(
+            "S", int(enable_vacuum)
         )
+
+        if guage_pressure_mbar is not None:
+            command.add_float(
+                "P",
+                max(0, min(guage_pressure_mbar, MAX_PRESSURE_MBAR)),
+                GCODE_ROUNDING_PRECISION,
+            )
         if duration is not None:
             command.add_int("D", duration)
         if rate is not None:
@@ -253,7 +239,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if not re.match(rf"^{GCODE.SET_PRESSURE_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pressure state: {resp}")
 
-    async def get_pressure_state(self) -> PressureState:
+    async def get_vacuum_state(self) -> PressureState:
         """Get the pressure state."""
         resp = await self._connection.send_command(
             GCODE.GET_PRESSURE_STATE.build_command()
@@ -286,20 +272,11 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         resp = await self._connection.send_command(GCODE.GET_PUMP_STATE.build_command())
         return self.parse_get_pump_state(resp)
 
-    # TODO: change pump power to be more specific when we find out how were gonna operate that
-    async def engage_vacuum(self, pump_power: Optional[float] = None) -> None:
-        """Engage the vacuum without regard to chamber pressure."""
-        ...
-
-    async def disengage_vacuum_pump(self) -> None:
-        """Stops the vacuum pump, doesn't vent air or disable the motor."""
-        ...
-
     # turns off motor, then releases, takes a timeout for buffer between turn off and vent
-    async def vent(self, open: bool) -> None:
+    async def set_vent_state(self, state: bool) -> None:
         """Opens/Closes the vent, which release the vacuum in the module chamber."""
 
-        command = GCODE.SET_VENT_STATE.build_command().add_int("V", int(open))
+        command = GCODE.SET_VENT_STATE.build_command().add_int("V", int(state))
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_VENT_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set vent state: {resp}")
