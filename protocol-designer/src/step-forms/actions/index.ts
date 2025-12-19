@@ -63,21 +63,23 @@ export const editDeckConfiguration = (
 })
 
 export interface StackerLabwareCreationStartAction {
-  type:  'STACKER_LABWARE_CREATION_START'
+  type: 'STACKER_LABWARE_CREATION_START'
 }
 
 export interface StackerLabwareCreationFinishAction {
-  type:  'STACKER_LABWARE_CREATION_FINISH'
+  type: 'STACKER_LABWARE_CREATION_FINISH'
 }
 
 export type StackerLabwareActions =
   | StackerLabwareCreationStartAction
   | StackerLabwareCreationFinishAction
 
-export const stackerLabwareCreationStart = (): StackerLabwareCreationStartAction => ({
-  type: 'STACKER_LABWARE_CREATION_START',
-})
+export const stackerLabwareCreationStart =
+  (): StackerLabwareCreationStartAction => ({
+    type: 'STACKER_LABWARE_CREATION_START',
+  })
 
-export const stackerLabwareCreationFinish = ( ): StackerLabwareCreationFinishAction => ({
-  type: 'STACKER_LABWARE_CREATION_FINISH',
-})
+export const stackerLabwareCreationFinish =
+  (): StackerLabwareCreationFinishAction => ({
+    type: 'STACKER_LABWARE_CREATION_FINISH',
+  })

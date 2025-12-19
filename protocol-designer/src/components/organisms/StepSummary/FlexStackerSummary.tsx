@@ -38,7 +38,7 @@ export function FlexStackerSummary(
         <StyledTrans
           i18nKey={`protocol_steps:flex_stacker.${FLEX_STACKER_FILL}`}
           tagText={labwareName}
-          tagText2={fillQuantity}
+          tagText2={fillQuantity?.length ?? 0}
         />
       )
       break

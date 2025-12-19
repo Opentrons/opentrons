@@ -1770,7 +1770,9 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     stackerLabwareReducer: stackerLabwareReducer(
       prevStateFallback.stackerLabwareReducer,
-      action
+      action as
+        | StackerLabwareCreationStartAction
+        | StackerLabwareCreationFinishAction
     ),
   })
 )

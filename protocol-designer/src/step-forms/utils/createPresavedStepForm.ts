@@ -33,7 +33,6 @@ import {
 import type {
   AbsorbanceReaderState,
   AdditionalEquipmentEntities,
-  FlexStackerModuleState,
   LabwareEntities,
   PipetteEntities,
   RobotState,

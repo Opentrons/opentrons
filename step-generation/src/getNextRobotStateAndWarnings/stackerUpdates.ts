@@ -142,30 +142,29 @@ export const forFlexStackerFillItems = (
     adapterLabwareId: group.adapter,
     lidLabwareId: group.lid,
   }))
-  
+
   // index existing groups by primaryLabwareId
   const existingByPrimary = new Map(
     existingGroups.map(g => [g.primaryLabwareId, g])
   )
-  
+
   // merge: new groups override existing ones with same primary
   const merged: FlexStackerStoredLabwareGroup[] = []
-  
+
   for (const newGroup of newGroups) {
     merged.push(newGroup)
     existingByPrimary.delete(newGroup.primaryLabwareId)
   }
-  
+
   // append remaining old groups (preserve their order)
   for (const oldGroup of existingGroups) {
     if (existingByPrimary.has(oldGroup.primaryLabwareId)) {
       merged.push(oldGroup)
     }
   }
-  
+
   moduleState.labwareInHopper = merged
 }
-
 
 export const forFlexStackerFill = (
   params: FlexStackerFillParams,

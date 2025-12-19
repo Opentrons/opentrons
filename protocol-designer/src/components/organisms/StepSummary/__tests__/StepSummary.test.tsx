@@ -50,7 +50,7 @@ describe('StepSummary', () => {
         stepType: 'flexStacker',
         flexStackerFormType: 'retrieve',
         fillLabwareUri: 'mockUri',
-        fillQuantity: 3,
+        fillQuantity: ['mock1', 'mock2', 'mock3'],
       },
       labwareEntities: {
         someId: {

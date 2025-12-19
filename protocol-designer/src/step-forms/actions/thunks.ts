@@ -1,5 +1,4 @@
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
-import { FlexStackerModuleState } from '@opentrons/step-generation'
 
 import { stackerLabwareCreationFinish, stackerLabwareCreationStart } from '.'
 import { createContainer } from '../../labware-ingred/actions'
@@ -12,7 +11,6 @@ import type {
   DeckSlotId,
   ModuleModel,
   ModuleType,
-  StackerStoredLabwareDefinitionURIs,
 } from '@opentrons/shared-data'
 import type { FormData } from '../../form-types'
 import type {

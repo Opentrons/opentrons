@@ -164,7 +164,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     const maskedValue = maskField(name, value)
     dispatch(actions.changeFormInput({ update: { [name]: maskedValue } }))
   }
-  
+
   const { pipetteEntities } = useSelector(getInvariantContext)
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
