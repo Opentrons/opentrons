@@ -93,12 +93,12 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
           <Box>
-            <LegacyStyledText as="h3" id="LabwareCard_labwareName">
+            <LegacyStyledText forwardedAs="h3" id="LabwareCard_labwareName">
               {displayName}
             </LegacyStyledText>
             {isCustomDefinition ? (
               <LegacyStyledText
-                as="label"
+                forwardedAs="label"
                 color={COLORS.grey50}
                 id="LabwareCard_customDef"
               >
@@ -112,7 +112,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                   height=".7rem"
                 />
                 <LegacyStyledText
-                  as="label"
+                  forwardedAs="label"
                   id="LabwareCard_opentronsDef"
                   marginLeft={SPACING.spacing4}
                 >
@@ -123,7 +123,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           </Box>
           <Box paddingTop={SPACING.spacing16}>
             <LegacyStyledText
-              as="h6"
+              forwardedAs="h6"
               textTransform={TYPOGRAPHY.textTransformUppercase}
               color={COLORS.grey60}
               id="LabwareCard_apiName"
@@ -132,7 +132,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             </LegacyStyledText>
 
             <Box overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
-              <LegacyStyledText as="p">{apiName}</LegacyStyledText>
+              <LegacyStyledText forwardedAs="p">{apiName}</LegacyStyledText>
             </Box>
           </Box>
         </Flex>
@@ -150,11 +150,11 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           >
             <CustomLabwareOverflowMenu filename={filename} />
             <Flex flexDirection={DIRECTION_COLUMN} alignItems={ALIGN_FLEX_END}>
-              <LegacyStyledText as="label" color={COLORS.grey50}>
+              <LegacyStyledText forwardedAs="label" color={COLORS.grey50}>
                 {t('date_added')}
               </LegacyStyledText>
               <LegacyStyledText
-                as="label"
+                forwardedAs="label"
                 color={COLORS.grey50}
                 id="LabwareCard_dateAdded"
               >

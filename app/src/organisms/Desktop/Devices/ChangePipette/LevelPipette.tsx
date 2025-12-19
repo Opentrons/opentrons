@@ -91,7 +91,7 @@ export function LevelPipette(props: LevelPipetteProps): JSX.Element {
                       display: list-item;
                     `}
                     marginLeft={SPACING.spacing32}
-                    as="p"
+                    forwardedAs="p"
                   />
                 ),
               }}

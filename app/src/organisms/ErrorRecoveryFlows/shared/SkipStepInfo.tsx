@@ -123,7 +123,7 @@ export function SkipStepInfo(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey={buildBodyCopyKey()}
         components={{
-          block: <LegacyStyledText as="p" />,
+          block: <LegacyStyledText forwardedAs="p" />,
         }}
       />
     )

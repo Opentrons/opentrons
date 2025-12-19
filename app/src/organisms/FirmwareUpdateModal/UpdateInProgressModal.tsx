@@ -51,7 +51,7 @@ export function UpdateInProgressModal(
         gridGap={SPACING.spacing40}
       >
         <LegacyStyledText
-          as="h4"
+          forwardedAs="h4"
           marginBottom={SPACING.spacing4}
           fontWeight={TYPOGRAPHY.fontWeightBold}
         >

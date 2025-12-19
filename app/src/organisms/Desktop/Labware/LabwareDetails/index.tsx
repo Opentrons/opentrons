@@ -135,7 +135,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
           <Icon color={COLORS.blue50} name="check-decagram" height=".7rem" />{' '}
           <LegacyStyledText
-            as="label"
+            forwardedAs="label"
             id="LabwareDetails_opentronsDef"
             marginLeft={SPACING.spacing4}
           >
@@ -151,7 +151,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
           alignItems={ALIGN_CENTER}
         >
           <LegacyStyledText
-            as="label"
+            forwardedAs="label"
             color={COLORS.grey50}
             id="LabwareDetails_dateAdded"
           >
@@ -175,7 +175,7 @@ export function LabwareDetails(props: LabwareDetailsProps): JSX.Element {
         marginBottom={SPACING.spacing24}
         borderRadius={BORDERS.borderRadius4}
       >
-        <LegacyStyledText as="h6">{t('api_name')}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="h6">{t('api_name')}</LegacyStyledText>
         <Link
           css={TYPOGRAPHY.pRegular}
           onClick={handleCopy}

@@ -79,10 +79,10 @@ export function ConnectRobotSlideout({
       }
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('ip_description_first')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('branded:ip_description_second')}
         </LegacyStyledText>
         <ExternalLink
@@ -94,7 +94,7 @@ export function ConnectRobotSlideout({
           {t('connect_ip_link')}
         </ExternalLink>
         <Divider marginY={SPACING.spacing24} />
-        <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+        <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
           {t('add_ip_hostname')}
         </LegacyStyledText>
         <ManualIpHostnameForm setMostRecentAddition={setMostRecentAddition} />
@@ -107,7 +107,7 @@ export function ConnectRobotSlideout({
           {Boolean(isScanning) ? (
             <Flex flexDirection={DIRECTION_ROW}>
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 color={COLORS.grey50}
                 marginRight={SPACING.spacing8}
               >
@@ -120,7 +120,7 @@ export function ConnectRobotSlideout({
               mostRecentAddition != null && !(mostRecentDiscovered ?? false) ? (
                 <>
                   <LegacyStyledText
-                    as="p"
+                    forwardedAs="p"
                     color={COLORS.grey50}
                     marginX={SPACING.spacing4}
                   >

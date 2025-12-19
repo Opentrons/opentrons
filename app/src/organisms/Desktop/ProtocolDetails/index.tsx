@@ -123,7 +123,7 @@ function MetadataDetails({
   protocolType,
 }: MetadataDetailsProps): JSX.Element {
   if (protocolType === 'json') {
-    return <LegacyStyledText as="p">{description}</LegacyStyledText>
+    return <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
   } else {
     const filteredMetaData = Object.entries(
       omit(metadata, ['description', 'protocolName', 'author', 'apiLevel'])
@@ -135,20 +135,20 @@ function MetadataDetails({
         flexDirection={DIRECTION_COLUMN}
         data-testid="ProtocolDetails_description"
       >
-        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+        <LegacyStyledText forwardedAs="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {description}
         </LegacyStyledText>
         {filteredMetaData.map((item, index) => {
           return (
             <Fragment key={index}>
               <LegacyStyledText
-                as="h6"
+                forwardedAs="h6"
                 marginTop={SPACING.spacing8}
                 color={COLORS.grey60}
               >
                 {startCase(item.label)}
               </LegacyStyledText>
-              <LegacyStyledText as="p">{item.value}</LegacyStyledText>
+              <LegacyStyledText forwardedAs="p">{item.value}</LegacyStyledText>
             </Fragment>
           )
         })}
@@ -174,7 +174,7 @@ const ReadMoreContent = (props: ReadMoreContentProps): JSX.Element => {
   return (
     <Flex flexDirection={DIRECTION_COLUMN} paddingRight={SPACING.spacing16}>
       {isReadMore ? (
-        <LegacyStyledText as="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
+        <LegacyStyledText forwardedAs="p" overflowWrap={OVERFLOW_WRAP_ANYWHERE}>
           {description.slice(0, 160)}
         </LegacyStyledText>
       ) : (
@@ -476,10 +476,10 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_creationMethod"
                 >
-                  <LegacyStyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
                     {t('creation_method')}
                   </LegacyStyledText>
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : creationMethod}
@@ -489,10 +489,10 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastUpdated"
                 >
-                  <LegacyStyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
                     {t('last_updated')}
                   </LegacyStyledText>
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : format(new Date(modified), 'M/d/yy HH:mm')}
@@ -502,10 +502,10 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_lastAnalyzed"
                 >
-                  <LegacyStyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
                     {t('last_analyzed')}
                   </LegacyStyledText>
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {analysisStatus === 'loading'
                       ? t('shared:loading')
                       : lastAnalyzed}
@@ -538,11 +538,11 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_author"
                 >
-                  <LegacyStyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
                     {t('org_or_author')}
                   </LegacyStyledText>
                   <LegacyStyledText
-                    as="p"
+                    forwardedAs="p"
                     overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   >
                     {analysisStatus === 'loading'
@@ -554,11 +554,11 @@ export function ProtocolDetails(
                   flexDirection={DIRECTION_COLUMN}
                   data-testid="ProtocolDetails_description"
                 >
-                  <LegacyStyledText as="h6" color={COLORS.grey60}>
+                  <LegacyStyledText forwardedAs="h6" color={COLORS.grey60}>
                     {t('description')}
                   </LegacyStyledText>
                   {analysisStatus === 'loading' ? (
-                    <LegacyStyledText as="p">
+                    <LegacyStyledText forwardedAs="p">
                       {t('shared:loading')}
                     </LegacyStyledText>
                   ) : null}
@@ -607,7 +607,7 @@ export function ProtocolDetails(
                 padding={SPACING.spacing16}
               >
                 <LegacyStyledText
-                  as="h3"
+                  forwardedAs="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('deck_view')}

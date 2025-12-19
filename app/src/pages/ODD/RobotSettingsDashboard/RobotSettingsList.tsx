@@ -267,7 +267,10 @@ function FeatureFlags(): JSX.Element {
               color="#171717"
             />
             <div className={styles.feature_flag_text_content}>
-              <LegacyStyledText as="h4" className={styles.feature_flag_title}>
+              <LegacyStyledText
+                forwardedAs="h4"
+                className={styles.feature_flag_title}
+              >
                 {t(`__dev_internal__${flag}`)}
               </LegacyStyledText>
             </div>

@@ -158,7 +158,7 @@ export function ProtocolDashboard(): JSX.Element {
               marginBottom={SPACING.spacing32}
             >
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 marginBottom={SPACING.spacing8}
                 color={COLORS.grey60}
               >

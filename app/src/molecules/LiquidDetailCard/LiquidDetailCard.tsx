@@ -231,13 +231,13 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
           <Icon name="circle" color={displayColor} size={SIZE_1} />
         </Flex>
         <LegacyStyledText
-          as="h3"
+          forwardedAs="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing8}
         >
           {newDisplayName}
         </LegacyStyledText>
-        <LegacyStyledText as="p" color={COLORS.grey50}>
+        <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
           {description != null ? description : null}
         </LegacyStyledText>
 
@@ -281,14 +281,14 @@ export function LiquidDetailCard(props: LiquidDetailCardProps): JSX.Element {
                 }
               >
                 <LegacyStyledText
-                  as="p"
+                  forwardedAs="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginRight={SPACING.spacing4}
                 >
                   {well.wellName}
                 </LegacyStyledText>
                 <LegacyStyledText
-                  as="p"
+                  forwardedAs="p"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                 >
                   {well.volume.toFixed(1)} {MICRO_LITERS}

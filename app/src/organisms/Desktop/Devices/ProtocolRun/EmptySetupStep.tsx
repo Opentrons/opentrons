@@ -28,7 +28,7 @@ export function EmptySetupStep(props: EmptySetupStepProps): JSX.Element {
         >
           {title}
         </LegacyStyledText>
-        <LegacyStyledText as="p">{description}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
       </Flex>
       {rightElement}
     </Flex>
