@@ -40,7 +40,7 @@ class LandingPage(BasePage):
     def upload_protocol_file(self, file_path: str) -> None:
         """Upload a protocol file from the landing page import input."""
         self.page.get_by_label("Import_from_landing").set_input_files(file_path)
-    
+
     def edit_protocol(self) -> None:
         """Click the 'Edit' button for a specific protocol."""
         self.page.get_by_role("button", name="Edit protocol").click()

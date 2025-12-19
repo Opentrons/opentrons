@@ -1,7 +1,7 @@
 """Test ability to drag and drop steps on the protocol editor."""
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from automation.pd_pages import LandingPage, ProtocolEditorPage
 
@@ -11,7 +11,6 @@ PROTOCOL_PATH = "fixtures/protocol/8/doItAllV8.json"
 @pytest.mark.pdE2E
 @pytest.mark.slow
 def test_drag_drop_steps(page: Page, base_url: str) -> None:
-    
     landing = LandingPage(page)
     editor = ProtocolEditorPage(page)
 
@@ -22,7 +21,6 @@ def test_drag_drop_steps(page: Page, base_url: str) -> None:
     landing.upload_protocol_file(PROTOCOL_PATH)
     landing.dismiss_migration_modal()
     landing.edit_protocol()
-
 
     ## Drag Transfer Step down the Step Form, from step 3 (index 2) to step 7 (becomes index 6)
     editor.drag_and_drop(2, 7)
