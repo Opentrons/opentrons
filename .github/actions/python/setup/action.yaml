@@ -4,10 +4,10 @@ inputs:
   project:
     description: 'Which project (by subdirectory) to set up'
     required: true
-  python-version:
-    description: "What Python version to use to create the project's virtual environment"
+  install-system-deps:
+    description: 'Whether to install system dependencies (libsystemd-dev on Linux)'
     required: false
-    default: "false"
+    default: 'true'
 runs:
   using: 'composite'
   steps:
@@ -28,11 +28,21 @@ runs:
       run: echo "OT_VIRTUALENV_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
     - shell: bash
       run: npm install --global shx@0.3.3
-    - shell: bash
-      run: $OT_PYTHON -m pip install --upgrade pip
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user pipenv==2023.12.1
-    - shell: bash
-      run: $OT_PYTHON -m pip install --user virtualenv==20.30.0
-    - shell: bash
-      run: 'make -C ${{ inputs.project }} setup || make -C ${{ inputs.project }} setup'
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Install pipenv and virtualenv
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install --user pipenv==2023.12.1
+        python -m pip install --user virtualenv==20.30.0
+    - name: Setup Python Environment
+      id: setup-env
+      shell: bash
+      run: |
+        # For pipenv projects, make setup runs "pipenv sync --dev" which always installs dev dependencies
+        # (see scripts/python.mk where pipenv_opts includes --dev)
+        make -C ${{ inputs.project }} setup
+        echo "::notice::Setup completed"
