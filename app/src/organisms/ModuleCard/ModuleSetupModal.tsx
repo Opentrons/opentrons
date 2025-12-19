@@ -99,7 +99,7 @@ export const ModuleSetupModal = (props: ModuleSetupModalProps): JSX.Element => {
             marginRight="3.625rem"
             width="50%"
           >
-            <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
               {instructionText()}
             </LegacyStyledText>
             <Link

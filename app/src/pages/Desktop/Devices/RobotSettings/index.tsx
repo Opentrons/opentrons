@@ -140,7 +140,7 @@ export function RobotSettingsComponent({
           )}
           {showRobotBusyBanner && (
             <Banner type="warning" marginBottom={SPACING.spacing8}>
-              <LegacyStyledText as="p">
+              <LegacyStyledText forwardedAs="p">
                 {t('some_robot_controls_are_not_available')}
               </LegacyStyledText>
             </Banner>

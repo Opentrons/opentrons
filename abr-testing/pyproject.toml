@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "abr_testing"
 description = "Tools for running application-based reliability tests."
-requires-python = "~=3.10"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },

@@ -38,7 +38,7 @@ export function HowCalibrationWorksModal({
       maxHeight="28.125rem"
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
           {t('robot_cal_description')}
         </LegacyStyledText>
         <ExternalLink
@@ -53,7 +53,7 @@ export function HowCalibrationWorksModal({
         </Box>
         {/* deck calibration */}
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
@@ -68,7 +68,7 @@ export function HowCalibrationWorksModal({
           ]}
         />
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
@@ -81,7 +81,7 @@ export function HowCalibrationWorksModal({
         />
         {/* pipette offset calibration */}
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginTop={SPACING.spacing16}
           role="heading"
@@ -123,7 +123,7 @@ function CalibrationSteps({
 }: CalibrationStepsProps): JSX.Element {
   return (
     <Box marginTop={SPACING.spacing4}>
-      <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+      <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
         {description}
       </LegacyStyledText>
       <ul>
@@ -134,7 +134,7 @@ function CalibrationSteps({
             `}
             key={step}
           >
-            <LegacyStyledText as="p">{step}</LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">{step}</LegacyStyledText>
           </li>
         ))}
       </ul>

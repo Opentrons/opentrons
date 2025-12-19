@@ -30,7 +30,7 @@ interface WellTooltipParams {
 
 interface WellTooltipProps {
   children: (wellTooltipParams: WellTooltipParams) => ReactNode
-  ingredNames: Record<string, string>
+  ingredNames: Record<string, string | null>
 }
 
 interface TooltipState {

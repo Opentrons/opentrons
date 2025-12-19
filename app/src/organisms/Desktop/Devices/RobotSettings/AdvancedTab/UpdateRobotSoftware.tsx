@@ -91,7 +91,7 @@ export function UpdateRobotSoftware({
           >
             {t('update_robot_software')}
           </LegacyStyledText>
-          <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
             {t('branded:update_robot_software_description')}
           </LegacyStyledText>
           <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>

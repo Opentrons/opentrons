@@ -218,7 +218,7 @@ export function QuickTransferDashboard(): JSX.Element {
               gap={SPACING.spacing8}
               paddingBottom={SPACING.spacing32}
             >
-              <LegacyStyledText as="p" color={COLORS.grey60}>
+              <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
                 {t('pinned_transfers')}
               </LegacyStyledText>
               <PinnedTransferCarousel

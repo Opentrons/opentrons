@@ -218,7 +218,7 @@ export const JogToWell = (props: JogToWellProps): JSX.Element | null => {
                   justifyContent={JUSTIFY_SPACE_BETWEEN}
                   header={
                     <LegacyStyledText
-                      as="h4"
+                      forwardedAs="h4"
                       css={css`
                         font-weight: ${TYPOGRAPHY.fontWeightBold};
                         font-size: ${TYPOGRAPHY.fontSize28};

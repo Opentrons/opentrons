@@ -79,11 +79,51 @@ export interface TemperatureModuleState {
   status: TemperatureStatus
   targetTemperature: number | null
 }
+
 export interface ThermocyclerModuleState {
   type: typeof THERMOCYCLER_MODULE_TYPE
-  blockTargetTemp: number | null // null means block is deactivated
-  lidTargetTemp: number | null // null means lid is deactivated
-  lidOpen: boolean | null // if false, closed. If null, unknown
+
+  lidTargetTemp: number | null /** null means lid is deactivated. */
+
+  /** What the thermal block is currently doing. */
+  currentBlockActivity:
+    | ProfileBlockActivity
+    | TargetTempBlockActivity
+    | DeactivatedBlockActivity
+
+  /** If false, closed. If null, unknown. */
+  lidOpen: boolean | null
+
+  /** Useful for generating unique task IDs every time a new profile is started. */
+  numProfilesStarted: number
+}
+
+/**
+ * A profile has been started on this Thermocycler
+ * and not yet awaited, so it's possibly still ongoing.
+ */
+export interface ProfileBlockActivity {
+  type: 'profile'
+  /** The steps of the profile that's currently running. */
+  profileElements: TCExtendedProfileParams['profileElements']
+  /**
+   * The ID of the concurrent task that represents this profile.
+   *
+   * `null` for unknown. Theoretically, the task ID is always knowable,
+   * but sometimes it's only available from a startRunExtendedProfile result,
+   * and step-generation only has access to the startRunExtendedProfile params.
+   */
+  taskId: string | null
+}
+
+/** The thermal block is targeting a constant temperature, outside of a profile. */
+export interface TargetTempBlockActivity {
+  type: 'blockTargetTemp'
+  blockTargetTemp: number
+}
+
+export interface DeactivatedBlockActivity {
+  type: 'blockDeactivated'
 }
 
 export interface HeaterShakerModuleState {
@@ -92,6 +132,7 @@ export interface HeaterShakerModuleState {
   targetSpeed: number | null
   latchOpen: boolean | null
 }
+
 export interface MagneticBlockState {
   type: typeof MAGNETIC_BLOCK_TYPE
 }

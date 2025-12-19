@@ -10,6 +10,7 @@ import {
   getIsTiprack,
   getPositionFromSlotId,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
+  SYSTEM_LOCATION,
   TC_MODULE_LOCATION_OT2,
   TC_MODULE_LOCATION_OT3,
   THERMOCYCLER_MODULE_TYPE,
@@ -313,7 +314,7 @@ export const useLabwareDropdownOptions = (
       const deckSlot = getSlotInLocationStack(
         deckSetupLabware[labwareId]?.stack
       )
-
+      const isInaccessible = deckSlot === SYSTEM_LOCATION
       const isOffDeck = deckSlot === 'offDeck'
       const fullStackFromLabwares = getFullStackFromLabwares(
         deckSetupLabware,
@@ -354,6 +355,7 @@ export const useLabwareDropdownOptions = (
 
       //  TODO: refactor this to be easier to read
       const options: DropdownOption[] =
+        isInaccessible ||
         (type === 'labware' && isOnStacker) ||
         isAdapter ||
         isLabwareInTrash ||

@@ -46,7 +46,10 @@ export const forThermocyclerSetTargetBlockTemperature = (
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
-  moduleState.blockTargetTemp = celsius
+  moduleState.currentBlockActivity = {
+    type: 'blockTargetTemp',
+    blockTargetTemp: celsius,
+  }
 }
 
 export const forThermocyclerSetTargetLidTemperature = (
@@ -102,7 +105,9 @@ export const forThermocyclerDeactivateBlock = (
 
   const moduleState = _getThermocyclerModuleState(robotState, moduleId)
 
-  moduleState.blockTargetTemp = null
+  moduleState.currentBlockActivity = {
+    type: 'blockDeactivated',
+  }
 }
 
 export const forThermocyclerDeactivateLid = (
@@ -176,6 +181,11 @@ export const forThermocyclerRunExtendedProfile = (
   )
   const lastStep = last(flatSteps)
   if (lastStep != null) {
-    moduleState.blockTargetTemp = lastStep.celsius
+    moduleState.currentBlockActivity = {
+      type: 'blockTargetTemp',
+      blockTargetTemp: lastStep.celsius,
+    }
   }
+
+  moduleState.numProfilesStarted++
 }

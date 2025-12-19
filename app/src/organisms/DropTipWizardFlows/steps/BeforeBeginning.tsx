@@ -175,7 +175,7 @@ function DropTipOption({
       >
         <source src={videoSrc} />
       </AnimationVideo>
-      <LegacyStyledText as="h3">{text}</LegacyStyledText>
+      <LegacyStyledText forwardedAs="h3">{text}</LegacyStyledText>
     </Flex>
   )
 }

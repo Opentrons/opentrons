@@ -799,6 +799,7 @@ export const DEFAULT_LIQUID_COLORS = [
   springGreen,
   tartRed,
 ]
+export const MIXED_WELL_COLOR = '#737578'
 export const DEPRECATED_WHALE_GREY = '#9395a0'
 
 // this can't go in @opentrons/components because its used in a utility
@@ -851,3 +852,7 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FAKE_FIXTURE_IDS,
   ...STAGING_AREA_FIXTURES,
 ]
+
+// a labware location when something has been used already on the deck
+// and moves to a new location that isn't accessible on or off the deck
+export const SYSTEM_LOCATION = 'systemLocation'

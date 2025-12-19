@@ -305,7 +305,7 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <LegacyStyledText as="p" color={COLORS.grey40}>
+            <LegacyStyledText forwardedAs="p" color={COLORS.grey40}>
               {t('offline_deck_configuration')}
             </LegacyStyledText>
           </Flex>

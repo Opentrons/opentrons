@@ -14,7 +14,7 @@ End-to-end tests for the Opentrons Protocol Designer using Playwright and pytest
 
 - Python 3.10+
 - [uv](https://github.com/astral-sh/uv) (Python package manager)
-- Node.js 22.12.0 (for building Protocol Designer locally)
+- Node.js 22.21.1 (for building Protocol Designer locally)
 
 ## Quick Start
 

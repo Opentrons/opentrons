@@ -32,7 +32,9 @@ export function useConfirmCrashRecovery(
       justifyContent={JUSTIFY_CENTER}
       gridGap={SPACING.spacing4}
     >
-      <LegacyStyledText as="p">{t('jog_too_far_or_bend_tip')}</LegacyStyledText>
+      <LegacyStyledText forwardedAs="p">
+        {t('jog_too_far_or_bend_tip')}
+      </LegacyStyledText>
       <Link
         role="button"
         onClick={() => {

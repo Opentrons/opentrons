@@ -843,9 +843,10 @@ export interface LoadedModule {
 }
 export interface Liquid {
   id: string
-  displayName: string
+  displayName: string | null
   description: string
   displayColor?: string
+  totalLiquids?: number
 }
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>

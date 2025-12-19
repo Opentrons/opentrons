@@ -81,7 +81,7 @@ const TipsAttachedModal = NiceModal.create(
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="liquid_damages_this_pipette"

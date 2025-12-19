@@ -184,7 +184,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         >
           {multiSlideoutSpecs === undefined ? null : (
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               color={COLORS.grey60}
               alignItems={ALIGN_CENTER}
               paddingX={SPACING.spacing16}
@@ -204,7 +204,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               marginBottom={SPACING.spacing16}
             >
               <LegacyStyledText
-                as="h2"
+                forwardedAs="h2"
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}
