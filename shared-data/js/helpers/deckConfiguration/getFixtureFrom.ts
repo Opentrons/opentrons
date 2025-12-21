@@ -1,5 +1,6 @@
 import { isEqual } from 'lodash'
 
+import { getDeckDefFromRobotType } from '..'
 import {
   ABSORBANCE_READER_V1_FIXTURE,
   DEFAULT_AA_FOR_WASTE_CHUTE,
@@ -25,10 +26,9 @@ import {
   getAAByAAId,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
-  getAAWithFakesFromVSId,
   getVisualSlotIdForAA,
 } from '../../fixtures'
-import { getDeckDefFromRobotType } from '../../helpers'
+import { getAAWithFakesFromVSId } from './getVisualSlotFrom'
 
 import type { CutoutFixtureId, CutoutId } from '../../../deck'
 import type {

@@ -36,7 +36,6 @@ import {
   getMainNonComboFixtureId,
   getMainUsbModuleFixtureIdForComboFixture,
   getVisualSlotIdForAA,
-  getVisualSlotIdFromAAId,
   getWasteChuteComboFixture,
   isFixtureInUsbModules,
   isModuleAllowedOnAA,
@@ -48,7 +47,8 @@ import {
   getReplacementFixtureForFakeFixture,
   getReplacementFixtureForFixtureRemoval,
   replaceCutoutFixtureForFixtureRemoval,
-} from '../helpers/deckConfiguration/getFixtureReplacment'
+} from '../helpers/deckConfiguration/getFixtureFrom'
+import { getVisualSlotIdFromAAId } from '../helpers/deckConfiguration/getVisualSlotFrom'
 
 import type { Mock } from 'vitest'
 import type { CutoutConfig, DeckConfiguration } from '..'

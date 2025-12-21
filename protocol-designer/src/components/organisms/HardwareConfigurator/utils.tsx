@@ -4,7 +4,6 @@ import { useDispatch } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-  getAASlotDisplayName,
   getAAsToFixtureIdFromDeckDefWithFakes,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
@@ -87,10 +86,7 @@ export function useDeckConfigurationEditing(
     cutoutId: CutoutId,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
-    console.log('cutoutId:', cutoutId)
-    console.log('addressableAreaId:', addressableAreaId)
     setTargetCutoutId(cutoutId)
-    console.log('getAASlotDisplayName(addressableAreaId):', getAASlotDisplayName(addressableAreaId))
     setAddressableAreaId(addressableAreaId)
     const foundFixtureId =
       deckConfig.find(config => config.cutoutId === cutoutId)
