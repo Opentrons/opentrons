@@ -80,40 +80,46 @@ async def jog(api, mount, position, cp) -> Dict[Axis, float]:
             # minus x direction
             sys.stdout.flush()
             await api.move_rel(
-                mount, Point(-step_size[step_length_index], 0, 0), speed=xy_speed
+                mount, Point(-step_size[step_length_index], 0, 0), speed=xy_speed,
+                expect_stalls = False
             )
 
         elif input == "d":
             # plus x direction
             sys.stdout.flush()
             await api.move_rel(
-                mount, Point(step_size[step_length_index], 0, 0), speed=xy_speed
+                mount, Point(step_size[step_length_index], 0, 0), speed=xy_speed,
+                expect_stalls=False
             )
 
         elif input == "w":
             # minus y direction
             sys.stdout.flush()
             await api.move_rel(
-                mount, Point(0, step_size[step_length_index], 0), speed=xy_speed
+                mount, Point(0, step_size[step_length_index], 0), speed=xy_speed,
+                expect_stalls=False
             )
 
         elif input == "s":
             # plus y direction
             sys.stdout.flush()
             await api.move_rel(
-                mount, Point(0, -step_size[step_length_index], 0), speed=xy_speed
+                mount, Point(0, -step_size[step_length_index], 0), speed=xy_speed,
+                expect_stalls=False
             )
 
         elif input == "i":
             sys.stdout.flush()
             await api.move_rel(
-                mount, Point(0, 0, step_size[step_length_index]), speed=za_speed
+                mount, Point(0, 0, step_size[step_length_index]), speed=za_speed,
+                expect_stalls=False
             )
 
         elif input == "k":
             sys.stdout.flush()
             await api.move_rel(
-                mount, Point(0, 0, -step_size[step_length_index]), speed=za_speed
+                mount, Point(0, 0, -step_size[step_length_index]), speed=za_speed,
+                expect_stalls=False
             )
         elif input == "t":
             sys.stdout.flush()
@@ -361,13 +367,20 @@ async def _main(args: argparse.Namespace) -> None:
         #                         mount, 
         #                         tip_length=(tip_length-tip_overlap))
         cp = CriticalPoint.TIP
-        pick_up_loc = await jog(hw_api, mount, tiprack_loc, cp)
-        await cam_jog(hw_api, mount)
+        # pick_up_loc = await jog(hw_api, mount, tiprack_loc, cp)
+        size = float(input("input the step size: "))
+
+        await hw_api.move_rel(
+                mount, Point(0, 0, -size), speed=1,
+                expect_stalls=False
+            )
         # await helpers_ot3.move_tip_motor_relative_ot3(hw_api,
         #                                         5, 
         #                                         motor_current = 1.5,
         #                                         speed=10,
         #                                         )
+        await cam_jog(hw_api, mount)
+        
         retract = Point(
                     pick_up_loc[Axis.X],
                     pick_up_loc[Axis.Y],
