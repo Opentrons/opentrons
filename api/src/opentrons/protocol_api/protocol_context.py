@@ -1853,22 +1853,24 @@ class ProtocolContext(CommandPublisher):
         brightness: Optional[float] = None,
         saturation: Optional[float] = None,
     ) -> None:
-        """Capture an image using the camera. Captured images get saved as a result
-        of the protocol run.
+        """Capture an image using the camera. Captured images are saved during
+        the protocol run.
 
         Args:
-            home_before (bool): Boolean to home the pipette before capturing an image.
-            filename (str): Filename to use when saving the captured image as a file.
-            resolution (Tuple[int, int]): Width/height tuple to determine the resolution
-                to use when capturing an image.
-            zoom (float): Optional zoom level, with minimum/default of 1x zoom and
-                maximum of 2x zoom.
-            contrast (float): Contrast level to be applied to an image, range is 0% to
-                100%.
-            brightness (float): Brightness level to be applied to an image, range is 0%
-                to 100%.
-            saturation (float): Saturation level to be applied to an image, range is 0%
-                to 100%.
+            home_before (bool): If `True`, homes the pipette before capturing an image.
+            filename (str): Custom name to use when saving the captured image as a file. The custom name
+            is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run, 
+            the step number, and a timestamp for the command running when the image was captured. 
+            resolution (Tuple[int, int]): Accepts a width and height (as a tuple) to determine the camera's resolution
+                when capturing an image.
+            zoom (float): Zoom level the camera will use. Defaults to a minimum of 1x zoom (`1.0`) and
+                has a maximum of 2x zoom (`2.0`).
+            contrast (float): The contrast level to be applied to the image. The acceptable range is from 0 to
+                100; provided as a percentage (`0.0` to `100.0`).
+            brightness (float): The brightness level to be applied to the image. The acceptable range is from 0 to
+                100; provided as a percentage (`0.0` to `100.0`).
+            saturation (float): The saturation level to be applied to the image. The acceptable range is from 0 to
+                100; provided as a percentage (`0.0` to `100.0`).
         """
         if home_before is True:
             self._core.home()

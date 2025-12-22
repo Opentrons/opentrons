@@ -3,7 +3,7 @@ title: "Python API: Utility Commands"
 description: Basic commands for working with robot utility features.
 ---
 
-With utility commands, you can control various robot functions such as pausing or delaying a protocol, checking the robot's door, turning robot lights on/off, and more. The following sections show you how to use these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic [protocol template][protocol-template].
+With utility commands, you can control various robot functions such as pausing or delaying a protocol, taking images with the build-in camera, turning robot lights on/off, and more. The following sections show you how to use these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
 ## Delay and resume
 
@@ -72,6 +72,25 @@ protocol.comment("Hello, world!")
 ```
 
 *New in version 2.0*
+
+## Capturing Images
+
+Use the [`capture_image()`][opentrons.protocol_api.ProtocolContext.capture_image] method to take an image during a protocol with the Flex or OT-2's built-in camera. You can use images to check on key protocol steps while spending more time away from the bench.
+
+This example uses optional parameters to home the pipette, clearing the camera's view, and gives a custom name to the image file:
+
+```python
+protocol.capture_image(
+    home_before=True,
+    filename="deck_view"
+)
+```
+
+*New in version 2.27.*
+
+Image filenames include your robot and protocol name, step number, and timestamps for the protocol and command running when the image was taken. Here, the custom filename `"deck_view"` is added to the beginning of the filename, making it easier to find the exact image you're looking for.
+
+You can further customize your images using the [`capture_image()`][opentrons.protocol_api.ProtocolContext.capture_image] method's optional parameters, including image resolution, zoom, brightness, and more. After a protocol run, access and download your images from the Recent Protocol Runs section of the Opentrons App's robot details page.
 
 ## Rail lights
 
