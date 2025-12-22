@@ -53,6 +53,11 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
       beforeSend(event, hint) {
         const error = hint.originalException || hint.syntheticException
         const errorMessage = ((): string => {
+          // this function is called on messages passed with captureMessage, which are
+          // just strings
+          if (typeof error === 'string') {
+            return error
+          }
           if (error == null || Object.keys(error).length === 0) {
             return ''
           }
