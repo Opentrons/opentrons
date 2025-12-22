@@ -175,16 +175,23 @@ export const forThermocyclerRunExtendedProfile = (
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  // The state update for a blocking runExtendedProfile is equivalent to a nonblocking
-  // startRunExtendedProfile followed by an immediate waitForTasks.
-  const taskId = uuid()
+  // A (blocking) runExtendedProfile command is equivalent to a (nonblocking)
+  // startRunExtendedProfile command immediately followed by a waitForTasks command.
+  // So, pretend that's exactly what happened--start and then immediately await a fake
+  // task.
+  //
+  // Because all of this happens within the scope of this function, the task ID is
+  // arbitrary. Nothing outside this function should see or care about it. We add a
+  // UUID to keep it unique just in case something goes wrong and it does leak out of
+  // this function somehow.
+  const privateTaskId = +'thermocyclerRunExtendedProfile-private-' + uuid()
   forThermocyclerStartRunExtendedProfile(
-    { ...params, taskId },
+    { ...params, taskId: privateTaskId },
     invariantContext,
     robotStateAndWarnings
   )
   handleWaitForTaskForThermocyclers(
-    taskId,
+    privateTaskId,
     invariantContext,
     robotStateAndWarnings
   )
