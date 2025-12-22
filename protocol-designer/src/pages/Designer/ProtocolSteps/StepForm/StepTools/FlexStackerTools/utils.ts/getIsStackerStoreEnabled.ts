@@ -71,7 +71,7 @@ export const getIsStackerStoreEnabled = (
   return isValid && !isFull
 }
 
-const getLabwareDefinitionFromURI = (
+export const getLabwareDefinitionFromURI = (
   labwareEntities: LabwareEntities,
   labwareURI: string
 ): LabwareDefinition | null =>

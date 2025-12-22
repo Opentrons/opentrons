@@ -1,10 +1,14 @@
 import {
+  FLEX_STACKER_MODULE_V1,
+  getMaxPoolCount,
   getMaxPushOutVolume,
   getMinXYDimension,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import { MANUAL } from '@opentrons/step-generation'
+
+import { getLabwareDefinitionFromURI } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/StepTools/FlexStackerTools/utils.ts/getIsStackerStoreEnabled'
 
 import {
   ABSORBANCE_READER_INITIALIZE,
@@ -126,7 +130,7 @@ const VOLUME_TOO_HIGH = (pipetteCapacity: number): FormError => ({
 })
 
 const QUANTITY_OUT_OF_RANGE: FormError = {
-  title: 'Value falls outside fo expected range',
+  title: 'Value falls outside of expected range',
   dependentFields: ['fillQuantity'],
   location: ['field'],
   showOnReopen: true,
@@ -753,10 +757,35 @@ export const pauseForTimeOrUntilTold = (
   }
 }
 export const verifyLabwareQuantity = (
-  fields: HydratedFlexStackerFormData
+  fields: HydratedFlexStackerFormData,
+  moduleEntities?: ModuleEntities,
+  labwareEntities?: LabwareEntities
 ): FormError | null => {
-  const { fillQuantity, flexStackerFormType } = fields
+  const { fillQuantity, flexStackerFormType, fillLabwareUri } = fields
   const numericalFillQuantity = Number(fillQuantity)
+  console.log("🚀 ~ verifyLabwareQuantity ~ numericalFillQuantity:", numericalFillQuantity)
+
+  if (fillLabwareUri && labwareEntities) {
+    const labwareDefinition = getLabwareDefinitionFromURI(
+      labwareEntities,
+      fillLabwareUri
+    )
+    if (labwareDefinition) {
+      const maxPoolCount = getMaxPoolCount({
+        labwareDefinitions: {
+          primary: labwareDefinition,
+          adapter: null,
+          lid: null,
+        },
+        model: FLEX_STACKER_MODULE_V1,
+      })
+      console.log("🚀 ~ verifyLabwareQuantity ~ maxPoolCount:", maxPoolCount)
+      if (numericalFillQuantity > maxPoolCount) {
+        return QUANTITY_OUT_OF_RANGE
+      }
+    }
+  }
+
   if (
     flexStackerFormType === 'fill' &&
     (numericalFillQuantity === 0 || numericalFillQuantity === null)
