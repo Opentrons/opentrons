@@ -1,5 +1,7 @@
 import {
   FLEX_ROBOT_TYPE,
+  getAASlotDisplayName,
+  getAAWithFakesFromVSId,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
@@ -194,13 +196,15 @@ export const updateInitialDeckState = (
         const vs = getVisualSlotIdFromAAId(
           value.addressableAreaId as AddressableAreaName
         )
-        const slot = getAAWithFakesFromVSId(vs) ?? ''
-        console.log('slot in updateInitialDeckState:', slot)
+        const slot =
+          getAAWithFakesFromVSId(vs) ?? ('' as AddressableAreaNamesWithFakes)
+        const slotName = getAASlotDisplayName(slot)
+        console.log('slot in updateInitialDeckState:', slotName)
         //   creating module
         if (labwareNotCompatible == null && model != null && type != null) {
           dispatch(
             createModule({
-              slot,
+              slot: slotName,
               model,
               type,
             })
