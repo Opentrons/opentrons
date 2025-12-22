@@ -86,7 +86,6 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
     })
 
     isSentryInitialized = true
-    console.log('Sentry initialized successfully.')
   } catch (error) {
     console.error('Error initializing Sentry:', { error })
   }
