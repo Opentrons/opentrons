@@ -124,6 +124,7 @@ async def main(args) -> None:
     else:
         raise("Define the Pump that is being Used")
     pump.csv_path = args.file_name
+    print(pump.csv_path)
     await pump.connect()
     if args.pump == "Opentrons":
         # await command_loop(pump)
