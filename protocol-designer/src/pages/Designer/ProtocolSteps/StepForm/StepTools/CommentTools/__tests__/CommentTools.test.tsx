@@ -7,9 +7,12 @@ import { i18n } from '/protocol-designer/assets/localization'
 import { CommentTools } from '..'
 
 import type { ComponentProps } from 'react'
+import type { TextAreaField } from '@opentrons/components'
 
-vi.mock('/protocol-designer/components/molecules/TextAreaField/index', () => {
+vi.mock('@opentrons/components', async importOriginal => {
+  const actual = await importOriginal<typeof TextAreaField>()
   return {
+    ...actual,
     TextAreaField: vi.fn(() => <div>mock TextAreaField</div>),
   }
 })

@@ -41,7 +41,7 @@ const useFocusVisible = (): boolean => {
   return isKeyboardFocus
 }
 
-export interface TextAreaFieldProps {
+interface TextAreaFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
