@@ -5,6 +5,8 @@ import type {
   TCExtendedProfileParams,
 } from '@opentrons/shared-data'
 
+type ProfileElements = TCExtendedProfileParams['profileElements']
+
 interface ThermocyclerProfileRepetitionsForPython {
   repeatingProfileSteps: AtomicProfileStep[]
   numRepetitions: number
@@ -18,7 +20,7 @@ interface ThermocyclerProfileRepetitionsForPython {
  * This converts the array-of-loops format to the single-loop format.
  */
 export function getThermocyclerProfileRepetitionsForPython(
-  profileElements: TCExtendedProfileParams['profileElements']
+  profileElements: ProfileElements
 ): ThermocyclerProfileRepetitionsForPython {
   const soleElement = profileElements.length === 1 ? profileElements[0] : null
   if (soleElement != null && 'steps' in soleElement) {
@@ -29,11 +31,20 @@ export function getThermocyclerProfileRepetitionsForPython(
   } else {
     return {
       numRepetitions: 1,
-      repeatingProfileSteps: profileElements.flatMap(element =>
-        'steps' in element
-          ? repeatArray(element.steps, element.repetitions)
-          : element
-      ),
+      repeatingProfileSteps: unrollThermocyclerProfile(profileElements),
     }
   }
+}
+
+/**
+ * Unroll a Thermocycler profile's cycles into an equivalent flat list of steps.
+ */
+export function unrollThermocyclerProfile(
+  profileElements: ProfileElements
+): AtomicProfileStep[] {
+  return profileElements.flatMap(element =>
+    'steps' in element
+      ? repeatArray(element.steps, element.repetitions)
+      : element
+  )
 }

@@ -248,6 +248,7 @@ describe('thermocyclerFormToArgs', () => {
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
+        concurrent: false,
         moduleId: tcModuleId,
         description: 'mock details',
         blockTargetTempHold: null,
@@ -364,6 +365,7 @@ describe('thermocyclerFormToArgs', () => {
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
+        concurrent: false,
         moduleId: tcModuleId,
         description: 'mock details',
         // todo(mm, 2025-10-09): See comments above about blockTargetTemp and blockTargetTempHold nullability.
