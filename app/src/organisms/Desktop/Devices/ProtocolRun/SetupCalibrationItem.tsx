@@ -82,11 +82,11 @@ export function SetupCalibrationItem({
               </LegacyStyledText>
             )}
             {title != null && (
-              <LegacyStyledText as="p" color={COLORS.black90} id={id}>
+              <LegacyStyledText forwardedAs="p" color={COLORS.black90} id={id}>
                 {title}
               </LegacyStyledText>
             )}
-            <LegacyStyledText as="label" color={COLORS.grey60}>
+            <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
               {calibrationDataNotAvailableText ?? subText ?? calibratedText}
             </LegacyStyledText>
           </Flex>

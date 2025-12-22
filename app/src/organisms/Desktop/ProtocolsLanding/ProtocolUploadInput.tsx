@@ -73,7 +73,7 @@ export function ProtocolUploadInput(
         }}
         uploadText={t('valid_file_types')}
         dragAndDropText={
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             <Trans
               t={t}
               i18nKey="shared:drag_and_drop"

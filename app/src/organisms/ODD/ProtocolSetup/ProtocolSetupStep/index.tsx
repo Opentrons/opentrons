@@ -141,7 +141,7 @@ export function ProtocolSetupStep({
           textAlign={TYPOGRAPHY.textAlignLeft}
         >
           <LegacyStyledText
-            as="h4"
+            forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             color={disabled ? COLORS.grey50 : COLORS.black90}
           >
@@ -149,7 +149,7 @@ export function ProtocolSetupStep({
           </LegacyStyledText>
           {description != null ? (
             <LegacyStyledText
-              as="h4"
+              forwardedAs="h4"
               color={disabled ? COLORS.grey50 : COLORS.grey60}
               maxWidth="35rem"
             >

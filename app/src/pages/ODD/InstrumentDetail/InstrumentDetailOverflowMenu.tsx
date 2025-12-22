@@ -118,7 +118,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
                     aria-label="restart_icon"
                   />
                   <LegacyStyledText
-                    as="h4"
+                    forwardedAs="h4"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     marginLeft={SPACING.spacing12}
                   >
@@ -136,7 +136,7 @@ const InstrumentDetailsOverflowMenu = NiceModal.create(
                     size="2.5rem"
                   />
                   <LegacyStyledText
-                    as="h4"
+                    forwardedAs="h4"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     marginLeft={SPACING.spacing12}
                   >

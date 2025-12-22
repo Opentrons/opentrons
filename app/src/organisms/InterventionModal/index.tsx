@@ -241,7 +241,9 @@ export function InterventionModal({
     </OddModal>
   ) : (
     <InterventionModalMolecule
-      iconHeading={<LegacyStyledText as="h1">{headerTitle}</LegacyStyledText>}
+      iconHeading={
+        <LegacyStyledText forwardedAs="h1">{headerTitle}</LegacyStyledText>
+      }
       iconName={iconName}
       type="intervention-required"
       iconSize={iconSize}

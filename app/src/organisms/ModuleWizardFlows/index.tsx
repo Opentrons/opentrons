@@ -164,7 +164,7 @@ export function ModuleWizardFlows(
               i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
-                block: <LegacyStyledText as="p" />,
+                block: <LegacyStyledText forwardedAs="p" />,
               }}
             />
           }

@@ -283,7 +283,7 @@ export function InstrumentsAndModules({
           >
             {/* TODO(bh, 2022-10-20): insert "offline" image when provided by illustrator */}
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               color={COLORS.grey40}
               id="InstrumentsAndModules_offline"
             >

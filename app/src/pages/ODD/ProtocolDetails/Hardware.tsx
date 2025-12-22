@@ -122,7 +122,10 @@ function HardwareItem({
   const hardwareName = useHardwareName(hardware, t as TFunction)
 
   let location: JSX.Element = (
-    <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+    <LegacyStyledText
+      forwardedAs="p"
+      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+    >
       {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
     </LegacyStyledText>
   )
@@ -170,7 +173,7 @@ function HardwareItem({
               <ModuleIcon moduleType={iconModuleType} size="1.75rem" />
             </Flex>
           ) : null}
-          <LegacyStyledText as="p">{hardwareName}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">{hardwareName}</LegacyStyledText>
         </Flex>
       </TableDatum>
     </TableRow>

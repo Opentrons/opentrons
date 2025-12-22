@@ -88,7 +88,10 @@ export function ChildNavigation({
             />
           </IconButton>
         ) : null}
-        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText
+          forwardedAs="h2"
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+        >
           {header}
         </LegacyStyledText>
       </Flex>

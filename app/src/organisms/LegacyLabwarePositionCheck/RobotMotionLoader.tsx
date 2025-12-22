@@ -31,7 +31,9 @@ export function RobotMotionLoader(props: RobotMotionLoaderProps): JSX.Element {
     >
       <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
       {header != null ? <LoadingText>{header}</LoadingText> : null}
-      {body != null ? <LegacyStyledText as="p">{body}</LegacyStyledText> : null}
+      {body != null ? (
+        <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
+      ) : null}
     </Flex>
   )
 }
