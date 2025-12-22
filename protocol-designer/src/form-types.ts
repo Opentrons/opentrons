@@ -467,22 +467,35 @@ export interface HydratedHeaterShakerFormData extends AnnotationFields {
 export interface HydratedThermocyclerFormData extends AnnotationFields {
   id: string
   stepType: 'thermocycler'
-  blockIsActive: boolean
-  blockIsActiveHold: boolean
-  blockTargetTemp: string | null
-  blockTargetTempHold: string | null
-  lidIsActive: boolean
-  lidIsActiveHold: boolean
-  lidOpen: boolean
-  lidOpenHold: boolean
-  lidTargetTemp: string | null
-  lidTargetTempHold: string | null
+
   moduleId: string
+
+  thermocyclerFormType: 'thermocyclerState' | 'thermocyclerProfile'
+
+  blockIsActive: boolean
+  blockTargetTemp: string | null
+
+  lidIsActive: boolean
+  lidTargetTemp: string | null
+
+  lidOpen: boolean
+
   orderedProfileItems: string[]
   profileItemsById: Record<string, ProfileItem>
   profileTargetLidTemp: string | null
   profileVolume: string | null
-  thermocyclerFormType: 'thermocyclerState' | 'thermocyclerProfile'
+
+  // https://opentrons.atlassian.net/browse/EXEC-2141
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  blockIsActiveHold: boolean
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  blockTargetTempHold: string | null
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  lidIsActiveHold: boolean
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  lidTargetTempHold: string | null
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  lidOpenHold: boolean
 }
 
 export type AbsorbanceReaderFormType =
