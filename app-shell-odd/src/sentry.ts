@@ -36,13 +36,17 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
     environment: _NODE_ENV_,
     release: app.getVersion(),
     tracesSampleRate: 1.0,
+    debug: true,
   }
-
   try {
     init({
       ...sentryOptions,
-      integrations: [
-        ...getDefaultIntegrations(sentryOptions),
+      integrations: () => [
+        // the sentry gpu integration will cause an event storm that doesn't let the
+        // ODD launch on the robot, for some reason. everything else is fine
+        ...getDefaultIntegrations(sentryOptions).filter(
+          integration => integration.name !== 'GpuContext'
+        ),
         additionalContextIntegration({
           deviceModelManufacturer: true,
         }),
