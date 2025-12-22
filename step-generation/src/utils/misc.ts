@@ -919,6 +919,10 @@ export const getIsLabwareCompatibleWithStack = (
   if (stack.length === 0) {
     return { isCompatible: true, isAboveStackLimit: false }
   }
+  // Determine if stacker is in the stack
+  const isStacker = Object.values(moduleEntities).some(
+    module => module.model === FLEX_STACKER_MODULE_V1
+  )
   const topIdInStack = getTopLocationInStack(stack)
   let isCompatible: boolean = true
   let isAboveStackLimit: boolean = false
@@ -928,14 +932,20 @@ export const getIsLabwareCompatibleWithStack = (
     const movingLabwareEntity = labwareEntities[labwareId]
     const topLabwareEntity = labwareEntities[topIdInStack]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
-    const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
-    const isSameLoadName =
-      loadNameToCheck === movingLabwareEntity.def.parameters.loadName
-    const currentStackAmount = stack.filter(
-      item => labwareEntities[item]?.def.parameters.loadName === loadNameToCheck
-    )?.length
-    isAboveStackLimit =
-      isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+    if (isStacker) {
+      // allow labware without a stack limit to be stacked on the stacker
+      isAboveStackLimit = false
+    } else {
+      const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
+      const isSameLoadName =
+        loadNameToCheck === movingLabwareEntity.def.parameters.loadName
+      const currentStackAmount = stack.filter(
+        item =>
+          labwareEntities[item]?.def.parameters.loadName === loadNameToCheck
+      )?.length
+      isAboveStackLimit =
+        isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+    }
 
     // This is an exception to allow universal lids to be placed on any labware except
     // tube racks, aluminum blocks, tip racks, or other lids.
