@@ -66,13 +66,16 @@ export const initializeSentry = (isAnalyticsEnabled: boolean): void => {
 
         if (
           errorMessage.includes('403') ||
+          // 404: common response case for a polled resource that doesn't exist (yet)
           errorMessage.includes('404') ||
+          // 502 and 503: common response case for a robot whose server isn't up yet or whose hardware controller isn't up yet
+          errorMessage.includes('502') ||
           errorMessage.includes('503')
         ) {
           return null
         }
 
-        // Filter out network/fetch errors.
+        // network fetch failures: the app works fine offline and otherwise uses local resources
         if (
           errorMessage.includes('Failed to fetch') ||
           errorMessage.includes('Failed to load resource') ||
