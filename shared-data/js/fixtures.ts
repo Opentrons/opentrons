@@ -476,32 +476,6 @@ export const getAAByAAId = (
   return aaItem
 }
 
-export const getAAWithFakesFromCutoutFixtureId = (
-  inputCutoutId: CutoutId,
-  cutoutFixtureId: CutoutFixtureIdsWithFakes,
-  deckDefinition: DeckDefinition
-): AddressableAreaNamesWithFakes[] | null => {
-  /**
-   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, null if there is none
-   */
-  const cutoutFixturesWithFakeFixtures = [
-    ...deckDefinition.cutoutFixtures,
-    ...FAKE_FIXTURES_AND_AA.cutoutFixtures,
-  ]
-  const deckDefWithFakeCutoutFixtures = {
-    ...deckDefinition,
-    cutoutFixtures: cutoutFixturesWithFakeFixtures,
-  }
-  const cutoutFixture = deckDefWithFakeCutoutFixtures.cutoutFixtures.find(
-    fixture => fixture.id === cutoutFixtureId
-  )
-  if (cutoutFixture == null) {
-    console.error(`Cannot find get addressable areas for ${cutoutFixtureId}`)
-    return null
-  }
-  return cutoutFixture?.providesAddressableAreas[inputCutoutId]
-}
-
 // #region: get fixture id by cutout id from module anchor cutout id
 
 export function getCutoutFixtureIdsForModuleModel(

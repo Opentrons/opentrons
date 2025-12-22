@@ -23,7 +23,6 @@ import {
   getAAComboFixtureDisplayName,
   getAAForModuleFixture,
   getAAsToFixtureIdFromDeckDefWithFakes,
-  getAAWithFakesFromCutoutFixtureId,
   getCutoutConfigReplacmentForModule,
   getFixtureDisplayName,
   getFlexStackerD3Compatibility,
@@ -47,29 +46,6 @@ vi.mock('react-i18next', () => ({
 }))
 
 const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-
-describe('getAAFromCutoutFixtureId', () => {
-  it('Should get the aa for a cutoutId and a cutoutFixtureId', () => {
-    const result = getAAWithFakesFromCutoutFixtureId(
-      'cutoutD3',
-      'flexStackerModuleV1',
-      deckDef
-    )
-
-    const expectedOrder = ['flexStackerModuleV1D4', 'D3']
-    expect(result).toEqual(expectedOrder)
-  })
-
-  it('Should return undefined if there is no match for a cutoutId and a cutoutFixtureId', () => {
-    const result = getAAWithFakesFromCutoutFixtureId(
-      'cutoutA1',
-      'flexStackerModuleV1',
-      deckDef
-    )
-
-    expect(result).toBeUndefined()
-  })
-})
 
 describe('replaceCutoutFixtureWithComboFixture', () => {
   it('Should replace flexStackerModuleV1 to a mag block/stacker combo fixture', () => {

@@ -25,9 +25,9 @@ import {
 import {
   getAAByAAId,
   getAAsToFixtureIdFromDeckDefWithFakes,
-  getAAWithFakesFromCutoutFixtureId,
   getVisualSlotIdForAA,
 } from '../../fixtures'
+import { getAAWithFakesFromCutoutFixtureId } from './getAddressableAreaFrom'
 import { getAAWithFakesFromVSId } from './getVisualSlotFrom'
 
 import type { CutoutFixtureId, CutoutId } from '../../../deck'
