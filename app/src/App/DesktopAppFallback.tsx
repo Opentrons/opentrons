@@ -13,6 +13,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
+import { useSentryReport } from '/app/App/hooks'
 import {
   ANALYTICS_DESKTOP_APP_ERROR,
   useTrackEvent,
@@ -36,6 +37,8 @@ export function DesktopAppFallback({ error }: FallbackProps): JSX.Element {
     navigate('/', { replace: true })
     dispatch(reloadUi(error.message as string))
   }
+
+  useSentryReport(error)
 
   return (
     <Modal type="warning" title={t('error_boundary_title')} marginLeft="0">

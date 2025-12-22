@@ -2,12 +2,15 @@ import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
 import { defineConfig } from 'vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import type { UserConfig } from 'vite'
 
 export default defineConfig(
   async (): Promise<UserConfig> => {
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
     const version = await versionForProject(project)
+    const mode = process.env.NODE_ENV ?? 'development'
+
     return {
       // this makes imports relative rather than absolute
       base: '',
@@ -30,6 +33,20 @@ export default defineConfig(
           formats: ['cjs'],
         },
       },
+      plugins: [
+        sentryVitePlugin({
+          org: 'opentrons-sw',
+          project: 'app',
+          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./dist/**'],
+            ignore: ['./node_modules/**'],
+            filesToDeleteAfterUpload:
+              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+          },
+        }),
+      ],
       optimizeDeps: {
         esbuildOptions: {
           target: 'CommonJs',
@@ -40,6 +57,7 @@ export default defineConfig(
         // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
         global: 'globalThis',
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+        _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
         _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
