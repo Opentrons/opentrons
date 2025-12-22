@@ -15,6 +15,7 @@ from automation.pd_pages import (
     ModuleConfigPage,
     PipetteModal,
     ProtocolEditorPage,
+    TransferPage,
 )
 
 LIQUID_NAME = "My liquid!"
@@ -94,4 +95,5 @@ def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> Non
     editor.open_add_step_menu()
     editor.verify_add_step_menu_options()
     editor.select_step_type("Transfer")
-    editor.expect_transfer_form()
+    transfer_page = TransferPage(page)
+    transfer_page.expect_transfer_form()

@@ -3,7 +3,9 @@
 import pytest
 from playwright.sync_api import Page, expect
 
-from automation.pd_pages import LandingPage, ProtocolEditorPage
+from automation.pd_pages import LandingPage, ProtocolEditorPage, BasePage
+
+from utility import _import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/9/PD_Move_Lids_Setup.py"
 
@@ -29,7 +31,7 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     - Made test for OT2 (only manual moves)
     """
     # Import setup protocol and open editor
-    _import_protocol_and_open_editor(page)
+    _import_protocol_and_open_editor(page, PROTOCOL_PATH)
 
     editor = ProtocolEditorPage(page)
 
@@ -103,21 +105,6 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
 ###########################################################################
 
 
-def _import_protocol_and_open_editor(page: Page) -> ProtocolEditorPage:
-    """Shared setup helper used by both tests."""
-
-    landing = LandingPage(page)
-    landing.wait_for_page_load()
-    landing.confirm_welcome_modal()
-    landing.click_import_existing_protocol()
-    landing.upload_protocol_file(PROTOCOL_PATH)
-
-    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
-    _dismiss_migration_modal(page)
-
-    page.get_by_role("button", name="Edit protocol").click()
-    expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
-    return ProtocolEditorPage(page)
 
 
 def _dismiss_migration_modal(page: Page) -> None:

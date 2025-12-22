@@ -1,7 +1,8 @@
 import functools
 
 from playwright.sync_api import Error as PlaywrightError
-from playwright.sync_api import Page, TimeoutError
+from playwright.sync_api import Page, TimeoutError, expect
+from automation.pd_pages import LandingPage, ProtocolEditorPage
 
 
 def _find_page_in_args(*args, **kwargs) -> Page | None:
@@ -49,3 +50,45 @@ def troubleshoot_and_pause(func):
             raise  # Re-raise the exception after pausing
 
     return wrapper
+
+def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str) -> ProtocolEditorPage:
+    """This test takes two inputs: 
+    1. page: The Playwright Page object.
+    2. PROTOCOL_PATH: The file path of the protocol to import
+    Located in fixtures/protocol/
+    """
+
+    landing = LandingPage(page)
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+    landing.click_import_existing_protocol()
+    landing.upload_protocol_file(PROTOCOL_PATH)
+
+    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
+
+    page.get_by_role("button", name="Edit protocol").click()
+    expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
+    return ProtocolEditorPage(page)
+
+
+
+
+
+def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str):
+    """This test takes two inputs: 
+    1. page: The Playwright Page object.
+    2. PROTOCOL_PATH: The file path of the protocol to import
+    Located in fixtures/protocol/
+    """
+
+    landing = LandingPage(page)
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+    landing.click_import_existing_protocol()
+    landing.upload_protocol_file(PROTOCOL_PATH)
+
+    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
+
+    page.get_by_role("button", name="Edit protocol").click()
+    expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
+    return ProtocolEditorPage(page)
