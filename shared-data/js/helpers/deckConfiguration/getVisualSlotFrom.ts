@@ -1,3 +1,6 @@
+/**
+ * This file contains helpers related to the visual slots and slot display names.
+ */
 import { getAASlotDisplayName } from '../..'
 
 import type { AddressableAreaNamesWithFakes } from '../..'

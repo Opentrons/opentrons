@@ -4,7 +4,6 @@ import {
   getDeckDefFromRobotType,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
-  getVisualSlotIdFromAAId,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
