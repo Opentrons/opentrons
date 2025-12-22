@@ -5,7 +5,8 @@ import fastapi
 import sqlalchemy
 
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
-from robot_server.persistence.tables import boolean_setting_table, BooleanSettingKey
+from robot_server.persistence.tables import boolean_setting_table, BooleanSettingKey, camera_capture_image_settings_table
+from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 
 # All camera behavior is disabled by default
 _CAMERA_ENABLED_DEFAULT = False
@@ -44,6 +45,70 @@ class CameraSettingStore:
             BooleanSettingKey.ENABLE_ERROR_RECOVERY_CAMERA
         )
         return result if result is not None else _CAMERA_ERROR_RECOVERY_ENABLED_DEFAULT
+    
+    def get_camera_capture_image_settings(self) -> CameraCaptureImageSettings:
+        """Get the values store in the camera capture image settings table."""
+        with self._sql_engine.begin() as transaction:
+            camera_id=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "camera_id"
+                )
+            ).scalar_one_or_none()
+            resolution_x=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "resolution_x"
+                )
+            ).scalar_one_or_none()
+            resolution_y=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "resolution_x"
+                )
+            ).scalar_one_or_none()
+            if resolution_x is not None and resolution_y is not None:
+                resolution=(resolution_x, resolution_y)
+            else: resolution = None
+            zoom=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "zoom"
+                )
+            ).scalar_one_or_none()
+            pan_x=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "pan_x"
+                )
+            ).scalar_one_or_none()
+            pan_y=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "pan_x"
+                )
+            ).scalar_one_or_none()
+            if pan_x is not None and pan_y is not None:
+                pan=(pan_x, pan_y)
+            else: pan = None
+            contrast=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "contrast"
+                )
+            ).scalar_one_or_none()
+            brightness=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "brightness"
+                )
+            ).scalar_one_or_none()
+            saturation=transaction.execute(
+                sqlalchemy.select(camera_capture_image_settings_table.c.value).where(
+                    camera_capture_image_settings_table.c.key == "saturation"
+                )
+            ).scalar_one_or_none()
+        return CameraCaptureImageSettings(
+            cameraId=camera_id,
+            resolution=resolution,
+            zoom=zoom,
+            pan=pan,
+            contrast=contrast,
+            brightness=brightness,
+            saturation=saturation
+        )
 
     def _set_enablement_status(
         self, setting: BooleanSettingKey, is_enabled: bool | None
@@ -79,6 +144,119 @@ class CameraSettingStore:
         self._set_enablement_status(
             BooleanSettingKey.ENABLE_ERROR_RECOVERY_CAMERA, is_enabled
         )
+
+    def set_camera_capture_image_settings(self, settings: CameraCaptureImageSettings) -> None:
+        """Set the value of the global "camera capture image" settings.
+
+        `None` means revert to the system default.
+        """
+        with self._sql_engine.begin() as transaction:
+            # Camera ID
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "camera_id"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="camera_id",
+                    value=settings.cameraId,
+                )
+            )
+            # Resolution
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "resolution_x"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="resolution_x",
+                    value=settings.resolution[0] if settings.resolution is not None else None,
+                )
+            )
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "resolution_y"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="resolution_y",
+                    value=settings.resolution[1] if settings.resolution is not None else None,
+                )
+            )
+            # Zoom
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "zoom"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="zoom",
+                    value=settings.zoom,
+                )
+            )
+            # Pan
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "pan_x"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="pan_x",
+                    value=settings.pan[0] if settings.pan is not None else None,
+                )
+            )
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "pan_y"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="pan_y",
+                    value=settings.pan[1] if settings.pan is not None else None,
+                )
+            )
+            # Contrast
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "contrast"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="contrast",
+                    value=settings.contrast,
+                )
+            )
+            # Brightness
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "brightness"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="brightness",
+                    value=settings.brightness,
+                )
+            )
+            # Saturation
+            transaction.execute(
+                sqlalchemy.delete(camera_capture_image_settings_table).where(
+                    camera_capture_image_settings_table.c.key == "saturation"
+                )
+            )
+            transaction.execute(
+                sqlalchemy.insert(camera_capture_image_settings_table).values(
+                    key="saturation",
+                    value=settings.saturation,
+                )
+            )
 
 
 async def get_camera_setting_store(

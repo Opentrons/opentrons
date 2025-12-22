@@ -254,6 +254,8 @@ class RunDataManager:
                 protocol_name=protocol_name,
             )
         )
+        
+        self._run_orchestrator_store.add_camera_capture_image_settings(capture_image_settings=self._camera_setting_store.get_camera_capture_image_settings())
 
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,

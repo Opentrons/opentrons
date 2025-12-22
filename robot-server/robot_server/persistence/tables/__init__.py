@@ -1,7 +1,7 @@
 """SQL database schemas."""
 
 # Re-export the latest schema.
-from .schema_13 import (
+from .schema_14 import (
     metadata,
     protocol_table,
     analysis_table,
@@ -15,6 +15,7 @@ from .schema_13 import (
     input_data_files_table,
     output_data_files_table,
     boolean_setting_table,
+    camera_capture_image_settings_table,
     labware_offset_table,
     labware_offset_location_sequence_components_table,
     PrimitiveParamSQLEnum,
@@ -38,6 +39,7 @@ __all__ = [
     "input_data_files_table",
     "output_data_files_table",
     "boolean_setting_table",
+    "camera_capture_image_settings_table",
     "labware_offset_table",
     "labware_offset_location_sequence_components_table",
     "PrimitiveParamSQLEnum",
