@@ -3,8 +3,7 @@
 import pytest
 from playwright.sync_api import Page, expect
 
-from automation.pd_pages import LandingPage, ProtocolEditorPage, BasePage
-
+from automation.pd_pages import ProtocolEditorPage
 from utility import _import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/9/PD_Move_Lids_Setup.py"
@@ -103,8 +102,6 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
 
 
 ###########################################################################
-
-
 
 
 def _dismiss_migration_modal(page: Page) -> None:
