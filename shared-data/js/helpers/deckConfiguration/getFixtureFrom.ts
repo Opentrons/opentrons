@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash'
 
-import { getDeckDefFromRobotType } from '..'
+import { getCutoutIdForSlotName, getDeckDefFromRobotType } from '..'
 import {
   ABSORBANCE_READER_V1_FIXTURE,
   DEFAULT_AA_FOR_WASTE_CHUTE,
@@ -11,6 +11,7 @@ import {
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
   MAGNETIC_BLOCK_V1,
+  MODULE_FIXTURES_BY_MODEL,
   SINGLE_CENTER_SLOT_FIXTURE,
   SINGLE_LEFT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
@@ -35,7 +36,13 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
 } from '../../constants'
-import type { CutoutConfig, CutoutConfigMap, DeckDefinition } from '../../types'
+import type {
+  CutoutConfig,
+  CutoutConfigMap,
+  CutoutFixture,
+  DeckDefinition,
+  ModuleModel,
+} from '../../types'
 
 export const getCutoutFixtureReplacementIfNeeded = (
   cutoutFixtureId: CutoutFixtureId,
@@ -221,4 +228,49 @@ export const replaceCutoutFixtureForFixtureRemoval = (
     // Fallback if no match found
     return cutoutFixtureRemoved
   }
+}
+
+export function getCutoutFixtureIdsForModuleModel(
+  moduleModel: ModuleModel
+): CutoutFixtureId[] {
+  const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
+  return moduleFixtures ?? []
+}
+
+export function getCutoutFixturesForModuleModel(
+  moduleModel: ModuleModel,
+  deckDef: DeckDefinition
+): CutoutFixture[] {
+  const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
+  return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
+    const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
+    return moduleFixture != null ? [...acc, moduleFixture] : acc
+  }, [])
+}
+
+export function getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+  anchorCutoutId: CutoutId | null,
+  moduleFixtures: CutoutFixture[] // cutout fixtures for a specific module model
+): { [cutoutId in CutoutId]?: CutoutFixtureId } {
+  // find the first fixture for this specific module model that may mount to the cutout implied by the slotName
+  const anchorFixture = moduleFixtures.find(fixture =>
+    fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId)
+  )
+  if (anchorCutoutId != null && anchorFixture != null) {
+    const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
+    return groupedFixtures?.[0] ?? { [anchorCutoutId]: anchorFixture.id }
+  }
+  return {}
+}
+
+export function getFixtureIdByCutoutIdFromModuleSlotName(
+  slotName: string,
+  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
+  deckDef: DeckDefinition
+): { [cutoutId in CutoutId]?: CutoutFixtureId } {
+  const anchorCutoutId = getCutoutIdForSlotName(slotName, deckDef)
+  return getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
+    anchorCutoutId,
+    moduleFixtures
+  )
 }

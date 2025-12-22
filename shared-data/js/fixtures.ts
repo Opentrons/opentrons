@@ -72,8 +72,12 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
-import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
+import { getDeckDefFromRobotType } from './helpers'
+import { getAAWithFakesFromCutoutFixtureId } from './helpers/deckConfiguration/getAddressableAreaFrom'
 import {
+  getCutoutFixtureIdsForModuleModel,
+  getCutoutFixturesForModuleModel,
+  getFixtureIdByCutoutIdFromModuleSlotName,
   getReplacementFixtureForFakeFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
 } from './helpers/deckConfiguration/getFixtureFrom'
@@ -477,51 +481,6 @@ export const getAAByAAId = (
 }
 
 // #region: get fixture id by cutout id from module anchor cutout id
-
-export function getCutoutFixtureIdsForModuleModel(
-  moduleModel: ModuleModel
-): CutoutFixtureId[] {
-  const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
-  return moduleFixtures ?? []
-}
-
-export function getCutoutFixturesForModuleModel(
-  moduleModel: ModuleModel,
-  deckDef: DeckDefinition
-): CutoutFixture[] {
-  const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
-  return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
-    const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
-    return moduleFixture != null ? [...acc, moduleFixture] : acc
-  }, [])
-}
-
-export function getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-  anchorCutoutId: CutoutId | null,
-  moduleFixtures: CutoutFixture[] // cutout fixtures for a specific module model
-): { [cutoutId in CutoutId]?: CutoutFixtureId } {
-  // find the first fixture for this specific module model that may mount to the cutout implied by the slotName
-  const anchorFixture = moduleFixtures.find(fixture =>
-    fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId)
-  )
-  if (anchorCutoutId != null && anchorFixture != null) {
-    const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
-    return groupedFixtures?.[0] ?? { [anchorCutoutId]: anchorFixture.id }
-  }
-  return {}
-}
-
-export function getFixtureIdByCutoutIdFromModuleSlotName(
-  slotName: string,
-  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
-  deckDef: DeckDefinition
-): { [cutoutId in CutoutId]?: CutoutFixtureId } {
-  const anchorCutoutId = getCutoutIdForSlotName(slotName, deckDef)
-  return getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-    anchorCutoutId,
-    moduleFixtures
-  )
-}
 
 export function getCutoutIdsFromModuleSlotName(
   slotName: string,
