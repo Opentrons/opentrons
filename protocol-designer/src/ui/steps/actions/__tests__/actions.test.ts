@@ -16,7 +16,11 @@ import {
   getSelectedStepId,
 } from '../../selectors'
 import { deselectAllSteps, selectAllSteps } from '../actions'
-import { duplicateSelectedSteps, saveStepForm } from '../thunks'
+import {
+  duplicateSelectedSteps,
+  reorderSelectedStep,
+  saveStepForm,
+} from '../thunks'
 
 import type { Timeline } from '@opentrons/step-generation/src/types'
 import type { FormData } from '/protocol-designer/form-types'
@@ -464,6 +468,66 @@ describe('steps actions', () => {
           }
         }
       )
+    })
+  })
+
+  describe('reorderSelectedStep', () => {
+    const mockFormData: FormData[] = [
+      {
+        id: 'step_1',
+        stepType: 'moveLiquid',
+      },
+      {
+        id: 'step_2',
+        stepType: 'mix',
+      },
+      {
+        id: 'step_3',
+        stepType: 'pause',
+      },
+    ] as FormData[]
+
+    beforeEach(() => {
+      when(vi.mocked(stepFormSelectors.getOrderedSavedForms))
+        .calledWith(expect.anything())
+        .thenReturn(mockFormData)
+      when(vi.mocked(featureFlagSelectors.getEnableConcurrentModuleActions))
+        .calledWith(expect.anything())
+        .thenReturn(true)
+    })
+
+    afterEach(() => {
+      vi.resetAllMocks()
+      vi.restoreAllMocks()
+    })
+
+    it('should dispatch REORDER_STEPS action when a step is selected', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn('step_2')
+
+      const store: any = mockStore()
+      store.dispatch(reorderSelectedStep('up'))
+
+      expect(store.getActions()).toStrictEqual([
+        {
+          type: 'REORDER_STEPS',
+          payload: {
+            stepIds: ['step_2', 'step_1', 'step_3'],
+          },
+        },
+      ])
+    })
+
+    it('should not dispatch any action when no step is selected', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+
+      const store: any = mockStore()
+      store.dispatch(reorderSelectedStep('up'))
+
+      expect(store.getActions()).toStrictEqual([])
     })
   })
 })
