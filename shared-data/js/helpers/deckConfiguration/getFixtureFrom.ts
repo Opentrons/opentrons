@@ -7,9 +7,11 @@ import {
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
+  FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_V1_FIXTURE,
   FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE,
+  FLEX_USB_MODULE_FIXTURES,
   MAGNETIC_BLOCK_V1,
   MODULE_FIXTURES_BY_MODEL,
   SINGLE_CENTER_SLOT_FIXTURE,
@@ -23,20 +25,24 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '../../constants'
+import { getAAByAAId, getVisualSlotIdForAA } from '../../fixtures'
 import {
-  getAAByAAId,
   getAAsToFixtureIdFromDeckDefWithFakes,
-  getVisualSlotIdForAA,
-} from '../../fixtures'
-import { getAAWithFakesFromCutoutFixtureId } from './getAddressableAreaFrom'
+  getAAWithFakesFromCutoutFixtureId,
+} from './getAddressableAreaFrom'
 import { getAAWithFakesFromVSId } from './getVisualSlotFrom'
 
-import type { CutoutFixtureId, CutoutId } from '../../../deck'
+import type {
+  AddressableAreaName,
+  CutoutFixtureId,
+  CutoutId,
+} from '../../../deck'
 import type {
   AddressableAreaNamesWithFakes,
   CutoutFixtureIdsWithFakes,
 } from '../../constants'
 import type {
+  AreaType,
   CutoutConfig,
   CutoutConfigMap,
   CutoutFixture,
@@ -273,4 +279,87 @@ export function getFixtureIdByCutoutIdFromModuleSlotName(
     anchorCutoutId,
     moduleFixtures
   )
+}
+
+export const getMainUsbModuleFixtureIdForComboFixture = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[]
+): CutoutFixtureId | null => {
+  return (
+    compatibleCutoutFixtureIds.find(cf =>
+      FLEX_USB_MODULE_FIXTURES.includes(cf)
+    ) ?? null
+  )
+}
+
+export const getMainFixtureIdForAA = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+  addressableAreaIds: AddressableAreaName[],
+  cutoutId: CutoutId
+): CutoutFixtureId | null => {
+  if (addressableAreaIds.length === 1) {
+    return getMainNonComboFixtureId(
+      compatibleCutoutFixtureIds,
+      addressableAreaIds,
+      cutoutId
+    )
+  }
+
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
+    compatibleCutoutFixtureIds.includes(cf.id)
+  )
+  const cutoutFixturesWithAddressableAreas = cutoutFixtures.find(cf =>
+    Object.values(cf.providesAddressableAreas).some(providedAAs =>
+      addressableAreaIds.every(aa => providedAAs.includes(aa))
+    )
+  )
+  return cutoutFixturesWithAddressableAreas?.id ?? null
+}
+
+export const getMainNonComboFixtureId = (
+  compatibleCutoutFixtureIds: CutoutFixtureId[],
+  addressableAreaIds: AddressableAreaName[],
+  cutoutId: CutoutId
+): CutoutFixtureId | null => {
+  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
+  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
+    compatibleCutoutFixtureIds.includes(cf.id)
+  )
+  const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
+  if (
+    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
+      aaAreaType as AreaType
+    ) &&
+    aaAreaType !== 'magneticBlock'
+  ) {
+    return (
+      getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
+      null
+    )
+  }
+  const cutoutFixturesWithAddressableAreas = cutoutFixtures.filter(cf =>
+    Object.values(cf.providesAddressableAreas).some(providedAAs =>
+      addressableAreaIds.every(aa => providedAAs.includes(aa))
+    )
+  )
+
+  if (cutoutFixturesWithAddressableAreas.length === 0) {
+    return null
+  }
+
+  // Find the fixture with the least items in its providesAddressableAreas in order to find the simplest fixture
+  const fixtureWithLeastAAs = cutoutFixturesWithAddressableAreas.reduce(
+    (minFixture, currentFixture) => {
+      const minAAsCount = Object.entries(minFixture.providesAddressableAreas)
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
+      const currentAAsCount = Object.entries(
+        currentFixture.providesAddressableAreas
+      )
+        .filter(([key, value]) => key === cutoutId)
+        .map(([key, value]) => value)[0].length
+      return currentAAsCount < minAAsCount ? currentFixture : minFixture
+    }
+  )
+  return fixtureWithLeastAAs.id
 }
