@@ -1,0 +1,5 @@
+name: otapi-wasmer-demo
+app_id: da_K6AIot5U0pLk
+owner: ddcc4
+package: .
+kind: wasmer.io/App.v0

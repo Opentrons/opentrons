@@ -1,0 +1,26 @@
+[package]
+name = "otapi-wasmer-demo"
+version = "0.0.1"
+description = "Silly cloud demo"
+
+[dependencies]
+"python/python" = "3.13" # 3.12 doesn't work with Wasmer packages
+
+[fs]
+"/api" = "."
+"/site-packages" = "../opentrons/api/.wasmenv/lib/python3.13/site-packages"
+
+[[command]]
+name = "script"
+module = "python/python:python"
+runner = "wasi"
+
+[command.annotations.wasi]
+cwd = "/api"
+main-args = ["-m", "uvicorn", "main:app"]
+env = [
+  "PYTHONPATH=/site-packages",
+  "OT_API_CONFIG_DIR=/tmp", # infer_config_base_dir() wants a home dir
+]
+
+# wasmer run . --net --env PORT=8000
