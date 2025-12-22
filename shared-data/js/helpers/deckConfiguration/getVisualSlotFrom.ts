@@ -1,4 +1,6 @@
-import { AddressableAreaNamesWithFakes } from '../..'
+import { getAASlotDisplayName } from '../..'
+
+import type { AddressableAreaNamesWithFakes } from '../..'
 
 export type VISUAL_SLOTS =
   | 'VSA1'
@@ -123,7 +125,7 @@ export const getVisualSlotIdFromAAId = (
 }
 
 export const getAAWithFakesFromVSId = (
-  vsId: string
+  vsId: VISUAL_SLOTS
 ): AddressableAreaNamesWithFakes | null => {
   switch (vsId) {
     case 'VSA1':
@@ -162,4 +164,15 @@ export const getAAWithFakesFromVSId = (
       console.error(`could not find a match for VS:${vsId}`)
       return null
   }
+}
+
+export const getSlotDisplayNameFromAAWithFakes = (
+  aaId: AddressableAreaNamesWithFakes
+): string => {
+  const vsId = getVisualSlotIdFromAAId(aaId as AddressableAreaNamesWithFakes)
+  const slot =
+    getAAWithFakesFromVSId(vsId as VISUAL_SLOTS) ??
+    ('' as AddressableAreaNamesWithFakes)
+
+  return getAASlotDisplayName(slot)
 }

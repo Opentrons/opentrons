@@ -411,10 +411,6 @@ export function getAddressableAreaFromSlotId(
   )
 }
 
-//# Fixture Replacement Region
-
-//#endregion
-
 export const filterAAByAreaType = (
   cutoutFixtures: CutoutConfigMap[],
   deckDef: DeckDefinition,

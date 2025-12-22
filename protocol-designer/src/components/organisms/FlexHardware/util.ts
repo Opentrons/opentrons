@@ -1,10 +1,9 @@
 import {
   FLEX_ROBOT_TYPE,
-  getAASlotDisplayName,
-  getAAWithFakesFromVSId,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
+  getSlotDisplayNameFromAAWithFakes,
   getVisualSlotIdFromAAId,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
@@ -193,18 +192,12 @@ export const updateInitialDeckState = (
                 value.cutoutId
               )
             : null
-        const vs = getVisualSlotIdFromAAId(
-          value.addressableAreaId as AddressableAreaName
-        )
-        const slot =
-          getAAWithFakesFromVSId(vs) ?? ('' as AddressableAreaNamesWithFakes)
-        const slotName = getAASlotDisplayName(slot)
-        console.log('slot in updateInitialDeckState:', slotName)
+        const slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
         //   creating module
         if (labwareNotCompatible == null && model != null && type != null) {
           dispatch(
             createModule({
-              slot: slotName,
+              slot,
               model,
               type,
             })
