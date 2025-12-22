@@ -83,12 +83,26 @@ The liquid meniscus in a well changes during aspirating or dispensing, so you'll
 - Set `target="start"` to target the existing liquid meniscus in the destination well before a dispense. 
 - Set `target="end"` to ensure the pipette stays submerged while aspirating, or to avoid touching liquid in the destination well while dispensing. 
 
+You can use the optional `location` and `end_location` parameters of the [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] and [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense] methods to pipette relative to the liquid meniscus as it changes: 
+
+```python
+pipette.aspirate(
+    volume=100,
+    location=plate["A1"].meniscus(z=-1, target="start"),
+    end_location=plate["A1"].meniscus(z=-1, target="end")
+)
+```
+
+*Changed in version 2.27*: Use the optional `end_location` parameter during an `aspirate()` or `dispense()`.
+
+Here, the pipette tip stays at 1 mm below the liquid meniscus, regardless of changes in liquid height during the aspirate. For more, see the [aspirate](liquids.md#aspirate-building-block) and [dispense](liquids.md#dispense-building-block) sections.
+
 !!! note
     To use the [`meniscus()`][opentrons.protocol_api.labware.Well.meniscus] method, you'll first need to specify the starting liquid volume with [`Labware.load_liquid()`][opentrons.protocol_api.labware.Labware.load_liquid] or probe for liquid with [`measure_liquid_height()`][opentrons.protocol_api.InstrumentContext.measure_liquid_height].
     
     Detecting liquid in a well requires pipette sensors, so you can only measure liquid height with a Flex pipette. 
 
-*New in version 2.23*
+*New in version 2.23.*
 
 ### Default positions
 
