@@ -30,7 +30,7 @@ import {
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
 } from './getAddressableAreaFrom'
-import { getAAWithFakesFromVSId } from './getVisualSlotFrom'
+import { getAAWithFakesFromVSId, type VISUAL_SLOTS } from './getVisualSlotFrom'
 
 import type {
   AddressableAreaName,
@@ -218,7 +218,9 @@ export const replaceCutoutFixtureForFixtureRemoval = (
   } else {
     const updated = aaForFixtureRemoval?.map(aa => {
       const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-      return aa === addressableAreaId ? getAAWithFakesFromVSId(vsId) : aa
+      return aa === addressableAreaId
+        ? getAAWithFakesFromVSId(vsId as VISUAL_SLOTS)
+        : aa
     })
     const match = Object.entries(aaPerFixtureOptions).find(([, value]) => {
       return isEqual(

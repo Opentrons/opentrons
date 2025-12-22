@@ -17,6 +17,7 @@ import {
 import {
   getAAWithFakesFromVSId,
   getVisualSlotIdFromAAId,
+  VISUAL_SLOTS,
 } from './getVisualSlotFrom'
 
 import type { CutoutFixtureId, CutoutId } from '../../../deck'
@@ -134,7 +135,7 @@ export const getMainAAForAFixture = (
   } else {
     const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
       const vsId = getVisualSlotIdFromAAId(aa)
-      const singleSlotId = getAAWithFakesFromVSId(vsId)
+      const singleSlotId = getAAWithFakesFromVSId(vsId as VISUAL_SLOTS)
       return singleSlotId === addressableAreaId
     })
     return aa! // we can cast this bc there should me a match for every fixtureId

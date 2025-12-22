@@ -37,7 +37,6 @@ import {
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
-  DEFAULT_AA_FOR_WASTE_CHUTE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
   FLEX_ROBOT_TYPE,
@@ -48,7 +47,6 @@ import {
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
-  LEFT_AND_CENTER_CUTOUTS,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
@@ -103,7 +101,7 @@ import type {
   AreaTypeWithFakes,
   CutoutFixtureIdsWithFakes,
 } from './constants'
-import type { CutoutConfigAndCompatibility } from './helpers'
+import type { CutoutConfigAndCompatibility, VISUAL_SLOTS } from './helpers'
 import type {
   AddressableArea,
   CoordinateTuple,
@@ -748,7 +746,7 @@ export const isModuleAllowedOnAA = (
     return {
       aa: item,
       slotLikeId: getAAWithFakesFromVSId(
-        getVisualSlotIdForAA(cutoutId, fixtureId[0], item)
+        getVisualSlotIdFromAAId(item) as VISUAL_SLOTS
       ),
     }
   })
