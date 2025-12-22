@@ -94,6 +94,7 @@ import {
 import type {
   LabwareEntities,
   ModuleEntities,
+  RobotState,
 } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
@@ -146,7 +147,8 @@ interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
     arg: StepFormDataMap[K],
     moduleEntities: ModuleEntities,
-    labwareEntities: LabwareEntities
+    labwareEntities: LabwareEntities,
+    robotState: RobotState | null
   ) => FormError[]
   getWarnings?: (arg: StepFormDataMap[K]) => FormWarning[] // Changed to match step type
 }
@@ -303,7 +305,8 @@ export const getFormErrors = (
   stepType: StepType,
   formData: HydratedFormData,
   moduleEntities: ModuleEntities,
-  labwareEntities: LabwareEntities
+  labwareEntities: LabwareEntities,
+  robotState: RobotState | null
 ): FormError[] => {
   //  manualIntervention is the initial starting deck state step
   if (stepType === 'manualIntervention') {
@@ -317,81 +320,93 @@ export const getFormErrors = (
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedAbsorbanceReaderFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
     case 'heaterShaker':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedHeaterShakerFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'magnet':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMagnetFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'mix':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMixFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'moveLabware':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMoveLabwareFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'moveLiquid':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedMoveLiquidFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'pause':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedPauseFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'temperature':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedTemperatureFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'thermocycler':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedThermocyclerFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
 
     case 'comment':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedCommentFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
     case 'camera':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedCameraFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
     case 'flexStacker':
       return stepFormHelperMap[stepType].getErrors(
         formData as HydratedFlexStackerFormData,
         moduleEntities,
-        labwareEntities
+        labwareEntities,
+        robotState
       )
     default:
       stepType satisfies never // if TypeScript complains here, you missed a stepType above

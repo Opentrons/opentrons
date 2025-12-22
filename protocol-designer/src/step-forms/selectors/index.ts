@@ -54,6 +54,7 @@ import type {
   ModuleTemporalProperties,
   NormalizedAdditionalEquipmentById,
   PipetteEntities,
+  RobotState,
   StagingAreaEntities,
   TrashBinEntities,
   WasteChuteEntities,
@@ -92,6 +93,7 @@ import type {
   NormalizedLabwareById,
   PipetteOnDeck,
 } from '../types'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
@@ -549,13 +551,15 @@ export const getBatchEditFormHasUnsavedChanges = createSelector(
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
   moduleEntities: ModuleEntities,
-  labwareEntities: LabwareEntities
+  labwareEntities: LabwareEntities,
+  robotState: RobotState | null
 ): StepFormErrors => {
   return getFormErrors(
     hydratedForm.stepType,
     hydratedForm,
     moduleEntities,
-    labwareEntities
+    labwareEntities,
+    robotState
   )
 }
 
@@ -574,13 +578,15 @@ const _dynamicMoveLabwareFieldFormErrors = (
 
 export const _hasFormLevelErrors = (
   hydratedForm: HydratedFormData,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  robotState: RobotState | null
 ): boolean => {
   if (
     _formLevelErrors(
       hydratedForm,
       invariantContext.moduleEntities,
-      invariantContext.labwareEntities
+      invariantContext.labwareEntities,
+      robotState
     ).length > 0
   )
     return true
@@ -603,9 +609,10 @@ export const _hasFormLevelErrors = (
 }
 export const _formHasErrors = (
   hydratedForm: HydratedFormData,
-  invariantContext: InvariantContext
+  invariantContext: InvariantContext,
+  robotState: RobotState | null
 ): boolean => {
-  return _hasFormLevelErrors(hydratedForm, invariantContext)
+  return _hasFormLevelErrors(hydratedForm, invariantContext, robotState)
 }
 export const getInvariantContext: Selector<BaseState, InvariantContext> =
   createSelector(
@@ -733,13 +740,15 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
 > = createSelector(
   getHydratedUnsavedForm,
   getInvariantContext,
-  (hydratedForm, invariantContext) => {
-    if (!hydratedForm) return []
+  getRobotStateAtActiveItem,
+  (hydratedForm, invariantContext, robotState) => {
+    if (!hydratedForm || !robotState) return []
 
     const errors = _formLevelErrors(
       hydratedForm,
       invariantContext.moduleEntities,
-      invariantContext.labwareEntities
+      invariantContext.labwareEntities,
+      robotState
     )
 
     return errors
@@ -749,9 +758,10 @@ export const getCurrentFormCanBeSaved: Selector<BaseState, boolean> =
   createSelector(
     getHydratedUnsavedForm,
     getInvariantContext,
-    (hydratedForm, invariantContext) => {
+    getRobotStateAtActiveItem,
+    (hydratedForm, invariantContext, robotState) => {
       if (!hydratedForm) return false
-      return !_formHasErrors(hydratedForm, invariantContext)
+      return !_formHasErrors(hydratedForm, invariantContext, robotState)
     }
   )
 export const getArgsAndErrorsByStepId: Selector<
@@ -761,7 +771,8 @@ export const getArgsAndErrorsByStepId: Selector<
   getOrderedSavedForms,
   getInvariantContext,
   labwareDefSelectors.getLabwareDefsByURI,
-  (stepForms, contextualState, allLabwareDefs) => {
+  getRobotStateAtActiveItem,
+  (stepForms, contextualState, allLabwareDefs, robotState) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
@@ -770,7 +781,7 @@ export const getArgsAndErrorsByStepId: Selector<
           contextualState,
           allLabwareDefs
         )
-        const errors = _formHasErrors(hydratedForm, contextualState)
+        const errors = _formHasErrors(hydratedForm, contextualState, robotState)
         const nextStepData = !errors
           ? {
               stepArgs: stepFormToArgs(

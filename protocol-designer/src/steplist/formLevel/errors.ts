@@ -43,7 +43,7 @@ import { getWellRatio } from '../utils/getWellRatio'
 
 import type { ReactNode } from 'react'
 import type { LabwareDefinition2, PipetteV2Specs } from '@opentrons/shared-data'
-import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
+import type { LabwareEntities, PipetteEntity, RobotState } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
@@ -758,8 +758,9 @@ export const pauseForTimeOrUntilTold = (
 }
 export const verifyLabwareQuantity = (
   fields: HydratedFlexStackerFormData,
-  moduleEntities?: ModuleEntities,
-  labwareEntities?: LabwareEntities
+  moduleEntities: ModuleEntities,
+  labwareEntities: LabwareEntities,
+  robotState: RobotState | null
 ): FormError | null => {
   const { fillQuantity, flexStackerFormType, fillLabwareUri } = fields
   const numericalFillQuantity = Number(fillQuantity)
@@ -1643,13 +1644,15 @@ type ComposeErrors = <T extends HydratedFormData>(
     (
       fields: T,
       moduleEntities?: ModuleEntities,
-      labwareEntities?: LabwareEntities
+      labwareEntities?: LabwareEntities,
+      robotState?: RobotState | null
     ) => FormError | null
   >
 ) => (
   arg: T,
   moduleEntities?: ModuleEntities,
-  labwareEntities?: LabwareEntities
+  labwareEntities?: LabwareEntities,
+  robotState?: RobotState | null
 ) => FormError[]
 
 export const composeErrors: ComposeErrors =
@@ -1658,15 +1661,17 @@ export const composeErrors: ComposeErrors =
       (
         fields: T,
         moduleEntities?: ModuleEntities,
-        labwareEntities?: LabwareEntities
+        labwareEntities?: LabwareEntities,
+        robotState?: RobotState | null
       ) => FormError | null
     >
   ) =>
   (
     formData: T,
     moduleEntities?: ModuleEntities,
-    labwareEntities?: LabwareEntities
+    labwareEntities?: LabwareEntities,
+    robotState?: RobotState | null
   ) =>
     errorCheckers
-      .map(checker => checker(formData, moduleEntities, labwareEntities))
+      .map(checker => checker(formData, moduleEntities, labwareEntities, robotState))
       .filter((error): error is FormError => error !== null)
