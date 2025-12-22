@@ -467,11 +467,11 @@ class TemperatureModuleContext(ModuleContext):
         """Sets the Temperature Module's target temperature and returns immediately without waiting for the module to reach the target. Allows the protocol to proceed while the Temperature Module heats.
 
         *Changed in version 2.27:* Returns a task object that represents
-        concurrent preheating. Pass the task object to
+        concurrent heating. Pass the task object to
         [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
+        to wait for the module to finish heating.
 
-        On version 2.26 or below, this function returns `None`.
+        In API version 2.26 or below, this function returns `None`.
 
         Args:
             celsius: A value between 4 and 95, representing the target
@@ -733,7 +733,7 @@ class ThermocyclerContext(ModuleContext):
     ) -> Task:
         """Sets the target temperature for the Thermocycler Module's well block, in °C.
 
-        Returns a task object that represents concurrent preheating.
+        Returns a [`Task`][opentrons.protocol_api.Task] object that represents concurrent heating.
         Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
         to wait for the preheat to complete.
 
@@ -744,10 +744,9 @@ class ThermocyclerContext(ModuleContext):
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
 
-                *Changed in version 2.27:* After API version
-                2.27 it will attempt to use the liquid tracking of the labware
-                first and then fall back to the 25 if there is no probed or loaded
-                liquid.
+                *Changed in version 2.27:* In API version
+                2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+                liquid information.
         """
 
         if block_max_volume is None:
@@ -764,10 +763,6 @@ class ThermocyclerContext(ModuleContext):
     def set_lid_temperature(self, temperature: float) -> None:
         """Set the target temperature for the heated lid, in °C.
 
-        Returns a task object that represents concurrent preheating.
-        Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
-
         Args:
             temperature: A value between 37 and 110, representing the target
                 temperature in °C.
@@ -782,19 +777,16 @@ class ThermocyclerContext(ModuleContext):
     @publish(command=cmds.thermocycler_start_set_lid_temperature)
     @requires_version(2, 27)
     def start_set_lid_temperature(self, temperature: float) -> Task:
-        """Set the target temperature for the heated lid, in °C.
+        """Sets a target temperature to heat the Thermocycler Module's lid, in °C.
 
-        Returns a task object that represents concurrent preheating.
+        Returns a [`Task`][opentrons.protocol_api.Task] object that represents concurrent heating.
         Pass the task object to [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
+        to wait for the lid to reach the target temperature.
 
         Args:
             temperature: A value between 37 and 110, representing the target
                 temperature in °C.
 
-        !!! note
-            The Thermocycler will proceed to the next command immediately after
-            `temperature` is reached.
         """
         task = self._core.start_set_target_lid_temperature(celsius=temperature)
         return Task(api_version=self._api_version, core=task)
@@ -842,12 +834,11 @@ class ThermocyclerContext(ModuleContext):
         block_max_volume: Optional[float] = None,
     ) -> Task:
         """
-        Start a Thermocycler profile and return a [`Task`][opentrons.protocol_api.Task] representing its execution.
+        Starts a defined Thermocycler Module profile and returns a [`Task`][opentrons.protocol_api.Task] representing its concurrent execution.
         Profile is defined as a cycle of `steps`, for a given number of `repetitions`.
 
-        Returns a task object that represents concurrent execution of the profile.
         Pass the task object to [`ProtocolContext.wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
+        to wait for the profile to complete.
 
         Args:
             steps: List of steps that make up a single cycle.
@@ -1126,18 +1117,19 @@ class HeaterShakerContext(ModuleContext):
         Set target temperature and return immediately.
 
         Sets the Heater-Shaker's target temperature and returns immediately without
-        waiting for the target to be reached. Does not delay the protocol until
-        target temperature has reached. Use
-        [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature]
+        waiting for the target to be reached. Allows the protocol to proceed while the module reaches the target temperature. 
+
+    
+        Use [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature]
         to delay protocol execution for API levels below 2.27.
 
         *Changed in version 2.25:* Removed the minimum temperature limit of 37 °C.
         Note that temperatures under ambient are not achievable.
 
-        *Changed in version 2.27:* Returns a task object that represents concurrent
-        preheating. Pass the task object to
+        *Changed in version 2.27:* Returns a [`Task`][opentrons.protocol_api.Task] object that represents concurrent
+        heating. Pass the task object to
         [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks]
-        to wait for the preheat to complete.
+        to wait for the module to reach the target temperature.
 
         Args:
             celsius: A value under 95, representing the target temperature in °C.
@@ -1166,13 +1158,11 @@ class HeaterShakerContext(ModuleContext):
     @requires_version(2, 13)
     @publish(command=cmds.heater_shaker_set_and_wait_for_shake_speed)
     def set_and_wait_for_shake_speed(self, rpm: int) -> None:
-        """Set a shake speed in rpm and block execution of further commands until the module reaches the target.
-
-        Reaching a target shake speed typically only takes a few seconds.
+        """Sets the Heater-Shaker's shake speed in RPM and returns a [`Task`][opentrons.protocol_api.Task] that represents concurrent shaking.
 
         !!! note
-            Before shaking, this command will retract the pipettes upward if they are parked
-            adjacent to the Heater-Shaker.
+            Before shaking, this command retracts pipettes upward if they are adjacent
+            to the Heater-Shaker Module.
 
         Args:
             rpm: A value between 200 and 3000, representing the target shake speed in

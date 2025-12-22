@@ -1295,7 +1295,7 @@ class ProtocolContext(CommandPublisher):
     @publish(command=cmds.wait_for_tasks)
     @requires_version(2, 27)
     def wait_for_tasks(self, tasks: list[Task]) -> None:
-        """Wait for a list of tasks to complete before executing subsequent commands.
+        """Wait for a list of [`Tasks`][opentrons.protocol_api.Task] to complete before executing subsequent commands.
 
         Args:
             tasks (list[Task]): A list of `Task` objects to wait for.
@@ -1308,7 +1308,7 @@ class ProtocolContext(CommandPublisher):
     @publish(command=cmds.create_timer)
     @requires_version(2, 27)
     def create_timer(self, seconds: float) -> Task:
-        """Create a timer :py:class:`Task` that runs in the background.
+        """Create a timer [`Task`][opentrons.protocol_api.Task] that runs in the background.
 
         Args:
             seconds (float): The time to delay in seconds.
