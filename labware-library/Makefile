@@ -18,7 +18,7 @@ all: clean dist
 
 .PHONY: clean
 clean:
-	pnpm dlx shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # production assets
 .PHONY: dist

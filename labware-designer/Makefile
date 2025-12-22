@@ -18,7 +18,7 @@ setup:
 
 .PHONY: clean
 clean:
-	pnpm dlx shx rm -rf dist
+	pnpm exec shx rm -rf dist
 
 # artifacts
 #####################################################################
