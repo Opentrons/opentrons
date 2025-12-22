@@ -20,6 +20,7 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  TextAreaField,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -34,7 +35,6 @@ import {
   LINE_CLAMP_TEXT_STYLE,
   LINK_BUTTON_STYLE,
 } from '/protocol-designer/components/atoms'
-import { TextAreaField } from '/protocol-designer/components/molecules'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
