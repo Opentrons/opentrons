@@ -205,8 +205,8 @@ EXPECTED_STATEMENTS_LATEST = [
     )
     """,
     """
-    CREATE TABLE camera_capture_image_settings_table (
-        camera_id VARCHAR,
+    CREATE TABLE camera_capture_image_settings (
+        camera_id VARCHAR NOT NULL,
         resolution_x INTEGER,
         resolution_y INTEGER,
         zoom FLOAT,
@@ -215,7 +215,7 @@ EXPECTED_STATEMENTS_LATEST = [
         contrast FLOAT,
         brightness FLOAT,
         saturation FLOAT,
-        PRIMARY KEY (camera_id),
+        PRIMARY KEY (camera_id)
     )
     """,
     """
