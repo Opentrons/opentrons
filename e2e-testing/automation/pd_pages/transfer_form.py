@@ -56,7 +56,7 @@ class TransferPage(BasePage):
                 self.page.locator(f'rect[data-wellname="{well}"]').click()
             else:
                 # Fallback for non-rect elements if applicable
-                self.page.get_by_text(f'circle[data-wellname="{well}"]').click()
+                self.page.locator(f'circle[data-wellname="{well}"]').click()
         self.page.get_by_text("Save", exact=True).click()
 
     def destination_labware_select(self, labware: str) -> None:
@@ -159,7 +159,7 @@ class TransferPage(BasePage):
             if speed is not None:
                 input_locator.fill(str(speed))
             if distance is not None:
-                self.page.locator(f"input[name='{strat}_touchTip_distance_from_edge']").fill(str(distance))
+                self.page.locator(f"input[name='{strat}_touchTip_mmFromEdge']").fill(str(distance))
         elif is_visible:
             self.page.get_by_text("Touch tip", exact=True).click()
 
@@ -203,10 +203,44 @@ class TransferPage(BasePage):
         elif is_visible:
             self.page.get_by_text("Delay", exact=True).click()
 
+    def set_blowout(self, location: str, flow_rate: float, enable: bool) -> None:
+        """
+        Configures blowout settings.
+
+        Args:
+            location: The blowout location, e.g., "Source well", "Destination well", "Trash"
+            or "Waste chute"
+            flow_rate: The blowout flow rate (µL/s).
+        """
+        if enable:
+            self.page.get_by_text("Blowout").click()
+            self.page.get_by_test_id("blowout_location_dropdownMenu").click()
+            self.page.get_by_text(location, exact=True).click()
+            self.page.locator('input[name="blowout_flowRate"]').fill(str(flow_rate))
+        else:
+            pass
+
+    def set_disposal_volume(self, volume: float, location: str, flowrate: float, enable: bool) -> None:
+        """
+        Configures disposal volume settings.
+
+        Args:
+            volume: The disposal volume (µL).
+            location: The disposal location, e.g., "Source well", "Destination well", "Trash"
+            or "Waste chute"
+            flowrate: The disposal flow rate (µL/s).
+        """
+        if enable:
+            self.page.locator('input[name="disposalVolume_volume"]').fill(str(volume))
+            self.page.get_by_test_id("blowout_location_dropdownMenu").select_option(label=location)
+            self.page.locator('input[name="blowout_flowRate"]').fill(str(flowrate))
+        else:
+            pass
+
     def advanced_settings(
         self,
         Aspirate: bool,
-        Pre_wetting: bool = False,
+        Pre_wetting: Optional[bool] = False,
         Touch_tip: bool = False,
         Touch_tip_speed: Optional[float] = None,
         Touch_tip_distance_from_edge: Optional[float] = None,
@@ -214,6 +248,13 @@ class TransferPage(BasePage):
         Air_gap_volume: Optional[float] = None,
         Delay: bool = False,
         Delay_time: Optional[float] = None,
+        set_blowout: Optional[bool] = None,
+        set_disposal_volume: Optional[bool] = None,
+        blowout_location: Optional[str] = None,
+        blowout_flow_rate: Optional[float] = None,
+        disposal_volume: Optional[float] = None,
+        disposal_location: Optional[str] = None,
+        disposal_flowrate: Optional[float] = None,
     ) -> None:
         """
         High-level orchestrator to configure all advanced pipetting parameters.
@@ -233,8 +274,17 @@ class TransferPage(BasePage):
             Delay_time: Seconds for delay (only filled if Delay=True).
         """
         strat = "aspirate" if Aspirate else "dispense"
+        if "aspirate" in strat:
+            self.set_pre_wetting(Pre_wetting)
+        else:
+            self.set_blowout(location=blowout_location, flow_rate=blowout_flow_rate, enable=set_blowout)
+            self.set_disposal_volume(
+                volume=disposal_volume,
+                location=disposal_location,
+                flowrate=disposal_flowrate,
+                enable=set_disposal_volume,
+            )
 
-        self.set_pre_wetting(Pre_wetting)
         self.set_touch_tip(strat, Touch_tip, Touch_tip_speed, Touch_tip_distance_from_edge)
         self.set_air_gap(strat, Air_gap, Air_gap_volume)
         self.set_delay(strat, Delay, Delay_time)

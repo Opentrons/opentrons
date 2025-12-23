@@ -7,6 +7,8 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page
 
+from utility import troubleshoot_and_pause
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from automation.pd_pages import (
@@ -15,6 +17,7 @@ from automation.pd_pages import (
     ModuleConfigPage,
     PipetteModal,
     ProtocolEditorPage,
+    TransferPage,
 )
 
 
@@ -29,6 +32,7 @@ def test_protocol_designer_loads(page: Page, base_url: str) -> None:
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
+@troubleshoot_and_pause
 def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     """Full onboarding flow test using page objects."""
     print(f"Running full onboarding test against: {base_url}")
@@ -100,9 +104,10 @@ def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     # Add Transfer Step
     editor.confirm_liquid_setup()  # Close labware setup
     editor.add_step("Transfer")
-    editor.configure_transfer_source()
-    editor.configure_transfer_destination("Axygen 96 Well Plate 500 µL", 17)
-    editor.set_transfer_volume("100")
+    transfer_page = TransferPage(page)
+    transfer_page.wells_select(location="Source", wells=["A1"], rect=False)
+    transfer_page.wells_select(location="Destination", wells=["A1"], rect=False)
+    transfer_page.input_volume("100")
     print("✓ Transfer step configured")
 
     print("\n✅ Full onboarding flow completed successfully!")

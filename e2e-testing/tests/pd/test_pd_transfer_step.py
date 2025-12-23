@@ -20,13 +20,6 @@ SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
 @troubleshoot_and_pause
 def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> None:
     _import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py")
-    """Replicate the Cypress transferSettings single-channel test using Playwright."""
-    """
-    1. 1:1 Return tip  1000uL
-    2. 1:2 Use 1000 
-    3. 2:1 Use 200uL
-    4. Partial tip 1:1, 1:2, 2:1
-    """
     editor = ProtocolEditorPage(page)
     editor.open_add_step_menu()
     editor.add_step()
@@ -38,8 +31,8 @@ def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> Non
     transfer_page.pipette_path_select("Single transfer")
     transfer_page.input_volume("30")
     transfer_page.transfer_continue_to_next_step()
-    """ 
-    Regressions steps for Liquid Class settings 
+    """
+    Regressions steps for Liquid Class settings
     """
     liquid_classes = ["Aqueous", "Viscous", "Volatile"]
 
@@ -73,9 +66,24 @@ def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> Non
         Pre_wetting=True,
         Touch_tip=False,
         Air_gap=True,
-        Air_gap_volume=10,
+        Air_gap_volume=5,
         Delay=True,
         Delay_time=1,
     )
     transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=True)
-    page.pause()
+    transfer_page.select_aspirate_or_dispense_advanced_settings("Dispense")
+    transfer_page.advanced_settings(
+        Aspirate=False,
+        Pre_wetting=True,
+        Touch_tip=True,
+        Touch_tip_speed=30,
+        Touch_tip_distance_from_edge=1.0,
+        Air_gap=True,
+        Air_gap_volume=30,
+        Delay=True,
+        Delay_time=1,
+        set_blowout=True,
+        blowout_location="Source well",
+        blowout_flow_rate=150,
+    )
+    transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=False)
