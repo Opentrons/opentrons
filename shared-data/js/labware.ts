@@ -1,5 +1,3 @@
-import { basename, extname } from 'path-browserify'
-
 import fixture12Trough from '../labware/fixtures/2/fixture_12_trough.json'
 import fixture24Tuberack from '../labware/fixtures/2/fixture_24_tuberack.json'
 import fixture96Plate from '../labware/fixtures/2/fixture_96_plate.json'
@@ -22,6 +20,18 @@ import type {
   LabwareDefinition3,
   LegacyLabwareDefByName,
 } from './types'
+
+const basename = (p: string): string => {
+  const s = p.replace(/\\/g, '/').replace(/\/+$/g, '')
+  const i = s.lastIndexOf('/')
+  return i === -1 ? s : s.slice(i + 1)
+}
+;``
+const extname = (p: string): string => {
+  const b = basename(p)
+  const i = b.lastIndexOf('.')
+  return i <= 0 ? '' : b.slice(i)
+}
 
 // todo(mm, 2025-03-04): This duplicates getLabwareDefUri() in ./helpers. We should use
 // that instead, but using it gives me obscure "TypeError: getLabwareDefURI is not a function"
