@@ -1,14 +1,8 @@
-import {
-  ALIGN_FLEX_START,
-  BORDERS,
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Box, Flex } from '../../primitives'
+import { ALIGN_FLEX_START, DIRECTION_COLUMN } from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { Meta, Story } from '@storybook/react'
 
@@ -45,9 +39,9 @@ const Template: Story<BorderRadiusStorybookProps> = args => {
           width="100%"
           height="6rem"
         >
-          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {`${br[0]}" ${br[1]}`}
-          </LegacyStyledText>
+          </StyledText>
           <Box
             width="10rem"
             height="4rem"
