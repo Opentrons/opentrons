@@ -7,6 +7,7 @@ import { when } from 'vitest-when'
 import * as featureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
+import { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import * as tutorialSelectors from '/protocol-designer/tutorial/selectors'
 import * as utils from '/protocol-designer/utils'
 
@@ -472,28 +473,27 @@ describe('steps actions', () => {
   })
 
   describe('reorderSelectedStep', () => {
-    const mockFormData: FormData[] = [
-      {
-        id: 'step_1',
-        stepType: 'moveLiquid',
-      },
-      {
-        id: 'step_2',
-        stepType: 'mix',
-      },
-      {
-        id: 'step_3',
-        stepType: 'pause',
-      },
-    ] as FormData[]
+    const mockStepHierarchy: StepHierarchy = {
+      topLevelItems: [
+        {
+          stepId: 'step_1',
+          type: 'standaloneStep',
+        },
+        {
+          stepId: 'step_2',
+          type: 'standaloneStep',
+        },
+        {
+          stepId: 'step_3',
+          type: 'standaloneStep',
+        },
+      ],
+    }
 
     beforeEach(() => {
-      when(vi.mocked(stepFormSelectors.getOrderedSavedForms))
+      when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
         .calledWith(expect.anything())
-        .thenReturn(mockFormData)
-      when(vi.mocked(featureFlagSelectors.getEnableConcurrentModuleActions))
-        .calledWith(expect.anything())
-        .thenReturn(true)
+        .thenReturn(mockStepHierarchy)
     })
 
     afterEach(() => {
