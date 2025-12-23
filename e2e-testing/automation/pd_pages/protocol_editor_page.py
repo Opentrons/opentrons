@@ -294,7 +294,6 @@ class ProtocolEditorPage(BasePage):
 
         self.page.get_by_role("button", name=step_type, exact=True).click()
 
-  
     def expect_move_labware_form(self) -> None:
         """Verify the move labware step form fields are visible."""
 

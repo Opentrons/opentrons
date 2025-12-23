@@ -3,8 +3,6 @@
 Ports `transferSettings.cy.ts` from the Cypress suite to Playwright.
 """
 
-from __future__ import annotations
-
 import pytest
 from playwright.sync_api import Page
 
@@ -16,24 +14,68 @@ from utility import _import_protocol_and_open_editor, troubleshoot_and_pause
 
 SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
 
+
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @troubleshoot_and_pause
 def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> None:
     _import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py")
     """Replicate the Cypress transferSettings single-channel test using Playwright."""
-    '''
+    """
     1. 1:1 Return tip  1000uL
     2. 1:2 Use 1000 
     3. 2:1 Use 200uL
     4. Partial tip 1:1, 1:2, 2:1
-    '''
+    """
     editor = ProtocolEditorPage(page)
     editor.open_add_step_menu()
     editor.add_step()
     transfer_page = TransferPage(page)
-    transfer_page.tip_rack_page_1_transfer_select()
+    # transfer_page.tip_rack_page_1_transfer_select()
     transfer_page.source_labware_select(SOURCE_LABWARE)
-    transfer_page.destination_labware_select('Greiner 384 Well Plate 240 µL')
-    transfer_page.wells_select('Destination', 'A1')
+    transfer_page.destination_labware_select("Greiner 384 Well Plate 240 µL")
+    transfer_page.wells_select("Destination", "A1")
+    transfer_page.pipette_path_select("Single transfer")
+    transfer_page.input_volume("30")
+    transfer_page.transfer_continue_to_next_step()
+    """ 
+    Regressions steps for Liquid Class settings 
+    """
+    liquid_classes = ["Aqueous", "Viscous", "Volatile"]
+
+    for liquid in liquid_classes:
+        transfer_page.part_2_transfer_form_liquid_class(liquid)
+
+        transfer_page.transfer_continue_to_next_step()
+        # Take snapshot here for visual regression testing: {liquid}
+        if liquid != "Aqueous":
+            transfer_page.update_or_keep_liquid_class_settings("Update settings")
+        else:
+            pass
+
+        transfer_page.select_aspirate_or_dispense_advanced_settings("Dispense")
+        # Take snapshot here for visual regression testing: {liquid}
+        transfer_page.select_aspirate_or_dispense_advanced_settings("Aspirate")
+        # Take snapshot here for visual regression testing: {liquid}
+
+        transfer_page.go_back_to_previous_step()
+
+    transfer_page.transfer_continue_to_next_step()
+
+    # Take another snapshot here for visual regression testing()
+
+    transfer_page.set_flow_rate_aspirate(150)
+    transfer_page.set_submerge_and_retract_aspirate(
+        submerge_speed=25, submerge_delay=0.5, retract_speed=25, retract_delay=0.5
+    )
+    transfer_page.advanced_settings(
+        Aspirate=True,
+        Pre_wetting=True,
+        Touch_tip=False,
+        Air_gap=True,
+        Air_gap_volume=10,
+        Delay=True,
+        Delay_time=1,
+    )
+    transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=True)
     page.pause()
