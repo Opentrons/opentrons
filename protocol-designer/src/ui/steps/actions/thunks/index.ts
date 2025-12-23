@@ -18,7 +18,6 @@ import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
 import {
   getCurrentFormIsPresaved,
   getInitialDeckSetup,
-  getOrderedSavedForms,
   getSavedStepHierarchy,
   getUnsavedForm,
 } from '/protocol-designer/step-forms/selectors'
@@ -31,7 +30,6 @@ import { getStepHierarchyAfterDuplication } from '/protocol-designer/steplist/ut
 import { getStepsToSelectAfterDuplication } from '/protocol-designer/steplist/utils/getStepsToSelect'
 import {
   computeStepSwap,
-  convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
   getPairedSteps,
 } from '/protocol-designer/steplist/utils/stepHierarchy'
@@ -224,14 +222,7 @@ export const reorderSelectedStep: (
     return
   }
 
-  const orderedSavedForms = getOrderedSavedForms(initialState)
-  const enableConcurrentModuleActions =
-    getEnableConcurrentModuleActions(initialState)
-  const originalStepHierarchy = convertStepArrayToHierarchy(
-    orderedSavedForms,
-    enableConcurrentModuleActions
-  )
-
+  const originalStepHierarchy = getSavedStepHierarchy(initialState)
   const newStepHierarchy = computeStepSwap(
     originalStepHierarchy,
     stepId,
