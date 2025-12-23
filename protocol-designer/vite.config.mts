@@ -17,15 +17,15 @@ import type { UserConfig } from 'vite'
 
 const REQUIRED_APP_VERSION = '8.8.0' // PD requires this robot stack version or higher
 const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
-  project: 'protocol-designer',
+    project: 'protocol-designer',
 })
 
 const isCI = process.env.CI === 'true'
 
 const hasSentryCreds =
-  !!process.env.SENTRY_AUTH_TOKEN &&
-  !!process.env.SENTRY_ORG &&
-  !!process.env.SENTRY_PROJECT
+    !!process.env.SENTRY_AUTH_TOKEN &&
+    !!process.env.SENTRY_ORG &&
+    !!process.env.SENTRY_PROJECT
 
 // Local opt-in only: devs can enable the plugin by exporting SENTRY_* env vars.
 // When enabled locally, the plugin will upload sourcemaps under the `local-dev`
@@ -36,170 +36,171 @@ const enableSentryLocalPlugin = !isCI && hasSentryCreds
 
 // eslint-disable-next-line import/no-default-export
 export default defineConfig(async (): Promise<UserConfig> => {
-  const OT_PD_VERSION = await getVersion()
-  const OT_PD_BUILD_DATE = new Date().toUTCString()
-  const OT_PD_LATEST_LABWARE_VERSIONS =
-    await latestLabwareVersions(REQUIRED_APP_VERSION)
+    const OT_PD_VERSION = await getVersion()
+    const OT_PD_BUILD_DATE = new Date().toUTCString()
+    const OT_PD_LATEST_LABWARE_VERSIONS =
+        await latestLabwareVersions(REQUIRED_APP_VERSION)
 
-  return {
-    // this makes imports relative rather than absolute
-    base: '',
-    build: {
-      // Relative to the root
-      outDir: 'dist',
-      // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
-      // Emit in CI (so action-release can upload) and in local builds.
-      sourcemap: true,
-      rollupOptions: {
-        external: ['react/compiler-runtime'],
-        output: {
-          // Manually split out vendor chunks
-          manualChunks(id) {
-            if (id.includes('node_modules')) {
-              return 'vendor'
-            }
-          },
+    return {
+        // this makes imports relative rather than absolute
+        base: '',
+        build: {
+            // Relative to the root
+            outDir: 'dist',
+            // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
+            // Emit in CI (so action-release can upload) and in local builds.
+            sourcemap: true,
+            rollupOptions: {
+                external: ['react/compiler-runtime'],
+                output: {
+                    // Manually split out vendor chunks
+                    manualChunks(id) {
+                        if (id.includes('node_modules')) {
+                            return 'vendor'
+                        }
+                    },
+                },
+            },
         },
-      },
-    },
-    plugins: [
-      react({
-        include: '**/*.tsx',
-        babel: {
-          // Use babel.config.js files 1Code has comments. Press enter to view.
-          configFile: true,
-        },
-        jsxRuntime: 'automatic',
-      }),
-      cssModuleSideEffect(),
-      {
-        name: 'markdown-loader',
-        transform(code, id) {
-          if (id.endsWith('.md')) {
-            return `export default ${JSON.stringify(code)}`
-          }
-        },
-      },
-
-      ...(enableSentryLocalPlugin
-        ? [
-            sentryVitePlugin({
-              org: process.env.SENTRY_ORG,
-              project: process.env.SENTRY_PROJECT,
-              authToken: process.env.SENTRY_AUTH_TOKEN,
-              telemetry: false,
-              reactComponentAnnotation: { enabled: true },
-
-              // Local opt-in behavior:
-              // - Upload sourcemaps via the plugin (requires SENTRY_* env vars)
-              // - Use the `local-dev` release name
-              // CI continues to upload via getsentry/action-release.
-              release: {
-                name: 'local-dev',
-                inject: false,
-              },
-            }),
-          ]
-        : []),
-
-      {
-        name: 'build-info-generator',
-        closeBundle: async () => {
-          const outputPath = path.resolve(
-            __dirname,
-            'dist',
-            'info',
-            'index.html'
-          )
-          await generateBuildInfoHtml(outputPath)
-        },
-      },
-      ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
-    ],
-    optimizeDeps: {
-      esbuildOptions: {
-        target: 'es2020',
-      },
-      // For unknown reasons, PD whitescreens on launch unless we have this.
-      include: ['tslib'],
-    },
-    css: {
-      postcss: {
         plugins: [
-          postCssImport({ root: 'src/' }),
-          postCssApply(),
-          postColorModFunction(),
-          postCssPresetEnv({ stage: 0 }),
-          lostCss(),
+            react({
+                include: '**/*.tsx',
+                babel: {
+                    // Use babel.config.js files 1Code has comments. Press enter to view.
+                    configFile: true,
+                },
+                jsxRuntime: 'automatic',
+            }),
+            cssModuleSideEffect(),
+            {
+                name: 'markdown-loader',
+                transform(code, id) {
+                    if (id.endsWith('.md')) {
+                        return `export default ${JSON.stringify(code)}`
+                    }
+                },
+            },
+
+            ...(enableSentryLocalPlugin
+                ? [
+                    sentryVitePlugin({
+                        org: process.env.SENTRY_ORG,
+                        project: process.env.SENTRY_PROJECT,
+                        authToken: process.env.SENTRY_AUTH_TOKEN,
+                        telemetry: false,
+                        reactComponentAnnotation: { enabled: true },
+
+                        // Local opt-in behavior:
+                        // - Upload sourcemaps via the plugin (requires SENTRY_* env vars)
+                        // - Use the `local-dev` release name
+                        // CI continues to upload via getsentry/action-release.
+                        release: {
+                            name: 'local-dev',
+                            inject: false,
+                        },
+                    }),
+                ]
+                : []),
+
+            {
+                name: 'build-info-generator',
+                closeBundle: async () => {
+                    const outputPath = path.resolve(
+                        __dirname,
+                        'dist',
+                        'info',
+                        'index.html'
+                    )
+                    await generateBuildInfoHtml(outputPath)
+                },
+            },
+            ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
         ],
-      },
-    },
-    define: {
-      // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
-      _FF_ENV_VARS_: getFeatureFlagEnvVars(),
-      _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
-      _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
-      _OT_PD_LATEST_LABWARE_VERSIONS_: OT_PD_LATEST_LABWARE_VERSIONS,
-      _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
-      _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
-      _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
-      _OT_PD_SENTRY_RELEASE_: JSON.stringify(
-        enableSentryLocalPlugin ? 'local-dev' : OT_PD_VERSION
-      ),
-      _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
-      _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
-      _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
-      global: 'globalThis',
-    },
-    resolve: {
-      conditions: ['browser'],
-      // For unknown reasons, PD whitescreens on launch unless we have this.
-      dedupe: ['tslib'],
-      alias: {
-        // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
-        // files being processed with the wrong config (the config from the
-        // consuming project vs. the config from the source project).
-        // Can these be replaced with regular package.json dependencies?
-        '@opentrons/components/styles/global': path.resolve(
-          '../components/src/styles/global.css'
-        ),
-        '@opentrons/components': path.resolve('../components/src/index.ts'),
-        '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
-        '@opentrons/step-generation': path.resolve(
-          '../step-generation/src/index.ts'
-        ),
-        '/protocol-designer/': path.resolve('./src/') + '/',
-      },
-    },
-    server: {
-      port: 5178,
-    },
-  }
+        optimizeDeps: {
+            esbuildOptions: {
+                target: 'es2020',
+            },
+            // For unknown reasons, PD whitescreens on launch unless we have this.
+            include: ['tslib'],
+        },
+        css: {
+            postcss: {
+                plugins: [
+                    postCssImport({ root: 'src/' }),
+                    postCssApply(),
+                    postColorModFunction(),
+                    postCssPresetEnv({ stage: 0 }),
+                    lostCss(),
+                ],
+            },
+        },
+        define: {
+            // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+            _FF_ENV_VARS_: getFeatureFlagEnvVars(),
+            _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
+            _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
+            _OT_PD_LATEST_LABWARE_VERSIONS_: OT_PD_LATEST_LABWARE_VERSIONS,
+            _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
+            _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
+            _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
+            _OT_PD_SENTRY_RELEASE_: JSON.stringify(
+                enableSentryLocalPlugin ? 'local-dev' : OT_PD_VERSION
+            ),
+            _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
+            _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
+            _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
+            'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG),
+            global: 'globalThis',
+        },
+        resolve: {
+            conditions: ['browser'],
+            // For unknown reasons, PD whitescreens on launch unless we have this.
+            dedupe: ['tslib'],
+            alias: {
+                // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+                // files being processed with the wrong config (the config from the
+                // consuming project vs. the config from the source project).
+                // Can these be replaced with regular package.json dependencies?
+                '@opentrons/components/styles/global': path.resolve(
+                    '../components/src/styles/global.css'
+                ),
+                '@opentrons/components': path.resolve('../components/src/index.ts'),
+                '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
+                '@opentrons/step-generation': path.resolve(
+                    '../step-generation/src/index.ts'
+                ),
+                '/protocol-designer/': path.resolve('./src/') + '/',
+            },
+        },
+        server: {
+            port: 5178,
+        },
+    }
 })
 
 function getFeatureFlagEnvVars(): Record<string, string | undefined> {
-  // If we change the prefix to something like "OT_PD_FF_...", we could automatically
-  // scrape process.env instead of having this explicit list. We don't want to scrape
-  // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
-  // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
-  const envVarNames = new Set([
-    'OT_PD_PRERELEASE_MODE',
-    'OT_PD_DISABLE_MODULE_RESTRICTIONS',
-    'OT_PD_ALLOW_ALL_TIPRACKS',
-    'OT_PD_ENABLE_COMMENT',
-    'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
-    'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
-    'OT_PD_ENABLE_REACT_SCAN',
-    'OT_PD_ENABLE_MULTIPLE_TEMPS_OT',
-    'OT_PD_ENABLE_TIMELINE_SCRUBBER',
-    'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
-    'OT_PD_ENABLE_STACKING',
-    'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
-    'OT_PD_ENABLE_BY_VOLUME_BUILDER',
-    'OT_PD_ENABLE_TIP_SELCTION',
-    'OT_PD_ENABLE_CAMERA_SUPPORT',
-  ])
-  return Object.fromEntries(
-    Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
-  )
+    // If we change the prefix to something like "OT_PD_FF_...", we could automatically
+    // scrape process.env instead of having this explicit list. We don't want to scrape
+    // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
+    // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
+    const envVarNames = new Set([
+        'OT_PD_PRERELEASE_MODE',
+        'OT_PD_DISABLE_MODULE_RESTRICTIONS',
+        'OT_PD_ALLOW_ALL_TIPRACKS',
+        'OT_PD_ENABLE_COMMENT',
+        'OT_PD_ENABLE_TIP_PICKUP_LOCATION',
+        'OT_PD_ENABLE_HOT_KEYS_DISPLAY',
+        'OT_PD_ENABLE_REACT_SCAN',
+        'OT_PD_ENABLE_MULTIPLE_TEMPS_OT',
+        'OT_PD_ENABLE_TIMELINE_SCRUBBER',
+        'OT_PD_ENABLE_PARTIAL_TIP_SUPPORT',
+        'OT_PD_ENABLE_STACKING',
+        'OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS',
+        'OT_PD_ENABLE_BY_VOLUME_BUILDER',
+        'OT_PD_ENABLE_TIP_SELCTION',
+        'OT_PD_ENABLE_CAMERA_SUPPORT',
+    ])
+    return Object.fromEntries(
+        Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
+    )
 }
