@@ -22,7 +22,6 @@ class Migration13to14(Migration):  # noqa: D101
         dest_db_file = dest_dir / DB_FILE
 
         with sql_engine_ctx(dest_db_file) as engine:
-
-            with engine.connect() as connection:
+            with engine.begin() as connection:
                 # Create the new capture image settings table
                 schema_14.camera_capture_image_settings_table.create(connection)
