@@ -255,10 +255,6 @@ class RunDataManager:
             )
         )
 
-        self._run_orchestrator_store.add_camera_capture_image_settings(
-            capture_image_settings=self._camera_setting_store.get_camera_capture_image_settings()
-        )
-
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
@@ -293,6 +289,9 @@ class RunDataManager:
             True,
             camera_provider,
             state_summary.cameraSettings,
+        )
+        self._run_orchestrator_store.add_camera_capture_image_settings(
+            capture_image_settings=self._camera_setting_store.get_camera_capture_image_settings()
         )
 
         return _build_run(

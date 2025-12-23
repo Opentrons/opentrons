@@ -155,7 +155,7 @@ async def get_camera(
 
 
 @router.post(
-    path="/runs/{runId}/camera/cameraSettings",
+    path="/camera/cameraSettings",
     summary="Add general camera capture image settings to be used in place of the system image capture defaults.",
     description=(
         "Add general camera capture image settings returning the implemented settings."
