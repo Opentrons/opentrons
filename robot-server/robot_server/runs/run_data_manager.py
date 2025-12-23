@@ -290,6 +290,9 @@ class RunDataManager:
             camera_provider,
             state_summary.cameraSettings,
         )
+        self._run_orchestrator_store.add_camera_capture_image_settings(
+            capture_image_settings=self._camera_setting_store.get_camera_capture_image_settings()
+        )
 
         return _build_run(
             run_resource=run_resource,

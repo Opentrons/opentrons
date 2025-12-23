@@ -1,7 +1,7 @@
 """Test manual and gripper move functionality."""
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from automation.pd_pages import ProtocolEditorPage
 from utility import _import_protocol_and_open_editor
@@ -33,6 +33,12 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     _import_protocol_and_open_editor(page, PROTOCOL_PATH)
 
     editor = ProtocolEditorPage(page)
+
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+    landing.click_import_existing_protocol()
+    landing.upload_protocol_file(PROTOCOL_PATH)
+    landing.edit_protocol()
 
     # Add Manual Move to move PCR Lid to Opentrons Tough Wellplate in Thermocycler
     editor.open_add_step_menu()

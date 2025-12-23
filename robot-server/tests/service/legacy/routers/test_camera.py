@@ -11,7 +11,10 @@ from robot_server.runs.run_data_manager import (
     RunDataManager,
 )
 from robot_server.service.json_api import RequestModel
-from robot_server.service.legacy.routers.camera import post_camera_preview_image
+from robot_server.service.legacy.routers.camera import (
+    post_camera_preview_image,
+    add_camera_capture_image_settings,
+)
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
 from robot_server.camera.settings.store import CameraSettingStore
 from fastapi.responses import FileResponse
@@ -290,3 +293,38 @@ async def test_camera_preview_image(
             robot_type="OT-3 Standard",
         )
         assert isinstance(response, FileResponse)
+
+
+async def test_camera_add_capture_image_settings(
+    decoy: Decoy,
+    mock_camera_setting_store: CameraSettingStore,
+):
+    """Test that we add global image capture settings."""
+    decoy.when(
+        mock_camera_setting_store.get_camera_capture_image_settings()
+    ).then_return(
+        CameraCaptureImageSettings(
+            cameraId=None,
+            resolution=(720, 1280),
+            zoom=1.5,
+            pan=(0, 0),
+            contrast=25.0,
+            brightness=50.0,
+            saturation=75.0,
+        )
+    )
+    response = await add_camera_capture_image_settings(
+        request_body=RequestModel(
+            data=CameraCaptureImageSettings(
+                cameraId=None,
+                resolution=(720, 1280),
+                zoom=1.5,
+                pan=(0, 0),
+                contrast=25.0,
+                brightness=50.0,
+                saturation=75.0,
+            )
+        ),
+        camera_settings_store=mock_camera_setting_store,
+    )
+    assert isinstance(response, CameraCaptureImageSettings)
