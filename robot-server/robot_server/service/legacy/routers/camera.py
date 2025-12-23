@@ -154,7 +154,43 @@ async def get_camera(
     )
 
 
-# todo(chb, 2025-09-08): Implement POST/GET /camera/picture/settings for picture taking settings when in protocol run
+@router.post(
+    path="/camera/cameraSettings",
+    summary="Add general camera capture image settings to be used in place of the system image capture defaults.",
+    description=(
+        "Add general camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's `data` will be the image capture settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def add_camera_capture_image_settings(
+    request_body: RequestModel[CameraCaptureImageSettings],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Add general camera capture image settings to be used in place of the global camera image capture settings.
+
+    Args:
+        request_body: New camera capture image settings from request body.
+        camera_provider: Access to the camera settings and related services.
+    """
+    if IS_ROBOT and not camera.camera_exists():
+        # todo(chb): Eventually we'll have mulitple camera ids that can be sent, so this should be able to verify more than just the default
+        raise LegacyErrorResponse(
+            message="Video device is unavailable.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    camera_settings_store.set_camera_capture_image_settings(settings=request_body.data)
+
+    # Get the newly set database settings
+    result = camera_settings_store.get_camera_capture_image_settings()
+
+    return result
 
 
 @router.post(
