@@ -7,6 +7,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getModuleDef,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
@@ -133,7 +134,9 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                         }
                         liquids={liquids}
                         labwareId={labwareLoadedOnModuleId}
-                        x={0}
+                        x={
+                          0 + (moduleType === FLEX_STACKER_MODULE_TYPE ? 17 : 0)
+                        }
                         y={0}
                         setSelectedSlot={setSelectedSlot}
                         setHoveredSlot={setHoveredSlot}

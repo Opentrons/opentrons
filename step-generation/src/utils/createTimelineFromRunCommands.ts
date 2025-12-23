@@ -1,10 +1,16 @@
-import { getModuleDef, locationIsOffDeck } from '@opentrons/shared-data'
+import {
+  FLEX_STACKER_MODULE_TYPE,
+  getModuleDef,
+  locationIsOffDeck,
+} from '@opentrons/shared-data'
 
 import { MODULE_INITIAL_STATE_BY_TYPE } from '../constants'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 import { getStackForLabwareLocation, makeInitialRobotState } from './misc'
 
 import type {
+  FlexStackerFillRunTimeCommand,
+  FlexStackerSetStoredLabwareRunTimeCommand,
   LabwareLocationSequence,
   OnLabwareLocationSequenceComponent,
   RunTimeCommand,
@@ -14,6 +20,13 @@ import type {
   RobotState,
   RobotStateAndWarnings,
 } from '../types'
+
+const STACKER_SLOT_MAPPING: Record<string, string> = {
+  A3: 'A4',
+  B3: 'B4',
+  C3: 'C4',
+  D3: 'D4',
+}
 
 export type RunCommandTimelineFrame = RobotStateAndWarnings & {
   command: RunTimeCommand
@@ -48,7 +61,10 @@ export function getResultingTimelineFrameFromRunCommands(
         return {
           ...acc,
           [command.result.moduleId]: {
-            slot: command.params.location.slotName,
+            slot:
+              moduleType === FLEX_STACKER_MODULE_TYPE
+                ? STACKER_SLOT_MAPPING[command.params.location.slotName]
+                : command.params.location.slotName,
             moduleState: MODULE_INITIAL_STATE_BY_TYPE[moduleType],
           },
         }
@@ -124,7 +140,24 @@ export function getResultingTimelineFrameFromRunCommands(
             stack,
           },
         }
+      } else if (command.commandType === 'flexStacker/setStoredLabware') {
+        const allStoredLabwareIds = getStoredLabwareIds(command)
+        allStoredLabwareIds.forEach(storedLabwareId => {
+          getIncrementStoredLabwareCounter(
+            acc,
+            storedLabwareId,
+            'setStoredLabwareCount'
+          )
+        })
+        return acc
+      } else if (command.commandType === 'flexStacker/fill') {
+        const allStoredLabwareIds = getStoredLabwareIds(command)
+        allStoredLabwareIds.forEach(storedLabwareId => {
+          getIncrementStoredLabwareCounter(acc, storedLabwareId, 'fillCount')
+        })
+        return acc
       }
+
       return acc
     },
     {}
@@ -146,4 +179,35 @@ export function getResultingTimelineFrameFromRunCommands(
     },
     invariantContext,
   }
+}
+
+const getIncrementStoredLabwareCounter = (
+  acc: RobotState['labware'],
+  storedLabwareId: string,
+  counter: 'setStoredLabwareCount' | 'fillCount'
+): void => {
+  const prev = acc[storedLabwareId] ?? {
+    stack: [storedLabwareId, 'offDeck'],
+  }
+
+  acc[storedLabwareId] = {
+    ...prev,
+    [counter]: (prev[counter] ?? 0) + 1,
+  }
+}
+
+const getStoredLabwareIds = (
+  command:
+    | FlexStackerSetStoredLabwareRunTimeCommand
+    | FlexStackerFillRunTimeCommand
+): string[] => {
+  const allStoredLabwareIds =
+    command.result?.storedLabware?.flatMap(stored =>
+      [
+        stored.primaryLabwareId,
+        stored.adapterLabwareId,
+        stored.lidLabwareId,
+      ].filter(id => id != null)
+    ) ?? []
+  return allStoredLabwareIds
 }

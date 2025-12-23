@@ -423,10 +423,11 @@ export interface StackerStoredLabwareDefinitionURIs {
 
 export interface FlexStackerSetStoredLabwareParams {
   moduleId: string
-  initialCount?: number | null
   primaryLabware: FlexStackerStoredLabwareDetails
-  lidLabware: FlexStackerStoredLabwareDetails | null
-  adapterLabware: FlexStackerStoredLabwareDetails | null
+  lidLabware?: FlexStackerStoredLabwareDetails | null
+  adapterLabware?: FlexStackerStoredLabwareDetails | null
+  initialCount?: number | null
+  initialStoredLabware?: FlexStackerStoredLabwareGroup[]
 }
 
 export interface FlexStackerSetStoredLabwareCreateCommand extends CommonCommandCreateInfo {

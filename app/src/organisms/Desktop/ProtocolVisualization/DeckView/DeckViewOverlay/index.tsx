@@ -13,6 +13,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   getFlexHoverDimensions,
@@ -62,7 +63,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const { modules } = robotState
   const deckDef = useMemo(() => getDeckDefFromRobotType(robotType), [robotType])
 
-  const hasTCOnSlot = Object.entries(modules).find(
+  const hasTCOnSlot = Object.entries(modules).some(
     ([id, module]) =>
       module.slot === slotId &&
       moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
@@ -90,7 +91,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
       stagingAreaLocations,
       cutoutId,
       slotId,
-      hasTCOnSlot != null,
+      hasTCOnSlot,
       slotPosition
     )
 
