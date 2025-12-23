@@ -1,15 +1,16 @@
 import fs from 'node:fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
-import { cssModuleSideEffect } from './cssModuleSideEffect'
+import { defineConfig } from 'vite'
+
 import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
+import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 const { generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'labware-library',
