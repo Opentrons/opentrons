@@ -291,6 +291,9 @@ jobs:
           OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
           OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
+          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          OT_SENTRY_DSN: ${{ matrix.target == 'desktop' && secrets.OT_DESKTOP_SENTRY_DSN || secrets.OT_ODD_SENTRY_DSN }}
         run: |
           make -C app dist
 
@@ -318,7 +321,9 @@ jobs:
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
           OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
-
+          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          OT_SENTRY_DSN: ${{ secrets.OT_DESKTOP_SENTRY_DSN }}
         run: |
           make -C app-shell dist-${{ matrix.os }} USE_HARD_LINKS=false
 
@@ -335,6 +340,9 @@ jobs:
         timeout-minutes: 60
         env:
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
+          OT_BUILD_TARGET: ${{ matrix.target }}
+          OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          OT_SENTRY_DSN: ${{ secrets.OT_ODD_SENTRY_DSN }}
         run: |
           make -C app-shell-odd dist-ot3
 

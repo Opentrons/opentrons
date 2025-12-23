@@ -24,9 +24,7 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "workspaces": {
-    "nohoist": [
-      "**"
-    ]
+    "nohoist": ["**"]
   },
   "devDependencies": {
     "@types/node-fetch": "2.6.11",
@@ -40,6 +38,8 @@
     "@opentrons/shared-data": "link:../shared-data",
     "@opentrons/step-generation": "link:../step-generation",
     "@opentrons/usb-bridge/node-client": "link:../usb-bridge/node-client",
+    "@sentry/electron": "7.5.0",
+    "@sentry/vite-plugin": "4.3.0",
     "@types/dateformat": "^3.0.1",
     "@types/fs-extra": "9.0.13",
     "@types/lodash": "^4.14.191",

@@ -99,6 +99,13 @@ export function missingTemperatureStep(): CommandCreatorError {
   }
 }
 
+export function missingProfileStep(): CommandCreatorError {
+  return {
+    message: 'This module is not currently running a profile.',
+    type: 'MISSING_PROFILE_STEP',
+  }
+}
+
 export function tipVolumeExceeded(args: {
   actionName: string
   volume: string | number

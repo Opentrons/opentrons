@@ -36,6 +36,7 @@ export {
   touchTip,
   transfer,
   waitForTemperature,
+  waitForModuleTask,
 } from './commandCreators'
 
 export * from './utils'

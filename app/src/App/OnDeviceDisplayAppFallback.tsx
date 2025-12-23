@@ -12,6 +12,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { useSentryReport } from '/app/App/hooks'
 import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
@@ -43,6 +44,8 @@ export function OnDeviceDisplayAppFallback({
     iconName: 'ot-alert',
     iconColor: COLORS.red50,
   }
+
+  useSentryReport(error)
 
   // immediately report to robot logs that something fatal happened
   useEffect(() => {

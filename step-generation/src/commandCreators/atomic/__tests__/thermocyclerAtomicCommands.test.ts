@@ -8,6 +8,7 @@ import { thermocyclerOpenLid } from '../thermocyclerOpenLid'
 import { thermocyclerRunExtendedProfile } from '../thermocyclerRunExtendedProfile'
 import { thermocyclerSetTargetBlockTemperature } from '../thermocyclerSetTargetBlockTemperature'
 import { thermocyclerSetTargetLidTemperature } from '../thermocyclerSetTargetLidTemperature'
+import { thermocyclerStartRunExtendedProfile } from '../thermocyclerStartRunExtendedProfile'
 
 import type { TCExtendedProfileParams } from '@opentrons/shared-data'
 import type {
@@ -45,7 +46,7 @@ invariantContext = {
   } as ModuleEntities,
 }
 describe('thermocycler atomic commands', () => {
-  const testCasesSetBlock = [
+  const testCases = [
     {
       commandCreator: thermocyclerSetTargetBlockTemperature,
       expectedType: 'thermocycler/setTargetBlockTemperature',
@@ -54,8 +55,6 @@ describe('thermocycler atomic commands', () => {
         celsius: temperature,
       },
     },
-  ]
-  const testCasesWithTempParam = [
     {
       commandCreator: thermocyclerSetTargetLidTemperature,
       expectedType: 'thermocycler/setTargetLidTemperature',
@@ -64,8 +63,6 @@ describe('thermocycler atomic commands', () => {
         celsius: temperature,
       },
     },
-  ]
-  const testCasesModuleOnly = [
     {
       commandCreator: thermocyclerDeactivateBlock,
       expectedType: 'thermocycler/deactivateBlock',
@@ -94,8 +91,6 @@ describe('thermocycler atomic commands', () => {
         moduleId: module,
       },
     },
-  ]
-  const testCasesRunExtendedProfile = [
     {
       commandCreator: thermocyclerRunExtendedProfile,
       expectedType: 'thermocycler/runExtendedProfile',
@@ -103,6 +98,16 @@ describe('thermocycler atomic commands', () => {
         moduleId: module,
         profileElements,
         blockMaxVolumeUl: volume,
+      },
+    },
+    {
+      commandCreator: thermocyclerStartRunExtendedProfile,
+      expectedType: 'thermocycler/startRunExtendedProfile',
+      params: {
+        moduleId: module,
+        profileElements,
+        blockMaxVolumeUl: volume,
+        taskId: 'test-task-id',
       },
     },
   ]
@@ -136,9 +141,5 @@ describe('thermocycler atomic commands', () => {
     })
   }
 
-  // Run all test cases
-  testCasesSetBlock.forEach(testParams)
-  testCasesWithTempParam.forEach(testParams)
-  testCasesModuleOnly.forEach(testParams)
-  testCasesRunExtendedProfile.forEach(testParams)
+  testCases.forEach(testParams)
 })

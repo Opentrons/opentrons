@@ -140,7 +140,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
       _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
       _OT_PD_LATEST_LABWARE_VERSIONS_: OT_PD_LATEST_LABWARE_VERSIONS,
-      _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_DEV_ID),
+      _OT_PD_MIXPANEL_DEV_ID_: JSON.stringify(
+        process.env.OT_PD_MIXPANEL_DEV_ID
+      ),
       _OT_PD_MIXPANEL_ID_: JSON.stringify(process.env.OT_PD_MIXPANEL_ID),
       _OT_PD_REQUIRED_APP_VERSION_: JSON.stringify(REQUIRED_APP_VERSION),
       _OT_PD_SENTRY_RELEASE_: JSON.stringify(
@@ -149,6 +151,7 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _OT_PD_SENTRY_DEV_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DEV_DSN),
       _OT_PD_SENTRY_DSN_: JSON.stringify(process.env.OT_PD_SENTRY_DSN),
       _OT_PD_VERSION_: JSON.stringify(OT_PD_VERSION),
+      'process.env.NODE_DEBUG': JSON.stringify(process.env.NODE_DEBUG),
       global: 'globalThis',
     },
     resolve: {
