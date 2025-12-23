@@ -97,7 +97,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
       />
       <Flex marginTop={SPACING.spacing16}>
         <LegacyStyledText
-          as="h4"
+          forwardedAs="h4"
           fontWeight={TYPOGRAPHY.fontWeightBold}
           color={disabled ? COLORS.grey50 : COLORS.black90}
           textAlign={TYPOGRAPHY.textAlignCenter}
@@ -111,7 +111,7 @@ export function CardButton(props: CardButtonProps): JSX.Element {
         justifyContent={JUSTIFY_CENTER}
       >
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightRegular}
           color={disabled ? COLORS.grey50 : COLORS.black90}
           css={CARD_BUTTON_TEXT_STYLE}

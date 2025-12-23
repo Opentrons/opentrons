@@ -283,7 +283,7 @@ export function ModulesListItem({
         }}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('view_setup_instructions')}
           </LegacyStyledText>
         </Flex>
@@ -292,7 +292,7 @@ export function ModulesListItem({
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
       <LegacyStyledText
-        as="p"
+        forwardedAs="p"
         marginLeft={SPACING.spacing20}
         color={COLORS.grey50}
       >
@@ -455,11 +455,11 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {getModuleDeckLabel(moduleType, slotName)}
             </LegacyStyledText>
             {portDisplay != null ? (
-              <LegacyStyledText as="p">{portDisplay}</LegacyStyledText>
+              <LegacyStyledText forwardedAs="p">{portDisplay}</LegacyStyledText>
             ) : null}
           </Flex>
           <Flex
@@ -484,7 +484,7 @@ export function ModulesListItem({
                     setShowLocationConflictModal(true)
                   }}
                 >
-                  <LegacyStyledText as="label" cursor="pointer">
+                  <LegacyStyledText forwardedAs="label" cursor="pointer">
                     {t('resolve')}
                   </LegacyStyledText>
                 </TertiaryButton>

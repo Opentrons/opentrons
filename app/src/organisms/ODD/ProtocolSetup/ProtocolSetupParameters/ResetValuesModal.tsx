@@ -53,7 +53,7 @@ export function ResetValuesModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('reset_parameter_values_body')}
         </LegacyStyledText>
         <Flex

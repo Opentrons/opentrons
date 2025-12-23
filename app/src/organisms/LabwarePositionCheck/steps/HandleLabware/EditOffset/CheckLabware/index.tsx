@@ -205,7 +205,7 @@ function CheckLabwareContentODD(props: CheckLabwareContentProps): JSX.Element {
                     : t('check_well_location'),
                 }}
                 components={{
-                  block: <LegacyStyledText as="p" />,
+                  block: <LegacyStyledText forwardedAs="p" />,
                   bold: <strong />,
                 }}
               />
@@ -296,7 +296,7 @@ function CheckLabwareContentDesktop(
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText as="p" />,
+                block: <LegacyStyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
             />

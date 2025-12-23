@@ -36,7 +36,7 @@ export function ClearDeckModal(props: ClearDeckModalProps): JSX.Element {
                 marginBottom={SPACING.spacing16}
               />
             ),
-            block: <LegacyStyledText as="p" />,
+            block: <LegacyStyledText forwardedAs="p" />,
           }}
         />
       </Flex>

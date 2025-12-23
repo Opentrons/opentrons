@@ -151,7 +151,7 @@ export function LegacyCurrentOffsetsTable(
       flexDirection={DIRECTION_COLUMN}
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
-      <LegacyStyledText as="label">
+      <LegacyStyledText forwardedAs="label">
         {i18n.format(t('applied_offset_data'), 'upperCase')}
       </LegacyStyledText>
       {isLabwareOffsetCodeSnippetsOn ? (

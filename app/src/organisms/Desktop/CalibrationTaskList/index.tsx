@@ -132,7 +132,7 @@ export function CalibrationTaskList({
             ) : (
               <Icon name="ot-check" size="3rem" color={COLORS.green50} />
             )}
-            <LegacyStyledText as="h1" marginTop={SPACING.spacing24}>
+            <LegacyStyledText forwardedAs="h1" marginTop={SPACING.spacing24}>
               {exitBeforeDeckConfigCompletion
                 ? t('using_current_calibrations')
                 : t('calibrations_complete')}

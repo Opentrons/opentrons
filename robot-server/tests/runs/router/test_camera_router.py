@@ -1,19 +1,21 @@
 """Tests for camera /runs/{runId}/camera routes."""
 import pytest
 from datetime import datetime
+from pathlib import Path
+import tempfile
 from decoy import Decoy
 
 from robot_server.service.json_api import RequestModel
 
-from robot_server.runs.router.camera_router import add_camera_capture_image_settings
-
-from robot_server.service.legacy.models.settings import (
-    CameraCaptureImageSettings,
+from robot_server.runs.router.camera_router import (
+    add_camera_capture_image_settings,
+    post_camera_preview_image,
 )
-
 from robot_server.runs.run_models import Run
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from opentrons.protocol_engine import EngineStatus
+from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+from fastapi.responses import FileResponse
 
 
 @pytest.fixture()
@@ -76,3 +78,28 @@ async def test_camera_settings(
 
     assert result.content.data == image_settings
     assert result.status_code == 201
+
+
+async def test_camera_preview_image(
+    decoy: Decoy,
+    run: Run,
+) -> None:
+    """Test that we can request a preview image with a collection of image settings based on run specific enablement."""
+    with tempfile.NamedTemporaryFile() as conf:
+        response = await post_camera_preview_image(
+            request_body=RequestModel(
+                data=CameraCaptureImageSettings(
+                    cameraId=None,
+                    resolution=(720, 1280),
+                    zoom=1.5,
+                    pan=(0, 0),
+                    contrast=25.0,
+                    brightness=50.0,
+                    saturation=75.0,
+                )
+            ),
+            run=run,
+            images_directory=Path(conf.name),
+            robot_type="OT-3 Standard",
+        )
+        assert isinstance(response, FileResponse)

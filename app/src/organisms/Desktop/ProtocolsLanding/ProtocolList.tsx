@@ -156,7 +156,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
         justifyContent={JUSTIFY_SPACE_BETWEEN}
         marginBottom={SPACING.spacing24}
       >
-        <LegacyStyledText as="h1">{t('protocols')}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="h1">{t('protocols')}</LegacyStyledText>
         <Flex flexDirection={DIRECTION_ROW}>
           <Flex
             flexDirection={DIRECTION_ROW}
@@ -164,7 +164,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
             marginRight={SPACING.spacing16}
           >
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               color={COLORS.grey60}
             >
@@ -180,7 +180,7 @@ export function ProtocolList(props: ProtocolListProps): JSX.Element | null {
               data-testid="ProtocolList_SortByMenu"
             >
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 paddingLeft={SPACING.spacing8}
                 paddingRight={SPACING.spacing4}

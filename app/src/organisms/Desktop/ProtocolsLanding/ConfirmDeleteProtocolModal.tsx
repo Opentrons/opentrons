@@ -31,7 +31,7 @@ export function ConfirmDeleteProtocolModal(
       title={t('delete_this_protocol')}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {t('this_protocol_will_be_trashed')}
         </LegacyStyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>

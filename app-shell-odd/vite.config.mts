@@ -2,6 +2,7 @@ import { versionForProject } from '../scripts/git-version.mjs'
 import pkg from './package.json'
 import path from 'path'
 import { defineConfig } from 'vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 import react from '@vitejs/plugin-react'
 import postCssImport from 'postcss-import'
 import postCssApply from 'postcss-apply'
@@ -14,6 +15,8 @@ export default defineConfig(
   async (): Promise<UserConfig> => {
     const project = process.env.OPENTRONS_PROJECT ?? 'robot-stack'
     const version = await versionForProject(project)
+    const mode = process.env.NODE_ENV ?? 'development'
+
     return {
       publicDir: false,
       build: {
@@ -41,6 +44,18 @@ export default defineConfig(
             configFile: true,
           },
         }),
+        sentryVitePlugin({
+          org: 'opentrons-sw',
+          project: 'odd',
+          authToken: process.env.OT_SENTRY_AUTH_TOKEN,
+          telemetry: false,
+          sourcemaps: {
+            assets: ['./dist/**'],
+            ignore: ['./node_modules/**'],
+            filesToDeleteAfterUpload:
+              mode === 'production' ? ['./dist/**/*.js.map'] : undefined,
+          },
+        }),
       ],
       optimizeDeps: {
         esbuildOptions: {
@@ -63,6 +78,7 @@ export default defineConfig(
         global: 'globalThis',
         _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
         _OPENTRONS_PROJECT_: JSON.stringify(project),
+        _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
         _PKG_BUGS_URL_: JSON.stringify(pkg.bugs.url),
         _PKG_PRODUCT_NAME_: JSON.stringify(pkg.productName),
         _PKG_VERSION_: JSON.stringify(version),

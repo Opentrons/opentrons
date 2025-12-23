@@ -32,7 +32,7 @@ export function EmptyRecentRun(): JSX.Element {
         height="166px"
       />
       <LegacyStyledText
-        as="h3"
+        forwardedAs="h3"
         fontWeight={TYPOGRAPHY.fontWeightBold}
         marginTop={SPACING.spacing16}
         marginBottom={SPACING.spacing8}
@@ -40,7 +40,7 @@ export function EmptyRecentRun(): JSX.Element {
         {t('no_recent_runs')}
       </LegacyStyledText>
       <LegacyStyledText
-        as="h4"
+        forwardedAs="h4"
         fontWeight={TYPOGRAPHY.fontWeightRegular}
         color={COLORS.grey60}
       >
