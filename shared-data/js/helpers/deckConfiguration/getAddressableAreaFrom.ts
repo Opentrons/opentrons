@@ -1,4 +1,3 @@
-import { getDeckDefFromRobotType } from '../..'
 import {
   A1_ADDRESSABLE_AREA,
   COMBO_FIXTURES,
@@ -14,10 +13,10 @@ import {
   getAAByAAId,
   getDeckDefWithFakes,
 } from '../../fixtures'
+import { getDeckDefFromRobotType } from '../index'
 import {
   getAAWithFakesFromVSId,
   getVisualSlotIdFromAAId,
-  type VISUAL_SLOTS,
 } from './getVisualSlotFrom'
 
 import type { CutoutFixtureId, CutoutId } from '../../../deck'
@@ -26,6 +25,7 @@ import type {
   CutoutFixtureIdsWithFakes,
 } from '../../constants'
 import type { DeckDefinition, ModuleModel } from '../../types'
+import type { VISUAL_SLOTS } from './getVisualSlotFrom'
 
 /**
  * Given a cutoutId and a cutoutFixtureId, returns a list of AA, null if there is none

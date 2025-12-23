@@ -151,7 +151,8 @@ export function DeviceDetailsDeckConfiguration({
           {
             displayLocation: vsId
               ? getAASlotDisplayName(
-                  getAAWithFakesFromVSId(vsId as VISUAL_SLOTS) ?? addressableAreaId
+                  getAAWithFakesFromVSId(vsId as VISUAL_SLOTS) ??
+                    addressableAreaId
                 )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,

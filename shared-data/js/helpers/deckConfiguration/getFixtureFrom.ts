@@ -30,7 +30,7 @@ import {
   getAAsToFixtureIdFromDeckDefWithFakes,
   getAAWithFakesFromCutoutFixtureId,
 } from './getAddressableAreaFrom'
-import { getAAWithFakesFromVSId, type VISUAL_SLOTS } from './getVisualSlotFrom'
+import { getAAWithFakesFromVSId } from './getVisualSlotFrom'
 
 import type {
   AddressableAreaName,
@@ -49,6 +49,7 @@ import type {
   DeckDefinition,
   ModuleModel,
 } from '../../types'
+import type { VISUAL_SLOTS } from './getVisualSlotFrom'
 
 export const getCutoutFixtureReplacementIfNeeded = (
   cutoutFixtureId: CutoutFixtureId,
