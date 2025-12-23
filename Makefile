@@ -39,7 +39,7 @@ cover ?= true
 updateSnapshot ?= false
 quiet ?= false
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
+FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
 
 ifeq ($(watch), true)
 	cover := false
