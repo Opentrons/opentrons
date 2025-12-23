@@ -17,7 +17,7 @@ import {
 import {
   getAAWithFakesFromVSId,
   getVisualSlotIdFromAAId,
-  VISUAL_SLOTS,
+  type VISUAL_SLOTS,
 } from './getVisualSlotFrom'
 
 import type { CutoutFixtureId, CutoutId } from '../../../deck'
