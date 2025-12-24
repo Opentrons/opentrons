@@ -1,13 +1,12 @@
 """opentrons_shared_data.robot: Submodule for handling robot definition data."""
 
+import json
 from pathlib import Path
 from typing import cast
+
 from typing_extensions import Final
 
-import json
-
 from .. import get_shared_data_root
-
 from .types import RobotDefinition, RobotType
 
 DEFAULT_ROBOT_DEFINITION_VERSION: Final = 1

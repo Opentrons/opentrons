@@ -1,38 +1,36 @@
 """A script for updating pre-existing V2 Pipette configurations."""
 
-import os
-import json
 import argparse
-
+import json
+import os
+from enum import Enum
 from pathlib import Path
-from typing import List, Dict, Tuple, Any, Iterator, Type
+from typing import Any, Dict, Iterator, List, Tuple, Type
 
 from pydantic import BaseModel
 from pydantic.main import ModelMetaclass
-from enum import Enum
 
-from opentrons_shared_data import get_shared_data_root
-
+from ..load_data import _geometry, _liquid, _physical
 from ..pipette_definition import (
     PipetteConfigurations,
     PipetteGeometryDefinition,
-    PipettePhysicalPropertiesDefinition,
     PipetteLiquidPropertiesDefinition,
     PipetteModelVersionType,
+    PipettePhysicalPropertiesDefinition,
     SupportedTipsDefinition,
 )
+from ..pipette_load_name_conversions import convert_pipette_model
 from ..types import (
-    PipetteModelType,
+    LiquidClasses,
     PipetteChannelType,
-    PipetteVersionType,
-    PipetteTipType,
+    PipetteModel,
     PipetteModelMajorVersion,
     PipetteModelMinorVersion,
-    LiquidClasses,
+    PipetteModelType,
+    PipetteTipType,
+    PipetteVersionType,
 )
-from ..load_data import _geometry, _physical, _liquid
-from ..pipette_load_name_conversions import convert_pipette_model
-from ..types import PipetteModel
+from opentrons_shared_data import get_shared_data_root
 
 """
 Instructions:

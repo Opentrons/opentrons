@@ -1,18 +1,20 @@
+from typing import Any, Dict, cast
+
 import pytest
-from typing import Dict, Any, cast
+
 from opentrons_shared_data.pipette import (
     load_data,
     pipette_load_name_conversions,
     types,
 )
 from opentrons_shared_data.pipette.types import (
+    LiquidClasses,
     PipetteChannelType,
     PipetteModelType,
-    PipetteVersionType,
     PipetteOEMType,
     PipetteTipType,
+    PipetteVersionType,
     Quirks,
-    LiquidClasses,
 )
 
 

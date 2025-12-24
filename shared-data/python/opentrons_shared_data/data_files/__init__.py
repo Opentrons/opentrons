@@ -1,17 +1,16 @@
 """Types and functions for accessing data files."""
 
 from .types import (
-    DataFileInfo,
-    InputDataFileInfo,
-    OutputDataFileInfo,
     CmdDataFileInfo,
-    MimeType,
-    IODataFileInfo,
-    DataFileSource,
+    DataFileInfo,
     DataFileInfoWithCommands,
+    DataFileSource,
+    InputDataFileInfo,
+    IODataFileInfo,
+    MimeType,
+    OutputDataFileInfo,
     RunFileNameMetadata,
 )
-
 
 __all__ = [
     "DataFileInfo",
