@@ -21,11 +21,9 @@ export const getPipetteCapacity = (
   }
   console.assert(
     false,
-    `Expected spec and tiprack def for pipette ${
-      pipetteEntity ? pipetteEntity.id : '???'
-    } and ${tipRackDefUri ?? '???'}. Available tipRackDefs: ${tipRackDefs.map(
-      def => getLabwareDefURI(def)
-    )}`
+    `Expected spec for pipette ${pipetteEntity?.id} and tiprack def for ${
+      tipRackDefUri
+    }. Available tipRackDefs: ${tipRackDefs.map(def => getLabwareDefURI(def))}`
   )
   return NaN
 }
