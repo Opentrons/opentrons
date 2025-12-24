@@ -1,26 +1,27 @@
 """StartRunProfile command request, result, and implementation models."""
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, List, Optional, Union, overload
+
 from pydantic import BaseModel, Field
-from typing import List, Optional, TYPE_CHECKING, overload, Union, Any
-from typing_extensions import Literal, Type
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal, Type
 
-from opentrons.hardware_control.modules.types import ThermocyclerStep, ThermocyclerCycle
-
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
-from .run_extended_profile import ProfileStep, ProfileCycle
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .run_extended_profile import ProfileCycle, ProfileStep
+from opentrons.hardware_control.modules.types import ThermocyclerCycle, ThermocyclerStep
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import (
-        TaskHandler,
         EquipmentHandler,
+        TaskHandler,
     )
     from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
         ThermocyclerModuleSubState,
     )
+    from opentrons.protocol_engine.state.state import StateView
 
 StartRunExtendedProfileCommandType = Literal["thermocycler/startRunExtendedProfile"]
 

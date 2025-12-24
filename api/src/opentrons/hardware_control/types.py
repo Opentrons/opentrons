@@ -1,22 +1,25 @@
-from asyncio import Queue
 import enum
 import logging
+from asyncio import Queue
 from dataclasses import dataclass
 from typing import (
-    cast,
-    Tuple,
-    Union,
-    List,
+    TYPE_CHECKING,
     Callable,
     Dict,
-    TypeVar,
+    List,
+    Tuple,
     Type,
-    TYPE_CHECKING,
+    TypeVar,
+    Union,
+    cast,
 )
+
 from typing_extensions import Literal
-from opentrons import types as top_types
-from opentrons_shared_data.pipette.types import PipetteChannelType
+
 from opentrons_shared_data.errors.exceptions import EnumeratedError
+from opentrons_shared_data.pipette.types import PipetteChannelType
+
+from opentrons import types as top_types
 from opentrons.config import feature_flags
 
 if TYPE_CHECKING:

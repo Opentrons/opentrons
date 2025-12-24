@@ -6,9 +6,8 @@ from decoy import Decoy
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
-from opentrons.protocol_api import LiquidClass
 
-from opentrons.protocol_api import InstrumentContext, Labware
+from opentrons.protocol_api import InstrumentContext, Labware, LiquidClass
 from opentrons.protocol_api._liquid_properties import build_transfer_properties
 from opentrons.protocols.advanced_control.transfers.common import (
     NoLiquidClassPropertyError,

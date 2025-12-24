@@ -1,17 +1,18 @@
 """Tests for LiquidClass properties and related functions."""
 
 import pytest
+
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    LiquidClassSchemaV1,
     Coordinate,
+    LiquidClassSchemaV1,
 )
 
 from opentrons.protocol_api._liquid_properties import (
-    build_aspirate_properties,
-    build_single_dispense_properties,
-    build_multi_dispense_properties,
     LiquidHandlingPropertyByVolume,
+    build_aspirate_properties,
+    build_multi_dispense_properties,
+    build_single_dispense_properties,
 )
 
 

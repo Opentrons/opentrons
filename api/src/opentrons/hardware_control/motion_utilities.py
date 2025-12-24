@@ -1,18 +1,16 @@
 """Utilities for calculating motion correctly."""
 
-from logging import getLogger
-
-from functools import lru_cache
-from typing import Callable, Dict, Union, Optional, cast
 from collections import OrderedDict
+from functools import lru_cache
+from logging import getLogger
+from typing import Callable, Dict, Optional, Union, cast
 
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.types import Mount, Point
-from opentrons.calibration_storage.types import AttitudeMatrix
-from opentrons.util import linal
-
 from .types import Axis, OT3Mount
+from opentrons.calibration_storage.types import AttitudeMatrix
+from opentrons.types import Mount, Point
+from opentrons.util import linal
 
 log = getLogger(__name__)
 

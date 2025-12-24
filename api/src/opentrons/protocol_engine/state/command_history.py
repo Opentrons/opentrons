@@ -4,10 +4,9 @@ from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
+from ..commands import Command, CommandIntent, CommandStatus
 from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
-
-from ..commands import Command, CommandStatus, CommandIntent
 
 
 @dataclass(frozen=True)

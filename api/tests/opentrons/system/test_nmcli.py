@@ -1,6 +1,7 @@
+from typing import List, Optional, Tuple
+
 import pytest
 from pytest import MonkeyPatch
-from typing import List, Optional, Tuple
 
 from opentrons.system import nmcli
 

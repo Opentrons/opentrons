@@ -1,9 +1,10 @@
 """Types for Tasks."""
 
-from datetime import datetime
-from opentrons.protocol_engine.errors import ErrorOccurrence
-from dataclasses import dataclass
 import asyncio
+from dataclasses import dataclass
+from datetime import datetime
+
+from opentrons.protocol_engine.errors import ErrorOccurrence
 
 
 @dataclass

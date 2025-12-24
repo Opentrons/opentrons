@@ -1,23 +1,24 @@
 """Move relative (jog) command payload, result, and implementation models."""
 
 from __future__ import annotations
-from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
 
+from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
 from ..types import MovementAxis
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    SuccessData,
     DefinedErrorData,
+    SuccessData,
 )
 from .movement_common import (
     DestinationPositionResult,
-    move_relative,
     StallOrCollisionError,
+    move_relative,
 )
 
 if TYPE_CHECKING:

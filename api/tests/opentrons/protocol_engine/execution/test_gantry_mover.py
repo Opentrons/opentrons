@@ -2,37 +2,38 @@
 
 from __future__ import annotations
 
+from collections import OrderedDict
+from typing import TYPE_CHECKING, Dict, Optional
+
 import pytest
 from decoy import Decoy
-from typing import TYPE_CHECKING, Dict, Optional
-from collections import OrderedDict
 
-from opentrons.types import Mount, MountType, Point
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    Axis as HardwareAxis,
-)
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from opentrons.motion_planning import Waypoint
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.motion import PipetteLocationData
-from opentrons.protocol_engine.types import (
-    MotorAxis,
-    DeckPoint,
-    CurrentWell,
-    TipGeometry,
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.types import (
+    Axis as HardwareAxis,
 )
-from opentrons.protocol_engine.errors import MustHomeError, InvalidAxisForRobotType
-
+from opentrons.hardware_control.types import (
+    CriticalPoint,
+)
+from opentrons.motion_planning import Waypoint
+from opentrons.protocol_engine.errors import InvalidAxisForRobotType, MustHomeError
 from opentrons.protocol_engine.execution.gantry_mover import (
+    VIRTUAL_MAX_OT3_HEIGHT,
     HardwareGantryMover,
     VirtualGantryMover,
     create_gantry_mover,
-    VIRTUAL_MAX_OT3_HEIGHT,
 )
+from opentrons.protocol_engine.state.motion import PipetteLocationData
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import (
+    CurrentWell,
+    DeckPoint,
+    MotorAxis,
+    TipGeometry,
+)
+from opentrons.types import Mount, MountType, Point
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

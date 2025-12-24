@@ -1,6 +1,7 @@
 """Protocol specifying API gripper control."""
 
 from typing import Optional
+
 from typing_extensions import Protocol
 
 from opentrons.hardware_control.dev_types import GripperDict

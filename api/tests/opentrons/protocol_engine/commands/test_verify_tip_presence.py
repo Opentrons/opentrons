@@ -2,15 +2,14 @@
 
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import TipHandler
-from opentrons.protocol_engine.types import TipPresenceStatus
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.verify_tip_presence import (
+    VerifyTipPresenceImplementation,
     VerifyTipPresenceParams,
     VerifyTipPresenceResult,
-    VerifyTipPresenceImplementation,
 )
+from opentrons.protocol_engine.execution import TipHandler
+from opentrons.protocol_engine.types import TipPresenceStatus
 
 
 async def test_verify_tip_presence_implementation(

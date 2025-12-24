@@ -6,9 +6,9 @@ from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+
 from opentrons.calibration_storage.helpers import hash_labware_def
 from opentrons.protocol_api.labware import get_labware_definition
-
 from opentrons.protocol_engine.resources import LabwareDataProvider
 
 

@@ -2,9 +2,19 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Callable, Optional, List, Dict, Mapping, Union, cast
+from typing import Callable, Dict, List, Mapping, Optional, Union, cast
+
+from ..execution_manager import ExecutionManager
+from . import mod_abc, types, update
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
+from opentrons.drivers.thermocycler import (
+    AbstractThermocyclerDriver,
+    SimulatingDriver,
+    ThermocyclerDriverFactory,
+    ThermocyclerDriverV2,
+)
+from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
 from opentrons.hardware_control.modules.types import (
@@ -12,18 +22,7 @@ from opentrons.hardware_control.modules.types import (
     ModuleErrorCallback,
     TemperatureStatus,
 )
-from opentrons.hardware_control.poller import Reader, Poller
-
-from ..execution_manager import ExecutionManager
-from . import types, update, mod_abc
-from opentrons.drivers.thermocycler import (
-    AbstractThermocyclerDriver,
-    SimulatingDriver,
-    ThermocyclerDriverV2,
-    ThermocyclerDriverFactory,
-)
-from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
-
+from opentrons.hardware_control.poller import Poller, Reader
 
 log = logging.getLogger(__name__)
 

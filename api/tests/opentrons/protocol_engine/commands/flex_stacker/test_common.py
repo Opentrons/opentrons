@@ -8,37 +8,37 @@ from decoy import Decoy
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocol_engine.types import (
-    StackerStoredLabwareGroup,
-    OnLabwareLocationSequenceComponent,
-    LabwareLocationSequence,
-    OFF_DECK_LOCATION,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareUri,
-    InStackerHopperLocation,
-    LabwareLocation,
-    LoadedLabware,
-    OnLabwareOffsetLocationSequenceComponent,
-    LabwareOffset,
-)
+from opentrons.protocol_engine.commands.flex_stacker import common as subject
 from opentrons.protocol_engine.execution.equipment import (
     EquipmentHandler,
     LoadedLabwarePoolData,
 )
 from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.commands.flex_stacker import common as subject
-from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
     FlexStackerId,
+    FlexStackerSubState,
 )
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
     BatchLabwareLocationUpdate,
-    FlexStackerStateUpdate,
     BatchLoadedLabwareUpdate,
+    FlexStackerStateUpdate,
     LabwareLidUpdate,
+    StateUpdate,
+)
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareLocationSequence,
+    LabwareOffset,
+    LabwareUri,
+    LoadedLabware,
+    ModuleLocation,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    StackerStoredLabwareGroup,
 )
 
 

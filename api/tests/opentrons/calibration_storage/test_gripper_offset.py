@@ -1,11 +1,13 @@
-import pytest
 import typing
 
-from opentrons.types import Point
+import pytest
+
 from opentrons.calibration_storage import (
     types as cs_types,
 )
-from opentrons.calibration_storage.ot3 import gripper_offset as gripper, models
+from opentrons.calibration_storage.ot3 import gripper_offset as gripper
+from opentrons.calibration_storage.ot3 import models
+from opentrons.types import Point
 
 
 @pytest.fixture

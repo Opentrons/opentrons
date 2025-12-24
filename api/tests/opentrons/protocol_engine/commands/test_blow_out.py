@@ -2,37 +2,38 @@
 
 from datetime import datetime
 
-from decoy import Decoy, matchers
 import pytest
+from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.types import Point
-from opentrons.protocol_engine import (
-    WellLocation,
-    WellOrigin,
-    WellOffset,
-    DeckPoint,
-)
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import LabwareWellId
-from opentrons.protocol_engine.commands import (
-    BlowOutResult,
-    BlowOutImplementation,
-    BlowOutParams,
-)
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.execution import (
-    MovementHandler,
-    PipettingHandler,
-)
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     StallOrCollisionDetectedError,
 )
+
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine import (
+    DeckPoint,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
+)
+from opentrons.protocol_engine.commands import (
+    BlowOutImplementation,
+    BlowOutParams,
+    BlowOutResult,
+)
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+from opentrons.protocol_engine.execution import (
+    MovementHandler,
+    PipettingHandler,
+)
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import LabwareWellId
+from opentrons.types import Point
 
 
 @pytest.fixture

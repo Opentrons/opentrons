@@ -1,6 +1,6 @@
-from typing import Optional, Dict, Sequence
+from typing import Dict, Optional, Sequence
 
-from opentrons_shared_data.errors import GeneralError, EnumeratedError, ErrorCodes
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, GeneralError
 
 
 class RuntimeParameterRequired(GeneralError):

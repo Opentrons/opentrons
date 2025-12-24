@@ -2,16 +2,16 @@
 
 from decoy import Decoy
 
-from opentrons.protocol_engine.commands.unsafe.unsafe_engage_axes import (
-    UnsafeEngageAxesParams,
-    UnsafeEngageAxesResult,
-    UnsafeEngageAxesImplementation,
-)
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.execution import GantryMover
-from opentrons.protocol_engine.types import MotorAxis
 from opentrons.hardware_control import OT3HardwareControlAPI
 from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.unsafe.unsafe_engage_axes import (
+    UnsafeEngageAxesImplementation,
+    UnsafeEngageAxesParams,
+    UnsafeEngageAxesResult,
+)
+from opentrons.protocol_engine.execution import GantryMover
+from opentrons.protocol_engine.types import MotorAxis
 
 
 async def test_engage_axes_implementation(

@@ -1,11 +1,11 @@
 """Automated testing for how labware stackups stack up."""
 
+from concurrent.futures import Future, ProcessPoolExecutor, as_completed
 from dataclasses import dataclass
-from concurrent.futures import ProcessPoolExecutor, as_completed, Future
 
-from .stackup_spec import StackupSpec
-from .test_types import SuccessfulTest, ResultSummary
 from . import data
+from .stackup_spec import StackupSpec
+from .test_types import ResultSummary, SuccessfulTest
 
 
 @dataclass(frozen=True)
@@ -33,8 +33,8 @@ class TestResults:
 
 
 def _init_swallow_logging() -> None:
-    import sys
     import io
+    import sys
 
     sys.stdout = io.StringIO()
     sys.stderr = io.StringIO()
@@ -109,8 +109,9 @@ def _process_single_test(
     spec: StackupSpec,
 ) -> SuccessfulTest | ExceptionDuringTest:
     """Process a single test in a subprocess to completely isolate resources."""
-    from .in_subprocess_test import run_test_subprocess
     import sys
+
+    from .in_subprocess_test import run_test_subprocess
 
     try:
         return SuccessfulTest(

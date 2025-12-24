@@ -1,7 +1,9 @@
+from dataclasses import asdict, dataclass, fields
 from enum import Enum
-from dataclasses import dataclass, asdict, fields
-from typing import Dict, Tuple, TypeVar, Generic, List, cast
-from typing_extensions import TypedDict, Literal
+from typing import Dict, Generic, List, Tuple, TypeVar, cast
+
+from typing_extensions import Literal, TypedDict
+
 from opentrons.hardware_control.types import OT3AxisKind
 
 

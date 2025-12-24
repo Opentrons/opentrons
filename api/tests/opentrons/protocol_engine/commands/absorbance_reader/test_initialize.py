@@ -1,21 +1,12 @@
 """Test absorbance reader initilize command."""
 
+from typing import List
+
 import pytest
 from decoy import Decoy
-from typing import List
 
 from opentrons.drivers.types import ABSMeasurementMode
 from opentrons.hardware_control.modules import AbsorbanceReader
-from opentrons.protocol_engine.errors import InvalidWavelengthError
-
-from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    AbsorbanceReaderSubState,
-    AbsorbanceReaderId,
-)
-from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.absorbance_reader import (
     InitializeParams,
     InitializeResult,
@@ -23,6 +14,15 @@ from opentrons.protocol_engine.commands.absorbance_reader import (
 from opentrons.protocol_engine.commands.absorbance_reader.initialize import (
     InitializeImpl,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.errors import InvalidWavelengthError
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.module_substates import (
+    AbsorbanceReaderId,
+    AbsorbanceReaderSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 
 
 @pytest.fixture

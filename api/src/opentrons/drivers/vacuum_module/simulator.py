@@ -2,12 +2,12 @@ from typing import Optional
 
 from .abstract import AbstractVacuumModuleDriver
 from .types import (
+    HardwareRevision,
+    LEDColor,
+    LEDPattern,
     PressureState,
     PumpState,
     VacuumModuleInfo,
-    HardwareRevision,
-    LEDPattern,
-    LEDColor,
     VentState,
 )
 from opentrons.util.async_helpers import ensure_yield

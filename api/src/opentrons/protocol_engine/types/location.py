@@ -1,7 +1,8 @@
 """Protocol engine types to deal with locating things on the deck."""
 
 from __future__ import annotations
-from typing import Literal, Union, TypeGuard
+
+from typing import Literal, TypeGuard, Union
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema

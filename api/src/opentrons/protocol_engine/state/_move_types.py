@@ -5,10 +5,9 @@ from typing import List, Optional
 
 from opentrons_shared_data.util import StrEnum
 
-from opentrons.types import Point
+from ..types import CurrentPipetteLocation, CurrentWell
 from opentrons.motion_planning.types import MoveType
-
-from ..types import CurrentWell, CurrentPipetteLocation
+from opentrons.types import Point
 
 
 @dataclass

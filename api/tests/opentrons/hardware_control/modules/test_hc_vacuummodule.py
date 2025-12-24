@@ -4,23 +4,22 @@ from typing import AsyncGenerator
 import pytest
 from decoy import Decoy
 
-
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
+    HardwareRevision,
     LEDColor,
     LEDPattern,
-    HardwareRevision,
     VacuumModuleInfo,
 )
-from opentrons.hardware_control import modules, ExecutionManager
-from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.hardware_control import ExecutionManager, modules
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+)
 from opentrons.hardware_control.modules.vacuum_module import (
     SIMULATING_POLL_PERIOD,
     VacuumModuleReader,
-)
-from opentrons.hardware_control.modules.types import (
-    ModuleErrorCallback,
-    ModuleDisconnectedCallback,
 )
 from opentrons.hardware_control.poller import Poller
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent

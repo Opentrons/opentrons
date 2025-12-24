@@ -1,24 +1,23 @@
 """Models and implementation for the calibrateGripper command."""
 
 from enum import Enum
-from typing import Optional, Type, Any
-from typing_extensions import Literal
+from typing import Any, Optional, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal
 
-from opentrons.types import Point
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control import ot3_calibration
-from opentrons.hardware_control.types import OT3Mount, GripperProbe as HWAPIGripperProbe
+from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.hardware_control import HardwareControlAPI, ot3_calibration
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
 )
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors.error_occurrence import ErrorOccurrence
-from opentrons.protocol_engine.types import Vec3f
+from opentrons.hardware_control.types import GripperProbe as HWAPIGripperProbe
+from opentrons.hardware_control.types import OT3Mount
 from opentrons.protocol_engine.resources import ensure_ot3_hardware
-
+from opentrons.protocol_engine.types import Vec3f
+from opentrons.types import Point
 
 CalibrateGripperCommandType = Literal["calibration/calibrateGripper"]
 

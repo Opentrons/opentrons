@@ -1,9 +1,10 @@
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import Optional, Union
 
-from opentrons.types import AxisMapType, Mount, Point
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons.protocol_api._types import PlungerPositionTypes, PipetteActionTypes
+
+from opentrons.protocol_api._types import PipetteActionTypes, PlungerPositionTypes
+from opentrons.types import AxisMapType, Mount, Point
 
 
 class AbstractRobot(ABC):

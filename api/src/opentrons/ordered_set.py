@@ -13,8 +13,8 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import Literal
 
+from typing_extensions import Literal
 
 _SetElementT = TypeVar("_SetElementT", bound=Hashable)
 

@@ -1,9 +1,9 @@
 import argparse
 from typing import Optional, Tuple, cast
 
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.hardware_control import API, Controller
 from opentrons.hardware_control.types import HardwareFeatureFlags
-from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 
 def root_argparser(description: Optional[str] = None) -> argparse.ArgumentParser:

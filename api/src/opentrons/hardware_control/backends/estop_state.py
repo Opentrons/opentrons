@@ -3,14 +3,14 @@
 from typing import List, Optional
 
 from opentrons_hardware.hardware_control.estop.detector import (
-    EstopSummary,
     EstopDetector,
+    EstopSummary,
 )
 
 from opentrons.hardware_control.types import (
-    EstopState,
-    EstopPhysicalStatus,
     EstopAttachLocation,
+    EstopPhysicalStatus,
+    EstopState,
     EstopStateNotification,
     HardwareEventHandler,
     HardwareEventUnsubscriber,

@@ -6,30 +6,66 @@ from typing import (
     Callable,
     Dict,
     List,
+    Mapping,
     Optional,
+    Tuple,
     Type,
     Union,
-    Mapping,
     cast,
-    Tuple,
 )
 
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
+from opentrons_shared_data.liquid_classes import DEFAULT_LC_VERSION, definition_exists
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedTransferProperties,
 )
-from opentrons_shared_data.liquid_classes import DEFAULT_LC_VERSION, definition_exists
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 from opentrons_shared_data.pipette.types import PipetteNameType
 
-from opentrons.types import Mount, Location, DeckLocation, DeckSlotName, StagingSlotName
-from opentrons.legacy_broker import LegacyBroker
+from . import validation
+from ._liquid import Liquid, LiquidClass
+from ._liquid_properties import build_transfer_properties
+from ._parameters import Parameters
+from ._types import OffDeckType
+from .core.common import LabwareCore, ModuleCore, ProtocolCore
+from .core.core_map import LoadedCoreMap
+from .core.engine import ENGINE_CORE_API_VERSION
+from .core.engine.module_core import NonConnectedModuleCore
+from .core.legacy.legacy_protocol_core import LegacyProtocolCore
+from .core.module import (
+    AbstractAbsorbanceReaderCore,
+    AbstractFlexStackerCore,
+    AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
+    AbstractMagneticModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractThermocyclerCore,
+)
+from .deck import Deck
+from .disposal_locations import TrashBin, WasteChute
+from .instrument_context import InstrumentContext
+from .labware import Labware
+from .module_contexts import (
+    AbsorbanceReaderContext,
+    FlexStackerContext,
+    HeaterShakerContext,
+    MagneticBlockContext,
+    MagneticModuleContext,
+    ModuleContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
+)
+from .robot_context import HardwareManager, RobotContext
+from .tasks import Task
 from opentrons.hardware_control.modules.types import (
-    MagneticBlockModel,
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
+    MagneticBlockModel,
 )
-from opentrons.legacy_commands import protocol_commands as cmds, types as cmd_types
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import protocol_commands as cmds
+from opentrons.legacy_commands import types as cmd_types
 from opentrons.legacy_commands.helpers import (
     stringify_labware_movement_command,
     stringify_lid_movement_command,
@@ -39,60 +75,22 @@ from opentrons.legacy_commands.publisher import (
     publish,
     publish_context,
 )
+from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
 from opentrons.protocols.api_support import instrument as instrument_support
 from opentrons.protocols.api_support.deck_type import (
     NoTrashDefinedError,
-    should_load_fixed_trash_labware_for_python_protocol,
     should_load_fixed_trash_area_for_python_protocol,
+    should_load_fixed_trash_labware_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import (
-    AxisMaxSpeeds,
-    requires_version,
     APIVersionError,
+    AxisMaxSpeeds,
     RobotTypeError,
     UnsupportedAPIError,
+    requires_version,
 )
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-from opentrons.protocol_engine.errors import LabwareMovementNotAllowedError
-from ._liquid_properties import build_transfer_properties
-
-from ._types import OffDeckType
-from .core.common import ModuleCore, LabwareCore, ProtocolCore
-from .core.core_map import LoadedCoreMap
-from .core.engine.module_core import NonConnectedModuleCore
-from .core.module import (
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractThermocyclerCore,
-    AbstractHeaterShakerCore,
-    AbstractMagneticBlockCore,
-    AbstractAbsorbanceReaderCore,
-    AbstractFlexStackerCore,
-)
-from .robot_context import RobotContext, HardwareManager
-from .core.engine import ENGINE_CORE_API_VERSION
-from .core.legacy.legacy_protocol_core import LegacyProtocolCore
-
-from . import validation
-from ._liquid import Liquid, LiquidClass
-from .disposal_locations import TrashBin, WasteChute
-from .deck import Deck
-from .instrument_context import InstrumentContext
-from .labware import Labware
-from .module_contexts import (
-    MagneticModuleContext,
-    TemperatureModuleContext,
-    ThermocyclerContext,
-    HeaterShakerContext,
-    MagneticBlockContext,
-    AbsorbanceReaderContext,
-    FlexStackerContext,
-    ModuleContext,
-)
-from .tasks import Task
-from ._parameters import Parameters
-
+from opentrons.types import DeckLocation, DeckSlotName, Location, Mount, StagingSlotName
 
 logger = logging.getLogger(__name__)
 
