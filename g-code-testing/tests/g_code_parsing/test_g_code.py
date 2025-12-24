@@ -1,10 +1,12 @@
+from typing import Dict, List, Union
+
 import pytest
+
+from g_code_parsing.errors import UnparsableGCodeError
+from g_code_parsing.g_code import GCode
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     Explanation,
 )
-from g_code_parsing.g_code import GCode
-from g_code_parsing.errors import UnparsableGCodeError
-from typing import List, Dict, Union
 
 
 def smoothie_g_codes() -> List[GCode]:
