@@ -1030,11 +1030,12 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def blow_out(
+    def blow_out(  # noqa: C901
         self,
         location: Optional[
             Union[types.Location, labware.Well, TrashBin, WasteChute]
         ] = None,
+        flow_rate: Optional[float] = None,
     ) -> InstrumentContext:
         """
         Blow an extra amount of air through a pipette's tip to clear it.
@@ -1056,12 +1057,27 @@ class InstrumentContext(publisher.CommandPublisher):
                               ``None``. This should happen if ``blow_out()`` is called
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
+        :param flow_rate: The absolute flow rate in µL/s.
+        :type flow_rate: float
+
         :returns: This instance.
 
         .. versionchanged:: 2.24
             ``location`` is no longer required if the pipette just moved to, dispensed, or blew out
             into a trash bin or waste chute.
+        .. versionchanged:: 2.28
+            Added ``flow_rate`` argument.
         """
+        if flow_rate is not None:
+            if self.api_version < APIVersion(2, 28):
+                raise APIVersionError(
+                    api_element="flow_rate",
+                    until_version="2.28",
+                    current_version=f"{self.api_version}",
+                )
+        else:
+            flow_rate = self._core.get_blow_out_flow_rate(1.0)
+
         well: Optional[labware.Well] = None
         move_to_location: types.Location
 
@@ -1105,24 +1121,28 @@ class InstrumentContext(publisher.CommandPublisher):
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.blow_out_in_disposal_location(
-                    instrument=self, location=target.location
+                    instrument=self, location=target.location, flow_rate=flow_rate
                 ),
             ):
                 self._core.blow_out(
                     location=target.location,
                     well_core=None,
                     in_place=target.in_place,
+                    flow_rate=flow_rate,
                 )
             return self
 
         with publisher.publish_context(
             broker=self.broker,
-            command=cmds.blow_out(instrument=self, location=move_to_location),
+            command=cmds.blow_out(
+                instrument=self, location=move_to_location, flow_rate=flow_rate
+            ),
         ):
             self._core.blow_out(
                 location=move_to_location,
                 well_core=well._core if well is not None else None,
                 in_place=target.in_place,
+                flow_rate=flow_rate,
             )
 
         return self

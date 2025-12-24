@@ -723,16 +723,18 @@ def test_blow_out_to_well(
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
     decoy.when(mock_well.top()).then_return(top_location)
-    subject.blow_out(location=mock_well)
+    subject.blow_out(location=mock_well, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=top_location, well_core=mock_well._core, in_place=False
+            location=top_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=123,
         ),
         times=1,
     )
@@ -749,15 +751,17 @@ def test_blow_out_to_well_location(
     input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=mock_well._core, in_place=False
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=123,
         ),
         times=1,
     )
@@ -793,14 +797,16 @@ def test_blow_out_to_well_meniscus_location(
     )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     mock_instrument_core.blow_out(
-        location=input_location_absolute, well_core=mock_well._core, in_place=False
+        location=input_location_absolute,
+        well_core=mock_well._core,
+        in_place=False,
+        flow_rate=123,
     )
 
 
@@ -814,16 +820,15 @@ def test_blow_out_to_location(
     input_location = Location(point=Point(2, 2, 2), labware=None)
     last_location = input_location  # to demonstrate how we set in_place=True
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
 
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=None, in_place=True
+            location=input_location, well_core=None, in_place=True, flow_rate=123
         ),
         times=1,
     )
@@ -839,14 +844,44 @@ def test_blow_out_with_trash_last_location(
     """It should blow out into a previously accessed disposal location."""
     mock_chute = decoy.mock(cls=WasteChute)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(mock_instrument_core.get_blow_out_flow_rate(1.0)).then_return(111)
     decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
         mock_chute
     )
+
     subject.blow_out()
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=mock_chute, well_core=None, in_place=True
+            location=mock_chute, well_core=None, in_place=True, flow_rate=111
+        ),
+        times=1,
+    )
+
+
+def test_blow_out_uses_previously_set_flow_rate(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should blow out to a well."""
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_instrument_core.get_blow_out_flow_rate(1.0)).then_return(111)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(mock_well.top()).then_return(top_location)
+    subject.blow_out(location=mock_well)
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=top_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=111,
         ),
         times=1,
     )
