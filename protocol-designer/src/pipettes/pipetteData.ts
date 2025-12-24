@@ -12,7 +12,7 @@ export const getPipetteCapacity = (
   const chosenTipRack =
     tipRackDefs.find(def => getLabwareDefURI(def) === tipRackDefUri) ??
     tipRackDefs[0]
-  // TODO: Figure out why we're crashing in getTiprackVolume() because we can't
+  // TODO: Figure out why we were crashing in getTiprackVolume() because we can't
   // find the tiprack def. Maybe tipRackDefUri is null, or tipRackDefs is empty?
   const tipRackTipVol = chosenTipRack ? getTiprackVolume(chosenTipRack) : null
 
