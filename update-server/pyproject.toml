@@ -53,12 +53,14 @@ dev = [
 
 [tool.ruff.lint]
 # TODO(sfoster, 2025-12-24) since 2012, we have ignored annotation and doc string lints.
-select = ["E", "C90"]
+select = ["E", "C90", "I"]
 ignore = ["E203", "E501", "E741"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
+[tool.ruff.lint.isort]
+known-local-folder = ["otupdate"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="otupdate/_version.py"

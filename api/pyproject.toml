@@ -104,7 +104,7 @@ override-versions-of=['opentrons-shared-data', 'opentrons-hardware']
 
 [tool.ruff.lint]
 exclude = ["docs/v2/example_protocols/*"]
-select = ["E", "ANN", "D", "C90"]
+select = ["E", "ANN", "D", "C90", "I"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "src/opentrons/__init__.py" = ["ANN","D"]
@@ -148,6 +148,9 @@ convention = "google"
 max-complexity = 9
 [tool.ruff.format]
 exclude = ["docs/v2/example_protocols/*"]
+[tool.ruff.lint.isort]
+known-first-party = ["opentrons_shared_data", "opentrons_hardware"]
+known-local-folder = ["opentrons"]
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]

@@ -82,7 +82,7 @@ requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3']
 build-backend = 'hatchling.build'
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90"]
+select = ["E", "ANN", "D", "C90", "I"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN","D"]
@@ -91,6 +91,9 @@ ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
+[tool.ruff.lint.isort]
+known-first-party = ["opentrons", "opentrons_shared_data", "server_utils"]
+known-local-folder = ["system_server"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="system_server/_version.py"

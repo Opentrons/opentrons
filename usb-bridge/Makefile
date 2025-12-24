@@ -64,6 +64,7 @@ lint:
 .PHONY: format
 format:
 	$(ruff) format ot3usb tests
+	$(ruff) check --select I --fix ot3usb tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)

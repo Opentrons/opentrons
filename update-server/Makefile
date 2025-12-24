@@ -64,6 +64,7 @@ lint:
 .PHONY: format
 format:
 	$(ruff) format otupdate tests
+	$(ruff) check --select I --fix otupdate tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

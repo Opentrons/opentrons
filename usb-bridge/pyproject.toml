@@ -60,7 +60,7 @@ dev = [
 "Documentation" = "https://docs.opentrons.com"
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90"]
+select = ["E", "ANN", "D", "C90", "I"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "D"]
@@ -69,6 +69,9 @@ ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
+[tool.ruff.lint.isort]
+known-first-party = ["opentrons", "opentrons_hardware", "opentrons_shared_data", "robot_server" ]
+known-local-folder = ["usb_bridge"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "ot3usb/_version.py"
