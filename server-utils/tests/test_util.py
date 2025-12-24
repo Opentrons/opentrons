@@ -1,9 +1,9 @@
 import asyncio
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
+from typing import Any, Iterator
 
 import pytest
 from mock import patch
-from typing import Any, Iterator
 
 from server_utils import util
 
