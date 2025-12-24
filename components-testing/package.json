@@ -13,7 +13,6 @@
   "dependencies": {
     "@opentrons/components": "link:pack/opentrons-components",
     "@opentrons/shared-data": "link:pack/opentrons-shared-data",
-    "@playwright/test": "^1.56.1",
     "@types/react": "18.2.51",
     "@types/react-dom": "18.2.0",
     "@vitejs/plugin-react": "4.2.0",
@@ -22,5 +21,8 @@
     "typescript": "5.3.3",
     "vite": "7.1.1"
   },
-  "packageManager": "pnpm@10.22.0"
+  "packageManager": "pnpm@10.22.0",
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
+  }
 }
