@@ -1,6 +1,5 @@
 """A SQL column type to store UTC datetimes."""
 
-
 from datetime import datetime, timezone
 from typing import Optional
 import sqlalchemy

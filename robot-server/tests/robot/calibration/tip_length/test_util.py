@@ -9,7 +9,7 @@ def machine():
         "imaginingTable",
         "millingLumber",
         "sawingToDimensions",
-        "assemblingTable" "gluingUp" "rethinkingDesign",
+        "assemblingTablegluingUprethinkingDesign",
         "sandingDown",
         "applyingFinish",
         "admiringWork",

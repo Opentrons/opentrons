@@ -1,4 +1,5 @@
 """Configure nozzle layout command request, result, and implementation models."""
+
 from __future__ import annotations
 from opentrons.protocol_engine.state.update_types import StateUpdate
 from pydantic import BaseModel
@@ -101,9 +102,9 @@ class ConfigureNozzleLayout(
     params: ConfigureNozzleLayoutParams
     result: Optional[ConfigureNozzleLayoutResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[ConfigureNozzleLayoutImplementation] = (
         ConfigureNozzleLayoutImplementation
-    ] = ConfigureNozzleLayoutImplementation
+    )
 
 
 class ConfigureNozzleLayoutCreate(BaseCommandCreate[ConfigureNozzleLayoutParams]):

@@ -126,7 +126,7 @@ mock_bad_security:50:no:foobar
             "active": False,
             "security": "foobar",
             "securityType": "unsupported",
-        }
+        },
         # note entry for 'ssid': '--' is expected to be filterd out
     ]
 

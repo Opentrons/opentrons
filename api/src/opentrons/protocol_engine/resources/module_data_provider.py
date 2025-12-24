@@ -1,4 +1,5 @@
 """Module data resource provider."""
+
 from typing import Dict
 from opentrons.hardware_control.modules.module_calibration import (
     load_all_module_calibrations,

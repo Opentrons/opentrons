@@ -1,4 +1,5 @@
 """Test configure nozzle layout commands."""
+
 from opentrons.protocol_engine.state.update_types import (
     PipetteNozzleMapUpdate,
     StateUpdate,

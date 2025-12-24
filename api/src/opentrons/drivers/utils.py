@@ -195,7 +195,7 @@ class AxisMoveTimestamp:
     def time_since_moved(self) -> Mapping[str, Optional[float]]:
         """Get a mapping of the time since each known axis moved"""
         now = time.monotonic()
-        return {ax: now - val if val else None for ax, val, in self._moved_at.items()}
+        return {ax: now - val if val else None for ax, val in self._moved_at.items()}
 
     def reset_moved(self, axis_iter: Iterable[str]) -> None:
         """Reset the clocks for a set of axes"""

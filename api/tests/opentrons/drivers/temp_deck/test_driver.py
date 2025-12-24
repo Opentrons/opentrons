@@ -51,7 +51,7 @@ async def test_set_temperature(driver: TempDeckDriver, connection: AsyncMock) ->
 
 async def test_get_temperature(driver: TempDeckDriver, connection: AsyncMock) -> None:
     """It should send a get temperature command and parse response"""
-    connection.send_command.return_value = "T:132 C:25 ok\r\nok\r\n" ""
+    connection.send_command.return_value = "T:132 C:25 ok\r\nok\r\n"
 
     response = await driver.get_temperature()
 

@@ -36,9 +36,10 @@ class Migration9to10(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 9 to 10."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        with sql_engine_ctx(
-            dest_dir / DB_FILE
-        ) as engine, engine.begin() as transaction:
+        with (
+            sql_engine_ctx(dest_dir / DB_FILE) as engine,
+            engine.begin() as transaction,
+        ):
             assert (
                 schema_09.labware_offset_table.name
                 != schema_10.labware_offset_table.name

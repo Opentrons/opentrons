@@ -1,4 +1,5 @@
 """Tests for LiquidClass properties and related functions."""
+
 import pytest
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
@@ -211,7 +212,9 @@ def test_single_dispense_settings_override() -> None:
 
     single_dispense_properties = build_single_dispense_properties(single_dispense_data)
 
-    single_dispense_properties.submerge.start_position.position_reference = "well-bottom"  # type: ignore[assignment]
+    single_dispense_properties.submerge.start_position.position_reference = (
+        "well-bottom"  # type: ignore[assignment]
+    )
     assert (
         single_dispense_properties.submerge.start_position.position_reference.value
         == "well-bottom"

@@ -60,14 +60,14 @@ async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
                 await asyncio.sleep(sleep_sec)
             else:
                 # The server has reported some other unexpected status code.
-                assert (
-                    False
-                ), f"Expected server to report failed initialization, but got: {response}"
+                assert False, (
+                    f"Expected server to report failed initialization, but got: {response}"
+                )
         else:
             # Server hasn't has unexpectedly reported success.
-            assert (
-                False
-            ), f"Expected server to report failed initialization, but got: {response}"
+            assert False, (
+                f"Expected server to report failed initialization, but got: {response}"
+            )
 
 
 async def test_upload_protocols_and_reset_persistence_dir() -> None:

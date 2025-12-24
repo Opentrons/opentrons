@@ -164,7 +164,7 @@ def add_args(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     """Add command line flags to drive the filters."""
     for this_field in fields(FilterSpecs):
         parser.add_argument(
-            f'--{this_field.name.replace("_", "-")}',
+            f"--{this_field.name.replace('_', '-')}",
             dest=this_field.name,
             nargs="*",
             action="store",

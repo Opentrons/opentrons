@@ -4,7 +4,6 @@ This module is not part of the public Python Protocol API.
 It's only for internal Opentrons use.
 """
 
-
 from dataclasses import dataclass
 from typing import Optional, Union
 from opentrons_shared_data.labware.types import LabwareDefinition2

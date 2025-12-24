@@ -1,6 +1,5 @@
 """HTTP-facing JSON models for deck configuration."""
 
-
 from datetime import datetime
 from typing import List, Optional
 from typing_extensions import Literal

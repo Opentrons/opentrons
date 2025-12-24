@@ -1,4 +1,5 @@
 """Drop tip in place command request, result, and implementation models."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Type, Any, Union
@@ -191,9 +192,9 @@ class DropTipInPlace(
     params: DropTipInPlaceParams
     result: Optional[DropTipInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[DropTipInPlaceImplementation] = (
         DropTipInPlaceImplementation
-    ] = DropTipInPlaceImplementation
+    )
 
 
 class DropTipInPlaceCreate(BaseCommandCreate[DropTipInPlaceParams]):

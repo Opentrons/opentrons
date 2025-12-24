@@ -1,4 +1,5 @@
 """Handle parsing and providing gripper information."""
+
 import re
 from typing import Tuple
 import struct

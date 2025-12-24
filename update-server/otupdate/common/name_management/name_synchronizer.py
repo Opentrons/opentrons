@@ -154,7 +154,7 @@ def get_name_synchronizer(request: web.Request) -> NameSynchronizer:
     aiohttp.Application already via install_name_synchronizer().
     """
     name_synchronizer = request.app.get(_NAME_SYNCHRONIZER_VARNAME, None)
-    assert isinstance(
-        name_synchronizer, NameSynchronizer
-    ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
+    assert isinstance(name_synchronizer, NameSynchronizer), (
+        f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
+    )
     return name_synchronizer

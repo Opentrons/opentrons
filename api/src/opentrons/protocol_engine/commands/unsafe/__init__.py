@@ -16,7 +16,6 @@ their shapes if we're confident that it won't break something in robot-server's
 persistent storage.
 """
 
-
 from .unsafe_blow_out_in_place import (
     UnsafeBlowOutInPlaceCommandType,
     UnsafeBlowOutInPlaceParams,

@@ -88,7 +88,7 @@ COMMAND_MAP = Dict[str, COMMAND_HANDLER]
 
 
 def tuplefy_cal_point_dicts(
-    pt_dicts: Union[ExpectedPoints, SavedPoints]
+    pt_dicts: Union[ExpectedPoints, SavedPoints],
 ) -> linal.SolvePoints:
     return (
         tuple(pt_dicts[POINT_ONE_ID]),  # type: ignore
@@ -325,9 +325,9 @@ class DeckCalibrationUserFlow:
         await self._move(to_loc)
 
     def _get_move_to_point_loc_by_state(self) -> Location:
-        assert (
-            self._z_height_reference is not None
-        ), "saveOffset has not been called yet"
+        assert self._z_height_reference is not None, (
+            "saveOffset has not been called yet"
+        )
         pt_id = MOVE_POINT_STATE_MAP[self.current_state]
         coords = self._deck.get_calibration_position(pt_id).position
         loc = Location(Point(*coords), None)

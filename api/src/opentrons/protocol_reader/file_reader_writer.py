@@ -30,7 +30,7 @@ class FileReaderWriter:
 
     @staticmethod
     async def read(
-        files: Sequence[Union[AbstractInputFile, pathlib.Path]]
+        files: Sequence[Union[AbstractInputFile, pathlib.Path]],
     ) -> List[BufferedFile]:
         """Read a set of input files into memory."""
         return [await _read_file(input_file=file) for file in files]
@@ -48,7 +48,7 @@ class FileReaderWriter:
 
 
 async def _read_file(
-    input_file: Union[AbstractInputFile, pathlib.Path]
+    input_file: Union[AbstractInputFile, pathlib.Path],
 ) -> BufferedFile:
     if isinstance(input_file, pathlib.Path):
         path: Optional[pathlib.Path] = input_file

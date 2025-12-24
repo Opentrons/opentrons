@@ -72,9 +72,9 @@ class OpenGripperJaw(
     params: OpenGripperJawParams
     result: Optional[OpenGripperJawResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[OpenGripperJawImplementation] = (
         OpenGripperJawImplementation
-    ] = OpenGripperJawImplementation
+    )
 
 
 class OpenGripperJawCreate(BaseCommandCreate[OpenGripperJawParams]):

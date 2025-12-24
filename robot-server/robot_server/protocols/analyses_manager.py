@@ -1,4 +1,5 @@
 """A collaborator for managing protocol analyses."""
+
 from typing import Optional
 
 from opentrons.util import helpers as datetime_helper

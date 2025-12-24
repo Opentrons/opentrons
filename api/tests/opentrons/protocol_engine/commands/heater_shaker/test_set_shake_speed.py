@@ -1,4 +1,5 @@
 """Test Heater Shaker set shake speed command implementation."""
+
 from decoy import Decoy, matchers
 import pytest
 

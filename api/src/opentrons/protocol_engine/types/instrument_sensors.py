@@ -1,4 +1,5 @@
 """Protocol engine types involving instrument sensors."""
+
 from opentrons_shared_data.util import StrEnum
 
 from opentrons.hardware_control.types import (

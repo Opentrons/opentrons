@@ -1,4 +1,5 @@
 """Shared code for managing pipette configuration and storage."""
+
 from dataclasses import dataclass
 import logging
 from typing import (
@@ -279,12 +280,12 @@ class OT3PipetteHandler:
                 alvl: self.plunger_speed(instr, fr, "aspirate")
                 for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
-            result[
-                "default_push_out_volume"
-            ] = instr.active_tip_settings.default_push_out_volume
-            result[
-                "pipette_bounding_box_offsets"
-            ] = instr.config.pipette_bounding_box_offsets
+            result["default_push_out_volume"] = (
+                instr.active_tip_settings.default_push_out_volume
+            )
+            result["pipette_bounding_box_offsets"] = (
+                instr.config.pipette_bounding_box_offsets
+            )
             result["lld_settings"] = instr.config.lld_settings
             result["plunger_positions"] = {
                 "top": instr.plunger_positions.top,
@@ -576,9 +577,9 @@ class OT3PipetteHandler:
         if asp_vol == 0:
             return None
 
-        assert instrument.ok_to_add_volume(
-            asp_vol
-        ), "Cannot aspirate more than pipette max volume"
+        assert instrument.ok_to_add_volume(asp_vol), (
+            "Cannot aspirate more than pipette max volume"
+        )
 
         dist = self.plunger_position(
             instr=instrument,

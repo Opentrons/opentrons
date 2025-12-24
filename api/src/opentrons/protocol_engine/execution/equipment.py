@@ -464,9 +464,9 @@ class EquipmentHandler:
             ModuleAlreadyPresentError: A module of a different type is already
                 assigned to the requested location.
         """
-        assert ModuleModel.is_magnetic_block(
-            model
-        ), f"Expected Magnetic block and got {model.name}"
+        assert ModuleModel.is_magnetic_block(model), (
+            f"Expected Magnetic block and got {model.name}"
+        )
         definition = self._module_data_provider.get_definition(model)
         return LoadedModuleData(
             module_id=self._model_utils.ensure_id(module_id),
@@ -630,6 +630,7 @@ class EquipmentHandler:
         Args:
             pipette_id: The identifier for the pipette.
             volume: The volume to configure the pipette for
+            tip_overlap_version: The version of tip overlap data to use.
 
         Returns:
             A LoadedConfiguredVolumeData object.
@@ -683,9 +684,9 @@ class EquipmentHandler:
 
         Args:
             pipette_id: The identifier for the pipette.
-            primary_nozzle: The nozzle which will be used as the
-            front_right_nozzle
-            back_left_nozzle
+            primary_nozzle: The nozzle which will be used as the main nozzle for positioning.
+            front_right_nozzle: The physically front right nozzle.
+            back_left_nozzle: The physically back left nozzle.
 
         Returns:
             A NozzleMap object or None.
@@ -725,43 +726,37 @@ class EquipmentHandler:
     def get_module_hardware_api(
         self,
         module_id: MagneticModuleId,
-    ) -> Optional[MagDeck]:
-        ...
+    ) -> Optional[MagDeck]: ...
 
     @overload
     def get_module_hardware_api(
         self,
         module_id: HeaterShakerModuleId,
-    ) -> Optional[HeaterShaker]:
-        ...
+    ) -> Optional[HeaterShaker]: ...
 
     @overload
     def get_module_hardware_api(
         self,
         module_id: TemperatureModuleId,
-    ) -> Optional[TempDeck]:
-        ...
+    ) -> Optional[TempDeck]: ...
 
     @overload
     def get_module_hardware_api(
         self,
         module_id: ThermocyclerModuleId,
-    ) -> Optional[Thermocycler]:
-        ...
+    ) -> Optional[Thermocycler]: ...
 
     @overload
     def get_module_hardware_api(
         self,
         module_id: AbsorbanceReaderId,
-    ) -> Optional[AbsorbanceReader]:
-        ...
+    ) -> Optional[AbsorbanceReader]: ...
 
     @overload
     def get_module_hardware_api(
         self,
         module_id: FlexStackerId,
-    ) -> Optional[FlexStacker]:
-        ...
+    ) -> Optional[FlexStacker]: ...
 
     def get_module_hardware_api(self, module_id: str) -> Optional[AbstractModule]:
         """Get the hardware API for a given module."""

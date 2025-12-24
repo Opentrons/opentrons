@@ -291,7 +291,6 @@ async def test_critical_point_applied(hardware_api: API) -> None:
 async def test_tip_pickup_routine(
     hardware_api: API, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-
     _move = mock.Mock(side_effect=hardware_api._move)
     monkeypatch.setattr(hardware_api, "_move", _move)
 

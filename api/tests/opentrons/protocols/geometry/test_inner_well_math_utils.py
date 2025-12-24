@@ -267,9 +267,7 @@ def test_volume_and_height_circular(well: List[Any], target_height_st: Any) -> N
                     )
                 )
                 r_y = (target_height / segment_height) * (a - b) + b
-                expected_volume = (pi * target_height / 3) * (
-                    b**2 + b * r_y + r_y**2
-                )
+                expected_volume = (pi * target_height / 3) * (b**2 + b * r_y + r_y**2)
                 found_volume = _volume_from_height_circular(
                     target_height=target_height,
                     segment=segment,
@@ -314,9 +312,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
             # test volume within a bunch of arbitrary heights
             for target_height in range(round(total_height)):
                 expected_volume = (
-                    a * (target_height**3)
-                    + b * (target_height**2)
-                    + c * target_height
+                    a * (target_height**3) + b * (target_height**2) + c * target_height
                 )
                 found_volume = _volume_from_height_rectangular(
                     target_height=target_height,
@@ -405,7 +401,7 @@ def test_volume_at_section_boundary_heights(well: List[Any]) -> None:
 
 
 def test_user_volumes_raises_error_for_invalid_target(
-    user_defined_volumes_params: Dict[str, Any]
+    user_defined_volumes_params: Dict[str, Any],
 ) -> None:
     """Test that UserDefinedVolumes calculations reject target inputs that are not allowed."""
     user_defined_volumes_obj = user_defined_volumes_params["obj"]

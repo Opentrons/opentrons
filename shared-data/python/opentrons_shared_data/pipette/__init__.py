@@ -1,8 +1,7 @@
-from __future__ import annotations
-
 """
 opentrons_shared_data.pipette: functions and types for pipette config
 """
+from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Dict, Optional
 import json
@@ -89,7 +88,7 @@ def _fuse_specs_cached(
 
     if pipette_name not in valid_names:
         raise KeyError(
-            f"pipette name {pipette_name} is not valid for model " f"{pipette_model}"
+            f"pipette name {pipette_name} is not valid for model {pipette_model}"
         )
     name_data = _name_config()[pipette_name]
     # unfortunately, mypy can't verify this way to build typed dicts - we'll

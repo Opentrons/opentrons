@@ -1,4 +1,5 @@
 """Utilities for updating the gripper settings."""
+
 import logging
 import asyncio
 from dataclasses import dataclass

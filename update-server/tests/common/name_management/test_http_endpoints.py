@@ -18,7 +18,7 @@ async def test_get_name(
 ) -> None:
     decoy.when(await mock_name_synchronizer.get_name()).then_return("the returned name")
 
-    response = await (test_cli[0].get("/server/name"))
+    response = await test_cli[0].get("/server/name")
     assert response.status == 200
 
     body = await response.json()

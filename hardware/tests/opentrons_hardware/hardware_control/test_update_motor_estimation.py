@@ -1,4 +1,5 @@
 """Tests for the motor position status tools."""
+
 import pytest
 from typing import Tuple, List, Any
 import asyncio
@@ -90,7 +91,8 @@ async def test_parse_estimation_response(
     if should_pass:
         data = await asyncio.wait_for(
             motor_position_status._parser_update_motor_position_response(
-                waitable_reader, node  # type: ignore[arg-type]
+                waitable_reader,  # type: ignore[arg-type]
+                node,
             ),
             1,
         )
@@ -99,7 +101,8 @@ async def test_parse_estimation_response(
         with pytest.raises(StopAsyncIteration):
             await asyncio.wait_for(
                 motor_position_status._parser_update_motor_position_response(
-                    waitable_reader, node  # type: ignore[arg-type]
+                    waitable_reader,  # type: ignore[arg-type]
+                    node,
                 ),
                 1,
             )

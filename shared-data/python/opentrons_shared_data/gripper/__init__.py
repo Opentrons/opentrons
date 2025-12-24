@@ -1,4 +1,5 @@
 """opentrons_shared_data.gripper: functions and types for gripper config."""
+
 from typing import cast, Any
 from typing_extensions import Literal
 import json

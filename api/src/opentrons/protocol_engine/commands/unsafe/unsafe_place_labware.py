@@ -178,9 +178,9 @@ class UnsafePlaceLabware(
     params: UnsafePlaceLabwareParams
     result: Optional[UnsafePlaceLabwareResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafePlaceLabwareImplementation] = (
         UnsafePlaceLabwareImplementation
-    ] = UnsafePlaceLabwareImplementation
+    )
 
 
 class UnsafePlaceLabwareCreate(BaseCommandCreate[UnsafePlaceLabwareParams]):

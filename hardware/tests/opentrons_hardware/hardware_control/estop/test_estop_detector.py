@@ -1,4 +1,5 @@
 """Test the estop.detector module."""
+
 import pytest
 from mock import AsyncMock
 from typing import Type, List

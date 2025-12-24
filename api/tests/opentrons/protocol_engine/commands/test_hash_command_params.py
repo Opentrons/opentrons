@@ -1,4 +1,5 @@
 """Tests for hash_command_params."""
+
 import pytest
 
 from opentrons.protocol_engine import CommandIntent

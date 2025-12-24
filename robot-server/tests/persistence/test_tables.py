@@ -1635,9 +1635,10 @@ def test_migrated_db_matches_db_created_from_metadata(tmp_path: Path) -> None:
 
     expected_statements = EXPECTED_STATEMENTS_LATEST
 
-    with sql_engine_ctx(
-        active_subdirectory / DB_FILE
-    ) as sql_engine, sql_engine.begin() as transaction:
+    with (
+        sql_engine_ctx(active_subdirectory / DB_FILE) as sql_engine,
+        sql_engine.begin() as transaction,
+    ):
         actual_statements = (
             transaction.execute(
                 sqlalchemy.text("SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL")

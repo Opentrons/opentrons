@@ -1,4 +1,5 @@
 """Tests for the PythonAndLegacyRunner, JsonRunner & LiveRunner classes."""
+
 from unittest.mock import sentinel
 from datetime import datetime
 

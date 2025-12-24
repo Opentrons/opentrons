@@ -170,9 +170,9 @@ class AspirateInPlace(
     params: AspirateInPlaceParams
     result: Optional[AspirateInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[AspirateInPlaceImplementation] = (
         AspirateInPlaceImplementation
-    ] = AspirateInPlaceImplementation
+    )
 
 
 class AspirateInPlaceCreate(BaseCommandCreate[AspirateInPlaceParams]):

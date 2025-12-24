@@ -1,4 +1,5 @@
 """Detector for estop status messages."""
+
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 
 from typing import List, Callable

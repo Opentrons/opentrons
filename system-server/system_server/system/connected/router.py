@@ -1,4 +1,5 @@
 """Router for all /system/connected endpoints."""
+
 from fastapi import APIRouter, Depends, status
 
 from system_server.connection import AuthorizationTracker

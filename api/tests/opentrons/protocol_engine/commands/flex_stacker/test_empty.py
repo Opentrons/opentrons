@@ -41,7 +41,7 @@ from opentrons.types import DeckSlotName
 def _contained_labware(count: int) -> list[StackerStoredLabwareGroup]:
     return [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{i+1}",
+            primaryLabwareId=f"primary-id-{i + 1}",
             adapterLabwareId=None,
             lidLabwareId=None,
         )

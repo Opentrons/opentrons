@@ -1,4 +1,5 @@
 """Command models for Absorbance Reader commands."""
+
 from .close_lid import (
     CloseLidCommandType,
     CloseLidParams,

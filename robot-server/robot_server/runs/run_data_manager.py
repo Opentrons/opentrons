@@ -417,13 +417,13 @@ class RunDataManager:
             run_result = await self._run_orchestrator_store.clear()
             state_summary = run_result.state_summary
             parameters = run_result.parameters
-            run_resource: Union[
-                RunResource, BadRunResource
-            ] = self._run_store.update_run_state(
-                run_id=run_id,
-                summary=run_result.state_summary,
-                commands=run_result.commands,
-                run_time_parameters=run_result.parameters,
+            run_resource: Union[RunResource, BadRunResource] = (
+                self._run_store.update_run_state(
+                    run_id=run_id,
+                    summary=run_result.state_summary,
+                    commands=run_result.commands,
+                    run_time_parameters=run_result.parameters,
+                )
             )
             self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
             self._file_provider.clear_run_metadata()

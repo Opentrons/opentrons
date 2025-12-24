@@ -283,7 +283,7 @@ async def post_camera_preview_image(
 
 @router.post(
     "/camera/picture",
-    description="Capture an image from the OT-2's on-board camera " "and return it",
+    description="Capture an image from the OT-2's on-board camera and return it",
     responses={status.HTTP_200_OK: {"content": {JPG: {}}, "description": "The image"}},
 )
 async def post_picture_capture(

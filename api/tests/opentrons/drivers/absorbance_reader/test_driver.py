@@ -77,7 +77,6 @@ async def test_driver_get_device_info(
     mock_interface: MagicMock,
     connected_driver: AbsorbanceReaderDriver,
 ) -> None:
-
     DEVICE_INFO = MagicMock(AbsorbanceHidInterface.DeviceInfo)
     DEVICE_INFO.ref_no = "DE MAA 001"
     DEVICE_INFO.sn = "BYOMAA00013"
@@ -165,7 +164,6 @@ async def test_driver_get_lid_status(
     parts_aligned: bool,
     module_status: AbsorbanceReaderLidStatus,
 ) -> None:
-
     mock_interface.get_device_parts_aligned.return_value = (
         MockErrorCode.NO_ERROR,
         parts_aligned,

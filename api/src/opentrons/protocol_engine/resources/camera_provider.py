@@ -1,4 +1,5 @@
 """Camera interaction resource provider."""
+
 from typing import Optional, Callable, Tuple, Awaitable
 from pydantic import BaseModel, Field
 from ..errors import CameraCaptureError, CameraSettingsInvalidError

@@ -100,8 +100,7 @@ class LabwareMovementHandler:
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     async def move_labware_with_gripper(
@@ -114,8 +113,7 @@ class LabwareMovementHandler:
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
         gripper_z_offset: Optional[float],
-    ) -> None:
-        ...
+    ) -> None: ...
 
     async def move_labware_with_gripper(  # noqa: C901
         self,

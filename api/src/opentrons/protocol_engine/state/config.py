@@ -1,4 +1,5 @@
 """Top-level ProtocolEngine configuration options."""
+
 from dataclasses import dataclass
 
 from opentrons_shared_data.robot.types import RobotType

@@ -37,12 +37,8 @@ dynamic = ['version', 'hatch-dependency-coversion']
 dev = [
     "pytest>=8.4.0,<9",
     "pytest-cov==4.1.0",
+    "ruff==0.14.10",
     "mypy==1.11.0",
-    "black==22.3.0",
-    "flake8==7.0.0",
-    "flake8-annotations~=3.0.1",
-    "flake8-docstrings~=1.7.0",
-    "flake8-noqa~=1.4.0",
     "mock~=5.1.0",
     "types-mock~=5.1.0",
     "hypothesis<7,>=6.96.1",
@@ -65,6 +61,14 @@ dev = [
 [build-system]
 requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a4']
 build-backend = 'hatchling.build'
+
+[tool.ruff.lint]
+select = ["E", "ANN", "D", "C90"]
+ignore = ["E203", "E501", "E741", "ANN401", "D105", "D107", "D400", "D401", "D402", "D403", "D404", "D415", "D418"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 override-versions-of=['opentrons_shared_data']

@@ -211,7 +211,7 @@ def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationTyp
 
 
 def convert_to_pipette_name_type(
-    model_or_name: Union[PipetteName, PipetteModel]
+    model_or_name: Union[PipetteName, PipetteModel],
 ) -> PipetteNameType:
     """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
 

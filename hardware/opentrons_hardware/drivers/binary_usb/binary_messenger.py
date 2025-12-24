@@ -1,4 +1,5 @@
 """Binary USB messenger class."""
+
 from __future__ import annotations
 import asyncio
 from inspect import Traceback
@@ -179,7 +180,7 @@ class BinaryMessenger:
                 await self._read_task()
             except (asyncio.CancelledError, StopAsyncIteration):
                 return
-            except (InternalUSBCommunicationError) as e:
+            except InternalUSBCommunicationError as e:
                 log.exception(f"Nonfatal error in USB read task: {e}")
                 continue
             except BaseException as e:

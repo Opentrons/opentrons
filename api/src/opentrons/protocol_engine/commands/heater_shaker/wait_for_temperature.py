@@ -1,4 +1,5 @@
 """Command models to wait for a Heater-Shaker Module's target temperature."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Any
 

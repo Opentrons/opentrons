@@ -1,4 +1,5 @@
 """A script for sending and receiving data from sensors on the OT3."""
+
 import os
 import logging
 import asyncio

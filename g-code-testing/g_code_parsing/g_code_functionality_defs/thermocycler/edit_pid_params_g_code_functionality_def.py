@@ -25,7 +25,7 @@ class EditPIDParamsGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                 message = message_temp.substitute(val=g_code_arg_val)
                 message_list.append(message)
 
-        return f'Editing PID values to the following:{"".join(message_list)}'
+        return f"Editing PID values to the following:{''.join(message_list)}"
 
     @classmethod
     def _generate_response_explanation(cls, response: str) -> str:
