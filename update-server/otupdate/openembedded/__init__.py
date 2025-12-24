@@ -1,4 +1,5 @@
-""" update-server implementation for openembedded systems """
+"""update-server implementation for openembedded systems"""
+
 import asyncio
 import logging
 
@@ -94,16 +95,14 @@ async def get_app(
             [
                 f"Device name: {await name_synchronizer.get_name()}",
                 "Openembedded version:         "
-                f'{version.get("openembedded_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                f"{version.get('openembedded_version', 'unknown')}",
+                f"\t(from git sha      {version.get('buildroot_sha', 'unknown')}",
                 "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
+                f"{version.get('opentrons_api_version', 'unknown')}",
+                f"\t(from git sha      {version.get('opentrons_api_sha', 'unknown')}",
                 "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
+                f"{version.get('update_server_version', 'unknown')}",
+                f"\t(from git sha      {version.get('update_server_sha', 'unknown')}",
             ]
         )
     )
