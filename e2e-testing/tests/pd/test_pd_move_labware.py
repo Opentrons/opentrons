@@ -34,12 +34,6 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
 
     editor = ProtocolEditorPage(page)
 
-    landing.wait_for_page_load()
-    landing.confirm_welcome_modal()
-    landing.click_import_existing_protocol()
-    landing.upload_protocol_file(PROTOCOL_PATH)
-    landing.edit_protocol()
-
     # Add Manual Move to move PCR Lid to Opentrons Tough Wellplate in Thermocycler
     editor.open_add_step_menu()
     editor.verify_add_step_menu_options()
@@ -108,12 +102,3 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
 
 
 ###########################################################################
-
-
-def _dismiss_migration_modal(page: Page) -> None:
-    """Dismiss the migration modal if it appears during import."""
-
-    overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
-    if overlay.is_visible():
-        page.get_by_role("button", name="Import", exact=True).click()
-        expect(overlay).not_to_be_visible()

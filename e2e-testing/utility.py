@@ -70,4 +70,14 @@ def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str) -> Protocol
 
     page.get_by_role("button", name="Edit protocol").click()
     expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
+    _dismiss_migration_modal(page)
     return ProtocolEditorPage(page)
+
+
+def _dismiss_migration_modal(page: Page) -> None:
+    """Dismiss the migration modal if it appears during import."""
+
+    overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+    if overlay.is_visible():
+        page.get_by_role("button", name="Import", exact=True).click()
+        expect(overlay).not_to_be_visible()

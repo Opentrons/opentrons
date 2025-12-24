@@ -18,7 +18,7 @@ SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @troubleshoot_and_pause
-def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> None:
+def test_96_channel_workflow(page: Page, base_url: str) -> None:
     _import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py")
     editor = ProtocolEditorPage(page)
     editor.open_add_step_menu()
@@ -37,6 +37,7 @@ def test_transfer_step_single_channel_workflow(page: Page, base_url: str) -> Non
     liquid_classes = ["Aqueous", "Viscous", "Volatile"]
 
     for liquid in liquid_classes:
+        # todo 12/24/25 add no liquid class when implementing snapshot
         transfer_page.part_2_transfer_form_liquid_class(liquid)
 
         transfer_page.transfer_continue_to_next_step()
