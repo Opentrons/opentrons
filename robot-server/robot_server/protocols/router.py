@@ -2,86 +2,83 @@
 
 import json
 import logging
-from textwrap import dedent
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, List, Literal, Optional, Union, Tuple
-
-from opentrons.protocol_engine.types import (
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-)
-from opentrons_shared_data.robot import user_facing_robot_type
-from opentrons.util.performance_helpers import TrackingFunctions
+from textwrap import dedent
+from typing import Annotated, List, Literal, Optional, Tuple, Union
 
 from fastapi import (
     Depends,
     File,
+    Form,
     HTTPException,
     Query,
     UploadFile,
     status,
-    Form,
 )
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field
+
+from opentrons.protocol_engine.types import (
+    CSVRuntimeParamPaths,
+    PrimitiveRunTimeParamValuesType,
+)
+from opentrons.protocol_reader import (
+    FileHasher,
+    FileReaderWriter,
+    ProtocolFilesInvalidError,
+    ProtocolReader,
+)
+from opentrons.util.performance_helpers import TrackingFunctions
+from opentrons_shared_data.robot import user_facing_robot_type
+from opentrons_shared_data.robot.types import RobotType
 from server_utils.fastapi_utils.light_router import LightRouter
 
-from opentrons.protocol_reader import (
-    ProtocolReader,
-    ProtocolFilesInvalidError,
-    FileReaderWriter,
-    FileHasher,
+from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
+from .analysis_models import (
+    AnalysisRequest,
+    AnalysisStatus,
+    AnalysisSummary,
+    ProtocolAnalysis,
 )
-from opentrons_shared_data.robot.types import RobotType
-
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.hardware import get_robot_type
-from robot_server.service.dependencies import get_unique_id, get_current_time
-from robot_server.service.json_api import (
-    Body,
-    SimpleBody,
-    SimpleMultiBody,
-    SimpleEmptyBody,
-    MultiBodyMeta,
-    PydanticResponse,
-    RequestModel,
+from .analysis_store import AnalysisIsPendingError, AnalysisNotFoundError, AnalysisStore
+from .dependencies import (
+    get_analyses_manager,
+    get_analysis_store,
+    get_file_hasher,
+    get_file_reader_writer,
+    get_maximum_quick_transfer_protocols,
+    get_protocol_auto_deleter,
+    get_protocol_directory,
+    get_protocol_reader,
+    get_protocol_store,
+    get_quick_transfer_protocol_auto_deleter,
 )
+from .protocol_auto_deleter import ProtocolAutoDeleter
+from .protocol_models import Metadata, Protocol, ProtocolFile, ProtocolKind
+from .protocol_store import (
+    ProtocolNotFoundError,
+    ProtocolResource,
+    ProtocolStore,
+    ProtocolUsedByRunError,
+)
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
 )
-from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.models import DataFile, FileIdNotFound, FileIdNotFoundError
-
-from .analyses_manager import AnalysesManager, FailedToInitializeAnalyzer
-
-from .protocol_auto_deleter import ProtocolAutoDeleter
-from .protocol_models import Protocol, ProtocolFile, Metadata, ProtocolKind
-from .analysis_store import AnalysisStore, AnalysisNotFoundError, AnalysisIsPendingError
-from .analysis_models import (
-    ProtocolAnalysis,
-    AnalysisRequest,
-    AnalysisSummary,
-    AnalysisStatus,
-)
-from .protocol_store import (
-    ProtocolStore,
-    ProtocolResource,
-    ProtocolNotFoundError,
-    ProtocolUsedByRunError,
-)
-from .dependencies import (
-    get_protocol_auto_deleter,
-    get_quick_transfer_protocol_auto_deleter,
-    get_protocol_reader,
-    get_protocol_store,
-    get_analysis_store,
-    get_analyses_manager,
-    get_protocol_directory,
-    get_file_reader_writer,
-    get_file_hasher,
-    get_maximum_quick_transfer_protocols,
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.hardware import get_robot_type
+from robot_server.service.dependencies import get_current_time, get_unique_id
+from robot_server.service.json_api import (
+    Body,
+    MultiBodyMeta,
+    PydanticResponse,
+    RequestModel,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
 )
 
 log = logging.getLogger(__name__)

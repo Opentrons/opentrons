@@ -2,21 +2,23 @@
 
 from __future__ import annotations
 
+from typing import List, Optional
+
 import pytest
-from typing import Optional, List
 from decoy import Decoy, matchers
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import (
-    StatusBarState,
     EstopState,
+    StatusBarState,
     SubSystem,
     SubSystemState,
     UpdateState,
 )
 from opentrons.protocol_engine.types import EngineStatus
-from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
+
 from robot_server.runs.light_control_task import LightController, Status
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 
 
 @pytest.fixture

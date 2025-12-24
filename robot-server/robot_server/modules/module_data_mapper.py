@@ -1,44 +1,47 @@
 """Module identification and response data mapping."""
 
-from typing import Annotated, List, Type, cast, Optional
+from typing import Annotated, List, Optional, Type, cast
+
 from fastapi import Depends
-
-from opentrons.hardware_control.types import SubSystem
 from opentrons_hardware.hardware_control.types import PCBARevision
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons_shared_data.module import load_definition
 
+from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+from opentrons.drivers.types import (
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
+    HeaterShakerLabwareLatchStatus,
+    ThermocyclerLidStatus,
+)
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
+    AbsorbanceReaderStatus,
+    FlexStackerStatus,
+    HeaterShakerStatus,
     LiveData,
+    MagneticStatus,
     ModuleDataValidator,
     ModuleType,
-    MagneticStatus,
-    TemperatureStatus,
-    HeaterShakerStatus,
-    SpeedStatus,
-    AbsorbanceReaderStatus,
     PlatformState,
-    FlexStackerStatus,
+    SpeedStatus,
+    TemperatureStatus,
     VacuumModuleStatus,
 )
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
-from opentrons.drivers.types import (
-    ThermocyclerLidStatus,
-    HeaterShakerLabwareLatchStatus,
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderPlatePresence,
-)
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
-
 from opentrons.hardware_control.modules.types import HopperDoorState, LatchState
-from opentrons.protocol_engine import ModuleModel, DeckType
+from opentrons.hardware_control.types import SubSystem
+from opentrons.protocol_engine import DeckType, ModuleModel
+from opentrons_shared_data.module import load_definition
 
 from .module_identifier import ModuleIdentity
 from .module_models import (
+    AbsorbanceReaderModule,
+    AbsorbanceReaderModuleData,
     AttachedModule,
     AttachedModuleData,
     FlexStackerModule,
     FlexStackerModuleData,
+    HeaterShakerModule,
+    HeaterShakerModuleData,
     MagneticModule,
     MagneticModuleData,
     ModuleCalibrationData,
@@ -46,15 +49,10 @@ from .module_models import (
     TemperatureModuleData,
     ThermocyclerModule,
     ThermocyclerModuleData,
-    HeaterShakerModule,
-    HeaterShakerModuleData,
-    AbsorbanceReaderModule,
-    AbsorbanceReaderModuleData,
     UsbPort,
     VacuumModule,
     VacuumModuleData,
 )
-
 from robot_server.hardware import get_deck_type, get_hardware
 
 
@@ -94,9 +92,9 @@ class ModuleDataMapper:
             module_cls = MagneticModule
             assert ModuleDataValidator.is_magnetic_module_data(live_data["data"])
             live_data_height = live_data["data"].get("height")
-            assert isinstance(live_data_height, (int, float)), (
-                f"Expected magnetic module height, got {live_data_height}"
-            )
+            assert isinstance(
+                live_data_height, (int, float)
+            ), f"Expected magnetic module height, got {live_data_height}"
 
             # Origin of height reported by hardware API is the magnet home
             # Origin we report to the user should be labware bottom

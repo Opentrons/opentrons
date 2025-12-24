@@ -1,40 +1,39 @@
 """App exception handlers."""
 
 from logging import getLogger
-from fastapi import Request, Response, status
-from fastapi.routing import APIRoute
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
 from typing import Any, Callable, Coroutine, Dict, Optional, Sequence, Type, Union
 
-from opentrons_shared_data.errors import ErrorCodes, EnumeratedError, PythonException
+from fastapi import Request, Response, status
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 from opentrons_shared_data.errors.exceptions import (
     FirmwareUpdateRequiredError as HWFirmwareUpdateRequired,
 )
 
-from robot_server.versioning import (
-    API_VERSION,
-    MIN_API_VERSION,
-    API_VERSION_HEADER,
-    MIN_API_VERSION_HEADER,
-)
-from robot_server.constants import V1_TAG
-from .global_errors import (
-    UnexpectedError,
-    BadRequest,
-    InvalidRequest,
-    FirmwareUpdateRequired,
-)
-
 from .error_responses import (
     ApiError,
-    ErrorSource,
     BaseErrorBody,
+    ErrorSource,
     LegacyErrorResponse,
     MultiErrorResponse,
 )
-
+from .global_errors import (
+    BadRequest,
+    FirmwareUpdateRequired,
+    InvalidRequest,
+    UnexpectedError,
+)
+from robot_server.constants import V1_TAG
+from robot_server.versioning import (
+    API_VERSION,
+    API_VERSION_HEADER,
+    MIN_API_VERSION,
+    MIN_API_VERSION_HEADER,
+)
 
 log = getLogger(__name__)
 

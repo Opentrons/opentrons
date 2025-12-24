@@ -1,64 +1,75 @@
-import aiohttp
 import logging
 from dataclasses import asdict
-from typing import cast, Annotated, Any, Dict, List, Optional, Union
-from starlette import status
-from fastapi import APIRouter, Depends
+from typing import Annotated, Any, Dict, List, Optional, Union, cast
 
-from opentrons_shared_data.errors import ErrorCodes
-from opentrons.hardware_control import (
-    HardwareControlAPI,
-    dev_types as hardware_dev_types,
-    API,
+import aiohttp
+from fastapi import APIRouter, Depends
+from starlette import status
+
+from opentrons.config import (
+    advanced_settings,
+    get_opentrons_path,
+    robot_configs,
 )
-from opentrons.hardware_control.types import HardwareFeatureFlags
-from opentrons_shared_data.pipette import (
-    mutable_configurations,
-    types as pip_types,
-    pipette_load_name_conversions as pip_names,
+from opentrons.config import (
+    feature_flags as ff,
 )
 from opentrons.config import (
     reset as reset_util,
-    robot_configs,
-    advanced_settings,
-    feature_flags as ff,
-    get_opentrons_path,
 )
+from opentrons.hardware_control import (
+    API,
+    HardwareControlAPI,
+)
+from opentrons.hardware_control import (
+    dev_types as hardware_dev_types,
+)
+from opentrons.hardware_control.types import HardwareFeatureFlags
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.pipette import (
+    mutable_configurations,
+)
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pip_names,
+)
+from opentrons_shared_data.pipette import (
+    types as pip_types,
+)
+from opentrons_shared_data.robot.types import RobotTypeEnum
+
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store_failsafe,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.hardware import (
     get_hardware,
-    get_robot_type_enum,
     get_ot2_hardware,
+    get_robot_type_enum,
 )
+from robot_server.persistence.fastapi_dependencies import (
+    get_images_resetter,
+    get_persistence_resetter,
+)
+from robot_server.persistence.images_directory import ImagesResetter
+from robot_server.persistence.persistence_directory import PersistenceResetter
 from robot_server.service.legacy import reset_odd
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.settings import (
+    AdvancedSetting,
+    AdvancedSettingRequest,
     AdvancedSettingsResponse,
-    LogLevel,
+    FactoryResetOption,
     FactoryResetOptions,
+    Links,
+    LogLevel,
+    MultiPipetteSettings,
     PipetteSettings,
+    PipetteSettingsFields,
+    PipetteSettingsInfo,
     PipetteSettingsUpdate,
     RobotConfigs,
-    MultiPipetteSettings,
-    PipetteSettingsInfo,
-    PipetteSettingsFields,
-    FactoryResetOption,
-    AdvancedSettingRequest,
-    Links,
-    AdvancedSetting,
 )
-from robot_server.persistence.fastapi_dependencies import (
-    get_persistence_resetter,
-    get_images_resetter,
-)
-from robot_server.persistence.persistence_directory import PersistenceResetter
-from robot_server.persistence.images_directory import ImagesResetter
-from opentrons_shared_data.robot.types import RobotTypeEnum
 
 log = logging.getLogger(__name__)
 

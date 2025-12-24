@@ -2,18 +2,16 @@ import asyncio
 import contextlib
 import json
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Generator
-from datetime import datetime
 
 import pytest
 import requests
 
-from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
-
 from .dev_server import DevServer
 from .robot_client import RobotClient
-
+from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 _SESSION_SERVER_SCHEME = "http://"
 _SESSION_SERVER_HOST = "localhost"

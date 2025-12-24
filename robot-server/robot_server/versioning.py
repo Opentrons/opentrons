@@ -1,8 +1,9 @@
 """HTTP API versioning logic, utilities, and dependencies."""
 
-from fastapi import Header, Request, Response, status
 from typing import Union
-from typing_extensions import Literal, Final
+
+from fastapi import Header, Request, Response, status
+from typing_extensions import Final, Literal
 
 from robot_server.errors.error_responses import ErrorDetails
 

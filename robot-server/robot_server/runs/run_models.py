@@ -1,40 +1,42 @@
 """Request and response models for run resources."""
 
 from datetime import datetime
+from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
-from typing import List, Optional, Literal, Dict
 
-from opentrons_shared_data.util import StrEnum
 from opentrons.protocol_engine import (
-    CommandStatus,
     CommandIntent,
-    CommandType,
+    CommandNote,
     CommandParams,
-    EngineStatus as RunStatus,
+    CommandStatus,
+    CommandType,
     ErrorOccurrence,
-    LoadedPipette,
-    LoadedLabware,
-    LoadedModule,
     LabwareOffset,
-    LegacyLabwareOffsetCreate,
     LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
     Liquid,
     LiquidClassRecordWithId,
-    CommandNote,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
 )
-from opentrons.protocol_engine.types import (
-    OnDeckLabwareLocation,
-    RunTimeParameter,
-    PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
+from opentrons.protocol_engine import (
+    EngineStatus as RunStatus,
 )
 from opentrons.protocol_engine.resources.camera_provider import CameraSettings
+from opentrons.protocol_engine.types import (
+    CSVRunTimeParamFilesType,
+    OnDeckLabwareLocation,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+)
 from opentrons_shared_data.errors import GeneralError
+from opentrons_shared_data.util import StrEnum
 
-from robot_server.service.json_api import ResourceModel
-from robot_server.errors.error_responses import ErrorDetails
 from .action_models import RunAction
+from robot_server.errors.error_responses import ErrorDetails
+from robot_server.service.json_api import ResourceModel
 
 
 class RunDataError(ErrorDetails):

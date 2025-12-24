@@ -1,11 +1,11 @@
 import logging
-from typing import Optional, List, Dict, Any, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from pydantic import field_validator, BaseModel, Field, create_model
+from pydantic import BaseModel, Field, create_model, field_validator
 
-from opentrons_shared_data.util import StrEnum
-from opentrons_shared_data.pipette import model_constants
 from opentrons.config.reset import ResetOptionId
+from opentrons_shared_data.pipette import model_constants
+from opentrons_shared_data.util import StrEnum
 
 
 class AdvancedSetting(BaseModel):

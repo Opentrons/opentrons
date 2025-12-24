@@ -6,27 +6,34 @@
 # We keep a list of all the modules that this file imports
 # so we can preload them when launching the subprocesses.
 from types import ModuleType
+
 _imports: "list[ModuleType]" = []
 
 import contextlib  # noqa: E402
 import pathlib  # noqa: E402
 import typing  # noqa: E402
+
 _imports.extend([contextlib, pathlib, typing])
 
 import pydantic  # noqa: E402
 import sqlalchemy  # noqa: E402
+
 _imports.extend([pydantic, sqlalchemy])
 
 from opentrons.protocol_engine import commands  # noqa: E402
 from server_utils import sql_utils  # noqa: E402
+
 _imports.extend([commands, sql_utils])
 
-from robot_server.persistence.tables import schema_02, schema_03  # noqa: E402
 from robot_server.persistence import (  # noqa: E402
-    database,
-    pydantic as pydantic_helpers,
     _legacy_pickle,
+    database,
 )
+from robot_server.persistence import (
+    pydantic as pydantic_helpers,
+)
+from robot_server.persistence.tables import schema_02, schema_03  # noqa: E402
+
 _imports.extend([schema_02, schema_03, database, pydantic_helpers, _legacy_pickle])
 
 # fmt: on

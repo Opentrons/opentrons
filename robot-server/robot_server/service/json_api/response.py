@@ -1,20 +1,23 @@
 from __future__ import annotations
-from anyio import to_thread
+
 from typing import (
     Any,
+    Callable,
     Dict,
     Generic,
     List,
     Optional,
-    TypeVar,
-    Sequence,
     ParamSpec,
-    Callable,
+    Sequence,
+    TypeVar,
 )
-from typing_extensions import get_args, override
-from pydantic import Field, BaseModel
-from fastapi.responses import JSONResponse
+
+from anyio import to_thread
 from fastapi.dependencies.utils import get_typed_return_annotation
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from typing_extensions import get_args, override
+
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
 
 

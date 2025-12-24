@@ -1,9 +1,11 @@
-from pytest import raises
-from pydantic import ValidationError
 from typing import Any, Dict
 
-from robot_server.service.json_api.request import RequestModel
+from pydantic import ValidationError
+from pytest import raises
+
 from tests.service.helpers import ItemModel
+
+from robot_server.service.json_api.request import RequestModel
 
 
 def test_attributes_as_dict():

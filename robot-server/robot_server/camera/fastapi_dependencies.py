@@ -4,12 +4,13 @@ from typing import Annotated
 
 import fastapi
 
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+
 from robot_server.camera.provider import CameraProviderWrapper
 from robot_server.camera.settings.store import (
     CameraSettingStore,
     get_camera_setting_store,
 )
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 
 
 async def get_camera_provider_wrapper(

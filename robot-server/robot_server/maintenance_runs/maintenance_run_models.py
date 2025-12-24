@@ -1,21 +1,25 @@
 """Request and response models for maintenance run resources."""
 
 from datetime import datetime
-from pydantic import BaseModel, Field
 from typing import List, Optional
+
+from pydantic import BaseModel, Field
 
 from opentrons.protocol_engine import (
     EngineStatus as RunStatus,
+)
+from opentrons.protocol_engine import (
     ErrorOccurrence,
-    LoadedPipette,
-    LoadedLabware,
-    LoadedModule,
     LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     Liquid,
     LiquidClassRecordWithId,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
 )
+
 from robot_server.service.json_api import ResourceModel
 
 

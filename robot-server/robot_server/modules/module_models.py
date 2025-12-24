@@ -1,25 +1,26 @@
 """Request and response models for /modules endpoints."""
 
 from datetime import datetime
-from pydantic import BaseModel, Field
 from typing import Generic, List, Optional, TypeVar, Union
+
+from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons.calibration_storage.types import SourceType
-from opentrons.hardware_control.modules import (
-    ModuleType,
-    TemperatureStatus,
-    MagneticStatus,
-    HeaterShakerStatus,
-    SpeedStatus,
-    AbsorbanceReaderStatus,
-    PlatformState,
-)
 from opentrons.drivers.types import (
-    ThermocyclerLidStatus,
-    HeaterShakerLabwareLatchStatus,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
+    HeaterShakerLabwareLatchStatus,
+    ThermocyclerLidStatus,
+)
+from opentrons.hardware_control.modules import (
+    AbsorbanceReaderStatus,
+    HeaterShakerStatus,
+    MagneticStatus,
+    ModuleType,
+    PlatformState,
+    SpeedStatus,
+    TemperatureStatus,
 )
 from opentrons.hardware_control.modules.types import HopperDoorState, LatchState
 from opentrons.protocol_engine import ModuleModel

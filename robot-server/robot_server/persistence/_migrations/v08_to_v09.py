@@ -11,13 +11,12 @@ import sqlalchemy
 
 from opentrons.protocol_engine import LabwareOffset, StateSummary
 
-from robot_server.persistence.database import sqlite_rowid, sql_engine_ctx
+from .._folder_migrator import Migration
+from ._util import copy_contents
+from robot_server.persistence.database import sql_engine_ctx, sqlite_rowid
 from robot_server.persistence.file_and_directory_names import DB_FILE
 from robot_server.persistence.pydantic import json_to_pydantic
 from robot_server.persistence.tables import schema_09
-
-from ._util import copy_contents
-from .._folder_migrator import Migration
 
 
 class Migration8to9(Migration):  # noqa: D101

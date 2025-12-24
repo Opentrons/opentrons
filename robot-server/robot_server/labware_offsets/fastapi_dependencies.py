@@ -2,6 +2,7 @@
 
 from typing import Annotated
 
+import sqlalchemy
 from fastapi import Depends
 
 from server_utils.fastapi_utils.app_state import (
@@ -9,15 +10,13 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-import sqlalchemy
 
+from .store import LabwareOffsetStore
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.service.notifications.publishers.labware_offsets_publisher import (
     LabwareOffsetsPublisher,
     get_labware_offsets_publisher,
 )
-from .store import LabwareOffsetStore
-
 
 _labware_offset_store_accessor = AppStateAccessor[LabwareOffsetStore](
     "labware_offset_store"

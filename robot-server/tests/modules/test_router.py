@@ -1,31 +1,35 @@
 """Tests for /modules routes."""
 
 import inspect
+
 import pytest
 from decoy import Decoy
 from typing_extensions import Final
 
 from opentrons.calibration_storage.ot3.models.v1 import CalibrationStatus
 from opentrons.calibration_storage.types import SourceType
+from opentrons.drivers.rpi_drivers.types import PortGroup
+from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort, PortGroup
-from opentrons.hardware_control.modules import MagDeck, ModuleType, MagneticStatus
-from opentrons.hardware_control.modules import module_calibration
-
-from opentrons.types import Point
+from opentrons.hardware_control.modules import (
+    MagDeck,
+    MagneticStatus,
+    ModuleType,
+    module_calibration,
+)
 from opentrons.protocol_engine import ModuleModel
 from opentrons.protocol_engine.types import Vec3f
+from opentrons.types import Point
 
-from robot_server.modules.router import get_attached_modules
-from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
 from robot_server.modules.module_data_mapper import ModuleDataMapper
+from robot_server.modules.module_identifier import ModuleIdentifier, ModuleIdentity
 from robot_server.modules.module_models import (
     MagneticModule,
     MagneticModuleData,
     ModuleCalibrationData,
     UsbPort,
 )
-
+from robot_server.modules.router import get_attached_modules
 
 _HTTP_API_VERSION: Final = 3
 
