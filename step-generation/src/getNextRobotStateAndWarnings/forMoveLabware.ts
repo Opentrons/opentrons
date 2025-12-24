@@ -32,7 +32,7 @@ export function forMoveLabware(
   const { robotState } = robotStateAndWarnings
   const { labwareEntities } = invariantContext
   const { modules, labware } = robotState
-  const initialDeckSlot = getSlotInLocationStack(labware[labwareId].stack)
+  const initialDeckSlot = getSlotInLocationStack(labware[labwareId]?.stack)
   const fullStackFromLabwares = getFullStackFromLabwares(
     labware,
     initialDeckSlot,
@@ -41,7 +41,7 @@ export function forMoveLabware(
   const index = fullStackFromLabwares.indexOf(labwareId)
   const labwareToMove = fullStackFromLabwares.slice(0, index + 1) // includes labwareId you're moving
 
-  const isLabwareToMoveLid = getIsLid(labwareEntities[labwareId].def)
+  const isLabwareToMoveLid = getIsLid(labwareEntities[labwareId]?.def)
   let isParentPipettableLabware: boolean = false
 
   // update shuttle if it is the initial location of the move
@@ -157,10 +157,14 @@ export function forMoveLabware(
   } else if ('labwareId' in newLocation) {
     const labwareId = newLocation.labwareId
     isParentPipettableLabware = getIsPipettableLabware(
-      labwareEntities[labwareId].def
+      labwareEntities[labwareId]?.def
     )
-    const labwareIdStack = labware[labwareId].stack
-    newLocationStack.push(...labwareIdStack)
+    const labwareIdStack = labware[labwareId]?.stack
+    if (labwareIdStack != null) {
+      newLocationStack.push(...labwareIdStack)
+    } else {
+      newLocationStack.push(labwareId)
+    }
   } else if ('addressableAreaName' in newLocation) {
     newLocationStack.push(newLocation.addressableAreaName)
   }

@@ -50,7 +50,7 @@ export const getActiveSlotForLabwareDetails = (
     )
   } else if ('labwareId' in currentCommand.params) {
     const isTiprack =
-      labwareEntities[currentCommand.params.labwareId].def.parameters.isTiprack
+      labwareEntities[currentCommand.params.labwareId]?.def.parameters.isTiprack
     if (!isTiprack) {
       slot = currentCommand.params.labwareId
     }
