@@ -1,4 +1,5 @@
 """Fields tests."""
+
 import pytest
 from typing import Optional
 

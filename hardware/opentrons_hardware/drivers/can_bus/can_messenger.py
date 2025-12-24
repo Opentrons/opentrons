@@ -391,7 +391,9 @@ class CanMessenger:
                     for listener, filter in self._listeners.values():
                         if filter and not filter(message.arbitration_id):
                             continue
-                        listener(message_definition(payload=build), message.arbitration_id)  # type: ignore[arg-type]
+                        listener(
+                            message_definition(payload=build), message.arbitration_id  # type: ignore[arg-type]
+                        )
                         handled = True
                     if not handled:
                         if (
@@ -440,9 +442,9 @@ class WaitableCallback:
         """
         self._messenger = messenger
         self._filter = filter
-        self._queue: asyncio.Queue[
-            Tuple[MessageDefinition, ArbitrationId]
-        ] = asyncio.Queue()
+        self._queue: asyncio.Queue[Tuple[MessageDefinition, ArbitrationId]] = (
+            asyncio.Queue()
+        )
 
     def __call__(
         self, message: MessageDefinition, arbitration_id: ArbitrationId

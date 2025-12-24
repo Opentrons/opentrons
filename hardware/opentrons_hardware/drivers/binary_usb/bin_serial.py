@@ -1,4 +1,5 @@
 """The usb binary protocol over serial transport."""
+
 import asyncio
 import logging
 import concurrent.futures
@@ -109,7 +110,8 @@ class SerialUsbDriver:
             message_def = get_binary_definition(message_type)
             if message_def is not None:
                 message_length = int.from_bytes(
-                    utils.UInt16Field.build(header_data[2:4]).value, "big"  # type: ignore[arg-type]
+                    utils.UInt16Field.build(header_data[2:4]).value,  # type: ignore[arg-type]
+                    "big",
                 )
                 message_data = await self._loop.run_in_executor(
                     self._executor,

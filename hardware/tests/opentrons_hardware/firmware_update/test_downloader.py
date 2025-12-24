@@ -1,4 +1,5 @@
 """Tests for the firmware downloader."""
+
 import binascii
 from typing import List
 
@@ -68,6 +69,7 @@ async def test_messaging(
     crc32: int,
 ) -> None:
     """It should send all the chunks as CAN messages."""
+
     # TODO (amit, 2022-1-27): Replace this test with integration test.
     def responder(node_id: NodeId, message: MessageDefinition) -> None:
         """Message responder."""

@@ -1,4 +1,5 @@
 """Utilities for reading the current status of the OT3 limit switches."""
+
 import asyncio
 import logging
 from typing import Dict, Set, Callable, cast

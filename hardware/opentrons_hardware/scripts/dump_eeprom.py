@@ -66,9 +66,10 @@ async def run(args: argparse.Namespace) -> None:
                 )
                 f.write("\n")
 
-        async with build.driver(build_settings(args)) as driver, CanMessenger(
-            driver
-        ) as messenger:
+        async with (
+            build.driver(build_settings(args)) as driver,
+            CanMessenger(driver) as messenger,
+        ):
             messenger.add_listener(
                 handle_read_resp,
                 lambda arbitration_id: bool(
