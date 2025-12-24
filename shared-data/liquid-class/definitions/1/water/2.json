@@ -125,7 +125,7 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 150.0
+                  "flowRate": 50.0
                 }
               },
               "touchTip": {
@@ -166,7 +166,7 @@
               }
             },
             "pushOutByVolume": [
-              [1.0, 7],
+              [1.0, 4],
               [4.999, 1.5],
               [5.0, 1.0],
               [10.0, 1.0],
