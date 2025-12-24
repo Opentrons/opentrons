@@ -1,4 +1,5 @@
 """Entrypoint for the USB-TCP bridge application."""
+
 import logging
 from . import systemd
 from .cli import build_root_parser
