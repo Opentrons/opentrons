@@ -104,9 +104,7 @@ def migrate_affine_xy_to_attitude(
             [False, False, False, False],
         ]
     )
-    masked_array: np.ma.MaskedArray[
-        Any, np.dtype[np.float64]
-    ] = np.ma.masked_array(  # type: ignore
+    masked_array: np.ma.MaskedArray[Any, np.dtype[np.float64]] = np.ma.masked_array(  # type: ignore
         gantry_cal, ~masked_transform
     )
     attitude_array: linal.DoubleMatrix = np.zeros((3, 3))

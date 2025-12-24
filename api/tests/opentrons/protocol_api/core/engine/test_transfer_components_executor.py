@@ -1,4 +1,5 @@
 """Tests for complex commands executor."""
+
 from typing import Literal, Union
 
 import pytest

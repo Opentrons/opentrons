@@ -87,9 +87,9 @@ class MoveAxesRelative(
     params: MoveAxesRelativeParams
     result: Optional[MoveAxesRelativeResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveAxesRelativeImplementation] = (
         MoveAxesRelativeImplementation
-    ] = MoveAxesRelativeImplementation
+    )
 
 
 class MoveAxesRelativeCreate(BaseCommandCreate[MoveAxesRelativeParams]):

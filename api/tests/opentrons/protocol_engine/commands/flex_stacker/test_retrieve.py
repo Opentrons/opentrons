@@ -70,9 +70,9 @@ def _contained_labware(
 ) -> list[StackerStoredLabwareGroup]:
     return [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{i+1}",
-            adapterLabwareId=f"adapter-id-{i+1}" if with_adapter else None,
-            lidLabwareId=f"lid-id-{i+1}" if with_lid else None,
+            primaryLabwareId=f"primary-id-{i + 1}",
+            adapterLabwareId=f"adapter-id-{i + 1}" if with_adapter else None,
+            lidLabwareId=f"lid-id-{i + 1}" if with_lid else None,
         )
         for i in range(count)
     ]

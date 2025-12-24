@@ -211,7 +211,6 @@ class DurationEstimator:
         return duration
 
     def on_drop_tip(self, payload: types.DropTipCommandPayload) -> float:
-
         instrument = payload["instrument"]
         # We are going to once again use our "deck movement" set up. This should
         # be in pickup, drop tip, aspirate, dispense
@@ -264,7 +263,7 @@ class DurationEstimator:
         assert isinstance(aspiration_time, float)
         duration = deck_travel_time + z_total_time + aspiration_time
         logger.info(
-            f"{instrument.name} aspirate from {slot}, " f"the duration is {duration}"
+            f"{instrument.name} aspirate from {slot}, the duration is {duration}"
         )
         return duration
 

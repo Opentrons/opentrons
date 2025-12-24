@@ -1,6 +1,5 @@
 """Tests for ordered_set."""
 
-
 import pytest
 from opentrons.ordered_set import OrderedSet
 

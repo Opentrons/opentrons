@@ -594,9 +594,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             increment: Customize the movement "distance" of the pipette to press harder.
             prep_after: Not used by this core, pipette preparation will always happen.
         """
-        assert (
-            presses is None and increment is None
-        ), "Tip pick-up with custom presses or increment deprecated"
+        assert presses is None and increment is None, (
+            "Tip pick-up with custom presses or increment deprecated"
+        )
 
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
@@ -1244,9 +1244,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             assert (
                 # We make sure to set these nozzles in the calling function
                 # if using QUADRANT or PARTIAL_COLUMN. Asserting only for type verification here.
-                front_right_nozzle is not None
-                and back_left_nozzle is not None
-            ), f"Both front right and back left nozzles are required for {style} configuration."
+                front_right_nozzle is not None and back_left_nozzle is not None
+            ), (
+                f"Both front right and back left nozzles are required for {style} configuration."
+            )
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,
@@ -1420,9 +1421,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
-        prev_dest: Optional[
-            Union[Tuple[Location, WellCore], TrashBin, WasteChute]
-        ] = None
+        prev_dest: Optional[Union[Tuple[Location, WellCore], TrashBin, WasteChute]] = (
+            None
+        )
         post_disp_tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
                 liquid=0,

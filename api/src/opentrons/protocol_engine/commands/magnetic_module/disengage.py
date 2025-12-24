@@ -1,6 +1,5 @@
 """Magnetic Module disengage command request, result, and implementation models."""
 
-
 from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING

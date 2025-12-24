@@ -224,9 +224,9 @@ class AspirateWhileTracking(
     params: AspirateWhileTrackingParams
     result: Optional[AspirateWhileTrackingResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[AspirateWhileTrackingImplementation] = (
         AspirateWhileTrackingImplementation
-    ] = AspirateWhileTrackingImplementation
+    )
 
 
 class AspirateWhileTrackingCreate(BaseCommandCreate[AspirateWhileTrackingParams]):

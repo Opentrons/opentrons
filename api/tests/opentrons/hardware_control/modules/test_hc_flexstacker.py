@@ -584,7 +584,6 @@ async def test_dispense_labware_error_handling(
             autospec=True,
         ) as labware_detected,
     ):
-
         with expected_raise:
             # Test valid labware height
             await subject.dispense_labware(

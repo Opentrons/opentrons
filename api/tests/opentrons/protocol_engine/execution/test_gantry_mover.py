@@ -1,4 +1,5 @@
 """Test gantry movement handler with hardware API."""
+
 from __future__ import annotations
 
 import pytest

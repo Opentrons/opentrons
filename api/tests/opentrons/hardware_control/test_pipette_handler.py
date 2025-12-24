@@ -1,4 +1,5 @@
 """Tests for the HardwareApi class."""
+
 from _pytest.fixtures import FixtureRequest
 import pytest
 from decoy import Decoy

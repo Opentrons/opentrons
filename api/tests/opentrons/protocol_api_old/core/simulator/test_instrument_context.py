@@ -1,4 +1,5 @@
 """Test instrument context simulation."""
+
 from typing import Callable, cast
 
 import pytest

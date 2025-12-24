@@ -100,8 +100,12 @@ def test_default_labware_version_coverage(
     if load_name not in KNOWN_EXCEPTIONS_FOR_TESTS:
         assert (
             _highest_possible_default_version(load_name) == highest_available_version
-        ), f"Expected version {highest_available_version} of {load_name} to be included in some apiLevel. See DEFAULT_LABWARE_VERSIONS."
+        ), (
+            f"Expected version {highest_available_version} of {load_name} to be included in some apiLevel. See DEFAULT_LABWARE_VERSIONS."
+        )
     else:
         assert (
             _highest_possible_default_version(load_name) != highest_available_version
-        ), f"{load_name} is included in KNOWN_EXCEPTIONS_FOR_TESTS but it no longer needs to be?"
+        ), (
+            f"{load_name} is included in KNOWN_EXCEPTIONS_FOR_TESTS but it no longer needs to be?"
+        )

@@ -118,9 +118,9 @@ class ModuleContext(CommandPublisher):
         )
         core = cast(LegacyModuleCore, self._core)
 
-        assert (
-            labware.parent == core.geometry
-        ), "Labware is not configured with this module as its parent"
+        assert labware.parent == core.geometry, (
+            "Labware is not configured with this module as its parent"
+        )
 
         return core.geometry.add_labware(labware)
 

@@ -1,4 +1,5 @@
 """Move to addressable area command request, result, and implementation models."""
+
 from __future__ import annotations
 from pydantic import Field
 from typing import TYPE_CHECKING, Optional, Type
@@ -162,9 +163,9 @@ class MoveToAddressableArea(
     params: MoveToAddressableAreaParams
     result: Optional[MoveToAddressableAreaResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveToAddressableAreaImplementation] = (
         MoveToAddressableAreaImplementation
-    ] = MoveToAddressableAreaImplementation
+    )
 
 
 class MoveToAddressableAreaCreate(BaseCommandCreate[MoveToAddressableAreaParams]):

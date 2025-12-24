@@ -1,4 +1,5 @@
 """Test Protocol Engine motion planning utility methods."""
+
 import pytest
 from typing import List, Optional
 

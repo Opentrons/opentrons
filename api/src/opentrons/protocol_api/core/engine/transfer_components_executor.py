@@ -1,4 +1,5 @@
 """Executor for liquid class based complex commands."""
+
 from __future__ import annotations
 
 import logging
@@ -74,31 +75,31 @@ class TipState:
     def append_liquid(self, volume: float) -> None:
         # Neither aspirate nor a dispense process should be adding liquid
         # when there is an air gap present.
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == 0
-        ), "Air gap present in the tip."
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == 0, (
+            "Air gap present in the tip."
+        )
         self.last_liquid_and_air_gap_in_tip.liquid += volume
 
     def delete_liquid(self, volume: float) -> None:
         # Neither aspirate nor a dispense process should be removing liquid
         # when there is an air gap present.
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == 0
-        ), "Air gap present in the tip."
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == 0, (
+            "Air gap present in the tip."
+        )
         self.last_liquid_and_air_gap_in_tip.liquid -= volume
 
     def append_air_gap(self, volume: float) -> None:
         # Neither aspirate nor a dispense process should be adding air gaps
         # when there is already an air gap present.
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == 0
-        ), "Air gap already present in the tip."
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == 0, (
+            "Air gap already present in the tip."
+        )
         self.last_liquid_and_air_gap_in_tip.air_gap = volume
 
     def delete_air_gap(self, volume: float) -> None:
-        assert (
-            self.last_liquid_and_air_gap_in_tip.air_gap == volume
-        ), "Last air gap volume doe not match the volume being removed"
+        assert self.last_liquid_and_air_gap_in_tip.air_gap == volume, (
+            "Last air gap volume doe not match the volume being removed"
+        )
         self.last_liquid_and_air_gap_in_tip.air_gap = 0
 
     def delete_last_air_gap_and_liquid(self) -> None:
@@ -811,9 +812,7 @@ class TransferComponentsExecutor:
 
             if (
                 # Same check as before for when it's the final air gap of current retract
-                conditioning_volume > 0
-                and is_last_retract
-                and add_final_air_gap
+                conditioning_volume > 0 and is_last_retract and add_final_air_gap
             ):
                 # The volume in tip at this point should be 0uL
                 air_gap_volume = retract_props.air_gap_by_volume.get_for_volume(0)

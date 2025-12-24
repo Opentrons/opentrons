@@ -1,6 +1,5 @@
 """Tests for thermocycler_movement_flagger."""
 
-
 from contextlib import nullcontext as does_not_raise
 from typing import Any, ContextManager, NamedTuple, Optional
 

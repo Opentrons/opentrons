@@ -3,6 +3,7 @@
 These fixtures consist of two "matching" JSON and Python protocols,
 saved to disk.
 """
+
 import pytest
 import json
 import textwrap

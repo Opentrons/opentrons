@@ -68,9 +68,9 @@ class UnsafeEngageAxes(
     params: UnsafeEngageAxesParams
     result: Optional[UnsafeEngageAxesResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeEngageAxesImplementation] = (
         UnsafeEngageAxesImplementation
-    ] = UnsafeEngageAxesImplementation
+    )
 
 
 class UnsafeEngageAxesCreate(BaseCommandCreate[UnsafeEngageAxesParams]):

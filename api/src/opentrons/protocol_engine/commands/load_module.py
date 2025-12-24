@@ -1,4 +1,5 @@
 """Implementation, request models, and response models for the load module command."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 from typing_extensions import Literal
@@ -67,8 +68,7 @@ class LoadModuleParams(BaseModel):
     moduleId: str | SkipJsonSchema[None] = Field(
         None,
         description=(
-            "An optional ID to assign to this module."
-            " If None, an ID will be generated."
+            "An optional ID to assign to this module. If None, an ID will be generated."
         ),
         json_schema_extra=_remove_default,
     )

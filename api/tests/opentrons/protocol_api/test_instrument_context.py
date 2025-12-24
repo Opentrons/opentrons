@@ -622,7 +622,10 @@ def test_dynamic_aspirate_validation(
     with pytest.raises(ValueError):
         # Raises if end location is well
         subject.aspirate(
-            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+            volume=42.0,
+            location=input_location,
+            rate=1.23,
+            end_location=mock_well,  # type: ignore[arg-type]
         )
 
 
@@ -1542,7 +1545,10 @@ def test_dynamic_dispense_validation(
     with pytest.raises(ValueError):
         # Raises if end location is well
         subject.dispense(
-            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+            volume=42.0,
+            location=input_location,
+            rate=1.23,
+            end_location=mock_well,  # type: ignore[arg-type]
         )
 
 

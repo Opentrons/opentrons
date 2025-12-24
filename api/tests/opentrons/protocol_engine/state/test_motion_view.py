@@ -1,4 +1,5 @@
 """Test state getters for retrieving motion planning views of state."""
+
 import inspect
 from typing import List
 

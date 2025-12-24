@@ -1,4 +1,5 @@
 """Test instrument context simulation."""
+
 from typing import cast
 import pytest
 from _pytest.fixtures import SubRequest

@@ -1,4 +1,5 @@
 """Move to coordinates command request, result, and implementation models."""
+
 from __future__ import annotations
 
 from pydantic import Field
@@ -93,9 +94,9 @@ class MoveToCoordinates(
     params: MoveToCoordinatesParams
     result: Optional[MoveToCoordinatesResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveToCoordinatesImplementation] = (
         MoveToCoordinatesImplementation
-    ] = MoveToCoordinatesImplementation
+    )
 
 
 class MoveToCoordinatesCreate(BaseCommandCreate[MoveToCoordinatesParams]):

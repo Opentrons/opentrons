@@ -1,4 +1,5 @@
 """Tests for the ProtocolReader interface."""
+
 from __future__ import annotations
 
 import pytest

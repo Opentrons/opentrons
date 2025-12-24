@@ -1,4 +1,5 @@
 """Fixtures for protocol engine command tests."""
+
 from __future__ import annotations
 
 import pytest

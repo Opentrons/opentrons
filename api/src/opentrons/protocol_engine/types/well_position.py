@@ -1,4 +1,5 @@
 """Protocol engine types to do with positions inside wells."""
+
 from enum import Enum, auto
 from typing import Union, Literal
 

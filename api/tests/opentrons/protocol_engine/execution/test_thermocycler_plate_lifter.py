@@ -1,4 +1,5 @@
 """Test thermocycler plate lifter execution side effects."""
+
 from __future__ import annotations
 
 import pytest
