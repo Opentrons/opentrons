@@ -348,8 +348,8 @@ class TransferPage(BasePage):
         Air_gap_volume: Optional[float] = None,
         Delay: bool = False,
         Delay_time: Optional[float] = None,
-        set_blowout: Optional[bool] = None,
-        set_disposal_volume: Optional[bool] = None,
+        set_blowout: Optional[bool] = False,
+        set_disposal_volume: Optional[bool] = False,
         blowout_location: Optional[str] = None,
         blowout_flow_rate: Optional[float] = None,
         disposal_volume: Optional[float] = None,
@@ -357,37 +357,54 @@ class TransferPage(BasePage):
         disposal_flowrate: Optional[float] = None,
     ) -> None:
         """
-        High-level orchestrator to configure all advanced pipetting parameters.
-
-        This method determines the 'aspirate' or 'dispense' context and delegates
-        individual settings to their respective handler functions.
-
-        Args:
-            Aspirate: True for 'aspirate' context, False for 'dispense'.
-            Pre_wetting: Whether to toggle Pre-wetting ON.
-            Touch_tip: Whether the Touch Tip setting should be ON or OFF.
-            Touch_tip_speed: Speed for touch tip (only filled if Touch_tip=True).
-            Touch_tip_distance_from_edge: Offset from edge (only filled if Touch_tip=True).
-            Air_gap: Whether the Air Gap setting should be ON or OFF.
-            Air_gap_volume: Volume for air gap (only filled if Air_gap=True).
-            Delay: Whether the Delay setting should be ON or OFF.
-            Delay_time: Seconds for delay (only filled if Delay=True).
+        Sets advanced settings based on aspirate or dispense.
+        args:
+            Aspirate: True for aspirate settings, False for dispense settings.
+            Pre_wetting: True to enable pre-wetting, False to disable.
+            Touch_tip: True to enable touch tip, False to disable.
+            Touch_tip_speed: Speed for touch tip (mm/s).
+            Touch_tip_distance_from_edge: Distance from edge for touch tip (mm).
+            Air_gap: True to enable air gap, False to disable.
+            Air_gap_volume: Volume for air gap (µL).
+            Delay: True to enable delay, False to disable.
+            Delay_time: Time for delay (s).
+            set_blowout: True to enable blowout settings, False to disable.
+            blowout_location: Location for blowout.
+            blowout_flow_rate: Flow rate for blowout (µL/s).
+            set_disposal_volume: True to enable disposal volume settings, False to disable.
+            disposal_volume: Volume for disposal (µL).
+            disposal_location: Location for disposal.
+            disposal_flowrate: Flow rate for disposal (µL/s).
         """
         strat = "aspirate" if Aspirate else "dispense"
-        if "aspirate" in strat:
-            self.set_pre_wetting(Pre_wetting)
+        if strat == "aspirate":
+            if Pre_wetting:
+                self.set_pre_wetting(Pre_wetting)
         else:
-            self.set_blowout(location=blowout_location, flow_rate=blowout_flow_rate, enable=set_blowout)
-            self.set_disposal_volume(
-                volume=disposal_volume,
-                location=disposal_location,
-                flowrate=disposal_flowrate,
-                enable=set_disposal_volume,
-            )
-
-        self.set_touch_tip(strat, Touch_tip, Touch_tip_speed, Touch_tip_distance_from_edge)
-        self.set_air_gap(strat, Air_gap, Air_gap_volume)
-        self.set_delay(strat, Delay, Delay_time)
+            if set_blowout and blowout_location is not None and blowout_flow_rate is not None:
+                self.set_blowout(
+                    location=blowout_location,
+                    flow_rate=blowout_flow_rate,
+                    enable=True,
+                )
+            if (
+                set_disposal_volume
+                and disposal_volume is not None
+                and disposal_location is not None
+                and disposal_flowrate is not None
+            ):
+                self.set_disposal_volume(
+                    volume=disposal_volume,
+                    location=disposal_location,
+                    flowrate=disposal_flowrate,
+                    enable=True,
+                )
+        if Touch_tip:
+            self.set_touch_tip(strat, True, Touch_tip_speed, Touch_tip_distance_from_edge)
+        if Air_gap and Air_gap_volume is not None:
+            self.set_air_gap(strat, True, Air_gap_volume)
+        if Delay and Delay_time is not None:
+            self.set_delay(strat, True, Delay_time)
 
     def set_mix_settings(self, mix_times: int, mix_volume: float, aspirate: bool) -> None:
         """Sets mix settings based on dynamic field names."""

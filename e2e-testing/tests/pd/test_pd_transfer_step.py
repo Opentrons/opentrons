@@ -18,7 +18,7 @@ SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
 @pytest.mark.pdE2E
 @pytest.mark.slow
 @troubleshoot_and_pause
-def test_96_channel_workflow(page: Page, base_url: str) -> None:
+def test_96_channel_workflow(page: Page) -> None:
     _import_protocol_and_open_editor(page, "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py")
     editor = ProtocolEditorPage(page)
     editor.open_add_step_menu()
