@@ -1,40 +1,41 @@
 """Can messenger class."""
 
 from __future__ import annotations
+
 import asyncio
+import logging
 from inspect import Traceback
 from typing import (
-    Optional,
     Callable,
-    Tuple,
     Dict,
-    Union,
     List,
-    cast,
-    TypeVar,
-    Type,
+    Optional,
     Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    cast,
 )
-
-import logging
 
 from opentrons_shared_data.errors.exceptions import (
     CanbusCommunicationError,
     EnumeratedError,
     PythonException,
 )
+
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    MessageId,
-    FunctionCode,
     ErrorCode,
+    FunctionCode,
+    MessageId,
+    NodeId,
 )
+from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     Acknowledgement,
     ErrorMessage,
@@ -392,7 +393,8 @@ class CanMessenger:
                         if filter and not filter(message.arbitration_id):
                             continue
                         listener(
-                            message_definition(payload=build), message.arbitration_id  # type: ignore[arg-type]
+                            message_definition(payload=build),
+                            message.arbitration_id,  # type: ignore[arg-type]
                         )
                         handled = True
                     if not handled:

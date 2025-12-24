@@ -1,19 +1,19 @@
 """bindings and generation for ot3 firmware canbus messages."""
 
-from .message import CanMessage
 from .arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
+from .binary_constants import BinaryMessageId
 from .constants import (
-    NodeId,
+    ErrorCode,
+    FirmwareTarget,
     FunctionCode,
     MessageId,
-    ErrorCode,
+    NodeId,
     USBTarget,
-    FirmwareTarget,
 )
-from .binary_constants import BinaryMessageId
+from .message import CanMessage
 
 __all__ = [
     "CanMessage",

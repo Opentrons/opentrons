@@ -1,25 +1,28 @@
 """Test one-shot tool detector."""
 
-from opentrons_hardware.firmware_bindings.constants import ToolType, PipetteName
-from opentrons_hardware.firmware_bindings.messages import (
-    MessageDefinition,
-)
+from typing import List, Tuple
+
 import pytest
 from mock import AsyncMock, call
 
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    ToolField,
-    PipetteNameField,
-    SerialDataCodeField,
-)
-from opentrons_hardware.firmware_bindings.utils import UInt16Field
-from opentrons_hardware.hardware_control.tools import detector, types
-from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
+from tests.conftest import CanLoopback
+
 from opentrons_hardware.firmware_bindings import (
     NodeId,
 )
-from tests.conftest import CanLoopback
-from typing import List, Tuple
+from opentrons_hardware.firmware_bindings.constants import PipetteName, ToolType
+from opentrons_hardware.firmware_bindings.messages import (
+    MessageDefinition,
+    message_definitions,
+    payloads,
+)
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    PipetteNameField,
+    SerialDataCodeField,
+    ToolField,
+)
+from opentrons_hardware.firmware_bindings.utils import UInt16Field
+from opentrons_hardware.hardware_control.tools import detector, types
 
 
 @pytest.fixture

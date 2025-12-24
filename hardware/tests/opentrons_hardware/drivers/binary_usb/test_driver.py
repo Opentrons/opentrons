@@ -1,19 +1,21 @@
 """USB Driver tests."""
 
-import serial  # type: ignore[import-untyped]
-import time
-from contextlib import ExitStack
+import asyncio
+import io
 import multiprocessing
 import os
 import pty
-from selectors import DefaultSelector as Selector, EVENT_READ
+import time
 import tty
-import io
-from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
-
+from contextlib import ExitStack
+from selectors import EVENT_READ
+from selectors import DefaultSelector as Selector
 from typing import AsyncGenerator, List
+
 import pytest
-import asyncio
+import serial  # type: ignore[import-untyped]
+
+from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     Ack,
     AckFailed,

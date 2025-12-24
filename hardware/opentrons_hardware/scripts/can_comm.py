@@ -1,33 +1,32 @@
 """A script for sending CAN messages."""
 
+import argparse
 import asyncio
 import dataclasses
 import logging
-import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Callable, TypeVar
+from typing import Callable, Sequence, Type, TypeVar
 
 from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
 from opentrons_hardware.drivers.gpio import OT3GPIO
-from opentrons_hardware.firmware_bindings.constants import (
-    MessageId,
-    NodeId,
-    FunctionCode,
-)
-from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.firmware_bindings.constants import (
+    FunctionCode,
+    MessageId,
+    NodeId,
+)
+from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.firmware_bindings.messages.messages import get_definition
-
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.firmware_bindings.utils import (
     BinarySerializable,
     BinarySerializableException,
 )
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 log = logging.getLogger(__name__)
 
