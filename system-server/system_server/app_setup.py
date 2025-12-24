@@ -1,7 +1,7 @@
 """Main FastAPI application."""
 
 import logging
-from typing import List, Any
+from typing import Any, List
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,8 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from system_server._version import version
-from system_server.settings import get_settings
 from system_server.router import router
+from system_server.settings import get_settings
 
 log = logging.getLogger(__name__)
 
