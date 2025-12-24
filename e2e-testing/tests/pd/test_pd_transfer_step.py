@@ -56,11 +56,9 @@ def test_96_channel_workflow(page: Page, base_url: str) -> None:
 
     transfer_page.transfer_continue_to_next_step()
 
-    # Take another snapshot here for visual regression testing()
-
     transfer_page.set_flow_rate_aspirate(150)
-    transfer_page.set_submerge_and_retract_aspirate(
-        submerge_speed=25, submerge_delay=0.5, retract_speed=25, retract_delay=0.5
+    transfer_page.set_submerge_and_retract(
+        aspirate=True, submerge_speed=25, submerge_delay=0.5, retract_speed=25, retract_delay=0.5
     )
     transfer_page.advanced_settings(
         Aspirate=True,
@@ -71,6 +69,9 @@ def test_96_channel_workflow(page: Page, base_url: str) -> None:
         Delay=True,
         Delay_time=1,
     )
+    transfer_page.tip_position_asp_disp(aspirate=True, xyz=(1, 2, 0))
+    transfer_page.tip_position_submerge_retract(aspirate=True, submerge=True, xyz=(1, 1, 0))
+    transfer_page.tip_position_submerge_retract(aspirate=True, submerge=False, xyz=(-1, -1, 0.5))
     transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=True)
     transfer_page.select_aspirate_or_dispense_advanced_settings("Dispense")
     transfer_page.advanced_settings(
@@ -88,3 +89,6 @@ def test_96_channel_workflow(page: Page, base_url: str) -> None:
         blowout_flow_rate=150,
     )
     transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=False)
+    transfer_page.transfer_continue_to_next_step()
+    transfer_page.tip_change_strategy("Once", drop_location="Tip rack")
+    transfer_page.save_transfer_step()

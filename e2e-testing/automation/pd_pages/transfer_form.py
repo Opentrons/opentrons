@@ -14,21 +14,34 @@ class TransferPage(BasePage):
     def __init__(self, page: Page) -> None:
         super().__init__(page)
 
+    ## Step 1 Transfer Form Methods
+
     def select_nozzles(self, nozzles: Literal["All", "Column", "Single"]) -> None:
-        """Select from All, Column, or Single nozzles."""
+        """
+        Select nozzles for transfer step.
+        args:
+            nozzles: Choose between
+            All, Column, or Single nozzles.
+        """
         initial_nozzle = self.page.get_by_text("All")
         initial_nozzle.click()
         actual_nozzle_option = self.page.get_by_text(nozzles)
         actual_nozzle_option.click()
 
     def tip_rack_page_1_transfer_select(self, tiprack: str) -> None:
-        """Select tip rack on page 1 of transfer step for Flex robot."""
+        """Select tip rack
+        args:
+            tiprack: The tip rack to select like "Opentrons 96 Filter Tip Rack 20 µL".
+        """
         self.page.get_by_test_id("tipRack_dropdownMenu").click()
         tip_rack = self.page.get_by_text(tiprack)
         tip_rack.click()
 
     def source_labware_select(self, labware: str) -> None:
-        """Select source labware in transfer step."""
+        """Select source labware in transfer step.
+        args:
+            labware: The labware to select like "Opentrons Tough 300 mL 1 Well Reservoir".
+        """
         self.page.get_by_test_id("aspirate_labware_dropdownMenu").click()
         source_labware = self.page.get_by_text(labware)
         source_labware.click()
@@ -60,7 +73,10 @@ class TransferPage(BasePage):
         self.page.get_by_text("Save", exact=True).click()
 
     def destination_labware_select(self, labware: str) -> None:
-        """Select destination labware in transfer step."""
+        """Select destination labware in transfer step.
+        args:
+            labware: The labware to select like "Greiner 384 Well Plate 240 µL".
+        """
         self.page.get_by_test_id("dispense_labware_dropdownMenu").click()
         destination_labware = self.page.get_by_text(labware)
         destination_labware.click()
@@ -76,7 +92,10 @@ class TransferPage(BasePage):
         path_option.click()
 
     def input_volume(self, volume: str) -> None:
-        """Input volume for transfer step."""
+        """Input volume for transfer step.
+        args:
+            volume: The volume to input like "30".
+        """
         volume_input = self.page.locator('input[name="volume"]')
         volume_input.fill(volume)
 
@@ -88,6 +107,8 @@ class TransferPage(BasePage):
         """Click back to previous step button in transfer step."""
         self.page.get_by_text("Back", exact=True).click()
 
+    ## STEP 2 Selecting liquid class
+
     def part_2_transfer_form_liquid_class(self, liquid_class: str) -> None:
         """Select liquid class in part 2 of transfer step.
         Args:
@@ -96,34 +117,113 @@ class TransferPage(BasePage):
         liquid_class_option = self.page.get_by_text(liquid_class)
         liquid_class_option.click()
 
+    ### Step 3 transfer form Aspiration and Dispense
+
     def select_aspirate_or_dispense_advanced_settings(self, setting: Literal["Aspirate", "Dispense"]) -> None:
-        """Select advanced settings for aspirate or dispense."""
+        """Select advanced settings for aspirate or dispense.
+        Args:
+            setting: Choose between "Aspirate" or "Dispense".
+        """
         if setting == "Aspirate":
             self.page.get_by_role("button", name="Aspirate").click()
         elif setting == "Dispense":
             self.page.get_by_role("button", name="Dispense").click()
 
     def update_or_keep_liquid_class_settings(self, action: Literal["Update settings", "Keep current settings"]) -> None:
-        """Click to update or keep current liquid class settings."""
+        """Click to update or keep current liquid class settings.
+        Args:
+            action: Choose between "Update settings" or "Keep current settings".
+        """
         if action == "Update settings":
             self.page.get_by_text("Update settings").click()
         elif action == "Keep current settings":
             self.page.get_by_text("Keep current settings").click()
 
     def set_flow_rate_aspirate(self, flow_rate: float) -> None:
-        """Sets the aspirate flow rate based on field name."""
+        """Sets the aspirate flow rate based on field name.
+        Args:
+            flow_rate: The aspirate flow rate (µL/s).
+        """
         self.page.locator('input[name="aspirate_flowRate"]').fill(str(flow_rate))
 
-    def set_submerge_and_retract_aspirate(
-        self, submerge_speed: float, submerge_delay: float, retract_speed: float, retract_delay: float
+    # Submerge and Retract Settings
+    def set_submerge_and_retract(
+        self, aspirate: bool, submerge_speed: float, submerge_delay: float, retract_speed: float, retract_delay: float
     ) -> None:
+        """
+        ToDO: Please include snapshot before/after
+        Sets the submerge and retract settings for aspirate or dispense.
+        Args:
+            aspirate: True for aspirate settings, False for dispense settings.
+            submerge_speed: Speed for submerging (mm/s).
+            submerge_delay: Delay time for submerging (s).
+            retract_speed: Speed for retracting (mm/s).
+            retract_delay: Delay time for retracting (s).
+        """
+        if aspirate:
+            strat = "aspirate"
+        else:
+            strat = "dispense"
         """Sets the submerge and retract settings based on field names."""
         # Submerge
-        self.page.locator('input[name="aspirate_submerge_speed"]').fill(str(submerge_speed))
-        self.page.locator('input[name="aspirate_submerge_delay_seconds"]').fill(str(submerge_delay))
+        self.page.locator(f'input[name="{strat}_submerge_speed"]').fill(str(submerge_speed))
+        self.page.locator(f'input[name="{strat}_submerge_delay_seconds"]').fill(str(submerge_delay))
         # Retract
-        self.page.locator('input[name="aspirate_retract_speed"]').fill(str(retract_speed))
-        self.page.locator('input[name="aspirate_retract_delay_seconds"]').fill(str(retract_delay))
+        self.page.locator(f'input[name="{strat}_retract_speed"]').fill(str(retract_speed))
+        self.page.locator(f'input[name="{strat}_retract_delay_seconds"]').fill(str(retract_delay))
+
+    ## Positions
+    def xyz_position(self, xyz: tuple[float, float, float]) -> None:
+        """
+        Sets the XYZ position settings for anything that uses XYZ coordinates.
+        Args:
+            x: X coordinate (mm).
+            y: Y coordinate (mm).
+            z: Z coordinate (mm).
+        """
+        self.page.get_by_test_id("TipPositionModal_x_custom_input").fill(str(xyz[0]))
+        self.page.get_by_test_id("TipPositionModal_y_custom_input").fill(str(xyz[1]))
+        self.page.get_by_test_id("TipPositionModal_z_custom_input").fill(str(xyz[2]))
+
+    def tip_position_asp_disp(self, aspirate: bool, xyz: tuple[float, float, float]) -> None:
+        """
+        Sets the tip position settings for aspirate or dispense.
+        Args:
+            aspirate: True for aspirate settings, False for dispense settings.
+            xyz: A tuple containing the X, Y, and Z coordinates (mm).
+        """
+        if aspirate:
+            strat = "aspirate"
+        else:
+            strat = "dispense"
+
+        self.page.get_by_test_id(f"PositionField_ListButton_{strat}").click()
+        self.xyz_position(xyz)
+        self.page.get_by_text("Save", exact=True).click()
+
+    def tip_position_submerge_retract(self, aspirate: bool, submerge: bool, xyz: tuple[float, float, float]) -> None:
+        """
+        Sets the tip position settings for aspirate or dispense.
+        Args:
+            aspirate: True for aspirate settings, False for dispense settings.
+            submerge: True for submerge settings, False for retract settings.
+            xyz: A tuple containing the X, Y, and Z coordinates (mm).
+        """
+        if aspirate:
+            strat = "aspirate"
+        else:
+            strat = "dispense"
+        if submerge:
+            summerge_strat = "submerge"
+        else:
+            summerge_strat = "retract"
+
+        """Sets the tip position settings based on field names."""
+        self.page.get_by_test_id(f"PositionField_ListButton_{strat}_{summerge_strat}").click()
+        self.xyz_position(xyz)
+        self.page.get_by_text("Save", exact=True).click()
+
+    ## Advanced Settings
 
     def set_pre_wetting(self, enable: bool) -> None:
         """
@@ -296,3 +396,19 @@ class TransferPage(BasePage):
         self.page.get_by_text("Mix").click()
         self.page.locator(f"input[name='{strat}_mix_times']").fill(str(mix_times))
         self.page.locator(f"input[name='{strat}_mix_volume']").fill(str(mix_volume))
+
+    ## Step 4
+    def tip_change_strategy(self, tipstrat: str, drop_location: str) -> None:
+        """Sets tip change strategy to Once and drop location to Tip rack.
+        args:
+            tipstrat: Tip change strategy like "Once", "Always", "Never", etc.
+            drop_location: Drop location like "Tip rack", "Trash", etc.
+        """
+        self.page.get_by_test_id("changeTip_dropdownMenu").click()
+        self.page.get_by_text(tipstrat).click()
+        self.page.get_by_test_id("dropTip_location_dropdownMenu").click()
+        self.page.get_by_text(drop_location).click()
+
+    def save_transfer_step(self) -> None:
+        """Click save transfer step button in transfer step."""
+        self.page.get_by_text("Save", exact=True).click()
