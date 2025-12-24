@@ -49,8 +49,8 @@ from aiohttp import web
 
 from .name_synchronizer import (
     NameSynchronizer,
-    install_name_synchronizer,
     get_name_synchronizer,
+    install_name_synchronizer,
 )
 from .static_hostname import set_up_static_hostname
 

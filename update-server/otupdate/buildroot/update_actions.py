@@ -16,17 +16,16 @@ import tempfile
 from typing import Callable, Generator, Optional
 
 from otupdate.common.constants import MODEL_OT2
-
 from otupdate.common.file_actions import (
+    HashMismatch,
     InvalidPKGName,
     InvalidRobotType,
+    hash_file,
     load_version_file,
     unzip_update,
-    hash_file,
-    HashMismatch,
     verify_signature,
 )
-from otupdate.common.update_actions import UpdateActionsInterface, Partition
+from otupdate.common.update_actions import Partition, UpdateActionsInterface
 
 UPDATE_PKG_BR = ["ot2-system.zip", "system-update.zip"]
 UPDATE_PKG_VERSION_FILE = "VERSION.json"
