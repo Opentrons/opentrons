@@ -1,6 +1,5 @@
 """Unit tests for robot_server.deck_configuration.defaults."""
 
-
 from typing_extensions import Final
 
 import pytest

@@ -197,7 +197,7 @@ class CameraSettingStore:
 
 
 async def get_camera_setting_store(
-    sql_engine: Annotated[sqlalchemy.engine.Engine, fastapi.Depends(get_sql_engine)]
+    sql_engine: Annotated[sqlalchemy.engine.Engine, fastapi.Depends(get_sql_engine)],
 ) -> CameraSettingStore:
     """A FastAPI dependency to return the server's CameraSettingStore."""
     # Since the store itself has no state, and no asyncio.Locks or anything,

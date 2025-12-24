@@ -56,7 +56,7 @@ class RobotServerError(ApiError):
         meta: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[BaseException]] = None,
         *fmt_args: object,
-        **fmt_kw_args: object
+        **fmt_kw_args: object,
     ) -> None:
         """
         Constructor.

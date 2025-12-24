@@ -1,4 +1,5 @@
 """Common test fixtures for runs route tests."""
+
 import pytest
 from decoy import Decoy
 

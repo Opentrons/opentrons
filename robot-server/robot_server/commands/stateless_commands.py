@@ -1,4 +1,5 @@
 """Command requests and responses allowed to be used with /commands."""
+
 from typing import Union
 from typing_extensions import Annotated
 

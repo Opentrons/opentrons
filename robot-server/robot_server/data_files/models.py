@@ -1,4 +1,5 @@
 """Data files models."""
+
 from datetime import datetime
 from typing import Literal, Set, Optional
 

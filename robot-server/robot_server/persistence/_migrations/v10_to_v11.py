@@ -47,9 +47,10 @@ class Migration10to11(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 10 to 11."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        with sql_engine_ctx(
-            dest_dir / DB_FILE
-        ) as engine, engine.begin() as transaction:
+        with (
+            sql_engine_ctx(dest_dir / DB_FILE) as engine,
+            engine.begin() as transaction,
+        ):
             _add_new_index(transaction)
             _upmigrate_labware_offsets_in_runs(transaction)
 

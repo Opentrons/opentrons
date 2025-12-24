@@ -1,4 +1,5 @@
 """An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
+
 import contextlib
 import random
 import logging
@@ -200,7 +201,7 @@ def get_notification_client(
 ) -> NotificationClient:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
     notification_client = _notification_client_accessor.get_from(app_state)
-    assert (
-        notification_client is not None
-    ), "Forgot to initialize notification client as part of server startup?"
+    assert notification_client is not None, (
+        "Forgot to initialize notification client as part of server startup?"
+    )
     return notification_client
