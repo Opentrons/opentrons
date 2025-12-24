@@ -5,7 +5,6 @@ browser dev tools.
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Server-Timing
 """
 
-
 import logging
 import time
 from typing import Awaitable, Callable
@@ -29,7 +28,7 @@ _CallNextType = Callable[[Request], Awaitable[Response]]
 
 
 def server_timing_middleware(
-    clock: Callable[[], float] = time.perf_counter
+    clock: Callable[[], float] = time.perf_counter,
 ) -> Callable[[Request, _CallNextType], Awaitable[Response]]:
     """Return a function that can be used as a FastAPI middleware.
 
