@@ -228,7 +228,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
             <ProtocolAnalysisStale protocolKey={protocolKey} />
           ) : null}
           <LegacyStyledText
-            as="h3"
+            forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             data-testid={`ProtocolCard_${protocolDisplayName}`}
             overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -238,7 +238,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
         </Flex>
         {/* data section */}
         {analysisStatus === 'loading' ? (
-          <LegacyStyledText as="p" flex="1" color={COLORS.grey60}>
+          <LegacyStyledText forwardedAs="p" flex="1" color={COLORS.grey60}>
             {t('loading_data')}
           </LegacyStyledText>
         ) : (
@@ -257,7 +257,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 >
                   {i18n.format('robot', 'capitalize')}
                 </StyledText>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {getRobotTypeDisplayName(robotType)}
                 </LegacyStyledText>
               </Flex>
@@ -276,19 +276,29 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
                 {
                   {
                     missing: (
-                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                      <LegacyStyledText forwardedAs="p">
+                        {t('no_data')}
+                      </LegacyStyledText>
                     ),
                     loading: (
-                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                      <LegacyStyledText forwardedAs="p">
+                        {t('no_data')}
+                      </LegacyStyledText>
                     ),
                     error: (
-                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                      <LegacyStyledText forwardedAs="p">
+                        {t('no_data')}
+                      </LegacyStyledText>
                     ),
                     parameterRequired: (
-                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                      <LegacyStyledText forwardedAs="p">
+                        {t('no_data')}
+                      </LegacyStyledText>
                     ),
                     stale: (
-                      <LegacyStyledText as="p">{t('no_data')}</LegacyStyledText>
+                      <LegacyStyledText forwardedAs="p">
+                        {t('no_data')}
+                      </LegacyStyledText>
                     ),
                     complete: (
                       <Flex flexWrap={WRAP} gridGap={SPACING.spacing4}>
@@ -373,7 +383,7 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
               justifyContent={JUSTIFY_FLEX_END}
               data-testid={`ProtocolCard_date_${protocolDisplayName}`}
             >
-              <LegacyStyledText as="label" color={COLORS.grey60}>
+              <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
                 {`${t('updated')} ${format(
                   new Date(modified),
                   'M/d/yy HH:mm'

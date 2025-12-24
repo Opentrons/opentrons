@@ -96,7 +96,10 @@ export const ProtocolLiquidsDetails = (
             name="ot-alert"
             aria-label="ProtocolLIquidsDetails_noLiquidsIcon"
           />
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {i18n.format(t('liquids_not_in_protocol'), 'capitalize')}
           </LegacyStyledText>
         </Flex>

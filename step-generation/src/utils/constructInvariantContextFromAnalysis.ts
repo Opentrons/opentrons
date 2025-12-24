@@ -47,6 +47,9 @@ export function constructInvariantContextFromAnalysis(
     (acc, loadedLabware) => {
       const { id, definitionUri } = loadedLabware
       const def = labwareDefinitions[definitionUri]
+      if (def == null) {
+        return acc
+      }
       if (def.schemaVersion === 3) {
         return acc
       }

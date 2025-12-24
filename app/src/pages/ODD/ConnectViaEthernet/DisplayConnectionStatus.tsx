@@ -59,12 +59,15 @@ export function DisplayConnectionStatus({
           gridGap={isConnected ? '0' : SPACING.spacing4}
           alignItems={ALIGN_CENTER}
         >
-          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="h3"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {isConnected ? t('successfully_connected') : t('no_network_found')}
           </LegacyStyledText>
           {isConnected ? null : (
             <LegacyStyledText
-              as="h4"
+              forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               textAlign={TYPOGRAPHY.textAlignCenter}
               color={COLORS.grey60}

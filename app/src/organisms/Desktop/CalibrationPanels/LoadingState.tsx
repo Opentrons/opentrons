@@ -25,9 +25,11 @@ export function LoadingState(props: LoadingStateProps): JSX.Element {
     >
       <Icon name="ot-spinner" spin size={SIZE_4} color={COLORS.grey50} />
       {header != null ? (
-        <LegacyStyledText as="h1">{header}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="h1">{header}</LegacyStyledText>
       ) : null}
-      {body != null ? <LegacyStyledText as="p">{body}</LegacyStyledText> : null}
+      {body != null ? (
+        <LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>
+      ) : null}
     </Flex>
   )
 }

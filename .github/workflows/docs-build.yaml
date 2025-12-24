@@ -82,11 +82,8 @@ jobs:
       - uses: ./.github/actions/environment/complex-variables
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
-      - uses: 'actions/setup-python@v3'
-        with:
-          python-version: '3.12'
-      - uses: './.github/actions/python/setup'
+          node-version: '22.21.1'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
       - name: 'Build docs'

@@ -25,6 +25,8 @@ import {
 
 import { HistoricalProtocolRun } from './HistoricalProtocolRun'
 
+const COLUMNS = '25% 27% 5% 14% 14% 12%'
+
 interface RecentProtocolRunsProps {
   robotName: string
 }
@@ -52,14 +54,15 @@ export function RecentProtocolRuns({
       width="100%"
       marginBottom="6rem"
     >
-      <StyledText
-        desktopStyle="bodyLargeSemiBold"
-        borderBottom={BORDERS.lineBorder}
+      <Flex
         padding={SPACING.spacing16}
+        borderBottom={BORDERS.lineBorder}
         width="100%"
       >
-        {t('recent_protocol_runs')}
-      </StyledText>
+        <StyledText desktopStyle="bodyLargeSemiBold">
+          {t('recent_protocol_runs')}
+        </StyledText>
+      </Flex>
       <Flex
         alignItems={ALIGN_CENTER}
         flexDirection={DIRECTION_COLUMN}
@@ -70,48 +73,45 @@ export function RecentProtocolRuns({
         {isRobotViewable && allRunsMutable && allRunsMutable?.length > 0 && (
           <>
             <Flex
+              display="grid"
               justifyContent={JUSTIFY_FLEX_START}
               padding={SPACING.spacing8}
               width="88%"
               marginRight="12%"
-              gridGap={SPACING.spacing20}
+              gap={SPACING.spacing20}
               color={COLORS.grey60}
+              gridTemplateColumns={COLUMNS}
             >
-              <LegacyStyledText
-                as="p"
-                width="25%"
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
                 data-testid="RecentProtocolRuns_RunTitle"
               >
                 {t('run')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="27%"
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
                 data-testid="RecentProtocolRuns_ProtocolTitle"
               >
                 {t('protocol')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="5%"
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
                 data-testid="RecentProtocolRuns_FilesTitle"
               >
                 {t('files')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="14%"
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
                 data-testid="RecentProtocolRuns_StatusTitle"
               >
                 {t('status')}
-              </LegacyStyledText>
-              <LegacyStyledText
-                as="p"
-                width="14%"
+              </StyledText>
+              <StyledText
+                desktopStyle="bodyDefaultRegular"
                 data-testid="RecentProtocolRuns_DurationTitle"
               >
                 {t('run_duration')}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
             {allRunsMutable
               .sort(
@@ -145,7 +145,7 @@ export function RecentProtocolRuns({
         )}
         {!isRobotViewable && (
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             alignItems={ALIGN_CENTER}
             color={COLORS.grey50}
             display={DISPLAY_FLEX}
@@ -157,7 +157,7 @@ export function RecentProtocolRuns({
         )}
         {isRobotViewable && allRunsMutable?.length === 0 && (
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             alignItems={ALIGN_CENTER}
             display={DISPLAY_FLEX}
             flex="1 0"

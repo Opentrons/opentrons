@@ -29,7 +29,7 @@ export function RetryWithSameTips(props: RecoveryContentProps): JSX.Element {
         t={t}
         i18nKey="robot_will_retry_with_same_tips"
         components={{
-          block: <LegacyStyledText as="p" />,
+          block: <LegacyStyledText forwardedAs="p" />,
         }}
       />
     )

@@ -51,6 +51,7 @@ export function SetupRunCameraControls({
         createPortal(
           <CameraControls
             onClose={toggleControls}
+            runId={runId}
             postCameraImageSettings={addCameraImageSettingsToRun}
           />,
           getTopPortalEl()

@@ -101,7 +101,7 @@ export function DeckSetupToolbox(
   if (slot == null) {
     return null
   }
-
+  const isHopperSlot = getIsSlotAHopper(slot)
   const offDeckLabware = deckSetup.labware[slot]
   const handleResetToolbox = (): void => {
     dispatch(
@@ -121,6 +121,12 @@ export function DeckSetupToolbox(
       })
     )
   }
+  const labwareInHopper =
+    createdModuleForSlot?.type === FLEX_STACKER_MODULE_TYPE &&
+    isHopperSlot &&
+    'labwareInHopper' in createdModuleForSlot.moduleState
+      ? createdModuleForSlot.moduleState.labwareInHopper
+      : null
 
   const slotFull =
     (createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
@@ -154,7 +160,6 @@ export function DeckSetupToolbox(
   const handleConfirm = (): void => {
     const isOffDeck = slot === 'offDeck'
     const hasModule = selectedModuleModel != null
-    const isHopperSlot = getIsSlotAHopper(slot)
     const isModuleStacker =
       selectedModuleModel != null &&
       getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
@@ -350,7 +355,11 @@ export function DeckSetupToolbox(
                   createdStackForSlot.includes(createdLidForSlot?.id)
                     ? {}
                     : { lidId: createdLidForSlot?.id })}
-                  quantity={createdStackForSlot.length}
+                  quantity={
+                    labwareInHopper != null
+                      ? labwareInHopper.length
+                      : createdStackForSlot.length
+                  }
                   location={slot}
                 />
               ) : null}

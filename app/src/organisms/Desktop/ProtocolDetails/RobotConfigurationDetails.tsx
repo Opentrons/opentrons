@@ -50,6 +50,7 @@ import type {
   PipetteName,
   RobotType,
   SingleSlotCutoutFixtureId,
+  VISUAL_SLOTS,
 } from '@opentrons/shared-data'
 
 interface RobotConfigurationDetailsProps {
@@ -258,7 +259,7 @@ export const RobotConfigurationDetails = (
           fixture.cutoutFixtureId,
           fixture.requiredAddressableAreas[0]
         )
-        const AAName = getAAWithFakesFromVSId(visualSlotId)
+        const AAName = getAAWithFakesFromVSId(visualSlotId as VISUAL_SLOTS)
         return (
           <Fragment key={`fixture_${index}`}>
             <Divider marginY={SPACING.spacing12} width="100%" />

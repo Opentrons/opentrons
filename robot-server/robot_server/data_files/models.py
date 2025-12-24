@@ -70,6 +70,13 @@ class FileIdNotFound(ErrorDetails):
     title: str = "Specified file id not found on the robot"
 
 
+class FileNotFound(ErrorDetails):
+    """An error returned when specified file path was not found on the robot."""
+
+    id: Literal["FileNotFound"] = "FileNotFound"
+    title: str = "Specified file path not found on the robot"
+
+
 class NoImagesFound(ErrorDetails):
     """An error returned when no images are found for the specified run."""
 

@@ -8,7 +8,16 @@ from decoy import Decoy
 from robot_server.runs.run_data_manager import (
     RunStore,
     RunOrchestratorStore,
+    RunDataManager,
 )
+from robot_server.service.json_api import RequestModel
+from robot_server.service.legacy.routers.camera import (
+    post_camera_preview_image,
+    add_camera_capture_image_settings,
+)
+from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
+from robot_server.camera.settings.store import CameraSettingStore
+from fastapi.responses import FileResponse
 
 
 @pytest.fixture
@@ -74,6 +83,18 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_run_orchestrator_store(decoy: Decoy) -> RunOrchestratorStore:
     """Get a mock EngineStore interface."""
     return decoy.mock(cls=RunOrchestratorStore)
+
+
+@pytest.fixture()
+def mock_run_data_manager(decoy: Decoy) -> RunDataManager:
+    """Get a mock EngineStore interface."""
+    return decoy.mock(cls=RunDataManager)
+
+
+@pytest.fixture
+def mock_camera_setting_store(decoy: Decoy) -> CameraSettingStore:
+    """Get a mock CameraSettingStore."""
+    return decoy.mock(cls=CameraSettingStore)
 
 
 def test_camera_exception(mock_take_picture, api_client):
@@ -243,3 +264,67 @@ async def test_camera_stream_settings_ot2(api_client_camera_overrides, decoy: De
             "errorCode": "4000",
             "message": "Opentrons Live Stream service is not available on OT-2.",
         }
+
+
+async def test_camera_preview_image(
+    decoy: Decoy,
+    mock_camera_setting_store: CameraSettingStore,
+    mock_run_data_manager: RunDataManager,
+):
+    """Test that we can send a POST request for a preview image with a collection of image settings."""
+    with tempfile.NamedTemporaryFile() as conf:
+        decoy.when(mock_run_data_manager.current_run_id).then_return(None)
+        decoy.when(mock_camera_setting_store.get_camera_enabled()).then_return(True)
+        response = await post_camera_preview_image(
+            request_body=RequestModel(
+                data=CameraCaptureImageSettings(
+                    cameraId=None,
+                    resolution=(720, 1280),
+                    zoom=1.5,
+                    pan=(0, 0),
+                    contrast=25.0,
+                    brightness=50.0,
+                    saturation=75.0,
+                )
+            ),
+            camera_settings_store=mock_camera_setting_store,
+            run_data_manager=mock_run_data_manager,
+            images_directory=Path(conf.name),
+            robot_type="OT-3 Standard",
+        )
+        assert isinstance(response, FileResponse)
+
+
+async def test_camera_add_capture_image_settings(
+    decoy: Decoy,
+    mock_camera_setting_store: CameraSettingStore,
+):
+    """Test that we add global image capture settings."""
+    decoy.when(
+        mock_camera_setting_store.get_camera_capture_image_settings()
+    ).then_return(
+        CameraCaptureImageSettings(
+            cameraId=None,
+            resolution=(720, 1280),
+            zoom=1.5,
+            pan=(0, 0),
+            contrast=25.0,
+            brightness=50.0,
+            saturation=75.0,
+        )
+    )
+    response = await add_camera_capture_image_settings(
+        request_body=RequestModel(
+            data=CameraCaptureImageSettings(
+                cameraId=None,
+                resolution=(720, 1280),
+                zoom=1.5,
+                pan=(0, 0),
+                contrast=25.0,
+                brightness=50.0,
+                saturation=75.0,
+            )
+        ),
+        camera_settings_store=mock_camera_setting_store,
+    )
+    assert isinstance(response, CameraCaptureImageSettings)
