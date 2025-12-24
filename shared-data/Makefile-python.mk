@@ -96,12 +96,11 @@ sdist: $(py_sources) $(json_sources)
 .PHONY: lint
 lint: $(py_sources)
 	$(python) -m mypy python/opentrons_shared_data python_tests tools
-	$(python) -m black --check python/opentrons_shared_data python_tests tools
-	$(python) -m flake8 python/opentrons_shared_data python_tests tools
+	$(ruff) check python/opentrons_shared_data python_tests tools
 
 .PHONY: format
 format:
-	$(python) -m black python/opentrons_shared_data python_tests tools
+	$(ruff) format python/opentrons_shared_data python_tests tools
 
 .PHONY: push-no-restart
 push-no-restart: wheel

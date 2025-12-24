@@ -63,12 +63,11 @@ test:
 .PHONY: lint
 lint:
 	$(python) -m mypy system_server tests
-	$(python) -m black --check ./system_server ./tests
-	$(python) -m flake8 system_server tests
+	$(ruff) check system_server tests
 
 .PHONY: format
 format:
-	$(python) -m black system_server tests
+	$(ruff) format system_server tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)
