@@ -531,11 +531,11 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             self._instrument.blow_out(
                 location=retract_location,
                 well_core=None,
                 in_place=True,
+                flow_rate=blowout_props.flow_rate,
             )
             self._tip_state.ready_to_aspirate = False
         is_final_air_gap = (
@@ -563,7 +563,6 @@ class TransferComponentsExecutor:
             and blowout_props.location != BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             blowout_touch_tip_props = retract_props.touch_tip
             touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
@@ -578,6 +577,7 @@ class TransferComponentsExecutor:
                     ),
                     well_core=source_well,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = Location(
                     source_well.get_top(0), labware=source_location.labware
@@ -595,6 +595,7 @@ class TransferComponentsExecutor:
                     location=trash_location,
                     well_core=None,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = trash_location
                 touch_tip_and_air_gap_well = (
@@ -693,11 +694,11 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             self._instrument.blow_out(
                 location=retract_location,
                 well_core=None,
                 in_place=True,
+                flow_rate=blowout_props.flow_rate,
             )
             # A blowout will remove all air gap and liquid (disposal volume) from the tip
             # so delete them from tip state (although practically, there will not be
@@ -763,7 +764,6 @@ class TransferComponentsExecutor:
             and blowout_props.location != BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            self._instrument.set_flow_rate(blow_out=blowout_props.flow_rate)
             blowout_touch_tip_props = retract_props.touch_tip
             touch_tip_and_air_gap_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.location == BlowoutLocation.SOURCE:
@@ -778,6 +778,7 @@ class TransferComponentsExecutor:
                     ),
                     well_core=source_well,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = Location(
                     source_well.get_top(0), labware=source_location.labware
@@ -795,6 +796,7 @@ class TransferComponentsExecutor:
                     location=trash_location,
                     well_core=None,
                     in_place=False,
+                    flow_rate=blowout_props.flow_rate,
                 )
                 touch_tip_and_air_gap_location = trash_location
                 touch_tip_and_air_gap_well = (
