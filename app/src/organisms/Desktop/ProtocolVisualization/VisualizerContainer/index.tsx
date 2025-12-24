@@ -99,7 +99,7 @@ export function VisualizerContainer(
     currentCommandsSlice,
     invariantContextFromAnalysis
   )
-console.log('frame', frame)
+  console.log('frame', frame)
   const handlePlayPause = (): void => {
     setIsPlaying(prev => !prev)
   }

@@ -73,16 +73,16 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
           id,
           Object.values(labware)
         )
-        const isStepAssosciatedWithModule =
-          selectedRunTimeCommand != null &&
-          'moduleId' in selectedRunTimeCommand.params &&
-          selectedRunTimeCommand.params.moduleId === id
         const { isActiveLayerVisible } = getActiveLayer(
           labwareLoadedOnModuleId,
           selectedRunTimeCommand
         )
         const moduleDef = getModuleDef(moduleEntities[id].model)
         const moduleType = moduleEntities[id].type
+        const isStepAssosciatedWithModule =
+          selectedRunTimeCommand != null &&
+          'moduleId' in selectedRunTimeCommand.params &&
+          selectedRunTimeCommand.params.moduleId === id
         const tempInnerProps = getModuleInnerProps(moduleState)
         const innerTCProps = {
           ...tempInnerProps,
@@ -94,7 +94,6 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
         const showModuleCommandSummary =
           (isActiveLayerVisible || isStepAssosciatedWithModule) &&
           selectedRunTimeCommand != null
-
         return (
           <Fragment key={id}>
             <>
@@ -111,7 +110,11 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                     ? innerTCProps
                     : tempInnerProps
                 }
-                targetSlotId={slot}
+                targetSlotId={
+                  moduleType === FLEX_STACKER_MODULE_TYPE
+                    ? `hopper${slot}`
+                    : slot
+                }
                 targetDeckId={deckDef.otId}
                 childrenPositioningMode="passThrough"
                 setSelectedSlot={setSelectedSlot}
@@ -170,8 +173,16 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                     ) : (
                       <DeckViewOverlay
                         key={slot}
-                        slotId={slot}
-                        slotPosition={slotPosition}
+                        slotId={
+                          moduleType === FLEX_STACKER_MODULE_TYPE
+                            ? `hopper${slot}`
+                            : slot
+                        }
+                        slotPosition={[
+                          moduleType === FLEX_STACKER_MODULE_TYPE ? 178 : 0,
+                          0,
+                          0,
+                        ]}
                         slotFillColor={COLORS.purple50}
                         robotType={robotType}
                         invariantContext={invariantContext}
@@ -180,7 +191,13 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                         setHoveredSlot={setHoveredSlot}
                         hover={hoveredSlot}
                       >
-                        {showModuleCommandSummary ? null : (
+                        {(moduleType === FLEX_STACKER_MODULE_TYPE &&
+                          selectedRunTimeCommand?.commandType !==
+                            'flexStacker/retrieve' &&
+                          selectedRunTimeCommand?.commandType !==
+                            'flexStacker/store') ||
+                        (moduleType !== FLEX_STACKER_MODULE_TYPE &&
+                          showModuleCommandSummary) ? null : (
                           <StyledText
                             desktopStyle="captionRegular"
                             color={COLORS.white}
@@ -196,8 +213,16 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                 ) : null}
                 <DeckViewOverlay
                   key={slot}
-                  slotId={slot}
-                  slotPosition={[0, 0, 0]}
+                  slotId={
+                    moduleType === FLEX_STACKER_MODULE_TYPE
+                      ? `hopper${slot}`
+                      : slot
+                  }
+                  slotPosition={[
+                    moduleType === FLEX_STACKER_MODULE_TYPE ? 178 : 0,
+                    0,
+                    0,
+                  ]}
                   slotFillColor={COLORS.purple50}
                   robotType={robotType}
                   invariantContext={invariantContext}

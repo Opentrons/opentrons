@@ -201,13 +201,13 @@ const getStoredLabwareIds = (
     | FlexStackerSetStoredLabwareRunTimeCommand
     | FlexStackerFillRunTimeCommand
 ): string[] => {
-  const allStoredLabwareIds =
+  const allStoredLabwareIds: string[] =
     command.result?.storedLabware?.flatMap(stored =>
       [
         stored.primaryLabwareId,
         stored.adapterLabwareId,
         stored.lidLabwareId,
-      ].filter(id => id != null)
+      ].filter((id): id is string => id != null)
     ) ?? []
   return allStoredLabwareIds
 }

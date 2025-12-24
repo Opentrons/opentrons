@@ -52,7 +52,7 @@ const setLabwareOnHopperFromItemCommands = (
   robotState: RobotState,
   baseLabwareStack: string[]
 ): void => {
-  let hopperGroup: FlexStackerStoredLabwareGroup[] =
+  const hopperGroup: FlexStackerStoredLabwareGroup[] =
     moduleState.labwareInHopper ?? []
   labwareToStore.forEach(storedLabware => {
     const { primaryLabwareId, adapterLabwareId, lidLabwareId } = storedLabware
