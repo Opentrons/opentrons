@@ -96,9 +96,9 @@ class ThermocyclerEmulator(AbstractEmulator):
             return self._pref(command) + f"Lid:{self.lid_status}"
         elif command.gcode == GCODE.SET_LID_TEMP:
             temperature = command.params["S"]
-            assert isinstance(
-                temperature, float
-            ), f"invalid temperature '{temperature}'"
+            assert isinstance(temperature, float), (
+                f"invalid temperature '{temperature}'"
+            )
             self._lid_temperature.set_target(temperature)
         elif command.gcode == GCODE.GET_LID_TEMP:
             res = (

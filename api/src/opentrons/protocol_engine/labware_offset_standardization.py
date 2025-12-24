@@ -68,8 +68,7 @@ def legacy_offset_location_to_offset_location_sequence(
         if (
             # Check for v2 specifically because v1 is OT-2-only and OT-2s don't have
             # modules in their deck definitions; and v3 does not exist at the time of writing.
-            location.moduleModel
-            == ModuleModel.THERMOCYCLER_MODULE_V2
+            location.moduleModel == ModuleModel.THERMOCYCLER_MODULE_V2
         ):
             possible_cutout_fixture_id = "thermocyclerModuleV2Front"
         else:

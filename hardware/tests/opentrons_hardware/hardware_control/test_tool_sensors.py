@@ -1,4 +1,5 @@
 """Test the tool-sensor coordination code."""
+
 import logging
 from mock import patch, AsyncMock, call
 import pytest

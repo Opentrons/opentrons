@@ -1,4 +1,5 @@
 """Data for concurrent protocol tasks."""
+
 from typing import TYPE_CHECKING
 from datetime import datetime
 from opentrons.protocols.api_support.util import requires_version

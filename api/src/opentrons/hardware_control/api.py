@@ -1326,9 +1326,9 @@ class API(
         model: modules.types.ModuleModel,
     ) -> modules.AbstractModule:
         """Get a simulating module hardware API interface for the given model."""
-        assert (
-            self.is_simulator
-        ), "Cannot build simulating module from non-simulating hardware control API"
+        assert self.is_simulator, (
+            "Cannot build simulating module from non-simulating hardware control API"
+        )
 
         return await self._backend.module_controls.register_simulated_module(
             simulated_usb_port=USBPort(
@@ -1353,7 +1353,7 @@ class API(
 
     @staticmethod
     def _axis_map_from_string_map(
-        input_map: Dict[str, "API.MapPayload"]
+        input_map: Dict[str, "API.MapPayload"],
     ) -> Dict[Axis, "API.MapPayload"]:
         return {Axis[k]: v for k, v in input_map.items()}
 

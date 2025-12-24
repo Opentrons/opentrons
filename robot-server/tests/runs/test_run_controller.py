@@ -1,4 +1,5 @@
 """Tests for RunController."""
+
 from typing import List
 
 import pytest

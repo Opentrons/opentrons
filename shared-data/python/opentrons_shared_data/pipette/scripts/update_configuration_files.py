@@ -166,7 +166,7 @@ def build_nozzle_map(
         return {"A1": nozzle_offset}
     elif channels == PipetteChannelType.EIGHT_CHANNEL:
         return {
-            f"{chr(ord('A') + 1*row)}1": [
+            f"{chr(ord('A') + 1 * row)}1": [
                 nozzle_offset[0],
                 nozzle_offset[1] + Y_OFFSET * row,
                 nozzle_offset[2],
@@ -175,7 +175,7 @@ def build_nozzle_map(
         }
     elif channels == PipetteChannelType.NINETY_SIX_CHANNEL:
         return {
-            f"{chr(ord('A') + 1*row)}{1 + 1*col}": [
+            f"{chr(ord('A') + 1 * row)}{1 + 1 * col}": [
                 nozzle_offset[0] + X_OFFSET * col,
                 nozzle_offset[1] + Y_OFFSET * row,
                 nozzle_offset[2],

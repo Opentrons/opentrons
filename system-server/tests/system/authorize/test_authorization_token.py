@@ -1,4 +1,5 @@
 """This module keeps track of current authorization."""
+
 from datetime import timedelta
 import uuid
 import jwt

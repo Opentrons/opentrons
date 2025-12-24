@@ -1,6 +1,5 @@
 """Unit tests for LabwareOffsetProvider."""
 
-
 from datetime import datetime
 
 import pytest

@@ -21,9 +21,7 @@ class DevServer:
             else Path(tempfile.mkdtemp())
         )
         self.port: int = (
-            port
-            if port is not None
-            else random.randrange(2**15 + 2**14, 2**16 - 1)
+            port if port is not None else random.randrange(2**15 + 2**14, 2**16 - 1)
         )
 
     def __enter__(self) -> DevServer:

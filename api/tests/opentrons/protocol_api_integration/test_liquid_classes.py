@@ -1,4 +1,5 @@
 """Tests for the APIs around liquid classes."""
+
 from typing import Dict, Any
 
 import pytest

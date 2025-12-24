@@ -1,4 +1,5 @@
 """Test absorbance reader initilize command."""
+
 import pytest
 from decoy import Decoy
 from typing import List

@@ -1,4 +1,5 @@
 """Tests for build module."""
+
 from mock import patch, AsyncMock, Mock
 
 from opentrons_hardware.drivers.binary_usb import (

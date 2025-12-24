@@ -1,4 +1,5 @@
 """Tests for FirmwareUpdateEraser."""
+
 import pytest
 from mock import AsyncMock
 

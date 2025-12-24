@@ -1,4 +1,5 @@
 """Wrapper to provide the callbacks utilized by the Protocol Engine Camera Utility."""
+
 from typing import Annotated
 from fastapi import Depends
 from robot_server.camera.settings.store import (

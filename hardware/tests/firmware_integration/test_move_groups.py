@@ -1,4 +1,5 @@
 """Tests for move groups."""
+
 import asyncio
 import numpy as np
 from typing import Iterator, List, Dict

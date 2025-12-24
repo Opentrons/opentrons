@@ -256,13 +256,11 @@ class WellView:
 
 
 @overload
-def _volume_from_info(info: Optional[ProbedVolumeInfo]) -> Optional[float]:
-    ...
+def _volume_from_info(info: Optional[ProbedVolumeInfo]) -> Optional[float]: ...
 
 
 @overload
-def _volume_from_info(info: Optional[LoadedVolumeInfo]) -> Optional[float]:
-    ...
+def _volume_from_info(info: Optional[LoadedVolumeInfo]) -> Optional[float]: ...
 
 
 def _volume_from_info(

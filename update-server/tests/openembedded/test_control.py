@@ -1,4 +1,4 @@
-"""test the openembedded endpoints in otupdate.common.control """
+"""test the openembedded endpoints in otupdate.common.control"""
 
 from typing import Dict
 

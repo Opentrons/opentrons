@@ -1,6 +1,5 @@
 """Unit tests for `stringify`."""
 
-
 from decoy import Decoy
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 

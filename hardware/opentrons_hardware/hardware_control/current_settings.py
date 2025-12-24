@@ -1,4 +1,5 @@
 """Utilities for updating the current settings on the OT3."""
+
 from typing import Tuple, Union, Type
 import logging
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger

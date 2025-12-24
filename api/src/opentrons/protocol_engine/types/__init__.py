@@ -239,7 +239,7 @@ __all__ = [
     "NonStackedLocation",
     "DeckPoint",
     "OffDeckLocationType",
-    "WasteChuteLocationType" "SystemLocationType",
+    "WasteChuteLocationTypeSystemLocationType",
     "InStackerHopperLocation",
     "WASTE_CHUTE_LOCATION",
     "AccessibleByGripperLocation",

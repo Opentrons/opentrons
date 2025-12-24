@@ -1,4 +1,5 @@
 """Script to monitor sensor output."""
+
 import asyncio
 import argparse
 import datetime

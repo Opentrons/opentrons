@@ -136,9 +136,9 @@ class LegacyInstrumentCoreSimulator(
 
         self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
         new_volume = self.get_current_volume() + volume
-        assert (
-            new_volume <= self._pipette_dict["working_volume"]
-        ), "Cannot aspirate more than pipette max volume"
+        assert new_volume <= self._pipette_dict["working_volume"], (
+            "Cannot aspirate more than pipette max volume"
+        )
         self._pipette_dict["ready_to_aspirate"] = True
         self._update_volume(new_volume)
 
@@ -262,9 +262,9 @@ class LegacyInstrumentCoreSimulator(
             elif self._api_version < APIVersion(2, 2):
                 location = well.bottom(z=_PRE_2_2_TIP_DROP_HEIGHT_MM)
             else:
-                assert (
-                    labware_core.is_tip_rack()
-                ), "Expected tip drop target to be a tip rack."
+                assert labware_core.is_tip_rack(), (
+                    "Expected tip drop target to be a tip rack."
+                )
 
                 return_height = self.get_return_height()
                 location = well.top(z=-return_height * labware_core.get_tip_length())

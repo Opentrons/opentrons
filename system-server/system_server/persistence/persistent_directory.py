@@ -26,7 +26,7 @@ async def create_persistent_directory(path: Optional[Path]) -> Path:
         # It's bad for this blocking I/O to be in this async function,
         # but we don't have an async mkdtemp().
         path = Path(mkdtemp(prefix=_TEMP_PERSISTENCE_DIR_PREFIX))
-        _log.info(f"Using auto-created temporary directory {path}" f" for persistence.")
+        _log.info(f"Using auto-created temporary directory {path} for persistence.")
     else:
         await AsyncPath(path).mkdir(parents=True, exist_ok=True)
         _log.info(f"Using directory {path} for persistence.")

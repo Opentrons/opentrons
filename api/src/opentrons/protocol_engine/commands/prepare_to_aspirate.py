@@ -107,9 +107,9 @@ class PrepareToAspirate(
     params: PrepareToAspirateParams
     result: Optional[PrepareToAspirateResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[PrepareToAspirateImplementation] = (
         PrepareToAspirateImplementation
-    ] = PrepareToAspirateImplementation
+    )
 
 
 class PrepareToAspirateCreate(BaseCommandCreate[PrepareToAspirateParams]):

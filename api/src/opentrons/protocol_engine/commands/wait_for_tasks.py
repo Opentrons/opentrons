@@ -1,4 +1,5 @@
 """WaitForTasks command request, result, and implementation models."""
+
 from __future__ import annotations
 from pydantic import BaseModel, Field
 from typing import Optional, Type, TYPE_CHECKING

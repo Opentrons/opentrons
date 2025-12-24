@@ -1,4 +1,5 @@
 """A collection of motions that define a single move."""
+
 from typing import List, Dict, Iterable, Union, Optional
 from dataclasses import dataclass
 import numpy as np
@@ -143,9 +144,15 @@ def create_step(
     """Create a move from a block.
 
     Args:
-        origin: Start position.
-        target: Target position.
-        speed: the speed
+        distance: Diplacement vector.
+        velocity: Velocity vector.
+        acceleration: Acceleration vector.
+        duration: Time for the move
+        present_nodes: Nodes to expect to be present and generate moves for.
+        stop_condition: Any reason to stop the move.
+        sensor_type_pass: Sensor type.
+        sensor_id_pass: Sensor id.
+        sensor_binding_flags: Flags for the sensor.
 
     Returns:
         A Move

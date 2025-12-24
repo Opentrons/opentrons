@@ -11,5 +11,4 @@ class USBDriverInterface(Protocol):
     def match_virtual_ports(
         self,
         virtual_port: Union[List[ModuleAtPort], List[SimulatingModuleAtPort]],
-    ) -> Union[List[ModuleAtPort], List[SimulatingModuleAtPort]]:
-        ...
+    ) -> Union[List[ModuleAtPort], List[SimulatingModuleAtPort]]: ...

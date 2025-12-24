@@ -1,4 +1,5 @@
 """A simple size-limited memory cache used for large resources."""
+
 from typing import Generic, TypeVar, Deque, Type, Dict
 from logging import getLogger
 

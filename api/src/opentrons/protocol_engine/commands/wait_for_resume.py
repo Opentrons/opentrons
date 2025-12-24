@@ -1,4 +1,5 @@
 """Wait for resume command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 

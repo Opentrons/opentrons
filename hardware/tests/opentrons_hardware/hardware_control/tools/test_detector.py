@@ -1,4 +1,5 @@
 """Tests for Tool Detector."""
+
 from opentrons_hardware.firmware_bindings.constants import ToolType
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,

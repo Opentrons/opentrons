@@ -193,17 +193,15 @@ def transfer(
 
 
 @overload
-def transform_volumes(volumes: Union[float, int]) -> float:
-    ...
+def transform_volumes(volumes: Union[float, int]) -> float: ...
 
 
 @overload
-def transform_volumes(volumes: List[float]) -> List[float]:
-    ...
+def transform_volumes(volumes: List[float]) -> List[float]: ...
 
 
 def transform_volumes(
-    volumes: Union[float, int, List[float]]
+    volumes: Union[float, int, List[float]],
 ) -> Union[float, List[float]]:
     if not isinstance(volumes, list):
         return float(volumes)

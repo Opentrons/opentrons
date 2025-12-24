@@ -1,4 +1,5 @@
 """Router for top-level /commands endpoints."""
+
 from typing import Annotated, Final, List, Literal, Optional, cast
 
 from fastapi import Depends, Query, status

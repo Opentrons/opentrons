@@ -1,4 +1,4 @@
-""" opentrons.system.nmcli: Functions and data for interacting with nmcli
+"""opentrons.system.nmcli: Functions and data for interacting with nmcli
 
 The functions contained here are for bridging Python calls with nmcli command
 line invocations. They are in general not safe to call anywhere except an

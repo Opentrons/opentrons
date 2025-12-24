@@ -1,4 +1,5 @@
 """Deck state accessors for the Protocol API."""
+
 from dataclasses import dataclass
 from typing import Iterator, List, Mapping, Optional, Tuple, Union
 

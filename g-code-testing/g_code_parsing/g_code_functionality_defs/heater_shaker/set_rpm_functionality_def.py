@@ -5,7 +5,6 @@ from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base impo
 
 
 class SetRPMGCodeFunctionalityDef(GCodeFunctionalityDefBase):
-
     RPM_ARG_KEY = "S"
 
     @classmethod

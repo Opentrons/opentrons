@@ -1081,8 +1081,7 @@ class InstrumentContext(publisher.CommandPublisher):
         if isinstance(target, validation.WellTarget):
             if target.well.parent.is_tiprack:
                 _log.warning(
-                    "Blow_out being performed on a tiprack. "
-                    "Please re-check your code"
+                    "Blow_out being performed on a tiprack. Please re-check your code"
                 )
             if target.location:
                 # because the lower levels of blowout don't handle LiquidHandlingWellLocation and
@@ -3304,7 +3303,7 @@ class InstrumentContext(publisher.CommandPublisher):
 
     @publisher.publish(command=cmds.configure_nozzle_layout)
     @requires_version(2, 16)
-    def configure_nozzle_layout(
+    def configure_nozzle_layout(  # noqa: C901
         self,
         style: NozzleLayout,
         start: Optional[str] = None,

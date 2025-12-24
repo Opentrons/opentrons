@@ -1,6 +1,5 @@
 """Fixtures to be used by Tavern tests."""
 
-
 from box import Box
 from requests import Response
 from opentrons.protocol_api import (

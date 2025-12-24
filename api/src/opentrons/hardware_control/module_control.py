@@ -45,7 +45,9 @@ MODULE_PORT_REGEX = re.compile(
     # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
     r"(?<!\.#ot_module_)"
     # capture all modules by name using alternation
-    + "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
+    + "("
+    + "|".join(modules.MODULE_TYPE_BY_NAME.keys())
+    + ")"
     # add a negative lookahead to suppress matches on Flex tempfiles udev creates
     + r"\d+(?!\.tmp-c\d+:\d+)",
     re.I,
@@ -70,10 +72,8 @@ class AttachedModulesControl:
         self._event_callback = event_callback
         if not IS_ROBOT and not api.is_simulator:
             # Start task that registers emulated modules.
-            self._emulation_listen_task: asyncio.Task[
-                None
-            ] | None = api.loop.create_task(
-                listen_module_connection(self.register_modules)
+            self._emulation_listen_task: asyncio.Task[None] | None = (
+                api.loop.create_task(listen_module_connection(self.register_modules))
             )
         else:
             self._emulation_listen_task = None

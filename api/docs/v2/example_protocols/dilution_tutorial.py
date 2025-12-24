@@ -25,7 +25,6 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # loop through each row
     for i in range(8):
-
         # save the destination row to a variable
         row = plate.rows()[i]
 

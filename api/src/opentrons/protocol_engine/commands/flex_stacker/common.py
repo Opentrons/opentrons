@@ -138,9 +138,9 @@ class FlexStackerHopperError(ErrorOccurrence):
     """Returned when the Flex Stacker hopper labware presence sensor raises an error."""
 
     isDefined: bool = True
-    errorType: Literal[
+    errorType: Literal["flexStackerHopperLabwareFailed"] = (
         "flexStackerHopperLabwareFailed"
-    ] = "flexStackerHopperLabwareFailed"
+    )
 
     errorCode: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.detail
@@ -152,9 +152,9 @@ class FlexStackerLabwareRetrieveError(ErrorOccurrence):
     """Returned when the labware was not able to get to the shuttle."""
 
     isDefined: bool = True
-    errorType: Literal[
+    errorType: Literal["flexStackerLabwareRetrieveFailed"] = (
         "flexStackerLabwareRetrieveFailed"
-    ] = "flexStackerLabwareRetrieveFailed"
+    )
 
     errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
@@ -165,9 +165,9 @@ class FlexStackerLabwareStoreError(ErrorOccurrence):
     """Returned when the labware was not able to get to the shuttle."""
 
     isDefined: bool = True
-    errorType: Literal[
+    errorType: Literal["flexStackerLabwareStoreFailed"] = (
         "flexStackerLabwareStoreFailed"
-    ] = "flexStackerLabwareStoreFailed"
+    )
 
     errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
@@ -882,9 +882,9 @@ def build_retrieve_labware_move_updates(
         locations_for_ids[group.primaryLabwareId] = OnLabwareLocation(
             labwareId=group.adapterLabwareId
         )
-        assert (
-            stacker.pool_adapter_definition
-        ), "Mismatched pool and labware definitions"
+        assert stacker.pool_adapter_definition, (
+            "Mismatched pool and labware definitions"
+        )
         adapter_uri = state_view.labware.get_uri_from_definition(
             stacker.pool_adapter_definition
         )
@@ -909,9 +909,9 @@ def build_retrieve_labware_move_updates(
         )
 
     if group.lidLabwareId:
-        assert (
-            stacker.pool_lid_definition is not None
-        ), "Mismatched pool and stored labware"
+        assert stacker.pool_lid_definition is not None, (
+            "Mismatched pool and stored labware"
+        )
         lid_offset_location = _prepend_loc(
             [OnLabwareOffsetLocationSequenceComponent(labwareUri=primary_uri)],
             primary_offset_location,

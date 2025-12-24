@@ -1,4 +1,5 @@
-""" Utility functions and classes for the hardware controller"""
+"""Utility functions and classes for the hardware controller"""
+
 import asyncio
 import logging
 from enum import Enum
@@ -41,7 +42,6 @@ def plan_arc(
     dest_cp: Optional[CriticalPoint] = None,
     extra_waypoints: Optional[List[Tuple[float, float]]] = None,
 ) -> List[Tuple[Point, Optional[CriticalPoint]]]:
-
     assert z_height >= max(origin_point.z, dest_point.z)
     checked_wp = extra_waypoints or []
     return (

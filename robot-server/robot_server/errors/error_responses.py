@@ -1,4 +1,5 @@
 """JSON API errors and response models."""
+
 from pydantic import BaseModel, Field
 from typing import Any, Dict, Generic, Optional, Sequence, TypeVar, Type
 
@@ -87,8 +88,7 @@ class ErrorDetails(BaseErrorBody):
     detail: str = Field(
         ...,
         description=(
-            "A human-readable message describing this specific occurrence "
-            "of the error."
+            "A human-readable message describing this specific occurrence of the error."
         ),
     )
     source: Optional[ErrorSource] = Field(

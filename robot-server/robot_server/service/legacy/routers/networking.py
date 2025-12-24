@@ -107,9 +107,7 @@ def _massage_nmcli_error(error_string: str) -> str:
 @router.post(
     path="/wifi/configure",
     summary="Configure the robot's Wi-Fi",
-    description=(
-        "Configures the wireless network interface to " "connect to a network"
-    ),
+    description=("Configures the wireless network interface to connect to a network"),
     status_code=status.HTTP_201_CREATED,
     response_model=WifiConfigurationResponse,
     responses={
@@ -233,7 +231,7 @@ async def delete_wifi_key(
 @router.get(
     "/wifi/eap-options",
     summary="Get EAP options",
-    description="Get the supported EAP variants and their " "configuration parameters",
+    description="Get the supported EAP variants and their configuration parameters",
     response_model=EapOptions,
 )
 async def get_eap_options() -> EapOptions:
