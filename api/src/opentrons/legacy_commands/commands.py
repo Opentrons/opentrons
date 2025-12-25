@@ -265,7 +265,7 @@ def blow_out(
     instrument: InstrumentContext, location: Location, flow_rate: float
 ) -> command_types.BlowOutCommand:
     location_text = stringify_location(location)
-    text = f"Blowing out into {location_text} at flow rate {flow_rate}"
+    text = f"Blowing out into {location_text} at {flow_rate} uL/sec"
 
     return {
         "name": command_types.BLOW_OUT,
@@ -279,7 +279,7 @@ def blow_out_in_disposal_location(
     flow_rate: float,
 ) -> command_types.BlowOutInDisposalLocationCommand:
     location_text = stringify_disposal_location(location)
-    text = f"Blowing out into {location_text} at flow rate {flow_rate}"
+    text = f"Blowing out into {location_text} at {flow_rate} uL/sec"
 
     return {
         "name": command_types.BLOW_OUT_IN_DISPOSAL_LOCATION,

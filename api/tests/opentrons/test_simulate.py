@@ -123,7 +123,7 @@ def test_simulate_function_json(
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
         "Touching tip",
-        "Blowing out at B1 of Dest Plate on 3",
+        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
         "Moving to 5",
         "Dropping tip into A1 of Trash on 12",
     ]
