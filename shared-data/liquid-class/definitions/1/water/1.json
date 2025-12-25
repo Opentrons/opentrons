@@ -1127,7 +1127,7 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 318.0
+                  "flowRate": 80.0
                 }
               },
               "touchTip": {
@@ -5020,7 +5020,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[50.0,80]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
