@@ -100,6 +100,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
         location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[WellCoreType],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         """Blow liquid out of the tip.
 
@@ -107,6 +108,7 @@ class AbstractInstrument(ABC, Generic[WellCoreType, LabwareCoreType]):
             location: The location to blow out into.
             well_core: The well to blow out into.
             in_place: Whether this is in-place.
+            flow_rate: The absolute flow rate in µL/s.
         """
         ...
 

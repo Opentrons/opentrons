@@ -932,7 +932,9 @@ def test_blow_out_to_well(
         (WellLocation(origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)), False)
     )
 
-    subject.blow_out(location=location, well_core=well_core, in_place=False)
+    subject.blow_out(
+        location=location, well_core=well_core, in_place=False, flow_rate=123
+    )
 
     decoy.verify(
         pipette_movement_conflict.check_safe_for_pipette_movement(
@@ -952,7 +954,7 @@ def test_blow_out_to_well(
                 wellLocation=WellLocation(
                     origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
                 ),
-                flowRate=6.7,
+                flowRate=123,
             )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
@@ -968,7 +970,7 @@ def test_blow_to_coordinates(
     """It should move to coordinate and blow out in place."""
     location = Location(point=Point(1, 2, 3), labware=None)
 
-    subject.blow_out(location=location, well_core=None, in_place=False)
+    subject.blow_out(location=location, well_core=None, in_place=False, flow_rate=123)
 
     decoy.verify(
         mock_engine_client.execute_command(
@@ -983,7 +985,7 @@ def test_blow_to_coordinates(
         mock_engine_client.execute_command(
             cmd.BlowOutInPlaceParams(
                 pipetteId="abc123",
-                flowRate=6.7,
+                flowRate=123,
             )
         ),
         mock_protocol_core.set_last_location(location=location, mount=Mount.LEFT),
@@ -1002,13 +1004,14 @@ def test_blow_out_in_place(
         location=location,
         well_core=None,
         in_place=True,
+        flow_rate=123,
     )
 
     decoy.verify(
         mock_engine_client.execute_command(
             cmd.BlowOutInPlaceParams(
                 pipetteId="abc123",
-                flowRate=6.7,
+                flowRate=123,
             )
         ),
     )
@@ -1031,6 +1034,7 @@ def test_blow_out_to_trash_bin(
         location=mock_trash,
         well_core=None,
         in_place=False,
+        flow_rate=111,
     )
 
     decoy.verify(
@@ -1049,7 +1053,7 @@ def test_blow_out_to_trash_bin(
         mock_engine_client.execute_command(
             cmd.BlowOutInPlaceParams(
                 pipetteId="abc123",
-                flowRate=6.7,
+                flowRate=111,
             )
         ),
         mock_protocol_core.set_last_location(location=mock_trash, mount=Mount.LEFT),

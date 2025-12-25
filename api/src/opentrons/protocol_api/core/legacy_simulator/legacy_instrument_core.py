@@ -171,6 +171,7 @@ class LegacyInstrumentCoreSimulator(
         location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(

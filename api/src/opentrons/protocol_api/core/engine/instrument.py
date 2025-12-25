@@ -455,15 +455,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         location: Union[Location, TrashBin, WasteChute],
         well_core: Optional[WellCore],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         """Blow liquid out of the tip.
 
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
-            in_place: whether this is a in-place command.
+            in_place: Whether this is an in-place command.
+            flow_rate: The absolute flow rate in µL/s.
         """
-        flow_rate = self.get_blow_out_flow_rate(1.0)
         if well_core is None:
             if not in_place:
                 if isinstance(location, (TrashBin, WasteChute)):

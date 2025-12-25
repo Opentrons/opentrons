@@ -175,6 +175,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         """Blow liquid out of the tip.
 
@@ -182,6 +183,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             location: The location to blow out into.
             well_core: Unused by legacy core.
             in_place: Whether we should move_to location.
+            flow_rate: Not used in this core.
         """
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
