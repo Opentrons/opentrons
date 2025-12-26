@@ -1,0 +1,135 @@
+name: Weekly Security Audit
+
+on:
+  schedule:
+    # every monday at 6:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  # Needed for uploading SARIF to GitHub Code Scanning
+  security-events: write
+
+jobs:
+  # JOB 1: Run the scanners, upload SARIF, and upload artifacts
+  run-scanners:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 1. Setup pnpm environment
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+
+      # 2. Run pnpm audit (save as JSON)
+      - name: Run pnpm audit (JSON)
+        run: |
+          pnpm audit --json > pnpm-audit.json || true
+
+      # Run OSV-Scanner via Docker and save JSON results
+      - name: Run OSV-Scanner (JSON)
+        run: |
+          docker run --rm \
+            -v "$PWD":/src \
+            ghcr.io/google/osv-scanner:v2.3.0-amd64 \
+            scan source /src \
+              --recursive \
+              --format=json \
+              --output=/src/osv-results.json \
+          || true
+
+      # Run OSV-Scanner again to produce SARIF for GitHub Code Scanning
+      - name: Run OSV-Scanner (SARIF)
+        run: |
+          docker run --rm \
+            -v "$PWD":/src \
+            ghcr.io/google/osv-scanner:v2.3.0-amd64 \
+            scan source /src \
+              --recursive \
+              --format=sarif \
+              --output=/src/osv-results.sarif \
+          || true
+
+      # Upload SARIF to GitHub Code Scanning
+      - name: Upload OSV SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: osv-results.sarif
+
+      # Upload JSON results so the next job can access them for Discord
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-results
+          path: |
+            pnpm-audit.json
+            osv-results.json
+
+  # JOB 2: Download results and notify Discord
+  notify:
+    needs: run-scanners
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: security-results
+
+      - name: Notify Discord
+        if: always()
+        run: |
+          PNPM_ISSUES=""
+
+          # 3. Parse pnpm audit JSON
+          if [ -s pnpm-audit.json ]; then
+            # pnpm audit returns an "advisories" object. We map through it.
+            PNPM_ISSUES=$(jq -r '
+              .advisories
+              | to_entries[]
+              | .value
+              | "\(.module_name) (\(.severity))"
+            ' pnpm-audit.json | sort -u)
+          fi
+
+          OSV_ISSUES=""
+          if [ -s osv-results.json ]; then
+            OSV_ISSUES=$(jq -r '
+              .results[]
+              .packages[]
+              | select(.vulnerabilities | length > 0)
+              | "\(.Package.name)@\(.Package.version)"
+            ' osv-results.json | sort -u)
+          fi
+
+          if [ -z "$PNPM_ISSUES$OSV_ISSUES" ]; then
+            MESSAGE="✅ **No Issues Found**\nAll security checks passed."
+          else
+            MESSAGE="🚨 **Security Alert**\n\`\`\`\n"
+            if [ -n "$PNPM_ISSUES" ]; then
+              MESSAGE="$MESSAGE[pnpm audit]\n$PNPM_ISSUES\n\n"
+            fi
+            if [ -n "$OSV_ISSUES" ]; then
+              MESSAGE="$MESSAGE[osv-scanner]\n$OSV_ISSUES\n"
+            fi
+            MESSAGE="$MESSAGE\`\`\`"
+          fi
+
+          FORMATTED_MESSAGE=$(printf "%b" "$MESSAGE")
+          PAYLOAD=$(jq -n --arg content "$FORMATTED_MESSAGE" '{content:$content}')
+
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "$PAYLOAD" \
+            "$SLACK_WEBHOOK_URL"
