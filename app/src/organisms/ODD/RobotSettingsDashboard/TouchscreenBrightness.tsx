@@ -26,16 +26,18 @@ import {
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
+const BRIGHTNESS_LEVELS = [6, 5, 4, 3, 2, 1] as const
+
 interface BrightnessTileProps {
-  isActive: boolean
+  $isActive: boolean // transient props to avoid warning
 }
 
-const BrightnessTile = styled(Box)`
+const BrightnessTile = styled(Box) <BrightnessTileProps>`
   width: 100%;
   height: 8.75rem;
   border-radius: ${BORDERS.borderRadius8};
-  background: ${(props: BrightnessTileProps) =>
-    props.isActive ? COLORS.blue50 : COLORS.blue35};
+  background: ${({ $isActive }) =>
+    $isActive === true ? COLORS.blue50 : COLORS.blue35};
 `
 
 // Note The actual brightness is Bright 1 <---> 6 Dark which is opposite to the UI
@@ -53,9 +55,15 @@ export function TouchscreenBrightness({
 }: TouchscreenBrightnessProps): JSX.Element {
   const { t } = useTranslation(['device_settings'])
   const dispatch = useDispatch<Dispatch>()
-  const initialBrightness = useSelector(getOnDeviceDisplaySettings).brightness
+  const initialBrightnessRawValue = useSelector(
+    getOnDeviceDisplaySettings
+  ).brightness
+  const initialBrightness = clamp(
+    initialBrightnessRawValue,
+    HIGHEST_BRIGHTNESS,
+    LOWEST_BRIGHTNESS
+  )
   const [brightness, setBrightness] = useState<number>(initialBrightness)
-  const brightnessLevel = [6, 5, 4, 3, 2, 1]
 
   const handleClick = (changeType: 'up' | 'down'): void => {
     const step = changeType === 'up' ? -1 : 1
@@ -100,10 +108,10 @@ export function TouchscreenBrightness({
           gridGap={SPACING.spacing8}
           width="43.5rem"
         >
-          {brightnessLevel.map(level => (
+          {BRIGHTNESS_LEVELS.map(level => (
             <BrightnessTile
               key={`brightness_level_${level}`}
-              isActive={brightness <= level}
+              $isActive={brightness <= level}
             />
           ))}
         </Flex>
