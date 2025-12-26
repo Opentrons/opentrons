@@ -88,8 +88,7 @@ export function DraggableSidebar({
   )
 }
 
-const SidebarContainer = styled(Box)`
-  display: ${DISPLAY_FLEX};
+const SidebarContainer = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   border-right: 1px solid #ccc;
   position: relative;
@@ -105,7 +104,7 @@ interface SidebarResizerProps {
   dragging: boolean
 }
 
-const SidebarResizer = styled(Flex)<SidebarResizerProps>`
+const SidebarResizer = styled(Flex) <SidebarResizerProps>`
   user-select: none;
   width: 2px;
   cursor: ew-resize;
