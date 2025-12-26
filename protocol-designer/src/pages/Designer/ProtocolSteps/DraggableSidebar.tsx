@@ -2,10 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import {
-  Box,
   COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
