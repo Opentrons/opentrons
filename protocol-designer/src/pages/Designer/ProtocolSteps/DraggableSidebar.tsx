@@ -104,7 +104,7 @@ interface SidebarResizerProps {
   dragging: boolean
 }
 
-const SidebarResizer = styled(Flex) <SidebarResizerProps>`
+const SidebarResizer = styled(Flex)<SidebarResizerProps>`
   user-select: none;
   width: 2px;
   cursor: ew-resize;
