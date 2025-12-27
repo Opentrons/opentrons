@@ -26,7 +26,7 @@ import {
 import type { Dispatch } from '/app/redux/types'
 import type { SetSettingOption } from './types'
 
-const BRIGHTNESS_LEVELS = [1, 2, 3, 4, 5, 6] as const
+const BRIGHTNESS_LEVELS = [6, 5, 4, 3, 2, 1] as const
 
 interface BrightnessTileProps {
   $isActive: boolean // transient props to avoid warning
@@ -40,11 +40,11 @@ const BrightnessTile = styled(Box) <BrightnessTileProps>`
     $isActive === true ? COLORS.blue50 : COLORS.blue35};
 `
 
-// Note The actual brightness is Bright 6 <---> 1 Dark which is opposite to the UI
+// Note The actual brightness is Bright 1 <---> 6 Dark which is opposite to the UI
 // For UI Bright 6 <--> 1 Dark
 // If the brightness 7 or more | 0, the display will be blackout
-const LOWEST_BRIGHTNESS = 1
-const HIGHEST_BRIGHTNESS = 6
+const LOWEST_BRIGHTNESS = 6
+const HIGHEST_BRIGHTNESS = 1
 
 interface TouchscreenBrightnessProps {
   setCurrentOption: SetSettingOption
