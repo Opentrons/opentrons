@@ -60,8 +60,8 @@ export function TouchscreenBrightness({
   ).brightness
   const initialBrightness = clamp(
     initialBrightnessRawValue,
-    HIGHEST_BRIGHTNESS,
-    LOWEST_BRIGHTNESS
+    LOWEST_BRIGHTNESS,
+    HIGHEST_BRIGHTNESS
   )
   const [brightness, setBrightness] = useState<number>(initialBrightness)
 
