@@ -111,7 +111,7 @@ export function TouchscreenBrightness({
           {BRIGHTNESS_LEVELS.map(level => (
             <BrightnessTile
               key={`brightness_level_${level}`}
-              $isActive={brightness <= level}
+              $isActive={brightness >= level}
             />
           ))}
         </Flex>
