@@ -69,8 +69,8 @@ export function TouchscreenBrightness({
     const step = changeType === 'up' ? 1 : -1
     const nextBrightness = clamp(
       brightness + step,
-      HIGHEST_BRIGHTNESS,
-      LOWEST_BRIGHTNESS
+      LOWEST_BRIGHTNESS,
+      HIGHEST_BRIGHTNESS
     )
     dispatch(
       updateConfigValue('onDeviceDisplaySettings.brightness', nextBrightness)
