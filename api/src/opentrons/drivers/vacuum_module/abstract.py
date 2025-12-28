@@ -49,10 +49,10 @@ class AbstractVacuumModuleDriver(Protocol):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float],
-        duration: Optional[int],
-        rate: Optional[float],
-        vent_after: Optional[bool],
+        guage_pressure_mbar: Optional[float] = None,
+        duration: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
         ...
@@ -64,8 +64,8 @@ class AbstractVacuumModuleDriver(Protocol):
     async def set_pump_state(
         self,
         start_pump: bool,
-        target_rpm: Optional[int],
-        duty_cycle: Optional[int],
+        target_rpm: Optional[int] = None,
+        duty_cycle: Optional[int] = None,
     ) -> None:
         """Start or the stop the pump at a given rpm or duty cycle."""
         ...

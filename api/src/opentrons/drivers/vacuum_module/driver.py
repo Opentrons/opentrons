@@ -33,7 +33,7 @@ MAX_REPS = 10
 MAX_PUMP_RPM = 3500
 MAX_PUMP_DUTY = 90
 MAX_RAMP_RATE = 10.0  # mbar/s
-MAX_PRESSURE_MBAR = 1013.25
+MAX_PRESSURE_MBAR = -1013.25
 
 
 class VacuumModuleDriver(AbstractVacuumModuleDriver):
@@ -75,14 +75,14 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("A")),
             float(match.group("B")),
             float(match.group("H")),
-            bool(match.group("E")),
+            bool(int(match.group("E"))),
             VentState(int(match.group("V"))),
         )
 
     @classmethod
     def parse_get_pump_state(cls, response: str) -> PumpState:
         """Parse the get pump state."""
-        pattern = r"T:(?P<T>\d.+) R:(?P<R>\d.+) A:(?P<A>\d) D:(?P<D>\d) E:(?P<E>\d) M:(?P<M>\d)"
+        pattern = r"T:(?P<T>\d.+) R:(?P<R>\d.+) A:(?P<A>\d+) D:(?P<D>\d+) E:(?P<E>\d) M:(?P<M>\d)"
         _RE = re.compile(rf"^{GCODE.GET_PUMP_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -92,8 +92,8 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
             float(match.group("R")),
             int(match.group("A")),
             int(match.group("D")),
-            bool(match.group("E")),
-            bool(match.group("M")),
+            bool(int(match.group("E"))),
+            bool(int(match.group("M"))),
         )
 
     @classmethod
@@ -212,10 +212,10 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def set_vacuum_state(
         self,
         enable_vacuum: bool,
-        guage_pressure_mbar: Optional[float],
-        duration: Optional[int],
-        rate: Optional[float],
-        vent_after: Optional[bool],
+        guage_pressure_mbar: Optional[float] = None,
+        duration: Optional[int] = None,
+        rate: Optional[float] = None,
+        vent_after: Optional[bool] = None,
     ) -> None:
         """Engage or release the vacuum until a desired internal pressure is reached."""
 
@@ -226,15 +226,16 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if guage_pressure_mbar is not None:
             command.add_float(
                 "P",
-                max(0, min(guage_pressure_mbar, MAX_PRESSURE_MBAR)),
+                min(max(guage_pressure_mbar, MAX_PRESSURE_MBAR), 0),
                 GCODE_ROUNDING_PRECISION,
             )
         if duration is not None:
             command.add_int("D", duration)
         if rate is not None:
             command.add_float("R", max(0, min(rate, MAX_RAMP_RATE)))
-        if vent_after:
-            command.add_element("V")
+        if vent_after is not None:
+            command.add_int("V", int(vent_after))
+
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_PRESSURE_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pressure state: {resp}")
@@ -249,8 +250,8 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     async def set_pump_state(
         self,
         start_pump: bool,
-        target_rpm: Optional[int],
-        duty_cycle: Optional[int],
+        target_rpm: Optional[int] = None,
+        duty_cycle: Optional[int] = None,
     ) -> None:
         """Start or the stop the pump at a given rpm or duty cycle."""
         if target_rpm and duty_cycle:
@@ -262,7 +263,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if target_rpm is not None:
             command.add_int("R", max(0, min(target_rpm, MAX_PUMP_RPM)))
         if duty_cycle is not None:
-            command.add_float("D", max(0, min(duty_cycle, MAX_PUMP_DUTY)))
+            command.add_int("D", max(0, min(duty_cycle, MAX_PUMP_DUTY)))
         resp = await self._connection.send_command(command)
         if not re.match(rf"^{GCODE.SET_PUMP_STATE}$", resp):
             raise ValueError(f"Incorrect Response for set pump state: {resp}")
