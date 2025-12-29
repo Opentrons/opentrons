@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import clsx from 'clsx'
@@ -63,7 +63,11 @@ export function InputPrompt(): JSX.Element {
   const { data, isLoading, callApi, error } = useApiCall()
 
   const pdProtocolContent = useMemo(() => {
-    if (data != null && typeof data === 'object' && 'protocol_content' in data) {
+    if (
+      data != null &&
+      typeof data === 'object' &&
+      'protocol_content' in data
+    ) {
       return data.protocol_content as ProtocolFile
     }
     return null

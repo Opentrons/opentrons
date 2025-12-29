@@ -6,7 +6,6 @@
 //   setUserPrompt: (v: string) => void
 // }
 
-
 // type UseInputPromptControllerResult = {
 //   submitChat: () => void
 //   submitCreateOrUpdate: () => void
