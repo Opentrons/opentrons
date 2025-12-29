@@ -79,14 +79,14 @@ describe('InputPrompt', () => {
   it('should show error message when errorMessage is provided', async () => {
     const { useInputPromptController } =
       await import('/ai-client/resources/hooks')
-      ; (useInputPromptController as any).mockImplementation(() => ({
-        submitChat: mockSubmitChat,
-        isLoading: false,
-        errorMessage: 'Something went wrong',
-        attachedFiles: [],
-        handleFileSelect: mockHandleFileSelect,
-        handleRemoveFile: mockHandleRemoveFile,
-      }))
+    ;(useInputPromptController as any).mockImplementation(() => ({
+      submitChat: mockSubmitChat,
+      isLoading: false,
+      errorMessage: 'Something went wrong',
+      attachedFiles: [],
+      handleFileSelect: mockHandleFileSelect,
+      handleRemoveFile: mockHandleRemoveFile,
+    }))
 
     render()
     expect(screen.getByText('Something went wrong')).toBeInTheDocument()
@@ -95,16 +95,16 @@ describe('InputPrompt', () => {
   it('should render attached files when provided by controller', async () => {
     const { useInputPromptController } =
       await import('/ai-client/resources/hooks')
-      ; (useInputPromptController as any).mockImplementation(() => ({
-        submitChat: mockSubmitChat,
-        isLoading: false,
-        errorMessage: null,
-        attachedFiles: [
-          new File(['hello'], 'example.txt', { type: 'text/plain' }),
-        ],
-        handleFileSelect: mockHandleFileSelect,
-        handleRemoveFile: mockHandleRemoveFile,
-      }))
+    ;(useInputPromptController as any).mockImplementation(() => ({
+      submitChat: mockSubmitChat,
+      isLoading: false,
+      errorMessage: null,
+      attachedFiles: [
+        new File(['hello'], 'example.txt', { type: 'text/plain' }),
+      ],
+      handleFileSelect: mockHandleFileSelect,
+      handleRemoveFile: mockHandleRemoveFile,
+    }))
 
     render()
     expect(screen.getByText('example.txt')).toBeInTheDocument()
@@ -113,14 +113,14 @@ describe('InputPrompt', () => {
   it('should disable attach button when loading', async () => {
     const { useInputPromptController } =
       await import('/ai-client/resources/hooks')
-      ; (useInputPromptController as any).mockImplementation(() => ({
-        submitChat: mockSubmitChat,
-        isLoading: true,
-        errorMessage: null,
-        attachedFiles: [],
-        handleFileSelect: mockHandleFileSelect,
-        handleRemoveFile: mockHandleRemoveFile,
-      }))
+    ;(useInputPromptController as any).mockImplementation(() => ({
+      submitChat: mockSubmitChat,
+      isLoading: true,
+      errorMessage: null,
+      attachedFiles: [],
+      handleFileSelect: mockHandleFileSelect,
+      handleRemoveFile: mockHandleRemoveFile,
+    }))
 
     render()
     const attachButton = screen.getByRole('button', { name: /attach/i })
