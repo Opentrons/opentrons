@@ -44,6 +44,7 @@ class ModuleModel(StrEnum):
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
     ABSORBANCE_READER_V1 = "absorbanceReaderV1"
     FLEX_STACKER_MODULE_V1 = "flexStackerModuleV1"
+    VACUUM_MODULE_V1 = "VacuumModuleV1"
 
     @classmethod
     def from_hardware(cls, hardware_model: HardwareModuleModel) -> "ModuleModel":
@@ -66,6 +67,8 @@ class ModuleModel(StrEnum):
             return ModuleType.ABSORBANCE_READER
         elif ModuleModel.is_flex_stacker(self):
             return ModuleType.FLEX_STACKER
+        elif ModuleModel.is_vacuum_module(self):
+            return ModuleType.VACUUM_MODULE
 
         assert False, f"Invalid ModuleModel {self}"
 
@@ -114,6 +117,11 @@ class ModuleModel(StrEnum):
         """Whether a given model is a Flex Stacker.."""
         return model == cls.FLEX_STACKER_MODULE_V1
 
+    @classmethod
+    def is_vacuum_module(cls, model: ModuleModel) -> TypeGuard[VacuumModuleModel]:
+        """Whether a given model is a Vacuum Module."""
+        return model == cls.VACUUM_MODULE_V1
+
 
 TemperatureModuleModel = Literal[
     ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2
@@ -128,6 +136,7 @@ HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
 AbsorbanceReaderModel = Literal[ModuleModel.ABSORBANCE_READER_V1]
 FlexStackerModuleModel = Literal[ModuleModel.FLEX_STACKER_MODULE_V1]
+VacuumModuleModel = Literal[ModuleModel.VACUUM_MODULE_V1]
 
 
 class ModuleDimensions(BaseModel):
