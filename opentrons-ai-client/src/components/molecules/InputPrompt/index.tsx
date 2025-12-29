@@ -21,9 +21,8 @@ export function InputPrompt(): JSX.Element {
   const {
     submitChat,
     isLoading,
-    error,
+    errorMessage,
     attachedFiles,
-    fileError,
     handleFileSelect,
     handleRemoveFile,
   } = useInputPromptController({
@@ -35,16 +34,6 @@ export function InputPrompt(): JSX.Element {
       setValue('userPrompt', v)
     },
   })
-
-  const errorMessage: string | null =
-    fileError ??
-    (typeof error === 'string'
-      ? error
-      : error instanceof Error
-        ? error.message
-        : error != null
-          ? String(error)
-          : null)
 
   return (
     <form id="User_Prompt" className={styles.form}>

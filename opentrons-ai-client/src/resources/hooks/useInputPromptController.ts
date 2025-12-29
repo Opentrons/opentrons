@@ -37,9 +37,8 @@ interface UseInputPromptControllerArgs {
 interface UseInputPromptControllerResult {
   submitChat: () => void
   isLoading: boolean
-  error: unknown
+  errorMessage: string | null
   attachedFiles: File[]
-  fileError: string | null
   handleFileSelect: (files: FileList | null) => void
   handleRemoveFile: (index: number) => void
 }
@@ -270,15 +269,23 @@ export function useInputPromptController(
     setChatHistory,
   ])
 
+  const errorMessage: string | null =
+    fileError ??
+    (typeof error === 'string'
+      ? error
+      : error instanceof Error
+        ? error.message
+        : error != null
+          ? String(error)
+          : null)
+
   return {
     submitChat: () => {
       void handleClick(false, false)
     },
     isLoading,
-    error,
+    errorMessage,
     attachedFiles,
-    fileError,
-    // handleFileSelect,
     handleFileSelect: (files: FileList | null) => {
       if (files == null) return
       handleFileSelectRaw(files)
