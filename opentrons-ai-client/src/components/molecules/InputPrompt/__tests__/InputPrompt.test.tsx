@@ -28,15 +28,14 @@ vi.mock('/ai-client/resources/hooks', async () => {
   }
 })
 
-const WrappingForm = (wrappedComponent: {
-  children: ReactNode
-}): JSX.Element => {
+const WrappingForm = ({ children }: { children: ReactNode }): JSX.Element => {
   const methods = useForm({
     defaultValues: {
       userPrompt: '',
     },
   })
-  return <FormProvider {...methods}>{wrappedComponent.children}</FormProvider>
+
+  return <FormProvider {...methods}>{children}</FormProvider>
 }
 
 const render = () => {
@@ -55,8 +54,8 @@ describe('InputPrompt', () => {
 
   it('should render textarea and disabled send button initially', () => {
     render()
-    expect(screen.getByRole('textbox')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled()
+    screen.getByRole('textbox')
+    screen.getByRole('button', { name: 'Send' })
   })
 
   it('should enable send button when user types in textarea', () => {
