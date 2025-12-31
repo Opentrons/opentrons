@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 
 import {
   DIRECTION_COLUMN,
@@ -13,8 +14,8 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { formatTime } from '/protocol-designer/pages/Designer/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import {
   getAdditionalEquipmentEntities,
@@ -130,8 +131,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_position"
               tagText={t(
-                `protocol_steps:thermocycler_module.lid_position.${
-                  lidOpen ? 'open' : 'closed'
+                `protocol_steps:thermocycler_module.lid_position.${lidOpen ? 'open' : 'closed'
                 }`
               )}
             />
@@ -157,8 +157,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.lid_position"
               tagText={t(
-                `protocol_steps:thermocycler_module.lid_position.${
-                  lidOpenHold ? 'open' : 'closed'
+                `protocol_steps:thermocycler_module.lid_position.${lidOpenHold ? 'open' : 'closed'
                 }`
               )}
             />
@@ -304,8 +303,8 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             tagText={
               targetHeaterShakerTemperature
                 ? `${targetHeaterShakerTemperature}${t(
-                    'application:units.degrees'
-                  )}`
+                  'application:units.degrees'
+                )}`
                 : t('protocol_steps:heater_shaker.active.ambient')
             }
           />
@@ -374,7 +373,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           <Flex padding={SPACING.spacing12}>
             <StyledText
               desktopStyle="bodyDefaultRegular"
-              css={LINE_CLAMP_TEXT_STYLE(3)}
+              className={clsx(
+                lineClampStyles.lineClamp,
+                lineClampStyles.wordBreakAll
+              )}
+              style={{ WebkitLineClamp: 3 }}
             >
               {stepDetails}
             </StyledText>

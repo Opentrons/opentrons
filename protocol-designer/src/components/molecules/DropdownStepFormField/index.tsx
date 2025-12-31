@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -8,13 +9,13 @@ import {
   DIRECTION_COLUMN,
   DropdownMenu,
   Flex,
-  LINE_CLAMP_TEXT_STYLE,
   ListItem,
   RobotInfoLabel,
   SPACING,
   StyledText,
 } from '@opentrons/components'
 
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import { selectDropdownItem } from '/protocol-designer/ui/steps/actions/actions'
 
 import type { DropdownOption, MenuPlacement } from '@opentrons/components'
@@ -96,8 +97,8 @@ export function DropdownStepFormField(
       {/* NOTE: we should not run into value == null when length === 1, but this
       just some extra error protection so users can't stuck where they can't select a value */}
       {options.length > 1 ||
-      options.length === 0 ||
-      (value == null && options.length === 1) ? (
+        options.length === 0 ||
+        (value == null && options.length === 1) ? (
         <DropdownMenu
           tooltipText={tooltipContent != null ? t(`${tooltipContent}`) : null}
           width={width}
@@ -144,7 +145,11 @@ export function DropdownStepFormField(
                 {options[0].name !== options[0].deckLabel ? (
                   <StyledText
                     desktopStyle="captionRegular"
-                    css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                    className={clsx(
+                      lineClampStyles.lineClamp,
+                      lineClampStyles.wordNormal
+                    )}
+                    style={{ WebkitLineClamp: 3 }}
                   >
                     {options[0].name}
                   </StyledText>

@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 import sum from 'lodash/sum'
 
 import {
@@ -27,12 +28,10 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import {
-  HandleEnter,
-  LINE_CLAMP_TEXT_STYLE,
-} from '/protocol-designer/components/atoms'
+import { HandleEnter } from '/protocol-designer/components/atoms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { getMainPagePortalEl } from '../Portal'
 
@@ -89,26 +88,26 @@ export function MaterialsListModal({
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               {fixtures.length > 0
                 ? fixtures.map(fixture => (
-                    <ListItem type="default" key={fixture.id}>
-                      <ListItemDescriptor
-                        type="large"
-                        description={
-                          <Flex minWidth="13.75rem">
-                            <RobotInfoLabel
-                              deckLabel={fixture.location.replace('cutout', '')}
-                            />
-                          </Flex>
-                        }
-                        content={
-                          <Flex alignItems={ALIGN_CENTER}>
-                            <StyledText desktopStyle="bodyDefaultRegular">
-                              {t(`shared:${fixture.name}`)}
-                            </StyledText>
-                          </Flex>
-                        }
-                      />
-                    </ListItem>
-                  ))
+                  <ListItem type="default" key={fixture.id}>
+                    <ListItemDescriptor
+                      type="large"
+                      description={
+                        <Flex minWidth="13.75rem">
+                          <RobotInfoLabel
+                            deckLabel={fixture.location.replace('cutout', '')}
+                          />
+                        </Flex>
+                      }
+                      content={
+                        <Flex alignItems={ALIGN_CENTER}>
+                          <StyledText desktopStyle="bodyDefaultRegular">
+                            {t(`shared:${fixture.name}`)}
+                          </StyledText>
+                        </Flex>
+                      }
+                    />
+                  </ListItem>
+                ))
                 : null}
               {hardware.length > 0 ? (
                 hardware.map((hw, id) => {
@@ -241,7 +240,11 @@ export function MaterialsListModal({
                                 <LiquidIcon color={liquid.displayColor ?? ''} />
                                 <StyledText
                                   desktopStyle="bodyDefaultRegular"
-                                  css={LINE_CLAMP_TEXT_STYLE(3)}
+                                  className={clsx(
+                                    lineClampStyles.lineClamp,
+                                    lineClampStyles.wordBreakAll
+                                  )}
+                                  style={{ WebkitLineClamp: 3 }}
                                 >
                                   {liquid.displayName ?? t('n/a')}
                                 </StyledText>

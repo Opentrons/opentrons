@@ -3,6 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { clsx } from 'clsx'
 import * as Yup from 'yup'
 
 import {
@@ -31,13 +32,13 @@ import { swatchColors } from '@opentrons/step-generation'
 
 import {
   HandleEnter,
-  LINE_CLAMP_TEXT_STYLE,
   LINK_BUTTON_STYLE,
 } from '/protocol-designer/components/atoms'
 import { TextAreaField } from '/protocol-designer/components/molecules'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
@@ -189,7 +190,11 @@ export function DefineLiquidsModal(
               <LiquidIcon color={initialValues.displayColor} />
               <StyledText
                 desktopStyle="bodyLargeSemiBold"
-                css={LINE_CLAMP_TEXT_STYLE(1)}
+                className={clsx(
+                  lineClampStyles.lineClamp,
+                  lineClampStyles.wordBreakAll
+                )}
+                style={{ WebkitLineClamp: 1 }}
               >
                 {initialValues.displayName}
               </StyledText>

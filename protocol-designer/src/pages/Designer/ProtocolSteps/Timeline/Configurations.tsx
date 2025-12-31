@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { clsx } from 'clsx'
 
 import {
   DIRECTION_COLUMN,
@@ -8,8 +9,8 @@ import {
   StyledText,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { HardwareStep } from './HardwareStep'
 
@@ -34,7 +35,11 @@ export function Configurations({
       >
         <StyledText
           desktopStyle="bodyDefaultSemiBold"
-          css={LINE_CLAMP_TEXT_STYLE(1)}
+          className={clsx(
+            lineClampStyles.lineClamp,
+            lineClampStyles.wordBreakAll
+          )}
+          style={{ WebkitLineClamp: 1 }}
         >
           {t('configuration')}
         </StyledText>

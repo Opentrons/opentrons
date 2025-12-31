@@ -1,0 +1,15 @@
+.lineClamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+}
+
+.wordNormal {
+  word-break: normal;
+}
+
+.wordBreakAll {
+  word-break: break-all;
+}

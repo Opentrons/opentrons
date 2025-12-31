@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -26,8 +27,8 @@ import {
   getIsSlotAHopper,
 } from '@opentrons/step-generation'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
@@ -92,7 +93,11 @@ export const SlotInformation: FC<SlotInformationProps> = ({
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   textAlign={TYPOGRAPHY.textAlignRight}
-                  css={LINE_CLAMP_TEXT_STYLE(2, true)}
+                  className={clsx(
+                    lineClampStyles.lineClamp,
+                    lineClampStyles.wordNormal
+                  )}
+                  style={{ WebkitLineClamp: 2 }}
                 >
                   {liquids.join(', ')}
                 </StyledText>
@@ -183,7 +188,11 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
                 ? TYPOGRAPHY.textAlignLeft
                 : TYPOGRAPHY.textAlignRight
             }
-            css={LINE_CLAMP_TEXT_STYLE(3, true)}
+            className={clsx(
+              lineClampStyles.lineClamp,
+              lineClampStyles.wordNormal
+            )}
+            style={{ WebkitLineClamp: 3 }}
           >
             {stackInformation ?? t('none')}
           </StyledText>
