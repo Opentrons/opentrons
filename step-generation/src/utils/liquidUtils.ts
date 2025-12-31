@@ -50,7 +50,11 @@ export const _wellContentsForLabware = (
         ...wellAcc,
         [well]: wellHasContents
           ? _wellContentsForWell(labwareLiquids[well], well)
-          : {},
+          : {
+              wellName: well,
+              groupIds: [],
+              ingreds: {},
+            },
       }
     },
     {}

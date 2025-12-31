@@ -166,7 +166,7 @@ const PROTOCOL_ANALYSIS = {
   runTimeParameters: mockRTPData,
 } as any
 describe.only('useMissingProtocolHardware', () => {
-  let wrapper: FunctionComponent<{ children: ReactNode }>
+  let wrapper: FunctionComponent<{ children: ReactNode }> | undefined
   beforeEach(() => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: { data: [] },

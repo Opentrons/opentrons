@@ -153,7 +153,7 @@ export const fetchProtocols = (
           ),
           srcFiles: storedProtocolDir.srcFilePaths.map(srcFilePath => {
             const buffer = fse.readFileSync(srcFilePath)
-            return Buffer.from(buffer, buffer.byteOffset, buffer.byteLength)
+            return buffer
           }),
           mostRecentAnalysis,
         }

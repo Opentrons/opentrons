@@ -427,13 +427,13 @@ export const getCalibrationAdapterLoadName = (
   }
 }
 
+const typedOt2DeckDef = standardOt2DeckDef as unknown as DeckDefinition
+const typedFlexDeckDef = standardFlexDeckDef as unknown as DeckDefinition
+
 export const getDeckDefFromRobotType = (
   robotType: RobotType
 ): DeckDefinition => {
-  // @ts-expect-error imported JSON not playing nice with TS. see https://github.com/microsoft/TypeScript/issues/32063
-  return robotType === 'OT-3 Standard'
-    ? standardFlexDeckDef
-    : standardOt2DeckDef
+  return robotType === 'OT-3 Standard' ? typedFlexDeckDef : typedOt2DeckDef
 }
 
 export const getCutoutIdFromAddressableArea = (

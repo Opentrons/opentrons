@@ -21,7 +21,7 @@ describe('useAttachedPipettesFromInstrumentsQuery hook', () => {
     vi.mocked(useIsOEMMode).mockReturnValue(false)
   })
 
-  let wrapper: FunctionComponent<{ children: ReactNode }>
+  let wrapper: FunctionComponent<{ children: ReactNode }> | undefined
   it('returns attached pipettes', () => {
     vi.mocked(useInstrumentsQuery).mockReturnValue({
       data: {

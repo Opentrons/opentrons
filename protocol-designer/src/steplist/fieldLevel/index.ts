@@ -461,7 +461,9 @@ export function castField<
     // name that it doesn't necessarily contain. It's OK here because it'll just
     // return undefined in the worst case, which this line handles.
     stepFieldHelperMap[name] && stepFieldHelperMap[name].castValue
-  return fieldCaster ? fieldCaster(value) : value
+  return fieldCaster
+    ? fieldCaster(value)
+    : (value as GetCastFieldType<FieldNameT>)
 }
 
 export const maskField = (name: StepFieldName, value: unknown): unknown => {

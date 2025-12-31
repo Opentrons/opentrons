@@ -13,7 +13,7 @@ import type { Modules } from '@opentrons/api-client'
 vi.mock('@opentrons/react-api-client')
 
 describe('useAttachedModules hook', () => {
-  let wrapper: FunctionComponent<{ children: ReactNode }>
+  let wrapper: FunctionComponent<{ children: ReactNode }> | undefined
 
   it('returns attached modules', () => {
     vi.mocked(useModulesQuery).mockReturnValue({

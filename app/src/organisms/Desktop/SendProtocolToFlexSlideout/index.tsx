@@ -78,7 +78,10 @@ export function SendProtocolToFlexSlideout(
 
   const srcFileObjects = srcFiles.map((srcFileBuffer, index) => {
     const srcFilePath = srcFileNames[index]
-    return new File([srcFileBuffer], _getFileBaseName(srcFilePath))
+    return new File(
+      [new Uint8Array(srcFileBuffer)],
+      _getFileBaseName(srcFilePath)
+    )
   })
 
   const protocolDisplayName = getProtocolDisplayName(

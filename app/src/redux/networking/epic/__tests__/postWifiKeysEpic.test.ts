@@ -8,7 +8,7 @@ import * as Actions from '../../actions'
 
 import type { Action } from '../../../types'
 
-const keyFile = new File([Buffer.from('contents')], 'key.crt')
+const keyFile = new File([new Uint8Array(Buffer.from('contents'))], 'key.crt')
 const makeTriggerAction = (robotName: string) =>
   Actions.postWifiKeys(robotName, keyFile)
 

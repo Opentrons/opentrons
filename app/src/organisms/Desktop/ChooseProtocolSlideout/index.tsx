@@ -182,7 +182,10 @@ export function ChooseProtocolSlideoutComponent(
     selectedProtocol != null
       ? selectedProtocol.srcFiles.map((srcFileBuffer, index) => {
           const srcFilePath = selectedProtocol.srcFileNames[index]
-          return new File([srcFileBuffer], _getFileBaseName(srcFilePath))
+          return new File(
+            [new Uint8Array(srcFileBuffer)],
+            _getFileBaseName(srcFilePath)
+          )
         })
       : []
 

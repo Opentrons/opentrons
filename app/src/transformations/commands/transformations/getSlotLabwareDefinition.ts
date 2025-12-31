@@ -3,7 +3,7 @@ import type { LabwareDefinition, RunTimeCommand } from '@opentrons/shared-data'
 export function getSlotLabwareDefinition(
   labwareId: string,
   commands?: RunTimeCommand[]
-): LabwareDefinition {
+): LabwareDefinition | null {
   const loadLabwareCommands = commands?.filter(
     command => command.commandType === 'loadLabware'
   )
@@ -11,5 +11,5 @@ export function getSlotLabwareDefinition(
     command => command.result?.labwareId === labwareId
   )
 
-  return loadLabwareCommand?.result?.definition
+  return loadLabwareCommand?.result?.definition ?? null
 }

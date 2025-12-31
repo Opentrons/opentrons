@@ -8,7 +8,6 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
-  SIZE_1,
   SPACING,
 } from '@opentrons/components'
 
@@ -62,9 +61,9 @@ export function Collapsible({
           <LegacyStyledText forwardedAs="h5">{title}</LegacyStyledText>
         </Flex>
         <Icon
-          size={SIZE_1}
+          size="1rem"
           name={expanded ? collapse : expand}
-          aria-label={`expandedIcon` ?? 'plus'}
+          aria-label={expandedIcon != null ? 'expandedIcon' : 'plus'}
         />
       </Flex>
       <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>

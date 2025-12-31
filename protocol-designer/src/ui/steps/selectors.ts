@@ -329,7 +329,6 @@ export const getCountPerStepType = createSelector(
     const steps = stepIds.map(id => allSteps[id])
     const countPerStepType = steps.reduce<CountPerStepType>((acc, step) => {
       const { stepType } = step
-      // @ts-expect-error(sa, 2021-6-15): cannot type narrow this way in TS
       const newCount = acc[stepType] ? acc[stepType] + 1 : 1
       acc[stepType] = newCount
       return acc

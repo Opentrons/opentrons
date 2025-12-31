@@ -20,7 +20,7 @@ vi.mock('@opentrons/react-api-client')
 vi.mock('@opentrons/shared-data')
 
 describe('useAttachedPipettes hook', () => {
-  let wrapper: FunctionComponent<{ children: ReactNode }>
+  let wrapper: FunctionComponent<{ children: ReactNode }> | undefined
   beforeEach(() => {
     vi.mocked(getPipetteModelSpecs).mockReturnValue({
       name: 'mockName',
