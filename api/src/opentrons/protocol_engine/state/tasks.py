@@ -1,4 +1,5 @@
 """Task state tracking."""
+
 from dataclasses import dataclass
 from itertools import chain
 from typing import Iterable

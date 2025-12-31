@@ -220,6 +220,7 @@ class ProtocolEngine:
         Arguments:
             request: The command type and payload data used to construct
                 the command in state.
+            failed_command_id: If this is a FIXIT command, the ID this is fixing.
 
         Returns:
             The full, newly queued command.

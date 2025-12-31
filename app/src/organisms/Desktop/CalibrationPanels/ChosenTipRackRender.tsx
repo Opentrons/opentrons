@@ -44,7 +44,7 @@ export function ChosenTipRackRender(
         alt={`${String(displayName)} image`}
       />
       <Box>
-        <LegacyStyledText as="p" marginLeft={SPACING.spacing16}>
+        <LegacyStyledText forwardedAs="p" marginLeft={SPACING.spacing16}>
           {displayName}
         </LegacyStyledText>
       </Box>

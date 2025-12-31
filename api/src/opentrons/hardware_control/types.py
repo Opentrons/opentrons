@@ -424,9 +424,9 @@ class HepaUVState:
 
 @dataclass(frozen=True)
 class DoorStateNotification:
-    event: Literal[
+    event: Literal[HardwareEventType.DOOR_SWITCH_CHANGE] = (
         HardwareEventType.DOOR_SWITCH_CHANGE
-    ] = HardwareEventType.DOOR_SWITCH_CHANGE
+    )
     new_state: DoorState = DoorState.CLOSED
     module_serial: str | None = None
 
@@ -450,9 +450,9 @@ class AsynchronousModuleErrorNotification:
     module_serial: str | None
     module_model: "ModuleModel"
     port: str
-    event: Literal[
+    event: Literal[HardwareEventType.ASYNCHRONOUS_MODULE_ERROR] = (
         HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
-    ] = HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
+    )
 
 
 @dataclass(frozen=True)
@@ -460,9 +460,9 @@ class ModuleDisconnectedNotification:
     module_serial: str | None
     module_model: "ModuleModel"
     port: str
-    event: Literal[
+    event: Literal[HardwareEventType.MODULE_DISCONNECTED] = (
         HardwareEventType.MODULE_DISCONNECTED
-    ] = HardwareEventType.MODULE_DISCONNECTED
+    )
 
 
 # new event types get new dataclasses

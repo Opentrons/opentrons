@@ -38,19 +38,33 @@ def test_touch_tip_properties_none_instantiation_combos() -> None:
     """Test handling of None combinations in TouchTipProperties instantiation."""
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=None, mmFromEdge=None, speed=None))  # type: ignore
+            TouchTipProperties(
+                enable=True,
+                params=LiquidClassTouchTipParams(
+                    zOffset=None, mmFromEdge=None, speed=None   # type: ignore
+                ),
+            )
         )
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=None, params=LiquidClassTouchTipParams(zOffset=None, mmFromEdge=1, speed=1))  # type: ignore
+            TouchTipProperties(
+                enable=None,   # type: ignore
+                params=LiquidClassTouchTipParams(zOffset=None, mmFromEdge=1, speed=1),   # type: ignore
+            )
         )
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=None, speed=1))  # type: ignore
+            TouchTipProperties(
+                enable=True,
+                params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=None, speed=1),  # type: ignore
+            )
         )
     with pytest.raises(ValidationError):
         _build_touch_tip_properties(
-            TouchTipProperties(enable=True, params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=1, speed=None))  # type: ignore
+            TouchTipProperties(
+                enable=True,
+                params=LiquidClassTouchTipParams(zOffset=1, mmFromEdge=1, speed=None),  # type: ignore
+            )
         )
 
 

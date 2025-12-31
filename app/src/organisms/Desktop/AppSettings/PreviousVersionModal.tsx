@@ -29,7 +29,7 @@ export function PreviousVersionModal(
   return (
     <Modal onClose={props.closeModal} title={t('how_to_restore')}>
       <Box>
-        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('branded:restore_description')}
         </LegacyStyledText>
         <ExternalLink

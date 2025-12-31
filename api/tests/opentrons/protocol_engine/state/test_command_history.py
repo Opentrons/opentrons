@@ -1,4 +1,5 @@
 """CommandHistory state store tests."""
+
 import pytest
 
 from opentrons.ordered_set import OrderedSet

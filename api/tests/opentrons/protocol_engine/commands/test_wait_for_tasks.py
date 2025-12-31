@@ -1,4 +1,5 @@
 """Test wait for tasks."""
+
 from datetime import datetime
 import pytest
 from decoy import Decoy, matchers

@@ -1,4 +1,5 @@
 """Interface to the status led bar."""
+
 from dataclasses import dataclass
 from typing import Optional, List
 import asyncio

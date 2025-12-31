@@ -1,4 +1,5 @@
 """Script for starting up a python smoothie emulator."""
+
 import logging
 import asyncio
 

@@ -1,4 +1,5 @@
 """Tests for the /system router."""
+
 from typing import Iterator
 
 import pytest

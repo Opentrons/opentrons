@@ -1,4 +1,5 @@
 """A simple script to create a motion plan."""
+
 import os
 import json
 import logging

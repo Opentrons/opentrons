@@ -8,6 +8,7 @@ import {
 
 import { makeImmutableStateUpdater } from '../../__utils__'
 import { getInitialRobotStateStandard, makeContext } from '../../fixtures'
+import { forWaitForTasks as _forWaitForTasks } from '../forWaitForTasks'
 import {
   forThermocyclerAwaitBlockTemperature as _forThermocyclerAwaitBlockTemperature,
   forThermocyclerAwaitLidTemperature as _forThermocyclerAwaitLidTemperature,
@@ -19,9 +20,14 @@ import {
   forThermocyclerRunProfile as _forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature as _forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature as _forThermocyclerSetTargetLidTemperature,
+  forThermocyclerStartRunExtendedProfile as _forThermocyclerStartRunExtendedProfile,
 } from '../thermocyclerUpdates'
 
-import type { TCExtendedProfileParams } from '@opentrons/shared-data'
+import type {
+  TCExtendedProfileParams,
+  TCStartExtendedProfileParams,
+  WaitForTasksParams,
+} from '@opentrons/shared-data'
 import type {
   ModuleOnlyParams,
   TCProfileParams,
@@ -33,8 +39,10 @@ import type {
   InvariantContext,
   RobotState,
   ThermocyclerModuleState,
+  WarningType,
 } from '../../types'
 
+const forWaitForTasks = makeImmutableStateUpdater(_forWaitForTasks)
 const forThermocyclerSetTargetBlockTemperature = makeImmutableStateUpdater(
   _forThermocyclerSetTargetBlockTemperature
 )
@@ -65,6 +73,9 @@ const forThermocyclerRunProfile = makeImmutableStateUpdater(
 const forThermocyclerRunExtendedProfile = makeImmutableStateUpdater(
   _forThermocyclerRunExtendedProfile
 )
+const forThermocyclerStartRunExtendedProfile = makeImmutableStateUpdater(
+  _forThermocyclerStartRunExtendedProfile
+)
 
 const moduleId = 'thermocyclerModuleId'
 let invariantContext: InvariantContext
@@ -92,6 +103,7 @@ beforeEach(() => {
 interface TestCase<P> {
   params: P
   expectedUpdate: Partial<ThermocyclerModuleState>
+  expectedWarningTypes?: WarningType[]
   moduleStateBefore: Partial<ThermocyclerModuleState>
   fn: ImmutableStateUpdater<P>
   testName: string
@@ -351,11 +363,114 @@ describe('thermocycler state updaters', () => {
         'forThermocyclerRunExtendedProfile should set blockTargetTemp from the last profile step',
     },
   ]
+  const startRunExtendedProfileCases: TestCases<TCStartExtendedProfileParams> =
+    [
+      {
+        params: {
+          moduleId,
+          profileElements: [
+            {
+              holdSeconds: 10,
+              celsius: 20,
+            },
+          ],
+          blockMaxVolumeUl: 10,
+          taskId: 'test-task-id',
+        },
+        moduleStateBefore: {},
+        expectedUpdate: {
+          currentBlockActivity: {
+            type: 'profile',
+            profileElements: [
+              {
+                holdSeconds: 10,
+                celsius: 20,
+              },
+            ],
+            taskId: 'test-task-id',
+          },
+          numProfilesStarted: 1,
+        },
+        fn: forThermocyclerStartRunExtendedProfile,
+        testName:
+          'forThermocyclerStartRunExtendedProfile should populate currentBlockActivity with information about the profile',
+      },
+    ]
+  const waitForTasksCases: TestCases<WaitForTasksParams> = [
+    {
+      fn: forWaitForTasks,
+      params: { task_ids: ['test-task-id'] },
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'profile',
+          taskId: 'test-task-id',
+          profileElements: [
+            {
+              holdSeconds: 10,
+              celsius: 100,
+            },
+            {
+              holdSeconds: 20,
+              celsius: 200,
+            },
+          ],
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'blockTargetTemp',
+          blockTargetTemp: 200,
+        },
+      },
+      testName:
+        'Waiting for a profile task should update state to say that the profile has ended',
+    },
+    {
+      fn: forWaitForTasks,
+      params: { task_ids: ['nonmatching-task-id'] },
+      moduleStateBefore: {
+        currentBlockActivity: {
+          type: 'profile',
+          taskId: 'test-task-id',
+          profileElements: [
+            {
+              holdSeconds: 10,
+              celsius: 100,
+            },
+            {
+              holdSeconds: 20,
+              celsius: 200,
+            },
+          ],
+        },
+      },
+      expectedUpdate: {
+        currentBlockActivity: {
+          type: 'profile',
+          taskId: 'test-task-id',
+          profileElements: [
+            {
+              holdSeconds: 10,
+              celsius: 100,
+            },
+            {
+              holdSeconds: 20,
+              celsius: 200,
+            },
+          ],
+        },
+      },
+      expectedWarningTypes: ['WAITING_FOR_NONEXISTENT_TASK'],
+      testName:
+        'Waiting for an unrelated task (having a non-matching task ID) should have no effect',
+    },
+  ]
 
   const runTest = <P>({
     params,
     moduleStateBefore,
     expectedUpdate,
+    expectedWarningTypes,
     fn,
     testName,
   }: TestCase<P>): void => {
@@ -368,20 +483,20 @@ describe('thermocycler state updaters', () => {
         },
       })
       const result = fn(params, invariantContext, prevRobotState)
-      expect(result).toMatchObject({
-        robotState: {
-          modules: {
-            [moduleId]: {
-              slot: 'span7_8_10_11',
-              moduleState: {
-                ...lidOpenRobotState.modules[moduleId].moduleState,
-                ...expectedUpdate,
-              },
+      expect(result.robotState).toMatchObject({
+        modules: {
+          [moduleId]: {
+            slot: 'span7_8_10_11',
+            moduleState: {
+              ...lidOpenRobotState.modules[moduleId].moduleState,
+              ...expectedUpdate,
             },
           },
         },
-        warnings: [],
       })
+      expect(
+        new Set(result.warnings.map(warning => warning.type))
+      ).toStrictEqual(new Set(expectedWarningTypes ?? []))
     })
   }
 
@@ -390,4 +505,6 @@ describe('thermocycler state updaters', () => {
   moduleOnlyParamsCases.forEach(runTest)
   runProfileCases.forEach(runTest)
   runExtendedProfileCases.forEach(runTest)
+  startRunExtendedProfileCases.forEach(runTest)
+  waitForTasksCases.forEach(runTest)
 })

@@ -1,4 +1,5 @@
 """Tests for current settings."""
+
 import pytest
 from mock import AsyncMock
 

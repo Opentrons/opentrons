@@ -1,4 +1,5 @@
 """OE Updater and dependency injection classes."""
+
 import os
 import contextlib
 import lzma
@@ -132,9 +133,10 @@ class RootFSInterface:
                 LOG.error(msg)
                 return False, msg
 
-            with lzma.open(rootfs_filepath, "rb") as fsrc, open(
-                part.path, "wb"
-            ) as fdst:
+            with (
+                lzma.open(rootfs_filepath, "rb") as fsrc,
+                open(part.path, "wb") as fdst,
+            ):
                 while True:
                     chunk = fsrc.read(chunk_size)
                     fdst.write(chunk)

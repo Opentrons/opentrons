@@ -1,4 +1,5 @@
 """Test the functionality of the `RobotContext`."""
+
 import pytest
 from decoy import Decoy
 from typing import Union, Optional

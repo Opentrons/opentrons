@@ -1,4 +1,5 @@
 """Motion planning types."""
+
 from __future__ import annotations
 import logging
 import dataclasses

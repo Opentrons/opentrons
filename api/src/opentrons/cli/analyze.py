@@ -325,7 +325,6 @@ async def _do_analyze(
     rtp_values: PrimitiveRunTimeParamValuesType,
     rtp_paths: CSVRuntimeParamPaths,
 ) -> RunResult:
-
     orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )

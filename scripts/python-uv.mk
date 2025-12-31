@@ -8,6 +8,7 @@ pip := $(UV) run --python $(UV_PYTHON) pip
 pytest := $(UV) run --python $(UV_PYTHON) pytest
 wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 build_wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),--verbose,)
+ruff := $(UV) run --python $(UV_PYTHON) ruff
 
 define uv_sync_dev
 	$(UV) sync --frozen --group dev --python $(UV_PYTHON)

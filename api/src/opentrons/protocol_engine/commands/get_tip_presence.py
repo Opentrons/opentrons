@@ -1,4 +1,5 @@
 """Get tip presence command request, result and implementation models."""
+
 from __future__ import annotations
 
 from pydantic import Field, BaseModel
@@ -73,9 +74,9 @@ class GetTipPresence(
     params: GetTipPresenceParams
     result: Optional[GetTipPresenceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[GetTipPresenceImplementation] = (
         GetTipPresenceImplementation
-    ] = GetTipPresenceImplementation
+    )
 
 
 class GetTipPresenceCreate(BaseCommandCreate[GetTipPresenceParams]):

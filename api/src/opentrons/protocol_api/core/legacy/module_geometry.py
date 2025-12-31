@@ -1,4 +1,4 @@
-""" opentrons.protocol_api.module_geometry: classes and functions for modules
+"""opentrons.protocol_api.module_geometry: classes and functions for modules
 as deck objects
 
 This module provides things like :py:class:`ModuleGeometry` and
@@ -6,6 +6,7 @@ This module provides things like :py:class:`ModuleGeometry` and
 objects on the deck (as opposed to calling commands on them, which is handled
 by :py:mod:`.module_contexts`)
 """
+
 from __future__ import annotations
 
 import logging
@@ -388,9 +389,9 @@ class HeaterShakerGeometry(ModuleGeometry):
 
         heater_shaker_slot = self.parent
 
-        assert isinstance(
-            heater_shaker_slot, str
-        ), "Could not determine module slot location"
+        assert isinstance(heater_shaker_slot, str), (
+            "Could not determine module slot location"
+        )
 
         return heater_shaker_slot == pipette_location_slot or int(
             pipette_location_slot
@@ -419,9 +420,9 @@ class HeaterShakerGeometry(ModuleGeometry):
 
         heater_shaker_slot = self.parent
 
-        assert isinstance(
-            heater_shaker_slot, str
-        ), "Could not determine module slot location"
+        assert isinstance(heater_shaker_slot, str), (
+            "Could not determine module slot location"
+        )
 
         return heater_shaker_slot == pipette_location_slot or int(
             pipette_location_slot

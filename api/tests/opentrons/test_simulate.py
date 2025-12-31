@@ -110,7 +110,7 @@ def test_simulate_function_apiv2_run_log(
 
 
 def test_simulate_function_json(
-    get_json_protocol_fixture: Callable[[str, str, bool], str]
+    get_json_protocol_fixture: Callable[[str, str, bool], str],
 ) -> None:
     """Test `simulate()` with a JSON file."""
     jp = get_json_protocol_fixture("3", "simple", False)
@@ -123,14 +123,14 @@ def test_simulate_function_json(
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
         "Touching tip",
-        "Blowing out at B1 of Dest Plate on 3",
+        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
         "Moving to 5",
         "Dropping tip into A1 of Trash on 12",
     ]
 
 
 def test_simulate_function_bundle_apiv2(
-    get_bundle_fixture: Callable[[str], Bundle]
+    get_bundle_fixture: Callable[[str], Bundle],
 ) -> None:
     """Test `simulate()` with a .zip bundle."""
     bundle_fixture = get_bundle_fixture("simple_bundle")
@@ -143,17 +143,17 @@ def test_simulate_function_bundle_apiv2(
         "Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
         "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
+        "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
         "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
+        "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
         "Picking up tip from C1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
+        "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
     ]
 

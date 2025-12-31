@@ -1,4 +1,5 @@
 """v6 of our SQLite schema."""
+
 import enum
 import sqlalchemy
 

@@ -46,7 +46,7 @@ export function Navbar({ routes }: { routes: RouteProps[] }): JSX.Element {
               `${styles.navbar_link} ${isActive ? 'active' : ''}`
             }
           >
-            <LegacyStyledText as="h3" className={styles.nav_link_text}>
+            <LegacyStyledText forwardedAs="h3" className={styles.nav_link_text}>
               {t(name)}
             </LegacyStyledText>
           </NavLink>

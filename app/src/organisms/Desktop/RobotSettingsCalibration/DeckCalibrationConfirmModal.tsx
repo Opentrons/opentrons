@@ -32,11 +32,11 @@ export function DeckCalibrationConfirmModal({
       onClose={cancel}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing16}>
           {t('deck_calibration_modal_description')}
         </LegacyStyledText>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing24}
         >

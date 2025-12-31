@@ -191,7 +191,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
       components={{
         bold: (
           <LegacyStyledText
-            as="span"
+            forwardedAs="span"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           />
         ),
@@ -208,7 +208,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         components={{
           bold: (
             <LegacyStyledText
-              as="span"
+              forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
           ),
@@ -233,7 +233,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
         components={{
           bold: (
             <LegacyStyledText
-              as="span"
+              forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
           ),
@@ -501,7 +501,7 @@ export const CheckItem = (props: CheckItemProps): JSX.Element | null => {
                   : t('check_well_location'),
               }}
               components={{
-                block: <LegacyStyledText as="p" />,
+                block: <LegacyStyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
             />

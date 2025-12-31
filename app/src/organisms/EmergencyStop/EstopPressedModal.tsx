@@ -110,7 +110,10 @@ function TouchscreenModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing40}>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {t('branded:estop_pressed_description')}
         </LegacyStyledText>
         <ListItem
@@ -120,7 +123,10 @@ function TouchscreenModal({
           alignItems={ALIGN_CENTER}
           borderRadius={BORDERS.borderRadius8}
         >
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('estop')}
           </LegacyStyledText>
           <Chip
@@ -188,7 +194,7 @@ function DesktopModal({
         <Banner type={isEngaged ? 'error' : 'success'}>
           {isEngaged ? t('estop_engaged') : t('estop_disengaged')}
         </Banner>
-        <LegacyStyledText as="p" color={COLORS.grey60}>
+        <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
           {t('branded:estop_pressed_description')}
         </LegacyStyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END}>

@@ -648,9 +648,9 @@ class OT3API(
         model: modules.types.ModuleModel,
     ) -> modules.AbstractModule:
         """Create a simulating module hardware interface."""
-        assert (
-            self.is_simulator
-        ), "Cannot build simulating module from non-simulating hardware control API"
+        assert self.is_simulator, (
+            "Cannot build simulating module from non-simulating hardware control API"
+        )
 
         return await self._backend.module_controls.register_simulated_module(
             simulated_usb_port=USBPort(

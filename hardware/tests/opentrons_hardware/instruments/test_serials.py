@@ -1,4 +1,5 @@
 """Test serial setting."""
+
 import pytest
 from opentrons_shared_data.errors.exceptions import InvalidInstrumentData
 from opentrons_hardware.instruments.serial_utils import model_versionstring_from_int

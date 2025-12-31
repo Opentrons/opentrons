@@ -27,15 +27,13 @@ def pydantic_list_to_json(obj_list: Sequence[BaseModel]) -> str:
 
 
 @overload
-def json_to_pydantic(model: Type[_BaseModelT], json_str: str) -> _BaseModelT:
-    ...
+def json_to_pydantic(model: Type[_BaseModelT], json_str: str) -> _BaseModelT: ...
 
 
 @overload
 def json_to_pydantic(
     model: TypeAdapter[_TypeAdapterArgT], json_str: str
-) -> _TypeAdapterArgT:
-    ...
+) -> _TypeAdapterArgT: ...
 
 
 def json_to_pydantic(

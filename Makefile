@@ -39,7 +39,7 @@ cover ?= true
 updateSnapshot ?= false
 quiet ?= false
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
+FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
 
 ifeq ($(watch), true)
 	cover := false
@@ -69,6 +69,9 @@ setup-py:
 
 %-py-setup:
 	$(MAKE) -C $* setup
+
+$(SHARED_DATA_DIR)-py-setup:
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # uninstall all project dependencies
 # tear down JS after Python, because Python cleanup depends on JS dep shx
@@ -199,8 +202,8 @@ test-py-windows: $(WINDOWS_PYTHON_TEST_TARGETS)
 %-py-test:
 	$(MAKE) -C $* test
 
-shared-data-py-test:
-	$(MAKE) -C shared-data test-py
+$(SHARED_DATA_DIR)-py-test:
+	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-js
 test-js: test-js-internal
@@ -216,6 +219,9 @@ lint-py: $(PYTHON_LINT_TARGETS)
 
 %-py-lint:
 	$(MAKE) -C $* lint
+
+$(SHARED_DATA_DIR)-py-lint:
+	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
 lint-js: lint-js-eslint lint-js-prettier
@@ -247,6 +253,9 @@ format-py: $(PYTHON_FORMAT_TARGETS)
 
 %-py-format:
 	$(MAKE) -C $* format
+
+$(SHARED_DATA_DIR)-py-format:
+	$(MAKE) -C $(SHARED_DATA_DIR) format-py
 
 .PHONY: format-js
 format-js:

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -136,7 +136,7 @@ export function ProtocolOverview(): JSX.Element {
   ]
 
   return (
-    <Fragment>
+    <>
       {showEditMetadataModal ? (
         <EditProtocolMetadataModal
           onClose={() => {
@@ -217,7 +217,7 @@ export function ProtocolOverview(): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
           <Flex
-            flex="1.27"
+            flex="1"
             flexDirection={DIRECTION_COLUMN}
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing40}
@@ -244,6 +244,7 @@ export function ProtocolOverview(): JSX.Element {
             <StepsInfo savedStepForms={savedStepForms} />
           </Flex>
           <Flex
+            flex="1"
             flexDirection={DIRECTION_COLUMN}
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
@@ -256,6 +257,6 @@ export function ProtocolOverview(): JSX.Element {
         </Flex>
       </Flex>
       <EndUserAgreementFooter />
-    </Fragment>
+    </>
   )
 }

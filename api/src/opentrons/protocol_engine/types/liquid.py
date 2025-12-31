@@ -1,4 +1,5 @@
 """Protocol engine types to do with liquids."""
+
 from dataclasses import dataclass
 from typing import Literal, Optional
 

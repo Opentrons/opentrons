@@ -1,4 +1,5 @@
 """Test device info."""
+
 import asyncio
 import pytest
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (

@@ -1,4 +1,5 @@
 """Protocol analysis storage."""
+
 from __future__ import annotations
 
 import sqlalchemy
@@ -135,6 +136,7 @@ class AnalysisStore:
                 a pending analysis.
             analysis_id: The ID of the new analysis.
                 Must be unique across *all* protocols, not just this one.
+            run_time_parameters: Run time parameters to analyze with.
 
         Returns:
             A summary of the just-added analysis.
@@ -182,9 +184,9 @@ class AnalysisStore:
         protocol_id = self._pending_store.get_protocol_id(analysis_id=analysis_id)
 
         # No protocol ID means there was no pending analysis with the given analysis ID.
-        assert (
-            protocol_id is not None
-        ), "Analysis ID to update must be for a valid pending analysis."
+        assert protocol_id is not None, (
+            "Analysis ID to update must be for a valid pending analysis."
+        )
 
         if len(errors) > 0:
             if any(
@@ -425,7 +427,9 @@ class AnalysisStore:
         ) + list(csv_rtps_in_last_analysis.keys())
         assert set(param.variableName for param in new_parameters) == set(
             total_params_in_last_analysis
-        ), "Mismatch in parameters found in the current request vs. last saved parameters."  # Indicates internal bug
+        ), (
+            "Mismatch in parameters found in the current request vs. last saved parameters."
+        )  # Indicates internal bug
         for param in new_parameters:
             if isinstance(param, CSVParameter):
                 new_file_id = param.file.id if param.file else None
@@ -458,9 +462,9 @@ class _PendingAnalysisStore:
         run_time_parameters: List[RunTimeParameter],
     ) -> None:
         """Add a new pending analysis and associate it with the given protocol."""
-        assert (
-            protocol_id not in self._analysis_ids_by_protocol_id
-        ), "Protocol must not already have a pending analysis."
+        assert protocol_id not in self._analysis_ids_by_protocol_id, (
+            "Protocol must not already have a pending analysis."
+        )
 
         new_pending_analysis = PendingAnalysis.model_construct(
             id=analysis_id,

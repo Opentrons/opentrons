@@ -105,10 +105,10 @@ export const Liquids = (props: { protocolId: string }): JSX.Element => {
                     />
                   </Flex>
                   <Flex flexDirection={DIRECTION_COLUMN}>
-                    <LegacyStyledText as="p">
+                    <LegacyStyledText forwardedAs="p">
                       {i18n.format(liquid.displayName, 'titleCase')}
                     </LegacyStyledText>
-                    <LegacyStyledText as="p" color={COLORS.grey60}>
+                    <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
                       {i18n.format(liquid.description, 'titleCase')}
                     </LegacyStyledText>
                   </Flex>

@@ -1,4 +1,5 @@
 """Router for /system/register endpoint."""
+
 from fastapi import APIRouter, Depends, status, Response
 from uuid import UUID
 import sqlalchemy

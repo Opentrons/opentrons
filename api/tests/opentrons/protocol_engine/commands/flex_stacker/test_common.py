@@ -2050,7 +2050,15 @@ def test_build_ids_to_fill_builds_specified_components(
         return f"generated-{generated_id_counts}"
 
     decoy.when(model_utils.generate_id()).then_do(_new_id)
-    subject.build_ids_to_fill(has_adapter, has_lid, None, 1, 2, 0, model_utils,) == [
+    subject.build_ids_to_fill(
+        has_adapter,
+        has_lid,
+        None,
+        1,
+        2,
+        0,
+        model_utils,
+    ) == [
         StackerStoredLabwareGroup(
             primaryLabwareId="generated-1",
             adapterLabwareId="generated-2" if has_adapter else None,

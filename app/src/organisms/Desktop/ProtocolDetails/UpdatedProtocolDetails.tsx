@@ -305,7 +305,7 @@ export function UpdatedProtocolDetails(
                   padding={SPACING.spacing16}
                 >
                   <LegacyStyledText
-                    as="h3"
+                    forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                   >
                     {t('deck_view')}

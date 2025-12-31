@@ -1,4 +1,5 @@
 """Gripper configurations."""
+
 from typing import List, Dict, Tuple, Any, NewType
 
 from typing_extensions import Annotated, Literal

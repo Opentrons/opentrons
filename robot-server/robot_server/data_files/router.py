@@ -1,4 +1,5 @@
 """Router for /dataFiles endpoints."""
+
 import asyncio
 from datetime import datetime
 from pathlib import Path
@@ -38,6 +39,7 @@ from .models import (
     DataFile,
     FileIdNotFoundError,
     FileIdNotFound,
+    FileNotFound,
     FileInUseError,
     ImageFileMetadata,
     NoImagesFound,
@@ -73,13 +75,6 @@ class NoDataFileSourceProvided(ErrorDetails):
 
     id: Literal["NoDataFileSourceProvided"] = "NoDataFileSourceProvided"
     title: str = "No data file source provided"
-
-
-class FileNotFound(ErrorDetails):
-    """An error returned when specified file path was not found on the robot."""
-
-    id: Literal["FileNotFound"] = "FileNotFound"
-    title: str = "Specified file path not found on the robot"
 
 
 class UnexpectedFileFormat(ErrorDetails):

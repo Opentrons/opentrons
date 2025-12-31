@@ -14,6 +14,7 @@ Database schema versions:
 - Version 0
     - Initial schema version
 """
+
 import logging
 from datetime import datetime, timezone
 from typing import Optional

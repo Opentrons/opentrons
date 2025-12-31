@@ -55,11 +55,11 @@ export function OverridePathToPython(): JSX.Element {
         >
           {t('override_path_to_python')}
         </LegacyStyledText>
-        <LegacyStyledText as="p" paddingBottom={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="p" paddingBottom={SPACING.spacing8}>
           {t('branded:opentrons_app_will_use_interpreter')}
         </LegacyStyledText>
         <LegacyStyledText
-          as="h6"
+          forwardedAs="h6"
           textTransform={TYPOGRAPHY.textTransformUppercase}
           color={COLORS.grey50}
           paddingBottom={SPACING.spacing4}
@@ -82,7 +82,9 @@ export function OverridePathToPython(): JSX.Element {
             />
           </Link>
         ) : (
-          <LegacyStyledText as="p">{t('no_specified_folder')}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">
+            {t('no_specified_folder')}
+          </LegacyStyledText>
         )}
       </Box>
       {pathToPythonInterpreter !== null ? (

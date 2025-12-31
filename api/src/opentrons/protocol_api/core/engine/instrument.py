@@ -455,15 +455,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         location: Union[Location, TrashBin, WasteChute],
         well_core: Optional[WellCore],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         """Blow liquid out of the tip.
 
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
-            in_place: whether this is a in-place command.
+            in_place: Whether this is an in-place command.
+            flow_rate: The absolute flow rate in µL/s.
         """
-        flow_rate = self.get_blow_out_flow_rate(1.0)
         if well_core is None:
             if not in_place:
                 if isinstance(location, (TrashBin, WasteChute)):
@@ -594,9 +595,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             increment: Customize the movement "distance" of the pipette to press harder.
             prep_after: Not used by this core, pipette preparation will always happen.
         """
-        assert (
-            presses is None and increment is None
-        ), "Tip pick-up with custom presses or increment deprecated"
+        assert presses is None and increment is None, (
+            "Tip pick-up with custom presses or increment deprecated"
+        )
 
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
@@ -1244,9 +1245,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             assert (
                 # We make sure to set these nozzles in the calling function
                 # if using QUADRANT or PARTIAL_COLUMN. Asserting only for type verification here.
-                front_right_nozzle is not None
-                and back_left_nozzle is not None
-            ), f"Both front right and back left nozzles are required for {style} configuration."
+                front_right_nozzle is not None and back_left_nozzle is not None
+            ), (
+                f"Both front right and back left nozzles are required for {style} configuration."
+            )
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,
@@ -1420,9 +1422,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
-        prev_dest: Optional[
-            Union[Tuple[Location, WellCore], TrashBin, WasteChute]
-        ] = None
+        prev_dest: Optional[Union[Tuple[Location, WellCore], TrashBin, WasteChute]] = (
+            None
+        )
         post_disp_tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
                 liquid=0,

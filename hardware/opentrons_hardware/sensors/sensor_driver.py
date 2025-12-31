@@ -1,4 +1,5 @@
 """Capacitve Sensor Driver Class."""
+
 import time
 import asyncio
 

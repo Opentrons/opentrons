@@ -18,16 +18,12 @@ Offset = typing.Sequence[float]
 # NOTE: this would be more accurately typed as
 # a 4x4 matrix using typing.Tuple, but Tuple is
 # not able to be expressed in OpenAPI Spec
-AffineMatrix = typing.Sequence[
-    typing.Sequence[float],
-]
+AffineMatrix = typing.Sequence[typing.Sequence[float],]
 
 # NOTE: this would be more accurately typed as
 # a 3x3 matrix using typing.Tuple, but Tuple is
 # not able to be expressed in OpenAPI Spec
-AttitudeMatrix = typing.Sequence[
-    typing.Sequence[float],
-]
+AttitudeMatrix = typing.Sequence[typing.Sequence[float],]
 
 
 class InstrumentOffset(BaseModel):
