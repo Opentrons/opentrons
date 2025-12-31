@@ -1,4 +1,5 @@
 """Waypoint planning."""
+
 from typing import List, Optional, Sequence, Tuple
 from typing_extensions import Final
 

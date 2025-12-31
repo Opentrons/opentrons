@@ -1,5 +1,5 @@
-""" Consolidated update tests for openembedded and buildroot
-"""
+"""Consolidated update tests for openembedded and buildroot"""
+
 import asyncio
 import binascii
 import hashlib
@@ -152,7 +152,6 @@ async def test_update_happypath(
     mock_partition_manager_valid_switch,
     extracted_update_file_consolidated,
 ):
-
     updaters = [
         OT3UpdateActions(
             root_FS_intf=RootFSInterface(),

@@ -154,7 +154,7 @@ def extracted_update_file_consolidated(request, tmpdir):
         ),
     ]
 
-    for (rootfs, sha256, sig) in list_of_extracted_files:
+    for rootfs, sha256, sig in list_of_extracted_files:
         rootfs_path = os.path.join(tmpdir, rootfs)
         hash_path = os.path.join(tmpdir, sha256)
         uncomp_xz_hash_path = os.path.join(tmpdir, "tmp_uncomp_xz_hash_path")
@@ -165,7 +165,6 @@ def extracted_update_file_consolidated(request, tmpdir):
         if request.node.get_closest_marker("bad_hash"):
             hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
         else:
-
             hashval = re.match(
                 b"^([a-z0-9]+) ",
                 gen_hash_val_direct(rootfs_path),

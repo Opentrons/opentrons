@@ -1,4 +1,5 @@
 """Control an active run with Actions."""
+
 import logging
 from datetime import datetime
 from typing import Optional
@@ -62,9 +63,9 @@ class RunController:
             RunNotFoundError: The given run identifier was not found in the database.
             RunActionNotAllowed: The following operation is not allowed
         """
-        assert (
-            self._run_id == self._run_orchestrator_store.current_run_id
-        ), "Expected RunController to be bound to current run"
+        assert self._run_id == self._run_orchestrator_store.current_run_id, (
+            "Expected RunController to be bound to current run"
+        )
 
         action = RunAction(id=action_id, actionType=action_type, createdAt=created_at)
 

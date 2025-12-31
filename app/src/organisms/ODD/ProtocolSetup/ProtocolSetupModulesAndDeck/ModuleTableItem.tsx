@@ -242,7 +242,10 @@ export function ModuleTableItem({
         )
       case 'calibrationBlocked':
         return (
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {calibrationStatus?.reason === 'attach_pipette_failure_reason'
               ? t('calibration_required_attach_pipette_first')
               : t('calibration_required_calibrate_pipette_first')}
@@ -309,7 +312,10 @@ export function ModuleTableItem({
         padding={`${SPACING.spacing16} ${SPACING.spacing24}`}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {comboFixtureId != null
               ? getFixtureDisplayName(t as TFunction, comboFixtureId)
               : getModuleDisplayName(module.moduleDef.model)}

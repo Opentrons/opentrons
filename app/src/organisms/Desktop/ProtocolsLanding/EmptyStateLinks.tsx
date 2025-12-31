@@ -35,7 +35,7 @@ export function EmptyStateLinks(props: Props): JSX.Element | null {
     >
       <LegacyStyledText
         role="complementary"
-        as="p"
+        forwardedAs="p"
         fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         marginBottom={SPACING.spacing8}
       >

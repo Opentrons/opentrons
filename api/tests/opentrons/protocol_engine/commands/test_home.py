@@ -1,4 +1,5 @@
 """Test home commands."""
+
 from decoy import Decoy
 
 from opentrons.protocol_engine.state import update_types

@@ -92,9 +92,9 @@ class MaintenanceRunsPublisher:
                 self._engine_state_slice.state_summary_status = new_state_summary.status
 
 
-_maintenance_runs_publisher_accessor: AppStateAccessor[
-    MaintenanceRunsPublisher
-] = AppStateAccessor[MaintenanceRunsPublisher]("maintenance_runs_publisher")
+_maintenance_runs_publisher_accessor: AppStateAccessor[MaintenanceRunsPublisher] = (
+    AppStateAccessor[MaintenanceRunsPublisher]("maintenance_runs_publisher")
+)
 
 
 async def get_maintenance_runs_publisher(

@@ -54,7 +54,7 @@ export function NetworkSetupMenu(): JSX.Element {
           marginBottom="3.09375rem"
         >
           <LegacyStyledText
-            as="h2"
+            forwardedAs="h2"
             fontWeight={TYPOGRAPHY.fontWeightBold}
             color={COLORS.black90}
           >
@@ -67,7 +67,7 @@ export function NetworkSetupMenu(): JSX.Element {
           marginBottom={SPACING.spacing40}
         >
           <LegacyStyledText
-            as="h4"
+            forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightRegular}
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignCenter}

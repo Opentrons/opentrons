@@ -55,13 +55,13 @@ export function UsageSettings({
           {t('usage_settings')}
         </LegacyStyledText>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing4}
         >
           {t('pause_protocol')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('pause_protocol_description')}
         </LegacyStyledText>
       </Box>

@@ -19,7 +19,7 @@ def test_parse_bundle_no_root_files(get_bundle_fixture: Callable[..., Any]) -> N
 
 
 def test_parse_bundle_no_entrypoint_protocol(
-    get_bundle_fixture: Callable[..., Any]
+    get_bundle_fixture: Callable[..., Any],
 ) -> None:
     fixture = get_bundle_fixture("no_entrypoint_protocol_bundle")
     with pytest.raises(RuntimeError, match="Bundled protocol should have a"):
@@ -30,7 +30,7 @@ def test_parse_bundle_no_entrypoint_protocol(
 
 
 def test_parse_bundle_conflicting_labware(
-    get_bundle_fixture: Callable[..., Any]
+    get_bundle_fixture: Callable[..., Any],
 ) -> None:
     fixture = get_bundle_fixture("conflicting_labware_bundle")
     with pytest.raises(RuntimeError, match="Conflicting labware in bundle"):

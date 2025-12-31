@@ -1,4 +1,5 @@
 """Tests for TaskState+TaskStore+TaskView trifecta."""
+
 import pytest
 from opentrons.protocol_engine.state.tasks import TaskStore, TaskView
 from opentrons.protocol_engine.types import Task, FinishedTask

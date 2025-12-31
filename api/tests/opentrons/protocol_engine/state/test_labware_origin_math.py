@@ -1,4 +1,5 @@
 """Test suite for _labware_origin_math.py module."""
+
 from typing import NamedTuple, List, Optional
 import pytest
 
@@ -194,7 +195,9 @@ _AR_LID_V2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
     stackingOffsetWithLabware={"default": Vector3D(x=0, y=0, z=0)},
     dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
     stackingOffsetWithModule={},
-    parameters=Parameters2.model_construct(loadName="opentrons_flex_lid_absorbance_plate_reader_module"),  # type: ignore[call-arg]
+    parameters=Parameters2.model_construct(
+        loadName="opentrons_flex_lid_absorbance_plate_reader_module"
+    ),  # type: ignore[call-arg]
     gripperOffsets={
         "default": GripperOffsets(
             pickUpOffset=Vector3D(x=7, y=14, z=21),

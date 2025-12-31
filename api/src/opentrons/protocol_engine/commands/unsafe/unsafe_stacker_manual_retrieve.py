@@ -277,9 +277,9 @@ class UnsafeFlexStackerManualRetrieve(
     params: UnsafeFlexStackerManualRetrieveParams
     result: UnsafeFlexStackerManualRetrieveResult | None = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeFlexStackerManualRetrieveImpl] = (
         UnsafeFlexStackerManualRetrieveImpl
-    ] = UnsafeFlexStackerManualRetrieveImpl
+    )
 
 
 class UnsafeFlexStackerManualRetrieveCreate(

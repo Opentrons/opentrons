@@ -1,4 +1,5 @@
 """Entrypoint for the USB-TCP bridge application."""
+
 import asyncio
 import logging
 import time

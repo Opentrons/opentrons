@@ -6,18 +6,21 @@ export function aspirateMoreThanWellContents(): CommandCreatorWarning {
     message: 'Not enough liquid',
   }
 }
+
 export function aspirateFromPristineWell(): CommandCreatorWarning {
   return {
     type: 'ASPIRATE_FROM_PRISTINE_WELL',
     message: 'This step tries to aspirate from an empty well.',
   }
 }
+
 export function labwareInWasteChuteHasLiquid(): CommandCreatorWarning {
   return {
     type: 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID',
     message: 'Disposing of a labware with liquid',
   }
 }
+
 export function tiprackInWasteChuteHasTips(): CommandCreatorWarning {
   return {
     type: 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS',
@@ -29,5 +32,12 @@ export function potentiallyUnreachableTemp(): CommandCreatorWarning {
   return {
     type: 'TEMPERATURE_IS_POTENTIALLY_UNREACHABLE',
     message: 'The module set temperature is potentially unreachable.',
+  }
+}
+
+export function waitingForNonexistentTask(): CommandCreatorWarning {
+  return {
+    type: 'WAITING_FOR_NONEXISTENT_TASK',
+    message: 'This step is waiting for a task that was never started.',
   }
 }

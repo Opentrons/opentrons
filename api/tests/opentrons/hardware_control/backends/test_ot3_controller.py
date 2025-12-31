@@ -212,7 +212,6 @@ def mock_send_stop_threshold() -> Iterator[mock.AsyncMock]:
 
 @pytest.fixture
 def mock_move_group_run() -> Iterator[mock.AsyncMock]:
-
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner.run",
         autospec=True,
@@ -386,7 +385,7 @@ async def test_home_execute(
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
-        **config
+        **config,
     ) as mock_runner:
         present_axes = set(ax for ax in axes if controller.axis_is_present(ax))
         controller.set_pressure_sensor_available(Axis.P_L, True)
@@ -1189,7 +1188,6 @@ async def test_motor_current(
     with mock.patch.object(controller, "set_active_current") as mock_run_currents:
         with mock.patch.object(controller, "set_hold_current") as mock_hold_currents:
             with mock.patch.object(controller, "set_default_currents") as mock_default:
-
                 async with controller.motor_current(run_currents, hold_currents):
                     await controller.update_position()
 
@@ -1499,7 +1497,7 @@ async def test_controller_move(
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
-        **config
+        **config,
     ):
         await controller.move(origin_pos, target_pos, 100)
         position = await controller.update_position()
@@ -1641,7 +1639,7 @@ async def test_controller_move_dynamic(
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
-        **config
+        **config,
     ):
         await controller.move(origin_pos, target_pos, 70)
         position = await controller.update_position()
@@ -1666,7 +1664,7 @@ async def test_pressure_disable(
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
-        **config
+        **config,
     ):
         with mock.patch.object(controller, "_monitor_overpressure") as monitor:
             controller.set_pressure_sensor_available(Axis.P_L, pipette_has_sensor)

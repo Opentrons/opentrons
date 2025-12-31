@@ -179,9 +179,9 @@ class MoveGroupRunner:
     def _accumulate_move_completions(
         completions: _Completions,
     ) -> NodeDict[MotorPositionStatus]:
-        position: NodeDict[
-            List[Tuple[Tuple[int, int], MotorPositionStatus]]
-        ] = defaultdict(list)
+        position: NodeDict[List[Tuple[Tuple[int, int], MotorPositionStatus]]] = (
+            defaultdict(list)
+        )
         gear_motor_position: NodeDict[
             List[Tuple[Tuple[int, int], MotorPositionStatus]]
         ] = defaultdict(list)
@@ -468,14 +468,16 @@ class MoveScheduler:
             self._completion_queue.put_nowait((arbitration_id, message))
             log.debug(
                 f"Received completion for {node_id} group {group_id} seq {seq_id}"
-                f", which {'is' if in_group else 'isn''t'} in group"
+                f", which {'is' if in_group else 'isnt'} in group"
             )
             if self._moves[group_id] and len(self._moves[group_id]) == 0:
                 log.error(
                     f"Python bug proven if check {bool(not self._moves[group_id])} len check {len(self._moves[group_id]) == 0}"
                 )
             if not self._moves[group_id]:
-                log.debug(f"Move group {group_id+self._start_at_index} has completed.")
+                log.debug(
+                    f"Move group {group_id + self._start_at_index} has completed."
+                )
                 self._event.set()
         except KeyError:
             log.warning(

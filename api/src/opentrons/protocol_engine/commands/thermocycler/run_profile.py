@@ -1,4 +1,5 @@
 """Command models to execute a Thermocycler profile."""
+
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type

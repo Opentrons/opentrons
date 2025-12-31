@@ -451,9 +451,9 @@ def _create_deck_conflict_error_message(
     new_item: Optional[DeckItem] = None,
     existing_item: Optional[DeckItem] = None,
 ) -> str:
-    assert (
-        new_item is not None or existing_item is not None
-    ), "Conflict error expects either new_item or existing_item"
+    assert new_item is not None or existing_item is not None, (
+        "Conflict error expects either new_item or existing_item"
+    )
 
     if new_item is not None:
         message = (

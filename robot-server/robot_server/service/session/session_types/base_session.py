@@ -93,6 +93,4 @@ class BaseSession(ABC):
         pass
 
     def __str__(self) -> str:
-        return (
-            f"Session(" f"session_type={self.session_type}," f"meta={self.meta}," f")"
-        )
+        return f"Session(session_type={self.session_type},meta={self.meta},)"

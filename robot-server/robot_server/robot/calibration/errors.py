@@ -51,6 +51,6 @@ class CalibrationError(ErrorDef):
     ERROR_DURING_TRANSITION = ErrorCreateDef(
         status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
         title="Error During State Transition",
-        format_string="Event {action} failed to transition " "from {state}: {error}",
+        format_string="Event {action} failed to transition from {state}: {error}",
         error_code=ErrorCodes.GENERAL_ERROR.value.code,
     )

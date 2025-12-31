@@ -1,4 +1,5 @@
 """LoadLiquidClass stores the liquid class settings used for a transfer into the Protocol Engine."""
+
 from __future__ import annotations
 
 from typing import Optional, Type, TYPE_CHECKING, Any
@@ -130,9 +131,9 @@ class LoadLiquidClass(
     params: LoadLiquidClassParams
     result: Optional[LoadLiquidClassResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[LoadLiquidClassImplementation] = (
         LoadLiquidClassImplementation
-    ] = LoadLiquidClassImplementation
+    )
 
 
 class LoadLiquidClassCreate(BaseCommandCreate[LoadLiquidClassParams]):

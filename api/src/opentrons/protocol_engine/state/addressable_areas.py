@@ -212,9 +212,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                     deck_definition=self._state.deck_definition,
                 )
             )
-            self._state.loaded_addressable_areas_by_name[
-                addressable_area.area_name
-            ] = addressable_area
+            self._state.loaded_addressable_areas_by_name[addressable_area.area_name] = (
+                addressable_area
+            )
 
     def _validate_addressable_area_for_simulation(
         self, addressable_area_name: str
@@ -237,9 +237,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                 set(potential_fixtures)
             )
 
-            self._state.potential_cutout_fixtures_by_cutout_id[
-                cutout_id
-            ] = remaining_fixtures
+            self._state.potential_cutout_fixtures_by_cutout_id[cutout_id] = (
+                remaining_fixtures
+            )
         else:
             self._state.potential_cutout_fixtures_by_cutout_id[cutout_id] = set(
                 potential_fixtures

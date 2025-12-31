@@ -1,4 +1,5 @@
 """Read relevant protocol information from a set of files."""
+
 from pathlib import Path
 from typing import Optional, Sequence
 
@@ -68,6 +69,7 @@ class ProtocolReader:
             files: List buffered files. Do not attempt to reuse any objects
                 in this list once they've been passed to the ProtocolReader.
             directory: Name of the directory to create and place files in.
+            content_hash: A hash of the protocol contents to trigger reanalysis.
 
         Returns:
             A ProtocolSource describing the validated protocol.

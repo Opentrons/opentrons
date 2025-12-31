@@ -1,6 +1,5 @@
 """FastAPI dependencies for protocol endpoints."""
 
-
 from asyncio import Lock as AsyncLock
 from pathlib import Path
 from typing_extensions import Annotated

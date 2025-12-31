@@ -1,4 +1,5 @@
 """Can Driver tests."""
+
 from typing import AsyncGenerator, Iterator, cast
 
 import pytest

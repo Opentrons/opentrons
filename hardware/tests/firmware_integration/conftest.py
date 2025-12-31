@@ -1,4 +1,5 @@
 """Common fixtures for integration tests."""
+
 from __future__ import annotations
 import pytest
 from typing import AsyncGenerator, Iterator, AsyncIterator, List, Dict

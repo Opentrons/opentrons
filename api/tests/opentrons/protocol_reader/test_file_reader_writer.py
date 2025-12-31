@@ -1,4 +1,5 @@
 """Tests for opentrons.protocol_reader.file_reader_writer.FileReaderWriter."""
+
 import pytest
 from pathlib import Path
 

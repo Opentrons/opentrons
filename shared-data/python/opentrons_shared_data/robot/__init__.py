@@ -1,4 +1,5 @@
 """opentrons_shared_data.robot: Submodule for handling robot definition data."""
+
 from pathlib import Path
 from typing import cast
 from typing_extensions import Final

@@ -1,4 +1,5 @@
 """Dependencies related to /robot/control endpoints."""
+
 from typing import Annotated
 
 from fastapi import status, Depends

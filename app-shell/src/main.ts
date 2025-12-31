@@ -27,6 +27,7 @@ import {
   closeSecondaryWindows,
   registerCameraStream,
 } from './secondary-windows'
+import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
 import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
 import { registerUpdate } from './update'
@@ -50,6 +51,9 @@ log.debug('App config', {
   store: getStore(),
   overrides: getOverrides(),
 })
+
+// Initialize Sentry before the app is ready.
+initializeSentry(getStore().analytics.optedIn)
 
 if (config.devtools) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -1,4 +1,5 @@
 """Utilities for calculating the labware origin offset position."""
+
 import dataclasses
 import enum
 from typing import Union, overload, Optional
@@ -267,8 +268,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: ModuleLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 @overload
@@ -280,8 +280,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 @overload
@@ -293,8 +292,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: OnLabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 def _get_parent_placement_origin_to_lw_origin(

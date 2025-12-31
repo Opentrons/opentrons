@@ -1,4 +1,5 @@
 """A script for sending and receiving data from sensors on the OT3."""
+
 import os
 import logging
 import asyncio
@@ -43,9 +44,7 @@ def prompt_int_input(prompt_name: str) -> int:
     """Prompt to choose a member of the enum.
 
     Args:
-        output_func: Function to output text to user.
-        get_user_input: Function to get user input.
-        enum_type: an enum type
+        prompt_name: the name to print
 
     Returns:
         The choice.

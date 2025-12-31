@@ -1,4 +1,5 @@
 """Tests for time utilities."""
+
 import pytest
 from mock import MagicMock, patch
 from datetime import datetime, timezone

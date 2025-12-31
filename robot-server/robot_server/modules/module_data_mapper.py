@@ -1,4 +1,5 @@
 """Module identification and response data mapping."""
+
 from typing import Annotated, List, Type, cast, Optional
 from fastapi import Depends
 
@@ -93,9 +94,9 @@ class ModuleDataMapper:
             module_cls = MagneticModule
             assert ModuleDataValidator.is_magnetic_module_data(live_data["data"])
             live_data_height = live_data["data"].get("height")
-            assert isinstance(
-                live_data_height, (int, float)
-            ), f"Expected magnetic module height, got {live_data_height}"
+            assert isinstance(live_data_height, (int, float)), (
+                f"Expected magnetic module height, got {live_data_height}"
+            )
 
             # Origin of height reported by hardware API is the magnet home
             # Origin we report to the user should be labware bottom

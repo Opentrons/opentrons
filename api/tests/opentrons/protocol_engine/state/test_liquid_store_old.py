@@ -4,6 +4,7 @@ DEPRECATED: Testing LiquidStore independently of LiquidView is no longer helpful
 Try to add new tests to test_liquid_state.py, where they can be tested together,
 treating LiquidState as a private implementation detail.
 """
+
 import pytest
 from opentrons.protocol_engine.state.liquids import LiquidStore
 from opentrons.protocol_engine import Liquid

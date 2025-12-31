@@ -3,6 +3,7 @@
 As of the v5 software release, these endpoints do not function.
 All labware offsets are set via `/run` endpoints.
 """
+
 from typing import Annotated, Optional
 from typing_extensions import Literal, NoReturn
 
@@ -22,9 +23,9 @@ router = LightRouter()
 class LabwareCalibrationEndpointsRemoved(ErrorDetails):
     """An error if you try to use the deprecated Labware Calibration endpoints."""
 
-    id: Literal[
+    id: Literal["LabwareCalibrationEndpointsRemoved"] = (
         "LabwareCalibrationEndpointsRemoved"
-    ] = "LabwareCalibrationEndpointsRemoved"
+    )
     title: str = "Labware Calibration Endpoints Removed"
     detail: str = "Use the `/runs` endpoints to manage labware offsets."
     errorCode: str = ErrorCodes.API_REMOVED.value.code

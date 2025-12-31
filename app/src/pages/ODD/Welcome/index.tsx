@@ -29,7 +29,10 @@ export function Welcome(): JSX.Element {
     >
       <img alt={IMAGE_ALT} src={screenImage} width="904px" height="189px" />
       <Flex justifyContent={JUSTIFY_CENTER}>
-        <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText
+          forwardedAs="h2"
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+        >
           {t('branded:welcome_title')}
         </LegacyStyledText>
       </Flex>

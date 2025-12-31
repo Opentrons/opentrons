@@ -122,9 +122,10 @@ async def update_serial_and_confirm(
 
 async def _main(args: argparse.Namespace) -> None:
     """Script entrypoint."""
-    async with build.driver(build_settings(args)) as driver, CanMessenger(
-        driver
-    ) as messenger:
+    async with (
+        build.driver(build_settings(args)) as driver,
+        CanMessenger(driver) as messenger,
+    ):
         while True:
             try:
                 model, data = await get_serial("Enter serial for hepauv: ")

@@ -46,12 +46,8 @@ CommandThermocyclerSetTargetBlock: types.ThermocyclerSetTargetBlockCommandId = (
 CommandThermocyclerSetTargetLid: types.ThermocyclerSetTargetLidCommandId = (
     "thermocycler/setTargetLidTemperature"
 )
-CommandThermocyclerAwaitLidTemperature: types.ThermocyclerAwaitLidTemperatureCommandId = (
-    "thermocycler/awaitLidTemperature"
-)
-CommandThermocyclerAwaitBlockTemperature: types.ThermocyclerAwaitBlockTemperatureCommandId = (
-    "thermocycler/awaitBlockTemperature"
-)
+CommandThermocyclerAwaitLidTemperature: types.ThermocyclerAwaitLidTemperatureCommandId = "thermocycler/awaitLidTemperature"
+CommandThermocyclerAwaitBlockTemperature: types.ThermocyclerAwaitBlockTemperatureCommandId = "thermocycler/awaitBlockTemperature"
 CommandThermocyclerDeactivateBlock: types.ThermocyclerDeactivateBlockCommandId = (
     "thermocycler/deactivateBlock"
 )

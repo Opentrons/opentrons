@@ -599,7 +599,7 @@ def get_bundle_fixture() -> Callable[[str], Bundle]:
             result["filelike"] = binary_zipfile
         else:
             raise ValueError(
-                f"get_bundle_fixture has no case to handle " f'fixture "{fixture_name}"'
+                f'get_bundle_fixture has no case to handle fixture "{fixture_name}"'
             )
         return result
 
@@ -1165,9 +1165,9 @@ def minimal_transfer_properties_dict() -> Dict[str, Dict[str, TransferProperties
 
 
 @pytest.fixture
-def custom_pip_n_tip_transfer_properties_dict() -> (
-    Dict[str, Dict[str, TransferPropertiesDict]]
-):
+def custom_pip_n_tip_transfer_properties_dict() -> Dict[
+    str, Dict[str, TransferPropertiesDict]
+]:
     """A minimal dictionary representation of transfer properties for a custom pipette and tiprack."""
     return {
         "a_custom_pipette_type": {
