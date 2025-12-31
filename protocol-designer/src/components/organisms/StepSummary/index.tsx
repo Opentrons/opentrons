@@ -131,7 +131,8 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_state.lid_position"
               tagText={t(
-                `protocol_steps:thermocycler_module.lid_position.${lidOpen ? 'open' : 'closed'
+                `protocol_steps:thermocycler_module.lid_position.${
+                  lidOpen ? 'open' : 'closed'
                 }`
               )}
             />
@@ -157,7 +158,8 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             <StyledTrans
               i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.lid_position"
               tagText={t(
-                `protocol_steps:thermocycler_module.lid_position.${lidOpenHold ? 'open' : 'closed'
+                `protocol_steps:thermocycler_module.lid_position.${
+                  lidOpenHold ? 'open' : 'closed'
                 }`
               )}
             />
@@ -303,8 +305,8 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
             tagText={
               targetHeaterShakerTemperature
                 ? `${targetHeaterShakerTemperature}${t(
-                  'application:units.degrees'
-                )}`
+                    'application:units.degrees'
+                  )}`
                 : t('protocol_steps:heater_shaker.active.ambient')
             }
           />

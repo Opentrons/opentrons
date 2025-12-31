@@ -192,24 +192,24 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             <Divider borderColor={COLORS.grey40} />
             {info.liquidIndex != null
               ? fullWellsByLiquid[info.liquidIndex]
-                .sort((a, b) =>
-                  orderedWells.indexOf(b) > orderedWells.indexOf(a) ? -1 : 1
-                )
-                .map((wellName, wellliquidIndex) => {
-                  const volume =
-                    wellContents != null
-                      ? wellContents[wellName].ingreds[liquidIndex].volume
-                      : 0
-                  return (
-                    <>
-                      <WellContents wellName={wellName} volume={volume} />
-                      {wellliquidIndex <
-                        fullWellsByLiquid[liquidIndex].length - 1 ? (
-                        <Divider borderColor={COLORS.grey40} />
-                      ) : null}
-                    </>
+                  .sort((a, b) =>
+                    orderedWells.indexOf(b) > orderedWells.indexOf(a) ? -1 : 1
                   )
-                })
+                  .map((wellName, wellliquidIndex) => {
+                    const volume =
+                      wellContents != null
+                        ? wellContents[wellName].ingreds[liquidIndex].volume
+                        : 0
+                    return (
+                      <>
+                        <WellContents wellName={wellName} volume={volume} />
+                        {wellliquidIndex <
+                        fullWellsByLiquid[liquidIndex].length - 1 ? (
+                          <Divider borderColor={COLORS.grey40} />
+                        ) : null}
+                      </>
+                    )
+                  })
               : null}
           </Flex>
         </>

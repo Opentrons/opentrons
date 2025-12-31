@@ -88,26 +88,26 @@ export function MaterialsListModal({
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
               {fixtures.length > 0
                 ? fixtures.map(fixture => (
-                  <ListItem type="default" key={fixture.id}>
-                    <ListItemDescriptor
-                      type="large"
-                      description={
-                        <Flex minWidth="13.75rem">
-                          <RobotInfoLabel
-                            deckLabel={fixture.location.replace('cutout', '')}
-                          />
-                        </Flex>
-                      }
-                      content={
-                        <Flex alignItems={ALIGN_CENTER}>
-                          <StyledText desktopStyle="bodyDefaultRegular">
-                            {t(`shared:${fixture.name}`)}
-                          </StyledText>
-                        </Flex>
-                      }
-                    />
-                  </ListItem>
-                ))
+                    <ListItem type="default" key={fixture.id}>
+                      <ListItemDescriptor
+                        type="large"
+                        description={
+                          <Flex minWidth="13.75rem">
+                            <RobotInfoLabel
+                              deckLabel={fixture.location.replace('cutout', '')}
+                            />
+                          </Flex>
+                        }
+                        content={
+                          <Flex alignItems={ALIGN_CENTER}>
+                            <StyledText desktopStyle="bodyDefaultRegular">
+                              {t(`shared:${fixture.name}`)}
+                            </StyledText>
+                          </Flex>
+                        }
+                      />
+                    </ListItem>
+                  ))
                 : null}
               {hardware.length > 0 ? (
                 hardware.map((hw, id) => {
