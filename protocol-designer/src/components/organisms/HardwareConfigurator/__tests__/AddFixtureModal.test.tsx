@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
+import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -11,6 +12,7 @@ import { AddFixtureModal } from '../AddFixtureModal'
 import type { ComponentProps } from 'react'
 
 vi.mock('/protocol-designer/step-forms/actions')
+vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/step-forms/selectors')
 const render = (props: ComponentProps<typeof AddFixtureModal>) => {
   return renderWithProviders(<AddFixtureModal {...props} />, {
@@ -32,6 +34,7 @@ describe('AddFixtureModal', () => {
       ],
       setValue: vi.fn(),
       hasGripper: false,
+      addressableAreaId: 'A1',
     }
     vi.mocked(getInitialDeckSetup).mockReturnValue({
       labware: {},
@@ -39,11 +42,12 @@ describe('AddFixtureModal', () => {
       additionalEquipmentOnDeck: {},
       pipettes: {},
     })
+    vi.mocked(getEnableStacking).mockReturnValue(true)
   })
 
   it('should render the fixture modal and clicking on the fixtures can select the trash bin', () => {
     render(props)
-    screen.getByText('Add to slot A1')
+    screen.getByText('Add to Slot A1')
     screen.getByText('Fixtures')
     fireEvent.click(screen.getAllByText('Select options')[0])
     screen.getByText('Trash bin')
@@ -53,7 +57,7 @@ describe('AddFixtureModal', () => {
   })
   it('should render the fixture modal and clicking on the modules can select the thermocycler', () => {
     render(props)
-    screen.getByText('Add to slot A1')
+    screen.getByText('Add to Slot A1')
     screen.getByText('Modules')
     fireEvent.click(screen.getAllByText('Select options')[1])
     screen.getByText('Thermocycler Module GEN2')

@@ -1,5 +1,41 @@
-dist
-python
-*.tgz
+# Source code (keep only built output in lib/)
 js/
 !lib/js
+
+# Python code and tests
+python/
+python_tests/
+*.py
+*.pyc
+__pycache__/
+
+# Development and build files
+node_modules/
+.git/
+.gitignore
+.coveragerc
+.flake8
+buildroot.mk
+Config.in
+Makefile*
+mypy.ini
+pyproject.toml
+pytest.ini
+tsconfig*.json
+vite.config.mts
+
+# Test files
+**/__tests__/
+**/*.test.*
+**/*.spec.*
+
+# Build artifacts and temporary files
+dist/
+*.tgz
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Development configuration
+Pipfile*

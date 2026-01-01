@@ -6,7 +6,6 @@ from anyio import run
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from enum import Enum
 from pathlib import Path
 from pydantic import BaseModel
 from typing import (
@@ -60,7 +59,9 @@ from opentrons.protocol_engine import (
     StateSummary,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
-from opentrons.protocol_engine.types import CommandAnnotation
+from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
+
+from opentrons_shared_data.util import StrEnum
 
 from opentrons_shared_data.robot.types import RobotType
 
@@ -324,7 +325,6 @@ async def _do_analyze(
     rtp_values: PrimitiveRunTimeParamValuesType,
     rtp_paths: CSVRuntimeParamPaths,
 ) -> RunResult:
-
     orchestrator = await create_simulating_orchestrator(
         robot_type=protocol_source.robot_type, protocol_config=protocol_source.config
     )
@@ -367,6 +367,7 @@ async def _do_analyze(
             ),
             parameters=[],
             command_annotations=[],
+            command_preconditions=None,
         )
         return analysis
     return await orchestrator.run(deck_configuration=[])
@@ -465,6 +466,7 @@ async def _analyze(  # noqa: C901
         liquids=analysis.state_summary.liquids,
         commandAnnotations=analysis.command_annotations,
         liquidClasses=analysis.state_summary.liquidClasses,
+        commandPreconditions=analysis.command_preconditions,
     )
 
     _call_for_output_of_kind(
@@ -508,7 +510,7 @@ class PythonConfig(BaseModel):
     apiVersion: APIVersion
 
 
-class AnalysisResult(str, Enum):
+class AnalysisResult(StrEnum):
     """Result of a completed protocol analysis.
 
     The result indicates whether the protocol is expected to run successfully.
@@ -555,3 +557,4 @@ class AnalyzeResults(BaseModel):
     liquidClasses: List[LiquidClassRecordWithId]
     errors: List[ErrorOccurrence]
     commandAnnotations: List[CommandAnnotation]
+    commandPreconditions: Optional[CommandPreconditions]

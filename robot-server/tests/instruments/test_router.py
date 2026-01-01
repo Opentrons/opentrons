@@ -1,4 +1,5 @@
 """Tests for /instruments routes."""
+
 from __future__ import annotations
 
 import pytest
@@ -160,7 +161,7 @@ async def test_get_all_attached_instruments(
                     next_fw_version=11,
                     fw_update_needed=False,
                     current_fw_sha="some-sha",
-                    pcba_revision="A1",
+                    pcba_revision="A1.0",
                     update_state=None,
                 ),
                 HWSubSystem.pipette_right: SubSystemState(
@@ -169,7 +170,7 @@ async def test_get_all_attached_instruments(
                     next_fw_version=11,
                     fw_update_needed=False,
                     current_fw_sha="some-other-sha",
-                    pcba_revision="A1",
+                    pcba_revision="A1.0",
                     update_state=None,
                 ),
                 HWSubSystem.gripper: SubSystemState(
@@ -178,7 +179,7 @@ async def test_get_all_attached_instruments(
                     next_fw_version=11,
                     fw_update_needed=False,
                     current_fw_sha="some-other-sha",
-                    pcba_revision="A1",
+                    pcba_revision="A1.0",
                     update_state=None,
                 ),
             }
@@ -412,7 +413,7 @@ async def test_get_instrument_not_ok(
                 next_fw_version=11,
                 fw_update_needed=True,
                 current_fw_sha="some-sha",
-                pcba_revision="A1",
+                pcba_revision="A1.0",
                 update_state=None,
             ),
             HWSubSystem.pipette_right: SubSystemState(
@@ -421,7 +422,7 @@ async def test_get_instrument_not_ok(
                 next_fw_version=11,
                 fw_update_needed=True,
                 current_fw_sha="some-other-sha",
-                pcba_revision="A1",
+                pcba_revision="A1.0",
                 update_state=None,
             ),
             HWSubSystem.gripper: SubSystemState(
@@ -430,7 +431,7 @@ async def test_get_instrument_not_ok(
                 next_fw_version=11,
                 fw_update_needed=True,
                 current_fw_sha="some-other-sha",
-                pcba_revision="A1",
+                pcba_revision="A1.0",
                 update_state=None,
             ),
         }

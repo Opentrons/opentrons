@@ -422,20 +422,29 @@
           "title": "Labwareid",
           "type": "string"
         },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
+        },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
           "title": "Pipetteid",
           "type": "string"
+        },
+        "trackFromLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to start the operation"
+        },
+        "trackToLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to end the operation"
         },
         "volume": {
           "description": "The amount of liquid to aspirate, in \u00b5L. Must not be greater than the remaining available amount, which depends on the pipette (see `loadPipette`), its configuration (see `configureForVolume`), the tip (see `pickUpTip`), and the amount you've aspirated so far. There is some tolerance for floating point rounding errors.",
           "minimum": 0.0,
           "title": "Volume",
           "type": "number"
-        },
-        "wellLocation": {
-          "$ref": "#/$defs/LiquidHandlingWellLocation",
-          "description": "Relative well location at which to perform the operation"
         },
         "wellName": {
           "description": "Name of well to use in labware.",
@@ -740,6 +749,143 @@
       },
       "required": ["mount"],
       "title": "CalibratePipetteParams",
+      "type": "object"
+    },
+    "CaptureImageCreate": {
+      "description": "A request to execute an Absorbance Reader measurement.",
+      "properties": {
+        "commandType": {
+          "const": "captureImage",
+          "default": "captureImage",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/CaptureImageParams"
+        }
+      },
+      "required": ["params"],
+      "title": "CaptureImageCreate",
+      "type": "object"
+    },
+    "CaptureImageParams": {
+      "description": "Input parameters for an image capture.",
+      "properties": {
+        "brightness": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The brightness to use when processing an image. Scale is 0% to 100%.",
+          "title": "Brightness"
+        },
+        "contrast": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The contrast to use when processing an image. Scale is 0% to 100%.",
+          "title": "Contrast"
+        },
+        "fileName": {
+          "description": "Optional file name to use when storing the results of an Image Capture.",
+          "title": "Filename",
+          "type": "string"
+        },
+        "pan": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "X/Y (pixels) position to pan to for a given zoom. Default is the center of the image.",
+          "title": "Pan"
+        },
+        "resolution": {
+          "anyOf": [
+            {
+              "maxItems": 2,
+              "minItems": 2,
+              "prefixItems": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "integer"
+                }
+              ],
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Width by height resolution in pixels for the image to be captured with.",
+          "title": "Resolution"
+        },
+        "saturation": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The saturation to use when processing an image. Scale is 0% to 100%.",
+          "title": "Saturation"
+        },
+        "zoom": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.",
+          "title": "Zoom"
+        }
+      },
+      "title": "CaptureImageParams",
       "type": "object"
     },
     "CloseGripperJawCreate": {
@@ -1679,6 +1825,11 @@
           "title": "Labwareid",
           "type": "string"
         },
+        "movement_delay": {
+          "description": "Optional movement delay in seconds. When this argument is used, the x/y/z movement will wait movement_delay seconds after the pipetting action starts before beginning the x/y/z move.",
+          "title": "Movement Delay",
+          "type": "number"
+        },
         "pipetteId": {
           "description": "Identifier of pipette to use for liquid handling.",
           "title": "Pipetteid",
@@ -1689,15 +1840,19 @@
           "title": "Pushout",
           "type": "number"
         },
+        "trackFromLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to start the operation"
+        },
+        "trackToLocation": {
+          "$ref": "#/$defs/LiquidHandlingWellLocation",
+          "description": "Relative well location at which to end the operation"
+        },
         "volume": {
           "description": "The amount of liquid to dispense, in \u00b5L. Must not be greater than the currently aspirated volume. There is some tolerance for floating point rounding errors.",
           "minimum": 0.0,
           "title": "Volume",
           "type": "number"
-        },
-        "wellLocation": {
-          "$ref": "#/$defs/LiquidHandlingWellLocation",
-          "description": "Relative well location at which to perform the operation"
         },
         "wellName": {
           "description": "Name of well to use in labware.",
@@ -2563,6 +2718,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Location the labware should be loaded into.",
@@ -2639,6 +2798,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Labware the lid should be loaded onto.",
@@ -2723,6 +2886,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Location the lid stack should be loaded into.",
@@ -3243,6 +3410,10 @@
             },
             {
               "$ref": "#/$defs/AddressableAreaLocation"
+            },
+            {
+              "const": "wasteChuteLocation",
+              "type": "string"
             }
           ],
           "description": "Where to move the labware.",
@@ -3385,7 +3556,7 @@
           "type": "boolean"
         },
         "ignoreTipConfiguration": {
-          "description": "Whether to utilize the critical point of the tip configuraiton when moving to an addressable area. If True, this command will ignore the tip configuration and use the center of the entire instrument as the critical point for movement. If False, this command will use the critical point provided by the current tip configuration.",
+          "description": "Whether to utilize the critical point of the tip configuration when moving to an addressable area. If True, this command will ignore the tip configuration and use the center of the entire instrument as the critical point for movement. If False, this command will use the critical point provided by the current tip configuration.",
           "title": "Ignoretipconfiguration",
           "type": "boolean"
         },
@@ -4215,6 +4386,11 @@
           "description": "Time to hold target temperature in seconds.",
           "title": "Holdseconds",
           "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
+          "type": "number"
         }
       },
       "required": ["celsius", "holdSeconds"],
@@ -4741,6 +4917,11 @@
           "description": "Time to hold target temperature at in seconds.",
           "title": "Holdseconds",
           "type": "number"
+        },
+        "rampRate": {
+          "description": "How quickly to change temperature in \u00b0C/second.",
+          "title": "Ramprate",
+          "type": "number"
         }
       },
       "required": ["celsius", "holdSeconds"],
@@ -4948,6 +5129,64 @@
       "title": "SetRailLightsParams",
       "type": "object"
     },
+    "SetShakeSpeedCreate": {
+      "description": "A request to create a Heater-Shaker's set shake speed command.",
+      "properties": {
+        "commandType": {
+          "const": "heaterShaker/setShakeSpeed",
+          "default": "heaterShaker/setShakeSpeed",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/SetShakeSpeedParams"
+        }
+      },
+      "required": ["params"],
+      "title": "SetShakeSpeedCreate",
+      "type": "object"
+    },
+    "SetShakeSpeedParams": {
+      "description": "Input parameters to set a shake speed for a Heater-Shaker Module.",
+      "properties": {
+        "moduleId": {
+          "description": "Unique ID of the Heater-Shaker Module.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "rpm": {
+          "description": "Target speed in rotations per minute.",
+          "title": "Rpm",
+          "type": "number"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid"
+        }
+      },
+      "required": ["moduleId", "rpm"],
+      "title": "SetShakeSpeedParams",
+      "type": "object"
+    },
     "SetStatusBarCreate": {
       "description": "setStatusBar command request model.",
       "properties": {
@@ -5140,6 +5379,11 @@
           "description": "The rate in C\u00b0/second to change temperature from the current target. If unspecified, the Thermocycler will change temperature at the fastest possible rate.",
           "title": "Ramp Rate",
           "type": "number"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -5174,7 +5418,7 @@
       "type": "object"
     },
     "SetTargetLidTemperatureParams": {
-      "description": "Input parameters to set a Thermocycler's target lid temperature.",
+      "description": "Input parameters to  to set a Thermocycler's target lid temperature.",
       "properties": {
         "celsius": {
           "description": "Target temperature in \u00b0C.",
@@ -5185,10 +5429,67 @@
           "description": "Unique ID of the Thermocycler Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature.",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
       "title": "SetTargetLidTemperatureParams",
+      "type": "object"
+    },
+    "SetTipStateCreate": {
+      "description": "Set tip state command creation request model.",
+      "properties": {
+        "commandType": {
+          "const": "setTipState",
+          "default": "setTipState",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/SetTipStateParams"
+        }
+      },
+      "required": ["params"],
+      "title": "SetTipStateCreate",
+      "type": "object"
+    },
+    "SetTipStateParams": {
+      "description": "Payload needed to set tip wells of a tip rack to the requested state.",
+      "properties": {
+        "labwareId": {
+          "description": "Identifier of tip rack labware to set tip wells in.",
+          "title": "Labwareid",
+          "type": "string"
+        },
+        "tipWellState": {
+          "$ref": "#/$defs/TipRackWellState",
+          "description": "State to set tip wells to."
+        },
+        "wellNames": {
+          "description": "Names of the well to set tip well state for.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Wellnames",
+          "type": "array"
+        }
+      },
+      "required": ["labwareId", "wellNames", "tipWellState"],
+      "title": "SetTipStateParams",
       "type": "object"
     },
     "SingleDispenseProperties": {
@@ -5412,6 +5713,79 @@
       "title": "StackerStoredLabwareGroup",
       "type": "object"
     },
+    "StartRunExtendedProfileCreate": {
+      "description": "A request to execute a Thermocycler profile run.",
+      "properties": {
+        "commandType": {
+          "const": "thermocycler/startRunExtendedProfile",
+          "default": "thermocycler/startRunExtendedProfile",
+          "title": "Commandtype",
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/$defs/CommandIntent",
+          "description": "The reason the command was added. If not specified or `protocol`, the command will be treated as part of the protocol run itself, and added to the end of the existing command queue.\n\nIf `setup`, the command will be treated as part of run setup. A setup command may only be enqueued if the run has not started.\n\nUse setup commands for activities like pre-run calibration checks and module setup, like pre-heating.",
+          "title": "Intent"
+        },
+        "key": {
+          "description": "A key value, unique in this run, that can be used to track the same logical command across multiple runs of the same protocol. If a value is not provided, one will be generated.",
+          "title": "Key",
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/$defs/StartRunExtendedProfileParams"
+        }
+      },
+      "required": ["params"],
+      "title": "StartRunExtendedProfileCreate",
+      "type": "object"
+    },
+    "StartRunExtendedProfileParams": {
+      "description": "Input parameters to run a Thermocycler profile.",
+      "properties": {
+        "blockMaxVolumeUl": {
+          "description": "Amount of liquid in uL of the most-full well in labware loaded onto the thermocycler.",
+          "title": "Blockmaxvolumeul",
+          "type": "number"
+        },
+        "moduleId": {
+          "description": "Unique ID of the Thermocycler.",
+          "title": "Moduleid",
+          "type": "string"
+        },
+        "profileElements": {
+          "description": "Elements of the profile. Each can be either a step or a cycle.",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/ProfileStep"
+              },
+              {
+                "$ref": "#/$defs/ProfileCycle"
+              }
+            ]
+          },
+          "title": "Profileelements",
+          "type": "array"
+        },
+        "taskId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "The id of the profile task",
+          "title": "Taskid"
+        }
+      },
+      "required": ["moduleId", "profileElements"],
+      "title": "StartRunExtendedProfileParams",
+      "type": "object"
+    },
     "StatusBarAnimation": {
       "description": "Status Bar animation options.",
       "enum": ["idle", "confirm", "updating", "disco", "off"],
@@ -5539,6 +5913,12 @@
       "description": "Tip presence status reported by a pipette.",
       "enum": ["present", "absent", "unknown"],
       "title": "TipPresenceStatus",
+      "type": "string"
+    },
+    "TipRackWellState": {
+      "description": "The state of a single tip in a tip rack's well.",
+      "enum": ["clean", "used", "empty"],
+      "title": "TipRackWellState",
       "type": "string"
     },
     "TouchTipCreate": {
@@ -6635,6 +7015,11 @@
           "description": "Unique ID of the Heater-Shaker Module.",
           "title": "Moduleid",
           "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid",
+          "type": "string"
         }
       },
       "required": ["moduleId", "celsius"],
@@ -6724,6 +7109,11 @@
         "moduleId": {
           "description": "Unique ID of the Temperature Module.",
           "title": "Moduleid",
+          "type": "string"
+        },
+        "taskId": {
+          "description": "Id for the background task that manages the temperature",
+          "title": "Taskid",
           "type": "string"
         }
       },
@@ -6875,6 +7265,7 @@
       "calibration/calibrateModule": "#/$defs/CalibrateModuleCreate",
       "calibration/calibratePipette": "#/$defs/CalibratePipetteCreate",
       "calibration/moveToMaintenancePosition": "#/$defs/MoveToMaintenancePositionCreate",
+      "captureImage": "#/$defs/CaptureImageCreate",
       "comment": "#/$defs/CommentCreate",
       "configureForVolume": "#/$defs/ConfigureForVolumeCreate",
       "configureNozzleLayout": "#/$defs/ConfigureNozzleLayoutCreate",
@@ -6897,6 +7288,7 @@
       "heaterShaker/deactivateShaker": "#/$defs/DeactivateShakerCreate",
       "heaterShaker/openLabwareLatch": "#/$defs/OpenLabwareLatchCreate",
       "heaterShaker/setAndWaitForShakeSpeed": "#/$defs/SetAndWaitForShakeSpeedCreate",
+      "heaterShaker/setShakeSpeed": "#/$defs/SetShakeSpeedCreate",
       "heaterShaker/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__set_target_temperature__SetTargetTemperatureCreate",
       "heaterShaker/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate",
       "home": "#/$defs/HomeCreate",
@@ -6932,6 +7324,7 @@
       "sealPipetteToTip": "#/$defs/SealPipetteToTipCreate",
       "setRailLights": "#/$defs/SetRailLightsCreate",
       "setStatusBar": "#/$defs/SetStatusBarCreate",
+      "setTipState": "#/$defs/SetTipStateCreate",
       "temperatureModule/deactivate": "#/$defs/DeactivateTemperatureCreate",
       "temperatureModule/setTargetTemperature": "#/$defs/opentrons__protocol_engine__commands__temperature_module__set_target_temperature__SetTargetTemperatureCreate",
       "temperatureModule/waitForTemperature": "#/$defs/opentrons__protocol_engine__commands__temperature_module__wait_for_temperature__WaitForTemperatureCreate",
@@ -6943,6 +7336,7 @@
       "thermocycler/runProfile": "#/$defs/RunProfileCreate",
       "thermocycler/setTargetBlockTemperature": "#/$defs/SetTargetBlockTemperatureCreate",
       "thermocycler/setTargetLidTemperature": "#/$defs/SetTargetLidTemperatureCreate",
+      "thermocycler/startRunExtendedProfile": "#/$defs/StartRunExtendedProfileCreate",
       "thermocycler/waitForBlockTemperature": "#/$defs/WaitForBlockTemperatureCreate",
       "thermocycler/waitForLidTemperature": "#/$defs/WaitForLidTemperatureCreate",
       "touchTip": "#/$defs/TouchTipCreate",
@@ -7102,6 +7496,9 @@
       "$ref": "#/$defs/GetNextTipCreate"
     },
     {
+      "$ref": "#/$defs/SetTipStateCreate"
+    },
+    {
       "$ref": "#/$defs/LiquidProbeCreate"
     },
     {
@@ -7117,6 +7514,9 @@
       "$ref": "#/$defs/UnsealPipetteFromTipCreate"
     },
     {
+      "$ref": "#/$defs/CaptureImageCreate"
+    },
+    {
       "$ref": "#/$defs/opentrons__protocol_engine__commands__heater_shaker__wait_for_temperature__WaitForTemperatureCreate"
     },
     {
@@ -7127,6 +7527,9 @@
     },
     {
       "$ref": "#/$defs/SetAndWaitForShakeSpeedCreate"
+    },
+    {
+      "$ref": "#/$defs/SetShakeSpeedCreate"
     },
     {
       "$ref": "#/$defs/DeactivateShakerCreate"
@@ -7178,6 +7581,9 @@
     },
     {
       "$ref": "#/$defs/RunProfileCreate"
+    },
+    {
+      "$ref": "#/$defs/StartRunExtendedProfileCreate"
     },
     {
       "$ref": "#/$defs/RunExtendedProfileCreate"

@@ -1,4 +1,5 @@
 """Tests for Tip Detector."""
+
 from typing import AsyncGenerator, List, Tuple
 
 from opentrons_hardware.firmware_bindings import NodeId

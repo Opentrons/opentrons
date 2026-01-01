@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -16700,7 +16703,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -16731,7 +16735,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"

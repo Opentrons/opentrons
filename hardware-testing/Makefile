@@ -127,6 +127,10 @@ test-integration: test-production-qc test-examples test-scripts test-gravimetric
 test-stacker:
 	$(python) -m hardware_testing.modules.flex_stacker_qc --simulate
 
+.PHONY: test-tc
+test-tc:
+	$(python) -m hardware_testing.scripts.monitor_thermocycler
+
 .PHONY: lint
 lint:
 	$(python) -m mypy hardware_testing tests
@@ -186,6 +190,7 @@ push-no-restart-ot3: wheel Pipfile.lock
 .PHONY: push-ot3
 push-ot3:
 	$(MAKE) push-no-restart-ot3
+	$(MAKE) restart-ot3
 	$(MAKE) push-plot-webpage-ot3
 	$(MAKE) push-description-ot3
 	$(MAKE) push-labware-ot3

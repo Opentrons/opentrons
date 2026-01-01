@@ -12,6 +12,8 @@ Opentrons *pipettes* are configurable devices used to move liquids throughout th
 
 - Opentrons Flex 8-Channel Pipette (5–1000 µL)
 
+- Opentrons Flex 96-Channel Pipette (1–200 µL)
+
 - Opentrons Flex 96-Channel Pipette (5–1000 µL)
 
 Pipettes attach to the gantry using captive screws on the front of the pipette. 1-channel and 8-channel pipettes each occupy one *pipette mount* (left or right); the 96-channel pipette occupies both mounts. For details on installing pipettes, see [Instrument Installation and Calibration](../installation/instruments.md).
@@ -25,13 +27,24 @@ The pipettes pick up disposable plastic *tips* by pressing them onto the pipette
 
 ## Pipette specifications
 
-Opentrons Flex pipettes are designed to handle a wide range of volumes.
-Because of their wide overall range, they can use multiple sizes of tips, which affect their liquid-handling characteristics. Opentrons has tested Flex pipettes for accuracy and precision in a number of tip and liquid volume combinations:
+Opentrons Flex pipettes are designed to handle a wide range of liquid volumes and are compatible with multiple tip sizes. To help ensure performance and quality, Opentrons has tested these instruments with different tips and liquid volume combinations.
+
+!!!tip
+    For best results, use the smallest capacity tips that meet the needs of your protocol.
+
+!!!note
+    You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See [Pipette calibration](pipettes.md#pipette-calibration) below, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
+
+The following tables list the accuracy and precision specifications for Opentrons Flex pipettes.
+
+### 1-channel pipette specifications
+
+Flex 1-channel pipettes meet the following accuracy and precision specifications.
 
 <table>
   <thead>
     <tr>
-      <th>Pipette</th>
+      <th>Pipette Capacity</th>
       <th>Tip Capacity</th>
       <th>Tested Volume</th>
       <th>Accuracy %D</th>
@@ -40,129 +53,180 @@ Because of their wide overall range, they can use multiple sizes of tips, which 
   </thead>
   <tbody>
     <tr>
-      <td rowspan="3"><b>Flex 1-Channel 50 µL</b></td>
-      <td>50 µL</td>
-      <td>1 µL</td>
-      <td>8.00%</td>
+      <td rowspan="3"><b>1–50 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>±8.00%</td>
       <td>7.00%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>10 µL</td>
-      <td>1.50%</td>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>±1.50%</td>
       <td>0.50%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>1.25%</td>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>±1.25%</td>
       <td>0.40%</td>
     </tr>
     <tr>
-      <td rowspan="4"><b>Flex 1-Channel 1000 µL</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>5.00%</td>
+      <td rowspan="4"><b>5–1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>±5.00%</td>
       <td>2.50%</td>
     </tr>
     <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>0.50%</td>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>±0.50%</td>
       <td>0.30%</td>
     </tr>
     <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>0.50%</td>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>±0.50%</td>
       <td>0.15%</td>
     </tr>
     <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>0.50%</td>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>±0.50%</td>
       <td>0.15%</td>
-    </tr>
-    <tr>
-      <td rowspan="3"><b>Flex 8-Channel 50 µL</b></td>
-      <td>50 µL</td>
-      <td>1 µL</td>
-      <td>10.00%</td>
-      <td>8.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>10 µL</td>
-      <td>2.50%</td>
-      <td>1.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>1.25%</td>
-      <td>0.60%</td>
-    </tr>
-    <tr>
-      <td rowspan="4"><b>Flex 8-Channel 1000 µL</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>8.00%</td>
-      <td>4.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>2.50%</td>
-      <td>0.60%</td>
-    </tr>
-    <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>1.00%</td>
-      <td>0.25%</td>
-    </tr>
-    <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>0.70%</td>
-      <td>0.15%</td>
-    </tr>
-    <tr>
-      <td rowspan="4"><b>Flex 96-Channel 1000 µL</b></td>
-      <td>50 µL</td>
-      <td>5 µL</td>
-      <td>10.00%</td>
-      <td>5.00%</td>
-    </tr>
-    <tr>
-      <td>50 µL</td>
-      <td>50 µL</td>
-      <td>2.50%</td>
-      <td>1.25%</td>
-    </tr>
-    <tr>
-      <td>200 µL</td>
-      <td>200 µL</td>
-      <td>1.50%</td>
-      <td>1.25%</td>
-    </tr>
-    <tr>
-      <td>1000 µL</td>
-      <td>1000 µL</td>
-      <td>1.50%</td>
-      <td>1.50%</td>
     </tr>
   </tbody>
 </table>
 
-Keep this accuracy information in mind when choosing tips for your
-pipette. In general, for best results you should use the smallest tips
-that meet the needs of your protocol.
+### 8-channel pipette specifications
 
-!!! note
-    Opentrons performs volumetric testing of Flex pipettes to ensure that they meet the accuracy and precision specifications listed above. You *do not* have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration. See the next section, as well as the [Pipette Installation section][pipette-installation] of the Installation and Relocation chapter, for details.
+Flex 8-channel pipettes meet the following accuracy and precision specifications.
 
-    The Opentrons Care and Opentrons Care Plus services include yearly pipette replacement and certificates of calibration. See the [Servicing Flex section](../maintenance/service.md) of the Maintenance and Service chapter for details.
+<table>
+  <thead>
+    <tr>
+      <th>Pipette Capacity</th>
+      <th>Tip Capacity</th>
+      <th>Tested Volume</th>
+      <th>Accuracy %D</th>
+      <th>Precision %CV</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="3"><b>1–50 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>±10.00%</td>
+      <td>8.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>10 µL</td>
+      <td>±2.50%</td>
+      <td>1.00%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>±1.25%</td>
+      <td>0.60%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>5–1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>±8.00%</td>
+      <td>4%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>±2.50%</td>
+      <td>0.60%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>±1.00%</td>
+      <td>0.25%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>±0.70%</td>
+      <td>0.15%</td>
+    </tr>
+  </tbody>
+</table>
+
+### 96-channel pipette specifications
+
+Flex 96-channel pipettes meet the following accuracy and precision specifications.
+
+<table>
+  <thead>
+    <tr>
+      <th>Pipette Capacity</th>
+      <th>Tip Capacity</th>
+      <th>Tested Volume</th>
+      <th>Accuracy %D</th>
+      <th>Precision %CV</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="4"><b>1–200 µL</b></td>
+      <td>50 µL</td>
+      <td>1 µL</td>
+      <td>±10%</td>
+      <td>6%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>±4%</td>
+      <td>2%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>±1.5%</td>
+      <td>1%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>±1%</td>
+      <td>1%</td>
+    </tr>
+    <tr>
+      <td rowspan="4"><b>5–1000 µL</b></td>
+      <td>50 µL</td>
+      <td>5 µL</td>
+      <td>±10%</td>
+      <td>5%</td>
+    </tr>
+    <tr>
+      <td>50 µL</td>
+      <td>50 µL</td>
+      <td>±2.5%</td>
+      <td>1.25%</td>
+    </tr>
+    <tr>
+      <td>200 µL</td>
+      <td>200 µL</td>
+      <td>±1.5%</td>
+      <td>1.25%</td>
+    </tr>
+    <tr>
+      <td>1000 µL</td>
+      <td>1000 µL</td>
+      <td>±1.5%</td>
+      <td>1.5%</td>
+    </tr>
+</table>
 
 ## Pipette calibration
 
@@ -172,7 +236,7 @@ The User Kit includes a metal pipette calibration probe, which you use during po
 
 ![The 96-channel tip rack adapter.](../images/96-channel-tip-rack-adapter.png "96-channel tip rack adapter")
 
-The Opentrons Flex 96-channel pipette ships with four tip rack adapters. These are precision formed aluminum brackets that you place on the deck. The adapters hold Flex 50 μL, 200 μL, and 1000 µL tip racks.
+The Opentrons Flex 96-channel pipette ships with four tip rack adapters. These are precision formed aluminum brackets that you place on the deck. The adapters hold Flex 50 µL, 200 µL, and 1000 µL tip racks.
 
 Because of the force involved, the 96-channel pipette requires an adapter to attach a full tip rack properly. During the attachment procedure, the pipette moves over the adapter, lowers itself onto the mounting pins, and pulls tips onto the pipettes by lifting the adapter and tip rack. Pulling the tips, rather than pushing, provides the leverage needed to secure tips to the pipettes and prevents warping the deck surface. When finished, the 96-channel pipette lowers the adapter and empty tip rack onto the deck. See the [Tips and Tip Racks section][tips-and-tip-racks] of the Labware chapter for more information.
 
@@ -200,7 +264,7 @@ A photointerruptor switch detects the position of the pipette's tip ejector mech
 
 ### Pressure sensors
 
-Flex pipettes use internal pressure sensors to detect liquid in well plates, reservoirs, and tubes. Liquid detection takes place as a pipette approaches the surface of a liquid. Sensors in the pipettes detect pressure changes relative to ambient pressure. A particular change in pressure tells the robot that liquid is present in a well and the pipette tip is in contact with the liquid's surface.
+Flex pipettes use internal pressure sensors to detect liquid in well plates, reservoirs, and tubes. Liquid detection takes place as a pipette approaches the surface of a liquid. Sensors in the pipettes detect pressure changes relative to ambient pressure. Particular changes in pressure tell the robot whether liquid is present in a well, the liquid level, and whether the pipette tip is in contact with the liquid's surface.
 
 1-channel pipettes have one pressure sensor. The 8-channel pipette pressure sensors are on channels 1 and 8 (positions A1 and H1). The 96-channel pipette pressure sensors are on channels 1 and 96 (positions A1 and H12). Other channels on multi-channel pipettes do not have sensors and cannot detect liquid.
 

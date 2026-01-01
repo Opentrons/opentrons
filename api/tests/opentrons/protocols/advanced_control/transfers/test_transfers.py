@@ -1,4 +1,5 @@
-""" Test the Transfer class and its functions """
+"""Test the Transfer class and its functions"""
+
 import pytest
 from typing import TypedDict
 

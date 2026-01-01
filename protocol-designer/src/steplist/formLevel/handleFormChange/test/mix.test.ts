@@ -7,6 +7,7 @@ import {
   fixture_tiprack_300_ul,
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
+import { AUTOMATIC } from '@opentrons/step-generation'
 
 import { DEFAULT_MM_OFFSET_FROM_BOTTOM } from '/protocol-designer/constants'
 
@@ -101,6 +102,9 @@ describe('well selection should update', () => {
       dispense_flowRate: null,
       nozzles: null,
       tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('pipette single -> multi', () => {
@@ -114,6 +118,9 @@ describe('well selection should update', () => {
       dispense_flowRate: null,
       nozzles: ALL,
       tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('pipette multi -> single', () => {
@@ -128,6 +135,9 @@ describe('well selection should update', () => {
       dispense_flowRate: null,
       nozzles: null,
       tipRack: null,
+      tiprack_selected: null,
+      tips_selected: [],
+      tip_tracking: AUTOMATIC,
     })
   })
   it('select single-well labware', () => {
@@ -140,6 +150,7 @@ describe('well selection should update', () => {
       mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
       mix_touchTip_mmFromTop: null,
       mix_touchTip_checkbox: false,
+      tips_selected: [],
     })
   })
   it('select labware with multiple wells', () => {
@@ -153,6 +164,18 @@ describe('well selection should update', () => {
       mix_mmFromBottom: DEFAULT_MM_OFFSET_FROM_BOTTOM,
       mix_touchTip_mmFromTop: null,
       mix_touchTip_checkbox: false,
+      tips_selected: [],
     })
+  })
+})
+
+describe('change tip', () => {
+  it('should update the tips_selected field when the changeTip field is changed', () => {
+    const form = {
+      changeTip: 'always',
+      tips_selected: [['A1']],
+    }
+    const result = handleFormHelper({ changeTip: 'once' }, form)
+    expect(result.tips_selected).toEqual([])
   })
 })

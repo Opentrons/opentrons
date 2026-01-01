@@ -7,7 +7,6 @@ import {
 
 import { getRequiredLabwareDetailsFromLoadCommands } from '/app/transformations/commands'
 
-import type { CompletedProtocolAnalysis } from '@opentrons/shared-data'
 import type { RequiredLabwareDetails } from '/app/transformations/commands'
 
 /**
@@ -20,15 +19,12 @@ export const useRequiredProtocolLabware = (
   protocolId: string
 ): RequiredLabwareDetails[] => {
   const { data: protocolData } = useProtocolQuery(protocolId)
-  const {
-    data: mostRecentAnalysis,
-  } = useProtocolAnalysisAsDocumentQuery(
+  const { data: mostRecentAnalysis } = useProtocolAnalysisAsDocumentQuery(
     protocolId,
     last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }
   )
-  const commands =
-    (mostRecentAnalysis as CompletedProtocolAnalysis)?.commands ?? []
+  const commands = mostRecentAnalysis?.commands ?? []
   const labwareDetails = getRequiredLabwareDetailsFromLoadCommands(commands)
   return labwareDetails
 }

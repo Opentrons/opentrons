@@ -2,6 +2,7 @@
 
 Contains routes dealing primarily with `Maintenance Run` models.
 """
+
 import logging
 from datetime import datetime
 from textwrap import dedent
@@ -35,12 +36,19 @@ from ..maintenance_run_models import (
 from ..maintenance_run_orchestrator_store import RunConflictError
 from ..maintenance_run_data_manager import MaintenanceRunDataManager
 from ..dependencies import get_maintenance_run_data_manager
+from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.run_data_manager import RunDataManager
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.service.notifications import get_pe_notify_publishers
+from robot_server.camera.fastapi_dependencies import (
+    get_camera_provider,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.types import EngineStatus
 
 log = logging.getLogger(__name__)
 base_router = LightRouter()
@@ -157,6 +165,7 @@ async def create_run(
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
+    camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     request_body: Optional[RequestModel[MaintenanceRunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[MaintenanceRun]]:
     """Create a new maintenance run.
@@ -169,11 +178,12 @@ async def create_run(
         is_ok_to_create_maintenance_run: Verify if a maintenance run may be created if a protocol run exists.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
+        camera_provider: Dependency to provide access to the Camera Settings to the run.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     if not is_ok_to_create_maintenance_run:
         raise ProtocolRunIsActive(
-            detail="Cannot create maintenance run when " "a protocol run is active."
+            detail="Cannot create maintenance run when a protocol run is active."
         ).as_error(status.HTTP_409_CONFLICT)
 
     offsets = request_body.data.labwareOffsets if request_body is not None else []
@@ -185,6 +195,7 @@ async def create_run(
         labware_offsets=offsets,
         deck_configuration=deck_configuration,
         notify_publishers=notify_publishers,
+        camera_provider=camera_provider,
     )
 
     log.info(f'Created an empty run "{run_id}"".')
@@ -267,18 +278,36 @@ async def get_run(
 )
 async def remove_run(
     runId: str,
-    run_data_manager: Annotated[
+    maintenance_run_data_manager: Annotated[
         MaintenanceRunDataManager, Depends(get_maintenance_run_data_manager)
     ],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
 ) -> PydanticResponse[SimpleEmptyBody]:
     """Delete a maintenance run by its ID.
 
     Arguments:
         runId: Run ID pulled from URL.
+        maintenance_run_data_manager: Current maintenance run data management.
         run_data_manager: Current run data management.
+        camera_provider: Utility for accessing image capture and camera settings.
     """
     try:
-        await run_data_manager.delete(runId)
+        camera_settings = None
+        if run_data_manager.current_run_id is not None:
+            # Import the camera settings from an external run if one exists
+            state_summary = run_data_manager._get_good_state_summary(
+                run_data_manager.current_run_id
+            )
+            if (
+                state_summary is not None
+                and state_summary.status is not EngineStatus.FINISHING
+            ):
+                camera_settings = state_summary.cameraSettings
+
+        await maintenance_run_data_manager.delete(
+            runId, camera_settings, camera_provider
+        )
 
     except RunConflictError as e:
         raise RunNotIdle().as_error(status.HTTP_409_CONFLICT) from e

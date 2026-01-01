@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  width: 41.625rem;
+  height: 17.25rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--border-radius-12);
+  background-color: var(--grey-35);
+  gap: var(--spacing-24);
+}
+
+.canceling_text {
+  font-weight: var(--font-weight-bold);
+}
+
+.icon {
+  color: var(--grey-60);
+}

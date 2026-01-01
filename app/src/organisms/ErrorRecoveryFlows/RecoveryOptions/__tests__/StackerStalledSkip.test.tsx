@@ -67,13 +67,6 @@ describe('StackerStalledSkip', () => {
     vi.resetAllMocks()
   })
 
-  it(`renders StackerHomeShuttle when step is ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING}`, () => {
-    props.recoveryMap.step =
-      RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING
-    render(props)
-    screen.getByText('MOCK_STACKER_HOME_SHUTTLE')
-  })
-
   it(`renders StackerHomeShuttle when step is ${RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS}`, () => {
     props.recoveryMap.step =
       RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS

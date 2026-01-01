@@ -20,6 +20,7 @@ from .flex_stacker.common import (
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
     FlexStackerShuttleOccupiedError,
+    FlexStackerLabwareStoreError,
 )
 
 from . import absorbance_reader
@@ -387,6 +388,14 @@ from .get_next_tip import (
     GetNextTipCommandType,
 )
 
+from .set_tip_state import (
+    SetTipState,
+    SetTipStateCreate,
+    SetTipStateParams,
+    SetTipStateResult,
+    SetTipStateCommandType,
+)
+
 from .liquid_probe import (
     LiquidProbe,
     LiquidProbeParams,
@@ -430,6 +439,14 @@ from .identify_module import (
     IdentifyModuleCreate,
     IdentifyModuleResult,
     IdentifyModuleCommandType,
+)
+
+from .capture_image import (
+    CaptureImage,
+    CaptureImageParams,
+    CaptureImageCreate,
+    CaptureImageResult,
+    CaptureImageCommandType,
 )
 
 Command = Annotated[
@@ -479,15 +496,18 @@ Command = Annotated[
         VerifyTipPresence,
         GetTipPresence,
         GetNextTip,
+        SetTipState,
         LiquidProbe,
         TryLiquidProbe,
         SealPipetteToTip,
         PressureDispense,
         UnsealPipetteFromTip,
+        CaptureImage,
         heater_shaker.WaitForTemperature,
         heater_shaker.SetTargetTemperature,
         heater_shaker.DeactivateHeater,
         heater_shaker.SetAndWaitForShakeSpeed,
+        heater_shaker.SetShakeSpeed,
         heater_shaker.DeactivateShaker,
         heater_shaker.OpenLabwareLatch,
         heater_shaker.CloseLabwareLatch,
@@ -505,6 +525,7 @@ Command = Annotated[
         thermocycler.OpenLid,
         thermocycler.CloseLid,
         thermocycler.RunProfile,
+        thermocycler.StartRunExtendedProfile,
         thermocycler.RunExtendedProfile,
         absorbance_reader.CloseLid,
         absorbance_reader.OpenLid,
@@ -584,15 +605,18 @@ CommandParams = Union[
     VerifyTipPresenceParams,
     GetTipPresenceParams,
     GetNextTipParams,
+    SetTipStateParams,
     LiquidProbeParams,
     TryLiquidProbeParams,
     SealPipetteToTipParams,
     PressureDispenseParams,
     UnsealPipetteFromTipParams,
+    CaptureImageParams,
     heater_shaker.WaitForTemperatureParams,
     heater_shaker.SetTargetTemperatureParams,
     heater_shaker.DeactivateHeaterParams,
     heater_shaker.SetAndWaitForShakeSpeedParams,
+    heater_shaker.SetShakeSpeedParams,
     heater_shaker.DeactivateShakerParams,
     heater_shaker.OpenLabwareLatchParams,
     heater_shaker.CloseLabwareLatchParams,
@@ -610,6 +634,7 @@ CommandParams = Union[
     thermocycler.OpenLidParams,
     thermocycler.CloseLidParams,
     thermocycler.RunProfileParams,
+    thermocycler.StartRunExtendedProfileParams,
     thermocycler.RunExtendedProfileParams,
     absorbance_reader.CloseLidParams,
     absorbance_reader.OpenLidParams,
@@ -687,15 +712,18 @@ CommandType = Union[
     VerifyTipPresenceCommandType,
     GetTipPresenceCommandType,
     GetNextTipCommandType,
+    SetTipStateCommandType,
     LiquidProbeCommandType,
     TryLiquidProbeCommandType,
     SealPipetteToTipCommandType,
     PressureDispenseCommandType,
     UnsealPipetteFromTipCommandType,
+    CaptureImageCommandType,
     heater_shaker.WaitForTemperatureCommandType,
     heater_shaker.SetTargetTemperatureCommandType,
     heater_shaker.DeactivateHeaterCommandType,
     heater_shaker.SetAndWaitForShakeSpeedCommandType,
+    heater_shaker.SetShakeSpeedCommandType,
     heater_shaker.DeactivateShakerCommandType,
     heater_shaker.OpenLabwareLatchCommandType,
     heater_shaker.CloseLabwareLatchCommandType,
@@ -713,6 +741,7 @@ CommandType = Union[
     thermocycler.OpenLidCommandType,
     thermocycler.CloseLidCommandType,
     thermocycler.RunProfileCommandType,
+    thermocycler.StartRunExtendedProfileCommandType,
     thermocycler.RunExtendedProfileCommandType,
     absorbance_reader.CloseLidCommandType,
     absorbance_reader.OpenLidCommandType,
@@ -791,15 +820,18 @@ CommandCreate = Annotated[
         VerifyTipPresenceCreate,
         GetTipPresenceCreate,
         GetNextTipCreate,
+        SetTipStateCreate,
         LiquidProbeCreate,
         TryLiquidProbeCreate,
         SealPipetteToTipCreate,
         PressureDispenseCreate,
         UnsealPipetteFromTipCreate,
+        CaptureImageCreate,
         heater_shaker.WaitForTemperatureCreate,
         heater_shaker.SetTargetTemperatureCreate,
         heater_shaker.DeactivateHeaterCreate,
         heater_shaker.SetAndWaitForShakeSpeedCreate,
+        heater_shaker.SetShakeSpeedCreate,
         heater_shaker.DeactivateShakerCreate,
         heater_shaker.OpenLabwareLatchCreate,
         heater_shaker.CloseLabwareLatchCreate,
@@ -817,6 +849,7 @@ CommandCreate = Annotated[
         thermocycler.OpenLidCreate,
         thermocycler.CloseLidCreate,
         thermocycler.RunProfileCreate,
+        thermocycler.StartRunExtendedProfileCreate,
         thermocycler.RunExtendedProfileCreate,
         absorbance_reader.CloseLidCreate,
         absorbance_reader.OpenLidCreate,
@@ -903,15 +936,18 @@ CommandResult = Union[
     VerifyTipPresenceResult,
     GetTipPresenceResult,
     GetNextTipResult,
+    SetTipStateResult,
     LiquidProbeResult,
     TryLiquidProbeResult,
     SealPipetteToTipResult,
     PressureDispenseResult,
     UnsealPipetteFromTipResult,
+    CaptureImageResult,
     heater_shaker.WaitForTemperatureResult,
     heater_shaker.SetTargetTemperatureResult,
     heater_shaker.DeactivateHeaterResult,
     heater_shaker.SetAndWaitForShakeSpeedResult,
+    heater_shaker.SetShakeSpeedResult,
     heater_shaker.DeactivateShakerResult,
     heater_shaker.OpenLabwareLatchResult,
     heater_shaker.CloseLabwareLatchResult,
@@ -929,6 +965,7 @@ CommandResult = Union[
     thermocycler.OpenLidResult,
     thermocycler.CloseLidResult,
     thermocycler.RunProfileResult,
+    thermocycler.StartRunExtendedProfileResult,
     thermocycler.RunExtendedProfileResult,
     absorbance_reader.CloseLidResult,
     absorbance_reader.OpenLidResult,
@@ -974,6 +1011,7 @@ CommandDefinedErrorData = Union[
     DefinedErrorData[FlexStackerHopperError],
     DefinedErrorData[FlexStackerLabwareRetrieveError],
     DefinedErrorData[FlexStackerShuttleOccupiedError],
+    DefinedErrorData[FlexStackerLabwareStoreError],
 ]
 
 
@@ -987,9 +1025,9 @@ def _map_create_types_by_params_type(
 
     # This isn't an inherent requirement of opentrons.protocol_engine,
     # but this mapping is only useful to higher-level code if this holds true.
-    assert len(result) == len(
-        create_types
-    ), "Param models should map to create models 1:1."
+    assert len(result) == len(create_types), (
+        "Param models should map to create models 1:1."
+    )
 
     return result
 

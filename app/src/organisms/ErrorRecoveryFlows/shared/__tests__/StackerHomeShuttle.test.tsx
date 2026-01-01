@@ -39,9 +39,8 @@ describe('Render StackerHomeShuttle', () => {
       stepCounts: { hasRunDiverged: false },
       recoveryMap: {
         route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-        step:
-          RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS
-            .PREPARE_TRACK_FOR_HOMING,
+        step: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS
+          .PREPARE_TRACK_FOR_HOMING,
       },
     } as any
   })
@@ -83,28 +82,9 @@ describe('Render StackerHomeShuttle', () => {
 
   it.each([
     {
-      route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.ROUTE,
-      step:
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
-    },
-    {
-      route: RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.ROUTE,
-      step:
-        RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING,
-    },
-    {
       route: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.ROUTE,
-      step:
-        RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS
-          .PREPARE_TRACK_FOR_HOMING,
-    },
-    {
-      route: RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
-      step: RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING,
-    },
-    {
-      route: RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,
-      step: RECOVERY_MAP.STACKER_STALLED_SKIP.STEPS.PREPARE_TRACK_FOR_HOMING,
+      step: RECOVERY_MAP.STACKER_SHUTTLE_MISSING_RETRY.STEPS
+        .PREPARE_TRACK_FOR_HOMING,
     },
   ])(`renders correct title for route $route step $step`, ({ route, step }) => {
     props.recoveryMap = {
@@ -123,8 +103,8 @@ describe('Render StackerHomeShuttle', () => {
   it.each([
     {
       route: RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE,
-      step:
-        RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS.CLEAR_TRACK_OF_OBSTRUCTIONS,
+      step: RECOVERY_MAP.STACKER_STALLED_RETRY.STEPS
+        .CLEAR_TRACK_OF_OBSTRUCTIONS,
     },
     {
       route: RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE,

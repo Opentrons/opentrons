@@ -81,6 +81,22 @@ describe('getLabwareDisplayLocation with translations', () => {
       screen.getByText('off deck')
     })
 
+    it('should return "off deck" for system location', () => {
+      render({
+        location: 'systemLocation',
+        params: defaultParams,
+      })
+      screen.getByText('off deck')
+    })
+
+    it('should return "off deck" for thrown-through-waste-chute location', () => {
+      render({
+        location: 'wasteChuteLocation',
+        params: defaultParams,
+      })
+      screen.getByText('off deck')
+    })
+
     it('should return a slot name for slot location', () => {
       render({
         location: { slotName: 'A1' },

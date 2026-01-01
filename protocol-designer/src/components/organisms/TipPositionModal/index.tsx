@@ -45,7 +45,7 @@ import * as utils from './utils'
 import type { ChangeEvent, Dispatch, SetStateAction } from 'react'
 import type { PositionReference } from '@opentrons/shared-data'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
-import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 import type { MoveLiquidPrefixType } from '/protocol-designer/resources/types'
 
 type Offset = 'x' | 'y' | 'z'
@@ -120,16 +120,13 @@ export function TipPositionModal(
   const [xValue, setXValue] = useState<string>(
     xSpec?.value == null ? '0' : String(xSpec?.value)
   )
-  const {
-    positionReferenceDropdown,
-    reference,
-    setReference,
-  } = usePositionReference({
-    initialReference: referenceSpec?.value,
-    zValue: Number(zValue),
-    updateZValue: setZValue,
-    wellDepth: wellDepthMm,
-  })
+  const { positionReferenceDropdown, reference, setReference } =
+    usePositionReference({
+      initialReference: referenceSpec?.value,
+      zValue: Number(zValue),
+      updateZValue: setZValue,
+      wellDepth: wellDepthMm,
+    })
 
   // submerge/retract in well warning
   const isInWell =
@@ -182,12 +179,10 @@ export function TipPositionModal(
     reference,
     wellDepthMm
   )
-  const { minValue: yMinWidth, maxValue: yMaxWidth } = utils.getMinMaxWidth(
-    wellYWidthMm
-  )
-  const { minValue: xMinWidth, maxValue: xMaxWidth } = utils.getMinMaxWidth(
-    wellXWidthMm
-  )
+  const { minValue: yMinWidth, maxValue: yMaxWidth } =
+    utils.getMinMaxWidth(wellYWidthMm)
+  const { minValue: xMinWidth, maxValue: xMaxWidth } =
+    utils.getMinMaxWidth(wellXWidthMm)
 
   const createErrors = (
     value: string | null,
@@ -280,15 +275,18 @@ export function TipPositionModal(
       ? utils.getIsZValueAtBottom(zValue, wellDepthMm, reference)
       : false
 
+  const titleText =
+    prefix === 'aspirate' || prefix === 'dispense' || prefix === 'mix'
+      ? t('shared:tip_position', { prefix: MoveLiquidPrefixToAction[prefix] })
+      : t('shared:start_point', { prefix: MoveLiquidPrefixToAction[prefix] })
+
   return createPortal(
     <Modal
       marginLeft="0"
       type="info"
       width="47rem"
       closeOnOutsideClick
-      title={t('shared:tip_position', {
-        prefix: MoveLiquidPrefixToAction[prefix],
-      })}
+      title={titleText}
       onClose={handleCancel}
       footer={
         <Flex
@@ -352,6 +350,7 @@ export function TipPositionModal(
               }
               error={xErrorText}
               id="TipPositionModal_x_custom_input"
+              data-testid="TipPositionModal_x_custom_input"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setXValue)
               }}
@@ -371,6 +370,7 @@ export function TipPositionModal(
               }
               error={yErrorText}
               id="TipPositionModal_y_custom_input"
+              data-testid="TipPositionModal_y_custom_input"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setYValue)
               }}
@@ -389,6 +389,7 @@ export function TipPositionModal(
               }
               error={zErrorText}
               id="TipPositionModal_z_custom_input"
+              data-testid="TipPositionModal_z_custom_input"
               isIndeterminate={zValue === null && isIndeterminate}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setZValue)
@@ -424,19 +425,22 @@ export function TipPositionModal(
               <TipPositionSideView
                 mmFromBottom={
                   zValue !== null
-                    ? getMmFromBottom(Number(zValue), reference, wellDepthMm) ??
-                      defaultMmFromBottom
+                    ? (getMmFromBottom(
+                        Number(zValue),
+                        reference,
+                        wellDepthMm
+                      ) ?? defaultMmFromBottom)
                     : defaultMmFromBottom
                 }
                 wellDepthMm={wellDepthMm}
-                xPosition={parseInt(xValue ?? '0')}
+                xPosition={parseFloat(xValue ?? '0')}
                 xWidthMm={wellXWidthMm}
               />
             ) : (
               <TipPositionTopView
-                xPosition={parseInt(xValue ?? '0')}
+                xPosition={parseFloat(xValue ?? '0')}
                 xWidthMm={wellXWidthMm}
-                yPosition={parseInt(yValue ?? '0')}
+                yPosition={parseFloat(yValue ?? '0')}
                 yWidthMm={wellYWidthMm}
               />
             )}

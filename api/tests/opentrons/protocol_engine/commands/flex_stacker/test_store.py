@@ -12,6 +12,7 @@ from opentrons.hardware_control.modules import FlexStacker, PlatformState
 from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerLabwareStoreError,
 )
 from opentrons.protocol_engine.resources import ModelUtils
 
@@ -49,6 +50,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerShuttleLabwareError,
 )
 
 
@@ -67,7 +69,7 @@ def subject(
 def _contained_labware(count: int) -> list[StackerStoredLabwareGroup]:
     return [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{i+1}",
+            primaryLabwareId=f"primary-id-{i + 1}",
             adapterLabwareId=None,
             lidLabwareId=None,
         )
@@ -199,6 +201,14 @@ async def test_store_raises_if_not_configured(
                 shuttle_state=PlatformState.UNKNOWN,
             ),
             FlexStackerShuttleError,
+        ),
+        (
+            FlexStackerShuttleLabwareError(
+                serial="123",
+                shuttle_state=PlatformState.UNKNOWN,
+                labware_expected=True,
+            ),
+            FlexStackerLabwareStoreError,
         ),
     ],
 )

@@ -19,18 +19,14 @@ import {
   LINK_BUTTON_STYLE,
 } from '../../components/atoms'
 
-const REQUIRED_APP_VERSION = '8.7.0'
-
-type MetadataInfo = Array<{
-  author?: string
-  description?: string | null
-  created?: string
-  modified?: string
-}>
+interface MetadataItem {
+  title: string
+  value: string | null
+}
 
 interface ProtocolMetadataProps {
   setShowEditMetadataModal: (showEditMetadataModal: boolean) => void
-  metaDataInfo: MetadataInfo
+  metaDataInfo: MetadataItem[]
 }
 
 export function ProtocolMetadata({
@@ -61,35 +57,31 @@ export function ProtocolMetadata({
         </Flex>
       </Flex>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
-        {metaDataInfo.map(info => {
-          const [title, value] = Object.entries(info)[0]
-
-          return (
-            <ListItem type="default" key={`ProtocolOverview_${title}`}>
-              <ListItemDescriptor
-                type="large"
-                description={
-                  <Flex minWidth="13.75rem">
-                    <StyledText
-                      desktopStyle="bodyDefaultRegular"
-                      color={COLORS.grey60}
-                    >
-                      {t(`${title}`)}
-                    </StyledText>
-                  </Flex>
-                }
-                content={
+        {metaDataInfo.map(({ title, value }) => (
+          <ListItem type="default" key={`ProtocolOverview_${title}`}>
+            <ListItemDescriptor
+              type="large"
+              description={
+                <Flex minWidth="13.75rem">
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
-                    css={LINE_CLAMP_TEXT_STYLE(2)}
+                    color={COLORS.grey60}
                   >
-                    {value ?? t('na')}
+                    {t(`${title}`)}
                   </StyledText>
-                }
-              />
-            </ListItem>
-          )
-        })}
+                </Flex>
+              }
+              content={
+                <StyledText
+                  desktopStyle="bodyDefaultRegular"
+                  css={LINE_CLAMP_TEXT_STYLE(2)}
+                >
+                  {value ?? t('na')}
+                </StyledText>
+              }
+            />
+          </ListItem>
+        ))}
         <ListItem type="default" key="ProtocolOverview_robotVersion">
           <ListItemDescriptor
             type="large"
@@ -106,7 +98,7 @@ export function ProtocolMetadata({
             content={
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('app_version', {
-                  version: REQUIRED_APP_VERSION,
+                  version: _OT_PD_REQUIRED_APP_VERSION_,
                 })}
               </StyledText>
             }

@@ -139,9 +139,9 @@ class UnsealPipetteFromTip(
     params: UnsealPipetteFromTipParams
     result: Optional[UnsealPipetteFromTipResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsealPipetteFromTipImplementation] = (
         UnsealPipetteFromTipImplementation
-    ] = UnsealPipetteFromTipImplementation
+    )
 
 
 class UnsealPipetteFromTipCreate(BaseCommandCreate[UnsealPipetteFromTipParams]):

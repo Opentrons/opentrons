@@ -51,13 +51,14 @@ class EmptyPayload(utils.BinarySerializable):
         return True
 
     # oh boy would it be great to have python 3.10 so we could use the kw_only thing here
-    # we can't have it as a normal arg becuase we'd have to initalize it everywhere we make a message
-    # and we can't just have it set as a default becuase we get a TypeError for initizling the non-default
+    # we can't have it as a normal arg because we'd have to initalize it everywhere we make a message
+    # and we can't just have it set as a default because we get a TypeError for initializing the non-default
     # args of subclasses after this default arg.
     # to work around this in binary_serializable.build() and can_comm.prompt_payload
     # we ignore the message_index when constructing args and then set the value manually after
     message_index: utils.UInt32Field = field(
-        init=False, default=utils.UInt32Field(None)  # type: ignore[arg-type]
+        init=False,
+        default_factory=lambda: utils.UInt32Field(None),  # type: ignore[arg-type]
     )
 
 
@@ -339,7 +340,10 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
 
     @classmethod
     def create(
-        cls, address: int, data: bytes, message_index: int = None  # type: ignore[assignment]
+        cls,
+        address: int,
+        data: bytes,
+        message_index: int = None,  # type: ignore[assignment]
     ) -> "FirmwareUpdateData":
         """Create a firmware update data payload."""
         # this is a special case, we normally instansiate message_index

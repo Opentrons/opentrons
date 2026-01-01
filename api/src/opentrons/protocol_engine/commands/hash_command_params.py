@@ -1,4 +1,5 @@
 """Hash command params into idempotent keys to track commands from analysis to run."""
+
 from hashlib import md5
 from typing import Optional
 

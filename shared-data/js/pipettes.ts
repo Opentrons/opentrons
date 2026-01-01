@@ -19,10 +19,8 @@ interface LiquidSpecs {
   default: PipetteV2LiquidSpecs
 }
 
-const generalGeometric: Record<
-  string,
-  GeneralGeometricSpecs
-> = import.meta.glob('../pipette/definitions/2/*/*/*/*.json', { eager: true })
+const generalGeometric: Record<string, GeneralGeometricSpecs> =
+  import.meta.glob('../pipette/definitions/2/*/*/*/*.json', { eager: true })
 
 const liquid: Record<string, LiquidSpecs> = import.meta.glob(
   '../pipette/definitions/2/liquid/*/*/*/*.json',
@@ -42,9 +40,9 @@ export type PipetteName = keyof typeof pipetteNameSpecs
 export type PipetteModel = keyof typeof pipetteModelSpecs.config
 
 // models sorted by channels and then volume by default
-const ALL_PIPETTE_NAMES: PipetteName[] = (Object.keys(
-  pipetteNameSpecs
-) as PipetteName[]).sort(comparePipettes(['channels', 'maxVolume']))
+const ALL_PIPETTE_NAMES: PipetteName[] = (
+  Object.keys(pipetteNameSpecs) as PipetteName[]
+).sort(comparePipettes(['channels', 'maxVolume']))
 
 // use a name like 'p10_single' to get specs true for all models under that name
 export function getPipetteNameSpecs(
@@ -78,8 +76,8 @@ export function getAllPipetteNames(...sortBy: SortableProps[]): PipetteName[] {
 function comparePipettes(sortBy: SortableProps[]) {
   return (modelA: PipetteName, modelB: PipetteName) => {
     // any cast is because we know these pipettes exist
-    const a = getPipetteNameSpecs(modelA) as PipetteNameSpecs
-    const b = getPipetteNameSpecs(modelB) as PipetteNameSpecs
+    const a = getPipetteNameSpecs(modelA)!
+    const b = getPipetteNameSpecs(modelB)!
     let i
 
     for (i = 0; i < sortBy.length; i++) {

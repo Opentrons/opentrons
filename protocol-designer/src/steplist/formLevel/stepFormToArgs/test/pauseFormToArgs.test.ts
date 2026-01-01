@@ -9,15 +9,45 @@ import {
 import { pauseFormToArgs } from '../pauseFormToArgs'
 
 import type { HydratedPauseFormData } from '/protocol-designer/form-types'
+import type { GetCastFormData } from '/protocol-designer/steplist/fieldLevel'
 
 describe('pauseFormToArgs', () => {
+  describe('with wrong (?) types', () => {
+    it('returns waitForTemperature command creator when form specifies pause until temp', () => {
+      // todo(mm, 2025-10-09)
+      // These are older tests. They pass input that, according to recently improved type
+      // hints, was not actually possible for prior stages to produce.
+      // We should clarify the expected input and delete these tests if it's safe to do so.
+      const formData: GetCastFormData<HydratedPauseFormData> = {
+        stepNumber: 1,
+        stepType: 'pause',
+        id: 'test_id',
+        pauseAction: PAUSE_UNTIL_TEMP,
+        // @ts-expect-error - See comment above.
+        pauseTemperature: '20',
+        pauseMessage: 'pause message',
+        moduleId: 'some_id',
+        stepName: 'pause step',
+        stepDetails: 'some details',
+      }
+      const expected = {
+        commandCreatorFnName: 'waitForTemperature',
+        celsius: 20,
+        message: 'pause message',
+        name: 'pause step',
+        description: 'some details',
+        moduleId: 'some_id',
+      }
+      expect(pauseFormToArgs(formData)).toEqual(expected)
+    })
+  })
   it('returns waitForTemperature command creator when form specifies pause until temp', () => {
-    const formData: HydratedPauseFormData = {
+    const formData: GetCastFormData<HydratedPauseFormData> = {
       stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
       pauseAction: PAUSE_UNTIL_TEMP,
-      pauseTemperature: '20',
+      pauseTemperature: 20,
       pauseMessage: 'pause message',
       moduleId: 'some_id',
       stepName: 'pause step',
@@ -34,7 +64,7 @@ describe('pauseFormToArgs', () => {
     expect(pauseFormToArgs(formData)).toEqual(expected)
   })
   it('returns delay command creator when form specifies pause until resume', () => {
-    const formData: HydratedPauseFormData = {
+    const formData: GetCastFormData<HydratedPauseFormData> = {
       stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',
@@ -58,7 +88,7 @@ describe('pauseFormToArgs', () => {
   })
 
   it('returns delay command creator when form specifies pause until time', () => {
-    const formData: HydratedPauseFormData = {
+    const formData: GetCastFormData<HydratedPauseFormData> = {
       stepNumber: 1,
       stepType: 'pause',
       id: 'test_id',

@@ -411,39 +411,6 @@ def test_get_next_tip_with_column_and_starting_tip(
     assert result == "A2"
 
 
-def test_reset_tips(
-    subject: TipStore,
-    load_labware_action: actions.SucceedCommandAction,
-) -> None:
-    """It should be able to reset tip tracking state."""
-    subject.handle_action(load_labware_action)
-
-    subject.handle_action(
-        actions.SucceedCommandAction(
-            command=_dummy_command(),
-            state_update=update_types.StateUpdate(
-                tips_state=update_types.TipsStateUpdate(
-                    tip_state=TipRackWellState.EMPTY,
-                    labware_id="cool-labware",
-                    well_names=["A1", "A2", "A3"],
-                )
-            ),
-        )
-    )
-
-    def get_result() -> str | None:
-        return TipView(subject.state).get_next_tip(
-            labware_id="cool-labware",
-            num_tips=1,
-            starting_tip_name=None,
-            nozzle_map=None,
-        )
-
-    assert get_result() != "A1"
-    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
-    assert get_result() == "A1"
-
-
 @pytest.mark.parametrize(
     "labware_definition",
     [
@@ -657,19 +624,19 @@ def test_next_tip_automatic_tip_tracking_tiprack_limits(
         assert _get_next_and_pickup(pipette_nozzle_map) is not None
     assert _get_next_and_pickup(pipette_nozzle_map) is None
 
-    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
+    subject.handle_action(load_labware_action)
     pipette_nozzle_map = _build_nozzle_map("A12", "A12", "A12")
     for _ in range(96):
         assert _get_next_and_pickup(pipette_nozzle_map) is not None
     assert _get_next_and_pickup(pipette_nozzle_map) is None
 
-    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
+    subject.handle_action(load_labware_action)
     pipette_nozzle_map = _build_nozzle_map("H1", "H1", "H1")
     for _ in range(96):
         assert _get_next_and_pickup(pipette_nozzle_map) is not None
     assert _get_next_and_pickup(pipette_nozzle_map) is None
 
-    subject.handle_action(actions.ResetTipsAction(labware_id="cool-labware"))
+    subject.handle_action(load_labware_action)
     pipette_nozzle_map = _build_nozzle_map("H12", "H12", "H12")
     for _ in range(96):
         assert _get_next_and_pickup(pipette_nozzle_map) is not None

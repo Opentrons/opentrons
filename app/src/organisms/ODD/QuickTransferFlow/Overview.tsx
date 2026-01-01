@@ -21,6 +21,7 @@ import { useToaster } from '/app/organisms/ToasterOven'
 
 import { CONSOLIDATE, DISTRIBUTE } from './constants'
 
+import type { CutoutConfig } from '@opentrons/shared-data'
 import type { QuickTransferSummaryState } from './types'
 
 interface OverviewProps {
@@ -48,6 +49,22 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     single: t('single'),
   }
   const pathCopy = pathCopyMap[state.path]
+
+  const dropTipLocationCopy = (location: CutoutConfig | string): string => {
+    if (location != null && typeof location !== 'string') {
+      return t(
+        `${
+          location.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
+            ? 'trashBin'
+            : 'wasteChute'
+        }_location`,
+        {
+          slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[location.cutoutId],
+        }
+      )
+    }
+    return t('tip_rack')
+  }
 
   const displayItems = [
     {
@@ -83,17 +100,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
     },
     {
       option: t('tip_drop_location'),
-      value: t(
-        `${
-          state.dropTipLocation?.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
-            ? 'trashBin'
-            : 'wasteChute'
-        }_location`,
-        {
-          slotName:
-            FLEX_SINGLE_SLOT_BY_CUTOUT_ID[state.dropTipLocation?.cutoutId],
-        }
-      ),
+      value: dropTipLocationCopy(state.dropTipLocation),
     },
     {
       option: t('liquid_class'),
@@ -111,7 +118,7 @@ export function Overview(props: OverviewProps): JSX.Element | null {
         <ListItem type="default" key={displayItem.option} onClick={onClick}>
           <Flex justifyContent={JUSTIFY_SPACE_BETWEEN} width="100%">
             <StyledText
-              oddStyle="level4HeaderRegular"
+              oddStyle="level4HeaderSemiBold"
               width="20rem"
               whiteSpace={NO_WRAP}
             >

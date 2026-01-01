@@ -24,8 +24,8 @@ import { useAttachedModules } from '/app/resources/modules'
 import {
   useChainLiveCommands,
   useMostRecentCompletedAnalysis,
+  useNotifyRunQuery,
   useRunCalibrationStatus,
-  useRunStatus,
 } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
@@ -120,9 +120,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
     vi.mocked(LocationConflictModal).mockReturnValue(
       <div>mock location conflict modal</div>
     )
-    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue(({
+    vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [],
-    } as unknown) as UseQueryResult<DeckConfiguration>)
+    } as unknown as UseQueryResult<DeckConfiguration>)
     when(vi.mocked(useRunCalibrationStatus))
       .calledWith(ROBOT_NAME, RUN_ID)
       .thenReturn({
@@ -132,7 +132,9 @@ describe('ProtocolSetupModulesAndDeck', () => {
       chainLiveCommands: mockChainLiveCommands,
     } as any)
     vi.mocked(FixtureTable).mockReturnValue(<div>mock FixtureTable</div>)
-    vi.mocked(useRunStatus).mockReturnValue(RUN_STATUS_IDLE)
+    vi.mocked(useNotifyRunQuery).mockReturnValue({
+      data: { data: { status: RUN_STATUS_IDLE } },
+    } as any)
   })
 
   afterEach(() => {

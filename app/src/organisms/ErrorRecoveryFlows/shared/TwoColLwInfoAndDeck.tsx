@@ -1,11 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  COLORS,
-  Flex,
-  LabwareRender,
-  MoveLabwareOnDeck,
-} from '@opentrons/components'
+import { COLORS, Flex, MoveLabwareOnDeck } from '@opentrons/components'
 
 import { DeckMapContent, TwoColumn } from '/app/molecules/InterventionModal'
 
@@ -44,9 +39,8 @@ export function TwoColLwInfoAndDeck(
   const { failedPipetteInfo, isPartialTipConfigValid } = failedPipetteUtils
   const { t } = useTranslation('error_recovery')
 
-  const {
-    displayNameCurrentLoc: slot,
-  } = failedLabwareUtils.relevantPickUpTipLwLocs
+  const { displayNameCurrentLoc: slot } =
+    failedLabwareUtils.relevantPickUpTipLwLocs
 
   const buildTitle = (): string => {
     switch (selectedRecoveryOption) {
@@ -119,7 +113,7 @@ export function TwoColLwInfoAndDeck(
         const {
           movedLabwareDef,
           moduleRenderInfo,
-          labwareRenderInfo,
+          labwareOnDeck,
           ...restUtils
         } = deckMapUtils
 
@@ -139,6 +133,9 @@ export function TwoColLwInfoAndDeck(
                 : [],
           }
         })
+        const labwareOnDeckFiltered = labwareOnDeck?.filter(
+          lw => lw.labwareId !== failedLwId
+        )
         return isValidDeck ? (
           <MoveLabwareOnDeck
             deckFill={isOnDevice ? COLORS.grey35 : '#e6e6e6'}
@@ -148,23 +145,7 @@ export function TwoColLwInfoAndDeck(
             labwareDefinitions={allRunDefs}
             {...restUtils}
             modulesOnDeck={modulesOnDeck}
-            backgroundItems={
-              <>
-                {labwareRenderInfo
-                  .filter(l => l.labwareId !== failedLwId)
-                  .map(({ labwareOrigin, labwareDef, labwareId }) => (
-                    <g
-                      key={labwareId}
-                      transform={`translate(${labwareOrigin.x},${labwareOrigin.y})`}
-                    >
-                      <LabwareRender
-                        definition={labwareDef}
-                        positioningMode="passThrough"
-                      />
-                    </g>
-                  ))}
-              </>
-            }
+            labwareOnDeck={labwareOnDeckFiltered}
           />
         ) : (
           <Flex />

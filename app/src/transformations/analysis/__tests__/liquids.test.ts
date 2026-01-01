@@ -7,41 +7,15 @@ import {
   getLiquidsByIdForLabware,
   getTotalVolumePerLiquidId,
   getTotalVolumePerLiquidLabwarePair,
-  getWellFillFromLabwareId,
   getWellGroupForLiquidId,
 } from '../liquids'
 
-import type { LabwareByLiquidId, Liquid } from '@opentrons/shared-data'
+import type { LabwareByLiquidId } from '@opentrons/shared-data'
 
 const LABWARE_ID =
   '60e8b050-3412-11eb-ad93-ed232a2337cf:opentrons/corning_24_wellplate_3.4ml_flat/1'
 const LIQUID_ID = '7'
-const MOCK_LIQUIDS_IN_LOAD_ORDER: Liquid[] = [
-  {
-    description: 'water',
-    displayColor: '#00d781',
-    displayName: 'liquid 2',
-    id: '7',
-  },
-  {
-    description: 'saline',
-    displayColor: '#0076ff',
-    displayName: 'liquid 1',
-    id: '123',
-  },
-  {
-    description: 'reagent',
-    displayColor: '#ff4888',
-    displayName: 'liquid 3',
-    id: '19',
-  },
-  {
-    description: 'saliva',
-    displayColor: '#B925FF',
-    displayName: 'liquid 4',
-    id: '4',
-  },
-]
+
 const MOCK_LABWARE_BY_LIQUID_ID: LabwareByLiquidId = {
   '4': [
     {
@@ -201,44 +175,6 @@ const MOCK_VOLUME_BY_WELL = {
   D3: 100,
   D4: 100,
 }
-
-describe('getWellFillFromLabwareId', () => {
-  it('returns wellfill object for the labwareId', () => {
-    const expected = {
-      A1: '#00d781',
-      A2: '#00d781',
-      A3: '#B925FF',
-      A4: '#B925FF',
-      A5: '#ff4888',
-      A6: '#ff4888',
-      B1: '#00d781',
-      B2: '#00d781',
-      B3: '#B925FF',
-      B4: '#B925FF',
-      B5: '#ff4888',
-      B6: '#ff4888',
-      C1: '#00d781',
-      C2: '#00d781',
-      C3: '#B925FF',
-      C4: '#B925FF',
-      C5: '#ff4888',
-      C6: '#ff4888',
-      D1: '#00d781',
-      D2: '#00d781',
-      D3: '#B925FF',
-      D4: '#B925FF',
-      D5: '#ff4888',
-      D6: '#ff4888',
-    }
-    expect(
-      getWellFillFromLabwareId(
-        LABWARE_ID,
-        MOCK_LIQUIDS_IN_LOAD_ORDER,
-        MOCK_LABWARE_BY_LIQUID_ID
-      )
-    ).toEqual(expected)
-  })
-})
 
 describe('getTotalVolumePerLiquidId', () => {
   it('returns volume of liquid needed accross all labware', () => {

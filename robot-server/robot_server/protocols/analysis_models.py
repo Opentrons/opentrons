@@ -1,18 +1,20 @@
 """Response models for protocol analysis."""
-# TODO(mc, 2021-08-25): add modules to simulation result
-from enum import Enum
 
+# TODO(mc, 2021-08-25): add modules to simulation result
+from typing import List, Optional, Union, NamedTuple
+
+from typing_extensions import Literal
+from pydantic import BaseModel, Field
+
+from opentrons_shared_data.util import StrEnum
 from opentrons.protocol_engine.types import (
     RunTimeParameter,
     PrimitiveRunTimeParamValuesType,
     CSVRunTimeParamFilesType,
     CommandAnnotation,
+    CommandPreconditions,
 )
 from opentrons_shared_data.robot.types import RobotType
-from pydantic import BaseModel, Field
-from typing import List, Optional, Union, NamedTuple
-from typing_extensions import Literal
-
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
@@ -24,14 +26,14 @@ from opentrons.protocol_engine import (
 )
 
 
-class AnalysisStatus(str, Enum):
+class AnalysisStatus(StrEnum):
     """Status of a protocol analysis."""
 
     PENDING = "pending"
     COMPLETED = "completed"
 
 
-class AnalysisResult(str, Enum):
+class AnalysisResult(StrEnum):
     """Result of a completed protocol analysis.
 
     The result indicates whether the protocol is expected to run successfully.
@@ -202,6 +204,10 @@ class CompletedAnalysis(BaseModel):
     commandAnnotations: List[CommandAnnotation] = Field(
         default_factory=list,
         description="Optional annotations for commands in this run.",
+    )
+    commandPreconditions: Optional[CommandPreconditions] = Field(
+        default=None,
+        description="Optional preconditions for commands used in this run.",
     )
 
 

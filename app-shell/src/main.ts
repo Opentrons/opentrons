@@ -3,10 +3,19 @@ import dns from 'dns'
 import { app, BrowserWindow, ipcMain } from 'electron'
 import contextMenu from 'electron-context-menu'
 import electronDebug from 'electron-debug'
-import * as electronDevtoolsInstaller from 'electron-devtools-installer'
+import {
+  installExtension,
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from 'electron-devtools-installer'
 
 import { getConfig, getOverrides, getStore, registerConfig } from './config'
-import { registerDiscovery } from './discovery'
+import {
+  initializeDiscovery,
+  registerDiscoveryMainWindow,
+  registerDiscoverySecondaryWindow,
+  unregisterDiscovery,
+} from './discovery'
 import { registerLabware } from './labware'
 import { createLogger } from './log'
 import { initializeMenu } from './menu'
@@ -18,6 +27,7 @@ import {
   closeSecondaryWindows,
   registerCameraStream,
 } from './secondary-windows'
+import { initializeSentry } from './sentry'
 import { registerSystemInfo } from './system-info'
 import { createUi, registerReloadUi, registerSystemLanguage } from './ui'
 import { registerUpdate } from './update'
@@ -42,6 +52,9 @@ log.debug('App config', {
   overrides: getOverrides(),
 })
 
+// Initialize Sentry before the app is ready.
+initializeSentry(getStore().analytics.optedIn)
+
 if (config.devtools) {
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   electronDebug({ isEnabled: true, showDevTools: true })
@@ -58,11 +71,20 @@ interface HandlerSet {
 // Handler caching using window ID as key
 const handlerSets = new Map<string, HandlerSet>()
 
-// prepended listener is important here to work around Electron issue
-// https://github.com/electron/electron/issues/19468#issuecomment-623529556
-app.prependOnceListener('ready', startUp)
-// eslint-disable-next-line @typescript-eslint/no-misused-promises
-if (config.devtools) app.once('ready', installDevtools)
+app
+  .whenReady()
+  .then(async () => {
+    startUp()
+
+    if (config.devtools) {
+      await installDevtools()
+
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.openDevTools({ mode: 'detach' })
+      }
+    }
+  })
+  .catch(err => log.error('Startup failed', { err }))
 
 app.once('window-all-closed', () => {
   log.debug('all windows closed, quitting the app')
@@ -90,7 +112,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
     const handlers: Dispatch[] = isMainWindow(window)
       ? [
           registerConfig(dispatch),
-          registerDiscovery(dispatch),
+          registerDiscoveryMainWindow(dispatch),
           registerProtocolAnalysis(dispatch, window),
           registerUpdate(dispatch),
           registerRobotUpdate(dispatch),
@@ -106,7 +128,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
       : // Only register necessary subset for secondary windows.
         [
           registerConfig(dispatch),
-          registerDiscovery(dispatch),
+          registerDiscoverySecondaryWindow(dispatch),
           registerUsb(dispatch),
           registerSystemInfo(dispatch),
           registerNotify(dispatch, window),
@@ -118,6 +140,7 @@ function getOrCreateHandlerSet(window: BrowserWindow): HandlerSet | null {
     handlerSets.set(windowId, { handlers, dispatch })
 
     window.on('closed', () => {
+      unregisterDiscovery(dispatch)
       handlerSets.delete(windowId)
       log.debug(`Cleaned up handlers for ${windowId}`)
     })
@@ -142,6 +165,7 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
+  initializeDiscovery()
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
@@ -196,36 +220,23 @@ function createRendererLogger(): Logger {
   return logger
 }
 
-function installDevtools(): Promise<Logger> {
-  const extensions = [
-    electronDevtoolsInstaller.REACT_DEVELOPER_TOOLS,
-    electronDevtoolsInstaller.REDUX_DEVTOOLS,
-  ]
-  // @ts-expect-error the types for electron-devtools-installer are not correct
-  // when importing the default export via commmon JS. the installer is actually nested in
-  // another default object
-  const install = electronDevtoolsInstaller.default?.default
-  const forceReinstall = config.reinstallDevtools
+async function installDevtools(): Promise<void> {
+  const extensions = [REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS]
 
-  log.debug('Installing devtools')
+  log.debug('Installing devtools with v4 API')
 
-  if (typeof install === 'function') {
-    return install(extensions, {
+  try {
+    await installExtension(extensions, {
       loadExtensionOptions: { allowFileAccess: true },
-      forceDownload: forceReinstall,
+      forceDownload: config.reinstallDevtools,
     })
-      .then(() => log.debug('Devtools extensions installed'))
-      .catch((error: unknown) => {
-        log.warn('Failed to install devtools extensions', {
-          forceReinstall,
-          error,
-        })
-      })
-  } else {
-    log.warn('could not resolve electron dev tools installer')
-    return Promise.reject(
-      new Error('could not resolve electron dev tools installer')
-    )
+
+    log.debug('Devtools extensions installed')
+  } catch (error) {
+    log.warn('Failed to install devtools extensions', {
+      forceReinstall: config.reinstallDevtools,
+      error,
+    })
   }
 }
 

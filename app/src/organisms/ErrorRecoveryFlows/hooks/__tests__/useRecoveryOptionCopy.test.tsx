@@ -122,6 +122,28 @@ describe('useRecoveryOptionCopy', () => {
     screen.getByText('Home gantry and retry step')
   })
 
+  it(`renders the correct copy for ${RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.STACKER_STALLED_RETRY.ROUTE })
+
+    screen.getByText('Clear obstruction in stacker and retry step')
+  })
+
+  it(`renders the correct copy for ${RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.STACKER_HOPPER_EMPTY_RETRY.ROUTE })
+  })
+
+  it(`renders the correct copy for ${RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.STACKER_STALLED_SKIP.ROUTE })
+
+    screen.getByText('Manually load labware onto labware shuttle and skip step')
+  })
+
+  it(`renders the correct copy for ${RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE}`, () => {
+    render({ route: RECOVERY_MAP.STACKER_STALLED_STORE_SKIP.ROUTE })
+
+    screen.getByText('Clear obstruction in stacker and skip to next step')
+  })
+
   it('renders "Unknown action" for an unknown recovery option', () => {
     render({ route: 'unknown_route' as RecoveryRoute })
 

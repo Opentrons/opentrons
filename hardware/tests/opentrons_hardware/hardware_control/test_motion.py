@@ -1,4 +1,5 @@
 """Tests for motion methods."""
+
 from numpy import float64
 from opentrons_hardware.drivers.can_bus import NodeId
 from opentrons_hardware.firmware_bindings.constants import MoveStopCondition

@@ -55,6 +55,7 @@ class AbstractThermocyclerDriver(ABC):
         temp: float,
         hold_time: Optional[float] = None,
         volume: Optional[float] = None,
+        ramp_rate: Optional[float] = None,
     ) -> None:
         """Send set plate temperature command"""
         ...
@@ -90,10 +91,14 @@ class AbstractThermocyclerDriver(ABC):
         ...
 
     @abstractmethod
-    async def enter_programming_mode(self) -> None:
-        ...
+    async def enter_programming_mode(self) -> None: ...
 
     @abstractmethod
     async def jog_lid(self, angle: float) -> None:
         """Send the Jog Lid command."""
+        ...
+
+    @abstractmethod
+    async def get_error_state(self) -> None:
+        """Raise if the thermocycler is in an error state."""
         ...

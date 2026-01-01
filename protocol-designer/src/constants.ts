@@ -57,6 +57,9 @@ export const MAX_TC_PROFILE_VOLUME = 100
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'
+export const PAUSE_UNTIL_TC_PROFILE_COMPLETE: 'untilThermocyclerProfileComplete' =
+  'untilThermocyclerProfileComplete'
+
 export const DND_TYPES = {
   LABWARE: 'LABWARE',
   STEP_ITEM: 'STEP_ITEM',
@@ -89,6 +92,12 @@ export const ABSORBANCE_READER_COLOR_BY_WAVELENGTH: Record<number, string> = {
   600: 'Orange',
   650: 'Red',
 }
+
+// Values for flex stacker
+export const FLEX_STACKER_RETRIEVE: 'retrieve' = 'retrieve'
+export const FLEX_STACKER_STORE: 'store' = 'store'
+export const FLEX_STACKER_FILL: 'fill' = 'fill'
+export const FLEX_STACKER_EMPTY: 'empty' = 'empty'
 
 export const OFFDECK: 'offDeck' = 'offDeck'
 
@@ -154,3 +163,6 @@ export const CHANNELS_MAPPED_TO_MAX_SPEED: Record<
 export const MINIMUM_LIQUID_CLASS_VOLUME = 1
 
 export const ACCEPTED_PROTOCOL_FILE_TYPES = '.json,.py'
+
+export const HOPPER_LABWARE_X_OFFSET = 178
+export const HOPPER_ZOOM_OFFSET_POSTITION = 230

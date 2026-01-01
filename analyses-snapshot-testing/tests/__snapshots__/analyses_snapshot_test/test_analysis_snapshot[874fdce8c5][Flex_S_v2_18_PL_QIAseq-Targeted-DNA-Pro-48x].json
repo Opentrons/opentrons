@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -6421,7 +6424,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -6452,7 +6456,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 100.0
+        "targetLidTemperature": 100.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -6483,7 +6488,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -9637,7 +9643,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -14862,7 +14869,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 65.0
+        "targetLidTemperature": 65.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -14919,7 +14927,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -18220,7 +18229,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 100.0
+        "targetLidTemperature": 100.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -18295,7 +18305,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -22499,7 +22510,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 105.0
+        "targetLidTemperature": 105.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -22668,7 +22680,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -29509,7 +29522,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -32278,7 +32292,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 105.0
+        "targetLidTemperature": 105.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -32415,7 +32430,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -33005,7 +33021,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -48408,7 +48424,7 @@
       "displayName": "Sample Plate 1",
       "id": "UUID",
       "loadName": "opentrons_96_wellplate_200ul_pcr_full_skirt",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_96_well_aluminum_block/1",

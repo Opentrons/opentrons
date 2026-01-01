@@ -2,22 +2,14 @@
  * Code to deal with fixtures in the sense of deck configuration.
  * Not to be confused with fixtures in the sense of dummy test data.
  */
-
-import isEqual from 'lodash/isEqual'
-
 import {
-  COMBO_FIXTURES,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
-  FLEX_MODULE_AA_TYPE_BY_MODEL,
   FLEX_STACKER_FIXTURES,
   FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES,
-  FLEX_USB_MODULE_FIXTURES,
   THERMOCYCLER_MODULE_CUTOUTS,
   WASTE_CHUTE_CUTOUT,
-  WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES,
-  WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '.'
 import {
   A1_ADDRESSABLE_AREA,
@@ -45,7 +37,6 @@ import {
   D1_ADDRESSABLE_AREA,
   D2_ADDRESSABLE_AREA,
   D3_ADDRESSABLE_AREA,
-  DEFAULT_AA_FOR_WASTE_CHUTE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
   FLEX_ROBOT_TYPE,
@@ -56,12 +47,10 @@ import {
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   HEATERSHAKER_MODULE_V1,
   HEATERSHAKER_MODULE_V1_FIXTURE,
-  LEFT_AND_CENTER_CUTOUTS,
   MAGNETIC_BLOCK_V1,
   MAGNETIC_BLOCK_V1_FIXTURE,
   MODULE_FIXTURES_BY_MODEL,
   SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_LEFT_CUTOUTS,
   SINGLE_LEFT_SLOT_FIXTURE,
   SINGLE_RIGHT_CUTOUTS,
   SINGLE_RIGHT_SLOT_FIXTURE,
@@ -78,7 +67,24 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from './constants'
-import { getCutoutIdForSlotName, getDeckDefFromRobotType } from './helpers'
+import { getDeckDefFromRobotType } from './helpers'
+import {
+  getAAForModuleFixture,
+  getAAsToFixtureIdFromDeckDefWithFakes,
+  getAAWithFakesFromCutoutFixtureId,
+} from './helpers/deckConfiguration/getAddressableAreaFrom'
+import {
+  getCutoutFixtureIdsForModuleModel,
+  getCutoutFixturesForModuleModel,
+  getFixtureIdByCutoutIdFromModuleSlotName,
+  getMainFixtureIdForAA,
+  getReplacementFixtureForFakeFixture,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
+} from './helpers/deckConfiguration/getFixtureFrom'
+import {
+  getAAWithFakesFromVSId,
+  getVisualSlotIdFromAAId,
+} from './helpers/deckConfiguration/getVisualSlotFrom'
 import { getModuleDisplayName } from './modules'
 
 import type { TFunction } from 'i18next'
@@ -95,10 +101,9 @@ import type {
   AreaTypeWithFakes,
   CutoutFixtureIdsWithFakes,
 } from './constants'
-import type { CutoutConfigAndCompatibility } from './helpers'
+import type { CutoutConfigAndCompatibility, VISUAL_SLOTS } from './helpers'
 import type {
   AddressableArea,
-  AreaType,
   CoordinateTuple,
   CutoutConfig,
   CutoutConfigMap,
@@ -121,6 +126,7 @@ export function getAADisplayName(
   ).displayName
 }
 
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
 // mapping of OT-2 deck slots to cutouts
 export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2CutoutId } = {
   1: 'cutout1',
@@ -137,6 +143,7 @@ export const OT2_CUTOUT_BY_SLOT_ID: { [slotId: string]: OT2CutoutId } = {
   fixedTrash: 'cutout12',
 }
 
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
 // mapping of Flex deck slots to cutouts
 export const FLEX_CUTOUT_BY_SLOT_ID: { [slotId: string]: CutoutId } = {
   A1: 'cutoutA1',
@@ -366,7 +373,10 @@ export const FAKE_FIXTURES_AND_AA: DeckDefinitionWithFakes = {
 // returns the position associated with a slot id
 export function getPositionFromSlotId(
   slotId: string,
-  deckDef: DeckDefinition
+  deckDef: DeckDefinition,
+  //  PD needs this in order to position zooming into the slot
+  //  the hopper doesn't have its own AddressableAreaName
+  hopperAdjustedOffset?: number
 ): CoordinateTuple | null {
   const cutoutWithSlot =
     deckDef.robot.model === FLEX_ROBOT_TYPE
@@ -384,7 +394,9 @@ export function getPositionFromSlotId(
   const slotPosition: CoordinateTuple | null =
     cutoutPosition != null
       ? [
-          cutoutPosition[0] + offsetFromCutoutFixture[0],
+          cutoutPosition[0] +
+            offsetFromCutoutFixture[0] +
+            (hopperAdjustedOffset != null ? hopperAdjustedOffset : 0),
           cutoutPosition[1] + offsetFromCutoutFixture[1],
           cutoutPosition[2] + offsetFromCutoutFixture[2],
         ]
@@ -402,131 +414,6 @@ export function getAddressableAreaFromSlotId(
       addressableArea => addressableArea.id === slotId
     ) ?? null
   )
-}
-
-export const getCutoutFixtureReplacementIfNeeded = (
-  cutoutFixtureId: CutoutFixtureId,
-  cutoutId: CutoutId,
-  deckDefinition: DeckDefinition
-): CutoutFixtureIdsWithFakes => {
-  if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    if (
-      cutoutFixtureId === SINGLE_RIGHT_SLOT_FIXTURE &&
-      deckDefinition.robot.model === FLEX_ROBOT_TYPE
-    ) {
-      return FAKE_STAGING_AREA_RIGHT_SLOT
-    } else if (
-      cutoutFixtureId === WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE &&
-      deckDefinition.robot.model === FLEX_ROBOT_TYPE
-    ) {
-      return FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE
-    } else if (cutoutFixtureId === MAGNETIC_BLOCK_V1) {
-      return 'fakeStagingSlotWithMagBlockV1'
-    }
-  }
-  return cutoutFixtureId
-}
-
-export const getReplacementFixtureForFixtureRemoval = (
-  cutoutFixtureId: CutoutFixtureIdsWithFakes,
-  cutoutId: CutoutId,
-  addressableAreaId?: AddressableAreaNamesWithFakes // nullable for PD
-): CutoutFixtureId => {
-  if (cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (addressableAreaId && SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    const cutoutFixtureReplacment = replaceCutoutFixtureForFixtureRemoval(
-      cutoutFixtureId,
-      cutoutId,
-      addressableAreaId
-    )
-    return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
-  } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (SINGLE_LEFT_CUTOUTS.includes(cutoutId)) {
-    return SINGLE_LEFT_SLOT_FIXTURE
-  }
-  return SINGLE_CENTER_SLOT_FIXTURE
-}
-
-/**
- * Given a fake cutout fixutre find a replacment to store on the server
- * @param cutoutFixtureId: a cutoutId we wish to replace with a non fake fixture
- * @returns the relevant cutoutFixtureId to store on the server
- */
-export const getReplacementFixtureForFakeFixture = (
-  cutoutFixtureId: CutoutFixtureIdsWithFakes
-): CutoutFixtureId => {
-  if (cutoutFixtureId === FAKE_STAGING_AREA_RIGHT_SLOT) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  }
-  if (cutoutFixtureId === FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE) {
-    return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-  }
-  if (cutoutFixtureId === FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE) {
-    return MAGNETIC_BLOCK_V1
-  }
-  return cutoutFixtureId
-}
-/**
- * Given a list of cutout configs replace fixtures with their fake fixtures
- * @param: a list of cutout config from the server
- * @returns: a list of cutout config with relevant AA
- */
-export const replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA = (
-  cutoutFixtures: CutoutConfig[]
-): CutoutConfigMap[] => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  return cutoutFixtures.reduce<CutoutConfigMap[]>((acc, obj) => {
-    const cutoutFixtureReplacment = getCutoutFixtureReplacementIfNeeded(
-      obj.cutoutFixtureId,
-      obj.cutoutId,
-      deckDef
-    )
-    const aaPerCutoutFixture = getAAWithFakesFromCutoutFixtureId(
-      obj.cutoutId,
-      cutoutFixtureReplacment ?? obj.cutoutFixtureId,
-      deckDef
-    )
-
-    if (WASTE_CHUTE_FIXTURES.includes(obj.cutoutFixtureId)) {
-      acc.push({
-        ...obj,
-        addressableAreaId: DEFAULT_AA_FOR_WASTE_CHUTE,
-        cutoutFixtureId: cutoutFixtureReplacment,
-      })
-      const otherWasteChuteAA = aaPerCutoutFixture?.find(
-        aa => getAAByAAId(aa, deckDef).areaType !== 'wasteChute'
-      )
-      if (otherWasteChuteAA != null) {
-        acc.push({
-          ...obj,
-          addressableAreaId: otherWasteChuteAA,
-          cutoutFixtureId: cutoutFixtureReplacment,
-        })
-      }
-    } else if (obj.cutoutFixtureId === ABSORBANCE_READER_V1_FIXTURE) {
-      const absorbanceReaderAA = aaPerCutoutFixture?.find(
-        aa => getAAByAAId(aa, deckDef).areaType === 'absorbanceReader'
-      )
-      if (absorbanceReaderAA != null) {
-        acc.push({
-          ...obj,
-          addressableAreaId: absorbanceReaderAA,
-          cutoutFixtureId: cutoutFixtureReplacment,
-        })
-      }
-    } else {
-      aaPerCutoutFixture?.forEach(item => {
-        acc.push({
-          ...obj,
-          addressableAreaId: item,
-          cutoutFixtureId: cutoutFixtureReplacment,
-        })
-      })
-    }
-    return acc
-  }, [])
 }
 
 export const filterAAByAreaType = (
@@ -587,83 +474,14 @@ export const getAAByAAId = (
   // there should be a match with addressableAreaId
   const aaItem = deckDefWithFakeLocations.locations.addressableAreas.find(
     (aaItem: AddressableAreaWithFakes) => aaItem.id === addressableAreaId
-  ) as AddressableAreaWithFakes
+  )!
   if (aaItem == null) {
     console.error(`Could not find AddressableArea for ${addressableAreaId}`)
   }
   return aaItem
 }
 
-export const getAAWithFakesFromCutoutFixtureId = (
-  inputCutoutId: CutoutId,
-  cutoutFixtureId: CutoutFixtureIdsWithFakes,
-  deckDefinition: DeckDefinition
-): AddressableAreaNamesWithFakes[] | null => {
-  /**
-   * Given a cutoutId and a cutoutFixtureId, returns a list of AA, null if there is none
-   */
-  const cutoutFixturesWithFakeFixtures = [
-    ...deckDefinition.cutoutFixtures,
-    ...FAKE_FIXTURES_AND_AA.cutoutFixtures,
-  ]
-  const deckDefWithFakeCutoutFixtures = {
-    ...deckDefinition,
-    cutoutFixtures: cutoutFixturesWithFakeFixtures,
-  }
-  const cutoutFixture = deckDefWithFakeCutoutFixtures.cutoutFixtures.find(
-    fixture => fixture.id === cutoutFixtureId
-  )
-  if (cutoutFixture == null) {
-    console.error(`Cannot find get addressable areas for ${cutoutFixtureId}`)
-    return null
-  }
-  return cutoutFixture?.providesAddressableAreas[inputCutoutId]
-}
-
-export function getCutoutFixtureIdsForModuleModel(
-  moduleModel: ModuleModel
-): CutoutFixtureId[] {
-  const moduleFixtures = MODULE_FIXTURES_BY_MODEL[moduleModel]
-  return moduleFixtures ?? []
-}
-
-export function getCutoutFixturesForModuleModel(
-  moduleModel: ModuleModel,
-  deckDef: DeckDefinition
-): CutoutFixture[] {
-  const moduleFixtureIds = getCutoutFixtureIdsForModuleModel(moduleModel)
-  return moduleFixtureIds.reduce<CutoutFixture[]>((acc, id) => {
-    const moduleFixture = deckDef.cutoutFixtures.find(cf => cf.id === id)
-    return moduleFixture != null ? [...acc, moduleFixture] : acc
-  }, [])
-}
-
-export function getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-  anchorCutoutId: CutoutId | null,
-  moduleFixtures: CutoutFixture[] // cutout fixtures for a specific module model
-): { [cutoutId in CutoutId]?: CutoutFixtureId } {
-  // find the first fixture for this specific module model that may mount to the cutout implied by the slotName
-  const anchorFixture = moduleFixtures.find(fixture =>
-    fixture.mayMountTo.some(cutoutId => cutoutId === anchorCutoutId)
-  )
-  if (anchorCutoutId != null && anchorFixture != null) {
-    const groupedFixtures = anchorFixture.fixtureGroup[anchorCutoutId]
-    return groupedFixtures?.[0] ?? { [anchorCutoutId]: anchorFixture.id }
-  }
-  return {}
-}
-
-export function getFixtureIdByCutoutIdFromModuleSlotName(
-  slotName: string,
-  moduleFixtures: CutoutFixture[], // cutout fixtures for a specific module model
-  deckDef: DeckDefinition
-): { [cutoutId in CutoutId]?: CutoutFixtureId } {
-  const anchorCutoutId = getCutoutIdForSlotName(slotName, deckDef)
-  return getFixtureIdByCutoutIdFromModuleAnchorCutoutId(
-    anchorCutoutId,
-    moduleFixtures
-  )
-}
+// #region: get fixture id by cutout id from module anchor cutout id
 
 export function getCutoutIdsFromModuleSlotName(
   slotName: string,
@@ -868,6 +686,8 @@ export function getFixtureDisplayName(
   }
 }
 
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
+// TODO: Move to helpers/deckDeclarationHelpers.ts
 export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_1,
   ADDRESSABLE_AREA_2,
@@ -882,6 +702,8 @@ export const STANDARD_OT2_SLOTS: AddressableAreaName[] = [
   ADDRESSABLE_AREA_11,
 ]
 
+// TODO(tz, 12-22-25): Remove this and use deckDefinition instead
+// TODO: Move to helpers
 export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   A1_ADDRESSABLE_AREA,
   A2_ADDRESSABLE_AREA,
@@ -897,170 +719,6 @@ export const STANDARD_FLEX_SLOTS: AddressableAreaName[] = [
   D3_ADDRESSABLE_AREA,
 ]
 
-export type VISUAL_SLOTS =
-  | 'VSA1'
-  | 'VSB1'
-  | 'VSC1'
-  | 'VSD1'
-  | 'VSA2'
-  | 'VSB2'
-  | 'VSC2'
-  | 'VSD2'
-  | 'VSA3'
-  | 'VSB3'
-  | 'VSC3'
-  | 'VSD3'
-  | 'VSA4'
-  | 'VSB4'
-  | 'VSC4'
-  | 'VSD4'
-
-export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
-  VSA1: [
-    'A1',
-    'magneticBlockV1A1',
-    'temperatureModuleV2A1',
-    'heaterShakerV1A1',
-    'movableTrashA1',
-  ],
-  VSB1: [
-    'B1',
-    'magneticBlockV1B1',
-    'temperatureModuleV2B1',
-    'heaterShakerV1B1',
-    'movableTrashB1',
-  ],
-  VSC1: [
-    'C1',
-    'magneticBlockV1C1',
-    'temperatureModuleV2C1',
-    'heaterShakerV1C1',
-    'movableTrashC1',
-  ],
-  VSD1: [
-    'D1',
-    'magneticBlockV1D1',
-    'temperatureModuleV2D1',
-    'heaterShakerV1D1',
-    'movableTrashD1',
-  ],
-  VSA2: ['A2', 'magneticBlockV1A2'],
-  VSB2: ['B2', 'magneticBlockV1B2'],
-  VSC2: ['C2', 'magneticBlockV1C2'],
-  VSD2: ['D2', 'magneticBlockV1D2'],
-  VSA3: [
-    'A3',
-    'magneticBlockV1A3',
-    'temperatureModuleV2A3',
-    'heaterShakerV1A3',
-    'movableTrashA3',
-    'absorbanceReaderV1A3',
-  ],
-  VSB3: [
-    'B3',
-    'magneticBlockV1B3',
-    'temperatureModuleV2B3',
-    'heaterShakerV1B3',
-    'movableTrashB3',
-    'absorbanceReaderV1B3',
-  ],
-  VSC3: [
-    'C3',
-    'magneticBlockV1C3',
-    'temperatureModuleV2C3',
-    'heaterShakerV1C3',
-    'movableTrashC3',
-    'absorbanceReaderV1C3',
-  ],
-  VSD3: [
-    'D3',
-    'magneticBlockV1D3',
-    'temperatureModuleV2D3',
-    'heaterShakerV1D3',
-    'movableTrashD3',
-    '96ChannelWasteChute',
-    '1ChannelWasteChute',
-    '8ChannelWasteChute',
-    'gripperWasteChute',
-    'absorbanceReaderV1D3',
-  ],
-  VSA4: [
-    'fakeA4',
-    'A4',
-    'flexStackerModuleV1A4',
-    'absorbanceReaderV1LidDockA4',
-  ],
-  VSB4: [
-    'fakeB4',
-    'B4',
-    'flexStackerModuleV1B4',
-    'absorbanceReaderV1LidDockB4',
-  ],
-  VSC4: [
-    'fakeC4',
-    'C4',
-    'flexStackerModuleV1C4',
-    'absorbanceReaderV1LidDockC4',
-  ],
-  VSD4: [
-    'fakeD4',
-    'D4',
-    'flexStackerModuleV1D4',
-    'absorbanceReaderV1LidDockD4',
-  ],
-}
-
-export const getVisualSlotIdFromAAId = (
-  aaId: AddressableAreaNamesWithFakes
-): string => {
-  const vsId = Object.entries(VS_TO_AA).find(([key, value]) =>
-    value.includes(aaId)
-  )?.[0]
-  return vsId as string // should always find a match
-}
-
-export const getAAWithFakesFromVSId = (
-  vsId: string
-): AddressableAreaNamesWithFakes | null => {
-  switch (vsId) {
-    case 'VSA1':
-      return 'A1'
-    case 'VSB1':
-      return 'B1'
-    case 'VSC1':
-      return 'C1'
-    case 'VSD1':
-      return 'D1'
-    case 'VSA2':
-      return 'A2'
-    case 'VSB2':
-      return 'B2'
-    case 'VSC2':
-      return 'C2'
-    case 'VSD2':
-      return 'D2'
-    case 'VSA3':
-      return 'A3'
-    case 'VSB3':
-      return 'B3'
-    case 'VSC3':
-      return 'C3'
-    case 'VSD3':
-      return 'D3'
-    case 'VSA4':
-      return 'fakeA4'
-    case 'VSB4':
-      return 'fakeB4'
-    case 'VSC4':
-      return 'fakeC4'
-    case 'VSD4':
-      return 'fakeD4'
-    default:
-      console.error(`could not find a match for VS:${vsId}`)
-      return null
-  }
-}
-
 export const isAddressableAreaStandardSlot = (
   addressableAreaName: AddressableAreaName,
   deckDef: DeckDefinition
@@ -1069,178 +727,6 @@ export const isAddressableAreaStandardSlot = (
     ? STANDARD_FLEX_SLOTS
     : STANDARD_OT2_SLOTS
   ).includes(addressableAreaName)
-
-/**
- * Given a cutout id get a key value pair of all possibilities for fixture id and related AA
- * @param addedCutoutConfigs: fixtures list selected to add to deck
- * @param cutoutId: cutout if we are adding a fixture to.
- * @returns key value pair of of all possibilities for fixture id and related AA
- */
-export const getAAsToFixtureIdFromDeckDefWithFakes = (
-  cutoutId: CutoutId,
-  deckDef: DeckDefinition
-): Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]> => {
-  const deckDefWithFakes = getDeckDefWithFakes(deckDef)
-  // replace staging area aaId to fake ones
-  const availableCutoutFixtuers = deckDefWithFakes.cutoutFixtures.filter(cf =>
-    cf.mayMountTo.includes(cutoutId)
-  )
-  const aaForCutoutFixrure = availableCutoutFixtuers.reduce<
-    Partial<Record<CutoutFixtureIdsWithFakes, AddressableAreaNamesWithFakes[]>>
-  >((acc, { id, providesAddressableAreas }) => {
-    acc[id] = providesAddressableAreas[cutoutId]
-    return acc
-  }, {})
-  return aaForCutoutFixrure as Record<
-    CutoutFixtureIdsWithFakes,
-    AddressableAreaNamesWithFakes[]
-  >
-}
-
-export const getAAForModuleFixture = (
-  cutoutId: CutoutId,
-  fixtureId: CutoutFixtureIdsWithFakes,
-  moduleModel: ModuleModel
-): AddressableAreaNamesWithFakes => {
-  const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const aaList = getAAWithFakesFromCutoutFixtureId(cutoutId, fixtureId, deckDef)
-  const aa = aaList?.find(
-    aa =>
-      getAAByAAId(aa, deckDef).areaType ===
-      FLEX_MODULE_AA_TYPE_BY_MODEL[moduleModel]
-  )
-  if (!aa) {
-    console.error(
-      `Was not able to find a aa match for module ${moduleModel} in cutout ${cutoutId}`
-    )
-    return A1_ADDRESSABLE_AREA
-  }
-  return aa
-}
-
-/**
- * get relevent aa name that match with cutoutId and fixtureId.
- *
- * @param cutoutId - The cutoutId we are looking for.
- * @param fixtureId - The fixtureId we are looking for.
- * @returns The aa name or null if not match found.
- */
-export const getMainAAForAFixture = (
-  cutoutId: CutoutId,
-  fixtureId: CutoutFixtureId,
-  addressableAreaId: AddressableAreaNamesWithFakes,
-  existingCutoutFixtureId?: CutoutFixtureIdsWithFakes
-): AddressableAreaNamesWithFakes | null => {
-  const addressableAreasByFixtureId = getAAsToFixtureIdFromDeckDefWithFakes(
-    cutoutId,
-    getDeckDefFromRobotType('OT-3 Standard')
-  )
-  const aaListForFixtureId = addressableAreasByFixtureId[fixtureId] ?? []
-  if (LEFT_AND_CENTER_CUTOUTS.includes(cutoutId)) {
-    return aaListForFixtureId[0]
-  } else if (WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE === fixtureId) {
-    return DEFAULT_AA_FOR_WASTE_CHUTE
-  } else if (fixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
-    if (
-      existingCutoutFixtureId &&
-      COMBO_FIXTURES.includes(existingCutoutFixtureId)
-    ) {
-      return null
-    } else {
-      return aaListForFixtureId[0]
-    }
-  } else {
-    const aa = aaListForFixtureId.find((aa: AddressableAreaNamesWithFakes) => {
-      const vsId = getVisualSlotIdFromAAId(aa)
-      const singleSlotId = getAAWithFakesFromVSId(vsId)
-      return singleSlotId === addressableAreaId
-    })
-    return aa as AddressableAreaNamesWithFakes // we can cast this bc there should me a match for every fixtureId
-  }
-}
-
-export const getMainUsbModuleFixtureIdForComboFixture = (
-  compatibleCutoutFixtureIds: CutoutFixtureId[]
-): CutoutFixtureId | null => {
-  return (
-    compatibleCutoutFixtureIds.find(cf =>
-      FLEX_USB_MODULE_FIXTURES.includes(cf)
-    ) ?? null
-  )
-}
-
-export const getMainFixtureIdForAA = (
-  compatibleCutoutFixtureIds: CutoutFixtureId[],
-  addressableAreaIds: AddressableAreaName[],
-  cutoutId: CutoutId
-): CutoutFixtureId | null => {
-  if (addressableAreaIds.length === 1) {
-    return getMainNonComboFixtureId(
-      compatibleCutoutFixtureIds,
-      addressableAreaIds,
-      cutoutId
-    )
-  }
-
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
-    compatibleCutoutFixtureIds.includes(cf.id)
-  )
-  const cutoutFixturesWithAddressableAreas = cutoutFixtures.find(cf =>
-    Object.values(cf.providesAddressableAreas).some(providedAAs =>
-      addressableAreaIds.every(aa => providedAAs.includes(aa))
-    )
-  )
-  return cutoutFixturesWithAddressableAreas?.id ?? null
-}
-
-export const getMainNonComboFixtureId = (
-  compatibleCutoutFixtureIds: CutoutFixtureId[],
-  addressableAreaIds: AddressableAreaName[],
-  cutoutId: CutoutId
-): CutoutFixtureId | null => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const cutoutFixtures = deckDef.cutoutFixtures.filter(cf =>
-    compatibleCutoutFixtureIds.includes(cf.id)
-  )
-  const aaAreaType = getAAByAAId(addressableAreaIds[0], deckDef).areaType
-  if (
-    Object.values(FLEX_MODULE_AA_TYPE_BY_MODEL).includes(
-      aaAreaType as AreaType
-    ) &&
-    aaAreaType !== 'magneticBlock'
-  ) {
-    return (
-      getMainUsbModuleFixtureIdForComboFixture(compatibleCutoutFixtureIds) ??
-      null
-    )
-  }
-  const cutoutFixturesWithAddressableAreas = cutoutFixtures.filter(cf =>
-    Object.values(cf.providesAddressableAreas).some(providedAAs =>
-      addressableAreaIds.every(aa => providedAAs.includes(aa))
-    )
-  )
-
-  if (cutoutFixturesWithAddressableAreas.length === 0) {
-    return null
-  }
-
-  // Find the fixture with the least items in its providesAddressableAreas in order to find the simplest fixture
-  const fixtureWithLeastAAs = cutoutFixturesWithAddressableAreas.reduce(
-    (minFixture, currentFixture) => {
-      const minAAsCount = Object.entries(minFixture.providesAddressableAreas)
-        .filter(([key, value]) => key === cutoutId)
-        .map(([key, value]) => value)[0].length
-      const currentAAsCount = Object.entries(
-        currentFixture.providesAddressableAreas
-      )
-        .filter(([key, value]) => key === cutoutId)
-        .map(([key, value]) => value)[0].length
-      return currentAAsCount < minAAsCount ? currentFixture : minFixture
-    }
-  )
-  return fixtureWithLeastAAs.id
-}
 
 export const isModuleAllowedOnAA = (
   cutoutId: CutoutId,
@@ -1260,7 +746,7 @@ export const isModuleAllowedOnAA = (
     return {
       aa: item,
       slotLikeId: getAAWithFakesFromVSId(
-        getVisualSlotIdForAA(cutoutId, fixtureId[0], item)
+        getVisualSlotIdFromAAId(item) as VISUAL_SLOTS
       ),
     }
   })
@@ -1443,11 +929,8 @@ export const getWasteChuteComboFixture = (
   aaCutoutItem: CutoutConfigMap,
   deckConfigWithAA: CutoutConfigMap[]
 ): CutoutConfig | null => {
-  const {
-    cutoutId,
-    cutoutFixtureId,
-    opentronsModuleSerialNumber,
-  } = aaCutoutItem
+  const { cutoutId, cutoutFixtureId, opentronsModuleSerialNumber } =
+    aaCutoutItem
   // Check if this is a valid waste chute cutout with compatible fixtures
   if (
     cutoutId !== WASTE_CHUTE_CUTOUT ||
@@ -1525,9 +1008,9 @@ export const replaceCutoutFixtureWithComboFixture = (
     }
 
     // Filter potential combo fixture options
-    const comboFixturesOptions = Object.entries(
-      addressableAreasById
-    ).filter(([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId))
+    const comboFixturesOptions = Object.entries(addressableAreasById).filter(
+      ([_, areaIds]) => areaIds.includes(aaCutoutItem.addressableAreaId)
+    )
     // Try to match with deck config
     for (const dc of deckConfigWithAA) {
       const match = comboFixturesOptions.find(([, areaIds]) =>
@@ -1562,7 +1045,10 @@ export const replaceCutoutFixtureWithComboFixture = (
           }
         }
       } else {
-        console.warn('Invalid match for:', aaCutoutItem.cutoutFixtureId)
+        console.log(
+          'Invalid deck config match for:',
+          aaCutoutItem.cutoutFixtureId
+        )
         continue
       }
     }
@@ -1576,68 +1062,6 @@ export const replaceCutoutFixtureWithComboFixture = (
     }
   })
 }
-
-/**
- * Given a cutout fixture to remove find what fixture to use instead
- * @param cutoutFixtureRemoved: fixtures to remove
- * @param cutoutId
- * @param addressableAreaId to remove from fixture
- * @returns fixture to replace with
- */
-export const replaceCutoutFixtureForFixtureRemoval = (
-  cutoutFixtureRemoved: CutoutFixtureIdsWithFakes,
-  cutoutId: CutoutId,
-  addressableAreaId: AddressableAreaNamesWithFakes
-): CutoutFixtureIdsWithFakes => {
-  const deckDef = getDeckDefFromRobotType('OT-3 Standard')
-  const aaPerFixtureOptions = getAAsToFixtureIdFromDeckDefWithFakes(
-    cutoutId,
-    deckDef
-  )
-  const aaForFixtureRemoval = getAAWithFakesFromCutoutFixtureId(
-    cutoutId,
-    cutoutFixtureRemoved,
-    deckDef
-  )
-  if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
-    if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
-      return WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)
-        ? FLEX_STACKER_V1_FIXTURE
-        : SINGLE_RIGHT_SLOT_FIXTURE
-    } else {
-      return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-    }
-  } else if (cutoutFixtureRemoved === ABSORBANCE_READER_V1_FIXTURE) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (cutoutFixtureRemoved === FLEX_STACKER_V1_FIXTURE) {
-    return SINGLE_RIGHT_SLOT_FIXTURE
-  } else if (cutoutFixtureRemoved === FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE) {
-    if (getAAByAAId(addressableAreaId, deckDef).areaType === 'flexStacker') {
-      return FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE
-    } else {
-      return FLEX_STACKER_V1_FIXTURE
-    }
-  } else {
-    const updated = aaForFixtureRemoval?.map(aa => {
-      const vsId = getVisualSlotIdForAA(cutoutId, cutoutFixtureRemoved, aa)
-      return aa === addressableAreaId ? getAAWithFakesFromVSId(vsId) : aa
-    })
-    const match = Object.entries(aaPerFixtureOptions).find(([, value]) => {
-      return isEqual(
-        value.sort(),
-        WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)
-          ? aaForFixtureRemoval?.sort()
-          : updated?.sort()
-      )
-    })
-    if (match) {
-      return match[0] as CutoutFixtureIdsWithFakes
-    }
-    // Fallback if no match found
-    return cutoutFixtureRemoved
-  }
-}
-
 /**
  * Check if a flex stacker module can be placed in the D3 cutout with waste chute compatibility
  * @param deckConfigCompatibility: array of deck configuration compatibility items
@@ -1673,20 +1097,24 @@ export const getFlexStackerD3Compatibility = (
       )
     ) {
       return {
-        comboFixtureId: deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureId,
-        comboFixtureConflict: !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
-          deckConfigCompatabilityD3.cutoutFixtureId
-        ),
+        comboFixtureId:
+          deckConfigCompatabilityD3.cutoutFixtureId as CutoutFixtureId,
+        comboFixtureConflict:
+          !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+            deckConfigCompatabilityD3.cutoutFixtureId
+          ),
       }
     }
 
-    const comboFixtureId = deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.find(
-      fixtureId => !fixtureId.startsWith('fake')
-    ) as CutoutFixtureId | undefined
+    const comboFixtureId =
+      deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.find(
+        fixtureId => !fixtureId.startsWith('fake')
+      ) as CutoutFixtureId | undefined
 
-    const comboFixtureConflict = !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
-      deckConfigCompatabilityD3.cutoutFixtureId
-    )
+    const comboFixtureConflict =
+      !deckConfigCompatabilityD3?.compatibleCutoutFixtureIds.includes(
+        deckConfigCompatabilityD3.cutoutFixtureId
+      )
 
     return {
       comboFixtureId,
@@ -1715,9 +1143,8 @@ export const getCutoutConfigReplacmentForModule = (
   moduleModel: ModuleModel,
   deckConfig: CutoutConfig[]
 ): CutoutFixtureId => {
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
   const mainAA = getAAForModuleFixture(cutoutId, fixtureId, moduleModel)
   const addedCutoutConfigs: CutoutConfigMap[] = [
     {

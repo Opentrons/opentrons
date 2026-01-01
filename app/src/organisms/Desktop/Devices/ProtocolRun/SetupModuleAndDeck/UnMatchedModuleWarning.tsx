@@ -27,14 +27,17 @@ export const UnMatchedModuleWarning = (): JSX.Element | null => {
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           data-testid="UnMatchedModuleWarning_title"
         >
           {t('extra_module_attached')}
         </LegacyStyledText>
 
-        <LegacyStyledText as="p" data-testid="UnMatchedModuleWarning_body">
+        <LegacyStyledText
+          forwardedAs="p"
+          data-testid="UnMatchedModuleWarning_body"
+        >
           {`${t('module_mismatch_body')}.`}
         </LegacyStyledText>
       </Flex>

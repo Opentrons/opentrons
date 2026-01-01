@@ -1,6 +1,7 @@
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../constants'
 import { PROFILE_STEP } from '../../../form-types'
 
+import type { AtomicProfileStep } from '@opentrons/shared-data'
 import type {
   ThermocyclerProfileStepArgs,
   ThermocyclerStateStepArgs,
@@ -10,97 +11,115 @@ import type {
   ProfileItem,
   ProfileStepItem,
 } from '../../../form-types'
+import type { GetCastFormData } from '../../fieldLevel'
 
-type FlatProfileSteps = ThermocyclerProfileStepArgs['profileSteps']
-
-const _flattenProfileSteps = (args: {
+const _convertToProfileElements = (args: {
   orderedProfileItems: string[]
   profileItemsById: Record<string, ProfileItem>
-}): FlatProfileSteps => {
+}): ThermocyclerProfileStepArgs['profileElements'] => {
   const { orderedProfileItems, profileItemsById } = args
-  const steps: FlatProfileSteps = []
 
-  const addStep = (step: ProfileStepItem): void => {
+  const convertStep = (step: ProfileStepItem): AtomicProfileStep => {
     const durationMinutes = Number(step.durationMinutes) || 0
     const durationSeconds = Number(step.durationSeconds) || 0
-    steps.push({
-      temperature: Number(step.temperature),
-      holdTime: durationMinutes * 60 + durationSeconds,
-    })
-  }
-
-  for (const itemId of orderedProfileItems) {
-    const item = profileItemsById[itemId]
-
-    if (item.type === PROFILE_STEP) {
-      addStep(item)
-    } else {
-      const repetitions = Number(item.repetitions)
-
-      for (let i = 0; i < repetitions; i++) {
-        for (const step of item.steps) {
-          addStep(step)
-        }
-      }
+    return {
+      celsius: Number(step.temperature),
+      holdSeconds: durationMinutes * 60 + durationSeconds,
     }
   }
 
-  return steps
+  return orderedProfileItems.map(itemId => {
+    const item = profileItemsById[itemId]
+    return item.type === PROFILE_STEP
+      ? convertStep(item)
+      : {
+          steps: item.steps.map(convertStep),
+          repetitions: Number(item.repetitions),
+        }
+  })
 }
 
 export const thermocyclerFormToArgs = (
-  formData: HydratedThermocyclerFormData
-): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs | null => {
-  const { thermocyclerFormType, stepDetails } = formData
+  castFormData: GetCastFormData<HydratedThermocyclerFormData>,
+  enableConcurrentModuleActions: boolean
+): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs => {
+  const { thermocyclerFormType, stepDetails } = castFormData
 
   switch (thermocyclerFormType) {
     case THERMOCYCLER_STATE: {
       return {
-        moduleId: formData.moduleId,
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: castFormData.moduleId!,
         commandCreatorFnName: THERMOCYCLER_STATE,
         blockTargetTemp:
-          formData.blockIsActive && formData.blockTargetTemp !== null
-            ? Number(formData.blockTargetTemp)
+          castFormData.blockIsActive && castFormData.blockTargetTemp !== null
+            ? Number(castFormData.blockTargetTemp)
             : null,
         lidTargetTemp:
-          formData.lidIsActive && formData.lidTargetTemp !== null
-            ? Number(formData.lidTargetTemp)
+          castFormData.lidIsActive && castFormData.lidTargetTemp !== null
+            ? Number(castFormData.lidTargetTemp)
             : null,
-        lidOpen: formData.lidOpen,
+        // todo(mm, 2025-10-09): Nullability error inherited from prior code. Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        lidOpen: castFormData.lidOpen!,
       }
     }
 
     case THERMOCYCLER_PROFILE: {
-      const profileSteps = _flattenProfileSteps({
-        orderedProfileItems: formData.orderedProfileItems,
-        profileItemsById: formData.profileItemsById,
+      const profileElements = _convertToProfileElements({
+        orderedProfileItems: castFormData.orderedProfileItems,
+        profileItemsById: castFormData.profileItemsById,
       })
 
-      return {
-        moduleId: formData.moduleId,
-        commandCreatorFnName: THERMOCYCLER_PROFILE,
+      const holdStepArgs = {
         blockTargetTempHold:
-          formData.blockIsActiveHold && formData.blockTargetTempHold !== null
-            ? Number(formData.blockTargetTempHold)
+          castFormData.blockIsActiveHold &&
+          castFormData.blockTargetTempHold !== null
+            ? Number(castFormData.blockTargetTempHold)
             : null,
-        lidOpenHold: formData.lidOpenHold,
+        lidOpenHold: castFormData.lidOpenHold,
         lidTargetTempHold:
-          formData.lidIsActiveHold && formData.lidTargetTempHold !== null
-            ? Number(formData.lidTargetTempHold)
+          castFormData.lidIsActiveHold &&
+          castFormData.lidTargetTempHold !== null
+            ? Number(castFormData.lidTargetTempHold)
             : null,
+      }
+
+      const args = {
+        commandCreatorFnName: THERMOCYCLER_PROFILE,
+
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: castFormData.moduleId!,
+
         meta: {
-          rawProfileItems: formData.orderedProfileItems.map(
-            (itemId: string | number) => formData.profileItemsById[itemId]
+          rawProfileItems: castFormData.orderedProfileItems.map(
+            (itemId: string | number) => castFormData.profileItemsById[itemId]
           ),
         },
-        profileSteps,
-        profileTargetLidTemp: Number(formData.profileTargetLidTemp),
-        profileVolume: Number(formData.profileVolume),
+        profileElements,
+        profileTargetLidTemp: Number(castFormData.profileTargetLidTemp),
+        profileVolume: Number(castFormData.profileVolume),
         description: stepDetails,
+
+        ...(enableConcurrentModuleActions
+          ? {
+              concurrent: true as const,
+              // holdStepArgs is omitted here because step-generation and the backend
+              // don't support that functionality when concurrent is true.
+            }
+          : {
+              concurrent: false as const,
+              ...holdStepArgs,
+            }),
       }
+
+      return args
     }
   }
-
-  // this should not happen, for Flow only
-  return null
 }

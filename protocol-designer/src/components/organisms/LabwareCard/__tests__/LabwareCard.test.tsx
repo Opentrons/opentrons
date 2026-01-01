@@ -2,7 +2,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
-import { getLiquidIdsOnLabware } from '@opentrons/step-generation'
+import {
+  getFullStackFromLabwares,
+  getLiquidIdsOnLabware,
+} from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 
@@ -58,7 +61,13 @@ describe('LabwareCard', () => {
       },
       lidId: 'lidId',
       quantity: 1,
+      location: 'A1',
     }
+    vi.mocked(getFullStackFromLabwares).mockReturnValue([
+      'lidId',
+      'labwreId',
+      'A1',
+    ])
     vi.mocked(EditLabwareQuantityModal).mockReturnValue(
       <div>mock EditLabwareQuantityModal</div>
     )
@@ -88,12 +97,12 @@ describe('LabwareCard', () => {
         lidId: {
           id: 'lidId',
           labwareDefURI: 'mockuri',
-          def: ({
+          def: {
             ...fixture96Plate,
             metadata: { displayName: 'mock lid' },
-          } as any) as LabwareDefinition2,
+          } as any as LabwareDefinition2,
           pythonName: 'mockPythonName',
-          stack: ['labwareId', 'A1'],
+          stack: ['lidId', 'labwareId', 'A1'],
         },
       },
     })

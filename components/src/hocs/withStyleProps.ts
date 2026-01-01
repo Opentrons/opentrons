@@ -1,9 +1,9 @@
 import { createElement } from 'react'
 
-import { styleProps } from '../primitives'
+import { isntStyleProp, styleProps } from '../primitives/style-props'
 
 import type { ComponentProps, ComponentType } from 'react'
-import type { StyleProps } from '../primitives'
+import type { StyleProps } from '../primitives/types'
 
 /**
  * A Higher-Order Component (HOC) that enhances a component by enabling it to
@@ -39,8 +39,18 @@ export function withStyleProps<T extends ComponentType<any>>(
     const stylePropsStyles = styleProps(props)
     const combinedStyles = { ...stylePropsStyles, ...style }
 
+    const forwardedProps = Object.entries(props).reduce(
+      (acc: Record<string, unknown>, [prop, value]) => {
+        if (isntStyleProp(prop)) {
+          acc[prop] = value
+        }
+        return acc
+      },
+      {}
+    )
+
     return createElement(Component, {
-      ...props,
+      ...(forwardedProps as ComponentProps<T>),
       style: combinedStyles,
     })
   }

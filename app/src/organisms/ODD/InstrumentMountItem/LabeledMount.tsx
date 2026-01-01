@@ -57,7 +57,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           gridGap={SPACING.spacing24}
         >
           <LegacyStyledText
-            as="h4"
+            forwardedAs="h4"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             textAlign={TYPOGRAPHY.textAlignLeft}
             textTransform={TEXT_TRANSFORM_CAPITALIZE}
@@ -68,7 +68,7 @@ export function LabeledMount(props: LabeledMountProps): JSX.Element {
           </LegacyStyledText>
           <LegacyStyledText
             flex="5"
-            as="h4"
+            forwardedAs="h4"
             color={COLORS.grey60}
             textAlign={TYPOGRAPHY.textAlignLeft}
             fontWeight={TYPOGRAPHY.fontWeightRegular}

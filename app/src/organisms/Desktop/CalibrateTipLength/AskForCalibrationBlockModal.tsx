@@ -19,9 +19,9 @@ import {
   TYPOGRAPHY,
   WizardHeader,
 } from '@opentrons/components'
+import { labwareImages } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
-import { labwareImages } from '/app/local-resources/labware'
 import { setUseTrashSurfaceForTipCal } from '/app/redux/calibration'
 
 import styles from './styles.module.css'
@@ -72,7 +72,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
       >
         <Flex gridGap={SPACING.spacing8}>
           <Flex flex="1" flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
               {t('do_you_have_a_cal_block')}
             </LegacyStyledText>
 
@@ -81,7 +81,10 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
               i18nKey="branded:calibration_block_description"
               components={{
                 block: (
-                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
+                  <LegacyStyledText
+                    forwardedAs="p"
+                    marginBottom={SPACING.spacing8}
+                  />
                 ),
                 supportLink: (
                   <Link
@@ -97,7 +100,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
             <img
               alt="Calibration Block"
               className={styles.block_image}
-              src={labwareImages[CAL_BLOCK_LOAD_NAME]}
+              src={labwareImages[CAL_BLOCK_LOAD_NAME][0]}
             />
           </Flex>
         </Flex>
@@ -115,7 +118,7 @@ export function AskForCalibrationBlockModal(props: Props): JSX.Element {
               }}
               value={rememberPreference}
             />
-            <LegacyStyledText as="p" marginLeft={SPACING.spacing8}>
+            <LegacyStyledText forwardedAs="p" marginLeft={SPACING.spacing8}>
               {t('shared:remember_my_selection_and_do_not_ask_again')}
             </LegacyStyledText>
           </Flex>

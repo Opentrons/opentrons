@@ -11,6 +11,10 @@ import type {
   ConcurrentCreateCommand,
   ConcurrentRunTimeCommand,
 } from './concurrent'
+import type {
+  RobotDevicesCreateCommand,
+  RobotDevicesRunTimeCommand,
+} from './devices'
 import type { GantryCreateCommand, GantryRunTimeCommand } from './gantry'
 import type {
   IncidentalCreateCommand,
@@ -38,6 +42,7 @@ export * from './unsafe'
 export * from './support'
 export * from './robot'
 export * from './concurrent'
+export * from './devices'
 // NOTE: these key/value pairs will only be present on commands at analysis/run time
 // they pertain only to the actual execution status of a command on hardware, as opposed to
 // the command's identity and parameters which can be known prior to runtime
@@ -50,7 +55,7 @@ export interface CommandNote {
 export type CommandStatus = 'queued' | 'running' | 'succeeded' | 'failed'
 export type CommandIntent = 'protocol' | 'setup' | 'fixit'
 export interface CommonCommandRunTimeInfo<
-  DefinedErrorsT extends DefinedRunCommandError = DefinedRunCommandError
+  DefinedErrorsT extends DefinedRunCommandError = DefinedRunCommandError,
 > {
   key?: string
   id: string
@@ -81,6 +86,8 @@ export type CreateCommand =
   | UnsafeCreateCommand // command providing capabilities that are not safe for scientific uses
   | RobotCreateCommand // command providing underlying robot capabilities outside the normal model
   | ConcurrentCreateCommand // command providing concurrent actions
+  | RobotDevicesCreateCommand // commands that interface with robot devices
+
 // commands will be required to have a key, but will not be created with one
 export type RunTimeCommand =
   | PipettingRunTimeCommand // involves the pipettes plunger motor
@@ -94,6 +101,8 @@ export type RunTimeCommand =
   | UnsafeRunTimeCommand // command providing capabilities that are not safe for scientific uses
   | RobotRunTimeCommand // command providing underlying robot capabilities outside the normal model
   | ConcurrentRunTimeCommand // command providing concurrent actions
+  | RobotDevicesRunTimeCommand // commands that interface with robot devices
+
 export type RunCommandError = RunCommandErrorUndefined | DefinedRunCommandError
 
 export type DefinedRunCommandError =
@@ -128,8 +137,7 @@ export interface RunCommandErrorOverpressure extends RunCommandErrorBase {
   errorInfo: { retryLocation: [number, number, number] }
 }
 
-export interface RunCommandErrorTipPhysicallyAttached
-  extends RunCommandErrorBase {
+export interface RunCommandErrorTipPhysicallyAttached extends RunCommandErrorBase {
   errorCode: '3004'
   errorType: 'tipPhysicallyAttached'
   isDefined: true
@@ -143,32 +151,28 @@ export interface RunCommandErrorFlexStackerStall extends RunCommandErrorBase {
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerShuttleMissing
-  extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleMissing extends RunCommandErrorBase {
   errorCode: '3020'
   errorType: 'flexStackerShuttleMissing'
   isDefined: true
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerShuttleLabware
-  extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleLabware extends RunCommandErrorBase {
   errorCode: '3021'
   errorType: 'flexStackerLabwareRetrieveFailed'
   isDefined: true
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerHopperLabware
-  extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerHopperLabware extends RunCommandErrorBase {
   errorCode: '3022'
   errorType: 'flexStackerHopperLabwareFailed'
   isDefined: true
   errorInfo: { labwareId?: string }
 }
 
-export interface RunCommandErrorFlexStackerShuttleOccupied
-  extends RunCommandErrorBase {
+export interface RunCommandErrorFlexStackerShuttleOccupied extends RunCommandErrorBase {
   errorCode: '3023'
   errorType: 'flexStackerShuttleOccupied'
   isDefined: true

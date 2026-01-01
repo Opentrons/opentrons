@@ -1,14 +1,9 @@
 import deepClone from 'lodash/cloneDeep'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+import { ot2DeckDefV5 } from '@opentrons/shared-data'
 
 import {
-  getSchema2Dimensions,
-  getSlotHasMatingSurfaceUnitVector,
-  ot2DeckDefV5,
-} from '@opentrons/shared-data'
-
-import {
-  mockLabwareDefinition,
   mockLabwareDefinitionsByUri,
   mockLabwareOnSlot,
   mockModule,
@@ -19,7 +14,6 @@ import {
   getLabwareNameFromRunData,
   getModuleDisplayLocationFromRunData,
   getModuleModelFromRunData,
-  getRunLabwareRenderInfo,
   getRunModuleRenderInfo,
 } from '../utils'
 
@@ -121,82 +115,6 @@ describe('getModuleModelFromRunData', () => {
     const res = getModuleModelFromRunData(mockRunData, 'mockBadModuleID')
 
     expect(res).toEqual(null)
-  })
-})
-
-describe('getRunLabwareRenderInfo', () => {
-  beforeEach(() => {
-    vi.mocked(getSlotHasMatingSurfaceUnitVector).mockReturnValue(true)
-  })
-
-  it('returns an empty array if there is no loaded labware for the run', () => {
-    const res = getRunLabwareRenderInfo({ labware: [] } as any, {}, {} as any)
-
-    expect(res).toBeInstanceOf(Array)
-    expect(res).toHaveLength(0)
-  })
-
-  it('returns run labware render info', () => {
-    const res = getRunLabwareRenderInfo(
-      mockRunData,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV5 as any
-    )
-    const labwareInfo = res[0]
-    expect(labwareInfo).toBeTruthy()
-    expect(labwareInfo.labwareOrigin).toStrictEqual({ x: 0, y: 0, z: 0 }) // taken from deckDef fixture
-    expect(labwareInfo.labwareDef.metadata.displayName).toEqual(
-      'NEST 96 Well Plate 100 µL PCR Full Skirt'
-    )
-    expect(labwareInfo.labwareId).toEqual('mockLabwareID2')
-  })
-
-  it('does not add labware to results array if the labware is on deck and the slot does not have a mating surface vector', () => {
-    vi.mocked(getSlotHasMatingSurfaceUnitVector).mockReturnValue(false)
-    const res = getRunLabwareRenderInfo(
-      mockRunData,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV5 as any
-    )
-    expect(res).toHaveLength(1) // the offdeck labware still gets added because the mating surface doesn't exist for offdeck labware
-  })
-
-  it('does add offdeck labware to the results array', () => {
-    const res = getRunLabwareRenderInfo(
-      mockRunData,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV5 as any
-    )
-    expect(res).toHaveLength(2)
-    const labwareInfo = res.find(
-      labware => labware.labwareId === 'mockLabwareID3'
-    )
-    expect(labwareInfo).toBeTruthy()
-    expect(labwareInfo?.labwareOrigin).toStrictEqual({
-      x: 0,
-      y:
-        ot2DeckDefV5.cornerOffsetFromOrigin[1] -
-        getSchema2Dimensions(mockLabwareDefinition).yDimension,
-      z: 0,
-    })
-  })
-
-  it('omits labware if slot position not found in deck definition', () => {
-    const mockBadSlotLabware = {
-      id: 'mockBadLabwareID',
-      loadName: 'nest_96_wellplate_100ul_pcr_full_skirt',
-      definitionUri: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
-      location: {
-        slotName: '0',
-      },
-    }
-    const res = getRunLabwareRenderInfo(
-      { labware: [mockBadSlotLabware] } as any,
-      mockLabwareDefinitionsByUri,
-      ot2DeckDefV5 as any
-    )
-
-    expect(res).toHaveLength(0)
   })
 })
 

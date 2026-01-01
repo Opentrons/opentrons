@@ -42,6 +42,7 @@ def test_device_info(heatershaker: HeaterShaker) -> None:
 
 async def test_latch_status(heatershaker: HeaterShaker) -> None:
     """It should run open and close latch."""
+    await heatershaker._poller.wait_next_poll()
     assert heatershaker.labware_latch_status.value == "idle_open"
 
     await heatershaker.close_labware_latch()

@@ -12,7 +12,6 @@ labware.
 # https://github.com/taverntesting/tavern/issues/833 is resolved. We need to upload
 # multiple files into the `files` field of the `POST /protocols` endpoint.
 
-
 import asyncio
 import textwrap
 from pathlib import Path

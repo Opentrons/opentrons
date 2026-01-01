@@ -8,7 +8,6 @@ import {
   RUN_STATUS_FAILED,
   RUN_STATUS_STOPPED,
   RUN_STATUS_SUCCEEDED,
-  RUN_STATUSES_TERMINAL,
 } from '@opentrons/api-client'
 import {
   ALIGN_CENTER,
@@ -43,16 +42,20 @@ import {
 } from '@opentrons/react-api-client'
 
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+import { isTerminalRunStatus } from '/app/local-resources/runs/utils'
 import { RunTimer } from '/app/molecules/RunTimer'
 import { handleTipsAttachedModal } from '/app/organisms/DropTipWizardFlows'
 import { RunFailedModal } from '/app/organisms/ODD/RunningProtocol'
 import { useRunControls } from '/app/organisms/RunTimeControl/hooks'
 import {
+  SOURCE_RUN_RECORD,
+  useCameraAnalytics,
   useRecoveryAnalytics,
   useRobotAnalyticsData,
   useTrackEventWithRobotSerial,
   useTrackProtocolRunEvent,
 } from '/app/redux-resources/analytics'
+import { useRobotType } from '/app/redux-resources/robots'
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   ANALYTICS_PROTOCOL_RUN_ACTION,
@@ -60,6 +63,7 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
+import { useRunGeneratedDataFiles } from '/app/resources/dataFiles/useRunGeneratedDataFiles'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import {
   EMPTY_TIMESTAMP,
@@ -121,12 +125,7 @@ export function RunSummary(): JSX.Element {
   )
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot?.name ?? 'no name'
-
-  const onCloneRunSuccess = (): void => {
-    if (isQuickTransfer) {
-      deleteRun(runId)
-    }
-  }
+  const robotType = useRobotType(robotName)
 
   const { trackProtocolRunEvent } = useTrackProtocolRunEvent(
     runId,
@@ -142,7 +141,7 @@ export function RunSummary(): JSX.Element {
     }
   }, [isRunCurrent, enteredER])
 
-  const { reset, isResetRunLoading } = useRunControls(runId, onCloneRunSuccess)
+  const { reset, isResetRunLoading } = useRunControls(runId)
   const trackEvent = useTrackEvent()
   const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
 
@@ -173,11 +172,7 @@ export function RunSummary(): JSX.Element {
     runId,
     { cursor: 0, pageLength: 100 },
     {
-      enabled:
-        runStatus != null &&
-        // @ts-expect-error runStatus expected to possibly not be terminal
-        RUN_STATUSES_TERMINAL.includes(runStatus) &&
-        isRunCurrent,
+      enabled: isTerminalRunStatus(runStatus) && isRunCurrent,
     }
   )
   // TODO(jh, 08-14-24): The backend never returns the "user cancelled a run" error and cancelledWithoutRecovery becomes unnecessary.
@@ -229,14 +224,11 @@ export function RunSummary(): JSX.Element {
     ) : null
   }
 
-  const {
-    determineTipStatus,
-    setTipStatusResolved,
-    aPipetteWithTip,
-  } = useTipAttachmentStatus({
-    runId,
-    runRecord: runRecord ?? null,
-  })
+  const { determineTipStatus, setTipStatusResolved, aPipetteWithTip } =
+    useTipAttachmentStatus({
+      runId,
+      runRecord: runRecord ?? null,
+    })
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
   const runSummaryNoFixit = useCurrentRunCommands({
@@ -333,11 +325,20 @@ export function RunSummary(): JSX.Element {
   const handleViewErrorDetails = (): void => {
     setShowRunFailedModal(true)
   }
-
+  const { reportImageCaptureUsage } = useCameraAnalytics({
+    source: SOURCE_RUN_RECORD,
+    robotType: robotType,
+  })
+  const outputFileIds = useRunGeneratedDataFiles(runId)
   const handleClickSplash = (): void => {
     trackProtocolRunEvent({
       name: ANALYTICS_PROTOCOL_RUN_ACTION.FINISH,
       properties: robotAnalyticsData ?? undefined,
+    })
+    const numberOfImages = outputFileIds.jpeg.length
+    reportImageCaptureUsage({
+      transactionId: runId,
+      amount: numberOfImages,
     })
     setShowSplash(false)
   }

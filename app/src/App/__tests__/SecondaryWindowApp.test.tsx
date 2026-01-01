@@ -6,6 +6,8 @@ import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { LocalizationProvider } from '/app/LocalizationProvider'
 // eslint-disable-next-line opentrons/no-imports-across-applications
+import { CameraPhotoViewer } from '/app/pages/Desktop/CameraPhotoViewer'
+// eslint-disable-next-line opentrons/no-imports-across-applications
 import { LivestreamViewer } from '/app/pages/Desktop/LivestreamViewer'
 import { useRobot } from '/app/redux-resources/robots'
 
@@ -16,6 +18,7 @@ import type { LocalizationProviderProps } from '/app/LocalizationProvider'
 vi.mock('/app/LocalizationProvider')
 vi.mock('/app/pages/Desktop/LivestreamViewer')
 vi.mock('/app/redux-resources/robots')
+vi.mock('/app/pages/Desktop/CameraPhotoViewer')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -31,20 +34,26 @@ describe('SecondaryWindowApp', () => {
     vi.mocked(LivestreamViewer).mockReturnValue(
       <div>Mock LivestreamViewer</div>
     )
+    vi.mocked(CameraPhotoViewer).mockReturnValue(
+      <div>Mock CameraPhotoViewer</div>
+    )
     vi.mocked(useRobot).mockReturnValue({
       name: 'otie',
       ip: '192.168.1.100',
     } as any)
-    vi.mocked(
-      LocalizationProvider
-    ).mockImplementation((props: LocalizationProviderProps) => (
-      <>{props.children}</>
-    ))
+    vi.mocked(LocalizationProvider).mockImplementation(
+      (props: LocalizationProviderProps) => <>{props.children}</>
+    )
   })
 
   it('renders a LivestreamViewer component from /devices/:robotName/camera-stream', () => {
     render('/devices/otie/camera-stream')
     screen.getByText('Mock LivestreamViewer')
+  })
+
+  it('renders a CameraPhotoViewer component from /devices/:robotName/camera-photo', () => {
+    render('/devices/otie/camera-photo')
+    screen.getByText('Mock CameraPhotoViewer')
   })
 
   it('navigates to home on unknown routes', () => {

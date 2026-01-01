@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping
+from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping, Tuple
 
 from anyio import move_on_after
 
@@ -15,7 +15,10 @@ from opentrons_shared_data.robot.types import RobotType
 
 from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
-from ..hardware_control.modules import AbstractModule as HardwareModuleAPI
+from ..hardware_control.modules import (
+    AbstractModule as HardwareModuleAPI,
+    ModuleModel as HardwareModuleModel,
+)
 from ..protocol_engine import (
     ProtocolEngine,
     CommandCreate,
@@ -40,7 +43,9 @@ from ..protocol_engine.types import (
     CSVRuntimeParamPaths,
     CommandAnnotation,
     ModuleModel,
+    CommandPreconditions,
 )
+from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
 from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 
 from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
@@ -81,6 +86,7 @@ class RunOrchestrator:
     _protocol_live_runner: protocol_runner.LiveRunner
     _hardware_api: HardwareControlAPI
     _protocol_engine: ProtocolEngine
+    _camera_provider: Optional[CameraProvider] = None
 
     def __init__(
         self,
@@ -89,6 +95,7 @@ class RunOrchestrator:
         fixit_runner: protocol_runner.LiveRunner,
         setup_runner: protocol_runner.LiveRunner,
         protocol_live_runner: protocol_runner.LiveRunner,
+        camera_provider: Optional[CameraProvider] = None,
         json_or_python_protocol_runner: Optional[
             Union[protocol_runner.PythonAndLegacyRunner, protocol_runner.JsonRunner]
         ] = None,
@@ -103,6 +110,7 @@ class RunOrchestrator:
             setup_runner: LiveRunner for setup commands.
             protocol_live_runner: LiveRunner for protocol commands.
             json_or_python_protocol_runner: JsonRunner/PythonAndLegacyRunner for protocol commands.
+            camera_provider: Provides callbacks to Camera interface.
             run_id: run id if any, associated to the runner/engine.
         """
         self._run_id = run_id
@@ -111,6 +119,7 @@ class RunOrchestrator:
         self._setup_runner = setup_runner
         self._fixit_runner = fixit_runner
         self._protocol_live_runner = protocol_live_runner
+        self._camera_provider = camera_provider
         self._fixit_runner.prepare()
         self._setup_runner.prepare()
         self._protocol_engine.set_and_start_queue_worker(self.command_generator)
@@ -129,6 +138,7 @@ class RunOrchestrator:
         cls,
         hardware_api: HardwareControlAPI,
         protocol_engine: ProtocolEngine,
+        camera_provider: Optional[CameraProvider] = None,
         protocol_config: Optional[
             Union[JsonProtocolConfig, PythonProtocolConfig]
         ] = None,
@@ -166,6 +176,7 @@ class RunOrchestrator:
             hardware_api=hardware_api,
             protocol_engine=protocol_engine,
             protocol_live_runner=protocol_live_runner,
+            camera_provider=camera_provider,
         )
 
     def play(self, deck_configuration: Optional[DeckConfigurationType] = None) -> None:
@@ -234,6 +245,10 @@ class RunOrchestrator:
         """Get protocol run data."""
         return self._protocol_engine.state_view.get_summary()
 
+    def get_preconditions(self) -> CommandPreconditions:
+        """Get the preconditions of a protocol run."""
+        return self._protocol_engine.state_view.preconditions.get_precondition()
+
     def get_loaded_labware_definitions(self) -> List[LabwareDefinition]:
         """Get loaded labware definitions."""
         return self._protocol_engine.state_view.labware.get_loaded_labware_definitions()
@@ -273,9 +288,7 @@ class RunOrchestrator:
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
-        most_recently_finalized_command = (
-            self._protocol_engine.state_view.commands.get_most_recently_finalized_command()
-        )
+        most_recently_finalized_command = self._protocol_engine.state_view.commands.get_most_recently_finalized_command()
         return (
             CommandPointer(
                 command_id=most_recently_finalized_command.command.id,
@@ -360,6 +373,28 @@ class RunOrchestrator:
         """Add a new labware definition to state."""
         return self._protocol_engine.add_labware_definition(definition)
 
+    def add_camera_enablement_settings(
+        self,
+        enablement_settings: CameraSettings,
+    ) -> CameraSettings:
+        """Add new camera enablement settings."""
+        return self._protocol_engine.add_camera_enablement_settings(enablement_settings)
+
+    def add_camera_capture_image_settings(
+        self,
+        camera_id: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        pan: Optional[Tuple[int, int]] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Add new camera capture image settings."""
+        self._protocol_engine.add_camera_capture_image_settings_to_state(
+            camera_id, resolution, zoom, pan, contrast, brightness, saturation
+        )
+
     async def add_command_and_wait_for_interval(
         self,
         command: CommandCreate,
@@ -380,6 +415,30 @@ class RunOrchestrator:
     def estop(self) -> None:
         """Handle an E-stop event from the hardware API."""
         return self._protocol_engine.estop()
+
+    async def asynchronous_module_error(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an asynchronous module error reported by hardware.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.async_module_error(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
+
+    async def module_disconnected(
+        self, module_model: HardwareModuleModel, module_serial: str | None
+    ) -> bool:
+        """Handle an unexpected module disconnection.
+
+        If this function returns true, the caller should call finish() immediately; if it returns
+        False, the caller should not call finish() until it otherwise would.
+        """
+        return await self._protocol_engine.module_disconnected(
+            module_model=ModuleModel.from_hardware(module_model), serial=module_serial
+        )
 
     async def use_attached_modules(
         self, modules_by_id: Dict[str, HardwareModuleAPI]
@@ -459,10 +518,10 @@ class RunOrchestrator:
         stackers: Dict[str, FlexStackerSubState] = {}
         for module in modules:
             if module.model == ModuleModel.FLEX_STACKER_MODULE_V1:
-                stackers[
-                    module.id
-                ] = self._protocol_engine.state_view.modules.get_flex_stacker_substate(
-                    module.id
+                stackers[module.id] = (
+                    self._protocol_engine.state_view.modules.get_flex_stacker_substate(
+                        module.id
+                    )
                 )
         return stackers
 

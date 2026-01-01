@@ -23,7 +23,6 @@ This does not: `pipenv run python scripts/get_all_http_resources.py`
 # todo(mm, 2025-01-14): Consider unifying this implementation with
 # tests/integration/http_api/persistence/test_compatibility.py.
 
-
 from __future__ import annotations
 
 import argparse

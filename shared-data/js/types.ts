@@ -49,6 +49,18 @@ export interface RobotDefinition {
   displayName: string
   robotType: RobotType
   models: string[]
+  extents: CoordinateTuple
+  paddingOffsets: {
+    rear: number
+    front: number
+    leftSide: number
+    rightSide: number
+  }
+  mountOffsets: {
+    left: CoordinateTuple
+    right: CoordinateTuple
+    gripper?: CoordinateTuple
+  }
 }
 
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
@@ -346,6 +358,9 @@ export interface LabwareDefinition3 {
 // I'm pretty sure nothing in the frontend needs to deal with it anymore.
 export type LabwareDefinition = LabwareDefinition2 | LabwareDefinition3
 
+export interface LabwareDefinitionsByURI {
+  [defURI: string]: LabwareDefinition
+}
 export interface LabwareDef2ByDefURI {
   [defUri: string]: LabwareDefinition2
 }
@@ -455,8 +470,10 @@ export interface CutoutFixture {
   height: number
 }
 
-export interface FakeCutoutFixture
-  extends Omit<CutoutFixture, 'id' | 'providesAddressableAreas'> {
+export interface FakeCutoutFixture extends Omit<
+  CutoutFixture,
+  'id' | 'providesAddressableAreas'
+> {
   id: CutoutFixtureIdsWithFakes
   providesAddressableAreas: Record<
     CutoutId,
@@ -492,8 +509,10 @@ export interface AddressableArea {
   matingSurfaceUnitVector?: UnitVectorTuple
 }
 
-export interface FakeAddressableArea
-  extends Omit<AddressableArea, 'id' | 'areaType'> {
+export interface FakeAddressableArea extends Omit<
+  AddressableArea,
+  'id' | 'areaType'
+> {
   id: AddressableAreaNamesWithFakes
   areaType: AreaTypeWithFakes
 }
@@ -523,11 +542,10 @@ export interface DeckLocations {
   legacyFixtures: LegacyFixture[]
 }
 
-export interface DeckLocationsWithFakes
-  extends Omit<
-    DeckLocations,
-    'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
-  > {
+export interface DeckLocationsWithFakes extends Omit<
+  DeckLocations,
+  'addressableAreas' | 'calibrationPoints' | 'legacyFixtures'
+> {
   addressableAreas: AddressableAreaWithFakes[]
 }
 
@@ -541,17 +559,16 @@ export interface DeckDefinition {
   cutoutFixtures: CutoutFixture[]
 }
 
-export interface DeckDefinitionWithFakes
-  extends Omit<
-    DeckDefinition,
-    | 'locations'
-    | 'cutoutFixtures'
-    | 'otId'
-    | 'cornerOffsetFromOrigin'
-    | 'dimensions'
-    | 'metadata'
-    | 'robot'
-  > {
+export interface DeckDefinitionWithFakes extends Omit<
+  DeckDefinition,
+  | 'locations'
+  | 'cutoutFixtures'
+  | 'otId'
+  | 'cornerOffsetFromOrigin'
+  | 'dimensions'
+  | 'metadata'
+  | 'robot'
+> {
   locations: DeckLocationsWithFakes
   cutoutFixtures: CutoutFixtureWithFakes[]
 }
@@ -566,6 +583,7 @@ export interface ModuleDimensions {
   labwareInterfaceXDimension?: number
   labwareInterfaceYDimension?: number
   lidHeight?: number
+  maxStackerFillHeight?: number
 }
 
 export interface ModuleCalibrationPoint {
@@ -598,7 +616,7 @@ export type AffineTransformMatrix = [
   AffineTransformRow,
   AffineTransformRow,
   AffineTransformRow,
-  AffineTransformRow
+  AffineTransformRow,
 ]
 
 export interface SlotTransforms {
@@ -825,9 +843,10 @@ export interface LoadedModule {
 }
 export interface Liquid {
   id: string
-  displayName: string
+  displayName: string | null
   description: string
   displayColor?: string
+  totalLiquids?: number
 }
 
 // TODO(ND, 12/17/2024): investigate why typescript doesn't allow Array<[number, number]>
@@ -899,20 +918,17 @@ interface BaseLiquidHandlingProperties<RetractType> {
   correctionByVolume: LiquidHandlingPropertyByVolume
   delay: DelayProperties
 }
-export interface AspirateProperties
-  extends BaseLiquidHandlingProperties<RetractAspirate> {
+export interface AspirateProperties extends BaseLiquidHandlingProperties<RetractAspirate> {
   aspiratePosition: TipPosition
   preWet: boolean
   mix: MixProperties
 }
-export interface SingleDispenseProperties
-  extends BaseLiquidHandlingProperties<RetractDispense> {
+export interface SingleDispenseProperties extends BaseLiquidHandlingProperties<RetractDispense> {
   dispensePosition: TipPosition
   mix: MixProperties
   pushOutByVolume: LiquidHandlingPropertyByVolume
 }
-export interface MultiDispenseProperties
-  extends BaseLiquidHandlingProperties<RetractDispense> {
+export interface MultiDispenseProperties extends BaseLiquidHandlingProperties<RetractDispense> {
   dispensePosition: TipPosition
   conditioningByVolume: LiquidHandlingPropertyByVolume
   disposalByVolume: LiquidHandlingPropertyByVolume
@@ -1033,6 +1049,11 @@ export type RunTimeParameter =
   | NumberParameter
   | CsvFileParameter
 
+export interface CommandPreconditions {
+  isCameraUsed: boolean
+}
+export type CameraId = 'ot_system_camera'
+
 // TODO(BC, 10/25/2023): this type (and others in this file) probably belong in api-client, not here
 export interface CompletedProtocolAnalysis {
   id: string
@@ -1047,6 +1068,7 @@ export interface CompletedProtocolAnalysis {
   robotType?: RobotType | null
   runTimeParameters?: RunTimeParameter[]
   commandAnnotations?: CommandAnnotation[]
+  commandPreconditions?: CommandPreconditions
 }
 
 export interface ResourceFile {
@@ -1077,6 +1099,7 @@ export type MotorAxis =
   | 'rightPlunger'
   | 'extensionZ'
   | 'extensionJaw'
+  | 'axis96ChannelCam'
 
 export type MotorAxes = MotorAxis[]
 

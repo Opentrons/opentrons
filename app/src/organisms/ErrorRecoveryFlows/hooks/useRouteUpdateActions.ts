@@ -54,11 +54,8 @@ export interface UseRouteUpdateActionsResult {
 export function useRouteUpdateActions(
   routeUpdateActionsParams: GetRouteUpdateActionsParams
 ): UseRouteUpdateActionsResult {
-  const {
-    recoveryMap,
-    setRecoveryMap,
-    doorStatusUtils,
-  } = routeUpdateActionsParams
+  const { recoveryMap, setRecoveryMap, doorStatusUtils } =
+    routeUpdateActionsParams
   const { route: currentRoute, step: currentStep } = recoveryMap
   const { OPTION_SELECTION, ROBOT_IN_MOTION, ROBOT_DOOR_OPEN } = RECOVERY_MAP
   const { isDoorOpen } = doorStatusUtils
@@ -147,7 +144,7 @@ export function useRouteUpdateActions(
           const route = robotMovingRoute ?? ROBOT_IN_MOTION.ROUTE
           const step =
             robotMovingRoute != null
-              ? (head(STEP_ORDER[robotMovingRoute]) as RouteStep)
+              ? head(STEP_ORDER[robotMovingRoute])!
               : ROBOT_IN_MOTION.STEPS.IN_MOTION
           setRecoveryMap({ route, step })
         } else {

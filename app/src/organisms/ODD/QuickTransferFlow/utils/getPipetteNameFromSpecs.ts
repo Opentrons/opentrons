@@ -9,10 +9,10 @@ export const getPipetteNameFromSpecs = (
     channels === 1
       ? 'single'
       : channels === 8
-      ? 'multi'
-      : channels === 96
-      ? '96'
-      : 'single'
+        ? 'multi'
+        : channels === 96
+          ? '96'
+          : 'single'
 
   // Note(kk:2025-09-05): This is used for Flex only
   const robotSuffix = displayCategory === 'FLEX' && 'flex'

@@ -1,4 +1,5 @@
 """Command models to execute a Thermocycler profile."""
+
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING, overload, Union, Any
 from typing_extensions import Literal, Type
@@ -32,6 +33,11 @@ class ProfileStep(BaseModel):
     celsius: float = Field(..., description="Target temperature in °C.")
     holdSeconds: float = Field(
         ..., description="Time to hold target temperature in seconds."
+    )
+    rampRate: float | SkipJsonSchema[None] = Field(
+        None,
+        description="How quickly to change temperature in °C/second.",
+        json_schema_extra=_remove_default,
     )
 
 
@@ -68,21 +74,20 @@ def _transform_profile_step(
     return ThermocyclerStep(
         temperature=thermocycler_state.validate_target_block_temperature(step.celsius),
         hold_time_seconds=step.holdSeconds,
+        ramp_rate=thermocycler_state.validate_ramp_rate(step.rampRate, step.celsius),
     )
 
 
 @overload
 def _transform_profile_element(
     element: ProfileStep, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerStep:
-    ...
+) -> ThermocyclerStep: ...
 
 
 @overload
 def _transform_profile_element(
     element: ProfileCycle, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerCycle:
-    ...
+) -> ThermocyclerCycle: ...
 
 
 def _transform_profile_element(

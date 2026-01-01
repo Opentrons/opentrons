@@ -88,23 +88,31 @@
   gap: var(--spacing-4);
 }
 
-.annotated_steps_error_container {
+.annotated_steps_error_wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 0 var(--spacing-12);
+  padding : var(--spacing-8) var(--spacing-12);
   gap: var(--spacing-4);
 }
 
-.annotated_steps_error_header {
+.annotated_steps_error_container {
   display: flex;
-  width: 100%;
-  align-items: center;
+  flex-direction: column;
   padding: var(--spacing-8);
   border-radius: var(--border-radius-4);
-  background-color: var(--red-20);
+  background-color: var(--red-30);
+  cursor: pointer;
   gap: var(--spacing-4);
+  overflow-wrap: break-word;
   transition: background-color 500ms ease-out, border-color 500ms ease-out;
+}
+
+.annotated_steps_header {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-4);
 }
 
 .annotated_steps_final_command {

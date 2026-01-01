@@ -202,41 +202,6 @@ To set up the Thermocycler with a clean seal:
 
 ![Location of the automation seal on the inside lid of the Thermocycler](../images/thermocycler-seal.svg "Thermocycler seal"){width="50%"}
 
-## Autoclave-safe labware
+## Autoclaving labware
 
-The following table lists labware sold by Opentrons that we have verified as autoclave-safe. When you can't determine whether a piece of labware is autoclave-safe, just replace it with new, clean labware. You can [purchase replacement labware](https://opentrons.com/products/categories/tips-&-labware) from the Opentrons shop.
-
-<table>
-  <thead>
-    <tr>
-      <th>Labware type</th>
-      <th>Autoclave-safe items</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><strong>Reservoirs</strong></td>
-      <td>NEST 1-well reservoirs</td>
-    </tr>
-    <tr>
-      <td><strong>Sample vials</strong></td>
-      <td>Eppendorf Safe-Lock 1.5 mL and 2.0 mL vials (when left open at 121 °C, 20 min)</td>
-    </tr>
-    <tr>
-      <td><strong>Tip racks and tips</strong></td>
-      <td>All Flex tip racks and tips</td>
-    </tr>
-    <tr>
-      <td><strong>Well plates</strong></td>
-      <td>
-        <ul>
-          <li>Thermo Scientific Nunc 96-Well Plate, 1300 μL</li>
-          <li>Thermo Scientific Nunc 96-Well Plate, 2000 μL</li>
-          <li>USA Scientific 96 Deep Well Plate, 2.4 mL</li>
-        </ul>
-      </td>
-    </tr>
-  </tbody>
-</table>
-
-If you're using labware from a manufacturer that's not listed here, refer to their website to see whether those items can be autoclaved.
+Opentrons doesn't recommend re-using autoclaved labware with a Flex. The heat and pressure may cause items to warp or shrink, even if they're considered "autoclave safe." While autoclaved labware may be acceptable for quick, proof-of-concept testing, it's always better to use fresh labware for production runs, which helps ensure the best results. You can find Flex-compatible labware in the [Opentrons Labware Library](https://labware.opentrons.com/) and on the [Tips & Labware section](https://opentrons.com/products/categories/tips-&-labware) of our website.

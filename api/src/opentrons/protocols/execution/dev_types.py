@@ -45,8 +45,7 @@ if Protocol is not None:
         not a type (https://github.com/python/mypy/issues/3915)
         """
 
-        async def _asdict(self) -> Dict[Any, Any]:
-            ...
+        async def _asdict(self) -> Dict[Any, Any]: ...
 
 
 # using a lot of string literals here instead of the enum values from

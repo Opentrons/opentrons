@@ -35,7 +35,7 @@ export function DeckConfigurationDiscardChangesModal({
   return (
     <OddModal header={modalHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('changes_will_be_lost_description')}
         </LegacyStyledText>
         <Flex

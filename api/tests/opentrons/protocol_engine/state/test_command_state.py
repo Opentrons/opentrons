@@ -1020,8 +1020,8 @@ def test_recovery_target_tracking() -> None:
 @pytest.mark.parametrize(
     "ending_action",
     [
-        actions.StopAction(from_estop=False),
-        actions.StopAction(from_estop=True),
+        actions.StopAction(from_asynchronous_error=False),
+        actions.StopAction(from_asynchronous_error=True),
         actions.FinishAction(set_run_status=False),
         actions.FinishAction(
             set_run_status=True,
@@ -1089,7 +1089,7 @@ def test_final_state_after_estop() -> None:
         detail="E-stop activated.",
     )
 
-    subject.handle_action(actions.StopAction(from_estop=True))
+    subject.handle_action(actions.StopAction(from_asynchronous_error=True))
     subject.handle_action(actions.FinishAction(error_details=error_details))
     subject.handle_action(
         actions.HardwareStoppedAction(

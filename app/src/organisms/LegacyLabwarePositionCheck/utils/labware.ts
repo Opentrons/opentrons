@@ -5,6 +5,8 @@ import {
   getIsTiprack,
   getLabwareDefURI,
   getTiprackVolume,
+  locationIsOffDeck,
+  locationIsOnSlot,
 } from '@opentrons/shared-data'
 
 import { getModuleInitialLoadInfo } from '/app/transformations/commands'
@@ -70,10 +72,7 @@ export const getTiprackIdsInOrder = (
           ...tipRackLocations.map(loc => ({
             definition: labwareDef,
             labwareId: labwareId,
-            slot:
-              loc !== 'offDeck' && loc !== 'systemLocation' && 'slotName' in loc
-                ? loc.slotName
-                : '',
+            slot: locationIsOnSlot(loc) ? loc.slotName : '',
           })),
         ]
       }
@@ -93,11 +92,12 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
   commands: RunTimeCommand[],
   labware: ProtocolAnalysisOutput['labware']
 ): string[] => {
-  const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] = commands.filter(
-    (command): command is PickUpTipRunTimeCommand =>
-      command.commandType === 'pickUpTip' &&
-      command.params.pipetteId === pipetteId
-  )
+  const pickUpTipCommandsWithPipette: PickUpTipRunTimeCommand[] =
+    commands.filter(
+      (command): command is PickUpTipRunTimeCommand =>
+        command.commandType === 'pickUpTip' &&
+        command.params.pipetteId === pipetteId
+    )
 
   const tipRackIdsVisited = pickUpTipCommandsWithPipette.reduce<string[]>(
     (visitedIds, command) => {
@@ -131,10 +131,7 @@ export const getAllTipracksIdsThatPipetteUsesInOrder = (
         ...tipRackLocations.map(loc => ({
           labwareId: tipRackId,
           definition,
-          slot:
-            loc !== 'offDeck' && loc !== 'systemLocation' && 'slotName' in loc
-              ? loc.slotName
-              : '',
+          slot: locationIsOnSlot(loc) ? loc.slotName : '',
         })),
       ]
     }, [])
@@ -173,7 +170,7 @@ export const getLabwareIdsInOrder = (
         ...acc,
         ...labwareLocations.reduce<LabwareToOrder[]>((innerAcc, loc) => {
           let slot = ''
-          if (loc === 'offDeck' || loc === 'systemLocation') {
+          if (locationIsOffDeck(loc)) {
             slot = 'offDeck'
           } else if ('moduleId' in loc) {
             slot = getModuleInitialLoadInfo(loc.moduleId, commands).location
@@ -185,10 +182,7 @@ export const getLabwareIdsInOrder = (
                 command.result?.labwareId === loc.labwareId
             )
             const adapterLocation = matchingAdapter?.params.location
-            if (
-              adapterLocation === 'offDeck' ||
-              adapterLocation === 'systemLocation'
-            ) {
+            if (adapterLocation == null || locationIsOffDeck(adapterLocation)) {
               slot = 'offDeck'
             } else if (
               adapterLocation != null &&
@@ -263,8 +257,9 @@ export function getLabwareDef(
   labwareId: string,
   protocolData: CompletedProtocolAnalysis
 ): LabwareDefinition | undefined {
-  const labwareDefUri = protocolData.labware.find(l => l.id === labwareId)
-    ?.definitionUri
+  const labwareDefUri = protocolData.labware.find(
+    l => l.id === labwareId
+  )?.definitionUri
   const labwareDefinitions = getLabwareDefinitionsFromCommands(
     protocolData.commands
   )

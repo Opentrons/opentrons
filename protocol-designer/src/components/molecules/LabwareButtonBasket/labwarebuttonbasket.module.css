@@ -1,7 +1,9 @@
 .basket {
   display: flex;
+  width: 20rem;
   flex-direction: column;
   gap: var(--spacing-8);
+  overflow-y: scroll;
 }
 
 .basket_container {

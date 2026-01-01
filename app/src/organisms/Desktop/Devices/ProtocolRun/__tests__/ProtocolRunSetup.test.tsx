@@ -17,6 +17,7 @@ import { useIsFlex, useRobot } from '/app/redux-resources/robots'
 import { useRequiredSetupStepsInOrder } from '/app/redux-resources/runs'
 import { mockConnectedRobot } from '/app/redux/discovery/__fixtures__'
 import {
+  getCameraUsageState,
   getMissingSetupSteps,
   selectAreOffsetsApplied,
   selectIsAnyNecessaryDefaultOffsetMissing,
@@ -114,12 +115,17 @@ describe('ProtocolRunSetup', () => {
     when(vi.mocked(useProtocolAnalysisErrors)).calledWith(RUN_ID).thenReturn({
       analysisErrors: null,
     })
+    vi.mocked(getCameraUsageState).mockReturnValue({
+      enabled: false,
+      recoveryEnabled: true,
+      liveStreamEnabled: true,
+    })
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(RUN_ID)
-      .thenReturn(({
+      .thenReturn({
         ...noModulesProtocol,
         ...MOCK_PROTOCOL_LIQUID_KEY,
-      } as unknown) as SharedData.ProtocolAnalysisOutput)
+      } as unknown as SharedData.ProtocolAnalysisOutput)
     when(vi.mocked(useRequiredSetupStepsInOrder))
       .calledWith({
         runId: RUN_ID,
@@ -193,13 +199,13 @@ describe('ProtocolRunSetup', () => {
       isLaunchingLPC: false,
       isFlexLPCInitializing: false,
     })
-    vi.mocked(
-      selectIsAnyNecessaryDefaultOffsetMissing
-    ).mockImplementation(() => () => false)
+    vi.mocked(selectIsAnyNecessaryDefaultOffsetMissing).mockImplementation(
+      () => () => false
+    )
     vi.mocked(selectAreOffsetsApplied).mockImplementation(() => () => false)
-    vi.mocked(
-      selectTotalCountLocationSpecificOffsets
-    ).mockImplementation(() => () => 3)
+    vi.mocked(selectTotalCountLocationSpecificOffsets).mockImplementation(
+      () => () => 3
+    )
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -371,7 +377,8 @@ describe('ProtocolRunSetup', () => {
       vi.mocked(useDeckConfigurationCompatibility).mockReturnValue([
         {
           cutoutId: 'cutoutA1',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           requiredAddressableAreas: ['D4'],
           compatibleCutoutFixtureIds: [
             STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -381,7 +388,8 @@ describe('ProtocolRunSetup', () => {
       vi.mocked(getRequiredDeckConfig).mockReturnValue([
         {
           cutoutId: 'cutoutA1',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          cutoutFixtureId:
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
           requiredAddressableAreas: ['D4'],
           compatibleCutoutFixtureIds: [
             STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,

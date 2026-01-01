@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import NamedTuple, TypedDict
+from typing import NamedTuple, TypedDict, Optional
 
 
 class APIVersion(NamedTuple):
@@ -30,3 +30,4 @@ class ThermocyclerStep(ThermocyclerStepBase, total=False):
 
     hold_time_seconds: float
     hold_time_minutes: float
+    ramp_rate: Optional[float]

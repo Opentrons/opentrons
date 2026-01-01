@@ -17,9 +17,9 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { labwareImages } from '@opentrons/shared-data'
 
 import { Divider } from '/app/atoms/structure'
-import { labwareImages } from '/app/local-resources/labware'
 import { getIsOnDevice } from '/app/redux/config'
 
 import { equipmentImages } from './equipmentImages'
@@ -93,7 +93,7 @@ export function WizardRequiredEquipmentList(
       ) : (
         <>
           <LegacyStyledText
-            as="h3"
+            forwardedAs="h3"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             marginBottom={SPACING.spacing8}
           >
@@ -109,7 +109,7 @@ export function WizardRequiredEquipmentList(
           {footer != null ? (
             <LegacyStyledText
               marginTop={SPACING.spacing8}
-              as="label"
+              forwardedAs="label"
               color={COLORS.grey60}
             >
               {footer}
@@ -133,7 +133,7 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
 
   let imageSrc: string | null = null
   if (loadName in labwareImages) {
-    imageSrc = labwareImages[loadName as keyof typeof labwareImages]
+    imageSrc = labwareImages[loadName as keyof typeof labwareImages][0]
   } else if (loadName in equipmentImages) {
     imageSrc = equipmentImages[loadName as keyof typeof equipmentImages]
   }
@@ -165,9 +165,9 @@ function RequiredEquipmentCard(props: RequiredEquipmentCardProps): JSX.Element {
           flexDirection={DIRECTION_COLUMN}
           justifyContent={JUSTIFY_SPACE_AROUND}
         >
-          <LegacyStyledText as="p">{displayName}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">{displayName}</LegacyStyledText>
           {subtitle != null ? (
-            <LegacyStyledText as="p" color={COLORS.grey50}>
+            <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
               {subtitle}
             </LegacyStyledText>
           ) : null}

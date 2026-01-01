@@ -70,8 +70,7 @@ export const selectInitialDatabaseOffsets = (
     loadedOffsets => loadedOffsets ?? []
   )
 
-export interface LocationSpecificOffsetDetailsWithCopy
-  extends LocationSpecificOffsetDetails {
+export interface LocationSpecificOffsetDetailsWithCopy extends LocationSpecificOffsetDetails {
   slotCopy: string
 }
 
@@ -128,9 +127,8 @@ export const selectTotalOrMissingOffsetRequiredCountForLwCopy = (
       state.protocolRuns[runId]?.lpc?.labwareInfo.labware[uri]
         .locationSpecificOffsetDetails,
     (defaultDetails, lsDetails) => {
-      const countLSOffsetsNoHC = getCountMissingLSOffsetsWithoutDefault(
-        lsDetails
-      )
+      const countLSOffsetsNoHC =
+        getCountMissingLSOffsetsWithoutDefault(lsDetails)
       const countLSOffsetsTotal = lsDetails?.length ?? 0
       const isNecessaryDefaultOffsetMising = getIsNecessaryDefaultOffsetMissing(
         defaultDetails,

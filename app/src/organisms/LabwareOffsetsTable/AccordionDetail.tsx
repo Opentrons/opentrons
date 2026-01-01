@@ -28,9 +28,8 @@ export function AccordionDetail({
 }: AccordionDetailProps): JSX.Element {
   const { t } = useTranslation('labware_position_check')
   const { locationDetails, existingOffset: lsExistingOffset } = detail
-  const {
-    existingOffset: defaultExistingOffset,
-  } = lpcLabwareInfo.info.defaultOffsetDetails
+  const { existingOffset: defaultExistingOffset } =
+    lpcLabwareInfo.info.defaultOffsetDetails
   const isHardcoded = locationDetails.hardCodedOffsetId != null
 
   const buildColTwoText = (): string => {

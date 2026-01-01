@@ -1,13 +1,12 @@
 import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 import { FLEX_ROBOT_TYPE } from '../constants'
-import {
-  getAddressableAreaFromSlotId,
-  getMainFixtureIdForAA,
-} from '../fixtures'
+import { getAddressableAreaFromSlotId } from '../fixtures'
+import { getMainFixtureIdForAA } from './deckConfiguration/getFixtureFrom'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
 import type {
+  AddressableArea,
   CompletedProtocolAnalysis,
   CutoutConfig,
   CutoutFixture,
@@ -39,9 +38,11 @@ export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   { cutoutId: 'cutoutD3', cutoutFixtureId: 'singleRightSlot' },
 ]
 
-export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] = FLEX_SIMPLEST_DECK_CONFIG.map(
-  config => ({ ...config, requiredAddressableAreas: [] })
-)
+export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] =
+  FLEX_SIMPLEST_DECK_CONFIG.map(config => ({
+    ...config,
+    requiredAddressableAreas: [],
+  }))
 
 export function getSimplestDeckConfigForProtocol(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null
@@ -57,10 +58,11 @@ export function getSimplestDeckConfigForProtocol(
     CutoutConfigProtocolSpec[]
   >((acc, addressableArea) => {
     // finds all cutout fixtures that provide this addressable area
-    const cutoutFixturesForAddressableArea = getCutoutFixturesForAddressableAreas(
-      [addressableArea],
-      deckDef.cutoutFixtures
-    )
+    const cutoutFixturesForAddressableArea =
+      getCutoutFixturesForAddressableAreas(
+        [addressableArea],
+        deckDef.cutoutFixtures
+      )
     // grabs the cutout id for the addressable area
     const cutoutIdForAddressableArea = getCutoutIdForAddressableArea(
       addressableArea,
@@ -148,7 +150,10 @@ export function getCutoutIdForSlotName(
   slotName: string,
   deckDef: DeckDefinition
 ): CutoutId | null {
-  const addressableArea = getAddressableAreaFromSlotId(slotName, deckDef)
+  const addressableArea = getAddressableAreaFromSlotId(
+    slotName,
+    deckDef
+  ) as AddressableArea | null
   const cutoutIdForSlotName =
     addressableArea != null
       ? getCutoutIdForAddressableArea(
@@ -175,10 +180,8 @@ export function getCutoutIdForAddressableArea(
 ): CutoutId | null {
   return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
     const [cutoutId] =
-      Object.entries(
-        cutoutFixture.providesAddressableAreas
-      ).find(([_cutoutId, providedAAs]) =>
-        providedAAs.includes(addressableArea)
+      Object.entries(cutoutFixture.providesAddressableAreas).find(
+        ([_cutoutId, providedAAs]) => providedAAs.includes(addressableArea)
       ) ?? []
     return (cutoutId as CutoutId) ?? acc
   }, null)

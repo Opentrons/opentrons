@@ -58,20 +58,21 @@ class Mitutoyo_Digimatic_Indicator:
 
     def read(self) -> float:
         """Reads dial indicator."""
-        data_list = []
         self.packet = self.GCODE["READ"]
+        self._send_packet(self.packet)
+        time.sleep(0.001)
         reading = True
+        value = 0.0  # Initialize value to avoid unbound error
         while reading:
-            self._send_packet(self.packet)
-            time.sleep(0.01)
-
             data = self._get_packet()
+            time.sleep(0.01)
             if data != "":
-                data_list.append(float(data[3:]))
-            if data != "" and len(data_list) > 5:  # read 5 times and get lasted number
-                reading = False
-        print("Data List:", data_list)
-        return float(data_list[-1])
+                try:
+                    value = float(data)
+                    reading = False
+                except ValueError:
+                    continue
+        return value
 
     def read_stable(self, timeout: float = 5) -> float:
         """Reads dial indicator with stable reading."""

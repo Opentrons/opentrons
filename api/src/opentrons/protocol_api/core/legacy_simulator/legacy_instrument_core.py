@@ -106,7 +106,10 @@ class LegacyInstrumentCoreSimulator(
         flow_rate: float,
         in_place: bool,
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        end_location: Optional[types.Location] = None,
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         if self.get_current_volume() == 0:
             # Make sure we're at the top of the labware and clear of any
@@ -133,9 +136,9 @@ class LegacyInstrumentCoreSimulator(
 
         self._raise_if_no_tip(HardwareAction.ASPIRATE.name)
         new_volume = self.get_current_volume() + volume
-        assert (
-            new_volume <= self._pipette_dict["working_volume"]
-        ), "Cannot aspirate more than pipette max volume"
+        assert new_volume <= self._pipette_dict["working_volume"], (
+            "Cannot aspirate more than pipette max volume"
+        )
         self._pipette_dict["ready_to_aspirate"] = True
         self._update_volume(new_volume)
 
@@ -149,7 +152,10 @@ class LegacyInstrumentCoreSimulator(
         in_place: bool,
         push_out: Optional[float],
         meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
+        end_location: Optional[types.Location] = None,
+        end_meniscus_tracking: Optional[types.MeniscusTrackingTarget] = None,
         correction_volume: Optional[float] = None,
+        movement_delay: Optional[float] = None,
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
@@ -165,6 +171,7 @@ class LegacyInstrumentCoreSimulator(
         location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
@@ -256,9 +263,9 @@ class LegacyInstrumentCoreSimulator(
             elif self._api_version < APIVersion(2, 2):
                 location = well.bottom(z=_PRE_2_2_TIP_DROP_HEIGHT_MM)
             else:
-                assert (
-                    labware_core.is_tip_rack()
-                ), "Expected tip drop target to be a tip rack."
+                assert labware_core.is_tip_rack(), (
+                    "Expected tip drop target to be a tip rack."
+                )
 
                 return_height = self.get_return_height()
                 location = well.top(z=-return_height * labware_core.get_tip_length())
@@ -536,6 +543,7 @@ class LegacyInstrumentCoreSimulator(
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        tips: Optional[List[LegacyWellCore]],
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "transfer_liquid is not supported in legacy context"
@@ -546,12 +554,17 @@ class LegacyInstrumentCoreSimulator(
         volume: float,
         source: Tuple[types.Location, LegacyWellCore],
         dest: List[Tuple[types.Location, LegacyWellCore]],
-        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
+        new_tip: Literal[
+            TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.ALWAYS,
+        ],
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        tips: Optional[List[LegacyWellCore]],
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "distribute_liquid is not supported in legacy context"
@@ -562,12 +575,17 @@ class LegacyInstrumentCoreSimulator(
         volume: float,
         source: List[Tuple[types.Location, LegacyWellCore]],
         dest: Union[Tuple[types.Location, LegacyWellCore], TrashBin, WasteChute],
-        new_tip: Literal[TransferTipPolicyV2.NEVER, TransferTipPolicyV2.ONCE],
+        new_tip: Literal[
+            TransferTipPolicyV2.NEVER,
+            TransferTipPolicyV2.ONCE,
+            TransferTipPolicyV2.ALWAYS,
+        ],
         tip_racks: List[Tuple[types.Location, LegacyLabwareCore]],
         starting_tip: Optional[LegacyWellCore],
         trash_location: Union[types.Location, TrashBin, WasteChute],
         return_tip: bool,
         keep_last_tip: bool,
+        tips: Optional[List[LegacyWellCore]],
     ) -> None:
         """This will never be called because it was added in API 2.23."""
         assert False, "consolidate_liquid is not supported in legacy context"

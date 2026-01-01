@@ -31,6 +31,7 @@ from opentrons.protocol_engine.types import (
     WellOrigin,
     WellOffset,
     DeckPoint,
+    LabwareWellId,
 )
 from opentrons.protocol_engine.state import update_types
 
@@ -70,6 +71,11 @@ def subject(
             "funky-labware",
             "funky-well",
         ),
+        (
+            CurrentAddressableArea("pipette-id-abc", "addressable-area-1"),
+            "funky-labware",
+            "funky-well",
+        ),
     ],
 )
 async def test_dispense_while_tracking_implementation(
@@ -92,16 +98,27 @@ async def test_dispense_while_tracking_implementation(
         pipetteId="pipette-id-abc",
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
-        wellLocation=well_location,
+        trackFromLocation=well_location,
+        trackToLocation=well_location,
         volume=123,
         flowRate=456,
     )
+    decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id=stateupdateLabware,
+            well_name=stateupdateWell,
+            well_location=well_location,
+            operation_volume=123,
+            pipette_id="pipette-id-abc",
+        )
+    ).then_return(Point(1, 2, 3))
 
     decoy.when(
         await pipetting.dispense_while_tracking(
             pipette_id="pipette-id-abc",
             volume=123,
             flow_rate=456,
+            end_point=Point(1, 2, 3),
             push_out=None,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
@@ -160,7 +177,8 @@ async def test_dispense_while_tracking_implementation(
     if isinstance(location, CurrentWell):
         assert result == SuccessData(
             public=DispenseWhileTrackingResult(
-                volume=42, position=DeckPoint(x=1, y=2, z=3)
+                volume=42,
+                position=DeckPoint(x=1, y=2, z=3),
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
@@ -174,13 +192,20 @@ async def test_dispense_while_tracking_implementation(
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id-abc", ready_to_aspirate=False
                 ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
+                ),
             ),
         )
     else:
-
         assert result == SuccessData(
             public=DispenseWhileTrackingResult(
-                volume=42, position=DeckPoint(x=1, y=2, z=3)
+                volume=42,
+                position=DeckPoint(x=1, y=2, z=3),
             ),
             state_update=update_types.StateUpdate(
                 pipette_aspirated_fluid=update_types.PipetteEjectedFluidUpdate(
@@ -193,6 +218,13 @@ async def test_dispense_while_tracking_implementation(
                     labware_id="funky-labware",
                     well_names=["A3", "A4"],
                     volume_added=84.0,
+                ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id-abc",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
                 ),
             ),
         )
@@ -244,7 +276,8 @@ async def test_overpressure_error(
         pipetteId=pipette_id,
         labwareId=stateupdateLabware,
         wellName=stateupdateWell,
-        wellLocation=well_location,
+        trackFromLocation=well_location,
+        trackToLocation=well_location,
         volume=50,
         flowRate=1.23,
         pushOut=10,
@@ -266,11 +299,23 @@ async def test_overpressure_error(
     decoy.when(state_view.pipettes.get_aspirated_volume("pipette-id")).then_return(50)
 
     decoy.when(pipetting.get_state_view()).then_return(state_view)
+
+    decoy.when(
+        state_view.geometry.get_well_position(
+            labware_id=stateupdateLabware,
+            well_name=stateupdateWell,
+            well_location=well_location,
+            operation_volume=50,
+            pipette_id="pipette-id",
+        )
+    ).then_return(Point(0, 0, 0))
+
     decoy.when(
         await pipetting.dispense_while_tracking(
             pipette_id=pipette_id,
             volume=50,
             flow_rate=1.23,
+            end_point=Point(0, 0, 0),
             push_out=10,
             well_name=stateupdateWell,
             labware_id=stateupdateLabware,
@@ -323,6 +368,13 @@ async def test_overpressure_error(
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id", ready_to_aspirate=False
                 ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
+                ),
             ),
         )
     else:
@@ -344,6 +396,13 @@ async def test_overpressure_error(
                 ),
                 ready_to_aspirate=update_types.PipetteAspirateReadyUpdate(
                     pipette_id="pipette-id", ready_to_aspirate=False
+                ),
+                pipette_location=update_types.PipetteLocationUpdate(
+                    pipette_id="pipette-id",
+                    new_location=LabwareWellId(
+                        labware_id="funky-labware", well_name="funky-well"
+                    ),
+                    new_deck_point=DeckPoint(x=4, y=5, z=6),
                 ),
             ),
             state_update_if_false_positive=update_types.StateUpdate(),

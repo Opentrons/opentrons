@@ -25,6 +25,7 @@ import {
 import { getRobotStateAtActiveItem } from '../../../top-selectors/labware-locations'
 import { getLabwareNicknamesById } from '../../../ui/labware/selectors'
 import { AbsorbanceReaderSummary } from './AbsorbanceReaderSummary'
+import { FlexStackerSummary } from './FlexStackerSummary'
 import { MixSummary } from './MixSummary'
 import { MoveLiquidSummary } from './MoveLiquidSummary'
 import { StyledTrans } from './StyledTrans'
@@ -165,6 +166,12 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         )
       break
     }
+    case 'camera': {
+      stepSummaryContent = (
+        <StyledTrans i18nKey={'protocol_steps:camera.capture_image'} />
+      )
+      break
+    }
 
     case 'pause': {
       const {
@@ -177,7 +184,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         case 'untilResume':
           stepSummaryContent = (
             <StyledText desktopStyle="bodyDefaultRegular">
-              {t('protocol_steps:pause.untilResume')}
+              {t('protocol_steps:pause.pausingUntilResume')}
             </StyledText>
           )
           break
@@ -189,7 +196,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
               : unknownModule
           stepSummaryContent = (
             <StyledTrans
-              i18nKey="protocol_steps:pause.untilTemperature"
+              i18nKey="protocol_steps:pause.pausingUntilTemperature"
               values={{ module: pauseModuleDisplayName }}
               tagText={`${pauseTemperature}${t('application:units.degrees')}`}
             />
@@ -198,7 +205,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         case 'untilTime':
           stepSummaryContent = (
             <StyledTrans
-              i18nKey={t('protocol_steps:pause.untilTime')}
+              i18nKey={t('protocol_steps:pause.pausingForDuration')}
               tagText={formatTime(pauseTime as string)}
             />
           )
@@ -332,6 +339,15 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           currentStep={currentStep}
           labwareNicknamesById={labwareNicknamesById}
           labwareState={labwareState}
+        />
+      )
+      break
+    }
+    case 'flexStacker': {
+      stepSummaryContent = (
+        <FlexStackerSummary
+          currentStep={currentStep}
+          labwareEntities={labwareEntities}
         />
       )
       break

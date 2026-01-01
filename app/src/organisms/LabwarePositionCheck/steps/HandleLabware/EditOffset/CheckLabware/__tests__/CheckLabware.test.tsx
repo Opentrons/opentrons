@@ -114,10 +114,11 @@ describe('CheckLabware', () => {
     vi.mocked(getIsOnDevice).mockReturnValue(false)
     vi.mocked(
       selectSelectedLwWithOffsetDetailsWorkingOffsets
-    ).mockImplementation((runId: string) => (state: any) =>
-      ({
-        initialPosition: { x: 100, y: 200, z: 50 },
-      } as any)
+    ).mockImplementation(
+      (runId: string) => (state: any) =>
+        ({
+          initialPosition: { x: 100, y: 200, z: 50 },
+        }) as any
     )
     vi.mocked(
       selectSelectedLwWithOffsetDetailsMostRecentVectorOffset
@@ -126,17 +127,15 @@ describe('CheckLabware', () => {
       y: 2,
       z: 3,
     }))
-    vi.mocked(
-      selectIsSelectedLwTipRack
-    ).mockImplementation((runId: string) => (state: any) => false)
-    vi.mocked(
-      selectSelectedLwOverview
-    ).mockImplementation((runId: string) => (state: any) =>
-      mockSelectedLwOverview
+    vi.mocked(selectIsSelectedLwTipRack).mockImplementation(
+      (runId: string) => (state: any) => false
     )
-    vi.mocked(
-      selectActivePipette
-    ).mockImplementation((runId: string) => (state: any) => mockActivePipette)
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      (runId: string) => (state: any) => mockSelectedLwOverview
+    )
+    vi.mocked(selectActivePipette).mockImplementation(
+      (runId: string) => (state: any) => mockActivePipette
+    )
     vi.mocked(setFinalPosition).mockReturnValue({
       type: 'SET_FINAL_POSITION',
     } as any)

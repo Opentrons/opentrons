@@ -24,6 +24,7 @@ from opentrons.protocol_engine.types import (
     ModuleModel,
     ModuleDefinition,
     LabwareWellId,
+    PreconditionTypes,
 )
 from opentrons.types import MountType, DeckSlotName
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
@@ -369,9 +370,9 @@ class FlexStackerStateUpdate:
 
     module_id: str
     pool_constraint: FlexStackerPoolConstraint | NoChangeType = NO_CHANGE
-    contained_labware_bottom_first: list[
-        StackerStoredLabwareGroup
-    ] | NoChangeType = NO_CHANGE
+    contained_labware_bottom_first: list[StackerStoredLabwareGroup] | NoChangeType = (
+        NO_CHANGE
+    )
 
     @classmethod
     def create_or_override(
@@ -399,6 +400,13 @@ class FilesAddedUpdate:
     """An update that adds a new data file."""
 
     file_ids: list[str]
+
+
+@dataclasses.dataclass
+class PreconditionUpdate:
+    """An update that changes command preconditions flags."""
+
+    preconditions: dict[PreconditionTypes, bool]
 
 
 @dataclasses.dataclass
@@ -476,6 +484,8 @@ class StateUpdate:
     addressable_area_used: AddressableAreaUsedUpdate | NoChangeType = NO_CHANGE
 
     ready_to_aspirate: PipetteAspirateReadyUpdate | NoChangeType = NO_CHANGE
+
+    precondition_update: PreconditionUpdate | NoChangeType = NO_CHANGE
 
     def append(self, other: Self) -> Self:
         """Apply another `StateUpdate` "on top of" this one.

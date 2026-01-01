@@ -22,6 +22,7 @@ const formatAxisMap = (axisMap: RobotMotorAxisMap, t: TFunction): string => {
     'leftPlunger',
     'rightPlunger',
     'extensionJaw',
+    'axis96ChannelCam',
   ] as const
   const names: Record<MotorAxis, string> = {
     x: 'X',
@@ -32,6 +33,7 @@ const formatAxisMap = (axisMap: RobotMotorAxisMap, t: TFunction): string => {
     rightPlunger: t('right_plunger'),
     extensionZ: t('extension_z'),
     extensionJaw: t('extension_jaw'),
+    axis96ChannelCam: t('ninety_six_channel_cam'),
   }
   const coordinateStr = sortedAxes
     .map(axis => {

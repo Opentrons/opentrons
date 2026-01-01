@@ -141,7 +141,7 @@ export const MountGripper = (
         </AnimationVideo>
       }
       bodyText={
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('attached_gripper_and_screw_in')}
         </LegacyStyledText>
       }

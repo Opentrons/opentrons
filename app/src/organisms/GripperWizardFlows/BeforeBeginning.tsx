@@ -149,7 +149,7 @@ export const BeforeBeginning = (
         <Trans
           t={t}
           i18nKey={bodyI18nKey}
-          components={{ block: <LegacyStyledText as="p" /> }}
+          components={{ block: <LegacyStyledText forwardedAs="p" /> }}
         />
       }
       proceedButtonText={t('move_gantry_to_front')}

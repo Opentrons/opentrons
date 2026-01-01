@@ -16,7 +16,9 @@ import type {
   UpdatePipetteSettingsAction,
 } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<UpdatePipetteSettingsAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  UpdatePipetteSettingsAction
+> = action => ({
   method: PATCH,
   path: `${Constants.PIPETTE_SETTINGS_PATH}/${action.payload.pipetteId}`,
   body: {
@@ -26,10 +28,9 @@ const mapActionToRequest: ActionToRequestMapper<UpdatePipetteSettingsAction> = a
   },
 })
 
-const mapResponseToAction: ResponseToActionMapper<UpdatePipetteSettingsAction> = (
-  response,
-  originalAction
-) => {
+const mapResponseToAction: ResponseToActionMapper<
+  UpdatePipetteSettingsAction
+> = (response, originalAction) => {
   const { host, body, ...responseMeta } = response
   const { pipetteId } = originalAction.payload
   const meta = { ...originalAction.meta, response: responseMeta }

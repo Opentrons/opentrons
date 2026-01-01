@@ -24,7 +24,7 @@ export interface DeckFromLayersProps {
 }
 
 const OT2_LAYER_MAP: {
-  [layer in typeof ALL_OT2_DECK_LAYERS[number]]: () => JSX.Element
+  [layer in (typeof ALL_OT2_DECK_LAYERS)[number]]: () => JSX.Element
 } = {
   fixedBase: () => <FixedBase />,
   fixedTrash: () => <FixedTrash />,

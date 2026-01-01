@@ -136,9 +136,8 @@ export const DetachPipette = (props: DetachPipetteProps): JSX.Element => {
       })
   }
 
-  const [showPipetteStillAttached, setShowPipetteStillAttached] = useState(
-    false
-  )
+  const [showPipetteStillAttached, setShowPipetteStillAttached] =
+    useState(false)
 
   const handleOnClick = (): void => {
     setFetching(true)

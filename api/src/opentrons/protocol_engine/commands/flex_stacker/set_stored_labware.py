@@ -31,6 +31,7 @@ from .common import (
     primary_location_sequences,
     adapter_location_sequences_with_default,
     lid_location_sequences_with_default,
+    validate_labware_pool_compatible_with_stacker,
 )
 
 if TYPE_CHECKING:
@@ -208,6 +209,12 @@ class SetStoredLabwareImpl(
             self._state_view.labware.stacker_labware_pool_to_ordered_list(
                 labware_def, lid_def, adapter_def
             )
+        )
+
+        validate_labware_pool_compatible_with_stacker(
+            pool_primary_definition=labware_def,
+            pool_adapter_definition=adapter_def,
+            pool_lid_definition=lid_def,
         )
 
         pool_height = self._state_view.geometry.get_height_of_labware_stack(

@@ -16,13 +16,14 @@ If there are no data and result models, then add the CommandDefinition to
 5) If not using `CommandsEmptyData` then add specialized request and response
 types to `RequestTypes` and `ResponseTypes`.
 """
+
 from datetime import datetime
-from enum import Enum
 import typing
 
 from typing_extensions import Literal
 from pydantic import BaseModel, Field
 
+from opentrons_shared_data.util import StrEnum
 from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import commands
 
@@ -55,7 +56,7 @@ class SetHasCalibrationBlockRequestData(BaseModel):
     )
 
 
-class CommandStatus(str, Enum):
+class CommandStatus(StrEnum):
     """The command status."""
 
     executed = "executed"

@@ -131,7 +131,7 @@ export const DisconnectModal = ({
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
         {isError ? (
-          <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
+          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
             {requestState != null &&
             'error' in requestState &&
             'message' in requestState?.error
@@ -139,11 +139,11 @@ export const DisconnectModal = ({
               : t('shared:unknown_error')}
           </LegacyStyledText>
         ) : null}
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {disconnectModalBody}
         </LegacyStyledText>
         {isError ? (
-          <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
+          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
             {t('branded:general_error_message')}
           </LegacyStyledText>
         ) : null}

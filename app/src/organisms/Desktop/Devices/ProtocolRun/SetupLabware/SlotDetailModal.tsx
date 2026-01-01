@@ -6,13 +6,13 @@ import {
   ALIGN_CENTER,
   Box,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_CENTER,
   LabwareRender,
   Modal,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -55,9 +55,9 @@ const LabwareThumbnail = styled.svg`
   flex-shrink: 0;
 `
 
-export const SlotDetailModal = (
+export function SlotDetailModal(
   props: SlotDetailModalProps
-): JSX.Element | null => {
+): JSX.Element | null {
   const {
     closeModal,
     slotName,
@@ -82,8 +82,9 @@ export const SlotDetailModal = (
   const [selectedLabware, setSelectedLabware] = useState(labwareInStack[0])
   const wellFill = getWellFillFromLabwareId(
     selectedLabware.labwareId,
-    protocolData?.liquids ?? [],
-    labwareByLiquidId
+    protocolData.liquids,
+    labwareByLiquidId,
+    protocolData.commands
   )
 
   const labwareDefinition = definitionsByURI[selectedLabware.definitionUri]
@@ -147,15 +148,12 @@ export const SlotDetailModal = (
       ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')
       : slotName
   const modalTitle = (
-    <Flex alignItems={ALIGN_CENTER}>
-      <StyledText
-        desktopStyle="bodyLargeSemiBold"
-        marginRight={SPACING.spacing4}
-      >
+    <Flex alignItems={ALIGN_CENTER} gap={SPACING.spacing4}>
+      <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
       {isFlex ? (
-        <DeckInfoLabel deckLabel={slotDisplayName} />
+        <RobotInfoLabel deckLabel={slotDisplayName} />
       ) : (
         <StyledText>{slotDisplayName}</StyledText>
       )}
@@ -189,7 +187,7 @@ export const SlotDetailModal = (
         padding={SPACING.spacing16}
         height={selectedLiquidId != null || isVariedStack ? '28rem' : '25rem'}
       >
-        <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing24}>
+        <Flex flexDirection={DIRECTION_ROW} gap={SPACING.spacing24}>
           {isVariedStack ? (
             <LabwareStackContents
               labwareInStack={labwareInStack}
@@ -201,7 +199,7 @@ export const SlotDetailModal = (
           <Flex
             flexDirection={DIRECTION_COLUMN}
             height="24rem"
-            gridGap={SPACING.spacing16}
+            gap={SPACING.spacing16}
             alignItems={ALIGN_CENTER}
             justifyContent={JUSTIFY_CENTER}
             width={isVariedStack ? '' : '100%'}

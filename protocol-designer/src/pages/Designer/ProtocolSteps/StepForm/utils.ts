@@ -424,7 +424,7 @@ export const getFormErrorsMappedToField = (
       if (!acc[field]) {
         acc[field] = []
       }
-      if (location === 'field') {
+      if (location.includes('field')) {
         acc[field].push({
           ...error,
         })

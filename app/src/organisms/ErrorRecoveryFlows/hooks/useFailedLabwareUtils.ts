@@ -8,7 +8,7 @@ import {
 } from '@opentrons/components'
 import {
   FLEX_ROBOT_TYPE,
-  getAllLabwareDefs,
+  getAllDefinitions,
   getLabwareDisplayName,
   getLoadedLabwareDefinitionsByUri,
 } from '@opentrons/shared-data'
@@ -116,6 +116,7 @@ export function useFailedLabwareUtils({
       }),
     [failedCommand, runCommands]
   )
+
   const relevantPickUpTipCommand = getRelevantPickUpTipCommand(
     failedCommandByRunRecord,
     runCommands
@@ -230,6 +231,7 @@ export function getRelevantFailedLabwareCmdFrom({
     case ERROR_KINDS.STACKER_SHUTTLE_EMPTY:
     case ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED:
     case ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY:
+    case ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY:
       return failedCommandByRunRecord as FlexStackerRetrieveRunTimeCommand
     default:
       console.error(
@@ -311,12 +313,9 @@ function useTipSelectionUtils(
 
   const deselectTips = (locations: string[]): void => {
     setSelectedLocs(prevLocs =>
-      without(Object.keys(prevLocs as WellGroup), ...locations).reduce(
-        (acc, well) => {
-          return { ...acc, [well]: null }
-        },
-        {}
-      )
+      without(Object.keys(prevLocs!), ...locations).reduce((acc, well) => {
+        return { ...acc, [well]: null }
+      }, {})
     )
   }
 
@@ -327,7 +326,7 @@ function useTipSelectionUtils(
   // Use this labware to represent all tip racks for manual tip selection.
   const tipSelectorDef = useMemo(
     () =>
-      getAllLabwareDefs()[
+      getAllDefinitions()[
         'opentrons/thermoscientificnunc_96_wellplate_1300ul/1'
       ],
     []
@@ -378,6 +377,7 @@ export function getRelevantLabwareIdFromFailedCmd(
       'flexStackerHopperLabwareFailed',
       'flexStackerLabwareRetrieveFailed',
       'flexStackerShuttleOccupied',
+      'flexStackerLabwareStoreFailed',
     ].includes(error.errorType)
   if (recentRelevantFailedLabwareCmd == null) {
     return null
@@ -410,8 +410,8 @@ export function getLabwareDisplayNamesFromFailedCmd(
 
   const labwareNickname =
     protocolAnalysis != null
-      ? getLoadedLabware(protocolAnalysis.labware, labwareId)?.displayName ??
-        null
+      ? (getLoadedLabware(protocolAnalysis.labware, labwareId)?.displayName ??
+        null)
       : null
   const failedLWURI = runRecord?.data.labware.find(
     labware => labware.id === labwareId

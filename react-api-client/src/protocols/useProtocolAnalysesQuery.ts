@@ -5,7 +5,7 @@ import { getProtocolAnalyses } from '@opentrons/api-client'
 import { useHost } from '../api'
 
 import type { UseQueryOptions, UseQueryResult } from 'react-query'
-import type { HostConfig, ProtocolAnalyses } from '@opentrons/api-client'
+import type { ProtocolAnalyses } from '@opentrons/api-client'
 
 const POLLING_INTERVAL = 1000
 
@@ -23,15 +23,13 @@ export function useProtocolAnalysesQuery(
       (enablePolling == null || enablePolling),
     refetchInterval:
       enablePolling != null
-        ? options?.refetchInterval ?? POLLING_INTERVAL
+        ? (options?.refetchInterval ?? POLLING_INTERVAL)
         : false,
   }
   const query = useQuery<ProtocolAnalyses>(
     [host, 'protocols', protocolId, 'analyses'],
     () =>
-      getProtocolAnalyses(host as HostConfig, protocolId as string).then(
-        response => response.data
-      ),
+      getProtocolAnalyses(host!, protocolId!).then(response => response.data),
     allOptions
   )
 

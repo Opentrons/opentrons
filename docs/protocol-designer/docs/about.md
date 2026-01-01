@@ -18,11 +18,11 @@ All protocol design takes place in your web browser. After creating and editing 
 
 Protocol Designer requires an internet connection and is currently only supported in Google Chrome. For the best experience, use the latest version of Chrome, maximize your browser window size, and zoom out if needed. 
 
-Newly designed or modified protocol files created in Protocol Designer require Opentrons App version 8.5.1 or higher to run on your robot. While you can use Protocol Designer to modify JSON files previously created in earlier versions, you'll only be create and export Python files from Protocol Designer 8.5.0 and newer. 
+Newly designed or modified protocol files created in Protocol Designer require Opentrons App version 8.7.0 or higher to run on your robot. While you can use Protocol Designer to modify JSON files previously created in earlier versions, you'll only be able to create and export Python files from Protocol Designer version 8.5.0 and newer. 
 
 ## Protocol Designer Settings
 
-Click the settings icon in the upper right to access Protocol Designer settings. Here, you can view this software manual and release notes in the App Info links. 
+Click the :material-cog: in the upper right to access Protocol Designer settings. Here, you can view this software manual and release notes in the App Info links. 
 
 Protocol Designer shows hints, tips, and timeline editing suggestions to help you fix protocol warnings and errors. You can restore all hints and tips shown during protocol editing and toggle timeline editing guidance on and off. 
 

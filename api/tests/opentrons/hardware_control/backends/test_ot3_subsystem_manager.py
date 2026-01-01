@@ -92,7 +92,7 @@ def default_fw_version() -> int:
 
 
 def default_revision() -> types.PCBARevision:
-    return types.PCBARevision("A1")
+    return types.PCBARevision("A1.0")
 
 
 def device_info_for(
@@ -230,7 +230,6 @@ def detection_queue(
 def prep_mock_update(
     update_bag: FirmwareUpdate, decoy: Decoy, update_details: Dict[FirmwareTarget, str]
 ) -> RunUpdate:
-
     updater = decoy.mock(cls=RunUpdate)
     update_class = update_bag.update_runner
     decoy.when(

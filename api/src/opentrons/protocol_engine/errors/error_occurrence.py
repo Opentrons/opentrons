@@ -1,4 +1,5 @@
 """Models for concrete occurrences of specific errors."""
+
 from logging import getLogger
 
 from datetime import datetime

@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from 'react'
+import { useReducer, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
@@ -33,16 +33,13 @@ import { Dispense } from './Dispense'
 import { Overview } from './Overview'
 import { quickTransferSummaryReducer } from './reducers'
 import { SaveOrRunModal } from './SaveOrRunModal'
-import {
-  createQuickTransferFile,
-  getInitialSummaryState,
-  retrieveLiquidClassValues,
-} from './utils'
+import { initializeSummaryState } from './utils'
 import { createQuickTransferPythonFile } from './utils/createQuickTransferFile'
 
 import type { ComponentProps } from 'react'
 import type { SmallButton } from '/app/atoms/buttons'
 import type { QuickTransferWizardState } from './types'
+import type { InitialSummaryStateProps } from './utils/getInitialSummaryState'
 
 interface SummaryAndSettingsProps {
   exitButtonProps: ComponentProps<typeof SmallButton>
@@ -60,22 +57,19 @@ export function SummaryAndSettings(
   const host = useHost()
   const { t } = useTranslation(['quick_transfer', 'shared'])
   const [showSaveOrRunModal, setShowSaveOrRunModal] = useState<boolean>(false)
-  const enableExportPython = useFeatureFlag('quickTransferExportPython')
+  const enableProtocolContentsLog = useFeatureFlag(
+    'quickTransferProtocolContentsLog'
+  )
 
   const displayCategory: string[] = ['overview', 'aspirate', 'dispense']
 
   const [selectedCategory, setSelectedCategory] = useState<string>('overview')
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const initialSummaryState = getInitialSummaryState({
-    // @ts-expect-error TODO figure out how to make this type non-null as we know
-    // none of these values will be undefined
-    state: wizardFlowState,
-    deckConfig,
-  })
   const [state, dispatch] = useReducer(
     quickTransferSummaryReducer,
-    initialSummaryState
+    { state: wizardFlowState as InitialSummaryStateProps['state'], deckConfig },
+    initializeSummaryState
   )
 
   const { mutateAsync: createProtocolAsync } = useCreateProtocolMutation()
@@ -92,21 +86,7 @@ export function SummaryAndSettings(
     host
   )
 
-  useEffect(() => {
-    if (!state.liquidClassValuesInitialized) {
-      const liquidClassValues = retrieveLiquidClassValues(state, 'all')
-      dispatch({
-        type: 'SET_LIQUID_CLASS_VALUES',
-        liquidClassValues: {
-          ...liquidClassValues,
-          liquidClassValuesInitialized: true,
-        },
-      })
-    }
-  })
-
-  const isMultiTransferAspirate = state?.path === 'multiDispense'
-  const isMultiTransferDispense = state?.path === 'multiAspirate'
+  const isMultiTransferDispense = state?.path === 'multiDispense'
 
   const handleClickCreateTransfer = (): void => {
     setShowSaveOrRunModal(true)
@@ -120,9 +100,12 @@ export function SummaryAndSettings(
   }
 
   const handleClickSave = (protocolName: string): void => {
-    const protocolFile = enableExportPython
-      ? createQuickTransferPythonFile(state, deckConfig, protocolName)
-      : createQuickTransferFile(state, deckConfig, protocolName)
+    const protocolFile = createQuickTransferPythonFile(
+      state,
+      deckConfig,
+      protocolName,
+      enableProtocolContentsLog
+    )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -139,9 +122,12 @@ export function SummaryAndSettings(
   }
 
   const handleClickRun = (): void => {
-    const protocolFile = enableExportPython
-      ? createQuickTransferPythonFile(state, deckConfig)
-      : createQuickTransferFile(state, deckConfig)
+    const protocolFile = createQuickTransferPythonFile(
+      state,
+      deckConfig,
+      undefined,
+      enableProtocolContentsLog
+    )
 
     createProtocolAsync({
       files: [protocolFile],
@@ -196,7 +182,7 @@ export function SummaryAndSettings(
             <Aspirate
               state={state}
               dispatch={dispatch}
-              isMultiTransfer={isMultiTransferAspirate}
+              isMultiTransfer={isMultiTransferDispense}
             />
           ) : null}
           {selectedCategory === 'dispense' ? (

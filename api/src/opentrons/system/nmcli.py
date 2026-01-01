@@ -1,4 +1,4 @@
-""" opentrons.system.nmcli: Functions and data for interacting with nmcli
+"""opentrons.system.nmcli: Functions and data for interacting with nmcli
 
 The functions contained here are for bridging Python calls with nmcli command
 line invocations. They are in general not safe to call anywhere except an
@@ -302,7 +302,10 @@ class NETWORK_IFACES(enum.Enum):
         config.SystemArchitecture.BUILDROOT: "wlan0",
         config.SystemArchitecture.YOCTO: "mlan0",
     }.get(config.ARCHITECTURE, "wlan0")
-    ETH_LL = "eth0"
+    ETH_LL = {
+        config.SystemArchitecture.BUILDROOT: "eth0",
+        config.SystemArchitecture.YOCTO: "end0",
+    }.get(config.ARCHITECTURE, "eth0")
 
 
 def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:

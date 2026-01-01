@@ -1,10 +1,13 @@
 """Main FastAPI application."""
+
 import contextlib
 from typing import AsyncGenerator, Optional
 from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.openapi.docs import get_redoc_html
+from fastapi.responses import HTMLResponse
 
 from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
@@ -19,6 +22,7 @@ from .hardware import (
 from .persistence.fastapi_dependencies import (
     start_initializing_persistence,
     clean_up_persistence,
+    initialize_images_directory,
 )
 from .router import router
 from .service.logging import initialize_logging
@@ -33,6 +37,9 @@ from .service.notifications import (
     set_up_notification_client,
     initialize_pe_publisher_notifier,
 )
+
+
+_REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 
 
 @contextlib.asynccontextmanager
@@ -71,6 +78,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         )
         exit_stack.push_async_callback(clean_up_hardware, app.state)
 
+        await initialize_images_directory(
+            app_state=app.state, images_directory_root=settings.images_directory
+        )
+
         start_initializing_persistence(
             app_state=app.state,
             persistence_directory_root=persistence_directory,
@@ -103,8 +114,30 @@ app = FastAPI(
     # Disable documentation hosting via Swagger UI, normally at /docs.
     # We instead focus on the docs hosted by ReDoc, at /redoc.
     docs_url=None,
+    # redoc_url is replaced by our own /redoc router, below.
+    redoc_url=None,
     lifespan=_lifespan,
 )
+
+
+# This is a workaround for a broken /redoc page in versions of FastAPI <0.115.3.
+# The page loads Redoc from a CDN, and the problem is that the default CDN URL
+# uses a fragile version tag.
+# https://github.com/Redocly/redoc/issues/2743
+# https://github.com/fastapi/fastapi/pull/9700
+@app.get("/redoc", include_in_schema=False)
+async def redoc_html() -> HTMLResponse:  # noqa: D103
+    if app.openapi_url is None:
+        raise RuntimeError(
+            "Couldn't get OpenAPI URL from FastAPI."
+            + " This is probably some kind of misconfiguration."
+        )
+    return get_redoc_html(
+        openapi_url=app.openapi_url,
+        title=app.title,
+        redoc_js_url=_REDOC_CDN_URL,
+    )
+
 
 app.add_middleware(
     CORSMiddleware,

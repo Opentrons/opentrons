@@ -23,7 +23,7 @@ import './global.css'
 const rootElement = document.getElementById('root')
 
 const getClientId = (): string => {
-  switch (process.env.NODE_ENV) {
+  switch (_NODE_ENV_) {
     case 'production':
       return PROD_AUTH0_CLIENT_ID
     case 'development':
@@ -34,9 +34,7 @@ const getClientId = (): string => {
 }
 
 const getDomain = (): string => {
-  return process.env.NODE_ENV === 'development'
-    ? LOCAL_AUTH0_DOMAIN
-    : AUTH0_DOMAIN
+  return _NODE_ENV_ === 'development' ? LOCAL_AUTH0_DOMAIN : AUTH0_DOMAIN
 }
 
 if (rootElement != null) {

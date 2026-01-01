@@ -1,4 +1,5 @@
 """Move to addressable area for drop tip command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 from typing_extensions import Literal
@@ -85,7 +86,7 @@ class MoveToAddressableAreaForDropTipParams(PipetteIdMixin, MovementMixin):
     ignoreTipConfiguration: bool | SkipJsonSchema[None] = Field(
         True,
         description=(
-            "Whether to utilize the critical point of the tip configuraiton when moving to an addressable area."
+            "Whether to utilize the critical point of the tip configuration when moving to an addressable area."
             " If True, this command will ignore the tip configuration and use the center of the entire instrument"
             " as the critical point for movement."
             " If False, this command will use the critical point provided by the current tip configuration."
@@ -180,9 +181,9 @@ class MoveToAddressableAreaForDropTip(
     params: MoveToAddressableAreaForDropTipParams
     result: Optional[MoveToAddressableAreaForDropTipResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveToAddressableAreaForDropTipImplementation] = (
         MoveToAddressableAreaForDropTipImplementation
-    ] = MoveToAddressableAreaForDropTipImplementation
+    )
 
 
 class MoveToAddressableAreaForDropTipCreate(

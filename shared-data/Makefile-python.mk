@@ -1,6 +1,6 @@
 # shared-data python code makefile
 
-include ../scripts/python.mk
+include ../scripts/python-uv.mk
 include ../scripts/push.mk
 
 # Host key location for robot
@@ -52,20 +52,22 @@ clean_cache_cmd	 = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 .PHONY: all
 all: clean sdist wheel
 
+
+
 .PHONY: setup
 setup: setup-py
 
 .PHONY: setup-py
 setup-py:
-	$(pipenv) sync $(pipenv_opts)
-	$(pipenv) run pip freeze
+	@$(uv_sync_dev)
+	@$(UV) pip list
 
 .PHONY: teardown
 teardown: teardown-py
 
 .PHONY: teardown-py
 teardown-py:
-	-$(pipenv) --rm
+	$(SHX) rm -rf .venv
 
 
 .PHONY: clean
@@ -93,13 +95,12 @@ sdist: $(py_sources) $(json_sources)
 
 .PHONY: lint
 lint: $(py_sources)
-	$(python) -m mypy python/opentrons_shared_data python_tests
-	$(python) -m black --check python/opentrons_shared_data python_tests
-	$(python) -m flake8 python/opentrons_shared_data python_tests
+	$(python) -m mypy python/opentrons_shared_data python_tests tools
+	$(ruff) check python/opentrons_shared_data python_tests tools
 
 .PHONY: format
 format:
-	$(python) -m black python/opentrons_shared_data python_tests
+	$(ruff) format python/opentrons_shared_data python_tests tools
 
 .PHONY: push-no-restart
 push-no-restart: wheel
@@ -123,7 +124,7 @@ deploy: wheel sdist
 
 .PHONY: test
 test:
-	$(python) -m pytest --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
+	$(pytest) --cov=opentrons_shared_data --cov-report xml:coverage.xml $(tests) $(test_opts)
 
 
 .PHONY: generate-schema

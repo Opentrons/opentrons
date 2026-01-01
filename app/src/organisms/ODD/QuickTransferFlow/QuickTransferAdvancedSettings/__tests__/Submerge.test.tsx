@@ -67,7 +67,12 @@ describe('Submerge', () => {
   })
 
   it('renders text, buttons, input field, and keyboard for submerge before aspirating - position', () => {
-    render(props)
+    render({
+      ...props,
+      state: {
+        submergeAspirate: { positionReference: 'well-bottom', position: 0 },
+      } as any,
+    })
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Continue'))
@@ -84,14 +89,20 @@ describe('Submerge', () => {
     fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Save')
     screen.getByText('Distance from bottom of well (mm)')
-    screen.getByText('Between 0 and 2 mm')
+    screen.getByText('Between 0 and 3 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
-    screen.getByText('Value must be between 1 to 2')
+    screen.getByText('Value must be between 0 to 3')
   })
 
   it('should call dispatch when clicking save button', () => {
+    props.state.submergeAspirate = {
+      speed: 0,
+      delayDuration: 0,
+      position: 0,
+      positionReference: 'well-top',
+    }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
@@ -108,7 +119,8 @@ describe('Submerge', () => {
       submergeSettings: {
         speed: 11,
         delayDuration: 0.5,
-        positionFromBottom: 22,
+        position: 22,
+        positionReference: 'well-top',
       },
     })
   })

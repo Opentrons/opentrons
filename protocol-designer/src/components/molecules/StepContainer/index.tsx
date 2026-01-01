@@ -144,7 +144,6 @@ export function StepContainer(props: StepContainerProps): JSX.Element {
                 <Flex
                   flexDirection={DIRECTION_ROW}
                   gridGap={SPACING.spacing4}
-                  alignItems={ALIGN_CENTER}
                   flex="1"
                   minWidth="0"
                 >

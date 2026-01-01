@@ -43,10 +43,8 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
     setUpdateId(null)
   }, [subsystem])
 
-  const {
-    data: instrumentsData,
-    refetch: refetchInstruments,
-  } = useInstrumentsQuery()
+  const { data: instrumentsData, refetch: refetchInstruments } =
+    useInstrumentsQuery()
   const instrument = instrumentsData?.data.find(
     instrument => instrument.subsystem === subsystem
   )
@@ -82,7 +80,7 @@ export function UpdateNeededModal(props: UpdateNeededModalProps): JSX.Element {
   let modalContent = (
     <OddModal header={updateNeededHeader}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing60}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing60}>
           <Trans
             t={t}
             i18nKey="firmware_out_of_date"

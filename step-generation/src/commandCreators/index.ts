@@ -11,6 +11,7 @@ export {
   thermocyclerProfileStep,
   thermocyclerStateStep,
   transfer,
+  waitForModuleTask,
 } from './compound'
 
 export {
@@ -20,6 +21,7 @@ export {
   absorbanceReaderRead,
   aspirate,
   blowOutInWell,
+  captureImage,
   comment,
   deactivateTemperature,
   delay,
@@ -28,6 +30,10 @@ export {
   dropTip,
   dropTipInPlace,
   engageMagnet,
+  flexStackerEmpty,
+  flexStackerFillItems,
+  flexStackerRetrieve,
+  flexStackerStore,
   moveLabware,
   moveToAddressableArea,
   moveToAddressableAreaForDropTip,

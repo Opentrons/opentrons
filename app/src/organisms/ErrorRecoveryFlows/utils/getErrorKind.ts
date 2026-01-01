@@ -26,11 +26,13 @@ export function getErrorKind(
           case 'prepareToAspirate':
             return ERROR_KINDS.OVERPRESSURE_PREPARE_TO_ASPIRATE
           case 'aspirate':
-          case 'aspirateInPlace': {
+          case 'aspirateInPlace':
+          case 'aspirateWhileTracking': {
             return ERROR_KINDS.OVERPRESSURE_WHILE_ASPIRATING
           }
           case 'dispense':
           case 'dispenseInPlace':
+          case 'dispenseWhileTracking':
           case 'blowout':
           case 'blowOutInPlace':
             return ERROR_KINDS.OVERPRESSURE_WHILE_DISPENSING
@@ -57,6 +59,8 @@ export function getErrorKind(
         return ERROR_KINDS.STACKER_SHUTTLE_MISSING
       case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_EMPTY:
         return ERROR_KINDS.STACKER_HOPPER_OR_SHUTTLE_EMPTY
+      case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_STORE_EMPTY:
+        return ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY
       case DEFINED_ERROR_TYPES.STACKER_SHUTTLE_OCCUPIED:
         return ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED
       default: {

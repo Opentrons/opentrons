@@ -277,6 +277,10 @@
     "4012": {
       "detail": "Labware Locating Feature Error",
       "category": "generalError"
+    },
+    "4013": {
+      "detail": "Camera Related Error",
+      "category": "generalError"
     }
   }
 }

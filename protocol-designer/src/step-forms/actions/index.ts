@@ -20,9 +20,10 @@ export const changeBatchEditField = (
 export interface ResetBatchEditFieldChangesAction {
   type: 'RESET_BATCH_EDIT_FIELD_CHANGES'
 }
-export const resetBatchEditFieldChanges = (): ResetBatchEditFieldChangesAction => ({
-  type: 'RESET_BATCH_EDIT_FIELD_CHANGES',
-})
+export const resetBatchEditFieldChanges =
+  (): ResetBatchEditFieldChangesAction => ({
+    type: 'RESET_BATCH_EDIT_FIELD_CHANGES',
+  })
 type EditedFields = Record<StepFieldName, unknown>
 export interface SaveStepFormsMultiAction {
   type: 'SAVE_STEP_FORMS_MULTI'
@@ -33,21 +34,19 @@ export interface SaveStepFormsMultiAction {
 }
 export const saveStepFormsMulti: (
   selectedStepIds?: StepIdType[] | null
-) => ThunkAction<SaveStepFormsMultiAction> = selectedStepIds => (
-  dispatch,
-  getState
-) => {
-  const state = getState()
-  const batchEditFieldChanges = getBatchEditFieldChanges(state)
-  const saveStepFormsMultiAction: SaveStepFormsMultiAction = {
-    type: 'SAVE_STEP_FORMS_MULTI',
-    payload: {
-      editedFields: batchEditFieldChanges,
-      stepIds: selectedStepIds || [],
-    },
+) => ThunkAction<SaveStepFormsMultiAction> =
+  selectedStepIds => (dispatch, getState) => {
+    const state = getState()
+    const batchEditFieldChanges = getBatchEditFieldChanges(state)
+    const saveStepFormsMultiAction: SaveStepFormsMultiAction = {
+      type: 'SAVE_STEP_FORMS_MULTI',
+      payload: {
+        editedFields: batchEditFieldChanges,
+        stepIds: selectedStepIds || [],
+      },
+    }
+    dispatch(saveStepFormsMultiAction)
   }
-  dispatch(saveStepFormsMultiAction)
-}
 
 export interface DeckConfigurationState {
   deckConfig: DeckConfiguration

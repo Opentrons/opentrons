@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -14706,7 +14709,16 @@
     "description": "To measure viability and cytotoxicity of A549 cells\ntreated with Thapsigargin using the OT-2",
     "protocolName": "Cell Viability and Cytotoxicity Assay"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "1"
+      },
+      "model": "heaterShakerModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

@@ -99,7 +99,7 @@ export const ON_DEVICE_DISPLAY_PATHS = [
 ] as const
 
 function getPathComponent(
-  path: typeof ON_DEVICE_DISPLAY_PATHS[number]
+  path: (typeof ON_DEVICE_DISPLAY_PATHS)[number]
 ): JSX.Element {
   switch (path) {
     case '/choose-language':

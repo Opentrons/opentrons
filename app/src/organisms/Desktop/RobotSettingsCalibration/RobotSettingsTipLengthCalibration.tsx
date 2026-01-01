@@ -22,7 +22,7 @@ import type { FormattedPipetteOffsetCalibration } from '.'
 interface RobotSettingsTipLengthCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export interface FormattedTipLengthCalibration {
@@ -36,7 +36,7 @@ export interface FormattedTipLengthCalibration {
 export function RobotSettingsTipLengthCalibration({
   formattedPipetteOffsetCalibrations,
   robotName,
-  updateRobotStatus,
+  isRobotBusy,
 }: RobotSettingsTipLengthCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -84,14 +84,17 @@ export function RobotSettingsTipLengthCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="h3"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {t('tip_length_calibrations_title')}
       </LegacyStyledText>
       <TipLengthCalibrationItems
         robotName={robotName}
+        isRobotBusy={isRobotBusy}
         formattedPipetteOffsetCalibrations={formattedPipetteOffsetCalibrations}
         formattedTipLengthCalibrations={formattedTipLengthCalibrations}
-        updateRobotStatus={updateRobotStatus}
       />
     </Flex>
   )

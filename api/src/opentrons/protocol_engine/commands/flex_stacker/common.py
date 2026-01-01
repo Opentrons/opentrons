@@ -10,6 +10,10 @@ from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from opentrons.protocol_engine.errors.exceptions import (
+    LabwarePoolNotCompatibleWithModuleError,
+)
+
 
 from ...errors import ErrorOccurrence
 from ...types import (
@@ -34,6 +38,15 @@ if TYPE_CHECKING:
     from opentrons.protocol_engine.resources import ModelUtils
     from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
     from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+
+
+# The stacker cannot dispense labware where there is no gap between the top surface
+# of the bottom labware being dispensed, and bottom surface of the top labware.
+# This is because the stacker latch, which holds the labware stack, needs enough
+# empty space to free the bottom labware, but still hold the top labware once it
+# closes.
+STACKER_INCOMPATIBLE_LABWARE = set(["opentrons_tough_universal_lid"])
+
 
 INITIAL_COUNT_DESCRIPTION = dedent(
     """\
@@ -125,9 +138,9 @@ class FlexStackerHopperError(ErrorOccurrence):
     """Returned when the Flex Stacker hopper labware presence sensor raises an error."""
 
     isDefined: bool = True
-    errorType: Literal[
+    errorType: Literal["flexStackerHopperLabwareFailed"] = (
         "flexStackerHopperLabwareFailed"
-    ] = "flexStackerHopperLabwareFailed"
+    )
 
     errorCode: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_HOPPER_LABWARE_FAILED.value.detail
@@ -139,9 +152,22 @@ class FlexStackerLabwareRetrieveError(ErrorOccurrence):
     """Returned when the labware was not able to get to the shuttle."""
 
     isDefined: bool = True
-    errorType: Literal[
+    errorType: Literal["flexStackerLabwareRetrieveFailed"] = (
         "flexStackerLabwareRetrieveFailed"
-    ] = "flexStackerLabwareRetrieveFailed"
+    )
+
+    errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
+    detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
+    errorInfo: FailedLabware
+
+
+class FlexStackerLabwareStoreError(ErrorOccurrence):
+    """Returned when the labware was not able to get to the shuttle."""
+
+    isDefined: bool = True
+    errorType: Literal["flexStackerLabwareStoreFailed"] = (
+        "flexStackerLabwareStoreFailed"
+    )
 
     errorCode: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.code
     detail: str = ErrorCodes.STACKER_SHUTTLE_LABWARE_FAILED.value.detail
@@ -856,9 +882,9 @@ def build_retrieve_labware_move_updates(
         locations_for_ids[group.primaryLabwareId] = OnLabwareLocation(
             labwareId=group.adapterLabwareId
         )
-        assert (
-            stacker.pool_adapter_definition
-        ), "Mismatched pool and labware definitions"
+        assert stacker.pool_adapter_definition, (
+            "Mismatched pool and labware definitions"
+        )
         adapter_uri = state_view.labware.get_uri_from_definition(
             stacker.pool_adapter_definition
         )
@@ -883,9 +909,9 @@ def build_retrieve_labware_move_updates(
         )
 
     if group.lidLabwareId:
-        assert (
-            stacker.pool_lid_definition is not None
-        ), "Mismatched pool and stored labware"
+        assert stacker.pool_lid_definition is not None, (
+            "Mismatched pool and stored labware"
+        )
         lid_offset_location = _prepend_loc(
             [OnLabwareOffsetLocationSequenceComponent(labwareUri=primary_uri)],
             primary_offset_location,
@@ -898,3 +924,25 @@ def build_retrieve_labware_move_updates(
             lid_offset_location,
         )
     return locations_for_ids, offset_ids_by_id
+
+
+def validate_labware_pool_compatible_with_stacker(
+    pool_primary_definition: LabwareDefinition,
+    pool_adapter_definition: LabwareDefinition | None,
+    pool_lid_definition: LabwareDefinition | None,
+) -> None:
+    """Verifies that the given labware pool is compatible with the stacker."""
+    labware_pool = set(
+        lw.parameters.loadName
+        for lw in [
+            pool_primary_definition,
+            pool_adapter_definition,
+            pool_lid_definition,
+        ]
+        if lw is not None
+    )
+    incompatible_labware = list(labware_pool & STACKER_INCOMPATIBLE_LABWARE)
+    if incompatible_labware:
+        raise LabwarePoolNotCompatibleWithModuleError(
+            f"The stacker cannot store {incompatible_labware}"
+        )

@@ -2,6 +2,7 @@
 
 Contains routes dealing primarily with `Run` models.
 """
+
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -32,7 +33,6 @@ from robot_server.data_files.dependencies import (
 )
 from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.service.dependencies import get_current_time, get_unique_id
 from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.hardware import get_hardware, get_robot_type_enum
@@ -76,17 +76,16 @@ from ..run_data_manager import (
 from ..dependencies import (
     get_run_data_manager,
     get_run_auto_deleter,
-    get_quick_transfer_run_auto_deleter,
 )
 
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from robot_server.file_provider.fastapi_dependencies import (
-    get_file_provider,
+from robot_server.camera.fastapi_dependencies import (
+    get_camera_provider,
 )
-from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from robot_server.service.notifications import get_pe_notify_publishers
 
 log = logging.getLogger(__name__)
@@ -195,14 +194,11 @@ async def create_run(  # noqa: C901
     run_auto_deleter: Annotated[RunAutoDeleter, Depends(get_run_auto_deleter)],
     data_files_directory: Annotated[Path, Depends(get_data_files_directory)],
     data_files_store: Annotated[DataFilesStore, Depends(get_data_files_store)],
-    quick_transfer_run_auto_deleter: Annotated[
-        RunAutoDeleter, Depends(get_quick_transfer_run_auto_deleter)
-    ],
     check_estop: Annotated[bool, Depends(require_estop_in_good_state)],
     deck_configuration_store: Annotated[
         DeckConfigurationStore, Depends(get_deck_configuration_store)
     ],
-    file_provider: Annotated[FileProvider, Depends(get_file_provider)],
+    camera_provider: Annotated[CameraProvider, Depends(get_camera_provider)],
     notify_publishers: Annotated[Callable[[], None], Depends(get_pe_notify_publishers)],
     request_body: Optional[RequestModel[RunCreate]] = None,
 ) -> PydanticResponse[SimpleBody[Union[Run, BadRun]]]:
@@ -216,13 +212,12 @@ async def create_run(  # noqa: C901
         created_at: Timestamp to attach to created run.
         run_auto_deleter: An interface to delete old resources to make room for
             the new run.
-        quick_transfer_run_auto_deleter: An interface to delete old quick-transfer
         data_files_directory: Persistence directory for data files.
         data_files_store: Database of data file resources.
         resources to make room for the new run.
         check_estop: Dependency to verify the estop is in a valid state.
         deck_configuration_store: Dependency to fetch the deck configuration.
-        file_provider: Dependency to provide access to file Reading and Writing to Protocol engine.
+        camera_provider: Dependency to provide access to the Camera Settings to the run.
         notify_publishers: Utilized by the engine to notify publishers of state changes.
     """
     protocol_id = request_body.data.protocolId if request_body is not None else None
@@ -263,13 +258,7 @@ async def create_run(  # noqa: C901
     # TODO(mc, 2022-05-13): move inside `RunDataManager` or return data
     # to pass to `RunDataManager.create`. Right now, runs may be deleted
     # even if a new create is unable to succeed due to a conflict
-    run_deleter: RunAutoDeleter = run_auto_deleter
-    if (
-        protocol_resource
-        and protocol_resource.protocol_kind == ProtocolKind.QUICK_TRANSFER
-    ):
-        run_deleter = quick_transfer_run_auto_deleter
-    run_deleter.make_room_for_new_run()
+    run_auto_deleter.make_room_for_new_run()
 
     try:
         run_data = await run_data_manager.create(
@@ -277,7 +266,7 @@ async def create_run(  # noqa: C901
             created_at=created_at,
             labware_offsets=offsets,
             deck_configuration=deck_configuration,
-            file_provider=file_provider,
+            camera_provider=camera_provider,
             run_time_param_values=rtp_values,
             run_time_param_paths=rtp_paths,
             protocol=protocol_resource,

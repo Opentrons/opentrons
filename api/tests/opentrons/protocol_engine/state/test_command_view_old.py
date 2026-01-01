@@ -5,7 +5,6 @@ Try to add new tests to test_command_state.py, where they can be tested together
 treating CommandState as a private implementation detail.
 """
 
-
 import pytest
 from contextlib import nullcontext as does_not_raise, AbstractContextManager
 from datetime import datetime
@@ -110,15 +109,18 @@ def get_command_view(  # noqa: C901
         finish_error=finish_error,
         failed_command=failed_command,
         command_error_recovery_types=command_error_recovery_types or {},
-        recovery_target=_RecoveryTargetInfo(
-            command_id=recovery_target_command_id,
-            state_update_if_false_positive=StateUpdate(),
-        )
-        if recovery_target_command_id is not None
-        else None,
+        recovery_target=(
+            _RecoveryTargetInfo(
+                command_id=recovery_target_command_id,
+                state_update_if_false_positive=StateUpdate(),
+            )
+            if recovery_target_command_id is not None
+            else None
+        ),
         run_started_at=run_started_at,
         latest_protocol_command_hash=latest_command_hash,
-        stopped_by_estop=False,
+        stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         has_entered_error_recovery=has_entered_error_recovery,
         error_recovery_policy=_placeholder_error_recovery_policy,
     )

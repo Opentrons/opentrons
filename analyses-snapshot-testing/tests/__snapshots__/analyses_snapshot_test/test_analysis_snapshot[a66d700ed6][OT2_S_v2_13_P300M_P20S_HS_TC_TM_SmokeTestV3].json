@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -13189,7 +13192,32 @@
     "protocolName": "🛠️ 2.13 Smoke Test V3 🪄",
     "source": "Software Testing Team"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "1"
+      },
+      "model": "heaterShakerModuleV1",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "9"
+      },
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "7"
+      },
+      "model": "thermocyclerModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

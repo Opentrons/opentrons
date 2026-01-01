@@ -57,7 +57,7 @@ touchTipAspirate = -(sourceWellHeight - prevTouchTipAspirate)
 touchTipDispense = -(destWellHeight - prevTouchTipDispense)
 ```
 
-## [WIP] Version 1.2.0
+## Version 1.2.0
 
 Due to changes in the Quick Transfer setup flow, there will be changes to QuickTransferWizardState and QuickTransferSummaryState. The changes are as follows:
 the comment `this has been added` will be removed before feature freeze.
@@ -110,13 +110,15 @@ export interface QuickTransferSummaryState {
     // from version 1.2.0
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   retractAspirate?: {
     // from version 1.2.0
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   delayAspirate?: {
     // updated in version 1.2.0
@@ -134,13 +136,15 @@ export interface QuickTransferSummaryState {
     // from version 1.2.0
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   retractDispense?: {
     // from version 1.2.0
     speed: number
     delayDuration: number
-    positionFromBottom: number
+    position: number
+    positionReference: PositionReference
   }
   delayDispense?: {
     // updated in version 1.2.0
@@ -168,3 +172,28 @@ export interface QuickTransferSummaryState {
   liquidClassValuesInitialized: boolean // from version 1.2.0
 }
 ```
+
+## Version 2.0.0
+
+Introduction of Python protocol generation starting in robot stack v8.7.0.
+
+The shape of the Python file is as follows:
+
+```ts
+imports
+metadata
+requirements
+commands
+```
+
+Note that the `designerApplicationData` is not included in the generated Python, therefore, cloning/editing the generated protocol is currently not possible (which is never has been).
+
+You can still generate JSON behind a feature flag.
+
+## Version 2.1.0
+
+Introduction of return tip in robot stack v8.8.0, mirroring return tip support introducted in Protocol Designer 8.6.0: Return an attached pipette tip to the tip rack after aspirating, dispensing, or mixing.
+
+## Version 2.1.1
+
+Note that this version number might still change and adding it here so we don't forget. The ability to generate JSON behind a feature flag has been deleted.

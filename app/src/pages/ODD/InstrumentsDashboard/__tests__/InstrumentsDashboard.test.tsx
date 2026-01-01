@@ -86,7 +86,7 @@ vi.mock('@opentrons/react-api-client', async importOriginal => {
           data: {
             data: [mockLeftPipetteData, mockRightPipetteData, mockGripperData],
           },
-        } as any)
+        }) as any
     ),
   }
 })

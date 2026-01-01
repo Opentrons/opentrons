@@ -1,13 +1,17 @@
 FLEX_MANUAL_PREFIX ?= flex
-# AWS_PROFILE is intentionally left undefined by default
-BRANCH ?= edge
-SANDBOX_S3_BUCKET ?= sandbox.docs
 
-
+.PHONY: build
+build:	
+	@if [ -n "$$CI" ]; then \
+		uv run mkdocs build -f ./mkdocs.yml --strict; \
+	else \
+		uv run mkdocs build -f ./mkdocs.yml; \
+	fi
 
 .PHONY: setup
 setup:
 	uv sync
+	uv run playwright install --with-deps chromium
 
 .PHONY: clean
 clean:
@@ -17,21 +21,7 @@ clean:
 serve:
 	uv run mkdocs serve -f ./mkdocs.yml
 
-.PHONY: build
-build:
-	@if [ -n "$$CI" ]; then \
-		uv run mkdocs build -f ./mkdocs.yml --strict; \
-	else \
-		uv run mkdocs build -f ./mkdocs.yml; \
-	fi
-
-	
-.PHONY: serve-flex-manual
-serve-flex-manual:
-	uv run mkdocs serve -f $(FLEX_MANUAL_PREFIX)/mkdocs.yml
-
-.PHONY: deploy
-deploy:
-	uv run python deploy_mkdocs.py $(ENVIRONMENT) --branch $(BRANCH) $(ARGS)
-
-
+.PHONY: pdf-flex
+pdf-flex:
+	uv run mkdocs build -f ./flex/mkdocs.yml && \
+	uv run python flex/export_to_pdf.py flex/site/print_page/index.html site/Opentrons-Flex-Instruction-Manual.pdf 'Opentrons Flex Instruction Manual'

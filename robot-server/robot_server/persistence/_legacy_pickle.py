@@ -1,6 +1,5 @@
 """Safely unpickle objects stored in the database by older robot-server versions."""
 
-
 from dataclasses import dataclass
 from functools import lru_cache
 from io import BytesIO
@@ -210,9 +209,9 @@ def _get_types_by_original_name() -> Dict[str, type]:
     types_by_original_name: Dict[str, type] = {}
 
     for legacy_type in _get_legacy_ot_types():
-        assert (
-            legacy_type.original_name not in types_by_original_name
-        ), "LegacyUnpickler assumes the original names are unique."
+        assert legacy_type.original_name not in types_by_original_name, (
+            "LegacyUnpickler assumes the original names are unique."
+        )
         types_by_original_name[legacy_type.original_name] = legacy_type.current_type
 
     return types_by_original_name

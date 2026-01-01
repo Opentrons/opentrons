@@ -3,6 +3,7 @@ endpoints for running software updates
 
 This has endpoints like update session management, validation, and execution
 """
+
 import asyncio
 import functools
 import logging
@@ -38,8 +39,7 @@ class _HandlerWithSession(Protocol):
 
     async def __call__(
         self, request: web.Request, session: UpdateSession
-    ) -> web.Response:
-        ...
+    ) -> web.Response: ...
 
 
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:
@@ -178,7 +178,12 @@ async def _read_parts_and_find_update(
 ) -> Optional[str]:
     found: Optional[str] = None
     async for part in reader:
-        if part.name not in VALID_UPDATE_PKG:
+        if part is None:
+            return None
+        elif isinstance(part, MultipartReader):
+            LOG.info("Incorrect nested multipart in file_upload, ignoring")
+            await part.release()
+        elif part.name not in VALID_UPDATE_PKG:
             LOG.info(f"Unknown field name {part.name} in file_upload, ignoring")
             await part.release()
         else:

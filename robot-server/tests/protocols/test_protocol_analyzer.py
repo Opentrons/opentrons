@@ -167,6 +167,7 @@ async def test_analyze(
     )
 
     command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
+    command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)
     decoy.when(
@@ -181,7 +182,11 @@ async def test_analyze(
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )
-    decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
+    decoy.when(
+        await orchestrator.run(
+            deck_configuration=[],
+        )
+    ).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(
@@ -199,6 +204,7 @@ async def test_analyze(
             ),
             parameters=[bool_parameter],
             command_annotations=[command_annotation],
+            command_preconditions=command_preconditions,
         )
     )
 
@@ -218,6 +224,7 @@ async def test_analyze(
             liquids=[],
             liquidClasses=[],
             command_annotations=[command_annotation],
+            command_preconditions=command_preconditions,
         )
     )
 

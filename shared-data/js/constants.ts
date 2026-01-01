@@ -70,6 +70,9 @@ export const GRIPPER_MODELS = [
 export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
 
+// robot camera name
+export const OT_SYSTEM_CAMERA = 'ot_system_camera'
+
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
 export const GEN2: 'GEN2' = 'GEN2'
@@ -150,6 +153,8 @@ export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
 export const ROBOT_MODELS = ['OT-2 Standard', 'OT-3 Standard']
 export const OT2_ROBOT_TYPE = 'OT-2 Standard' as const
 export const FLEX_ROBOT_TYPE = 'OT-3 Standard' as const
+
+export const FLEX_96_CHANNEL_PIPETTES = ['p1000_96', 'p200_96']
 
 //  TODO(jr, 7/13/23): rename this constant to FLEX_PIPETTES
 export const OT3_PIPETTES = [
@@ -443,6 +448,20 @@ export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
 export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
 
+export const exactMatchOnlyLoadNames = new Set([
+  'milliplex_microtiter_plate',
+  'milliplex_microtiter_plate_lid',
+  'corning_falcon_384_wellplate_130ul_flat',
+  'corning_falcon_384_wellplate_130ul_flat_lid',
+  'ibidi_96_square_well_plate_300ul',
+  'ibidi_96_square_well_plate_300ul_lid',
+  'opentrons_96_deep_well_adapter',
+  'opentrons_96_filtertiprack_1000ul',
+  'opentrons_96_tiprack_1000ul',
+  'opentrons_universal_flat_adapter',
+  'opentrons_universal_flat_adapter_type_b',
+])
+
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,
   MAGNETIC_BLOCK_B1_ADDRESSABLE_AREA,
@@ -522,10 +541,8 @@ export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
 ]
 
-export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] = [
-  ...FLEX_STAGING_ADDRESSABLE_AREAS,
-  ...FAKE_AA,
-]
+export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] =
+  [...FLEX_STAGING_ADDRESSABLE_AREAS, ...FAKE_AA]
 
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
@@ -572,6 +589,25 @@ export const FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A4_ADDRESSABLE_AREA,
   B4_ADDRESSABLE_AREA,
   C4_ADDRESSABLE_AREA,
+  D4_ADDRESSABLE_AREA,
+]
+
+export const ALL_FLEX_ADDRESSABLE_AREAS_SORTED: AddressableAreaName[] = [
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  A4_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  B4_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  C4_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
   D4_ADDRESSABLE_AREA,
 ]
 
@@ -700,10 +736,8 @@ export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 ]
 
-export const WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES: CutoutFixtureIdsWithFakes[] = [
-  ...WASTE_CHUTE_ONLY_FIXTURES,
-  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
-]
+export const WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES: CutoutFixtureIdsWithFakes[] =
+  [...WASTE_CHUTE_ONLY_FIXTURES, FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE]
 
 export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
@@ -736,7 +770,8 @@ export const MODULE_FIXTURES_BY_MODEL: {
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
 }
 
-export const DEFAULT_AA_FOR_WASTE_CHUTE = ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+export const DEFAULT_AA_FOR_WASTE_CHUTE =
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
 
 export const STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -764,6 +799,7 @@ export const DEFAULT_LIQUID_COLORS = [
   springGreen,
   tartRed,
 ]
+export const MIXED_WELL_COLOR = '#737578'
 export const DEPRECATED_WHALE_GREY = '#9395a0'
 
 // this can't go in @opentrons/components because its used in a utility
@@ -816,3 +852,7 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FAKE_FIXTURE_IDS,
   ...STAGING_AREA_FIXTURES,
 ]
+
+// a labware location when something has been used already on the deck
+// and moves to a new location that isn't accessible on or off the deck
+export const SYSTEM_LOCATION = 'systemLocation'

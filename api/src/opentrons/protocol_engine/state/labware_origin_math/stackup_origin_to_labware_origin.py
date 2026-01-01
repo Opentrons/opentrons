@@ -1,4 +1,5 @@
 """Utilities for calculating the labware origin offset position."""
+
 import dataclasses
 import enum
 from typing import Union, overload, Optional
@@ -49,6 +50,7 @@ from opentrons.protocol_engine.types import (
     OnLabwareLocation,
     LabwareMovementOffsetData,
     LabwareOffsetVector,
+    WASTE_CHUTE_LOCATION,
 )
 
 _OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
@@ -174,9 +176,13 @@ def _get_stackup_origin_to_lw_origin(
             slot_name=slot_name,
             is_topmost_labware=False,
         )
+    elif location == WASTE_CHUTE_LOCATION:
+        raise LabwareNotOnDeckError(
+            f"Cannot access {definition.metadata.displayName} because it is in the waste chute."
+        )
     else:
         raise LabwareNotOnDeckError(
-            "Cannot access labware since it is not on the deck. "
+            f"Cannot access {definition.metadata.displayName} since it is not on the deck. "
             "Either it has been loaded off-deck or its been moved off-deck."
         )
 
@@ -262,8 +268,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: ModuleLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 @overload
@@ -275,8 +280,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 @overload
@@ -288,8 +292,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: OnLabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 def _get_parent_placement_origin_to_lw_origin(

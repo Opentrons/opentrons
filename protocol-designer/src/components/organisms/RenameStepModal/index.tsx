@@ -73,16 +73,14 @@ export function RenameStepModal(props: RenameStepModalProps): JSX.Element {
           <PrimaryButton
             data-testid="RenameStepModal_saveButton"
             disabled={stepName.length >= MAX_STEP_NAME_LENGTH}
-            onClick={() => {
-              handleSave()
-            }}
+            onClick={handleSave}
           >
             {t('shared:save')}
           </PrimaryButton>
         </Flex>
       }
     >
-      <form>
+      <form onSubmit={handleSave}>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing12}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
             <StyledText color={COLORS.grey60} desktopStyle="captionRegular">

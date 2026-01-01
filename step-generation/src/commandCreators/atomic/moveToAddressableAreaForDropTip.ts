@@ -3,11 +3,9 @@ import { uuid } from '../../utils'
 import type { MoveToAddressableAreaForDropTipParams } from '@opentrons/shared-data'
 import type { CommandCreator } from '../../types'
 
-export const moveToAddressableAreaForDropTip: CommandCreator<MoveToAddressableAreaForDropTipParams> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const moveToAddressableAreaForDropTip: CommandCreator<
+  MoveToAddressableAreaForDropTipParams
+> = (args, invariantContext, prevRobotState) => {
   const { pipetteId, addressableAreaName } = args
 
   const commands = [

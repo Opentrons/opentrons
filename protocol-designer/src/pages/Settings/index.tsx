@@ -27,9 +27,8 @@ const SETTINGS_MAX_WIDTH = '56rem'
 
 export function Settings(): JSX.Element {
   const { t } = useTranslation('shared')
-  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
-    false
-  )
+  const [showAnnouncementModal, setShowAnnouncementModal] =
+    useState<boolean>(false)
   const flags = useSelector(getFeatureFlagData)
   const canClearHintDismissals = useSelector(
     tutorialSelectors.getCanClearHintDismissals

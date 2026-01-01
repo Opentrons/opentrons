@@ -10,22 +10,20 @@ import {
   getModuleType,
   getPositionFromSlotId,
   getSimplestDeckConfigForProtocol,
+  locationIsOffDeck,
   OT2_ROBOT_TYPE,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
 import { RECOVERY_MAP } from '/app/organisms/ErrorRecoveryFlows/constants'
-import {
-  getRunLabwareRenderInfo,
-  getRunModuleRenderInfo,
-} from '/app/organisms/InterventionModal/utils'
+import { getRunModuleRenderInfo } from '/app/organisms/InterventionModal/utils'
 
-import type { Run } from '@opentrons/api-client'
+import type { Run, RunData } from '@opentrons/api-client'
 import type {
   CutoutConfigProtocolSpec,
   DeckDefinition,
   LabwareDefinition,
-  LabwareDefinitionsByUri,
+  LabwareDefinitionsByURI,
   LabwareLocation,
   LoadedLabware,
   LoadedModule,
@@ -33,10 +31,7 @@ import type {
   ModuleModel,
   RobotType,
 } from '@opentrons/shared-data'
-import type {
-  RunLabwareInfo,
-  RunModuleInfo,
-} from '/app/organisms/InterventionModal/utils'
+import type { RunModuleInfo } from '/app/organisms/InterventionModal/utils'
 import type { ErrorRecoveryFlowsProps } from '..'
 import type { ERUtilsProps, ERUtilsResults } from './useERUtils'
 import type { UseFailedLabwareUtilsResult } from './useFailedLabwareUtils'
@@ -58,7 +53,6 @@ export interface UseDeckMapUtilsResult {
   loadedModules: LoadedModule[]
   movedLabwareDef: LabwareDefinition | null
   moduleRenderInfo: RunModuleInfo[]
-  labwareRenderInfo: RunLabwareInfo[]
   highlightLabwareEventuallyIn: string[]
   kind: 'intervention'
   robotType: RobotType
@@ -99,7 +93,8 @@ export function useDeckMapUtils({
   )
 
   const currentLabwareInfo = useMemo(
-    () => getRunCurrentLabwareInfo({ runRecord, runLwDefsByUri }),
+    () =>
+      getRunCurrentLabwareInfo({ runData: runRecord?.data, runLwDefsByUri }),
     [runRecord, runLwDefsByUri]
   )
 
@@ -132,14 +127,6 @@ export function useDeckMapUtils({
     [deckDef, runLwDefsByUri, runRecord]
   )
 
-  const labwareRenderInfo = useMemo(
-    () =>
-      runRecord != null && runLwDefsByUri != null
-        ? getRunLabwareRenderInfo(runRecord.data, runLwDefsByUri, deckDef)
-        : [],
-    [deckDef, runLwDefsByUri, runRecord]
-  )
-
   return {
     deckConfig,
     modulesOnDeck: updatedModules.map(
@@ -155,10 +142,13 @@ export function useDeckMapUtils({
         nestedLabwareDefsBottomToTop,
       })
     ),
-    labwareOnDeck: runCurrentLabware.map(({ labwareLocation, definition }) => ({
-      labwareLocation,
-      definition,
-    })),
+    labwareOnDeck: runCurrentLabware.map(
+      ({ labwareLocation, definition, labwareId }) => ({
+        labwareLocation,
+        definition,
+        labwareId,
+      })
+    ),
     highlightLabwareEventuallyIn: [...updatedModules, ...runCurrentLabware]
       .map(el => el.highlight)
       .filter(maybeSlot => maybeSlot != null) as string[],
@@ -168,7 +158,6 @@ export function useDeckMapUtils({
     loadedLabware: runRecord?.data.labware ?? [],
     movedLabwareDef,
     moduleRenderInfo,
-    labwareRenderInfo,
   }
 }
 
@@ -224,6 +213,7 @@ export function getRunCurrentModulesOnDeck({
 interface RunCurrentLabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition
+  labwareId?: string
 }
 // Builds the necessary labware object expected by BaseDeck.
 // Note that while this highlights all labware in the failed labware slot, the result is later filtered to render
@@ -254,12 +244,13 @@ export function getRunCurrentLabwareOnDeck({
   }
 
   return currentLabwareInfo.map(
-    ({ slotName, labwareDef, labwareLocation }) => ({
+    ({ slotName, labwareDef, labwareLocation, labwareId }) => ({
       labwareLocation,
       definition: labwareDef,
       highlight: getIsLabwareMatch(slotName, runRecord, labwareToMatch())
         ? slotName
         : null,
+      labwareId,
     })
   )
 }
@@ -316,7 +307,7 @@ export const getRunCurrentModulesInfo = ({
         const nestedLwLoc = nestedLabware?.location ?? null
         const [nestedLwSlotName] = getSlotNameAndLwLocFrom(
           nestedLwLoc,
-          runRecord,
+          runRecord.data,
           false
         )
 
@@ -349,21 +340,21 @@ interface RunCurrentLabwareInfo {
 
 // Derive the labware info necessary to render labware on the deck.
 export function getRunCurrentLabwareInfo({
-  runRecord,
+  runData,
   runLwDefsByUri,
 }: {
-  runRecord: UseDeckMapUtilsProps['runRecord']
+  runData: RunData | undefined
   runLwDefsByUri: UseDeckMapUtilsProps['runLwDefsByUri']
 }): RunCurrentLabwareInfo[] {
-  if (runRecord == null) {
+  if (runData == null) {
     return []
   } else {
-    const allLabware = runRecord.data.labware.reduce(
+    const allLabware = runData.labware.reduce(
       (acc: RunCurrentLabwareInfo[], lw) => {
         const loc = lw.location
         const [slotName, labwareLocation] = getSlotNameAndLwLocFrom(
           loc,
-          runRecord,
+          runData,
           true
         ) // Exclude modules since handled separately.
         const labwareDef = getLabwareDefinition(lw, runLwDefsByUri)
@@ -424,7 +415,7 @@ export function getRunCurrentLabwareInfo({
 
 const getLabwareDefinition = (
   labware: LoadedLabware,
-  protocolLabwareDefinitionsByUri: LabwareDefinitionsByUri
+  protocolLabwareDefinitionsByUri: LabwareDefinitionsByURI
 ): LabwareDefinition => {
   if (labware.id === 'fixedTrash') {
     return getFixedTrashLabwareDefinition()
@@ -436,14 +427,14 @@ const getLabwareDefinition = (
 // Get the slotName for on deck labware.
 export function getSlotNameAndLwLocFrom(
   location: LabwareLocation | null,
-  runRecord: UseDeckMapUtilsProps['runRecord'],
+  runData: RunData,
   excludeModules: boolean
 ): [string | null, LabwareLocation | null] {
   const labwareLocationObject = getLabwareLocation({
     location,
     detailLevel: 'slot-only',
-    loadedLabwares: runRecord?.data?.labware ?? [],
-    loadedModules: runRecord?.data?.modules ?? [],
+    loadedLabwares: runData?.labware ?? [],
+    loadedModules: runData?.modules ?? [],
     robotType: FLEX_ROBOT_TYPE,
   })
   const onModuleModel = labwareLocationObject?.moduleModel ?? null
@@ -453,21 +444,15 @@ export function getSlotNameAndLwLocFrom(
   const baseSlot =
     onModuleModel != null &&
     getModuleType(onModuleModel) === FLEX_STACKER_MODULE_TYPE
-      ? labwareLocationObject?.slotName.charAt(0) ?? null
-      : labwareLocationObject?.slotName ?? null
-  if (
-    location == null ||
-    location === 'offDeck' ||
-    location === 'systemLocation'
-  ) {
+      ? (labwareLocationObject?.slotName.charAt(0) ?? null)
+      : (labwareLocationObject?.slotName ?? null)
+  if (location == null || locationIsOffDeck(location)) {
+    return [null, null]
+  } else if (excludeModules && onModuleModel != null) {
     return [null, null]
   } else if ('moduleId' in location) {
-    if (excludeModules && onModuleModel != null) {
-      return [null, null]
-    } else {
-      const moduleId = location.moduleId
-      return [baseSlot, { moduleId }]
-    }
+    const moduleId = location.moduleId
+    return [baseSlot, { moduleId }]
   } else if ('labwareId' in location) {
     const labwareId = location.labwareId
     return [baseSlot, { labwareId }]

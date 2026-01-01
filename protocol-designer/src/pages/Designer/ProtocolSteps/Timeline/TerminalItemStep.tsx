@@ -104,6 +104,7 @@ export function TerminalItemStep(props: TerminalItemStepProps): JSX.Element {
             id === START_TERMINAL_ITEM_ID
               ? t('starting_deck')
               : t('ending_deck'),
+          subtext: null,
           onClick,
           onMouseEnter,
           onMouseLeave,

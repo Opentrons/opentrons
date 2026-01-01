@@ -1,6 +1,5 @@
 """Unit tests for `protocol_auto_deleter`."""
 
-
 from datetime import datetime
 import logging
 

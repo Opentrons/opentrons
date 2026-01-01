@@ -22,10 +22,8 @@ export function useRetainedFailedCommandBySource(
   // In some cases, Error Recovery (by the app definition) persists when Error Recovery (by the server definition) does
   // not persist. Retaining the failed command allows the app to show information related to the failed command while
   // the robot is out of "awaiting-recovery" (by the server definition).
-  const [
-    retainedFailedCommand,
-    setRetainedFailedCommand,
-  ] = useState<FailedCommandBySource | null>(null)
+  const [retainedFailedCommand, setRetainedFailedCommand] =
+    useState<FailedCommandBySource | null>(null)
 
   useLayoutEffect(() => {
     if (failedCommandByRunRecord !== null) {

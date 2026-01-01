@@ -82,16 +82,17 @@ describe('OffsetBannerContainer', () => {
       type: 'TOGGLE_DEFAULT_OFFSET_INFO_BANNER',
     } as any)
 
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      ({
-        uri: 'test-uri-1',
-        displayName: 'Test Labware',
-      } as any)
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () =>
+        ({
+          uri: 'test-uri-1',
+          displayName: 'Test Labware',
+        }) as any
     )
     vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => false)
     vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => false)
-    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(() => () =>
-      false
+    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(
+      () => () => false
     )
   })
 
@@ -120,8 +121,8 @@ describe('OffsetBannerContainer', () => {
   })
 
   it('renders default info banner when showDefaultInfoBanner is true', () => {
-    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(() => () =>
-      true
+    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(
+      () => () => true
     )
 
     render(props)
@@ -157,8 +158,8 @@ describe('OffsetBannerContainer', () => {
 
   it('prioritizes default alert over default info banner', () => {
     vi.mocked(selectIsDefaultOffsetAbsent).mockImplementation(() => () => true)
-    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(() => () =>
-      true
+    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(
+      () => () => true
     )
 
     render(props)
@@ -175,8 +176,8 @@ describe('OffsetBannerContainer', () => {
   })
 
   it('prioritizes default info banner over hardcoded info banner', () => {
-    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(() => () =>
-      true
+    vi.mocked(selectShowDefaultOffsetInfoBanner).mockImplementation(
+      () => () => true
     )
     vi.mocked(selectIsAnyOffsetHardCoded).mockImplementation(() => () => true)
 
@@ -195,11 +196,12 @@ describe('OffsetBannerContainer', () => {
 
   it('passes the correct URI to selectors', () => {
     const mockUri = 'test-uri-123'
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      ({
-        uri: mockUri,
-        displayName: 'Test Labware',
-      } as any)
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () =>
+        ({
+          uri: mockUri,
+          displayName: 'Test Labware',
+        }) as any
     )
 
     render(props)

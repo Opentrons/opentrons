@@ -1,9 +1,9 @@
+""" Classes and functions for pipette state tracking
+"""
 from __future__ import annotations
 
 import functools
 
-""" Classes and functions for pipette state tracking
-"""
 import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
@@ -188,9 +188,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
             return
 
         str_name = f"{name.pipette_type.name}_{str(name.pipette_channels)}"
-        assert str_name in self._config.pipette_backcompat_names + [
-            self.name
-        ], f"{self.name} is not back-compatible with {name}"
+        assert str_name in self._config.pipette_backcompat_names + [self.name], (
+            f"{self.name} is not back-compatible with {name}"
+        )
 
         liquid_model = load_pipette_data.load_liquid_model(
             name.pipette_type, name.pipette_channels, name.get_version(), name.oem_type

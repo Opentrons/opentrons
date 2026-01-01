@@ -1,4 +1,5 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
+
 from typing import List, Tuple
 from numpy import pi, iscomplex, roots, real
 from math import isclose
@@ -493,7 +494,7 @@ def _find_height_in_partial_frustum(
         return 0.0
     for section, capacity in zip(sorted_well, volumetric_capacity):
         section_top_height, section_volume = capacity
-        if target_volume == section_volume + bottom_section_volume:
+        if isclose(target_volume, section_volume + bottom_section_volume):
             return section_top_height
         if (
             bottom_section_volume

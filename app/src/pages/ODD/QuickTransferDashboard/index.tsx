@@ -56,21 +56,14 @@ export function QuickTransferDashboard(): JSX.Element {
   const { t } = useTranslation(['quick_transfer', 'protocol_info'])
   const dispatch = useDispatch<Dispatch>()
   const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
-  const [longPressModalIsOpened, setLongPressModalOpened] = useState<boolean>(
-    false
-  )
-  const [
-    showDeleteConfirmationModal,
-    setShowDeleteConfirmationModal,
-  ] = useState<boolean>(false)
-  const [
-    showPipetteNotAttachedModal,
-    setShowPipetteNotAttaachedModal,
-  ] = useState<boolean>(false)
-  const [
-    showStorageLimitReachedModal,
-    setShowStorageLimitReachedModal,
-  ] = useState<boolean>(false)
+  const [longPressModalIsOpened, setLongPressModalOpened] =
+    useState<boolean>(false)
+  const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] =
+    useState<boolean>(false)
+  const [showPipetteNotAttachedModal, setShowPipetteNotAttaachedModal] =
+    useState<boolean>(false)
+  const [showStorageLimitReachedModal, setShowStorageLimitReachedModal] =
+    useState<boolean>(false)
   const [targetTransferId, setTargetTransferId] = useState<string>('')
   const sortBy = useSelector(getQuickTransfersOnDeviceSortKey) ?? 'alphabetical'
   const hasDismissedIntro = useSelector(getHasDismissedQuickTransferIntro)
@@ -225,7 +218,7 @@ export function QuickTransferDashboard(): JSX.Element {
               gap={SPACING.spacing8}
               paddingBottom={SPACING.spacing32}
             >
-              <LegacyStyledText as="p" color={COLORS.grey60}>
+              <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
                 {t('pinned_transfers')}
               </LegacyStyledText>
               <PinnedTransferCarousel

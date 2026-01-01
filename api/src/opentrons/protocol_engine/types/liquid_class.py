@@ -1,4 +1,5 @@
 """Protocol engine types to do with liquid classes."""
+
 from typing import Any
 from pydantic import Field
 
@@ -29,6 +30,7 @@ class LiquidClassRecord(ByTipTypeSetting, frozen=True):
 
     def __hash__(self) -> int:
         """Hash function for LiquidClassRecord."""
+
         # Within the Protocol Engine, LiquidClassRecords are immutable, and we'd like to be able to
         # look up LiquidClassRecords by value, which involves hashing. However, Pydantic does not
         # generate a usable hash function if any of the subfields (like Coordinate) are not frozen.

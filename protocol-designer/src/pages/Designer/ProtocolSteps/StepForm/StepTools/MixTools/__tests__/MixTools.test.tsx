@@ -8,10 +8,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
-import {
-  getEnablePartialTipSupport,
-  getEnableTipPickupLocation,
-} from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import {
   getLabwareEntities,
@@ -29,13 +25,15 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { FormData } from '/protocol-designer/form-types'
 
 vi.mock('/protocol-designer/step-forms/selectors')
-vi.mock('/protocol-designer/feature-flags/selectors')
 vi.mock('/protocol-designer/file-data/selectors')
 vi.mock('../../../utils')
 vi.mock('../FirstStepMixTools')
 vi.mock('../SecondStepMixTools')
 vi.mock('../../MoveLiquidTools/LiquidClassesStepTools')
 vi.mock('../../MoveLiquidTools/hooks/useAssignLiquidClass')
+vi.mock('react-plotly.js', () => ({
+  default: () => <div data-testid="plotly-chart">Mock Plotly Chart</div>,
+}))
 
 const labwareId = 'mockLabwareId'
 const pipetteId = 'mockPipetteId'
@@ -76,8 +74,6 @@ describe('MixToolFirstStep', () => {
         pythonName: 'mockPythonName',
       },
     })
-    vi.mocked(getEnableTipPickupLocation).mockReturnValue(false)
-    vi.mocked(getEnablePartialTipSupport).mockReturnValue(false)
     vi.mocked(getFormErrorsMappedToField).mockReturnValue({})
     vi.mocked(FirstStepMixTools).mockReturnValue(
       <div>mock FirstStepMixTools</div>

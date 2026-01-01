@@ -4,11 +4,11 @@ import { useLocation } from 'react-router-dom'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   ListItem,
   ListItemDescriptor,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   TYPOGRAPHY,
@@ -21,12 +21,17 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  getIsSlotAHopper,
+} from '@opentrons/step-generation'
 
 import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 
 interface SlotInformationProps {
   location: string
@@ -51,11 +56,18 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     robotType === FLEX_ROBOT_TYPE
       ? TC_MODULE_LOCATION_OT3
       : TC_MODULE_LOCATION_OT2
-  const modifiedLocation =
+
+  let modifiedLocation = location
+  if (
     modules.includes(getModuleDisplayName(THERMOCYCLER_MODULE_V2)) ||
     modules.includes(getModuleDisplayName(THERMOCYCLER_MODULE_V1))
-      ? tcDisplayLocation
-      : location
+  ) {
+    modifiedLocation = tcDisplayLocation
+  } else if (getIsSlotAHopper(location)) {
+    modifiedLocation = t('stacker', {
+      slot: FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey],
+    })
+  }
 
   return (
     <Flex
@@ -65,7 +77,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
       width="100%"
     >
       <Flex gridGap={SPACING.spacing8} alignItems={ALIGN_CENTER}>
-        {isOffDeck ? null : <DeckInfoLabel deckLabel={modifiedLocation} />}
+        {isOffDeck ? null : <RobotInfoLabel deckLabel={modifiedLocation} />}
         <StyledText desktopStyle="bodyLargeSemiBold">
           {t(isOffDeck ? 'labware_detail' : 'slot_detail')}
         </StyledText>

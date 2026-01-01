@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -10419,7 +10422,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26495,7 +26499,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 70.0
+        "targetLidTemperature": 70.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26542,7 +26547,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 42.0
+        "targetBlockTemperature": 42.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26574,7 +26580,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -26605,7 +26612,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -30665,7 +30673,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 105.0
+        "targetLidTemperature": 105.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -30712,7 +30721,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 95.0
+        "targetBlockTemperature": 95.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -30947,7 +30957,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 72.0
+        "targetBlockTemperature": 72.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -30979,7 +30990,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 4.0
+        "targetBlockTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -31010,7 +31022,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 4.0
+        "targetTemperature": 4.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -36816,7 +36829,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -37564,7 +37577,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 37.0
+        "targetLidTemperature": 37.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -37611,7 +37625,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 37.0
+        "targetBlockTemperature": 37.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -37643,7 +37658,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 23.0
+        "targetBlockTemperature": 23.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -37964,7 +37980,7 @@
       "displayName": "Reservoir",
       "id": "UUID",
       "loadName": "nest_96_wellplate_2ml_deep",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1",

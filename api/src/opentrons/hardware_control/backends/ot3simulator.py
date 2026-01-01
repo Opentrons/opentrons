@@ -183,7 +183,7 @@ class OT3Simulator(FlexBackend):
             raise KeyError(
                 "If you specify attached_instruments, the model "
                 "should be pipette names or pipette models, but "
-                f'{passed_ai["model"]} is not'
+                f"{passed_ai['model']} is not"
             )
 
         self._attached_instruments = {
@@ -367,6 +367,7 @@ class OT3Simulator(FlexBackend):
         speed: Optional[float] = None,
         stop_condition: HWStopCondition = HWStopCondition.none,
         nodes_in_moves_only: bool = True,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> None:
         """Move to a position.
 
@@ -782,7 +783,7 @@ class OT3Simulator(FlexBackend):
                 next_fw_version=1,
                 fw_update_needed=False,
                 current_fw_sha="simulated",
-                pcba_revision="A1",
+                pcba_revision="A1.0",
                 update_state=None,
             )
             for axis in self._present_axes
@@ -849,6 +850,7 @@ class OT3Simulator(FlexBackend):
         max_allowed_grip_error: float,
         hard_limit_lower: float,
         hard_limit_upper: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         # This is a (pretty bad) simulation of the gripper actually gripping something,
         # but it should work.

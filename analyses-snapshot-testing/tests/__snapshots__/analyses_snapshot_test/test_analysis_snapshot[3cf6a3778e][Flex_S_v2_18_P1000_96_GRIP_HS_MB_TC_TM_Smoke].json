@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -14899,7 +14902,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetBlockTemperature": 60.0
+        "targetBlockTemperature": 60.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -14930,7 +14934,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetLidTemperature": 80.0
+        "targetLidTemperature": 80.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -15018,7 +15023,9 @@
         "celsius": 50.0,
         "moduleId": "UUID"
       },
-      "result": {},
+      "result": {
+        "taskId": "UUID"
+      },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
     },
@@ -15093,7 +15100,8 @@
         "moduleId": "UUID"
       },
       "result": {
-        "targetTemperature": 50.0
+        "targetTemperature": 50.0,
+        "taskId": "UUID"
       },
       "startedAt": "TIMESTAMP",
       "status": "succeeded"
@@ -15827,7 +15835,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -15878,7 +15886,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -15943,13 +15951,13 @@
       "definitionUri": "opentrons/nest_1_reservoir_290ml/1",
       "id": "UUID",
       "loadName": "nest_1_reservoir_290ml",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2",
       "id": "UUID",
       "loadName": "nest_96_wellplate_100ul_pcr_full_skirt",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_adapter/1",

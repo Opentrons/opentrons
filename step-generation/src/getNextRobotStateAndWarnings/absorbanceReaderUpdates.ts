@@ -63,12 +63,8 @@ export const forAbsorbanceReaderInitialize = (
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
   const { robotState } = robotStateAndWarnings
-  const {
-    moduleId,
-    measureMode,
-    sampleWavelengths,
-    referenceWavelength,
-  } = params
+  const { moduleId, measureMode, sampleWavelengths, referenceWavelength } =
+    params
 
   const moduleState = _getAbsorbanceReaderState(robotState, moduleId)
   if (moduleState != null) {

@@ -1,4 +1,5 @@
 """Command models to set and wait for a shake speed for a Heater-Shaker Module."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type
@@ -7,6 +8,8 @@ from pydantic import BaseModel, Field
 from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...state import update_types
+
+from .common import get_heatershaker_ready_to_shake
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView
@@ -64,10 +67,9 @@ class SetAndWaitForShakeSpeedImpl(
             module_id=params.moduleId
         )
 
-        hs_module_substate.raise_if_labware_latch_not_closed()
-
-        # Verify speed from hs module view
-        validated_speed = hs_module_substate.validate_target_speed(params.rpm)
+        validated_speed = await get_heatershaker_ready_to_shake(
+            hs_module_substate, params.rpm
+        )
 
         pipette_should_retract = (
             self._state_view.motion.check_pipette_blocking_hs_shaker(

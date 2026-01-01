@@ -5,16 +5,21 @@ import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
 import {
-  ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
-  MAGNETIC_BLOCK_TYPE,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { TEMPERATURE_DEACTIVATED } from '@opentrons/step-generation'
+import { MODULE_INITIAL_STATE_BY_TYPE as STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE } from '@opentrons/step-generation'
+
+import { getStepVisibilities } from '/protocol-designer/steplist/utils/getStepVisibilities'
+import {
+  convertStepArrayToHierarchy,
+  convertStepHierarchyToArray,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import * as featureFlagSelectors from '../../feature-flags/selectors'
@@ -31,22 +36,30 @@ import { denormalizePipetteEntities, getHydratedForm } from '../utils'
 
 import type { Selector } from 'reselect'
 import type { DropdownOption, Mount } from '@opentrons/components'
-import type { LabwareDefinition2, PipetteName } from '@opentrons/shared-data'
+import type {
+  LabwareDefinition2,
+  ModuleType,
+  PipetteName,
+} from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
+  FlexStackerModuleState,
   GripperEntities,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
   LiquidEntities,
   ModuleEntities,
+  ModuleTemporalProperties,
   NormalizedAdditionalEquipmentById,
   PipetteEntities,
   StagingAreaEntities,
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
+import type { BonusStepModalType } from '/protocol-designer/components/organisms'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   FormData,
   HydratedFormData,
@@ -70,20 +83,14 @@ import type {
   SavedStepFormState,
 } from '../reducers'
 import type {
-  AbsorbanceReaderState,
   FormPipettesByMount,
-  HeaterShakerModuleState,
   InitialDeckSetup,
   LabwareOnDeck,
-  MagneticBlockState,
-  MagneticModuleState,
   ModuleOnDeck,
   ModulesForEditModulesCard,
   NormalizedLabware,
   NormalizedLabwareById,
   PipetteOnDeck,
-  TemperatureModuleState,
-  ThermocyclerModuleState,
 } from '../types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
@@ -96,35 +103,27 @@ const _getInitialDeckSetupStepFormRootState: (
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
-export const getCurrentFormIsPresaved: Selector<
-  BaseState,
-  boolean
-> = createSelector(
-  getPresavedStepForm,
-  presavedStepForm => presavedStepForm != null
-)
+export const getCurrentFormIsPresaved: Selector<BaseState, boolean> =
+  createSelector(
+    getPresavedStepForm,
+    presavedStepForm => presavedStepForm != null
+  )
 
-const _getNormalizedLiquidById: Selector<
-  BaseState,
-  LiquidEntities
-> = createSelector(labwareIngredRootSelector, state => state.ingredients)
+const _getNormalizedLiquidById: Selector<BaseState, LiquidEntities> =
+  createSelector(labwareIngredRootSelector, state => state.ingredients)
 
-export const getLiquidEntities: Selector<
-  BaseState,
-  LiquidEntities
-> = createSelector(
-  _getNormalizedLiquidById,
-  normalizedLiquidById => normalizedLiquidById
-)
+export const getLiquidEntities: Selector<BaseState, LiquidEntities> =
+  createSelector(
+    _getNormalizedLiquidById,
+    normalizedLiquidById => normalizedLiquidById
+  )
 
 // NOTE Ian 2019-04-15: outside of this file, you probably only care about
 // the labware entity in its denormalized representation, in which case you ought
 // to use `getLabwareEntities` instead.
 // `_getNormalizedLabwareById` is intended for uses tied to the NormalizedLabware type
-const _getNormalizedLabwareById: Selector<
-  BaseState,
-  NormalizedLabwareById
-> = createSelector(rootSelector, state => state.labwareInvariantProperties)
+const _getNormalizedLabwareById: Selector<BaseState, NormalizedLabwareById> =
+  createSelector(rootSelector, state => state.labwareInvariantProperties)
 
 function _hydrateLabwareEntity(
   l: NormalizedLabware,
@@ -139,17 +138,15 @@ function _hydrateLabwareEntity(
   return { ...l, id: labwareId, def }
 }
 
-export const getLabwareEntities: Selector<
-  BaseState,
-  LabwareEntities
-> = createSelector(
-  _getNormalizedLabwareById,
-  labwareDefSelectors.getLabwareDefsByURI,
-  (normalizedLabwareById, labwareDefs) =>
-    mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
-      _hydrateLabwareEntity(l, id, labwareDefs)
-    )
-)
+export const getLabwareEntities: Selector<BaseState, LabwareEntities> =
+  createSelector(
+    _getNormalizedLabwareById,
+    labwareDefSelectors.getLabwareDefsByURI,
+    (normalizedLabwareById, labwareDefs) =>
+      mapValues(normalizedLabwareById, (l: NormalizedLabware, id: string) =>
+        _hydrateLabwareEntity(l, id, labwareDefs)
+      )
+  )
 // Special version of `getLabwareEntities` selector for use in step-forms reducers
 export const _getLabwareEntitiesRootState: (
   arg0: RootState
@@ -165,24 +162,21 @@ export const _getLabwareEntitiesRootState: (
 export const _getModuleEntitiesRootState: (
   arg: RootState
 ) => ModuleEntities = rs => rs.moduleInvariantProperties
-export const getModuleEntities: Selector<
-  BaseState,
-  ModuleEntities
-> = createSelector(rootSelector, _getModuleEntitiesRootState)
+export const getModuleEntities: Selector<BaseState, ModuleEntities> =
+  createSelector(rootSelector, _getModuleEntitiesRootState)
 // Special version of `getPipetteEntities` selector for use in step-forms reducers
-export const _getPipetteEntitiesRootState: (
-  arg: RootState
-) => PipetteEntities = createSelector(
-  rs => rs.pipetteInvariantProperties,
-  labwareDefSelectors._getLabwareDefsByIdRootState,
-  _getInitialDeckSetupStepFormRootState,
-  (pipetteInvariantProperties, labwareDefs, initialDeckSetupStepForm) =>
-    denormalizePipetteEntities(
-      pipetteInvariantProperties,
-      labwareDefs,
-      initialDeckSetupStepForm.pipetteLocationUpdate as Record<string, string>
-    )
-)
+export const _getPipetteEntitiesRootState: (arg: RootState) => PipetteEntities =
+  createSelector(
+    rs => rs.pipetteInvariantProperties,
+    labwareDefSelectors._getLabwareDefsByIdRootState,
+    _getInitialDeckSetupStepFormRootState,
+    (pipetteInvariantProperties, labwareDefs, initialDeckSetupStepForm) =>
+      denormalizePipetteEntities(
+        pipetteInvariantProperties,
+        labwareDefs,
+        initialDeckSetupStepForm.pipetteLocationUpdate as Record<string, string>
+      )
+  )
 
 // Special version of `getAdditionalEquipmentEntities` selector for use in step-forms reducers
 export const _getAdditionalEquipmentEntitiesRootState: (
@@ -194,10 +188,8 @@ export const getAdditionalEquipmentEntities: Selector<
   AdditionalEquipmentEntities
 > = createSelector(rootSelector, _getAdditionalEquipmentEntitiesRootState)
 
-export const getPipetteEntities: Selector<
-  BaseState,
-  PipetteEntities
-> = createSelector(rootSelector, _getPipetteEntitiesRootState)
+export const getPipetteEntities: Selector<BaseState, PipetteEntities> =
+  createSelector(rootSelector, _getPipetteEntitiesRootState)
 
 export const _getAdditionalEquipmentRootState: (
   arg: RootState
@@ -209,39 +201,25 @@ export const getAdditionalEquipment: Selector<
   NormalizedAdditionalEquipmentById
 > = createSelector(rootSelector, _getAdditionalEquipmentRootState)
 
-export const getInitialDeckSetupStepForm: Selector<
-  BaseState,
-  FormData
-> = createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
-const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
-  type: MAGNETIC_MODULE_TYPE,
-  engaged: false,
+export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
+  createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
+
+// todo(mm, 2025-12-12): Temporarily defining FLEX_STACKER_INITIAL_STATE here until step-generation supports it.
+const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
+  type: FLEX_STACKER_MODULE_TYPE,
+  storedLabwareDetails: null,
+  labwareInHopper: null,
+  labwareOnShuttle: null,
 }
-const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
-  type: TEMPERATURE_MODULE_TYPE,
-  status: TEMPERATURE_DEACTIVATED,
-  targetTemperature: null,
-}
-const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
-  type: THERMOCYCLER_MODULE_TYPE,
-  blockTargetTemp: null,
-  lidTargetTemp: null,
-  lidOpen: null,
-}
-const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
-  type: HEATERSHAKER_MODULE_TYPE,
-  targetTemp: null,
-  targetSpeed: null,
-  latchOpen: null,
-}
-const MAGNETIC_BLOCK_INITIAL_STATE: MagneticBlockState = {
-  type: MAGNETIC_BLOCK_TYPE,
-}
-const ABSORBANCE_READER_INITIAL_STATE: AbsorbanceReaderState = {
-  type: ABSORBANCE_READER_TYPE,
-  lidOpen: null,
-  initialization: null,
-}
+
+const MODULE_INITIAL_STATES_MAP = {
+  ...STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE,
+  [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_INITIAL_STATE,
+} as const
+MODULE_INITIAL_STATES_MAP satisfies Record<
+  ModuleType,
+  ModuleTemporalProperties['moduleState']
+>
 
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
@@ -281,7 +259,8 @@ const _getInitialDeckSetup = (
           stack: getLocationStackTopToBottom(
             labwareId,
             labwareLocations,
-            moduleLocations
+            moduleLocations,
+            moduleEntities
           ),
           ...labwareEntities[labwareId],
         }
@@ -289,65 +268,26 @@ const _getInitialDeckSetup = (
     ),
     modules: mapValues<Record<DeckSlot, string>, ModuleOnDeck>(
       moduleLocations as Record<DeckSlot, string>,
-      // @ts-expect-error Flex stacker not yet supported in PD
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
         const moduleEntity = moduleEntities[moduleId]
+        const { id, model, type, pythonName } = moduleEntity
+        const baseModuleState = MODULE_INITIAL_STATES_MAP[type]
+        const moduleStateUpdate =
+          (initialSetupStep && initialSetupStep.moduleStateUpdate) || {}
+        const updatedModuleState = moduleStateUpdate[moduleId]
+        const moduleState = updatedModuleState || baseModuleState
 
-        switch (moduleEntity.type) {
-          case MAGNETIC_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: MAGNETIC_MODULE_TYPE,
-              slot,
-              moduleState: MAGNETIC_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case TEMPERATURE_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: TEMPERATURE_MODULE_TYPE,
-              slot,
-              moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case THERMOCYCLER_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: THERMOCYCLER_MODULE_TYPE,
-              slot,
-              moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case HEATERSHAKER_MODULE_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: HEATERSHAKER_MODULE_TYPE,
-              slot,
-              moduleState: HEATERSHAKER_MODULE_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case MAGNETIC_BLOCK_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: MAGNETIC_BLOCK_TYPE,
-              slot,
-              moduleState: MAGNETIC_BLOCK_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
-          case ABSORBANCE_READER_TYPE:
-            return {
-              id: moduleEntity.id,
-              model: moduleEntity.model,
-              type: ABSORBANCE_READER_TYPE,
-              slot,
-              moduleState: ABSORBANCE_READER_INITIAL_STATE,
-              pythonName: moduleEntity.pythonName,
-            }
+        if (moduleState == null) {
+          console.error(`Unknown module type: ${type}`)
+        }
+
+        return {
+          id,
+          model,
+          type,
+          slot,
+          moduleState,
+          pythonName,
         }
       }
     ),
@@ -361,17 +301,15 @@ const _getInitialDeckSetup = (
   }
 }
 
-export const getInitialDeckSetup: Selector<
-  BaseState,
-  InitialDeckSetup
-> = createSelector(
-  getInitialDeckSetupStepForm,
-  getLabwareEntities,
-  getPipetteEntities,
-  getModuleEntities,
-  getAdditionalEquipment,
-  _getInitialDeckSetup
-)
+export const getInitialDeckSetup: Selector<BaseState, InitialDeckSetup> =
+  createSelector(
+    getInitialDeckSetupStepForm,
+    getLabwareEntities,
+    getPipetteEntities,
+    getModuleEntities,
+    getAdditionalEquipment,
+    _getInitialDeckSetup
+  )
 // Special version of `getLabwareEntities` selector for use in step-forms reducers
 export const _getInitialDeckSetupRootState: (
   arg0: RootState
@@ -383,18 +321,16 @@ export const _getInitialDeckSetupRootState: (
   _getAdditionalEquipmentRootState,
   _getInitialDeckSetup
 )
-export const getPermittedTipracks: Selector<
-  BaseState,
-  string[]
-> = createSelector(getInitialDeckSetup, initialDeckSetup =>
-  reduce(
-    initialDeckSetup.pipettes,
-    (acc: string[], pipette: PipetteOnDeck) => {
-      return pipette.tiprackDefURI ? [...acc, ...pipette.tiprackDefURI] : acc
-    },
-    []
+export const getPermittedTipracks: Selector<BaseState, string[]> =
+  createSelector(getInitialDeckSetup, initialDeckSetup =>
+    reduce(
+      initialDeckSetup.pipettes,
+      (acc: string[], pipette: PipetteOnDeck) => {
+        return pipette.tiprackDefURI ? [...acc, ...pipette.tiprackDefURI] : acc
+      },
+      []
+    )
   )
-)
 
 function _getPipetteDisplayName(name: PipetteName): string {
   const pipetteSpecs = getPipetteSpecsV2(name)
@@ -411,32 +347,29 @@ function _getPipettesSame(
   return pipettes[0]?.name === pipettes[1]?.name
 }
 
-// TODO: Ian 2018-12-20 EVENTUALLY make this `getEquippedPipetteOptionsForStepId`, so it tells you
-// equipped pipettes per step id instead of always using initial deck setup
-// (for when we support multiple deck setup steps)
-export const getEquippedPipetteOptions: Selector<
-  BaseState,
-  DropdownOption[]
-> = createSelector(getInitialDeckSetup, initialDeckSetup => {
-  const pipettes = initialDeckSetup.pipettes
+export const getEquippedPipetteOptions = createSelector(
+  getInitialDeckSetup,
+  (initialDeckSetup): DropdownOption[] => {
+    const pipettes = initialDeckSetup.pipettes
 
-  const pipettesSame = _getPipettesSame(pipettes)
+    const pipettesSame = _getPipettesSame(pipettes)
 
-  return reduce(
-    pipettes,
-    (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
-      const mountLabel = pipette.mount === 'left' ? '(L)' : '(R)'
-      const nextOption = {
-        name: pipettesSame
-          ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
-          : _getPipetteDisplayName(pipette.name),
-        value: id,
-      }
-      return [...acc, nextOption]
-    },
-    []
-  )
-})
+    return reduce(
+      pipettes,
+      (acc: DropdownOption[], pipette: PipetteOnDeck, id: string) => {
+        const mountLabel = pipette.mount === 'left' ? '(L)' : '(R)'
+        const nextOption = {
+          name: pipettesSame
+            ? `${_getPipetteDisplayName(pipette.name)} ${mountLabel}`
+            : _getPipetteDisplayName(pipette.name),
+          value: id,
+        }
+        return [...acc, nextOption]
+      },
+      []
+    )
+  }
+)
 export const getPipettesForEditPipetteForm: Selector<
   BaseState,
   FormPipettesByMount
@@ -489,83 +422,129 @@ export const getModulesForEditModulesCard: Selector<
     }
   )
 )
-export const getUnsavedGroup: Selector<
-  BaseState,
-  StepIdType[]
-> = createSelector(rootSelector, state => state.unsavedGroup)
+export const getUnsavedGroup: Selector<BaseState, StepIdType[]> =
+  createSelector(rootSelector, state => state.unsavedGroup)
 export const getStepGroups: Selector<
   BaseState,
   Record<string, StepIdType[]>
 > = createSelector(rootSelector, state => state.stepGroups)
 
-export const getUnsavedForm: Selector<
-  BaseState,
-  FormData | null | undefined
-> = createSelector(rootSelector, state => state.unsavedForm)
-export const getOrderedStepIds: Selector<
-  BaseState,
-  StepIdType[]
-> = createSelector(rootSelector, state => state.orderedStepIds)
-export const getSavedStepForms: Selector<
-  BaseState,
-  SavedStepFormState
-> = createSelector(rootSelector, state => state.savedStepForms)
-const getOrderedSavedForms: Selector<BaseState, FormData[]> = createSelector(
-  getOrderedStepIds,
-  getSavedStepForms,
-  (orderedStepIds, savedStepForms) => {
-    return orderedStepIds
-      .map(stepId => savedStepForms[stepId])
-      .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
-  }
-)
-export const getCurrentFormHasUnsavedChanges: Selector<
-  BaseState,
-  boolean
-> = createSelector(
-  getUnsavedForm,
-  getSavedStepForms,
-  (unsavedForm, savedStepForms) => {
-    const id = unsavedForm?.id
-    const savedForm = id != null ? savedStepForms[id] : null
+export const getUnsavedForm: Selector<BaseState, FormData | null | undefined> =
+  createSelector(rootSelector, state => state.unsavedForm)
 
-    if (savedForm == null) {
-      // nonexistent = no unsaved changes
-      return false
+export const getOrderedStepIds: Selector<BaseState, StepIdType[]> =
+  createSelector(rootSelector, state => state.orderedStepIds)
+
+export const getSavedStepForms: Selector<BaseState, SavedStepFormState> =
+  createSelector(rootSelector, state => state.savedStepForms)
+
+export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
+  createSelector(
+    getOrderedStepIds,
+    getSavedStepForms,
+    (orderedStepIds, savedStepForms) => {
+      return orderedStepIds
+        .map(stepId => savedStepForms[stepId])
+        .filter(form => form && form.id != null) // NOTE: for old protocols where stepId could === 0, need to do != null here
+    }
+  )
+
+export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
+  createSelector(
+    getOrderedSavedForms,
+    featureFlagSelectors.getEnableConcurrentModuleActions,
+    (orderedSavedForms, enableConcurrentModuleActions) => {
+      return convertStepArrayToHierarchy(
+        orderedSavedForms,
+        enableConcurrentModuleActions
+      )
+    }
+  )
+
+/**
+ * A mapping from step IDs to the step's user-visible index in the timeline.
+ * This is more complicated than just .indexOf() because some steps are hidden and
+ * shouldn't be counted (see `StepHierarchy`).
+ *
+ * Hidden steps get a step number of `null`.
+ */
+export const getUserVisibleStepNumbers = createSelector(
+  getSavedStepHierarchy,
+  (stepHierarchy): Record<StepIdType, number | null> => {
+    const visibilities = getStepVisibilities(stepHierarchy)
+    const allStepIdsAsFlatArray = convertStepHierarchyToArray(stepHierarchy)
+
+    const result: Record<StepIdType, number | null> = {}
+    let nextStepNumber = 1
+    for (const stepId of allStepIdsAsFlatArray) {
+      result[stepId] = visibilities[stepId].isVisibleToUser
+        ? nextStepNumber++
+        : null
     }
 
-    return !isEqual(unsavedForm, savedForm)
+    return result
   }
 )
-export const getCurrentFormUnsavedChangedFields: Selector<
-  BaseState,
-  string[]
-> = createSelector(
-  getUnsavedForm,
-  getSavedStepForms,
-  (unsavedForm, savedStepForms) => {
-    const id = unsavedForm?.id
-    const savedForm = id != null ? savedStepForms[id] : null
 
-    if (savedForm == null || unsavedForm == null) {
-      // nonexistent = no unsaved changes
-      return []
-    }
-    const fields = Object.keys(savedForm)
-    return fields.reduce<string[]>((acc, field) => {
-      return savedForm[field] !== unsavedForm[field] ? [...acc, field] : acc
-    }, [])
+/** If a step is added to the end of the timeline, it will have this number. */
+export const getNextUserVisibleStepNumber = createSelector(
+  getUserVisibleStepNumbers,
+  (userVisibleStepNumbers): number => {
+    const isNonNull = (stepNumber: number | null): stepNumber is number =>
+      stepNumber !== null
+    const stepNumbers = Object.values(userVisibleStepNumbers)
+    return (
+      Math.max(
+        0, // In case there are no steps yet.
+        ...stepNumbers.filter(isNonNull)
+      ) + 1
+    )
   }
 )
+
+export const getCurrentFormHasUnsavedChanges: Selector<BaseState, boolean> =
+  createSelector(
+    getUnsavedForm,
+    getSavedStepForms,
+    (unsavedForm, savedStepForms) => {
+      const id = unsavedForm?.id
+      const savedForm = id != null ? savedStepForms[id] : null
+
+      if (savedForm == null) {
+        // nonexistent = no unsaved changes
+        return false
+      }
+
+      return !isEqual(unsavedForm, savedForm)
+    }
+  )
+export const getCurrentFormUnsavedChangedFields: Selector<BaseState, string[]> =
+  createSelector(
+    getUnsavedForm,
+    getSavedStepForms,
+    (unsavedForm, savedStepForms) => {
+      const id = unsavedForm?.id
+      const savedForm = id != null ? savedStepForms[id] : null
+
+      if (savedForm == null || unsavedForm == null) {
+        // nonexistent = no unsaved changes
+        return []
+      }
+      const fields = Object.keys(savedForm)
+      return fields.reduce<string[]>((acc, field) => {
+        return savedForm[field] !== unsavedForm[field] ? [...acc, field] : acc
+      }, [])
+    }
+  )
 
 export const getBatchEditFieldChanges: Selector<
   BaseState,
   BatchEditFormChangesState
 > = createSelector(rootSelector, state => state.batchEditFormChanges)
-export const getBatchEditFormHasUnsavedChanges: Selector<
-  BaseState,
-  boolean
-> = createSelector(getBatchEditFieldChanges, changes => !isEmpty(changes))
+export const getBatchEditFormHasUnsavedChanges = createSelector(
+  getBatchEditFieldChanges,
+  (changes): boolean => !isEmpty(changes)
+)
 
 const _formLevelErrors = (
   hydratedForm: HydratedFormData,
@@ -628,38 +607,38 @@ export const _formHasErrors = (
 ): boolean => {
   return _hasFormLevelErrors(hydratedForm, invariantContext)
 }
-export const getInvariantContext: Selector<
-  BaseState,
-  InvariantContext
-> = createSelector(
-  getLabwareEntities,
-  getModuleEntities,
-  getPipetteEntities,
-  getLiquidEntities,
-  getAdditionalEquipmentEntities,
-  featureFlagSelectors.getDisableModuleRestrictions,
-  featureFlagSelectors.getAllowAllTipracks,
-  (
-    labwareEntities,
-    moduleEntities,
-    pipetteEntities,
-    liquidEntities,
-    additionalEquipmentEntities,
-    disableModuleRestrictions,
-    allowAllTipracks
-  ) => {
-    const stagingAreaEntities = Object.values(
-      additionalEquipmentEntities
-    ).reduce((acc: StagingAreaEntities, entity: AdditionalEquipmentEntity) => {
-      if (entity.name === 'stagingArea') {
-        acc[entity.id] = { id: entity.id, location: entity.location }
-        return acc
-      } else {
-        return acc
-      }
-    }, {})
-    const trashBinEntities = Object.values(additionalEquipmentEntities).reduce(
-      (acc: TrashBinEntities, entity: AdditionalEquipmentEntity) => {
+export const getInvariantContext: Selector<BaseState, InvariantContext> =
+  createSelector(
+    getLabwareEntities,
+    getModuleEntities,
+    getPipetteEntities,
+    getLiquidEntities,
+    getAdditionalEquipmentEntities,
+    featureFlagSelectors.getDisableModuleRestrictions,
+    (
+      labwareEntities,
+      moduleEntities,
+      pipetteEntities,
+      liquidEntities,
+      additionalEquipmentEntities,
+      disableModuleRestrictions
+    ) => {
+      const stagingAreaEntities = Object.values(
+        additionalEquipmentEntities
+      ).reduce(
+        (acc: StagingAreaEntities, entity: AdditionalEquipmentEntity) => {
+          if (entity.name === 'stagingArea') {
+            acc[entity.id] = { id: entity.id, location: entity.location }
+            return acc
+          } else {
+            return acc
+          }
+        },
+        {}
+      )
+      const trashBinEntities = Object.values(
+        additionalEquipmentEntities
+      ).reduce((acc: TrashBinEntities, entity: AdditionalEquipmentEntity) => {
         if (entity.name === 'trashBin' && entity.pythonName != null) {
           acc[entity.id] = {
             id: entity.id,
@@ -670,64 +649,64 @@ export const getInvariantContext: Selector<
         } else {
           return acc
         }
-      },
-      {}
-    )
-    const wasteChuteEntities = Object.values(
-      additionalEquipmentEntities
-    ).reduce((acc: WasteChuteEntities, entity: AdditionalEquipmentEntity) => {
-      if (entity.name === 'wasteChute' && entity.pythonName != null) {
-        acc[entity.id] = {
-          id: entity.id,
-          pythonName: entity.pythonName,
-          location: entity.location,
-        }
-        return acc
-      } else {
-        return acc
-      }
-    }, {})
-    const gripperEntities = Object.values(additionalEquipmentEntities).reduce(
-      (acc: GripperEntities, entity: AdditionalEquipmentEntity) => {
-        if (entity.name === 'gripper') {
+      }, {})
+      const wasteChuteEntities = Object.values(
+        additionalEquipmentEntities
+      ).reduce((acc: WasteChuteEntities, entity: AdditionalEquipmentEntity) => {
+        if (entity.name === 'wasteChute' && entity.pythonName != null) {
           acc[entity.id] = {
             id: entity.id,
+            pythonName: entity.pythonName,
+            location: entity.location,
           }
           return acc
         } else {
           return acc
         }
-      },
-      {}
-    )
+      }, {})
+      const gripperEntities = Object.values(additionalEquipmentEntities).reduce(
+        (acc: GripperEntities, entity: AdditionalEquipmentEntity) => {
+          if (entity.name === 'gripper') {
+            acc[entity.id] = {
+              id: entity.id,
+            }
+            return acc
+          } else {
+            return acc
+          }
+        },
+        {}
+      )
 
-    return {
-      labwareEntities,
-      moduleEntities,
-      pipetteEntities,
-      liquidEntities,
-      trashBinEntities,
-      wasteChuteEntities,
-      stagingAreaEntities,
-      gripperEntities,
-      config: {
-        OT_PD_ALLOW_ALL_TIPRACKS: Boolean(allowAllTipracks),
-        OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
-      },
+      return {
+        labwareEntities,
+        moduleEntities,
+        pipetteEntities,
+        liquidEntities,
+        trashBinEntities,
+        wasteChuteEntities,
+        stagingAreaEntities,
+        gripperEntities,
+        config: {
+          OT_PD_DISABLE_MODULE_RESTRICTIONS: Boolean(disableModuleRestrictions),
+        },
+      }
     }
-  }
-)
+  )
 export const getHydratedUnsavedForm: Selector<
   BaseState,
   HydratedFormData | null
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
-  (unsavedForm, invariantContext) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (unsavedForm, invariantContext, allLabwareDefs) => {
     if (unsavedForm == null) return null
-
-    const hydratedForm = getHydratedForm(unsavedForm, invariantContext)
-
+    const hydratedForm = getHydratedForm(
+      unsavedForm,
+      invariantContext,
+      allLabwareDefs
+    )
     return hydratedForm ?? null
   }
 )
@@ -766,35 +745,44 @@ export const getFormLevelErrorsForUnsavedForm: Selector<
     return errors
   }
 )
-export const getCurrentFormCanBeSaved: Selector<
-  BaseState,
-  boolean
-> = createSelector(
-  getHydratedUnsavedForm,
-  getInvariantContext,
-  (hydratedForm, invariantContext) => {
-    if (!hydratedForm) return false
-    return !_formHasErrors(hydratedForm, invariantContext)
-  }
-)
+export const getCurrentFormCanBeSaved: Selector<BaseState, boolean> =
+  createSelector(
+    getHydratedUnsavedForm,
+    getInvariantContext,
+    (hydratedForm, invariantContext) => {
+      if (!hydratedForm) return false
+      return !_formHasErrors(hydratedForm, invariantContext)
+    }
+  )
 export const getArgsAndErrorsByStepId: Selector<
   BaseState,
   StepArgsAndErrorsById
 > = createSelector(
   getOrderedSavedForms,
   getInvariantContext,
-  (stepForms, contextualState) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  featureFlagSelectors.getEnableConcurrentModuleActions,
+  (
+    stepForms,
+    contextualState,
+    allLabwareDefs,
+    enableConcurrentModuleActions
+  ) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
-        const hydratedForm = getHydratedForm(stepForm, contextualState)
-
+        const hydratedForm = getHydratedForm(
+          stepForm,
+          contextualState,
+          allLabwareDefs
+        )
         const errors = _formHasErrors(hydratedForm, contextualState)
         const nextStepData = !errors
           ? {
               stepArgs: stepFormToArgs(
                 { ...hydratedForm, stepNumber: index + 1 },
-                contextualState
+                contextualState,
+                enableConcurrentModuleActions
               ),
             }
           : {
@@ -807,60 +795,87 @@ export const getArgsAndErrorsByStepId: Selector<
     )
   }
 )
-export const getUnsavedFormIsPristineSetTempForm: Selector<
-  BaseState,
-  boolean
-> = createSelector(
+
+export const getBonusStepModalType = createSelector(
   getUnsavedForm,
   getCurrentFormIsPresaved,
-  (unsavedForm, isPresaved) => {
-    const isSetTempForm =
+  featureFlagSelectors.getEnableConcurrentModuleActions,
+  (
+    unsavedForm,
+    currentFormIsPresaved,
+    enableConcurrentModuleActions
+  ): BonusStepModalType | null => {
+    // NOTE: This logic to decide whether a bonus step is warranted should be kept in
+    // sync with saveStepForm().
+
+    const isTempModSetTempForm =
       unsavedForm?.stepType === 'temperature' &&
       unsavedForm?.targetTemperature != null
-    return isPresaved && isSetTempForm
-  }
-)
-
-export const getUnsavedFormIsPristineHeaterShakerForm: Selector<
-  BaseState,
-  boolean
-> = createSelector(
-  getUnsavedForm,
-  getCurrentFormIsPresaved,
-  (unsavedForm, isPresaved) => {
-    const isSetHsTempForm =
+    const isHSSetTempForm =
       unsavedForm?.stepType === 'heaterShaker' &&
-      unsavedForm?.targetHeaterShakerTemperature != null
+      unsavedForm?.targetHeaterShakerTemperature != null &&
+      unsavedForm?.heaterShakerSetTimer !== true
+    const isTCProfileForm =
+      unsavedForm?.stepType === 'thermocycler' &&
+      unsavedForm?.thermocyclerFormType === 'thermocyclerProfile'
 
-    return isPresaved && isSetHsTempForm
+    const isFirstTimeSavingThisForm = currentFormIsPresaved
+
+    // todo(mm, 2025-11-24): These should also be conditional on "Don't show again"
+    // not having been clicked before. https://opentrons.atlassian.net/browse/EXEC-1925
+    if (isTempModSetTempForm && isFirstTimeSavingThisForm) {
+      return enableConcurrentModuleActions
+        ? 'explainWaitForTemperatureModuleTemp'
+        : 'optionallyWaitForTemp'
+    } else if (isHSSetTempForm && isFirstTimeSavingThisForm) {
+      return enableConcurrentModuleActions
+        ? 'explainWaitForHeaterShakerTemp'
+        : 'optionallyWaitForTemp'
+    } else if (
+      enableConcurrentModuleActions &&
+      isTCProfileForm &&
+      isFirstTimeSavingThisForm
+    ) {
+      return 'explainWaitForThermocyclerProfile'
+    } else {
+      return null
+    }
   }
 )
+
 export const getFormLevelWarningsForUnsavedForm: Selector<
   BaseState,
   FormWarning[]
 > = createSelector(
   getUnsavedForm,
   getInvariantContext,
-  (unsavedForm, contextualState) => {
+  labwareDefSelectors.getLabwareDefsByURI,
+  (unsavedForm, contextualState, allLabwareDefs) => {
     if (!unsavedForm) return []
-
-    const hydratedForm = getHydratedForm(unsavedForm, contextualState)
-
+    const hydratedForm = getHydratedForm(
+      unsavedForm,
+      contextualState,
+      allLabwareDefs
+    )
     return getFormWarnings(unsavedForm.stepType, hydratedForm)
   }
 )
+
 export const getFormLevelWarningsPerStep: Selector<
   BaseState,
   Record<string, FormWarning[]>
 > = createSelector(
   getSavedStepForms,
   getInvariantContext,
-  (forms, contextualState) =>
+  labwareDefSelectors.getLabwareDefsByURI,
+  (forms, contextualState, allLabwareDefs) =>
     mapValues(forms, (form, stepId) => {
       if (!form) return []
-
-      const hydratedForm = getHydratedForm(form, contextualState)
-
+      const hydratedForm = getHydratedForm(
+        form,
+        contextualState,
+        allLabwareDefs
+      )
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )

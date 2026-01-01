@@ -39,9 +39,8 @@ export function Troubleshooting({
   const robot = useRobot(robotName)
   const controlDisabled = robot?.status !== CONNECTABLE
   const logsAvailable = robot?.health?.logs != null
-  const [isDownloadingRobotLogs, setIsDownloadingRobotLogs] = useState<boolean>(
-    false
-  )
+  const [isDownloadingRobotLogs, setIsDownloadingRobotLogs] =
+    useState<boolean>(false)
   const { makeToast, eatToast } = useToaster()
   const toastIcon: IconProps = { name: 'ot-spinner', spin: true }
 
@@ -111,14 +110,14 @@ export function Troubleshooting({
     >
       <Box width="70%">
         <LegacyStyledText
-          as="h3"
+          forwardedAs="h3"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           marginBottom={SPACING.spacing20}
         >
           {t('troubleshooting')}
         </LegacyStyledText>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           data-testid="RobotSettings_Troubleshooting"
         >

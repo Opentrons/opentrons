@@ -5,7 +5,6 @@ import {
   RetryStepInfo,
   StackerEmptyHopper,
   StackerEnsureShuttleEmpty,
-  StackerHomeShuttle,
   StackerHopperLwInfo,
   StackerReengageLatch,
 } from '../shared'
@@ -23,8 +22,6 @@ export function StackerShuttleEmptyRetry(
   switch (step) {
     case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.EMPTY_STACKER:
       return <StackerEmptyHopper {...props} />
-    case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.PREPARE_TRACK_FOR_HOMING:
-      return <StackerHomeShuttle {...props} />
     case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.CONFIRM_LABWARE_IN_LATCH:
       return <HoldingLabware {...props} />
     case STACKER_SHUTTLE_EMPTY_RETRY.STEPS.RELEASE_FROM_LATCH:

@@ -11,18 +11,40 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 export default defineConfig({
   build: {
-    // Relative to the root
-    ssr: 'src/index.ts',
+    lib: {
+      entry: 'src/index.ts',
+      formats: ['es', 'cjs'],
+      fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
+    },
     outDir: 'lib',
     // Do not delete the outdir, typescript types might live there and we don't want to delete them
     emptyOutDir: false,
+    // Ensure CSS is extracted properly
+    cssCodeSplit: false,
     commonjsOptions: {
       transformMixedEsModules: true,
       esmExternals: true,
     },
     rollupOptions: {
-      // Only @opentrons/shared-data is external; step-generation will be bundled!
-      external: ['@opentrons/shared-data'],
+      // Externalize React runtime so consuming app supplies single instance
+      external: [
+        '@opentrons/shared-data',
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        'react-dom/client',
+      ],
+      output: {
+        // Ensure CSS is bundled and exported with stable names for consumers
+        assetFileNames: assetInfo => {
+          const assetNames = assetInfo.names ?? []
+          const representativeName = assetNames[0] ?? ''
+
+          return representativeName.endsWith('.css')
+            ? 'style.css'
+            : '[name].[ext]'
+        },
+      },
     },
   },
   plugins: [
@@ -41,10 +63,15 @@ export default defineConfig({
     },
   },
   css: {
+    modules: {
+      generateScopedName: '[local]',
+    },
     postcss: {
       plugins: [
         postCssImport({ root: 'src/' }),
-        postCssApply(),
+        // Remove legacy custom property set blocks so downstream plugins cannot emit invalid CSS
+        postCssApply({ preserve: false }),
+        // Process colors and other functions after apply
         postColorModFunction(),
         postCssPresetEnv({ stage: 0 }),
         lostCss(),
@@ -52,11 +79,16 @@ export default defineConfig({
     },
   },
   define: {
-    'process.env': process.env,
+    // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
+    _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
     global: 'globalThis',
   },
   resolve: {
     alias: {
+      // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
+      // files being processed with the wrong config (the config from the
+      // consuming project vs. the config from the source project).
+      // Can these be replaced with regular package.json dependencies?
       '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
       '@opentrons/components/styles': path.resolve(
         '../components/src/index.module.css'

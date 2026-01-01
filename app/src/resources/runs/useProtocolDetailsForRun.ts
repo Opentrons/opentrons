@@ -30,10 +30,8 @@ export function useProtocolDetailsForRun(
 ): ProtocolDetails {
   const { data: runRecord } = useNotifyRunQuery(runId, { staleTime: Infinity })
   const protocolId = runRecord?.data?.protocolId ?? null
-  const [
-    isPollingProtocolAnalyses,
-    setIsPollingProtocolAnalyses,
-  ] = useState<boolean>(true)
+  const [isPollingProtocolAnalyses, setIsPollingProtocolAnalyses] =
+    useState<boolean>(true)
 
   const { data: protocolRecord } = useProtocolQuery(protocolId, {
     staleTime: Infinity,
@@ -67,7 +65,7 @@ export function useProtocolDetailsForRun(
     robotType:
       protocolRecord?.data.robotType ??
       (mostRecentAnalysis?.status === 'completed'
-        ? mostRecentAnalysis?.robotType ?? FLEX_ROBOT_TYPE
+        ? (mostRecentAnalysis?.robotType ?? FLEX_ROBOT_TYPE)
         : FLEX_ROBOT_TYPE),
     isQuickTransfer: protocolRecord?.data.protocolKind === 'quick-transfer',
   }

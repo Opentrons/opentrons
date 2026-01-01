@@ -24,7 +24,8 @@ vi.mock('@opentrons/shared-data', async importOriginal => {
     getStacksWithLabware: vi.fn(),
   }
 })
-const protocolWithTC = (multiple_tipacks_with_tc as unknown) as CompletedProtocolAnalysis
+const protocolWithTC =
+  multiple_tipacks_with_tc as unknown as CompletedProtocolAnalysis
 
 const render = (props: ComponentProps<typeof SetupLabwareList>) => {
   return renderWithProviders(

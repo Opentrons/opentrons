@@ -25,9 +25,10 @@ class Migration8to9(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 8 to 9."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        with sql_engine_ctx(
-            dest_dir / DB_FILE
-        ) as engine, engine.begin() as transaction:
+        with (
+            sql_engine_ctx(dest_dir / DB_FILE) as engine,
+            engine.begin() as transaction,
+        ):
             schema_09.labware_offset_table.create(transaction)
             _import_labware_offsets_from_runs(transaction)
 
@@ -36,9 +37,8 @@ def _import_labware_offsets_from_runs(connection: sqlalchemy.engine.Connection) 
     """Seed the new labware_offset table with records scraped from existing runs."""
     raw_state_summaries = (
         connection.execute(
-            sqlalchemy.select(schema_09.run_table.c.state_summary).where(
-                schema_09.run_table.c.state_summary.is_not(None)
-            )
+            sqlalchemy.select(schema_09.run_table.c.state_summary)
+            .where(schema_09.run_table.c.state_summary.is_not(None))
             # Be careful to preserve order.
             # Offsets from newer runs should shadow offsets from older runs.
             .order_by(sqlite_rowid)

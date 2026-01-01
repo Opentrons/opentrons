@@ -11,6 +11,7 @@ from ..execution_manager import ExecutionManager
 from .types import (
     BundledFirmware,
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     UploadFunction,
     LiveData,
     ModuleType,
@@ -47,12 +48,13 @@ class AbstractModule(abc.ABC):
         port: str,
         usb_port: USBPort,
         hw_control_loop: asyncio.AbstractEventLoop,
-        execution_manager: Optional[ExecutionManager] = None,
-        poll_interval_seconds: Optional[float] = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
+        poll_interval_seconds: float | None = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "AbstractModule":
         """Modules should always be created using this factory.
 
@@ -65,8 +67,9 @@ class AbstractModule(abc.ABC):
         port: str,
         usb_port: USBPort,
         hw_control_loop: asyncio.AbstractEventLoop,
-        execution_manager: Optional[ExecutionManager] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ) -> None:
         self._port = port
         self._usb_port = usb_port
@@ -75,6 +78,7 @@ class AbstractModule(abc.ABC):
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
         self._disconnected_callback = disconnected_callback
         self._updating = False
+        self._error_callback = error_callback
 
     @staticmethod
     def sort_key(inst: "AbstractModule") -> int:
@@ -101,7 +105,11 @@ class AbstractModule(abc.ABC):
     def disconnected_callback(self) -> None:
         """Called from within the module object to signify the object is no longer connected"""
         if self._disconnected_callback is not None:
-            self._disconnected_callback(self.port, self.serial_number)
+            self._disconnected_callback(self.model(), self.port, self.serial_number)
+
+    def error_callback(self, exc: Exception) -> None:
+        """Called from within the module object when an asynchronous hardware error occurrs."""
+        self._error_callback(exc, self.model(), self.port, self.serial_number)
 
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """Get absolute path to bundled version of module fw if available."""

@@ -1,4 +1,5 @@
 """Functions for commanding motion limited by tool sensors."""
+
 import asyncio
 from contextlib import AsyncExitStack
 from functools import partial
@@ -516,6 +517,36 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
+
+
+async def touch_probe(
+    messenger: CanMessenger,
+    mover: NodeId,
+    distance: float,
+    speed: float,
+) -> MotorPositionStatus:
+    """Move the specified tool down until the probe triggers.
+
+    Moves down by the specified distance at the specified speed until the
+    probe triggers and returns the position afterward.
+
+    The direction is sgn(distance)*sgn(speed), so you can set the direction
+    either by negating speed or negating distance.
+    """
+    movers = [mover]
+    sensor_group = _build_pass_step(
+        movers=movers,
+        distance={mover: distance},
+        speed={mover: speed},
+        sensor_type=SensorType.UNUSED,
+        sensor_id=SensorId.UNUSED,
+        stop_condition=MoveStopCondition.sync_line,
+    )
+
+    runner = MoveGroupRunner(move_groups=[[sensor_group]])
+    positions = await runner.run(can_messenger=messenger)
+
+    return positions[mover]
 
 
 @asynccontextmanager

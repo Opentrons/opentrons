@@ -43,8 +43,7 @@ describe('utils', () => {
           expected: true,
         },
         {
-          msg:
-            '2x volume + air gap vol >= max capacity, air gap checkbox NOT checked',
+          msg: '2x volume + air gap vol >= max capacity, air gap checkbox NOT checked',
           form: {
             path: 'multiDispense',
             volume: '150',
@@ -110,8 +109,7 @@ describe('utils', () => {
           expected: false,
         },
         {
-          msg:
-            '2x volume + 2x air gap vol >= max capacity, air gap checkbox NOT checked',
+          msg: '2x volume + 2x air gap vol >= max capacity, air gap checkbox NOT checked',
           form: {
             path: 'multiAspirate',
             volume: '150',

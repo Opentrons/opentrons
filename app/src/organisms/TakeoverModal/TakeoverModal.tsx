@@ -49,7 +49,7 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
       //    confirm terminate modal
       <OddModal header={terminateHeader}>
         <Flex flexDirection={DIRECTION_COLUMN} width="100%">
-          <LegacyStyledText as="p" marginBottom={SPACING.spacing32}>
+          <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing32}>
             {t('branded:confirm_terminate')}
           </LegacyStyledText>
           <Flex flex="1" gridGap={SPACING.spacing8}>
@@ -97,18 +97,21 @@ export function TakeoverModal(props: TakeoverModalProps): JSX.Element {
               marginBottom={SPACING.spacing16}
             />
             <LegacyStyledText
-              as="h4"
+              forwardedAs="h4"
               marginBottom={SPACING.spacing4}
               fontWeight={TYPOGRAPHY.fontWeightBold}
             >
               {title}
             </LegacyStyledText>
-            <LegacyStyledText as="p" textAlign={TYPOGRAPHY.textAlignCenter}>
+            <LegacyStyledText
+              forwardedAs="p"
+              textAlign={TYPOGRAPHY.textAlignCenter}
+            >
               {t('branded:computer_in_app_is_controlling_robot')}
             </LegacyStyledText>
           </Flex>
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             onClick={() => {
               setShowConfirmTerminateModal(true)

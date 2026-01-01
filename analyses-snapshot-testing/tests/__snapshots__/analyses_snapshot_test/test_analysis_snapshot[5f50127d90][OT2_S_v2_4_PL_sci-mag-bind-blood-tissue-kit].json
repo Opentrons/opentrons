@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -21773,7 +21776,16 @@
     "author": "Opentrons <protocols@opentrons.com>",
     "protocolName": "Mag-BindÂ® Blood & Tissue DNA HDQ 96 Kit"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "6"
+      },
+      "model": "magneticModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

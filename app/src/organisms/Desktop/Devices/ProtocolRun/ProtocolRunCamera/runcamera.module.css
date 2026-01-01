@@ -10,7 +10,7 @@
   padding: var(--spacing-16);
 }
 
-.camera_status {
+.camera_setting {
   display: flex;
   align-items: center;
   gap: var(--spacing-10);

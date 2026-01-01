@@ -21,16 +21,16 @@ import type { FormattedPipetteOffsetCalibration } from '..'
 
 interface ModuleCalibrationItemsProps {
   attachedModules: AttachedModule[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   robotName: string
+  isRobotBusy: boolean
 }
 
 export function ModuleCalibrationItems({
   attachedModules,
-  updateRobotStatus,
   formattedPipetteOffsetCalibrations,
   robotName,
+  isRobotBusy,
 }: ModuleCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -53,17 +53,17 @@ export function ModuleCalibrationItems({
           return (
             <StyledTableRow key={attachedModule.id}>
               <StyledTableCell>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {getModuleDisplayName(attachedModule.moduleModel)}
                 </LegacyStyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {attachedModule.serialNumber}
                 </LegacyStyledText>
               </StyledTableCell>
               <StyledTableCell>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {attachedModule.moduleOffset?.last_modified != null
                     ? formatLastCalibrated(
                         attachedModule.moduleOffset?.last_modified
@@ -78,11 +78,11 @@ export function ModuleCalibrationItems({
                       attachedModule.moduleOffset?.last_modified != null
                     }
                     attachedModule={attachedModule}
-                    updateRobotStatus={updateRobotStatus}
                     formattedPipetteOffsetCalibrations={
                       formattedPipetteOffsetCalibrations
                     }
                     robotName={robotName}
+                    isRobotBusy={isRobotBusy}
                   />
                 ) : null}
               </StyledTableCell>

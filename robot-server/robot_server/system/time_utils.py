@@ -1,4 +1,5 @@
 """System time utilities to support /system/time endpoints."""
+
 import asyncio
 import logging
 from typing import Dict, Tuple, Union, cast
@@ -22,9 +23,7 @@ def _str_to_dict(res_str: str) -> Dict[str, Union[str, bool]]:
                 prop, val = line.split("=")
                 res_dict[prop] = (
                     # Convert yes/no to boolean value
-                    val
-                    if val not in ["yes", "no"]
-                    else val == "yes"
+                    val if val not in ["yes", "no"] else val == "yes"
                 )
             except (ValueError, IndexError) as e:
                 log.error(f"Error converting timedatectl status line {line}:  {e}")

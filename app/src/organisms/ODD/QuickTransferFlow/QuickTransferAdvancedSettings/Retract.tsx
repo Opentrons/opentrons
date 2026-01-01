@@ -12,6 +12,7 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
+import { POSITION_REFERENCE_TOP } from '@opentrons/shared-data'
 
 import { getTopPortalEl } from '/app/App/portal'
 import { NumericalKeyboard } from '/app/atoms/SoftwareKeyboard'
@@ -23,6 +24,7 @@ import { ACTIONS } from '../constants'
 
 import type { Dispatch } from 'react'
 import type { KeyboardReactInterface } from 'react-simple-keyboard'
+import type { PositionReference } from '@opentrons/shared-data'
 import type {
   FlowRateKind,
   QuickTransferSummaryAction,
@@ -53,9 +55,13 @@ export function Retract({
   const [delayDuration, setDelayDuration] = useState<number | null>(
     retractSettings?.delayDuration ?? null
   )
-  const [position, setPosition] = useState<number | null>(
-    retractSettings?.positionFromBottom ?? null
+  const [position, setPosition] = useState<string | null>(
+    String(retractSettings?.position) ?? null
   )
+  const positionReference =
+    kind === 'aspirate'
+      ? state.retractAspirate?.positionReference
+      : state.retractDispense?.positionReference
 
   const action =
     kind === 'aspirate'
@@ -81,7 +87,8 @@ export function Retract({
             retractSettings: {
               speed,
               delayDuration,
-              positionFromBottom: position,
+              position: Number(position),
+              positionReference: positionReference ?? undefined,
             },
           })
           trackEventWithRobotSerial({
@@ -108,7 +115,7 @@ export function Retract({
   if (delayDuration == null && currentStep === 2) {
     buttonIsDisabled = true
   }
-  if (position == null && currentStep === 3) {
+  if ((position == null || isNaN(Number(position))) && currentStep === 3) {
     buttonIsDisabled = true
   }
 
@@ -145,6 +152,7 @@ export function Retract({
           position={position}
           setPosition={setPosition}
           currentStep={currentStep}
+          positionReference={positionReference}
         />
       </Flex>
     </Flex>,
@@ -156,12 +164,13 @@ interface RetractSettingComponentProps {
   kind: FlowRateKind
   state: QuickTransferSummaryState
   setSpeed: (speed: number | null) => void
-  setPosition: (position: number | null) => void
+  setPosition: (position: string | null) => void
   delayDuration: number | null
   setDelayDuration: (delayDuration: number | null) => void
   speed: number | null
-  position: number | null
+  position: string | null
   currentStep: number
+  positionReference?: PositionReference
 }
 
 function RetractSettingComponent({
@@ -174,9 +183,16 @@ function RetractSettingComponent({
   position,
   setPosition,
   currentStep,
+  positionReference,
 }: RetractSettingComponentProps): JSX.Element {
   const { t } = useTranslation(['quick_transfer'])
   const keyboardRef = useRef<KeyboardReactInterface | null>(null)
+
+  // TODO: accommodate arbitrary position reference
+  const positionText =
+    positionReference === POSITION_REFERENCE_TOP
+      ? t('distance_top_of_well_mm')
+      : t('distance_bottom_of_well_mm')
 
   let wellHeight = 1
   if (
@@ -204,10 +220,20 @@ function RetractSettingComponent({
       )
     )
   }
-  const positionRange = { min: 1, max: Math.floor(wellHeight * 2) }
+  const positionRange =
+    positionReference === POSITION_REFERENCE_TOP
+      ? {
+          min: -wellHeight,
+          max: 2,
+        }
+      : {
+          min: 0,
+          max: wellHeight + 2,
+        }
   const positionError =
     position != null &&
-    (position < positionRange.min || position > positionRange.max)
+    (Number(position) < positionRange.min ||
+      Number(position) > positionRange.max)
       ? t(`value_out_of_range`, {
           min: positionRange.min,
           max: positionRange.max,
@@ -236,8 +262,7 @@ function RetractSettingComponent({
     if (userInput === '') {
       setPosition(null)
     } else {
-      const parsedValue = Number(userInput)
-      setPosition(!isNaN(parsedValue) ? parsedValue : null)
+      setPosition(userInput)
     }
   }
 
@@ -311,6 +336,10 @@ function RetractSettingComponent({
   }
 
   const positionSetting = (): JSX.Element => {
+    const caption =
+      positionReference === POSITION_REFERENCE_TOP
+        ? t('from_top', { min: -wellHeight })
+        : t('from_bottom', { max: wellHeight + 2 })
     return (
       <>
         <Flex
@@ -321,15 +350,15 @@ function RetractSettingComponent({
           marginTop={SPACING.spacing68}
         >
           <InputField
-            type="number"
+            type="text"
             value={position}
             error={positionError}
-            title={t('distance_bottom_of_well_mm')}
+            title={positionText}
             readOnly
           />
           {positionError == null ? (
             <StyledText oddStyle="bodyTextRegular" color={COLORS.grey60}>
-              {t('from_bottom', { max: positionRange.max })}
+              {caption}
             </StyledText>
           ) : null}
         </Flex>
@@ -343,6 +372,7 @@ function RetractSettingComponent({
             keyboardRef={keyboardRef}
             initialValue={String(position ?? '')}
             onChange={handlePositionChange}
+            hasHyphen={positionReference === POSITION_REFERENCE_TOP}
           />
         </Flex>
       </>

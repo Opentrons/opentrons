@@ -88,6 +88,16 @@ describe('getErrorKind', () => {
       expectedError: ERROR_KINDS.STACKER_STALLED,
     },
     {
+      commandType: 'flexStacker/store',
+      errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_STORE_EMPTY,
+      expectedError: ERROR_KINDS.STACKER_SHUTTLE_STORE_EMPTY,
+    },
+    {
+      commandType: 'flexStacker/store',
+      errorType: DEFINED_ERROR_TYPES.STACKER_SHUTTLE_OCCUPIED,
+      expectedError: ERROR_KINDS.STACKER_SHUTTLE_OCCUPIED,
+    },
+    {
       commandType: 'aspirate',
       errorType: DEFINED_ERROR_TYPES.OVERPRESSURE,
       isDefined: false,
@@ -103,16 +113,18 @@ describe('getErrorKind', () => {
       errorType: 'someHithertoUnknownDefinedErrorType',
       expectedError: ERROR_KINDS.GENERAL_ERROR,
     },
-    ...([
-      'aspirate',
-      'dispense',
-      'blowOut',
-      'moveToWell',
-      'moveToAddressableArea',
-      'dropTip',
-      'pickUpTip',
-      'prepareToAspirate',
-    ] as const).map(cmd => ({
+    ...(
+      [
+        'aspirate',
+        'dispense',
+        'blowOut',
+        'moveToWell',
+        'moveToAddressableArea',
+        'dropTip',
+        'pickUpTip',
+        'prepareToAspirate',
+      ] as const
+    ).map(cmd => ({
       commandType: cmd,
       errorType: DEFINED_ERROR_TYPES.STALL_OR_COLLISION,
       expectedError: ERROR_KINDS.STALL_OR_COLLISION,

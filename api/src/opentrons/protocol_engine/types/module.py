@@ -16,11 +16,13 @@ from typing import (
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Extents
 from opentrons_shared_data.labware.types import LocatingFeatures
 
 from opentrons.hardware_control.modules import (
     ModuleType as ModuleType,
+    ModuleModel as HardwareModuleModel,
 )
 
 from .location import DeckSlotLocation
@@ -29,7 +31,7 @@ from .labware_movement import LabwareMovementOffsetData
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.types.ModuleModel
-class ModuleModel(str, Enum):
+class ModuleModel(StrEnum):
     """All available modules' models."""
 
     TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
@@ -42,6 +44,11 @@ class ModuleModel(str, Enum):
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
     ABSORBANCE_READER_V1 = "absorbanceReaderV1"
     FLEX_STACKER_MODULE_V1 = "flexStackerModuleV1"
+
+    @classmethod
+    def from_hardware(cls, hardware_model: HardwareModuleModel) -> "ModuleModel":
+        """Convert from the hardware model representation."""
+        return cls(hardware_model.value)
 
     def as_type(self) -> ModuleType:
         """Get the ModuleType of this model."""
@@ -273,14 +280,14 @@ class ModuleOffsetData:
     location: DeckSlotLocation
 
 
-class StackerFillEmptyStrategy(str, Enum):
+class StackerFillEmptyStrategy(StrEnum):
     """Strategy to use for filling or emptying a stacker."""
 
     MANUAL_WITH_PAUSE = "manualWithPause"
     LOGICAL = "logical"
 
 
-class StackerLabwareMovementStrategy(str, Enum):
+class StackerLabwareMovementStrategy(StrEnum):
     """Strategy to retrieve or store labware."""
 
     AUTOMATIC = "automatic"
@@ -297,14 +304,14 @@ class StackerStoredLabwareGroup(BaseModel):
 
 @dataclass
 class StackerPoolDefinition:
-    """Represents an internal configuraiton of stored labware."""
+    """Represents an internal configuration of stored labware."""
 
     primaryLabwareDefinition: LabwareDefinition
     adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
     lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
 
 
-class IdentifyColor(str, Enum):
+class IdentifyColor(StrEnum):
     """Module identify color."""
 
     WHITE = "white"

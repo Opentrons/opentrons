@@ -30,9 +30,10 @@ async def run(
     args: argparse.Namespace, base_log: logging.Logger, trace_log: logging.Logger
 ) -> None:
     """Script entrypoint."""
-    async with build.driver(build_settings(args)) as driver, CanMessenger(
-        driver
-    ) as messenger:
+    async with (
+        build.driver(build_settings(args)) as driver,
+        CanMessenger(driver) as messenger,
+    ):
         await flash_serials(messenger, base_log, trace_log)
 
 
@@ -119,7 +120,7 @@ async def update_serial_and_confirm(
                             base_log.debug("message relevant serial NOT confirmed")
                     base_log.debug(f"message {type(message)} is not relevant")
                     base_log.debug(
-                        f"{(target-datetime.datetime.now()).total_seconds()} remaining in attempt {attempt}"
+                        f"{(target - datetime.datetime.now()).total_seconds()} remaining in attempt {attempt}"
                     )
         except asyncio.TimeoutError:
             continue

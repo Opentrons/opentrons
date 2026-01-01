@@ -1,4 +1,5 @@
 """Test SQL database migrations."""
+
 from pathlib import Path
 from typing import Generator
 

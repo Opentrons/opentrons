@@ -12,13 +12,14 @@ from opentrons.protocol_api.module_contexts import (
 )
 
 from typing import List
+from abr_testing.protocols import helpers
 
 metadata = {
     "protocolName": "Flex Stacker Stamping Protocol",
     "author": "Rhyann Clarke <rhyann.clarke@opentrons.com",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.25"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 
 DECK_SLOTS = ["A2", "A3", "B1", "B2", "B3", "C1", "C2", "C3", "D2", "D3"]
@@ -71,6 +72,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         maximum=40,
         minimum=1,
     )
+    helpers.create_error_capture_duration_duration(parameters)
 
 
 def move_plates_to_deck_fill_and_store(
@@ -83,6 +85,8 @@ def move_plates_to_deck_fill_and_store(
     """Move plates to the deck, fill them with water, and store back in stacker."""
     # Move PCR Plates and Fill
     plates_on_deck = []
+    ctx.capture_image(filename="move_plates")
+
     for i in range(6):
         plate = stacker.retrieve()
         ctx.move_labware(plate, LABWARE_SLOTS[i], use_gripper=True)
@@ -112,6 +116,8 @@ def unload_tipracks_from_stacker(
     tiprack_adapters: List[Labware],
 ) -> None:
     """Unload tipracks and assign to pipette."""
+    ctx.capture_image(filename="unload_tipracks")
+
     p96.tip_racks.clear()
     for i in range(2):
         tip_rack = stacker.retrieve()
@@ -124,10 +130,11 @@ def unload_tipracks_from_stacker(
 
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
+    ctx.capture_image(filename="start_of_run")
+    length = ctx.params.error_capture_duration  # type: ignore[attr-defined]
     use_temp_mod = ctx.params.use_temp_mod  # type: ignore[attr-defined]
     if not ctx.is_simulating():
-        from abr_testing.protocols import helpers
-
+        helpers.comment_protocol_version(ctx, "03")
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     tiprack_adapters = [
@@ -218,7 +225,13 @@ def run(ctx: ProtocolContext) -> None:
         move_plates_to_deck_fill_and_store(
             stacker_nest96deep, ctx, p96, water, reservoir
         )
+        ctx.capture_image(filename="end_of_run")
+
+        if not ctx.is_simulating():
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not ctx.is_simulating():
-            slack_bot.send_error_message(metadata["protocolName"], str(e))
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
+            )
         raise (e)

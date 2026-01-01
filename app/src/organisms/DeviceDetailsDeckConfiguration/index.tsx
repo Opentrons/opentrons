@@ -18,6 +18,7 @@ import {
   Link,
   SIZE_4,
   SPACING,
+  StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
@@ -47,7 +48,7 @@ import { useRunStatuses } from '/app/resources/runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
 import type { TFunction } from 'i18next'
-import type { CutoutId } from '@opentrons/shared-data'
+import type { CutoutId, VISUAL_SLOTS } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -64,10 +65,8 @@ export function DeviceDetailsDeckConfiguration({
   robotName,
 }: DeviceDetailsDeckConfigurationProps): JSX.Element | null {
   const { t, i18n } = useTranslation(['device_details', 'deck_configuration'])
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
 
   const deckConfig =
     useNotifyDeckConfigurationQuery({
@@ -87,11 +86,8 @@ export function DeviceDetailsDeckConfiguration({
   const isMaintenanceRunExisting = maintenanceRunData?.data?.id != null
   const isRobotViewable = useIsRobotViewable(robotName)
 
-  const {
-    addFixtureToCutout,
-    removeFixtureFromCutout,
-    addFixtureModal,
-  } = useDeckConfigurationEditingTools(false)
+  const { addFixtureToCutout, removeFixtureFromCutout, addFixtureModal } =
+    useDeckConfigurationEditingTools(false)
 
   // do not show standard slot in fixture display list
   const { displayList: fixtureDisplayList } = deckConfigWithAA.reduce<{
@@ -155,7 +151,8 @@ export function DeviceDetailsDeckConfiguration({
           {
             displayLocation: vsId
               ? getAASlotDisplayName(
-                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
+                  getAAWithFakesFromVSId(vsId as VISUAL_SLOTS) ??
+                    addressableAreaId
                 )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
@@ -191,9 +188,9 @@ export function DeviceDetailsDeckConfiguration({
           width="100%"
           borderBottom={BORDERS.lineBorder}
         >
-          <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
-            {`${robotName} ${t('deck_configuration')}`}
-          </LegacyStyledText>
+          <StyledText desktopStyle="bodyLargeSemiBold">
+            {t('deck_configuration')}
+          </StyledText>
           <Link
             role="button"
             css={TYPOGRAPHY.linkPSemiBold}
@@ -309,7 +306,7 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <LegacyStyledText as="p" color={COLORS.grey40}>
+            <LegacyStyledText forwardedAs="p" color={COLORS.grey40}>
               {t('offline_deck_configuration')}
             </LegacyStyledText>
           </Flex>

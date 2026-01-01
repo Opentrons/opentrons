@@ -92,160 +92,159 @@ const getIsOverwriteMismatched = (
 
 const _createCustomLabwareDef: (
   onlyTiprack: boolean
-) => (
-  event: SyntheticEvent<HTMLInputElement>
-) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
-  const customLabwareDefs = values(
-    labwareDefSelectors.getCustomLabwareDefsByURI(getState())
-  )
-  const allLabwareDefs = values(
-    labwareDefSelectors.getLabwareDefsByURI(getState())
-  )
-  // @ts-expect-error(sa, 2021-6-20): null check
-  const file = event.currentTarget.files[0]
-  const reader = new FileReader()
-  // reset the state of the input to allow file re-uploads
-  event.currentTarget.value = ''
-
-  if (!file.name.match(/\.json$/i)) {
-    return dispatch(
-      labwareUploadMessage({
-        messageType: 'NOT_JSON',
-      })
+) => (event: SyntheticEvent<HTMLInputElement>) => ThunkAction<any> =
+  onlyTiprack => event => (dispatch, getState) => {
+    const customLabwareDefs = values(
+      labwareDefSelectors.getCustomLabwareDefsByURI(getState())
     )
-  }
+    const allLabwareDefs = values(
+      labwareDefSelectors.getLabwareDefsByURI(getState())
+    )
+    // @ts-expect-error(sa, 2021-6-20): null check
+    const file = event.currentTarget.files[0]
+    const reader = new FileReader()
+    // reset the state of the input to allow file re-uploads
+    event.currentTarget.value = ''
 
-  reader.onload = readEvent => {
-    const result = ((readEvent.currentTarget as any) as FileReader).result
-    let parsedLabwareDef: LabwareDefinition2 | null | undefined
+    if (!file.name.match(/\.json$/i)) {
+      return dispatch(
+        labwareUploadMessage({
+          messageType: 'NOT_JSON',
+        })
+      )
+    }
 
-    try {
-      parsedLabwareDef = JSON.parse((result as any) as string)
-    } catch (error) {
-      console.error(error)
-      if (error instanceof Error) {
+    reader.onload = readEvent => {
+      const result = (readEvent.currentTarget as any as FileReader).result
+      let parsedLabwareDef: LabwareDefinition2 | null | undefined
+
+      try {
+        parsedLabwareDef = JSON.parse(result as any as string)
+      } catch (error) {
+        console.error(error)
+        if (error instanceof Error) {
+          return dispatch(
+            labwareUploadMessage({
+              messageType: 'INVALID_JSON_FILE',
+              errorText: error.message,
+            })
+          )
+        }
+      }
+
+      const valid: boolean | PromiseLike<any> =
+        parsedLabwareDef === null ? false : validate(parsedLabwareDef)
+      const hasWellMatching = validateCustomLabwareHelper(parsedLabwareDef)
+      const loadName = parsedLabwareDef?.parameters?.loadName || ''
+      const displayName = parsedLabwareDef?.metadata?.displayName || ''
+
+      if (!hasWellMatching) {
+        console.warn(
+          'uploaded labware conforms to schema, but wells do not match!'
+        )
+      }
+
+      if (!valid || !hasWellMatching) {
         return dispatch(
           labwareUploadMessage({
             messageType: 'INVALID_JSON_FILE',
-            errorText: error.message,
+          })
+        )
+        // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
+      } else if (onlyTiprack && !getIsTiprack(parsedLabwareDef)) {
+        return dispatch(
+          labwareUploadMessage({
+            messageType: 'ONLY_TIPRACK',
+          })
+        )
+      } else if (parsedLabwareDef?.namespace === OPENTRONS_LABWARE_NAMESPACE) {
+        return dispatch(
+          labwareUploadMessage({
+            messageType: 'USES_STANDARD_NAMESPACE',
+          })
+        )
+      } else if (allLabwareDefs.some(def => isEqual(def, parsedLabwareDef))) {
+        return dispatch(
+          labwareUploadMessage({
+            messageType: 'EXACT_LABWARE_MATCH',
           })
         )
       }
-    }
 
-    const valid: boolean | PromiseLike<any> =
-      parsedLabwareDef === null ? false : validate(parsedLabwareDef)
-    const hasWellMatching = validateCustomLabwareHelper(parsedLabwareDef)
-    const loadName = parsedLabwareDef?.parameters?.loadName || ''
-    const displayName = parsedLabwareDef?.metadata?.displayName || ''
+      const defsMatchingCustomLoadName = _labwareDefsMatchingLoadName(
+        customLabwareDefs,
+        loadName
+      )
 
-    if (!hasWellMatching) {
-      console.warn(
-        'uploaded labware conforms to schema, but wells do not match!'
+      const defsMatchingCustomDisplayName = _labwareDefsMatchingDisplayName(
+        customLabwareDefs,
+        displayName
       )
-    }
 
-    if (!valid || !hasWellMatching) {
-      return dispatch(
-        labwareUploadMessage({
-          messageType: 'INVALID_JSON_FILE',
-        })
-      )
-      // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
-    } else if (onlyTiprack && !getIsTiprack(parsedLabwareDef)) {
-      return dispatch(
-        labwareUploadMessage({
-          messageType: 'ONLY_TIPRACK',
-        })
-      )
-    } else if (parsedLabwareDef?.namespace === OPENTRONS_LABWARE_NAMESPACE) {
-      return dispatch(
-        labwareUploadMessage({
-          messageType: 'USES_STANDARD_NAMESPACE',
-        })
-      )
-    } else if (allLabwareDefs.some(def => isEqual(def, parsedLabwareDef))) {
-      return dispatch(
-        labwareUploadMessage({
-          messageType: 'EXACT_LABWARE_MATCH',
-        })
-      )
-    }
-
-    const defsMatchingCustomLoadName = _labwareDefsMatchingLoadName(
-      customLabwareDefs,
-      loadName
-    )
-
-    const defsMatchingCustomDisplayName = _labwareDefsMatchingDisplayName(
-      customLabwareDefs,
-      displayName
-    )
-
-    if (
-      defsMatchingCustomLoadName.length > 0 ||
-      defsMatchingCustomDisplayName.length > 0
-    ) {
-      const matchingDefs = [
-        ...defsMatchingCustomLoadName,
-        ...defsMatchingCustomDisplayName,
-      ]
-      console.assert(
-        uniqBy(matchingDefs, getLabwareDefURI).length === 1,
-        'expected exactly 1 matching labware def to ask to overwrite'
-      )
-      return dispatch(
-        labwareUploadMessage({
-          messageType: 'ASK_FOR_LABWARE_OVERWRITE',
-          defsMatchingLoadName: defsMatchingCustomLoadName,
-          defsMatchingDisplayName: defsMatchingCustomDisplayName,
-          // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
-          newDef: parsedLabwareDef,
-          defURIToOverwrite: getLabwareDefURI(matchingDefs[0]),
-          isOverwriteMismatched: getIsOverwriteMismatched(
+      if (
+        defsMatchingCustomLoadName.length > 0 ||
+        defsMatchingCustomDisplayName.length > 0
+      ) {
+        const matchingDefs = [
+          ...defsMatchingCustomLoadName,
+          ...defsMatchingCustomDisplayName,
+        ]
+        console.assert(
+          uniqBy(matchingDefs, getLabwareDefURI).length === 1,
+          'expected exactly 1 matching labware def to ask to overwrite'
+        )
+        return dispatch(
+          labwareUploadMessage({
+            messageType: 'ASK_FOR_LABWARE_OVERWRITE',
+            defsMatchingLoadName: defsMatchingCustomLoadName,
+            defsMatchingDisplayName: defsMatchingCustomDisplayName,
             // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
-            parsedLabwareDef,
-            matchingDefs[0]
-          ),
-        })
+            newDef: parsedLabwareDef,
+            defURIToOverwrite: getLabwareDefURI(matchingDefs[0]),
+            isOverwriteMismatched: getIsOverwriteMismatched(
+              // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
+              parsedLabwareDef,
+              matchingDefs[0]
+            ),
+          })
+        )
+      }
+
+      const allDefsMatchingLoadName = _labwareDefsMatchingLoadName(
+        allLabwareDefs,
+        loadName
       )
-    }
 
-    const allDefsMatchingLoadName = _labwareDefsMatchingLoadName(
-      allLabwareDefs,
-      loadName
-    )
+      const allDefsMatchingDisplayName = _labwareDefsMatchingDisplayName(
+        allLabwareDefs,
+        displayName
+      )
 
-    const allDefsMatchingDisplayName = _labwareDefsMatchingDisplayName(
-      allLabwareDefs,
-      displayName
-    )
+      if (
+        allDefsMatchingLoadName.length > 0 ||
+        allDefsMatchingDisplayName.length > 0
+      ) {
+        return dispatch(
+          labwareUploadMessage({
+            messageType: 'LABWARE_NAME_CONFLICT',
+            defsMatchingLoadName: allDefsMatchingLoadName,
+            defsMatchingDisplayName: allDefsMatchingDisplayName,
+            // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
+            newDef: parsedLabwareDef,
+          })
+        )
+      }
 
-    if (
-      allDefsMatchingLoadName.length > 0 ||
-      allDefsMatchingDisplayName.length > 0
-    ) {
       return dispatch(
-        labwareUploadMessage({
-          messageType: 'LABWARE_NAME_CONFLICT',
-          defsMatchingLoadName: allDefsMatchingLoadName,
-          defsMatchingDisplayName: allDefsMatchingDisplayName,
+        createCustomLabwareDefAction({
           // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
-          newDef: parsedLabwareDef,
+          def: parsedLabwareDef,
         })
       )
     }
 
-    return dispatch(
-      createCustomLabwareDefAction({
-        // @ts-expect-error(sa, 2021-6-20): parsedLabwareDef might be nullsy
-        def: parsedLabwareDef,
-      })
-    )
+    reader.readAsText(file)
   }
-
-  reader.readAsText(file)
-}
 
 export const createCustomLabwareDef: (
   event: SyntheticEvent<HTMLInputElement>

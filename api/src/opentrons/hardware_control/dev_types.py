@@ -14,13 +14,15 @@ from opentrons_shared_data.pipette.types import (
     PipetteModel,
     PipetteName,
     ChannelCount,
+    PipetteTipType,
+    LiquidClasses,
 )
-from opentrons_shared_data.pipette.types import PipetteTipType
 from opentrons_shared_data.pipette.pipette_definition import (
     PipetteConfigurations,
     SupportedTipsDefinition,
     PipetteBoundingBoxOffsetDefinition,
     AvailableSensorDefinition,
+    PipetteLiquidPropertiesDefinition,
 )
 from opentrons_shared_data.gripper import (
     GripperModel,
@@ -104,6 +106,10 @@ class PipetteDict(InstrumentDict):
     plunger_positions: Dict[str, float]
     shaft_ul_per_mm: float
     available_sensors: AvailableSensorDefinition
+    volume_mode: LiquidClasses  # LiquidClasses refer to volume mode in this context
+    available_volume_modes: Dict[
+        LiquidClasses, PipetteLiquidPropertiesDefinition
+    ]  # Ditto
 
 
 class PipetteStateDict(TypedDict):

@@ -21,7 +21,7 @@ export function PresavedStep({
 }: PresavedStepProps): JSX.Element | null {
   const { t } = useTranslation('application')
   const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)
-  const stepNumber = useSelector(stepFormSelectors.getOrderedStepIds).length + 1
+  const stepNumber = useSelector(stepFormSelectors.getNextUserVisibleStepNumber)
   const hovered = useSelector(getHoveredTerminalItemId) === PRESAVED_STEP_ID
   const selected = useSelector(getSelectedTerminalItemId) === PRESAVED_STEP_ID
   const dispatch = useDispatch()
@@ -48,6 +48,7 @@ export function PresavedStep({
       stepNumber={stepNumber}
       iconName={stepIconsByType[stepType]}
       text={t(`stepType.${stepType}`)}
+      subtext={null}
       sidebarWidth={sidebarWidth}
     />
   )

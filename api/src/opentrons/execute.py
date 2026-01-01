@@ -1,10 +1,11 @@
-""" opentrons.execute: functions and entrypoint for running protocols
+"""opentrons.execute: functions and entrypoint for running protocols
 
 This module has functions that can be imported to provide protocol
 contexts for running protocols during interactive sessions like Jupyter or just
 regular python shells. It also provides a console entrypoint for running a
 protocol from the command line.
 """
+
 import asyncio
 import atexit
 import argparse
@@ -555,6 +556,7 @@ def _create_live_context_pe(
             load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
                 api_version
             ),
+            camera_provider=None,
         )
     )
 
@@ -644,6 +646,7 @@ def _run_file_pe(
             hardware_api=hardware_api_wrapped,
         )
 
+        # todo (chb, 2025-09-30): The Camera Provider is provided in to a run by the robot server, no analog exists for execute
         orchestrator = RunOrchestrator(
             hardware_api=hardware_api_wrapped,
             protocol_engine=protocol_engine,
@@ -657,6 +660,7 @@ def _run_file_pe(
             protocol_live_runner=LiveRunner(
                 protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
             ),
+            camera_provider=None,
         )
 
         unsubscribe = protocol_runner.broker.subscribe(

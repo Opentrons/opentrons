@@ -1,10 +1,11 @@
 from datetime import datetime
-from enum import Enum
 
 import typing
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
+
+from opentrons_shared_data.util import StrEnum
 
 from robot_server.robot.calibration.check.models import (
     CalibrationCheckSessionStatus,
@@ -24,7 +25,7 @@ from robot_server.service.json_api import (
 )
 
 
-class SessionType(str, Enum):
+class SessionType(StrEnum):
     """The available session types"""
 
     calibration_check = "calibrationCheck"
@@ -53,14 +54,13 @@ class CalibrationCheckCreateAttributes(BaseModel):
 class TipLengthCalibrationCreateAttributes(BaseModel):
     """The tip length calibration create request."""
 
-    sessionType: Literal[
+    sessionType: Literal[SessionType.tip_length_calibration] = (
         SessionType.tip_length_calibration
-    ] = SessionType.tip_length_calibration
+    )
     createParams: SessionCreateParams
 
 
-class _NoParams(BaseModel):
-    ...
+class _NoParams(BaseModel): ...
 
 
 class DeckCalibrationCreateAttributes(BaseModel):
@@ -73,9 +73,9 @@ class DeckCalibrationCreateAttributes(BaseModel):
 class PipetteOffsetCalibrationCreateAttributes(BaseModel):
     """Pipette offset calibration create request."""
 
-    sessionType: Literal[
+    sessionType: Literal[SessionType.pipette_offset_calibration] = (
         SessionType.pipette_offset_calibration
-    ] = SessionType.pipette_offset_calibration
+    )
     createParams: SessionCreateParams
 
 

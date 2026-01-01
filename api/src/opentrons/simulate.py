@@ -1,4 +1,4 @@
-""" opentrons.simulate: functions and entrypoints for simulating protocols
+"""opentrons.simulate: functions and entrypoints for simulating protocols
 
 This module has functions that provide a console entrypoint for simulating
 a protocol from the command line.
@@ -50,6 +50,7 @@ from opentrons.protocol_engine.create_protocol_engine import (
 from opentrons.protocol_engine import error_recovery_policy
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_reader.protocol_source import ProtocolSource
 from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
 from opentrons.protocol_runner import RunOrchestrator
@@ -831,10 +832,9 @@ def _create_live_context_pe(
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
 
     @contextmanager
-    def _cleanup_hardware_with_engine() -> (
-        Iterator[tuple["ProtocolEngine", asyncio.AbstractEventLoop]]
-    ):
-
+    def _cleanup_hardware_with_engine() -> Iterator[
+        tuple["ProtocolEngine", asyncio.AbstractEventLoop]
+    ]:
         try:
             with create_protocol_engine_in_thread(
                 hardware_api=hardware_api_wrapped,
@@ -849,6 +849,7 @@ def _create_live_context_pe(
                 load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
                     api_version
                 ),
+                camera_provider=CameraProvider(),
             ) as (engine, loop):
                 yield engine, loop
         finally:
@@ -982,6 +983,7 @@ def _run_file_pe(
             protocol_live_runner=LiveRunner(
                 protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
             ),
+            camera_provider=CameraProvider(),
         )
 
         # TODO(mm, 2024-08-06): This home is theoretically redundant with Protocol

@@ -33,13 +33,17 @@ It uses [shared-data](../shared-data) for data about labware and pipettes and fo
 - `protocol-designer/src/steplist` - contains Redux actions, reducers, and selectors that make up the bulk of the logic for the behavior of Step Forms and the protocol Timeline.
 - `protocol-designer/src/ui` - Redux actions, reducers, and selectors that are purely concerned with UI and not with the "domain layer" of the protocol itself
 
-## Environment variable feature flags
+## Environment variables
 
-Any env var that starts with `OT_PD_` will be picked up by `webpack.EnvironmentPlugin` and made available to use in the app code with `process.env`. Webpack bakes the values of these env vars **at compile time, as strings**.
+### Feature flags
 
-Right now we are using them as feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`.
+We have an evolving set of feature flags for development, to avoid introducing regressions when we add new features that aren't fully ready to be "live" on `edge`. You can either set them through the UI, or through environment variables that are baked in at build time.
 
-Use them like: `OT_PD_COOL_FLAG=true OT_PD_SWAG_FLAG=100 make dev`.
+The environment variables start with `OT_PD_`. See the code for the current list. Use them like:
+
+```
+OT_PD_COOL_FLAG=1 OT_PD_SWAG_FLAG=1 make dev
+```
 
 ### `OT_PD_VERSION`
 
@@ -64,6 +68,45 @@ Used for Mixpanel in dev (eg via a sandbox URL). Should be provided in the CI bu
 ### `OT_PD_SHOW_GATE`
 
 If truthy, uses the `GateModal` component in development. The `GateModal` component is always used in production.
+
+### Sentry (error reporting + sourcemaps)
+
+Protocol Designer uses Sentry in two places:
+
+1. **Runtime error reporting** (in the browser) via `@sentry/react`.
+2. **Build-time sourcemap uploading** (optional) via `@sentry/vite-plugin`.
+
+#### Runtime error reporting (browser)
+
+PD will only initialize Sentry if a DSN is provided and the user has opted in.
+
+- `OT_PD_SENTRY_DSN`: production/staging DSN.
+- `OT_PD_SENTRY_DEV_DSN`: development DSN fallback.
+
+#### Local sourcemap upload (opt-in)
+
+By default, local builds do **not** upload sourcemaps. To opt in locally, set the Sentry plugin credentials:
+
+```bash
+SENTRY_AUTH_TOKEN=... \
+SENTRY_ORG=... \
+SENTRY_PROJECT=... \
+make -C protocol-designer build
+```
+
+Notes:
+
+- The plugin is **disabled in CI**; it only runs locally when the `SENTRY_*` env vars are present.
+- Local sourcemaps are uploaded under the Sentry release name `local-dev` so they don’t collide with real releases.
+- The runtime SDK is configured to report `release=local-dev` when local upload is enabled, so local events can resolve the uploaded sourcemaps.
+
+#### CI sourcemap upload (releases)
+
+CI uploads sourcemaps via `getsentry/action-release` (not the Vite plugin). See the workflow at `.github/workflows/pd-test-build-deploy.yaml`.
+
+- Sourcemaps are uploaded from `protocol-designer/dist`.
+- Upload only runs for tagged **staging** or **production** releases.
+- The release name comes from the tag version (e.g. `protocol-designer@8.8.0` → `8.8.0`).
 
 [chrome]: https://www.google.com/chrome/
 [json-schema]: https://json-schema.org/

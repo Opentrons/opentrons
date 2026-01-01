@@ -527,9 +527,8 @@ describe('robot update selectors', () => {
 
     expect(result).toMatchObject({
       autoUpdateDisabledReason: expect.stringMatching(/other_robot_updating/),
-      updateFromFileDisabledReason: expect.stringMatching(
-        /other_robot_updating/
-      ),
+      updateFromFileDisabledReason:
+        expect.stringMatching(/other_robot_updating/),
     })
   })
 

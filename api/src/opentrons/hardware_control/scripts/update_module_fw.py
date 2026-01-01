@@ -1,4 +1,5 @@
 """Module Firmware update script."""
+
 import argparse
 import asyncio
 from glob import glob
@@ -14,6 +15,7 @@ from opentrons.hardware_control import modules
 from opentrons.hardware_control.modules.mod_abc import AbstractModule
 from opentrons.hardware_control.modules.update import update_firmware
 from opentrons.hardware_control.types import BoardRevision
+from opentrons.hardware_control.execution_manager import ExecutionManager
 
 
 # Constants for checking if module is back online
@@ -84,6 +86,9 @@ async def build_module(
             port=port,
             usb_port=mod.usb_port,
             type=modules.MODULE_TYPE_BY_NAME[mod.name],
+            execution_manager=ExecutionManager(),
+            disconnected_callback=lambda *args: None,
+            error_callback=lambda *args: None,
             simulating=False,
             hw_control_loop=loop,
         )

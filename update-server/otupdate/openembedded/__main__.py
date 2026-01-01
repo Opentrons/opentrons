@@ -1,6 +1,7 @@
 """
 Entrypoint for the openembedded update server
 """
+
 import asyncio
 import logging
 from typing import NoReturn

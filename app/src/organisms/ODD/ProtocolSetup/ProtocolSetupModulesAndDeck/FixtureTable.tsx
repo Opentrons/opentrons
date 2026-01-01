@@ -7,11 +7,11 @@ import {
   BORDERS,
   Chip,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_ROW,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -63,9 +63,8 @@ export function FixtureTable({
     deckConfigCompatibility
   )
 
-  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
-    requiredDeckConfigCompatibility
-  )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(requiredDeckConfigCompatibility)
 
   // list not configured/conflicted fixtures first
   const sortedDeckConfigCompatibility = filteredDeckConfigCompatibility.sort(
@@ -111,13 +110,10 @@ function FixtureTableItem({
 }: FixtureTableItemProps): JSX.Element {
   const { t, i18n } = useTranslation(['protocol_setup', 'deck_configuration'])
 
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
-  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
-    false
-  )
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] =
+    useState<boolean>(false)
   const isCurrentFixtureCompatible = isFixtureCompatible(
     cutoutFixtureId,
     compatibleCutoutFixtureIds,
@@ -216,7 +212,10 @@ function FixtureTableItem({
         marginBottom={lastItem ? SPACING.spacing68 : 'none'}
       >
         <Flex flex="3.5 0 0" alignItems={ALIGN_CENTER}>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {cutoutFixtureId != null && isCurrentFixtureCompatible
               ? getFixtureDisplayName(
                   t as TFunction,
@@ -230,7 +229,7 @@ function FixtureTableItem({
           </LegacyStyledText>
         </Flex>
         <Flex flex="2 0 0" alignItems={ALIGN_CENTER}>
-          <DeckInfoLabel deckLabel={displayLocation} />
+          <RobotInfoLabel deckLabel={displayLocation} />
         </Flex>
         <Flex
           flex="4 0 0"

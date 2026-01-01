@@ -80,7 +80,12 @@ describe('Retract', () => {
   })
 
   it('renders test, buttons, input field, and keyboard for retract after aspirating - position', () => {
-    render(props)
+    render({
+      ...props,
+      state: {
+        retractAspirate: { positionReference: 'well-bottom', position: 0 },
+      } as any,
+    })
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByText('Continue'))
@@ -90,14 +95,20 @@ describe('Retract', () => {
     fireEvent.click(screen.getByRole('button', { name: '6' }))
     fireEvent.click(screen.getByText('Continue'))
     screen.getByText('Distance from bottom of well (mm)')
-    screen.getByText('Between 0 and 2 mm')
+    screen.getByText('Between 0 and 3 mm')
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
     fireEvent.click(screen.getByRole('button', { name: '2' }))
-    screen.getByText('Value must be between 1 to 2')
+    screen.getByText('Value must be between 0 to 3')
     screen.getByText('Save')
   })
   it('calls dispatch with correct action and settings when save is clicked', () => {
+    props.state.retractAspirate = {
+      speed: 0,
+      delayDuration: 0,
+      position: 0,
+      positionReference: 'well-bottom',
+    }
     render(props)
     fireEvent.click(screen.getByRole('button', { name: '1' }))
     fireEvent.click(screen.getByRole('button', { name: '1' }))
@@ -114,7 +125,8 @@ describe('Retract', () => {
       retractSettings: {
         speed: 11,
         delayDuration: 0.5,
-        positionFromBottom: 22,
+        position: 22,
+        positionReference: 'well-bottom',
       },
     })
   })

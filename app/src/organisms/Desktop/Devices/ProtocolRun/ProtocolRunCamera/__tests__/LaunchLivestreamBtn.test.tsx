@@ -22,9 +22,12 @@ vi.mock('react-redux', async () => {
 vi.mock('@opentrons/react-api-client')
 
 const render = () => {
-  return renderWithProviders(<LaunchLivestreamBtn />, {
-    i18nInstance: i18n,
-  })
+  return renderWithProviders(
+    <LaunchLivestreamBtn runId="MOCK-RUN-ID" robotType="OT-3 Standard" />,
+    {
+      i18nInstance: i18n,
+    }
+  )
 }
 
 describe('LaunchLivestreamBtn', () => {
@@ -42,7 +45,7 @@ describe('LaunchLivestreamBtn', () => {
   it('renders button text', () => {
     render()
 
-    screen.getByText('Live camera view')
+    screen.getByText('Live camera')
   })
 
   it('dispatches a camera stream open action when clicked', () => {
@@ -53,7 +56,11 @@ describe('LaunchLivestreamBtn', () => {
 
     expect(mockDispatch).toHaveBeenCalledWith({
       type: CAMERA_STREAM_OPEN,
-      payload: { hostname: 'test-hostname', robotName: 'test-robot' },
+      payload: {
+        hostname: 'test-hostname',
+        robotName: 'test-robot',
+        windowTitle: 'Opentrons test-robot Live Camera',
+      },
       meta: { shell: true },
     })
   })

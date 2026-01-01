@@ -54,7 +54,7 @@
   --purple-30-non-touchscreen: #e6d5ec;
   --purple-30-touchscreen: #f4def7;
   --purple-30: var(--purple-30-non-touchscreen);
-  --purple-20-non-touchscreen: #f1e8f5;
+  --purple-20-non-touchscreen: #f3e9f6;
   --purple-20-touchscreen: #fff3fe;
   --purple-20: var(--purple-20-non-touchscreen);
 
@@ -87,6 +87,7 @@
   /* semi-opaques */
   --transparent-white-80: #fffc;
   --transparent-white-50: #ffffff80;
+  --transparent-black-60: #16212d60;
   --transparent-black-80: #16212d80;
 
   /* flex */

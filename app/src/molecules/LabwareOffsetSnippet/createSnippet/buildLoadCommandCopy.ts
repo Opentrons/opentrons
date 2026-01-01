@@ -1,6 +1,9 @@
 import isEqual from 'lodash/isEqual'
 
-import { getLoadedLabwareDefinitionsByUri } from '@opentrons/shared-data'
+import {
+  getLoadedLabwareDefinitionsByUri,
+  locationIsOffDeck,
+} from '@opentrons/shared-data'
 
 import { getLwOffsetLocSeqFromLocSeq } from '/app/local-resources/offsets'
 import { getLegacyLabwareOffsetLocation } from '/app/transformations/analysis'
@@ -81,9 +84,8 @@ function handleLoadLabwareCommand(
   } else {
     const labwareDefinitions = getLoadedLabwareDefinitionsByUri(allCommands)
 
-    const { loadName } = labwareDefinitions[
-      loadedLabware.definitionUri
-    ].parameters
+    const { loadName } =
+      labwareDefinitions[loadedLabware.definitionUri].parameters
     const loadStatement = buildLoadCopy(
       command,
       labware,
@@ -145,7 +147,7 @@ function buildLoadCopy(
 ): string {
   const location = command.params.location
 
-  if (location === 'offDeck' || location === 'systemLocation') {
+  if (locationIsOffDeck(location)) {
     return `labware_${labwareCount} = protocol.load_labware("${loadName}", location="offDeck")`
   } else if ('slotName' in location) {
     const { slotName } = location

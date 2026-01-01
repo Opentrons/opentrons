@@ -8,8 +8,8 @@ export const DEV_INTERNAL_FLAGS: DevInternalFlag[] = [
   'enableLabwareCreator',
   'reactQueryDevtools',
   'reactScan',
-  'quickTransferExportPython',
   'camera',
+  'quickTransferProtocolContentsLog',
 ]
 
 // action type constants

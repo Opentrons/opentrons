@@ -10,7 +10,7 @@ import type { AnalyticsConfig, AnalyticsEvent } from './types'
 const log = createLogger(new URL('', import.meta.url).pathname)
 
 // pulled in from environment at build time
-const MIXPANEL_ID = process.env.OT_APP_MIXPANEL_ID
+const MIXPANEL_ID = _OT_APP_MIXPANEL_ID_
 
 const MIXPANEL_OPTS: Partial<MixpanelConfig> = {
   // opt out by default

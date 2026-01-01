@@ -19,6 +19,8 @@ import {
   RecoveryOptions,
   SelectRecoveryOption,
   STACKER_SHUTTLE_EMPTY_OPTIONS,
+  STACKER_STALLED_RETRIEVE_OPTIONS,
+  STACKER_STALLED_STORE_OPTIONS,
   STALL_OR_COLLISION_OPTIONS,
   TIP_DROP_FAILED_OPTIONS,
   TIP_NOT_DETECTED_OPTIONS,
@@ -557,5 +559,25 @@ describe('getRecoveryOptions', () => {
       ERROR_KINDS.STACKER_SHUTTLE_EMPTY
     )
     expect(labwareMissingInShuttleOptions).toBe(STACKER_SHUTTLE_EMPTY_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${
+    ERROR_KINDS.STACKER_STALLED
+  } and the commandType is ${'flexStacker/store'}`, () => {
+    const stackerStalledOptions = getRecoveryOptions(
+      ERROR_KINDS.STACKER_STALLED,
+      'flexStacker/store'
+    )
+    expect(stackerStalledOptions).toBe(STACKER_STALLED_STORE_OPTIONS)
+  })
+
+  it(`returns valid options when the errorKind is ${
+    ERROR_KINDS.STACKER_STALLED
+  } and the commandType is ${'flexStacker/retrieve'}`, () => {
+    const stackerStalledOptions = getRecoveryOptions(
+      ERROR_KINDS.STACKER_STALLED,
+      'flexStacker/retrieve'
+    )
+    expect(stackerStalledOptions).toBe(STACKER_STALLED_RETRIEVE_OPTIONS)
   })
 })

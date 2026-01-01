@@ -63,9 +63,9 @@ class UnsafeUngripLabware(
     params: UnsafeUngripLabwareParams
     result: Optional[UnsafeUngripLabwareResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeUngripLabwareImplementation] = (
         UnsafeUngripLabwareImplementation
-    ] = UnsafeUngripLabwareImplementation
+    )
 
 
 class UnsafeUngripLabwareCreate(BaseCommandCreate[UnsafeUngripLabwareParams]):

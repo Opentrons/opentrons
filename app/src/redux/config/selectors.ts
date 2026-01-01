@@ -55,12 +55,11 @@ export const getIsLabwareOffsetCodeSnippetsOn = (state: State): boolean => {
   return state.config?.labware.showLabwareOffsetCodeSnippets ?? false
 }
 
-export const getPathToPythonOverride: (
-  state: State
-) => string | null = createSelector(
-  getConfig,
-  config => config?.python.pathToPythonOverride ?? null
-)
+export const getPathToPythonOverride: (state: State) => string | null =
+  createSelector(
+    getConfig,
+    config => config?.python.pathToPythonOverride ?? null
+  )
 
 const UPDATE_CHANNEL_OPTS = [
   { label: 'Stable', value: 'latest' as UpdateChannel },
@@ -83,12 +82,11 @@ export const getIsOnDevice: (state: State) => boolean = createSelector(
   config => !!(config?.isOnDevice ?? false)
 )
 
-export const getProtocolsDesktopSortKey: (
-  state: State
-) => ProtocolSort | null = createSelector(
-  getConfig,
-  config => config?.protocols.protocolsStoredSortKey ?? null
-)
+export const getProtocolsDesktopSortKey: (state: State) => ProtocolSort | null =
+  createSelector(
+    getConfig,
+    config => config?.protocols.protocolsStoredSortKey ?? null
+  )
 
 export const getProtocolsOnDeviceSortKey: (
   state: State
@@ -97,19 +95,11 @@ export const getProtocolsOnDeviceSortKey: (
   config => config?.protocols.protocolsOnDeviceSortKey ?? null
 )
 
-export const getPinnedProtocolIds: (
-  state: State
-) => string[] | undefined = createSelector(
-  getConfig,
-  config => config?.protocols.pinnedProtocolIds
-)
+export const getPinnedProtocolIds: (state: State) => string[] | undefined =
+  createSelector(getConfig, config => config?.protocols.pinnedProtocolIds)
 
-export const getPinnedQuickTransferIds: (
-  state: State
-) => string[] | undefined = createSelector(
-  getConfig,
-  config => config?.protocols.pinnedQuickTransferIds
-)
+export const getPinnedQuickTransferIds: (state: State) => string[] | undefined =
+  createSelector(getConfig, config => config?.protocols.pinnedQuickTransferIds)
 
 export const getQuickTransfersOnDeviceSortKey: (
   state: State
@@ -118,12 +108,11 @@ export const getQuickTransfersOnDeviceSortKey: (
   config => config?.protocols.quickTransfersOnDeviceSortKey ?? null
 )
 
-export const getHasDismissedQuickTransferIntro: (
-  state: State
-) => boolean = createSelector(
-  getConfig,
-  config => config?.protocols.hasDismissedQuickTransferIntro ?? false
-)
+export const getHasDismissedQuickTransferIntro: (state: State) => boolean =
+  createSelector(
+    getConfig,
+    config => config?.protocols.hasDismissedQuickTransferIntro ?? false
+  )
 
 export const getOnDeviceDisplaySettings: (
   state: State
@@ -157,9 +146,5 @@ export const getAppLanguage: (state: State) => Language | null = createSelector(
   config => config?.language.appLanguage ?? null
 )
 
-export const getStoredSystemLanguage: (
-  state: State
-) => string | null = createSelector(
-  getConfig,
-  config => config?.language.systemLanguage ?? null
-)
+export const getStoredSystemLanguage: (state: State) => string | null =
+  createSelector(getConfig, config => config?.language.systemLanguage ?? null)

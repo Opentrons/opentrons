@@ -160,12 +160,12 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
       <Overlay
         onClick={handleClose}
         css={`
-          ${isExpanded ?? false ? OVERLAY_IN_STYLE : overlayOutStyle}
+          ${(isExpanded ?? false) ? OVERLAY_IN_STYLE : overlayOutStyle}
         `}
         backgroundColor={COLORS.black90}
       />
       <Box
-        css={isExpanded ?? false ? EXPANDED_STYLE : collapsedStyle}
+        css={(isExpanded ?? false) ? EXPANDED_STYLE : collapsedStyle}
         cursor="auto"
         position={POSITION_FIXED}
         right="0"
@@ -184,7 +184,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
         >
           {multiSlideoutSpecs === undefined ? null : (
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               color={COLORS.grey60}
               alignItems={ALIGN_CENTER}
               paddingX={SPACING.spacing16}
@@ -204,7 +204,7 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
               marginBottom={SPACING.spacing16}
             >
               <LegacyStyledText
-                as="h2"
+                forwardedAs="h2"
                 overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 data-testid={`Slideout_title_${title}`}

@@ -121,9 +121,8 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
   const isOnDevice = useSelector(getIsOnDevice)
   const { t } = useTranslation(['pipette_wizard_flows', 'shared'])
   const attachedPipettesByMount = useAttachedPipettesFromInstrumentsQuery()
-  const [showExitConfirmation, setShowExitConfirmation] = useState<boolean>(
-    false
-  )
+  const [showExitConfirmation, setShowExitConfirmation] =
+    useState<boolean>(false)
 
   const bothMounts = getIsGantryEmpty(attachedPipettesByMount)
     ? t('ninety_six_channel', {
@@ -225,7 +224,9 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
             justifyContent={JUSTIFY_SPACE_BETWEEN}
           >
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText as="h1">{t('choose_pipette')}</LegacyStyledText>
+              <LegacyStyledText forwardedAs="h1">
+                {t('choose_pipette')}
+              </LegacyStyledText>
               <Flex
                 margin={SPACING.spacing40}
                 justifyContent={JUSTIFY_SPACE_AROUND}
@@ -243,7 +244,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     alt={singleMount}
                   />
                   <LegacyStyledText
-                    as="h3"
+                    forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >
@@ -263,7 +264,7 @@ export const ChoosePipette = (props: ChoosePipetteProps): JSX.Element => {
                     alt={bothMounts}
                   />
                   <LegacyStyledText
-                    as="h3"
+                    forwardedAs="h3"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     textAlign={TYPOGRAPHY.textAlignCenter}
                   >

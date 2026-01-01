@@ -15,16 +15,16 @@ import type { FormattedPipetteOffsetCalibration } from '.'
 
 interface RobotSettingsModuleCalibrationProps {
   attachedModules: AttachedModule[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   robotName: string
+  isRobotBusy: boolean
 }
 
 export function RobotSettingsModuleCalibration({
   attachedModules,
-  updateRobotStatus,
   formattedPipetteOffsetCalibrations,
   robotName,
+  isRobotBusy,
 }: RobotSettingsModuleCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -34,23 +34,26 @@ export function RobotSettingsModuleCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="h3"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {t('module_calibration')}
       </LegacyStyledText>
-      <LegacyStyledText as="p">
+      <LegacyStyledText forwardedAs="p">
         {t('module_calibration_description')}
       </LegacyStyledText>
       {attachedModules.length > 0 ? (
         <ModuleCalibrationItems
           attachedModules={attachedModules}
-          updateRobotStatus={updateRobotStatus}
           formattedPipetteOffsetCalibrations={
             formattedPipetteOffsetCalibrations
           }
           robotName={robotName}
+          isRobotBusy={isRobotBusy}
         />
       ) : (
-        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
           {t('no_modules_attached')}
         </LegacyStyledText>
       )}

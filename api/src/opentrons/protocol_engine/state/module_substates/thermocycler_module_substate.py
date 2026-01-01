@@ -1,4 +1,5 @@
 """Thermocycler Module sub-state."""
+
 from dataclasses import dataclass
 from typing import NewType, Optional
 
@@ -24,9 +25,9 @@ from opentrons.hardware_control.modules import ModuleData, ModuleDataValidator
 
 ThermocyclerModuleId = NewType("ThermocyclerModuleId", str)
 
-# TODO(Ryan) add a real max heating and cooling rate
-MAX_HEATING_RATE = 100.0
-MAX_COOLING_RATE = 100.0
+# These are our published numbers, and from testing they are good bounds
+MAX_HEATING_RATE = 4.25
+MAX_COOLING_RATE = 2.0
 
 
 @dataclass(frozen=True)
@@ -148,7 +149,9 @@ class ThermocyclerModuleSubState:
             )
         return target
 
-    def validate_ramp_rate(self, ramp_rate: float, target_temp: float) -> float:
+    def validate_ramp_rate(
+        self, ramp_rate: Optional[float], target_temp: float
+    ) -> Optional[float]:
         """Validate a given temperature ramp rate.
 
         Args:
@@ -161,6 +164,9 @@ class ThermocyclerModuleSubState:
         Returns:
             The validated ramp rate in °C/second
         """
+        if ramp_rate is None:
+            return ramp_rate
+
         heating = target_temp > self.get_target_block_temperature()
         if (heating and ramp_rate > MAX_HEATING_RATE) or (
             not heating and ramp_rate > MAX_COOLING_RATE
@@ -170,7 +176,9 @@ class ThermocyclerModuleSubState:
                 f" while heating or {MAX_COOLING_RATE}°C/s when cooling."
             )
         if ramp_rate <= 0:
-            raise InvalidRampRateError("Thermocycler ramp rate cannot be negative or 0")
+            raise InvalidRampRateError(
+                f"Thermocycler ramp rate cannot be less than or equal to 0, got {ramp_rate}"
+            )
         return ramp_rate
 
     @classmethod

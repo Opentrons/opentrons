@@ -7,6 +7,7 @@ export {
   absorbanceReaderRead,
   aspirate,
   blowOutInWell,
+  captureImage,
   comment,
   consolidate,
   deactivateTemperature,
@@ -19,6 +20,10 @@ export {
   dropTipInTrash,
   dropTipInWasteChute,
   engageMagnet,
+  flexStackerEmpty,
+  flexStackerFillItems,
+  flexStackerRetrieve,
+  flexStackerStore,
   heaterShaker,
   mix,
   moveLabware,
@@ -31,6 +36,7 @@ export {
   touchTip,
   transfer,
   waitForTemperature,
+  waitForModuleTask,
 } from './commandCreators'
 
 export * from './utils'

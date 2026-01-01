@@ -159,11 +159,12 @@ export const LocationConflictModal = (
         requiredModule,
         deckDef
       )
-      const moduleFixtureIdByCutoutId = getFixtureIdByCutoutIdFromModuleSlotName(
-        slotName,
-        moduleFixtures,
-        deckDef
-      )
+      const moduleFixtureIdByCutoutId =
+        getFixtureIdByCutoutIdFromModuleSlotName(
+          slotName,
+          moduleFixtures,
+          deckDef
+        )
 
       const newDeckConfig = deckConfig.map(existingCutoutConfig => {
         const replacementCutoutFixtureId =
@@ -322,13 +323,13 @@ export const LocationConflictModal = (
               cutout: displaySlotName,
             }}
             components={{
-              block: <LegacyStyledText as="p" />,
+              block: <LegacyStyledText forwardedAs="p" />,
               strong: <strong />,
             }}
           />
           <Flex flexDirection={DIRECTION_COLUMN}>
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               paddingBottom={SPACING.spacing8}
             >
@@ -348,13 +349,13 @@ export const LocationConflictModal = (
                 borderRadius={BORDERS.borderRadius4}
               >
                 <LegacyStyledText
-                  as="p"
+                  forwardedAs="p"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('protocol_specifies')}
                 </LegacyStyledText>
 
-                <LegacyStyledText as="p" color={COLORS.grey60}>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
                   {protocolSpecifiesDisplayName}
                 </LegacyStyledText>
               </Flex>
@@ -367,13 +368,13 @@ export const LocationConflictModal = (
                 borderRadius={BORDERS.borderRadius4}
               >
                 <LegacyStyledText
-                  as="p"
+                  forwardedAs="p"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('currently_configured')}
                 </LegacyStyledText>
 
-                <LegacyStyledText as="p" color={COLORS.grey60}>
+                <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
                   {currentFixtureDisplayName}
                 </LegacyStyledText>
               </Flex>
@@ -408,7 +409,7 @@ export const LocationConflictModal = (
           >
             <Icon name="ot-alert" size="1rem" color={COLORS.yellow50} />
             <LegacyStyledText
-              as="h3"
+              forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('deck_conflict')}
@@ -455,10 +456,13 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <LegacyStyledText as="label" width={SPACING.spacing120}>
+                <LegacyStyledText
+                  forwardedAs="label"
+                  width={SPACING.spacing120}
+                >
                   {t('protocol_specifies')}
                 </LegacyStyledText>
-                <LegacyStyledText as="label" flex="1">
+                <LegacyStyledText forwardedAs="label" flex="1">
                   {protocolSpecifiesDisplayName}
                 </LegacyStyledText>
               </Flex>
@@ -470,10 +474,13 @@ export const LocationConflictModal = (
                 alignItems={ALIGN_CENTER}
                 borderRadius={BORDERS.borderRadius4}
               >
-                <LegacyStyledText as="label" width={SPACING.spacing120}>
+                <LegacyStyledText
+                  forwardedAs="label"
+                  width={SPACING.spacing120}
+                >
                   {t('currently_configured')}
                 </LegacyStyledText>
-                <LegacyStyledText as="label" flex="1">
+                <LegacyStyledText forwardedAs="label" flex="1">
                   {currentFixtureDisplayName}
                 </LegacyStyledText>
               </Flex>

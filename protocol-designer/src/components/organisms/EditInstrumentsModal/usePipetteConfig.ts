@@ -20,7 +20,10 @@ export interface PipetteConfig {
   setPipetteGen: Dispatch<SetStateAction<Gen | 'flex'>>
   setPipetteVolume: Dispatch<SetStateAction<string | null>>
   setSelectedTips: Dispatch<SetStateAction<string[]>>
+  temporarilyDeletedPipettes: string[]
+  setTemporarilyDeletedPipettes: Dispatch<SetStateAction<string[]>>
   resetFields: () => void
+  resetTemporarilyDeletedPipettes: () => void
 }
 
 export const usePipetteConfig = (): PipetteConfig => {
@@ -30,12 +33,19 @@ export const usePipetteConfig = (): PipetteConfig => {
   const [pipetteGen, setPipetteGen] = useState<Gen | 'flex'>('flex')
   const [pipetteVolume, setPipetteVolume] = useState<string | null>(null)
   const [selectedTips, setSelectedTips] = useState<string[]>([])
+  const [temporarilyDeletedPipettes, setTemporarilyDeletedPipettes] = useState<
+    string[]
+  >([])
 
   const resetFields = (): void => {
     setPipetteType(null)
     setPipetteGen('flex')
     setPipetteVolume(null)
     setSelectedTips([])
+  }
+
+  const resetTemporarilyDeletedPipettes = (): void => {
+    setTemporarilyDeletedPipettes([])
   }
 
   return {
@@ -51,6 +61,9 @@ export const usePipetteConfig = (): PipetteConfig => {
     setPipetteVolume,
     selectedTips,
     setSelectedTips,
+    temporarilyDeletedPipettes,
+    setTemporarilyDeletedPipettes,
     resetFields,
+    resetTemporarilyDeletedPipettes,
   }
 }

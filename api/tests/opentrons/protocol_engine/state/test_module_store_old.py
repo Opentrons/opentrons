@@ -4,6 +4,7 @@ DEPRECATED: Testing ModuleStore independently of ModuleView is no longer helpful
 Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
+
 from typing import List, Set, cast, Dict, Optional
 
 import pytest
@@ -426,7 +427,7 @@ def test_handle_hs_temperature_commands(heater_shaker_v1_def: ModuleDefinition) 
     )
     set_temp_cmd = hs_commands.SetTargetTemperature.model_construct(  # type: ignore[call-arg]
         params=hs_commands.SetTargetTemperatureParams(moduleId="module-id", celsius=42),
-        result=hs_commands.SetTargetTemperatureResult(),
+        result=hs_commands.SetTargetTemperatureResult(taskId="taskId"),
     )
     deactivate_cmd = hs_commands.DeactivateHeater.model_construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateHeaterParams(moduleId="module-id"),
@@ -486,10 +487,15 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         params=hs_commands.SetAndWaitForShakeSpeedParams(moduleId="module-id", rpm=111),
         result=hs_commands.SetAndWaitForShakeSpeedResult(pipetteRetracted=False),
     )
+    start_set_shake_cmd = hs_commands.SetShakeSpeed.model_construct(  # type: ignore[call-arg]
+        params=hs_commands.SetShakeSpeedParams(moduleId="module-id", rpm=111),
+        result=hs_commands.SetShakeSpeedResult(pipetteRetracted=False, taskId="taskId"),
+    )
     deactivate_cmd = hs_commands.DeactivateShaker.model_construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
         result=hs_commands.DeactivateShakerResult(),
     )
+
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
         deck_fixed_labware=[],
@@ -508,6 +514,15 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         )
     )
     subject.handle_action(actions.SucceedCommandAction(command=set_shake_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
+            is_plate_shaking=True,
+            plate_target_temperature=None,
+        )
+    }
+    subject.handle_action(actions.SucceedCommandAction(command=start_set_shake_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
@@ -615,7 +630,9 @@ def test_handle_tempdeck_temperature_commands(
         params=temp_commands.SetTargetTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
-        result=temp_commands.SetTargetTemperatureResult(targetTemperature=42),
+        result=temp_commands.SetTargetTemperatureResult(
+            targetTemperature=42, taskId="taskId"
+        ),
     )
     deactivate_cmd = temp_commands.DeactivateTemperature.model_construct(  # type: ignore[call-arg]
         params=temp_commands.DeactivateTemperatureParams(moduleId="module-id"),

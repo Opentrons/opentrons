@@ -116,9 +116,8 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
         )
   }
 
-  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
-    props
-  )
+  const [confirmLink, crashRecoveryConfirmation] =
+    useConfirmCrashRecovery(props)
 
   let titleText =
     calBlock != null ? t('calibrate_tip_on_block') : t('calibrate_tip_on_trash')
@@ -140,10 +139,10 @@ export function MeasureTip(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
               {titleText}
             </LegacyStyledText>
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {calBlock != null
                 ? t('jog_nozzle_to_block', { slotName: calBlock.slot })
                 : t('jog_nozzle_to_trash')}

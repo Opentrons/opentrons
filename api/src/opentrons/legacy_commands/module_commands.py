@@ -89,6 +89,24 @@ def thermocycler_set_block_temp(
     }
 
 
+def thermocycler_start_set_block_temp(
+    temperature: float,
+) -> command_types.ThermocyclerStartSetBlockTempCommand:
+    temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
+    text = f"Starting to set Thermocycler well block temperature to {temp} °C"
+    # TODO: BC 2019-09-05 this time resolving logic is partially duplicated
+    # in the thermocycler api class definition, with this command logger
+    # implementation, there isn't a great way to avoid this, but it should
+    # be consolidated as soon as an alternative to the publisher is settled on.
+    return {
+        "name": command_types.THERMOCYCLER_START_SET_BLOCK_TEMP,
+        "payload": {
+            "temperature": temperature,
+            "text": text,
+        },
+    }
+
+
 def thermocycler_execute_profile(
     steps: List[ThermocyclerStep], repetitions: int
 ) -> command_types.ThermocyclerExecuteProfileCommand:
@@ -98,6 +116,19 @@ def thermocycler_execute_profile(
     )
     return {
         "name": command_types.THERMOCYCLER_EXECUTE_PROFILE,
+        "payload": {"text": text, "steps": steps},
+    }
+
+
+def thermocycler_start_execute_profile(
+    steps: List[ThermocyclerStep], repetitions: int
+) -> command_types.ThermocyclerStartExecuteProfileCommand:
+    text = (
+        f"In the background, thermocycler starting to run {repetitions} repetitions "
+        f" of cycle composed of the following steps: {steps}"
+    )
+    return {
+        "name": command_types.THERMOCYCLER_START_EXECUTE_PROFILE,
         "payload": {"text": text, "steps": steps},
     }
 
@@ -118,6 +149,17 @@ def thermocycler_set_lid_temperature(
     temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
     text = f"Setting Thermocycler lid temperature to {temp} °C"
     return {"name": command_types.THERMOCYCLER_SET_LID_TEMP, "payload": {"text": text}}
+
+
+def thermocycler_start_set_lid_temperature(
+    temperature: float,
+) -> command_types.ThermocyclerStartSetLidTempCommand:
+    temp = round(float(temperature), utils.TC_GCODE_ROUNDING_PRECISION)
+    text = f"Starting to set Thermocycler lid temperature to {temp} °C"
+    return {
+        "name": command_types.THERMOCYCLER_START_SET_LID_TEMP,
+        "payload": {"text": text},
+    }
 
 
 def thermocycler_deactivate_lid() -> command_types.ThermocyclerDeactivateLidCommand:
@@ -165,7 +207,9 @@ def heater_shaker_set_target_temperature(
     }
 
 
-def heater_shaker_wait_for_temperature() -> command_types.HeaterShakerWaitForTemperatureCommand:
+def heater_shaker_wait_for_temperature() -> (
+    command_types.HeaterShakerWaitForTemperatureCommand
+):
     text = "Waiting for Heater-Shaker to reach target temperature"
     return {
         "name": command_types.HEATER_SHAKER_WAIT_FOR_TEMPERATURE,
@@ -183,7 +227,19 @@ def heater_shaker_set_and_wait_for_shake_speed(
     }
 
 
-def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareLatchCommand:
+def heater_shaker_set_shake_speed(
+    rpm: int,
+) -> command_types.HeaterShakerSetShakeSpeedCommand:
+    text = f"Setting Heater-Shaker to Shake at {rpm} RPM"
+    return {
+        "name": command_types.HEATER_SHAKER_SET_SHAKE_SPEED,
+        "payload": {"text": text},
+    }
+
+
+def heater_shaker_open_labware_latch() -> (
+    command_types.HeaterShakerOpenLabwareLatchCommand
+):
     text = "Unlatching labware on Heater-Shaker"
     return {
         "name": command_types.HEATER_SHAKER_OPEN_LABWARE_LATCH,
@@ -191,7 +247,9 @@ def heater_shaker_open_labware_latch() -> command_types.HeaterShakerOpenLabwareL
     }
 
 
-def heater_shaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwareLatchCommand:
+def heater_shaker_close_labware_latch() -> (
+    command_types.HeaterShakerCloseLabwareLatchCommand
+):
     text = "Latching labware on Heater-Shaker"
     return {
         "name": command_types.HEATER_SHAKER_CLOSE_LABWARE_LATCH,
@@ -199,7 +257,9 @@ def heater_shaker_close_labware_latch() -> command_types.HeaterShakerCloseLabwar
     }
 
 
-def heater_shaker_deactivate_shaker() -> command_types.HeaterShakerDeactivateShakerCommand:
+def heater_shaker_deactivate_shaker() -> (
+    command_types.HeaterShakerDeactivateShakerCommand
+):
     text = "Deactivating Shaker"
     return {
         "name": command_types.HEATER_SHAKER_DEACTIVATE_SHAKER,
@@ -207,7 +267,9 @@ def heater_shaker_deactivate_shaker() -> command_types.HeaterShakerDeactivateSha
     }
 
 
-def heater_shaker_deactivate_heater() -> command_types.HeaterShakerDeactivateHeaterCommand:
+def heater_shaker_deactivate_heater() -> (
+    command_types.HeaterShakerDeactivateHeaterCommand
+):
     text = "Deactivating Heater"
     return {
         "name": command_types.HEATER_SHAKER_DEACTIVATE_HEATER,

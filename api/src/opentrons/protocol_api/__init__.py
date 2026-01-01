@@ -14,7 +14,7 @@ from opentrons.protocols.parameters.exceptions import (
     RuntimeParameterRequired as RuntimeParameterRequiredError,
 )
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
-
+from .tasks import Task
 from .protocol_context import ProtocolContext
 from .deck import Deck
 from .robot_context import RobotContext
@@ -101,6 +101,8 @@ __all__ = [
     "BLOWOUT_ACTION",
     "RuntimeParameterRequiredError",
     "CSVParameter",
+    # Concurrent task types
+    "Task",
     # For internal Opentrons use only:
     "create_protocol_context",
     "ProtocolEngineCoreRequiredError",

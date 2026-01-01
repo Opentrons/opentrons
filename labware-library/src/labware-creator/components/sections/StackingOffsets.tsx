@@ -47,21 +47,17 @@ const maskTo2Decimal = makeMaskToDecimal(2)
 
 export function StackingOffsets(): JSX.Element | null {
   const labwareDefinitions = getAllDefinitions()
-  const adapterDefinitions = Object.values(
-    labwareDefinitions
-  ).filter(definition => definition.allowedRoles?.includes('adapter'))
+  const adapterDefinitions = Object.values(labwareDefinitions).filter(
+    definition => definition.allowedRoles?.includes('adapter')
+  )
 
   const fieldList: Array<keyof LabwareFields> = [
     'compatibleAdapters',
     'compatibleModules',
     'stackedLabwareZDimension',
   ]
-  const {
-    values,
-    errors,
-    touched,
-    setFieldValue,
-  } = useFormikContext<LabwareFields>()
+  const { values, errors, touched, setFieldValue } =
+    useFormikContext<LabwareFields>()
 
   if (isEveryFieldHidden(fieldList, values)) {
     return null
@@ -192,7 +188,7 @@ export function StackingOffsets(): JSX.Element | null {
             {isStackableLabware && (
               <>
                 <LegacyStyledText
-                  as="h3"
+                  forwardedAs="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   Labware
@@ -215,7 +211,7 @@ export function StackingOffsets(): JSX.Element | null {
             {modifiedAdapterDefinitions.length === 0 ? null : (
               <Flex gridGap={SPACING.spacing4} flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText
-                  as="h3"
+                  forwardedAs="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   Adapters
@@ -251,10 +247,8 @@ export function StackingOffsets(): JSX.Element | null {
                                 ...values.compatibleAdapters,
                               }
                               if (isChecked) {
-                                const {
-                                  [key]: _,
-                                  ...newCompatibleAdapters
-                                } = compatibleAdaptersCopy
+                                const { [key]: _, ...newCompatibleAdapters } =
+                                  compatibleAdaptersCopy
                                 setFieldValue(
                                   'compatibleAdapters',
                                   newCompatibleAdapters
@@ -304,7 +298,7 @@ export function StackingOffsets(): JSX.Element | null {
                 gridGap={SPACING.spacing4}
               >
                 <LegacyStyledText
-                  as="h3"
+                  forwardedAs="h3"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   Modules
@@ -336,10 +330,8 @@ export function StackingOffsets(): JSX.Element | null {
                                 ...values.compatibleModules,
                               }
                               if (isChecked) {
-                                const {
-                                  [model]: _,
-                                  ...newCompatibleModules
-                                } = compatibleModulesCopy
+                                const { [model]: _, ...newCompatibleModules } =
+                                  compatibleModulesCopy
                                 setFieldValue(
                                   'compatibleModules',
                                   newCompatibleModules

@@ -1,4 +1,5 @@
 """Fixtures for protocol engine command tests."""
+
 from __future__ import annotations
 
 import pytest
@@ -128,16 +129,22 @@ def state_store(decoy: Decoy) -> StateStore:
 
 
 @pytest.fixture
+def real_concurrency_provider() -> ConcurrencyProvider:
+    """Get a real concurrency provider."""
+    return ConcurrencyProvider()
+
+
+@pytest.fixture
 def real_task_handler(
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     model_utils: ModelUtils,
-    concurrency_provider: ConcurrencyProvider,
+    real_concurrency_provider: ConcurrencyProvider,
 ) -> TaskHandler:
     """Get a real task handler with mocked dependencies."""
     return TaskHandler(
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         model_utils=model_utils,
-        concurrency_provider=concurrency_provider,
+        concurrency_provider=real_concurrency_provider,
     )

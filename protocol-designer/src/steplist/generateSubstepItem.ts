@@ -17,7 +17,7 @@ import {
   substepTimelineMultiChannel,
   substepTimelineSingleChannel,
 } from './substepTimeline'
-import * as steplistUtils from './utils'
+import { mergeWhen } from './utils/mergeWhen'
 
 import type {
   ConsolidateArgs,
@@ -118,7 +118,7 @@ export const mergeSubstepRowsSingleChannel = (args: {
   showDispenseVol: boolean
 }): StepItemSourceDestRow[] => {
   const { substepRows, showDispenseVol } = args
-  return steplistUtils.mergeWhen(
+  return mergeWhen(
     substepRows,
     (
       currentRow,
@@ -253,9 +253,8 @@ function transferLikeSubsteps(args: {
   const showDispenseVol = stepArgs.commandCreatorFnName === 'distribute'
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
-  const substepCommandCreator = getCommandCreatorForTransferlikeSubsteps(
-    stepArgs
-  )
+  const substepCommandCreator =
+    getCommandCreatorForTransferlikeSubsteps(stepArgs)
 
   if (!substepCommandCreator) {
     console.assert(
@@ -276,14 +275,13 @@ function transferLikeSubsteps(args: {
       invariantContext,
       initialRobotState
     )
-    const mergedMultiRows: StepItemSourceDestRow[][] = mergeSubstepRowsMultiChannel(
-      {
+    const mergedMultiRows: StepItemSourceDestRow[][] =
+      mergeSubstepRowsMultiChannel({
         substepRows,
         isMixStep: stepArgs.commandCreatorFnName === 'mix',
         channels,
         showDispenseVol,
-      }
-    )
+      })
     return {
       substepType: 'sourceDest',
       multichannel: true,
@@ -355,31 +353,8 @@ export function generateSubstepItem(
   }
 
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_PROFILE) {
-    const labwareNames = stepArgs.moduleId
-      ? labwareNamesByModuleId[stepArgs.moduleId]
-      : null
-
-    const {
-      blockTargetTempHold,
-      lidOpenHold,
-      lidTargetTempHold,
-      message,
-      meta,
-      profileSteps,
-      profileTargetLidTemp,
-      profileVolume,
-    } = stepArgs
     return {
       substepType: THERMOCYCLER_PROFILE,
-      blockTargetTempHold,
-      labwareNickname: labwareNames?.nickname,
-      lidOpenHold,
-      lidTargetTempHold,
-      message,
-      meta,
-      profileSteps,
-      profileTargetLidTemp,
-      profileVolume,
     }
   }
 

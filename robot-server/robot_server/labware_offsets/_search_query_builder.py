@@ -160,8 +160,7 @@ def _build_where_expression_for_location_match(
                 # (which offset's row ID would it be?), but remember that this is evaluated
                 # in the context of some larger overall SELECT statement defined outside this
                 # function.
-                components_table.c.offset_id
-                == labware_offset_table.c.row_id
+                components_table.c.offset_id == labware_offset_table.c.row_id
             )
             .where(components_table.c.sequence_ordinal == index)
             .where(components_table.c.component_kind == component.kind)
@@ -190,11 +189,11 @@ def _primary_component_value(
     component: StoredLabwareOffsetLocationSequenceComponents,
 ) -> str:
     match component:
-        case OnLabwareOffsetLocationSequenceComponent(
-            labwareUri=value
-        ) | OnModuleOffsetLocationSequenceComponent(
-            moduleModel=value
-        ) | OnAddressableAreaOffsetLocationSequenceComponent(
-            addressableAreaName=value
+        case (
+            OnLabwareOffsetLocationSequenceComponent(labwareUri=value)
+            | OnModuleOffsetLocationSequenceComponent(moduleModel=value)
+            | OnAddressableAreaOffsetLocationSequenceComponent(
+                addressableAreaName=value
+            )
         ):
             return value

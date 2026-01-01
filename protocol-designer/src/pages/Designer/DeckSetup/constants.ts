@@ -11,6 +11,7 @@ import {
   ABSORBANCE_READER_TYPE,
   ABSORBANCE_READER_V1,
   FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   HEATERSHAKER_MODULE_TYPE,
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
@@ -28,6 +29,15 @@ import {
 
 import type { ModuleModel, ModuleType } from '@opentrons/shared-data'
 
+export const FLEX_MODULE_MODELS_WITH_FF: ModuleModel[] = [
+  ABSORBANCE_READER_V1,
+  FLEX_STACKER_MODULE_V1,
+  HEATERSHAKER_MODULE_V1,
+  MAGNETIC_BLOCK_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V2,
+]
+
 export const FLEX_MODULE_MODELS: ModuleModel[] = [
   ABSORBANCE_READER_V1,
   HEATERSHAKER_MODULE_V1,
@@ -35,6 +45,7 @@ export const FLEX_MODULE_MODELS: ModuleModel[] = [
   TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V2,
 ]
+
 export const OT2_MODULE_MODELS: ModuleModel[] = [
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_MODULE_V1,
@@ -106,7 +117,23 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'opentrons_96_wellplate_200ul_pcr_full_skirt',
   ],
   [ABSORBANCE_READER_TYPE]: ['nest_96_wellplate_200ul_flat'],
-  [FLEX_STACKER_MODULE_TYPE]: [],
+  [FLEX_STACKER_MODULE_TYPE]: [
+    // all flex tipracks
+    'opentrons_flex_96_filtertiprack_1000ul',
+    'opentrons_flex_96_filtertiprack_200ul',
+    'opentrons_flex_96_filtertiprack_50ul',
+    'opentrons_flex_96_tiprack_1000ul',
+    'opentrons_flex_96_tiprack_200ul',
+    'opentrons_flex_96_tiprack_50ul',
+    // tested and verified well plates
+    'opentrons_96_wellplate_200ul_pcr_full_skirt',
+    'biorad_96_wellplate_200ul_pcr',
+    'biorad_384_wellplate_50ul',
+    'corning_24_wellplate_3.4ml_flat',
+    'nest_96_wellplate_2ml_deep',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'nest_96_wellplate_200ul_flat',
+  ],
 }
 
 export const MOAM_MODELS_WITH_FF: ModuleModel[] = [TEMPERATURE_MODULE_V2]
@@ -122,12 +149,17 @@ export const MAX_MOAM_MODULES = 7
 //  to be auto-generated
 export const MAX_MAGNETIC_BLOCKS = 10
 
-export const DECK_CONTROLS_STYLE = {
+export const DECK_CONTROLS_STYLE_BASE = {
   position: POSITION_ABSOLUTE,
   top: 0,
   right: 0,
   bottom: 0,
   left: 0,
+  cursor: CURSOR_POINTER,
+}
+
+export const DECK_CONTROLS_STYLE = {
+  ...DECK_CONTROLS_STYLE_BASE,
   transform: 'rotate(180deg) scaleX(-1)',
   zIndex: 1,
   backgroundColor: `${COLORS.black90}cc`,
@@ -136,5 +168,4 @@ export const DECK_CONTROLS_STYLE = {
   color: COLORS.white,
   fontSize: PRODUCT.TYPOGRAPHY.fontFamilyBodyDefaultRegular,
   borderRadius: BORDERS.borderRadius8,
-  cursor: CURSOR_POINTER,
 }

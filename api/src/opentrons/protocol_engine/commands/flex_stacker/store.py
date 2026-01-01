@@ -1,4 +1,4 @@
-"""Command models to retrieve a labware from a Flex Stacker."""
+"""Command models to store a labware in a Flex Stacker."""
 
 from __future__ import annotations
 from typing import Optional, Literal, TYPE_CHECKING, Type, Union, cast
@@ -10,6 +10,7 @@ from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import (
     FlexStackerStallError,
     FlexStackerShuttleMissingError,
+    FlexStackerShuttleLabwareError,
 )
 
 from ..command import (
@@ -22,6 +23,7 @@ from ..command import (
 from ..flex_stacker.common import (
     FlexStackerStallOrCollisionError,
     FlexStackerShuttleError,
+    FlexStackerLabwareStoreError,
     labware_locations_for_group,
     labware_location_base_sequence,
     primary_location_sequence,
@@ -80,15 +82,15 @@ class StoreResult(BaseModel):
             "The full location in which all labware moved by this command will eventually reside."
         ),
     )
-    primaryOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description=("The origin location of the primary labware."))
+    primaryOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description=("The origin location of the primary labware."))
+    )
     primaryLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The primary labware in the stack that was stored."
     )
-    adapterOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description=("The origin location of the adapter labware, if any."))
+    adapterOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description=("The origin location of the adapter labware, if any."))
+    )
     adapterLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The adapter in the stack that was stored, if any."
     )
@@ -115,7 +117,8 @@ class StoreResult(BaseModel):
 _ExecuteReturn = Union[
     SuccessData[StoreResult],
     DefinedErrorData[FlexStackerStallOrCollisionError]
-    | DefinedErrorData[FlexStackerShuttleError],
+    | DefinedErrorData[FlexStackerShuttleError]
+    | DefinedErrorData[FlexStackerLabwareStoreError],
 ]
 
 
@@ -180,7 +183,7 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
                 )
             return labware_ids[0], None, lid_id
 
-    async def execute(self, params: StoreParams) -> _ExecuteReturn:
+    async def execute(self, params: StoreParams) -> _ExecuteReturn:  # noqa: C901
         """Execute the labware storage command."""
         stacker_state = self._state_view.modules.get_flex_stacker_substate(
             params.moduleId
@@ -238,6 +241,21 @@ class StoreImpl(AbstractCommandImpl[StoreParams, _ExecuteReturn]):
             except FlexStackerShuttleMissingError as e:
                 return DefinedErrorData(
                     public=FlexStackerShuttleError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=e,
+                            )
+                        ],
+                        errorInfo={"labwareId": primary_id},
+                    ),
+                )
+            except FlexStackerShuttleLabwareError as e:
+                return DefinedErrorData(
+                    public=FlexStackerLabwareStoreError(
                         id=self._model_utils.generate_id(),
                         createdAt=self._model_utils.get_timestamp(),
                         wrappedErrors=[

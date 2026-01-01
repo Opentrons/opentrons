@@ -1,4 +1,5 @@
 """Partial tip configurations for tests."""
+
 import pytest
 from contextlib import nullcontext as does_not_raise
 from typing import NamedTuple, Optional, ContextManager, Any

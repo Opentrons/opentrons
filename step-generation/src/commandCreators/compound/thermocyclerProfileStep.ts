@@ -1,9 +1,10 @@
 import * as errorCreators from '../../errorCreators'
 import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
+import { thermocyclerRunExtendedProfile } from '../atomic'
 import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
-import { thermocyclerRunProfile } from '../atomic/thermocyclerRunProfile'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
+import { thermocyclerStartRunExtendedProfile } from '../atomic/thermocyclerStartRunExtendedProfile'
 import { thermocyclerStateStep } from './thermocyclerStateStep'
 
 import type {
@@ -12,27 +13,25 @@ import type {
   ThermocyclerProfileStepArgs,
 } from '../../types'
 
-export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const thermocyclerProfileStep: CommandCreator<
+  ThermocyclerProfileStepArgs
+> = (args, invariantContext, prevRobotState) => {
   const {
-    blockTargetTempHold,
-    lidTargetTempHold,
-    lidOpenHold,
+    concurrent,
     moduleId,
-    profileSteps,
+    profileElements,
     profileTargetLidTemp,
     profileVolume,
   } = args
   const thermocyclerState = thermocyclerStateGetter(prevRobotState, moduleId)
-
   if (thermocyclerState === null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
+
+  const thermocyclerPythonName =
+    invariantContext.moduleEntities[moduleId].pythonName
 
   const commandCreators: CurriedCommandCreator[] = []
 
@@ -53,26 +52,37 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
     )
   }
 
-  commandCreators.push(
-    curryCommandCreator(thermocyclerRunProfile, {
-      moduleId,
-      profile: profileSteps.map(step => ({
-        celsius: step.temperature,
-        holdSeconds: step.holdTime,
-      })),
-      blockMaxVolumeUl: profileVolume,
-    })
-  )
+  if (concurrent) {
+    // This is going to get used as a Python variable name, so it's snake_case.
+    const taskId = `${thermocyclerPythonName}_task_${thermocyclerState.numProfilesStarted + 1}`
+    commandCreators.push(
+      curryCommandCreator(thermocyclerStartRunExtendedProfile, {
+        moduleId,
+        profileElements,
+        blockMaxVolumeUl: profileVolume,
+        taskId,
+      })
+    )
+  } else {
+    const { blockTargetTempHold, lidTargetTempHold, lidOpenHold } = args
+    commandCreators.push(
+      curryCommandCreator(thermocyclerRunExtendedProfile, {
+        moduleId,
+        profileElements,
+        blockMaxVolumeUl: profileVolume,
+      })
+    )
+    commandCreators.push(
+      curryCommandCreator(thermocyclerStateStep, {
+        commandCreatorFnName: 'thermocyclerState',
+        moduleId,
+        blockTargetTemp: blockTargetTempHold,
+        lidTargetTemp: lidTargetTempHold,
+        lidOpen: lidOpenHold,
+      })
+    )
+  }
 
-  commandCreators.push(
-    curryCommandCreator(thermocyclerStateStep, {
-      commandCreatorFnName: 'thermocyclerState',
-      moduleId: moduleId,
-      blockTargetTemp: blockTargetTempHold,
-      lidTargetTemp: lidTargetTempHold,
-      lidOpen: lidOpenHold,
-    })
-  )
   return reduceCommandCreators(
     commandCreators,
     invariantContext,

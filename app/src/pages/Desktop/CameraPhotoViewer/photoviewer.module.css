@@ -1,0 +1,21 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+}
+
+.image_active {
+  display: block;
+}
+
+.image_inactive {
+  display: none;
+}

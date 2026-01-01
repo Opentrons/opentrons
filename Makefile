@@ -39,7 +39,7 @@ cover ?= true
 updateSnapshot ?= false
 quiet ?= false
 
-FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml)" "**/*.@(ts|tsx|js|json|md|yml)"
+FORMAT_FILE_GLOB = ".*.@(js|ts|tsx|yml|mjs|mts)" "**/*.@(ts|tsx|js|mts|mjs|json|md|yml)"
 
 ifeq ($(watch), true)
 	cover := false
@@ -53,19 +53,9 @@ usb_host=$(shell yarn -s discovery find -i 169.254)
 .PHONY: setup
 setup: setup-js setup-py
 
-# Both the python and JS setup targets depend on a minimal python setup so they can create
-# virtual envs using pipenv.
-.PHONY: setup-py-toolchain
-setup-py-toolchain:
-	$(OT_PYTHON) -m pip install --upgrade pip
-	$(OT_PYTHON) -m pip install pipenv==2023.12.1
-# this needs to be installed AFTER pipenv or pipenv will update this to the bad version
-	$(OT_PYTHON) -m pip install virtualenv==20.30.0
-
-# front-end dependecies handled by yarn
+# front-end dependencies handled by yarn
 .PHONY: setup-js
 setup-js:
-setup-js: setup-py-toolchain
 	yarn config set network-timeout 60000
 	yarn
 	$(MAKE) -C $(APP_SHELL_DIR) setup
@@ -74,11 +64,14 @@ setup-js: setup-py-toolchain
 PYTHON_SETUP_TARGETS := $(addsuffix -py-setup, $(PYTHON_DIRS))
 
 .PHONY: setup-py
-setup-py: setup-py-toolchain
+setup-py:
 	$(MAKE) $(PYTHON_SETUP_TARGETS)
 
 %-py-setup:
 	$(MAKE) -C $* setup
+
+$(SHARED_DATA_DIR)-py-setup:
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # uninstall all project dependencies
 # tear down JS after Python, because Python cleanup depends on JS dep shx
@@ -196,7 +189,6 @@ test-windows: test-js test-py-windows
 .PHONY: test-e2e
 test-e2e:
 	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
-	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
 PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(PYTHON_DIRS))
 WINDOWS_PYTHON_TEST_TARGETS := $(addsuffix -py-test, $(HARDWARE_DIR) $(API_DIR) $(SHARED_DATA_DIR)/python)
@@ -209,6 +201,9 @@ test-py-windows: $(WINDOWS_PYTHON_TEST_TARGETS)
 
 %-py-test:
 	$(MAKE) -C $* test
+
+$(SHARED_DATA_DIR)-py-test:
+	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-js
 test-js: test-js-internal
@@ -224,6 +219,9 @@ lint-py: $(PYTHON_LINT_TARGETS)
 
 %-py-lint:
 	$(MAKE) -C $* lint
+
+$(SHARED_DATA_DIR)-py-lint:
+	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
 lint-js: lint-js-eslint lint-js-prettier
@@ -255,6 +253,9 @@ format-py: $(PYTHON_FORMAT_TARGETS)
 
 %-py-format:
 	$(MAKE) -C $* format
+
+$(SHARED_DATA_DIR)-py-format:
+	$(MAKE) -C $(SHARED_DATA_DIR) format-py
 
 .PHONY: format-js
 format-js:

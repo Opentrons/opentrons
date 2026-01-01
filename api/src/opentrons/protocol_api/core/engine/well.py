@@ -1,4 +1,5 @@
 """ProtocolEngine-based Well core implementations."""
+
 from typing import Optional, Union
 
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
@@ -213,6 +214,14 @@ class WellCore(AbstractWellCore):
         labware_id = self.labware_id
         well_name = self._name
         return self._engine_client.state.geometry.get_meniscus_height(
+            labware_id=labware_id, well_name=well_name
+        )
+
+    def has_tracked_liquid(self) -> bool:
+        """Return true if liquid has been loaded or probed."""
+        labware_id = self.labware_id
+        well_name = self._name
+        return self._engine_client.state.geometry.well_has_tracked_liquid(
             labware_id=labware_id, well_name=well_name
         )
 

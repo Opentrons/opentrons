@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import debounce from 'lodash/debounce'
 
@@ -31,6 +30,7 @@ import {
 } from '/protocol-designer/ui/steps/actions/actions'
 
 import { ConnectedStepContainer } from './ConnectedStepContainer'
+import { useStepText } from './useStepText'
 import {
   getMetaSelectedSteps,
   getMouseClickKeyInfo,
@@ -47,28 +47,31 @@ import type { SelectMultipleStepsAction } from '/protocol-designer/ui/steps'
 
 export interface ConnectedStepInfoProps {
   stepId: StepIdType
-  stepNumber: number
-  dragHovered?: boolean
   openedOverflowMenuId?: string | null
   setOpenedOverflowMenuId?: Dispatch<SetStateAction<string | null>>
   sidebarWidth: number
 }
 
+// This debounce reduces flickering when the cursor moves across steps in the timeline.
+// Although there's no hover gap between adjacent `StepContainer`s (they have a visual
+// gap but it's made out of internal padding), there are hover gaps in `ConcurrentStepGroup`s.
 const DEBOUNCE_DURATION_MS = 500
 
+// todo(mm, 2025-11-14): I've made a mess of ConnectedStepInfo and ConnectedStepContainer.
+// We should try to either merge them, or clarify each one's responsibilities.
 export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const {
     stepId,
-    stepNumber,
-    dragHovered = false,
     openedOverflowMenuId,
     setOpenedOverflowMenuId,
     sidebarWidth,
   } = props
-  const { i18n, t } = useTranslation('application')
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const stepIds = useSelector(getOrderedStepIds)
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
+  const stepNumber = useSelector(stepFormSelectors.getUserVisibleStepNumbers)[
+    stepId
+  ]
   const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
     stepId
   ]
@@ -85,6 +88,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
     errorStepId != null ? stepIds.slice(stepIds.indexOf(errorStepId) + 1) : []
   const stepAfterError =
     stepId != null ? stepListAfterErrors.includes(stepId) : false
+  const { text, subtext } = useStepText(step)
 
   const hasWarnings =
     hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
@@ -92,12 +96,13 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
   const hoveredStep = useSelector(getHoveredStepId)
   const selectedStepId = useSelector(getSelectedStepId)
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
+  const stepHierarchy = useSelector(stepFormSelectors.getSavedStepHierarchy)
   const lastMultiSelectedStepId = useSelector(getMultiSelectLastSelected)
   const isMultiSelectMode = useSelector(getIsMultiSelectMode)
-  const selected: boolean = multiSelectItemIds?.length
-    ? multiSelectItemIds.includes(stepId)
-    : selectedStepId === stepId
+  const selected: boolean =
+    multiSelectItemIds != null && multiSelectItemIds.length > 0
+      ? multiSelectItemIds.includes(stepId)
+      : selectedStepId === stepId
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -150,7 +155,7 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
       if (isShiftKeyPressed) {
         stepsToSelect = getShiftSelectedSteps(
           selectedStepId,
-          orderedStepIds,
+          stepHierarchy,
           stepId,
           multiSelectItemIds,
           lastMultiSelectedStepId
@@ -245,16 +250,10 @@ export function ConnectedStepInfo(props: ConnectedStepInfoProps): JSX.Element {
         onClick={confirm}
         hovered={hoveredStep === stepId && !hoveredSubstep}
         onMouseEnter={handleMouseEnter}
-        iconName={hasError || hasWarnings ? 'alert-circle' : iconName}
+        iconName={hasError || hasWarnings ? 'ot-alert' : iconName}
         stepNumber={stepNumber}
-        // add empty check to avoid causing undefined issue when calling titleCase
-        // todo(mm, 2025-09-05): `stepName !== undefined || stepName !== ''` will always evaluate to true, won't it?
-        text={
-          step.stepName !== undefined || step.stepName !== ''
-            ? i18n.format(step.stepName, 'titleCase')
-            : t(`stepType.${step.stepType}`)
-        }
-        dragHovered={dragHovered}
+        text={text}
+        subtext={subtext}
         sidebarWidth={sidebarWidth}
       />
     </>

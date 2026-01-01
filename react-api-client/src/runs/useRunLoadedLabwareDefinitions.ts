@@ -23,7 +23,7 @@ export function useRunLoadedLabwareDefinitions(
   return useQuery<RunLoadedLabwareDefinitions, AxiosError>(
     [host, 'runs', runId, 'loaded_labware_definitions'],
     () =>
-      getRunLoadedLabwareDefintions(host as HostConfig, runId as string).then(
+      getRunLoadedLabwareDefintions(host!, runId!).then(
         response => response.data
       ),
     {

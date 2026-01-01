@@ -55,7 +55,7 @@ describe('RadioButton', () => {
     props = {
       ...props,
       radioButtonType: 'small',
-      iconName: 'alert-circle',
+      iconName: 'ot-alert',
     }
     render(props)
     const label = screen.getByRole('label')

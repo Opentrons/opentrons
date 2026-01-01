@@ -65,8 +65,7 @@ function isMatchedFixture(
   )
 }
 
-interface CutoutConfigAndCompatibilityWithPartial
-  extends CutoutConfigAndCompatibility {
+interface CutoutConfigAndCompatibilityWithPartial extends CutoutConfigAndCompatibility {
   partialRequiredCutoutFixtureId?: CutoutFixtureId
 }
 
@@ -121,7 +120,7 @@ export const getFilteredDeckConfigFixtureCompatibility = (
         // if there is a magnetic block combination fixture, separate it out
         // and show two line items in the table
         if (
-          compatabilityItem.compatibleCutoutFixtureIds.some(fixtureId =>
+          compatabilityItem.compatibleCutoutFixtureIds.every(fixtureId =>
             MAGNETIC_BLOCK_FIXTURES.includes(fixtureId)
           )
         ) {

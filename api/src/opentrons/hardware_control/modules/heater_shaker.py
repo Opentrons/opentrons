@@ -2,19 +2,21 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, Mapping
+from typing import Optional, Mapping, Callable
 from typing_extensions import Final
 
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.heater_shaker.driver import HeaterShakerDriver
 from opentrons.drivers.heater_shaker.abstract import AbstractHeaterShakerDriver
 from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
 from opentrons.hardware_control.execution_manager import ExecutionManager
 from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     ModuleType,
     TemperatureStatus,
     SpeedStatus,
@@ -47,12 +49,13 @@ class HeaterShaker(mod_abc.AbstractModule):
         port: str,
         usb_port: USBPort,
         hw_control_loop: asyncio.AbstractEventLoop,
-        execution_manager: Optional[ExecutionManager] = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
         poll_interval_seconds: Optional[float] = None,
         simulating: bool = False,
         sim_model: Optional[str] = None,
         sim_serial_number: Optional[str] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
     ) -> "HeaterShaker":
         """
         Build a HeaterShaker
@@ -67,6 +70,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             loop: Loop
             sim_model: The model name used by simulator
             disconnected_callback: Callback to inform the module controller that the device was disconnected
+            error_callback: Callback to inform the module controller of an asynchronous error
 
         Returns:
             HeaterShaker instance
@@ -91,6 +95,7 @@ class HeaterShaker(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
 
         try:
@@ -109,8 +114,9 @@ class HeaterShaker(mod_abc.AbstractModule):
         poller: Poller,
         device_info: Mapping[str, str],
         hw_control_loop: asyncio.AbstractEventLoop,
-        execution_manager: Optional[ExecutionManager] = None,
-        disconnected_callback: ModuleDisconnectedCallback = None,
+        execution_manager: ExecutionManager,
+        disconnected_callback: ModuleDisconnectedCallback,
+        error_callback: ModuleErrorCallback,
     ):
         super().__init__(
             port=port,
@@ -118,14 +124,22 @@ class HeaterShaker(mod_abc.AbstractModule):
             hw_control_loop=hw_control_loop,
             execution_manager=execution_manager,
             disconnected_callback=disconnected_callback,
+            error_callback=error_callback,
         )
         self._device_info = device_info
         self._driver = driver
         self._reader = reader
         self._poller = poller
+        self._unsubscribe_reader = self._reader.register_error_handler(
+            self._handle_error
+        )
+
+    def _handle_error(self, error: Exception) -> None:
+        self.error_callback(error)
 
     async def cleanup(self) -> None:
         """Stop the poller task"""
+        self._unsubscribe_reader()
         await self._poller.stop()
         await self._driver.disconnect()
 
@@ -397,11 +411,22 @@ class HeaterShakerReader(Reader):
         self.labware_latch = HeaterShakerLabwareLatchStatus.IDLE_UNKNOWN
         self.error: Optional[str] = None
         self._driver = driver
+        self._handle_error: Callable[[Exception], None] | None = None
+
+    def register_error_handler(
+        self, handle_error: Callable[[Exception], None]
+    ) -> Callable[[], None]:
+        self._handle_error = handle_error
+        return self._unsubscribe_error_handler
+
+    def _unsubscribe_error_handler(self) -> None:
+        self._handle_error = None
 
     async def read(self) -> None:
         await self.read_temperature()
         await self.read_rpm()
         await self.read_labware_latch()
+        await self._read_errors()
         self._set_error(None)
 
     def on_error(self, exception: Exception) -> None:
@@ -420,7 +445,19 @@ class HeaterShakerReader(Reader):
         if exception is None:
             self.error = None
         else:
+            if self._handle_error:
+                self._handle_error(exception)
             try:
                 self.error = str(exception.args[0])
             except Exception:
                 self.error = repr(exception)
+
+    async def _read_errors(self) -> None:
+        try:
+            await self._driver.get_error_state()
+        except UnhandledGcode:
+            # This device's firmware cannot accept this command, because it
+            # hasn't been updated or because it's a gen1. Ignore the result.
+            pass
+        # If the error is one we should let pass, raise it so the top level
+        # error handler can take it.

@@ -4,10 +4,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import {
+  ALIGN_CENTER,
   BasicButton,
   COLORS,
+  DIRECTION_COLUMN,
+  Flex,
   INFO_TOAST,
+  JUSTIFY_CENTER,
   LargeButton,
+  SPACING,
   StyledText,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -38,9 +43,8 @@ export function Landing(): JSX.Element {
   const dispatch: ThunkDispatch<any> = useDispatch()
   const metadata = useSelector(getFileMetadata)
   const navigate = useNavigate()
-  const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
-    false
-  )
+  const [showAnnouncementModal, setShowAnnouncementModal] =
+    useState<boolean>(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { hasOptedIn, appVersion } = useSelector(getHasOptedIn)
   const { bakeToast, eatToast } = useKitchen()
@@ -61,7 +65,7 @@ export function Landing(): JSX.Element {
       hasOptedIn != null
     ) {
       const toastId = bakeToast(
-        t('learn_more', { version: process.env.OT_PD_VERSION }) as string,
+        t('learn_more', { version: _OT_PD_VERSION_ }) as string,
         INFO_TOAST,
         {
           heading: t('updated_protocol_designer'),
@@ -75,7 +79,7 @@ export function Landing(): JSX.Element {
             setShowAnnouncementModal(true)
           },
           disableTimeout: true,
-          justifyContent: 'center',
+          justifyContent: JUSTIFY_CENTER,
         }
       )
     }
@@ -108,15 +112,32 @@ export function Landing(): JSX.Element {
           }}
         />
       ) : null}
-      <div data-cy="landing-page" className={styles.landing_page}>
-        <div className={styles.content_section}>
+      <Flex
+        data-cy="landing-page"
+        backgroundColor={COLORS.grey10}
+        flexDirection={DIRECTION_COLUMN}
+        alignItems={ALIGN_CENTER}
+        justifyContent={JUSTIFY_CENTER}
+        height="calc(100vh - 9rem)"
+        width="100%"
+        gridGap={SPACING.spacing32}
+      >
+        <Flex
+          flexDirection={DIRECTION_COLUMN}
+          gridGap={SPACING.spacing16}
+          alignItems={ALIGN_CENTER}
+        >
           <img
             src={welcomeImage}
             height="132px"
             width="548px"
             aria-label="welcome image"
           />
-          <div className={styles.text_section}>
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing8}
+            alignItems={ALIGN_CENTER}
+          >
             <StyledText desktopStyle="headingLargeBold">
               {t('welcome')}
             </StyledText>
@@ -128,8 +149,8 @@ export function Landing(): JSX.Element {
             >
               {t('no-code-required')}
             </StyledText>
-          </div>
-        </div>
+          </Flex>
+        </Flex>
         <NavLink to="/createNew" className={styles.nav_link}>
           <LargeButton
             onClick={() => {
@@ -155,7 +176,7 @@ export function Landing(): JSX.Element {
             accept={ACCEPTED_PROTOCOL_FILE_TYPES}
           />
         </label>
-      </div>
+      </Flex>
       <EndUserAgreementFooter />
     </>
   )

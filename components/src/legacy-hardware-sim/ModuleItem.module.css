@@ -1,4 +1,4 @@
-@import '../index.module.css';
+@import url('../index.module.css');
 
 .module {
   display: flex;
@@ -28,7 +28,7 @@
 .module_review_text {
   margin-bottom: 0.75rem;
   color: var(--c-white);
-  fill: currentColor;
+  fill: currentcolor;
   font-size: 0.55rem;
   font-weight: var(--fw-semibold);
   text-transform: capitalize;
@@ -49,7 +49,7 @@
 
 .module_port_text {
   color: var(--c-white);
-  fill: currentColor;
+  fill: currentcolor;
   font-size: 0.65rem;
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
@@ -57,7 +57,7 @@
 
 .module_port_text_na {
   color: var(--c-med-gray);
-  fill: currentColor;
+  fill: currentcolor;
   font-size: 0.65rem;
   font-weight: var(--fw-semibold);
   text-transform: uppercase;
@@ -83,7 +83,7 @@
 
 .module_name_text {
   color: var(--c-white);
-  fill: currentColor;
+  fill: currentcolor;
   font-size: 0.5rem;
   font-weight: var(--fw-semibold);
   text-transform: uppercase;

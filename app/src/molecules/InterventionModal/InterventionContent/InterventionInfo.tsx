@@ -4,11 +4,11 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   Icon,
   RESPONSIVENESS,
+  RobotInfoLabel,
   SPACING,
   SPACING_1,
   SPACING_2,
@@ -19,15 +19,15 @@ import {
 
 import { Divider } from '/app/atoms/structure/Divider'
 
-import type { DeckInfoLabelProps } from '@opentrons/components'
+import type { RobotInfoLabelProps } from '@opentrons/components'
 
 export interface BaseInterventionInfo {
   layout: 'default' | 'stacked'
   type: 'location-arrow-location' | 'location-colon-location' | 'location'
   labwareName: string
   labwareNickname?: string
-  currentLocationProps: DeckInfoLabelProps
-  newLocationProps?: DeckInfoLabelProps
+  currentLocationProps: RobotInfoLabelProps
+  newLocationProps?: RobotInfoLabelProps
 }
 
 export interface InterventionInfoDefaultProps extends BaseInterventionInfo {
@@ -124,9 +124,9 @@ const buildLocArrowLoc = (props: InterventionInfoProps): JSX.Element => {
           }
         `}
       >
-        <DeckInfoLabel {...currentLocationProps} />
+        <RobotInfoLabel {...currentLocationProps} />
         <Icon name="arrow-right" css={ICON_STYLE} />
-        <DeckInfoLabel {...newLocationProps} />
+        <RobotInfoLabel {...newLocationProps} />
       </Flex>
     )
   } else {
@@ -142,7 +142,7 @@ const buildLoc = ({
 }: InterventionInfoProps): JSX.Element => {
   return (
     <Flex gridGap={SPACING.spacing8}>
-      <DeckInfoLabel {...currentLocationProps} />
+      <RobotInfoLabel {...currentLocationProps} />
     </Flex>
   )
 }
@@ -161,9 +161,9 @@ const buildLocColonLoc = (props: InterventionInfoProps): JSX.Element => {
           }
         `}
       >
-        <DeckInfoLabel {...currentLocationProps} />
+        <RobotInfoLabel {...currentLocationProps} />
         <Icon name="colon" css={ICON_STYLE} />
-        <DeckInfoLabel {...newLocationProps} />
+        <RobotInfoLabel {...newLocationProps} />
       </Flex>
     )
   } else {

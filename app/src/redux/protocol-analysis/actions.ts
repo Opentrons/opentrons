@@ -18,12 +18,14 @@ export type ProtocolAnalysisAction =
   | OpenPythonInterpreterDirectoryAction
   | ChangePythonPathOverrideConfigAction
 
-export const openPythonInterpreterDirectory = (): OpenPythonInterpreterDirectoryAction => ({
-  type: OPEN_PYTHON_DIRECTORY,
-  meta: { shell: true },
-})
+export const openPythonInterpreterDirectory =
+  (): OpenPythonInterpreterDirectoryAction => ({
+    type: OPEN_PYTHON_DIRECTORY,
+    meta: { shell: true },
+  })
 
-export const changePythonPathOverrideConfig = (): ChangePythonPathOverrideConfigAction => ({
-  type: CHANGE_PYTHON_PATH_OVERRIDE,
-  meta: { shell: true },
-})
+export const changePythonPathOverrideConfig =
+  (): ChangePythonPathOverrideConfigAction => ({
+    type: CHANGE_PYTHON_PATH_OVERRIDE,
+    meta: { shell: true },
+  })

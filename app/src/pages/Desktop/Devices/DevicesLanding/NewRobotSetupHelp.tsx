@@ -47,7 +47,10 @@ export function NewRobotSetupHelp(): JSX.Element {
               }}
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
-                <LegacyStyledText as="p" marginBottom={SPACING.spacing16}>
+                <LegacyStyledText
+                  forwardedAs="p"
+                  marginBottom={SPACING.spacing16}
+                >
                   {t('branded:new_robot_instructions')}
                 </LegacyStyledText>
                 <ExternalLink

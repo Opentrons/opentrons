@@ -1,4 +1,5 @@
 """Abstract base classes for the sensor drivers."""
+
 from abc import ABC, abstractmethod
 
 from typing import Optional, AsyncIterator, Sequence

@@ -121,11 +121,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const [currentStep, setCurrentStep] = useState<number>(1)
   const [blowOutLocation, setBlowOutLocation] = useState<
     BlowOutLocation | undefined
-  >(state.blowOutDispense?.location as BlowOutLocation | undefined)
+  >(state.blowOutDispense?.location ?? undefined)
   const [speed, setSpeed] = useState<number | null>(
-    (state.blowOutDispense?.flowRate as number) ?? null
+    state.blowOutDispense?.flowRate! ?? null
   )
-
   const enableBlowOutDisplayItems = [
     {
       option: true,
@@ -142,12 +141,10 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       },
     },
   ]
-
   const blowOutLocationItems = useBlowOutLocationOptions(
     deckConfig,
     state.transferType
   )
-
   const handleClickBackOrExit = (): void => {
     currentStep > 1 ? setCurrentStep(currentStep - 1) : onBack()
   }
@@ -235,8 +232,8 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
   const correctionByVolume = tipTypeSettings?.singleDispense?.correctionByVolume
   const retract = tipTypeSettings?.singleDispense?.retract
 
-  const referenceVolumesForByVolumeInterpolation = getTransferPlanAndReferenceVolumes(
-    {
+  const referenceVolumesForByVolumeInterpolation =
+    getTransferPlanAndReferenceVolumes({
       pipetteSpecs: state.pipette,
       volume: state.volume,
       tiprackDefinition: state.tipRack,
@@ -244,12 +241,11 @@ export function BlowOut(props: BlowOutProps): JSX.Element {
       numAspirateWells: state.sourceWells.length,
       numDispenseWells: state.destinationWells.length,
       aspirateAirGapByVolume:
-        (retract?.airGapByVolume as Array<[number, number]>) ?? null,
+        (retract?.airGapByVolume as Array<[number, number]>) ?? [],
       conditioningByVolume:
         (correctionByVolume as Array<[number, number]>) ?? null,
       disposalByVolume: null, // note always null because blowout is available only for single dispense
-    }
-  )
+    })
 
   const [referenceVolumeFlowRate, referenceVolumeCorrection] = [
     referenceVolumesForByVolumeInterpolation.referenceVolumes?.flowRate

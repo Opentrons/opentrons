@@ -1,4 +1,5 @@
 """Utility functions for transfer_liquid, consolidate_liquid and distribute_liquid"""
+
 from __future__ import annotations
 
 from typing import Literal, Sequence, List, Optional, TYPE_CHECKING
@@ -72,7 +73,7 @@ def raise_if_location_inside_liquid(
 def group_wells_for_multi_channel_transfer(
     targets: Sequence[Well],
     nozzle_map: NozzleMapInterface,
-    target_name: Literal["source", "destination"],
+    target_name: Literal["source", "destination", "tip"],
 ) -> List[Well]:
     """Takes a list of wells and a nozzle map and returns a list of target wells to address every well given
 
@@ -108,7 +109,7 @@ def group_wells_for_multi_channel_transfer(
 def _group_wells_for_nozzle_configuration(  # noqa: C901
     targets: List[Well],
     nozzle_map: NozzleMapInterface,
-    target_name: Literal["source", "destination"],
+    target_name: Literal["source", "destination", "tip"],
 ) -> List[Well]:
     """Groups wells together for a column, row, or full 96 configuration and returns a reduced list of target wells."""
     grouped_wells = []

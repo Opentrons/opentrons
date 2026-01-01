@@ -3,11 +3,12 @@
 Actions can be passed to the ActionDispatcher, where they will trigger
 reactions in objects that subscribe to the pipeline, like the StateStore.
 """
+
 import dataclasses
 from datetime import datetime
-from enum import Enum
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
+from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
@@ -23,6 +24,7 @@ from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..errors import ErrorOccurrence
 from ..notes.notes import CommandNote
 from ..state.update_types import StateUpdate
+from ..resources.camera_provider import CameraSettings
 from ..types import (
     LabwareOffsetCreateInternal,
     ModuleDefinition,
@@ -39,7 +41,7 @@ class PlayAction:
     requested_at: datetime
 
 
-class PauseSource(str, Enum):
+class PauseSource(StrEnum):
     """The source of a PauseAction.
 
     Attributes:
@@ -62,7 +64,7 @@ class PauseAction:
 class StopAction:
     """Request engine execution to stop soon."""
 
-    from_estop: bool = False
+    from_asynchronous_error: bool = False
 
 
 @dataclasses.dataclass(frozen=True)
@@ -236,6 +238,26 @@ class AddLabwareDefinitionAction:
 
 
 @dataclasses.dataclass(frozen=True)
+class AddCameraSettingsAction:
+    """Add Camera settings to be used in place of the Camera Provider accessible settings."""
+
+    enablement_settings: CameraSettings
+
+
+@dataclasses.dataclass(frozen=True)
+class AddCameraCaptureImageSettingsAction:
+    """Add Camera capture image settings to be used in place of the system default settings."""
+
+    camera_id: Optional[str] = None
+    resolution: Optional[Tuple[int, int]] = None
+    zoom: Optional[float] = None
+    pan: Optional[Tuple[int, int]] = None
+    contrast: Optional[float] = None
+    brightness: Optional[float] = None
+    saturation: Optional[float] = None
+
+
+@dataclasses.dataclass(frozen=True)
 class AddLiquidAction:
     """Add a liquid, to apply to subsequent `LoadLiquid`s."""
 
@@ -272,13 +294,6 @@ class AddModuleAction:
 
 
 @dataclasses.dataclass(frozen=True)
-class ResetTipsAction:
-    """Reset the tip tracking state of a given tip rack."""
-
-    labware_id: str
-
-
-@dataclasses.dataclass(frozen=True)
 class SetPipetteMovementSpeedAction:
     """Set the speed of a pipette's X/Y/Z movements. Does not affect plunger speed.
 
@@ -311,10 +326,11 @@ Action = Union[
     AddLabwareOffsetAction,
     AddLabwareDefinitionAction,
     AddModuleAction,
+    AddCameraSettingsAction,
+    AddCameraCaptureImageSettingsAction,
     SetDeckConfigurationAction,
     AddAddressableAreaAction,
     AddLiquidAction,
-    ResetTipsAction,
     SetPipetteMovementSpeedAction,
     SetErrorRecoveryPolicyAction,
     StartTaskAction,

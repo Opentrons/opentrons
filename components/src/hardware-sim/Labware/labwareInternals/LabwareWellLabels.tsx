@@ -70,7 +70,7 @@ const Labels = (props: {
             textAnchor="middle"
             dominantBaseline={isLetterColumn ? 'middle' : 'auto'}
             fill={
-              highlightedWellLabels?.wells.includes(wellName) ?? false
+              (highlightedWellLabels?.wells.includes(wellName) ?? false)
                 ? highlightColor
                 : fillColor
             }

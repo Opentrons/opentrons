@@ -63,7 +63,7 @@ class Record:
     def format_date_offset(self: RecordSlfType, date: datetime) -> str:
         """Print with a time offset from some other time rather than a timestamp."""
         return (
-            f"{self.__class__.__name__}: offset={(self.date-date).total_seconds()}, sender={self.sender.name}, dest={self.dest.name}, "
+            f"{self.__class__.__name__}: offset={(self.date - date).total_seconds()}, sender={self.sender.name}, dest={self.dest.name}, "
             + self.format_fields()
         )
 
@@ -73,7 +73,7 @@ class Record:
 
     def __str__(self) -> str:
         """String."""
-        return f'{self.__class__.__name__}: date={self.date.strftime("%b %d %H:%M:%S")}.{self.date.time().microsecond/1000000}, sender={self.sender.name}, dest={self.dest.name}'
+        return f"{self.__class__.__name__}: date={self.date.strftime('%b %d %H:%M:%S')}.{self.date.time().microsecond / 1000000}, sender={self.sender.name}, dest={self.dest.name}"
 
 
 _MOVE_COMPLETE_RE = re.compile(
@@ -345,7 +345,7 @@ def receive_records(records: Iterator[Record]) -> Iterator[Union[MoveComplete, E
 
 
 def complete_records(
-    records: Union[Iterator[Record], Iterator[Union[MoveComplete, Error]]]
+    records: Union[Iterator[Record], Iterator[Union[MoveComplete, Error]]],
 ) -> Iterator[MoveComplete]:
     """Filter only move-complete."""
     for record in records:
@@ -354,7 +354,7 @@ def complete_records(
 
 
 def error_records(
-    records: Union[Iterator[Record], Iterator[Union[MoveComplete, Error]]]
+    records: Union[Iterator[Record], Iterator[Union[MoveComplete, Error]]],
 ) -> Iterator[Error]:
     """Filter only errors."""
     for record in records:
@@ -734,7 +734,7 @@ def _verify_nodes(nodes: Optional[List[str]]) -> Iterator[NodeId]:
         except BaseException as e:
             print(repr(e))
             print(
-                f'Invalid node name {node}, must be one of: {", ".join(valid_node_strs)}'
+                f"Invalid node name {node}, must be one of: {', '.join(valid_node_strs)}"
             )
             sys.exit(-1)
     for node_element in to_check:

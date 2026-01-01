@@ -267,6 +267,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 heater_shaker.SetTargetTemperatureResult,
                 heater_shaker.DeactivateHeaterResult,
                 heater_shaker.SetAndWaitForShakeSpeedResult,
+                heater_shaker.SetShakeSpeedResult,
                 heater_shaker.DeactivateShakerResult,
                 heater_shaker.OpenLabwareLatchResult,
                 heater_shaker.CloseLabwareLatchResult,
@@ -340,24 +341,24 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=actual_model,
             )
         elif ModuleModel.is_heater_shaker_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = HeaterShakerModuleSubState.from_live_data(
-                module_id=HeaterShakerModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                HeaterShakerModuleSubState.from_live_data(
+                    module_id=HeaterShakerModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_temperature_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = TemperatureModuleSubState.from_live_data(
-                module_id=TemperatureModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                TemperatureModuleSubState.from_live_data(
+                    module_id=TemperatureModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_thermocycler_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = ThermocyclerModuleSubState.from_live_data(
-                module_id=ThermocyclerModuleId(module_id), data=live_data
+            self._state.substate_by_module_id[module_id] = (
+                ThermocyclerModuleSubState.from_live_data(
+                    module_id=ThermocyclerModuleId(module_id), data=live_data
+                )
             )
             self._update_additional_slots_occupied_by_thermocycler(
                 module_id=module_id, slot_name=slot_name
@@ -416,9 +417,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
             module_serial = module.serial_number
-            assert (
-                module_serial is not None
-            ), "Expected a module SN and got None instead."
+            assert module_serial is not None, (
+                "Expected a module SN and got None instead."
+            )
             self._state.module_offset_by_serial[module_serial] = ModuleOffsetData(
                 moduleOffsetVector=module_offset,
                 location=location,
@@ -430,6 +431,7 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             heater_shaker.SetTargetTemperature,
             heater_shaker.DeactivateHeater,
             heater_shaker.SetAndWaitForShakeSpeed,
+            heater_shaker.SetShakeSpeed,
             heater_shaker.DeactivateShaker,
             heater_shaker.OpenLabwareLatch,
             heater_shaker.CloseLabwareLatch,
@@ -437,9 +439,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     ) -> None:
         module_id = command.params.moduleId
         hs_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            hs_substate, HeaterShakerModuleSubState
-        ), f"{module_id} is not heater-shaker."
+        assert isinstance(hs_substate, HeaterShakerModuleSubState), (
+            f"{module_id} is not heater-shaker."
+        )
 
         # Get current values to preserve target temperature not being set/deactivated
         prev_state: HeaterShakerModuleSubState = hs_substate
@@ -459,6 +461,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 plate_target_temperature=None,
             )
         elif isinstance(command.result, heater_shaker.SetAndWaitForShakeSpeedResult):
+            self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
+                module_id=HeaterShakerModuleId(module_id),
+                labware_latch_status=prev_state.labware_latch_status,
+                is_plate_shaking=True,
+                plate_target_temperature=prev_state.plate_target_temperature,
+            )
+        elif isinstance(command.result, heater_shaker.SetShakeSpeedResult):
             self._state.substate_by_module_id[module_id] = HeaterShakerModuleSubState(
                 module_id=HeaterShakerModuleId(module_id),
                 labware_latch_status=prev_state.labware_latch_status,
@@ -523,9 +532,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     ) -> None:
         module_id = command.params.moduleId
         thermocycler_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            thermocycler_substate, ThermocyclerModuleSubState
-        ), f"{module_id} is not a thermocycler module."
+        assert isinstance(thermocycler_substate, ThermocyclerModuleSubState), (
+            f"{module_id} is not a thermocycler module."
+        )
 
         # Get current values to preserve target temperature not being set/deactivated
         block_temperature = thermocycler_substate.target_block_temperature
@@ -591,9 +600,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         # Get current values:
         module_id = absorbance_reader_state_update.module_id
         absorbance_reader_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            absorbance_reader_substate, AbsorbanceReaderSubState
-        ), f"{module_id} is not an absorbance plate reader."
+        assert isinstance(absorbance_reader_substate, AbsorbanceReaderSubState), (
+            f"{module_id} is not an absorbance plate reader."
+        )
         is_lid_on = absorbance_reader_substate.is_lid_on
         measured = True
         configured = absorbance_reader_substate.configured
@@ -616,12 +625,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             measure_mode = AbsorbanceReaderMeasureMode(
                 absorbance_reader_state_update.initialize_absorbance_reader_update.measure_mode
             )
-            configured_wavelengths = (
-                absorbance_reader_state_update.initialize_absorbance_reader_update.sample_wave_lengths
-            )
-            reference_wavelength = (
-                absorbance_reader_state_update.initialize_absorbance_reader_update.reference_wave_length
-            )
+            configured_wavelengths = absorbance_reader_state_update.initialize_absorbance_reader_update.sample_wave_lengths
+            reference_wavelength = absorbance_reader_state_update.initialize_absorbance_reader_update.reference_wave_length
             data = None
         elif (
             absorbance_reader_state_update.absorbance_reader_data
@@ -645,13 +650,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         """Handle Flex Stacker state updates."""
         module_id = state_update.module_id
         prev_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            prev_substate, FlexStackerSubState
-        ), f"{module_id} is not a Flex Stacker."
+        assert isinstance(prev_substate, FlexStackerSubState), (
+            f"{module_id} is not a Flex Stacker."
+        )
 
-        self._state.substate_by_module_id[
-            module_id
-        ] = prev_substate.new_from_state_change(state_update)
+        self._state.substate_by_module_id[module_id] = (
+            prev_substate.new_from_state_change(state_update)
+        )
 
 
 class ModuleView:
@@ -1329,6 +1334,12 @@ class ModuleView:
                     f"Module {module.model} is already present at {location}."
                 )
 
+    def is_column_4_module(self, model: ModuleModel) -> bool:
+        """Determine whether or not a module is a Column 4 Module."""
+        if model in _COLUMN_4_MODULES:
+            return True
+        return False
+
     def get_overflowed_module_in_slot(
         self, slot_name: DeckSlotName
     ) -> Optional[LoadedModule]:
@@ -1505,3 +1516,24 @@ class ModuleView:
                 f"Provided overlap offset {overlap_offset} does not match "
                 f"configured {configured}."
             )
+
+    def get_has_module_probably_matching_hardware_details(
+        self, module_model: ModuleModel, module_serial: str | None
+    ) -> bool:
+        """Get the ID of a model that possibly matches the provided details.
+
+        If the provided serial is not None, return True if there is a module with the same serial or
+        False if there is not.
+        If the provided serial is None, return True if there is a module with the same model or False if
+        there is not.
+
+        This is intended to provide a good probability that a module matching the provided details
+        is or is not present in the state store. It is used to drive whether the engine cancels a protocol
+        in response to an asynchronous module error or not.
+        """
+        for module_id, module in self._state.hardware_by_module_id.items():
+            if module_serial is not None and module_serial == module.serial_number:
+                return True
+            if module_serial is None and module.definition.model == module_model:
+                return True
+        return False

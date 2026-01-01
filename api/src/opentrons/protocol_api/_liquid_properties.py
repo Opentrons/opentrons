@@ -106,7 +106,6 @@ class LiquidHandlingPropertyByVolume:
 # values will cause the protocol to fail analysis, rather than silently passing.
 @dataclass(slots=True)
 class TipPosition:
-
     _position_reference: PositionReference
     _offset: Coordinate
 
@@ -148,7 +147,6 @@ class TipPosition:
 
 @dataclass(slots=True)
 class DelayProperties:
-
     _enabled: bool
     _duration: Optional[float]
 
@@ -183,7 +181,6 @@ class DelayProperties:
 
 @dataclass(slots=True)
 class TouchTipProperties:
-
     _enabled: bool
     _z_offset: Optional[float]
     _mm_from_edge: Optional[float]
@@ -255,7 +252,6 @@ class TouchTipProperties:
 
 @dataclass(slots=True)
 class MixProperties:
-
     _enabled: bool
     _repetitions: Optional[int]
     _volume: Optional[float]
@@ -308,7 +304,6 @@ class MixProperties:
 
 @dataclass(slots=True)
 class BlowoutProperties:
-
     _enabled: bool
     _location: Optional[BlowoutLocation]
     _flow_rate: Optional[float]
@@ -362,7 +357,6 @@ class BlowoutProperties:
 
 @dataclass(slots=True)
 class _SubmergeRetractCommon:
-
     _speed: float
     _delay: DelayProperties
 
@@ -382,7 +376,6 @@ class _SubmergeRetractCommon:
 
 @dataclass(slots=True)
 class Submerge(_SubmergeRetractCommon):
-
     _start_position: TipPosition
 
     @property
@@ -399,7 +392,6 @@ class Submerge(_SubmergeRetractCommon):
 
 @dataclass(slots=True)
 class RetractAspirate(_SubmergeRetractCommon):
-
     _end_position: TipPosition
     _air_gap_by_volume: LiquidHandlingPropertyByVolume
     _touch_tip: TouchTipProperties
@@ -462,7 +454,6 @@ class RetractDispense(_SubmergeRetractCommon):
 
 @dataclass(slots=True)
 class _BaseLiquidHandlingProperties:
-
     _submerge: Submerge
     _flow_rate_by_volume: LiquidHandlingPropertyByVolume
     _correction_by_volume: LiquidHandlingPropertyByVolume
@@ -487,7 +478,6 @@ class _BaseLiquidHandlingProperties:
 
 @dataclass(slots=True)
 class AspirateProperties(_BaseLiquidHandlingProperties):
-
     _aspirate_position: TipPosition
     _retract: RetractAspirate
     _pre_wet: bool
@@ -529,7 +519,6 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
 
 @dataclass(slots=True)
 class SingleDispenseProperties(_BaseLiquidHandlingProperties):
-
     _dispense_position: TipPosition
     _retract: RetractDispense
     _push_out_by_volume: LiquidHandlingPropertyByVolume
@@ -566,7 +555,6 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
 
 @dataclass(slots=True)
 class MultiDispenseProperties(_BaseLiquidHandlingProperties):
-
     _dispense_position: TipPosition
     _retract: RetractDispense
     _conditioning_by_volume: LiquidHandlingPropertyByVolume

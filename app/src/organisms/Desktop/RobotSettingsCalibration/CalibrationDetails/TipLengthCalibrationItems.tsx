@@ -45,16 +45,16 @@ const BODY_STYLE = css`
 `
 interface TipLengthCalibrationItemsProps {
   robotName: string
+  isRobotBusy: boolean
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   formattedTipLengthCalibrations: FormattedTipLengthCalibration[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function TipLengthCalibrationItems({
   robotName,
+  isRobotBusy,
   formattedPipetteOffsetCalibrations,
   formattedTipLengthCalibrations,
-  updateRobotStatus,
 }: TipLengthCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
   const customLabwareDefs = useSelector((state: State) => {
@@ -99,7 +99,7 @@ export function TipLengthCalibrationItems({
         {tipLengthCalibrations.map((calibration, index) => (
           <StyledTableRow key={index}>
             <StyledTableCell>
-              <LegacyStyledText as="p">
+              <LegacyStyledText forwardedAs="p">
                 {calibration.tiprackDefURI &&
                   getDisplayNameForTipRack(
                     calibration.tiprackDefURI,
@@ -108,15 +108,15 @@ export function TipLengthCalibrationItems({
               </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <LegacyStyledText as="p">
+              <LegacyStyledText forwardedAs="p">
                 {calibration.modelName}
               </LegacyStyledText>
-              <LegacyStyledText as="p">
+              <LegacyStyledText forwardedAs="p">
                 {calibration.serialNumber}
               </LegacyStyledText>
             </StyledTableCell>
             <StyledTableCell>
-              <LegacyStyledText as="p">
+              <LegacyStyledText forwardedAs="p">
                 {calibration.lastCalibrated !== undefined
                   ? formatLastCalibrated(calibration.lastCalibrated)
                   : 'Not calibrated'}
@@ -126,13 +126,13 @@ export function TipLengthCalibrationItems({
               <OverflowMenu
                 calType="tipLength"
                 robotName={robotName}
+                isRobotBusy={isRobotBusy}
                 serialNumber={calibration.serialNumber}
                 mount={
                   calibration.mount != null
                     ? calibration.mount
                     : checkMountWithAttachedPipettes(calibration.serialNumber)
                 }
-                updateRobotStatus={updateRobotStatus}
                 tiprackDefURI={calibration.tiprackDefURI}
               />
             </StyledTableCell>

@@ -12,13 +12,11 @@ import {
 const times = 200
 
 bench(`commandCreatorsTimeline: mix ${times} times`, b => {
-  const {
-    robotState: initialRobotState,
-    invariantContext,
-  } = getStateAndContextTempTCModules({
-    temperatureModuleId: 'someTemperatureModuleId',
-    thermocyclerId: 'someTCId',
-  })
+  const { robotState: initialRobotState, invariantContext } =
+    getStateAndContextTempTCModules({
+      temperatureModuleId: 'someTemperatureModuleId',
+      thermocyclerId: 'someTCId',
+    })
 
   const curriedCommandCreators = [
     curryCommandCreator(mix, {

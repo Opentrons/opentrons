@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -9698,7 +9701,32 @@
     "protocolName": "IDT xGEN MC",
     "source": "Protocol Library"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "1"
+      },
+      "model": "magneticModuleV2",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "3"
+      },
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "7"
+      },
+      "model": "thermocyclerModuleV1",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",
