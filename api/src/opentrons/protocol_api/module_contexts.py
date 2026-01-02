@@ -30,6 +30,7 @@ from .core.common import (
     MagneticBlockCore,
     AbsorbanceReaderCore,
     FlexStackerCore,
+    VacuumModuleCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -1731,3 +1732,22 @@ class FlexStackerContext(ModuleContext):
         :py:meth:`.retrieve`.
         """
         return self._cores_to_labware(self._core.get_stored_labware())
+
+
+class VacuumModuleContext(ModuleContext):
+    """An object representing a connected Vacuum Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    .. versionadded:: 2.25
+    """
+
+    _core: VacuumModuleCore
+
+    @property
+    @requires_version(2, 25)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()
+

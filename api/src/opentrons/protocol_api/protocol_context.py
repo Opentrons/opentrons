@@ -69,6 +69,7 @@ from .core.module import (
     AbstractMagneticBlockCore,
     AbstractAbsorbanceReaderCore,
     AbstractFlexStackerCore,
+    AbstractVacuumModuleCore,
 )
 from .robot_context import RobotContext, HardwareManager
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -1889,6 +1890,8 @@ def _create_module_context(
     elif isinstance(module_core, AbstractAbsorbanceReaderCore):
         module_cls = AbsorbanceReaderContext
     elif isinstance(module_core, AbstractFlexStackerCore):
+        module_cls = FlexStackerContext
+    elif isinstance(module_core, AbstractVacuumModuleCore):
         module_cls = FlexStackerContext
     else:
         assert False, "Unsupported module type"

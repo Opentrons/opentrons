@@ -47,6 +47,7 @@ from ..module import (
     AbstractMagneticBlockCore,
     AbstractAbsorbanceReaderCore,
     AbstractFlexStackerCore,
+    AbstractVacuumModuleCore,
 )
 from .exceptions import InvalidMagnetEngageHeightError
 
@@ -1114,3 +1115,9 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
                 poolOverlapOverride=stacking_offset_z,
             )
         )
+
+
+class VacuumModuleCore(ModuleCore, AbstractVacuumModuleCore[LabwareCore]):
+    """Vacuum Module core logic implementation for Python protocols."""
+
+    _sync_module_hardware: SynchronousAdapter[hw_modules.VacuumModule]

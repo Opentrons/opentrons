@@ -204,7 +204,7 @@ class ModuleType(StrEnum):
     MAGNETIC_BLOCK: MagneticBlockType = "magneticBlockType"
     ABSORBANCE_READER: AbsorbanceReaderType = "absorbanceReaderType"
     FLEX_STACKER: FlexStackerModuleType = "flexStackerModuleType"
-    VACUUM_MODULE: VacuumModuleType = "VacuumModuleType"
+    VACUUM_MODULE: VacuumModuleType = "vacuumModuleType"
 
     @classmethod
     def from_model(cls, model: ModuleModel) -> ModuleType:
@@ -241,7 +241,7 @@ class ModuleType(StrEnum):
         if module_type == ModuleType.FLEX_STACKER:
             return "flexStackerModuleV1"
         if module_type == ModuleType.VACUUM_MODULE:
-            return "VacuumModuleV1"
+            return "vacuumModuleMilliporeV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
@@ -280,7 +280,7 @@ class FlexStackerModuleModel(StrEnum):
 
 
 class VacuumModuleModel(StrEnum):
-    VACUUM_MODULE_V1: str = "VacuumModuleV1"
+    VACUUM_MODULE_V1: str = "vacuumModuleMilliporeV1"
 
 
 def module_model_from_string(model_string: str) -> ModuleModel:

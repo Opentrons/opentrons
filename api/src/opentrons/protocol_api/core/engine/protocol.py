@@ -78,6 +78,7 @@ from .module_core import (
     MagneticBlockCore,
     AbsorbanceReaderCore,
     FlexStackerCore,
+    VacuumModuleCore,
 )
 from .exceptions import InvalidModuleLocationError
 from . import (
@@ -774,6 +775,7 @@ class ProtocolCore(
             ModuleType.HEATER_SHAKER: HeaterShakerModuleCore,
             ModuleType.ABSORBANCE_READER: AbsorbanceReaderCore,
             ModuleType.FLEX_STACKER: FlexStackerCore,
+            ModuleType.VACUUM_MODULE: VacuumModuleCore,
         }
 
         module_type = load_module_result.model.as_type()
