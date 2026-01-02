@@ -203,7 +203,7 @@ def _check_ot2_axis_type(
             )
     if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
         if any(
-            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]   # type: ignore [union-attr]
+            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]  # type: ignore [union-attr]
             for k in axis_map_keys
         ):
             raise IncorrectAxisError(

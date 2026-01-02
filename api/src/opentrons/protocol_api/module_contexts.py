@@ -1750,4 +1750,3 @@ class VacuumModuleContext(ModuleContext):
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
-
