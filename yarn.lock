@@ -17700,10 +17700,10 @@ react-router@6.24.1:
   dependencies:
     "@remix-run/router" "1.17.1"
 
-react-scan@^0.0.38:
-  version "0.0.38"
-  resolved "https://registry.yarnpkg.com/react-scan/-/react-scan-0.0.38.tgz#f5c1fd1d60fa16f5fa508335bd0e2ac42235e672"
-  integrity sha512-n6+yIiw6FIx6EnIpf3B5dus9mmOZmU0wXpPQmXCG9rac/4rO9kv9UFBTdV6hgIA2L0JsrIJonkXpse7jt3Zi1Q==
+react-scan@0.0.43:
+  version "0.0.43"
+  resolved "https://registry.yarnpkg.com/react-scan/-/react-scan-0.0.43.tgz#2f9700a6033b85f97ea6b70d0216cf0fae88679c"
+  integrity sha512-HL4pbOApez7SMbN0pxXQM/1Eb17jFg8hm7NcDJK+HJCkkFrOQ4qiuK/3VH4GbF2nqKwf8bC7SijUD2/dg4ebEA==
   dependencies:
     "@babel/core" "^7.26.0"
     "@babel/generator" "^7.26.2"
@@ -17720,7 +17720,8 @@ react-scan@^0.0.38:
     playwright "^1.49.0"
     preact "^10.25.1"
     tsx "^4.0.0"
-    unplugin "2.0.0-beta.2"
+  optionalDependencies:
+    unplugin "2.1.0"
 
 react-select@5.4.0:
   version "5.4.0"
@@ -20483,10 +20484,10 @@ unplugin@1.0.1:
     webpack-sources "^3.2.3"
     webpack-virtual-modules "^0.5.0"
 
-unplugin@2.0.0-beta.2:
-  version "2.0.0-beta.2"
-  resolved "https://registry.yarnpkg.com/unplugin/-/unplugin-2.0.0-beta.2.tgz#a05912d32c560b87b0dbe534bff6fc3427652cd3"
-  integrity sha512-gWIFAjTFKFsHI9xSWQGhhoLkAqMoG/JzVZ0T4W0VeC02kitb8zIdiTjUBJXX5tCt0bdfr/0cJaOf2S7ujuVqtw==
+unplugin@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/unplugin/-/unplugin-2.1.0.tgz#c093c34bf52812131125b67d0724bd57685c830a"
+  integrity sha512-us4j03/499KhbGP8BU7Hrzrgseo+KdfJYWcbcajCOqsAyb8Gk0Yn2kiUIcZISYCb1JFaZfIuG3b42HmguVOKCQ==
   dependencies:
     acorn "^8.14.0"
     webpack-virtual-modules "^0.6.2"
