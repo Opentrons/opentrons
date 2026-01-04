@@ -146,8 +146,8 @@ export function DropdownStepFormField(
                   <StyledText
                     desktopStyle="captionRegular"
                     className={clsx(
-                      lineClampStyles.lineClamp,
-                      lineClampStyles.wordNormal
+                      lineClampStyles.line_clamp,
+                      lineClampStyles.word_normal
                     )}
                     style={{ WebkitLineClamp: 3 }}
                   >

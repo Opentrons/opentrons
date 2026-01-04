@@ -37,8 +37,8 @@ const getLiquidDescription = (liquid: IngredInputs): JSX.Element | null => {
         <StyledText
           desktopStyle="bodyDefaultRegular"
           className={clsx(
-            lineClampStyles.lineClamp,
-            lineClampStyles.wordBreakAll
+            lineClampStyles.line_clamp,
+            lineClampStyles.word_break_all
           )}
           style={{ WebkitLineClamp: 10 }}
         >
@@ -86,8 +86,8 @@ export function LiquidDefinitions({
                         desktopStyle="bodyDefaultRegular"
                         id="liquid-name"
                         className={clsx(
-                          lineClampStyles.lineClamp,
-                          lineClampStyles.wordBreakAll
+                          lineClampStyles.line_clamp,
+                          lineClampStyles.word_break_all
                         )}
                         style={{ WebkitLineClamp: 3 }}
                       >

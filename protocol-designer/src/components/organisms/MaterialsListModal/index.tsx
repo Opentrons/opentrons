@@ -241,8 +241,8 @@ export function MaterialsListModal({
                                 <StyledText
                                   desktopStyle="bodyDefaultRegular"
                                   className={clsx(
-                                    lineClampStyles.lineClamp,
-                                    lineClampStyles.wordBreakAll
+                                    lineClampStyles.line_clamp,
+                                    lineClampStyles.word_break_all
                                   )}
                                   style={{ WebkitLineClamp: 3 }}
                                 >

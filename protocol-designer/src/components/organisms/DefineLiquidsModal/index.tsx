@@ -191,8 +191,8 @@ export function DefineLiquidsModal(
               <StyledText
                 desktopStyle="bodyLargeSemiBold"
                 className={clsx(
-                  lineClampStyles.lineClamp,
-                  lineClampStyles.wordBreakAll
+                  lineClampStyles.line_clamp,
+                  lineClampStyles.word_break_all
                 )}
                 style={{ WebkitLineClamp: 1 }}
               >

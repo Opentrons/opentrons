@@ -94,8 +94,8 @@ export const SlotInformation: FC<SlotInformationProps> = ({
                   desktopStyle="bodyDefaultRegular"
                   textAlign={TYPOGRAPHY.textAlignRight}
                   className={clsx(
-                    lineClampStyles.lineClamp,
-                    lineClampStyles.wordNormal
+                    lineClampStyles.line_clamp,
+                    lineClampStyles.word_normal
                   )}
                   style={{ WebkitLineClamp: 2 }}
                 >
@@ -189,8 +189,8 @@ function StackInfo({ title, stackInformation }: StackInfoProps): JSX.Element {
                 : TYPOGRAPHY.textAlignRight
             }
             className={clsx(
-              lineClampStyles.lineClamp,
-              lineClampStyles.wordNormal
+              lineClampStyles.line_clamp,
+              lineClampStyles.word_normal
             )}
             style={{ WebkitLineClamp: 3 }}
           >

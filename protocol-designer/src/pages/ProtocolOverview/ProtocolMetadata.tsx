@@ -75,8 +75,8 @@ export function ProtocolMetadata({
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
                   className={clsx(
-                    lineClampStyles.lineClamp,
-                    lineClampStyles.wordBreakAll
+                    lineClampStyles.line_clamp,
+                    lineClampStyles.word_break_all
                   )}
                   style={{ WebkitLineClamp: 2 }}
                 >

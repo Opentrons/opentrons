@@ -555,8 +555,8 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             <StyledText
               desktopStyle="bodyLargeSemiBold"
               className={clsx(
-                lineClampStyles.lineClamp,
-                lineClampStyles.wordNormal
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_normal
               )}
               style={{ WebkitLineClamp: 2 }}
             >

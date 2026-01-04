@@ -122,8 +122,8 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             <StyledText
               desktopStyle="bodyDefaultSemiBold"
               className={clsx(
-                lineClampStyles.lineClamp,
-                lineClampStyles.wordBreakAll
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_break_all
               )}
               style={{ WebkitLineClamp: 3 }}
             >
@@ -139,8 +139,8 @@ export function LiquidCard({ info }: LiquidCardProps): JSX.Element {
             <StyledText
               desktopStyle="bodyDefaultRegular"
               className={clsx(
-                lineClampStyles.lineClamp,
-                lineClampStyles.wordBreakAll
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_break_all
               )}
               style={{ WebkitLineClamp: 3 }}
             >
