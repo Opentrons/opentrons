@@ -1246,8 +1246,12 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
 
         if "touchTipDisabled" in parent_labware.quirks:
-            _log.info(f"Ignoring touch tip on labware {well}")
-            return self
+            if self.api_version < APIVersion(2, 28):
+                _log.info(f"Ignoring touch tip on labware {well}")
+                return self
+            raise RuntimeError(
+                f"Touch tip not allowed on labware {parent_labware.name}"
+            )
         if parent_labware.is_tiprack:
             _log.warning(
                 "Touch_tip being performed on a tiprack. Please re-check your code"
