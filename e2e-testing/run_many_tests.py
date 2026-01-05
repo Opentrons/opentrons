@@ -1,3 +1,4 @@
+import argparse
 import concurrent.futures
 import os
 import re
@@ -48,7 +49,15 @@ def run_task(name, command, debug_cmd):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Local CI Runner")
+    parser.add_argument("--no-staging", action="store_true", help="Skip staging environment tests")
+    args = parser.parse_args()
+
     final_results = []
+    tasks_to_run = E2E_TASKS.copy()
+
+    if args.no_staging:
+        tasks_to_run.pop("Staging", None)
 
     print(f"\n{BOLD}🛡️  PHASE 1: Static Analysis{RESET}")
     for name, (cmd, debug) in STATIC_TASKS.items():
@@ -58,18 +67,24 @@ def main():
             print(f"  {GREEN}✔{RESET} {name}")
         else:
             print(f"  {RED}✘{RESET} {name}")
-            # Exit early if static checks fail
             break
 
     # Only proceed to E2E if all static checks passed
     if all(r["success"] for r in final_results):
         print(f"\n{BOLD}🔥 PHASE 2: E2E Suites (Running Parallel...){RESET}")
-        with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-            futures = {executor.submit(run_task, name, cmd, debug): name for name, (cmd, debug) in E2E_TASKS.items()}
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(tasks_to_run)) as executor:
+            futures = {executor.submit(run_task, name, cmd, debug): name for name, (cmd, debug) in tasks_to_run.items()}
             for future in concurrent.futures.as_completed(futures):
                 res = future.result()
                 final_results.append(res)
-                status = f"{GREEN}✔{RESET}" if res["success"] else f"{RED}✘{RESET}"
+
+                if res["success"]:
+                    status = f"{GREEN}✔{RESET}"
+                elif res["name"] == "Staging":
+                    status = f"{YELLOW}⚠{RESET}"  # Warning icon for staging divergence
+                else:
+                    status = f"{RED}✘{RESET}"
+
                 print(f"  {status} {res['name']} Finished")
 
     # --- FINAL DASHBOARD ---
@@ -78,24 +93,32 @@ def main():
 
     all_passed = True
     for res in final_results:
-        icon = f"{GREEN}✔{RESET}" if res["success"] else f"{RED}✘{RESET}"
-        status = f"{GREEN}PASSED{RESET}" if res["success"] else f"{RED}FAILED{RESET}"
-        print(f"{icon} {res['name'].ljust(12)} {status}")
+        # Determine Status Text and Color
+        if res["success"]:
+            icon = f"{GREEN}✔{RESET}"
+            status_text = f"{GREEN}PASSED{RESET}"
+        elif res["name"] == "Staging":
+            icon = f"{YELLOW}⚠{RESET}"
+            status_text = f"{YELLOW}DIVERGED (WARNING){RESET}"
+        else:
+            icon = f"{RED}✘{RESET}"
+            status_text = f"{RED}FAILED{RESET}"
+            all_passed = False  # Only block CI if non-staging tasks fail
+
+        print(f"{icon} {res['name'].ljust(12)} {status_text}")
 
         if not res["success"]:
-            all_passed = False
             for f in res["fails"]:
                 print(f"   {YELLOW}└─ {f}{RESET}")
-            # The Debug Recommendation
             print(f"   {CYAN}💡 To debug, run:{RESET} {BOLD}{res['debug_cmd']}{RESET}")
 
     print("─" * 65)
 
-    # Simple report link
     report_path = os.path.abspath("test-results/report.html")
     if os.path.exists(report_path):
         print(f"📂 Report: file://{report_path}")
 
+    # Exit 1 only if Static Analysis or Local E2E fails
     sys.exit(0 if all_passed else 1)
 
 

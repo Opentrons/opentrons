@@ -4,14 +4,13 @@ import pytest
 from playwright.sync_api import Page
 
 from automation.pd_pages import ProtocolEditorPage
-from utility import _import_protocol_and_open_editor, troubleshoot_and_pause
+from utility import _import_protocol_and_open_editor
 
 PROTOCOL_PATH = "fixtures/protocol/9/PD_Move_Lids_Setup.py"
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-@troubleshoot_and_pause
 def test_move_labware_flex(page: Page, base_url: str) -> None:
     """Test manual and gripper move functionality with Lids and Labware.
 
@@ -100,6 +99,3 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     editor.select_step_type("Move")
     editor.toggle_checkbox("Use gripper")
     editor.move_labware("D2 Opentrons Tough 22mL 12 Well Reservoir", "Off-deck")
-
-
-###########################################################################

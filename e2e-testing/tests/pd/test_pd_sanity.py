@@ -7,8 +7,6 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page
 
-from utility import troubleshoot_and_pause
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from automation.pd_pages import (
@@ -32,7 +30,6 @@ def test_protocol_designer_loads(page: Page, base_url: str) -> None:
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-@troubleshoot_and_pause
 def test_full_onboarding_flow(page: Page, base_url: str) -> None:
     """Full onboarding flow test using page objects."""
     print(f"Running full onboarding test against: {base_url}")
