@@ -1,4 +1,5 @@
 """Instruments routes."""
+
 from typing import Annotated, Optional, Dict, List, cast
 
 from fastapi import status, Depends

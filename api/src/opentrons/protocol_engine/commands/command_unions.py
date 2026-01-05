@@ -1025,9 +1025,9 @@ def _map_create_types_by_params_type(
 
     # This isn't an inherent requirement of opentrons.protocol_engine,
     # but this mapping is only useful to higher-level code if this holds true.
-    assert len(result) == len(
-        create_types
-    ), "Param models should map to create models 1:1."
+    assert len(result) == len(create_types), (
+        "Param models should map to create models 1:1."
+    )
 
     return result
 

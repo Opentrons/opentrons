@@ -252,9 +252,11 @@ async def aspirate_while_tracking(
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
     movement_delay: Optional[float] = None,
-) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[
-    OverpressureError
-] | DefinedErrorData[StallOrCollisionError]:
+) -> (
+    SuccessData[BaseLiquidHandlingResult]
+    | DefinedErrorData[OverpressureError]
+    | DefinedErrorData[StallOrCollisionError]
+):
     """Execute an aspirate while tracking microoperation."""
     try:
         volume_aspirated = await pipetting.aspirate_while_tracking(
@@ -321,9 +323,11 @@ async def dispense_while_tracking(
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
     movement_delay: Optional[float] = None,
-) -> SuccessData[BaseLiquidHandlingResult] | DefinedErrorData[
-    OverpressureError
-] | DefinedErrorData[StallOrCollisionError]:
+) -> (
+    SuccessData[BaseLiquidHandlingResult]
+    | DefinedErrorData[OverpressureError]
+    | DefinedErrorData[StallOrCollisionError]
+):
     """Execute an dispense while tracking microoperation."""
     # The current volume won't be none since it passed validation
     current_volume = (

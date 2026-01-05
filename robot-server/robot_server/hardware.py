@@ -1,4 +1,5 @@
 """Hardware API wrapper module for initialization and management."""
+
 import asyncio
 import logging
 from pathlib import Path

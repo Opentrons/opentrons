@@ -1,6 +1,5 @@
 """FastAPI endpoint functions to implement `/errorRecovery/settings`."""
 
-
 from typing import Annotated
 
 import fastapi
@@ -23,7 +22,7 @@ _PATH = "/errorRecovery/settings"
 async def get_error_recovery_settings(  # noqa: D103
     store: Annotated[
         ErrorRecoverySettingStore, fastapi.Depends(get_error_recovery_setting_store)
-    ]
+    ],
 ) -> PydanticResponse[SimpleBody[ResponseData]]:
     return await _get_current_response(store)
 

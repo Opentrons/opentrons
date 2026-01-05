@@ -39,6 +39,7 @@ TEST_FILES = {
     "Mix_8_0_0": "fixtures/protocol/8/mix_8_0_0.json",
     "DoItAllV7MigratedToV8": "fixtures/protocol/8/doItAllV7MigratedToV8.json",
     "ThermocyclerOnOt2V7MigratedToV8": "fixtures/protocol/8/thermocyclerOnOt2V7MigratedToV8.json",
+    # V2 protocols
     # V5 protocols
     "MixSettingsV5": "fixtures/protocol/5/mixSettings.json",
     "DoItAllV5": "fixtures/protocol/5/doItAllV5.json",

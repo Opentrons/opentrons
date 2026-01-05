@@ -76,9 +76,9 @@ class UnsafeFlexStackerCloseLatch(
     params: UnsafeFlexStackerCloseLatchParams
     result: Optional[UnsafeFlexStackerCloseLatchResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeFlexStackerCloseLatchImpl] = (
         UnsafeFlexStackerCloseLatchImpl
-    ] = UnsafeFlexStackerCloseLatchImpl
+    )
 
 
 class UnsafeFlexStackerCloseLatchCreate(

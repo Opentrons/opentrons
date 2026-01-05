@@ -6,7 +6,8 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '../constants'
-import { getMainAAForAFixture, isFixtureInUsbModules } from '../fixtures'
+import { isFixtureInUsbModules } from '../fixtures'
+import { getMainAAForAFixture } from './deckConfiguration/getAddressableAreaFrom'
 
 import type { CutoutFixtureId, CutoutId } from '../../deck'
 import type {

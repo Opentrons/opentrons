@@ -1,4 +1,5 @@
 """Interface for interacting with JWT's."""
+
 import jwt
 import logging
 from datetime import datetime, timezone, timedelta

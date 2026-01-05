@@ -1,4 +1,5 @@
 """Tests for FastAPI application object of the robot server."""
+
 import pytest
 from mock import MagicMock, patch
 from fastapi import status

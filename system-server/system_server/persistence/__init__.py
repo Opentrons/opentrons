@@ -1,4 +1,5 @@
 """system_server.persistence: provides interface for persistent database storage."""
+
 import logging
 from pathlib import Path
 from fastapi import Depends

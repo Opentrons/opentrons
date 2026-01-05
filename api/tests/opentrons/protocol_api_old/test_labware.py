@@ -588,7 +588,9 @@ def test_uris() -> None:
     uri = "opentrons/opentrons_96_tiprack_300ul/1"
     assert helpers.uri_from_details(*details) == uri
     defn = labware.get_labware_definition(
-        details[1], details[0], details[2]  # type: ignore[arg-type]
+        details[1],
+        details[0],
+        details[2],  # type: ignore[arg-type]
     )
     assert defn["schemaVersion"] == 2  # LegacyLabwareCore expects this.
     assert helpers.uri_from_definition(defn) == uri

@@ -1,4 +1,5 @@
 """Tests for opentrons.legacy.Deck."""
+
 import inspect
 from typing import cast, Dict
 

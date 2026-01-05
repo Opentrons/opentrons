@@ -1,6 +1,5 @@
 """Tests for the error recovery settings store."""
 
-
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
 
 import pytest

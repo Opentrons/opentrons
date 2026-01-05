@@ -298,9 +298,9 @@ class RunStore:
             try:
                 transaction.execute(insert)
             except sqlalchemy.exc.IntegrityError:
-                assert (
-                    run.protocol_id is not None
-                ), "Insert run failed due to unexpected IntegrityError"
+                assert run.protocol_id is not None, (
+                    "Insert run failed due to unexpected IntegrityError"
+                )
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
@@ -767,9 +767,9 @@ def _convert_row_to_run(
     # other way to delete it. It's also unclear how it could happen without the table schema
     # changing out from under us.
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
-    assert protocol_id is None or isinstance(
-        protocol_id, str
-    ), f"Protocol ID {protocol_id} is not a string or None"
+    assert protocol_id is None or isinstance(protocol_id, str), (
+        f"Protocol ID {protocol_id} is not a string or None"
+    )
     try:
         actions = [
             RunAction(

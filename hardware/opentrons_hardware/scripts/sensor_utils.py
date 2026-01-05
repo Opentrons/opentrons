@@ -1,4 +1,5 @@
 """Helper functions for the sensor scripts."""
+
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta

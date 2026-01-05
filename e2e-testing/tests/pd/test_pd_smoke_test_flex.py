@@ -18,38 +18,12 @@ from playwright.sync_api import Page, expect
 from automation.pd_pages.heater_shaker_step_form_page import _add_heater_shaker_step
 from automation.pd_pages.tc_step_form_page import _add_thermocycler_profile_step, _add_thermocycler_state_step
 from automation.pd_pages.tempdeck_step_form_page import _add_temperature_module_step
+from utility import _import_protocol_and_open_editor
 
 # Make the automation package importable in tests (same pattern as other tests)
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from automation.pd_pages import (
-    LandingPage,
-    ProtocolEditorPage,
-)
-
-
-@pytest.mark.pdE2E
-@pytest.mark.slow
-def import_protocol_onboarding_flow(page: Page, base_url: str) -> ProtocolEditorPage:
-    """Import test_pd_sanity.py and return the editor page object."""
-    landing_page = LandingPage(page)
-    landing_page.goto(base_url)
-    landing_page.wait_for_page_load()
-    print("✓ Main page loaded")
-
-    landing_page.confirm_welcome_modal()
-
-    landing_page.click_import_existing_protocol()
-
-    print("✓ Protocol creation initiated")
-    landing_page.upload_protocol_file("fixtures/protocol/9/smoke_flex_setup.py")
-    print("✓ Protocol file uploaded")
-
-    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
-
-    page.get_by_role("button", name="Edit protocol").click()
-
-    return ProtocolEditorPage(page)
+PROTOCOL_PATH = "fixtures/protocol/9/smoke_flex_setup.py"
 
 
 @pytest.mark.pdE2E
@@ -67,7 +41,7 @@ def test_pd_combined_smoke_flow(page: Page, base_url: str) -> None:
     If any Playwright action or assertion fails, the test will pause for debugging.
     """
 
-    editor = import_protocol_onboarding_flow(page, base_url)
+    editor = _import_protocol_and_open_editor(page, PROTOCOL_PATH)
     print("✓ File uploaded, ready for module steps")
     editor.add_step("Temperature")
     _add_temperature_module_step(page, "50")

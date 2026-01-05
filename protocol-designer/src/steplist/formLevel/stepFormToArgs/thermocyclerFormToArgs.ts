@@ -40,7 +40,8 @@ const _convertToProfileElements = (args: {
 }
 
 export const thermocyclerFormToArgs = (
-  castFormData: GetCastFormData<HydratedThermocyclerFormData>
+  castFormData: GetCastFormData<HydratedThermocyclerFormData>,
+  enableConcurrentModuleActions: boolean
 ): ThermocyclerProfileStepArgs | ThermocyclerStateStepArgs => {
   const { thermocyclerFormType, stepDetails } = castFormData
 
@@ -73,13 +74,7 @@ export const thermocyclerFormToArgs = (
         profileItemsById: castFormData.profileItemsById,
       })
 
-      return {
-        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
-        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
-        // Look into this.
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        moduleId: castFormData.moduleId!,
-        commandCreatorFnName: THERMOCYCLER_PROFILE,
+      const holdStepArgs = {
         blockTargetTempHold:
           castFormData.blockIsActiveHold &&
           castFormData.blockTargetTempHold !== null
@@ -91,6 +86,17 @@ export const thermocyclerFormToArgs = (
           castFormData.lidTargetTempHold !== null
             ? Number(castFormData.lidTargetTempHold)
             : null,
+      }
+
+      const args = {
+        commandCreatorFnName: THERMOCYCLER_PROFILE,
+
+        // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
+        // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
+        // Look into this.
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        moduleId: castFormData.moduleId!,
+
         meta: {
           rawProfileItems: castFormData.orderedProfileItems.map(
             (itemId: string | number) => castFormData.profileItemsById[itemId]
@@ -100,8 +106,20 @@ export const thermocyclerFormToArgs = (
         profileTargetLidTemp: Number(castFormData.profileTargetLidTemp),
         profileVolume: Number(castFormData.profileVolume),
         description: stepDetails,
-        concurrent: false,
+
+        ...(enableConcurrentModuleActions
+          ? {
+              concurrent: true as const,
+              // holdStepArgs is omitted here because step-generation and the backend
+              // don't support that functionality when concurrent is true.
+            }
+          : {
+              concurrent: false as const,
+              ...holdStepArgs,
+            }),
       }
+
+      return args
     }
   }
 }

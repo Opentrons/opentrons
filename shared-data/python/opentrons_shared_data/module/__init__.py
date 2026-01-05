@@ -1,4 +1,4 @@
-""" opentrons_shared_data.module: functions and types for module defs """
+"""opentrons_shared_data.module: functions and types for module defs"""
 
 import json
 from ast import literal_eval
@@ -51,8 +51,7 @@ class ModuleNotFoundError(KeyError):
 
     def __str__(self) -> str:
         return (
-            f"No such version {self.requested_version} module "
-            f"{self.requested_module}"
+            f"No such version {self.requested_version} module {self.requested_module}"
         )
 
     def __repr__(self) -> str:
@@ -68,16 +67,16 @@ def load_schema(version: SchemaVersions) -> ModuleSchema:
 
 
 @overload
-def load_definition(version: SchemaV1, model_or_loadname: str) -> ModuleDefinitionV1:
-    ...
+def load_definition(
+    version: SchemaV1, model_or_loadname: str
+) -> ModuleDefinitionV1: ...
 
 
 @overload
 def load_definition(
     version: SchemaV3,
     model_or_loadname: Union[str, ModuleModel],
-) -> ModuleDefinitionV3:
-    ...
+) -> ModuleDefinitionV3: ...
 
 
 def load_definition(

@@ -1,4 +1,5 @@
 """JSON file reading."""
+
 from typing import Union
 
 from opentrons_shared_data.protocol.models.protocol_schema_v6 import ProtocolSchemaV6

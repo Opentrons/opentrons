@@ -1,4 +1,5 @@
 """Getters for Protocol Engine motion planning."""
+
 from dataclasses import dataclass
 from typing import List, Optional
 

@@ -1,11 +1,11 @@
 import path from 'path'
-import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import postCssImport from 'postcss-import'
+import lostCss from 'lost'
 import postCssApply from 'postcss-apply'
 import postColorModFunction from 'postcss-color-mod-function'
+import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
-import lostCss from 'lost'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   build: {
@@ -48,10 +48,14 @@ export default defineConfig({
       // files being processed with the wrong config (the config from the
       // consuming project vs. the config from the source project).
       // Can these be replaced with regular package.json dependencies?
-      '@opentrons/components/styles': path.resolve('../components/src/index.module.css'),
+      '@opentrons/components/styles': path.resolve(
+        '../components/src/index.module.css'
+      ),
       '@opentrons/components': path.resolve('../components/src/index.ts'),
       '@opentrons/shared-data': path.resolve('../shared-data/js/index.ts'),
-      '@opentrons/step-generation': path.resolve('../step-generation/src/index.ts'),
+      '@opentrons/step-generation': path.resolve(
+        '../step-generation/src/index.ts'
+      ),
     },
   },
 })

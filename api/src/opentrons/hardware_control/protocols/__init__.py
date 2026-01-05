@@ -1,4 +1,5 @@
 """Typing protocols describing a hardware controller."""
+
 from typing_extensions import Protocol, Type
 
 from .module_provider import ModuleProvider

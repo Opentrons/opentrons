@@ -22,6 +22,7 @@ OT_API_ROBOT_CONFIG_FILE variable.
 This module's interface to the rest of the system are the IS_* attributes and
 the CONFIG attribute.
 """
+
 import enum
 import os
 import json
@@ -420,8 +421,7 @@ def _ensure_paths_and_types(index: Dict[str, str]) -> Dict[str, Path]:
             correct_types[key] = it
         else:
             raise RuntimeError(
-                f"unhandled kind in ConfigElements: {key}: "
-                f"{configs_by_name[key].kind}"
+                f"unhandled kind in ConfigElements: {key}: {configs_by_name[key].kind}"
             )
     return correct_types
 

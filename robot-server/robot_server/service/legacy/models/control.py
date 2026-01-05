@@ -142,8 +142,7 @@ class RobotHomeTarget(BaseModel):
     )
     mount: typing.Optional[Mount] = Field(
         None,
-        description="Which mount to home, if target is pipette (required"
-        " in that case)",
+        description="Which mount to home, if target is pipette (required in that case)",
     )
 
     @model_validator(mode="after")

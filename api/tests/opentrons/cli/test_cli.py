@@ -1,6 +1,5 @@
 """Test cli execution."""
 
-
 import json
 import tempfile
 import textwrap

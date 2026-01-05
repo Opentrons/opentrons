@@ -4,6 +4,7 @@ DEPRECATED: Testing ModuleStore independently of ModuleView is no longer helpful
 Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
+
 from typing import List, Set, cast, Dict, Optional
 
 import pytest

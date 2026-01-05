@@ -1,4 +1,5 @@
 """The types of sensors supported by the system."""
+
 from dataclasses import dataclass
 from typing import List, Union
 from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField

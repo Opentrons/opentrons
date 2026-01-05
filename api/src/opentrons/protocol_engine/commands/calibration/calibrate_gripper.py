@@ -152,9 +152,9 @@ class CalibrateGripper(
     params: CalibrateGripperParams
     result: Optional[CalibrateGripperResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[CalibrateGripperImplementation] = (
         CalibrateGripperImplementation
-    ] = CalibrateGripperImplementation
+    )
 
 
 class CalibrateGripperCreate(BaseCommandCreate[CalibrateGripperParams]):

@@ -1,4 +1,5 @@
 """Tracks active connections to the server."""
+
 from datetime import datetime
 from typing import List
 from dataclasses import dataclass

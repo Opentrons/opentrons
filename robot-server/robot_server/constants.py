@@ -1,4 +1,5 @@
 """Global constants for the HTTP API server."""
+
 from typing_extensions import Final
 
 

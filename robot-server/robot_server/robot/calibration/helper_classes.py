@@ -106,7 +106,7 @@ class AttachedPipette(BaseModel):
         " version string",
     )
     name: typing.Optional[str] = Field(
-        None, description="Short name of pipette model without" "generation version"
+        None, description="Short name of pipette model withoutgeneration version"
     )
     tipLength: typing.Optional[float] = Field(
         None, description="The default tip length for this pipette"

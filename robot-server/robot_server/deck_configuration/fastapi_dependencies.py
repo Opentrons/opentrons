@@ -1,6 +1,5 @@
 """Dependency functions for use with `fastapi.Depends()`."""
 
-
 from pathlib import Path
 from typing import Annotated, Optional
 

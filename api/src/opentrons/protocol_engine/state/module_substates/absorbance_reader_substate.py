@@ -1,4 +1,5 @@
 """Heater-Shaker Module sub-state."""
+
 from dataclasses import dataclass
 from typing import List, NewType, Optional, Dict
 
