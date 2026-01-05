@@ -140,6 +140,7 @@ class LoadLabwareImplementation(
             )
             state_update.set_addressable_area_used(params.location.slotName.id)
 
+        print("LABWARE", params.loadName)
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
             params.location
         )

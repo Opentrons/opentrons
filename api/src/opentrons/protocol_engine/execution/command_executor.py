@@ -1,5 +1,6 @@
 """Command side-effect execution logic container."""
 
+import traceback
 import asyncio
 from logging import getLogger
 from typing import Optional, List, Protocol
@@ -165,6 +166,7 @@ class CommandExecutor:
         except (Exception, asyncio.CancelledError) as error:
             # The command encountered an undefined error.
 
+            traceback.print_exc()
             log.warning(f"Execution of {running_command.id} failed", exc_info=error)
             # TODO(mc, 2022-11-14): mark command as stopped rather than failed
             # https://opentrons.atlassian.net/browse/RCORE-390

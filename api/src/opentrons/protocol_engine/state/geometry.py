@@ -891,6 +891,30 @@ class GeometryView:
                 details={"eventual-location": repr(labware.location)},
             )
 
+    def get_parent_from_location(self, location: _LabwareLocation) -> str:
+        seen: Set[str] = set()
+        while isinstance(location, OnLabwareLocation):
+            labware = self._labware.get(location.labwareId)
+            if labware.id in seen:
+                raise InvalidLabwarePositionError(
+                    f"Cycle detected in labware positioning for {location}"
+                )
+            seen.add(labware.id)
+        if isinstance(location, DeckSlotLocation):
+            return location.slotName.id
+        elif isinstance(location, AddressableAreaLocation):
+            return location.addressableAreaName
+        elif isinstance(location, ModuleLocation):
+            return self._modules.get_provided_addressable_area(
+                location.moduleId
+            )
+        else:
+            raise LabwareNotOnDeckError(
+                f"Labware `SOMETHING` is not loaded on deck",
+                details={"eventual-location": repr(location)},
+            )
+
+
     def ensure_location_not_occupied(
         self,
         location: _LabwareLocation,
@@ -909,6 +933,11 @@ class GeometryView:
             else None
         )
 
+        print("LOCATION", location)
+        print("DESIRED", desired_addressable_area)
+        print("EXISTS", existing_fixtures)
+        print("POTENTIAL", potential_fixtures)
+
         # Handle the checking conflict on an incoming fixture
         if potential_fixtures is not None and isinstance(location, DeckSlotLocation):
             if (
@@ -919,7 +948,10 @@ class GeometryView:
                         existing_fixtures[1]
                     )
                 )
-            ) or (
+            ):
+                self._labware.raise_if_labware_in_location(location)
+
+            if (
                 self._labware.get_by_slot(location.slotName) is not None
                 and not any(
                     location.slotName.id in fixture.provided_addressable_areas
@@ -933,6 +965,14 @@ class GeometryView:
 
         # Otherwise handle standard conflict checking
         else:
+
+            # Check if the parent (Module or Labware) has a 'containedSpace'
+            parent = self.get_parent_from_location(location)
+            labware_stack = self._labware.get_labware_stack_from_parent(parent)
+            print("PARENT", location, parent)
+            print("STACK", labware_stack)
+            # parent_space = parent.definition.get("containedSpace") if parent else None
+
             if isinstance(
                 location,
                 (
