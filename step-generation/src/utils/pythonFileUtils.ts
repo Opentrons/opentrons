@@ -267,6 +267,7 @@ const getFormatLidParams = (def: LabwareDefinition2): string[] => {
 }
 
 export function getLoadLabware(
+  moduleRobotState: TimelineFrame['modules'],
   moduleEntities: ModuleEntities,
   allLabwareEntities: LabwareEntities,
   labwareRobotState: TimelineFrame['labware'],
@@ -296,7 +297,15 @@ export function getLoadLabware(
       )
       // 2nd item in stack is the slot the labware is on
       const labwareSlot = labwareRobotState[id].stack[1]
-      const onModule = moduleEntities[labwareSlot] != null
+      // this is the deck slot that the labware is on
+      const deckSlot = getSlotInLocationStack(labwareRobotState[id].stack)
+      const stackerOnSlot = Object.entries(moduleRobotState).find(
+        ([id, module]) =>
+          module.slot === deckSlot &&
+          module.moduleState.type === FLEX_STACKER_MODULE_TYPE
+      )
+      const onModule =
+        moduleEntities[labwareSlot] != null || deckSlot === stackerOnSlot?.[1].slot // special case stacker shuttle labware
       const onLabware = allLabwareEntities[labwareSlot] != null
 
       let parentName: string
@@ -304,7 +313,8 @@ export function getLoadLabware(
       if (onLabware && !isLabwareOnHopper) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
-        parentName = moduleEntities[labwareSlot].pythonName
+        const moduleId = stackerOnSlot != null ? stackerOnSlot?.[0] : labwareSlot
+        parentName = moduleEntities[moduleId].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
         locationArg = `location=${
@@ -569,6 +579,7 @@ export function pythonDefRun(
     getLoadAdapters(moduleEntities, labwareEntities, labware),
     getLoadLidStacks(labwareEntities, labware),
     getLoadLabware(
+      modules,
       moduleEntities,
       labwareEntities,
       labware,
