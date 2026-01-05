@@ -1,10 +1,14 @@
 import { screen } from '@testing-library/react'
 import { beforeEach, describe, it, vi } from 'vitest'
 
-import { fixture96Plate } from '@opentrons/shared-data'
+import {
+  fixture96Plate,
+  FLEX_STACKER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   getAdditionalEquipmentEntities,
   getLabwareEntities,
@@ -22,6 +26,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/top-selectors/labware-locations')
 vi.mock('/protocol-designer/ui/labware/selectors')
+vi.mock('/protocol-designer/labware-defs/selectors')
 const render = (props: ComponentProps<typeof StepSummary>) => {
   return renderWithProviders(<StepSummary {...props} />, {
     i18nInstance: i18n,
@@ -51,6 +56,7 @@ describe('StepSummary', () => {
         flexStackerFormType: 'retrieve',
         fillLabwareUri: 'mockUri',
         fillLabwareIds: ['mock1', 'mock2', 'mock3'],
+        moduleId: 'stacker',
       },
       labwareEntities: {
         someId: {
@@ -81,6 +87,9 @@ describe('StepSummary', () => {
         pythonName: 'mockPythonName',
       },
     })
+    vi.mocked(getLabwareDefsByURI).mockReturnValue({
+      mockUri: fixture96Plate as LabwareDefinition2,
+    })
     vi.mocked(getModuleEntities).mockReturnValue({})
     vi.mocked(getAdditionalEquipmentEntities).mockReturnValue({})
     vi.mocked(getRobotStateAtActiveItem).mockReturnValue({
@@ -88,7 +97,17 @@ describe('StepSummary', () => {
         labware: { labware: { A1: { liquidId: { volume: 100 } } } },
       } as any,
       labware: {},
-      modules: {},
+      modules: {
+        stacker: {
+          slot: 'D3',
+          moduleState: {
+            labwareOnShuttle: null,
+            labwareInHopper: null,
+            storedLabwareDetails: { primaryLabwareURI: 'mockUri' },
+            type: FLEX_STACKER_MODULE_TYPE,
+          },
+        },
+      },
       pipettes: {},
       tipState: {} as any,
     })
