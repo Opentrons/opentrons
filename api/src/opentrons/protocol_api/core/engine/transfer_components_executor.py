@@ -585,6 +585,7 @@ class TransferComponentsExecutor:
                 )
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
+                # Q (spp, 2026-01-05): should we raise an error like we're doing in touch_tip() now?
                 if (
                     "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
@@ -786,6 +787,7 @@ class TransferComponentsExecutor:
                 )
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
+                # Q (spp, 2026-01-05): should we raise an error like we're doing in touch_tip() now? 
                 if (
                     "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
