@@ -47,10 +47,16 @@ class LandingPage(BasePage):
 
     def wait_for_no_modal_overlay(self, timeout: int = 10000) -> None:
         """Wait until no modal overlay is blocking pointer events."""
-        self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]').wait_for(
-            state="hidden",
-            timeout=timeout,
-        )
+
+    """Dismiss the overlay modal if it exists and wait for it to disappear."""
+    overlay = self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+    if overlay.is_visible():
+        # Attempt to find a button inside modal (like 'Import', 'Confirm', or 'Close')
+        try:
+            overlay.get_by_role("button").click(timeout=5000)
+        except:
+            pass  # fallback if button not found, just wait
+    overlay.wait_for(state="hidden", timeout=timeout)
 
     def dismiss_migration_modal(self) -> None:
         """Dismiss the migration modal if it appears during import."""
