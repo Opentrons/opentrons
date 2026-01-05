@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -6,6 +7,7 @@ import { getIsTiprack } from '@opentrons/shared-data'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import { uuid } from '/protocol-designer/utils'
 
 import styles from './flexstackertools.module.css'
 import { MessageField } from './MessageField'
@@ -25,6 +27,9 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   const { t } = useTranslation('form')
   const { storedLabwareDetails } = moduleState ?? {}
   const labwareEntities = useSelector(getLabwareEntities)
+  const [fillQuantityLocalState, setFillQuantityState] = useState<
+    string | null
+  >(null)
   const storedEntity = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => {
       return labwareDefURI === storedLabwareDetails?.primaryLabwareURI
@@ -32,6 +37,21 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   )
   const storedEntityName = storedEntity?.def.metadata.displayName
   const isTiprack = storedEntity != null && getIsTiprack(storedEntity.def)
+
+  // TODO: figure out a way to not need this use Effect. its hard because
+  // you can't rely on generating the uuid in the hydrated form
+  useEffect(() => {
+    if (!storedEntity?.labwareDefURI || fillQuantityLocalState == null) return
+
+    const quantity = Number(fillQuantityLocalState) ?? 1
+
+    const newFill = Array.from(
+      { length: quantity },
+      () => `${uuid()}:${storedEntity.labwareDefURI}`
+    )
+    propsForFields.fillLabwareIds.updateValue(newFill)
+  }, [fillQuantityLocalState, storedEntity?.labwareDefURI])
+
   return (
     <div className={styles.refill_settings_container}>
       {storedLabwareDetails != null ? (
@@ -49,13 +69,18 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
         </div>
       ) : null}
       <InputStepFormField
-        title={t('step_edit_form.flex_stacker.fields.fillQuantity.title')}
-        {...propsForFields.fillQuantity}
+        title={t('step_edit_form.flex_stacker.fields.fillLabwareIds.title')}
+        {...propsForFields.fillLabwareIds}
         showTooltip={false}
-        caption={t('step_edit_form.flex_stacker.fields.fillQuantity.caption', {
-          max: maxPoolCount,
-        })}
+        caption={t(
+          'step_edit_form.flex_stacker.fields.fillLabwareIds.caption',
+          {
+            max: maxPoolCount,
+          }
+        )}
         padding="0"
+        setFillQuantityState={setFillQuantityState}
+        fillQuantityLocalState={fillQuantityLocalState}
       />
       <MessageField fieldProps={propsForFields.interventionMessage} />
     </div>
