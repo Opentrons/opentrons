@@ -58,7 +58,6 @@ import {
 } from '/app/redux-resources/analytics'
 import { useRobotType } from '/app/redux-resources/robots'
 import { ANALYTICS_PROTOCOL_RUN_ACTION } from '/app/redux/analytics'
-import { useFeatureFlag } from '/app/redux/config'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { mockHeaterShaker } from '/app/redux/modules/__fixtures__'
@@ -145,7 +144,6 @@ vi.mock('/app/local-resources/instruments')
 vi.mock('/app/organisms/DoorOpenControl/useIsDoorOpen')
 vi.mock('/app/organisms/LabwarePositionCheck')
 vi.mock('/app/organisms/ODD/ProtocolSetup/ProtocolSetupCamera')
-vi.mock('/app/redux/config')
 
 const render = (path = '/') => {
   return renderWithProviders(
@@ -372,7 +370,6 @@ describe('ProtocolSetup', () => {
       isApplyingOffsets: false,
       applyOffsets: vi.fn(),
     })
-    when(vi.mocked(useFeatureFlag)).calledWith('camera').thenReturn(true)
     vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
       addCameraSettingsToRun: vi.fn(),
     } as any)
