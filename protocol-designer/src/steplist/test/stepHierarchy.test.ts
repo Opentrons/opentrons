@@ -6,13 +6,18 @@ import {
 } from '/protocol-designer/constants'
 import {
   computeStepMove,
+  computeStepSwap,
   convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
   getPairedSteps,
 } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import type { FormData } from '/protocol-designer/form-types'
-import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
+import type {
+  StandaloneStep,
+  StepHierarchy,
+  ThermocyclerProfileGroup,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
 
 describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray()', () => {
   test.each([
@@ -435,6 +440,148 @@ describe('computeStepMove()', () => {
       isMoveAllowed: true,
       stepsAfterMove: originalHierarchy,
     } satisfies typeof result)
+  })
+})
+
+describe('computeStepSwap()', () => {
+  it('should swap a top-level step up or down with its neighbor', () => {
+    const step1: StandaloneStep = { type: 'standaloneStep', stepId: 'step_1' }
+    const step2: StandaloneStep = { type: 'standaloneStep', stepId: 'step_2' }
+    const step3TCProfile: ThermocyclerProfileGroup = {
+      type: 'thermocyclerProfileGroup',
+      thermocyclerProfileStepId: 'step_3_tc_profile',
+      concurrentSteps: [
+        { type: 'standaloneStep', stepId: 'step_3_tc_concurrent_1' },
+        { type: 'standaloneStep', stepId: 'step_3_tc_concurrent_2' },
+      ],
+      waitForThermocyclerProfileStepId: 'step_3_tc_wait',
+    }
+    const step4: StandaloneStep = { type: 'standaloneStep', stepId: 'step_4' }
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [step1, step2, step3TCProfile, step4],
+    }
+
+    // Swap step_2 up (should swap with step_1)
+    expect(
+      computeStepSwap(originalHierarchy, step2.stepId, 'up')
+    ).toStrictEqual({
+      topLevelItems: [step2, step1, step3TCProfile, step4],
+    })
+
+    // Swap step_2 down (should swap with step_3_tc_profile)
+    expect(
+      computeStepSwap(originalHierarchy, step2.stepId, 'down')
+    ).toStrictEqual({
+      topLevelItems: [step1, step3TCProfile, step2, step4],
+    })
+
+    // Swap step_3_tc_profile up (should swap with step_2)
+    expect(
+      computeStepSwap(
+        originalHierarchy,
+        step3TCProfile.thermocyclerProfileStepId,
+        'up'
+      )
+    ).toStrictEqual({
+      topLevelItems: [step1, step3TCProfile, step2, step4],
+    })
+
+    // Swap step_4 up (should swap with step_3_tc_profile)
+    expect(
+      computeStepSwap(originalHierarchy, step4.stepId, 'up')
+    ).toStrictEqual({
+      topLevelItems: [step1, step2, step4, step3TCProfile],
+    })
+  })
+
+  it('should swap steps within a Thermocycler group concurrentSteps', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        {
+          type: 'thermocyclerProfileGroup',
+          thermocyclerProfileStepId: 'profile_step',
+          concurrentSteps: [
+            { type: 'standaloneStep', stepId: 'concurrent_1' },
+            { type: 'standaloneStep', stepId: 'concurrent_2' },
+            { type: 'standaloneStep', stepId: 'concurrent_3' },
+          ],
+          waitForThermocyclerProfileStepId: 'wait_step',
+        },
+      ],
+    }
+    const result = computeStepSwap(originalHierarchy, 'concurrent_2', 'up')
+    expect(result).toStrictEqual({
+      topLevelItems: [
+        {
+          type: 'thermocyclerProfileGroup',
+          thermocyclerProfileStepId: 'profile_step',
+          concurrentSteps: [
+            { type: 'standaloneStep', stepId: 'concurrent_2' },
+            { type: 'standaloneStep', stepId: 'concurrent_1' },
+            { type: 'standaloneStep', stepId: 'concurrent_3' },
+          ],
+          waitForThermocyclerProfileStepId: 'wait_step',
+        },
+      ],
+    })
+  })
+
+  it('should not swap when step is at a boundary (first/last in top-level or Thermocycler group)', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        { type: 'standaloneStep', stepId: 'step_1' },
+        { type: 'standaloneStep', stepId: 'step_2' },
+        {
+          type: 'thermocyclerProfileGroup',
+          thermocyclerProfileStepId: 'profile_step',
+          concurrentSteps: [
+            { type: 'standaloneStep', stepId: 'concurrent_1' },
+            { type: 'standaloneStep', stepId: 'concurrent_2' },
+          ],
+          waitForThermocyclerProfileStepId: 'wait_step',
+        },
+        { type: 'standaloneStep', stepId: 'step_3' },
+      ],
+    }
+
+    // First step of the top level of the hierarchy trying to move up.
+    expect(computeStepSwap(originalHierarchy, 'step_1', 'up')).toStrictEqual(
+      originalHierarchy
+    )
+
+    // Last step of the top level of the hierarchy trying to move down.
+    expect(computeStepSwap(originalHierarchy, 'step_3', 'down')).toStrictEqual(
+      originalHierarchy
+    )
+
+    // First step within a Thermocycler group trying to move up.
+    // This ought to be allowed, but our current implementation doesn't support it.
+    expect(
+      computeStepSwap(originalHierarchy, 'concurrent_1', 'up')
+    ).toStrictEqual(originalHierarchy)
+
+    // Last step within a Thermocycler group trying to move down.
+    // This ought to be allowed, but our current implementation doesn't support it.
+    expect(
+      computeStepSwap(originalHierarchy, 'concurrent_2', 'down')
+    ).toStrictEqual(originalHierarchy)
+  })
+
+  it('should no-op if trying to move a nonexistent step', () => {
+    const originalHierarchy: StepHierarchy = {
+      topLevelItems: [
+        {
+          type: 'standaloneStep',
+          stepId: 'step_1',
+        },
+        {
+          type: 'standaloneStep',
+          stepId: 'step_2',
+        },
+      ],
+    }
+    const result = computeStepSwap(originalHierarchy, 'nonexistent', 'up')
+    expect(result).toStrictEqual(originalHierarchy)
   })
 })
 
