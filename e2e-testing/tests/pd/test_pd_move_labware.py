@@ -36,6 +36,7 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     landing.confirm_welcome_modal()
     landing.click_import_existing_protocol()
     landing.upload_protocol_file(PROTOCOL_PATH)
+    landing.wait_for_no_modal_overlay()
     landing.edit_protocol()
 
     # Add Manual Move to move PCR Lid to Opentrons Tough Wellplate in Thermocycler
