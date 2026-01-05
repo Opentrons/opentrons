@@ -57,7 +57,6 @@ const unsavedChanges = (state: boolean = false, action: Action): boolean => {
     case 'ADD_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'REORDER_STEPS':
-    case 'REORDER_SELECTED_STEP':
     case 'SAVE_STEP_FORM':
     case 'SAVE_FILE_METADATA':
     case 'REPLACE_CUSTOM_LABWARE_DEF':

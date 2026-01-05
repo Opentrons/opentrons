@@ -50,13 +50,6 @@ export interface HoverOnSubstepAction {
   type: 'HOVER_ON_SUBSTEP'
   payload: SubstepIdentifier
 }
-export interface ReorderSelectedStepAction {
-  type: 'REORDER_SELECTED_STEP'
-  payload: {
-    delta: number
-    stepId: StepIdType
-  }
-}
 export interface ClearSelectedItemAction {
   type: 'CLEAR_SELECTED_ITEM'
 }

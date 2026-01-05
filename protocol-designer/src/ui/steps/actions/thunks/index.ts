@@ -21,11 +21,15 @@ import {
   getSavedStepHierarchy,
   getUnsavedForm,
 } from '/protocol-designer/step-forms/selectors'
-import { changeFormInput } from '/protocol-designer/steplist/actions/actions'
+import {
+  changeFormInput,
+  reorderSteps,
+} from '/protocol-designer/steplist/actions/actions'
 import { PRESAVED_STEP_ID } from '/protocol-designer/steplist/types'
 import { getStepHierarchyAfterDuplication } from '/protocol-designer/steplist/utils/getStepHierarchyAfterDuplication'
 import { getStepsToSelectAfterDuplication } from '/protocol-designer/steplist/utils/getStepsToSelect'
 import {
+  computeStepSwap,
   convertStepHierarchyToArray,
   getPairedSteps,
 } from '/protocol-designer/steplist/utils/stepHierarchy'
@@ -42,11 +46,8 @@ import {
 } from '../../selectors'
 import { addStep, selectDropdownItem } from '../actions'
 
-import type {
-  FormData,
-  StepIdType,
-  StepType,
-} from '/protocol-designer/form-types'
+import type { FormData, StepType } from '/protocol-designer/form-types'
+import type { ReorderStepsAction } from '/protocol-designer/steplist/actions/actions'
 import type { ThunkAction } from '/protocol-designer/types'
 import type {
   DuplicateSelectedStepsAction,
@@ -211,30 +212,25 @@ export const addAndSelectStep: (arg: {
   }
 }
 
-// todo(mm, 2025-10-27): This action, currently only used for moving steps via keyboard,
-// needs to be updated to correctly handle the selected step being the root of a nested
-// group.  Currently, it lets you reorder the root of a group after the paired step
-// that closes the group, which causes all manner of timeline breakage.
-export interface ReorderSelectedStepAction {
-  type: 'REORDER_SELECTED_STEP'
-  payload: {
-    delta: number
-    stepId: StepIdType
-  }
-}
 export const reorderSelectedStep: (
-  delta: number
-) => ThunkAction<ReorderSelectedStepAction> = delta => (dispatch, getState) => {
-  const stepId = getSelectedStepId(getState())
+  direction: 'up' | 'down'
+) => ThunkAction<ReorderStepsAction> = direction => (dispatch, getState) => {
+  const initialState = getState()
+
+  const stepId = getSelectedStepId(initialState)
+  if (stepId == null) {
+    return
+  }
+
+  const originalStepHierarchy = getSavedStepHierarchy(initialState)
+  const newStepHierarchy = computeStepSwap(
+    originalStepHierarchy,
+    stepId,
+    direction
+  )
 
   if (stepId != null) {
-    dispatch({
-      type: 'REORDER_SELECTED_STEP',
-      payload: {
-        delta,
-        stepId,
-      },
-    })
+    dispatch(reorderSteps(convertStepHierarchyToArray(newStepHierarchy)))
   }
 }
 
