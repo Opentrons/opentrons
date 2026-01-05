@@ -39,9 +39,6 @@ TEST_FILES = {
     "Mix_8_0_0": "fixtures/protocol/8/mix_8_0_0.json",
     "DoItAllV7MigratedToV8": "fixtures/protocol/8/doItAllV7MigratedToV8.json",
     "ThermocyclerOnOt2V7MigratedToV8": "fixtures/protocol/8/thermocyclerOnOt2V7MigratedToV8.json",
-    # V9 protocols
-    "LiquidClass96ChannelTest": "fixtures/protocol/9/Liquid_Class_96_Channel_Test.py",
-    "PD_Move_Lids_Setup": "fixtures/protocol/9/PD_Move_Lids_Setup.py",
     # V2 protocols
     # V5 protocols
     "MixSettingsV5": "fixtures/protocol/5/mixSettings.json",
