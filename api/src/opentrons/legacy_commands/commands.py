@@ -260,10 +260,10 @@ def dynamic_mix(
 
 
 def blow_out(
-    instrument: InstrumentContext, location: Location
+    instrument: InstrumentContext, location: Location, flow_rate: float
 ) -> command_types.BlowOutCommand:
     location_text = stringify_location(location)
-    text = f"Blowing out at {location_text}"
+    text = f"Blowing out into {location_text} at {flow_rate} uL/sec"
 
     return {
         "name": command_types.BLOW_OUT,
@@ -272,10 +272,12 @@ def blow_out(
 
 
 def blow_out_in_disposal_location(
-    instrument: InstrumentContext, location: Union[TrashBin, WasteChute]
+    instrument: InstrumentContext,
+    location: Union[TrashBin, WasteChute],
+    flow_rate: float,
 ) -> command_types.BlowOutInDisposalLocationCommand:
     location_text = stringify_disposal_location(location)
-    text = f"Blowing out into {location_text}"
+    text = f"Blowing out into {location_text} at {flow_rate} uL/sec"
 
     return {
         "name": command_types.BLOW_OUT_IN_DISPOSAL_LOCATION,

@@ -16,10 +16,15 @@ import {
   getSelectedStepId,
 } from '../../selectors'
 import { deselectAllSteps, selectAllSteps } from '../actions'
-import { duplicateSelectedSteps, saveStepForm } from '../thunks'
+import {
+  duplicateSelectedSteps,
+  reorderSelectedStep,
+  saveStepForm,
+} from '../thunks'
 
 import type { Timeline } from '@opentrons/step-generation/src/types'
 import type { FormData } from '/protocol-designer/form-types'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   DuplicateSelectedStepsAction,
   SelectMultipleStepsAction,
@@ -464,6 +469,65 @@ describe('steps actions', () => {
           }
         }
       )
+    })
+  })
+
+  describe('reorderSelectedStep', () => {
+    const mockStepHierarchy: StepHierarchy = {
+      topLevelItems: [
+        {
+          stepId: 'step_1',
+          type: 'standaloneStep',
+        },
+        {
+          stepId: 'step_2',
+          type: 'standaloneStep',
+        },
+        {
+          stepId: 'step_3',
+          type: 'standaloneStep',
+        },
+      ],
+    }
+
+    beforeEach(() => {
+      when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
+        .calledWith(expect.anything())
+        .thenReturn(mockStepHierarchy)
+    })
+
+    afterEach(() => {
+      vi.resetAllMocks()
+      vi.restoreAllMocks()
+    })
+
+    it('should dispatch REORDER_STEPS action when a step is selected', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn('step_2')
+
+      const store: any = mockStore()
+      store.dispatch(reorderSelectedStep('up'))
+
+      expect(store.getActions()).toStrictEqual([
+        {
+          type: 'REORDER_STEPS',
+          payload: {
+            stepIds: ['step_2', 'step_1', 'step_3'],
+          },
+        },
+      ])
+    })
+
+    it('should not dispatch any action when no step is selected', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+
+      const store: any = mockStore()
+      store.dispatch(reorderSelectedStep('up'))
+
+      expect(store.getActions()).toStrictEqual([])
     })
   })
 })

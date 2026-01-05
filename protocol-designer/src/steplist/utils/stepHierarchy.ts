@@ -192,6 +192,7 @@ function findStep(
   stepHierarchy: StepHierarchy,
   stepIdToFind: StepIdType
 ): null | {
+  foundNode: StandaloneStep | ThermocyclerProfileGroup
   enclosingNode: StepHierarchy | ThermocyclerProfileGroup
   indexInEnclosingNode: number
 } {
@@ -209,6 +210,7 @@ function findStep(
         topLevelItem.thermocyclerProfileStepId === stepIdToFind)
     ) {
       return {
+        foundNode: topLevelItem,
         enclosingNode: stepHierarchy,
         indexInEnclosingNode: topLevelIndex,
       }
@@ -222,6 +224,7 @@ function findStep(
         const itemInGroup = topLevelItem.concurrentSteps[indexInGroup]
         if (itemInGroup.stepId === stepIdToFind) {
           return {
+            foundNode: itemInGroup,
             enclosingNode: topLevelItem,
             indexInEnclosingNode: indexInGroup,
           }
@@ -283,6 +286,48 @@ export function computeStepMove(
         stepsAfterMove: insertResult.stepHierarchy,
       }
     : { isMoveAllowed: false }
+}
+
+/**
+ * Swap a step with the one immediately above or below it.
+ * This is useful for keyboard-based step reordering.
+ */
+export function computeStepSwap(
+  originalStepHierarchy: StepHierarchy,
+  stepIdToMove: StepIdType,
+  direction: 'up' | 'down'
+): StepHierarchy {
+  return produce(originalStepHierarchy, draftStepHierarchy => {
+    const findResult = findStep(draftStepHierarchy, stepIdToMove)
+    if (findResult == null) {
+      console.error(
+        `Couldn't find step to move. Looking for step ID ${stepIdToMove}.`
+      )
+      return
+    }
+
+    const { enclosingNode, indexInEnclosingNode } = findResult
+
+    // todo(mm, 2025-12-22): This currently only allows reordering steps within a single
+    // level of the tree. e.g. if you have an inner step inside a Thermocycler profile
+    // group, this method won't work to move it out of the group; it'll stop at the
+    // beginning or end of the group and won't be able to "escape".
+    //
+    // One way to solve this:
+    //
+    // Define a "pointer type"
+    // Define a utility function that returns all the places where a step of a given type could go
+    // getStepHierarchyAfterDuplication() could also be greatly simplified
+    const enclosingArray =
+      'topLevelItems' in enclosingNode
+        ? enclosingNode.topLevelItems
+        : enclosingNode.concurrentSteps
+    const otherIndex = indexInEnclosingNode + (direction === 'down' ? 1 : -1)
+    if (otherIndex < 0 || otherIndex >= enclosingArray.length) {
+      return
+    }
+    mutableSwap(enclosingArray, indexInEnclosingNode, otherIndex)
+  })
 }
 
 interface InsertResult {
@@ -381,13 +426,16 @@ function popFromStepHierarchy(
         return
       }
 
-      const { enclosingNode: draftEnclosingNode, indexInEnclosingNode } =
-        findResult
+      const {
+        enclosingNode: draftEnclosingNode,
+        foundNode,
+        indexInEnclosingNode,
+      } = findResult
       const draftArrayToSplice =
         'topLevelItems' in draftEnclosingNode
           ? draftEnclosingNode.topLevelItems
           : draftEnclosingNode.concurrentSteps
-      draft.poppedItem = draftArrayToSplice[indexInEnclosingNode]
+      draft.poppedItem = foundNode
       draftArrayToSplice.splice(indexInEnclosingNode, 1)
     }
   )
@@ -416,4 +464,9 @@ export function getPairedSteps(
     }
   }
   return result
+}
+
+/** Swap the positions of two elements in an array, modifying the array in-place. */
+function mutableSwap<T>(arr: T[], indexA: number, indexB: number): void {
+  ;[arr[indexA], arr[indexB]] = [arr[indexB], arr[indexA]]
 }
