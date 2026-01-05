@@ -105,6 +105,7 @@ class LoadedLabwarePoolData:
     adapter_labware: Optional[LoadedLabware] = None
     lid_labware: Optional[LoadedLabware] = None
 
+
 @dataclass(frozen=True)
 class LoadedConfigureNozzleLayoutData:
     """The result of a configure nozzle layout."""
