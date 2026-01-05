@@ -219,6 +219,20 @@ const setSelection = (
         mode: 'add',
       },
     })
+  } else if (
+    formData.stepType === 'flexStacker'
+  ) {
+    dispatch({
+      type: 'SELECT_DROPDOWN_ITEM',
+      payload: {
+        selection: {
+          id: formData.moduleId,
+          text: formData.flexStackerFormType,
+          field: '1',
+        },
+        mode: 'add',
+      },
+    })
   }
 }
 

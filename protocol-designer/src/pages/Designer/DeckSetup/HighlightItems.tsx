@@ -77,6 +77,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     labware,
     modules
   )
+  console.log('highlightItems',highlightItems)
   const hoveredItemTrash: {
     name: AdditionalEquipmentName
     id: string
@@ -162,6 +163,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         moduleOnDeck.id,
         Object.values(labware)
       )
+      console.log('highlightItems',highlightItems)
       const position = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
       if (position != null) {
         return [
