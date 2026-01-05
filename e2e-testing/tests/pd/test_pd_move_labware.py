@@ -30,7 +30,7 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     - Made test for OT2 (only manual moves)
     """
     # Import setup protocol and open editor
-    _import_protocol_and_open_editor(page, PROTOCOL_PATH)
+    _import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
 
     editor = ProtocolEditorPage(page)
 
