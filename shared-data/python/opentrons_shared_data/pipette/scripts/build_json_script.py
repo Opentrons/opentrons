@@ -136,7 +136,7 @@ def _build_partial_tip_configurations(channels: int) -> PartialTipDefinition:
 
 
 def build_geometry_model_v2(
-    input_dictionary: Dict[str, Any]
+    input_dictionary: Dict[str, Any],
 ) -> PipetteGeometryDefinition:
     return PipetteGeometryDefinition.model_validate(input_dictionary)
 
@@ -288,7 +288,6 @@ def migrate_new_blow_out_configs_v2() -> None:
 def fill_blowout_configs(
     pipette_gen: int, shaft_diameters: Dict[str, float], volumes: List[str]
 ) -> None:
-
     general_config_files = Path(GENERAL_ROOT).glob("*")
     for pipette_type in general_config_files:  # single, eight, 96-channel
         for volume in volumes:  # pipette max volume- p10, p20, p50, etc.

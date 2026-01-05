@@ -1,4 +1,5 @@
 """Movement planning errors."""
+
 from opentrons.types import Point
 
 

@@ -1,4 +1,5 @@
 """ArgumentParser setup for a can device."""
+
 from argparse import ArgumentParser, Namespace
 
 from opentrons_hardware.drivers.can_bus import DriverSettings

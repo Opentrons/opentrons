@@ -1502,7 +1502,7 @@ class OT3Controller(FlexBackend):
             provided_context_manager = await check_overpressure(
                 self._messenger, tools_with_id
             )
-            errors: asyncio.Queue[Tuple[NodeId, ErrorCode]] = asyncio.Queue()
+            errors: asyncio.Queue[Tuple[NodeId, ErrorCode]]
 
             async with provided_context_manager() as errors:
                 try:
@@ -1526,7 +1526,6 @@ class OT3Controller(FlexBackend):
             yield
 
     async def touch_probe(self, axis: Axis, speed: float, distance: float) -> float:
-
         status = await touch_probe(
             messenger=self._messenger,
             mover=axis_to_node(axis),

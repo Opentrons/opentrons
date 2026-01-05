@@ -183,7 +183,7 @@ class OT3Simulator(FlexBackend):
             raise KeyError(
                 "If you specify attached_instruments, the model "
                 "should be pipette names or pipette models, but "
-                f'{passed_ai["model"]} is not'
+                f"{passed_ai['model']} is not"
             )
 
         self._attached_instruments = {

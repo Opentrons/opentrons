@@ -1,4 +1,5 @@
 """Smoke tests for the ProtocolEngine creation factory."""
+
 import pytest
 from pytest_lazy_fixtures import lf as lazy_fixture
 

@@ -394,23 +394,25 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 # todo(mm, 2024-09-26): Catch LabwareNotPickedUpError when that exists and
                 # move_labware_with_gripper() raises it.
             ) as exception:
-                gripper_movement_error: GripperMovementError | None = GripperMovementError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    errorCode=exception.code.value.code,
-                    detail=exception.code.value.detail,
-                    errorInfo={
-                        "originLocationSequence": origin_location_sequence,
-                        "immediateDestinationLocationSequence": immediate_destination_location_sequence,
-                        "eventualDestinationLocationSequence": eventual_destination_location_sequence,
-                    },
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=exception,
-                        )
-                    ],
+                gripper_movement_error: GripperMovementError | None = (
+                    GripperMovementError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        errorCode=exception.code.value.code,
+                        detail=exception.code.value.detail,
+                        errorInfo={
+                            "originLocationSequence": origin_location_sequence,
+                            "immediateDestinationLocationSequence": immediate_destination_location_sequence,
+                            "eventualDestinationLocationSequence": eventual_destination_location_sequence,
+                        },
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=exception,
+                            )
+                        ],
+                    )
                 )
             else:
                 gripper_movement_error = None

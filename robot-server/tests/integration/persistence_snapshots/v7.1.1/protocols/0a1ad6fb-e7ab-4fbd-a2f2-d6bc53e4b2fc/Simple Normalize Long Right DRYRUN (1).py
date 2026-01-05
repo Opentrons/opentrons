@@ -3,9 +3,9 @@ from dataclasses import replace
 from opentrons import protocol_api, types
 
 metadata = {
-    'protocolName': 'Simple Normalize Long Right DRYRUN.py',
-    'author': 'Opentrons <protocols@opentrons.com>',
-    'source': 'Protocol Library',
+    "protocolName": "Simple Normalize Long Right DRYRUN.py",
+    "author": "Opentrons <protocols@opentrons.com>",
+    "source": "Protocol Library",
 }
 
 requirements = {
@@ -18,51 +18,67 @@ requirements = {
 DRYRUN = True  # True or False, DRYRUN = True will return tips, skip incubation times, shorten mix, for testing purposes
 MEASUREPAUSE = "NO"
 
-ABR_TEST                = True
+ABR_TEST = True
 if ABR_TEST == True:
-    DRYRUN              = True          # True = skip incubation times, shorten mix, for testing purposes
-    TIP_TRASH           = False         # True = Used tips go in Trash, False = Used tips go back into rack
+    DRYRUN = True  # True = skip incubation times, shorten mix, for testing purposes
+    TIP_TRASH = (
+        False  # True = Used tips go in Trash, False = Used tips go back into rack
+    )
 else:
-    DRYRUN              = False          # True = skip incubation times, shorten mix, for testing purposes
-    TIP_TRASH           = True 
-
+    DRYRUN = False  # True = skip incubation times, shorten mix, for testing purposes
+    TIP_TRASH = True
 
 
 def run(protocol: protocol_api.ProtocolContext):
-
     if DRYRUN == True:
         protocol.comment("THIS IS A DRY RUN")
     else:
         protocol.comment("THIS IS A REACTION RUN")
 
-
     # DECK SETUP AND LABWARE
     # ========== FIRST ROW ===========
     protocol.comment("THIS IS A NO MODULE RUN")
-    reservoir       = protocol.load_labware("nest_12_reservoir_15ml", "1")
-    sample_plate_1    = protocol.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", "3")
+    reservoir = protocol.load_labware("nest_12_reservoir_15ml", "1")
+    sample_plate_1 = protocol.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "3"
+    )
     # ========== SECOND ROW ==========
-    tiprack_200_1   = protocol.load_labware('opentrons_flex_96_tiprack_200ul',  '4')
-    tiprack_200_2   = protocol.load_labware('opentrons_flex_96_tiprack_200ul',  '5')
-    sample_plate_2    = protocol.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", "6")
+    tiprack_200_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "4")
+    tiprack_200_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "5")
+    sample_plate_2 = protocol.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "6"
+    )
     # ========== THIRD ROW ===========
-    tiprack_200_3   = protocol.load_labware('opentrons_flex_96_tiprack_200ul',  '7')
-    tiprack_200_4   = protocol.load_labware('opentrons_flex_96_tiprack_200ul',  '8')
-    sample_plate_3    = protocol.load_labware("armadillo_96_wellplate_200ul_pcr_full_skirt", "9")
+    tiprack_200_3 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "7")
+    tiprack_200_4 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "8")
+    sample_plate_3 = protocol.load_labware(
+        "armadillo_96_wellplate_200ul_pcr_full_skirt", "9"
+    )
     # ========== FOURTH ROW ==========
-    tiprack_200_5   = protocol.load_labware('opentrons_flex_96_tiprack_200ul',  '10')
-    tiprack_200_6   = protocol.load_labware('opentrons_flex_96_tiprack_200ul',  '11')
+    tiprack_200_5 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "10")
+    tiprack_200_6 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "11")
 
     # reagent
-    Dye_1     = reservoir["A1"]
-    Dye_2     = reservoir["A2"]
-    Dye_3     = reservoir["A3"]
+    Dye_1 = reservoir["A1"]
+    Dye_2 = reservoir["A2"]
+    Dye_3 = reservoir["A3"]
     Diluent_1 = reservoir["A4"]
     Diluent_2 = reservoir["A5"]
     Diluent_3 = reservoir["A6"]
 
     # pipette
-    p1000 = protocol.load_instrument("flex_1channel_1000", "right", tip_racks=[tiprack_200_1,tiprack_200_2,tiprack_200_3,tiprack_200_4,tiprack_200_5,tiprack_200_6])
+    p1000 = protocol.load_instrument(
+        "flex_1channel_1000",
+        "right",
+        tip_racks=[
+            tiprack_200_1,
+            tiprack_200_2,
+            tiprack_200_3,
+            tiprack_200_4,
+            tiprack_200_5,
+            tiprack_200_6,
+        ],
+    )
 
     sample_quant_csv = """
     sample_plate_1, Sample_well,DYE,DILUENT
@@ -177,7 +193,12 @@ def run(protocol: protocol_api.ProtocolContext):
             CurrentWell = str(data[current][1])
             DyeVol = float(data[current][2])
             if DyeVol != 0:
-                p1000.transfer(DyeVol, Dye_1.bottom(z=2), sample_plate_1.wells_by_name()[CurrentWell].top(z=1), new_tip='never')
+                p1000.transfer(
+                    DyeVol,
+                    Dye_1.bottom(z=2),
+                    sample_plate_1.wells_by_name()[CurrentWell].top(z=1),
+                    new_tip="never",
+                )
             current += 1
         p1000.blow_out()
         p1000.touch_tip()
@@ -194,7 +215,9 @@ def run(protocol: protocol_api.ProtocolContext):
             if DilutionVol != 0:
                 p1000.pick_up_tip()
                 p1000.aspirate(DilutionVol, Diluent_1.bottom(z=2))
-                p1000.dispense(DilutionVol, sample_plate_1.wells_by_name()[CurrentWell].top(z=0.2))
+                p1000.dispense(
+                    DilutionVol, sample_plate_1.wells_by_name()[CurrentWell].top(z=0.2)
+                )
                 p1000.blow_out()
                 p1000.touch_tip()
                 p1000.return_tip()
@@ -210,7 +233,12 @@ def run(protocol: protocol_api.ProtocolContext):
             CurrentWell = str(data[current][1])
             DyeVol = float(data[current][2])
             if DyeVol != 0:
-                p1000.transfer(DyeVol, Dye_2.bottom(z=2), sample_plate_2.wells_by_name()[CurrentWell].top(z=1), new_tip='never')
+                p1000.transfer(
+                    DyeVol,
+                    Dye_2.bottom(z=2),
+                    sample_plate_2.wells_by_name()[CurrentWell].top(z=1),
+                    new_tip="never",
+                )
             current += 1
         p1000.blow_out()
         p1000.touch_tip()
@@ -227,7 +255,9 @@ def run(protocol: protocol_api.ProtocolContext):
             if DilutionVol != 0:
                 p1000.pick_up_tip()
                 p1000.aspirate(DilutionVol, Diluent_2.bottom(z=2))
-                p1000.dispense(DilutionVol, sample_plate_2.wells_by_name()[CurrentWell].top(z=0.2))
+                p1000.dispense(
+                    DilutionVol, sample_plate_2.wells_by_name()[CurrentWell].top(z=0.2)
+                )
                 p1000.blow_out()
                 p1000.touch_tip()
                 p1000.return_tip()
@@ -243,7 +273,12 @@ def run(protocol: protocol_api.ProtocolContext):
             CurrentWell = str(data[current][1])
             DyeVol = float(data[current][2])
             if DyeVol != 0:
-                p1000.transfer(DyeVol, Dye_3.bottom(z=2), sample_plate_3.wells_by_name()[CurrentWell].top(z=1), new_tip='never')
+                p1000.transfer(
+                    DyeVol,
+                    Dye_3.bottom(z=2),
+                    sample_plate_3.wells_by_name()[CurrentWell].top(z=1),
+                    new_tip="never",
+                )
             current += 1
         p1000.blow_out()
         p1000.touch_tip()
@@ -260,7 +295,9 @@ def run(protocol: protocol_api.ProtocolContext):
             if DilutionVol != 0:
                 p1000.pick_up_tip()
                 p1000.aspirate(DilutionVol, Diluent_3.bottom(z=2))
-                p1000.dispense(DilutionVol, sample_plate_3.wells_by_name()[CurrentWell].top(z=0.2))
+                p1000.dispense(
+                    DilutionVol, sample_plate_3.wells_by_name()[CurrentWell].top(z=0.2)
+                )
                 p1000.blow_out()
                 p1000.touch_tip()
                 p1000.return_tip()

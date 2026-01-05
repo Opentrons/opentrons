@@ -826,9 +826,9 @@ class CheckCalibrationUserFlow:
                 diff_magnitude = ref_pt._replace(x=0.0, y=0.0).magnitude_to(
                     jogged_pt._replace(x=0.0, y=0.0)
                 )
-            assert (
-                diff_magnitude is not None
-            ), "step comparisons must check z or (x and y) magnitude"
+            assert diff_magnitude is not None, (
+                "step comparisons must check z or (x and y) magnitude"
+            )
 
             threshold_mag = Point(0, 0, 0).magnitude_to(threshold_vector)
             exceeds = diff_magnitude > threshold_mag
@@ -949,9 +949,9 @@ class CheckCalibrationUserFlow:
         await self.register_initial_point()
 
     def _get_move_to_point_loc_by_state(self) -> Location:
-        assert (
-            self._z_height_reference is not None
-        ), "comparePoint has not been called yet"
+        assert self._z_height_reference is not None, (
+            "comparePoint has not been called yet"
+        )
         pt_id = MOVE_POINT_STATE_MAP[self._current_state]
         coords = self._deck.get_calibration_position(pt_id).position
         loc = Location(Point(*coords), None)

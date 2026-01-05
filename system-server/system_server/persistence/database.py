@@ -1,4 +1,5 @@
 """SQLite database initialization and utilities."""
+
 from pathlib import Path
 
 import sqlalchemy

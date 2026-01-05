@@ -14,7 +14,6 @@ This helps you maintain a file tree like this:
 Where each version has its own isolated subdirectory.
 """
 
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

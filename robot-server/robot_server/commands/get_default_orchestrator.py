@@ -1,4 +1,5 @@
 """Get the default protocol engine."""
+
 from typing import Annotated, Literal
 
 from fastapi import Depends, status

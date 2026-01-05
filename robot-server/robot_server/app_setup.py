@@ -1,4 +1,5 @@
 """Main FastAPI application."""
+
 import contextlib
 from typing import AsyncGenerator, Optional
 from pathlib import Path

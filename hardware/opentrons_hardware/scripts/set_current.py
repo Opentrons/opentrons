@@ -1,4 +1,5 @@
 """A very simple script to set motor currents."""
+
 import os
 import argparse
 import asyncio

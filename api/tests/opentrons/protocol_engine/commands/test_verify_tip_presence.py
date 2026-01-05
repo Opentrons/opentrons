@@ -1,4 +1,5 @@
 """Test verify tip presence commands."""
+
 from decoy import Decoy
 
 from opentrons.protocol_engine.execution import TipHandler

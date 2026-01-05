@@ -1,4 +1,5 @@
 """Command models to close a Thermocycler's lid."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type

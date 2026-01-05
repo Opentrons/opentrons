@@ -1,6 +1,5 @@
 """Unit tests for `run_auto_deleter`."""
 
-
 from datetime import datetime
 import logging
 from typing import List, Union

@@ -1,6 +1,5 @@
 """Utils for handling instrument serial."""
 
-
 DEFAULT_INSTR_SERIAL_LENGTH = 16
 
 

@@ -1,4 +1,5 @@
 """Application routes."""
+
 from fastapi import APIRouter
 from system_server.system.router import system_router
 

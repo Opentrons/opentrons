@@ -1,6 +1,7 @@
 """
 ssh_key_management: Endpoints for managing SSH keys on the robot
 """
+
 import contextlib
 import functools
 import hashlib
@@ -186,7 +187,7 @@ async def clear(request: web.Request) -> web.Response:
 
     return web.json_response(
         data={
-            "message": "Keys cleared. " "Restart robot to take effect",
+            "message": "Keys cleared. Restart robot to take effect",
             "restart_url": "/server/restart",
         },
         status=200,
@@ -224,7 +225,7 @@ async def remove(request: web.Request) -> web.Response:
 
     return web.json_response(
         data={
-            "message": f"Key {requested_hash} deleted. " "Restart robot to take effect",
+            "message": f"Key {requested_hash} deleted. Restart robot to take effect",
             "restart_url": "/server/restart",
         },
         status=200,

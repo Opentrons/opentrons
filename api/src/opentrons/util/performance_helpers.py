@@ -46,7 +46,7 @@ class _StubbedTracker:
         def inner_decorator(
             func: _UnderlyingFunction[
                 _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
-            ]
+            ],
         ) -> _UnderlyingFunction[
             _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
         ]:
@@ -121,7 +121,7 @@ def _track_a_function(
     @functools.wraps(func)
     def wrapper(
         *args: _UnderlyingFunctionParameters.args,
-        **kwargs: _UnderlyingFunctionParameters.kwargs
+        **kwargs: _UnderlyingFunctionParameters.kwargs,
     ) -> _UnderlyingFunctionReturn:
         try:
             return wrapped(*args, **kwargs)
@@ -142,7 +142,7 @@ class TrackingFunctions:
     def track_analysis(
         func: _UnderlyingFunction[
             _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
-        ]
+        ],
     ) -> typing.Callable[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]:
         """Track a function that runs an analysis."""
         return _track_a_function("ANALYZING_PROTOCOL", func)
@@ -151,7 +151,7 @@ class TrackingFunctions:
     def track_getting_cached_protocol_analysis(
         func: _UnderlyingFunction[
             _UnderlyingFunctionParameters, _UnderlyingFunctionReturn
-        ]
+        ],
     ) -> typing.Callable[_UnderlyingFunctionParameters, _UnderlyingFunctionReturn]:
         """Track a function that gets cached analysis."""
         return _track_a_function("GETTING_CACHED_ANALYSIS", func)

@@ -1,4 +1,5 @@
 """Tests for the /health router."""
+
 import pytest
 from typing import Dict, Iterator
 from pathlib import Path

@@ -96,18 +96,22 @@ def test_user_flow_select_pipette(pipettes, target_mount, hardware):
         pip2 = pipette.Pipette(pip2_configurations, PIP_OFFSET, "testId2")
     hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
     # load a labware with calibrations
-    with patch.object(
-        check_flow,
-        "get_robot_deck_attitude",
-        new=build_mock_deck_calibration(),
-    ), patch.object(
-        check_flow,
-        "load_tip_length_calibration",
-        new=build_mock_stored_tip_length(),
-    ), patch.object(
-        check_flow,
-        "get_pipette_offset",
-        new=build_mock_stored_pipette_offset(),
+    with (
+        patch.object(
+            check_flow,
+            "get_robot_deck_attitude",
+            new=build_mock_deck_calibration(),
+        ),
+        patch.object(
+            check_flow,
+            "load_tip_length_calibration",
+            new=build_mock_stored_tip_length(),
+        ),
+        patch.object(
+            check_flow,
+            "get_pipette_offset",
+            new=build_mock_stored_pipette_offset(),
+        ),
     ):
         uf = CheckCalibrationUserFlow(hardware=hardware)
         assert uf.hw_pipette == hardware.hardware_instruments[target_mount]
@@ -130,18 +134,22 @@ async def test_switching_to_second_pipette(pipettes, target_mount, hardware):
         pip2 = pipette.Pipette(pip2_configurations, PIP_OFFSET, "testId2")
     hardware.hardware_instruments = {Mount.LEFT: pip, Mount.RIGHT: pip2}
     # load a labware with calibrations
-    with patch.object(
-        check_flow,
-        "get_robot_deck_attitude",
-        new=build_mock_deck_calibration(),
-    ), patch.object(
-        check_flow,
-        "load_tip_length_calibration",
-        new=build_mock_stored_tip_length(),
-    ), patch.object(
-        check_flow,
-        "get_pipette_offset",
-        new=build_mock_stored_pipette_offset(),
+    with (
+        patch.object(
+            check_flow,
+            "get_robot_deck_attitude",
+            new=build_mock_deck_calibration(),
+        ),
+        patch.object(
+            check_flow,
+            "load_tip_length_calibration",
+            new=build_mock_stored_tip_length(),
+        ),
+        patch.object(
+            check_flow,
+            "get_pipette_offset",
+            new=build_mock_stored_pipette_offset(),
+        ),
     ):
         uf = CheckCalibrationUserFlow(hardware=hardware)
         if pip and pip2:
@@ -227,18 +235,22 @@ def build_mock_deck_calibration(kind="normal"):
 
 def test_load_labware(mock_hw):
     # load a labware with calibrations
-    with patch.object(
-        check_flow,
-        "get_robot_deck_attitude",
-        new=build_mock_deck_calibration(),
-    ), patch.object(
-        check_flow,
-        "load_tip_length_calibration",
-        new=build_mock_stored_tip_length(),
-    ), patch.object(
-        check_flow,
-        "get_pipette_offset",
-        new=build_mock_stored_pipette_offset(),
+    with (
+        patch.object(
+            check_flow,
+            "get_robot_deck_attitude",
+            new=build_mock_deck_calibration(),
+        ),
+        patch.object(
+            check_flow,
+            "load_tip_length_calibration",
+            new=build_mock_stored_tip_length(),
+        ),
+        patch.object(
+            check_flow,
+            "get_pipette_offset",
+            new=build_mock_stored_pipette_offset(),
+        ),
     ):
         uf = CheckCalibrationUserFlow(hardware=mock_hw, has_calibration_block=True)
         assert (
@@ -254,18 +266,22 @@ def test_load_custom_tiprack(mock_hw, custom_tiprack_def, clear_custom_tiprack_d
         "custom/minimal_labware_def/1", custom_tiprack_def
     )
     # load a labware with calibrations
-    with patch.object(
-        check_flow,
-        "get_robot_deck_attitude",
-        new=build_mock_deck_calibration(),
-    ), patch.object(
-        check_flow,
-        "load_tip_length_calibration",
-        new=build_mock_stored_tip_length("custom_tiprack"),
-    ), patch.object(
-        check_flow,
-        "get_pipette_offset",
-        new=build_mock_stored_pipette_offset("custom_tiprack"),
+    with (
+        patch.object(
+            check_flow,
+            "get_robot_deck_attitude",
+            new=build_mock_deck_calibration(),
+        ),
+        patch.object(
+            check_flow,
+            "load_tip_length_calibration",
+            new=build_mock_stored_tip_length("custom_tiprack"),
+        ),
+        patch.object(
+            check_flow,
+            "get_pipette_offset",
+            new=build_mock_stored_pipette_offset("custom_tiprack"),
+        ),
     ):
         uf = CheckCalibrationUserFlow(hardware=mock_hw, has_calibration_block=True)
         assert uf.active_tiprack._core.get_display_name() == "minimal labware on 8"
@@ -277,36 +293,44 @@ def test_bad_calibration(mock_hw):
         CheckCalibrationUserFlow(hardware=mock_hw)
 
     with pytest.raises(RobotServerError):
-        with patch.object(
-            check_flow,
-            "get_robot_deck_attitude",
-            new=build_mock_deck_calibration("identity"),
-        ), patch.object(
-            check_flow,
-            "load_tip_length_calibration",
-            new=build_mock_stored_tip_length(),
-        ), patch.object(
-            check_flow,
-            "get_pipette_offset",
-            new=build_mock_stored_pipette_offset(),
+        with (
+            patch.object(
+                check_flow,
+                "get_robot_deck_attitude",
+                new=build_mock_deck_calibration("identity"),
+            ),
+            patch.object(
+                check_flow,
+                "load_tip_length_calibration",
+                new=build_mock_stored_tip_length(),
+            ),
+            patch.object(
+                check_flow,
+                "get_pipette_offset",
+                new=build_mock_stored_pipette_offset(),
+            ),
         ):
             CheckCalibrationUserFlow(hardware=mock_hw)
 
 
 @pytest.fixture
 def mock_user_flow(mock_hw):
-    with patch.object(
-        check_flow,
-        "get_robot_deck_attitude",
-        new=build_mock_deck_calibration(),
-    ), patch.object(
-        check_flow,
-        "load_tip_length_calibration",
-        new=build_mock_stored_tip_length(),
-    ), patch.object(
-        check_flow,
-        "get_pipette_offset",
-        new=build_mock_stored_pipette_offset(),
+    with (
+        patch.object(
+            check_flow,
+            "get_robot_deck_attitude",
+            new=build_mock_deck_calibration(),
+        ),
+        patch.object(
+            check_flow,
+            "load_tip_length_calibration",
+            new=build_mock_stored_tip_length(),
+        ),
+        patch.object(
+            check_flow,
+            "get_pipette_offset",
+            new=build_mock_stored_pipette_offset(),
+        ),
     ):
         m = CheckCalibrationUserFlow(hardware=mock_hw)
         initial_pt = Point(1, 1, 5)
@@ -319,18 +343,22 @@ def mock_user_flow(mock_hw):
 
 @pytest.fixture
 def mock_user_flow_bad_vectors(mock_hw):
-    with patch.object(
-        check_flow,
-        "get_robot_deck_attitude",
-        new=build_mock_deck_calibration(),
-    ), patch.object(
-        check_flow,
-        "load_tip_length_calibration",
-        new=build_mock_stored_tip_length(),
-    ), patch.object(
-        check_flow,
-        "get_pipette_offset",
-        new=build_mock_stored_pipette_offset(),
+    with (
+        patch.object(
+            check_flow,
+            "get_robot_deck_attitude",
+            new=build_mock_deck_calibration(),
+        ),
+        patch.object(
+            check_flow,
+            "load_tip_length_calibration",
+            new=build_mock_stored_tip_length(),
+        ),
+        patch.object(
+            check_flow,
+            "get_pipette_offset",
+            new=build_mock_stored_pipette_offset(),
+        ),
     ):
         m = CheckCalibrationUserFlow(hardware=mock_hw)
         initial_pt = Point(1, 6, 5)
@@ -519,12 +547,12 @@ async def test_mark_bad_calibration(mock_user_flow_bad_vectors):
     cal_store = "opentrons.calibration_storage"
     user_flow_path = "robot_server.robot.calibration.check.user_flow"
 
-    with patch(f"{cal_store}.mark_bad_calibration.mark_bad") as m, patch(
-        f"{user_flow_path}.create_tip_length_data"
-    ), patch(f"{user_flow_path}.save_tip_length_calibration"), patch(
-        f"{user_flow_path}.save_pipette_calibration"
-    ), patch(
-        f"{user_flow_path}.save_robot_deck_attitude"
+    with (
+        patch(f"{cal_store}.mark_bad_calibration.mark_bad") as m,
+        patch(f"{user_flow_path}.create_tip_length_data"),
+        patch(f"{user_flow_path}.save_tip_length_calibration"),
+        patch(f"{user_flow_path}.save_pipette_calibration"),
+        patch(f"{user_flow_path}.save_robot_deck_attitude"),
     ):
         uf._current_state = CalibrationCheckState.comparingTip
         await uf.update_comparison_map()

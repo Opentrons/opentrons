@@ -265,7 +265,9 @@ def dispatch_json(
         # different `_command` helpers take different args
         if command_type in pipette_commands:
             dispatcher_map[command_type](  # type: ignore[call-arg]
-                instruments, loaded_labware, params  # type: ignore[arg-type]
+                instruments,  # type: ignore[arg-type]
+                loaded_labware,  # type: ignore[arg-type]
+                params,  # type: ignore[arg-type]
             )
         elif command_type == JsonRobotCommand.delay.value:
             dispatcher_map[command_type](context, params)  # type: ignore

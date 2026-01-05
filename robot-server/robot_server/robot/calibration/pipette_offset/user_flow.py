@@ -446,9 +446,9 @@ class PipetteOffsetCalibrationUserFlow:
         self._should_perform_tip_length = False
 
     async def move_to_point_one(self) -> None:
-        assert (
-            self._z_height_reference is not None
-        ), "saveOffset has not been called yet"
+        assert self._z_height_reference is not None, (
+            "saveOffset has not been called yet"
+        )
         target_loc = Location(self._cal_ref_point, None)
         target = target_loc.move(point=Point(0, 0, self._z_height_reference))
         await self._move(target)
@@ -497,9 +497,7 @@ class PipetteOffsetCalibrationUserFlow:
             new_tip_length = self._get_stored_tip_length_cal()
             self._has_calibrated_tip_length = new_tip_length is not None
             # load the new tip length for the rest of the session
-            self._hw_pipette.current_tip_length = (
-                new_tip_length  # type: ignore[assignment]
-            )
+            self._hw_pipette.current_tip_length = new_tip_length  # type: ignore[assignment]
             await self.hardware.retract(self._mount, 20)
 
     async def move_to_reference_point(self) -> None:

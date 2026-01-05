@@ -1,4 +1,5 @@
 """Flex-specific extensions to instrument configuration."""
+
 from typing import Union, Optional
 from typing_extensions import Protocol
 
@@ -23,13 +24,11 @@ class FlexInstrumentConfigurer(Protocol[MountArgType]):
     async def get_instrument_state(
         self,
         mount: MountArgType,
-    ) -> PipetteStateDict:
-        ...
+    ) -> PipetteStateDict: ...
 
     def get_instrument_offset(
         self, mount: MountArgType
-    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary, None]:
-        ...
+    ) -> Union[GripperCalibrationOffset, PipetteOffsetSummary, None]: ...
 
     async def get_tip_presence_status(
         self,

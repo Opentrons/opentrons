@@ -55,7 +55,11 @@ async def test_reload_labware_implementation(
         labwareId="my-labware-id",
     )
 
-    decoy.when(await equipment.reload_labware(labware_id="my-labware-id",)).then_return(
+    decoy.when(
+        await equipment.reload_labware(
+            labware_id="my-labware-id",
+        )
+    ).then_return(
         ReloadedLabwareData(
             location=DeckSlotLocation(slotName=DeckSlotName.SLOT_4),
             offsetId="labware-offset-id",

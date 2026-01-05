@@ -1,4 +1,5 @@
 """Run router dependency-injection wire-up."""
+
 from typing import Annotated
 
 from fastapi import Depends, status

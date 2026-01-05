@@ -592,12 +592,12 @@ def _convert_sql_row_to_dataclass(
     protocol_kind = sql_row.protocol_kind
 
     assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
-    assert protocol_key is None or isinstance(
-        protocol_key, str
-    ), f"Protocol Key {protocol_key} not a string or None"
-    assert isinstance(
-        protocol_kind, ProtocolKindSQLEnum
-    ), f"Protocol Kind {protocol_kind} not the expected enum"
+    assert protocol_key is None or isinstance(protocol_key, str), (
+        f"Protocol Key {protocol_key} not a string or None"
+    )
+    assert isinstance(protocol_kind, ProtocolKindSQLEnum), (
+        f"Protocol Kind {protocol_kind} not the expected enum"
+    )
 
     return _DBProtocolResource(
         protocol_id=protocol_id,

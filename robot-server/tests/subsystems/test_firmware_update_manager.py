@@ -1,4 +1,5 @@
 """Tests for UpdateProgressMonitor."""
+
 from __future__ import annotations
 import asyncio
 

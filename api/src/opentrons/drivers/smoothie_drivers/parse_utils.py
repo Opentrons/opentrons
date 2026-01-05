@@ -79,7 +79,7 @@ def byte_array_to_ascii_string(byte_array: bytearray) -> str:
     """
     # remove trailing null characters
     try:
-        for c in [b"\x00", b"\xFF"]:
+        for c in [b"\x00", b"\xff"]:
             if c in byte_array:
                 byte_array = byte_array[: byte_array.index(c)]
         res = byte_array.decode()

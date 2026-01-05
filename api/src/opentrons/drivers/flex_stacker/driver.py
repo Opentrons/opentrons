@@ -497,9 +497,9 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
                 channel = frame.data[7:]
                 data.append(channel)
                 data_len += len(channel)
-                assert (
-                    not data_len > start.total_bytes
-                ), f"Invalid number of bytes, expected {start.total_bytes} got {data_len}."
+                assert not data_len > start.total_bytes, (
+                    f"Invalid number of bytes, expected {start.total_bytes} got {data_len}."
+                )
                 retries = FS_TOF_FRAME_RETRIES
                 next_frame_id += 1
                 resend = False
@@ -597,7 +597,7 @@ class FlexStackerDriver(AbstractFlexStackerDriver):
                 timeout=FS_TOF_INIT_TIMEOUT,
             )
             return self.parse_tof_sensor_status(response)
-        except (TaskNotReady):
+        except TaskNotReady:
             return TOFSensorStatus(
                 sensor, TOFSensorState.INITIALIZING, TOFSensorMode.UNKNOWN, False
             )

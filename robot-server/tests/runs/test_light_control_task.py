@@ -1,4 +1,5 @@
 """Unit tests for `runs.light_control_task`."""
+
 from __future__ import annotations
 
 import pytest

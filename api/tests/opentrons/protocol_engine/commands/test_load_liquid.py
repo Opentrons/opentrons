@@ -1,4 +1,5 @@
 """Test load-liquid command."""
+
 import pytest
 from decoy import Decoy
 from datetime import datetime

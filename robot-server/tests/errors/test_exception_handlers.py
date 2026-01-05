@@ -1,4 +1,5 @@
 """Tests for the server's exception handlers."""
+
 import pytest
 from decoy import matchers
 from fastapi import FastAPI, Header, status
@@ -168,8 +169,7 @@ def test_handles_body_validation_error(app: FastAPI, client: TestClient) -> None
                 "errorCode": "4000",
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
-                "detail": "Input should be a valid boolean, unable to interpret "
-                "input",
+                "detail": "Input should be a valid boolean, unable to interpret input",
                 "source": {"pointer": "/array_field/0"},
             },
         ]

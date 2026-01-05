@@ -175,6 +175,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
         location: Union[types.Location, TrashBin, WasteChute],
         well_core: Optional[LegacyWellCore],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         """Blow liquid out of the tip.
 
@@ -182,6 +183,7 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             location: The location to blow out into.
             well_core: Unused by legacy core.
             in_place: Whether we should move_to location.
+            flow_rate: Not used in this core.
         """
         if isinstance(location, (TrashBin, WasteChute)):
             raise APIVersionError(
@@ -298,9 +300,9 @@ class LegacyInstrumentCore(AbstractInstrument[LegacyWellCore, LegacyLabwareCore]
             elif self._api_version < APIVersion(2, 2):
                 location = well.bottom(z=_PRE_2_2_TIP_DROP_HEIGHT_MM)
             else:
-                assert (
-                    labware_core.is_tip_rack()
-                ), "Expected tip drop target to be a tip rack."
+                assert labware_core.is_tip_rack(), (
+                    "Expected tip drop target to be a tip rack."
+                )
 
                 return_height = self.get_return_height()
                 location = well.top(z=-return_height * labware_core.get_tip_length())

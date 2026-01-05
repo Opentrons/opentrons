@@ -1,4 +1,5 @@
 """Definitions of data and interface shapes for notes."""
+
 from typing import Union, Literal, Protocol, List, TYPE_CHECKING
 from pydantic import BaseModel, Field
 

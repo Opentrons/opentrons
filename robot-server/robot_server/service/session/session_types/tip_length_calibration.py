@@ -46,7 +46,7 @@ class TipLengthCalibration(BaseSession):
 
     @staticmethod
     def _verify_tip_rack(
-        tip_rack_def: Union[dict[str, object], None]
+        tip_rack_def: Union[dict[str, object], None],
     ) -> Optional[LabwareDefinition2]:
         if tip_rack_def:
             verified_definition = labware.verify_definition(tip_rack_def)
@@ -86,9 +86,9 @@ class TipLengthCalibration(BaseSession):
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler: Optional[
-                Awaitable[None]
-            ] = configuration.hardware.set_lights(rails=False)
+            shutdown_handler: Optional[Awaitable[None]] = (
+                configuration.hardware.set_lights(rails=False)
+            )
         else:
             shutdown_handler = None
 

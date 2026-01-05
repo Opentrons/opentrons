@@ -1,4 +1,5 @@
 """Firmware update script."""
+
 import argparse
 import asyncio
 import logging
@@ -68,7 +69,7 @@ async def run(args: argparse.Namespace) -> None:
 
     usb_messenger: Optional[BinaryMessenger] = None
     try:
-        usb_driver: SerialUsbDriver = await (build_rear_panel_driver())
+        usb_driver: SerialUsbDriver = await build_rear_panel_driver()
         usb_messenger = build_rear_panel_messenger(usb_driver)
         usb_messenger.start()
     except IOError as e:

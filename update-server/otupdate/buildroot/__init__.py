@@ -1,4 +1,5 @@
-""" update-server implementation for buildroot systems """
+"""update-server implementation for buildroot systems"""
+
 import asyncio
 import logging
 from typing import Any, Mapping, Optional
@@ -86,16 +87,14 @@ async def get_app(
             [
                 f"Device name: {await name_synchronizer.get_name()}",
                 "Buildroot version:         "
-                f'{version.get("buildroot_version", "unknown")}',
-                "\t(from git sha      " f'{version.get("buildroot_sha", "unknown")}',
+                f"{version.get('buildroot_version', 'unknown')}",
+                f"\t(from git sha      {version.get('buildroot_sha', 'unknown')}",
                 "API version:               "
-                f'{version.get("opentrons_api_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("opentrons_api_sha", "unknown")}',
+                f"{version.get('opentrons_api_version', 'unknown')}",
+                f"\t(from git sha      {version.get('opentrons_api_sha', 'unknown')}",
                 "Update server version:     "
-                f'{version.get("update_server_version", "unknown")}',
-                "\t(from git sha      "
-                f'{version.get("update_server_sha", "unknown")}',
+                f"{version.get('update_server_version', 'unknown')}",
+                f"\t(from git sha      {version.get('update_server_sha', 'unknown')}",
                 "Smoothie firmware version: TODO",
             ]
         )

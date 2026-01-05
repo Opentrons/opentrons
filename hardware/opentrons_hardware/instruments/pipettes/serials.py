@@ -1,4 +1,5 @@
 """Handle parsing and providing pipette information."""
+
 import re
 from typing import Dict, Tuple
 import struct
@@ -36,7 +37,7 @@ NAME_LOOKUP: Dict[str, PipetteName] = {
 }
 
 SERIAL_FORMAT_MSG = (
-    f'Serial numbers must have the format PNNNVMMXXXXXX... where NNN is one of {", ".join(NAME_LOOKUP.keys())}, '
+    f"Serial numbers must have the format PNNNVMMXXXXXX... where NNN is one of {', '.join(NAME_LOOKUP.keys())}, "
     "MM is a two-digit model number, and the rest is some serial code."
 )
 

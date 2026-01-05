@@ -1,6 +1,5 @@
 """Default deck configurations."""
 
-
 from . import models
 
 
