@@ -18,7 +18,7 @@ export function FlexStackerSummary(
   props: FlexStackerSummaryProps
 ): JSX.Element | null {
   const { currentStep, labwareEntities } = props
-  const { fillLabwareUri, fillQuantity, flexStackerFormType } = currentStep
+  const { fillLabwareUri, fillLabwareIds, flexStackerFormType } = currentStep
   const labwareName = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => labwareDefURI === fillLabwareUri
   )?.def.metadata.displayName
@@ -38,7 +38,7 @@ export function FlexStackerSummary(
         <StyledTrans
           i18nKey={`protocol_steps:flex_stacker.${FLEX_STACKER_FILL}`}
           tagText={labwareName}
-          tagText2={fillQuantity?.length ?? 0}
+          tagText2={fillLabwareIds?.length ?? 0}
         />
       )
       break

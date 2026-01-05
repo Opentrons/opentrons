@@ -111,7 +111,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
         hydratedForm.stepType === 'flexStacker' &&
         hydratedForm.flexStackerFormType === 'fill'
       ) {
-        createdLabwareForQueue(hydratedForm.moduleId, hydratedForm.fillQuantity)
+        createdLabwareForQueue(hydratedForm.moduleId, hydratedForm.fillLabwareIds)
       }
     } else {
       // There's a dialog we have to show before saving the step.

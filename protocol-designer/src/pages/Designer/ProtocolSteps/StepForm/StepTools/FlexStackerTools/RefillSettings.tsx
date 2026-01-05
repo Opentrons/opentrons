@@ -49,7 +49,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
       { length: quantity },
       () => `${uuid()}:${storedEntity.labwareDefURI}`
     )
-    propsForFields.fillQuantity.updateValue(newFill)
+    propsForFields.fillLabwareIds.updateValue(newFill)
   }, [fillQuantityLocalState, storedEntity?.labwareDefURI])
 
   return (
@@ -70,7 +70,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
       ) : null}
       <InputStepFormField
         title={t('step_edit_form.flex_stacker.fields.fillQuantity.title')}
-        {...propsForFields.fillQuantity}
+        {...propsForFields.fillLabwareIds}
         showTooltip={false}
         caption={t('step_edit_form.flex_stacker.fields.fillQuantity.caption', {
           max: maxPoolCount,

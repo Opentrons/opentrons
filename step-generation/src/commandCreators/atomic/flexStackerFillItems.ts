@@ -17,7 +17,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   invariantContext,
   robotState
 ) => {
-  const { moduleId, interventionMessage, fill } = args
+  const { moduleId, interventionMessage, fillLabwareIds } = args
   const { labwareEntities, moduleEntities } = invariantContext
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const isSpace = getIsSpaceInHopper(
@@ -25,7 +25,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = fill.map(lwId => labwareEntities[lwId]?.pythonName)
+  const labwarePythonNames = fillLabwareIds.map(lwId => labwareEntities[lwId]?.pythonName)
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
 
   const indentedLabwarePythonNames = labwareChunks
@@ -41,8 +41,8 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     return {
       errors: [errorCreators.flexStackerHopperFull()],
     }
-  } else if (fill.length > 0) {
-    const allMatch = fill.every(labware =>
+  } else if (fillLabwareIds.length > 0) {
+    const allMatch = fillLabwareIds.every(labware =>
       labwareMatchesLabwareInHopper(labware, invariantContext, flexStackerState)
     )
     if (!allMatch) {
@@ -53,7 +53,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   }
 
   const pythonArgs = [
-    ...(fill.length > 0 ? `labware=[${formattedPythonLabwareNames}],\n` : []),
+    ...(fillLabwareIds.length > 0 ? `labware=[${formattedPythonLabwareNames}],\n` : []),
     ...(interventionMessage != null
       ? [`message=${formatPyStr(interventionMessage)},\n`]
       : []),
@@ -66,7 +66,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          labware: fill,
+          labware: fillLabwareIds,
           message: interventionMessage ?? undefined,
         },
       },
