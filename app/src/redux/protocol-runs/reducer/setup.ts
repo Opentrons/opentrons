@@ -1,8 +1,18 @@
 import * as Constants from '../constants'
 
-import type { ProtocolRunAction, RunSetupStatus } from '../types'
+import type {
+  CameraSetupStepKey,
+  ProtocolRunAction,
+  RunSetupStatus,
+} from '../types'
 
-const INITIAL_SETUP_STEP_STATE = { complete: false, required: true }
+const INITIAL_SETUP_STEP_STATE = {
+  required: true,
+  complete: false,
+  cameraEnabled: false,
+  liveStreamEnabled: false,
+  cameraRecoveryEnabled: false,
+}
 
 export const INITIAL_RUN_SETUP_STATE: RunSetupStatus = {
   [Constants.ROBOT_CALIBRATION_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
@@ -42,6 +52,17 @@ export function setupReducer(
         }),
         state
       )
+
+    case Constants.CAMERA_SETUP_STEP_KEY: {
+      const cameraStep = state[Constants.CAMERA_SETUP_STEP_KEY]
+
+      return {
+        ...state,
+        [Constants.CAMERA_SETUP_STEP_KEY]: {
+          ...cameraStep,
+        },
+      }
+    }
 
     default:
       return state

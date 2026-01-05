@@ -1,3 +1,6 @@
+import * as Constants from '../constants'
+import { INITIAL_CAMERA_STATE } from '../reducer'
+
 import type { State } from '../../types'
 import type * as Types from '../types'
 
@@ -74,6 +77,26 @@ export const getSetupStepsMissing: (
     }),
     {}
   ) as Types.StepMap<boolean>
+}
+
+export const getCameraUsageState = (
+  state: State,
+  runId: string
+): Types.CameraState => {
+  const cameraStep =
+    state.protocolRuns[runId]?.setup[Constants.CAMERA_SETUP_STEP_KEY]
+
+  if (cameraStep == null) {
+    return INITIAL_CAMERA_STATE
+  }
+
+  return {
+    required: false,
+    complete: true,
+    enabled: cameraStep.cameraEnabled,
+    liveStreamEnabled: cameraStep.liveStreamEnabled,
+    recoveryEnabled: cameraStep.cameraRecoveryEnabled,
+  }
 }
 
 // Reports all missing setup steps, including those validated on the robot.

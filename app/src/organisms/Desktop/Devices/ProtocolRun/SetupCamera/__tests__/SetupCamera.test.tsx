@@ -70,6 +70,8 @@ describe('SetupCamera', () => {
     vi.mocked(useNavigate).mockReturnValue(mockNavigate)
     vi.mocked(useFeatureFlag).mockReturnValue(true)
     vi.mocked(getCameraUsageState).mockReturnValue({
+      required: true,
+      complete: true,
       enabled: true,
       recoveryEnabled: true,
       liveStreamEnabled: true,
@@ -107,6 +109,8 @@ describe('SetupCamera', () => {
 
   it('renders disabled status when camera is disabled', () => {
     vi.mocked(getCameraUsageState).mockReturnValue({
+      required: false,
+      complete: false,
       enabled: false,
       recoveryEnabled: true,
       liveStreamEnabled: true,
@@ -127,6 +131,8 @@ describe('SetupCamera', () => {
 
   it('renders camera required notification when camera is disabled', () => {
     vi.mocked(getCameraUsageState).mockReturnValue({
+      required: false,
+      complete: false,
       enabled: false,
       recoveryEnabled: true,
       liveStreamEnabled: true,
@@ -140,6 +146,8 @@ describe('SetupCamera', () => {
 
   it('does not render SetupRunCameraUsage when camera is disabled', () => {
     vi.mocked(getCameraUsageState).mockReturnValue({
+      required: false,
+      complete: false,
       enabled: false,
       recoveryEnabled: true,
       liveStreamEnabled: true,
@@ -160,6 +168,8 @@ describe('SetupCamera', () => {
 
   it('does not render SetupRunCameraControls when camera is disabled', () => {
     vi.mocked(getCameraUsageState).mockReturnValue({
+      required: false,
+      complete: false,
       enabled: false,
       recoveryEnabled: true,
       liveStreamEnabled: true,

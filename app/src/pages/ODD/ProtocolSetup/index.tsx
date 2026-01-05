@@ -859,7 +859,14 @@ export function ProtocolSetup(): JSX.Element {
   useEffect(() => {
     if (initialRobotCameraSettings != null) {
       dispatch(
-        updateCameraEnablement(runId, initialRobotCameraSettings.cameraEnabled)
+        updateCameraEnablement(runId, {
+          required: false,
+          complete: false,
+          enabled: initialRobotCameraSettings.cameraEnabled,
+          recoveryEnabled:
+            initialRobotCameraSettings.errorRecoveryCameraEnabled,
+          liveStreamEnabled: initialRobotCameraSettings.liveStreamEnabled,
+        })
       )
     }
   }, [initialRobotCameraSettings])

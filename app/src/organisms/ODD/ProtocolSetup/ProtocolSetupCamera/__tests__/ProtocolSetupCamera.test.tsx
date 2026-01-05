@@ -48,6 +48,8 @@ describe('ProtocolSetupCamera', () => {
     ))
     vi.mocked(ODDBackButton).mockReturnValue(<div>MOCK_ODD_BACK_BUTTON</div>)
     vi.mocked(getCameraUsageState).mockReturnValue({
+      required: true,
+      complete: true,
       enabled: true,
       recoveryEnabled: true,
       liveStreamEnabled: true,

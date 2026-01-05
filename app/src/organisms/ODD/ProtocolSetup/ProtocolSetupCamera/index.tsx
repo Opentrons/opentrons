@@ -12,8 +12,6 @@ import { useToaster } from '/app/organisms/ToasterOven'
 import {
   getCameraUsageState,
   updateCameraEnablement,
-  updateCameraRecoveryEnablement,
-  updateCameraStreamEnablement,
 } from '/app/redux/protocol-runs'
 
 import styles from './setupcamera.module.css'
@@ -54,19 +52,43 @@ export function ProtocolSetupCamera(
 
   const toggleCameraEnabled = (): void => {
     if (!cameraConfirmed) {
-      dispatch(updateCameraEnablement(runId, !cameraEnabled))
+      dispatch(
+        updateCameraEnablement(runId, {
+          required: false,
+          complete: false,
+          enabled: !cameraEnabled,
+          recoveryEnabled: recoveryEnabled,
+          liveStreamEnabled: liveStreamEnabled,
+        })
+      )
     }
   }
 
   const toggleRecoveryEnabled = (): void => {
     if (!cameraConfirmed) {
-      dispatch(updateCameraRecoveryEnablement(runId, !recoveryEnabled))
+      dispatch(
+        updateCameraEnablement(runId, {
+          required: false,
+          complete: false,
+          enabled: cameraEnabled,
+          recoveryEnabled: !recoveryEnabled,
+          liveStreamEnabled: liveStreamEnabled,
+        })
+      )
     }
   }
 
   const toggleLiveStreamEnabled = (): void => {
     if (!cameraConfirmed) {
-      dispatch(updateCameraStreamEnablement(runId, !liveStreamEnabled))
+      dispatch(
+        updateCameraEnablement(runId, {
+          required: false,
+          complete: false,
+          enabled: cameraEnabled,
+          recoveryEnabled: recoveryEnabled,
+          liveStreamEnabled: !liveStreamEnabled,
+        })
+      )
     }
   }
 

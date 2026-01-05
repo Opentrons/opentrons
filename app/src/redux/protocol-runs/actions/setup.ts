@@ -17,3 +17,11 @@ export const updateRunSetupStepsRequired = (
   type: Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED,
   payload: { runId, required },
 })
+
+export const updateCameraEnablement = (
+  runId: string,
+  required: Types.CameraState
+): Types.UpdateCameraEnablement => ({
+  type: Constants.CAMERA_SETUP_STEP_KEY,
+  payload: { runId, required },
+})

@@ -21,8 +21,6 @@ import { useFeatureFlag } from '/app/redux/config'
 import {
   getCameraUsageState,
   updateCameraEnablement,
-  updateCameraRecoveryEnablement,
-  updateCameraStreamEnablement,
 } from '/app/redux/protocol-runs'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
@@ -65,15 +63,39 @@ export function SetupCamera({
   } = useSelector((state: State) => getCameraUsageState(state, runId))
 
   const toggleCameraEnabled = (): void => {
-    dispatch(updateCameraEnablement(runId, !cameraEnabled))
+    dispatch(
+      updateCameraEnablement(runId, {
+        required: false,
+        complete: false,
+        enabled: !cameraEnabled,
+        recoveryEnabled: recoveryEnabled,
+        liveStreamEnabled: liveStreamEnabled,
+      })
+    )
   }
 
   const toggleRecoveryEnabled = (): void => {
-    dispatch(updateCameraRecoveryEnablement(runId, !recoveryEnabled))
+    dispatch(
+      updateCameraEnablement(runId, {
+        required: false,
+        complete: false,
+        enabled: cameraEnabled,
+        recoveryEnabled: !recoveryEnabled,
+        liveStreamEnabled: liveStreamEnabled,
+      })
+    )
   }
 
   const toggleLiveStreamEnabled = (): void => {
-    dispatch(updateCameraStreamEnablement(runId, !liveStreamEnabled))
+    dispatch(
+      updateCameraEnablement(runId, {
+        required: false,
+        complete: false,
+        enabled: cameraEnabled,
+        recoveryEnabled: recoveryEnabled,
+        liveStreamEnabled: !liveStreamEnabled,
+      })
+    )
   }
 
   const onConfirmPreferences = (): void => {

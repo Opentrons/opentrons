@@ -13,7 +13,13 @@ export type ModuleSetupStepKey = typeof MODULE_SETUP_STEP_KEY
 export type LPCStepKey = typeof LPC_STEP_KEY
 export type LabwareSetupStepKey = typeof LABWARE_SETUP_STEP_KEY
 export type CameraSetupStepKey = typeof CAMERA_SETUP_STEP_KEY
-
+export interface CameraState {
+  required: boolean
+  complete: boolean
+  enabled: boolean
+  liveStreamEnabled: boolean
+  recoveryEnabled: boolean
+}
 export type StepKey =
   | RobotCalibrationStepKey
   | ModuleSetupStepKey
@@ -24,6 +30,9 @@ export type StepKey =
 export interface StepState {
   required: boolean
   complete: boolean
+  cameraEnabled: boolean
+  liveStreamEnabled: boolean
+  cameraRecoveryEnabled: boolean
 }
 
 export type StepMap<V> = { [Step in StepKey]: V }
@@ -48,6 +57,14 @@ export interface UpdateRunSetupStepsRequiredAction {
   }
 }
 
+export interface UpdateCameraEnablement {
+  type: typeof CAMERA_SETUP_STEP_KEY
+  payload: {
+    runId: string
+    required: CameraState
+  }
+}
 export type RunSetupStepsAction =
   | UpdateRunSetupStepsCompleteAction
   | UpdateRunSetupStepsRequiredAction
+  | UpdateCameraEnablement

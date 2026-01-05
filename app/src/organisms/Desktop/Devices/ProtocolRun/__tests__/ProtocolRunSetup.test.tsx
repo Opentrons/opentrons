@@ -116,6 +116,8 @@ describe('ProtocolRunSetup', () => {
       analysisErrors: null,
     })
     vi.mocked(getCameraUsageState).mockReturnValue({
+      required: true,
+      complete: true,
       enabled: false,
       recoveryEnabled: true,
       liveStreamEnabled: true,

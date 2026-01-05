@@ -20,6 +20,9 @@ describe('protocol runs reducer', () => {
     [Constants.LABWARE_SETUP_STEP_KEY]: {
       required: true,
       complete: false,
+      liveStreamEnabled: true,
+    recoveryEnabled: true,
+    enabled: true
     },
     [Constants.CAMERA_SETUP_STEP_KEY]: {
       required: true,
@@ -27,6 +30,8 @@ describe('protocol runs reducer', () => {
     },
   }
   const CAMERA_INITIAL: CameraState = {
+    required: true,
+    complete: false,
     liveStreamEnabled: true,
     recoveryEnabled: true,
     enabled: true,
