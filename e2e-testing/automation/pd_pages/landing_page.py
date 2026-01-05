@@ -18,6 +18,11 @@ class LandingPage(BasePage):
     def confirm_welcome_modal(self) -> None:
         """Click the Confirm button on welcome modal if present."""
         self.click_button("Confirm")
+        # Wait for the modal overlay to be fully removed
+        self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]').wait_for(
+            state="hidden",
+            timeout=10000,
+        )
         expect(self.page.get_by_role("button", name="View release notes")).to_be_visible(timeout=5000)
         self.dismiss_release_notes_toast()
 
