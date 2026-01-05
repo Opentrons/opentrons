@@ -17,7 +17,10 @@ nav:
       - Instrument Installation and Calibration: installation/instruments.md
       - Relocation: installation/relocation.md
   - Instruments and Modules: modules.md
-  - Labware: labware.md
+  - Labware:
+      - Labware: labware/index.md
+      - Labware Concepts: labware/concepts.md
+      - Labware Types: labware/types.md
   - Software: software.md
   - Maintenance:
       - Maintenance: maintenance/index.md
