@@ -953,7 +953,7 @@ export const getIsLabwareCompatibleWithStack = (
         },
         model: FLEX_STACKER_MODULE_V1,
       })
-      isAboveStackLimit = maxPoolCount > stack.length
+      isAboveStackLimit = stack.length > maxPoolCount
     } else {
       const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
       const isSameLoadName =
