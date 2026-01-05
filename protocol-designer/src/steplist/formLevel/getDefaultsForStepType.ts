@@ -255,7 +255,7 @@ export function getDefaultsForStepType(
     case 'flexStacker':
       return {
         fillLabwareUri: null,
-        fillQuantity: null,
+        fillLabwareIds: null,
         flexStackerFormType: null,
         interventionMessage: null,
         moduleId: null,

@@ -241,7 +241,7 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('flexStacker')).toEqual({
         fillLabwareUri: null,
-        fillQuantity: null,
+        fillLabwareIds: null,
         flexStackerFormType: null,
         interventionMessage: null,
         moduleId: null,
