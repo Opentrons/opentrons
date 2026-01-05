@@ -6,6 +6,7 @@ import reduce from 'lodash/reduce'
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
   getIsTiprack,
@@ -919,10 +920,20 @@ export const getIsLabwareCompatibleWithStack = (
   if (stack.length === 0) {
     return { isCompatible: true, isAboveStackLimit: false }
   }
-  // Determine if stacker is in the stack
-  const isStacker = Object.values(moduleEntities).some(
-    module => module.model === FLEX_STACKER_MODULE_V1
+  // Determine if labware is on hopper
+  let isOnHopper = false
+  const moduleId = stack.find(id => id in moduleEntities)
+  const hopperLocations = Object.values(
+    FAKE_HOPPER_LOCATION_MAP as Record<string, string>
   )
+  if (moduleId != null) {
+    const isStackerInStack =
+      moduleEntities[moduleId].type === FLEX_STACKER_MODULE_TYPE
+    isOnHopper =
+      isStackerInStack &&
+      stack.some(location => hopperLocations.includes(location))
+  }
+
   const topIdInStack = getTopLocationInStack(stack)
   let isCompatible: boolean = true
   let isAboveStackLimit: boolean = false
@@ -932,9 +943,17 @@ export const getIsLabwareCompatibleWithStack = (
     const movingLabwareEntity = labwareEntities[labwareId]
     const topLabwareEntity = labwareEntities[topIdInStack]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
-    if (isStacker) {
+    if (isOnHopper) {
       // allow labware without a stack limit to be stacked on the stacker
-      isAboveStackLimit = false
+      const maxPoolCount = getMaxPoolCount({
+        labwareDefinitions: {
+          primary: topLabwareEntity.def,
+          adapter: null,
+          lid: null,
+        },
+        model: FLEX_STACKER_MODULE_V1,
+      })
+      isAboveStackLimit = maxPoolCount > stack.length
     } else {
       const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
       const isSameLoadName =
