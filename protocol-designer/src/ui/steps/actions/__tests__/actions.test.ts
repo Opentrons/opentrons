@@ -7,7 +7,6 @@ import { when } from 'vitest-when'
 import * as featureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
-import { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import * as tutorialSelectors from '/protocol-designer/tutorial/selectors'
 import * as utils from '/protocol-designer/utils'
 
@@ -25,6 +24,7 @@ import {
 
 import type { Timeline } from '@opentrons/step-generation/src/types'
 import type { FormData } from '/protocol-designer/form-types'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   DuplicateSelectedStepsAction,
   SelectMultipleStepsAction,
