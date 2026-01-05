@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getAddressableAreaFromSlotId,
   getPositionFromSlotId,
   inferModuleOrientationFromXCoordinate,
@@ -13,6 +14,7 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
+import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
 import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
 
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
@@ -77,7 +79,6 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     labware,
     modules
   )
-  console.log('highlightItems',highlightItems)
   const hoveredItemTrash: {
     name: AdditionalEquipmentName
     id: string
@@ -163,8 +164,13 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         moduleOnDeck.id,
         Object.values(labware)
       )
-      console.log('highlightItems',highlightItems)
-      const position = getPositionFromSlotId(moduleOnDeck.slot, deckDef)
+      const isStacker = moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
+      const isActionOnShuttle = text === 'Store'
+      const position = getPositionFromSlotId(
+        moduleOnDeck.slot,
+        deckDef,
+        ...(isStacker && !isActionOnShuttle ? [HOPPER_LABWARE_X_OFFSET] : [])
+      )
       if (position != null) {
         return [
           ...acc,

@@ -1,3 +1,4 @@
+import capitalize from 'lodash/capitalize'
 import last from 'lodash/last'
 
 import { analyticsEvent } from '../../../analytics/actions'
@@ -219,15 +220,16 @@ const setSelection = (
         mode: 'add',
       },
     })
-  } else if (
-    formData.stepType === 'flexStacker'
-  ) {
+  } else if (formData.stepType === 'flexStacker') {
     dispatch({
       type: 'SELECT_DROPDOWN_ITEM',
       payload: {
         selection: {
           id: formData.moduleId,
-          text: formData.flexStackerFormType,
+          text:
+            formData.flexStackerFormType === 'fill'
+              ? 'Refill'
+              : capitalize(String(formData.flexStackerFormType)),
           field: '1',
         },
         mode: 'add',
