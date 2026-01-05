@@ -13,6 +13,7 @@ import {
   Toolbox,
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
+import { LabwareLiquidState } from '@opentrons/step-generation'
 
 import {
   createContainer,
@@ -43,6 +44,7 @@ interface LabwareStackToolboxData {
   }
   labwareId: string | null
   allWellContents: Record<string, any>
+  liquidLocations: LabwareLiquidState
 }
 
 interface LabwareStackToolboxProps {
@@ -62,7 +64,7 @@ export function LabwareStackToolbox({
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { makeSnackbar } = useKitchen()
 
-  const { labware, labwareId, allWellContents } = data
+  const { labware, labwareId, allWellContents, liquidLocations } = data
   const labwareStack: string[] =
     labwareId != null ? (labware[labwareId]?.stack ?? []) : []
   const filteredLabwareStack = labwareStack.filter(id => labware[id] != null)
@@ -93,12 +95,20 @@ export function LabwareStackToolbox({
   }
 
   const handleSelectAllLabware = (): void => {
-    const currentLiquidContents = labwareId && allWellContents[labwareId]
-    const allEqual = filteredLabwareStack.every(
-      item =>
-        JSON.stringify(allWellContents[item]) ===
-        JSON.stringify(currentLiquidContents)
-    )
+    const allEqual = <T, K extends keyof T>(arr: T[], prop: K): boolean => {
+      // If the array is empty, it vacuously returns true
+      if (arr.length === 0) {
+        return true
+      }
+
+      // Get the value of the specified property from the first element
+      const firstValue = arr[0]
+
+      // Use the every() method to compare all elements' property value
+      return arr.every(
+        item => JSON.stringify(item) === JSON.stringify(firstValue)
+      )
+    }
 
     if (!allEqual) {
       setShowLiquidLayoutOverlay(true)
@@ -201,11 +211,15 @@ export function LabwareStackToolboxContainer({
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
 
   const data: LabwareStackToolboxData = {
     labwareId: labwareId ?? null,
     labware,
     allWellContents,
+    liquidLocations,
   }
 
   return (
