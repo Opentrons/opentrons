@@ -698,6 +698,7 @@ class EquipmentHandler:
             primary_nozzle: The nozzle which will be used as the main nozzle for positioning.
             front_right_nozzle: The physically front right nozzle.
             back_left_nozzle: The physically back left nozzle.
+            tip_overlap_version: maximum tip overlap version.
 
         Returns:
             A LoadedConfigureNozzleLayoutData object or None.
