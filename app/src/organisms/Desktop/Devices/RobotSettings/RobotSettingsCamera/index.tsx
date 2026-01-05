@@ -6,7 +6,6 @@ import {
   useCameraAnalytics,
 } from '/app/redux-resources/analytics'
 import { useIsFlex, useRobotType } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 
 import styles from './camerasettings.module.css'
 import { CameraStatusContainer } from './CameraStatusContainer'
@@ -37,7 +36,6 @@ export function RobotSettingsCamera({
     source: SOURCE_ROBOT_SETTINGS,
     robotType,
   })
-  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const handleToggleLiveStream = (): void => {
     toggleLiveVideoEnabled()
     reportCameraEnablementSettings({
@@ -73,12 +71,10 @@ export function RobotSettingsCamera({
             toggleDisabled={isRobotBusy}
             robotType={robotType}
           />
-          {isCameraSettingsEnabled && (
-            <>
-              <Divider />
-              <RobotSettingsCameraControls />
-            </>
-          )}
+          <>
+            <Divider />
+            <RobotSettingsCameraControls />
+          </>
         </>
       )}
     </div>
