@@ -37,3 +37,8 @@ class LandingPage(BasePage):
     def upload_protocol_file(self, file_path: str) -> None:
         """Upload a protocol JSON from the landing page import input."""
         self.page.get_by_label("Import_from_landing").set_input_files(file_path)
+
+    def wait_for_no_modal_overlay(self, timeout: int = 10000) -> None:
+        self.page.locator(
+            '[aria-label="BackgroundOverlay_ModalShell"]'
+        ).wait_for(state="hidden", timeout=timeout)

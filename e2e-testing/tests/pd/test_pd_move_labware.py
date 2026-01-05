@@ -115,6 +115,7 @@ def _import_protocol_and_open_editor(page: Page) -> ProtocolEditorPage:
     expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
     _dismiss_migration_modal(page)
 
+    landing.wait_for_no_modal_overlay()
     page.get_by_role("button", name="Edit protocol").click()
     expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
     return ProtocolEditorPage(page)
