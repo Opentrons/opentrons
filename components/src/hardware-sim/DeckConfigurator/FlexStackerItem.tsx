@@ -9,12 +9,12 @@ import { Btn } from '../../primitives'
 import { TYPOGRAPHY } from '../../ui-style-constants'
 import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import {
-  COLUMN_DEFAULT_X_ADJUSTMENT,
+  STACKER_X_ADJUSTMENT,
   CONFIG_STYLE_EDITABLE,
   CONFIG_STYLE_READ_ONLY,
   CONFIG_STYLE_SELECTED,
   FIXTURE_HEIGHT,
-  LARGE_SINGLE_ITEM_SLOT_WIDTH,
+  COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH,
   Y_ADJUSTMENT,
 } from './constants'
 
@@ -71,7 +71,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
     deckDefinition
   )
   const y = ySlotPosition + Y_ADJUSTMENT
-  const x = xSlotPosition + COLUMN_DEFAULT_X_ADJUSTMENT
+  const x = xSlotPosition + offsetVector[0] + STACKER_X_ADJUSTMENT
 
   const editableStyle = selected ? CONFIG_STYLE_SELECTED : CONFIG_STYLE_EDITABLE
   const handleRemoveClick = (): void => {
@@ -81,7 +81,7 @@ export function FlexStackerItem(props: FlexStackerItemProps): JSX.Element {
   }
   return (
     <RobotCoordsForeignObject
-      width={LARGE_SINGLE_ITEM_SLOT_WIDTH}
+      width={COLUMN_DEFAULT_SINGLE_SLOT_FIXTURE_WIDTH}
       height={FIXTURE_HEIGHT}
       x={x}
       y={y}
