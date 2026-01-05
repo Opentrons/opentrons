@@ -19,7 +19,9 @@ class LandingPage(BasePage):
         """Click the Confirm button on welcome modal if present."""
         self.click_button("Confirm")
         # Wait for the modal overlay to be fully removed
-        self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]').wait_for(
+        self.page.locator(
+            '[aria-label="BackgroundOverlay_ModalShell"]'
+        ).wait_for(
             state="hidden",
             timeout=10000,
         )
@@ -43,9 +45,13 @@ class LandingPage(BasePage):
         self.page.get_by_role("button", name="Edit protocol").click()
 
     def wait_for_no_modal_overlay(self, timeout: int = 10000) -> None:
+        """Wait until no modal overlay is blocking pointer events."""
         self.page.locator(
             '[aria-label="BackgroundOverlay_ModalShell"]'
-        ).wait_for(state="hidden", timeout=timeout)
+        ).wait_for(
+            state="hidden",
+            timeout=timeout,
+        )
 
     def dismiss_migration_modal(self) -> None:
         """Dismiss the migration modal if it appears during import."""
