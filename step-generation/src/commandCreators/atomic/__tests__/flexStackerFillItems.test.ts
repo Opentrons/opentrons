@@ -163,7 +163,13 @@ mock_flex_stacker_1.fill_items(
         commandCreatorFnName: 'flexStackerFillItems',
         interventionMessage: 'a fill message',
         fillLabwareUri: 'mockURI',
-        fillLabwareIds: [labwareId, labwareId2, labwareId3, labwareId4, labwareId5],
+        fillLabwareIds: [
+          labwareId,
+          labwareId2,
+          labwareId3,
+          labwareId4,
+          labwareId5,
+        ],
       },
       invariantContext,
       robotState
