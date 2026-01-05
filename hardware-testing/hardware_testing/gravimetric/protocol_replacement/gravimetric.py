@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple
 from dataclasses import dataclass
 import os
 import sys
@@ -1578,7 +1578,6 @@ def _adjust_settings_for_increment(fixture_settings: FixtureSettings) -> None:
 def run(ctx: ProtocolContext) -> None:
     """Pick up, aspirate, and dispense one trial and write it to the report."""
     fixture_settings = FixtureSettings.build(ctx)
-    error: Optional[Exception] = None
     try:
         _store_config_as_old_style(fixture_settings)
         if _should_alter_discontinuity(fixture_settings):
@@ -1588,12 +1587,10 @@ def run(ctx: ProtocolContext) -> None:
         _run(ctx, fixture_settings)
     except Exception as e:
         print_error(f"Captured traceback:\n{traceback.format_exc()}")
-        error = e
+        raise e
     finally:
         if fixture_settings.recorder is not None:
             print_info("ending recording")
             fixture_settings.recorder.stop()
             fixture_settings.recorder.deactivate()
             set_output_file(None)
-    if error:
-        raise error
