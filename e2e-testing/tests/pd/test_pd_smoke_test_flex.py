@@ -41,7 +41,7 @@ def test_pd_combined_smoke_flow(page: Page, base_url: str) -> None:
     If any Playwright action or assertion fails, the test will pause for debugging.
     """
 
-    editor = _import_protocol_and_open_editor(page, PROTOCOL_PATH)
+    editor = _import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
     print("✓ File uploaded, ready for module steps")
     editor.add_step("Temperature")
     _add_temperature_module_step(page, "50")

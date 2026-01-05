@@ -53,10 +53,12 @@ def troubleshoot_and_pause(func):
     return wrapper
 
 
-def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str) -> ProtocolEditorPage:
+def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> ProtocolEditorPage:
     """This test takes two inputs:
     1. page: The Playwright Page object.
     2. PROTOCOL_PATH: The file path of the protocol to import
+    3. migration: Boolean indicating if a migration modal is expected
+    when we update PD
     Located in fixtures/protocol/
     """
 
@@ -65,9 +67,9 @@ def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str) -> Protocol
     landing.confirm_welcome_modal()
     landing.click_import_existing_protocol()
     landing.upload_protocol_file(PROTOCOL_PATH)
-
+    if migration:
+        landing.dismiss_migration_modal()
     expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
-
     page.get_by_role("button", name="Edit protocol").click()
     expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
     _dismiss_migration_modal(page)
