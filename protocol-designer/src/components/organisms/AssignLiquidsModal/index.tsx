@@ -292,8 +292,7 @@ export function AssignLiquidsModalContainer(
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
-  // consolidate a selector for this, like getSelectedLabwareId not that we can have multiple labware ids selected
-  const labwareId = selectedLabwareIds?.[0] ?? selectedLabwareId
+  const labwareId = useSelector(selectors.getMultiSelectSelectedLabwareId)
 
   const enableStacking = useSelector(getEnableStacking) ?? false
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
