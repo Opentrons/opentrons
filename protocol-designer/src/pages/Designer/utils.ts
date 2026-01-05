@@ -124,6 +124,9 @@ export const getSlotInformation = (
   const createdModuleForSlot = Object.values(deckSetupModules).find(
     module => module.slot === adjustedSlot
   )
+  // we need to pend the creation of new labware on the hopper to prevent
+  // a white screen where we are looking for labware that don't yet exist
+  // in the protocol.
   const fullStackFromLabwares = pendingCreationStateForHopper
     ? []
     : getFullStackFromLabwaresOnDeck(

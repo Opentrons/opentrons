@@ -220,14 +220,14 @@ export const createModuleEntityAndChangeForm: (
   }
 
 interface CreateLabwareAndQueueForHopperArgs {
-  fill: string[]
+  fillLabwareIds: string[]
   moduleId: string
 }
 
 export const createLabwareAndQueueForHopper =
   (args: CreateLabwareAndQueueForHopperArgs): ThunkAction<any> =>
   async (dispatch, getState) => {
-    const { fill, moduleId } = args
+    const { fillLabwareIds, moduleId } = args
     dispatch(stackerLabwareCreationStart())
 
     const state = getState()
@@ -237,7 +237,7 @@ export const createLabwareAndQueueForHopper =
 
     if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
       // collect all container creation promises
-      const containerPromises = fill.map(labwareId => {
+      const containerPromises = fillLabwareIds.map(labwareId => {
         const [id, uri] = labwareId.split(':')
         // dispatch can return a promise if createContainer is async
         return dispatch(

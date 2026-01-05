@@ -341,7 +341,6 @@ const _patchFlexStackerModuleId =
         return null
       }
       // get labware details in hopper at moment
-
       return {
         moduleId,
       }

@@ -352,7 +352,6 @@ export const getDeckSetupForActiveItem: Selector<AllTemporalPropertiesForTimelin
           additionalEquipmentOnDeck: {},
         }
       const { pipettes, modules, additionalEquipmentOnDeck } = initialDeckSetup
-
       return {
         pipettes: mapValues(pipettes, (pipEntity, pipId) => ({
           ...pipEntity,

@@ -73,9 +73,7 @@ export function InputStepFormField(
           }
         }}
         value={
-          fillQuantityLocalState != null
-            ? fillQuantityLocalState
-            : value?.toString()
+          fillQuantityLocalState ?? value?.toString()
         }
         units={units}
         placeholder={placeholder}

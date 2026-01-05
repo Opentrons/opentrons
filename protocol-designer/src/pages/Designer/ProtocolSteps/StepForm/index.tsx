@@ -44,7 +44,7 @@ interface StateProps {
 interface DispatchProps {
   cancelStepForm: () => void
   saveStepForm: (options?: { userWantsBonusStep?: boolean }) => void
-  createdLabwareForQueue: (moduleId: string, fill: string[]) => void
+  createdLabwareForQueue: (moduleId: string, fillLabwareIds: string[]) => void
 }
 type StepFormManagerProps = StateProps & DispatchProps
 
@@ -221,11 +221,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
     dispatch(stepsActions.saveStepForm(options))
   }
 
-  const createdLabwareForQueue = (moduleId: string, fill: string[]): void => {
+  const createdLabwareForQueue = (
+    moduleId: string,
+    fillLabwareIds: string[]
+  ): void => {
     dispatch(
       createLabwareAndQueueForHopper({
         moduleId,
-        fill,
+        fillLabwareIds,
       })
     )
   }

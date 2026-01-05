@@ -72,9 +72,12 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
         title={t('step_edit_form.flex_stacker.fields.fillLabwareIds.title')}
         {...propsForFields.fillLabwareIds}
         showTooltip={false}
-        caption={t('step_edit_form.flex_stacker.fields.fillLabwareIds.caption', {
-          max: maxPoolCount,
-        })}
+        caption={t(
+          'step_edit_form.flex_stacker.fields.fillLabwareIds.caption',
+          {
+            max: maxPoolCount,
+          }
+        )}
         padding="0"
         setFillQuantityState={setFillQuantityState}
         fillQuantityLocalState={fillQuantityLocalState}
