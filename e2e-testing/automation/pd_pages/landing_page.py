@@ -13,25 +13,19 @@ class LandingPage(BasePage):
 
     def wait_for_page_load(self) -> None:
         """Wait for the landing page to load."""
-        expect(
-            self.page.get_by_test_id("basic_button_Create new")
-        ).to_be_visible(timeout=5000)
+        expect(self.page.get_by_test_id("basic_button_Create new")).to_be_visible(timeout=5000)
 
     def confirm_welcome_modal(self) -> None:
         """Click the Confirm button on welcome modal if present."""
         self.click_button("Confirm")
 
         # Wait for the modal overlay to be fully removed
-        self.page.locator(
-            '[aria-label="BackgroundOverlay_ModalShell"]'
-        ).wait_for(
+        self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]').wait_for(
             state="hidden",
             timeout=10000,
         )
 
-        expect(
-            self.page.get_by_role("button", name="View release notes")
-        ).to_be_visible(timeout=5000)
+        expect(self.page.get_by_role("button", name="View release notes")).to_be_visible(timeout=5000)
 
         self.dismiss_release_notes_toast()
 
@@ -53,9 +47,7 @@ class LandingPage(BasePage):
 
     def wait_for_no_modal_overlay(self, timeout: int = 10000) -> None:
         """Wait until no modal overlay is blocking pointer events."""
-        self.page.locator(
-            '[aria-label="BackgroundOverlay_ModalShell"]'
-        ).wait_for(
+        self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]').wait_for(
             state="hidden",
             timeout=timeout,
         )
