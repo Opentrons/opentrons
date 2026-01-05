@@ -305,7 +305,8 @@ export function getLoadLabware(
           module.moduleState.type === FLEX_STACKER_MODULE_TYPE
       )
       const onModule =
-        moduleEntities[labwareSlot] != null || deckSlot === stackerOnSlot?.[1].slot // special case stacker shuttle labware
+        moduleEntities[labwareSlot] != null ||
+        deckSlot === stackerOnSlot?.[1].slot // special case stacker shuttle labware
       const onLabware = allLabwareEntities[labwareSlot] != null
 
       let parentName: string
@@ -313,7 +314,8 @@ export function getLoadLabware(
       if (onLabware && !isLabwareOnHopper) {
         parentName = allLabwareEntities[labwareSlot].pythonName
       } else if (onModule) {
-        const moduleId = stackerOnSlot != null ? stackerOnSlot?.[0] : labwareSlot
+        const moduleId =
+          stackerOnSlot != null ? stackerOnSlot?.[0] : labwareSlot
         parentName = moduleEntities[moduleId].pythonName
       } else {
         parentName = PROTOCOL_CONTEXT_NAME
