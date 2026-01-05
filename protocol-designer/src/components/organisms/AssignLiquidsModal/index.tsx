@@ -117,6 +117,9 @@ export function AssignLiquidsModal(
   const labwareStack = labware[labwareId].stack
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
+  console.log('allWellContents: ', allWellContents)
+  console.log('labwareId: ', labwareId)
+  console.log('wellContents: ', wellContents)
   const selectableLabwareProps: {
     wellLabelOption: typeof WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
     definition: typeof labwareDef
@@ -133,6 +136,7 @@ export function AssignLiquidsModal(
       liquidDisplayColors
     ),
   }
+  console.log('selectableLabwareProps: ', selectableLabwareProps)
 
   return (
     <Flex
@@ -278,15 +282,19 @@ export function AssignLiquidsModalContainer(
 
   // All selectors moved here
   const nickNames = useSelector(getLabwareNicknamesById)
-  const labwareId = useSelector(selectors.getSelectedLabwareId)
+  const selectedLabwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const selectedLabwareIds =
-    useSelector(selectors.getSelectedLabwareIds) ?? ([labwareId] as string[])
+    useSelector(selectors.getSelectedLabwareIds) ??
+    ([selectedLabwareId] as string[])
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
+  // consolidate a selector for this, like getSelectedLabwareId not that we can have multiple labware ids selected
+  const labwareId = selectedLabwareIds?.[0] ?? selectedLabwareId
+
   const enableStacking = useSelector(getEnableStacking) ?? false
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)

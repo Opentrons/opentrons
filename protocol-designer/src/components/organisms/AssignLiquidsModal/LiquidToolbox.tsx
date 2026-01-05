@@ -555,6 +555,7 @@ export function LiquidToolboxContainer({
   const selectedLabwareId = useSelector(
     labwareIngredSelectors.getSelectedLabwareId
   )
+  // consolidate a selector for this, like getSelectedLabwareId not that we can have multiple labware ids selected
   const labwareId = multipleSelectedLabwareIds?.[0] ?? selectedLabwareId
   const selectedWellGroups = useSelector(getSelectedWells)
   const nickNames = useSelector(getLabwareNicknamesById)
