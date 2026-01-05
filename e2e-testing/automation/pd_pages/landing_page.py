@@ -38,7 +38,11 @@ class LandingPage(BasePage):
         """Upload a protocol JSON from the landing page import input."""
         self.page.get_by_label("Import_from_landing").set_input_files(file_path)
 
-    def wait_for_no_modal_overlay(self, timeout: int = 10000) -> None:
-        self.page.locator(
-            '[aria-label="BackgroundOverlay_ModalShell"]'
-        ).wait_for(state="hidden", timeout=timeout)
+    def edit_protocol(self) -> None:
+        """Click the 'Edit' button for a specific protocol."""
+        self.page.get_by_role("button", name="Edit protocol").click()
+
+    def dismiss_migration_modal(self) -> None:
+        """Dismiss the migration modal if it appears during import."""
+
+        self.page.get_by_role("button", name="Import", exact=True).click()

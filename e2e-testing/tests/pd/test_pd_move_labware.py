@@ -1,7 +1,7 @@
 """Test manual and gripper move functionality."""
 
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from automation.pd_pages import LandingPage, ProtocolEditorPage
 
@@ -29,9 +29,14 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     - Made test for OT2 (only manual moves)
     """
     # Import setup protocol and open editor
-    _import_protocol_and_open_editor(page)
-
+    landing = LandingPage(page)
     editor = ProtocolEditorPage(page)
+
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+    landing.click_import_existing_protocol()
+    landing.upload_protocol_file(PROTOCOL_PATH)
+    landing.edit_protocol()
 
     # Add Manual Move to move PCR Lid to Opentrons Tough Wellplate in Thermocycler
     editor.open_add_step_menu()
@@ -98,33 +103,3 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     editor.select_step_type("Move")
     editor.toggle_checkbox("Use gripper")
     editor.move_labware("D2 Opentrons Tough 22mL 12 Well Reservoir", "Off-deck")
-
-
-###########################################################################
-
-
-def _import_protocol_and_open_editor(page: Page) -> ProtocolEditorPage:
-    """Shared setup helper used by both tests."""
-
-    landing = LandingPage(page)
-    landing.wait_for_page_load()
-    landing.confirm_welcome_modal()
-    landing.click_import_existing_protocol()
-    landing.upload_protocol_file(PROTOCOL_PATH)
-
-    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
-    _dismiss_migration_modal(page)
-
-    landing.wait_for_no_modal_overlay()
-    page.get_by_role("button", name="Edit protocol").click()
-    expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
-    return ProtocolEditorPage(page)
-
-
-def _dismiss_migration_modal(page: Page) -> None:
-    """Dismiss the migration modal if it appears during import."""
-
-    overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
-    if overlay.is_visible():
-        page.get_by_role("button", name="Import", exact=True).click()
-        expect(overlay).not_to_be_visible()

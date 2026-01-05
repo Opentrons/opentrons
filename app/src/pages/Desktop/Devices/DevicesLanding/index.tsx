@@ -75,7 +75,7 @@ export function DevicesLanding(): JSX.Element {
         marginTop={SPACING.spacing8}
         height="2.25rem"
       >
-        <LegacyStyledText as="h1" id="DevicesLanding_title">
+        <LegacyStyledText forwardedAs="h1" id="DevicesLanding_title">
           {t('devices')}
         </LegacyStyledText>
         <NewRobotSetupHelp />
@@ -146,7 +146,9 @@ function DevicesLoadingState(): JSX.Element {
       marginTop="10vh"
       marginBottom="10vh"
     >
-      <LegacyStyledText as="h1">{t('looking_for_robots')}</LegacyStyledText>
+      <LegacyStyledText forwardedAs="h1">
+        {t('looking_for_robots')}
+      </LegacyStyledText>
       <Icon
         name="ot-spinner"
         aria-label="ot-spinner"

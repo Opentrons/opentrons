@@ -761,7 +761,13 @@ export const getArgsAndErrorsByStepId: Selector<
   getOrderedSavedForms,
   getInvariantContext,
   labwareDefSelectors.getLabwareDefsByURI,
-  (stepForms, contextualState, allLabwareDefs) => {
+  featureFlagSelectors.getEnableConcurrentModuleActions,
+  (
+    stepForms,
+    contextualState,
+    allLabwareDefs,
+    enableConcurrentModuleActions
+  ) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
@@ -775,7 +781,8 @@ export const getArgsAndErrorsByStepId: Selector<
           ? {
               stepArgs: stepFormToArgs(
                 { ...hydratedForm, stepNumber: index + 1 },
-                contextualState
+                contextualState,
+                enableConcurrentModuleActions
               ),
             }
           : {

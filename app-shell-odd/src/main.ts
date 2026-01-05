@@ -21,6 +21,7 @@ import {
   registerNotify,
 } from './notifications'
 import { registerAppRestart } from './restart'
+import { initializeSentry } from './sentry'
 import { registerUpdateBrightness } from './system'
 import { registerRobotSystemUpdate } from './system-update'
 import systemd from './systemd'
@@ -49,6 +50,9 @@ log.debug('App config', {
   store: getStore(),
   overrides: getOverrides(),
 })
+
+// Initialize Sentry before the app is ready.
+initializeSentry(getStore().analytics.optedIn)
 
 systemd.setRemoteDevToolsEnabled(config.devtools)
 
@@ -85,7 +89,6 @@ app.once('render-process-gone', (_, __, details) => {
 
 function startUp(): void {
   log.info('Starting App')
-  console.log('Starting App')
   const storeNeedsReset = fse.existsSync(
     path.join(setUserDataPath(), `_CONFIG_TO_BE_DELETED_ON_REBOOT`)
   )
@@ -198,15 +201,19 @@ function installDevtools(): void {
 
   log.debug('Installing devtools')
 
-  install(extensions, {
-    loadExtensionOptions: { allowFileAccess: true },
-    forceDownload: forceReinstall,
-  })
-    .then(() => log.debug('Devtools extensions installed'))
-    .catch((error: unknown) => {
-      log.warn('Failed to install devtools extensions', {
-        forceReinstall,
-        error,
-      })
+  try {
+    install(extensions, {
+      loadExtensionOptions: { allowFileAccess: true },
+      forceDownload: forceReinstall,
     })
+      .then(() => log.debug('Devtools extensions installed'))
+      .catch((error: unknown) => {
+        log.warn('Failed to install devtools extensions', {
+          forceReinstall,
+          error,
+        })
+      })
+  } catch (error) {
+    log.error(`Failed to install devtool extensions: ${error}`)
+  }
 }

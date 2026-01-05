@@ -220,23 +220,23 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=loaded_labware_update.definition.version,
             )
 
-            self._state.definitions_by_uri[
-                definition_uri
-            ] = loaded_labware_update.definition
+            self._state.definitions_by_uri[definition_uri] = (
+                loaded_labware_update.definition
+            )
 
             location = loaded_labware_update.new_location
 
             display_name = loaded_labware_update.display_name
 
-            self._state.labware_by_id[
-                loaded_labware_update.labware_id
-            ] = LoadedLabware.model_construct(
-                id=loaded_labware_update.labware_id,
-                location=location,
-                loadName=loaded_labware_update.definition.parameters.loadName,
-                definitionUri=definition_uri,
-                offsetId=loaded_labware_update.offset_id,
-                displayName=display_name,
+            self._state.labware_by_id[loaded_labware_update.labware_id] = (
+                LoadedLabware.model_construct(
+                    id=loaded_labware_update.labware_id,
+                    location=location,
+                    loadName=loaded_labware_update.definition.parameters.loadName,
+                    definitionUri=definition_uri,
+                    offsetId=loaded_labware_update.offset_id,
+                    displayName=display_name,
+                )
             )
 
     def _add_batch_loaded_labwares(
@@ -265,9 +265,9 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 ].version,
             )
 
-            self._state.definitions_by_uri[
-                definition_uri
-            ] = batch_loaded_labware_update.definitions_by_id[labware_id]
+            self._state.definitions_by_uri[definition_uri] = (
+                batch_loaded_labware_update.definitions_by_id[labware_id]
+            )
 
             location = batch_loaded_labware_update.new_locations_by_id[labware_id]
 
@@ -291,18 +291,18 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 load_name=loaded_lid_stack_update.stack_object_definition.parameters.loadName,
                 version=loaded_lid_stack_update.stack_object_definition.version,
             )
-            self.state.definitions_by_uri[
-                stack_definition_uri
-            ] = loaded_lid_stack_update.stack_object_definition
-            self._state.labware_by_id[
-                loaded_lid_stack_update.stack_id
-            ] = LoadedLabware.construct(
-                id=loaded_lid_stack_update.stack_id,
-                location=loaded_lid_stack_update.stack_location,
-                loadName=loaded_lid_stack_update.stack_object_definition.parameters.loadName,
-                definitionUri=stack_definition_uri,
-                offsetId=None,
-                displayName=None,
+            self.state.definitions_by_uri[stack_definition_uri] = (
+                loaded_lid_stack_update.stack_object_definition
+            )
+            self._state.labware_by_id[loaded_lid_stack_update.stack_id] = (
+                LoadedLabware.construct(
+                    id=loaded_lid_stack_update.stack_id,
+                    location=loaded_lid_stack_update.stack_location,
+                    loadName=loaded_lid_stack_update.stack_object_definition.parameters.loadName,
+                    definitionUri=stack_definition_uri,
+                    offsetId=None,
+                    displayName=None,
+                )
             )
 
             # Add the Lids on top of the stack object
@@ -317,9 +317,9 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     version=loaded_lid_stack_update.definition.version,
                 )
 
-                self._state.definitions_by_uri[
-                    definition_uri
-                ] = loaded_lid_stack_update.definition
+                self._state.definitions_by_uri[definition_uri] = (
+                    loaded_lid_stack_update.definition
+                )
 
                 location = loaded_lid_stack_update.new_locations_by_id[labware_id]
 
@@ -853,12 +853,10 @@ class LabwareView:
     @overload
     def get_uri_from_definition_unless_none(
         self, labware_definition: LabwareDefinition
-    ) -> str:
-        ...
+    ) -> str: ...
 
     @overload
-    def get_uri_from_definition_unless_none(self, labware_definition: None) -> None:
-        ...
+    def get_uri_from_definition_unless_none(self, labware_definition: None) -> None: ...
 
     def get_uri_from_definition_unless_none(
         self, labware_definition: LabwareDefinition | None

@@ -1,4 +1,5 @@
 """Unit tests for `error_recovery_mapping`."""
+
 import pytest
 from decoy import Decoy
 

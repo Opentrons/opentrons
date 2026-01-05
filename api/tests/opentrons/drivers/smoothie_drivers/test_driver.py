@@ -446,8 +446,9 @@ async def test_no_auto_recover_on_alarm(
     await smoothie.hard_halt()
     assert smoothie._is_hard_halting.is_set()
 
-    with patch.object(smoothie, "_send_command_unsynchronized"), patch.object(
-        smoothie, "_reset_from_error"
+    with (
+        patch.object(smoothie, "_send_command_unsynchronized"),
+        patch.object(smoothie, "_reset_from_error"),
     ):
         mocked_send = cast(AsyncMock, smoothie._send_command_unsynchronized)
         mocked_send.side_effect = [SmoothieAlarm("G0", "Alarm: Hard limit -X")]
@@ -460,9 +461,11 @@ async def test_auto_recover_on_error(
     smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
 ) -> None:
     """Errors do incur recovery."""
-    with patch.object(smoothie, "_send_command_unsynchronized"), patch.object(
-        smoothie, "_reset_from_error"
-    ), patch.object(smoothie, "home"):
+    with (
+        patch.object(smoothie, "_send_command_unsynchronized"),
+        patch.object(smoothie, "_reset_from_error"),
+        patch.object(smoothie, "home"),
+    ):
         mocked_home = cast(AsyncMock, smoothie.home)
         mocked_send = cast(AsyncMock, smoothie._send_command_unsynchronized)
         mocked_send.side_effect = [SmoothieError("G0", "error: Uh oh")]

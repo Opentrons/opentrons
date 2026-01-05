@@ -54,14 +54,13 @@ class CalibrationCheckCreateAttributes(BaseModel):
 class TipLengthCalibrationCreateAttributes(BaseModel):
     """The tip length calibration create request."""
 
-    sessionType: Literal[
+    sessionType: Literal[SessionType.tip_length_calibration] = (
         SessionType.tip_length_calibration
-    ] = SessionType.tip_length_calibration
+    )
     createParams: SessionCreateParams
 
 
-class _NoParams(BaseModel):
-    ...
+class _NoParams(BaseModel): ...
 
 
 class DeckCalibrationCreateAttributes(BaseModel):
@@ -74,9 +73,9 @@ class DeckCalibrationCreateAttributes(BaseModel):
 class PipetteOffsetCalibrationCreateAttributes(BaseModel):
     """Pipette offset calibration create request."""
 
-    sessionType: Literal[
+    sessionType: Literal[SessionType.pipette_offset_calibration] = (
         SessionType.pipette_offset_calibration
-    ] = SessionType.pipette_offset_calibration
+    )
     createParams: SessionCreateParams
 
 

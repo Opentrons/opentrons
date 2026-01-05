@@ -1,4 +1,5 @@
 """Tests for the command QueueWorker in opentrons.protocol_engine."""
+
 from typing import Generator, AsyncGenerator, Callable
 
 import pytest

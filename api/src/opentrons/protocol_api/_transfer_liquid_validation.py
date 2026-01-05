@@ -18,7 +18,6 @@ from . import validation
 
 @dataclass
 class TransferInfo:
-
     source: List[Well]
     dest: Union[List[Well], TrashBin, WasteChute]
     tip_policy: TransferTipPolicyV2

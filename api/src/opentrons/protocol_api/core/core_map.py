@@ -29,12 +29,10 @@ class LoadedCoreMap:
         ] = {}
 
     @overload
-    def add(self, core: LabwareCore, context: Labware) -> None:
-        ...
+    def add(self, core: LabwareCore, context: Labware) -> None: ...
 
     @overload
-    def add(self, core: ModuleCore, context: ModuleTypes) -> None:
-        ...
+    def add(self, core: ModuleCore, context: ModuleTypes) -> None: ...
 
     def add(
         self,
@@ -45,16 +43,13 @@ class LoadedCoreMap:
         self._contexts_by_core[core] = context
 
     @overload
-    def get(self, core: LabwareCore) -> Labware:
-        ...
+    def get(self, core: LabwareCore) -> Labware: ...
 
     @overload
-    def get(self, core: ModuleCore) -> ModuleTypes:
-        ...
+    def get(self, core: ModuleCore) -> ModuleTypes: ...
 
     @overload
-    def get(self, core: None) -> None:
-        ...
+    def get(self, core: None) -> None: ...
 
     def get(
         self, core: Union[LabwareCore, ModuleCore, None]

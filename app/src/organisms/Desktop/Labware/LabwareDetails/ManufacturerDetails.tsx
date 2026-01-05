@@ -35,12 +35,16 @@ export function ManufacturerDetails(
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText as="h6">{t('manufacturer')}</LegacyStyledText>
-          <LegacyStyledText as="p">{manufacturerValue}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="h6">
+            {t('manufacturer')}
+          </LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">
+            {manufacturerValue}
+          </LegacyStyledText>
           {links != null &&
             links.length > 0 &&
             links.map((href, index) => (
-              <LegacyStyledText as="p" key={index}>
+              <LegacyStyledText forwardedAs="p" key={index}>
                 <Link href={href} external>
                   website <Icon height="10px" name="open-in-new" />
                 </Link>
@@ -49,10 +53,12 @@ export function ManufacturerDetails(
         </Flex>
         {brandId != null && brandId.length > 0 && (
           <Flex flexDirection={DIRECTION_COLUMN}>
-            <LegacyStyledText as="h6">
+            <LegacyStyledText forwardedAs="h6">
               {t('manufacturer_number')}
             </LegacyStyledText>
-            <LegacyStyledText as="p">{brandId.join(', ')}</LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">
+              {brandId.join(', ')}
+            </LegacyStyledText>
           </Flex>
         )}
       </Flex>

@@ -1,4 +1,5 @@
 """Worker thread to write serial data."""
+
 from typing import Tuple
 from typing_extensions import TypeAlias
 import serial  # type: ignore[import-untyped]

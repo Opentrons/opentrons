@@ -107,7 +107,7 @@ export function DetachProbe(props: LPCWizardContentProps): JSX.Element {
               <Trans
                 t={t}
                 i18nKey="store_probe"
-                components={{ block: <LegacyStyledText as="p" /> }}
+                components={{ block: <LegacyStyledText forwardedAs="p" /> }}
               />
             </StyledText>
           }

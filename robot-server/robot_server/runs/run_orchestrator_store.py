@@ -250,8 +250,10 @@ class RunOrchestratorStore:
         Args:
             run_id: The run resource the run orchestrator is assigned to.
             labware_offsets: Labware offsets to create the run with.
+            initial_error_recovery_policy: How to recover from errors.
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
             file_provider: Wrapper to let the engine read/write data files.
+            camera_provider: Wrapper to let the engine use the camera.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             protocol: The protocol to load the runner with, if any.
             run_time_param_values: Any runtime parameter values to set.

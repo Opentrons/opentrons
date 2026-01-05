@@ -1,4 +1,5 @@
 """Tests for motor drivers."""
+
 import asyncio
 
 import pytest

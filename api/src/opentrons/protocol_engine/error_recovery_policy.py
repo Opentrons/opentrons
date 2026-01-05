@@ -63,8 +63,7 @@ class ErrorRecoveryPolicy(Protocol):
         config: Config,
         failed_command: Command,
         defined_error_data: Optional[CommandDefinedErrorData],
-    ) -> ErrorRecoveryType:
-        ...
+    ) -> ErrorRecoveryType: ...
 
 
 def never_recover(

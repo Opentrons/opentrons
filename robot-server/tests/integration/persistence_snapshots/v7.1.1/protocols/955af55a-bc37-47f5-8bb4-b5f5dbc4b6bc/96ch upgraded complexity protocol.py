@@ -29,7 +29,7 @@ TEMPERATURE_MODULE_NAME = "temperature module gen2"
 THERMOCYCLER_NAME = "thermocycler module gen2"
 
 PCR_PLATE_96_NAME = "nest_96_wellplate_100ul_pcr_full_skirt"
-RESERVOIR_NAME = "nest_96_wellplate_2ml_deep" #originally nest_1_reservoir_290ml, but we had none for testing
+RESERVOIR_NAME = "nest_96_wellplate_2ml_deep"  # originally nest_1_reservoir_290ml, but we had none for testing
 TIPRACK_96_ADAPTER_NAME = "opentrons_flex_96_tiprack_adapter"
 TIPRACK_96_NAME = "opentrons_flex_96_tiprack_1000ul"
 
@@ -40,7 +40,6 @@ RESET_AFTER_EACH_MOVE = True
 
 
 def run(ctx: protocol_api.ProtocolContext) -> None:
-
     ################
     ### FIXTURES ###
     ################
@@ -63,7 +62,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### MODULE ADAPTERS ###
     #######################
 
-    temperature_module_adapter = temperature_module.load_adapter(TEMPERATURE_MODULE_ADAPTER_NAME)
+    temperature_module_adapter = temperature_module.load_adapter(
+        TEMPERATURE_MODULE_ADAPTER_NAME
+    )
     heater_shaker_adapter = heater_shaker.load_adapter(HEATER_SHAKER_ADAPTER_NAME)
 
     adapters = [temperature_module_adapter, heater_shaker_adapter]
@@ -75,7 +76,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     source_reservoir = ctx.load_labware(RESERVOIR_NAME, "D2")
     dest_pcr_plate = ctx.load_labware(PCR_PLATE_96_NAME, "C2")
 
-    tip_rack_1 = ctx.load_labware(TIPRACK_96_NAME, "A2", adapter=TIPRACK_96_ADAPTER_NAME)
+    tip_rack_1 = ctx.load_labware(
+        TIPRACK_96_NAME, "A2", adapter=TIPRACK_96_ADAPTER_NAME
+    )
     tip_rack_adapter = tip_rack_1.parent
 
     tip_rack_2 = ctx.load_labware(TIPRACK_96_NAME, "C3")
@@ -91,7 +94,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### PIPETTE DEFINITION ###
     ##########################
 
-    pipette_96_channel = ctx.load_instrument(PIPETTE_96_CHANNEL_NAME, mount="left", tip_racks=tip_racks)
+    pipette_96_channel = ctx.load_instrument(
+        PIPETTE_96_CHANNEL_NAME, mount="left", tip_racks=tip_racks
+    )
 
     assert isinstance(pipette_96_channel.trash_container, protocol_api.TrashBin)
 
@@ -99,7 +104,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
     ### LOAD SOME LIQUID ###
     ########################
 
-    water = ctx.define_liquid(name="water", description="High Quality H₂O", display_color="#42AB2D")
+    water = ctx.define_liquid(
+        name="water", description="High Quality H₂O", display_color="#42AB2D"
+    )
     source_reservoir.wells_by_name()["A1"].load_liquid(liquid=water, volume=29000)
 
     ################################
@@ -115,7 +122,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                    either `protocol_api.OFF_DECK` or `waste_chute`. The second element is a boolean indicating
                    whether the gripper is being used or not.
         """
-        return (protocol_api.OFF_DECK, not USING_GRIPPER) if PREFER_MOVE_OFF_DECK else (waste_chute, USING_GRIPPER)
+        return (
+            (protocol_api.OFF_DECK, not USING_GRIPPER)
+            if PREFER_MOVE_OFF_DECK
+            else (waste_chute, USING_GRIPPER)
+        )
 
     def run_moves(labware, move_sequences, reset_location, use_gripper):
         """
@@ -132,7 +143,13 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             use_gripper (bool): Flag indicating whether to use the gripper during the moves.
         """
 
-        def move_to_locations(labware_to_move, move_locations, reset_after_each_move, use_gripper, reset_location):
+        def move_to_locations(
+            labware_to_move,
+            move_locations,
+            reset_after_each_move,
+            use_gripper,
+            reset_location,
+        ):
             """
             Move the labware to the specified locations.
 
@@ -148,7 +165,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 """
                 Reset the labware to the reset location.
                 """
-                ctx.move_labware(labware_to_move, reset_location, use_gripper=use_gripper)
+                ctx.move_labware(
+                    labware_to_move, reset_location, use_gripper=use_gripper
+                )
 
             if len(move_locations) == 0:
                 return
@@ -163,8 +182,20 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 reset_labware()
 
         for move_sequence in move_sequences:
-            move_to_locations(labware, move_sequence, RESET_AFTER_EACH_MOVE, use_gripper, reset_location)
-            move_to_locations(labware, move_sequence, not RESET_AFTER_EACH_MOVE, use_gripper, reset_location)
+            move_to_locations(
+                labware,
+                move_sequence,
+                RESET_AFTER_EACH_MOVE,
+                use_gripper,
+                reset_location,
+            )
+            move_to_locations(
+                labware,
+                move_sequence,
+                not RESET_AFTER_EACH_MOVE,
+                use_gripper,
+                reset_location,
+            )
 
     def test_gripper_moves():
         """
@@ -195,7 +226,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 ["B2"],  # Deck Moves
                 ["C3"],  # Staging Area Slot 3 Moves
                 ["C4", "D4"],  # Staging Area Slot 4 Moves
-                [thermocycler, temperature_module_adapter, heater_shaker_adapter, magnetic_block],  # Module Moves
+                [
+                    thermocycler,
+                    temperature_module_adapter,
+                    heater_shaker_adapter,
+                    magnetic_block,
+                ],  # Module Moves
             ]
 
             run_moves(labware, deck_move_sequence, reset_location, USING_GRIPPER)
@@ -215,10 +251,20 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 ["B2", "C2"],  # Deck Moves
                 [],  # Don't have Staging Area Slot 3 open
                 ["C4", "D4"],  # Staging Area Slot 4 Moves
-                [thermocycler, temperature_module_adapter, heater_shaker_adapter, magnetic_block],  # Module Moves
+                [
+                    thermocycler,
+                    temperature_module_adapter,
+                    heater_shaker_adapter,
+                    magnetic_block,
+                ],  # Module Moves
             ]
 
-            run_moves(labware, staging_area_slot_3_move_sequence, reset_location, USING_GRIPPER)
+            run_moves(
+                labware,
+                staging_area_slot_3_move_sequence,
+                reset_location,
+                USING_GRIPPER,
+            )
 
         def staging_area_slot_4_moves(labware, reset_location):
             """
@@ -235,10 +281,20 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 ["C2", "B2"],  # Deck Moves
                 ["C3"],  # Staging Area Slot 3 Moves
                 ["C4"],  # Staging Area Slot 4 Moves
-                [thermocycler, temperature_module_adapter, heater_shaker_adapter, magnetic_block],  # Module Moves
+                [
+                    thermocycler,
+                    temperature_module_adapter,
+                    heater_shaker_adapter,
+                    magnetic_block,
+                ],  # Module Moves
             ]
 
-            run_moves(labware, staging_area_slot_4_move_sequence, reset_location, USING_GRIPPER)
+            run_moves(
+                labware,
+                staging_area_slot_4_move_sequence,
+                reset_location,
+                USING_GRIPPER,
+            )
 
         def module_moves(labware, module_locations):
             """
@@ -262,8 +318,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
                 labware_move_to_locations.remove(module_starting_location)
                 all_sequences = module_move_sequence.copy()
                 all_sequences.append(labware_move_to_locations)
-                ctx.move_labware(labware, module_starting_location, use_gripper=USING_GRIPPER)
-                run_moves(labware, all_sequences, module_starting_location, USING_GRIPPER)
+                ctx.move_labware(
+                    labware, module_starting_location, use_gripper=USING_GRIPPER
+                )
+                run_moves(
+                    labware, all_sequences, module_starting_location, USING_GRIPPER
+                )
 
         DECK_MOVE_RESET_LOCATION = "C2"
         STAGING_AREA_SLOT_3_RESET_LOCATION = "C3"
@@ -271,10 +331,18 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
         deck_moves(dest_pcr_plate, DECK_MOVE_RESET_LOCATION)
 
-        ctx.move_labware(dest_pcr_plate, STAGING_AREA_SLOT_3_RESET_LOCATION, use_gripper=USING_GRIPPER)
+        ctx.move_labware(
+            dest_pcr_plate,
+            STAGING_AREA_SLOT_3_RESET_LOCATION,
+            use_gripper=USING_GRIPPER,
+        )
         staging_area_slot_3_moves(dest_pcr_plate, STAGING_AREA_SLOT_3_RESET_LOCATION)
 
-        ctx.move_labware(dest_pcr_plate, STAGING_AREA_SLOT_4_RESET_LOCATION, use_gripper=USING_GRIPPER)
+        ctx.move_labware(
+            dest_pcr_plate,
+            STAGING_AREA_SLOT_4_RESET_LOCATION,
+            use_gripper=USING_GRIPPER,
+        )
         staging_area_slot_4_moves(dest_pcr_plate, STAGING_AREA_SLOT_4_RESET_LOCATION)
 
         module_locations = [thermocycler, magnetic_block] + adapters
@@ -286,7 +354,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
 
     def test_pipetting():
         def test_partial_tip_pickup_usage():
-            pipette_96_channel.configure_nozzle_layout(style=protocol_api.COLUMN, start="A12")
+            pipette_96_channel.configure_nozzle_layout(
+                style=protocol_api.COLUMN, start="A12"
+            )
             for i in range(1, 13):
                 pipette_96_channel.pick_up_tip(tip_rack_2[f"A{i}"])
 
@@ -301,7 +371,9 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             ctx.move_labware(tip_rack_2, waste_chute, use_gripper=USING_GRIPPER)
 
         def test_full_tip_rack_usage():
-            pipette_96_channel.configure_nozzle_layout(style=protocol_api.ALL, start="A1")
+            pipette_96_channel.configure_nozzle_layout(
+                style=protocol_api.ALL, start="A1"
+            )
             pipette_96_channel.pick_up_tip(tip_rack_1["A1"])
 
             pipette_96_channel.aspirate(5, source_reservoir["A1"])
@@ -324,7 +396,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             pipette_96_channel.mix(repetitions=5, volume=15)
             pipette_96_channel.return_tip()
 
-            ctx.move_labware(tip_rack_1, get_disposal_preference()[0], use_gripper=get_disposal_preference()[1])
+            ctx.move_labware(
+                tip_rack_1,
+                get_disposal_preference()[0],
+                use_gripper=get_disposal_preference()[1],
+            )
             ctx.move_labware(tip_rack_3, tip_rack_adapter, use_gripper=USING_GRIPPER)
 
             pipette_96_channel.pick_up_tip(tip_rack_3["A1"])
@@ -341,7 +417,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             )
             pipette_96_channel.return_tip()
 
-            ctx.move_labware(tip_rack_3, get_disposal_preference()[0], use_gripper=get_disposal_preference()[1])
+            ctx.move_labware(
+                tip_rack_3,
+                get_disposal_preference()[0],
+                use_gripper=get_disposal_preference()[1],
+            )
 
         test_partial_tip_pickup_usage()
         test_full_tip_rack_usage()

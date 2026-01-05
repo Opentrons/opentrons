@@ -1,4 +1,5 @@
 """Command models for moving any robot mount to a destination point."""
+
 from __future__ import annotations
 from typing import Literal, Type, Optional, TYPE_CHECKING, Any
 

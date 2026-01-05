@@ -1,4 +1,5 @@
 """Test load-liquid command."""
+
 from decoy import Decoy
 import pytest
 
@@ -79,9 +80,12 @@ async def test_load_liquid_class_existing_liquid_class_no_id(
 
     params = LoadLiquidClassParams(liquidClassRecord=liquid_class_record)
     result = await subject.execute(params)
-    assert result == SuccessData(
-        public=LoadLiquidClassResult(liquidClassId="existing-id"),
-        state_update=update_types.StateUpdate(),  # no state change since liquid class already loaded
+    assert (
+        result
+        == SuccessData(
+            public=LoadLiquidClassResult(liquidClassId="existing-id"),
+            state_update=update_types.StateUpdate(),  # no state change since liquid class already loaded
+        )
     )
 
 
@@ -132,9 +136,12 @@ async def test_load_liquid_class_existing_liquid_class_specified_id(
         liquidClassId="liquid-class-1", liquidClassRecord=liquid_class_record
     )
     result = await subject.execute(params)
-    assert result == SuccessData(
-        public=LoadLiquidClassResult(liquidClassId="liquid-class-1"),
-        state_update=update_types.StateUpdate(),  # no state change since liquid class already loaded
+    assert (
+        result
+        == SuccessData(
+            public=LoadLiquidClassResult(liquidClassId="liquid-class-1"),
+            state_update=update_types.StateUpdate(),  # no state change since liquid class already loaded
+        )
     )
 
 

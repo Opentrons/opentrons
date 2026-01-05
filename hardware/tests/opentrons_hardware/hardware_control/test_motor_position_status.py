@@ -1,4 +1,5 @@
 """Tests for the motor position status tools."""
+
 import pytest
 from typing import Tuple, List, Any
 import asyncio

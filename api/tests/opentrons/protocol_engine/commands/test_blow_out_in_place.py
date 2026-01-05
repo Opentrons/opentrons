@@ -1,4 +1,5 @@
 """Test blow-out-in-place commands."""
+
 from datetime import datetime
 
 import pytest

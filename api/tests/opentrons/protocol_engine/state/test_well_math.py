@@ -422,7 +422,7 @@ def test_nozzles_per_well_dense_force_1(
         if well_name not in all_fixture_wells:
             break
         assert nozzles_per_well(nozzle_map, well_name, fixture_map(fixture_name)) == 1
-        well_name = f"{chr(ord(well_name[0])+1)}{str(int(well_name[1:])+1)}"
+        well_name = f"{chr(ord(well_name[0]) + 1)}{str(int(well_name[1:]) + 1)}"
 
 
 @pytest.mark.parametrize(

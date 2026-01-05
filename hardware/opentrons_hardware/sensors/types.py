@@ -1,4 +1,5 @@
 """Data types for sensors."""
+
 from dataclasses import dataclass
 from typing import List, Union, overload
 from typing_extensions import Final
@@ -22,43 +23,35 @@ class SensorDataType:
 
     @overload
     @classmethod
-    def build(cls, data: int, _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: int, _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: float, _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: float, _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: Int32Field, _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: Int32Field, _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: List[int], _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: List[int], _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: int, _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: int, _type: SensorType) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: float, _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: float, _type: SensorType) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: Int32Field, _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: Int32Field, _type: SensorType) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: List[int], _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: List[int], _type: SensorType) -> "SensorDataType": ...
 
     @classmethod
     def build(cls, data, _type):  # type: ignore[no-untyped-def]

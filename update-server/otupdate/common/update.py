@@ -3,6 +3,7 @@ endpoints for running software updates
 
 This has endpoints like update session management, validation, and execution
 """
+
 import asyncio
 import functools
 import logging
@@ -38,8 +39,7 @@ class _HandlerWithSession(Protocol):
 
     async def __call__(
         self, request: web.Request, session: UpdateSession
-    ) -> web.Response:
-        ...
+    ) -> web.Response: ...
 
 
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:

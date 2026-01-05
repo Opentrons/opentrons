@@ -11,6 +11,7 @@ export {
   thermocyclerProfileStep,
   thermocyclerStateStep,
   transfer,
+  waitForModuleTask,
 } from './compound'
 
 export {

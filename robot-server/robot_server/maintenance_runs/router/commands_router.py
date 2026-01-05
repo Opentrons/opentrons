@@ -1,4 +1,5 @@
 """Router for /maintenance_runs commands endpoints."""
+
 import textwrap
 from typing import Annotated, Optional, Union
 from typing_extensions import Final, Literal

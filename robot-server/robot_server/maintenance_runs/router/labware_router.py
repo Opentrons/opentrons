@@ -122,7 +122,7 @@ async def add_labware_definition(
         run: Run response data by ID from URL; ensures 404 if run not found.
     """
     uri = run_orchestrator_store.add_labware_definition(request_body.data)
-    log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
+    log.info(f'Added labware definition "{uri}" to run "{run.id}".')
 
     return PydanticResponse(
         content=SimpleBody.model_construct(

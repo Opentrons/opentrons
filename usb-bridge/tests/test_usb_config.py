@@ -41,7 +41,6 @@ def test_serial_gadget_failure(
     os_driver: mock.Mock,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-
     # Mock out the _write_file function
     monkeypatch.setattr(subject, "_write_file", write_file_mock)
 

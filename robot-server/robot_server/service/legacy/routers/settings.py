@@ -100,9 +100,7 @@ async def post_settings(
                 # Unlike opentrons.advanced_settings, system-server cannot store
                 # `None`/`null` to restore to default. Storing `False` instead is close
                 # enough.
-                update.value
-                if update.value is not None
-                else False
+                update.value if update.value is not None else False
             )
             if resp != 200:
                 # TODO: raise correct error here

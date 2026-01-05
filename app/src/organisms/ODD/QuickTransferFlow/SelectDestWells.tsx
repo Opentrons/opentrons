@@ -243,7 +243,7 @@ function NumberWellsSelectedErrorModal({
         setShowNumberWellsSelectedErrorModal(false)
       }}
     >
-      <LegacyStyledText as="p">
+      <LegacyStyledText forwardedAs="p">
         {t('number_wells_selected_error_learn_more', {
           wellCount,
           selectionUnit,

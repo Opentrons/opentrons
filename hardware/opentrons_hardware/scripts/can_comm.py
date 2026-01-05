@@ -1,4 +1,5 @@
 """A script for sending CAN messages."""
+
 import asyncio
 import dataclasses
 import logging
@@ -55,7 +56,7 @@ async def listen_task(can_driver: AbstractCanDriver) -> None:
         if message_definition:
             try:
                 build = message_definition.payload_type.build(message.data)
-                log.info(f"Received <-- \n\traw: {message}, " f"\n\tparsed: {build}")
+                log.info(f"Received <-- \n\traw: {message}, \n\tparsed: {build}")
             except BinarySerializableException:
                 log.exception(f"Failed to build from {message}")
         else:
@@ -246,7 +247,7 @@ async def run(args: argparse.Namespace) -> None:
     gpio = OT3GPIO()
     gpio.deactivate_estop()
     async with build.driver(build_settings(args)) as driver:
-        await (run_ui(driver))
+        await run_ui(driver)
 
 
 def in_red(s: str) -> str:

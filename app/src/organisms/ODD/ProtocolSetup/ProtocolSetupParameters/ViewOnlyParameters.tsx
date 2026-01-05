@@ -86,7 +86,7 @@ export function ViewOnlyParameters({
             >
               <LegacyStyledText
                 width="48%"
-                as="p"
+                forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {parameter.displayName}
@@ -96,7 +96,7 @@ export function ViewOnlyParameters({
                 flexDirection={DIRECTION_ROW}
                 gridGap={SPACING.spacing8}
               >
-                <LegacyStyledText as="p" css={PARAMETER_VALUE_STYLE}>
+                <LegacyStyledText forwardedAs="p" css={PARAMETER_VALUE_STYLE}>
                   {formatRunTimeParameterValue(parameter, t)}
                 </LegacyStyledText>
                 {parameter.type === 'csv_file' ||

@@ -1,4 +1,5 @@
 """A script for sending CAN messages."""
+
 import asyncio
 import dataclasses
 import logging
@@ -200,7 +201,7 @@ async def run_ui(driver: SerialUsbDriver) -> None:
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
     async with build.usb_driver() as driver:
-        await (run_ui(driver))
+        await run_ui(driver)
 
 
 def in_red(s: str) -> str:

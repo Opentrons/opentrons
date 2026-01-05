@@ -44,6 +44,7 @@ export function RobotSettingsCameraControls(): JSX.Element {
         createPortal(
           <CameraControls
             onClose={toggleControls}
+            runId={null}
             postCameraImageSettings={createCameraImageSettings}
           />,
           getTopPortalEl()

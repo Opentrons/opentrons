@@ -116,7 +116,9 @@ class _ExecuteCommonResult(NamedTuple):
     # If the probe succeeded, the z_pos that it returned.
     # Or, if the probe found no liquid, the error representing that,
     # so calling code can propagate those details up.
-    z_pos_or_error: LiquidTrackingType | PipetteLiquidNotFoundError | PipetteOverpressureError
+    z_pos_or_error: (
+        LiquidTrackingType | PipetteLiquidNotFoundError | PipetteOverpressureError
+    )
     state_update: update_types.StateUpdate
     deck_point: DeckPoint
 
@@ -128,9 +130,11 @@ async def _execute_common(  # noqa: C901
     pipetting: PipettingHandler,
     model_utils: ModelUtils,
     params: _CommonParams,
-) -> _ExecuteCommonResult | DefinedErrorData[StallOrCollisionError] | DefinedErrorData[
-    OverpressureError
-]:
+) -> (
+    _ExecuteCommonResult
+    | DefinedErrorData[StallOrCollisionError]
+    | DefinedErrorData[OverpressureError]
+):
     pipette_id = params.pipetteId
     labware_id = params.labwareId
     well_name = params.wellName
@@ -441,9 +445,9 @@ class TryLiquidProbe(
     params: TryLiquidProbeParams
     result: Optional[TryLiquidProbeResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[TryLiquidProbeImplementation] = (
         TryLiquidProbeImplementation
-    ] = TryLiquidProbeImplementation
+    )
 
 
 class LiquidProbeCreate(BaseCommandCreate[LiquidProbeParams]):

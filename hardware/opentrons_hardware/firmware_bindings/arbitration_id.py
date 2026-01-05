@@ -4,6 +4,7 @@ This file is used as a source for code generation, which does not run in a venv 
 default. Please do not unconditionally import things outside the python standard
 library.
 """
+
 from __future__ import annotations
 import ctypes
 from enum import Enum
@@ -79,4 +80,4 @@ class ArbitrationId(ctypes.Union):
 
     def __repr__(self) -> str:
         """Return string representation of class."""
-        return f"id: 0x{self.id:x}, " f"parts: {self.parts}"
+        return f"id: 0x{self.id:x}, parts: {self.parts}"

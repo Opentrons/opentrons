@@ -1,4 +1,5 @@
 """A script to test canbus loading."""
+
 import argparse
 import asyncio
 import dataclasses
@@ -177,7 +178,7 @@ class BusLoader:
             if now - then > self._period:
                 if not warned:
                     log.warning(
-                        f"Sending messages took {now-then}s, cannot achieve "
+                        f"Sending messages took {now - then}s, cannot achieve "
                         f"requested period {self._period}"
                     )
                     warned = True
@@ -211,7 +212,7 @@ async def run(
 ) -> LoadResults:
     """Main entrypoint."""
     nodes = await BusProber().run(messenger)
-    log.info(f'Detected {", ".join([n.name for n in nodes])} on the bus')
+    log.info(f"Detected {', '.join([n.name for n in nodes])} on the bus")
     if mode == "individual-one" and which not in nodes:
         raise RuntimeError(f"Node {which} not detected on the bus")
     loader = BusLoader.build_from_args(mode, messenger, rate, nodes, which)

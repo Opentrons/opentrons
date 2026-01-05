@@ -165,9 +165,9 @@ class DispenseInPlace(
     params: DispenseInPlaceParams
     result: Optional[DispenseInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[DispenseInPlaceImplementation] = (
         DispenseInPlaceImplementation
-    ] = DispenseInPlaceImplementation
+    )
 
 
 class DispenseInPlaceCreate(BaseCommandCreate[DispenseInPlaceParams]):

@@ -96,7 +96,7 @@ function ProgressTrackerItem({
           width="1.25rem"
           borderRadius="0.625rem"
         >
-          <LegacyStyledText as="label">
+          <LegacyStyledText forwardedAs="label">
             {(taskIndex + 1).toString()}
           </LegacyStyledText>
         </Flex>
@@ -236,7 +236,10 @@ function SubTask({
         flexDirection={DIRECTION_COLUMN}
         gridGap={SPACING.spacing4}
       >
-        <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           <Flex
             alignItems={ALIGN_CENTER}
             flexDirection={DIRECTION_ROW}
@@ -245,9 +248,9 @@ function SubTask({
             {title}
           </Flex>
         </LegacyStyledText>
-        <LegacyStyledText as="p">{description}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
         {footer != null ? (
-          <LegacyStyledText as="p" color={COLORS.grey60}>
+          <LegacyStyledText forwardedAs="p" color={COLORS.grey60}>
             <Flex
               alignItems={ALIGN_CENTER}
               flexDirection={DIRECTION_ROW}
@@ -389,7 +392,7 @@ function Task({
             gridGap={SPACING.spacing4}
           >
             <LegacyStyledText
-              as="h3"
+              forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               <Flex
@@ -409,9 +412,9 @@ function Task({
                 {title}
               </Flex>
             </LegacyStyledText>
-            <LegacyStyledText as="p">{description}</LegacyStyledText>
+            <LegacyStyledText forwardedAs="p">{description}</LegacyStyledText>
             {footer != null ? (
-              <LegacyStyledText as="p" color={COLORS.grey50}>
+              <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
                 <Flex
                   alignItems={ALIGN_CENTER}
                   flexDirection={DIRECTION_ROW}

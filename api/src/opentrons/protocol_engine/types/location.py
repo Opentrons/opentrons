@@ -146,7 +146,9 @@ class NotOnDeckLocationSequenceComponent(BaseModel):
     """Labware on a system location."""
 
     kind: Literal["notOnDeck"] = "notOnDeck"
-    logicalLocationName: _OffDeckLocationType | _SystemLocationType | _WasteChuteLocationType
+    logicalLocationName: (
+        _OffDeckLocationType | _SystemLocationType | _WasteChuteLocationType
+    )
 
 
 LabwareLocationSequence = list[

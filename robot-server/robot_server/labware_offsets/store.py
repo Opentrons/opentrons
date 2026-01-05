@@ -43,9 +43,9 @@ class IncomingStoredLabwareOffset:
     id: str
     createdAt: datetime
     definitionUri: str
-    locationSequence: Sequence[
-        StoredLabwareOffsetLocationSequenceComponents
-    ] | AnyLocation
+    locationSequence: (
+        Sequence[StoredLabwareOffsetLocationSequenceComponents] | AnyLocation
+    )
     vector: LabwareOffsetVector
 
 

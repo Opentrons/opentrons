@@ -1,4 +1,5 @@
 """Command models for moving any robot axis to an absolute position."""
+
 from __future__ import annotations
 from typing import Literal, Optional, Type, TYPE_CHECKING, Any
 

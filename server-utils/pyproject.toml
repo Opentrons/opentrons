@@ -28,9 +28,52 @@ dependencies = [
     "wsproto==1.2.0",
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
+    "idna==3.3",
 ]
 
 dynamic = ['version']
+
+[dependency-groups]
+dev = [
+    "ruff==0.14.10",
+    "atomicwrites==1.4.0; sys_platform=='win32'",
+    "colorama==0.4.4; sys_platform=='win32'",
+    "pytest>=8,<9",
+    "pytest-asyncio<2,>=1",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=2.5.0",
+    "requests==2.31.0",
+    "mock==5.1.0",
+    "mypy==1.11.0",
+    "decoy<3,>=2.2.0",
+    "httpx==0.26.0",
+    "types-requests~=2.31.0",
+    "types-mock~=5.1.0",
+    "sqlalchemy2-stubs==0.0.2a21",
+    "build~=1.2.0",
+]
+
+[tool.ruff.lint]
+select = ["E", "ANN", "D", "C90"]
+ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+[tool.ruff.lint.per-file-ignores]
+"server_utils/util.py" = ["ANN", "D"]
+"server_utils/fastapi_utils/service/*" = ["ANN", "D"]
+"tests/fastapi_utils/service/*" = ["ANN", "D"]
+"tests/test_util.py" = ["ANN", "D"]
+
+# uv: global settings and dependency tweaks
+[tool.uv]
+# Provide static metadata so uv can resolve systemd-python without building its sdist on
+# macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+    ] },
+]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/server-utils"

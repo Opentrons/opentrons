@@ -1,4 +1,5 @@
 """Generates a UUID in the persistence directory."""
+
 from uuid import UUID, uuid4
 from pathlib import Path
 

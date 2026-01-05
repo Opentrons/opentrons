@@ -1,4 +1,5 @@
 """Test for message definitions."""
+
 import pytest
 from typing_extensions import get_args
 from dataclasses import fields

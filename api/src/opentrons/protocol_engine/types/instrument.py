@@ -1,4 +1,5 @@
 """Protocol Engine types to do with instruments."""
+
 import enum
 from typing import Union
 

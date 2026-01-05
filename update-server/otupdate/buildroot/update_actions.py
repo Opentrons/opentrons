@@ -5,6 +5,7 @@ This module has functions that actually accomplish the various tasks required
 for an update: unzipping update files, hashing rootfs, checking signatures,
 writing to root partitions
 """
+
 import contextlib
 import enum
 import logging

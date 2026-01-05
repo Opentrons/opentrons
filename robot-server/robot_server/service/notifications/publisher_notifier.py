@@ -1,4 +1,5 @@
 """Provides an interface for alerting notification publishers to events and related lifecycle utilities."""
+
 import asyncio
 from logging import getLogger
 from fastapi import Depends
@@ -51,7 +52,7 @@ class PublisherNotifier:
                         await callback()
                     except BaseException:
                         LOG.exception(
-                            f'PublisherNotifier: exception in callback {getattr(callback, "__name__", "<unknown>")}'
+                            f"PublisherNotifier: exception in callback {getattr(callback, '__name__', '<unknown>')}"
                         )
         except asyncio.exceptions.CancelledError:
             LOG.warning("PublisherNotifier task cancelled.")

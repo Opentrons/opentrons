@@ -59,7 +59,9 @@ export function ConfirmSetupStepsCompleteModal({
         gridGap={SPACING.spacing32}
         width="100%"
       >
-        <LegacyStyledText as="p">{buildMissingStepsCopy()}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="p">
+          {buildMissingStepsCopy()}
+        </LegacyStyledText>
         <Flex gridGap={SPACING.spacing8}>
           <SmallButton
             flex="1"

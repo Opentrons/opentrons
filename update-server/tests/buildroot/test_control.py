@@ -1,4 +1,5 @@
-"""test the buildroot endpoints in otupdate.common.control """
+"""test the buildroot endpoints in otupdate.common.control"""
+
 from typing import Dict
 
 # Avoid pytest trying to collect TestClient because it begins with "Test".

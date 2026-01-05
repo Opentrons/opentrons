@@ -1,4 +1,5 @@
 """Application routes."""
+
 from fastapi import Depends, status
 from server_utils.fastapi_utils.light_router import LightRouter
 

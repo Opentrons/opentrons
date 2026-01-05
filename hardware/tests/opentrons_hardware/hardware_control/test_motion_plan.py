@@ -1,4 +1,5 @@
 """Tests for motion planning."""
+
 import numpy as np
 from hypothesis import given, assume, strategies as st
 from hypothesis.extra import numpy as hynp

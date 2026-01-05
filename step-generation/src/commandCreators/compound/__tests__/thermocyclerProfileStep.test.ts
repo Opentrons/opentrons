@@ -18,7 +18,7 @@ import type {
 const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 
-describe('thermocyclerProfileStep', () => {
+describe('thermocyclerProfileStep with concurrent=false', () => {
   const testCases: Array<{
     testName: string
     initialThermocyclerModuleState?: ThermocyclerModuleState
@@ -45,6 +45,7 @@ describe('thermocyclerProfileStep', () => {
         ],
         profileTargetLidTemp: 55,
         profileVolume: 42,
+        concurrent: false,
       },
       expected: [
         {
@@ -136,6 +137,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
+        concurrent: false,
       },
       expected: [
         {
@@ -201,6 +203,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
+        concurrent: false,
       },
       expected: [
         {
@@ -274,6 +277,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
         profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
+        concurrent: false,
       },
       expected: [
         {
@@ -353,8 +357,10 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       })
     }
   )
+})
 
-  it('should return timeline error with bad moduleId', () => {
+describe('thermocyclerProfileStep() with concurrent=true', () => {
+  it('should generate expected commands', () => {
     const { robotState, invariantContext } = getStateAndContextTempTCModules({
       temperatureModuleId,
       thermocyclerId,
@@ -362,6 +368,85 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
 
     const args: ThermocyclerProfileStepArgs = {
       commandCreatorFnName: 'thermocyclerProfile',
+      concurrent: true,
+      moduleId: thermocyclerId,
+      profileElements: [
+        {
+          repetitions: 4,
+          steps: [
+            { celsius: 30, holdSeconds: 10 },
+            { celsius: 40, holdSeconds: 20 },
+          ],
+        },
+      ],
+      profileTargetLidTemp: 55,
+      profileVolume: 42,
+    }
+
+    const result = thermocyclerProfileStep(args, invariantContext, robotState)
+    const { commands, python } = getSuccessResult(result)
+    expect(commands).toEqual([
+      {
+        commandType: 'thermocycler/closeLid',
+        key: expect.any(String),
+        params: {
+          moduleId: 'thermocyclerId',
+        },
+      },
+      {
+        commandType: 'thermocycler/setTargetLidTemperature',
+        key: expect.any(String),
+        params: {
+          moduleId: 'thermocyclerId',
+          celsius: 55,
+        },
+      },
+      {
+        commandType: 'thermocycler/startRunExtendedProfile',
+        key: expect.any(String),
+        params: {
+          moduleId: 'thermocyclerId',
+          profileElements: [
+            {
+              repetitions: 4,
+              steps: [
+                { celsius: 30, holdSeconds: 10 },
+                { celsius: 40, holdSeconds: 20 },
+              ],
+            },
+          ],
+          blockMaxVolumeUl: 42,
+          taskId: 'mock_thermocycler_task_1',
+        },
+      },
+    ])
+    expect(python).toStrictEqual(
+      `
+mock_thermocycler.close_lid()
+mock_thermocycler.set_lid_temperature(55)
+mock_thermocycler_task_1 = mock_thermocycler.start_execute_profile(
+    [
+        {"temperature": 30, "hold_time_seconds": 10},
+        {"temperature": 40, "hold_time_seconds": 20},
+    ],
+    4,
+    block_max_volume=42,
+)`.trimStart()
+    )
+  })
+})
+
+it.each([true, false])(
+  'should return timeline error with bad moduleId, concurrent=%s',
+  concurrent => {
+    const { robotState, invariantContext } = getStateAndContextTempTCModules({
+      temperatureModuleId,
+      thermocyclerId,
+    })
+
+    const args: ThermocyclerProfileStepArgs = {
+      commandCreatorFnName: 'thermocyclerProfile',
+      concurrent,
       blockTargetTempHold: 4,
       lidTargetTempHold: null,
       lidOpenHold: true,
@@ -377,5 +462,5 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'MISSING_MODULE',
     })
-  })
-})
+  }
+)

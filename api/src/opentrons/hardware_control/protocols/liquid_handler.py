@@ -202,8 +202,7 @@ class LiquidHandler(
         mount: MountArgType,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     async def pick_up_tip(
         self,
@@ -237,8 +236,7 @@ class LiquidHandler(
         home_after: bool = True,
         ignore_plunger: bool = False,
         scrape_type: TipScrapeType = TipScrapeType.NONE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     async def drop_tip(
         self,

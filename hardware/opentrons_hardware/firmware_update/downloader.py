@@ -1,4 +1,5 @@
 """Firmware download."""
+
 import asyncio
 import binascii
 import logging

@@ -126,7 +126,7 @@ def load_tip_length_for_pipette(
             "TypeDictLabwareDef2",
             tiprack.model_dump(
                 exclude_none=True,
-                exclude_unset=True
+                exclude_unset=True,
                 # todo(mm, 2025-02-13): Do we need by_alias=True here?
             ),
         )

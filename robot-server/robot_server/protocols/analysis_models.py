@@ -1,4 +1,5 @@
 """Response models for protocol analysis."""
+
 # TODO(mc, 2021-08-25): add modules to simulation result
 from typing import List, Optional, Union, NamedTuple
 

@@ -1,4 +1,5 @@
 """Test rear panel integration."""
+
 from __future__ import annotations
 from asyncio import Queue
 import pytest

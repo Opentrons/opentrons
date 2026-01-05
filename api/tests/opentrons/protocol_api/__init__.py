@@ -1,4 +1,5 @@
 """Tests for opentrons.protocol_api."""
+
 from typing import List, overload, Optional
 
 from opentrons.protocols.api_support.types import APIVersion
@@ -66,15 +67,13 @@ def versions_between(
     *,
     low_inclusive_bound: APIVersion,
     high_inclusive_bound: APIVersion,
-) -> List[APIVersion]:
-    ...
+) -> List[APIVersion]: ...
 
 
 @overload
 def versions_between(
     *, low_inclusive_bound: APIVersion, high_exclusive_bound: APIVersion
-) -> List[APIVersion]:
-    ...
+) -> List[APIVersion]: ...
 
 
 @overload
@@ -82,15 +81,13 @@ def versions_between(
     *,
     high_inclusive_bound: APIVersion,
     low_exclusive_bound: APIVersion,
-) -> List[APIVersion]:
-    ...
+) -> List[APIVersion]: ...
 
 
 @overload
 def versions_between(
     *, low_exclusive_bound: APIVersion, high_exclusive_bound: APIVersion
-) -> List[APIVersion]:
-    ...
+) -> List[APIVersion]: ...
 
 
 def versions_between(
@@ -101,30 +98,30 @@ def versions_between(
 ) -> List[APIVersion]:
     """Build a list of versions based on exclusive and inclusive constraints."""
     if low_inclusive_bound and high_inclusive_bound:
-        assert (
-            low_inclusive_bound.major == high_inclusive_bound.major
-        ), "You need to change this test when you add a new major version"
+        assert low_inclusive_bound.major == high_inclusive_bound.major, (
+            "You need to change this test when you add a new major version"
+        )
         major = low_inclusive_bound.major
         start = low_inclusive_bound.minor
         stop = high_inclusive_bound.minor + 1
     elif low_inclusive_bound and high_exclusive_bound:
-        assert (
-            low_inclusive_bound.major == high_exclusive_bound.major
-        ), "You need to change this test when you add a new major version"
+        assert low_inclusive_bound.major == high_exclusive_bound.major, (
+            "You need to change this test when you add a new major version"
+        )
         major = low_inclusive_bound.major
         start = low_inclusive_bound.minor
         stop = high_exclusive_bound.minor
     elif low_exclusive_bound and high_inclusive_bound:
-        assert (
-            low_exclusive_bound.major == high_inclusive_bound.major
-        ), "You need to change this test when you add a new major version"
+        assert low_exclusive_bound.major == high_inclusive_bound.major, (
+            "You need to change this test when you add a new major version"
+        )
         major = low_exclusive_bound.major
         start = low_exclusive_bound.minor + 1
         stop = high_inclusive_bound.minor + 1
     elif low_exclusive_bound and high_exclusive_bound:
-        assert (
-            low_exclusive_bound.major == high_exclusive_bound.major
-        ), "You need to change this test when you add a new major version"
+        assert low_exclusive_bound.major == high_exclusive_bound.major, (
+            "You need to change this test when you add a new major version"
+        )
         major = low_exclusive_bound.major
         start = low_exclusive_bound.minor + 1
         stop = high_exclusive_bound.minor

@@ -136,10 +136,13 @@ export function HistoricalProtocolRunDrawer(
       iconMarginLeft={SPACING.spacing4}
     >
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {t('data_out_of_date')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('robot_was_recalibrated')}
         </LegacyStyledText>
       </Flex>
@@ -162,7 +165,7 @@ export function HistoricalProtocolRunDrawer(
         >
           <Box width="33%">
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_fileNameTitle"
             >
               {t('name')}
@@ -170,7 +173,7 @@ export function HistoricalProtocolRunDrawer(
           </Box>
           <Box width="33%">
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_fileDateTitle"
             >
               {t('date')}
@@ -178,7 +181,7 @@ export function HistoricalProtocolRunDrawer(
           </Box>
           <Box width="34%">
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_fileDownloadTitle"
             >
               {t('download')}
@@ -222,7 +225,7 @@ export function HistoricalProtocolRunDrawer(
             paddingY={`${SPACING.spacing4} ${SPACING.spacing8} ${SPACING.spacing4} ${SPACING.spacing4}`}
           >
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_locationTitle"
             >
               {i18n.format(t('labware'), 'capitalize')}
@@ -230,7 +233,7 @@ export function HistoricalProtocolRunDrawer(
           </Box>
           <Box width="25%" padding={`${SPACING.spacing4} 0`}>
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_labwareTitle"
             >
               {i18n.format(t('location'), 'capitalize')}
@@ -238,7 +241,7 @@ export function HistoricalProtocolRunDrawer(
           </Box>
           <Box width="25%" padding={`${SPACING.spacing4} 0`}>
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               datatest-id="RecentProtocolRun_Drawer_labwareOffsetDataTitle"
             >
               {i18n.format(t('labware_offset_data'), 'sentenceCase')}
@@ -278,7 +281,7 @@ export function HistoricalProtocolRunDrawer(
                 gridGap={SPACING.spacing24}
               >
                 <Box width="75%">
-                  <LegacyStyledText as="p" title={labwareName}>
+                  <LegacyStyledText forwardedAs="p" title={labwareName}>
                     {labwareName}
                   </LegacyStyledText>
                 </Box>
@@ -353,7 +356,7 @@ function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
     >
       <Flex width="33%" gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           css={css`
             overflow: ${OVERFLOW_HIDDEN};
             text-overflow: ellipsis;
@@ -363,7 +366,7 @@ function CsvFileDataRow(props: CsvFileDataRowProps): JSX.Element | null {
         </LegacyStyledText>
       </Flex>
       <Box width="33%">
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {format(new Date(createdAt), 'M/d/yy HH:mm:ss')}
         </LegacyStyledText>
       </Box>
@@ -405,7 +408,7 @@ function ImagesFileDataRow({
     >
       <Flex width="33%" gridGap={SPACING.spacing4} alignItems={ALIGN_CENTER}>
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           css={css`
             overflow: ${OVERFLOW_HIDDEN};
             text-overflow: ellipsis;
@@ -415,7 +418,7 @@ function ImagesFileDataRow({
         </LegacyStyledText>
       </Flex>
       <Box width="33%">
-        <LegacyStyledText as="p">{formattedRunTs}</LegacyStyledText>
+        <LegacyStyledText forwardedAs="p">{formattedRunTs}</LegacyStyledText>
       </Box>
       <Box width="34%">
         <Link
@@ -435,7 +438,7 @@ function ImagesFileDataRow({
           }}
         >
           <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {isLoading ? t('loading') : t('download')}
             </LegacyStyledText>
             {!isLoading && <Icon name="download" size="1rem" />}

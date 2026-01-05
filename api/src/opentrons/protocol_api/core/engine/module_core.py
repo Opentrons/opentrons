@@ -238,12 +238,12 @@ class MagneticModuleCore(ModuleCore, AbstractMagneticModuleCore[LabwareCore]):
         # This core will only be used in apiLevels >=2.14, where
         # MagneticModuleContext.engage(height=...) is no longer available.
         # So these asserts should always pass.
-        assert (
-            height_from_home is None
-        ), "Expected engage height to be specified from base."
-        assert (
-            height_from_base is not None
-        ), "Expected engage height to be specified from base."
+        assert height_from_home is None, (
+            "Expected engage height to be specified from base."
+        )
+        assert height_from_base is not None, (
+            "Expected engage height to be specified from base."
+        )
 
         self._engine_client.execute_command(
             cmd.magnetic_module.EngageParams(
@@ -999,12 +999,10 @@ class FlexStackerCore(ModuleCore, AbstractFlexStackerCore[LabwareCore]):
     @overload
     def _ssld_from_core(
         self, core: LabwareCore
-    ) -> cmd.flex_stacker.StackerStoredLabwareDetails:
-        ...
+    ) -> cmd.flex_stacker.StackerStoredLabwareDetails: ...
 
     @overload
-    def _ssld_from_core(self, core: None) -> None:
-        ...
+    def _ssld_from_core(self, core: None) -> None: ...
 
     def _ssld_from_core(
         self, core: LabwareCore | None

@@ -1,4 +1,5 @@
 """A script for monitoring CAN bus."""
+
 import asyncio
 import dataclasses
 from dataclasses import fields

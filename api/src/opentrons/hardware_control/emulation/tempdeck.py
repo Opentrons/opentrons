@@ -52,9 +52,9 @@ class TempDeckEmulator(AbstractEmulator):
             return res
         elif command.gcode == GCODE.SET_TEMP:
             temperature = command.params["S"]
-            assert isinstance(
-                temperature, float
-            ), f"invalid temperature '{temperature}'"
+            assert isinstance(temperature, float), (
+                f"invalid temperature '{temperature}'"
+            )
             self._temperature.set_target(temperature)
         elif command.gcode == GCODE.DISENGAGE:
             self._temperature.deactivate(util.TEMPERATURE_ROOM)

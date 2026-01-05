@@ -780,9 +780,9 @@ class ProtocolCore(
 
         module_core_cls = type_lookup[module_type]
 
-        assert (
-            load_module_result.serialNumber is not None
-        ), "Expected a connected module but did not get a serial number."
+        assert load_module_result.serialNumber is not None, (
+            "Expected a connected module but did not get a serial number."
+        )
         selected_hardware = self._resolve_module_hardware(
             load_module_result.serialNumber, model
         )

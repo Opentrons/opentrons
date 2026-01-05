@@ -497,7 +497,7 @@ def test_available_resets(api_client):
 
 @pytest.fixture
 def mock_reset():
-    with patch("robot_server.service.legacy.routers." "settings.reset_util.reset") as m:
+    with patch("robot_server.service.legacy.routers.settings.reset_util.reset") as m:
         yield m
 
 
@@ -538,9 +538,9 @@ def mock_deck_configuration_store_failsafe(
     async def mock_get_deck_configuration_store_failsafe() -> DeckConfigurationStore:
         return mock_deck_configuration_store
 
-    app.dependency_overrides[
-        get_deck_configuration_store_failsafe
-    ] = mock_get_deck_configuration_store_failsafe
+    app.dependency_overrides[get_deck_configuration_store_failsafe] = (
+        mock_get_deck_configuration_store_failsafe
+    )
     yield mock_deck_configuration_store
     del app.dependency_overrides[get_deck_configuration_store_failsafe]
 
@@ -624,7 +624,7 @@ def test_reset_invalid_option(
 
 @pytest.fixture()
 def mock_robot_configs():
-    with patch("robot_server.service.legacy.routers." "settings.robot_configs") as m:
+    with patch("robot_server.service.legacy.routers.settings.robot_configs") as m:
         yield m
 
 

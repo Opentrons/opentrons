@@ -40,7 +40,7 @@ export const JogToPosition = ({
         >
           {t('position_the_pipette')}
         </StyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {currentRoute === DT_ROUTES.BLOWOUT
             ? t('position_and_blowout')
             : t('position_and_drop_tip')}
