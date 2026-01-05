@@ -46,7 +46,7 @@ def import_protocol_onboarding_flow(page: Page, base_url: str) -> ProtocolEditor
     print("✓ Protocol file uploaded")
 
     expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
-    landing.wait_for_no_modal_overlay()
+    landing_page.wait_for_no_modal_overlay()
     page.get_by_role("button", name="Edit protocol").click()
 
     return ProtocolEditorPage(page)
