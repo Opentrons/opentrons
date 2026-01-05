@@ -917,21 +917,17 @@ export const getIsLabwareCompatibleWithStack = (
   moduleEntities: ModuleEntities
 ): CompatibleWithStack => {
   // if stack is empty, moving directly to empty slot
+  console.log('🚀 ~ getIsLabwareCompatibleWithStack ~ stack:', stack)
   if (stack.length === 0) {
     return { isCompatible: true, isAboveStackLimit: false }
   }
   // Determine if labware is on hopper
   let isOnHopper = false
   const moduleId = stack.find(id => id in moduleEntities)
-  const hopperLocations = Object.values(
-    FAKE_HOPPER_LOCATION_MAP as Record<string, string>
-  )
   if (moduleId != null) {
     const isStackerInStack =
       moduleEntities[moduleId].type === FLEX_STACKER_MODULE_TYPE
-    isOnHopper =
-      isStackerInStack &&
-      stack.some(location => hopperLocations.includes(location))
+    isOnHopper = isStackerInStack && stack.includes('hopper')
   }
 
   const topIdInStack = getTopLocationInStack(stack)
