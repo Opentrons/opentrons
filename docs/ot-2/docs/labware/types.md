@@ -70,4 +70,3 @@ The 24-tube rack supports both snap cap and screw cap tubes.
 ### Custom tube rack labware
 
 Try creating a custom labware definition using the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a tube and rack combination you'd like to use isn't listed on Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex reads this information to understand how to work with your custom labware. See the <font color="red">Labware Definitions section</font> for more information.
-
