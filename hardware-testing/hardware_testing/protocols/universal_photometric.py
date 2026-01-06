@@ -287,6 +287,34 @@ def dispense_with_liquid_class(
     )
 
 
+def multidispense_with_liquid_class(
+    pipette: InstrumentContext,
+    volume: float,
+    transfer_properties: TransferProperties,
+    transfer_type: tx_comps_executor.TransferType,
+    dest: Well,
+    contents: List[tx_comps_executor.LiquidAndAirGapPair],
+    last_dispense: bool,
+) -> List[tx_comps_executor.LiquidAndAirGapPair]:
+    """Dispense with liquid class."""
+    return pipette._core.dispense_liquid_class_during_multi_dispense(  # type: ignore [attr-defined]
+        volume=volume,
+        dest=(
+            dest.top(),
+            dest._core,
+        ),
+        source=None,
+        transfer_properties=transfer_properties,
+        transfer_type=transfer_type,
+        tip_contents=contents,
+        add_final_air_gap=True,
+        trash_location=pipette.trash_container,
+        conditioning_volume=0,
+        disposal_volume=0,
+        is_last_dispense_in_tip=last_dispense,
+    )
+
+
 def aspirate_with_liquid_class(
     pipette: InstrumentContext,
     volume: float,
@@ -422,6 +450,12 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         transfer_properties.dispense.dispense_position.position_reference = (
             PositionReference.LIQUID_MENISCUS
         )
+        transfer_properties.multi_dispense.submerge.start_position.offset = disp_offset  # type: ignore [attr-defined, union-attr]
+        transfer_properties.multi_dispense.dispense_position.offset = disp_offset  # type: ignore [attr-defined, union-attr]
+        transfer_properties.multi_dispense.retract.end_position.offset = disp_offset  # type: ignore [attr-defined, union-attr]
+        transfer_properties.multi_dispense.dispense_position.position_reference = (  # type: ignore [attr-defined, union-attr]
+            PositionReference.LIQUID_MENISCUS
+        )
 
         if not ctx.params.use_pip_motion_defaults:  # type: ignore [attr-defined]
             transfer_properties.aspirate.flow_rate_by_volume.set_for_volume(target_volume, ctx.params.asp_flow_rate)  # type: ignore [attr-defined]
@@ -455,7 +489,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
         _validate_dye_liquid_height(i)
 
         # we'll always end up with 200 uL after dispensing
-        prep_vol = 200 - target_volume
+        prep_vol = max(200 - target_volume, 0)
         plate.load_liquid(plate.wells(), prep_vol, diluent)
 
         aspirate_volume = (
@@ -463,7 +497,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             + ctx.params.conditioning_volume  # type: ignore [attr-defined]
         )
         transfer_type = tx_comps_executor.TransferType.ONE_TO_ONE
-        if ctx.params.conditioning_volume > 0:  # type: ignore [attr-defined]
+        if ctx.params.conditioning_volume > 0 or target_volume > 250:  # type: ignore [attr-defined]
             transfer_type = tx_comps_executor.TransferType.ONE_TO_MANY
         contents = aspirate_with_liquid_class(
             pip,
@@ -488,14 +522,34 @@ def run(ctx: protocol_api.ProtocolContext) -> None:
             ctx.pause("Inspect for dropouts.")
 
         # Dispense
-        contents = dispense_with_liquid_class(
-            pip,
-            target_volume,
-            liquid_class.get_for(pip, tips),
-            transfer_type,
-            plate.wells()[0],
-            contents,
-        )
+        if target_volume <= 250:
+            contents = dispense_with_liquid_class(
+                pip,
+                target_volume,
+                liquid_class.get_for(pip, tips),
+                transfer_type,
+                plate.wells()[0],
+                contents,
+            )
+        else:
+            best_divisor = 1
+            disp_volume = target_volume / best_divisor
+            while disp_volume > 250:
+                best_divisor += 1
+                disp_volume = target_volume / best_divisor
+            for i in range(best_divisor):
+                contents = multidispense_with_liquid_class(
+                    pip,
+                    disp_volume,
+                    liquid_class.get_for(pip, tips),
+                    transfer_type,
+                    plate.wells()[0],
+                    contents,
+                    last_dispense=i == (best_divisor - 1),
+                )
+                pip._retract()
+                ctx.pause("Replace dispense plate.")
+                plate.load_liquid(plate.wells(), prep_vol, diluent)
         # Return tip to tip rack
         pip.return_tip()
         # Retract pipette
