@@ -4,12 +4,12 @@ title: "Opentrons OT-2: Labware Types"
 
 ## Reservoirs
 
-Opentrons Flex works by default with single-well and multi-well reservoirs. [Reservoirs on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=reservoir) are automation-ready right out of the box.
-
 <figure class="side-by-side" markdown>
 ![Single-well reservoir labware](../images/labware-1-well-reservoir.png "Single-well reservoir")
 ![12-well reservoir labware](../images/labware-12-well-reservoir.png "12-well reservoir")
 </figure>
+
+Opentrons Flex works by default with single-well and multi-well reservoirs. [Reservoirs on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=reservoir) are automation-ready right out of the box.
 
 ## Custom reservoirs
 
@@ -19,14 +19,18 @@ Try creating a custom labware definition with the [Opentrons Labware Creator](ht
 
 ## Well plates
 
-The Opentrons Flex works by default with well plates in a variety of well configurations. This category includes standard depth and deep well plates, with various well bottom shapes. [Well plates on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=wellPlate) are automation-ready right out of the box.
-
 <figure class="side-by-side" markdown>
-![24-well plate labware](../images/labware-24-well-plate.png "24-well plate")
-![96-well deep well plate labware](../images/labware-96-deep-well-plate.png "96-well deep well plate")
+![24-well plate labware.](../images/labware-24-well-plate.png "24-well plate")
+![96-well deep well plate labware.](../images/labware-96-deep-well-plate.png "96-well deep well plate")
 </figure>
 
+The OT-2 works by default with well plates in a variety of well configurations. This category includes standard depth and deep well plates, with various well bottom shapes. [Well plates on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=wellPlate) are automation-ready right out of the box.
+
 ### Plates with fewer than 96 wells
+
+The Labware Library includes plates with 12, 24, and 48 wells. Due to the grid configuration and spacing of the wells on these plates, they are only usable with single-channel pipettes.
+
+### 96-well plates
 
 The Labware Library includes many 96-well plates, including Opentrons and third-party plates. The 8-channel and 96-channel Flex pipettes are optimized to work with the 8×12 well grid on these plates. 8-channel pipettes in their full nozzle configuration pipette in an entire column of wells, and the 96-channel pipette in its full configuration pipettes to every well on the plate.
 
@@ -54,6 +58,11 @@ See the [Tips & Labware section](https://opentrons.com/products/categories/tips-
 
 ## Tubes and tube racks
 
+<figure class="side-by-side" markdown>
+![Empty Opentrons tube rack.](../images/labware-tube-rack.jpg "Tube rack")
+![NEST tubes in two sizes.](../images/labware-tubes.jpg "NEST tubes")
+</figure>
+
 The Opentrons 4-in-1 Tube Rack system works with the OT-2 by default. [Tube rack combinations on the Opentrons Labware Library](https://labware.opentrons.com/#/?category=tubeRack) are automation-ready right out of the box.
 
 The Opentrons 4-in-1 tube rack supports a wide variety of tube sizes, singly or in different size (volume) combinations. These include a:
@@ -77,13 +86,20 @@ A set OT-2 compatible aluminum blocks also ship with the Temperature Module GEN2
 
 ### Flat bottom plate
 
-IMAGE PLACEHOLDER
+<figure class="side-by-side" markdown>
+![OT-2 flat well plate](../images/flat-plate-ot2.png "Flat well plate for an OT-2")
+![Flex flat well plate](../images/flat-plate-flex.png "Flat well plate for Flex")
+
+<figcaption>Flat well plate for the OT-2 (left) and Opentrons Flex (right).</figcaption>
+</figure>
 
 The aluminum flat bottom plate can be used with various ANSI/SLAS standard well plates. You can identify an [OT-2 compatible plate](https://opentrons.com/products/aluminum-block-flat-bottom-ot-2) from its plain matte finish and lack of external markings.
 
 ### 24-well aluminum block
 
-IMAGE PLACEHOLDER
+<figure markdown>
+![24-well aluminum block adapter.](../images/labware-24-well-block.jpg "24-well block"){style="width: 65%"}
+</figure>
 
 The 24-well block is used with individual sample vials. For example, it accepts sample vials that:
 
@@ -95,7 +111,9 @@ The 24-well block is used with individual sample vials. For example, it accepts 
 
 ### 96-well aluminum block
 
-IMAGE PLACEHOLDER
+<figure markdown>
+![96-well aluminum block adapter.](../images/labware-96-well-block.jpg "96-well block"){style="width: 65%"}
+</figure>
 
 The 96-well block supports a wide variety of well plate types. For example, it accepts:
 
