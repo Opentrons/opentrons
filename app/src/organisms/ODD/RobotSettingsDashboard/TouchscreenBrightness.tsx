@@ -32,7 +32,7 @@ interface BrightnessTileProps {
   $isActive: boolean // transient props to avoid warning
 }
 
-const BrightnessTile = styled(Box)<BrightnessTileProps>`
+const BrightnessTile = styled(Box) <BrightnessTileProps>`
   width: 100%;
   height: 8.75rem;
   border-radius: ${BORDERS.borderRadius8};
@@ -40,7 +40,6 @@ const BrightnessTile = styled(Box)<BrightnessTileProps>`
     $isActive === true ? COLORS.blue50 : COLORS.blue35};
 `
 
-// Note The actual brightness is Bright 6 <---> 1 Dark which is opposite to the UI
 // For UI Bright 6 <--> 1 Dark
 // If the brightness 7 or more | 0, the display will be blackout
 const LOWEST_BRIGHTNESS = 1
