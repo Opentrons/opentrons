@@ -252,6 +252,10 @@
         "body": "Please reselect which slot your labware should move to.",
         "title": "Attempting to move labware on top of another entity"
       },
+      "LABWARE_ON_HOPPER": {
+        "title": "Labware on Flex Stacker hopper",
+        "body": "Retrieve the labware before moving it"
+      },
       "MISMATCHED_STACKER_LABWARE_TYPE": {
         "title": "Cannot store or refill multiple labware types in the stacker",
         "body": "The stacker can only store a single labware at a time."
