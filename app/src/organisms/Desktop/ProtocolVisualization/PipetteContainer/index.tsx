@@ -23,7 +23,8 @@ export function PipetteContainer({
   const pipetteDisplayName = usePipetteNameSpecs(pipetteName)?.displayName ?? ''
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container_wrapper}>
+      <div className={styles.container}>
       <div className={styles.header}>
         <Tag text={t('pipette')} type="default" shrinkToContent />
         <RobotInfoLabel deckLabel={t(mount)} />
@@ -40,6 +41,7 @@ export function PipetteContainer({
             chipSize="small"
           />
         ) : null}
+      </div>
       </div>
     </div>
   )
