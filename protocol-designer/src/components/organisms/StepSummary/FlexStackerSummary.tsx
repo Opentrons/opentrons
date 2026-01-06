@@ -45,7 +45,7 @@ export function FlexStackerSummary(
     lidLabwareURI,
   ]
     .filter(Boolean)
-    .map(uri => labwareDefByURI[uri as string]?.metadata?.displayName)
+    .map(uri => labwareDefByURI[uri!]?.metadata?.displayName)
     .filter(Boolean)
     .join(', ')
 
