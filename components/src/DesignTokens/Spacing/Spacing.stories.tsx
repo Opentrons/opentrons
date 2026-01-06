@@ -2,15 +2,11 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import {
-  ALIGN_FLEX_START,
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
+import { StyledText } from '../../atoms/StyledText'
+import { COLORS } from '../../helix-design-system'
+import { Box, Flex } from '../../primitives'
+import { ALIGN_FLEX_START, DIRECTION_COLUMN } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
 
 import type { Meta, Story } from '@storybook/react'
 
