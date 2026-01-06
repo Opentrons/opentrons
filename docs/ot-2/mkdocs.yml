@@ -21,6 +21,7 @@ nav:
       - Labware: labware/index.md
       - Labware Concepts: labware/concepts.md
       - Labware Types: labware/types.md
+      - Labware Definitions: labware/definitions.md
   - Software: software.md
   - Maintenance:
       - Maintenance: maintenance/index.md
