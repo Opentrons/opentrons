@@ -1,11 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  Icon,
-  InfoScreen,
-  SecondaryButton,
-  StyledText,
-} from '@opentrons/components'
+import { Icon, SecondaryButton, StyledText } from '@opentrons/components'
 
 import { usePreviewImage } from '/app/resources/camera/usePreviewImage'
 
