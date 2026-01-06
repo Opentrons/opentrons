@@ -32,7 +32,7 @@ interface BrightnessTileProps {
   $isActive: boolean // transient props to avoid warning
 }
 
-const BrightnessTile = styled(Box) <BrightnessTileProps>`
+const BrightnessTile = styled(Box)<BrightnessTileProps>`
   width: 100%;
   height: 8.75rem;
   border-radius: ${BORDERS.borderRadius8};
