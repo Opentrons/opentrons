@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { a } from 'vitest/dist/chunks/suite.B2jumIFP'
 
 import {
   ALIGN_CENTER,
@@ -95,22 +96,22 @@ export function LabwareStackToolbox({
   }
 
   const handleSelectAllLabware = (): void => {
-    const allEqual = <T, K extends keyof T>(arr: T[], prop: K): boolean => {
+    const allEqual = <T, K extends keyof T>(arr: string[]): boolean => {
       // If the array is empty, it vacuously returns true
       if (arr.length === 0) {
         return true
       }
 
       // Get the value of the specified property from the first element
-      const firstValue = arr[0]
-
+      const firstValue = allWellContents[filteredLabwareStack[0]]
       // Use the every() method to compare all elements' property value
       return arr.every(
-        item => JSON.stringify(item) === JSON.stringify(firstValue)
+        item =>
+          JSON.stringify(allWellContents[item]) === JSON.stringify(firstValue)
       )
     }
 
-    if (!allEqual) {
+    if (!allEqual(filteredLabwareStack)) {
       setShowLiquidLayoutOverlay(true)
       return
     }
