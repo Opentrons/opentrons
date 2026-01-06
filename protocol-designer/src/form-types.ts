@@ -196,6 +196,8 @@ export const stepIconsByType: Record<StepType, IconName> = {
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
+  // todo(mm, 2026-01-06):
+  //
   // FormData does not extend from this type, but we do have code that tries to access
   // stepName and stepDetails on FormData. (This has not been an error because FormData
   // is essentially any-typed).

@@ -8,6 +8,23 @@ import type { PAUSE_UNTIL_TC_PROFILE_COMPLETE } from '/protocol-designer/constan
 import type { PDMetadata } from '/protocol-designer/file-types'
 import type { FormData } from '/protocol-designer/form-types'
 
+// FormData isn't typed today, but these definitions are written in such a way that this
+// migration should automatically benefit from the added detail whenever it is typed.
+type ThermocyclerProfileFormData = FormData & {
+  stepType: 'thermocycler'
+  thermocyclerFormType: 'thermocyclerProfile'
+}
+type ThermocyclerStateFormData = FormData & {
+  stepType: 'thermocycler'
+  thermocyclerFormType: 'thermocyclerState'
+}
+type PauseUntilProfileCompleteFormData = FormData & {
+  stepType: 'pause'
+  pauseAction: typeof PAUSE_UNTIL_TC_PROFILE_COMPLETE
+}
+
+type StepForms = Pick<PDMetadata, 'savedStepForms' | 'orderedStepIds'>
+
 /**
  * Migrates a PD v8.8.0 file to a PD v8.9.0 file.
  *
@@ -124,21 +141,6 @@ function migrateThermocyclerProfileForm(
   return [newProfileForm, newPauseForm, newStateForm]
 }
 
-// FormData isn't typed today, but these definitions are written in such a way that this
-// migration should automatically benefit from the added detail whenever it is typed.
-type ThermocyclerProfileFormData = FormData & {
-  stepType: 'thermocycler'
-  thermocyclerFormType: 'thermocyclerProfile'
-}
-type ThermocyclerStateFormData = FormData & {
-  stepType: 'thermocycler'
-  thermocyclerFormType: 'thermocyclerState'
-}
-type PauseUntilProfileCompleteFormData = FormData & {
-  stepType: 'pause'
-  pauseAction: typeof PAUSE_UNTIL_TC_PROFILE_COMPLETE
-}
-
 function isThermocyclerProfileForm(
   formData: FormData
 ): formData is ThermocyclerProfileFormData {
@@ -149,23 +151,21 @@ function isThermocyclerProfileForm(
   )
 }
 
-type StepFormProps = Pick<PDMetadata, 'savedStepForms' | 'orderedStepIds'>
-
 function mapStepForms(
-  originalStepFormProps: StepFormProps,
+  originalStepForms: StepForms,
   mapFn: (originalForm: FormData) => FormData[]
-): StepFormProps {
-  const stepIdsPresentInOrdering = new Set(originalStepFormProps.orderedStepIds)
+): StepForms {
+  const stepIdsPresentInOrdering = new Set(originalStepForms.orderedStepIds)
 
   // Capture special entries like __INITIAL_DECK_SETUP_STEP__ that are present in
   // savedStepForms but not present in orderedStepIds.
   const stepFormsMissingFromOrdering = pickBy(
-    originalStepFormProps.savedStepForms,
+    originalStepForms.savedStepForms,
     (stepForm, stepId) => !stepIdsPresentInOrdering.has(stepId)
   )
 
-  const originalOrderedStepForms = originalStepFormProps.orderedStepIds.map(
-    stepId => originalStepFormProps.savedStepForms[stepId]
+  const originalOrderedStepForms = originalStepForms.orderedStepIds.map(
+    stepId => originalStepForms.savedStepForms[stepId]
   )
   const newOrderedStepForms = originalOrderedStepForms.flatMap(mapFn)
 
