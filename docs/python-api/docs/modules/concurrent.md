@@ -15,7 +15,7 @@ This section covers module tasks and explains how to run multiple module actions
 
 ## Module tasks
 
-When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`task`](opentrons.protocol_api.task) that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the targe temperature or completes another action. 
+When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`Task`][opentrons.protocol_api.Task] that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the target temperature or completes another action. 
 
 <table>
     <thead>
@@ -83,7 +83,7 @@ protocol.wait_for_tasks([heat_task])
 protocol.move_labware(labware=temp_plate, new_location="D3", use_gripper="True")
 ```
 
-Let's say your samples have to both reach a target temperature and incubate for a specific amount of time. The example below uses concurrent commands to heat and shake samples, and [`create_timer`][opentrons.protocol_api.ProtocolContext.create_timer] to set an incubation time. 
+Let's say your samples have to both reach a target temperature and incubate for a specific amount of time. The example below uses concurrent commands to heat and shake samples, and [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to set an incubation time. 
 
 ```python
 
@@ -102,7 +102,7 @@ protocol.wait_for_tasks([hs_timer])
 hs_mod.deactivate_heater()
 ```
 
-Here, the Heater-Shaker Module will heat and shake samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Because the Heater-Shaker could take longer than 5 minutes to reach the target temperature, `wait_for_tasks` ensures the timer starts only after the target temperature is reached. 
+Here, the Heater-Shaker Module will heat and shake samples at 75 °C and 300 RPM, and a timer pauses the protocol for a 5 minute incubation. Because the Heater-Shaker could take longer than 5 minutes to reach the target temperature, `wait_for_tasks()` ensures the timer starts only after the target temperature is reached. 
 
 !!! note
     Using the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] method to wait for multiple of the same task on the same module will cause the API to raise an error. For example, if you need to heat a Temperature Module to two separate target temperatures, use [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] twice: 

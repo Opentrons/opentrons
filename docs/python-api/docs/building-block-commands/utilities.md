@@ -3,7 +3,7 @@ title: "Python API: Utility Commands"
 description: Basic commands for working with robot utility features.
 ---
 
-With utility commands, you can control various robot functions such as pausing or delaying a protocol, taking images with the build-in camera, turning robot lights on/off, and more. The following sections show you how to use these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic [protocol template][protocol-template].
+With utility commands, you can control various robot functions such as pausing or delaying a protocol, taking images with the built-in camera, turning robot lights on/off, and more. The following sections show you how to use these utility commands and include sample code. The examples used here assume that you’ve loaded the pipettes and labware from the basic [protocol template][protocol-template].
 
 ## Delay and resume
 
@@ -73,7 +73,7 @@ protocol.comment("Hello, world!")
 
 *New in version 2.0*
 
-## Capturing Images
+## Capturing images
 
 Use the [`capture_image()`][opentrons.protocol_api.ProtocolContext.capture_image] method to take an image during a protocol with the Flex or OT-2's built-in camera. You can use images to check on key protocol steps while spending more time away from the bench.
 

@@ -29,8 +29,8 @@ Now our pipette holds 300 µL.
 
 The `aspirate()` method includes the location parameters `location` and `end_location`. Each accepts different location types: 
 
-- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.protocol_api.Location]. 
-- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.protocol_api.Location]. 
+- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][types.Location]. 
+- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.types.Location].
 
 *Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations during an aspirate.
 
@@ -42,7 +42,7 @@ pipette.well_bottom_clearance.aspirate = 2  # tip is 2 mm above well bottom
 pipette.aspirate(200, plate["A1"])
 ```
 
-You can also aspirate from a [`Location`][opentrons.protocol_api.Location] along the center vertical axis within a well using the [`Well.top()`][opentrons.protocol_api.Well.top] and [`Well.bottom()`][opentrons.protocol_api.Well.bottom] methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
+You can also aspirate from a [`Location`][opentrons.types.Location] along the center vertical axis within a well using the [`Well.top()`][opentrons.protocol_api.Well.top] and [`Well.bottom()`][opentrons.protocol_api.Well.bottom] methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
 
 ```python
 pipette.pick_up_tip()
@@ -146,8 +146,8 @@ pipette.dispense(100)     # dispense 100 µL at current position
 
 The `dispense()` method includes the location parameters `location` and `end_location`. Each accepts different location types: 
 
-- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.protocol_api.Location]. 
-- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.protocol_api.Location]. 
+- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
+- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.types.Location]. 
 
 *Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations during a dispense.
 
@@ -183,7 +183,7 @@ pipette.dispense(
 
 *Changed in version 2.23*: Set `target="start"` or `"end"` to target the liquid meniscus during a dispense.
 
-To ensure the pipette begins the dispense at the liquid meniscus, set `target="start"`. See the [meniscus](meniscus) section for more details on pipetting relative to the liquid meniscus.
+To ensure the pipette begins the dispense at the liquid meniscus, set `target="start"`. See the [meniscus][meniscus] section for more details on pipetting relative to the liquid meniscus.
 
 !!!note
     `measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
@@ -442,7 +442,6 @@ pipette.mix(repetitions=3, volume=100, final_push_out=10)
 
 *Changed in version 2.24:* Adds the `aspirate_flow_rate`, `dispense_flow_rate`, `aspirate_delay`, `dispense_delay`, and `final_push_out` parameters.
 
-<!-- ## Dynamic Mix TK -->
 ## Dynamic mix
 The [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] method lets you aspirate and dispense repeatedly in multiple locations. Like the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, it's designed to mix the contents of a well together using a single command rather than using multiple `aspirate()` and `dispense()` calls. Both methods include arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix. [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] lets you additionally specify multiple aspirate and dispense locations: 
 
@@ -461,9 +460,9 @@ pipette.dynamic_mix(
 
 Like with the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, you can use other optional arguments to customize your dynamic mix: 
 
-- specify the aspirate, dispense, or mix flow rate.
-- add a delay after as aspirate or dispense, or a `movement_delay` before moving to an `end_location`.
-- include a push out after an aspirate or dispense in the mix.
+- Specify the aspirate, dispense, or mix flow rate.
+- Add a delay after as aspirate or dispense, or a `movement_delay` before moving to an `end_location`.
+- Include a push out after an aspirate or dispense in the mix.
 
 *New in version 2.27*.
 

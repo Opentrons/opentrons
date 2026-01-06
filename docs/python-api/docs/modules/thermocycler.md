@@ -84,7 +84,7 @@ This section covers using the Thermocycler Module, including its blocking and co
 tc_mod = protocol.load_module(module_name="thermocyclerModuleV2")
 plate = tc_mod.load_labware(name="opentrons_96_wellplate_200ul_pcr_full_skirt")
 ```
-*New in version 2.13.*
+*New in version 2.13*
 
 ## Lid control
 
@@ -150,7 +150,7 @@ To set the block temperature inside the Thermocycler, you can use either a block
 If you don't specify any other parameters, the Thermocycler will hold this temperature until a new temperature is set, [`deactivate_block()`][opentrons.protocol_api.ThermocyclerContext.deactivate_block] is called, or the module is powered off.
 
 
-### Timing Temperature Holds
+### Timing temperature holds
 You can optionally instruct the Thermocycler to hold its block temperature for a specific amount of time. Both examples below set the block to 4 °C for 4 minutes and 15 seconds:  
 
 === "Blocking"
@@ -277,7 +277,7 @@ For instance, a PCR prep protocol might define and execute a profile like this:
     *New in version 2.27.*
 
 
-In terms of the actions that the Thermocycler performs, running each of the examples above this would be equivalent to nesting `set_block_temperature()` (shown below) or `start_set_block_temperature()` commands in a `for` loop:
+In terms of the actions that the Thermocycler performs, running each of the examples above this would be equivalent to nesting `set_block_temperature()` commands in a `for` loop:
 
 ```python
 for i in range(20):

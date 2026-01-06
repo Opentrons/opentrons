@@ -113,7 +113,7 @@ Both examples below set the target temperature to 4 °C. Each takes one paramete
     pipette.drop_tip()
     ```
 
-    Beginning with API version 2.27, you can use the concurrent [`start_set_temperature`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature] method to move on to further commands while the Temperature Module reaches its target temperature. The method also allows some other simultaneous module actions. For more, see the [concurrent module actions](concurrent-module) section.
+    Beginning with API version 2.27, you can use the concurrent [`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature] method to move on to further commands while the Temperature Module reaches its target temperature. The method also allows some other simultaneous module actions. For more, see the [concurrent module actions][concurrent-module] section.
 
     *New in version 2.27.*
 
