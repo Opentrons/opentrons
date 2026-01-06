@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Labware Definitions"
 ---
 
-Every labware you use on an OT-2 requires a _labware definition_ that contains all the information your robot needs to work with the labware. This includes information about the physical shape of the labware, how pipettes and the gripper should interact with it, and what the labware should be called on the touchscreen and in the Opentrons App.
+Every piece of labware you use on an OT-2 requires a _labware definition_ that contains all the information your robot needs to work with the labware. This includes information about the physical shape of the labware, how pipettes and the gripper should interact with it, and what the labware should be called on the touchscreen and in the Opentrons App.
 
 The OT-2 robot software and Opentrons App include the labware definitions for everything available in the [Opentrons Labware Library](https://labware.opentrons.com/). 
 
@@ -13,7 +13,7 @@ Custom labware is labware that's not listed in the Opentrons Labware Library. Yo
 
 ## Custom Labware Creator 
 
-The [Custom Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file. Labware Creator produces a JSON labware definition file that you import into the Opentrons App. After that, your custom labware is available to the Flex robot and the Python API. 
+The [Custom Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file. Labware Creator produces a JSON labware definition file that you import into the Opentrons App. After that, your custom labware is available to the OT-2 and the Python API. 
 
 You can use the Custom Labware Creator if your labware meets the following criteria:
 
@@ -52,32 +52,256 @@ A JSON file is the blueprint for Opentrons standard and custom labware. This fil
 
 A schema is a framework for organizing data. It sets the rules about what information is required or optional and how it’s organized in the JSON file. If you’re interested, take a moment to review [our labware schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/schemas). For an actual example, see the definition for the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json). The following table lists and defines the items in the Opentrons labware schema.
 
-| Property {style="width: 25%;"} | Data type | Definition                                   |
-| :------------------ | :-------- | :------------------------------------------- |
-| `schemaVersion`     | Number    | Schema version used by a labware. The current version is `2`. |
-| `version`           | Integer   | An incrementing integer that identifies the labware version. Minimum version is `1`. |
-| `namespace`         | String    | See `safeString` in the JSON definitions section below. |
-| `metadata`          | Object    | Properties used for search and display. Accepts only:<ul><li>`displayName` (String): An easy-to-remember labware name.</li><li>`displayCategory`: Labels used in the UI to categorize labware. See `displayCategory` in the JSON definitions section below.</li><li>`displayVolumeUnits` (String): Labels used in the UI to indicate volume. Must be either `µL`, `mL`, or `L`.</li></ul> |
-| `brand`             | Object    | Information about the labware manufacturer or those products the labware is compatible with. |
-| `parameters`        | Object    | Internal parameters that describe labware characteristics. Accepts only:<ul><li>`format` (String): Determines labware compatibility with multichannel pipettes. Must be one of `96Standard`, `384Standard`, `trough`, `irregular`, or `trash`.</li><li>`quirks` (Array): Strings describing labware behavior. See the [Opentrons 96 Deep Well Adapter](https://github.com/Opentrons/opentrons/blob/03cd0336c6051c05fa66088fabec426c7b751a85/shared-data/labware/definitions/2/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1.json#L1108) definition.</li><li>`isTiprack` (Boolean): Indicates if labware is a tip rack (`true`) or not (`false`).</li><li>`tipLength` (Number): Required if labware is a tip rack. Specifies tip length (in mm), from top to bottom, as indicated in technical drawings or as measured with calipers.</li><li>`tipoverlap` (Number): Required if labware is a tip rack. Specifies how far tips on a tip rack are expected to overlap with the pipette's nozzle. Defined as tip length minus the distance between the bottom of the pipette and the bottom of the tip. The robot's calibration process may fine-tune this estimate.</li><li>`loadName`: Name used to reference a labware definition (e.g., `opentrons_flex_96_tiprack_50_ul`).</li><li>`isMagneticModuleCompatible` (Boolean): Indicates if labware is compatible with the Magnetic Module.</li><li>`magneticModuleEngageHeight`: How far the Magnetic Module will move its magnets when used with this labware. See `positiveNumber` in the JSON definitions section below.</li></ul> |
-| `ordering`          | Array     | An array that tracks how wells should be ordered on a piece of labware. See the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L2) example. |
-| `cornerOffset`<wbr>`FromSlot` | Object    | Used for labware that spans multiple deck slots. Offset is the distance from the left-front-bottom corner of the slot to the left-front-bottom corner of the labware bounding box. Accepts only:<ul><li>`x` (number)</li><li>`y` (number)</li><li>`z` (number)</li></ul> For labware that does not span multiple slots, these values should be zero. See `positiveNumber` in the JSON definitions section below. |
-| `dimensions`        | Object    | Outer dimensions (in mm) of a piece of labware. Accepts only:<ul><li>`xDimension` (length)</li><li>`yDimension` (width)</li><li>`zDimension` (height)</li></ul> See the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L26) example. |
-| `wells`             | Object    | An unordered object of well objects, including position and dimensions.<br />Each well object's key is the well's coordinates, which must be an uppercase letter followed by a number, e.g., A1, B1, H12.<br />Each well object accepts the following properties:<ul><li>`depth` (Number): The distance (in mm) between the top and bottom of the well. For tip racks, depth is ignored in favor of `tipLength`, but the values should match.</li><li>`x` (Number): Location of the center-bottom of a well in reference to the left of the labware.</li><li>`y` (Number): Location of the center-bottom of a well in reference to the front of the labware.</li><li>`z` (Number): Location of the center-bottom of a well in reference to the bottom of the labware.</li><li>`totalLiquidVolume` (Number): Total well, tube, or tip volume in µL.</li><li>`xDimension` (Number): Length of a rectangular well.</li><li>`yDimension` (Number): Width of a rectangular well.</li><li>`diameter` (Number): Diameter of a circular well.</li><li>`shape` (String): Either `rectangular` or `circular`.<br />If `rectangular`, specify `xDimension` and `yDimension`.<br />If `circular`, specify `diameter`.</li></ul>For a circular well example, see the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L31). For a rectangular well example, see the [NEST 96 Deep Well Plate 2mL](https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/nest_96_wellplate_2ml_deep/2.json#L35).<br />For dimension, depth, and volume, see `positiveNumber` in the JSON definitions section below. |
-| `groups`            | Array     | Logical well groupings for metadata and display purposes. Changes in groups do not affect protocol execution. Each item in the array accepts: <ul><li>`wells` (Array): An array of wells (e.g., `["A1", "B1", "C1"]`) that share the same metadata. Array elements are strings.</li><li>`metadata` (Object): Metadata specific to a grid of wells. Accepts only:</li><ul><li>`displayName` (String): Human-readable name for the well group.</li><li>`displayCategory`: Labels used to categorize well groups. See `displayCategory` in the JSON definitions section below.</li><li>`wellBottomShape` (String): Bottom shape of a well. Available shapes are `flat`, `u`, or `v` only.</li></ul><li>`brand`: Brand information for the well group. See `brandData` in the JSON definitions section below.</li></ul> |
-| `allowedRoles`      | Array     | Defines an item's role or purpose. If the `allowedRoles` field is missing from a definition, an item is treated as `labware`. Possible array items are only the following strings: <ul><li>`labware` (standard labware items)</li><li>`adapter` (items designed to hold labware)</li><li>`fixture` (items that are affixed to the deck)</li><li>`maintenance` (items not used in normal protocol runs)</li></ul> |
-| `stackingOffset`<wbr>`WithLabware` | Object    | For labware that can stack on top of another piece of labware. Used to determine z-height (labware z height + adapter z height - overlap). See `coordinates` in the JSON definitions section below. |
-| `stackingOffset`<wbr>`WithModule` | Object    | For labware that can stack on top of a module. Used to determine z-height (module labware offset z + labware z - overlap). See `coordinates` in the JSON definitions section below. |
-| `gripperOffsets`    | Object    | Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware. Includes a `default` object that includes two properties: <ul><li>`pickUpOffset`: Offset added to calculate the pick-up coordinates of labware placed on this labware.</li><li>`dropOffset`: Offset added to calculate the drop-off coordinates of labware placed on this labware.</li></ul> See `coordinates` in the JSON definitions section below. |
-| `gripForce`         | Number    | Measured in newtons, this is the force which the gripper uses to grasp labware. Recommended values are between 5 and 16. |
-| `gripHeightFrom`<wbr>`LabwareBottom` | Number    | Recommended z-axis height, from the labware bottom to the center of the gripper pads. |
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Data type</th>
+      <th>Definition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="white-space: nowrap;"><code>schemaVersion</code></td>
+      <td>Number</td>
+      <td>Schema version used by a labware. The current version is <code>2</code>.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>version</code></td>
+      <td>Integer</td>
+      <td>An incrementing integer that identifies the labware version. Minimum version is <code>1</code>.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>namespace</code></td>
+      <td>String</td>
+      <td>See <code>safeString</code> in the JSON definitions section below.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>metadata</code></td>
+      <td>Object</td>
+      <td>
+        Properties used for search and display. Accepts only:
+        <ul>
+          <li><code>displayName</code> (String): An easy-to-remember labware name.</li>
+          <li><code>displayCategory</code>: Labels used in the UI to categorize labware. See <code>displayCategory</code> in the JSON definitions section below.</li>
+          <li><code>displayVolumeUnits</code> (String): Labels used in the UI to indicate volume. Must be <code>µL</code>, <code>mL</code>, or <code>L</code>.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>brand</code></td>
+      <td>Object</td>
+      <td>Information about the labware manufacturer or those products the labware is compatible with.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>parameters</code></td>
+      <td>Object</td>
+      <td>
+        Internal parameters that describe labware characteristics. Accepts only:
+        <ul>
+          <li><code>format</code> (String): Determines labware compatibility with multichannel pipettes. Must be one of <code>96Standard</code>, <code>384Standard</code>, <code>trough</code>, <code>irregular</code>, or <code>trash</code>.</li>
+          <li><code>quirks</code> (Array): Strings describing labware behavior. See the <a href="https://github.com/Opentrons/opentrons/blob/03cd0336c6051c05fa66088fabec426c7b751a85/shared-data/labware/definitions/2/opentrons_96_deep_well_adapter_nest_wellplate_2ml_deep/1.json#L1108">Opentrons 96 Deep Well Adapter</a> definition.</li>
+          <li><code>isTiprack</code> (Boolean): Indicates if labware is a tip rack (<code>true</code>) or not (<code>false</code>).</li>
+          <li><code>tipLength</code> (Number): Required if labware is a tip rack. Specifies tip length (in mm), from top to bottom, as indicated in technical drawings or as measured with calipers.</li>
+          <li><code>tipoverlap</code> (Number): Required if labware is a tip rack. Specifies how far tips on a tip rack are expected to overlap with the pipette's nozzle. Defined as tip length minus the distance between the bottom of the pipette and the bottom of the tip. The robot's calibration process may fine-tune this estimate.</li>
+          <li><code>loadName</code>: Name used to reference a labware definition (e.g., <code>opentrons_96_tiprack_300ul</code>).</li>
+          <li><code>isMagneticModuleCompatible</code> (Boolean): Indicates if labware is compatible with the Magnetic Module.</li>
+          <li><code>magneticModuleEngageHeight</code>: How far the Magnetic Module will move its magnets when used with this labware. See <code>positiveNumber</code> in the JSON definitions section below.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>ordering</code></td>
+      <td>Array</td>
+      <td>An array that tracks how wells should be ordered on a piece of labware. See the <a href="https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L2">Opentrons 96 PCR Adapter</a> example.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>cornerOffsetFromSlot</code></td>
+      <td>Object</td>
+      <td>
+        Used for labware that spans multiple deck slots. Offset is the distance from the left-front-bottom corner of the slot to the left-front-bottom corner of the labware bounding box. Accepts only:
+        <ul>
+          <li><code>x</code> (number)</li>
+          <li><code>y</code> (number)</li>
+          <li><code>z</code> (number)</li>
+        </ul>
+        For labware that does not span multiple slots, these values should be zero. See <code>positiveNumber</code> in the JSON definitions section below.
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>dimensions</code></td>
+      <td>Object</td>
+      <td>
+        Outer dimensions (in mm) of a piece of labware. Accepts only:
+        <ul>
+          <li><code>xDimension</code> (length)</li>
+          <li><code>yDimension</code> (width)</li>
+          <li><code>zDimension</code> (height)</li>
+        </ul>
+        See the <a href="https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L26">Opentrons 96 PCR Adapter</a> example.
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>wells</code></td>
+      <td>Object</td>
+      <td>
+        An unordered object of well objects, including position and dimensions.
+        <br>
+        Each well object's key is the well's coordinates, which must be an uppercase letter followed by a number, e.g., A1, B1, H12.
+        <br>
+        Each well object accepts the following properties:
+        <ul>
+          <li><code>depth</code> (Number): The distance (in mm) between the top and bottom of the well. For tip racks, depth is ignored in favor of <code>tipLength</code>, but the values should match.</li>
+          <li><code>x</code> (Number): Location of the center-bottom of a well in reference to the left of the labware.</li>
+          <li><code>y</code> (Number): Location of the center-bottom of a well in reference to the front of the labware.</li>
+          <li><code>z</code> (Number): Location of the center-bottom of a well in reference to the bottom of the labware.</li>
+          <li><code>totalLiquidVolume</code> (Number): Total well, tube, or tip volume in µL.</li>
+          <li><code>xDimension</code> (Number): Length of a rectangular well.</li>
+          <li><code>yDimension</code> (Number): Width of a rectangular well.</li>
+          <li><code>diameter</code> (Number): Diameter of a circular well.</li>
+          <li><code>shape</code> (String): Either <code>rectangular</code> or <code>circular</code>.
+            <br>
+            If <code>rectangular</code>, specify <code>xDimension</code> and <code>yDimension</code>.
+            <br>
+            If <code>circular</code>, specify <code>diameter</code>.
+          </li>
+        </ul>
+        For a circular well example, see the <a href="https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L31">Opentrons 96 PCR Adapter</a>. For a rectangular well example, see the <a href="https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/nest_96_wellplate_2ml_deep/2.json#L35">NEST 96 Deep Well Plate 2mL</a>.
+        <br>
+        For dimension, depth, and volume, see <code>positiveNumber</code> in the JSON definitions section below.
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>groups</code></td>
+      <td>Array</td>
+      <td>
+        Logical well groupings for metadata and display purposes. Changes in groups do not affect protocol execution. Each item in the array accepts:
+        <ul>
+          <li><code>wells</code> (Array): An array of wells (e.g., <code>["A1", "B1", "C1"]</code>) that share the same metadata. Array elements are strings.</li>
+          <li><code>metadata</code> (Object): Metadata specific to a grid of wells. Accepts only:
+            <ul>
+              <li><code>displayName</code> (String): Human-readable name for the well group.</li>
+              <li><code>displayCategory</code>: Labels used to categorize well groups. See <code>displayCategory</code> in the JSON definitions section below.</li>
+              <li><code>wellBottomShape</code> (String): Bottom shape of a well. Available shapes are <code>flat</code>, <code>u</code>, or <code>v</code> only.</li>
+            </ul>
+          </li>
+          <li><code>brand</code>: Brand information for the well group. See <code>brandData</code> in the JSON definitions section below.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>allowedRoles</code></td>
+      <td>Array</td>
+      <td>
+        Defines an item's role or purpose. If the <code>allowedRoles</code> field is missing from a definition, an item is treated as <code>labware</code>. Possible array items are only the following strings:
+        <ul>
+          <li><code>labware</code> (standard labware items)</li>
+          <li><code>adapter</code> (items designed to hold labware)</li>
+          <li><code>fixture</code> (items that are affixed to the deck)</li>
+          <li><code>maintenance</code> (items not used in normal protocol runs)</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>stackingOffsetWithLabware</code></td>
+      <td>Object</td>
+      <td>For labware that can stack on top of another piece of labware. Used to determine z-height (labware z height + adapter z height - overlap). See <code>coordinates</code> in the JSON definitions section below.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>stackingOffsetWithModule</code></td>
+      <td>Object</td>
+      <td>For labware that can stack on top of a module. Used to determine z-height (module labware offset z + labware z - overlap). See <code>coordinates</code> in the JSON definitions section below.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>gripperOffsets</code></td>
+      <td>Object</td>
+      <td>
+        Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware. Includes a <code>default</code> object that includes two properties:
+        <ul>
+          <li><code>pickUpOffset</code>: Offset added to calculate the pick-up coordinates of labware placed on this labware.</li>
+          <li><code>dropOffset</code>: Offset added to calculate the drop-off coordinates of labware placed on this labware.</li>
+        </ul>
+        See <code>coordinates</code> in the JSON definitions section below.
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>gripForce</code></td>
+      <td>Number</td>
+      <td>Measured in newtons, this is the force which the gripper uses to grasp labware. Recommended values are between 5 and 16.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>gripHeightFromLabwareBottom</code></td>
+      <td>Number</td>
+      <td>Recommended z-axis height, from the labware bottom to the center of the gripper pads.</td>
+    </tr>
+  </tbody>
+</table>
 
-## JSON labware definitions 
+## JSON labware definitions
 
-| Property {style="width: 25%;"}       | Data type | Definition                                   |
-| :-------------- | :-------- | :------------------------------------------- |
-| `positiveNumber` | Number    | Minimum: 0.                      |
-| `brandData`     | Object    | Information about branded items. Accepts only:<br><ul><li>`brand` (String): Brand/manufacturer's name.</li><li>`brandId` (Array): OEM part numbers or IDs.</li><li>`links` (Array): Manufacturer URLs. Array items are strings.</li></ul> |
-| `displayCategory` | String    | Must be one of:<br><ul><li>`tipRack`</li><li>`tubeRack`</li><li>`reservoir`</li><li>`trash`</li><li>`wellPlate`</li><li>`aluminumBlock`</li><li>`adapter`</li><li>`other`</li><li>`lid`</li></ul> |
-| `safeString`    | String    | A string safe to use for load names and namespaces. Lowercase letters, numerals, periods, and underscores only. |
-| `coordinates`   | Object    | Coordinates that specify a distance or position along the x-, y-, and z-axes. Accepts only:<br><ul><li>`x` (number)</li><li>`y` (number)</li><li>`z` (number)</li></ul> |
+<table>
+  <thead>
+    <tr>
+      <th>Property</th>
+      <th>Data type</th>
+      <th>Definition</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="white-space: nowrap;"><code>positiveNumber</code></td>
+      <td>Number</td>
+      <td>Minimum: 0.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>brandData</code></td>
+      <td>Object</td>
+      <td>
+        Information about branded items. Accepts only:
+        <br>
+        <ul>
+          <li><code>brand</code> (String): Brand/manufacturer's name.</li>
+          <li><code>brandId</code> (Array): OEM part numbers or IDs.</li>
+          <li><code>links</code> (Array): Manufacturer URLs. Array items are strings.</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>displayCategory</code></td>
+      <td>String</td>
+      <td>
+        Must be one of:
+        <br>
+        <ul>
+          <li><code>tipRack</code></li>
+          <li><code>tubeRack</code></li>
+          <li><code>reservoir</code></li>
+          <li><code>trash</code></li>
+          <li><code>wellPlate</code></li>
+          <li><code>aluminumBlock</code></li>
+          <li><code>adapter</code></li>
+          <li><code>other</code></li>
+          <li><code>lid</code></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>safeString</code></td>
+      <td>String</td>
+      <td>A string safe to use for load names and namespaces. Lowercase letters, numerals, periods, and underscores only.</td>
+    </tr>
+    <tr>
+      <td style="white-space: nowrap;"><code>coordinates</code></td>
+      <td>Object</td>
+      <td>
+        Coordinates that specify a distance or position along the x-, y-, and z-axes. Accepts only:
+        <br>
+        <ul>
+          <li><code>x</code> (number)</li>
+          <li><code>y</code> (number)</li>
+          <li><code>z</code> (number)</li>
+        </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
