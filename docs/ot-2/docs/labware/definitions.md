@@ -55,29 +55,29 @@ A schema is a framework for organizing data. It sets the rules about what inform
 <table>
   <thead>
     <tr>
-      <th>Property</th>
+      <th style="width: 25%;">Property</th>
       <th>Data type</th>
       <th>Definition</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="white-space: nowrap;"><code>schemaVersion</code></td>
+      <td><code>schemaVersion</code></td>
       <td>Number</td>
       <td>Schema version used by a labware. The current version is <code>2</code>.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>version</code></td>
+      <td><code>version</code></td>
       <td>Integer</td>
       <td>An incrementing integer that identifies the labware version. Minimum version is <code>1</code>.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>namespace</code></td>
+      <td><code>namespace</code></td>
       <td>String</td>
       <td>See <code>safeString</code> in the JSON definitions section below.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>metadata</code></td>
+      <td><code>metadata</code></td>
       <td>Object</td>
       <td>
         Properties used for search and display. Accepts only:
@@ -89,12 +89,12 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>brand</code></td>
+      <td><code>brand</code></td>
       <td>Object</td>
       <td>Information about the labware manufacturer or those products the labware is compatible with.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>parameters</code></td>
+      <td><code>parameters</code></td>
       <td>Object</td>
       <td>
         Internal parameters that describe labware characteristics. Accepts only:
@@ -111,12 +111,12 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>ordering</code></td>
+      <td><code>ordering</code></td>
       <td>Array</td>
       <td>An array that tracks how wells should be ordered on a piece of labware. See the <a href="https://github.com/Opentrons/opentrons/blob/8569e32d2d918abb1f232f48a7b28385021215fd/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json#L2">Opentrons 96 PCR Adapter</a> example.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>cornerOffsetFromSlot</code></td>
+      <td><code>cornerOffset<wbr>FromSlot</code></td>
       <td>Object</td>
       <td>
         Used for labware that spans multiple deck slots. Offset is the distance from the left-front-bottom corner of the slot to the left-front-bottom corner of the labware bounding box. Accepts only:
@@ -129,7 +129,7 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>dimensions</code></td>
+      <td><code>dimensions</code></td>
       <td>Object</td>
       <td>
         Outer dimensions (in mm) of a piece of labware. Accepts only:
@@ -142,7 +142,7 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>wells</code></td>
+      <td><code>wells</code></td>
       <td>Object</td>
       <td>
         An unordered object of well objects, including position and dimensions.
@@ -172,7 +172,7 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>groups</code></td>
+      <td><code>groups</code></td>
       <td>Array</td>
       <td>
         Logical well groupings for metadata and display purposes. Changes in groups do not affect protocol execution. Each item in the array accepts:
@@ -190,7 +190,7 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>allowedRoles</code></td>
+      <td><code>allowedRoles</code></td>
       <td>Array</td>
       <td>
         Defines an item's role or purpose. If the <code>allowedRoles</code> field is missing from a definition, an item is treated as <code>labware</code>. Possible array items are only the following strings:
@@ -203,17 +203,17 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>stackingOffsetWithLabware</code></td>
+      <td><code>stackingOffset<wbr>WithLabware</code></td>
       <td>Object</td>
       <td>For labware that can stack on top of another piece of labware. Used to determine z-height (labware z height + adapter z height - overlap). See <code>coordinates</code> in the JSON definitions section below.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>stackingOffsetWithModule</code></td>
+      <td><code>stackingOffset<wbr>WithModule</code></td>
       <td>Object</td>
       <td>For labware that can stack on top of a module. Used to determine z-height (module labware offset z + labware z - overlap). See <code>coordinates</code> in the JSON definitions section below.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>gripperOffsets</code></td>
+      <td><code>gripperOffsets</code></td>
       <td>Object</td>
       <td>
         Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware. Includes a <code>default</code> object that includes two properties:
@@ -225,12 +225,12 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>gripForce</code></td>
+      <td><code>gripForce</code></td>
       <td>Number</td>
       <td>Measured in newtons, this is the force which the gripper uses to grasp labware. Recommended values are between 5 and 16.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>gripHeightFromLabwareBottom</code></td>
+      <td><code>gripHeightFrom<wbr>LabwareBottom</code></td>
       <td>Number</td>
       <td>Recommended z-axis height, from the labware bottom to the center of the gripper pads.</td>
     </tr>
@@ -242,19 +242,19 @@ A schema is a framework for organizing data. It sets the rules about what inform
 <table>
   <thead>
     <tr>
-      <th>Property</th>
+      <th style="width: 25%;">Property</th>
       <th>Data type</th>
       <th>Definition</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td style="white-space: nowrap;"><code>positiveNumber</code></td>
+      <td><code>positiveNumber</code></td>
       <td>Number</td>
       <td>Minimum: 0.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>brandData</code></td>
+      <td><code>brandData</code></td>
       <td>Object</td>
       <td>
         Information about branded items. Accepts only:
@@ -267,7 +267,7 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>displayCategory</code></td>
+      <td><code>displayCategory</code></td>
       <td>String</td>
       <td>
         Must be one of:
@@ -286,12 +286,12 @@ A schema is a framework for organizing data. It sets the rules about what inform
       </td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>safeString</code></td>
+      <td><code>safeString</code></td>
       <td>String</td>
       <td>A string safe to use for load names and namespaces. Lowercase letters, numerals, periods, and underscores only.</td>
     </tr>
     <tr>
-      <td style="white-space: nowrap;"><code>coordinates</code></td>
+      <td><code>coordinates</code></td>
       <td>Object</td>
       <td>
         Coordinates that specify a distance or position along the x-, y-, and z-axes. Accepts only:
