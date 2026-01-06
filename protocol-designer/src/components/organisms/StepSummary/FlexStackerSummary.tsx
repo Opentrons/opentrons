@@ -83,10 +83,10 @@ export function FlexStackerSummary(
       const labwareNames =
         groupToRetrieve != null
           ? getLabwareGroupNamesString(
-            groupToRetrieve,
-            nicknamesById,
-            labwareDefByURI
-          )
+              groupToRetrieve,
+              nicknamesById,
+              labwareDefByURI
+            )
           : ''
 
       stepSummaryContent = (
@@ -102,10 +102,10 @@ export function FlexStackerSummary(
       const labwareNames =
         groupToStore != null
           ? getLabwareGroupNamesString(
-            groupToStore,
-            nicknamesById,
-            labwareDefByURI
-          )
+              groupToStore,
+              nicknamesById,
+              labwareDefByURI
+            )
           : ''
       stepSummaryContent = (
         <StyledTrans

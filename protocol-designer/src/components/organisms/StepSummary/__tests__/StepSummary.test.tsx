@@ -107,8 +107,18 @@ describe('StepSummary', () => {
         stacker: {
           slot: 'D3',
           moduleState: {
-            labwareOnShuttle: { primaryLabwareId: 'mockId', adapterLabwareId: null, lidLabwareId: null },
-            labwareInHopper: [{ primaryLabwareId: 'mockId', adapterLabwareId: null, lidLabwareId: null }],
+            labwareOnShuttle: {
+              primaryLabwareId: 'mockId',
+              adapterLabwareId: null,
+              lidLabwareId: null,
+            },
+            labwareInHopper: [
+              {
+                primaryLabwareId: 'mockId',
+                adapterLabwareId: null,
+                lidLabwareId: null,
+              },
+            ],
             storedLabwareDetails: { primaryLabwareURI: 'mockUri' },
             type: FLEX_STACKER_MODULE_TYPE,
           },
@@ -117,10 +127,14 @@ describe('StepSummary', () => {
       pipettes: {},
       tipState: {} as any,
     })
-    vi.mocked(getLabwareNicknamesById).mockReturnValue({ 'mockId': 'mockNickName' })
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({
+      mockId: 'mockNickName',
+    })
   })
   it('renders the mix summary with 1 liquid', () => {
-    vi.mocked(getLabwareNicknamesById).mockReturnValue({ 'labware': 'mockNickName' })
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({
+      labware: 'mockNickName',
+    })
     render(props)
     screen.getByText('Mixing')
     screen.getByText('100 µL')
@@ -130,7 +144,9 @@ describe('StepSummary', () => {
     screen.getByText('A1 of mockNickName')
   })
   it('renders the move liquid transfer summary with 2 liquids', () => {
-    vi.mocked(getLabwareNicknamesById).mockReturnValue({ 'labware': 'mockNickName' })
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({
+      labware: 'mockNickName',
+    })
     props = {
       currentStep: {
         id: 'mockId',
