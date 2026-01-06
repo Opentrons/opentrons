@@ -379,7 +379,7 @@ class HardwarePipettingHandler(PipettingHandler):
 
 
 class VirtualPipettingHandler(PipettingHandler):
-    """Liquid handling, using the virtual pipettes.""" ""
+    """Liquid handling, using the virtual pipettes."""
 
     _state_view: StateView
 

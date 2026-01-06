@@ -1,11 +1,9 @@
-import { HOPPER_STACKER_LOCATION } from '../../constants'
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
   formatPyStr,
   getChunkForIndentingLists,
   getIsSpaceInHopper,
-  getSlotInLocationStack,
   INDENT,
   indentPyLines,
   labwareMatchesLabwareInHopper,
@@ -19,26 +17,16 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   invariantContext,
   robotState
 ) => {
-  // NOTE: fillLabwareUri, fillQuantity will be wired up when we emit setStoredLabware
-  // midway through the protocol
-  const { moduleId, interventionMessage } = args
+  const { moduleId, interventionMessage, fillLabwareIds } = args
   const { labwareEntities, moduleEntities } = invariantContext
-  const moduleSlot = robotState.modules[moduleId].slot
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
-  const labwareOnHopper = Object.entries(robotState.labware)
-    .filter(
-      ([id, { stack }]) =>
-        stack.includes(HOPPER_STACKER_LOCATION) &&
-        getSlotInLocationStack(stack) === moduleSlot
-    )
-    .map(labwareState => labwareState[0])
   const isSpace = getIsSpaceInHopper(
     flexStackerState,
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = labwareOnHopper.map(
-    lwId => labwareEntities[lwId].pythonName
+  const labwarePythonNames = fillLabwareIds.map(
+    lwId => labwareEntities[lwId]?.pythonName
   )
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
 
@@ -55,8 +43,8 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     return {
       errors: [errorCreators.flexStackerHopperFull()],
     }
-  } else if (labwareOnHopper.length > 0) {
-    const allMatch = labwareOnHopper.every(labware =>
+  } else if (fillLabwareIds.length > 0) {
+    const allMatch = fillLabwareIds.every(labware =>
       labwareMatchesLabwareInHopper(labware, invariantContext, flexStackerState)
     )
     if (!allMatch) {
@@ -67,7 +55,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
   }
 
   const pythonArgs = [
-    ...(labwareOnHopper.length > 0
+    ...(fillLabwareIds.length > 0
       ? `labware=[${formattedPythonLabwareNames}],\n`
       : []),
     ...(interventionMessage != null
@@ -82,7 +70,7 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
         key: uuid(),
         params: {
           moduleId,
-          labware: labwareOnHopper,
+          labware: fillLabwareIds,
           message: interventionMessage ?? undefined,
         },
       },

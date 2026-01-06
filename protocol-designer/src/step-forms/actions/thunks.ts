@@ -1,5 +1,6 @@
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { stackerLabwareCreationFinish, stackerLabwareCreationStart } from '.'
 import { createContainer } from '../../labware-ingred/actions'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
@@ -216,4 +217,41 @@ export const createModuleEntityAndChangeForm: (
         })
       )
     })
+  }
+
+interface CreateLabwareAndQueueForHopperArgs {
+  fillLabwareIds: string[]
+  moduleId: string
+}
+
+export const createLabwareAndQueueForHopper =
+  (args: CreateLabwareAndQueueForHopperArgs): ThunkAction<any> =>
+  async (dispatch, getState) => {
+    const { fillLabwareIds, moduleId } = args
+    dispatch(stackerLabwareCreationStart())
+
+    const state = getState()
+    const deckSetup = getDeckSetupForActiveItem(state)
+    const { modules } = deckSetup
+    const module = modules[moduleId]
+
+    if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
+      // collect all container creation promises
+      const containerPromises = fillLabwareIds.map(labwareId => {
+        const [id, uri] = labwareId.split(':')
+        // dispatch can return a promise if createContainer is async
+        return dispatch(
+          createContainer({
+            labwareDefURIStack: [uri],
+            slot: 'offDeck',
+            uuids: [id],
+          })
+        )
+      })
+
+      // wait for all containers to finish
+      await Promise.all(containerPromises)
+    }
+
+    dispatch(stackerLabwareCreationFinish())
   }
