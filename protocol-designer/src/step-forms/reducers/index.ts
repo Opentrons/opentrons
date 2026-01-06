@@ -18,6 +18,12 @@ import {
 } from '@opentrons/shared-data'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
 
+import {
+  convertStepArrayToHierarchy,
+  findStep,
+  getPairedSteps,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
+
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -51,6 +57,8 @@ import {
   getDeckItemIdInSlot,
   getIdsInRange,
 } from '../utils'
+import { findAndSplice } from '../utils/findAndSplice'
+import { getThermocyclerFormType } from '../utils/getThermocyclerFormType'
 import { nestedCombineReducers } from './nestedCombineReducers'
 
 import type { Reducer } from 'redux'
@@ -349,10 +357,14 @@ export const savedStepForms = (
 
   switch (action.type) {
     case 'SAVE_STEP_FORM': {
-      return {
-        ...savedStepForms,
-        [action.payload.form.id]: action.payload.form,
-      }
+      const { newStepFormsById } = saveStepFormHelper({
+        action,
+        originalOrderedStepIds: rootState.orderedStepIds,
+        originalStepFormsById: savedStepForms,
+        enableConcurrentModuleActions:
+          action.payload.enableConcurrentModuleActions,
+      })
+      return newStepFormsById
     }
 
     case 'SAVE_STEP_FORMS_MULTI': {
@@ -1600,13 +1612,14 @@ export const orderedStepIds = (
 
   switch (action.type) {
     case 'SAVE_STEP_FORM': {
-      const id = action.payload.form.id
-
-      if (!orderedStepIds.includes(id)) {
-        return [...orderedStepIds, id]
-      }
-
-      return orderedStepIds
+      const { newOrderedStepIds } = saveStepFormHelper({
+        action,
+        originalOrderedStepIds: orderedStepIds,
+        originalStepFormsById: rootState.savedStepForms,
+        enableConcurrentModuleActions:
+          action.payload.enableConcurrentModuleActions,
+      })
+      return newOrderedStepIds
     }
 
     case 'DELETE_MULTIPLE_STEPS': {
@@ -1702,6 +1715,172 @@ export const stackerLabwareReducer = (
       return { ...state, pendingCreation: false }
     default:
       return state
+  }
+}
+
+// If/when FormData becomes a proper union, these should automatically pick up the improved property types.
+type ThermocyclerFormData = FormData & { stepType: 'thermocycler' }
+type PauseFormData = FormData & { stepType: 'pause' }
+
+interface SaveStepFormHelperArgs {
+  action: SaveStepFormAction
+  originalOrderedStepIds: StepIdType[]
+  originalStepFormsById: Record<StepIdType, FormData>
+  enableConcurrentModuleActions: boolean
+}
+interface SaveStepFormHelperResult {
+  newOrderedStepIds: StepIdType[]
+  newStepFormsById: Record<StepIdType, FormData>
+}
+function saveStepFormHelper(
+  args: SaveStepFormHelperArgs
+): SaveStepFormHelperResult {
+  const {
+    action,
+    originalOrderedStepIds,
+    originalStepFormsById,
+    enableConcurrentModuleActions,
+  } = args
+
+  const newForm = action.payload.form
+  const originalStep: FormData | null =
+    originalStepFormsById[newForm.id] ?? null
+
+  const originalOrderedSteps = originalOrderedStepIds.map(
+    id => originalStepFormsById[id]
+  )
+  const originalStepHierarchy = convertStepArrayToHierarchy(
+    originalOrderedSteps,
+    action.payload.enableConcurrentModuleActions
+  )
+
+  const findResult = findStep(originalStepHierarchy, newForm.id)
+
+  if (findResult == null) {
+    // We're creating a brand new step. Append it to the end.
+    // If it's a Thermocycler profile, also pair it with a "wait for profile to complete" step.
+
+    const newPauseForm: PauseFormData | null =
+      enableConcurrentModuleActions &&
+      getThermocyclerFormType(newForm) === 'thermocyclerProfile'
+        ? getThermocyclerProfilePauseForm(
+            newForm as ThermocyclerFormData,
+            action.payload.thermocyclerPauseStepId
+          )
+        : null
+    return {
+      newOrderedStepIds: [
+        ...originalOrderedStepIds,
+        newForm.id,
+        ...(newPauseForm != null ? [newPauseForm.id] : []),
+      ],
+      newStepFormsById: {
+        ...originalStepFormsById,
+        [newForm.id]: newForm,
+        ...(newPauseForm != null && { [newPauseForm.id]: newPauseForm }),
+      },
+    }
+  } else {
+    // We're editing an existing step.
+    if (
+      getThermocyclerFormType(originalStep) === 'thermocyclerProfile' &&
+      getThermocyclerFormType(newForm) !== 'thermocyclerProfile'
+    ) {
+      // An existing Thermocycler profile step is turning into a non-profile step.
+      // We need to delete the hidden "wait for profile to complete" step that it was paired with.
+
+      const pairedStepIds = getPairedSteps(
+        originalStepHierarchy,
+        new Set([originalStep.id])
+      )
+      return {
+        newOrderedStepIds: originalOrderedStepIds.filter(
+          id => !pairedStepIds.has(id)
+        ),
+        newStepFormsById: {
+          ...omit(originalStepFormsById, [...pairedStepIds]),
+          [newForm.id]: newForm,
+        },
+      }
+    } else if (
+      getThermocyclerFormType(originalStep) !== 'thermocyclerProfile' &&
+      getThermocyclerFormType(newForm) === 'thermocyclerProfile'
+    ) {
+      // An existing step is turning into a Thermocycler profile step. We need to:
+      // 1) Potentially find a new position to move it to, since we can't allow Thermocycler profiles to nest.
+      // 2) Create a hidden "wait for profile to complete" step that it will be permanently paired with.
+
+      const newPauseForm = enableConcurrentModuleActions
+        ? getThermocyclerProfilePauseForm(
+            newForm as ThermocyclerFormData,
+            action.payload.thermocyclerPauseStepId
+          )
+        : null
+
+      // If the edited step was is inside a Thermocycler profile, we'll move it to just after the profile.
+      // null means "leave the edited step in-place."
+      const stepIdToMoveEditedStepAfter: StepIdType | null =
+        'type' in findResult.enclosingNode &&
+        findResult.enclosingNode.type === 'thermocyclerProfileGroup'
+          ? findResult.enclosingNode.waitForThermocyclerProfileStepId
+          : null
+
+      const { result: newOrderedStepIds, success: spliceSuccess } =
+        findAndSplice({
+          source: originalOrderedStepIds,
+          elementToRemove: originalStep.id,
+          elementToInsertAfter: stepIdToMoveEditedStepAfter,
+          elementsToInsert: [
+            newForm.id,
+            ...(newPauseForm != null ? [newPauseForm.id] : []),
+          ],
+        })
+
+      if (!spliceSuccess) {
+        // This should only happen if there's a bug elsewhere that's messing up the timeline order. See `StepHierarchy`.
+        console.error(
+          'Error rearranging steps for a new Thermocycler profile. Leaving the steps unchanged.'
+        )
+        return {
+          newOrderedStepIds: originalOrderedStepIds,
+          newStepFormsById: originalStepFormsById,
+        }
+      }
+
+      return {
+        newOrderedStepIds,
+        newStepFormsById: {
+          ...originalStepFormsById,
+          [newForm.id]: newForm,
+          ...(newPauseForm != null && { [newPauseForm.id]: newPauseForm }),
+        },
+      }
+    } else {
+      // We're editing an existing step and there's no Thermocycler profile nonsense going on,
+      // so just update the step to its new value and leave the step order unchanged.
+      return {
+        newOrderedStepIds: originalOrderedStepIds,
+        newStepFormsById: {
+          ...originalStepFormsById,
+          [newForm.id]: newForm,
+        },
+      }
+    }
+  }
+}
+
+function getThermocyclerProfilePauseForm(
+  thermocyclerForm: ThermocyclerFormData,
+  id: string
+): PauseFormData {
+  return {
+    id,
+    stepType: 'pause',
+    stepName: 'pause',
+    stepDetails: '',
+
+    pauseAction: 'untilThermocyclerProfileComplete',
+    moduleId: thermocyclerForm.moduleId,
   }
 }
 
