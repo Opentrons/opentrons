@@ -45,9 +45,7 @@ Try using the [Opentrons Labware Creator](https://labware.opentrons.com/#/create
 
 OT-2 tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 300 µL, and 1000 µL sizes. These are clear, non-conducting, sterile polypropylene tips that are available with or without filters.
 
-OT-2 pipette tips are designed for OT-2 pipettes. OT-2 tips are incompatible with Opentrons Flex pipettes, nor can you use Flex tips on OT-2 pipettes.
-
-Other industry-standard tips may work with OT-2 pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons OT-2 tips with OT-2 pipettes.
+OT-2 pipette tips are designed for OT-2 pipettes. OT-2 tips are incompatible with Opentrons Flex pipettes, nor can you use Flex tips on OT-2 pipettes. Other industry-standard tips may work with OT-2 pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons OT-2 tips with OT-2 pipettes.
 
 !!! tip
     For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
@@ -70,3 +68,43 @@ The 24-tube rack supports both snap cap and screw cap tubes.
 ### Custom tube rack labware
 
 Try creating a custom labware definition using the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a tube and rack combination you'd like to use isn't listed on Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The Opentrons Flex reads this information to understand how to work with your custom labware. See the <font color="red">Labware Definitions section</font> for more information.
+
+## Aluminum blocks
+
+The OT-2 uses [aluminum blocks on the Labware Library](https://labware.opentrons.com/#/?category=aluminumBlock) to hold sample tubes or well plates on the Temperature Module or deck.
+
+A set OT-2 compatible aluminum blocks also ship with the Temperature Module GEN2. This includes a flat bottom plate, a 24-well block, and 96-well block, which are also available for purchase from Opentrons.
+
+### Flat bottom plate
+
+IMAGE PLACEHOLDER
+
+The aluminum flat bottom plate can be used with various ANSI/SLAS standard well plates. You can identify an [OT-2 compatible plate](https://opentrons.com/products/aluminum-block-flat-bottom-ot-2) from its plain matte finish and lack of external markings.
+
+### 24-well aluminum block
+
+IMAGE PLACEHOLDER
+
+The 24-well block is used with individual sample vials. For example, it accepts sample vials that:
+
+- Have V-shaped or U-shaped bottoms.
+
+- Secure contents with snap cap or screw cap closures.
+
+- Hold liquid in capacities of 0.5 mL, 1.5 mL, and 2 mL.
+
+### 96-well aluminum block
+
+IMAGE PLACEHOLDER
+
+The 96-well block supports a wide variety of well plate types. For example, it accepts:
+
+- Well plates designed with V-shaped bottoms, U-shaped bottoms, or flat bottoms.
+
+- Well plates designed with 100 µL or 200 µL wells.
+
+- Generic PCR strips.
+
+### Custom aluminum block combinations
+
+Labware Creator can't define new aluminum blocks. For placing tubes in the 24-well block, it can create combination labware definitions that comprise the aluminum block and the tubes. For placing custom plates on the 96-well adapter, define the custom plate with the stacking offset information required for seating the plate on top of the block. See the <font color="red">Labware Definitions section</font> for more information.
