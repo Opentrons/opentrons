@@ -1,4 +1,5 @@
 """Command precondition state and store resource."""
+
 from dataclasses import dataclass
 
 from opentrons.protocol_engine.actions.get_state_update import get_state_updates

@@ -1,14 +1,27 @@
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getIsLid,
   getIsPipettableLabware,
   locationIsOffDeck,
 } from '@opentrons/shared-data'
 
+import { BOTTOM_UP_LABWARE_POOL_KEYS } from '../constants'
 import { TOUCHED_PIPETTABLE_LABWARE } from '../types'
-import { getFullStackFromLabwares, getSlotInLocationStack } from '../utils'
+import {
+  getFullStackFromLabwares,
+  getLargestStackInSlot,
+  getSlotInLocationStack,
+} from '../utils'
 
-import type { MoveLabwareParams } from '@opentrons/shared-data'
-import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import type {
+  FlexStackerStoredLabwareGroup,
+  MoveLabwareParams,
+} from '@opentrons/shared-data'
+import type {
+  FlexStackerModuleState,
+  InvariantContext,
+  RobotStateAndWarnings,
+} from '../types'
 
 export function forMoveLabware(
   params: MoveLabwareParams,
@@ -30,6 +43,95 @@ export function forMoveLabware(
 
   const isLabwareToMoveLid = getIsLid(labwareEntities[labwareId].def)
   let isParentPipettableLabware: boolean = false
+
+  // update shuttle if it is the initial location of the move
+  const initialShuttleParentStackerState =
+    Object.entries(modules).find(([id, { slot }]) => {
+      const { type } = invariantContext.moduleEntities[id] ?? {}
+      return type === FLEX_STACKER_MODULE_TYPE && slot === initialDeckSlot
+    }) ?? null
+
+  if (
+    initialShuttleParentStackerState != null &&
+    initialShuttleParentStackerState[1].moduleState.type ===
+      FLEX_STACKER_MODULE_TYPE
+  ) {
+    const moduleState = initialShuttleParentStackerState[1]
+      .moduleState as FlexStackerModuleState
+    const firstAffectedKey = BOTTOM_UP_LABWARE_POOL_KEYS.findIndex(
+      key => moduleState.labwareOnShuttle?.[key] === labwareId
+    )
+    if (firstAffectedKey !== -1 && moduleState.labwareOnShuttle != null) {
+      // remove everything above the target labware in the shuttle stack
+      for (const key of BOTTOM_UP_LABWARE_POOL_KEYS.slice(
+        firstAffectedKey,
+        BOTTOM_UP_LABWARE_POOL_KEYS.length
+      )) {
+        if (key === 'primaryLabwareId') {
+          moduleState.labwareOnShuttle = null
+          break
+        } else {
+          moduleState.labwareOnShuttle[key] = null
+        }
+      }
+    }
+  }
+
+  // update shuttle if it is the new location of the move
+  const newShuttleParentStackerState =
+    Object.entries(modules).find(([id, { slot }]) => {
+      const { type } = invariantContext.moduleEntities[id] ?? {}
+      return (
+        type === FLEX_STACKER_MODULE_TYPE &&
+        typeof newLocation === 'object' &&
+        (('moduleId' in newLocation && newLocation.moduleId === id) ||
+          ('slotName' in newLocation && slot === newLocation.slotName))
+      )
+    }) ?? null
+  const [newModuleId, newStackerOnDeck] = newShuttleParentStackerState ?? []
+  if (newModuleId != null && newStackerOnDeck != null) {
+    const fullStack = getLargestStackInSlot(labware, initialDeckSlot)
+    const stackIndexOfTarget = fullStack.indexOf(labwareId)
+    const moduleState = newStackerOnDeck.moduleState as FlexStackerModuleState
+    if (stackIndexOfTarget !== -1) {
+      const stackFromTargetUp = fullStack
+        .slice(0, stackIndexOfTarget + 1) // inclusive of target
+        .toReversed()
+      if (moduleState.labwareOnShuttle == null) {
+        // initialize the shuttle group
+        moduleState.labwareOnShuttle = {
+          primaryLabwareId: '',
+          adapterLabwareId: null,
+          lidLabwareId: null,
+        }
+      }
+      if (stackFromTargetUp.length === 3) {
+        // updating each element of the shuttle group (adapter + primary + lid)
+        for (let i = 0; i < BOTTOM_UP_LABWARE_POOL_KEYS.length; i++) {
+          const key = BOTTOM_UP_LABWARE_POOL_KEYS[i]
+          moduleState.labwareOnShuttle![key] = stackFromTargetUp[i]
+        }
+      } else if (stackFromTargetUp.length === 2) {
+        // either adapter + primary or primary + lid
+        const keysToUpdate = stackFromTargetUp.some(id =>
+          invariantContext.labwareEntities[id].def.allowedRoles?.some(
+            role => role === 'lid'
+          )
+        )
+          ? ['primaryLabwareId', 'lidLabwareId']
+          : ['adapterLabwareId', 'primaryLabwareId']
+        for (let i = 0; i < keysToUpdate.length; i++) {
+          const key = keysToUpdate[i]
+          moduleState.labwareOnShuttle![
+            key as keyof FlexStackerStoredLabwareGroup
+          ] = stackFromTargetUp[i]
+        }
+      } else if (stackFromTargetUp.length === 1) {
+        // primary labware only
+        moduleState.labwareOnShuttle!.primaryLabwareId = stackFromTargetUp[0]
+      }
+    }
+  }
 
   const newLocationStack: string[] = []
   if (locationIsOffDeck(newLocation)) {

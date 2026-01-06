@@ -105,9 +105,9 @@ class BlowOutInPlace(
     params: BlowOutInPlaceParams
     result: Optional[BlowOutInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[BlowOutInPlaceImplementation] = (
         BlowOutInPlaceImplementation
-    ] = BlowOutInPlaceImplementation
+    )
 
 
 class BlowOutInPlaceCreate(BaseCommandCreate[BlowOutInPlaceParams]):

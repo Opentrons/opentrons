@@ -1,4 +1,5 @@
 """Test create timer command."""
+
 from datetime import datetime
 import asyncio
 from decoy import Decoy, matchers

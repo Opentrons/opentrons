@@ -64,7 +64,7 @@ def subject(
 def _contained_labware(count: int) -> list[StackerStoredLabwareGroup]:
     return [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"primary-id-{i+1}",
+            primaryLabwareId=f"primary-id-{i + 1}",
             adapterLabwareId=None,
             lidLabwareId=None,
         )
@@ -162,27 +162,27 @@ async def test_fill_by_count_happypath(
         message="some-message",
         strategy=StackerFillEmptyStrategy.LOGICAL,
     )
-    primary_ids = iter([f"new-primary-{i+1}" for i in range(expected_new_labware)])
+    primary_ids = iter([f"new-primary-{i + 1}" for i in range(expected_new_labware)])
     decoy.when(model_utils.generate_id()).then_do(lambda: next(primary_ids))
     decoy.when(
         state_view.labware.get_uri_from_definition_unless_none(flex_50uL_tiprack)
     ).then_return("opentrons/opentrons_flex_96_filtertiprack_50ul/1")
     for i in range(expected_new_labware):
-        decoy.when(state_view.labware.known(f"new-primary-{i+1}")).then_return(False)
+        decoy.when(state_view.labware.known(f"new-primary-{i + 1}")).then_return(False)
         decoy.when(
             await equipment.load_labware_pool_from_definitions(
                 pool_primary_definition=flex_50uL_tiprack,
                 pool_adapter_definition=None,
                 pool_lid_definition=None,
                 location=InStackerHopperLocation(moduleId="some-module-id"),
-                primary_id=f"new-primary-{i+1}",
+                primary_id=f"new-primary-{i + 1}",
                 adapter_id=None,
                 lid_id=None,
             )
         ).then_return(
             LoadedLabwarePoolData(
                 primary_labware=LoadedLabware(
-                    id=f"new-primary-{i+1}",
+                    id=f"new-primary-{i + 1}",
                     loadName="loadname",
                     definitionUri="opentrons/opentrons_flex_96_filtertiprack_50ul/1",
                     location=InStackerHopperLocation(moduleId="some-module-id"),
@@ -197,7 +197,7 @@ async def test_fill_by_count_happypath(
     result = await subject.execute(params)
     added_labware = [
         StackerStoredLabwareGroup(
-            primaryLabwareId=f"new-primary-{i+1}",
+            primaryLabwareId=f"new-primary-{i + 1}",
             adapterLabwareId=None,
             lidLabwareId=None,
         )
@@ -210,17 +210,19 @@ async def test_fill_by_count_happypath(
         ),
         batch_loaded_labware=BatchLoadedLabwareUpdate(
             new_locations_by_id={
-                f"new-primary-{i+1}": InStackerHopperLocation(moduleId="some-module-id")
+                f"new-primary-{i + 1}": InStackerHopperLocation(
+                    moduleId="some-module-id"
+                )
                 for i in range(expected_new_labware)
             },
             offset_ids_by_id={
-                f"new-primary-{i+1}": None for i in range(expected_new_labware)
+                f"new-primary-{i + 1}": None for i in range(expected_new_labware)
             },
             display_names_by_id={
-                f"new-primary-{i+1}": None for i in range(expected_new_labware)
+                f"new-primary-{i + 1}": None for i in range(expected_new_labware)
             },
             definitions_by_id={
-                f"new-primary-{i+1}": flex_50uL_tiprack
+                f"new-primary-{i + 1}": flex_50uL_tiprack
                 for i in range(expected_new_labware)
             },
         ),

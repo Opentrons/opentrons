@@ -52,7 +52,7 @@ class ErrorRecoverySettingStore:
 
 
 async def get_error_recovery_setting_store(
-    sql_engine: Annotated[sqlalchemy.engine.Engine, fastapi.Depends(get_sql_engine)]
+    sql_engine: Annotated[sqlalchemy.engine.Engine, fastapi.Depends(get_sql_engine)],
 ) -> ErrorRecoverySettingStore:
     """A FastAPI dependency to return the server's ErrorRecoverySettingStore."""
     # Since the store itself has no state, and no asyncio.Locks or anything,

@@ -9,6 +9,7 @@ or axis)  to a deck-absolute point (not a Smoothie-coordinate point).
 This module is not for use outside the opentrons api module. Higher-level
 functions are available elsewhere.
 """
+
 from .adapters import SynchronousAdapter
 from .api import API
 from .pause_manager import PauseManager

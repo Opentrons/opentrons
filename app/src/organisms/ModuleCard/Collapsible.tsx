@@ -59,7 +59,7 @@ export function Collapsible({
         onClick={toggleExpanded}
       >
         <Flex flexDirection={DIRECTION_COLUMN}>
-          <LegacyStyledText as="h5">{title}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="h5">{title}</LegacyStyledText>
         </Flex>
         <Icon
           size={SIZE_1}

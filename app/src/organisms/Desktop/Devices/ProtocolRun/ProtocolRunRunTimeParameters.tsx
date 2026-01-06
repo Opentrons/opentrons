@@ -98,14 +98,14 @@ export function ProtocolRunRuntimeParameters({
         >
           {hasRunTimeParameters ? (
             <LegacyStyledText
-              as="h3"
+              forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('parameters')}
             </LegacyStyledText>
           ) : null}
           {hasRunTimeParameters ? (
-            <LegacyStyledText as="label" color={COLORS.grey60}>
+            <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
               {hasCustomRunTimeParameterValues
                 ? t('custom_values')
                 : t('default_values')}
@@ -173,10 +173,13 @@ function RunTimeParametersBanner({
   return (
     <Banner type="informing" width="100%" iconMarginLeft={SPACING.spacing4}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {isRunTerminal ? t('download_files') : t('values_are_view_only')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {isRunTerminal
             ? t('all_files_associated')
             : t('cancel_and_restart_to_edit')}
@@ -202,7 +205,7 @@ const StyledTableRowComponent = (
     <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
       <StyledTableCell display="span">
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           css={css`
             display: inline;
             padding-right: 8px;
@@ -238,7 +241,7 @@ const StyledTableRowComponent = (
           gridGap={SPACING.spacing16}
           alignItems={ALIGN_CENTER}
         >
-          <LegacyStyledText as="p" css={PARAMETER_VALUE_TEXT_STYLE}>
+          <LegacyStyledText forwardedAs="p" css={PARAMETER_VALUE_TEXT_STYLE}>
             {parameter.type === 'csv_file'
               ? (parameter.file?.name ?? '')
               : formatRunTimeParameterValue(parameter, t)}

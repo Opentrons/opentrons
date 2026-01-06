@@ -1,6 +1,5 @@
 """Test the utils module."""
 
-
 import json
 import os
 import secrets
@@ -256,7 +255,7 @@ def test_load_firmware_manifest_invalid_json() -> None:
 
 
 def test_load_firmware_manifest_unknown_update_type(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test unknown update_type."""
     with open(manifest_filename, "w") as fp:
@@ -272,7 +271,7 @@ def test_load_firmware_manifest_unknown_update_type(
 
 
 def test_load_firmware_manifest_invalid_update_info(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test invalid update info."""
     with open(manifest_filename, "w") as fp:
@@ -302,7 +301,7 @@ def test_load_firmware_manifest_invalid_update_info(
 
 
 def test_load_firmware_manifest_binary_file_not_found(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test binary update file not found."""
     with open(manifest_filename, "w") as fp:
@@ -351,7 +350,7 @@ def test_check_firmware_updates_available(mock_manifest: Dict[str, Any]) -> None
 
 
 def test_check_firmware_updates_available_nodes_specified(
-    mock_manifest: Dict[str, Any]
+    mock_manifest: Dict[str, Any],
 ) -> None:
     """Test that only specified devices are updated if given."""
     manifest = mock_manifest.copy()

@@ -20,6 +20,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -39,6 +40,7 @@ import {
 import { HighlightLabware } from '../HighlightLabware'
 import { getSlotInformation } from '../utils'
 import { HighlightItems } from './HighlightItems'
+import { HopperLabwareRenders } from './HopperLabwareRenders'
 import { AdapterControls, LabwareControls, SlotControls } from './Overlays'
 import { ActiveLabwareControls } from './Overlays/ActiveLabwareControls'
 import { SelectedItems } from './SelectedItems'
@@ -99,11 +101,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     activeDeckSetup,
     robotType
   )
+  const pendingCreationStateForHopper = useSelector(getPendingCreationState)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const dispatch = useDispatch<any>()
-
   // handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls. But when swapping labware when at least
   // one is on a module, we need to be aware of not only what labware is
@@ -148,6 +150,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       deckSetup: activeDeckSetup,
       slot: selectedZoomInSlot ?? '',
       deckDef,
+      pendingCreationStateForHopper,
     })
   }, [activeDeckSetup, selectedZoomInSlot])
 
@@ -179,7 +182,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     selectedZoomInSlot,
   ])
 
-  const allLabware = Object.values(activeLabware)
+  const allLabware = pendingCreationStateForHopper
+    ? []
+    : Object.values(activeLabware)
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =
@@ -246,9 +251,26 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
             } else if (moduleState.lidOpen === false) {
               lidMotorState = 'closed'
             }
+
+            let blockTargetTemp
+            switch (moduleState.currentBlockActivity.type) {
+              case 'blockTargetTemp':
+                blockTargetTemp =
+                  moduleState.currentBlockActivity.blockTargetTemp
+                break
+              case 'blockDeactivated':
+                blockTargetTemp = null
+                break
+              case 'profile':
+                blockTargetTemp = null
+                break
+              default:
+                moduleState.currentBlockActivity satisfies never
+            }
+
             return {
               lidMotorState,
-              blockTargetTemp: moduleState.blockTargetTemp,
+              blockTargetTemp,
             }
           } else if (
             'targetTemperature' in moduleState &&
@@ -294,6 +316,12 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         const labwareRightBelowTopMostLabware =
           rightBelowTopId != null ? activeLabware[rightBelowTopId] : null
         const isAdapter = labwareOnModule?.def.allowedRoles?.includes('adapter')
+        const labwareInHopper =
+          'labwareInHopper' in moduleOnDeck.moduleState
+            ? moduleOnDeck.moduleState.labwareInHopper
+            : null
+        const topLabwareGroup =
+          labwareInHopper?.[labwareInHopper.length - 1] ?? null
 
         return moduleOnDeck.slot !== selectedSlot.slot ? (
           <Fragment key={moduleOnDeck.id}>
@@ -314,33 +342,20 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
                   : 'offsetToSlot'
               }
             >
-              {hopperTopMostId != null ? (
-                <>
-                  <LabwareOnDeck
-                    x={HOPPER_LABWARE_X_OFFSET}
-                    y={0}
-                    labwareOnDeck={activeLabware[hopperTopMostId]}
-                  />
-                  <HighlightLabware
-                    labwareOnDeck={activeLabware[hopperTopMostId]}
-                    position={[HOPPER_LABWARE_X_OFFSET, 0, 0]}
-                    isZoomed={selectedZoomInSlot != null}
-                  />
-                  <LabwareControls
-                    terminalItemId={terminalItemId}
-                    itemId={`hopper${slotId}`}
-                    setHover={setHover}
-                    setShowMenuListForId={setShowMenuListForId}
-                    hover={hover}
-                    slotPosition={[HOPPER_LABWARE_X_OFFSET, 0, 0]} // Module Component already handles nested positioning
-                    setHoveredLabware={setHoveredLabware}
-                    setDraggedLabware={setDraggedLabware}
-                    swapBlocked={false}
-                    labwareOnDeck={activeLabware[hopperTopMostId]}
-                    isSelected={selectedZoomInSlot != null}
-                    allModules={allModules}
-                  />
-                </>
+              {topLabwareGroup ? (
+                <HopperLabwareRenders
+                  labwaresOnDeck={activeLabware}
+                  slot={moduleOnDeck.slot}
+                  topLabwareGroup={topLabwareGroup}
+                  allModules={allModules}
+                  terminalItemId={terminalItemId}
+                  setHover={setHover}
+                  setShowMenuListForId={setShowMenuListForId}
+                  hover={hover}
+                  setHoveredLabware={setHoveredLabware}
+                  setDraggedLabware={setDraggedLabware}
+                  selectedZoomInSlot={selectedZoomInSlot}
+                />
               ) : null}
               {labwareOnModule != null &&
               !isLabwareOccludedByThermocyclerLid ? (

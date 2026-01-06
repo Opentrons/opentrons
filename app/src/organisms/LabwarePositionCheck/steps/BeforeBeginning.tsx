@@ -51,7 +51,7 @@ export function BeforeBeginning(props: LPCWizardContentProps): JSX.Element {
             <Trans
               t={t}
               i18nKey="labware_position_check_description"
-              components={{ block: <LegacyStyledText as="p" /> }}
+              components={{ block: <LegacyStyledText forwardedAs="p" /> }}
             />
           }
         />

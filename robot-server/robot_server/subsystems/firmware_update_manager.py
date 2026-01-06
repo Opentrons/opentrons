@@ -1,4 +1,5 @@
 """Class to monitor firmware update status."""
+
 from asyncio import Lock, Queue, QueueEmpty
 from dataclasses import dataclass
 from datetime import datetime

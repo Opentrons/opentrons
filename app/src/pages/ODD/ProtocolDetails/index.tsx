@@ -134,7 +134,7 @@ const ProtocolHeader = ({
           </Flex>
           {!isProtocolFetching ? (
             <LegacyStyledText
-              as="h2"
+              forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -222,15 +222,18 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         gridGap={SPACING.spacing4}
       >
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
         >{`${i18n.format(t('author'), 'capitalize')}: `}</LegacyStyledText>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {author}
         </LegacyStyledText>
       </Flex>
       <LegacyStyledText
-        as="p"
+        forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
         overflowWrap={OVERFLOW_WRAP_ANYWHERE}
       >
@@ -243,7 +246,7 @@ const Summary = ({ author, description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText as="p">{`${t('protocol_info:date_added')}: ${
+        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
         }`}</LegacyStyledText>
       </Flex>
@@ -441,7 +444,7 @@ export function ProtocolDetails(): JSX.Element | null {
             >
               <Flex flexDirection={DIRECTION_COLUMN} width="100%">
                 <LegacyStyledText
-                  as="h4"
+                  forwardedAs="h4"
                   fontWeight={TYPOGRAPHY.fontWeightRegular}
                   marginBottom={SPACING.spacing40}
                 >

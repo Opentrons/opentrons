@@ -1,4 +1,5 @@
 """Tests for robot_server.modules.module_identifier."""
+
 import pytest
 from decoy import matchers
 from typing import Optional

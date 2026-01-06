@@ -1,9 +1,9 @@
 import { createElement } from 'react'
 
-import { isntStyleProp, styleProps } from '../primitives'
+import { isntStyleProp, styleProps } from '../primitives/style-props'
 
 import type { ComponentProps, ComponentType } from 'react'
-import type { StyleProps } from '../primitives'
+import type { StyleProps } from '../primitives/types'
 
 /**
  * A Higher-Order Component (HOC) that enhances a component by enabling it to

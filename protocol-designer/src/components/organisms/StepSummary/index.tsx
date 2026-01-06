@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 
 import {
   DIRECTION_COLUMN,
@@ -13,8 +14,8 @@ import {
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 
-import { LINE_CLAMP_TEXT_STYLE } from '/protocol-designer/components/atoms'
 import { formatTime } from '/protocol-designer/pages/Designer/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import {
   getAdditionalEquipmentEntities,
@@ -374,7 +375,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
           <Flex padding={SPACING.spacing12}>
             <StyledText
               desktopStyle="bodyDefaultRegular"
-              css={LINE_CLAMP_TEXT_STYLE(3)}
+              className={clsx(
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_break_all
+              )}
+              style={{ WebkitLineClamp: 3 }}
             >
               {stepDetails}
             </StyledText>

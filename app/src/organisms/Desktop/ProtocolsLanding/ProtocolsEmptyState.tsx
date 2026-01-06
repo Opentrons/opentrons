@@ -22,7 +22,7 @@ export function ProtocolsEmptyState(): JSX.Element | null {
       paddingTop={SPACING.spacing32}
       transform="translateY(25%)"
     >
-      <LegacyStyledText role="complementary" as="h1">
+      <LegacyStyledText role="complementary" forwardedAs="h1">
         {t('import_a_file')}
       </LegacyStyledText>
       <ProtocolUploadInput />

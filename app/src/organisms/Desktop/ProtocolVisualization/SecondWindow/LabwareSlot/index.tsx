@@ -110,7 +110,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
 
   const labwareViewBox = getLabwareViewBox(labwareDef)
   const ingredNames = liquids.reduce(
-    (acc: Record<string, string>, { id, displayName }) => {
+    (acc: Record<string, string | null>, { id, displayName }) => {
       acc[id] = displayName
       return acc
     },

@@ -1,4 +1,5 @@
 """Tests for the DataFilesStore interface."""
+
 from pathlib import Path
 import sqlalchemy
 

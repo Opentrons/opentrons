@@ -25,6 +25,7 @@ import type { Middleware } from 'redux'
 import type {
   ConsolidateArgs,
   DistributeArgs,
+  FlexStackerFillItemsArgs,
   MixArgs,
   NormalizedPipetteById,
   TransferArgs,
@@ -217,6 +218,29 @@ export const reduxActionToAnalyticsEvent = (
             },
           }
         }
+        case 'flexStackerEmpty':
+          return {
+            name: 'flexStackerEmptyStep',
+            properties: {},
+          }
+        case 'flexStackerRetrieve':
+          return {
+            name: 'flexStackerRetrieveStep',
+            properties: {},
+          }
+        case 'flexStackerFillItems':
+          const args = stepArgs as FlexStackerFillItemsArgs
+          return {
+            name: 'flexStackerFillItemsStep',
+            properties: {
+              labwareUri: args.fillLabwareUri,
+            },
+          }
+        case 'flexStackerStore':
+          return {
+            name: 'flexStackerStoreStep',
+            properties: {},
+          }
         default:
           return {
             name: `${modifiedStepName}Step`,

@@ -1,4 +1,5 @@
 """Tests for the maintenance runs publisher."""
+
 import pytest
 from unittest.mock import AsyncMock, Mock
 

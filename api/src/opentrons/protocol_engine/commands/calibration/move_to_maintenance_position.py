@@ -1,4 +1,5 @@
 """Calibration Move To Maintenance Location command payload, result, and implementation models."""
+
 from __future__ import annotations
 
 import enum
@@ -138,9 +139,9 @@ class MoveToMaintenancePosition(
     params: MoveToMaintenancePositionParams
     result: Optional[MoveToMaintenancePositionResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveToMaintenancePositionImplementation] = (
         MoveToMaintenancePositionImplementation
-    ] = MoveToMaintenancePositionImplementation
+    )
 
 
 class MoveToMaintenancePositionCreate(

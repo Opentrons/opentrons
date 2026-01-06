@@ -202,7 +202,6 @@ async def test_dispense_while_tracking_implementation(
             ),
         )
     else:
-
         assert result == SuccessData(
             public=DispenseWhileTrackingResult(
                 volume=42,

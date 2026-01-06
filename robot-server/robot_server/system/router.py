@@ -4,6 +4,7 @@ Endpoints include:
 
 - /system/time: allows the client to read & update robot system time
 """
+
 from datetime import datetime
 
 from server_utils.fastapi_utils.light_router import LightRouter

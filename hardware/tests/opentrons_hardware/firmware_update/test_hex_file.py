@@ -1,4 +1,5 @@
 """Tests for hex file processing."""
+
 from typing import Iterable, List
 
 import pytest
@@ -24,8 +25,8 @@ from opentrons_hardware.firmware_update import hex_file
                 byte_count=16,
                 address=0x01C0,
                 record_type=hex_file.RecordType.Data,
-                data=b"\xE9\x45\x00\x08\xE9\x45\x00\x08"
-                b"\xE9\x45\x00\x08\xE9\x45\x00\x08",
+                data=b"\xe9\x45\x00\x08\xe9\x45\x00\x08"
+                b"\xe9\x45\x00\x08\xe9\x45\x00\x08",
                 checksum=0x57,
             ),
         ],

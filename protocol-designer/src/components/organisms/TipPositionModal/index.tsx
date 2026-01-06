@@ -350,6 +350,7 @@ export function TipPositionModal(
               }
               error={xErrorText}
               id="TipPositionModal_x_custom_input"
+              data-testid="TipPositionModal_x_custom_input"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setXValue)
               }}
@@ -369,6 +370,7 @@ export function TipPositionModal(
               }
               error={yErrorText}
               id="TipPositionModal_y_custom_input"
+              data-testid="TipPositionModal_y_custom_input"
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setYValue)
               }}
@@ -387,6 +389,7 @@ export function TipPositionModal(
               }
               error={zErrorText}
               id="TipPositionModal_z_custom_input"
+              data-testid="TipPositionModal_z_custom_input"
               isIndeterminate={zValue === null && isIndeterminate}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
                 handleChange(e.target.value, setZValue)

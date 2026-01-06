@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -13,7 +14,8 @@ import {
   Tag,
 } from '@opentrons/components'
 
-import { LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
+
 import { getLiquidClassDisplayName } from '../../liquid-defs/utils'
 
 import type {
@@ -34,7 +36,11 @@ const getLiquidDescription = (liquid: IngredInputs): JSX.Element | null => {
       {description ? (
         <StyledText
           desktopStyle="bodyDefaultRegular"
-          css={LINE_CLAMP_TEXT_STYLE(10)}
+          className={clsx(
+            lineClampStyles.line_clamp,
+            lineClampStyles.word_break_all
+          )}
+          style={{ WebkitLineClamp: 10 }}
         >
           {description}
         </StyledText>
@@ -79,7 +85,11 @@ export function LiquidDefinitions({
                       <StyledText
                         desktopStyle="bodyDefaultRegular"
                         id="liquid-name"
-                        css={LINE_CLAMP_TEXT_STYLE(3)}
+                        className={clsx(
+                          lineClampStyles.line_clamp,
+                          lineClampStyles.word_break_all
+                        )}
+                        style={{ WebkitLineClamp: 3 }}
                       >
                         {liquid.displayName}
                       </StyledText>

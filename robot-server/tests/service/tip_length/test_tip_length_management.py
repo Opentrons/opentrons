@@ -18,7 +18,7 @@ def test_access_tip_length_calibration(api_client, set_up_tip_length_temp_direct
     }
 
     resp = api_client.get(
-        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&" f"tiprack_hash={LW_HASH}"
+        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_hash={LW_HASH}"
     )
     assert resp.status_code == 200
     data = resp.json()["data"][0]
@@ -53,18 +53,18 @@ def test_delete_tip_length_calibration(api_client, set_up_tip_length_temp_direct
     }
 
     resp = api_client.get(
-        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&" f"tiprack_uri={LW_URI}"
+        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_uri={LW_URI}"
     )
     assert resp.status_code == 200
     assert resp.json()["data"][0]["uri"] == LW_URI
 
     resp = api_client.delete(
-        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&" f"tiprack_uri={LW_URI}"
+        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_uri={LW_URI}"
     )
     assert resp.status_code == 200
 
     resp = api_client.get(
-        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&" f"tiprack_uri={LW_URI}"
+        f"/calibration/tip_length?pipette_id={PIPETTE_ID}&tiprack_uri={LW_URI}"
     )
     assert resp.status_code == 200
     assert resp.json()["data"] == []

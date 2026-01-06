@@ -90,7 +90,6 @@ class GCodeProgram:
     def save_text_explanation_to_file(
         self, file_path: str, mode: Union[SupportedTextModes, str]
     ):
-
         with open(file_path, "w") as file:
             file.write(self.get_text_explanation(mode))
 

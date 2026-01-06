@@ -1,4 +1,5 @@
 """Test device info."""
+
 import asyncio
 
 import pytest

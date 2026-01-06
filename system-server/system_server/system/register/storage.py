@@ -1,4 +1,5 @@
 """Functionality to interface with the registration table."""
+
 import sqlalchemy
 from typing import Optional, Dict, Tuple
 from datetime import timedelta

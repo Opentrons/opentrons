@@ -17,7 +17,6 @@ import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolR
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useToaster } from '/app/organisms/ToasterOven'
 import { useIsFlex } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 import {
   getCameraUsageState,
   updateCameraEnablement,
@@ -49,7 +48,6 @@ export function SetupCamera({
   confirmCameraSettings,
 }: SetupCameraProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
-  const isCameraSettingsEnabled = useFeatureFlag('camera')
   const { makeSnackbar } = useToaster()
   const storageInfo = useRobotStorageInfo()
   const dispatch = useDispatch()
@@ -131,12 +129,10 @@ export function SetupCamera({
             toggleLiveStreamEnabled={toggleLiveStreamEnabled}
             cameraConfirmed={cameraConfirmed}
           />
-          {isCameraSettingsEnabled && (
-            <SetupRunCameraControls
-              cameraConfirmed={cameraConfirmed}
-              runId={runId}
-            />
-          )}
+          <SetupRunCameraControls
+            cameraConfirmed={cameraConfirmed}
+            runId={runId}
+          />
         </>
       )}
       <div className={styles.camera_btn_container}>

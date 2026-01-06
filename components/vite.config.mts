@@ -14,7 +14,7 @@ export default defineConfig({
     lib: {
       entry: 'src/index.ts',
       formats: ['es', 'cjs'],
-      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'js'}`,
+      fileName: format => `index.${format === 'es' ? 'mjs' : 'js'}`,
     },
     outDir: 'lib',
     // Do not delete the outdir, typescript types might live there and we don't want to delete them
@@ -32,17 +32,19 @@ export default defineConfig({
         'react',
         'react-dom',
         'react/jsx-runtime',
-        'react-dom/client'
+        'react-dom/client',
       ],
       output: {
-  // Ensure CSS is bundled and exported with stable names for consumers
+        // Ensure CSS is bundled and exported with stable names for consumers
         assetFileNames: assetInfo => {
           const assetNames = assetInfo.names ?? []
           const representativeName = assetNames[0] ?? ''
 
-          return representativeName.endsWith('.css') ? 'style.css' : '[name].[ext]'
-        }
-      }
+          return representativeName.endsWith('.css')
+            ? 'style.css'
+            : '[name].[ext]'
+        },
+      },
     },
   },
   plugins: [
@@ -61,6 +63,9 @@ export default defineConfig({
     },
   },
   css: {
+    modules: {
+      generateScopedName: '[local]',
+    },
     postcss: {
       plugins: [
         postCssImport({ root: 'src/' }),

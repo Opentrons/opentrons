@@ -76,9 +76,9 @@ class UpdatePositionEstimators(
     params: UpdatePositionEstimatorsParams
     result: Optional[UpdatePositionEstimatorsResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UpdatePositionEstimatorsImplementation] = (
         UpdatePositionEstimatorsImplementation
-    ] = UpdatePositionEstimatorsImplementation
+    )
 
 
 class UpdatePositionEstimatorsCreate(BaseCommandCreate[UpdatePositionEstimatorsParams]):

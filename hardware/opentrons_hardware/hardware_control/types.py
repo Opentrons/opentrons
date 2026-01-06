@@ -1,4 +1,5 @@
 """Types and definitions for hardware bindings."""
+
 import re
 from dataclasses import dataclass
 from enum import Enum

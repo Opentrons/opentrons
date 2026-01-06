@@ -1,6 +1,10 @@
 .text_style {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
   font-size: var(--font-size-p);
   font-weight: var(--font-weight-regular);
+  -webkit-line-clamp: 1;
   line-height: var(--line-height-16);
 }
 

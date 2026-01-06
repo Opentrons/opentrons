@@ -35,7 +35,9 @@ def test_mix_properties_none_instantiation_combos() -> None:
     with pytest.raises(ValidationError):
         _build_mix_properties(MixProperties(enable=True, params=None))
     with pytest.raises(ValidationError):
-        _build_mix_properties(MixProperties(enable=None, params=MixParams(repetitions=2, volume=10)))  # type: ignore
+        _build_mix_properties(
+            MixProperties(enable=None, params=MixParams(repetitions=2, volume=10))  # type: ignore
+        )
     _build_mix_properties(MixProperties(enable=False, params=None))
 
 

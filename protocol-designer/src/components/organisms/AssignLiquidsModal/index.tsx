@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -26,15 +27,13 @@ import {
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
-import {
-  LINE_CLAMP_TEXT_STYLE,
-  NAV_BAR_HEIGHT_REM,
-} from '/protocol-designer/components/atoms'
+import { NAV_BAR_HEIGHT_REM } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
 import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import {
@@ -181,7 +180,11 @@ export function AssignLiquidsModal(
               />
               <StyledText
                 desktopStyle="headingLargeBold"
-                css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                className={clsx(
+                  lineClampStyles.line_clamp,
+                  lineClampStyles.word_normal
+                )}
+                style={{ WebkitLineClamp: 3 }}
               >
                 {t('add_liquids_to_labware', {
                   labwareName: nickNames[labwareId],

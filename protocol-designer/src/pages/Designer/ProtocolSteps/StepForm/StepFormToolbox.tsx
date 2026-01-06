@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 import get from 'lodash/get'
 
 import {
@@ -17,7 +18,11 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import {
+  FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  OT2_ROBOT_TYPE,
+} from '@opentrons/shared-data'
 
 import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import {
@@ -25,7 +30,6 @@ import {
   FORM_WARNINGS_EVENT,
 } from '/protocol-designer/analytics/constants'
 import {
-  LINE_CLAMP_TEXT_STYLE,
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
@@ -46,11 +50,13 @@ import {
   getDynamicFieldFormErrorsForUnsavedForm,
   getFormLevelErrorsForUnsavedForm,
   getInvariantContext,
+  getModuleEntities,
   getSavedStepForms,
 } from '/protocol-designer/step-forms/selectors'
 import { actions } from '/protocol-designer/steplist'
 import { maskField } from '/protocol-designer/steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
 import {
   hoverSelection,
@@ -283,7 +289,16 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
     dispatchAnalyticsEvent(FORM_WARNINGS_EVENT, visibleFormWarningsTypes)
     dispatchAnalyticsEvent(FORM_ERRORS_EVENT, visibleFormErrorsTypes)
   }, [visibleFormWarningsTypes, visibleFormErrorsTypes])
-
+  const moduleEntities = Object.values(useSelector(getModuleEntities))
+  const stackerModules = moduleEntities.filter(moduleEntity => {
+    return moduleEntity.type === FLEX_STACKER_MODULE_TYPE
+  })
+  const numberOfStackersLoaded: AnalyticsEvent = {
+    name: 'loadFlexStacker',
+    properties: {
+      numberOfStackers: stackerModules.length,
+    },
+  }
   if (!ToolsComponent) {
     // early-exit if step form doesn't exist, this is a good check for when new steps
     // are added
@@ -338,6 +353,7 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       })
     }
   }
+
   const handleSaveClick = (): void => {
     if (canSave) {
       const duration = new Date().getTime() - analyticsStartTime.getTime()
@@ -363,6 +379,9 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
       dispatch(analyticsEvent(stepDuration))
       dispatch(selectDropdownItem({ selection: null, mode: 'clear' }))
       dispatch(hoverSelection({ id: null, text: null }))
+      if (stackerModules.length > 0) {
+        dispatch(analyticsEvent(numberOfStackersLoaded))
+      }
     } else {
       setShowFormErrors(true)
       if (tab === 'aspirate' && isDispenseError && !isAspirateError) {
@@ -535,7 +554,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             <Icon size="1rem" name={icon} minWidth="1rem" />
             <StyledText
               desktopStyle="bodyLargeSemiBold"
-              css={LINE_CLAMP_TEXT_STYLE(2, true)}
+              className={clsx(
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_normal
+              )}
+              style={{ WebkitLineClamp: 2 }}
             >
               {/* TODO: use  module object from form.json instead */}
               {formData.stepType === 'flexStacker'

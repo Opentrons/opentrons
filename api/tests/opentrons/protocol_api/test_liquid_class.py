@@ -1,4 +1,5 @@
 """Tests for LiquidClass methods."""
+
 import pytest
 from decoy import Decoy
 

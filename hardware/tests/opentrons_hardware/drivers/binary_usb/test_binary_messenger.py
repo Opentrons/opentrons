@@ -1,4 +1,5 @@
 """Tests for the can messaging class."""
+
 from __future__ import annotations
 import asyncio
 from asyncio import Queue

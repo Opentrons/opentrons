@@ -1,10 +1,11 @@
-""" opentrons.execute: functions and entrypoint for running protocols
+"""opentrons.execute: functions and entrypoint for running protocols
 
 This module has functions that can be imported to provide protocol
 contexts for running protocols during interactive sessions like Jupyter or just
 regular python shells. It also provides a console entrypoint for running a
 protocol from the command line.
 """
+
 import asyncio
 import atexit
 import argparse

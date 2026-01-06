@@ -182,7 +182,11 @@ async def test_analyze(
     await subject.load_orchestrator(
         run_time_param_values={"rtp_var": 123}, run_time_param_paths={}
     )
-    decoy.when(await orchestrator.run(deck_configuration=[],)).then_return(
+    decoy.when(
+        await orchestrator.run(
+            deck_configuration=[],
+        )
+    ).then_return(
         protocol_runner.RunResult(
             commands=[analysis_command],
             state_summary=StateSummary(

@@ -1,4 +1,5 @@
 """Tests that validate the built-in liquid class definitions."""
+
 import pytest
 from typing import List, Dict, Any
 

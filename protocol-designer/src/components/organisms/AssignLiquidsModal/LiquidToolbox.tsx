@@ -20,7 +20,9 @@ import {
   Toolbox,
   TYPOGRAPHY,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { analyticsEvent } from '/protocol-designer/analytics/actions'
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
 import {
@@ -29,7 +31,10 @@ import {
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getLiquidClassDisplayName } from '/protocol-designer/liquid-defs/utils'
-import { getLiquidEntities } from '/protocol-designer/step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getLiquidEntities,
+} from '/protocol-designer/step-forms/selectors'
 import * as fieldProcessors from '/protocol-designer/steplist/fieldLevel/processing'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
@@ -273,12 +278,35 @@ function LiquidToolbox({
       : false
   const hasSelection = selectedWells.length > 0
   const canEdit = !showLiquidLayoutOverlay && (hasLiquids || hasSelection)
+  const { labware, modules } = useSelector(getInitialDeckSetup)
+  const stackerModuleIds = Object.entries(modules).reduce<string[]>(
+    (stackerIds, [moduleId, moduleOnDeck]) => {
+      return moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
+        ? stackerIds.concat(moduleId)
+        : stackerIds
+    },
+    []
+  )
 
+  const labwareOnStackerWithLiquid = Object.entries(labware).filter(
+    ([, labwareInfo]) =>
+      labwareInfo.stack != null &&
+      stackerModuleIds.some(stackerId => labwareInfo.stack.includes(stackerId))
+  )
   const handleConfirmClick = (): void => {
+    if (labwareOnStackerWithLiquid.length > 0) {
+      dispatch(
+        analyticsEvent({
+          name: 'liquidInLabwareInStacker',
+          properties: {},
+        })
+      )
+    }
     if (selectedWells.length > 0) {
       setShowBadFormState(true)
       return
     }
+
     dispatch(deselectAllWells())
     navigate('/designer')
   }

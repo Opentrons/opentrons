@@ -1,4 +1,5 @@
-""" Utility functions and classes for the protocol api """
+"""Utility functions and classes for the protocol api"""
+
 from __future__ import annotations
 
 from collections import UserDict
@@ -303,7 +304,6 @@ class AxisMaxSpeeds(UserDict[Union[str, Axis], float]):
         return checked_key
 
     def __setitem__(self, key: object, value: object) -> None:
-
         checked_key = AxisMaxSpeeds._verify_key(key)
         if value is None:
             del self[checked_key]

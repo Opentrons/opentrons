@@ -1,4 +1,5 @@
 """Wait for duration command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 
@@ -62,9 +63,9 @@ class WaitForDuration(
     params: WaitForDurationParams
     result: Optional[WaitForDurationResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[WaitForDurationImplementation] = (
         WaitForDurationImplementation
-    ] = WaitForDurationImplementation
+    )
 
 
 class WaitForDurationCreate(BaseCommandCreate[WaitForDurationParams]):

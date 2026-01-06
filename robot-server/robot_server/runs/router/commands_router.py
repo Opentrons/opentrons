@@ -1,4 +1,5 @@
 """Router for /runs commands endpoints."""
+
 import textwrap
 from typing import Annotated, Final, Literal, Optional, Union
 
@@ -72,9 +73,9 @@ class CommandNotAllowed(ErrorDetails):
 class PreSerializedCommandsNotAvailable(ErrorDetails):
     """An error if one tries to fetch pre-serialized commands before they are written to the database."""
 
-    id: Literal[
+    id: Literal["PreSerializedCommandsNotAvailable"] = (
         "PreSerializedCommandsNotAvailable"
-    ] = "PreSerializedCommandsNotAvailable"
+    )
     title: str = "Pre-Serialized commands not available."
     detail: str = (
         "Pre-serialized commands are only available once a run has finished running."

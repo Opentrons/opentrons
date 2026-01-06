@@ -1,4 +1,5 @@
 """Message types."""
+
 from functools import lru_cache
 from typing import Union, Optional, Type
 

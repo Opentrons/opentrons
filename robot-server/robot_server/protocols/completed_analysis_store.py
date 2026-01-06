@@ -1,4 +1,5 @@
 """Completed analysis storage and access."""
+
 from __future__ import annotations
 
 import asyncio

@@ -238,13 +238,13 @@ export function FixtureListItem({
                   setShowSetupInstructionsModal(true)
                 }}
               >
-                <LegacyStyledText marginLeft={SPACING.spacing4} as="p">
+                <LegacyStyledText marginLeft={SPACING.spacing4} forwardedAs="p">
                   {t('protocol_setup:view_setup_instructions')}
                 </LegacyStyledText>
               </Btn>
             </Flex>
           </Flex>
-          <LegacyStyledText as="p" width="15%">
+          <LegacyStyledText forwardedAs="p" width="15%">
             {displayLocation}
           </LegacyStyledText>
           <Flex
@@ -262,7 +262,7 @@ export function FixtureListItem({
                     : setShowNotConfiguredModal(true)
                 }}
               >
-                <LegacyStyledText as="label" cursor="pointer">
+                <LegacyStyledText forwardedAs="label" cursor="pointer">
                   {t('protocol_setup:resolve')}
                 </LegacyStyledText>
               </TertiaryButton>

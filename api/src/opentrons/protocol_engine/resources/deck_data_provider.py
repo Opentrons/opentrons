@@ -1,4 +1,5 @@
 """Deck data resource provider."""
+
 from dataclasses import dataclass
 from typing import List, Optional, cast
 from typing_extensions import final

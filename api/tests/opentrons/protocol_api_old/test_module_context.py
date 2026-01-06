@@ -354,7 +354,9 @@ def test_hs_flag_unsafe_move_raises(
     mod._core.geometry.flag_unsafe_move = mock.MagicMock(side_effect=raiser)  # type: ignore[attr-defined]
 
     with pytest.raises(PipetteMovementRestrictedByHeaterShakerError, match="uh oh"):
-        mod._core.flag_unsafe_move(to_loc=labware.wells()[1].top(), is_multichannel=False)  # type: ignore[attr-defined]
+        mod._core.flag_unsafe_move(  # type: ignore[attr-defined]
+            to_loc=labware.wells()[1].top(), is_multichannel=False
+        )
 
 
 def test_hs_flag_unsafe_move_skips_non_labware_locations(

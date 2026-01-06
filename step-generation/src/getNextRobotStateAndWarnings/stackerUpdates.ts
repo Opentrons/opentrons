@@ -3,9 +3,13 @@ import {
   getHeightOfLabwareStackFromDefinitions,
   getLabwareOverlapOffset,
   getStackerMaxPoolCountByHeight,
+  SYSTEM_LOCATION,
 } from '@opentrons/shared-data'
 
-import { HOPPER_STACKER_LOCATION } from '../constants'
+import {
+  BOTTOM_UP_LABWARE_POOL_KEYS,
+  HOPPER_STACKER_LOCATION,
+} from '../constants'
 import { flexStackerStateGetter } from '../robotStateSelectors'
 import { uuid } from '../utils'
 
@@ -19,9 +23,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
-const BOTTOM_UP_LABWARE_POOL_KEYS: Array<keyof FlexStackerStoredLabwareGroup> =
-  ['adapterLabwareId', 'adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
-
 export const forFlexStackerEmpty = (
   params: FlexStackerEmptyCreateCommand['params'],
   invariantContext: InvariantContext,
@@ -29,6 +30,11 @@ export const forFlexStackerEmpty = (
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
+  const labwareInHopper = Object.entries(robotState.labware).filter(
+    ([, labware]) =>
+      labware.stack.includes(HOPPER_STACKER_LOCATION) &&
+      labware.stack.includes(moduleId)
+  )
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   if (moduleState != null && moduleState.labwareInHopper != null) {
     if (params.count != null) {
@@ -40,22 +46,104 @@ export const forFlexStackerEmpty = (
       moduleState.labwareInHopper = []
     }
   }
+  labwareInHopper.forEach(([labwareId]) => {
+    robotState.labware[labwareId] = {
+      ...robotState.labware[labwareId],
+      stack: [labwareId, SYSTEM_LOCATION],
+    }
+  })
 }
-
 export const forFlexStackerFillItems = (
   params: FlexStackerFillItemsParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  // TODO: we need to update both the labwareInHopper key and all the robotState.labware entities currently in the hopper
-  // const { robotState } = robotStateAndWarnings
-  // const { moduleId, labware } = params
-  // const slot = robotState.modules[moduleId].slot
-  // const moduleState = _getStackerModuleState(robotState, moduleId)
-  // const largestStackInSlot = getLargestStackInSlot(robotState.labware, slot)
-  // if (moduleState != null) {
-  //   moduleState.labwareInHopper = [labware, ...moduleState.labwareInHopper]
-  // }
+  const { robotState } = robotStateAndWarnings
+  const { labwareEntities } = invariantContext
+  const { moduleId, labware } = params
+
+  const moduleSlot = robotState.modules[moduleId].slot
+  const moduleState = flexStackerStateGetter(robotState, moduleId)
+
+  if (moduleState == null || moduleState.storedLabwareDetails == null) {
+    return
+  }
+  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    moduleState.storedLabwareDetails
+
+  // group labware IDs by primaryyyy (each primary = one hopper position)
+  const groups: FlexStackerStoredLabwareGroup[] = []
+
+  for (const labwareId of labware) {
+    const defURI = labwareEntities[labwareId].labwareDefURI
+
+    if (defURI === primaryLabwareURI) {
+      groups.push({
+        primaryLabwareId: labwareId,
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      })
+    } else if (defURI === adapterLabwareURI) {
+      const lastGroup = groups[groups.length - 1]
+      if (lastGroup) {
+        lastGroup.adapterLabwareId = labwareId
+      }
+    } else if (defURI === lidLabwareURI) {
+      const lastGroup = groups[groups.length - 1]
+      if (lastGroup) {
+        lastGroup.lidLabwareId = labwareId
+      }
+    }
+  }
+
+  // rebuild ALL stacks (bottom-up)
+  const baseStack = [HOPPER_STACKER_LOCATION, moduleId, moduleSlot]
+
+  for (const group of groups) {
+    const bottomUpStack = [
+      group.adapterLabwareId,
+      group.primaryLabwareId,
+      group.lidLabwareId,
+      ...baseStack,
+    ].filter((v): v is string => v != null)
+
+    // primary
+    robotState.labware[group.primaryLabwareId] = {
+      ...robotState.labware[group.primaryLabwareId],
+      stack: bottomUpStack.slice(bottomUpStack.indexOf(group.primaryLabwareId)),
+    }
+
+    // adapter
+    if (group.adapterLabwareId != null) {
+      robotState.labware[group.adapterLabwareId] = {
+        ...robotState.labware[group.adapterLabwareId],
+        stack: bottomUpStack.slice(
+          bottomUpStack.indexOf(group.adapterLabwareId)
+        ),
+      }
+    }
+
+    // lid
+    if (group.lidLabwareId != null) {
+      robotState.labware[group.lidLabwareId] = {
+        ...robotState.labware[group.lidLabwareId],
+        stack: bottomUpStack.slice(bottomUpStack.indexOf(group.lidLabwareId)),
+      }
+    }
+  }
+
+  // Rebuild labwareInHopper
+  const existingGroups = moduleState.labwareInHopper ?? []
+
+  const newGroups: FlexStackerStoredLabwareGroup[] = groups.map(
+    ({ primaryLabwareId, adapterLabwareId, lidLabwareId }) => ({
+      primaryLabwareId,
+      adapterLabwareId,
+      lidLabwareId,
+    })
+  )
+
+  moduleState.labwareInHopper = [...existingGroups, ...newGroups]
 }
 
 export const forFlexStackerFill = (
@@ -122,7 +210,6 @@ export const forFlexStackerRetrieve = (
   const { moduleId } = params
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   const moduleSlot = robotState.modules[moduleId].slot
-
   if (moduleState != null) {
     const { labwareInHopper, labwareOnShuttle } = moduleState
     if (
@@ -137,7 +224,7 @@ export const forFlexStackerRetrieve = (
       labwareInHopper.shift()
 
       // build labware stacks on the deck
-      const runningStack = [moduleId, moduleSlot]
+      const runningStack = [moduleSlot]
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareGroupOnShuttle[
@@ -159,8 +246,8 @@ export const forFlexStackerStore = (
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
+  const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
-
   if (moduleState != null) {
     const { labwareOnShuttle } = moduleState
     if (labwareOnShuttle != null) {
@@ -176,10 +263,13 @@ export const forFlexStackerStore = (
           labwareOnShuttle[
             labwarePoolKey as keyof FlexStackerStoredLabwareGroup
           ]
+
         if (labwareId != null) {
           robotState.labware[labwareId].stack = [
             labwareId,
             HOPPER_STACKER_LOCATION,
+            moduleId,
+            moduleSlot,
           ]
         }
       }

@@ -110,7 +110,7 @@ export function RunFailedModal({
           isSingleError={!!highestPriorityError}
           runStatus={runStatus}
         />
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('branded:run_failed_modal_description_desktop')}
         </LegacyStyledText>
         <Flex

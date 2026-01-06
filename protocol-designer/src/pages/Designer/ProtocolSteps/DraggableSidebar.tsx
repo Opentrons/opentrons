@@ -2,10 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import {
-  Box,
   COLORS,
   DIRECTION_COLUMN,
-  DISPLAY_FLEX,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
 } from '@opentrons/components'
@@ -31,7 +29,9 @@ export function DraggableSidebar({
 }: DraggableSidebarProps): JSX.Element {
   const sidebarRef = useRef<HTMLDivElement>(null)
   const [isResizing, setIsResizing] = useState(false)
-  const [sidebarWidth, setSidebarWidth] = useState(INITIAL_SIDEBAR_WIDTH)
+  const [sidebarWidth, setSidebarWidth] = useState<number>(
+    INITIAL_SIDEBAR_WIDTH
+  )
 
   const startResizing = useCallback(() => {
     setIsResizing(true)
@@ -86,8 +86,7 @@ export function DraggableSidebar({
   )
 }
 
-const SidebarContainer = styled(Box)`
-  display: ${DISPLAY_FLEX};
+const SidebarContainer = styled(Flex)`
   flex-direction: ${DIRECTION_COLUMN};
   border-right: 1px solid #ccc;
   position: relative;

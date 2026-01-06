@@ -1,4 +1,5 @@
 """Tests for the Analyses Manager interface."""
+
 import pytest
 from decoy import Decoy, matchers
 from datetime import datetime

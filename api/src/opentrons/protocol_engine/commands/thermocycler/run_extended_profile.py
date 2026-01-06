@@ -1,4 +1,5 @@
 """Command models to execute a Thermocycler profile."""
+
 from __future__ import annotations
 from typing import List, Optional, TYPE_CHECKING, overload, Union, Any
 from typing_extensions import Literal, Type
@@ -80,15 +81,13 @@ def _transform_profile_step(
 @overload
 def _transform_profile_element(
     element: ProfileStep, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerStep:
-    ...
+) -> ThermocyclerStep: ...
 
 
 @overload
 def _transform_profile_element(
     element: ProfileCycle, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerCycle:
-    ...
+) -> ThermocyclerCycle: ...
 
 
 def _transform_profile_element(

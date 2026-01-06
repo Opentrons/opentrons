@@ -1,4 +1,5 @@
 """Utils for motion planning."""
+
 import numpy as np
 import logging
 from typing import Iterator, List, Tuple, Set, TYPE_CHECKING, cast

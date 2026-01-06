@@ -1,4 +1,5 @@
 """Modules routes."""
+
 from typing import Annotated, List, Dict
 
 from fastapi import Depends, status

@@ -37,7 +37,7 @@ export const PipetteRecalibrationODDWarning = (): JSX.Element | null => {
           marginRight={SPACING.spacing12}
           aria-label="ot-alert_icon"
         />
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           <Trans
             t={t}
             i18nKey="pipette_calibrations_differ"
