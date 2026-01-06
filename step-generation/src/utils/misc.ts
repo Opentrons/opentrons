@@ -917,7 +917,6 @@ export const getIsLabwareCompatibleWithStack = (
   moduleEntities: ModuleEntities
 ): CompatibleWithStack => {
   // if stack is empty, moving directly to empty slot
-  console.log('🚀 ~ getIsLabwareCompatibleWithStack ~ stack:', stack)
   if (stack.length === 0) {
     return { isCompatible: true, isAboveStackLimit: false }
   }
@@ -927,7 +926,7 @@ export const getIsLabwareCompatibleWithStack = (
   if (moduleId != null) {
     const isStackerInStack =
       moduleEntities[moduleId].type === FLEX_STACKER_MODULE_TYPE
-    isOnHopper = isStackerInStack && stack.includes('hopper')
+    isOnHopper = isStackerInStack && stack.includes(HOPPER_STACKER_LOCATION)
   }
 
   const topIdInStack = getTopLocationInStack(stack)
@@ -938,14 +937,21 @@ export const getIsLabwareCompatibleWithStack = (
   if (topIdInStack in labwareEntities) {
     const movingLabwareEntity = labwareEntities[labwareId]
     const topLabwareEntity = labwareEntities[topIdInStack]
+    const labwareIdsInStack = stack.filter(id => labwareEntities[id] != null)
+    const lidInStack = labwareIdsInStack.filter(id =>
+      labwareEntities[id]?.def?.allowedRoles?.includes('lid')
+    )[0]
+    const adapterInStack = labwareIdsInStack.filter(id =>
+      labwareEntities[id]?.def?.allowedRoles?.includes('adapter')
+    )[0]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
     if (isOnHopper) {
       // allow labware without a stack limit to be stacked on the stacker
       const maxPoolCount = getMaxPoolCount({
         labwareDefinitions: {
           primary: topLabwareEntity.def,
-          adapter: null,
-          lid: null,
+          adapter: labwareEntities[adapterInStack]?.def ?? null,
+          lid: labwareEntities[lidInStack]?.def ?? null,
         },
         model: FLEX_STACKER_MODULE_V1,
       })
