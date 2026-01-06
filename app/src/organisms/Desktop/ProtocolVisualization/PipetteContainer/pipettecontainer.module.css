@@ -33,10 +33,12 @@
   .container {
     gap: var(--spacing-8);
   }
+
   .header {
     flex-wrap: wrap;
     gap: var(--spacing-8);
   }
+
   .main_content {
     flex-wrap: wrap;
     gap: var(--spacing-4);
