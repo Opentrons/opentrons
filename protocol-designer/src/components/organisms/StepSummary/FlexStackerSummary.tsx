@@ -1,5 +1,7 @@
 import { useSelector } from 'react-redux'
 
+import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+
 import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 import {
@@ -10,10 +12,7 @@ import {
 } from '../../../constants'
 import { StyledTrans } from './StyledTrans'
 
-import type {
-  FlexStackerModuleState,
-  TimelineFrame,
-} from '@opentrons/step-generation'
+import type { TimelineFrame } from '@opentrons/step-generation'
 import type { FormData } from '../../../form-types'
 
 interface FlexStackerSummaryProps {
@@ -25,28 +24,35 @@ export function FlexStackerSummary(
   props: FlexStackerSummaryProps
 ): JSX.Element | null {
   const { currentStep, moduleRobotState } = props
+  const labwareDefByURI = useSelector(getLabwareDefsByURI)
   const { fillLabwareIds, flexStackerFormType, moduleId } = currentStep
-  if (moduleRobotState[moduleId] == null) {
+  const { moduleState: stackerModuleState } = moduleRobotState[moduleId] ?? {}
+  if (
+    stackerModuleState == null ||
+    stackerModuleState.type !== FLEX_STACKER_MODULE_TYPE
+  ) {
     console.error(
       `expected to find the stacker module state but could not with moduleId ${moduleId}`
     )
+    return null
   }
-  const stackerModuleState: FlexStackerModuleState = moduleRobotState[moduleId]
-    .moduleState as FlexStackerModuleState
+
   let stepSummaryContent: JSX.Element | null = null
   const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
     stackerModuleState.storedLabwareDetails ?? {}
-
-  const labwareDefByURI = useSelector(getLabwareDefsByURI)
 
   const labwareNameString = [
     adapterLabwareURI,
     primaryLabwareURI,
     lidLabwareURI,
   ]
-    .filter(Boolean)
-    .map(uri => labwareDefByURI[uri!]?.metadata?.displayName)
-    .filter(Boolean)
+    .reduce<string[]>((names, uri) => {
+      const name = uri && labwareDefByURI[uri]?.metadata?.displayName
+      if (name != null) {
+        names.push(name)
+      }
+      return names
+    }, [])
     .join(', ')
 
   switch (flexStackerFormType) {
