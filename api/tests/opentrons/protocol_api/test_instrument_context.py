@@ -79,7 +79,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
 from opentrons_shared_data.robot.types import RobotType
-from . import versions_at_or_above, versions_between
+from . import versions_at_or_above, versions_between, versions_below
 
 
 @pytest.fixture(autouse=True)
@@ -1710,6 +1710,49 @@ def test_touch_tip_raises_if_trash_last_location(
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
     with pytest.raises(RuntimeError, match="not valid for touch tip"):
         subject.touch_tip()
+
+
+@pytest.mark.parametrize("api_version", versions_below(APIVersion(2, 28), False))
+def test_touch_tip_noops_for_older_api_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should no-op for labware with `touchTipDisabled` quirk for older API versions."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+    decoy.when(mock_well.top(z=4.56)).then_return(
+        Location(point=Point(1, 2, 3), labware=mock_well)
+    )
+    subject.touch_tip(mock_well, v_offset=4.56, speed=42.0)
+    decoy.verify(
+        mock_instrument_core.touch_tip(
+            location=Location(point=Point(1, 2, 3), labware=mock_well),
+            well_core=mock_well._core,
+            radius=1,
+            z_offset=4.56,
+            speed=42.0,
+        ),
+        times=0,
+    )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
+def test_touch_tip_raises_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise if the labware has quirk 'touchTipDisabled' for API v2.28 & above."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+
+    with pytest.raises(RuntimeError, match="Touch tip not allowed on labware"):
+        subject.touch_tip(mock_well)
 
 
 def test_return_height(

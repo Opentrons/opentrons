@@ -1202,11 +1202,15 @@ class InstrumentContext(publisher.CommandPublisher):
                               ``None``. This should happen if ``touch_tip`` is called
                               without first calling a method that takes a location, like
                               :py:meth:`.aspirate` or :py:meth:`dispense`.
+                              Also raises RuntimeError if location is in a labware with
+                              `touchTipDisabled` quirk.
         :raises: ValueError: If both ``mm_from_edge`` and ``radius`` are specified.
         :returns: This instance.
 
         .. versionchanged:: 2.24
                 Added the ``mm_from_edge`` parameter.
+        .. versionchanged:: 2.28
+                Raises error if touching tip on a labware with `touchTipDisabled` quirk.
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
@@ -1246,8 +1250,12 @@ class InstrumentContext(publisher.CommandPublisher):
                 )
 
         if "touchTipDisabled" in parent_labware.quirks:
-            _log.info(f"Ignoring touch tip on labware {well}")
-            return self
+            if self.api_version < APIVersion(2, 28):
+                _log.info(f"Ignoring touch tip on labware {well}")
+                return self
+            raise RuntimeError(
+                f"Touch tip not allowed on labware {parent_labware.name}"
+            )
         if parent_labware.is_tiprack:
             _log.warning(
                 "Touch_tip being performed on a tiprack. Please re-check your code"
