@@ -1,12 +1,12 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
-import styled from 'styled-components'
 
 import { StyledText } from '../../atoms/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Box, Flex } from '../../primitives'
 import { ALIGN_FLEX_START, DIRECTION_COLUMN } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
+import styles from './spacing.stories.module.css'
 
 import type { Meta, Story } from '@storybook/react'
 
@@ -52,8 +52,8 @@ const Template: Story<SpacingsStorybookProps> = args => {
             {`${spacing[0]} - ${spacing[1]}: ${convertToPx(spacing[1])}`}
           </StyledText>
           <Flex gridGap={spacing[1]} backgroundColor={COLORS.blue50}>
-            <StyledBox />
-            <StyledBox />
+            <Box className={styles.styled_box} />
+            <Box className={styles.styled_box} />
           </Flex>
         </Flex>
       ))}
@@ -66,9 +66,3 @@ const allSpacings = Object.entries(SPACING)
 AllSpacing.args = {
   spacings: allSpacings,
 }
-
-const StyledBox = styled(Box)`
-  width: 2rem;
-  height: 2rem;
-  background-color: ${COLORS.blue35};
-`
