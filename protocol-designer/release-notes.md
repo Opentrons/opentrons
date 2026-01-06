@@ -15,11 +15,13 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 This release adds support for the Flex Stacker Module in Protocol Designer, and includes other bug fixes.
 
 ### New Features
-- Use the Flex Stacker Module to store and use multiple well plates, PCR plates, or tip racks in your Protocol Designer protocols. 
+
+- Use the Flex Stacker Module to store and use multiple well plates, PCR plates, or tip racks in your Protocol Designer protocols.
 
 ### Bug Fixes
+
 - Add tip rack lids to tip racks placed inside Flex 96-channel adapters.
-- Protocol Designer properly displays tip racks and their lids on the deck. 
+- Protocol Designer properly displays tip racks and their lids on the deck.
 
 Running a protocol created in Protocol Designer requires Opentrons App version 8.8.0 or newer.
 
@@ -133,6 +135,7 @@ This hotfix release addresses several bugs.
 ### Bug Fixes
 
 - Crashes and protocol loss no longer occur when:
+
   - deleting a pipette involved in a mix step.
   - deleting a Protocol Designer step title.
   - checking labware details after deleting a liquid.
