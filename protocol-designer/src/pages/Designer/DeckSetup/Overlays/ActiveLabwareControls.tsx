@@ -10,6 +10,7 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
@@ -22,6 +23,7 @@ import { DECK_CONTROLS_STYLE } from '../constants'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
+import type { FlexStackerModuleState } from '@opentrons/step-generation'
 import type { DeckSetupTerminalIdType } from '../../types'
 
 interface ActiveLabwareControlsProps extends DeckSetupTerminalIdType {
@@ -56,6 +58,27 @@ export function ActiveLabwareControls(
         isSlotAHopper
       )
 
+  const stackerModuleId = fullStack.find(
+    id =>
+      activeDeckSetup.modules[id] != null &&
+      activeDeckSetup.modules[id].type === FLEX_STACKER_MODULE_TYPE
+  )
+  const stackerModuleState: FlexStackerModuleState | null =
+    stackerModuleId != null
+      ? (activeDeckSetup.modules[stackerModuleId]
+          .moduleState as FlexStackerModuleState)
+      : null
+  const stackerHopperLabware: string[] =
+    stackerModuleState?.labwareInHopper?.reduce<string[]>((acc, hopper) => {
+      acc.push(hopper.primaryLabwareId)
+      if (hopper.adapterLabwareId) {
+        acc.push(hopper.adapterLabwareId)
+      }
+      if (hopper.lidLabwareId) {
+        acc.push(hopper.lidLabwareId)
+      }
+      return acc
+    }, []) ?? []
   const filteredStack = fullStack.filter(
     item => activeDeckSetup.labware[item] != null
   )
@@ -74,7 +97,11 @@ export function ActiveLabwareControls(
           closeModal={() => {
             setShowSlotDetailModal(false)
           }}
-          stackOfLabware={filteredStack}
+          stackOfLabware={
+            stackerHopperLabware.length > 0
+              ? stackerHopperLabware
+              : filteredStack
+          }
         />
       ) : null}
 
