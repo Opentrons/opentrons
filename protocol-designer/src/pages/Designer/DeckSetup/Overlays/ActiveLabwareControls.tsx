@@ -10,11 +10,13 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getFullStackFromLabwares } from '@opentrons/step-generation'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
+import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getFullStackFromLabwaresOnDeck } from '/protocol-designer/utils'
 
 import { DECK_CONTROLS_STYLE } from '../constants'
 
@@ -42,9 +44,18 @@ export function ActiveLabwareControls(
     setHover,
   } = props
   const { t } = useTranslation('starting_deck_state')
+  const pendingCreationStateForHopper = useSelector(getPendingCreationState)
+  const isSlotAHopper = getIsSlotAHopper(itemId)
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
+  const fullStack = pendingCreationStateForHopper
+    ? []
+    : getFullStackFromLabwaresOnDeck(
+        Object.values(activeDeckSetup.labware),
+        itemId,
+        isSlotAHopper
+      )
+
   const filteredStack = fullStack.filter(
     item => activeDeckSetup.labware[item] != null
   )
