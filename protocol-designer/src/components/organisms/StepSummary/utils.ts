@@ -1,8 +1,12 @@
 import first from 'lodash/first'
 import last from 'lodash/last'
 
-import { AIR } from '@opentrons/step-generation'
+import { AIR, BOTTOM_UP_LABWARE_POOL_KEYS } from '@opentrons/step-generation'
 
+import type {
+  FlexStackerStoredLabwareGroup,
+  LabwareDefinition,
+} from '@opentrons/shared-data'
 import type { RobotState } from '@opentrons/step-generation'
 
 export const getWellsForStepSummary = (
@@ -39,4 +43,22 @@ export const getLiquidIdsForStepSummary = (
       return acc
     }, new Set<string>())
   )
+}
+
+export const getLabwareGroupNamesString = (
+  group: FlexStackerStoredLabwareGroup,
+  nicknamesById: Record<string, string>,
+  labwareDefByURI: Record<string, LabwareDefinition>
+): string => {
+  return BOTTOM_UP_LABWARE_POOL_KEYS.reduce<string[]>((acc, key) => {
+    const nickname =
+      group[key] != null
+        ? (nicknamesById[group[key]!] ??
+          labwareDefByURI[group[key]!]?.metadata?.displayName)
+        : null
+    if (nickname != null) {
+      acc.push(nickname)
+    }
+    return acc
+  }, []).join(', ')
 }

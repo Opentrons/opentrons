@@ -273,6 +273,25 @@ export const forFlexStackerStore = (
           ]
         }
       }
+      // if there are no stored labware details, set them now
+      if (moduleState.storedLabwareDetails == null) {
+        moduleState.storedLabwareDetails = {
+          primaryLabwareURI:
+            invariantContext.labwareEntities[labwareOnShuttle.primaryLabwareId]
+              .labwareDefURI,
+          adapterLabwareURI:
+            labwareOnShuttle.adapterLabwareId != null
+              ? invariantContext.labwareEntities[
+                  labwareOnShuttle.adapterLabwareId
+                ].labwareDefURI
+              : null,
+          lidLabwareURI:
+            labwareOnShuttle.lidLabwareId != null
+              ? invariantContext.labwareEntities[labwareOnShuttle.lidLabwareId]
+                  .labwareDefURI
+              : null,
+        }
+      }
     }
   }
 }

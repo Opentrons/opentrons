@@ -77,6 +77,12 @@ describe('StepSummary', () => {
         def: fixture96Plate as LabwareDefinition2,
         pythonName: 'mockPythonName',
       },
+      someId: {
+        id: 'someId',
+        labwareDefURI: 'mockRetrieveUri',
+        def: fixture96Plate as LabwareDefinition2,
+        pythonName: 'mockPythonName',
+      },
     })
     vi.mocked(getLiquidEntities).mockReturnValue({
       liquidId: {
@@ -101,8 +107,8 @@ describe('StepSummary', () => {
         stacker: {
           slot: 'D3',
           moduleState: {
-            labwareOnShuttle: null,
-            labwareInHopper: null,
+            labwareOnShuttle: { primaryLabwareId: 'mockId', adapterLabwareId: null, lidLabwareId: null },
+            labwareInHopper: [{ primaryLabwareId: 'mockId', adapterLabwareId: null, lidLabwareId: null }],
             storedLabwareDetails: { primaryLabwareURI: 'mockUri' },
             type: FLEX_STACKER_MODULE_TYPE,
           },
@@ -111,8 +117,10 @@ describe('StepSummary', () => {
       pipettes: {},
       tipState: {} as any,
     })
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({ 'mockId': 'mockNickName' })
   })
   it('renders the mix summary with 1 liquid', () => {
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({ 'labware': 'mockNickName' })
     render(props)
     screen.getByText('Mixing')
     screen.getByText('100 µL')
@@ -122,6 +130,7 @@ describe('StepSummary', () => {
     screen.getByText('A1 of mockNickName')
   })
   it('renders the move liquid transfer summary with 2 liquids', () => {
+    vi.mocked(getLabwareNicknamesById).mockReturnValue({ 'labware': 'mockNickName' })
     props = {
       currentStep: {
         id: 'mockId',
@@ -177,7 +186,7 @@ describe('StepSummary', () => {
   it('renders flex stacker retrieve command summary', () => {
     render(baseStackerProps)
     screen.getByText('Retrieving')
-    screen.getByText('ANSI 96 Standard Microplate')
+    screen.getByText('mockNickName')
     screen.getByText('from stacker')
   })
 
@@ -192,7 +201,7 @@ describe('StepSummary', () => {
       },
     })
     screen.getByText('Storing')
-    screen.getByText('ANSI 96 Standard Microplate')
+    screen.getByText('mockNickName')
     screen.getByText('from shuttle into stacker')
   })
 
