@@ -117,9 +117,7 @@ export function AssignLiquidsModal(
   const labwareStack = labware[labwareId].stack
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
-  console.log('allWellContents: ', allWellContents)
-  console.log('labwareId: ', labwareId)
-  console.log('wellContents: ', wellContents)
+
   const selectableLabwareProps: {
     wellLabelOption: typeof WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
     definition: typeof labwareDef
@@ -136,7 +134,6 @@ export function AssignLiquidsModal(
       liquidDisplayColors
     ),
   }
-  console.log('selectableLabwareProps: ', selectableLabwareProps)
 
   return (
     <Flex

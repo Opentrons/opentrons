@@ -104,7 +104,6 @@ export function LabwareStackToolbox({
 
       // Get the value of the specified property from the first element
       const firstValue = allWellContents[filteredLabwareStack[0]]
-      // Use the every() method to compare all elements' property value
       return arr.every(
         item =>
           JSON.stringify(allWellContents[item]) === JSON.stringify(firstValue)
