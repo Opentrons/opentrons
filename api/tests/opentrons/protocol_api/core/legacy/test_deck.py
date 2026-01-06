@@ -1,4 +1,5 @@
 """Tests for the opentrons.protocols.geometry.Deck interface."""
+
 from typing import Any
 
 import pytest

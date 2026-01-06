@@ -118,9 +118,9 @@ class UnsafeFlexStackerPrepareShuttle(
     params: UnsafeFlexStackerPrepareShuttleParams
     result: UnsafeFlexStackerPrepareShuttleResult | None = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeFlexStackerPrepareShuttleImpl] = (
         UnsafeFlexStackerPrepareShuttleImpl
-    ] = UnsafeFlexStackerPrepareShuttleImpl
+    )
 
 
 class UnsafeFlexStackerPrepareShuttleCreate(

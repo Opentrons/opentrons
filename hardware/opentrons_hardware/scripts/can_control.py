@@ -5,6 +5,7 @@ Uses the styled output of can_mon while allowing message prompts as can_comm.
 
 Enter ? to get the can_comm prompts.
 """
+
 import asyncio
 import logging
 import argparse
@@ -73,9 +74,10 @@ async def input_task(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    async with build.driver(build_settings(args)) as driver, CanMessenger(
-        driver
-    ) as messenger:
+    async with (
+        build.driver(build_settings(args)) as driver,
+        CanMessenger(driver) as messenger,
+    ):
         try:
             all_fut = asyncio.gather(
                 monitor_task(messenger, args.output),

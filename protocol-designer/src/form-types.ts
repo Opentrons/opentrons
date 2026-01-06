@@ -196,6 +196,20 @@ export const stepIconsByType: Record<StepType, IconName> = {
 }
 // ===== Unprocessed form types =====
 export interface AnnotationFields {
+  // todo(mm, 2026-01-06):
+  //
+  // FormData does not extend from this type, but we do have code that tries to access
+  // stepName and stepDetails on FormData. (This has not been an error because FormData
+  // is essentially any-typed).
+  //
+  // Meanwhile, stepNumber seems to be hard-coded to 0 in new protocols, missing in
+  // old migrated protocols, and always overwritten with the actual index in
+  // getArgsAndErrorsByStepId() by the time we pass it to step-generation.
+  //
+  // We probably want to:
+  // - Make FormData extend from this type (to reflect the fact that code expects stepName and stepDetails on it)
+  // - Make stepNumber optional (to reflect the fact that it may or may not be present in imported files)
+  // - Deprecate stepNumber (to reflect the fact that it's overwritten and doesn't matter)
   stepName: string
   stepDetails: string
   stepNumber: number
@@ -467,22 +481,35 @@ export interface HydratedHeaterShakerFormData extends AnnotationFields {
 export interface HydratedThermocyclerFormData extends AnnotationFields {
   id: string
   stepType: 'thermocycler'
-  blockIsActive: boolean
-  blockIsActiveHold: boolean
-  blockTargetTemp: string | null
-  blockTargetTempHold: string | null
-  lidIsActive: boolean
-  lidIsActiveHold: boolean
-  lidOpen: boolean
-  lidOpenHold: boolean
-  lidTargetTemp: string | null
-  lidTargetTempHold: string | null
+
   moduleId: string
+
+  thermocyclerFormType: 'thermocyclerState' | 'thermocyclerProfile'
+
+  blockIsActive: boolean
+  blockTargetTemp: string | null
+
+  lidIsActive: boolean
+  lidTargetTemp: string | null
+
+  lidOpen: boolean
+
   orderedProfileItems: string[]
   profileItemsById: Record<string, ProfileItem>
   profileTargetLidTemp: string | null
   profileVolume: string | null
-  thermocyclerFormType: 'thermocyclerState' | 'thermocyclerProfile'
+
+  // https://opentrons.atlassian.net/browse/EXEC-2141
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  blockIsActiveHold: boolean
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  blockTargetTempHold: string | null
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  lidIsActiveHold: boolean
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  lidTargetTempHold: string | null
+  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  lidOpenHold: boolean
 }
 
 export type AbsorbanceReaderFormType =
@@ -515,7 +542,7 @@ export interface HydratedFlexStackerFormData extends AnnotationFields {
   stepType: 'flexStacker'
   id: string
   fillLabwareUri: string | null
-  fillQuantity: number | null
+  fillLabwareIds: string[]
   flexStackerFormType: FlexStackerFormType | null
   interventionMessage: string | null
   moduleId: string

@@ -142,7 +142,7 @@ const QuickTransferHeader = ({
           </Flex>
           {!isTransferFetching ? (
             <LegacyStyledText
-              as="h2"
+              forwardedAs="h2"
               fontWeight={TYPOGRAPHY.fontWeightBold}
               onClick={toggleTruncate}
               overflowWrap={OVERFLOW_WRAP_ANYWHERE}
@@ -226,7 +226,7 @@ const Summary = ({ description, date }: SummaryProps): JSX.Element => {
       paddingBottom={SPACING.spacing24}
     >
       <LegacyStyledText
-        as="p"
+        forwardedAs="p"
         color={description === null ? COLORS.grey60 : undefined}
       >
         {description}
@@ -238,7 +238,7 @@ const Summary = ({ description, date }: SummaryProps): JSX.Element => {
         width="max-content"
         padding={`${SPACING.spacing8} ${SPACING.spacing12}`}
       >
-        <LegacyStyledText as="p">{`${t('protocol_info:date_added')}: ${
+        <LegacyStyledText forwardedAs="p">{`${t('protocol_info:date_added')}: ${
           date != null ? formatTimeWithUtcLabel(date) : t('shared:no_data')
         }`}</LegacyStyledText>
       </Flex>

@@ -1,4 +1,5 @@
 """Mock representations of potential circular frusta."""
+
 """
 These are circular frusta whose radii either decay or grow, but always at a constant rate.
 Height always decays from the max height to 0 in increments of 1.

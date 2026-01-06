@@ -26,17 +26,20 @@ export function InvalidationWarning(
   if (sessionType === Sessions.SESSION_TYPE_DECK_CALIBRATION) {
     warningBody = (
       <>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {t('deck_invalidates_pipette_offset')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('pipette_offset_recalibrate_both_mounts')}
         </LegacyStyledText>
       </>
     )
   } else {
     warningBody = (
-      <LegacyStyledText as="p">
+      <LegacyStyledText forwardedAs="p">
         {t('tip_length_invalidates_pipette_offset')}
       </LegacyStyledText>
     )

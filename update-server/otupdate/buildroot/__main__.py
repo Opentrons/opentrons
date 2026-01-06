@@ -1,6 +1,7 @@
 """
 Entrypoint for the buildroot update server
 """
+
 import asyncio
 import logging
 from typing import NoReturn

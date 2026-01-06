@@ -1,4 +1,5 @@
 """Tests for the legacy ModuleGeometry interface."""
+
 import pytest
 import mock
 

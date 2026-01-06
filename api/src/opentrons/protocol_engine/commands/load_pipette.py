@@ -1,4 +1,5 @@
 """Load pipette command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 
@@ -97,16 +98,12 @@ class LoadPipetteImplementation(
             self._state_view.config.robot_type
         )
         if (
-            (
-                robot_type == RobotTypeEnum.FLEX
-                and pipette_generation != PipetteGenerationType.FLEX
-            )
+            robot_type == RobotTypeEnum.FLEX
+            and pipette_generation != PipetteGenerationType.FLEX
         ) or (
-            (
-                robot_type == RobotTypeEnum.OT2
-                and pipette_generation
-                not in [PipetteGenerationType.GEN1, PipetteGenerationType.GEN2]
-            )
+            robot_type == RobotTypeEnum.OT2
+            and pipette_generation
+            not in [PipetteGenerationType.GEN1, PipetteGenerationType.GEN2]
         ):
             raise InvalidSpecificationForRobotTypeError(
                 f"Cannot load a {pipette_generation.value.capitalize()} pipette on "
@@ -138,9 +135,11 @@ class LoadPipetteImplementation(
             config=loaded_pipette.static_config,
         )
         state_update.set_fluid_unknown(pipette_id=loaded_pipette.pipette_id)
-        state_update.set_pipette_ready_to_aspirate(
-            pipette_id=loaded_pipette.pipette_id, ready_to_aspirate=False
-        ),
+        (
+            state_update.set_pipette_ready_to_aspirate(
+                pipette_id=loaded_pipette.pipette_id, ready_to_aspirate=False
+            ),
+        )
 
         return SuccessData(
             public=LoadPipetteResult(pipetteId=loaded_pipette.pipette_id),

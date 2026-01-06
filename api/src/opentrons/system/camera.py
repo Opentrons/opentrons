@@ -23,6 +23,9 @@ log = logging.getLogger(__name__)
 # Default System Cameras
 DEFAULT_SYSTEM_CAMERA = "/dev/ot_system_camera"
 
+# Default Preview Image Filename
+PREVIEW_IMAGE = "preview_image.jpeg"
+
 # Stream Globals
 DEFAULT_CONF_FILE = (
     "/lib/systemd/system/opentrons-live-stream/opentrons-live-stream.env"

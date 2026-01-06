@@ -1,4 +1,5 @@
 """A driver that emulates CAN over socket."""
+
 from __future__ import annotations
 
 import argparse

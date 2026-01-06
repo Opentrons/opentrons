@@ -1,6 +1,7 @@
 """
 opentrons_shared_data.protocol: types and bindings for json protocols
 """
+
 import json
 from typing import Any, NewType, Dict
 

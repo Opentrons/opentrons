@@ -105,6 +105,7 @@ class MaintenanceRunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            deck_configuration: The deck config to use.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             camera_provider: Utility for accessing image capture and camera settings.
 
@@ -185,7 +186,9 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-            await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+            await (
+                self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+            )
 
             if camera_settings is not None:
                 # Restart the live stream for the external run when the maintenance run has ended.

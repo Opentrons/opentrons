@@ -9,6 +9,7 @@ import type { ComponentProps, ReactNode } from 'react'
 export interface LegacyProps extends Omit<ComponentProps<typeof Text>, 'as'> {
   children?: ReactNode
   as?: keyof JSX.IntrinsicElements | React.ComponentType<any> // Note this would be temporary
+  forwardedAs?: keyof JSX.IntrinsicElements | React.ComponentType<any> // to avoid stopping apply the color style
 }
 
 const styleMap: { [tag: string]: FlattenSimpleInterpolation } = {
@@ -92,6 +93,7 @@ export const LegacyStyledText: (props: LegacyProps) => JSX.Element = styled(
     } else if (props.fontWeight === TYPOGRAPHY.fontWeightBold) {
       fontWeight = 'Bold'
     }
-    return styleMap[`${props.as}${fontWeight}`]
+    const tag = props.forwardedAs ?? props.as
+    return styleMap[`${tag}${fontWeight}`]
   }}
 `

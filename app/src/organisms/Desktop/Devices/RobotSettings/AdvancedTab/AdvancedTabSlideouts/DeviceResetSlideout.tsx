@@ -160,7 +160,7 @@ export function DeviceResetSlideout({
             marginRight={SPACING.spacing8}
             color={COLORS.yellow60}
           />
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('resets_cannot_be_undone')}
           </LegacyStyledText>
         </Flex>
@@ -169,12 +169,12 @@ export function DeviceResetSlideout({
             <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing20}>
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <LegacyStyledText
-                  as="p"
+                  forwardedAs="p"
                   fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                 >
                   {t('clear_all_data')}
                 </LegacyStyledText>
-                <LegacyStyledText as="p" marginY={SPACING.spacing8}>
+                <LegacyStyledText forwardedAs="p" marginY={SPACING.spacing8}>
                   {t('clear_all_stored_data_description')}
                 </LegacyStyledText>
                 <CheckboxField
@@ -198,10 +198,13 @@ export function DeviceResetSlideout({
           </>
         ) : null}
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('clear_individual_data')}
           </LegacyStyledText>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('device_reset_slideout_description')}
           </LegacyStyledText>
           <Flex
@@ -216,7 +219,7 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom="0.625rem"
               >
-                <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+                <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
                   {t('robot_calibration_data')}
                 </LegacyStyledText>
                 <Link
@@ -307,7 +310,7 @@ export function DeviceResetSlideout({
                 justifyContent={JUSTIFY_SPACE_BETWEEN}
                 marginBottom={SPACING.spacing8}
               >
-                <LegacyStyledText as="p" css={TYPOGRAPHY.pSemiBold}>
+                <LegacyStyledText forwardedAs="p" css={TYPOGRAPHY.pSemiBold}>
                   {t('protocol_run_data')}
                 </LegacyStyledText>
                 <Link
@@ -347,7 +350,7 @@ export function DeviceResetSlideout({
             </Box>
             <Box>
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >
@@ -365,7 +368,7 @@ export function DeviceResetSlideout({
             </Box>
             <Box>
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 css={TYPOGRAPHY.pSemiBold}
                 marginBottom={SPACING.spacing8}
               >

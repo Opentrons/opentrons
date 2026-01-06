@@ -1,4 +1,5 @@
 """Tests for opentrons.protocol_reader.role_analyzer.RoleAnalyzer."""
+
 import pytest
 from typing import List, Union
 

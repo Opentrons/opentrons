@@ -220,9 +220,9 @@ class DispenseWhileTracking(
     params: DispenseWhileTrackingParams
     result: Optional[DispenseWhileTrackingResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[DispenseWhileTrackingImplementation] = (
         DispenseWhileTrackingImplementation
-    ] = DispenseWhileTrackingImplementation
+    )
 
 
 class DispenseWhileTrackingCreate(BaseCommandCreate[DispenseWhileTrackingParams]):

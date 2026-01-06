@@ -1,6 +1,5 @@
 """The HTTP API for getting and setting the robot's current deck configuration."""
 
-
 from datetime import datetime
 from typing import Annotated, Union
 

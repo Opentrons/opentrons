@@ -1,4 +1,5 @@
 """A very simple script to run a move group and wait for it to complete."""
+
 import argparse
 import asyncio
 import logging

@@ -1,4 +1,5 @@
 """Test setTipState command."""
+
 import pytest
 
 from decoy import Decoy

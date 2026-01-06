@@ -1,4 +1,5 @@
 """Thermocycler Module sub-state."""
+
 from dataclasses import dataclass
 from typing import NewType, Optional
 

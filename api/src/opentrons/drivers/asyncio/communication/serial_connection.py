@@ -181,8 +181,9 @@ class SerialConnection:
 
         Raises: SerialException
         """
-        async with self._send_data_lock, self._serial.timeout_override(
-            "timeout", timeout
+        async with (
+            self._send_data_lock,
+            self._serial.timeout_override("timeout", timeout),
         ):
             return await self._send_data(data=data, retries=retries)
 
@@ -512,8 +513,9 @@ class AsyncResponseSerialConnection(SerialConnection):
         self, data: str, retries: int = 0, timeout: float | None = None, acks: int = 1
     ) -> list[str]:
         """Send data and return all responses."""
-        async with super().send_data_lock, self._serial.timeout_override(
-            "timeout", timeout
+        async with (
+            super().send_data_lock,
+            self._serial.timeout_override("timeout", timeout),
         ):
             return await self._send_data_multiack(
                 data=data, retries=retries or self._number_of_retries, acks=acks
@@ -534,8 +536,9 @@ class AsyncResponseSerialConnection(SerialConnection):
 
         Raises: SerialException
         """
-        async with super().send_data_lock, self._serial.timeout_override(
-            "timeout", timeout
+        async with (
+            super().send_data_lock,
+            self._serial.timeout_override("timeout", timeout),
         ):
             return await self._send_data(
                 data=data,

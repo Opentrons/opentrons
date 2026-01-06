@@ -3,6 +3,7 @@ Command type definitions.
 
 Definitions should be grouped into thematic namespaces.
 """
+
 import typing
 
 from typing_extensions import Self

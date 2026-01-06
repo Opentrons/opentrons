@@ -193,9 +193,9 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
         replace its route decoration with this one, passing the erstwhile route decorator in.
         """
         # our outermost function exists to capture the arguments that you want to forward to the route decorator
-        assert (
-            "response_model" not in route_kwargs
-        ), "Do not use PydanticResponse.wrap_route if you are already specifying a response model"
+        assert "response_model" not in route_kwargs, (
+            "Do not use PydanticResponse.wrap_route if you are already specifying a response model"
+        )
 
         def decorator(
             endpoint_method: DecoratedEndpoint,

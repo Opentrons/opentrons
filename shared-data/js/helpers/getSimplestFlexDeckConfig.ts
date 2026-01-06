@@ -1,13 +1,12 @@
 import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
 import { FLEX_ROBOT_TYPE } from '../constants'
-import {
-  getAddressableAreaFromSlotId,
-  getMainFixtureIdForAA,
-} from '../fixtures'
+import { getAddressableAreaFromSlotId } from '../fixtures'
+import { getMainFixtureIdForAA } from './deckConfiguration/getFixtureFrom'
 
 import type { AddressableAreaName, CutoutFixtureId, CutoutId } from '../../deck'
 import type { ProtocolAnalysisOutput } from '../../protocol'
 import type {
+  AddressableArea,
   CompletedProtocolAnalysis,
   CutoutConfig,
   CutoutFixture,
@@ -151,7 +150,10 @@ export function getCutoutIdForSlotName(
   slotName: string,
   deckDef: DeckDefinition
 ): CutoutId | null {
-  const addressableArea = getAddressableAreaFromSlotId(slotName, deckDef)
+  const addressableArea = getAddressableAreaFromSlotId(
+    slotName,
+    deckDef
+  ) as AddressableArea | null
   const cutoutIdForSlotName =
     addressableArea != null
       ? getCutoutIdForAddressableArea(

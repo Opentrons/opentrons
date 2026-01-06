@@ -1,4 +1,5 @@
 """Functional tests for the LabwareDataProvider."""
+
 from typing import cast
 
 from opentrons_shared_data.labware.labware_definition import (

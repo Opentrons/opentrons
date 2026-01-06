@@ -1,4 +1,5 @@
 """Test Thermocycler close lid command implementation."""
+
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler

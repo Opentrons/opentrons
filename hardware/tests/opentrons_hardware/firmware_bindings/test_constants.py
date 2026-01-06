@@ -1,4 +1,5 @@
 """Test for constants module."""
+
 from typing import Iterable
 
 import pytest

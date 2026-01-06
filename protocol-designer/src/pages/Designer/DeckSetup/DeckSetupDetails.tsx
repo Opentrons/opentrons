@@ -20,6 +20,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -100,11 +101,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     activeDeckSetup,
     robotType
   )
+  const pendingCreationStateForHopper = useSelector(getPendingCreationState)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const dispatch = useDispatch<any>()
-
   // handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls. But when swapping labware when at least
   // one is on a module, we need to be aware of not only what labware is
@@ -149,6 +150,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       deckSetup: activeDeckSetup,
       slot: selectedZoomInSlot ?? '',
       deckDef,
+      pendingCreationStateForHopper,
     })
   }, [activeDeckSetup, selectedZoomInSlot])
 
@@ -180,7 +182,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     selectedZoomInSlot,
   ])
 
-  const allLabware = Object.values(activeLabware)
+  const allLabware = pendingCreationStateForHopper
+    ? []
+    : Object.values(activeLabware)
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =
@@ -718,20 +722,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
           </Fragment>
         )
       })}
-
-      {/* special-cased hopper labware based on module states */}
-      {/* <HopperTopLabwareRenders
-        labwaresOnDeck={activeLabware}
-        modules={allModules}
-        deckDef={deckDef}
-        terminalItemId={terminalItemId}
-        setHover={setHover}
-        setShowMenuListForId={setShowMenuListForId}
-        hover={hover}
-        setHoveredLabware={setHoveredLabware}
-        setDraggedLabware={setDraggedLabware}
-        selectedZoomInSlot={selectedZoomInSlot}
-      /> */}
 
       {/* highlight items from Protocol steps */}
       <HighlightItems robotType={robotType} deckDef={deckDef} />

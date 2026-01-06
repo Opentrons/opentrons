@@ -45,7 +45,10 @@ import { getSelectedTerminalItemId } from '../../ui/steps/selectors'
 import { getIsAdapter } from '../../utils'
 
 import type { AddressableAreaName, CutoutId } from '@opentrons/shared-data'
-import type { RobotState } from '@opentrons/step-generation'
+import type {
+  FlexStackerModuleState,
+  RobotState,
+} from '@opentrons/step-generation'
 import type { AllTemporalPropertiesForTimelineFrame } from '../../step-forms'
 import type { Selector } from '../../types'
 
@@ -236,10 +239,12 @@ export const getUnoccupiedLabwareLocationOptions: Selector<Option[] | null> =
         (acc, [modId, modOnDeck]) => {
           const isModuleIsAStacker =
             modOnDeck.moduleState.type === FLEX_STACKER_MODULE_TYPE
-          const moduleHasLabware = Object.entries(labware).some(
-            ([_, lwOnDeck]) =>
-              lwOnDeck.stack[lwOnDeck.stack.length - 2] === modId
-          )
+          const moduleHasLabware = !isModuleIsAStacker
+            ? Object.entries(labware).some(
+                ([_, lwOnDeck]) =>
+                  lwOnDeck.stack[lwOnDeck.stack.length - 2] === modId
+              )
+            : (modOnDeck.moduleState as FlexStackerModuleState) == null
           const type = moduleEntities[modId].type
           const slot = modOnDeck.slot
           let tcLocations

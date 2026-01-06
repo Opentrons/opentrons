@@ -1,4 +1,5 @@
 """Command models to start heating a Temperature Module."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type

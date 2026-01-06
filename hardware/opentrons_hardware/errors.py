@@ -1,4 +1,5 @@
 """Module to convert message errors to exceptions."""
+
 from typing import Dict, Optional, Tuple
 import logging
 
@@ -39,7 +40,6 @@ def nice_name_for_error(code: ErrorCode) -> str:
 def _safe_details_from_message(
     message: ErrorMessage, arbitration_id: Optional[ArbitrationId]
 ) -> Tuple[Optional[NodeId], ErrorCode, ErrorSeverity]:
-
     detail_dict = {
         "hardware-error": str(message.payload.error_code.value),
         "hardware-severity": str(message.payload.severity.value),

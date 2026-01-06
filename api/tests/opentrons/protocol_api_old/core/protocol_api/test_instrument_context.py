@@ -1,4 +1,5 @@
 """Tests for the InstrumentContext implementation core."""
+
 from typing import cast
 
 import pytest

@@ -4,6 +4,7 @@ DEPRECATED: Testing PipetteStore independently of PipetteView is no longer helpf
 Try to add new tests to test_pipette_state.py, where they can be tested together,
 treating PipetteState as a private implementation detail.
 """
+
 import pytest
 
 from opentrons_shared_data.pipette.types import (

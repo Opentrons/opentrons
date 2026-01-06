@@ -294,54 +294,6 @@ class ProtocolEditorPage(BasePage):
 
         self.page.get_by_role("button", name=step_type, exact=True).click()
 
-    def configure_transfer_source(self) -> None:
-        """Configure the source for a transfer step."""
-        self.page.locator('input[name="aspirate_wells"]').click()
-        self.page.locator("circle").first.click()
-        self.click_button("Save")
-
-    def configure_transfer_destination(self, labware_name: str | None = None, well_index: int = 17) -> None:
-        """Configure the destination for a transfer step.
-
-        Args:
-            labware_name: Name of destination labware (if needed for sandbox)
-            well_index: Index of the destination well
-        """
-        if self.is_sandbox and labware_name:
-            self.page.get_by_text("Choose option").click()
-            self.click_button(labware_name)
-
-        # Select dispense wells
-        if self.is_sandbox:
-            self.page.locator('input[name="dispense_wells"]').click()
-        else:
-            self.page.locator("[name='dispense_wells']").click()
-
-        self.page.locator(f"circle:nth-child({well_index})").first.click()
-        self.click_button("Save")
-
-    def set_transfer_volume(self, volume: str) -> None:
-        """Set the volume for a transfer step.
-
-        Args:
-            volume: Volume in µL as a string
-        """
-        self.page.locator('input[name="volume"]').click()
-        self.page.locator('input[name="volume"]').fill(volume)
-        self.click_button("Continue")
-        self.click_button("Continue")
-
-    def expect_transfer_form(self) -> None:
-        """Verify the transfer step form fields are visible."""
-
-        for text in [
-            "Source labware",
-            "Select source wells",
-            "Destination labware",
-            "Volume per well",
-        ]:
-            self.wait_for_visible(self.page.get_by_text(text, exact=False).first)
-
     def expect_move_labware_form(self) -> None:
         """Verify the move labware step form fields are visible."""
 
@@ -359,7 +311,6 @@ class ProtocolEditorPage(BasePage):
 
     def move_labware(self, labware: str, new_location: str) -> None:
         """Select labware and new location to move the labware."""
-
         self.page.get_by_test_id("labware_dropdownMenu").first.click()
         self.page.get_by_role("button", name=labware).click()
         self.page.get_by_test_id("newLocation_dropdownMenu").first.click()
@@ -370,3 +321,50 @@ class ProtocolEditorPage(BasePage):
             self.page.get_by_role("button", name=new_location).click()
         self.page.get_by_role("button", name="Save").click()
         self.page.locator("div").filter(has_text="Move has been saved").nth(3).click()
+
+    def drag_and_drop(self, from_index: int, to_num: int) -> None:
+        """Drag and drop a step from one position to another in the step list.
+
+        IMPORTANT NOTE ON PARAMETERS:
+
+        Args:
+            from_index: ALWAYS the index of the source step
+            to_num: num is dependent on the direction you are moving the source step.
+                If you are moving DOWN the list, to_num is the STEP NUMBER.
+                If you are moving UP the list, to_num is the INDEX.
+        """
+        steps = self.page.locator('div[draggable="true"]')
+
+        source = steps.nth(from_index)
+        target = steps.nth(to_num)
+
+        source.scroll_into_view_if_needed()
+        target.scroll_into_view_if_needed()
+
+        source_box = source.bounding_box()
+        target_box = target.bounding_box()
+
+        assert source_box is not None
+        assert target_box is not None
+
+        start_x = source_box["x"] + source_box["width"] / 2
+        start_y = source_box["y"] + source_box["height"] / 2
+        end_y = target_box["y"] + target_box["height"] / 2
+
+        mouse = self.page.mouse
+
+        ## Move mouse to source
+        mouse.move(start_x, start_y)
+        mouse.down()
+        self.page.wait_for_timeout(150)
+        source.dispatch_event("dragstart")
+
+        ## NOTE: Future work? we can manipulate this move so that if the (end_y - start_y) is positive or negative we can # noqa: E501
+        #  adjust the percentage the mouse moves to the target which may fix the issue of step versus index for target number # noqa: E501
+        mouse.move(start_x, start_y + (end_y - start_y), steps=20)
+
+        target.dispatch_event("drop")
+        source.dispatch_event("dragend")
+
+        mouse.up()
+        self.page.wait_for_timeout(150)

@@ -218,9 +218,9 @@ def test_csv_parameter_trailing_empties(
     subject = CSVParameter(csv_file, api_version)
     parsed_csv = subject.parse_as_csv()
 
-    assert (
-        parsed_csv == expected_output
-    ), f"Expected {expected_output}, but got {parsed_csv}"
-    assert len(parsed_csv) == len(
-        expected_output
-    ), f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"
+    assert parsed_csv == expected_output, (
+        f"Expected {expected_output}, but got {parsed_csv}"
+    )
+    assert len(parsed_csv) == len(expected_output), (
+        f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"
+    )

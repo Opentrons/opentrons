@@ -86,9 +86,9 @@ class UnsafeBlowOutInPlace(
     params: UnsafeBlowOutInPlaceParams
     result: Optional[UnsafeBlowOutInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeBlowOutInPlaceImplementation] = (
         UnsafeBlowOutInPlaceImplementation
-    ] = UnsafeBlowOutInPlaceImplementation
+    )
 
 
 class UnsafeBlowOutInPlaceCreate(BaseCommandCreate[UnsafeBlowOutInPlaceParams]):

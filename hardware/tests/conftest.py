@@ -1,4 +1,5 @@
 """Pytest shared fixtures."""
+
 from typing import List, Tuple, Optional
 from typing_extensions import Protocol
 

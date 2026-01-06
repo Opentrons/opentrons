@@ -1,4 +1,5 @@
 """Tests for robot_server.commands.get_default_orchestrator."""
+
 import pytest
 from decoy import Decoy
 

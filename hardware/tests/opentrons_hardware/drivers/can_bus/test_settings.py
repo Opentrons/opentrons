@@ -1,4 +1,5 @@
 """Tests for pcan bit timing calculations."""
+
 import pytest
 
 from typing import Optional

@@ -28,6 +28,7 @@ import {
   MIN_TC_PROFILE_VOLUME,
   MIN_TEMP_MODULE_TEMP,
   PAUSE_UNTIL_RESUME,
+  PAUSE_UNTIL_TC_PROFILE_COMPLETE,
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
   THERMOCYCLER_PROFILE,
@@ -731,6 +732,12 @@ export const pauseForTimeOrUntilTold = (
   ) {
     // user selected pause until resume
     return null
+  } else if (
+    'pauseAction' in fields &&
+    fields.pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE
+  ) {
+    // This is a system-created pause step that's paired with a TC profile step.
+    return null
   } else {
     // user did not select a pause type
     return PAUSE_TYPE_REQUIRED
@@ -965,9 +972,10 @@ export const pauseModuleRequired = (
   fields: HydratedPauseFormData
 ): FormError | null => {
   const { moduleId, pauseAction } = fields
-  return pauseAction === PAUSE_UNTIL_TEMP && moduleId == null
-    ? PAUSE_MODULE_REQUIRED
-    : null
+  const expectingModuleId =
+    pauseAction === PAUSE_UNTIL_TEMP ||
+    pauseAction === PAUSE_UNTIL_TC_PROFILE_COMPLETE
+  return expectingModuleId && moduleId == null ? PAUSE_MODULE_REQUIRED : null
 }
 export const pauseTemperatureRequired = (
   fields: HydratedPauseFormData

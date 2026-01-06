@@ -81,16 +81,13 @@ class Point(NamedTuple):
 
 class _HasXYZ(Protocol):
     @property
-    def x(self) -> float:
-        ...
+    def x(self) -> float: ...
 
     @property
-    def y(self) -> float:
-        ...
+    def y(self) -> float: ...
 
     @property
-    def z(self) -> float:
-        ...
+    def z(self) -> float: ...
 
 
 LocationLabware = Union[

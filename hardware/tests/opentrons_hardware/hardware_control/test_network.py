@@ -1,4 +1,5 @@
 """Test the network submodule."""
+
 import pytest
 import asyncio
 import datetime

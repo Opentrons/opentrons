@@ -13,6 +13,5 @@ class WriteInstrumentIDGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         left_or_right = cls.SIDE_EXPANSION_DICT[l_or_r]
 
         return (
-            f"Writing instrument ID {g_code_args[l_or_r]} for "
-            f"{left_or_right} pipette"
+            f"Writing instrument ID {g_code_args[l_or_r]} for {left_or_right} pipette"
         )

@@ -1,4 +1,5 @@
 """Tests for Protocol API point calculation."""
+
 from typing import Tuple
 
 import pytest

@@ -82,15 +82,15 @@ class StoreResult(BaseModel):
             "The full location in which all labware moved by this command will eventually reside."
         ),
     )
-    primaryOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description=("The origin location of the primary labware."))
+    primaryOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description=("The origin location of the primary labware."))
+    )
     primaryLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The primary labware in the stack that was stored."
     )
-    adapterOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description=("The origin location of the adapter labware, if any."))
+    adapterOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description=("The origin location of the adapter labware, if any."))
+    )
     adapterLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The adapter in the stack that was stored, if any."
     )

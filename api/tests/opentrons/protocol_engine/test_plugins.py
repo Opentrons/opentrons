@@ -1,4 +1,5 @@
 """Tests for ProtocolEngine plugins."""
+
 import pytest
 from decoy import Decoy
 from datetime import datetime

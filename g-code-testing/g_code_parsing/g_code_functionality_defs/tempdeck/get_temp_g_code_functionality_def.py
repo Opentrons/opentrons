@@ -22,8 +22,7 @@ class GetTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):
             set_temp = match.groupdict()["set_temp"].strip()
             if set_temp == "none":
                 message = (
-                    f"Temp deck is disengaged. "
-                    f"Current temperature is {current_temp}C"
+                    f"Temp deck is disengaged. Current temperature is {current_temp}C"
                 )
             else:
                 message = (

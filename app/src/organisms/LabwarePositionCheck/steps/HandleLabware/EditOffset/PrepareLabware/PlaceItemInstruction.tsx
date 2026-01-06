@@ -191,7 +191,7 @@ function PlaceItemInstructionContent({
         components={{
           bold: (
             <LegacyStyledText
-              as="span"
+              forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
           ),
@@ -214,7 +214,7 @@ function PlaceItemInstructionContent({
         components={{
           bold: (
             <LegacyStyledText
-              as="span"
+              forwardedAs="span"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             />
           ),

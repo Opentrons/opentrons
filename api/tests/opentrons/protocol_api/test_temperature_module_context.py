@@ -1,4 +1,5 @@
 """Tests for Protocol API temperature module contexts."""
+
 import pytest
 from decoy import Decoy, matchers
 

@@ -140,12 +140,15 @@ export function AvailableRobotOption(
           marginTop={SPACING.spacing8}
           marginBottom={SPACING.spacing16}
         >
-          <LegacyStyledText as="h6" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <LegacyStyledText
+            forwardedAs="h6"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {robotModel}
           </LegacyStyledText>
           <Box maxWidth="9.5rem">
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               overflowWrap="break-word"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
@@ -170,10 +173,9 @@ export function AvailableRobotOption(
           </>
         ) : null}
       </MiniCard>
-
       {isSelectedRobotOnDifferentSoftwareVersion && isSelected ? (
         <LegacyStyledText
-          as="label"
+          forwardedAs="label"
           color={COLORS.red60}
           marginBottom={SPACING.spacing8}
           css={css`

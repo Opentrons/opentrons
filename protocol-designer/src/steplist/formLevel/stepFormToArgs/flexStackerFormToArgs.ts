@@ -10,7 +10,7 @@ export const flexStackerFormToArgs = (
     flexStackerFormType,
     interventionMessage,
     moduleId,
-    fillQuantity,
+    fillLabwareIds,
   } = castFormData
   switch (flexStackerFormType) {
     case 'empty':
@@ -24,7 +24,7 @@ export const flexStackerFormToArgs = (
         moduleId: moduleId!,
         commandCreatorFnName: 'flexStackerFillItems',
         fillLabwareUri,
-        fillQuantity,
+        fillLabwareIds,
         interventionMessage,
       }
     case 'retrieve':

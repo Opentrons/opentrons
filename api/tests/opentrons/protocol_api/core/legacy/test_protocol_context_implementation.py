@@ -1,4 +1,5 @@
 """Tests for the legacy Protocol API core implementation."""
+
 import inspect
 from typing import Any, Dict, cast
 
@@ -82,8 +83,7 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 def mock_deck(decoy: Decoy) -> Deck:
     """Get a mock Deck."""
 
-    class _MockDeck(Dict[str, Any]):
-        ...
+    class _MockDeck(Dict[str, Any]): ...
 
     deck = _MockDeck()
     setattr(deck, "position_for", decoy.mock(name="Deck.position_for"))

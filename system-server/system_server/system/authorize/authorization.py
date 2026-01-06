@@ -1,4 +1,5 @@
 """This module keeps track of current authorization."""
+
 from system_server.jwt import create_jwt, registrant_from_jwt
 from datetime import timedelta
 import uuid

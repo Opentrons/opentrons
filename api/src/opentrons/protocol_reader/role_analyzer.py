@@ -1,4 +1,5 @@
 """Input file role analysis."""
+
 from dataclasses import dataclass
 from typing import List, Sequence, Union
 

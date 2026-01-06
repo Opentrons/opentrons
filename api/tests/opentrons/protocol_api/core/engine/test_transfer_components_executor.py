@@ -1,4 +1,5 @@
 """Tests for complex commands executor."""
+
 from typing import Literal, Union
 
 import pytest
@@ -1203,11 +1204,11 @@ def test_retract_after_dispense_with_blowout_in_source(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(10, 20, 30), labware=None),
             well_core=source_well,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(10, 20, 30), labware=None),
@@ -1313,11 +1314,11 @@ def test_retract_after_dispense_with_blowout_in_destination(
             speed=50,
         ),
         mock_instrument_core.delay(10),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(12, 24, 36), labware=None),
             well_core=None,
             in_place=True,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(12, 24, 36), labware=None),
@@ -1441,11 +1442,11 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=trash_location,
             well_core=None,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=trash_location,
@@ -1565,11 +1566,11 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=trash_location,
             well_core=None,
             in_place=False,
+            flow_rate=100,
         ),
         *(
             add_final_air_gap
@@ -1648,11 +1649,11 @@ def test_retract_after_dispense_in_trash_with_blowout_in_source(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(10, 20, 30), labware=None),
             well_core=source_well,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(10, 20, 30), labware=None),
@@ -1743,11 +1744,11 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
     )
     decoy.verify(
         mock_instrument_core.delay(10),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=target_trash,
             well_core=None,
             in_place=True,
+            flow_rate=100,
         ),
         *(
             add_final_air_gap
@@ -1827,11 +1828,11 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=trash_location,
             well_core=None,
             in_place=False,
+            flow_rate=100,
         ),
         *(
             add_final_air_gap
@@ -2078,11 +2079,11 @@ def test_retract_after_dispense_with_blowout_in_src_moves_to_safe_loc_for_air_ga
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(10, 20, 30), labware=None),
             well_core=source_well,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(10, 20, 30), labware=None),
@@ -2326,17 +2327,11 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
         *(
             expect_blowout
             and [
-                mock_instrument_core.set_flow_rate(blow_out=10)  # type: ignore[func-returns-value]
-            ]
-            or []
-        ),
-        *(
-            expect_blowout
-            and [
                 mock_instrument_core.blow_out(  # type: ignore[func-returns-value]
                     location=Location(Point(3, 5, 4), labware=None),
                     well_core=None,
                     in_place=True,
+                    flow_rate=10,
                 )
             ]
             or []

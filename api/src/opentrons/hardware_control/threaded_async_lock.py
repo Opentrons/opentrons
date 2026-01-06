@@ -43,8 +43,7 @@ class ThreadedAsyncForbidden(Exception):
 
     def __init__(
         self,
-        msg: str = "Robot is currently moving. Please wait and try "
-        "this command again.",
+        msg: str = "Robot is currently moving. Please wait and try this command again.",
     ) -> None:
         super().__init__(msg)
 
@@ -77,7 +76,7 @@ class _Internal:
                 raise ThreadedAsyncForbidden()
             await asyncio.sleep(0.1)
         now = time.perf_counter()
-        log.debug(pref + f"acquired in {now-then}s")
+        log.debug(pref + f"acquired in {now - then}s")
 
     async def __aexit__(self, exc_type: Any, exc: Any, tb: Any) -> None:
         log.debug(

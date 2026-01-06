@@ -79,7 +79,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
 from opentrons_shared_data.robot.types import RobotType
-from . import versions_at_or_above, versions_between
+from . import versions_at_or_above, versions_between, versions_below
 
 
 @pytest.fixture(autouse=True)
@@ -622,7 +622,10 @@ def test_dynamic_aspirate_validation(
     with pytest.raises(ValueError):
         # Raises if end location is well
         subject.aspirate(
-            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+            volume=42.0,
+            location=input_location,
+            rate=1.23,
+            end_location=mock_well,  # type: ignore[arg-type]
         )
 
 
@@ -723,16 +726,18 @@ def test_blow_out_to_well(
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
     decoy.when(mock_well.top()).then_return(top_location)
-    subject.blow_out(location=mock_well)
+    subject.blow_out(location=mock_well, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=top_location, well_core=mock_well._core, in_place=False
+            location=top_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=123,
         ),
         times=1,
     )
@@ -749,15 +754,17 @@ def test_blow_out_to_well_location(
     input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=mock_well._core, in_place=False
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=123,
         ),
         times=1,
     )
@@ -793,14 +800,16 @@ def test_blow_out_to_well_meniscus_location(
     )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     mock_instrument_core.blow_out(
-        location=input_location_absolute, well_core=mock_well._core, in_place=False
+        location=input_location_absolute,
+        well_core=mock_well._core,
+        in_place=False,
+        flow_rate=123,
     )
 
 
@@ -814,16 +823,15 @@ def test_blow_out_to_location(
     input_location = Location(point=Point(2, 2, 2), labware=None)
     last_location = input_location  # to demonstrate how we set in_place=True
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
 
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=None, in_place=True
+            location=input_location, well_core=None, in_place=True, flow_rate=123
         ),
         times=1,
     )
@@ -839,14 +847,44 @@ def test_blow_out_with_trash_last_location(
     """It should blow out into a previously accessed disposal location."""
     mock_chute = decoy.mock(cls=WasteChute)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(mock_instrument_core.get_blow_out_flow_rate(1.0)).then_return(111)
     decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
         mock_chute
     )
+
     subject.blow_out()
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=mock_chute, well_core=None, in_place=True
+            location=mock_chute, well_core=None, in_place=True, flow_rate=111
+        ),
+        times=1,
+    )
+
+
+def test_blow_out_uses_previously_set_flow_rate(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should blow out to a well."""
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_instrument_core.get_blow_out_flow_rate(1.0)).then_return(111)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(mock_well.top()).then_return(top_location)
+    subject.blow_out(location=mock_well)
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=top_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=111,
         ),
         times=1,
     )
@@ -1542,7 +1580,10 @@ def test_dynamic_dispense_validation(
     with pytest.raises(ValueError):
         # Raises if end location is well
         subject.dispense(
-            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+            volume=42.0,
+            location=input_location,
+            rate=1.23,
+            end_location=mock_well,  # type: ignore[arg-type]
         )
 
 
@@ -1669,6 +1710,49 @@ def test_touch_tip_raises_if_trash_last_location(
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
     with pytest.raises(RuntimeError, match="not valid for touch tip"):
         subject.touch_tip()
+
+
+@pytest.mark.parametrize("api_version", versions_below(APIVersion(2, 28), False))
+def test_touch_tip_noops_for_older_api_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should no-op for labware with `touchTipDisabled` quirk for older API versions."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+    decoy.when(mock_well.top(z=4.56)).then_return(
+        Location(point=Point(1, 2, 3), labware=mock_well)
+    )
+    subject.touch_tip(mock_well, v_offset=4.56, speed=42.0)
+    decoy.verify(
+        mock_instrument_core.touch_tip(
+            location=Location(point=Point(1, 2, 3), labware=mock_well),
+            well_core=mock_well._core,
+            radius=1,
+            z_offset=4.56,
+            speed=42.0,
+        ),
+        times=0,
+    )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
+def test_touch_tip_raises_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise if the labware has quirk 'touchTipDisabled' for API v2.28 & above."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+
+    with pytest.raises(RuntimeError, match="Touch tip not allowed on labware"):
+        subject.touch_tip(mock_well)
 
 
 def test_return_height(

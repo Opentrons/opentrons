@@ -89,8 +89,10 @@ export function ConfirmCancelModal(
       title={t('cancel_run_modal_heading')}
     >
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-        <LegacyStyledText as="p">{cancelRunAlertInfo}</LegacyStyledText>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing24}>
+        <LegacyStyledText forwardedAs="p">
+          {cancelRunAlertInfo}
+        </LegacyStyledText>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing24}>
           {t('cancel_run_module_info')}
         </LegacyStyledText>
         <Flex justifyContent={JUSTIFY_FLEX_END} alignItems={ALIGN_CENTER}>
