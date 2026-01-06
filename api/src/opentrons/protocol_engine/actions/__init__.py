@@ -31,6 +31,8 @@ from .actions import (
     SetPipetteMovementSpeedAction,
     StartTaskAction,
     FinishTaskAction,
+    CreateUserCommandAnnotation,
+    CloseUserCommandAnnotation,
 )
 from .get_state_update import get_state_updates
 
@@ -63,6 +65,8 @@ __all__ = [
     "SetPipetteMovementSpeedAction",
     "StartTaskAction",
     "FinishTaskAction",
+    "CreateUserCommandAnnotation",
+    "CloseUserCommandAnnotation",
     # action payload values
     "PauseSource",
     "FinishErrorDetails",

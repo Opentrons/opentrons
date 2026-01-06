@@ -6,7 +6,7 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 
 import dataclasses
 from datetime import datetime
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Union, Tuple, Dict, Any
 
 from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.errors import EnumeratedError
@@ -311,6 +311,23 @@ class SetErrorRecoveryPolicyAction:
     error_recovery_policy: ErrorRecoveryPolicy
 
 
+@dataclasses.dataclass(frozen=True)
+class CreateUserCommandAnnotation:
+    """Creates a user command annotation."""
+
+    annotation_id: Optional[str]
+    user_defined_name: str
+    user_description: Optional[str]
+    params: Dict[str, Any]  # TODO we might want to do something ensure this serializes
+
+
+@dataclasses.dataclass(frozen=True)
+class CloseUserCommandAnnotation:
+    """Closes and ends a command annotation."""
+
+    annotation_id: str
+
+
 Action = Union[
     PlayAction,
     PauseAction,
@@ -333,6 +350,8 @@ Action = Union[
     AddLiquidAction,
     SetPipetteMovementSpeedAction,
     SetErrorRecoveryPolicyAction,
+    CreateUserCommandAnnotation,
+    CloseUserCommandAnnotation,
     StartTaskAction,
     FinishTaskAction,
 ]

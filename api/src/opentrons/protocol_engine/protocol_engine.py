@@ -64,6 +64,8 @@ from .actions import (
     AddModuleAction,
     HardwareStoppedAction,
     SetPipetteMovementSpeedAction,
+    CreateUserCommandAnnotation,
+    CloseUserCommandAnnotation,
 )
 
 
@@ -764,6 +766,26 @@ class ProtocolEngine:
     def set_error_recovery_policy(self, policy: ErrorRecoveryPolicy) -> None:
         """Replace the run's error recovery policy with a new one."""
         self._action_dispatcher.dispatch(SetErrorRecoveryPolicyAction(policy))
+
+    def create_user_command_annotation(
+        self,
+        annotation_name: str,
+        description: Optional[str],
+        annotation_id: Optional[str],
+    ) -> None:
+        self._action_dispatcher.dispatch(
+            CreateUserCommandAnnotation(
+                annotation_id=annotation_id,
+                user_defined_name=annotation_name,
+                user_description=description,
+                params={},
+            )
+        )
+
+    def close_user_command_annotation(self, annotation_id: str) -> None:
+        self._action_dispatcher.dispatch(
+            CloseUserCommandAnnotation(annotation_id=annotation_id)
+        )
 
     def clear_command_history(self) -> None:
         """Clear command history."""

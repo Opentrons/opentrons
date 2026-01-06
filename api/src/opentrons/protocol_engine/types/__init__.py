@@ -21,8 +21,8 @@ from .run_time_parameters import (
 )
 
 from .command_annotations import (
-    SecondOrderCommandAnnotation,
-    CustomCommandAnnotation,
+    SecondOrderCommandAnnotationLegacy,
+    CustomCommandAnnotationLegacy,
     CommandAnnotation,
 )
 from .command_preconditions import (
@@ -170,8 +170,8 @@ __all__ = [
     "FileInfo",
     "RunTimeParameter",
     # Command annotations
-    "SecondOrderCommandAnnotation",
-    "CustomCommandAnnotation",
+    "SecondOrderCommandAnnotationLegacy",
+    "CustomCommandAnnotationLegacy",
     "CommandAnnotation",
     # Command preconditions
     "PreconditionTypes",
