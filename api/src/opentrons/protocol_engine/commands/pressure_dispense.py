@@ -141,9 +141,9 @@ class PressureDispense(
     params: PressureDispenseParams
     result: Optional[PressureDispenseResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[PressureDispenseImplementation] = (
         PressureDispenseImplementation
-    ] = PressureDispenseImplementation
+    )
 
 
 class PressureDispenseCreate(BaseCommandCreate[PressureDispenseParams]):

@@ -1,4 +1,5 @@
 """Test serial number setting."""
+
 import asyncio
 
 import pytest

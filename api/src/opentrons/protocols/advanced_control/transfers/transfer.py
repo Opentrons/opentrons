@@ -641,7 +641,6 @@ class TransferPlan:
                 self._sources[0],
             )
             for step in asp_grouped:
-
                 yield from self._dispense_actions(
                     vol=step[0],
                     src=self._sources[0],
@@ -861,12 +860,13 @@ class TransferPlan:
         else:
             if not isinstance(volume, List):
                 raise TypeError(
-                    "Volume expected as a number or List or"
-                    " tuple but got {}".format(volume)
+                    "Volume expected as a number or List or tuple but got {}".format(
+                        volume
+                    )
                 )
             elif not len(volume) == total_xfers:
                 raise RuntimeError(
-                    "List of volumes should be equal to number " "of transfers"
+                    "List of volumes should be equal to number of transfers"
                 )
             return volume
 
@@ -877,7 +877,6 @@ class TransferPlan:
         total: int,
         gradient: Optional[Callable[[float], float]] = None,
     ) -> List[float]:
-
         diff_vol = max_v - min_v
 
         def _map_volume(i: int) -> float:

@@ -644,7 +644,7 @@ async def test_set_stored_labware_limits_count(
         poolOverlapOverride=overlap_override,
     )
     for i in range(len(output_labware)):
-        decoy.when(model_utils.generate_id()).then_return(f"labware-{i+1}")
+        decoy.when(model_utils.generate_id()).then_return(f"labware-{i + 1}")
 
     decoy.when(state_view.modules.get_flex_stacker_substate(module_id)).then_return(
         FlexStackerSubState(
@@ -787,17 +787,17 @@ async def test_set_stored_labware_limits_count(
             ),
             batch_loaded_labware=BatchLoadedLabwareUpdate(
                 new_locations_by_id={
-                    f"labware-{i+1}": InStackerHopperLocation(moduleId="module-id")
+                    f"labware-{i + 1}": InStackerHopperLocation(moduleId="module-id")
                     for i, _ in enumerate(output_labware)
                 },
                 offset_ids_by_id={
-                    f"labware-{i+1}": None for i, _ in enumerate(output_labware)
+                    f"labware-{i + 1}": None for i, _ in enumerate(output_labware)
                 },
                 display_names_by_id={
-                    f"labware-{i+1}": None for i, _ in enumerate(output_labware)
+                    f"labware-{i + 1}": None for i, _ in enumerate(output_labware)
                 },
                 definitions_by_id={
-                    f"labware-{i+1}": flex_50uL_tiprack
+                    f"labware-{i + 1}": flex_50uL_tiprack
                     for i, _ in enumerate(output_labware)
                 },
             ),

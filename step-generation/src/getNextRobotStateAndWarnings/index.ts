@@ -17,6 +17,7 @@ import { forMoveLabware } from './forMoveLabware'
 import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
+import { forWaitForTasks } from './forWaitForTasks'
 import {
   forHeaterShakerCloseLatch,
   forHeaterShakerDeactivateHeater,
@@ -51,6 +52,7 @@ import {
   forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
+  forThermocyclerStartRunExtendedProfile,
 } from './thermocyclerUpdates'
 
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -120,12 +122,10 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    //  for concurrent modules
-    //  TODO: wire these up if they change state
-    //  for concurrent module support
-    case 'createTimer':
     case 'waitForTasks':
+      forWaitForTasks(command.params, invariantContext, robotStateAndWarnings)
       break
+
     // setStoredLabware and setStoredLabwareItems handled in the python file while adding a labware on the stacker. no need to update state
     case 'flexStacker/setStoredLabware':
     case 'flexStacker/setStoredLabwareItems':
@@ -204,6 +204,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'unsealPipetteFromTip':
     case 'verifyTipPresence':
     case 'pressureDispense': //  evo tip specific command
+    case 'createTimer':
       break
 
     case 'moveToAddressableArea':
@@ -332,6 +333,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'thermocycler/runExtendedProfile':
       forThermocyclerRunExtendedProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'thermocycler/startRunExtendedProfile':
+      forThermocyclerStartRunExtendedProfile(
         command.params,
         invariantContext,
         robotStateAndWarnings

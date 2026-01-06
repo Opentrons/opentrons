@@ -43,7 +43,7 @@ export function RetryStepInfo(
         t={t}
         i18nKey={buildBodyCopyKey()}
         components={{
-          block: <LegacyStyledText as="p" />,
+          block: <LegacyStyledText forwardedAs="p" />,
         }}
       />
     )

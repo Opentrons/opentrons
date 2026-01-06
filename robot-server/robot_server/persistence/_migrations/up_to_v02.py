@@ -35,6 +35,7 @@ Database schema versions:
     It then populates the column with data converted from elsewhere in the table,
     so entries should never be NULL in practice even though nullable=True.
 """
+
 import logging
 from datetime import datetime, timezone
 from typing import Optional
@@ -212,7 +213,7 @@ def _migrate_data_1_to_2(transaction: sqlalchemy.engine.Connection) -> None:
 
     for index, row in enumerate(rows_needing_migration):
         _log.info(
-            f"Migrating analysis {index+1}/{len(rows_needing_migration)}, {row.id}..."
+            f"Migrating analysis {index + 1}/{len(rows_needing_migration)}, {row.id}..."
         )
 
         v1_completed_analysis = CompletedAnalysis.model_validate(

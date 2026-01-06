@@ -16,6 +16,7 @@ If there are no data and result models, then add the CommandDefinition to
 5) If not using `CommandsEmptyData` then add specialized request and response
 types to `RequestTypes` and `ResponseTypes`.
 """
+
 from datetime import datetime
 import typing
 

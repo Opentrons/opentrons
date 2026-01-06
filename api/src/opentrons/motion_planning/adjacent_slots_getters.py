@@ -1,4 +1,5 @@
 """Getters for specific adjacent slots."""
+
 from dataclasses import dataclass
 from typing import Optional, List, Dict, Union
 

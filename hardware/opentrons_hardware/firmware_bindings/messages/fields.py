@@ -1,4 +1,5 @@
 """Custom payload fields."""
+
 from __future__ import annotations
 
 from typing import Iterable, List, Iterator, Optional, Tuple

@@ -1,5 +1,5 @@
-""" Adapters for the :py:class:`.hardware_control.API` instances.
-"""
+"""Adapters for the :py:class:`.hardware_control.API` instances."""
+
 import asyncio
 import functools
 from typing import Generic, TypeVar, Callable, Any, cast, Awaitable

@@ -1,7 +1,7 @@
 """
-    This module is mostly a thin wrapper around fastapi.BackgroundTasks
-    that adds logging. It should be tested primarily through integration
-    and end-to-end tests.
+This module is mostly a thin wrapper around fastapi.BackgroundTasks
+that adds logging. It should be tested primarily through integration
+and end-to-end tests.
 """
 
 from __future__ import annotations
@@ -89,7 +89,7 @@ async def set_up_task_runner(app_state: AppState) -> AsyncGenerator[None, None]:
 
 
 def get_task_runner(
-    app_state: Annotated[AppState, Depends(get_app_state)]
+    app_state: Annotated[AppState, Depends(get_app_state)],
 ) -> TaskRunner:
     """Intended to be used by endpoint functions as a FastAPI dependency,
     like `Annotated[task_runner, fastapi.Depends(get_task_runner)]`.

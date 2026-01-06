@@ -1,4 +1,5 @@
 """Definition of Binary messages."""
+
 from dataclasses import dataclass, field, fields, MISSING
 from functools import lru_cache
 from typing import Type, Union, Optional, cast

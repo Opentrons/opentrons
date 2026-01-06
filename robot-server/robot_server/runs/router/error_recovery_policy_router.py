@@ -1,6 +1,5 @@
 """Router for /runs/{runId}/errorRecoveryPolicy endpoints."""
 
-
 from textwrap import dedent
 from typing import Annotated
 

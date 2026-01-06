@@ -1,4 +1,5 @@
 """Tests for Protocol API magnetic module contexts."""
+
 import pytest
 from decoy import Decoy, matchers
 

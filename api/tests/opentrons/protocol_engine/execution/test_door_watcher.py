@@ -1,6 +1,5 @@
 """Tests for door_watcher."""
 
-
 from typing import cast
 
 import pytest

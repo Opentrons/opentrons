@@ -1,4 +1,5 @@
 """MovementHandler command subject."""
+
 import pytest
 from decoy import Decoy
 from typing import NamedTuple, Optional

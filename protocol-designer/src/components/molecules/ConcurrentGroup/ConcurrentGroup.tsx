@@ -2,7 +2,6 @@ import {
   Box,
   COLORS,
   DIRECTION_ROW,
-  DISPLAY_FLEX,
   Flex,
   SPACING,
 } from '@opentrons/components'
@@ -33,7 +32,16 @@ export function ConcurrentGroup(
       gridGap={SPACING.spacing4}
     >
       <OrnamentalLine active={active} />
-      <ul style={{ display: DISPLAY_FLEX, flex: '1' }}>{children}</ul>
+      <ul
+        style={{
+          flex: '1',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+      >
+        {children}
+      </ul>
     </Flex>
   )
 }

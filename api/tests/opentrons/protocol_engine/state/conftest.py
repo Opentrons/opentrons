@@ -1,4 +1,5 @@
 """State test fixtures."""
+
 import pytest
 from decoy import Decoy
 

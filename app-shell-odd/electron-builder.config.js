@@ -7,6 +7,8 @@ module.exports = {
   files: [
     '**/*',
     '!Makefile',
+    '!**/.venv/**',
+    '!**/shared-data/.venv/**',
     {
       from: '../app/dist',
       to: './ui',

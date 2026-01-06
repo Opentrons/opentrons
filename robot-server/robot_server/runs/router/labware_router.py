@@ -138,7 +138,7 @@ async def add_labware_definition(
         )
 
     uri = run_orchestrator_store.add_labware_definition(request_body.data)
-    log.info(f'Added labware definition "{uri}"' f' to run "{run.id}".')
+    log.info(f'Added labware definition "{uri}" to run "{run.id}".')
 
     return PydanticResponse(
         content=SimpleBody.model_construct(

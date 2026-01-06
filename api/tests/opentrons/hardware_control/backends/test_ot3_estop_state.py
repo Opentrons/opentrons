@@ -107,7 +107,7 @@ async def test_estop_state_listener(
     ]
 
     prev: Optional[EstopState] = None
-    for (input, result) in steps:
+    for input, result in steps:
         subject.detector_listener(summary=input)
         assert len(events) == 1
         event = events.pop(0)
@@ -235,7 +235,7 @@ async def test_estop_state_machine(
         ),
     ]
 
-    for (input, result) in steps:
+    for input, result in steps:
         subject.detector_listener(input)
         assert subject.state == result
 

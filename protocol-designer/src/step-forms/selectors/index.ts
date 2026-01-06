@@ -5,7 +5,6 @@ import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
@@ -44,7 +43,6 @@ import type {
 import type {
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
-  FlexStackerModuleState,
   GripperEntities,
   InvariantContext,
   LabwareEntities,
@@ -94,12 +92,16 @@ import type {
 } from '../types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
+
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
   state.labwareIngred
 
 const _getInitialDeckSetupStepFormRootState: (
   arg: RootState
 ) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
+export const getPendingCreationState = (state: BaseState): boolean =>
+  rootSelector(state).stackerLabwareReducer.pendingCreation
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
@@ -204,17 +206,8 @@ export const getAdditionalEquipment: Selector<
 export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
   createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
 
-// todo(mm, 2025-12-12): Temporarily defining FLEX_STACKER_INITIAL_STATE here until step-generation supports it.
-const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
-  type: FLEX_STACKER_MODULE_TYPE,
-  storedLabwareDetails: null,
-  labwareInHopper: null,
-  labwareOnShuttle: null,
-}
-
 const MODULE_INITIAL_STATES_MAP = {
   ...STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE,
-  [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_INITIAL_STATE,
 } as const
 MODULE_INITIAL_STATES_MAP satisfies Record<
   ModuleType,
@@ -761,7 +754,13 @@ export const getArgsAndErrorsByStepId: Selector<
   getOrderedSavedForms,
   getInvariantContext,
   labwareDefSelectors.getLabwareDefsByURI,
-  (stepForms, contextualState, allLabwareDefs) => {
+  featureFlagSelectors.getEnableConcurrentModuleActions,
+  (
+    stepForms,
+    contextualState,
+    allLabwareDefs,
+    enableConcurrentModuleActions
+  ) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
@@ -775,7 +774,8 @@ export const getArgsAndErrorsByStepId: Selector<
           ? {
               stepArgs: stepFormToArgs(
                 { ...hydratedForm, stepNumber: index + 1 },
-                contextualState
+                contextualState,
+                enableConcurrentModuleActions
               ),
             }
           : {

@@ -1,4 +1,5 @@
 """Magnetic Module engage command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type

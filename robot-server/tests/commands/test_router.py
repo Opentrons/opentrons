@@ -1,4 +1,5 @@
 """Tests for robot_server.commands.router."""
+
 import pytest
 from datetime import datetime
 from decoy import Decoy

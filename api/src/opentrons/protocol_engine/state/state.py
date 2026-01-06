@@ -1,4 +1,5 @@
 """Protocol engine state management."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass

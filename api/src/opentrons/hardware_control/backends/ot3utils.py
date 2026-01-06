@@ -1,4 +1,5 @@
 """Shared utilities for ot3 hardware control."""
+
 import copy
 from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
 from typing_extensions import Literal
@@ -426,7 +427,7 @@ def create_move_group(
         for block in move.blocks:
             if block.time < (3.0 / interrupts_per_sec):
                 LOG.info(
-                    f"Skipping move block with time {block.time} (<{3.0/interrupts_per_sec})"
+                    f"Skipping move block with time {block.time} (<{3.0 / interrupts_per_sec})"
                 )
                 continue
             distances = unit_vector_multiplication(unit_vector, block.distance)

@@ -53,9 +53,10 @@ TARGETS: Final[Dict[str, NodeId]] = {
 
 async def run(args: argparse.Namespace) -> None:
     """Script entrypoint."""
-    async with build.driver(build_settings(args)) as driver, CanMessenger(
-        driver
-    ) as messenger:
+    async with (
+        build.driver(build_settings(args)) as driver,
+        CanMessenger(driver) as messenger,
+    ):
         await clear_eeprom(
             messenger,
             TARGETS[args.target],

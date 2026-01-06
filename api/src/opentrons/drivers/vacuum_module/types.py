@@ -8,7 +8,6 @@ from opentrons.drivers.command_builder import CommandBuilder
 
 
 class GCODE(StrEnum):
-
     GET_RESET_REASON = "M114"
     GET_DEVICE_INFO = "M115"
     SET_SERIAL_NUMBER = "M996"
@@ -56,7 +55,7 @@ class LEDColor(Enum):
 
     @classmethod
     def from_name(cls, name: str) -> "LEDColor":
-        match (name.lower()):
+        match name.lower():
             case "red":
                 return cls.RED
             case "green":

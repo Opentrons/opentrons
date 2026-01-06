@@ -1,4 +1,5 @@
 """Test save position command."""
+
 import pytest
 from decoy import Decoy
 

@@ -1,4 +1,5 @@
 """Router for /robot/control endpoints."""
+
 from typing import Annotated, TYPE_CHECKING
 
 from fastapi import status, Depends
@@ -76,7 +77,7 @@ async def put_acknowledge_estop_disengage(
 
 
 def get_door_switch_required(
-    robot_type: Annotated[RobotType, Depends(get_robot_type)]
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
 ) -> bool:
     return ff.enable_door_safety_switch(RobotTypeEnum.robot_literal_to_enum(robot_type))
 

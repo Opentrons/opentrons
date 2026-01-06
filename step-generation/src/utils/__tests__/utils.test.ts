@@ -379,9 +379,10 @@ describe('thermocyclerStateDiff', () => {
       testMsg: 'returns lidOpen when the lid state has changed to open',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: null,
         lidOpen: null,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -400,9 +401,10 @@ describe('thermocyclerStateDiff', () => {
         'does NOT return lidOpen when the lid state did not change to open',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: null,
         lidOpen: null,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -421,9 +423,10 @@ describe('thermocyclerStateDiff', () => {
       testMsg: 'returns lidClosed when the lid state has changed to closed',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: null,
         lidOpen: null,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -442,9 +445,10 @@ describe('thermocyclerStateDiff', () => {
         'does NOT return lidClosed when the lid state did not change to closed',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: null,
         lidOpen: null,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -464,9 +468,10 @@ describe('thermocyclerStateDiff', () => {
         'returns setLidTemperature when the lid temperature state changes from null to non null value',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: null,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -485,9 +490,10 @@ describe('thermocyclerStateDiff', () => {
         'returns setLidTemperature when the lid temperature state changes from a non null value to a different non null value',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: 20,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -506,9 +512,10 @@ describe('thermocyclerStateDiff', () => {
         'does NOT return setLidTemperature when the lid temperature state stays the same ',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: 20,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -527,9 +534,10 @@ describe('thermocyclerStateDiff', () => {
         'returns deactivateLidTemperature when the lid temperature state changes from a non null value to null',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: 20,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -548,9 +556,10 @@ describe('thermocyclerStateDiff', () => {
         'returns setBlockTemperature when the block temperature state has changed to non null value',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: null,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -569,9 +578,10 @@ describe('thermocyclerStateDiff', () => {
         'returns no diff when the block temperature state is the same number as previous',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: 20,
+        currentBlockActivity: { type: 'blockTargetTemp', blockTargetTemp: 20 },
         lidTargetTemp: null,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -589,9 +599,10 @@ describe('thermocyclerStateDiff', () => {
         'returns activate block when temp goes from number to a different number',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: 20,
+        currentBlockActivity: { type: 'blockTargetTemp', blockTargetTemp: 20 },
         lidTargetTemp: null,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -609,9 +620,10 @@ describe('thermocyclerStateDiff', () => {
       testMsg: 'returns deactivate block when temp goes from number to null',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: 20,
+        currentBlockActivity: { type: 'blockTargetTemp', blockTargetTemp: 20 },
         lidTargetTemp: null,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         moduleId: thermocyclerId,
@@ -652,9 +664,10 @@ describe('thermocyclerPipetteColision', () => {
           slot: '7',
           moduleState: {
             type: THERMOCYCLER_MODULE_TYPE,
-            blockTargetTemp: null,
+            currentBlockActivity: { type: 'blockDeactivated' },
             lidTargetTemp: null,
             lidOpen: null,
+            numProfilesStarted: 0,
           },
         },
       },
@@ -672,9 +685,10 @@ describe('thermocyclerPipetteColision', () => {
           slot: '7',
           moduleState: {
             type: THERMOCYCLER_MODULE_TYPE,
-            blockTargetTemp: null,
+            currentBlockActivity: { type: 'blockDeactivated' },
             lidTargetTemp: null,
             lidOpen: false,
+            numProfilesStarted: 0,
           },
         },
       },
@@ -692,9 +706,10 @@ describe('thermocyclerPipetteColision', () => {
           slot: '7',
           moduleState: {
             type: THERMOCYCLER_MODULE_TYPE,
-            blockTargetTemp: null,
+            currentBlockActivity: { type: 'blockDeactivated' },
             lidTargetTemp: null,
             lidOpen: true,
+            numProfilesStarted: 0,
           },
         },
       },
@@ -712,9 +727,10 @@ describe('thermocyclerPipetteColision', () => {
           slot: '7',
           moduleState: {
             type: THERMOCYCLER_MODULE_TYPE,
-            blockTargetTemp: null,
+            currentBlockActivity: { type: 'blockDeactivated' },
             lidTargetTemp: null,
             lidOpen: false,
+            numProfilesStarted: 0,
           },
         },
       },

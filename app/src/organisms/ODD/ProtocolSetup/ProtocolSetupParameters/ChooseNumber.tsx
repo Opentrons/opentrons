@@ -117,7 +117,10 @@ export function ChooseNumber({
           flexDirection={DIRECTION_COLUMN}
           marginTop="7.75rem"
         >
-          <LegacyStyledText as="h4" textAlign={TYPOGRAPHY.textAlignLeft}>
+          <LegacyStyledText
+            forwardedAs="h4"
+            textAlign={TYPOGRAPHY.textAlignLeft}
+          >
             {parameter.description}
           </LegacyStyledText>
           <InputField

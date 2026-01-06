@@ -145,7 +145,7 @@ export function RecentProtocolRuns({
         )}
         {!isRobotViewable && (
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             alignItems={ALIGN_CENTER}
             color={COLORS.grey50}
             display={DISPLAY_FLEX}
@@ -157,7 +157,7 @@ export function RecentProtocolRuns({
         )}
         {isRobotViewable && allRunsMutable?.length === 0 && (
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             alignItems={ALIGN_CENTER}
             display={DISPLAY_FLEX}
             flex="1 0"

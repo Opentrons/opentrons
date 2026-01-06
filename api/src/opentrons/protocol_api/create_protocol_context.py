@@ -1,4 +1,5 @@
 """ProtocolContext factory."""
+
 import asyncio
 from typing import Any, Dict, Optional, Union, cast
 
@@ -165,12 +166,9 @@ def create_protocol_context(
     # knowing what addressable areas have been loaded (and any checks involving trash geometry). Because the method
     # that uses this in the core relies on the sync client and this code will run in the main thread (which if called
     # will cause a deadlock), we're directly calling the protocol engine method here where we have access to it.
-    if (
-        protocol_engine is not None
-        and should_load_fixed_trash_area_for_python_protocol(
-            api_version=api_version,
-            robot_type=protocol_engine.state_view.config.robot_type,
-        )
+    if protocol_engine is not None and should_load_fixed_trash_area_for_python_protocol(
+        api_version=api_version,
+        robot_type=protocol_engine.state_view.config.robot_type,
     ):
         assert isinstance(context.fixed_trash, TrashBin)
         protocol_engine.add_addressable_area(context.fixed_trash.area_name)

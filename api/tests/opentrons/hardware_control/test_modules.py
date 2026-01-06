@@ -144,7 +144,6 @@ async def mod_tempdeck(
     module_error_callback: ModuleErrorCallback,
     mock_execution_manager: ExecutionManager,
 ) -> AsyncIterator[AbstractModule]:
-
     usb_port = USBPort(
         name="",
         hub=False,

@@ -1,4 +1,5 @@
 """Integration tests for the can_comm script."""
+
 from typing import List
 
 from mock import MagicMock
@@ -73,7 +74,7 @@ def test_prompt_message_with_payload(
                 message_id=message_id, node_id=node_id, originating_node_id=NodeId.host
             )
         ),
-        data=b"\x00\x00\x00\x01\xff\x00\xff\x00\xAA\00\xBB\x00",
+        data=b"\x00\x00\x00\x01\xff\x00\xff\x00\xaa\00\xbb\x00",
     )
 
 

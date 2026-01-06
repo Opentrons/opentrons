@@ -125,9 +125,9 @@ class RetrieveResult(BaseModel):
     originalPrimaryLocationSequence: LabwareLocationSequence = Field(
         ..., description="The original location of the just-retrieved primary labware"
     )
-    originalAdapterLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description="The original location of an adapter labware if any")
+    originalAdapterLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description="The original location of an adapter labware if any")
+    )
     originalLidLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
         None, description="The original location of a lid labware if any"
     )

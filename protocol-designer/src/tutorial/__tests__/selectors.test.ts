@@ -55,7 +55,8 @@ describe('shouldShowCoolingHint', () => {
           type: THERMOCYCLER_MODULE_TYPE,
           lidTargetTemp: prevLidTemp,
           lidOpen: false,
-          blockTargetTemp: null,
+          currentBlockActivity: { type: 'blockDeactivated' },
+          numProfilesStarted: 0,
         }
         const prevTimelineFrame = {
           robotState: {

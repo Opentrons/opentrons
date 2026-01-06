@@ -1,6 +1,5 @@
 """Unit tests for the `get_union_elements` module."""
 
-
 import typing
 
 import pytest

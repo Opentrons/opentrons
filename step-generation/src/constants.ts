@@ -54,9 +54,10 @@ export const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
 }
 export const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
   type: THERMOCYCLER_MODULE_TYPE,
-  blockTargetTemp: null,
+  currentBlockActivity: { type: 'blockDeactivated' },
   lidTargetTemp: null,
   lidOpen: null,
+  numProfilesStarted: 0,
 }
 export const HEATERSHAKER_MODULE_INITIAL_STATE: HeaterShakerModuleState = {
   type: HEATERSHAKER_MODULE_TYPE,

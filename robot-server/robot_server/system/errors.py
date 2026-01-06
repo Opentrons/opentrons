@@ -1,4 +1,5 @@
 """Errors returned from /system endpoints."""
+
 from typing import Optional
 from robot_server.service.errors import (
     RobotServerError,

@@ -315,7 +315,6 @@ def test_add_key_no_key(api_client):
 )
 def test_add_key_response(add_key_return, expected_status, expected_body, api_client):
     with tempfile.TemporaryDirectory() as source_td:
-
         path = os.path.join(source_td, "t.pem")
         with open(path, "w") as f:
             f.write(str(random.getrandbits(20)))

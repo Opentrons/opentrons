@@ -59,9 +59,9 @@ def publish(command: CommandPayloadCreator) -> Callable[[FuncT], FuncT]:
 
             broker = getattr(args[0], "broker", None)
 
-            assert isinstance(
-                broker, LegacyBroker
-            ), "Only methods of CommandPublisher classes should be decorated."
+            assert isinstance(broker, LegacyBroker), (
+                "Only methods of CommandPublisher classes should be decorated."
+            )
 
             func_sig = _inspect_signature(func)
             bound_func_args = func_sig.bind(*args, **kwargs)

@@ -82,7 +82,7 @@ export function SkipToNextStep(
           t={t}
           i18nKey="robot_will_not_check_for_liquid"
           components={{
-            block: <LegacyStyledText as="p" />,
+            block: <LegacyStyledText forwardedAs="p" />,
           }}
         />
         <InlineNotification

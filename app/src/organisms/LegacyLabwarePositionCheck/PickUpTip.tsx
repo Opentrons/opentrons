@@ -128,7 +128,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
       components={{
         bold: (
           <LegacyStyledText
-            as="span"
+            forwardedAs="span"
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           />
         ),
@@ -449,7 +449,7 @@ export const PickUpTip = (props: PickUpTipProps): JSX.Element | null => {
                   : 'ensure_nozzle_position_desktop'
               }
               components={{
-                block: <LegacyStyledText as="p" />,
+                block: <LegacyStyledText forwardedAs="p" />,
                 bold: <strong />,
               }}
               values={{

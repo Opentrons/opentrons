@@ -1,4 +1,5 @@
 """Sensor driver message scheduler."""
+
 import asyncio
 import logging
 from contextlib import asynccontextmanager
@@ -132,7 +133,6 @@ class SensorScheduler:
                 ),
             )
             try:
-
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
@@ -201,7 +201,6 @@ class SensorScheduler:
                 ),
             )
             try:
-
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,
@@ -240,7 +239,6 @@ class SensorScheduler:
             number_of_messages=expected_num_messages,
         ) as reader:
             try:
-
                 data_list = await asyncio.wait_for(
                     self._multi_wait_for_response(reader, _format_sensor_response),
                     timeout,

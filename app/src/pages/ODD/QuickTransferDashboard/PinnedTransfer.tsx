@@ -131,7 +131,7 @@ export function PinnedTransfer(props: {
         width="100%"
         color={COLORS.grey60}
       >
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {formatTimeWithUtcLabel(transfer.createdAt)}
         </LegacyStyledText>
       </Flex>

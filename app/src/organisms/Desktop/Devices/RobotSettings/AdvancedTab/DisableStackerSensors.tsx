@@ -35,7 +35,7 @@ export function DisableStackerSensors({
         >
           {t('disable_stacker_sensors')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('disable_stacker_sensors_description')}
         </LegacyStyledText>
       </Box>

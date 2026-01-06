@@ -1,4 +1,5 @@
 """Test Heater-Shaker start set temperature command implementation."""
+
 from decoy import Decoy, matchers
 
 from opentrons.hardware_control.modules import HeaterShaker

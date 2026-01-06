@@ -13,12 +13,18 @@ import type { StyleProps } from './types'
 
 const TextComponent = ({
   as,
+  color,
   ...props
 }: ComponentProps<'p'> & { as?: string }): JSX.Element => {
   const Component = as || 'p'
   return createElement(Component, {
     ...props,
-    style: { marginTop: 0, marginBottom: 0, ...props.style },
+    style: {
+      marginTop: 0,
+      marginBottom: 0,
+      ...(color != null ? { color } : {}),
+      ...props.style,
+    },
   })
 }
 

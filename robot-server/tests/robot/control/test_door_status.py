@@ -1,4 +1,5 @@
 """Test door status route."""
+
 import pytest
 from decoy import Decoy
 from opentrons.hardware_control.types import DoorState

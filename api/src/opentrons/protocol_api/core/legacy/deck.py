@@ -44,12 +44,10 @@ DEFAULT_LEGACY_DECK_DEFINITION_VERSION: Final = 3
 
 class DeckItem(Protocol):
     @property
-    def highest_z(self) -> float:
-        ...
+    def highest_z(self) -> float: ...
 
     @property
-    def load_name(self) -> str:
-        ...
+    def load_name(self) -> str: ...
 
 
 class Deck(UserDict):  # type: ignore[type-arg]
@@ -82,7 +80,8 @@ class Deck(UserDict):  # type: ignore[type-arg]
             # If `Deck` is public, all items in a `Deck` should be
             # instances of other public APIs.
             loaded_f = load_lw(
-                f["labware"], self.position_for(slot_name)  # type: ignore
+                f["labware"],  # type: ignore
+                self.position_for(slot_name),
             )
             self.__setitem__(slot_name, loaded_f)
 
@@ -253,8 +252,7 @@ class Deck(UserDict):  # type: ignore[type-arg]
         if not slot_def:
             slot_ids = [slot["id"] for slot in slots]
             raise ValueError(
-                f"slot {slot_name} could not be found,"
-                f"valid deck slots are: {slot_ids}"
+                f"slot {slot_name} could not be found,valid deck slots are: {slot_ids}"
             )
         return slot_def
 

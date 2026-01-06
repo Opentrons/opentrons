@@ -43,10 +43,10 @@ describe('TouchscreenBrightness', () => {
     screen.getByTestId('TouchscreenBrightness_increase')
   })
 
-  it('plus button should be disabled when brightness max(1)', () => {
+  it('plus button should be disabled when brightness max(6)', () => {
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       sleepMS: 1,
-      brightness: 1,
+      brightness: 6,
       textSize: 1,
     } as any)
     render(props)
@@ -54,10 +54,10 @@ describe('TouchscreenBrightness', () => {
     expect(button).toBeDisabled()
   })
 
-  it('plus button should be disabled when brightness min(6)', () => {
+  it(' button should be disabled when brightness min(1)', () => {
     vi.mocked(getOnDeviceDisplaySettings).mockReturnValue({
       sleepMS: 1,
-      brightness: 6,
+      brightness: 1,
       textSize: 1,
     } as any)
     render(props)

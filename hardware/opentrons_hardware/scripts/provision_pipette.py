@@ -33,9 +33,10 @@ async def run(
     which_pipette = {"left": NodeId.pipette_left, "right": NodeId.pipette_right}[
         args.which
     ]
-    async with build.driver(build_settings(args)) as driver, CanMessenger(
-        driver
-    ) as messenger:
+    async with (
+        build.driver(build_settings(args)) as driver,
+        CanMessenger(driver) as messenger,
+    ):
         await flash_serials(messenger, which_pipette, base_log, trace_log)
 
 
@@ -134,7 +135,7 @@ async def update_serial_and_confirm(
                             )
                     base_log.debug(f"message {type(message)} is not relevant")
                     base_log.debug(
-                        f"{(target-datetime.datetime.now()).total_seconds()} remaining in attempt {attempt}"
+                        f"{(target - datetime.datetime.now()).total_seconds()} remaining in attempt {attempt}"
                     )
         except asyncio.TimeoutError:
             continue
@@ -148,7 +149,7 @@ async def get_and_update_serial_once(
 ) -> None:
     """Read and update a single serial."""
     name, model, data = await get_serial(
-        f'Enter serial for pipette on {which_pipette.name.split("_")[-1]}: ', base_log
+        f"Enter serial for pipette on {which_pipette.name.split('_')[-1]}: ", base_log
     )
     try:
         await update_serial_and_confirm(

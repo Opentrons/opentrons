@@ -1,4 +1,5 @@
 """Motion planning base interfaces."""
+
 from dataclasses import dataclass
 from enum import Enum, auto as auto_enum_value
 from typing import Optional

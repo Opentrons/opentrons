@@ -288,9 +288,7 @@ class RunOrchestrator:
 
     def get_most_recently_finalized_command(self) -> Optional[CommandPointer]:
         """Get the most recently finalized command, if any."""
-        most_recently_finalized_command = (
-            self._protocol_engine.state_view.commands.get_most_recently_finalized_command()
-        )
+        most_recently_finalized_command = self._protocol_engine.state_view.commands.get_most_recently_finalized_command()
         return (
             CommandPointer(
                 command_id=most_recently_finalized_command.command.id,
@@ -520,10 +518,10 @@ class RunOrchestrator:
         stackers: Dict[str, FlexStackerSubState] = {}
         for module in modules:
             if module.model == ModuleModel.FLEX_STACKER_MODULE_V1:
-                stackers[
-                    module.id
-                ] = self._protocol_engine.state_view.modules.get_flex_stacker_substate(
-                    module.id
+                stackers[module.id] = (
+                    self._protocol_engine.state_view.modules.get_flex_stacker_substate(
+                        module.id
+                    )
                 )
         return stackers
 

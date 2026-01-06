@@ -1,4 +1,4 @@
-""" Constants to avoid circular deps """
+"""Constants to avoid circular deps"""
 
 from typing_extensions import Final
 

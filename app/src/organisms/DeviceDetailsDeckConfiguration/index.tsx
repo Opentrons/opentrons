@@ -48,7 +48,7 @@ import { useRunStatuses } from '/app/resources/runs'
 import { DeckFixtureSetupInstructionsModal } from './DeckFixtureSetupInstructionsModal'
 
 import type { TFunction } from 'i18next'
-import type { CutoutId } from '@opentrons/shared-data'
+import type { CutoutId, VISUAL_SLOTS } from '@opentrons/shared-data'
 
 const DECK_CONFIG_REFETCH_INTERVAL = 5000
 const RUN_REFETCH_INTERVAL = 5000
@@ -151,7 +151,8 @@ export function DeviceDetailsDeckConfiguration({
           {
             displayLocation: vsId
               ? getAASlotDisplayName(
-                  getAAWithFakesFromVSId(vsId) ?? addressableAreaId
+                  getAAWithFakesFromVSId(vsId as VISUAL_SLOTS) ??
+                    addressableAreaId
                 )
               : getDisplayLocationForCutoutIds([cutoutId]),
             displayName,
@@ -305,7 +306,7 @@ export function DeviceDetailsDeckConfiguration({
             paddingBottom={SPACING.spacing24}
             width="100%"
           >
-            <LegacyStyledText as="p" color={COLORS.grey40}>
+            <LegacyStyledText forwardedAs="p" color={COLORS.grey40}>
               {t('offline_deck_configuration')}
             </LegacyStyledText>
           </Flex>

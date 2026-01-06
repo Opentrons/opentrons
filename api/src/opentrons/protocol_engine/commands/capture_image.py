@@ -1,4 +1,5 @@
 """Command models to capture an image with a camera."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Tuple, Any
 from datetime import datetime

@@ -148,6 +148,9 @@ mock_dir
 .npm-cache/
 .eslintcache
 
+# mise versions file
+mise.toml
+
 # include archived API docs
 !api/docs/dist/
 api/docs/dist/hardware/

@@ -230,7 +230,6 @@ def detection_queue(
 def prep_mock_update(
     update_bag: FirmwareUpdate, decoy: Decoy, update_details: Dict[FirmwareTarget, str]
 ) -> RunUpdate:
-
     updater = decoy.mock(cls=RunUpdate)
     update_class = update_bag.update_runner
     decoy.when(

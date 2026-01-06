@@ -1,4 +1,5 @@
 """Tools for temporary protocol files."""
+
 from pathlib import Path
 import tempfile
 from typing import IO

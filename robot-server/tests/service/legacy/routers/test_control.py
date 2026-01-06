@@ -29,7 +29,7 @@ def test_home_pipette(api_client, hardware, mount_name, mount):
     test_data = {"target": "pipette", "mount": mount_name}
 
     res = api_client.post("/robot/home", json=test_data)
-    assert res.json() == {"message": f"Pipette on {mount_name}" f" homed successfully"}
+    assert res.json() == {"message": f"Pipette on {mount_name} homed successfully"}
     assert res.status_code == 200
     hardware.home.assert_called_once_with([Axis.by_mount(mount)])
     hardware.home_plunger.assert_called_once_with(mount)

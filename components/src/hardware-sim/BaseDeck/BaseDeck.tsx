@@ -32,15 +32,14 @@ import {
   FixedTrashText,
 } from '../..'
 import { COLORS } from '../../helix-design-system'
-import { RobotInfoLabel } from '../../molecules/RobotInfoLabel'
 import { SlotLabels } from '../Deck'
 import { DeckFromLayers } from '../Deck/DeckFromLayers'
 import { FlexTrash } from '../Deck/FlexTrash'
-import { RobotCoordsForeignObject } from '../Deck/RobotCoordsForeignObject'
 import { LabwareRender } from '../Labware'
 import { Module } from '../Module'
 import { RobotCoordinateSpace } from '../RobotCoordinateSpace'
 import { SingleSlotFixture } from './SingleSlotFixture'
+import { StackedBadge } from './StackedBadge'
 import { StagingAreaFixture } from './StagingAreaFixture'
 import { WasteChuteFixture } from './WasteChuteFixture'
 import { WasteChuteStagingAreaFixture } from './WasteChuteStagingAreaFixture'
@@ -323,7 +322,9 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
             const slotPosition = getPositionFromSlotId(stackerSlotName, deckDef)
             const moduleDef = getModuleDef(moduleModel)
             return slotPosition != null ? (
-              <>
+              <Fragment
+                key={`stacker_${moduleModel}_${moduleLocation.slotName}`}
+              >
                 <StagingAreaFixture
                   cutoutId={
                     `cutout${moduleLocation.slotName}` as StagingAreaLocation
@@ -391,7 +392,7 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
                   ) : null}
                   {moduleChildren}
                 </Module>
-              </>
+              </Fragment>
             ) : null
           }
         )}
@@ -578,19 +579,6 @@ export function BaseDeck(props: BaseDeckProps): JSX.Element {
       </>
       {children}
     </RobotCoordinateSpace>
-  )
-}
-
-function StackedBadge(): JSX.Element {
-  return (
-    <RobotCoordsForeignObject height="2.5rem" width="2.5rem" x={113} y={53}>
-      <RobotInfoLabel
-        height="1.25rem"
-        svgSize="0.875rem"
-        highlight
-        iconName="stacked"
-      />
-    </RobotCoordsForeignObject>
   )
 }
 

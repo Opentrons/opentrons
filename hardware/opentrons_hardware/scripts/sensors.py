@@ -1,4 +1,5 @@
 """A script for sending and receiving data from sensors on the OT3."""
+
 import logging
 import asyncio
 import argparse
@@ -70,7 +71,7 @@ def prompt_str_input(prompt_name: str, get_user_input: GetInputFunc) -> str:
     """Prompt to type in a particular string.
 
     Args:
-        output_func: Function to output text to user.
+        prompt_name: The string to print.
         get_user_input: Function to get user input.
 
     Returns:
@@ -87,7 +88,7 @@ def prompt_float_input(prompt_name: str, get_user_input: GetInputFunc) -> float:
     """Prompt a float input.
 
     Args:
-        output_func: Function to output text to user.
+        prompt_name: The string to print.
         get_user_input: Function to get user input.
 
     Returns:
@@ -104,7 +105,7 @@ def prompt_bool_input(prompt_name: str, get_user_input: GetInputFunc) -> bool:
     """Prompt user for a yes or no answer.
 
     Args:
-        output_func: Function to output text to user.
+        prompt_name: The string to print.
         get_user_input: Function to get user input.
 
     Returns:

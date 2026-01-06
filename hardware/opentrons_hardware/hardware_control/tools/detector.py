@@ -180,9 +180,7 @@ async def _do_tool_resolve(
         node_id=NodeId.broadcast,
         message=message_definitions.InstrumentInfoRequest(),
     )
-    incoming_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]" = (
-        asyncio.Queue()
-    )
+    incoming_queue: "asyncio.Queue[Tuple[NodeId, Union[PipetteInformation, GripperInformation, HepaUVInformation]]]" = asyncio.Queue()
     try:
         await asyncio.wait_for(
             _await_responses(wc, should_respond, incoming_queue),
@@ -240,7 +238,6 @@ async def _resolve_tool_types(
     attached: ToolDetectionResult,
     timeout_sec: float,
 ) -> ToolSummary:
-
     should_respond = _need_type_query(attached)
     if not should_respond:
         return ToolSummary(left=None, right=None, gripper=None)

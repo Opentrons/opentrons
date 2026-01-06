@@ -1,4 +1,5 @@
 """Home command payload, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, List, Type, Any
 

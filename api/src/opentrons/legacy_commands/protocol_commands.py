@@ -15,9 +15,7 @@ def delay(
     td = timedelta(minutes=minutes, seconds=seconds)
     actual_min, actual_sec = divmod(td.total_seconds(), 60)
 
-    text = (
-        f"Delaying for {int(actual_min)} minutes and " f"{round(actual_sec, 3)} seconds"
-    )
+    text = f"Delaying for {int(actual_min)} minutes and {round(actual_sec, 3)} seconds"
 
     if msg:
         text = f"{text}. {msg}"
