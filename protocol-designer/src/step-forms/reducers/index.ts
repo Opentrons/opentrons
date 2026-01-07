@@ -1582,43 +1582,54 @@ const unsavedGroup: Reducer<UnsavedGroupState, any> = handleActions<
   initialUnsavedGroupState
 )
 
+type OrderedStepIdsActions =
+  | SaveStepFormAction
+  | DeleteMultipleStepsAction
+  | LoadFileAction
+  | DuplicateSelectedStepsAction
+  | ReorderStepsAction
 export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState: string[] = []
-// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
-// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
-  {
-    SAVE_STEP_FORM: (
-      state: OrderedStepIdsState,
-      action: SaveStepFormAction
-    ) => {
+export const orderedStepIds = (
+  rootState: RootState,
+  action: OrderedStepIdsActions
+): OrderedStepIdsState => {
+  const orderedStepIds = rootState
+    ? rootState.orderedStepIds
+    : initialOrderedStepIdsState
+
+  switch (action.type) {
+    case 'SAVE_STEP_FORM': {
       const id = action.payload.form.id
 
-      if (!state.includes(id)) {
-        return [...state, id]
+      if (!orderedStepIds.includes(id)) {
+        return [...orderedStepIds, id]
       }
 
-      return state
-    },
-    DELETE_MULTIPLE_STEPS: (
-      state: OrderedStepIdsState,
-      action: DeleteMultipleStepsAction
-    ) => state.filter(id => !action.payload.includes(id)),
-    LOAD_FILE: (
-      state: OrderedStepIdsState,
-      action: LoadFileAction
-    ): OrderedStepIdsState => getPDMetadata(action.payload.file).orderedStepIds,
-    DUPLICATE_SELECTED_STEPS: (
-      state: OrderedStepIdsState,
-      action: DuplicateSelectedStepsAction
-    ): OrderedStepIdsState => action.payload.newStepOrder,
-    REORDER_STEPS: (
-      state: OrderedStepIdsState,
-      action: ReorderStepsAction
-    ): OrderedStepIdsState => action.payload.stepIds,
-  },
-  initialOrderedStepIdsState
-)
+      return orderedStepIds
+    }
+
+    case 'DELETE_MULTIPLE_STEPS': {
+      return orderedStepIds.filter(id => !action.payload.includes(id))
+    }
+
+    case 'LOAD_FILE': {
+      return getPDMetadata(action.payload.file).orderedStepIds
+    }
+
+    case 'DUPLICATE_SELECTED_STEPS': {
+      return action.payload.newStepOrder
+    }
+
+    case 'REORDER_STEPS': {
+      return action.payload.stepIds
+    }
+
+    default: {
+      return orderedStepIds
+    }
+  }
+}
 
 const initialDeckConfiguration: DeckConfigurationState = {
   deckConfig: FLEX_SIMPLEST_DECK_CONFIG,
@@ -1717,7 +1728,6 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
   ({ action, state, prevStateFallback }) => ({
     unsavedGroup: unsavedGroup(prevStateFallback.unsavedGroup, action),
     stepGroups: stepGroups(prevStateFallback.stepGroups, action),
-    orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
     labwareInvariantProperties: labwareInvariantProperties(
       prevStateFallback.labwareInvariantProperties,
       action
@@ -1741,6 +1751,7 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     ),
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action as SavedStepFormsActions),
+    orderedStepIds: orderedStepIds(state, action as OrderedStepIdsActions),
     unsavedForm: unsavedForm(state, action as UnsavedFormActions),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,

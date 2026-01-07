@@ -29,6 +29,7 @@ import {
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 
 import type { ModuleEntity } from '@opentrons/step-generation'
+import type { SaveStepFormAction } from '/protocol-designer/ui/steps/actions/thunks'
 import type { FormData, StepType } from '../../form-types'
 import type { DeleteContainerAction } from '../../labware-ingred/actions/actions'
 import type {
@@ -73,37 +74,77 @@ afterEach(() => {
 })
 describe('orderedStepIds reducer', () => {
   it('should add a saved step when that step is new', () => {
-    const state = ['99']
-    const action = {
-      type: 'SAVE_STEP_FORM',
-      payload: {
-        id: '123',
-        stepType: 'moveLiquid',
+    const state: Partial<RootState> = {
+      orderedStepIds: ['99'],
+      savedStepForms: {
+        '99': {
+          id: '99',
+          stepType: 'moveLiquid',
+        },
       },
     }
-    expect(orderedStepIds(state, action)).toEqual(['99', '123'])
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: '123',
+          stepType: 'moveLiquid',
+        },
+        enableConcurrentModuleActions: true,
+        thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+      },
+    }
+    expect(orderedStepIds(state as RootState, action)).toEqual(['99', '123'])
   })
   it('should not update when an existing step is saved', () => {
-    const state = ['99', '123', '11']
-    const action = {
-      type: 'SAVE_STEP_FORM',
-      payload: {
-        id: '123',
-        stepType: 'moveLiquid',
+    const state: Partial<RootState> = {
+      orderedStepIds: ['99', '123', '11'],
+      savedStepForms: {
+        '99': {
+          id: '99',
+          stepType: 'moveLiquid',
+        },
+        '123': {
+          id: '123',
+          stepType: 'moveLiquid',
+        },
+        '11': {
+          id: '11',
+          stepType: 'moveLiquid',
+        },
       },
     }
-    expect(orderedStepIds(state, action)).toBe(state)
+    const action: SaveStepFormAction = {
+      type: 'SAVE_STEP_FORM',
+      payload: {
+        form: {
+          id: '123',
+          stepType: 'moveLiquid',
+        },
+        enableConcurrentModuleActions: true,
+        thermocyclerPauseStepId: 'thermocyclerPauseStepId',
+      },
+    }
+    expect(orderedStepIds(state as RootState, action)).toBe(
+      state.orderedStepIds
+    )
   })
   it('should remove multiple saved steps when multiple steps are deleted', () => {
-    const state = ['1', '2', '3']
-    const action = {
+    const state: Partial<RootState> = {
+      orderedStepIds: ['1', '2', '3'],
+      savedStepForms: {},
+    }
+    const action: DeleteMultipleStepsAction = {
       type: 'DELETE_MULTIPLE_STEPS',
       payload: ['1', '3'],
     }
-    expect(orderedStepIds(state, action)).toEqual(['2'])
+    expect(orderedStepIds(state as RootState, action)).toEqual(['2'])
   })
   it('should set the new step order when steps are duplicated', () => {
-    const state = ['1', '2', '3']
+    const state: Partial<RootState> = {
+      orderedStepIds: ['1', '2', '3'],
+      savedStepForms: {},
+    }
     const action: DuplicateSelectedStepsAction = {
       type: 'DUPLICATE_SELECTED_STEPS',
       payload: {
@@ -116,7 +157,12 @@ describe('orderedStepIds reducer', () => {
         newStepOrder: ['1', 'dup_1', '2', '3'],
       },
     }
-    expect(orderedStepIds(state, action)).toEqual(['1', 'dup_1', '2', '3'])
+    expect(orderedStepIds(state as RootState, action)).toEqual([
+      '1',
+      'dup_1',
+      '2',
+      '3',
+    ])
   })
 })
 describe('labwareInvariantProperties reducer', () => {
