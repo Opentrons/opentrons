@@ -16,11 +16,11 @@ One way to think of labware is as the durable components and consumable items th
 
 ## Opentrons-verified labware
 
-Opentrons has prepared information about common labware for our Labware Library. This information is stored in Javascript object notation (JSON) files with `.json` file extensions. A JSON file includes spatial dimensions (length, width, height), volumetric capacity (µL, mL), and other metrics that define the labware's surface features, their shapes, and locations. Newer labware definitions also include information about the internal shapes of wells within labware. When running a protocol, the the OT-2 reads the data in these `.json` files to know what labware is on the deck and how to work with it.
+Opentrons has prepared information about common labware for our Labware Library. This information is stored in Javascript object notation (JSON) files with `.json` file extensions. A JSON file includes spatial dimensions (length, width, height), volumetric capacity (µL, mL), and other metrics that define the labware's surface features, their shapes, and locations. Newer labware definitions also include information about the internal shapes of wells within labware. When running a protocol, the the OT-2 reads the data in these files to know what labware is on the deck and how to work with it.
 
 ## Custom labware
 
-Custom labware is labware that is not included in the Labware Library or was created with our Custom Labware Creator. However, sometimes the idea of custom labware comes burdened by notions of complexity, expense, or difficulty. But, custom labware shouldn't be hard to understand or create.
+Custom labware is labware that is not included in the Labware Library or was created with our [Custom Labware Creator](https://labware.opentrons.com/#/create). However, sometimes the idea of custom labware comes burdened by notions of complexity, expense, or difficulty. But, custom labware shouldn't be hard to understand or create.
 
 Let's take a moment to unpack the concept of custom labware.
 
