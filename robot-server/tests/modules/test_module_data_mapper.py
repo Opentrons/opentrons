@@ -1,4 +1,5 @@
 """Tests for robot_server.modules.module_data_mapper."""
+
 from decoy import Decoy
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.types import SubSystem, SubSystemState

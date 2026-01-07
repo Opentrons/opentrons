@@ -1,4 +1,5 @@
 """Tests for adjacent_slots_getters."""
+
 import pytest
 from typing import List, Optional
 

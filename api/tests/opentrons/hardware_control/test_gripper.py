@@ -21,7 +21,6 @@ fake_gripper_conf = gripper_config.load(GripperModel.v1)
 
 @pytest.fixture
 def fake_offset() -> GripperCalibrationOffset:
-
     return instrument_calibration.load_gripper_calibration_offset("fakeid123")
 
 
@@ -91,7 +90,6 @@ def test_gripper_has_jaw_width_calibration(
     loaded_encoder_pos: float,
     existing_encoder_pos: float,
 ) -> None:
-
     gripr = gripper.Gripper(fake_gripper_conf, fake_offset, "fakeid123")
     gripr._encoder_position_at_jaw_closed = existing_encoder_pos
     with mock.patch(

@@ -1,4 +1,5 @@
 """Test pipette data provider."""
+
 from typing import Dict
 from sys import maxsize
 import pytest
@@ -399,7 +400,7 @@ def test_default_tip_overlap_versions() -> None:
     )
 
 
-@pytest.mark.parametrize("version", ["v0", "v1", f"v{maxsize+1}"])
+@pytest.mark.parametrize("version", ["v0", "v1", f"v{maxsize + 1}"])
 def test_pass_valid_tip_overlap_versions(version: str) -> None:
     """Pass valid tip overlap specs."""
     assert validate_and_default_tip_overlap_version(version) == version

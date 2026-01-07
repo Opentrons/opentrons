@@ -22,9 +22,41 @@ classifiers = [
 dependencies = [
     "jsonschema>=4.0.0,<5",
     "typing-extensions>=4.0.0,<5",
+    "numpy~=1.26.4",
     "pydantic>=2.0.0,<3.0.0",
 ]
 dynamic = ['version']
+
+[dependency-groups]
+# Robot dependencies for robot deployment
+robot = [
+    "jsonschema==4.17.3",
+    "pydantic==2.11.7",
+    "numpy==1.26.4",
+    "zipp==3.21.0",
+]
+# Dev dependencies
+# Robot group is always included in dev to ensure dev environment matches robot
+dev = [
+    {include-group = "robot"},
+    "mypy==1.11.0",
+    "ruff==0.14.10",
+    "twine==4.0.0",
+    "wheel==0.37.1",
+    "pytest>=8.4.0,<9",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=3.5.0",
+    "typeguard~=4.4.4",
+    "typing-extensions>=4.0.0,<5",
+    "atomicwrites==1.4.0; sys_platform == 'win32'",
+    "colorama==0.4.4; sys_platform == 'win32'",
+    "pytest-clarity~=1.0.0",
+    "build~=1.2.0",
+    "pillow",
+    "types-Pillow",
+    "setuptools==80.9.0",
+    "zipp==3.21.0",
+]
 
 [project.urls]
 "Source Code" = "https://github.com/Opentrons/opentrons"
@@ -41,6 +73,24 @@ build-backend = 'hatchling.build'
 # do this in the first place happens because hatch-vcs inherits from setuptools_scm but it
 # doesn't matter.
 #[tool.setuptools_scm]
+
+[tool.ruff.lint]
+select = ["E", "ANN", "D", "C90"]
+ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
+[tool.ruff.lint.per-file-ignores]
+"python/opentrons_shared_data/load.py" = ["D"]
+"python/opentrons_shared_data/deck/*" = ["D"]
+"python/opentrons_shared_data/labware/*" = ["D"]
+"python/opentrons_shared_data/module/*" = ["D"]
+"python/opentrons_shared_data/pipette/*" = ["D"]
+"python/opentrons_shared_data/protocol/*" = ["D"]
+"python_tests/*" = ["ANN", "D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="python/opentrons_shared_data/_version.py"

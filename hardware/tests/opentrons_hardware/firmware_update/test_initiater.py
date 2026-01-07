@@ -1,4 +1,5 @@
 """Tests for FirmwareUpdateInitiator."""
+
 import pytest
 from mock import AsyncMock, call
 

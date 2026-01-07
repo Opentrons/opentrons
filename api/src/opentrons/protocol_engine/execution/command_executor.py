@@ -1,4 +1,5 @@
 """Command side-effect execution logic container."""
+
 import asyncio
 from logging import getLogger
 from typing import Optional, List, Protocol

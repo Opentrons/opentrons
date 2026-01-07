@@ -41,7 +41,7 @@ def test_estop_state_transform(
         (HwEstopState.LOGICALLY_ENGAGED, EstopState.LOGICALLY_ENGAGED),
         (HwEstopState.DISENGAGED, EstopState.DISENGAGED),
     ]
-    for (input, output) in steps:
+    for input, output in steps:
         decoy.when(mock_hardware.estop_status).then_return(
             EstopOverallStatus(
                 state=input,
@@ -95,7 +95,7 @@ def test_estop_physical_state_transform(
         ),
     ]
 
-    for (input, left, right) in steps:
+    for input, left, right in steps:
         decoy.when(mock_hardware.estop_status).then_return(input)
         assert subject.get_left_physical_status() == left
         assert subject.get_right_physical_status() == right

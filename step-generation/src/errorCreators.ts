@@ -99,6 +99,13 @@ export function missingTemperatureStep(): CommandCreatorError {
   }
 }
 
+export function missingProfileStep(): CommandCreatorError {
+  return {
+    message: 'This module is not currently running a profile.',
+    type: 'MISSING_PROFILE_STEP',
+  }
+}
+
 export function tipVolumeExceeded(args: {
   actionName: string
   volume: string | number
@@ -441,5 +448,12 @@ export const incompletePickup = (): CommandCreatorError => {
   return {
     type: 'INCOMPLETE_PICKUP',
     message: 'At least one of the selected tips is empty',
+  }
+}
+
+export const labwareOnHopper = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_ON_HOPPER',
+    message: 'Labware cannot be moved from the Flex Stacker Hopper',
   }
 }

@@ -525,8 +525,7 @@ def test_no_heater_shaker_south_of_trash() -> None:
     with pytest.raises(
         deck_conflict.DeckConflictError,
         match=(
-            "some_fixed_trash in slot 12"
-            " prevents some_heater_shaker from using slot 9"
+            "some_fixed_trash in slot 12 prevents some_heater_shaker from using slot 9"
         ),
     ):
         deck_conflict.check(
@@ -550,7 +549,7 @@ def test_heater_shaker_restrictions_trash_bin_addressable_area() -> None:
     with pytest.raises(
         deck_conflict.DeckConflictError,
         match=(
-            "some_trash_bin in slot 12" " prevents some_heater_shaker from using slot 9"
+            "some_trash_bin in slot 12 prevents some_heater_shaker from using slot 9"
         ),
     ):
         deck_conflict.check(
@@ -562,8 +561,7 @@ def test_heater_shaker_restrictions_trash_bin_addressable_area() -> None:
     with pytest.raises(
         deck_conflict.DeckConflictError,
         match=(
-            "some_trash_bin in slot 12"
-            " prevents some_heater_shaker from using slot 11"
+            "some_trash_bin in slot 12 prevents some_heater_shaker from using slot 11"
         ),
     ):
         deck_conflict.check(

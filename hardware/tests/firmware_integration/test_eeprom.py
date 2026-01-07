@@ -1,4 +1,5 @@
 """Tests for eeprom."""
+
 import asyncio
 from typing import Iterator
 

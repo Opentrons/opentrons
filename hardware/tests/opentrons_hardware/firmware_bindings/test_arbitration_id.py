@@ -1,4 +1,5 @@
 """Arbitration id tests."""
+
 import pytest
 from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
 

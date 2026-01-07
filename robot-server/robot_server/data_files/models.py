@@ -1,4 +1,5 @@
 """Data files models."""
+
 from datetime import datetime
 from typing import Literal, Set, Optional
 
@@ -68,6 +69,13 @@ class FileIdNotFound(ErrorDetails):
 
     id: Literal["FileIdNotFound"] = "FileIdNotFound"
     title: str = "Specified file id not found on the robot"
+
+
+class FileNotFound(ErrorDetails):
+    """An error returned when specified file path was not found on the robot."""
+
+    id: Literal["FileNotFound"] = "FileNotFound"
+    title: str = "Specified file path not found on the robot"
 
 
 class NoImagesFound(ErrorDetails):

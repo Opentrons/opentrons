@@ -120,6 +120,7 @@ export function CameraControls({
           settings={settings}
           setActiveSubView={setActiveSubView}
           toggleShowControls={toggleShowControls}
+          runId={runId}
         />
       )
   }

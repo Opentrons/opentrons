@@ -1,7 +1,7 @@
+"""Classes and functions for gripper state tracking"""
+
 from __future__ import annotations
 
-""" Classes and functions for gripper state tracking
-"""
 import logging
 from typing import Any, Optional, Set, Dict, Tuple, Final
 

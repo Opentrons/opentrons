@@ -184,6 +184,7 @@ export interface LabwareEntity {
   def: LabwareDefinition2
   pythonName: string
 }
+
 export interface LabwareEntities {
   [labwareId: string]: LabwareEntity
 }
@@ -542,6 +543,16 @@ export interface WaitForTemperatureArgs extends CommonArgs {
   message?: string
 }
 
+export interface WaitForModuleTaskArgs extends CommonArgs {
+  commandCreatorFnName: 'waitForModuleTask'
+
+  /** This step will wait for this to happen before moving on. */
+  // Note: Leaving room for this to become a union with stuff like 'temperatureModuleReachedTarget'.
+  waitCondition: 'thermocyclerProfileComplete'
+
+  moduleId: string
+}
+
 export type EngageMagnetArgs = CommonArgs & {
   height: number
   moduleId: string
@@ -608,19 +619,50 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
-export interface ThermocyclerProfileStepArgs extends CommonArgs {
-  moduleId: string
+export type ThermocyclerProfileStepArgs = CommonArgs & {
   commandCreatorFnName: THERMOCYCLER_PROFILE
-  blockTargetTempHold: number | null
-  lidOpenHold: boolean
-  lidTargetTempHold: number | null
-  message?: string
+
+  moduleId: string
+
   profileElements: TCExtendedProfileParams['profileElements']
   profileTargetLidTemp: number
   profileVolume: number
+
   meta?: {
     rawProfileItems: ProfileItem[]
   }
+
+  message?: string
+} & (
+    | BlockingThermocyclerProfileStepArgs
+    | ConcurrentThermocyclerProfileStepArgs
+  )
+
+/**
+ * Emits a blocking Thermocycler profile step. The entire profile will complete
+ * before the protocol moves on to the next step.
+ *
+ * In this mode, we can do some extra things immediately after the profile ends,
+ * like open the lid or set final temperatures. ("Hold" steps.)
+ */
+interface BlockingThermocyclerProfileStepArgs {
+  concurrent: false
+  blockTargetTempHold: number | null
+  lidOpenHold: boolean
+  lidTargetTempHold: number | null
+}
+
+/**
+ * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
+ * step immediately after the profile starts, and the profile will continue in the
+ * background.
+ *
+ * Because of limitations in Protocol Engine and the Python Protocol API, this mode lacks
+ * support for running "hold" steps immediately after the profile ends, so those
+ * properties are omitted here.
+ */
+interface ConcurrentThermocyclerProfileStepArgs {
+  concurrent: true
 }
 
 export interface ThermocyclerStateStepArgs extends CommonArgs {
@@ -691,7 +733,7 @@ export interface FlexStackerFillItemsArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerFillItems'
   fillLabwareUri: string | null
-  fillQuantity: number | null
+  fillLabwareIds: string[]
   interventionMessage: string | null
 }
 export interface FlexStackerStoreArgs extends CommonArgs {
@@ -718,6 +760,7 @@ export type CommandCreatorArgs =
   | DistributeArgs
   | MixArgs
   | PauseArgs
+  | WaitForModuleTaskArgs
   | TransferArgs
   | EngageMagnetArgs
   | DisengageMagnetArgs
@@ -839,10 +882,12 @@ export type ErrorType =
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
+  | 'LABWARE_ON_HOPPER'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
   | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
+  | 'MISSING_PROFILE_STEP'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
@@ -881,6 +926,7 @@ export type WarningType =
   | 'LABWARE_IN_WASTE_CHUTE_HAS_LIQUID'
   | 'TIPRACK_IN_WASTE_CHUTE_HAS_TIPS'
   | 'TEMPERATURE_IS_POTENTIALLY_UNREACHABLE'
+  | 'WAITING_FOR_NONEXISTENT_TASK'
 
 export interface CommandCreatorWarning {
   message: string

@@ -1,4 +1,5 @@
 """Test move to addressable area commands."""
+
 from datetime import datetime
 
 from decoy import Decoy, matchers

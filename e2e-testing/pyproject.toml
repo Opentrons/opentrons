@@ -28,10 +28,13 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py312"
+extend-exclude = ['fixtures/protocol/9/*']
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
 ignore = []
+[tool.ruff.lint.per-file-ignores]
+'fixtures/protocol/9/*' = ["ALL"]
 
 [tool.mypy]
 python_version = "3.10"

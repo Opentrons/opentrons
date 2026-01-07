@@ -33,9 +33,9 @@ async def run_cli(persistence_directory: pathlib.Path) -> bytes:
         stderr=asyncio.subprocess.PIPE,
     )
     stdout, stderr = await proc.communicate()
-    assert (
-        proc.returncode == 0
-    ), f"Subprocess exited with failure.\nstdout:\n{stdout!r}\nstderr:\n{stderr.decode()}"
+    assert proc.returncode == 0, (
+        f"Subprocess exited with failure.\nstdout:\n{stdout!r}\nstderr:\n{stderr.decode()}"
+    )
     return stdout
 
 

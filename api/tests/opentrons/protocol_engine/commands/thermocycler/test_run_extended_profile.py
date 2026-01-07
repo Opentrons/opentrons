@@ -1,4 +1,5 @@
 """Test Thermocycler run profile command implementation."""
+
 from typing import List, Union
 
 from decoy import Decoy

@@ -57,8 +57,7 @@ class LabwareCalibration(DeprecatedResponseDataModel):
 
     calibrationData: CalibrationData = Field(
         ...,
-        description="A dictionary of calibration data"
-        "including tip length and offsets",
+        description="A dictionary of calibration dataincluding tip length and offsets",
     )
     loadName: str = Field(..., description="The loadname of the labware definition.")
     namespace: str = Field(

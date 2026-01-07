@@ -1,4 +1,5 @@
 """opentrons_shared_data.command: functions command schemas."""
+
 from pathlib import Path
 from functools import cache
 import json
@@ -106,6 +107,6 @@ def known_schema_ids() -> list[str]:
             )
         except Exception:
             LOG.exception(
-                f"Could not load command schema from {str(command_schemas_dir/schema_file_name)}, skipping"
+                f"Could not load command schema from {str(command_schemas_dir / schema_file_name)}, skipping"
             )
     return all_schema_ids

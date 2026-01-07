@@ -1,4 +1,5 @@
 """Test get next tip in place commands."""
+
 from decoy import Decoy
 
 from opentrons.types import NozzleConfigurationType

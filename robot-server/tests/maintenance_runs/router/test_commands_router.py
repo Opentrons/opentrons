@@ -1,4 +1,5 @@
 """Tests for the /maintenance_runs/.../commands routes."""
+
 import pytest
 
 from datetime import datetime

@@ -1,4 +1,5 @@
 """Protocol engine types dealing with automatic tip selection."""
+
 from enum import Enum
 from typing import Optional
 

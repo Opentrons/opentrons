@@ -1,4 +1,5 @@
 """Command models for heating a Thermocycler's block."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING, Any
 from typing_extensions import Literal, Type
@@ -159,9 +160,9 @@ class SetTargetBlockTemperature(
     params: SetTargetBlockTemperatureParams
     result: Optional[SetTargetBlockTemperatureResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[SetTargetBlockTemperatureImpl] = (
         SetTargetBlockTemperatureImpl
-    ] = SetTargetBlockTemperatureImpl
+    )
 
 
 class SetTargetBlockTemperatureCreate(

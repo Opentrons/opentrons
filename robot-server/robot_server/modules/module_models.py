@@ -1,4 +1,5 @@
 """Request and response models for /modules endpoints."""
+
 from datetime import datetime
 from pydantic import BaseModel, Field
 from typing import Generic, List, Optional, TypeVar, Union
@@ -229,8 +230,7 @@ class ThermocyclerModuleData(BaseModel):
     totalStepCount: Optional[int] = Field(
         ...,
         description=(
-            "The total number of steps within the current cycle,"
-            " if a cycle is running."
+            "The total number of steps within the current cycle, if a cycle is running."
         ),
     )
 

@@ -1,4 +1,5 @@
 """Background task to drive the Flex's status bar."""
+
 from typing import Optional, List
 from logging import getLogger
 import asyncio

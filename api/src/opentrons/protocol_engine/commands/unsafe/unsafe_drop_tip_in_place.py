@@ -107,9 +107,9 @@ class UnsafeDropTipInPlace(
     params: UnsafeDropTipInPlaceParams
     result: Optional[UnsafeDropTipInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeDropTipInPlaceImplementation] = (
         UnsafeDropTipInPlaceImplementation
-    ] = UnsafeDropTipInPlaceImplementation
+    )
 
 
 class UnsafeDropTipInPlaceCreate(BaseCommandCreate[UnsafeDropTipInPlaceParams]):

@@ -107,9 +107,9 @@ class TipTracker:
         # dirty tips and non-present tips; but until then, we can avoid the
         # exception.
         if fail_if_full:
-            assert all(
-                well.has_tip() for well in target_wells
-            ), "{} is out of tips".format(str(self))
+            assert all(well.has_tip() for well in target_wells), (
+                "{} is out of tips".format(str(self))
+            )
 
         for well in target_wells:
             well.set_has_tip(False)

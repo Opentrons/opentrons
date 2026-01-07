@@ -1,4 +1,5 @@
 """Tests for the AnalysisStore interface."""
+
 import json
 
 from datetime import datetime, timezone

@@ -1,4 +1,5 @@
 """Tests for opentrons.legacy_commands.publisher."""
+
 from __future__ import annotations
 
 import pytest

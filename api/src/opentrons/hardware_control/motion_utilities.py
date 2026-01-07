@@ -1,4 +1,5 @@
 """Utilities for calculating motion correctly."""
+
 from logging import getLogger
 
 from functools import lru_cache

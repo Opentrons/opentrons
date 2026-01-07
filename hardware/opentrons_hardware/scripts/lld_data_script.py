@@ -1,4 +1,5 @@
 """Script that can process previous real world data to test lld processes."""
+
 import csv
 import os
 import argparse
@@ -420,7 +421,6 @@ def run(
         # have a time list for each trial so the list lengths can all be equal
         results: List[float] = []
         for trial in range(number_of_trials):
-
             time = []
             pressures = []
             z_travel = []
@@ -459,7 +459,7 @@ def run(
                 p_travel,
                 args.no_plot,
                 algorithm,
-                f"{algorithm.name()} trial: {trial+1}",
+                f"{algorithm.name()} trial: {trial + 1}",
             )
             if threshold_data:
                 # threshold_time = threshold_data[0]
@@ -473,7 +473,7 @@ def run(
                 print("No threshold found {algorithm.name()}")
                 results.append(sys.float_info.max)
         print(
-            f"{algorithm.name()}, expected {expected_travel} max {max(results)} min{min(results)}, avg {sum(results)/len(results)}"
+            f"{algorithm.name()}, expected {expected_travel} max {max(results)} min{min(results)}, avg {sum(results) / len(results)}"
         )
         final_results.append(
             (float(expected_travel), results, f"{algorithm.name()}", f"{report_file}")

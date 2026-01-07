@@ -70,6 +70,7 @@ export * from './deckConfig'
 export * from './testHelpers'
 export * from './symbolicPositionHelpers'
 export * from './slotHovers'
+export * from './deckConfiguration'
 
 export const getLabwareDefIsStandard = (def: LabwareDefinition): boolean =>
   def?.namespace === OPENTRONS_LABWARE_NAMESPACE

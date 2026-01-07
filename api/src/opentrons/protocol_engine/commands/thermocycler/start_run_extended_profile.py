@@ -79,15 +79,13 @@ def _transform_profile_step(
 @overload
 def _transform_profile_element(
     element: ProfileStep, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerStep:
-    ...
+) -> ThermocyclerStep: ...
 
 
 @overload
 def _transform_profile_element(
     element: ProfileCycle, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerCycle:
-    ...
+) -> ThermocyclerCycle: ...
 
 
 def _transform_profile_element(

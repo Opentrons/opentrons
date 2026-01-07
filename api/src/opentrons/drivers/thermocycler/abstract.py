@@ -91,8 +91,7 @@ class AbstractThermocyclerDriver(ABC):
         ...
 
     @abstractmethod
-    async def enter_programming_mode(self) -> None:
-        ...
+    async def enter_programming_mode(self) -> None: ...
 
     @abstractmethod
     async def jog_lid(self, angle: float) -> None:

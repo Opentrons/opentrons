@@ -1,4 +1,4 @@
-""" Entrypoint for the OT2 hardware control server
+"""Entrypoint for the OT2 hardware control server
 
 This server listens on a variety of different interfaces and runs a hardware
 controller. It is the only thing that is allowed to talk to the OT2's hardware,
@@ -24,15 +24,15 @@ LOG = logging.getLogger("opentrons.hardware_control.__main__")
 def exception_handler(loop: asyncio.AbstractEventLoop, context: Dict[str, Any]) -> None:
     message = ""
     if "exception" in context:
-        message += f'exception: {repr(context["exception"])}'
+        message += f"exception: {repr(context['exception'])}"
     if "future" in context:
-        message += f' while running future {repr(context["future"])}'
+        message += f" while running future {repr(context['future'])}"
     if "protocol" in context:
-        message += f' from protocol {repr(context["protocol"])}'
+        message += f" from protocol {repr(context['protocol'])}"
     if "transport" in context:
-        message += f' from transport {repr(context["transport"])}'
+        message += f" from transport {repr(context['transport'])}"
     if "socket" in context:
-        message += f' from socket {repr(context["socket"])}'
+        message += f" from socket {repr(context['socket'])}"
     LOG.error(f"Unhandled exception in event loop: {message}")
     loop.default_exception_handler(context)
 

@@ -1,4 +1,5 @@
 """Drivers for SOM gpio pins."""
+
 from typing import Any, Optional
 from typing_extensions import Final
 from unittest import mock

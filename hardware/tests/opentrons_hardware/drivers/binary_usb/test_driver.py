@@ -1,4 +1,5 @@
 """USB Driver tests."""
+
 import serial  # type: ignore[import-untyped]
 import time
 from contextlib import ExitStack

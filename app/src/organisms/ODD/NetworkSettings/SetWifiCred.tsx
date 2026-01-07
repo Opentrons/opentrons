@@ -55,7 +55,9 @@ export function SetWifiCred({
         marginTop={isUnboxingFlowOngoing ? undefined : '7.75rem'}
       >
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
-          <LegacyStyledText as="p">{t('enter_password')}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">
+            {t('enter_password')}
+          </LegacyStyledText>
           <Flex
             flexDirection={DIRECTION_ROW}
             justifyContent={JUSTIFY_SPACE_BETWEEN}
@@ -89,7 +91,7 @@ export function SetWifiCred({
                 data-testid={showPassword ? 'icon_eye-slash' : 'icon_eye'}
               />
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               >
                 {showPassword ? t('hide') : t('show')}

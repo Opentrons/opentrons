@@ -271,7 +271,6 @@ def test_dispatch_json(
     thermocycler_module_command_map: "JsonV4ThermocyclerDispatch",
     mockObj: mock.Mock,
 ) -> None:
-
     monkeypatch.setattr(v4, "_delay", mockObj)
     monkeypatch.setattr(v4, "_move_to_slot", mockObj)
 

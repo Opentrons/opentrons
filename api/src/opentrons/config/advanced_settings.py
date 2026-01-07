@@ -151,8 +151,7 @@ settings = [
         _id="enableOT3HardwareController",
         title="Enable experimental OT-3 hardware controller",
         description=(
-            "Do not enable. This is an Opentrons-internal setting to test "
-            "new hardware."
+            "Do not enable. This is an Opentrons-internal setting to test new hardware."
         ),
         restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],

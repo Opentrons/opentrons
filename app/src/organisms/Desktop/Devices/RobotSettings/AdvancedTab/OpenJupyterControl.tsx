@@ -47,7 +47,7 @@ export function OpenJupyterControl({
         >
           {t('jupyter_notebook')}
         </LegacyStyledText>
-        <LegacyStyledText as="p" marginBottom={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
           {t('jupyter_notebook_description')}
         </LegacyStyledText>
         <ExternalLink href={JUPYTER_NOTEBOOK_LINK}>

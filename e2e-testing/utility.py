@@ -1,7 +1,9 @@
 import functools
 
 from playwright.sync_api import Error as PlaywrightError
-from playwright.sync_api import Page, TimeoutError
+from playwright.sync_api import Page, TimeoutError, expect
+
+from automation.pd_pages import LandingPage, ProtocolEditorPage
 
 
 def _find_page_in_args(*args, **kwargs) -> Page | None:
@@ -49,3 +51,35 @@ def troubleshoot_and_pause(func):
             raise  # Re-raise the exception after pausing
 
     return wrapper
+
+
+def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> ProtocolEditorPage:
+    """This test takes two inputs:
+    1. page: The Playwright Page object.
+    2. PROTOCOL_PATH: The file path of the protocol to import
+    3. migration: Boolean indicating if a migration modal is expected
+    when we update PD
+    Located in fixtures/protocol/
+    """
+
+    landing = LandingPage(page)
+    landing.wait_for_page_load()
+    landing.confirm_welcome_modal()
+    landing.click_import_existing_protocol()
+    landing.upload_protocol_file(PROTOCOL_PATH)
+    if migration:
+        landing.dismiss_migration_modal()
+    expect(page.get_by_text("Protocol Metadata")).to_be_visible(timeout=10000)
+    page.get_by_role("button", name="Edit protocol").click()
+    expect(page.get_by_role("button", name="Add Step")).to_be_visible(timeout=5000)
+    _dismiss_migration_modal(page)
+    return ProtocolEditorPage(page)
+
+
+def _dismiss_migration_modal(page: Page) -> None:
+    """Dismiss the migration modal if it appears during import."""
+
+    overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+    if overlay.is_visible():
+        page.get_by_role("button", name="Import", exact=True).click()
+        expect(overlay).not_to_be_visible()

@@ -109,8 +109,7 @@ class SessionCreateParams(BaseModel):
     # https://opentrons.atlassian.net/browse/EXEC-1230
     tipRacks: List[Dict[str, Any]] = Field(
         [],
-        description="A list of labware definitions to use in"
-        "calibration health check",
+        description="A list of labware definitions to use incalibration health check",
     )
 
 

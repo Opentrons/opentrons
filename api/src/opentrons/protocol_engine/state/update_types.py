@@ -370,9 +370,9 @@ class FlexStackerStateUpdate:
 
     module_id: str
     pool_constraint: FlexStackerPoolConstraint | NoChangeType = NO_CHANGE
-    contained_labware_bottom_first: list[
-        StackerStoredLabwareGroup
-    ] | NoChangeType = NO_CHANGE
+    contained_labware_bottom_first: list[StackerStoredLabwareGroup] | NoChangeType = (
+        NO_CHANGE
+    )
 
     @classmethod
     def create_or_override(

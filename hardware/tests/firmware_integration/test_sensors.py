@@ -1,4 +1,5 @@
 """Tests for eeprom."""
+
 import asyncio
 
 import pytest
@@ -158,7 +159,7 @@ async def test_baseline_poll_environment(
                 can_messenger_queue.read(), 1
             )
         except Exception as e:
-            pytest.fail(f"Did not get response #{response_idx+1}: {str(e)}")
+            pytest.fail(f"Did not get response #{response_idx + 1}: {str(e)}")
         assert isinstance(response, ReadFromSensorResponse)
         assert response.payload.sensor.value in (
             SensorType.humidity.value,

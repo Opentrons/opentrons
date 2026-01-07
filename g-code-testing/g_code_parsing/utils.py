@@ -18,7 +18,7 @@ def reverse_enum(
         Type[TEMPDECK_G_CODE],
         Type[THERMOCYCLER_G_CODE],
         Type[HEATER_SHAKER_G_CODE],
-    ]
+    ],
 ) -> Dict:
     """
     Returns dictionary with keys and values switched from passed Enum

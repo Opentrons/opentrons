@@ -103,7 +103,10 @@ export function CalibrationDataDownload({
       gridGap={SPACING.spacing40}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {isFlex
             ? t('about_calibration_title')
             : t('robot_calibration:download_calibration_title')}
@@ -114,7 +117,7 @@ export function CalibrationDataDownload({
               t={t}
               i18nKey="about_calibration_description_ot3"
               components={{
-                block: <LegacyStyledText as="p" />,
+                block: <LegacyStyledText forwardedAs="p" />,
               }}
             />
             <Link
@@ -126,7 +129,7 @@ export function CalibrationDataDownload({
             </Link>
           </>
         ) : (
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t(
               ot2DownloadIsPossible
                 ? 'robot_calibration:download_calibration_data_available'

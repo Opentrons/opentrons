@@ -1,4 +1,5 @@
 """Driver settings."""
+
 from typing_extensions import Final, TypedDict
 from typing import Optional
 from pydantic import Field

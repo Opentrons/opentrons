@@ -212,7 +212,7 @@ export interface TCRunProfileRunTimeCommand
 }
 export interface TCStartRunExtendedProfileCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/startRunExtendedProfile'
-  params: TCExtendedProfileParams
+  params: TCStartExtendedProfileParams
 }
 export interface TCStartRunExtendedProfileRunTimeCommand
   extends CommonCommandRunTimeInfo, TCStartRunExtendedProfileCreateCommand {
@@ -392,6 +392,7 @@ export interface TCStartExtendedProfileParams {
   moduleId: string
   profileElements: Array<TCProfileCycle | AtomicProfileStep>
   blockMaxVolumeUl?: number
+  taskId?: string | null
 }
 
 export interface FlexStackerStoredLabwareDetails {

@@ -75,9 +75,9 @@ class UnsafeFlexStackerOpenLatch(
     params: UnsafeFlexStackerOpenLatchParams
     result: Optional[UnsafeFlexStackerOpenLatchResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeFlexStackerOpenLatchImpl] = (
         UnsafeFlexStackerOpenLatchImpl
-    ] = UnsafeFlexStackerOpenLatchImpl
+    )
 
 
 class UnsafeFlexStackerOpenLatchCreate(

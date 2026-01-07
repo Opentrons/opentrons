@@ -1,6 +1,5 @@
 """FastAPI dependencies for the `/labwareOffsets` endpoints."""
 
-
 from typing import Annotated
 
 from fastapi import Depends

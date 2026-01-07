@@ -200,7 +200,6 @@ class GeometryView:
             if isinstance(loc, InStackerHopperLocation) or isinstance(
                 loc, NotOnDeckLocationSequenceComponent
             ):
-
                 return False
         return True
 
@@ -359,9 +358,9 @@ class GeometryView:
         calibrated_slot_column = self.get_slot_column(calibrated_slot)
         current_slot_column = self.get_slot_column(module_location.slotName)
         # make sure that we have valid colums since we cant have modules in the middle of the deck
-        assert set([calibrated_slot_column, current_slot_column]).issubset(
-            {1, 3}
-        ), f"Module calibration offset is an invalid slot {calibrated_slot}"
+        assert set([calibrated_slot_column, current_slot_column]).issubset({1, 3}), (
+            f"Module calibration offset is an invalid slot {calibrated_slot}"
+        )
 
         # Check if the module has moved from one side of the deck to the other
         if calibrated_slot_column != current_slot_column:
@@ -1216,9 +1215,7 @@ class GeometryView:
                                     self._config.robot_type
                                 )
                             )
-                        ][
-                            0
-                        ],
+                        ][0],
                     )
                 return [(middle_slot_center.x, middle_slot_center.y)]
         return []
@@ -1272,9 +1269,9 @@ class GeometryView:
             return 4
         row_col_name = slot_name.to_ot3_equivalent()
         slot_name_match = WELL_NAME_PATTERN.match(row_col_name.value)
-        assert (
-            slot_name_match is not None
-        ), f"Slot name {row_col_name} did not match required pattern; please check labware location."
+        assert slot_name_match is not None, (
+            f"Slot name {row_col_name} did not match required pattern; please check labware location."
+        )
 
         row_name, column_name = slot_name_match.group(1, 2)
         return int(column_name)
@@ -1391,9 +1388,9 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot[
-                addressable_area_name
-            ] = _TipDropSection.LEFT
+            self._last_drop_tip_location_spot[addressable_area_name] = (
+                _TipDropSection.LEFT
+            )
         else:
             # Drop tip in RIGHT section
             x_offset = self._get_drop_tip_well_x_offset(
@@ -1403,9 +1400,9 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot[
-                addressable_area_name
-            ] = _TipDropSection.RIGHT
+            self._last_drop_tip_location_spot[addressable_area_name] = (
+                _TipDropSection.RIGHT
+            )
 
         return AddressableOffsetVector(x=x_offset, y=0, z=0)
 
@@ -1858,12 +1855,12 @@ class GeometryView:
         # this function is only called by
         # HardwarePipetteHandler::aspirate/dispense while_tracking, and shouldn't
         # be reached in the case of a simulated liquid_probe
-        assert not isinstance(
-            initial_handling_height, SimulatedProbeResult
-        ), "Initial handling height got SimulatedProbeResult"
-        assert not isinstance(
-            final_height, SimulatedProbeResult
-        ), "final height is SimulatedProbeResult"
+        assert not isinstance(initial_handling_height, SimulatedProbeResult), (
+            "Initial handling height got SimulatedProbeResult"
+        )
+        assert not isinstance(final_height, SimulatedProbeResult), (
+            "final height is SimulatedProbeResult"
+        )
         return final_height - initial_handling_height
 
     def get_well_offset_adjustment(

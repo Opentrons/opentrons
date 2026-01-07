@@ -201,7 +201,10 @@ def _check_ot2_axis_type(
                 f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
             )
     if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
-        if any(k.upper() not in [axis.value for axis in AxisType.ot2_axes()] for k in axis_map_keys):  # type: ignore [union-attr]
+        if any(
+            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]  # type: ignore [union-attr]
+            for k in axis_map_keys
+        ):
             raise IncorrectAxisError(
                 f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
             )
@@ -528,7 +531,7 @@ def is_all_strings(items: Sequence[Any]) -> TypeGuard[Sequence[str]]:
 
 
 def ensure_valid_labware_offset_vector(
-    offset: Mapping[str, float]
+    offset: Mapping[str, float],
 ) -> Tuple[float, float, float]:
     if not isinstance(offset, dict):
         raise TypeError("Labware offset must be a dictionary.")
@@ -762,7 +765,7 @@ def ensure_valid_flat_wells_list_for_transfer_v2(
 
 
 def ensure_valid_trash_location_for_transfer_v2(
-    trash_location: Union[Location, Well, TrashBin, WasteChute]
+    trash_location: Union[Location, Well, TrashBin, WasteChute],
 ) -> Union[Location, TrashBin, WasteChute]:
     """Ensure that the trash location is valid for v2 transfer."""
     from .labware import Well

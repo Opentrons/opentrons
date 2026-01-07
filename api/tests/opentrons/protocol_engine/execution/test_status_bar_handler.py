@@ -1,4 +1,5 @@
 """StatusBar handler."""
+
 import pytest
 from decoy import Decoy
 

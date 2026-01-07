@@ -1,4 +1,5 @@
 """Tests for the move scheduler."""
+
 import pytest
 from typing import List, Any
 from numpy import float64, float32, int32

@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "test_data_generation"
 description = "Library for working with test data on the Opentrons robots"
-requires-python = "~=3.10"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },

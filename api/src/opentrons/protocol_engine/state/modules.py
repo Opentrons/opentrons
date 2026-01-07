@@ -341,24 +341,24 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 model=actual_model,
             )
         elif ModuleModel.is_heater_shaker_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = HeaterShakerModuleSubState.from_live_data(
-                module_id=HeaterShakerModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                HeaterShakerModuleSubState.from_live_data(
+                    module_id=HeaterShakerModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_temperature_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = TemperatureModuleSubState.from_live_data(
-                module_id=TemperatureModuleId(module_id),
-                data=live_data,
+            self._state.substate_by_module_id[module_id] = (
+                TemperatureModuleSubState.from_live_data(
+                    module_id=TemperatureModuleId(module_id),
+                    data=live_data,
+                )
             )
         elif ModuleModel.is_thermocycler_module_model(actual_model):
-            self._state.substate_by_module_id[
-                module_id
-            ] = ThermocyclerModuleSubState.from_live_data(
-                module_id=ThermocyclerModuleId(module_id), data=live_data
+            self._state.substate_by_module_id[module_id] = (
+                ThermocyclerModuleSubState.from_live_data(
+                    module_id=ThermocyclerModuleId(module_id), data=live_data
+                )
             )
             self._update_additional_slots_occupied_by_thermocycler(
                 module_id=module_id, slot_name=slot_name
@@ -417,9 +417,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         module = self._state.hardware_by_module_id.get(module_id)
         if module:
             module_serial = module.serial_number
-            assert (
-                module_serial is not None
-            ), "Expected a module SN and got None instead."
+            assert module_serial is not None, (
+                "Expected a module SN and got None instead."
+            )
             self._state.module_offset_by_serial[module_serial] = ModuleOffsetData(
                 moduleOffsetVector=module_offset,
                 location=location,
@@ -439,9 +439,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     ) -> None:
         module_id = command.params.moduleId
         hs_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            hs_substate, HeaterShakerModuleSubState
-        ), f"{module_id} is not heater-shaker."
+        assert isinstance(hs_substate, HeaterShakerModuleSubState), (
+            f"{module_id} is not heater-shaker."
+        )
 
         # Get current values to preserve target temperature not being set/deactivated
         prev_state: HeaterShakerModuleSubState = hs_substate
@@ -532,9 +532,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
     ) -> None:
         module_id = command.params.moduleId
         thermocycler_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            thermocycler_substate, ThermocyclerModuleSubState
-        ), f"{module_id} is not a thermocycler module."
+        assert isinstance(thermocycler_substate, ThermocyclerModuleSubState), (
+            f"{module_id} is not a thermocycler module."
+        )
 
         # Get current values to preserve target temperature not being set/deactivated
         block_temperature = thermocycler_substate.target_block_temperature
@@ -600,9 +600,9 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         # Get current values:
         module_id = absorbance_reader_state_update.module_id
         absorbance_reader_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            absorbance_reader_substate, AbsorbanceReaderSubState
-        ), f"{module_id} is not an absorbance plate reader."
+        assert isinstance(absorbance_reader_substate, AbsorbanceReaderSubState), (
+            f"{module_id} is not an absorbance plate reader."
+        )
         is_lid_on = absorbance_reader_substate.is_lid_on
         measured = True
         configured = absorbance_reader_substate.configured
@@ -625,12 +625,8 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
             measure_mode = AbsorbanceReaderMeasureMode(
                 absorbance_reader_state_update.initialize_absorbance_reader_update.measure_mode
             )
-            configured_wavelengths = (
-                absorbance_reader_state_update.initialize_absorbance_reader_update.sample_wave_lengths
-            )
-            reference_wavelength = (
-                absorbance_reader_state_update.initialize_absorbance_reader_update.reference_wave_length
-            )
+            configured_wavelengths = absorbance_reader_state_update.initialize_absorbance_reader_update.sample_wave_lengths
+            reference_wavelength = absorbance_reader_state_update.initialize_absorbance_reader_update.reference_wave_length
             data = None
         elif (
             absorbance_reader_state_update.absorbance_reader_data
@@ -654,13 +650,13 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
         """Handle Flex Stacker state updates."""
         module_id = state_update.module_id
         prev_substate = self._state.substate_by_module_id[module_id]
-        assert isinstance(
-            prev_substate, FlexStackerSubState
-        ), f"{module_id} is not a Flex Stacker."
+        assert isinstance(prev_substate, FlexStackerSubState), (
+            f"{module_id} is not a Flex Stacker."
+        )
 
-        self._state.substate_by_module_id[
-            module_id
-        ] = prev_substate.new_from_state_change(state_update)
+        self._state.substate_by_module_id[module_id] = (
+            prev_substate.new_from_state_change(state_update)
+        )
 
 
 class ModuleView:

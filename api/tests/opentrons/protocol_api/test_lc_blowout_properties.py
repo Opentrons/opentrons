@@ -40,11 +40,17 @@ def test_blowout_properties_none_instantiation_combos() -> None:
     """Test that none values raise."""
     with pytest.raises(ValidationError):
         _build_blowout_properties(
-            BlowoutProperties(enable=None, params=BlowoutParams(location=None, flowRate=None))  # type: ignore
+            BlowoutProperties(
+                enable=None,  # type: ignore
+                params=BlowoutParams(location=None, flowRate=None),  # type: ignore
+            )
         )
     with pytest.raises(ValidationError):
         _build_blowout_properties(
-            BlowoutProperties(enable=True, params=BlowoutParams(location=None, flowRate=100))  # type: ignore
+            BlowoutProperties(
+                enable=True,
+                params=BlowoutParams(location=None, flowRate=100),  # type: ignore
+            )
         )
 
 

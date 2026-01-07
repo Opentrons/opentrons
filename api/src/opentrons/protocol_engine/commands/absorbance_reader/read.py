@@ -1,4 +1,5 @@
 """Command models to read absorbance."""
+
 from __future__ import annotations
 from datetime import datetime
 from typing import Optional, Dict, TYPE_CHECKING, List, Any

@@ -1,4 +1,5 @@
 """Class to monitor estop status."""
+
 import logging
 from typing import TYPE_CHECKING
 from .models import EstopState, EstopPhysicalStatus

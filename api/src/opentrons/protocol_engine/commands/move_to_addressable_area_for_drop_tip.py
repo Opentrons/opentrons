@@ -1,4 +1,5 @@
 """Move to addressable area for drop tip command request, result, and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 from typing_extensions import Literal
@@ -180,9 +181,9 @@ class MoveToAddressableAreaForDropTip(
     params: MoveToAddressableAreaForDropTipParams
     result: Optional[MoveToAddressableAreaForDropTipResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveToAddressableAreaForDropTipImplementation] = (
         MoveToAddressableAreaForDropTipImplementation
-    ] = MoveToAddressableAreaForDropTipImplementation
+    )
 
 
 class MoveToAddressableAreaForDropTipCreate(

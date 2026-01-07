@@ -1,4 +1,5 @@
 """Tests for the legacy Protocol API module core implementations."""
+
 import pytest
 from decoy import Decoy
 
