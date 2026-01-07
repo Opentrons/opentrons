@@ -93,8 +93,12 @@ const selectedMultipleContainerIds: Reducer<
   switch (action.type) {
     case 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR':
       return action.payload
+    // why the hell is this being called? what am i doing wrong?
+    case 'SELECT_WELLS':
+      return state
     case 'CLOSE_INGREDIENT_SELECTOR':
     default:
+      // when should we return null and when should we return state?
       return null
   }
 }
