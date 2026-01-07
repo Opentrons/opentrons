@@ -1,21 +1,27 @@
 name: Weekly Security Audit
 
 on:
+  # for testing on PR
   pull_request:
     paths:
       - '.github/workflows/npm-packages-scan.yaml'
       - 'yarn.lock'
       - 'package.json'
       - '**/package.json'
+
   workflow_dispatch: {}
+
   schedule:
-    - cron: '0 6 * * 1'
+    # every monday at 7:00 EDT (summer), 6:00 EST (winter) | 12:00 UTC
+    - cron: '0 12 * * 1'
 
 permissions:
   contents: read
+  # Needed for uploading SARIF to GitHub Code Scanning
   security-events: write
 
 jobs:
+  # JOB 1: Run the scanners, upload SARIF, and upload artifacts
   run-scanners:
     runs-on: ubuntu-latest
     steps:
@@ -28,18 +34,18 @@ jobs:
           node-version: 22
           cache: 'yarn'
 
-      # will be replaced with pnpm in the future
-      - name: Ensure Yarn v1
+      # ensure yarn version is 1.x
+      - name: Show Yarn version
         run: |
           corepack disable || true
           yarn --version
 
-      # 1) yarn audit (JSON)
+      # 1) Run yarn audit (JSONL)
       - name: Run yarn audit (JSON)
         run: |
           yarn audit --json > yarn-audit.json || true
 
-      # 2) OSV-Scanner (JSON)
+      # 2) Run OSV-Scanner via Docker and save JSON results
       - name: Run OSV-Scanner (JSON)
         run: |
           docker run --rm \
@@ -50,7 +56,7 @@ jobs:
               --format=json \
               --output=/src/osv-results.json || true
 
-      # 3) OSV-Scanner (SARIF)
+      # 3) Run OSV-Scanner again to produce SARIF for GitHub Code Scanning
       - name: Run OSV-Scanner (SARIF)
         run: |
           docker run --rm \
@@ -61,11 +67,13 @@ jobs:
               --format=sarif \
               --output=/src/osv-results.sarif || true
 
+      # Upload SARIF to GitHub Code Scanning
       - name: Upload OSV SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: osv-results.sarif
 
+      # Upload results so the next job can access them
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -74,6 +82,7 @@ jobs:
             yarn-audit.json
             osv-results.json
 
+  # JOB 2: Download results and notify Slack (summary only)
   notify:
     needs: run-scanners
     runs-on: ubuntu-latest
@@ -85,43 +94,71 @@ jobs:
         with:
           name: security-results
 
-      - name: Notify Slack
+      - name: Notify Slack (summary)
         if: always()
         run: |
-          YARN_ISSUES=""
+          set -euo pipefail
 
+          # --- yarn audit summary (severity counts) ---
+          # counts by severity
           if [ -s yarn-audit.json ]; then
-            YARN_ISSUES=$(jq -r '
-              select(.type == "auditAdvisory")
-              | .data.advisory
-              | "\(.module_name) (\(.severity))"
-            ' yarn-audit.json 2>/dev/null | sort -u || true)
-          fi
+            YARN_COUNTS=$(jq -s -r '
+              map(select(.type=="auditAdvisory") | .data.advisory.severity)
+              | reduce .[] as $s ({"info":0,"low":0,"moderate":0,"high":0,"critical":0}; .[$s] += 1)
+              | "yarn audit: critical=\(.critical) high=\(.high) moderate=\(.moderate) low=\(.low) info=\(.info)"
+            ' yarn-audit.json 2>/dev/null || true)
 
-          OSV_ISSUES=""
-          if [ -s osv-results.json ]; then
-            OSV_ISSUES=$(jq -r '
-              (.results // [])
-              | .[]
-              | (.packages // [])
-              | .[]
-              | select((.vulnerabilities // []) | length > 0)
-              | "\(.Package.name)@\(.Package.version)"
-            ' osv-results.json 2>/dev/null | sort -u || true)
-          fi
-
-          if [ -z "$YARN_ISSUES$OSV_ISSUES" ]; then
-            MESSAGE="✅ No Issues Found\nAll security checks passed."
+            read -r YARN_CRIT YARN_HIGH < <(jq -s -r '
+              map(select(.type=="auditAdvisory") | .data.advisory.severity)
+              | reduce .[] as $s ({"high":0,"critical":0};
+                  if $s=="high" then .high+=1
+                  elif $s=="critical" then .critical+=1
+                  else . end)
+              | "\(.critical) \(.high)"
+            ' yarn-audit.json 2>/dev/null || echo "0 0")
           else
-            MESSAGE="🚨 Security Alert\n"
-            if [ -n "$YARN_ISSUES" ]; then
-              MESSAGE="$MESSAGE\n[yarn audit]\n$YARN_ISSUES\n"
-            fi
-            if [ -n "$OSV_ISSUES" ]; then
-              MESSAGE="$MESSAGE\n[osv-scanner]\n$OSV_ISSUES\n"
-            fi
+            YARN_COUNTS="yarn audit: (no data)"
+            YARN_CRIT=0
+            YARN_HIGH=0
           fi
 
+          # --- OSV summary ---
+          # OSV JSON often doesn't include a consistent severity field.
+          # So we summarize: total vulnerability entries and affected package entries.
+          if [ -s osv-results.json ]; then
+            OSV_VULN_COUNT=$(jq -r '
+              (.results // [])
+              | map((.packages // []) | map((.vulnerabilities // []) | length) | add)
+              | add
+            ' osv-results.json 2>/dev/null || echo "0")
+
+            OSV_PKG_ENTRIES=$(jq -r '
+              (.results // [])
+              | map((.packages // []) | length)
+              | add
+            ' osv-results.json 2>/dev/null || echo "0")
+
+            OSV_SUMMARY="osv-scanner: vulnerabilities=${OSV_VULN_COUNT} package-entries=${OSV_PKG_ENTRIES}"
+          else
+            OSV_VULN_COUNT=0
+            OSV_SUMMARY="osv-scanner: (no data)"
+          fi
+
+          # --- Overall status ---
+          if [ "${YARN_CRIT:-0}" -eq 0 ] && [ "${YARN_HIGH:-0}" -eq 0 ] && [ "${OSV_VULN_COUNT:-0}" -eq 0 ]; then
+            HEADER="✅ Weekly Security Audit: OK"
+          else
+            HEADER="🚨 Weekly Security Audit: Findings"
+          fi
+
+          RUN_URL="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+
+          MESSAGE="$HEADER
+          $YARN_COUNTS
+          $OSV_SUMMARY
+          run: $RUN_URL"
+
+          # Slack Incoming Webhook expects { "text": "..." }
           PAYLOAD=$(jq -n --arg text "$MESSAGE" '{text:$text}')
 
           curl -H "Content-Type: application/json" \
