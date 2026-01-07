@@ -28,7 +28,7 @@ export function getDisabledWellFillFromLabwareId(
           } else if (wellFill[key] == null && labwareWellFill[key] == null) {
             wellFill[key] =
               liquid?.displayColor != null
-                ? `${liquid?.displayColor}${COLORS.opacity40HexCode}`
+                ? `${liquid.displayColor}${COLORS.opacity40HexCode}`
                 : COLORS.transparent
           }
         })
