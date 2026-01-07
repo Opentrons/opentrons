@@ -288,8 +288,8 @@ importers:
         specifier: 3.35.0
         version: 3.35.0(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       react-scan:
-        specifier: ^0.0.38
-        version: 0.0.38(react-dom@18.2.0(react@18.2.0))(react-router-dom@6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-router@6.24.1(react@18.2.0))(react@18.2.0)(rollup@4.53.3)
+        specifier: 0.0.43
+        version: 0.0.43(react-dom@18.2.0(react@18.2.0))(react-router-dom@6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-router@6.24.1(react@18.2.0))(react@18.2.0)(rollup@4.53.3)
       redux-mock-store:
         specifier: 1.5.5
         version: 1.5.5(redux@5.0.1)
@@ -10300,8 +10300,8 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
-  react-scan@0.0.38:
-    resolution: {integrity: sha512-n6+yIiw6FIx6EnIpf3B5dus9mmOZmU0wXpPQmXCG9rac/4rO9kv9UFBTdV6hgIA2L0JsrIJonkXpse7jt3Zi1Q==}
+  react-scan@0.0.43:
+    resolution: {integrity: sha512-HL4pbOApez7SMbN0pxXQM/1Eb17jFg8hm7NcDJK+HJCkkFrOQ4qiuK/3VH4GbF2nqKwf8bC7SijUD2/dg4ebEA==}
     hasBin: true
     peerDependencies:
       '@remix-run/react': '>=1.0.0'
@@ -11886,8 +11886,8 @@ packages:
     resolution: {integrity: sha512-4/u/j4FrCKdi17jaxuJA0jClGxB1AvU2hw/IuayPc4ay1XGaJs/rbb4v5WKwAjNifjmXK9PIFyuPiaK8azyR9w==}
     engines: {node: '>=14.0.0'}
 
-  unplugin@2.0.0-beta.2:
-    resolution: {integrity: sha512-gWIFAjTFKFsHI9xSWQGhhoLkAqMoG/JzVZ0T4W0VeC02kitb8zIdiTjUBJXX5tCt0bdfr/0cJaOf2S7ujuVqtw==}
+  unplugin@2.1.0:
+    resolution: {integrity: sha512-us4j03/499KhbGP8BU7Hrzrgseo+KdfJYWcbcajCOqsAyb8Gk0Yn2kiUIcZISYCb1JFaZfIuG3b42HmguVOKCQ==}
     engines: {node: '>=18.12.0'}
 
   unquote@1.1.1:
@@ -23874,7 +23874,7 @@ snapshots:
       '@remix-run/router': 1.17.1
       react: 18.2.0
 
-  react-scan@0.0.38(react-dom@18.2.0(react@18.2.0))(react-router-dom@6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-router@6.24.1(react@18.2.0))(react@18.2.0)(rollup@4.53.3):
+  react-scan@0.0.43(react-dom@18.2.0(react@18.2.0))(react-router-dom@6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0))(react-router@6.24.1(react@18.2.0))(react@18.2.0)(rollup@4.53.3):
     dependencies:
       '@babel/core': 7.28.5
       '@babel/generator': 7.28.5
@@ -23893,10 +23893,10 @@ snapshots:
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
       tsx: 4.21.0
-      unplugin: 2.0.0-beta.2
     optionalDependencies:
       react-router: 6.24.1(react@18.2.0)
       react-router-dom: 6.24.1(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      unplugin: 2.1.0
     transitivePeerDependencies:
       - rollup
       - supports-color
@@ -25805,10 +25805,11 @@ snapshots:
       acorn: 8.15.0
       webpack-virtual-modules: 0.6.2
 
-  unplugin@2.0.0-beta.2:
+  unplugin@2.1.0:
     dependencies:
       acorn: 8.15.0
       webpack-virtual-modules: 0.6.2
+    optional: true
 
   unquote@1.1.1: {}
 
