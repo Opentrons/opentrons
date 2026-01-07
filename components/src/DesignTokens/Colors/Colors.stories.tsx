@@ -1,35 +1,28 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from 'react'
-
+import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
 import {
   ALIGN_FLEX_START,
-  BORDERS,
-  COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+} from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Colors',
 } as Meta
 
 interface ColorsStorybookProps {
-  colors: Array<[string, string]>
+  colors: string[]
 }
 
-const Template: StoryFn<ColorsStorybookProps> = args => {
+const Template: Story<ColorsStorybookProps> = args => {
   const targetColors = args.colors
-  const colorCategories = targetColors.reduce<
-    Record<string, Array<[string, string]>>
-  >((acc, color) => {
+  const colorCategories = targetColors.reduce((acc, color) => {
     const match = color[0].match(/[a-zA-Z]+/)
     const category = match?.[0]
     if (category) {
@@ -83,20 +76,20 @@ const Template: StoryFn<ColorsStorybookProps> = args => {
                 border: `1px solid ${COLORS.grey20}`,
               }}
             >
-              <LegacyStyledText
+              <StyledText
                 color={invertColor(color[1] as string)}
                 fontSize={TYPOGRAPHY.fontSizeP}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {color[0]}
-              </LegacyStyledText>
-              <LegacyStyledText
+              </StyledText>
+              <StyledText
                 fontSize={TYPOGRAPHY.fontSizeP}
                 color={invertColor(color[1] as string)}
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {color[1]}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           ))}
         </Flex>
@@ -121,7 +114,7 @@ const order = [
 
 const filteredColors = Object.entries(COLORS).filter(([key]) =>
   order.some(color => key.toLowerCase().includes(color))
-) as Array<[string, string]>
+)
 
 const sortedColors = filteredColors.sort((a, b) => {
   const aOrder = order.findIndex(color => a[0].toLowerCase().includes(color))

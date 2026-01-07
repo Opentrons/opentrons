@@ -1,19 +1,11 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from 'react'
 import { css } from 'styled-components'
 
-import {
-  ALIGN_CENTER,
-  Box,
-  DIRECTION_COLUMN,
-  Flex,
-  PRODUCT,
-  SPACING,
-  Text,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { PRODUCT } from '../../helix-design-system'
+import { Box, Flex, Text } from '../../primitives'
+import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 import type { FlattenSimpleInterpolation } from 'styled-components'
 
 const fontStyles = {
@@ -141,7 +133,7 @@ const fontWeightForPairForLegacy = (style: string, weight: string): string => {
 
 const valueFromFlattenedInterp = (
   style: FlattenSimpleInterpolation,
-  valueName: string
+  valueName: str
 ): string => {
   return style.reduce(
     ([sawKey, value]: [boolean, null | string], el) => {
@@ -197,35 +189,30 @@ const fontWeightForPair = (
     ? fontWeightForPairForHelix(style, weight)
     : fontWeightForPairForLegacy(style, weight)
 
-const Template: StoryFn<TypographyStorybookProps> = args => {
-  const fonts = fontStyles[args.styles] as Array<[string, string]>
+const Template: Story<TypographyStorybookProps> = args => {
+  const fonts = fontStyles[args.styles]
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
       gridGap={SPACING.spacing8}
       padding={SPACING.spacing24}
     >
-      {fonts.map(([style, weight]: [string, string]) => {
-        const styleStr: string = String(style)
-        const weightStr: string = String(weight)
-        return (
-          <Box key={`${styleStr}_${weightStr}`} alignItems={ALIGN_CENTER}>
-            <Text css={styleForPair(styleStr, weightStr, args.styles)}>
-              {`${styleStr} ${weightStr} (${fontWeightForPair(
-                styleStr,
-                weightStr,
-                args.styles
-              )}, ${fontSizeForPair(
-                styleStr,
-                weightStr,
-                args.styles
-              )}, ${lineHeightForPair(styleStr, weightStr, args.styles)}): ${
-                args.text
+      {fonts.map(([style, weight]) => (
+        <Box key={`${style}_${weight}`} alignItems={ALIGN_CENTER}>
+          <Text css={styleForPair(style, weight, args.styles)}>
+            {`${style} ${weight} (${fontWeightForPair(
+              style,
+              weight,
+              args.styles
+            )}, ${fontSizeForPair(
+              style,
+              weight,
+              args.styles
+            )}, ${lineHeightForPair(style, weight, args.styles)}): ${args.text
               }`}
-            </Text>
-          </Box>
-        )
-      })}
+          </Text>
+        </Box>
+      ))}
     </Flex>
   )
 }

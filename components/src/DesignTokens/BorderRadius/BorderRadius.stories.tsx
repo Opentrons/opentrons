@@ -1,37 +1,25 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from 'react'
+import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Box, Flex } from '../../primitives'
+import { ALIGN_FLEX_START, DIRECTION_COLUMN } from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
-import {
-  ALIGN_FLEX_START,
-  BORDERS,
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
-
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/BorderRadius',
 } as Meta
 
 interface BorderRadiusStorybookProps {
-  borderRadius: Array<[string, string]>
+  borderRadius: string[]
 }
 
-const Template: StoryFn<BorderRadiusStorybookProps> = args => {
+const Template: Story<BorderRadiusStorybookProps> = args => {
   const targetBorderRadiuses = args.borderRadius
-    .filter(
-      (s): s is [string, string] =>
-        typeof s[0] === 'string' && s[0].includes('borderRadius')
-    )
+    .filter(s => s[0].includes('borderRadius'))
     .sort((a, b) => {
-      const aValue = parseInt(String(a[1]), 10)
-      const bValue = parseInt(String(b[1]), 10)
+      const aValue = parseInt(a[1])
+      const bValue = parseInt(b[1])
       return aValue - bValue
     })
 
@@ -51,14 +39,14 @@ const Template: StoryFn<BorderRadiusStorybookProps> = args => {
           width="100%"
           height="6rem"
         >
-          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
+          <StyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightRegular}>
             {`${br[0]}" ${br[1]}`}
-          </LegacyStyledText>
+          </StyledText>
           <Box
             width="10rem"
             height="4rem"
             backgroundColor={COLORS.blue50}
-            borderRadius={String(br[1])}
+            borderRadius={br[1]}
           />
         </Flex>
       ))}
@@ -67,7 +55,7 @@ const Template: StoryFn<BorderRadiusStorybookProps> = args => {
 }
 
 export const AllBorderRadiuses = Template.bind({})
-const allBorderRadiuses = Object.entries(BORDERS) as Array<[string, string]>
+const allBorderRadiuses = Object.entries(BORDERS)
 AllBorderRadiuses.args = {
   borderRadius: allBorderRadiuses,
 }

@@ -1,36 +1,29 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react'
-import styled from 'styled-components'
 
-import {
-  ALIGN_FLEX_START,
-  Box,
-  COLORS,
-  DIRECTION_COLUMN,
-  Flex,
-  SPACING,
-  StyledText,
-} from '@opentrons/components'
+import { StyledText } from '../../atoms/StyledText'
+import { COLORS } from '../../helix-design-system'
+import { Box, Flex } from '../../primitives'
+import { ALIGN_FLEX_START, DIRECTION_COLUMN } from '../../styles'
+import { SPACING } from '../../ui-style-constants'
+import styles from './spacing.stories.module.css'
 
-import type { Meta, StoryFn } from '@storybook/react'
+import type { Meta, Story } from '@storybook/react'
 
 export default {
   title: 'Design Tokens/Spacing',
 } as Meta
 
 interface SpacingsStorybookProps {
-  spacings: Array<[string, string]>
+  spacings: string[]
 }
 
-const Template: StoryFn<SpacingsStorybookProps> = args => {
-  const targetSpacings = args.spacings.filter(
-    (s): s is [string, string] =>
-      typeof s[1] === 'string' && !s[1].includes('auto')
-  )
+const Template: Story<SpacingsStorybookProps> = args => {
+  const targetSpacings = args.spacings.filter(s => !s[1].includes('auto'))
   // sort by rem value
   const sortedSpacing = targetSpacings.sort((a, b) => {
-    const aValue = parseFloat(String(a[1]).replace('rem', ''))
-    const bValue = parseFloat(String(b[1]).replace('rem', ''))
+    const aValue = parseFloat(a[1].replace('rem', ''))
+    const bValue = parseFloat(b[1].replace('rem', ''))
     return aValue - bValue
   })
 
@@ -56,11 +49,11 @@ const Template: StoryFn<SpacingsStorybookProps> = args => {
           height="6rem"
         >
           <StyledText desktopStyle="bodyLargeSemiBold">
-            {`${spacing[0]} - ${spacing[1]}: ${convertToPx(String(spacing[1]))}`}
+            {`${spacing[0]} - ${spacing[1]}: ${convertToPx(spacing[1])}`}
           </StyledText>
-          <Flex gridGap={String(spacing[1])} backgroundColor={COLORS.blue50}>
-            <StyledBox />
-            <StyledBox />
+          <Flex gridGap={spacing[1]} backgroundColor={COLORS.blue50}>
+            <Box className={styles.styled_box} />
+            <Box className={styles.styled_box} />
           </Flex>
         </Flex>
       ))}
@@ -69,13 +62,7 @@ const Template: StoryFn<SpacingsStorybookProps> = args => {
 }
 
 export const AllSpacing = Template.bind({})
-const allSpacings = Object.entries(SPACING) as Array<[string, string]>
+const allSpacings = Object.entries(SPACING)
 AllSpacing.args = {
   spacings: allSpacings,
 }
-
-const StyledBox = styled(Box)`
-  width: 2rem;
-  height: 2rem;
-  background-color: ${COLORS.blue35};
-`
