@@ -85,6 +85,9 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
     properties: {},
   }
 
+  const isStackerFillStep =
+    savedStepFormData.stepType === 'flexStacker' &&
+    savedStepFormData.flexStackerFormType === 'fill'
   return (
     <>
       <Flex
@@ -142,15 +145,17 @@ export function StepOverflowMenu(props: StepOverflowMenuProps): JSX.Element {
                 {t('view_details')}
               </MenuItem>
             ) : null}
-            <MenuItem
-              disabled={singleEditFormHasUnsavedChanges}
-              onClick={() => {
-                dispatch(stepsActions.duplicateSelectedSteps())
-                setOpenedOverflowMenuId(null)
-              }}
-            >
-              {t('duplicate')}
-            </MenuItem>
+            {isStackerFillStep ? null : (
+              <MenuItem
+                disabled={singleEditFormHasUnsavedChanges}
+                onClick={() => {
+                  dispatch(stepsActions.duplicateSelectedSteps())
+                  setOpenedOverflowMenuId(null)
+                }}
+              >
+                {t('duplicate')}
+              </MenuItem>
+            )}
             <Divider marginY="0" />
             <MenuItem
               onClick={() => {

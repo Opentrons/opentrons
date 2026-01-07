@@ -73,7 +73,7 @@ export function RobotSettingsCamera({
           />
           <>
             <Divider />
-            <RobotSettingsCameraControls />
+            <RobotSettingsCameraControls disabled={isRobotBusy} />
           </>
         </>
       )}

@@ -7,6 +7,7 @@ import { convertStepHierarchyToArray } from '/protocol-designer/steplist/utils/s
 
 import type { MouseEvent } from 'react'
 import type { StepIdType } from '/protocol-designer/form-types'
+import type { SavedStepFormState } from '/protocol-designer/step-forms'
 import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 export const capitalizeFirstLetterAfterNumber = (title: string): string =>
@@ -148,3 +149,21 @@ export const getMouseClickKeyInfo = (
 }
 
 export const getUserOS = (): string | undefined => new UAParser().getOS().name
+
+export const getFillLabwareIdsToDelete = (
+  stepIds: string[],
+  savedStepForms: SavedStepFormState
+): string[] => {
+  return stepIds.reduce<string[]>((acc, stepId) => {
+    const formData = savedStepForms[stepId]
+
+    if (
+      formData?.stepType === 'flexStacker' &&
+      formData.fillLabwareIds != null
+    ) {
+      acc.push(...(formData.fillLabwareIds as string[]))
+    }
+
+    return acc
+  }, [])
+}

@@ -1,5 +1,5 @@
-""" Classes and functions for gripper state tracking
-"""
+"""Classes and functions for gripper state tracking"""
+
 from __future__ import annotations
 
 import logging

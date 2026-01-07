@@ -189,7 +189,7 @@ class SyncClient:
         self, name: str, color: Optional[str], description: Optional[str]
     ) -> Liquid:
         """Add a liquid to the engine."""
-        return self._transport.call_method(   # type: ignore[no-any-return]
+        return self._transport.call_method(  # type: ignore[no-any-return]
             "add_liquid", name=name, color=color, description=description
         )
 

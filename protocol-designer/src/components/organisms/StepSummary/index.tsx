@@ -58,7 +58,11 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
     return null
   }
   const { stepType } = currentStep
-  const { labware: labwareState, liquidState } = robotState
+  const {
+    labware: labwareState,
+    liquidState,
+    modules: moduleState,
+  } = robotState
   let stepSummaryContent: JSX.Element | null = null
   switch (stepType) {
     case 'mix': {
@@ -348,7 +352,7 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
       stepSummaryContent = (
         <FlexStackerSummary
           currentStep={currentStep}
-          labwareEntities={labwareEntities}
+          moduleRobotState={moduleState}
         />
       )
       break
