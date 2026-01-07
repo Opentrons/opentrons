@@ -63,7 +63,6 @@ export function SetupCamera({
     enabled: cameraEnabled,
     recoveryEnabled,
   } = useSelector((state: State) => getCameraUsageState(state, runId))
-  console.log('🚀 ~ toggleCameraEnabled ~ cameraEnabled:', cameraEnabled)
 
   const toggleCameraEnabled = (): void => {
     dispatch(updateCameraEnablement(runId, !cameraEnabled))
