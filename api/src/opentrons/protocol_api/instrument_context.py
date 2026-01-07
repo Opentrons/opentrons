@@ -268,6 +268,7 @@ class InstrumentContext(publisher.CommandPublisher):
             `pipette.aspirate(location=plate['A1'])`.
 
         *Changed in version 2.24*: Added the `flow_rate` parameter.
+
         *Changed in version 2.27*: Added the `end_location` and `movement_delay` parameters.
         """
         if flow_rate is not None:
@@ -863,7 +864,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Mix a volume of liquid by repeatedly aspirating and dispensing it in multiple
         locations.
 
-        See Dynamic Mix for examples.
+        See [dynamic mix][dynamic-mix] for examples.
 
         Args:
             repetitions (int, optional): Number of times to mix (default is 1).

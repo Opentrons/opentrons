@@ -744,9 +744,9 @@ class ThermocyclerContext(ModuleContext):
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
 
-                *Changed in version 2.27:* In API version
-                2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
-                liquid information.
+        *Changed in version 2.27:* In API version
+        2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+        liquid information.
         """
 
         if block_max_volume is None:
