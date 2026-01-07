@@ -9,9 +9,7 @@
 .left_column {
   position: relative;
   display: flex;
-  min-width: 37.5rem; /* 600px */
-
-  /* height: 100%; */
+  max-width: 37.5rem; /* 600px */
   flex-direction: column;
   flex-shrink: 0;
   border-radius: var(--border-radius-8);
