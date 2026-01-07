@@ -25,23 +25,23 @@ export function PipetteContainer({
   return (
     <div className={styles.container_wrapper}>
       <div className={styles.container}>
-      <div className={styles.header}>
-        <Tag text={t('pipette')} type="default" shrinkToContent />
-        <RobotInfoLabel deckLabel={t(mount)} />
-      </div>
-      <div className={styles.main_content}>
-        <StyledText desktopStyle="captionRegular">
-          {pipetteDisplayName}
-        </StyledText>
-        {selected ? (
-          <Chip
-            text={t('active')}
-            type="success"
-            iconName="circle"
-            chipSize="small"
-          />
-        ) : null}
-      </div>
+        <div className={styles.header}>
+          <Tag text={t('pipette')} type="default" shrinkToContent />
+          <RobotInfoLabel deckLabel={t(mount)} />
+        </div>
+        <div className={styles.main_content}>
+          <StyledText desktopStyle="captionRegular">
+            {pipetteDisplayName}
+          </StyledText>
+          {selected ? (
+            <Chip
+              text={t('active')}
+              type="success"
+              iconName="circle"
+              chipSize="small"
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   )
