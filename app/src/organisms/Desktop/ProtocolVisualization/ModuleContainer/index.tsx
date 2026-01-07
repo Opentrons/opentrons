@@ -212,7 +212,6 @@ export function ModuleContainer({
         `ran into the default moduleContainer moduleState with module ${moduleDisplayName}`
       )
   }
-  console.log('moduleDisplayName', moduleDisplayName)
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>

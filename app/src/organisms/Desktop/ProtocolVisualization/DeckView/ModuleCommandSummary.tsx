@@ -52,11 +52,14 @@ export const ModuleCommandSummary = (
   }, [])
 
   const def = getModuleDef(moduleModel)
+  const FLEX_STACKER_STATUS = [
+    'flexStacker/fill',
+    'flexStacker/empty',
+    'flexStacker/setStoredLabware',
+  ]
   const showHopperAdjustment =
     def?.moduleType === FLEX_STACKER_MODULE_TYPE &&
-    (commandType === 'flexStacker/fill' ||
-      commandType === 'flexStacker/empty' ||
-      commandType === 'flexStacker/setStoredLabware')
+    FLEX_STACKER_STATUS.includes(commandType)
 
   const slotTransformKey =
     robotType === FLEX_ROBOT_TYPE ? FLEX_STANDARD_DECKID : OT2_STANDARD_DECKID
@@ -75,6 +78,22 @@ export const ModuleCommandSummary = (
       : 0
   const hopperAdjustmentX = showHopperAdjustment ? 190 : 0
   const hopperAdjustmentY = showHopperAdjustment ? -5 : 0
+  const x =
+    position[0] +
+    def.cornerOffsetFromSlot.x +
+    (cornerOffsetsFromSlotFromTransform?.[0][3] ?? 0) +
+    hopperAdjustmentX +
+    tempAdjustmentX +
+    heaterShakerAdjustmentX -
+    1
+
+  const y =
+    position[1] +
+    def.cornerOffsetFromSlot.y +
+    (cornerOffsetsFromSlotFromTransform?.[1][3] ?? 0) -
+    labelContainerHeight +
+    tempAdjustmentY +
+    hopperAdjustmentY
 
   return (
     <DeckLabelSet
@@ -88,23 +107,8 @@ export const ModuleCommandSummary = (
           isZoomed: false,
         },
       ]}
-      x={
-        position[0] +
-        def.cornerOffsetFromSlot.x +
-        (cornerOffsetsFromSlotFromTransform?.[0][3] ?? 0) +
-        hopperAdjustmentX +
-        tempAdjustmentX +
-        heaterShakerAdjustmentX -
-        1
-      }
-      y={
-        position[1] +
-        def.cornerOffsetFromSlot.y +
-        (cornerOffsetsFromSlotFromTransform?.[1][3] ?? 0) -
-        labelContainerHeight +
-        tempAdjustmentY +
-        hopperAdjustmentY
-      }
+      x={x}
+      y={y}
       width={def?.dimensions.xDimension + (showHopperAdjustment ? -15 : 2)}
       height={def?.dimensions.yDimension + (showHopperAdjustment ? 10 : 2)}
       showModuleIcon={showModuleIcon}

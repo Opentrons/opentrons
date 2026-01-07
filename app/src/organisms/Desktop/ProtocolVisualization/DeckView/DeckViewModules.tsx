@@ -1,10 +1,8 @@
 import { Fragment } from 'react'
 
 import {
-  CenterLabwareInModuleChildSlot,
   COLORS,
   Module,
-  StyledText,
 } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
@@ -18,7 +16,7 @@ import { getActiveLayer } from '../utils/getActiveLayer'
 import { getModuleInnerProps } from '../utils/getModuleInnerProps'
 import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOnModuleFromStack'
 import { DeckViewOverlay } from './DeckViewOverlay'
-import { LabwareOnDeck } from './LabwareOnDeck'
+import { DeckViewStacker } from './DeckViewStacker'
 import { ModuleCommandSummary } from './ModuleCommandSummary'
 
 import type { Dispatch, SetStateAction } from 'react'
@@ -79,7 +77,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
         )
         const moduleDef = getModuleDef(moduleEntities[id].model)
         const moduleType = moduleEntities[id].type
-        const isStepAssosciatedWithModule =
+        const isStepAssociatedWithModule =
           selectedRunTimeCommand != null &&
           'moduleId' in selectedRunTimeCommand.params &&
           selectedRunTimeCommand.params.moduleId === id
@@ -92,7 +90,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
               : 'open',
         }
         const showModuleCommandSummary =
-          (isActiveLayerVisible || isStepAssosciatedWithModule) &&
+          (isActiveLayerVisible || isStepAssociatedWithModule) &&
           selectedRunTimeCommand != null
         return (
           <Fragment key={id}>
@@ -121,95 +119,23 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                 setHoveredSlot={setHoveredSlot}
               >
                 {labwareLoadedOnModuleId != null ? (
-                  <>
-                    <CenterLabwareInModuleChildSlot
-                      deckId={deckDef.otId}
-                      slotId={slot}
-                      moduleDefinition={moduleDef}
-                      labwareDefinition={
-                        labwareEntitiesExtended[labwareLoadedOnModuleId].def
-                      }
-                    >
-                      <LabwareOnDeck
-                        robotState={robotState}
-                        labwareDef={
-                          labwareEntitiesExtended[labwareLoadedOnModuleId].def
-                        }
-                        liquids={liquids}
-                        labwareId={labwareLoadedOnModuleId}
-                        x={
-                          0 + (moduleType === FLEX_STACKER_MODULE_TYPE ? 17 : 0)
-                        }
-                        y={0}
-                        setSelectedSlot={setSelectedSlot}
-                        setHoveredSlot={setHoveredSlot}
-                      />
-                    </CenterLabwareInModuleChildSlot>
-                    {moduleType === THERMOCYCLER_MODULE_TYPE ? (
-                      <DeckViewOverlay
-                        key={slot}
-                        slotId={slot}
-                        slotPosition={[0, 0, 0]}
-                        slotFillColor={COLORS.purple50}
-                        robotType={robotType}
-                        invariantContext={invariantContext}
-                        robotState={robotState}
-                        setSelectedSlot={setSelectedSlot}
-                        setHoveredSlot={setHoveredSlot}
-                        hover={hoveredSlot}
-                      >
-                        {showModuleCommandSummary ? null : (
-                          <StyledText
-                            desktopStyle="captionRegular"
-                            color={COLORS.white}
-                          >
-                            {
-                              labwareEntitiesExtended[labwareLoadedOnModuleId]
-                                .def.metadata.displayName
-                            }
-                          </StyledText>
-                        )}
-                      </DeckViewOverlay>
-                    ) : (
-                      <DeckViewOverlay
-                        key={slot}
-                        slotId={
-                          moduleType === FLEX_STACKER_MODULE_TYPE
-                            ? `hopper${slot}`
-                            : slot
-                        }
-                        slotPosition={[
-                          moduleType === FLEX_STACKER_MODULE_TYPE ? 178 : 0,
-                          0,
-                          0,
-                        ]}
-                        slotFillColor={COLORS.purple50}
-                        robotType={robotType}
-                        invariantContext={invariantContext}
-                        robotState={robotState}
-                        setSelectedSlot={setSelectedSlot}
-                        setHoveredSlot={setHoveredSlot}
-                        hover={hoveredSlot}
-                      >
-                        {(moduleType === FLEX_STACKER_MODULE_TYPE &&
-                          selectedRunTimeCommand?.commandType !==
-                            'flexStacker/retrieve' &&
-                          selectedRunTimeCommand?.commandType !==
-                            'flexStacker/store') ||
-                        (moduleType !== FLEX_STACKER_MODULE_TYPE &&
-                          showModuleCommandSummary) ? null : (
-                          <StyledText
-                            desktopStyle="captionRegular"
-                            color={COLORS.white}
-                          >
-                            {labwareEntitiesExtended[id]?.nickName ??
-                              labwareEntitiesExtended[labwareLoadedOnModuleId]
-                                .def.metadata.displayName}
-                          </StyledText>
-                        )}
-                      </DeckViewOverlay>
-                    )}
-                  </>
+                  <DeckViewStacker
+                    robotState={robotState}
+                    invariantContext={invariantContext}
+                    liquids={liquids}
+                    deckDef={deckDef}
+                    robotType={robotType}
+                    setHoveredSlot={setHoveredSlot}
+                    setSelectedSlot={setSelectedSlot}
+                    slot={slot}
+                    moduleType={moduleType}
+                    moduleDef={moduleDef}
+                    labwareLoadedOnModuleId={labwareLoadedOnModuleId}
+                    showModuleCommandSummary={showModuleCommandSummary}
+                    hoveredSlot={hoveredSlot}
+                    labwareEntitiesExtended={labwareEntitiesExtended}
+                    selectedRunTimeCommand={selectedRunTimeCommand}
+                  />
                 ) : null}
                 <DeckViewOverlay
                   key={slot}

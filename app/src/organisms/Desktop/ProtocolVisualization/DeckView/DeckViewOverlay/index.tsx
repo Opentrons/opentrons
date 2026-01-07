@@ -72,7 +72,6 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const slotMapped = HOPPER_FAKE_LOCATIONS.includes(slotId)
     ? FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]
     : slotId
-  console.log('slotId', hover, slotId)
   const hasTCOnSlot = Object.entries(modules).some(
     ([id, module]) =>
       module.slot === slotMapped &&
