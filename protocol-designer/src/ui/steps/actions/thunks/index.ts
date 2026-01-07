@@ -42,7 +42,11 @@ import {
 } from '../../selectors'
 import { addStep, selectDropdownItem } from '../actions'
 
-import type { FormData, StepType } from '/protocol-designer/form-types'
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+} from '/protocol-designer/form-types'
 import type { ReorderStepsAction } from '/protocol-designer/steplist/actions/actions'
 import type { ThunkAction } from '/protocol-designer/types'
 import type {
@@ -318,14 +322,42 @@ export const duplicateSelectedSteps: () => ThunkAction<
 export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
 export interface SaveStepFormAction {
   type: typeof SAVE_STEP_FORM
-  payload: FormData
+  payload: {
+    /**
+     * The form that the user is saving.
+     *
+     * If the ID points to one that already exists, it will be edited in-place.
+     * Otherwise, it will be appended to the timeline as a new step.
+     */
+    form: FormData
+
+    /**
+     * If a new Thermocycler profile step is being saved, a "wait for profile to
+     * complete" step will be saved along with it, implicitly. This is the ID to use
+     * for that new wait step.
+     *
+     * If no wait step needs to be created, this is ignored.
+     */
+    thermocyclerPauseStepId: StepIdType
+
+    enableConcurrentModuleActions: boolean
+  }
 }
-export const _saveStepForm = (form: FormData): SaveStepFormAction => {
+export const _saveStepForm = (
+  form: FormData,
+  enableConcurrentModuleActions: boolean
+): SaveStepFormAction => {
   // if presaved, transform pseudo ID to real UUID upon save
-  const payload = form.id === PRESAVED_STEP_ID ? { ...form, id: uuid() } : form
+  const id = form.id === PRESAVED_STEP_ID ? uuid() : form.id
+  const adjustedForm = { ...form, id }
+
   return {
     type: SAVE_STEP_FORM,
-    payload,
+    payload: {
+      form: adjustedForm,
+      thermocyclerPauseStepId: uuid(),
+      enableConcurrentModuleActions,
+    },
   }
 }
 
@@ -344,6 +376,8 @@ export const saveStepForm: (options?: {
   const { userWantsBonusStep = false } = options ?? {}
   const initialState = getState()
   const unsavedForm = getUnsavedForm(initialState)
+  const enableConcurrentModuleActions =
+    getEnableConcurrentModuleActions(initialState)
 
   // this check is only for TypeScript. At this point, unsavedForm should always be populated
   if (unsavedForm == null) {
@@ -363,7 +397,7 @@ export const saveStepForm: (options?: {
   }
 
   // save the form
-  dispatch(_saveStepForm(unsavedForm))
+  dispatch(_saveStepForm(unsavedForm, enableConcurrentModuleActions))
 
   // Save any bonus steps that come with it.
   // NOTE: This logic to decide whether a bonus step is warranted should be kept in sync
@@ -385,6 +419,8 @@ export const saveStepForm: (options?: {
 const saveWaitForTemperatureModuleTemp: (
   unsavedSetTemperatureForm: FormData
 ) => ThunkAction<any> = unsavedSetTemperatureForm => (dispatch, getState) => {
+  const enableConcurrentModuleActions =
+    getEnableConcurrentModuleActions(getState())
   const tempertureModuleId = unsavedSetTemperatureForm?.moduleId
   const temperature = unsavedSetTemperatureForm.targetTemperature
 
@@ -426,7 +462,7 @@ const saveWaitForTemperatureModuleTemp: (
   // finally save the new pause form
   const unsavedPauseForm = getUnsavedForm(getState())
   if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm))
+    dispatch(_saveStepForm(unsavedPauseForm, enableConcurrentModuleActions))
   } else {
     // this conditional is for TypeScript, the unsaved form should always exist
     console.assert(
@@ -439,6 +475,8 @@ const saveWaitForTemperatureModuleTemp: (
 const saveWaitForHeaterShakerTemp: (
   unsavedHeaterShakerForm: FormData
 ) => ThunkAction<any> = unsavedHeaterShakerForm => (dispatch, getState) => {
+  const enableConcurrentModuleActions =
+    getEnableConcurrentModuleActions(getState())
   const heaterShakerModuleId = unsavedHeaterShakerForm.moduleId
   const temperature = unsavedHeaterShakerForm.targetHeaterShakerTemperature
 
@@ -475,7 +513,7 @@ const saveWaitForHeaterShakerTemp: (
   // finally save the new pause form
   const unsavedPauseForm = getUnsavedForm(getState())
   if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm))
+    dispatch(_saveStepForm(unsavedPauseForm, enableConcurrentModuleActions))
   } else {
     // this conditional is for TypeScript, the unsaved form should always exist
     console.assert(

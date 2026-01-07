@@ -327,7 +327,11 @@ describe('steps actions', () => {
           const actions = store.getActions()
           expect(actions[0]).toEqual({
             type: 'SAVE_STEP_FORM',
-            payload: temperatureForm,
+            payload: {
+              form: temperatureForm,
+              thermocyclerPauseStepId: expect.any(String),
+              enableConcurrentModuleActions: true,
+            },
           })
           if (shouldAddBonusStep) {
             expect(actions[1].type).toStrictEqual('ADD_STEP')
@@ -391,7 +395,11 @@ describe('steps actions', () => {
           const actions = store.getActions()
           expect(actions[0]).toEqual({
             type: 'SAVE_STEP_FORM',
-            payload: heaterShakerForm,
+            payload: {
+              form: heaterShakerForm,
+              thermocyclerPauseStepId: expect.any(String),
+              enableConcurrentModuleActions: true,
+            },
           })
           if (shouldAddBonusStep) {
             expect(actions[1].type).toStrictEqual('ADD_STEP')

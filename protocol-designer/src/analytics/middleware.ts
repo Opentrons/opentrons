@@ -74,7 +74,7 @@ export const reduxActionToAnalyticsEvent = (
     const a: SaveStepFormAction = action
 
     const argsAndErrors: StepArgsAndErrors =
-      getArgsAndErrorsByStepId(state)[a.payload.id]
+      getArgsAndErrorsByStepId(state)[a.payload.form.id]
 
     const { stepArgs } = argsAndErrors
 

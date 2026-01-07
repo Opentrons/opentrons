@@ -349,7 +349,10 @@ export const savedStepForms = (
 
   switch (action.type) {
     case 'SAVE_STEP_FORM': {
-      return { ...savedStepForms, [action.payload.id]: action.payload }
+      return {
+        ...savedStepForms,
+        [action.payload.form.id]: action.payload.form,
+      }
     }
 
     case 'SAVE_STEP_FORMS_MULTI': {
@@ -1589,7 +1592,7 @@ export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
       state: OrderedStepIdsState,
       action: SaveStepFormAction
     ) => {
-      const id = action.payload.id
+      const id = action.payload.form.id
 
       if (!state.includes(id)) {
         return [...state, id]
