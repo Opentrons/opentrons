@@ -43,8 +43,9 @@
   font-weight: var(--font-weight-bold);
   -webkit-line-clamp: 2;
   line-height: var(--line-height-24);
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   text-overflow: ellipsis;
+  word-break: normal;
 }
 
 .max_content_size {
