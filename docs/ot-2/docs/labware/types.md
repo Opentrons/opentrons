@@ -15,7 +15,7 @@ The OT-2 works by default with single-well and multi-well reservoirs. [Reservoir
 
 The Labware Library currently includes reservoirs in several common configurations, although other well configurations are possible.
 
-Try creating a custom labware definition with the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a reservoir you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The OT-2 needs this information to understand how to work with your custom labware. See the <font color="red">Labware Definitions section</font> for more information.
+Try creating a custom labware definition with the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a reservoir you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The OT-2 needs this information to understand how to work with your custom labware. See the [Labware Definitions section](./definitions.md) for more information.
 
 ## Well plates
 
@@ -32,24 +32,24 @@ The Labware Library includes plates with 12, 24, and 48 wells. Due to the grid c
 
 ### 96-well plates
 
-The Labware Library includes many 96-well plates, including Opentrons and third-party plates. The 1-channel and 8-channel OT-2 pipettes are optimized to work with the 8×12 well grid on these plates
+The Labware Library includes many 96-well plates, including Opentrons and third-party plates. The 1-channel and 8-channel OT-2 pipettes are optimized to work with the well geometry on these plates.
 
 For a full example of a 96-well plate, reference the [Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt definition](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_wellplate_200ul_pcr_full_skirt/3.json) on GitHub.
 
 
 ### 384-well plates
 
-The Labware Library includes 384-well plates for applications that require greater well density or smaller liquid quantities. The OT-2 single-channel and 8-channel pipettes can work with the 16×24 well grid on these plates.
+The Labware Library includes 384-well plates for applications that require greater well density or smaller liquid quantities. The OT-2 single-channel and 8-channel pipettes can work with the well geometry on these plates.
 
 ### Custom well plates
 
-Try using the [Opentrons Labware Creator](https://labware.opentrons.com/#/create) to make a custom labware definition if a well plate you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The OT-2 reads this information to understand how to work with your custom labware. See the <font color="red">Labware Definitions section</font> for more information.
+Try using the [Opentrons Labware Creator](https://labware.opentrons.com/#/create) to make a custom labware definition if a well plate you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The OT-2 reads this information to understand how to work with your custom labware. See the [Labware Definitions section](./definitions.md) for more information.
 
 ## Tips and tip racks
 
 OT-2 tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 300 µL, and 1000 µL sizes. These are clear, non-conducting, sterile polypropylene tips that are available with or without filters.
 
-OT-2 pipette tips are designed for OT-2 pipettes. OT-2 tips are incompatible with Opentrons Flex pipettes; likewise, Flex tips cannot be used on OT-2 pipettes. Other industry-standard tips may work with OT-2 pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons OT-2 tips with OT-2 pipettes.
+OT-2 pipette tips are designed for OT-2 pipettes. OT-2 tips are incompatible with Opentrons Flex pipettes, and Flex tips cannot be used on OT-2 pipettes. Other industry-standard tips may work with OT-2 pipettes, but this is not recommended. To ensure optimum performance, you should only use Opentrons OT-2 tips with OT-2 pipettes.
 
 !!! tip
     For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate.
@@ -76,13 +76,13 @@ The 24-tube rack supports both snap cap and screw cap tubes.
 
 ### Custom tube rack labware
 
-Try creating a custom labware definition using the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a tube and rack combination you'd like to use isn't listed on Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The OT-2 reads this information to understand how to work with your custom labware. See the <font color="red">Labware Definitions section</font> for more information.
+Try creating a custom labware definition using the [Opentrons Labware Creator](https://labware.opentrons.com/create/) if a tube and rack combination you'd like to use isn't listed on Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The OT-2 reads this information to understand how to work with your custom labware. See the [Labware Definitions section](./definitions.md) for more information.
 
 ## Aluminum blocks
 
 The OT-2 uses [aluminum blocks on the Labware Library](https://labware.opentrons.com/#/?category=aluminumBlock) to hold sample tubes or well plates on the Temperature Module or deck.
 
-A set of OT-2 compatible aluminum blocks also ship with the Temperature Module GEN2. This includes a flat bottom plate, a 24-well block, and 96-well block, which are also available for purchase from Opentrons.
+A set of OT-2 compatible aluminum blocks also ships with the Temperature Module GEN2. This includes a flat bottom plate, a 24-well block, and a 96-well block, which are also available for purchase from Opentrons.
 
 ### Flat bottom plate
 
@@ -125,4 +125,4 @@ The 96-well block supports a wide variety of well plate types. For example, it a
 
 ### Custom aluminum block combinations
 
-Labware Creator can't define new aluminum blocks. For placing tubes in the 24-well block, it can create combination labware definitions that comprise the aluminum block and the tubes. For placing custom plates on the 96-well adapter, define the custom plate with the stacking offset information required for seating the plate on top of the block. See the <font color="red">Labware Definitions section</font> for more information.
+Labware Creator can't define new aluminum blocks. For placing tubes in the 24-well block, it can create combination labware definitions that combine the aluminum block and the tubes. For placing custom plates on the 96-well adapter, define the custom plate with the stacking offset information required for seating the plate on top of the block. See the [Labware Definitions section](./definitions.md) for more information.
