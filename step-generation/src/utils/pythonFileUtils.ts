@@ -306,7 +306,7 @@ export function getLoadLabware(
       )
       const onModule =
         moduleEntities[labwareSlot] != null ||
-        deckSlot === stackerOnSlot?.[1].slot // special case stacker shuttle labware
+        (deckSlot === stackerOnSlot?.[1].slot && !isLabwareOnHopper) // special case stacker shuttle labware
       const onLabware = allLabwareEntities[labwareSlot] != null
 
       let parentName: string

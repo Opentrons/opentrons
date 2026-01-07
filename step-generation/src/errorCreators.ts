@@ -450,3 +450,10 @@ export const incompletePickup = (): CommandCreatorError => {
     message: 'At least one of the selected tips is empty',
   }
 }
+
+export const labwareOnHopper = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_ON_HOPPER',
+    message: 'Labware cannot be moved from the Flex Stacker Hopper',
+  }
+}
