@@ -14,11 +14,12 @@ import {
   Toolbox,
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
-import { LabwareLiquidState } from '@opentrons/step-generation'
+import { getLargestStackInSlot, getSlotInLocationStack, LabwareLiquidState, TimelineFrame } from '@opentrons/step-generation'
 
 import {
   createContainer,
   multipleIngredientsSelector,
+  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -31,6 +32,7 @@ import styles from './labwareToolbox.module.css'
 import type { Dispatch, SetStateAction } from 'react'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
+import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
 
 export interface LiquidInfo {
   name: string
@@ -55,11 +57,13 @@ interface LabwareStackToolboxProps {
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   data: LabwareStackToolboxData
   selectedLabwareIds: string[]
+  initialRobotState: TimelineFrame
 }
 export function LabwareStackToolbox({
   setShowLiquidLayoutOverlay,
   data,
   selectedLabwareIds,
+  initialRobotState,
 }: LabwareStackToolboxProps): JSX.Element {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
@@ -67,8 +71,12 @@ export function LabwareStackToolbox({
 
   const { labware, labwareId, allWellContents, liquidLocations } = data
   const labwareStack: string[] =
-    labwareId != null ? (labware[labwareId]?.stack ?? []) : []
-  const filteredLabwareStack = labwareStack.filter(id => labware[id] != null)
+  labwareId != null ? (labware[labwareId]?.stack ?? []) : []
+  const slot = getSlotInLocationStack(labwareStack)
+  const largestStackInSlot = getLargestStackInSlot(initialRobotState.labware,slot )
+
+const filteredLabwareStack = largestStackInSlot.filter(id => labware[id] != null)
+
   const hopperStackLimit =
     labwareId != null
       ? getMaxPoolCount({
@@ -121,6 +129,7 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
+    dispatch(openIngredientSelector(newItem))
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
@@ -208,6 +217,7 @@ export function LabwareStackToolboxContainer({
   // All selectors moved here
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const { labware } = useSelector(getInitialDeckSetup)
+  const initialRobotState = useSelector(getInitialRobotState)
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
@@ -230,6 +240,7 @@ export function LabwareStackToolboxContainer({
       setDefineLiquidModal={setDefineLiquidModal}
       selectedLabwareIds={selectedLabwareIds}
       data={data}
+      initialRobotState={initialRobotState}
     />
   )
 }
