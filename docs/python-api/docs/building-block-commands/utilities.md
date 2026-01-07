@@ -86,7 +86,7 @@ protocol.capture_image(
 )
 ```
 
-*New in version 2.27.*
+*New in version 2.27*
 
 Image filenames include your robot and protocol name, step number, and timestamps for the protocol and command running when the image was taken. Here, the custom filename `"deck_view"` is added to the beginning of the filename, making it easier to find the exact image you're looking for.
 

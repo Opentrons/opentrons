@@ -17,34 +17,11 @@ This section covers module tasks and explains how to run multiple module actions
 
 When you use a Heater-Shaker, Temperature, or Thermocycler Module in your protocol, you can choose to use a concurrent command for the module actions shown below. Each command returns a [`Task`][opentrons.protocol_api.Task] that runs in the background of your protocol and allows the robot to continue performing protocol steps, regardless of whether the module reaches the target temperature or completes another action. 
 
-<table>
-    <thead>
-        <tr>
-            <th>Module</th>
-            <th>Concurrent commands</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr> 
-            <td>
-                Heater-Shaker Module
-            </td>
-            <td><li><a href="../api-reference/modules/#opentrons.protocol_api.HeaterShakerContext.set_target_temperature"><code>set_target_temperature()</code></a></li><li><a href="../api-reference/modules/#opentrons.protocol_api.HeaterShakerContext.set_shake_speed"><code>set_shake_speed()</code></a></li>
-        </tr>
-        <tr>
-            <td>
-                Temperature Module
-            </td>
-            <td><li><a href="../api-reference/modules/#opentrons.protocol_api.TemperatureModuleContext.start_set_temperature"><code>start_set_temperature()</code></a></li></td>
-        </tr>
-        <tr>
-            <td>
-                Thermocycler Module
-            </td>
-            <td><li><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature"><code>start_set_lid_temperature()</code></a><li><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature"><code>start_set_block_temperature()</code></a><li><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_execute_profile"><code>start_execute_profile()</code></a></li></td>
-        </tr>
-    </tbody>
-</table>
+| **Module** | **Concurrent commands** |
+| :----------|------------------------ |
+| Heater-Shaker Module | <ul><li>[`set_target_temperarature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature]</li><li>[`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed]</li></ul> |
+| Temperature Module | <ul><li>[`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature]</li></ul> |
+| Thermocycler Module | <ul><li>[`start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature]</li><li>[`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature]</li><li>[`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile]</li></ul> |
 
 Your protocol can include multiple module tasks that run parallel to one another. The example below has the API create two tasks: one for a Temperature Module, holding samples at 4 °C, and another for a Thermocycler Module running a profile. Neither task affects the other, and neither module action will prevent the robot from continuing to the next protocol steps. 
 

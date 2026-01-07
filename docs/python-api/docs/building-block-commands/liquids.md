@@ -29,8 +29,8 @@ Now our pipette holds 300 µL.
 
 The `aspirate()` method includes the location parameters `location` and `end_location`. Each accepts different location types: 
 
-- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][types.Location]. 
-- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.types.Location].
+- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
+- `end_location` can only be used in combination with the `location` parameter. Both must be a [`Location`][opentrons.types.Location].
 
 *Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations during an aspirate.
 
@@ -464,7 +464,7 @@ Like with the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, yo
 - Add a delay after as aspirate or dispense, or a `movement_delay` before moving to an `end_location`.
 - Include a push out after an aspirate or dispense in the mix.
 
-*New in version 2.27*.
+*New in version 2.27*
 
 ## Air gap { #air-gap-building-block }
 
