@@ -4,16 +4,15 @@ on:
   # for testing
   pull_request:
     paths:
-      - ".github/workflows/npm-packages-scan.yaml"
-      - "pnpm-lock.yaml"
-      - "package.json"
-      - "**/package.json"
+      - '.github/workflows/npm-packages-scan.yaml'
+      - 'pnpm-lock.yaml'
+      - 'package.json'
+      - '**/package.json'
   workflow_dispatch: {}
 
   schedule:
     # every monday at 6:00 UTC
     - cron: '0 6 * * 1'
-  workflow_dispatch: {}
 
 permissions:
   contents: read
