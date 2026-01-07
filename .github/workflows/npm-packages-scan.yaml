@@ -1,19 +1,11 @@
 name: Weekly Security Audit
 
 on:
-  # for testing on PR
-  pull_request:
-    paths:
-      - '.github/workflows/npm-packages-scan.yaml'
-      - 'yarn.lock'
-      - 'package.json'
-      - '**/package.json'
-
-  workflow_dispatch: {}
-
   schedule:
     # every monday at 7:00 EDT (summer), 6:00 EST (winter) | 12:00 UTC
     - cron: '0 12 * * 1'
+
+  workflow_dispatch: {}
 
 permissions:
   contents: read
@@ -100,7 +92,7 @@ jobs:
           set -euo pipefail
 
           # --- yarn audit summary (severity counts) ---
-          # counts by severity
+          # count by severity: critical, high, moderate, low, info
           if [ -s yarn-audit.json ]; then
             YARN_COUNTS=$(jq -s -r '
               map(select(.type=="auditAdvisory") | .data.advisory.severity)
