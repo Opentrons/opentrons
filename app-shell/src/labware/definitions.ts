@@ -39,7 +39,7 @@ export function parseLabwareFiles(
         const modified = Date.now()
         const filename =
           data?.parameters.loadName != null
-            ? `${data?.parameters?.loadName}.json`
+            ? `${data.parameters.loadName}.json`
             : 'unknown_file'
 
         resolve([{ filename, modified, data }])
