@@ -9,8 +9,6 @@ import type { CameraState, ProtocolRunState } from '../types'
 const INITIAL_STATE: ProtocolRunState = {}
 
 export const INITIAL_CAMERA_STATE: CameraState = {
-  required: true,
-  complete: false,
   enabled: false,
   liveStreamEnabled: false,
   recoveryEnabled: false,

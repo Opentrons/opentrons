@@ -11,23 +11,22 @@ export const getSetupStepComplete: (
 ) => boolean | null = (state, runId, step) =>
   getSetupStepsComplete(state, runId)?.[step] ?? null
 
-export const getSetupStepsComplete: (
+export const getSetupStepsComplete = (
   state: State,
   runId: string
-) => Types.StepMap<boolean> | null = (state, runId) => {
+): Partial<Record<Types.StepKey, boolean>> | null => {
   const setup = state.protocolRuns[runId]?.setup
   if (setup == null) {
     return null
   }
-  return (
-    Object.entries(setup) as Array<[Types.StepKey, Types.StepState]>
-  ).reduce<Partial<Types.StepMap<boolean>>>(
-    (acc, [step, state]) => ({
-      ...acc,
-      [step]: state.complete,
-    }),
+
+  return Object.entries(setup).reduce<Partial<Record<Types.StepKey, boolean>>>(
+    (acc, [step, stepState]) => {
+      acc[step as Types.StepKey] = stepState.complete
+      return acc
+    },
     {}
-  ) as Types.StepMap<boolean>
+  )
 }
 
 export const getSetupStepRequired: (
@@ -37,46 +36,46 @@ export const getSetupStepRequired: (
 ) => boolean | null = (state, runId, step) =>
   getSetupStepsRequired(state, runId)?.[step] ?? null
 
-export const getSetupStepsRequired: (
+export const getSetupStepsRequired = (
   state: State,
   runId: string
-) => Types.StepMap<boolean> | null = (state, runId) => {
+): Partial<Record<Types.StepKey, boolean>> | null => {
   const setup = state.protocolRuns[runId]?.setup
   if (setup == null) {
     return null
   }
-  return (
-    Object.entries(setup) as Array<[Types.StepKey, Types.StepState]>
-  ).reduce<Partial<Types.StepMap<boolean>>>(
-    (acc, [step, state]) => ({ ...acc, [step]: state.required }),
+
+  return Object.entries(setup).reduce<Partial<Record<Types.StepKey, boolean>>>(
+    (acc, [step, stepState]) => {
+      acc[step as Types.StepKey] = stepState.required
+      return acc
+    },
     {}
-  ) as Types.StepMap<boolean>
+  )
 }
 
-export const getSetupStepMissing: (
+export const getSetupStepMissing = (
   state: State,
   runId: string,
   step: Types.StepKey
-) => boolean | null = (state, runId, step) =>
-  getSetupStepsMissing(state, runId)?.[step] || null
+): boolean | null => getSetupStepsMissing(state, runId)?.[step] ?? null
 
-export const getSetupStepsMissing: (
+export const getSetupStepsMissing = (
   state: State,
   runId: string
-) => Types.StepMap<boolean> | null = (state, runId) => {
+): Partial<Record<Types.StepKey, boolean>> | null => {
   const setup = state.protocolRuns[runId]?.setup
   if (setup == null) {
     return null
   }
-  return (
-    Object.entries(setup) as Array<[Types.StepKey, Types.StepState]>
-  ).reduce<Partial<Types.StepMap<boolean>>>(
-    (acc, [step, state]) => ({
-      ...acc,
-      [step]: state.required && !state.complete,
-    }),
+
+  return Object.entries(setup).reduce<Partial<Record<Types.StepKey, boolean>>>(
+    (acc, [step, stepState]) => {
+      acc[step as Types.StepKey] = stepState.required && !stepState.complete
+      return acc
+    },
     {}
-  ) as Types.StepMap<boolean>
+  )
 }
 
 export const getCameraUsageState = (
@@ -85,17 +84,13 @@ export const getCameraUsageState = (
 ): Types.CameraState => {
   const cameraStep =
     state.protocolRuns[runId]?.setup[Constants.CAMERA_SETUP_STEP_KEY]
-
   if (cameraStep == null) {
     return INITIAL_CAMERA_STATE
   }
-
   return {
-    required: false,
-    complete: true,
     enabled: cameraStep.cameraEnabled,
     liveStreamEnabled: cameraStep.liveStreamEnabled,
-    recoveryEnabled: cameraStep.cameraRecoveryEnabled,
+    recoveryEnabled: cameraStep.recoveryEnabled,
   }
 }
 

@@ -20,8 +20,34 @@ export const updateRunSetupStepsRequired = (
 
 export const updateCameraEnablement = (
   runId: string,
-  required: Types.CameraState
+  cameraEnabled: boolean
 ): Types.UpdateCameraEnablement => ({
   type: Constants.CAMERA_SETUP_STEP_KEY,
-  payload: { runId, required },
+  payload: { runId, cameraEnabled },
+})
+
+export const updateCameraRecoveryEnablement = (
+  runId: string,
+  recoveryEnabled: boolean
+): Types.UpdateCameraErrorRecoveryEnablement => ({
+  type: Constants.CAMERA_SETUP_STEP_KEY,
+  payload: { runId, recoveryEnabled },
+})
+
+export const updateCameraStreamEnablement = (
+  runId: string,
+  liveStreamEnabled: boolean
+): Types.UpdateLivestreamEnabled => ({
+  type: Constants.CAMERA_SETUP_STEP_KEY,
+  payload: { runId, liveStreamEnabled },
+})
+
+export const updateAllCameraSettings = (allCameraArgs: {
+  runId: string
+  cameraEnabled: boolean
+  liveStreamEnabled: boolean
+  recoveryEnabled: boolean
+}): Types.UpdateAllCameraSettings => ({
+  type: Constants.CAMERA_SETUP_STEP_KEY,
+  payload: allCameraArgs,
 })

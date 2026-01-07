@@ -52,8 +52,6 @@ describe('ProtocolRunCamera', () => {
       <div>MOCK_IMAGE_GALLERY_CONTAINER</div>
     )
     vi.mocked(getCameraUsageState).mockReturnValue({
-      required: true,
-      complete: true,
       enabled: true,
       recoveryEnabled: true,
       liveStreamEnabled: true,

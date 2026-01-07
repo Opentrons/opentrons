@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { updateCameraEnablement } from '/app/redux/protocol-runs'
+import { updateAllCameraSettings } from '/app/redux/protocol-runs'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
@@ -22,11 +22,10 @@ export function useInitializeCameraState(runId: string): void {
         runCameraSettings
 
       dispatch(
-        updateCameraEnablement(runId, {
-          required: false,
-          complete: false,
-          enabled: cameraEnabled,
-          liveStreamEnabled: liveStreamEnabled,
+        updateAllCameraSettings({
+          runId,
+          cameraEnabled,
+          liveStreamEnabled,
           recoveryEnabled: errorRecoveryCameraEnabled,
         })
       )
@@ -35,11 +34,10 @@ export function useInitializeCameraState(runId: string): void {
         cameraSettings
 
       dispatch(
-        updateCameraEnablement(runId, {
-          required: false,
-          complete: false,
-          enabled: cameraEnabled,
-          liveStreamEnabled: liveStreamEnabled,
+        updateAllCameraSettings({
+          runId,
+          cameraEnabled,
+          liveStreamEnabled,
           recoveryEnabled: errorRecoveryCameraEnabled,
         })
       )

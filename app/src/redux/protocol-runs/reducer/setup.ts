@@ -1,17 +1,16 @@
 import * as Constants from '../constants'
 
-import type {
-  CameraSetupStepKey,
-  ProtocolRunAction,
-  RunSetupStatus,
-} from '../types'
+import type { ProtocolRunAction, RunSetupStatus } from '../types'
 
 const INITIAL_SETUP_STEP_STATE = {
   required: true,
   complete: false,
+}
+const CAMERA_INITIAL_SETUP_STATE = {
+  ...INITIAL_SETUP_STEP_STATE,
   cameraEnabled: false,
   liveStreamEnabled: false,
-  cameraRecoveryEnabled: false,
+  recoveryEnabled: false,
 }
 
 export const INITIAL_RUN_SETUP_STATE: RunSetupStatus = {
@@ -19,7 +18,7 @@ export const INITIAL_RUN_SETUP_STATE: RunSetupStatus = {
   [Constants.MODULE_SETUP_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
   [Constants.LPC_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
   [Constants.LABWARE_SETUP_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
-  [Constants.CAMERA_SETUP_STEP_KEY]: INITIAL_SETUP_STEP_STATE,
+  [Constants.CAMERA_SETUP_STEP_KEY]: CAMERA_INITIAL_SETUP_STATE,
 }
 
 export function setupReducer(
@@ -32,9 +31,9 @@ export function setupReducer(
         (currentState, step) => ({
           ...currentState,
           [step]: {
+            ...currentState[step],
             complete:
               action.payload.complete[step] ?? currentState[step].complete,
-            required: currentState[step].required,
           },
         }),
         state
@@ -45,21 +44,20 @@ export function setupReducer(
         (currentState, step) => ({
           ...currentState,
           [step]: {
+            ...currentState[step],
             required:
               action.payload.required[step] ?? currentState[step].required,
-            complete: currentState[step].complete,
           },
         }),
         state
       )
 
     case Constants.CAMERA_SETUP_STEP_KEY: {
-      const cameraStep = state[Constants.CAMERA_SETUP_STEP_KEY]
-
       return {
         ...state,
         [Constants.CAMERA_SETUP_STEP_KEY]: {
-          ...cameraStep,
+          ...state[Constants.CAMERA_SETUP_STEP_KEY],
+          ...action.payload,
         },
       }
     }

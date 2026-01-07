@@ -88,7 +88,7 @@ import {
   selectIsAnyNecessaryDefaultOffsetMissing,
   selectOffsetSource,
   selectTotalCountLocationSpecificOffsets,
-  updateCameraEnablement,
+  updateAllCameraSettings,
 } from '/app/redux/protocol-runs'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
@@ -859,10 +859,9 @@ export function ProtocolSetup(): JSX.Element {
   useEffect(() => {
     if (initialRobotCameraSettings != null) {
       dispatch(
-        updateCameraEnablement(runId, {
-          required: false,
-          complete: false,
-          enabled: initialRobotCameraSettings.cameraEnabled,
+        updateAllCameraSettings({
+          runId,
+          cameraEnabled: initialRobotCameraSettings.cameraEnabled,
           recoveryEnabled:
             initialRobotCameraSettings.errorRecoveryCameraEnabled,
           liveStreamEnabled: initialRobotCameraSettings.liveStreamEnabled,
