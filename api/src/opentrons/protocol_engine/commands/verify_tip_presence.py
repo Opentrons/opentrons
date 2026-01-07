@@ -1,4 +1,5 @@
 """Verify tip presence command request, result and implementation models."""
+
 from __future__ import annotations
 from typing import TYPE_CHECKING, Optional, Type, Any
 
@@ -86,9 +87,9 @@ class VerifyTipPresence(
     params: VerifyTipPresenceParams
     result: Optional[VerifyTipPresenceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[VerifyTipPresenceImplementation] = (
         VerifyTipPresenceImplementation
-    ] = VerifyTipPresenceImplementation
+    )
 
 
 class VerifyTipPresenceCreate(BaseCommandCreate[VerifyTipPresenceParams]):

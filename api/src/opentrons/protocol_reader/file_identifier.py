@@ -261,9 +261,9 @@ def _analyze_python_protocol(
         ) from e
 
     # We know this should never be a JsonProtocol. Help out the type-checker.
-    assert isinstance(
-        parsed, PythonProtocol
-    ), "Parsing a Python file returned something other than a Python protocol."
+    assert isinstance(parsed, PythonProtocol), (
+        "Parsing a Python file returned something other than a Python protocol."
+    )
 
     if parsed.api_level > MAX_SUPPORTED_VERSION:
         raise FileIdentificationError(

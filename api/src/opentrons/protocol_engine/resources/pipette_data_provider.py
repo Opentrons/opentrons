@@ -1,4 +1,5 @@
 """Pipette config data providers."""
+
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence
 import re
@@ -70,7 +71,9 @@ class LoadedStaticPipetteData:
     plunger_positions: Dict[str, float]
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
-    volume_mode: pip_types.LiquidClasses  # pip_types Liquid Classes refers to volume modes
+    volume_mode: (
+        pip_types.LiquidClasses
+    )  # pip_types Liquid Classes refers to volume modes
     available_volume_modes_min_vol: Dict[pip_types.LiquidClasses, float]  # Ditto
 
 
@@ -372,6 +375,7 @@ def get_latest_tip_overlap_before_version(
     overlap: Dict[str, Dict[str, float]], version: str
 ) -> Dict[str, float]:
     """Get the latest tip overlap definitions that are equal or older than the version."""
+
     # TODO: make this less awful
     def _numeric(versionstr: str) -> int:
         return int(versionstr[1:])

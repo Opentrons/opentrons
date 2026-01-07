@@ -1,4 +1,5 @@
 """Tests for /modules routes."""
+
 import inspect
 import pytest
 from decoy import Decoy

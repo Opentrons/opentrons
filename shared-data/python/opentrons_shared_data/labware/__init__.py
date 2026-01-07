@@ -22,15 +22,13 @@ Schema = NewType("Schema", dict[str, Any])
 @overload
 def load_definition(
     loadname: str, version: int, schema: Literal[2] = 2
-) -> LabwareDefinition2:
-    ...
+) -> LabwareDefinition2: ...
 
 
 @overload
 def load_definition(
     loadname: str, version: int, schema: Literal[3]
-) -> LabwareDefinition3:
-    ...
+) -> LabwareDefinition3: ...
 
 
 def load_definition(loadname: str, version: int, schema: int = 2) -> LabwareDefinition:

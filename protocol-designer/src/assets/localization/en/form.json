@@ -414,7 +414,7 @@
     },
     "flex_stacker": {
       "fields": {
-        "fillQuantity": {
+        "fillLabwareIds": {
           "caption": "Valid range between 1 and {{max}}",
           "title": "Number of labware to refill"
         },

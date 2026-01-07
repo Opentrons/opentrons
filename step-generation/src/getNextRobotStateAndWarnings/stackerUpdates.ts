@@ -53,21 +53,97 @@ export const forFlexStackerEmpty = (
     }
   })
 }
-
 export const forFlexStackerFillItems = (
   params: FlexStackerFillItemsParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void => {
-  // TODO: we need to update both the labwareInHopper key and all the robotState.labware entities currently in the hopper
-  // const { robotState } = robotStateAndWarnings
-  // const { moduleId, labware } = params
-  // const slot = robotState.modules[moduleId].slot
-  // const moduleState = _getStackerModuleState(robotState, moduleId)
-  // const largestStackInSlot = getLargestStackInSlot(robotState.labware, slot)
-  // if (moduleState != null) {
-  //   moduleState.labwareInHopper = [labware, ...moduleState.labwareInHopper]
-  // }
+  const { robotState } = robotStateAndWarnings
+  const { labwareEntities } = invariantContext
+  const { moduleId, labware } = params
+
+  const moduleSlot = robotState.modules[moduleId].slot
+  const moduleState = flexStackerStateGetter(robotState, moduleId)
+
+  if (moduleState == null || moduleState.storedLabwareDetails == null) {
+    return
+  }
+  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    moduleState.storedLabwareDetails
+
+  // group labware IDs by primaryyyy (each primary = one hopper position)
+  const groups: FlexStackerStoredLabwareGroup[] = []
+
+  for (const labwareId of labware) {
+    const defURI = labwareEntities[labwareId].labwareDefURI
+
+    if (defURI === primaryLabwareURI) {
+      groups.push({
+        primaryLabwareId: labwareId,
+        adapterLabwareId: null,
+        lidLabwareId: null,
+      })
+    } else if (defURI === adapterLabwareURI) {
+      const lastGroup = groups[groups.length - 1]
+      if (lastGroup) {
+        lastGroup.adapterLabwareId = labwareId
+      }
+    } else if (defURI === lidLabwareURI) {
+      const lastGroup = groups[groups.length - 1]
+      if (lastGroup) {
+        lastGroup.lidLabwareId = labwareId
+      }
+    }
+  }
+
+  // rebuild ALL stacks (bottom-up)
+  const baseStack = [HOPPER_STACKER_LOCATION, moduleId, moduleSlot]
+
+  for (const group of groups) {
+    const bottomUpStack = [
+      group.adapterLabwareId,
+      group.primaryLabwareId,
+      group.lidLabwareId,
+      ...baseStack,
+    ].filter((v): v is string => v != null)
+
+    // primary
+    robotState.labware[group.primaryLabwareId] = {
+      ...robotState.labware[group.primaryLabwareId],
+      stack: bottomUpStack.slice(bottomUpStack.indexOf(group.primaryLabwareId)),
+    }
+
+    // adapter
+    if (group.adapterLabwareId != null) {
+      robotState.labware[group.adapterLabwareId] = {
+        ...robotState.labware[group.adapterLabwareId],
+        stack: bottomUpStack.slice(
+          bottomUpStack.indexOf(group.adapterLabwareId)
+        ),
+      }
+    }
+
+    // lid
+    if (group.lidLabwareId != null) {
+      robotState.labware[group.lidLabwareId] = {
+        ...robotState.labware[group.lidLabwareId],
+        stack: bottomUpStack.slice(bottomUpStack.indexOf(group.lidLabwareId)),
+      }
+    }
+  }
+
+  // Rebuild labwareInHopper
+  const existingGroups = moduleState.labwareInHopper ?? []
+
+  const newGroups: FlexStackerStoredLabwareGroup[] = groups.map(
+    ({ primaryLabwareId, adapterLabwareId, lidLabwareId }) => ({
+      primaryLabwareId,
+      adapterLabwareId,
+      lidLabwareId,
+    })
+  )
+
+  moduleState.labwareInHopper = [...existingGroups, ...newGroups]
 }
 
 export const forFlexStackerFill = (
@@ -134,7 +210,6 @@ export const forFlexStackerRetrieve = (
   const { moduleId } = params
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   const moduleSlot = robotState.modules[moduleId].slot
-
   if (moduleState != null) {
     const { labwareInHopper, labwareOnShuttle } = moduleState
     if (
@@ -149,7 +224,7 @@ export const forFlexStackerRetrieve = (
       labwareInHopper.shift()
 
       // build labware stacks on the deck
-      const runningStack = [moduleId, moduleSlot]
+      const runningStack = [moduleSlot]
       for (const labwarePoolKey of BOTTOM_UP_LABWARE_POOL_KEYS) {
         const labwareId =
           labwareGroupOnShuttle[
@@ -196,6 +271,25 @@ export const forFlexStackerStore = (
             moduleId,
             moduleSlot,
           ]
+        }
+      }
+      // if there are no stored labware details, set them now
+      if (moduleState.storedLabwareDetails == null) {
+        moduleState.storedLabwareDetails = {
+          primaryLabwareURI:
+            invariantContext.labwareEntities[labwareOnShuttle.primaryLabwareId]
+              .labwareDefURI,
+          adapterLabwareURI:
+            labwareOnShuttle.adapterLabwareId != null
+              ? invariantContext.labwareEntities[
+                  labwareOnShuttle.adapterLabwareId
+                ].labwareDefURI
+              : null,
+          lidLabwareURI:
+            labwareOnShuttle.lidLabwareId != null
+              ? invariantContext.labwareEntities[labwareOnShuttle.lidLabwareId]
+                  .labwareDefURI
+              : null,
         }
       }
     }

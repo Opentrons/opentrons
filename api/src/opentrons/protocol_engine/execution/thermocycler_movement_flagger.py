@@ -1,4 +1,5 @@
 """Helpers for flagging unsafe movements to a Thermocycler Module."""
+
 from typing import Optional
 
 from opentrons.drivers.types import ThermocyclerLidStatus
@@ -154,7 +155,7 @@ class ThermocyclerMovementFlagger:
         )
         if thermocycler is None:
             raise self._HardwareThermocyclerMissingError(
-                f"No Thermocycler found" f' with serial number "{thermocycler_serial}".'
+                f'No Thermocycler found with serial number "{thermocycler_serial}".'
             )
 
         lid_status = thermocycler.lid_status

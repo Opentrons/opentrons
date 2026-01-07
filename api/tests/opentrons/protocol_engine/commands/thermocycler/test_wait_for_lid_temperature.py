@@ -1,4 +1,5 @@
 """Test Thermocycler wait for lid temperature command implementation."""
+
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import Thermocycler

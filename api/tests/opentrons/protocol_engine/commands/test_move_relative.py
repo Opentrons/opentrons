@@ -1,4 +1,5 @@
 """Test move relative commands."""
+
 from datetime import datetime
 
 from decoy import Decoy, matchers

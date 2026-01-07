@@ -1,4 +1,5 @@
 """Test Heater Shaker open labware latch command implementation."""
+
 from decoy import Decoy
 import pytest
 

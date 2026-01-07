@@ -1,4 +1,5 @@
 """Tests for motion planning module."""
+
 import pytest
 
 from opentrons.motion_planning.types import GripperMovementWaypointsWithJawStatus

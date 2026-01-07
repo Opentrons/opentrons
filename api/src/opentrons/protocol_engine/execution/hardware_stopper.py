@@ -1,4 +1,5 @@
 """Post-protocol hardware stopper."""
+
 import logging
 from typing import Optional
 

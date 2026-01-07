@@ -1,4 +1,5 @@
 """Request and response models for /instruments endpoints."""
+
 from __future__ import annotations
 
 from typing_extensions import Literal

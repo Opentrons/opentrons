@@ -59,12 +59,11 @@ test:
 .PHONY: lint
 lint:
 	$(python) -m mypy ot3usb tests
-	$(python) -m black --check ./ot3usb ./tests
-	$(python) -m flake8 ot3usb tests
+	$(ruff) check ot3usb tests
 
 .PHONY: format
 format:
-	$(python) -m black ot3usb tests
+	$(ruff) format ot3usb tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(project_rs_default)

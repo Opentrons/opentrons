@@ -3,6 +3,7 @@
 The purpose is to provide a fake backend that responds to the GCODE sent by the
 Opentrons smoothie driver.
 """
+
 import logging
 import re
 from typing import Optional, Dict

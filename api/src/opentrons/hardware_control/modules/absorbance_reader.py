@@ -348,9 +348,9 @@ class AbsorbanceReader(mod_abc.AbstractModule):
     ) -> None:
         """Set the Absorbance Reader's measurement mode and active wavelength."""
         if mode == ABSMeasurementMode.SINGLE:
-            assert (
-                len(wavelengths) == 1
-            ), "Cannot initialize single read mode with more than 1 wavelength."
+            assert len(wavelengths) == 1, (
+                "Cannot initialize single read mode with more than 1 wavelength."
+            )
 
         await self._driver.initialize_measurement(wavelengths, mode)
         self._measurement_config = ABSMeasurementConfig(

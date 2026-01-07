@@ -16,6 +16,7 @@ import {
   getHydratedForm,
   selectors as stepFormSelectors,
 } from '/protocol-designer/step-forms'
+import { createLabwareAndQueueForHopper } from '/protocol-designer/step-forms/actions/thunks'
 import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { actions } from '/protocol-designer/steplist'
 import { actions as stepsActions } from '/protocol-designer/ui/steps'
@@ -43,6 +44,7 @@ interface StateProps {
 interface DispatchProps {
   cancelStepForm: () => void
   saveStepForm: (options?: { userWantsBonusStep?: boolean }) => void
+  createdLabwareForQueue: (moduleId: string, fillLabwareIds: string[]) => void
 }
 type StepFormManagerProps = StateProps & DispatchProps
 
@@ -57,8 +59,8 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveStepForm,
     invariantContext,
     allLabwareDefs,
+    createdLabwareForQueue,
   } = props
-
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
@@ -105,6 +107,15 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     if (bonusStepModalType == null) {
       // No dialog to show. Just save the step directly.
       saveStepForm()
+      if (
+        hydratedForm.stepType === 'flexStacker' &&
+        hydratedForm.flexStackerFormType === 'fill'
+      ) {
+        createdLabwareForQueue(
+          hydratedForm.moduleId,
+          hydratedForm.fillLabwareIds
+        )
+      }
     } else {
       // There's a dialog we have to show before saving the step.
       // Its confirm/cancel handlers will be the thing that saves the step.
@@ -202,13 +213,30 @@ const mapStateToProps = (state: BaseState): StateProps => {
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
-  const cancelStepForm = (): void => dispatch(actions.cancelStepForm())
-  const saveStepForm = (options?: { userWantsBonusStep?: boolean }): void =>
+  const cancelStepForm = (): void => {
+    dispatch(actions.cancelStepForm())
+  }
+
+  const saveStepForm = (options?: { userWantsBonusStep?: boolean }): void => {
     dispatch(stepsActions.saveStepForm(options))
+  }
+
+  const createdLabwareForQueue = (
+    moduleId: string,
+    fillLabwareIds: string[]
+  ): void => {
+    dispatch(
+      createLabwareAndQueueForHopper({
+        moduleId,
+        fillLabwareIds,
+      })
+    )
+  }
 
   return {
     cancelStepForm,
     saveStepForm,
+    createdLabwareForQueue,
   }
 }
 

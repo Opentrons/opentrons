@@ -2,6 +2,7 @@
 
 Contains routes dealing primarily with `Maintenance Run` models.
 """
+
 import logging
 from datetime import datetime
 from textwrap import dedent
@@ -182,7 +183,7 @@ async def create_run(
     """
     if not is_ok_to_create_maintenance_run:
         raise ProtocolRunIsActive(
-            detail="Cannot create maintenance run when " "a protocol run is active."
+            detail="Cannot create maintenance run when a protocol run is active."
         ).as_error(status.HTTP_409_CONFLICT)
 
     offsets = request_body.data.labwareOffsets if request_body is not None else []

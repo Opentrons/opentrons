@@ -43,8 +43,7 @@ class PipetteOffsetCalibration(DeprecatedResponseDataModel):
     )
     tiprackUri: str = Field(
         ...,
-        description="The standard labware uri of the tiprack "
-        "used in this calibration",
+        description="The standard labware uri of the tiprack used in this calibration",
     )
     lastModified: datetime = Field(
         ..., description="When this calibration was last modified"

@@ -80,7 +80,6 @@ def test_build_serial_number_lookup(key_spot_check: str, value_spot_check: str) 
 def test_update_pipette_configuration(
     pipette_model: str, v1_configuration_changes: Dict[str, Any]
 ) -> None:
-
     liquid_class = LiquidClasses.default
     model_name = pipette_load_name_conversions.convert_pipette_model(
         cast(types.PipetteModel, pipette_model)

@@ -4,6 +4,7 @@ require typing_extensions.
 
 This module should only be imported if typing.TYPE_CHECKING is True.
 """
+
 from typing import Dict, List, NewType, Union
 
 from typing_extensions import Literal, TypedDict

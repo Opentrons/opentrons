@@ -1,6 +1,5 @@
 """Tests for the APIs around waste chutes and trash bins."""
 
-
 from opentrons import protocol_api
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import UnsupportedAPIError

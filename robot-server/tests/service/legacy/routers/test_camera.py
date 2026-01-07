@@ -23,7 +23,7 @@ from fastapi.responses import FileResponse
 @pytest.fixture
 def mock_take_picture():
     with patch(
-        "robot_server.service.legacy.routers." "camera.camera.take_picture",
+        "robot_server.service.legacy.routers.camera.camera.take_picture",
         spec=camera.take_picture,
     ) as m:
         yield m

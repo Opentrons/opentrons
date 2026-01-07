@@ -1,4 +1,5 @@
 """App exception handlers."""
+
 from logging import getLogger
 from fastapi import Request, Response, status
 from fastapi.routing import APIRoute
@@ -64,7 +65,7 @@ def _route_is_legacy(request: Request) -> bool:
 
 
 def _format_validation_source(
-    parts: Sequence[Union[str, int]]
+    parts: Sequence[Union[str, int]],
 ) -> Optional[ErrorSource]:
     """Format a validation location from FastAPI into an ErrorSource."""
     try:

@@ -1,4 +1,5 @@
 """Command models to deactivate shaker for the Heater-Shaker Module."""
+
 from __future__ import annotations
 from typing import Optional, TYPE_CHECKING
 from typing_extensions import Literal, Type

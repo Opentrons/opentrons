@@ -37,6 +37,7 @@ export const VS_TO_AA: Record<VISUAL_SLOTS, AddressableAreaNamesWithFakes[]> = {
     'temperatureModuleV2B1',
     'heaterShakerV1B1',
     'movableTrashB1',
+    'thermocyclerModuleV2',
   ],
   VSC1: [
     'C1',

@@ -1,4 +1,5 @@
 """Test Temperature Module's set target temperature command implementation."""
+
 from decoy import Decoy, matchers
 from opentrons.hardware_control.modules import TempDeck
 

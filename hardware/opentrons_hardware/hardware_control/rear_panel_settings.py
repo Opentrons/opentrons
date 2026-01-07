@@ -1,4 +1,5 @@
 """Utilities for updating the rear-panel settings."""
+
 import logging
 from dataclasses import dataclass
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger

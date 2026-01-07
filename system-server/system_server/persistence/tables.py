@@ -1,4 +1,5 @@
 """SQLite table schemas."""
+
 import sqlalchemy
 from sqlalchemy import Column, Integer
 

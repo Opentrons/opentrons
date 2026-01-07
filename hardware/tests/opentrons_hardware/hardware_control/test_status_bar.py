@@ -1,4 +1,5 @@
 """Test status bar integration."""
+
 from __future__ import annotations
 import pytest
 from mock import AsyncMock

@@ -1,5 +1,4 @@
-""" opentrons.util.entrypoint_util: functions common to entrypoints
-"""
+"""opentrons.util.entrypoint_util: functions common to entrypoints"""
 
 import asyncio
 import contextlib
@@ -54,7 +53,7 @@ class FoundLabware:
 
 
 def labware_from_paths(
-    paths: Sequence[Union[str, pathlib.Path]]
+    paths: Sequence[Union[str, pathlib.Path]],
 ) -> Dict[str, FoundLabware]:
     """Search paths for labware definitions.
 

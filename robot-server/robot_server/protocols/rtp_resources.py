@@ -1,4 +1,5 @@
 """Primitive and CSV run time parameter resources."""
+
 from __future__ import annotations
 
 import sqlalchemy

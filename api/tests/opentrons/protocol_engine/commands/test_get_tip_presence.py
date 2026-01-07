@@ -1,4 +1,5 @@
 """Test get tip presence commands."""
+
 from decoy import Decoy
 import pytest
 

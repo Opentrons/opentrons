@@ -1,4 +1,5 @@
 """Protocol Engine CommandStore sub-state."""
+
 from collections import OrderedDict
 from dataclasses import dataclass
 from typing import Dict, List, Optional
@@ -126,7 +127,7 @@ class CommandHistory:
     def get_slice(
         self, start: int, stop: int, command_ids: Optional[list[str]] = None
     ) -> List[Command]:
-        """Get a list of commands between start and stop.""" """Get a list of commands between start and stop."""
+        """Get a list of commands between start and stop."""
         commands = self._all_command_ids[start:stop]
         selected_command_ids = (
             command_ids if command_ids is not None else self._all_command_ids

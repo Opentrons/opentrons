@@ -4,7 +4,7 @@ import {
   BORDERS,
   Btn,
   COLORS,
-  CURSOR_DEFAULT,
+  CURSOR_POINTER,
   SPACING,
   StyledText,
 } from '@opentrons/components'
@@ -64,7 +64,7 @@ const StyledTouchButton = styled(Btn)<{
   border: ${({ isActive, isOnDevice }) =>
     `1px ${getBorderColor(isActive, isOnDevice)} solid`};
 
-  cursor: ${CURSOR_DEFAULT};
+  cursor: ${CURSOR_POINTER};
   border-radius: ${({ isOnDevice }) =>
     isOnDevice ? BORDERS.borderRadius16 : BORDERS.borderRadius8};
   padding: ${SPACING.spacing8} ${SPACING.spacing20};

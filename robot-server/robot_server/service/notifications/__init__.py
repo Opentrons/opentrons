@@ -1,4 +1,5 @@
 """Notification service creation and management."""
+
 from .notification_client import (
     NotificationClient,
     get_notification_client,

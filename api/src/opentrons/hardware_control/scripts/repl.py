@@ -87,7 +87,6 @@ LOG_CONFIG = {
 }
 
 if ff.enable_ot3_hardware_controller():
-
     HCApi: Union[Type[OT3API], Type[API]] = OT3API
 
     def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:
@@ -108,7 +107,6 @@ if ff.enable_ot3_hardware_controller():
         return synchronizer
 
 else:
-
     HCApi = API
 
     def build_thread_manager() -> ThreadManager[Union[API, OT3API]]:

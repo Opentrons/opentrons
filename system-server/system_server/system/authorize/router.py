@@ -1,4 +1,5 @@
 """Router for all /system/ endpoints."""
+
 from fastapi import APIRouter, Depends, status, Response, Query
 from uuid import UUID
 from typing import List, Optional

@@ -1,6 +1,5 @@
 """Validate a deck configuration."""
 
-
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import DefaultDict, FrozenSet, List, Set, Tuple, Union, Optional

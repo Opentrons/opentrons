@@ -601,7 +601,7 @@ async def test_big_protocol_commands(big_protocol_file: Path) -> None:
         startedAt=matchers.IsA(datetime),
         completedAt=matchers.IsA(datetime),
         params=LegacyCommandParams(
-            legacyCommandText="Blowing out at (100, 100, 10)",
+            legacyCommandText="Blowing out into (100, 100, 10) at 1000.0 uL/sec",
             legacyCommandType="command.BLOW_OUT",
         ),
         notes=[],

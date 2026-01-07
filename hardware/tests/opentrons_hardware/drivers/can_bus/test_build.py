@@ -1,4 +1,5 @@
 """Tests for build module."""
+
 from opentrons_hardware.drivers.can_bus import DriverSettings, build
 import pytest
 from mock import patch, AsyncMock, Mock

@@ -114,7 +114,8 @@ def _process_single_test(
 
     try:
         return SuccessfulTest(
-            spec=spec, coordinates=tuple(round(c, 6) for c in run_test_subprocess(spec))  # type: ignore[arg-type]
+            spec=spec,
+            coordinates=tuple(round(c, 6) for c in run_test_subprocess(spec)),  # type: ignore[arg-type]
         )
     except Exception:
         import sys  # noqa: F811
