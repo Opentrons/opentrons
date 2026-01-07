@@ -38,7 +38,6 @@ import {
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
-  labwareNotLoaded,
   labwareToMoveRequired,
   lidTargetTempHoldRange,
   lidTargetTempRange,
@@ -294,7 +293,7 @@ const stepFormHelperMap: {
     getErrors: composeErrors(),
   },
   flexStacker: {
-    getErrors: composeErrors(labwareNotLoaded),
+    getErrors: composeErrors(),
   },
 }
 

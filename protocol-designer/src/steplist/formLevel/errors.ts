@@ -44,7 +44,6 @@ import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
-  HydratedFlexStackerFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -435,13 +434,6 @@ const ASPIRATE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   page: 2,
   tab: 'aspirate',
 }
-const LABWARE_NOT_LOADED: FormError = {
-  title: 'Stacker labware not defined',
-  body: 'Add labware to the stacker in the starting deck so that you can refill it later.',
-  dependentFields: ['fillLabwareUri'],
-  location: ['field'],
-  showOnReopen: true,
-}
 const DISPENSE_TOUCH_TIP_SPEED_REQUIRED: FormError = {
   title: 'Touch tip speed required',
   dependentFields: ['dispense_touchTip_speed'],
@@ -643,17 +635,6 @@ export type FormErrorChecker = (
 /*******************
  ** Error Checkers **
  ********************/
-export const labwareNotLoaded = (
-  fields: HydratedFlexStackerFormData
-): FormError | null => {
-  const { flexStackerFormType, fillLabwareUri } = fields
-  if (flexStackerFormType === 'fill' && fillLabwareUri === null) {
-    return LABWARE_NOT_LOADED
-  } else {
-    return null
-  }
-}
-
 export const incompatibleLabware = (
   fields: HydratedMixFormData
 ): FormError | null => {

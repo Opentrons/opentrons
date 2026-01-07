@@ -452,7 +452,8 @@
       "no_labware_on_shuttle": "No labware on shuttle",
       "no_labware_on_stacker": "No labware on stacker",
       "no_labware_selected": "No labware selected",
-      "no_labware_selected_body": "Add labware to the stacker in the starting deck so that you can refill it later.",
+      "stacker_labware_not_defined": "Stacker labware not defined",
+      "no_labware_selected_body": "Add labware to the stacker in the starting deck so that you can refill it later",
 
       "quantity": "Quantity: {{count}}",
       "selected_labware": "Select labware to refill into stacker",
