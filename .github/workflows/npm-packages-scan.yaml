@@ -1,50 +1,45 @@
 name: Weekly Security Audit
 
 on:
-  # for testing
   pull_request:
     paths:
       - '.github/workflows/npm-packages-scan.yaml'
-      - 'pnpm-lock.yaml'
+      - 'yarn.lock'
       - 'package.json'
       - '**/package.json'
   workflow_dispatch: {}
-
   schedule:
-    # every monday at 6:00 UTC
     - cron: '0 6 * * 1'
 
 permissions:
   contents: read
-  # Needed for uploading SARIF to GitHub Code Scanning
   security-events: write
 
 jobs:
-  # JOB 1: Run the scanners, upload SARIF, and upload artifacts
   run-scanners:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # 1. Setup pnpm environment
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: 'yarn'
 
-      # 2. Run pnpm audit (save as JSON)
-      - name: Run pnpm audit (JSON)
+      # will be replaced with pnpm in the future
+      - name: Ensure Yarn v1
         run: |
-          pnpm audit --json > pnpm-audit.json || true
+          corepack disable || true
+          yarn --version
 
-      # Run OSV-Scanner via Docker and save JSON results
+      # 1) yarn audit (JSON)
+      - name: Run yarn audit (JSON)
+        run: |
+          yarn audit --json > yarn-audit.json || true
+
+      # 2) OSV-Scanner (JSON)
       - name: Run OSV-Scanner (JSON)
         run: |
           docker run --rm \
@@ -53,10 +48,9 @@ jobs:
             scan source /src \
               --recursive \
               --format=json \
-              --output=/src/osv-results.json \
-          || true
+              --output=/src/osv-results.json || true
 
-      # Run OSV-Scanner again to produce SARIF for GitHub Code Scanning
+      # 3) OSV-Scanner (SARIF)
       - name: Run OSV-Scanner (SARIF)
         run: |
           docker run --rm \
@@ -65,25 +59,21 @@ jobs:
             scan source /src \
               --recursive \
               --format=sarif \
-              --output=/src/osv-results.sarif \
-          || true
+              --output=/src/osv-results.sarif || true
 
-      # Upload SARIF to GitHub Code Scanning
       - name: Upload OSV SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: osv-results.sarif
 
-      # Upload JSON results so the next job can access them for Discord
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: security-results
           path: |
-            pnpm-audit.json
+            yarn-audit.json
             osv-results.json
 
-  # JOB 2: Download results and notify Discord
   notify:
     needs: run-scanners
     runs-on: ubuntu-latest
@@ -95,47 +85,44 @@ jobs:
         with:
           name: security-results
 
-      - name: Notify Discord
+      - name: Notify Slack
         if: always()
         run: |
-          PNPM_ISSUES=""
+          YARN_ISSUES=""
 
-          # 3. Parse pnpm audit JSON
-          if [ -s pnpm-audit.json ]; then
-            # pnpm audit returns an "advisories" object. We map through it.
-            PNPM_ISSUES=$(jq -r '
-              .advisories
-              | to_entries[]
-              | .value
+          if [ -s yarn-audit.json ]; then
+            YARN_ISSUES=$(jq -r '
+              select(.type == "auditAdvisory")
+              | .data.advisory
               | "\(.module_name) (\(.severity))"
-            ' pnpm-audit.json | sort -u)
+            ' yarn-audit.json 2>/dev/null | sort -u || true)
           fi
 
           OSV_ISSUES=""
           if [ -s osv-results.json ]; then
             OSV_ISSUES=$(jq -r '
-              .results[]
-              .packages[]
-              | select(.vulnerabilities | length > 0)
+              (.results // [])
+              | .[]
+              | (.packages // [])
+              | .[]
+              | select((.vulnerabilities // []) | length > 0)
               | "\(.Package.name)@\(.Package.version)"
-            ' osv-results.json | sort -u)
+            ' osv-results.json 2>/dev/null | sort -u || true)
           fi
 
-          if [ -z "$PNPM_ISSUES$OSV_ISSUES" ]; then
-            MESSAGE="✅ **No Issues Found**\nAll security checks passed."
+          if [ -z "$YARN_ISSUES$OSV_ISSUES" ]; then
+            MESSAGE="✅ No Issues Found\nAll security checks passed."
           else
-            MESSAGE="🚨 **Security Alert**\n\`\`\`\n"
-            if [ -n "$PNPM_ISSUES" ]; then
-              MESSAGE="$MESSAGE[pnpm audit]\n$PNPM_ISSUES\n\n"
+            MESSAGE="🚨 Security Alert\n"
+            if [ -n "$YARN_ISSUES" ]; then
+              MESSAGE="$MESSAGE\n[yarn audit]\n$YARN_ISSUES\n"
             fi
             if [ -n "$OSV_ISSUES" ]; then
-              MESSAGE="$MESSAGE[osv-scanner]\n$OSV_ISSUES\n"
+              MESSAGE="$MESSAGE\n[osv-scanner]\n$OSV_ISSUES\n"
             fi
-            MESSAGE="$MESSAGE\`\`\`"
           fi
 
-          FORMATTED_MESSAGE=$(printf "%b" "$MESSAGE")
-          PAYLOAD=$(jq -n --arg content "$FORMATTED_MESSAGE" '{content:$content}')
+          PAYLOAD=$(jq -n --arg text "$MESSAGE" '{text:$text}')
 
           curl -H "Content-Type: application/json" \
             -X POST \
