@@ -945,11 +945,16 @@ export const getIsLabwareCompatibleWithStack = (
       labwareEntities[id]?.def?.allowedRoles?.includes('adapter')
     )[0]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
+    const primaryLabwareInStack = labwareIdsInStack.filter(
+      id =>
+        !labwareEntities[id]?.def?.allowedRoles?.includes('adapter') &&
+        !labwareEntities[id]?.def?.allowedRoles?.includes('lid')
+    )[0]
     if (isOnHopper) {
       // allow labware without a stack limit to be stacked on the stacker
       const maxPoolCount = getMaxPoolCount({
         labwareDefinitions: {
-          primary: topLabwareEntity.def,
+          primary: labwareEntities[primaryLabwareInStack]?.def ?? null,
           adapter: labwareEntities[adapterInStack]?.def ?? null,
           lid: labwareEntities[lidInStack]?.def ?? null,
         },
