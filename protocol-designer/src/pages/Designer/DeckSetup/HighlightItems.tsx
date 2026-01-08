@@ -165,7 +165,10 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         Object.values(labware)
       )
       const isStacker = moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
-      const isActionOnShuttle = text === 'Store'
+      const notOnShuttleActions = ['empty', 'refill', 'retrieve']
+      const isActionOnShuttle =
+        isStacker && !notOnShuttleActions.includes(text?.toLowerCase() ?? '')
+
       const position = getPositionFromSlotId(
         moduleOnDeck.slot,
         deckDef,
@@ -306,6 +309,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
           slot != null && slot !== WASTE_CHUTE_CUTOUT
             ? getAddressableAreaFromSlotId(slot, deckDef)
             : null
+        console.log('🚀 ~ getDeckItems ~ addressableArea:', addressableArea)
 
         if (!addressableArea) {
           console.warn(
@@ -313,6 +317,7 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
           )
           return []
         }
+
         items.push(
           <DeckItemHighlight
             slotBoundingBox={addressableArea.boundingBox}
