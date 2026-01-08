@@ -59,6 +59,8 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["g_code_testing"]
 known-first-party = ["opentrons", "opentrons_shared_data"]
+[tool.ruff.lint.per-file-ignores]
+"g_code_parsing/_version.py" = ["I"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]
