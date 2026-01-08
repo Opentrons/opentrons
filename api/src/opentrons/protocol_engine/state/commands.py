@@ -60,6 +60,7 @@ from ..errors import (
     PauseNotAllowedError,
     UnexpectedProtocolError,
     ProtocolCommandFailedError,
+    CommandAnnotationNotFoundError,
 )
 from ..types import EngineStatus
 from ..types.command_annotations import UserCommandAnnotation
@@ -630,7 +631,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
         try:
             self._state.command_annotations[action.annotation_id].enabled = False
         except IndexError:
-            raise ValueError(
+            raise CommandAnnotationNotFoundError(
                 f"Could not find command annotation with ID {action.annotation_id}."
             )
 
@@ -965,6 +966,24 @@ class CommandView:
         )
 
         return no_command_running and no_command_to_execute
+
+    def get_command_annotation(self, annotation_id: str) -> UserCommandAnnotation:
+        """Return the command annotation given its annotation ID."""
+        try:
+            return self._state.command_annotations[annotation_id].annotation
+        except IndexError:
+            raise CommandAnnotationNotFoundError(
+                f"Could not find command annotation with ID {annotation_id}."
+            )
+
+    def get_command_annotation_enabled_status(self, annotation_id: str) -> bool:
+        """Returns if the given annotation for that ID is enabled."""
+        try:
+            return self._state.command_annotations[annotation_id].enabled
+        except IndexError:
+            raise CommandAnnotationNotFoundError(
+                f"Could not find command annotation with ID {annotation_id}."
+            )
 
     def get_recovery_target(self) -> Optional[CommandPointer]:
         """Return the command currently undergoing error recovery, if any."""

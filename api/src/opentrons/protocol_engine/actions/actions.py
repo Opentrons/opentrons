@@ -318,7 +318,7 @@ class CreateUserCommandAnnotation:
     annotation_id: str
     user_defined_name: str
     user_description: Optional[str]
-    params: Dict[str, Any]  # TODO we might want to do something ensure this serializes
+    params: Dict[str, Union[str, float, int]]
 
 
 @dataclasses.dataclass(frozen=True)
