@@ -228,6 +228,14 @@ export const flexStackerLabwareTypeMismatch = (): CommandCreatorError => {
   }
 }
 
+export const flexStackerLabwareTypeMissing = (): CommandCreatorError => {
+  return {
+    type: 'MISSING_STACKER_LABWARE_TYPE',
+    message:
+      'Add labware to the stacker in the starting deck so that you can refill it later',
+  }
+}
+
 export const flexStackerHopperFull = (): CommandCreatorError => {
   return {
     type: 'HOPPER_FULL',

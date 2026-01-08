@@ -269,6 +269,10 @@
         "body": "This step tries to use a module not in the protocol. Add the module to your protocol or remove this step.",
         "title": "Module not in protocol"
       },
+      "MISSING_STACKER_LABWARE_TYPE": {
+        "title": "Stacker labware not defined",
+        "body": "Add labware to the stacker in the starting deck so that you can refill it later."
+      },
       "MISSING_TEMPERATURE_STEP": {
         "body": "The protocol can't proceed beyond this pause step, because the module is not changing temperature. Add or modify a temperature step before this step.",
         "title": "Unreachable target temperature"
