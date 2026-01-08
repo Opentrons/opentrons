@@ -165,9 +165,9 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         Object.values(labware)
       )
       const isStacker = moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
-      const notOnShuttleActions = ['empty', 'refill', 'retrieve']
+      const onHopperActions = ['Empty', 'Refill', 'Retrieve']
       const isActionOnShuttle =
-        isStacker && !notOnShuttleActions.includes(text?.toLowerCase() ?? '')
+        isStacker && !onHopperActions.includes(text ?? '')
 
       const position = getPositionFromSlotId(
         moduleOnDeck.slot,
