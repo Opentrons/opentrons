@@ -34,6 +34,7 @@ from .types import (
 )
 from .update import update_firmware
 from .utils import MODULE_TYPE_BY_NAME, build
+from .vacuum_module import VacuumModule
 
 __all__ = [
     "MODULE_TYPE_BY_NAME",
