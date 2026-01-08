@@ -26,7 +26,7 @@ const basename = (p: string): string => {
   const i = s.lastIndexOf('/')
   return i === -1 ? s : s.slice(i + 1)
 }
-;``
+
 const extname = (p: string): string => {
   const b = basename(p)
   const i = b.lastIndexOf('.')
@@ -105,8 +105,7 @@ function getAllImages(): Record<string, string> {
   const imageKeyToUrl: Record<string, string> = {}
   for (const imgPath in imageModules) {
     const filename = basename(imgPath)
-    const ext = extname(filename)
-    const base = basename(filename, ext)
+    const base = basename(filename)
     const varName = base.replace(/\./g, '_').replace(/-/g, '_')
     imageKeyToUrl[varName] = imageModules[imgPath] as string
   }

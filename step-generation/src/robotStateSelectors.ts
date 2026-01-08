@@ -1,6 +1,4 @@
 // TODO: Ian 2019-04-18 move orderWells somewhere more general -- shared-data util?
-import min from 'lodash/min'
-
 import {
   ABSORBANCE_READER_TYPE,
   ALL,
@@ -253,7 +251,7 @@ export function getPipetteWithTipMaxVol(
     )
     return NaN
   }
-  return min([tiprackTipVol, pipetteMaxVol])
+  return Math.min(tiprackTipVol, pipetteMaxVol)
 }
 export function getModuleState(
   robotState: RobotState,
