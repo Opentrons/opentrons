@@ -86,6 +86,8 @@ A set of OT-2 compatible aluminum blocks also ships with the Temperature Module 
 
 ### Flat bottom plate
 
+The aluminum flat bottom plate is compatible with ANSI/SLAS standard well plates.
+
 <figure class="side-by-side" markdown>
 ![OT-2 flat well plate](../images/flat-plate-ot2.png "Flat well plate for an OT-2")
 ![Flex flat well plate](../images/flat-plate-flex.png "Flat well plate for Flex")
@@ -93,7 +95,7 @@ A set of OT-2 compatible aluminum blocks also ships with the Temperature Module 
 <figcaption>Flat well plate for the OT-2 (left) and Opentrons Flex (right).</figcaption>
 </figure>
 
-The aluminum flat bottom plate is compatible with ANSI/SLAS standard well plates. You can identify an [OT-2 compatible plate](https://opentrons.com/products/aluminum-block-flat-bottom-ot-2) from its plain matte finish and lack of external markings.
+You can identify an [OT-2 compatible plate](https://opentrons.com/products/aluminum-block-flat-bottom-ot-2) from its plain matte finish and lack of external markings.
 
 ### 24-well aluminum block
 
