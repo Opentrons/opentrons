@@ -309,7 +309,6 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
           slot != null && slot !== WASTE_CHUTE_CUTOUT
             ? getAddressableAreaFromSlotId(slot, deckDef)
             : null
-        console.log('🚀 ~ getDeckItems ~ addressableArea:', addressableArea)
 
         if (!addressableArea) {
           console.warn(
