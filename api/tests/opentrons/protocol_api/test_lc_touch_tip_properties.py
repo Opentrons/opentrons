@@ -41,8 +41,8 @@ def test_touch_tip_properties_none_instantiation_combos() -> None:
             TouchTipProperties(
                 enable=True,
                 params=LiquidClassTouchTipParams(
-                    zOffset=None,
-                    mmFromEdge=None,
+                    zOffset=None,  # type: ignore
+                    mmFromEdge=None,  # type: ignore
                     speed=None,  # type: ignore
                 ),
             )
@@ -51,7 +51,11 @@ def test_touch_tip_properties_none_instantiation_combos() -> None:
         _build_touch_tip_properties(
             TouchTipProperties(
                 enable=None,  # type: ignore
-                params=LiquidClassTouchTipParams(zOffset=None, mmFromEdge=1, speed=1),  # type: ignore
+                params=LiquidClassTouchTipParams(
+                    zOffset=None,  # type: ignore
+                    mmFromEdge=1,
+                    speed=1,
+                ),
             )
         )
     with pytest.raises(ValidationError):

@@ -227,14 +227,16 @@ function AnalysisInfo(props: AnalysisInfoProps): JSX.Element {
           {analysisStatus === 'stale' ? (
             <ProtocolAnalysisStale protocolKey={protocolKey} />
           ) : null}
-          <LegacyStyledText
-            forwardedAs="h3"
-            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
-            data-testid={`ProtocolCard_${protocolDisplayName}`}
-            overflowWrap={OVERFLOW_WRAP_ANYWHERE}
-          >
-            {protocolDisplayName}
-          </LegacyStyledText>
+          <Flex paddingRight={SPACING.spacing24}>
+            <LegacyStyledText
+              forwardedAs="h3"
+              fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+              data-testid={`ProtocolCard_${protocolDisplayName}`}
+              overflowWrap={OVERFLOW_WRAP_ANYWHERE}
+            >
+              {protocolDisplayName}
+            </LegacyStyledText>
+          </Flex>
         </Flex>
         {/* data section */}
         {analysisStatus === 'loading' ? (

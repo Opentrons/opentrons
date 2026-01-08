@@ -1,5 +1,4 @@
 {
-  "__dev_internal__camera": "Enable Camera support",
   "__dev_internal__enableLabwareCreator": "Enable App Labware Creator",
   "__dev_internal__enableRunNotes": "Display Notes During a Protocol Run",
   "__dev_internal__forceHttpPolling": "Poll all network requests instead of using MQTT",

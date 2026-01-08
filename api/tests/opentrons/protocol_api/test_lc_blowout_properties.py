@@ -41,7 +41,7 @@ def test_blowout_properties_none_instantiation_combos() -> None:
     with pytest.raises(ValidationError):
         _build_blowout_properties(
             BlowoutProperties(
-                enable=None,
+                enable=None,  # type: ignore
                 params=BlowoutParams(location=None, flowRate=None),  # type: ignore
             )
         )

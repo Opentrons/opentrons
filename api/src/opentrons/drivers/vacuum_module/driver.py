@@ -32,7 +32,7 @@ MAX_REPS = 10
 
 MAX_PUMP_RPM = 3500
 MAX_PUMP_DUTY = 90
-MAX_RAMP_RATE = 10.0  # mbar/s
+MAX_RAMP_RATE = -10.0  # mbar/s
 MAX_PRESSURE_MBAR = -1013.25
 
 
@@ -64,7 +64,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
     @classmethod
     def parse_get_pressure_state(cls, response: str) -> PressureState:
         """Parse the get pressure state."""
-        pattern = r"T:(?P<T>\d.+) C:(?P<C>\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) V:(?P<V>\d)"
+        pattern = r"T:(?P<T>-?\d.+) C:(?P<C>-?\d.+) A:(?P<A>\d.+) B:(?P<B>\d.+) H:(?P<H>\d.+) E:(?P<E>\d) V:(?P<V>\d)"
         _RE = re.compile(rf"^{GCODE.GET_PRESSURE_STATE} {pattern}$")
         match = _RE.match(response)
         if not match:
@@ -232,7 +232,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         if duration is not None:
             command.add_int("D", duration)
         if rate is not None:
-            command.add_float("R", max(0, min(rate, MAX_RAMP_RATE)))
+            command.add_float("R", min(max(rate, MAX_RAMP_RATE), 0))
         if vent_after is not None:
             command.add_int("V", int(vent_after))
 

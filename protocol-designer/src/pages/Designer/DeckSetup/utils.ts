@@ -4,6 +4,7 @@ import some from 'lodash/some'
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_V1_FIXTURE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAreSlotsAdjacent,
   getModuleType,
@@ -102,7 +103,8 @@ export function getModuleModelsBySlot(
               return FLEX_RIGHT_SLOTS.has(slot)
             } else if (
               model === TEMPERATURE_MODULE_V2 ||
-              model === HEATERSHAKER_MODULE_V1
+              model === HEATERSHAKER_MODULE_V1 ||
+              model === FLEX_STACKER_V1_FIXTURE
             ) {
               return !FLEX_MIDDLE_SLOTS.has(slot)
             } else if (

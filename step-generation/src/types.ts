@@ -725,7 +725,7 @@ export interface FlexStackerFillItemsArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerFillItems'
   fillLabwareUri: string | null
-  fillQuantity: number | null
+  fillLabwareIds: string[]
   interventionMessage: string | null
 }
 export interface FlexStackerStoreArgs extends CommonArgs {
@@ -874,6 +874,7 @@ export type ErrorType =
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
+  | 'LABWARE_ON_HOPPER'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
   | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
