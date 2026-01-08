@@ -2,9 +2,7 @@
 title: "Opentrons OT-2: Labware Definitions"
 ---
 
-Every piece of labware you use on an OT-2 requires a _labware definition_ that contains all the information your robot needs to work with the labware. This includes information about the physical shape of the labware, how pipettes and the gripper should interact with it, and what the labware should be called on the touchscreen and in the Opentrons App.
-
-The OT-2 robot software and Opentrons App include the labware definitions for everything available in the [Opentrons Labware Library](https://labware.opentrons.com/). 
+Every piece of labware you use on an OT-2 requires a _labware definition_. Each definition contains all the information your robot needs to work with a piece of labware. This includes information about the physical shape of the labware, what pipettes can interact with it, and what the labware should be called in the Opentrons App. The OT-2 robot software and the Opentrons App include the labware definitions for everything available in the [Opentrons Labware Library](https://labware.opentrons.com/).
 
 Custom labware is labware that's not listed in the Opentrons Labware Library. You can use other common or unique labware items with the OT-2 by accurately measuring and recording the characteristics of that object and saving that data in a JSON file. When imported into the app, the OT-2 and the Python Protocol API use that JSON data to interact with your labware. Opentrons provides tools and services, which we'll examine below, to help you use the OT-2 with custom labware. 
 
@@ -25,13 +23,13 @@ You can use the Custom Labware Creator if your labware meets the following crite
 | Layout {style="width: 200px;"} | Description |
 | ------ | ----------- |
 | ![Labware with 3 evenly spaced rows and 4 evenly spaced columns.](../images/labware-layout-regular-even-space.svg "Regular labware layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />All columns are evenly spaced and all rows are evenly spaced.<br />Columns do not need to have the same spacing as rows. |
-| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns on the left side of the labware.](../images/labware-layout-regular-off-center.svg "Regular labware layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />The grid does not have to be in the center of labware.  |
+| ![Labware with 3 evenly spaced rows and 4 evenly spaced columns on the left side of the labware.](../images/labware-layout-regular-off-center.svg "Regular labware off-center layout") | :material-check-bold:{ .opentrons-blue } **Regular** <br />The grid does not have to be in the center of labware.  |
 
 For other labware, consider the Custom Labware Service, outlined below. Or you can reference the complete JSON schema to create a labware definition from scratch, although this is not recommended.
 
 ## Custom Labware Service 
 
-Get in touch with us if the labware you'd like to use isn't available in the library, if you can't create your own definitions, or because a custom item includes different shapes, sizes, or other irregularities described below. 
+Get in touch with us if the labware you'd like to use isn't available in the library, if you can't create your own definitions, or if a custom item includes different shapes, sizes, or other irregularities described below. 
 
 - Well or tube shapes vary.
 - Rows are not evenly spaced.
@@ -40,17 +38,17 @@ Get in touch with us if the labware you'd like to use isn't available in the lib
 
 | Layout {style="width: 200px;"} | Description |
 | ------ | ----------- |
-| ![Labware with 4 columns of 3 rows, separated into two groups.](../images/labware-layout-irregular-uneven-space.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Rows are evenly spaced but **columns are not evenly spaced.**  |
-| ![Labware with 3 square wells and 9 circular wells.](../images/labware-layout-irregular-wells-not-identical.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Columns/rows are evenly spaced but **wells are not identical.** |
-| ![Labware with a 4-by-5 grid of wells and another 2-by-3 grid of wells.](../images/labware-layout-irregular-multiple-grids.svg "Regular labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />There is **more than one grid.** |
+| ![Labware with 4 columns of 3 rows, separated into two groups.](../images/labware-layout-irregular-uneven-space.svg "Irregular uneven labware layout") | :octicons-x-12:{ .grey } **Irregular** <br />Rows are evenly spaced but **columns are not evenly spaced.**  |
+| ![Labware with 3 square wells and 9 circular wells.](../images/labware-layout-irregular-wells-not-identical.svg "Irregular labware wells layout") | :octicons-x-12:{ .grey } **Irregular** <br />Columns/rows are evenly spaced but **wells are not identical.** |
+| ![Labware with a 4-by-5 grid of wells and another 2-by-3 grid of wells.](../images/labware-layout-irregular-multiple-grids.svg "Irregular labware wells layout") | :octicons-x-12:{ .grey } **Irregular** <br />There is **more than one grid.** |
 
 If you need help creating custom labware definitions, contact Opentrons Support (<support@opentrons.com>). They will work to design custom labware definitions based on your requirements. This is a fee-based service.
 
 ## JSON labware schema 
 
-A JSON file is the blueprint for Opentrons standard and custom labware. This file contains and organizes labware data according to the design specifications set by the default schema. 
+A JSON file is the blueprint for Opentrons standard and custom labware. This file contains and organizes labware data according to the design specifications set by the default schema.
 
-A schema is a framework for organizing data. It sets the rules about what information is required or optional and how it’s organized in the JSON file. If you’re interested, take a moment to review [our labware schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/schemas). For an actual example, see the definition for the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json). The following table lists and defines the items in the Opentrons labware schema.
+A schema is a framework for organizing data. It sets the rules about what information is required or optional and how it’s organized in the JSON file. If you’re interested, take a moment to review [our labware schemas](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/schemas). For an actual example, see the definition for the [Opentrons 96 PCR Adapter](https://github.com/Opentrons/opentrons/blob/edge/shared-data/labware/definitions/2/opentrons_96_pcr_adapter/1.json). The following table defines the items in the Opentrons labware schema.
 
 <table>
   <thead>
