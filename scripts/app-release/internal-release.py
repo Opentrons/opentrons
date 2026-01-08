@@ -146,17 +146,28 @@ def get_remote_tags(clone_url: str, tag_pattern: str) -> List[str]:
         return []
 
 
+def extract_internal_numeric_version(tag: str) -> int:
+    """Extract numeric version from internal@vN tag."""
+    m = re.match(r"^internal@v(\d+)$", tag)
+    return int(m.group(1)) if m else -1
+
+
 def get_last_tag_from_list(tags: List[str], tag_type: str, internal_version: str) -> Optional[str]:
     """Get the most recent tag from a list for the given internal version."""
     if not tags:
         return None
     
-    # Sort tags by version
-    tags_sorted = sorted(tags, key=lambda t: t, reverse=True)
-    
-    # For internal_numeric (ot3-firmware), just return the latest
+    # For internal_numeric (ot3-firmware), sort by numeric version
     if tag_type == "internal_numeric":
-        return tags_sorted[0] if tags_sorted else None
+        numeric_tags = [(t, extract_internal_numeric_version(t)) for t in tags]
+        numeric_tags = [(t, n) for t, n in numeric_tags if n >= 0]
+        if not numeric_tags:
+            return None
+        numeric_tags.sort(key=lambda x: x[1], reverse=True)
+        return numeric_tags[0][0]
+    
+    # Sort tags by version for alpha tags
+    tags_sorted = sorted(tags, key=lambda t: t, reverse=True)
     
     # For alpha tags, find the latest tag matching this specific version
     for tag in tags_sorted:
