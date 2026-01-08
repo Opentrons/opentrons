@@ -315,7 +315,7 @@ class SetErrorRecoveryPolicyAction:
 class CreateUserCommandAnnotation:
     """Creates a user command annotation."""
 
-    annotation_id: Optional[str]
+    annotation_id: str
     user_defined_name: str
     user_description: Optional[str]
     params: Dict[str, Any]  # TODO we might want to do something ensure this serializes

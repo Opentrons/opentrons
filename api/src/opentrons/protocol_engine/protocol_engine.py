@@ -772,7 +772,10 @@ class ProtocolEngine:
         annotation_name: str,
         description: Optional[str],
         annotation_id: Optional[str],
-    ) -> None:
+    ) -> str:
+        """Creates a new user generated command annotation."""
+        if annotation_id is None:
+            annotation_id = self._model_utils.generate_id()
         self._action_dispatcher.dispatch(
             CreateUserCommandAnnotation(
                 annotation_id=annotation_id,
@@ -781,8 +784,10 @@ class ProtocolEngine:
                 params={},
             )
         )
+        return annotation_id
 
     def close_user_command_annotation(self, annotation_id: str) -> None:
+        """Closes an existing user generated command annotation."""
         self._action_dispatcher.dispatch(
             CloseUserCommandAnnotation(annotation_id=annotation_id)
         )
