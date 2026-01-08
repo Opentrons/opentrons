@@ -17,7 +17,7 @@ All of these settings are covered when you [first set up your Flex](../installat
 
 ### Language
 
-Set the language used by the touchscreen to Chinese or English. You can also change the language at any time.
+Set the language used by the touchscreen to Chinese or English.
 
 ### Network Settings
 
@@ -57,13 +57,7 @@ Set how long the touchscreen should remain on when idle. When the screen is asle
 
 ## Advanced
 
-You shouldn't need these settings for everyday operation, but they may be useful for troubleshooting or testing pre-release features.
-
-<!-- double check this, it may be removed 
-### Apply Labware Offsets
-
-Choose whether to use saved offset data from Labware Position Check in subsequent protocol runs. This setting is on by default. Opentrons recommends running Labware Position Check before every run, and applying previous labware offsets at the beginning of Labware Position Check can make the process quicker.
--->
+These settings aren't required for everyday operation but can be useful for troubleshooting or testing pre-release features.
 
 ### Developer Tools
 
@@ -73,9 +67,14 @@ Enable additional tools and features designed for developers. Not recommended fo
 
 Batch delete certain types of information from the robot, such as calibrations, run history, or protocols.
 
-### Disable Stacker sensors for labware detection in z- and x-axis.
+### Disable Stacker sensors for labware detection in z- and x-axis
 
-<font color="red">PLACEHOLDER FOR DESCRIPTION</font>
+Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the ToF sensor detects if labware is loaded in the Stacker before this external module attempts to dispense or store it.
+
+You should disable this setting only when using specialized labware that causes detection errors (false positives or negatives). Sometimes these errors can occur with labware that is opaque or has an irregular shape that interferes with the sensor's ability to "see" labware in the Stacker.
+
+!!! note
+    When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
 
 ### Home Gantry on Restart
 
