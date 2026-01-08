@@ -36,6 +36,7 @@ if TYPE_CHECKING:
         MagneticBlockType,
         AbsorbanceReaderType,
         FlexStackerModuleType,
+        VacuumModuleType,
     )
 
 
@@ -129,6 +130,10 @@ class FlexStackerData(TypedDict):
     errorDetails: str | None
 
 
+class VacuumModuleData(TypedDict):
+    errorDetails: str | None
+
+
 ModuleData = Union[
     Dict[Any, Any],  # This allows an empty dict as module data
     MagneticModuleData,
@@ -137,6 +142,7 @@ ModuleData = Union[
     ThermocyclerData,
     AbsorbanceReaderData,
     FlexStackerData,
+    VacuumModuleData,
 ]
 
 
@@ -177,6 +183,13 @@ class ModuleDataValidator:
     ) -> TypeGuard[FlexStackerData]:
         return data is not None and "platformState" in data.keys()
 
+    @classmethod
+    def is_vacuum_module_data(
+        cls, data: ModuleData | None
+    ) -> TypeGuard[VacuumModuleData]:
+        # TODO: Change platformState to specific key
+        return data is not None and "platformState" in data.keys()
+
 
 class LiveData(TypedDict):
     status: str
@@ -191,6 +204,7 @@ class ModuleType(StrEnum):
     MAGNETIC_BLOCK: MagneticBlockType = "magneticBlockType"
     ABSORBANCE_READER: AbsorbanceReaderType = "absorbanceReaderType"
     FLEX_STACKER: FlexStackerModuleType = "flexStackerModuleType"
+    VACUUM_MODULE: VacuumModuleType = "VacuumModuleType"
 
     @classmethod
     def from_model(cls, model: ModuleModel) -> ModuleType:
@@ -208,6 +222,8 @@ class ModuleType(StrEnum):
             return cls.ABSORBANCE_READER
         if isinstance(model, FlexStackerModuleModel):
             return cls.FLEX_STACKER
+        if isinstance(model, VacuumModuleModel):
+            return cls.VACUUM_MODULE
 
     @classmethod
     def to_module_fixture_id(cls, module_type: ModuleType) -> str:
@@ -224,6 +240,8 @@ class ModuleType(StrEnum):
             return "absorbanceReaderV1"
         if module_type == ModuleType.FLEX_STACKER:
             return "flexStackerModuleV1"
+        if module_type == ModuleType.VACUUM_MODULE:
+            return "VacuumModuleV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
@@ -261,6 +279,10 @@ class FlexStackerModuleModel(StrEnum):
     FLEX_STACKER_V1: str = "flexStackerModuleV1"
 
 
+class VacuumModuleModel(StrEnum):
+    VACUUM_MODULE_V1: str = "VacuumModuleV1"
+
+
 def module_model_from_string(model_string: str) -> ModuleModel:
     for model_enum in {
         MagneticModuleModel,
@@ -270,6 +292,7 @@ def module_model_from_string(model_string: str) -> ModuleModel:
         MagneticBlockModel,
         AbsorbanceReaderModel,
         FlexStackerModuleModel,
+        VacuumModuleModel,
     }:
         try:
             return cast(ModuleModel, model_enum(model_string))
@@ -323,6 +346,7 @@ ModuleModel = Union[
     MagneticBlockModel,
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
+    VacuumModuleModel,
 ]
 
 
@@ -433,3 +457,17 @@ class HopperDoorState(StrEnum):
     def from_state(cls, state: bool) -> "HopperDoorState":
         """Get the hopper door state from the door state boolean."""
         return cls.CLOSED if state else cls.OPENED
+
+
+class VacuumModuleStatus(StrEnum):
+    IDLE = "idle"  # Waiting for input
+    RAMPING = "ramping"  # Moving toward target
+    HOLDING = "holding"  # Maintaining target for duration_s
+    VENTING = "venting"  # Opening valve to atmosphere
+    COMPLETE = "complete"  # Finished cycle
+    ERROR = "error"  # An error has occured
+
+
+class VentState(StrEnum):
+    CLOSED = "closed"
+    OPENED = "opened"

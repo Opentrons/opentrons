@@ -23,6 +23,7 @@ HeaterShakerModuleType = Literal["heaterShakerModuleType"]
 MagneticBlockType = Literal["magneticBlockType"]
 AbsorbanceReaderType = Literal["absorbanceReaderType"]
 FlexStackerModuleType = Literal["flexStackerModuleType"]
+VacuumModuleType = Literal["VacuumModuleType"]
 
 ModuleType = Union[
     MagneticModuleType,
@@ -32,6 +33,7 @@ ModuleType = Union[
     MagneticBlockType,
     AbsorbanceReaderType,
     FlexStackerModuleType,
+    VacuumModuleType,
 ]
 
 MagneticModuleModel = Literal["magneticModuleV1", "magneticModuleV2"]
@@ -41,6 +43,7 @@ HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
 MagneticBlockModel = Literal["magneticBlockV1"]
 AbsorbanceReaderModel = Literal["absorbanceReaderV1"]
 FlexStackerModuleModel = Literal["flexStackerModuleV1"]
+VacuumModuleModel = Literal["VacuumModuleV1"]
 
 ModuleModel = Union[
     MagneticModuleModel,
@@ -50,6 +53,7 @@ ModuleModel = Union[
     MagneticBlockModel,
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
+    VacuumModuleModel,
 ]
 
 ModuleSlotTransform = TypedDict(

@@ -14,8 +14,8 @@ from opentrons.util.async_helpers import ensure_yield
 
 
 class SimulatingDriver(AbstractVacuumModuleDriver):
-    def __init__(self, serial_number: str) -> None:
-        self._serial_number = serial_number
+    def __init__(self, serial_number: Optional[str] = None) -> None:
+        self._serial_number = serial_number or "dummySerialFS"
         self.vent_state = VentState.OPENED
         self.vacuum_on = False
         self.pump_enabled = False
@@ -37,7 +37,7 @@ class SimulatingDriver(AbstractVacuumModuleDriver):
     async def is_connected(self) -> bool:
         return True
 
-    async def reset_serial_buffers(self) -> None:
+    def reset_serial_buffers(self) -> None:
         pass
 
     async def get_device_info(self) -> VacuumModuleInfo:

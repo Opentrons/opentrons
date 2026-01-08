@@ -5,6 +5,7 @@ from .thermocycler import Thermocycler
 from .heater_shaker import HeaterShaker
 from .absorbance_reader import AbsorbanceReader
 from .flex_stacker import FlexStacker
+from .vacuum_module import VacuumModule
 from .update import update_firmware
 from .utils import MODULE_TYPE_BY_NAME, build
 from .types import (
@@ -28,6 +29,7 @@ from .types import (
     ModuleData,
     ModuleDataValidator,
     module_model_from_string,
+    VacuumModuleStatus,
 )
 
 from .errors import (
@@ -69,4 +71,6 @@ __all__ = [
     "PlatformState",
     "StackerAxisState",
     "module_model_from_string",
+    "VacuumModule",
+    "VacuumModuleStatus",
 ]

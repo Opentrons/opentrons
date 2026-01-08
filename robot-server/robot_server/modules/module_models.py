@@ -397,6 +397,36 @@ class FlexStackerModule(
     data: FlexStackerModuleData
 
 
+class VacuumModuleData(BaseModel):
+    """Live data from a Vacuum module."""
+
+    status: str = Field(
+        ...,
+        description="Overall status of the module.",
+    )
+    errorDetails: Optional[str] = Field(
+        ...,
+        description=(
+            "Error details, if the module hardware has encountered something"
+            " unexpected and unrecoverable."
+        ),
+    )
+
+
+class VacuumModule(
+    _GenericModule[
+        Literal[ModuleType.VACUUM_MODULE],
+        Literal[ModuleModel.VACUUM_MODULE_V1],
+        VacuumModuleData,
+    ]
+):
+    """An attached Vacuum Module."""
+
+    moduleType: Literal[ModuleType.VACUUM_MODULE]
+    moduleModel: Literal[ModuleModel.VACUUM_MODULE_V1]
+    data: VacuumModuleData
+
+
 AttachedModule = Union[
     TemperatureModule,
     MagneticModule,
@@ -404,6 +434,7 @@ AttachedModule = Union[
     HeaterShakerModule,
     AbsorbanceReaderModule,
     FlexStackerModule,
+    VacuumModule,
 ]
 
 
@@ -414,4 +445,5 @@ AttachedModuleData = Union[
     HeaterShakerModuleData,
     AbsorbanceReaderModuleData,
     FlexStackerModuleData,
+    VacuumModuleData,
 ]

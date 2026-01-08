@@ -30,7 +30,7 @@ class AbstractVacuumModuleDriver(Protocol):
         """Reboot into programming mode"""
         ...
 
-    async def reset_serial_buffers(self) -> None:
+    def reset_serial_buffers(self) -> None:
         """Reset the input and output serial buffers."""
         ...
 

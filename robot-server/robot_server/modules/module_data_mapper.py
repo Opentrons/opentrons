@@ -19,6 +19,7 @@ from opentrons.hardware_control.modules import (
     AbsorbanceReaderStatus,
     PlatformState,
     FlexStackerStatus,
+    VacuumModuleStatus,
 )
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 from opentrons.drivers.types import (
@@ -50,6 +51,8 @@ from .module_models import (
     AbsorbanceReaderModule,
     AbsorbanceReaderModuleData,
     UsbPort,
+    VacuumModule,
+    VacuumModuleData,
 )
 
 from robot_server.hardware import get_deck_type, get_hardware
@@ -204,6 +207,13 @@ class ModuleDataMapper:
                 if rear_panel is not None:
                     rear_panel_rev = PCBARevision.from_string(rear_panel.pcba_revision)
                     compatible_with_robot = rear_panel_rev >= PCBARevision("D1")
+        elif module_type == ModuleType.VACUUM_MODULE:
+            module_cls = VacuumModule
+            assert ModuleDataValidator.is_vacuum_module_data(live_data["data"])
+            module_data = VacuumModuleData(
+                status=VacuumModuleStatus(live_data["status"]),
+                errorDetails=cast(str, live_data["data"].get("errorDetails")),
+            )
         else:
             assert False, f"Invalid module type {module_type}"
 
