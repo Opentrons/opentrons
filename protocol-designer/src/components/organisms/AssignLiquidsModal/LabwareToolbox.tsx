@@ -119,12 +119,10 @@ export function LabwareStackToolbox({
       if (arr.length === 0) {
         return true
       }
-
-      // Get the value of the specified property from the first element
-      const firstValue = allWellContents[filteredLabwareStack[0]]
+      const firstValue = liquidLocations[filteredLabwareStack[0]]
       return arr.every(
         item =>
-          JSON.stringify(allWellContents[item]) === JSON.stringify(firstValue)
+          JSON.stringify(liquidLocations[item]) === JSON.stringify(firstValue)
       )
     }
 
@@ -234,7 +232,6 @@ export function LabwareStackToolboxContainer({
   const liquidLocations = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
-
   const data: LabwareStackToolboxData = {
     labwareId: labwareId ?? null,
     labware,
