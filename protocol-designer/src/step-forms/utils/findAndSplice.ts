@@ -31,15 +31,17 @@ export function findAndSplice<T>(
 
   const withRemoved = source.toSpliced(indexToRemove, 1)
 
-  let indexToInsertAt: number;
+  let indexToInsertAt: number
   if (elementToInsertAfter == null) {
-    indexToInsertAt = indexToRemove;
+    indexToInsertAt = indexToRemove
   } else {
-    const indexToInsertAfter = withRemoved.findIndex(element => element === elementToInsertAfter);
+    const indexToInsertAfter = withRemoved.findIndex(
+      element => element === elementToInsertAfter
+    )
     if (indexToInsertAfter === -1) {
       return { success: false, result: source }
     }
-    indexToInsertAt = indexToInsertAfter + 1;
+    indexToInsertAt = indexToInsertAfter + 1
   }
 
   const withReinserted = withRemoved.toSpliced(

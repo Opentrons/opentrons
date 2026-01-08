@@ -27,7 +27,7 @@ describe('findAndSplice', () => {
       success: true,
       result: ['a', 'b', 'c', 'inserted-1', 'inserted-2', 'd', 'f', 'g'],
     } satisfies typeof result)
-  });
+  })
 
   test('insertion point not found', () => {
     const result = findAndSplice({
@@ -40,7 +40,7 @@ describe('findAndSplice', () => {
       success: false,
       result: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
     } satisfies typeof result)
-  });
+  })
 
   test('removal point not found', () => {
     const result = findAndSplice({
@@ -53,5 +53,5 @@ describe('findAndSplice', () => {
       success: false,
       result: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
     } satisfies typeof result)
-  });
+  })
 })
