@@ -393,8 +393,8 @@ class CanMessenger:
                         if filter and not filter(message.arbitration_id):
                             continue
                         listener(
-                            message_definition(payload=build),
-                            message.arbitration_id,  # type: ignore[arg-type]
+                            message_definition(payload=build),  # type: ignore[arg-type]
+                            message.arbitration_id,
                         )
                         handled = True
                     if not handled:
