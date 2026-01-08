@@ -29,7 +29,7 @@ describe('findAndSplice', () => {
     } satisfies typeof result)
   })
 
-  test('insertion point not found', () => {
+  test('removal point not found', () => {
     const result = findAndSplice({
       source: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
       elementToRemove: 'z',
@@ -42,7 +42,7 @@ describe('findAndSplice', () => {
     } satisfies typeof result)
   })
 
-  test('removal point not found', () => {
+  test('insertion point not found', () => {
     const result = findAndSplice({
       source: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
       elementToRemove: 'a',
