@@ -15,7 +15,7 @@ async def _main(cfg: TestConfig) -> None:
     # BUILD REPORT
     test_name = Path(__file__).parent.name
     ui.print_title(test_name.replace("_", " ").upper())
-    pipette_string = "p1000_96_v3.4" if cfg.pipette == 1000 else "p200_96_v3.0"
+    pipette_string = "p1000_96_v3.4" if cfg.pipette == 1000 else "p200_96_v3.2"
     # BUILD API
     api = await helpers_ot3.build_async_ot3_hardware_api(
         is_simulating=cfg.simulate,
