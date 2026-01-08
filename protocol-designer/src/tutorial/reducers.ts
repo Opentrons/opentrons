@@ -38,22 +38,19 @@ const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
       action: RehydratePersistedAction
     ) => {
       const persistedState = action.payload?.['tutorial.dismissedHints']
-      return persistedState !== undefined ? persistedState : state
+      return persistedState ?? state
     },
     REMOVE_HINT: (
       state: DismissedHintReducerState,
       action: RemoveHintAction
     ): DismissedHintReducerState => {
       const { hintKey, rememberDismissal } = action.payload
-      // TODO(IL 2020-02-24): consider using an immutable type for DismissedHintReducerState
-      // to make this copy-mutate pattern less precarious, see #5073
-      // (Flow won't let you do `return {...state, [hintKey]: spam})`) b/c it no longer
-      // allows Unions as computed properties
-      const nextState = { ...state }
-      nextState[hintKey] = {
-        rememberDismissal,
+      return {
+        ...state,
+        [hintKey]: {
+          rememberDismissal,
+        },
       }
-      return nextState
     },
     CLEAR_ALL_HINT_DISMISSALS: () => dismissedHintsInitialState,
   },
