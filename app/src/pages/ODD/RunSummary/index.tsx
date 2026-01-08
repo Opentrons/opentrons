@@ -622,4 +622,5 @@ const EqualWidthButton = styled(LargeButton)`
   flex: 1;
   min-width: 0;
   height: 17rem;
+  text-wrap: wrap;
 `
