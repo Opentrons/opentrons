@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import asdict
-from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Tuple, cast
 
 from typing_extensions import Final
 
@@ -9,6 +11,7 @@ from .types import (
     EdgeSenseSettings,
     LiquidProbeSettings,
     Offset,
+    OT3AxisKind,
     OT3CalibrationSettings,
     OT3Config,
     OT3CurrentSettings,
@@ -16,7 +19,9 @@ from .types import (
     OT3Transform,
     ZSenseSettings,
 )
-from opentrons.hardware_control.types import InstrumentProbeType, OT3AxisKind
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.types import InstrumentProbeType
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
@@ -250,6 +255,9 @@ def _build_log_files_with_default(
             return {k: v for k, v in default.items()}
     else:
         validated: Dict[InstrumentProbeType, str] = {}
+        # Inline import prevents circular import from hardware_control.types
+        from opentrons.hardware_control.types import InstrumentProbeType
+
         for k, v in from_conf.items():
             if isinstance(k, InstrumentProbeType):
                 validated[k] = v
@@ -480,6 +488,9 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 
 
 def serialize(config: OT3Config) -> Dict[str, Any]:
+    # inline import prevents circular import error from hardware_control.types
+    from opentrons.hardware_control.types import InstrumentProbeType
+
     def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
         def _normalize_key(key: Any) -> Any:
             if isinstance(key, OT3AxisKind) or isinstance(key, InstrumentProbeType):
