@@ -61,6 +61,8 @@ convention = "google"
 max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["otupdate"]
+[tool.ruff.lint.per-file-ignores]
+"otupdate/_version.py" = ["I"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="otupdate/_version.py"

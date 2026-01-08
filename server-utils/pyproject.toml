@@ -63,6 +63,7 @@ max-complexity = 9
 [tool.ruff.lint.per-file-ignores]
 "server_utils/util.py" = ["ANN", "D"]
 "server_utils/fastapi_utils/service/*" = ["ANN", "D"]
+"server_utils/_version.py" = ["I"]
 "tests/fastapi_utils/service/*" = ["ANN", "D"]
 "tests/test_util.py" = ["ANN", "D"]
 [tool.ruff.lint.isort]
