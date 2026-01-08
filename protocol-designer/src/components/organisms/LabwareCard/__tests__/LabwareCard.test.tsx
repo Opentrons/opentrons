@@ -10,7 +10,6 @@ import {
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 
 import { i18n } from '../../../../assets/localization'
-import { getEnableStacking } from '../../../../feature-flags/selectors'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
@@ -80,7 +79,6 @@ describe('LabwareCard', () => {
     vi.mocked(
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
-    vi.mocked(getEnableStacking).mockReturnValue(true)
     vi.mocked(getLiquidIdsOnLabware).mockReturnValue([])
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       modules: {},

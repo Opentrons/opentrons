@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -42,7 +41,6 @@ describe('AddFixtureModal', () => {
       additionalEquipmentOnDeck: {},
       pipettes: {},
     })
-    vi.mocked(getEnableStacking).mockReturnValue(true)
   })
 
   it('should render the fixture modal and clicking on the fixtures can select the trash bin', () => {

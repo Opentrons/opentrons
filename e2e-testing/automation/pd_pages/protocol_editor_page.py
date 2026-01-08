@@ -253,7 +253,7 @@ class ProtocolEditorPage(BasePage):
 
     def confirm_liquid_setup(self) -> None:
         """Confirm the liquid setup and close the modal."""
-        self.confirm_toolbox()
+        self.page.get_by_text("Done").click()
 
     def add_step(self, step_type: str = "Transfer") -> None:
         """Add a new protocol step.

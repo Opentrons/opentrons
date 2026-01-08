@@ -29,7 +29,6 @@ import {
 
 import { NAV_BAR_HEIGHT_REM } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -69,7 +68,6 @@ interface AssignLiquidsModalData {
   allWellContents: Record<string, any>
   liquidNamesById: Record<string, string>
   liquidDisplayColors: Record<string, string>
-  enableStacking: boolean
 }
 
 interface AssignLiquidsModalProps {
@@ -100,7 +98,6 @@ export function AssignLiquidsModal(
     liquidNamesById,
     liquidDisplayColors,
     selectedLabwareIds,
-    enableStacking,
   } = data
 
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
@@ -141,7 +138,7 @@ export function AssignLiquidsModal(
       position={POSITION_RELATIVE}
     >
       <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
-        {labwareStack.length > 1 && enableStacking ? (
+        {labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
             selectedLabwareIds={selectedLabwareIds}
@@ -290,7 +287,6 @@ export function AssignLiquidsModalContainer(
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
-  const enableStacking = useSelector(getEnableStacking) ?? false
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
@@ -304,7 +300,6 @@ export function AssignLiquidsModalContainer(
     liquidNamesById,
     liquidDisplayColors,
     selectedLabwareIds: selectedLabwareIds ?? [],
-    enableStacking,
   }
 
   return (
