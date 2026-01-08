@@ -45,7 +45,7 @@ The Labware Library includes 384-well plates for applications that require great
 
 Try using the [Opentrons Labware Creator](https://labware.opentrons.com/#/create) to make a custom labware definition if a well plate you'd like to use isn't listed in the Labware Library. A custom definition combines all the dimensions, metadata, shapes, volumetric capacity, and other information in a JSON file. The OT-2 reads this information to understand how to work with your custom labware. See the [Labware Definitions section](./definitions.md) for more information.
 
-## Tips and tip racks {ot2-tips-and-tip-racks}
+## Tips and tip racks { #tips-and-tip-racks-ot2 }
 
 OT-2 tips come in racks that hold 96 tips. Currently, we offer tips in 20 µL, 300 µL, and 1000 µL sizes. These are clear, non-conducting, sterile polypropylene tips that are available with or without filters.
 
