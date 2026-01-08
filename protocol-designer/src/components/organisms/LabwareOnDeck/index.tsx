@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 
-import { LabwareRender } from '@opentrons/components'
+import { CenterLabwareInSlot, LabwareRender } from '@opentrons/components'
+import { getIsLid } from '@opentrons/shared-data'
 import * as wellContentsSelectors from '@opentrons/step-generation'
 
 import { selectors } from '../../../labware-ingred/selectors'
@@ -63,26 +64,37 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
       ? missingAndUsedTipsByLabwareId[labwareOnDeck.id]
       : null
   const { missingTips } = labwareTipInfo ?? {}
+  const isLid = getIsLid(labwareOnDeck.def)
+  const labwareRenderComponent = (
+    <LabwareRender
+      definition={labwareOnDeck.def}
+      positioningMode="offsetInSlot"
+      wellFill={wellContentsSelectors.wellFillFromWellContents(
+        wellContents,
+        liquidDisplayColors
+      )}
+      handleClickWell={handleClickWell}
+      {...(showHighlightedWells ? { highlightedWells } : {})}
+      {...(ignoreMissingTips ? {} : { missingTips })}
+      highlight={highlight}
+      tipStatusByWellName={tipStatusByWellName}
+      onMouseEnterWell={onMouseEnterWell}
+      onMouseLeaveWell={onMouseLeaveWell}
+      selectedTipsByIndex={selectedTipsByIndex}
+      fill={fill}
+      labwareStroke={borderStroke}
+    />
+  )
   return (
     <g transform={`translate(${x}, ${y})`}>
-      <LabwareRender
-        definition={labwareOnDeck.def}
-        positioningMode="offsetInSlot"
-        wellFill={wellContentsSelectors.wellFillFromWellContents(
-          wellContents,
-          liquidDisplayColors
-        )}
-        handleClickWell={handleClickWell}
-        {...(showHighlightedWells ? { highlightedWells } : {})}
-        {...(ignoreMissingTips ? {} : { missingTips })}
-        highlight={highlight}
-        tipStatusByWellName={tipStatusByWellName}
-        onMouseEnterWell={onMouseEnterWell}
-        onMouseLeaveWell={onMouseLeaveWell}
-        selectedTipsByIndex={selectedTipsByIndex}
-        fill={fill}
-        labwareStroke={borderStroke}
-      />
+      {/* TODO (ND, 01/06/2026): Center all labware including non-lids in the slot. Requires a larger audit of LabwareOnDeck implementation. */}
+      {isLid ? (
+        <CenterLabwareInSlot definition={labwareOnDeck.def}>
+          {labwareRenderComponent}
+        </CenterLabwareInSlot>
+      ) : (
+        labwareRenderComponent
+      )}
     </g>
   )
 }

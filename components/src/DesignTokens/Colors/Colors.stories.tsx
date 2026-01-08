@@ -1,16 +1,14 @@
+import { StyledText } from '../../atoms/StyledText'
+import { BORDERS, COLORS } from '../../helix-design-system'
+import { Flex } from '../../primitives'
 import {
   ALIGN_FLEX_START,
-  BORDERS,
-  COLORS,
   CURSOR_POINTER,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
-  Flex,
   JUSTIFY_SPACE_BETWEEN,
-  LegacyStyledText,
-  SPACING,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+} from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { Meta, Story } from '@storybook/react'
 
@@ -78,20 +76,20 @@ const Template: Story<ColorsStorybookProps> = args => {
                 border: `1px solid ${COLORS.grey20}`,
               }}
             >
-              <LegacyStyledText
+              <StyledText
                 color={invertColor(color[1] as string)}
                 fontSize={TYPOGRAPHY.fontSizeP}
                 fontWeight={TYPOGRAPHY.fontWeightBold}
               >
                 {color[0]}
-              </LegacyStyledText>
-              <LegacyStyledText
+              </StyledText>
+              <StyledText
                 fontSize={TYPOGRAPHY.fontSizeP}
                 color={invertColor(color[1] as string)}
                 fontWeight={TYPOGRAPHY.fontWeightRegular}
               >
                 {color[1]}
-              </LegacyStyledText>
+              </StyledText>
             </Flex>
           ))}
         </Flex>

@@ -1,0 +1,15 @@
+.line_clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  overflow-wrap: break-word;
+  text-overflow: ellipsis;
+}
+
+.word_normal {
+  word-break: normal;
+}
+
+.word_break_all {
+  word-break: break-all;
+}

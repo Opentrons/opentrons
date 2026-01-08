@@ -236,7 +236,7 @@ class VacuumModule(mod_abc.AbstractModule):
                 self._handle_status_bar_event(event), self._loop
             )
 
-    async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:
+    async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:  # noqa: C901
         if event.enabled and self.initialized:
             match event.state:
                 case StatusBarState.RUNNING:
