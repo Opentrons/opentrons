@@ -7,7 +7,6 @@ from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
-from . import Task, validation
 from .core.common import (
     AbsorbanceReaderCore,
     FlexStackerCore,
@@ -41,6 +40,9 @@ from opentrons.protocols.api_support.util import (
     UnsupportedAPIError,
     requires_version,
 )
+
+from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
+from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 

@@ -12,6 +12,9 @@ functions are available elsewhere.
 
 from typing import Union
 
+# .types must be imported first to avoid circular import with opentrons.config.types
+from .types import CriticalPoint, ExecutionState, OT3Mount  # isort: skip
+
 from .adapters import SynchronousAdapter
 from .api import API
 from .backends import Controller, Simulator
@@ -29,7 +32,6 @@ from .protocols import FlexHardwareControlInterface, HardwareControlInterface
 from .robot_calibration import RobotCalibration
 from .thread_manager import ThreadManager
 from .threaded_async_lock import ThreadedAsyncForbidden, ThreadedAsyncLock
-from .types import CriticalPoint, ExecutionState, OT3Mount
 from opentrons.config.types import OT3Config, RobotConfig
 from opentrons.types import Mount
 

@@ -4,8 +4,6 @@ from typing import Dict, Generic, List, Tuple, TypeVar, cast
 
 from typing_extensions import Literal, TypedDict
 
-from opentrons.hardware_control.types import OT3AxisKind
-
 
 class AxisDict(TypedDict):
     X: float
@@ -33,6 +31,35 @@ class ByGantryLoad(Generic[Vt]):
 
     def __getitem__(self, key: GantryLoad) -> Vt:
         return cast(Vt, asdict(self)[key.value])
+
+
+class OT3AxisKind(Enum):
+    """An enum of the different kinds of axis we have.
+
+    The machine may have different numbers of specific axes implementing
+    each axis kind.
+    """
+
+    X = 0
+    #: Gantry X axis
+    Y = 1
+    #: Gantry Y axis
+    Z = 2
+    #: Z axis (of the left and right)
+    P = 3
+    #: Plunger axis (of the left and right pipettes)
+    Z_G = 4
+    #: Gripper Z axis
+    Q = 6
+    #: High-throughput tip grabbing axis
+    OTHER = 6
+    #: The internal axes of high throughput pipettes, for instance
+
+    def __str__(self) -> str:
+        return self.name
+
+    def is_z_axis(self) -> bool:
+        return self in [OT3AxisKind.Z, OT3AxisKind.Z_G]
 
 
 PerPipetteAxisSettings = ByGantryLoad[Dict[OT3AxisKind, float]]

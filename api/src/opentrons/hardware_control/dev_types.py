@@ -3,7 +3,7 @@ from __future__ import annotations
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking. this file should only
 # be imported if typing.TYPE_CHECKING is True
-from typing import Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Dict, List, Optional, Union
 
 from typing_extensions import Literal, TypedDict
 
@@ -27,12 +27,14 @@ from opentrons_shared_data.pipette.types import (
 )
 
 from opentrons.drivers.types import MoveSplit
-from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
-    GripperCalibrationOffset,
-)
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.hardware_control.types import GripperJawState
 from opentrons.types import Mount
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
+        GripperCalibrationOffset,
+    )
 
 
 class InstrumentSpec(TypedDict):

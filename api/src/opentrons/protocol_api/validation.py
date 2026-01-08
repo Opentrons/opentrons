@@ -34,7 +34,6 @@ from opentrons.hardware_control.modules.types import (
     TemperatureModuleModel,
     ThermocyclerModuleModel,
 )
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
 from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.types import (
@@ -49,6 +48,9 @@ from opentrons.types import (
 
 if TYPE_CHECKING:
     from .labware import Well
+    from opentrons.protocols.advanced_control.transfers.common import (
+        TransferTipPolicyV2,
+    )
 
 
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
@@ -716,8 +718,12 @@ def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
     return float(value[0]), float(value[1]), float(value[2])
 
 
-def ensure_new_tip_policy(value: str) -> TransferTipPolicyV2:
+def ensure_new_tip_policy(value: str) -> "TransferTipPolicyV2":
     """Ensure that new_tip value is a valid TransferTipPolicy value."""
+    from opentrons.protocols.advanced_control.transfers.common import (
+        TransferTipPolicyV2,
+    )
+
     try:
         return TransferTipPolicyV2(value.lower())
     except ValueError:

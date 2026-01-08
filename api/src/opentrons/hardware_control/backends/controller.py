@@ -37,7 +37,6 @@ import opentrons.config
 from ..module_control import AttachedModulesControl
 from ..types import AionotifyEvent, Axis, BoardRevision, DoorState
 from ..util import ot2_axis_to_string
-from opentrons.config.types import RobotConfig
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
 from opentrons.drivers.smoothie_drivers import SmoothieDriver
 from opentrons.types import Mount
@@ -50,6 +49,7 @@ if TYPE_CHECKING:
         AttachedPipette,
         InstrumentHardwareConfigs,
     )
+    from opentrons.config.types import RobotConfig
     from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
 
 MODULE_LOG = logging.getLogger(__name__)

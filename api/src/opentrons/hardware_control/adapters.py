@@ -4,7 +4,7 @@ import asyncio
 import functools
 from typing import Any, Awaitable, Callable, Generic, TypeVar, cast
 
-from .protocols import AsyncioConfigurable
+from .protocols.asyncio_configurable import AsyncioConfigurable
 
 WrappedObj = TypeVar("WrappedObj", bound=AsyncioConfigurable, covariant=True)
 WrappedReturn = TypeVar("WrappedReturn")

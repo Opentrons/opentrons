@@ -15,13 +15,21 @@ import logging
 from math import isclose
 from os import environ
 from time import monotonic
-from typing import Any, AsyncIterator, Dict, List, Optional, Tuple, Union, cast
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    AsyncIterator,
+    Dict,
+    List,
+    Optional,
+    Tuple,
+    Union,
+    cast,
+)
 
 from serial.serialutil import SerialException  # type: ignore[import-untyped]
 
 from .types import AxisCurrentSettings
-from opentrons.config.robot_configs import current_for_revision
-from opentrons.config.types import RobotConfig
 from opentrons.drivers.asyncio.communication import (
     AlarmResponse,
     ErrorResponse,
@@ -74,6 +82,9 @@ from opentrons.drivers.smoothie_drivers.errors import (
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import AxisMoveTimestamp, ParseError, string_to_hex
 from opentrons.system import smoothie_update
+
+if TYPE_CHECKING:
+    from opentrons.config.types import RobotConfig
 
 log = logging.getLogger(__name__)
 
@@ -143,6 +154,9 @@ class SmoothieDriver:
         self._config = config
 
         self._gpio_chardev = gpio_chardev
+
+        # Import here to avoid circular import at module load time
+        from opentrons.config.robot_configs import current_for_revision
 
         # Current settings:
         # The amperage of each axis, has been organized into three states:
