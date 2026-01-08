@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -14,10 +15,9 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 
-import {
-  LINE_CLAMP_TEXT_STYLE,
-  LINK_BUTTON_STYLE,
-} from '../../components/atoms'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
+
+import { LINK_BUTTON_STYLE } from '../../components/atoms'
 
 interface MetadataItem {
   title: string
@@ -74,7 +74,11 @@ export function ProtocolMetadata({
               content={
                 <StyledText
                   desktopStyle="bodyDefaultRegular"
-                  css={LINE_CLAMP_TEXT_STYLE(2)}
+                  className={clsx(
+                    lineClampStyles.line_clamp,
+                    lineClampStyles.word_break_all
+                  )}
+                  style={{ WebkitLineClamp: 2 }}
                 >
                   {value ?? t('na')}
                 </StyledText>

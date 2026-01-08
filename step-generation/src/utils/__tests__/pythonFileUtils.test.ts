@@ -334,6 +334,7 @@ describe('getLoadLabware', () => {
   it('should generate load_labware for 3 labware with a lid on the first one', () => {
     expect(
       getLoadLabware(
+        {},
         mockModuleEntities,
         mockLabwareEntities,
         labwareRobotState,
@@ -364,10 +365,51 @@ well_plate_3 = protocol.load_labware_from_definition(
     )
   })
 
+  it('should generate load_labware for 1 labware on the stacker shuttle', () => {
+    expect(
+      getLoadLabware(
+        {
+          [moduleId]: {
+            moduleState: { type: FLEX_STACKER_MODULE_TYPE } as any,
+            slot: 'B2',
+          },
+        },
+        {
+          [moduleId]: {
+            id: moduleId,
+            model: FLEX_STACKER_MODULE_V1,
+            type: FLEX_STACKER_MODULE_TYPE,
+            pythonName: 'flex_stacker_1',
+          },
+        },
+        {
+          [labwareId1]: {
+            id: labwareId1,
+            labwareDefURI: 'opentrons/fixture_96_plate/1',
+            def: opentrons96Plate,
+            pythonName: 'well_plate_1',
+          },
+        },
+        { [labwareId1]: { stack: [labwareId1, 'B2'] } },
+        mockLabwareNicknames
+      )
+    ).toBe(
+      `
+# Load Labware:
+well_plate_1 = flex_stacker_1.load_labware(
+    "fixture_96_plate",
+    label="Fixture Flex 96 Tip Rack Adapter",
+    namespace="opentrons",
+    version=1,
+)`.trimStart()
+    )
+  })
+
   describe('getLoadLabware off-deck', () => {
     it('should generate loadLabware for off-deck', () => {
       expect(
         getLoadLabware(
+          {},
           {},
           {
             plateId: {
@@ -402,6 +444,7 @@ well_plate_5 = protocol.load_labware(
     }
     expect(
       getLoadLabware(
+        {},
         mockModuleEntities,
         mockLabwareEntities,
         labwareRobotStateWithLids,

@@ -1,6 +1,7 @@
 """
 opentrons_shared_data.pipette: functions and types for pipette config
 """
+
 from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING, Dict, Optional

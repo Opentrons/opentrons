@@ -269,7 +269,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       },
     ])
     expect(robotState.labware.tiprack1Id).toEqual({
-      stack: ['tiprack1Id', FLEX_STACKER_ID, '1'],
+      stack: ['tiprack1Id', '1'],
     })
   })
 })

@@ -75,13 +75,11 @@ export function TimelineToolbox({
     const { key, altKey: altIsPressed } = e
 
     if (altIsPressed) {
-      let delta = 0
       if (key === 'ArrowUp') {
-        delta = -1
+        dispatch(stepsActions.reorderSelectedStep('up'))
       } else if (key === 'ArrowDown') {
-        delta = 1
+        dispatch(stepsActions.reorderSelectedStep('down'))
       }
-      dispatch(stepsActions.reorderSelectedStep(delta))
     }
   }
 

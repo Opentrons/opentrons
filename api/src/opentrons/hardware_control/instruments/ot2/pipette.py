@@ -1,5 +1,5 @@
-""" Classes and functions for pipette state tracking
-"""
+"""Classes and functions for pipette state tracking"""
+
 from __future__ import annotations
 
 import functools

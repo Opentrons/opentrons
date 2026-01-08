@@ -8,6 +8,23 @@ By using Opentrons Protocol Designer, you agree to the Opentrons End-User Licens
 
 ---
 
+## Opentrons Protocol Designer Changes in 8.8.0
+
+**Welcome to Protocol Designer 8.8.0.!**
+
+This release adds support for the Flex Stacker Module in Protocol Designer, and includes other bug fixes.
+
+### New Features
+
+- Use the Flex Stacker Module to store and use multiple well plates, PCR plates, or tip racks in your Protocol Designer protocols.
+
+### Bug Fixes
+
+- Add tip rack lids to tip racks placed inside Flex 96-channel adapters.
+- Protocol Designer properly displays tip racks and their lids on the deck.
+
+Running a protocol created in Protocol Designer requires Opentrons App version 8.8.0 or newer.
+
 ## Opentrons Protocol Designer Changes in 8.7.1
 
 **Welcome to Protocol Designer 8.7.1!**

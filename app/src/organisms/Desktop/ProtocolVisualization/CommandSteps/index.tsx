@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COLORS, StyledText } from '@opentrons/components'
@@ -28,6 +29,28 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
     currentCommandIndex,
   } = props
   const { t } = useTranslation('protocol_visualization')
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const root = scrollRef.current
+    const target = bottomRef.current
+    if (root == null || target == null) return
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        setIsAtBottom(entry.isIntersecting)
+      },
+      { root, threshold: 1 }
+    )
+
+    io.observe(target)
+    return () => {
+      io.disconnect()
+    }
+  }, [])
+
   return (
     <div className={styles.detail_container}>
       <div className={styles.command_step}>
@@ -39,7 +62,10 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
             {t('percent_complete', { percent: percentComplete.toFixed(0) })}
           </StyledText>
         </div>
-        <div className={styles.command_step_groups}>
+        <div
+          ref={scrollRef}
+          className={`${styles.command_step_groups} ${isAtBottom ? styles.at_bottom : ''}`}
+        >
           <AnnotatedSteps
             currentCommandIndex={currentCommandIndex}
             analysis={analysis}
@@ -47,6 +73,7 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
             setSelectedCommand={setSelectedCommand}
             handlePause={handlePause}
           />
+          <div ref={bottomRef} className={styles.bottom_sentinel} />
         </div>
       </div>
     </div>
