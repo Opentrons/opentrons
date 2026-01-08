@@ -27,11 +27,11 @@ const basename = (p: string): string => {
   return i === -1 ? s : s.slice(i + 1)
 }
 
-const extname = (p: string): string => {
-  const b = basename(p)
-  const i = b.lastIndexOf('.')
-  return i <= 0 ? '' : b.slice(i)
-}
+// const extname = (p: string): string => {
+//   const b = basename(p)
+//   const i = b.lastIndexOf('.')
+//   return i <= 0 ? '' : b.slice(i)
+// }
 
 // todo(mm, 2025-03-04): This duplicates getLabwareDefUri() in ./helpers. We should use
 // that instead, but using it gives me obscure "TypeError: getLabwareDefURI is not a function"
