@@ -8,7 +8,7 @@ from typing import Annotated
 from fastapi import Depends
 
 from robot_server.persistence.fastapi_dependencies import get_images_directory
-from robot_server.settings import get_settings, RobotServerSettings
+from robot_server.settings import RobotServerSettings, get_settings
 
 _FALLBACK_DEFAULT_DISK_SPACE_MB = 10_000.0
 

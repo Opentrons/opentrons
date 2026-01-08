@@ -1,10 +1,10 @@
 """Error codes."""
 
-from enum import Enum
-from dataclasses import dataclass
 import json
-from typing import Tuple, Dict
+from dataclasses import dataclass
+from enum import Enum
 from functools import lru_cache
+from typing import Dict, Tuple
 
 from ..load import load_shared_data
 from .categories import ErrorCategories

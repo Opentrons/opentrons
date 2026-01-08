@@ -1,50 +1,48 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Optional, Union, cast, Iterator, Sequence
+from typing import Dict, Iterator, List, Optional, Sequence, Union, cast
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-
-from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.legacy_commands import module_commands as cmds
-from opentrons.legacy_commands.publisher import CommandPublisher, publish
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
-from opentrons.protocols.api_support.util import (
-    APIVersionError,
-    requires_version,
-    UnsupportedAPIError,
-)
-
 from .core.common import (
-    ProtocolCore,
-    LabwareCore,
-    ModuleCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    ThermocyclerCore,
-    HeaterShakerCore,
-    MagneticBlockCore,
     AbsorbanceReaderCore,
     FlexStackerCore,
+    HeaterShakerCore,
+    LabwareCore,
+    MagneticBlockCore,
+    MagneticModuleCore,
+    ModuleCore,
+    ProtocolCore,
+    TemperatureModuleCore,
+    ThermocyclerCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
+from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.legacy.legacy_module_core import LegacyModuleCore
 from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
-from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
-
-from .module_validation_and_errors import (
-    validate_heater_shaker_temperature,
-    validate_heater_shaker_speed,
-)
 from .labware import Labware
-from . import validation
-from . import Task
-from opentrons.drivers.thermocycler.driver import BLOCK_VOL_MIN, BLOCK_VOL_MAX
+from .module_validation_and_errors import (
+    validate_heater_shaker_speed,
+    validate_heater_shaker_temperature,
+)
+from opentrons.drivers.thermocycler.driver import BLOCK_VOL_MAX, BLOCK_VOL_MIN
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import module_commands as cmds
+from opentrons.legacy_commands.publisher import CommandPublisher, publish
+from opentrons.protocol_engine.types import ABSMeasureMode
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    UnsupportedAPIError,
+    requires_version,
+)
+
+from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
+from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 

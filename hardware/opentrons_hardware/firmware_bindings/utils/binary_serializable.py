@@ -1,13 +1,14 @@
 """BinarySerializable dataclass."""
 
 from __future__ import annotations
+
 import struct
-from dataclasses import dataclass, fields, astuple
-from typing import TypeVar, Generic, Type, Optional, Dict, Any, Sequence
+from dataclasses import astuple, dataclass, fields
+from typing import Any, Dict, Generic, Optional, Sequence, Type, TypeVar
 
 from opentrons_shared_data.errors.exceptions import (
-    InternalMessageFormatError,
     EnumeratedError,
+    InternalMessageFormatError,
     PythonException,
 )
 

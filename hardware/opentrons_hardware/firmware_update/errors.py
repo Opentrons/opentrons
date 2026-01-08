@@ -1,12 +1,14 @@
 """Firmware update exceptions."""
 
 from typing import Optional, Sequence
+
 from opentrons_shared_data.errors.exceptions import (
-    FirmwareUpdateFailedError,
     EnumeratedError,
+    FirmwareUpdateFailedError,
 )
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+
 from opentrons_hardware.firmware_bindings import FirmwareTarget
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 
 
 class ErrorResponse(FirmwareUpdateFailedError):

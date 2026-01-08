@@ -1,12 +1,13 @@
 import pytest
 from mock import AsyncMock, MagicMock
+
 from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
+from opentrons.drivers.vacuum_module import types
 from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,
 )
-from opentrons.drivers.vacuum_module import types
 
 
 @pytest.fixture

@@ -9,7 +9,6 @@ from typing import Any, AsyncGenerator, BinaryIO, Dict, List, Optional, Tuple, U
 import httpx
 from httpx import Response
 
-
 _STARTUP_WAIT = 40
 _SHUTDOWN_WAIT = 20
 

@@ -1,15 +1,15 @@
 """Unit tests for `deletion_planner`."""
 
-import pytest
-
 from dataclasses import dataclass
 from typing import List, NamedTuple, Set
 
+import pytest
+
 from robot_server.deletion_planner import (
-    ProtocolDeletionPlanner,
-    RunDeletionPlanner,
     DataFileDeletionPlanner,
     FileUsageInfo,
+    ProtocolDeletionPlanner,
+    RunDeletionPlanner,
 )
 
 

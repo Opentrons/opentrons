@@ -1,13 +1,14 @@
 """Handle parsing and providing gripper information."""
 
 import re
-from typing import Tuple
 import struct
+from typing import Tuple
 
 from opentrons_shared_data.errors.exceptions import (
     InvalidInstrumentData,
     PythonException,
 )
+
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 
 # Separate string into 2 groups

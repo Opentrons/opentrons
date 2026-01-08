@@ -1,13 +1,14 @@
-from typing import cast
-from mock import MagicMock
-import pytest
 import asyncio
-from enum import Enum
 from concurrent.futures.thread import ThreadPoolExecutor
+from enum import Enum
+from typing import cast
+
+import pytest
+from mock import MagicMock
 
 from opentrons.drivers.absorbance_reader import (
-    AbsorbanceReaderDriver,
     AbsorbanceHidInterface,
+    AbsorbanceReaderDriver,
 )
 from opentrons.drivers.absorbance_reader.async_byonoy import AsyncByonoy
 from opentrons.drivers.types import ABSMeasurementMode, AbsorbanceReaderLidStatus

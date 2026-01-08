@@ -1,9 +1,9 @@
 import typing
 
-from pydantic import field_validator, BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-from opentrons_shared_data.util import StrEnum
 from opentrons.hardware_control import types
+from opentrons_shared_data.util import StrEnum
 
 
 class MotorName(StrEnum):

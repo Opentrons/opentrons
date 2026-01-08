@@ -5,9 +5,10 @@ for modules
 
 import enum
 from typing import Any, Dict, List, Union
+
 from typing_extensions import Literal, TypedDict
 
-from opentrons_shared_data.labware.types import LocatingFeatures, Extents
+from opentrons_shared_data.labware.types import Extents, LocatingFeatures
 
 SchemaV1 = Literal["1"]
 SchemaV2 = Literal["2"]

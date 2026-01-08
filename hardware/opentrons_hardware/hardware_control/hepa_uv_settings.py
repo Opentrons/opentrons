@@ -1,30 +1,30 @@
 """Utilities for controlling the hepa/uv extension module."""
 
-import logging
 import asyncio
-from typing import Optional
+import logging
 from dataclasses import dataclass
+from typing import Optional
+
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-
+from opentrons_hardware.firmware_bindings.constants import (
+    ErrorCode,
+    MessageId,
+    NodeId,
+)
 from opentrons_hardware.firmware_bindings.messages import payloads
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetHepaFanStateRequest,
     GetHepaFanStateRequest,
     GetHepaFanStateResponse,
-    SetHepaUVStateRequest,
     GetHepaUVStateRequest,
     GetHepaUVStateResponse,
+    SetHepaFanStateRequest,
+    SetHepaUVStateRequest,
 )
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt32Field,
-)
-from opentrons_hardware.firmware_bindings.constants import (
-    MessageId,
-    NodeId,
-    ErrorCode,
 )
 
 log = logging.getLogger(__name__)

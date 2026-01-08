@@ -1,9 +1,11 @@
 from typing import Dict, Optional
+
 from typing_extensions import Protocol
+
 from ..types import (
     DoorState,
-    StatusBarState,
     EstopState,
+    StatusBarState,
     StatusBarUpdateListener,
     StatusBarUpdateUnsubscriber,
 )

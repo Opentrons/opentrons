@@ -2,11 +2,10 @@ from typing import AsyncIterator, Iterator
 
 import pytest
 
+from .build_module import build_module
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import MagDeck
-
-from .build_module import build_module
 
 
 @pytest.fixture

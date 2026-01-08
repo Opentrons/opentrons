@@ -1,32 +1,36 @@
 """Test pipette data provider."""
 
-from typing import Dict
 from sys import maxsize
+from typing import Dict
+
 import pytest
-from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
-    PipetteModel,
-    LiquidClasses as VolumeModes,
-)
-from opentrons_shared_data.pipette import pipette_definition, types as pip_types
+
+from opentrons_shared_data.pipette import pipette_definition
+from opentrons_shared_data.pipette import types as pip_types
 from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteBoundingBoxOffsetDefinition,
     TIP_OVERLAP_VERSION_MAXIMUM,
     AvailableSensorDefinition,
+    PipetteBoundingBoxOffsetDefinition,
+)
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses as VolumeModes,
+)
+from opentrons_shared_data.pipette.types import (
+    PipetteModel,
+    PipetteNameType,
 )
 
+from ..pipette_fixtures import get_default_nozzle_map
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocol_engine.types import FlowRates
+from opentrons.protocol_engine.errors.exceptions import InvalidLoadPipetteSpecsError
+from opentrons.protocol_engine.resources import pipette_data_provider as subject
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
     VirtualPipetteDataProvider,
-    validate_and_default_tip_overlap_version,
     get_latest_tip_overlap_before_version,
+    validate_and_default_tip_overlap_version,
 )
-
-from opentrons.protocol_engine.resources import pipette_data_provider as subject
-from opentrons.protocol_engine.errors.exceptions import InvalidLoadPipetteSpecsError
-from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.types import FlowRates
 from opentrons.types import Point
 
 

@@ -4,7 +4,6 @@ from typing import Dict
 
 # Avoid pytest trying to collect TestClient because it begins with "Test".
 from aiohttp.test_utils import TestClient as HTTPTestClient
-
 from decoy import Decoy
 
 from otupdate.common.name_management import NameSynchronizer

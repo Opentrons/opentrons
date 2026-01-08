@@ -5,26 +5,26 @@ from datetime import datetime
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+
 from opentrons.drivers.flex_stacker.types import StackerAxis
 from opentrons.hardware_control.modules import FlexStacker
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.flex_stacker.common import (
     FlexStackerStallOrCollisionError,
 )
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
 from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_prepare_shuttle import (
     UnsafeFlexStackerPrepareShuttleImpl,
     UnsafeFlexStackerPrepareShuttleParams,
     UnsafeFlexStackerPrepareShuttleResult,
 )
-
-from opentrons_shared_data.errors.exceptions import FlexStackerStallError
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 
 
 @pytest.fixture

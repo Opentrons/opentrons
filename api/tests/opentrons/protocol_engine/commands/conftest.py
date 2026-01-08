@@ -5,22 +5,25 @@ from __future__ import annotations
 import pytest
 from decoy import Decoy
 
+from opentrons.protocol_engine.actions import ActionDispatcher
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
+    GantryMover,
+    LabwareMovementHandler,
     MovementHandler,
     PipettingHandler,
-    RunControlHandler,
     RailLightsHandler,
-    LabwareMovementHandler,
+    RunControlHandler,
     StatusBarHandler,
-    TipHandler,
-    GantryMover,
     TaskHandler,
+    TipHandler,
 )
-from opentrons.protocol_engine.resources import FileProvider
-from opentrons.protocol_engine.resources import ModelUtils, ConcurrencyProvider
-from opentrons.protocol_engine.state.state import StateView, StateStore
-from opentrons.protocol_engine.actions import ActionDispatcher
+from opentrons.protocol_engine.resources import (
+    ConcurrencyProvider,
+    FileProvider,
+    ModelUtils,
+)
+from opentrons.protocol_engine.state.state import StateStore, StateView
 
 
 @pytest.fixture

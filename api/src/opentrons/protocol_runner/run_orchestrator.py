@@ -3,54 +3,55 @@
 from __future__ import annotations
 
 import enum
-from typing import Optional, Union, List, Dict, AsyncGenerator, Mapping, Tuple
+from typing import AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Union
 
 from anyio import move_on_after
 
-from opentrons.types import NozzleMapInterface
-from opentrons_shared_data.labware.types import LabwareUri
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors import GeneralError
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
 
-from . import protocol_runner, RunResult, JsonRunner, PythonAndLegacyRunner
 from ..hardware_control import HardwareControlAPI
 from ..hardware_control.modules import (
     AbstractModule as HardwareModuleAPI,
+)
+from ..hardware_control.modules import (
     ModuleModel as HardwareModuleModel,
 )
 from ..protocol_engine import (
-    ProtocolEngine,
-    CommandCreate,
     Command,
-    StateSummary,
+    CommandCreate,
+    CommandErrorSlice,
     CommandPointer,
     CommandSlice,
-    CommandErrorSlice,
     DeckType,
     ErrorOccurrence,
+    ProtocolEngine,
+    StateSummary,
 )
+from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
 from ..protocol_engine.errors import RunStoppedError
+from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
+from ..protocol_engine.state.module_substates import FlexStackerSubState
 from ..protocol_engine.types import (
-    PostRunHardwareState,
+    CommandAnnotation,
+    CommandPreconditions,
+    CSVRuntimeParamPaths,
+    DeckConfigurationType,
     EngineStatus,
+    LabwareOffset,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
-    LabwareOffset,
-    DeckConfigurationType,
-    RunTimeParameter,
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-    CommandAnnotation,
     ModuleModel,
-    CommandPreconditions,
+    PostRunHardwareState,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
 )
-from ..protocol_engine.resources.camera_provider import CameraProvider, CameraSettings
-from ..protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
-
-from ..protocol_reader import JsonProtocolConfig, PythonProtocolConfig, ProtocolSource
+from ..protocol_reader import JsonProtocolConfig, ProtocolSource, PythonProtocolConfig
 from ..protocols.parse import PythonParseMode
-from ..protocol_engine.state.module_substates import FlexStackerSubState
+from . import JsonRunner, PythonAndLegacyRunner, RunResult, protocol_runner
+from opentrons.types import NozzleMapInterface
 
 
 class NoProtocolRunAvailable(RuntimeError):

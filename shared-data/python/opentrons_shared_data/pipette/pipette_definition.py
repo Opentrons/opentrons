@@ -1,15 +1,17 @@
 import re
-from typing import List, Dict, Tuple, Optional, Annotated, Literal, TypeVar
-from pydantic import (
-    field_validator,
-    BaseModel,
-    Field,
-    BeforeValidator,
-    PlainSerializer,
-)
 from dataclasses import dataclass
+from typing import Annotated, Dict, List, Literal, Optional, Tuple, TypeVar
 
-from . import types as pip_types, types
+from pydantic import (
+    BaseModel,
+    BeforeValidator,
+    Field,
+    PlainSerializer,
+    field_validator,
+)
+
+from . import types
+from . import types as pip_types
 
 # The highest and lowest existing overlap version values.
 TIP_OVERLAP_VERSION_MINIMUM = 0

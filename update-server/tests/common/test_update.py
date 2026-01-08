@@ -12,14 +12,15 @@ import pytest
 # Avoid pytest trying to collect TestClient because it begins with "Test".
 from aiohttp.test_utils import TestClient as HTTPTestClient
 
-from otupdate.buildroot import update, config, update_actions
-from otupdate.common import file_actions
-from otupdate.common.session import UpdateSession, Stages
-from otupdate.common.update_actions import UpdateActionsInterface
-from otupdate.openembedded import OT3UpdateActions, RootFSInterface
 from tests.openembedded.conftest import (
     mock_partition_manager_valid_switch_,
 )
+
+from otupdate.buildroot import config, update, update_actions
+from otupdate.common import file_actions
+from otupdate.common.session import Stages, UpdateSession
+from otupdate.common.update_actions import UpdateActionsInterface
+from otupdate.openembedded import OT3UpdateActions, RootFSInterface
 
 
 @pytest.fixture

@@ -3,44 +3,45 @@
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
 
 import pytest
-from sqlalchemy.engine import Engine
 from decoy import Decoy
+from sqlalchemy.engine import Engine
 
+from opentrons.protocol_reader import (
+    JsonProtocolConfig,
+    ProtocolSource,
+)
 from opentrons_shared_data.data_files import DataFileInfo, MimeType
+
+from robot_server.data_files.data_files_store import (
+    DataFilesStore,
+)
 from robot_server.persistence.tables import (
-    analysis_table,
-    analysis_primitive_type_rtp_table,
     analysis_csv_rtp_table,
+    analysis_primitive_type_rtp_table,
+    analysis_table,
+)
+from robot_server.protocols.analysis_memcache import MemoryCache
+from robot_server.protocols.analysis_models import (
+    AnalysisResult,
+    AnalysisStatus,
+    CompletedAnalysis,
+    RunTimeParameterAnalysisData,
 )
 from robot_server.protocols.completed_analysis_store import (
     CompletedAnalysisResource,
     CompletedAnalysisStore,
 )
-from opentrons.protocol_reader import (
-    ProtocolSource,
-    JsonProtocolConfig,
-)
-from robot_server.data_files.data_files_store import (
-    DataFilesStore,
-)
-from robot_server.protocols.analysis_memcache import MemoryCache
-from robot_server.protocols.analysis_models import (
-    CompletedAnalysis,
-    AnalysisResult,
-    AnalysisStatus,
-    RunTimeParameterAnalysisData,
-)
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
-    ProtocolStore,
     ProtocolResource,
+    ProtocolStore,
 )
 from robot_server.protocols.rtp_resources import (
-    PrimitiveParameterResource,
     CSVParameterResource,
+    PrimitiveParameterResource,
 )
 
 

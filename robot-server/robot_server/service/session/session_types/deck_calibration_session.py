@@ -1,21 +1,20 @@
 from typing import Awaitable, Optional
 
-from robot_server.robot.calibration.deck.user_flow import DeckCalibrationUserFlow
+from ..configuration import SessionConfiguration
+from ..models.session import DeckCalibrationResponseAttributes, SessionType
+from .base_session import BaseSession, SessionMetaData
 from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
-from robot_server.service.session.errors import (
-    SessionCreationException,
-    CommandExecutionException,
-)
+from robot_server.robot.calibration.deck.user_flow import DeckCalibrationUserFlow
 from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
-    CompletedCommand,
     CommandExecutor,
+    CompletedCommand,
 )
-
-from .base_session import BaseSession, SessionMetaData
-from ..configuration import SessionConfiguration
-from ..models.session import SessionType, DeckCalibrationResponseAttributes
+from robot_server.service.session.errors import (
+    CommandExecutionException,
+    SessionCreationException,
+)
 
 
 class DeckCalibrationCommandExecutor(CallableExecutor):

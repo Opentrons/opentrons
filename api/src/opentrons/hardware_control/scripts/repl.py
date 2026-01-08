@@ -4,11 +4,12 @@ Running this script will create and spin up a hardware controller
 and expose it to a python commandline.
 """
 
-import os
-from functools import wraps
 import asyncio
 import logging
+import os
+from functools import wraps
 from logging.config import dictConfig
+
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.ot3api import OT3API
 from opentrons.hardware_control.types import HardwareFeatureFlags
@@ -33,32 +34,31 @@ else:
 
 from code import interact  # noqa: E402
 from subprocess import run  # noqa: E402
-from typing import Union, Type, Any  # noqa: E402
+from typing import Any, Type, Union  # noqa: E402
 
-from opentrons.types import Mount, Point  # noqa: E402
 from opentrons.config import feature_flags as ff  # noqa: E402
 from opentrons.hardware_control.modules.types import ModuleType  # noqa: E402
-from opentrons.hardware_control.types import (  # noqa: E402
-    Axis,
-    OT3Mount,
-    SubSystem,
-    GripperProbe,
-    CriticalPoint,
-)
 from opentrons.hardware_control.ot3_calibration import (  # noqa: E402
-    calibrate_pipette,
+    CalibrationMethod,
     calibrate_belts,
-    delete_belt_calibration_data,
     calibrate_gripper_jaw,
     calibrate_module,
+    calibrate_pipette,
+    delete_belt_calibration_data,
+    find_axis_center,
     find_calibration_structure_height,
     find_edge_binary,
-    CalibrationMethod,
-    find_axis_center,
     gripper_pin_offsets_mean,
 )
 from opentrons.hardware_control.thread_manager import ThreadManager  # noqa: E402
-
+from opentrons.hardware_control.types import (  # noqa: E402
+    Axis,
+    CriticalPoint,
+    GripperProbe,
+    OT3Mount,
+    SubSystem,
+)
+from opentrons.types import Mount, Point  # noqa: E402
 
 log = logging.getLogger(__name__)
 

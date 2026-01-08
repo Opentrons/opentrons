@@ -1,11 +1,17 @@
 """Request and response models for /robot/control endpoints."""
 
 import enum
+
 from pydantic import BaseModel, Field
+
+from opentrons.hardware_control.types import (
+    DoorState as HwDoorState,
+)
 from opentrons.hardware_control.types import (
     EstopPhysicalStatus as HwEstopPhysicalStatus,
+)
+from opentrons.hardware_control.types import (
     EstopState as HwEstopState,
-    DoorState as HwDoorState,
 )
 
 

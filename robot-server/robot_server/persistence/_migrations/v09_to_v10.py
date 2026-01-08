@@ -11,24 +11,22 @@ from pathlib import Path
 
 import sqlalchemy
 
-from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.deck import load as load_deck
-
-from opentrons.types import DeckSlotName
-from opentrons.protocols.api_support.deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
-)
-from opentrons.protocol_engine import LegacyLabwareOffsetLocation, DeckType, ModuleModel
+from opentrons.protocol_engine import DeckType, LegacyLabwareOffsetLocation, ModuleModel
 from opentrons.protocol_engine.labware_offset_standardization import (
     legacy_offset_location_to_offset_location_sequence,
 )
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
+from opentrons.types import DeckSlotName
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 
+from .._folder_migrator import Migration
+from ._util import copy_contents
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
-from robot_server.persistence.tables import schema_10, schema_09
-
-from ._util import copy_contents
-from .._folder_migrator import Migration
+from robot_server.persistence.tables import schema_09, schema_10
 
 
 class Migration9to10(Migration):  # noqa: D101

@@ -1,6 +1,6 @@
 from typing import Any, Dict, Tuple
 
-from .common import MixStrategy, Mix
+from .common import Mix, MixStrategy
 
 
 def mix_from_kwargs(top_kwargs: Dict[str, Any]) -> Tuple[MixStrategy, Mix]:

@@ -1,22 +1,19 @@
 import logging
 from typing import Dict, Optional, Sequence
 
-from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.pipette.pipette_load_name_conversions import (
     convert_to_pipette_name_type,
 )
-from opentrons_shared_data.pipette.types import PipetteGenerationType
+from opentrons_shared_data.pipette.types import PipetteGenerationType, PipetteNameType
 
-from opentrons.types import Mount
-
-from ..protocol import AbstractProtocol
-from ..legacy.legacy_protocol_core import LegacyProtocolCore
 from ..legacy.legacy_labware_core import LegacyLabwareCore
 from ..legacy.legacy_module_core import LegacyModuleCore
+from ..legacy.legacy_protocol_core import LegacyProtocolCore
 from ..legacy.load_info import InstrumentLoadInfo
-
+from ..protocol import AbstractProtocol
 from .legacy_instrument_core import LegacyInstrumentCoreSimulator
 from .tasks import LegacyTaskCore
+from opentrons.types import Mount
 
 logger = logging.getLogger(__name__)
 

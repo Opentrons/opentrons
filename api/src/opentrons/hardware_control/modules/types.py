@@ -1,22 +1,24 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
+from pathlib import Path
 from typing import (
+    TYPE_CHECKING,
+    Any,
+    Awaitable,
+    Callable,
     Dict,
     List,
     NamedTuple,
-    Callable,
-    Any,
-    Tuple,
-    Awaitable,
-    Union,
     Optional,
     Protocol,
-    cast,
-    TYPE_CHECKING,
+    Tuple,
     TypeGuard,
+    Union,
+    cast,
 )
+
 from typing_extensions import TypedDict
-from pathlib import Path
 
 from opentrons_shared_data.util import StrEnum
 
@@ -29,13 +31,13 @@ from opentrons.drivers.rpi_drivers.types import USBPort
 
 if TYPE_CHECKING:
     from opentrons_shared_data.module.types import (
-        ThermocyclerModuleType,
-        MagneticModuleType,
-        TemperatureModuleType,
-        HeaterShakerModuleType,
-        MagneticBlockType,
         AbsorbanceReaderType,
         FlexStackerModuleType,
+        HeaterShakerModuleType,
+        MagneticBlockType,
+        MagneticModuleType,
+        TemperatureModuleType,
+        ThermocyclerModuleType,
         VacuumModuleType,
     )
 

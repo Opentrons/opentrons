@@ -2,6 +2,9 @@
 util.async_helpers - various utilities for asyncio functions and tasks.
 """
 
+import asyncio
+import contextlib
+import queue
 from functools import wraps
 from threading import Thread
 from typing import (
@@ -14,10 +17,6 @@ from typing import (
     TypeVar,
     cast,
 )
-
-import asyncio
-import contextlib
-import queue
 
 
 async def asyncio_yield() -> None:

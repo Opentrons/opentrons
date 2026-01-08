@@ -11,22 +11,23 @@ from textwrap import dedent
 import pytest
 from decoy import matchers
 
+from opentrons_shared_data.pipette.types import PipetteNameType
+
 from opentrons.protocol_engine import (
-    EngineStatus,
-    commands,
-    DeckSlotLocation,
-    ModuleModel,
-    ModuleLocation,
     DeckPoint,
+    DeckSlotLocation,
+    EngineStatus,
+    ModuleLocation,
+    ModuleModel,
+    commands,
 )
+from opentrons.protocol_engine.types import PostRunHardwareState
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
 from opentrons.protocol_runner.legacy_command_mapper import LegacyCommandParams
-from opentrons.protocol_engine.types import PostRunHardwareState
-from opentrons.types import MountType, DeckSlotName
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons.types import DeckSlotName, MountType
 
 
 async def simulate_and_get_commands(protocol_file: Path) -> list[commands.Command]:

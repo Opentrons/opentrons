@@ -6,28 +6,27 @@ from typing import Any, ContextManager, NamedTuple, Optional
 import pytest
 from decoy import Decoy
 
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
-    ThermocyclerModuleId,
-    ThermocyclerModuleSubState,
-)
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleLocation,
-)
+from opentrons.drivers.types import ThermocyclerLidStatus
+from opentrons.hardware_control import API as HardwareAPI
+from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
 from opentrons.protocol_engine.errors import (
     ThermocyclerNotOpenError,
     WrongModuleTypeError,
 )
-from opentrons.hardware_control import API as HardwareAPI
-from opentrons.hardware_control.modules import Thermocycler as HardwareThermocycler
-from opentrons.drivers.types import ThermocyclerLidStatus
-
+from opentrons.protocol_engine.execution.equipment import EquipmentHandler
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
-from opentrons.protocol_engine.execution.equipment import EquipmentHandler
+from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    ModuleLocation,
+)
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture

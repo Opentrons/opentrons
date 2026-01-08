@@ -1,9 +1,9 @@
 """Store Pydantic objects in the SQL database."""
 
 import json
-from typing import Type, TypeVar, Sequence, overload
-from pydantic import BaseModel, TypeAdapter
+from typing import Sequence, Type, TypeVar, overload
 
+from pydantic import BaseModel, TypeAdapter
 
 _BaseModelT = TypeVar("_BaseModelT", bound=BaseModel)
 _TypeAdapterArgT = TypeVar("_TypeAdapterArgT")

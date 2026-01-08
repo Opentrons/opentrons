@@ -1,14 +1,15 @@
+from datetime import datetime, timedelta, timezone
+from uuid import uuid4
+
+import jwt
+
 from system_server.jwt import (
     Registrant,
     create_jwt,
+    expiration_from_jwt,
     jwt_is_valid,
     registrant_from_jwt,
-    expiration_from_jwt,
 )
-from uuid import uuid4
-from datetime import datetime, timedelta, timezone
-
-import jwt
 
 
 async def test_create_good_jwt() -> None:

@@ -1,7 +1,7 @@
 import asyncio
-from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 from . import args_handler
+from opentrons.drivers.smoothie_drivers import SmoothieDriver
 
 BAD_BARCODE_MESSAGE = "Unexpected Serial -> {}"
 WRITE_FAIL_MESSAGE = "Data not saved, HOLD BUTTON"

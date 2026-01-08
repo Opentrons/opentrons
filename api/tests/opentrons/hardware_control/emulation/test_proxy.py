@@ -7,7 +7,6 @@ from opentrons.hardware_control.emulation.proxy import (
     Proxy,
     ProxyListener,
 )
-
 from opentrons.hardware_control.emulation.settings import ProxySettings
 
 

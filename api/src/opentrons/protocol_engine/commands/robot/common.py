@@ -1,10 +1,10 @@
 """Shared result types for robot API commands."""
 
+from typing import Dict
+
 from pydantic import BaseModel, Field
 
-from typing import Dict
 from opentrons.protocol_engine.types import MotorAxis
-
 
 MotorAxisMapType = Dict[MotorAxis, float]
 default_position = {ax: 0.0 for ax in MotorAxis}

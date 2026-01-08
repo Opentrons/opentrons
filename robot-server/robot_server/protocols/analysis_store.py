@@ -2,42 +2,42 @@
 
 from __future__ import annotations
 
-import sqlalchemy
 from logging import getLogger
 from typing import Dict, List, Optional
+
+import sqlalchemy
 from typing_extensions import Final
 
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.errors import ErrorCodes
-from opentrons.protocol_engine.types import (
-    RunTimeParameter,
-    CSVParameter,
-    CommandAnnotation,
-    CommandPreconditions,
-)
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
-    LoadedPipette,
-    LoadedLabware,
-    LoadedModule,
     Liquid,
     LiquidClassRecordWithId,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
 )
 from opentrons.protocol_engine.protocol_engine import code_in_error_tree
+from opentrons.protocol_engine.types import (
+    CommandAnnotation,
+    CommandPreconditions,
+    CSVParameter,
+    RunTimeParameter,
+)
+from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.robot.types import RobotType
 
+from .analysis_memcache import MemoryCache
 from .analysis_models import (
-    AnalysisSummary,
-    ProtocolAnalysis,
-    PendingAnalysis,
-    CompletedAnalysis,
     AnalysisResult,
     AnalysisStatus,
+    AnalysisSummary,
+    CompletedAnalysis,
+    PendingAnalysis,
+    ProtocolAnalysis,
 )
-
-from .completed_analysis_store import CompletedAnalysisStore, CompletedAnalysisResource
-from .analysis_memcache import MemoryCache
-from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
+from .completed_analysis_store import CompletedAnalysisResource, CompletedAnalysisStore
+from .rtp_resources import CSVParameterResource, PrimitiveParameterResource
 
 _log = getLogger(__name__)
 

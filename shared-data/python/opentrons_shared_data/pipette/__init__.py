@@ -3,21 +3,22 @@ opentrons_shared_data.pipette: functions and types for pipette config
 """
 
 from __future__ import annotations
+
 import copy
-from typing import TYPE_CHECKING, Dict, Optional
 import json
 from functools import lru_cache
+from typing import TYPE_CHECKING, Dict, Optional
 
 from .. import load_shared_data
 
 if TYPE_CHECKING:
     from .types import (
-        PipetteNameSpecs,
+        ChannelCount,
+        PipetteFusedSpec,
+        PipetteModel,
         PipetteModelSpecs,
         PipetteName,
-        PipetteModel,
-        PipetteFusedSpec,
-        ChannelCount,
+        PipetteNameSpecs,
     )
 
 

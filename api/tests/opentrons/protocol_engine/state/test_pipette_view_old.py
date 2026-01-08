@@ -6,58 +6,59 @@ treating PipetteState as a private implementation detail.
 """
 
 from collections import OrderedDict
-from typing import cast, Dict, List, Optional, Tuple, NamedTuple
+from typing import Dict, List, NamedTuple, Optional, Tuple, cast
 
 import pytest
 from decoy import Decoy
 
-
-from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
-    LiquidClasses as VolumeModes,
-)
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.pipette_definition import (
-    ValidNozzleMaps,
     AvailableSensorDefinition,
+    ValidNozzleMaps,
 )
-
-from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
-from opentrons.hardware_control import CriticalPoint
-from opentrons.types import MountType, Mount as HwMount, Point, NozzleConfigurationType
-from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    LoadedPipette,
-    MotorAxis,
-    FlowRates,
-    DeckPoint,
-    CurrentPipetteLocation,
-    TipGeometry,
-    LabwareWellId,
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses as VolumeModes,
 )
-from opentrons.protocol_engine.state.pipettes import (
-    PipetteState,
-    PipetteView,
-    CurrentDeckPoint,
-    HardwarePipette,
-    StaticPipetteConfig,
-    BoundingNozzlesOffsets,
-    PipetteBoundingBoxOffsets,
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
 )
-from opentrons.protocol_engine.state import fluid_stack
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_engine.errors import TipNotAttachedError, PipetteNotLoadedError
 
 from ..pipette_fixtures import (
-    NINETY_SIX_ROWS,
-    NINETY_SIX_COLS,
-    NINETY_SIX_MAP,
-    EIGHT_CHANNEL_ROWS,
     EIGHT_CHANNEL_COLS,
     EIGHT_CHANNEL_MAP,
+    EIGHT_CHANNEL_ROWS,
+    NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
+    NINETY_SIX_ROWS,
     get_default_nozzle_map,
 )
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
+from opentrons.hardware_control import CriticalPoint
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.errors import PipetteNotLoadedError, TipNotAttachedError
+from opentrons.protocol_engine.state import fluid_stack
+from opentrons.protocol_engine.state.pipettes import (
+    BoundingNozzlesOffsets,
+    CurrentDeckPoint,
+    HardwarePipette,
+    PipetteBoundingBoxOffsets,
+    PipetteState,
+    PipetteView,
+    StaticPipetteConfig,
+)
+from opentrons.protocol_engine.types import (
+    CurrentPipetteLocation,
+    DeckPoint,
+    FlowRates,
+    LabwareWellId,
+    LoadedPipette,
+    MotorAxis,
+    TipGeometry,
+)
+from opentrons.types import Mount as HwMount
+from opentrons.types import MountType, NozzleConfigurationType, Point
 
 _SAMPLE_NOZZLE_BOUNDS_OFFSETS = BoundingNozzlesOffsets(
     back_left_offset=Point(x=10, y=20, z=30), front_right_offset=Point(x=40, y=50, z=60)

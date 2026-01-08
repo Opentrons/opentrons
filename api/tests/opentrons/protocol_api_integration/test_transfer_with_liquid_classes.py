@@ -1,13 +1,13 @@
 """Tests for the transfer APIs using liquid classes."""
 
-import pytest
 import mock
+import pytest
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.core.engine import InstrumentCore
 from opentrons.protocol_api.core.engine.transfer_components_executor import (
-    TransferType,
     LiquidAndAirGapPair,
+    TransferType,
 )
 from opentrons.protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2Type,

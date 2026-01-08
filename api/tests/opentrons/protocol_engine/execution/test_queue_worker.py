@@ -1,13 +1,13 @@
 """Tests for the command QueueWorker in opentrons.protocol_engine."""
 
-from typing import Generator, AsyncGenerator, Callable
+from typing import AsyncGenerator, Callable, Generator
 
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.state.state import StateStore
 from opentrons.protocol_engine.errors import RunStoppedError
 from opentrons.protocol_engine.execution import CommandExecutor, QueueWorker
+from opentrons.protocol_engine.state.state import StateStore
 
 
 class BreakLoopError(Exception):

@@ -1,10 +1,10 @@
 """Test drop tip commands."""
 
 from datetime import datetime
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
-from unittest.mock import sentinel
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 from opentrons_shared_data.labware.labware_definition import (
@@ -12,33 +12,31 @@ from opentrons_shared_data.labware.labware_definition import (
     Parameters2,
 )
 
+from opentrons.hardware_control.types import TipScrapeType
 from opentrons.protocol_engine import (
+    DeckPoint,
     DropTipWellLocation,
     DropTipWellOrigin,
     WellLocation,
     WellOffset,
-    DeckPoint,
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.drop_tip import (
+    DropTipImplementation,
     DropTipParams,
     DropTipResult,
-    DropTipImplementation,
 )
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.commands.pipetting_common import (
     TipPhysicallyAttachedError,
 )
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.errors.exceptions import TipAttachedError
+from opentrons.protocol_engine.execution import MovementHandler, TipHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import LabwareWellId, TipRackWellState
-from opentrons.protocol_engine.execution import MovementHandler, TipHandler
-
-
 from opentrons.types import Point
-from opentrons.hardware_control.types import TipScrapeType
 
 
 @pytest.fixture

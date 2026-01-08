@@ -2,23 +2,22 @@
 
 import json
 from ast import literal_eval
-from pathlib import Path
-from typing import Union, cast, overload
 from functools import lru_cache
 from itertools import product
+from pathlib import Path
+from typing import Union, cast, overload
 
 from ..load import load_shared_data
 from .types import (
-    SchemaVersions,
-    ModuleSchema,
-    SchemaV1,
-    SchemaV3,
     ModuleDefinitionV1,
     ModuleDefinitionV3,
     ModuleModel,
+    ModuleSchema,
+    SchemaV1,
+    SchemaV3,
+    SchemaVersions,
     TOFSensorBaseline,
 )
-
 
 OLD_TC_GEN2_LABWARE_OFFSET = {"x": 0, "y": 68.06, "z": 98.26}
 

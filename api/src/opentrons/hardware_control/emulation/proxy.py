@@ -1,14 +1,15 @@
 """The Proxy class module."""
 
 from __future__ import annotations
+
 import asyncio
 import logging
-import uuid
 import socket
+import sys
+import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import List
-import sys
 
 from opentrons.hardware_control.emulation.settings import ProxySettings
 

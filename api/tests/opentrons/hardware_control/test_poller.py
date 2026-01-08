@@ -3,8 +3,8 @@ from typing import AsyncGenerator
 
 import pytest
 from decoy import Decoy, matchers
-from opentrons.hardware_control.poller import Poller, Reader
 
+from opentrons.hardware_control.poller import Poller, Reader
 
 POLLING_INTERVAL = 0.1
 

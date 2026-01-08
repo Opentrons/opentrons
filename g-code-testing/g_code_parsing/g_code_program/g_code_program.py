@@ -1,11 +1,12 @@
 from __future__ import annotations
+
 import json
 from typing import List, Union
 
-from g_code_parsing.g_code_watcher import GCodeWatcher
+from g_code_parsing.errors import PollingGCodeAdditionError
 from g_code_parsing.g_code import GCode
 from g_code_parsing.g_code_program.supported_text_modes import SupportedTextModes
-from g_code_parsing.errors import PollingGCodeAdditionError
+from g_code_parsing.g_code_watcher import GCodeWatcher
 
 
 class GCodeProgram:

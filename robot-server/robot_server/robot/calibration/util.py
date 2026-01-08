@@ -1,49 +1,48 @@
 import logging
 from typing import (
+    TYPE_CHECKING,
     Generic,
+    List,
     Mapping,
+    Optional,
     TypeVar,
     Union,
-    List,
-    Optional,
-    TYPE_CHECKING,
 )
 
-from opentrons.hardware_control.util import plan_arc
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.protocol_api import labware
-from opentrons.protocols.geometry import planning
-from opentrons.protocol_api.core.legacy.deck import Deck
 from opentrons.calibration_storage import helpers
-
 from opentrons.calibration_storage import ot2 as ot2_cal_storage
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.util import plan_arc
+from opentrons.protocol_api import labware
+from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocols.geometry import planning
+from opentrons.types import Location, Point
 
-from opentrons.types import Point, Location
-
-from robot_server.service.errors import RobotServerError
-from robot_server.service.session.models.command_definitions import CommandDefinition
+from .check.constants import CalibrationCheckState
 from .constants import (
-    STATE_WILDCARD,
     MOVE_TO_REF_POINT_SAFETY_BUFFER,
-    TRASH_WELL,
+    STATE_WILDCARD,
     TRASH_REF_POINT_OFFSET,
+    TRASH_WELL,
 )
+from .deck.constants import DeckCalibrationState
 from .errors import CalibrationError
-from .tip_length.constants import TipCalibrationState
 from .pipette_offset.constants import (
     PipetteOffsetCalibrationState,
     PipetteOffsetWithTipLengthCalibrationState,
 )
-from .deck.constants import DeckCalibrationState
-from .check.constants import CalibrationCheckState
+from .tip_length.constants import TipCalibrationState
+from robot_server.service.errors import RobotServerError
+from robot_server.service.session.models.command_definitions import CommandDefinition
 
 if TYPE_CHECKING:
-    from .deck.user_flow import DeckCalibrationUserFlow
-    from .tip_length.user_flow import TipCalibrationUserFlow
-    from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
-    from .check.user_flow import CheckCalibrationUserFlow
-    from opentrons_shared_data.pipette.types import LabwareUri
     from opentrons_shared_data.labware.types import LabwareDefinition2
+    from opentrons_shared_data.pipette.types import LabwareUri
+
+    from .check.user_flow import CheckCalibrationUserFlow
+    from .deck.user_flow import DeckCalibrationUserFlow
+    from .pipette_offset.user_flow import PipetteOffsetCalibrationUserFlow
+    from .tip_length.user_flow import TipCalibrationUserFlow
 
 ValidState = Union[
     TipCalibrationState,

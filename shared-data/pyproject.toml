@@ -75,7 +75,7 @@ build-backend = 'hatchling.build'
 #[tool.setuptools_scm]
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90"]
+select = ["E", "ANN", "D", "C90", "I"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "python/opentrons_shared_data/load.py" = ["D"]
@@ -85,11 +85,14 @@ ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 "python/opentrons_shared_data/pipette/*" = ["D"]
 "python/opentrons_shared_data/protocol/*" = ["D"]
 "python_tests/*" = ["ANN", "D"]
+"python/opentrons_shared_data/_version.py" = ["I"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
+[tool.ruff.lint.isort]
+known-local-folder = ["opentrons_shared_data"]
 
 
 [tool.hatch.build.hooks.vcs-tunable]

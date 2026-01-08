@@ -2,32 +2,32 @@
 
 import math
 from typing import Dict, List, Optional
+
 import pytest
 from decoy import Decoy
 
-from opentrons.drivers.types import ABSMeasurementMode, ABSMeasurementConfig
+from opentrons.drivers.types import ABSMeasurementConfig, ABSMeasurementMode
 from opentrons.hardware_control.modules import AbsorbanceReader
-from opentrons.protocol_engine.errors import (
-    CannotPerformModuleAction,
-)
-
-from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.resources import FileProvider
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    AbsorbanceReaderSubState,
-    AbsorbanceReaderId,
-)
-from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.absorbance_reader import (
-    ReadAbsorbanceResult,
     ReadAbsorbanceParams,
+    ReadAbsorbanceResult,
 )
 from opentrons.protocol_engine.commands.absorbance_reader.read import (
     ReadAbsorbanceImpl,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.errors import (
+    CannotPerformModuleAction,
+)
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.resources import FileProvider
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.module_substates import (
+    AbsorbanceReaderId,
+    AbsorbanceReaderSubState,
+)
+from opentrons.protocol_engine.state.modules import ModuleView
+from opentrons.protocol_engine.state.state import StateView
 
 
 def _get_absorbance_map(data: Optional[List[float]] = None) -> Dict[str, float]:

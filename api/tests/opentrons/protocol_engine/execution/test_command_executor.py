@@ -2,15 +2,29 @@
 
 import asyncio
 from datetime import datetime
-from typing import Optional, Type, cast, Any, Union
+from typing import Any, Optional, Type, Union, cast
 
 import pytest
 from decoy import Decoy, matchers
 from pydantic import BaseModel, PrivateAttr
 
-from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
+from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
 
+from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.actions import (
+    ActionDispatcher,
+    FailCommandAction,
+    RunCommandAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.commands import (
+    AbstractCommandImpl,
+    BaseCommand,
+    Command,
+    CommandStatus,
+)
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
@@ -20,46 +34,29 @@ from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
 from opentrons.protocol_engine.errors.exceptions import (
     EStopActivatedError as PE_EStopActivatedError,
 )
-from opentrons.protocol_engine.resources import ModelUtils, FileProvider, CameraProvider
+from opentrons.protocol_engine.execution import (
+    CommandExecutor,
+    EquipmentHandler,
+    GantryMover,
+    LabwareMovementHandler,
+    MovementHandler,
+    PipettingHandler,
+    RailLightsHandler,
+    RunControlHandler,
+    StatusBarHandler,
+    TaskHandler,
+    TipHandler,
+)
+from opentrons.protocol_engine.execution.command_executor import (
+    CommandNoteTrackerProvider,
+)
+from opentrons.protocol_engine.notes import CommandNote, CommandNoteTracker
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider, ModelUtils
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraSettings,
     ImageParameters,
 )
 from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.actions import (
-    ActionDispatcher,
-    RunCommandAction,
-    SucceedCommandAction,
-    FailCommandAction,
-)
-
-from opentrons.protocol_engine.commands import (
-    AbstractCommandImpl,
-    BaseCommand,
-    CommandStatus,
-    Command,
-)
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-
-from opentrons.protocol_engine.execution import (
-    CommandExecutor,
-    EquipmentHandler,
-    MovementHandler,
-    GantryMover,
-    LabwareMovementHandler,
-    PipettingHandler,
-    TipHandler,
-    RunControlHandler,
-    RailLightsHandler,
-    StatusBarHandler,
-    TaskHandler,
-)
-from opentrons.protocol_engine.execution.command_executor import (
-    CommandNoteTrackerProvider,
-)
-
-from opentrons_shared_data.errors.exceptions import EStopActivatedError, PythonException
-from opentrons.protocol_engine.notes import CommandNoteTracker, CommandNote
 
 
 @pytest.fixture

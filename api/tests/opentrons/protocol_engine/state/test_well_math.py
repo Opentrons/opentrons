@@ -2,23 +2,22 @@
 
 import json
 import pathlib
+from collections import OrderedDict
 from itertools import chain
 from typing import Any, cast
-from collections import OrderedDict
 
 import pytest
 
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 
-from opentrons.types import Point
+from .. import pipette_fixtures
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state._well_math import (
+    nozzles_per_well,
     wells_covered_dense,
     wells_covered_sparse,
-    nozzles_per_well,
 )
-
-from .. import pipette_fixtures
+from opentrons.types import Point
 
 _96_FULL_MAP = NozzleMap.build(
     physical_nozzles=pipette_fixtures.NINETY_SIX_MAP,

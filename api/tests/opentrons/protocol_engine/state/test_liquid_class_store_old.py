@@ -10,12 +10,12 @@ import pytest
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
+
+from .command_fixtures import create_comment_command
 from opentrons.protocol_engine import actions
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.liquid_classes import LiquidClassStore
 from opentrons.protocol_engine.types import LiquidClassRecord
-
-from .command_fixtures import create_comment_command
 
 
 @pytest.fixture

@@ -6,14 +6,11 @@ reactions in objects that subscribe to the pipeline, like the StateStore.
 
 import dataclasses
 from datetime import datetime
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Tuple, Union
 
-from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.errors import EnumeratedError
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-
-from opentrons.hardware_control.types import DoorState
-from opentrons.hardware_control.modules import LiveData
+from opentrons_shared_data.util import StrEnum
 
 from ..commands import (
     Command,
@@ -23,15 +20,17 @@ from ..commands import (
 from ..error_recovery_policy import ErrorRecoveryPolicy, ErrorRecoveryType
 from ..errors import ErrorOccurrence
 from ..notes.notes import CommandNote
-from ..state.update_types import StateUpdate
 from ..resources.camera_provider import CameraSettings
+from ..state.update_types import StateUpdate
 from ..types import (
-    LabwareOffsetCreateInternal,
-    ModuleDefinition,
-    Liquid,
     DeckConfigurationType,
+    LabwareOffsetCreateInternal,
+    Liquid,
+    ModuleDefinition,
     Task,
 )
+from opentrons.hardware_control.modules import LiveData
+from opentrons.hardware_control.types import DoorState
 
 
 @dataclasses.dataclass(frozen=True)

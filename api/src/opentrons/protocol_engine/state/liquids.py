@@ -2,11 +2,11 @@
 
 from dataclasses import dataclass
 from typing import Dict, List
-from opentrons.protocol_engine.types import Liquid, LiquidId
 
-from ._abstract_store import HasState, HandlesActions
 from ..actions import Action, AddLiquidAction
-from ..errors import LiquidDoesNotExistError, InvalidLiquidError
+from ..errors import InvalidLiquidError, LiquidDoesNotExistError
+from ._abstract_store import HandlesActions, HasState
+from opentrons.protocol_engine.types import Liquid, LiquidId
 
 
 @dataclass

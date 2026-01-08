@@ -1,34 +1,36 @@
-from typing import List, Tuple
-from mock import call, MagicMock, patch
-
-import pytest
 import datetime
 from pathlib import Path
-from opentrons.hardware_control.instruments.ot2 import pipette
-from opentrons.types import Mount, Point
+from typing import List, Tuple
+
+import pytest
+from mock import MagicMock, call, patch
+
 from opentrons import calibration_storage
 from opentrons.config import robot_configs
+from opentrons.hardware_control.instruments.ot2 import pipette
+from opentrons.types import Mount, Point
 from opentrons_shared_data.pipette import (
     mutable_configurations,
+)
+from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 
 from robot_server.robot.calibration.check import user_flow as check_flow
-from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
 from robot_server.robot.calibration.check.constants import CalibrationCheckState
 from robot_server.robot.calibration.check.models import (
     ComparisonStatus,
-    PipetteOffsetComparisonMap,
     DeckComparisonMap,
+    PipetteOffsetComparisonMap,
     TipComparisonMap,
 )
-from robot_server.service.errors import RobotServerError
+from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
 from robot_server.robot.calibration.constants import (
     POINT_ONE_ID,
-    POINT_TWO_ID,
     POINT_THREE_ID,
+    POINT_TWO_ID,
 )
-
+from robot_server.service.errors import RobotServerError
 
 PIP_OFFSET = calibration_storage.ot2.models.v1.InstrumentOffsetModel(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,

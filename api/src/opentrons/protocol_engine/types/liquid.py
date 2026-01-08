@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from typing import Literal, Optional
 
-from pydantic import RootModel, BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 
 from opentrons_shared_data.util import StrEnum
 

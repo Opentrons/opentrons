@@ -1,10 +1,11 @@
 """Provides support to create a persistent directory, if it doesn't exist."""
 
 import logging
-from tempfile import mkdtemp
 from pathlib import Path
-from anyio import Path as AsyncPath
+from tempfile import mkdtemp
 from typing import Optional
+
+from anyio import Path as AsyncPath
 from typing_extensions import Final
 
 _TEMP_PERSISTENCE_DIR_PREFIX: Final = "opentrons-system-server-"

@@ -1,56 +1,54 @@
 """Test Flex Stacker store command implementation."""
 
 from datetime import datetime
-from unittest.mock import sentinel
 from typing import Type, Union
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerShuttleLabwareError,
+    FlexStackerShuttleMissingError,
+    FlexStackerStallError,
+)
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
 from opentrons.drivers.flex_stacker.types import StackerAxis
 from opentrons.hardware_control.modules import FlexStacker, PlatformState
-from opentrons.protocol_engine.commands.flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-    FlexStackerShuttleError,
-    FlexStackerLabwareStoreError,
-)
-from opentrons.protocol_engine.resources import ModelUtils
-
-from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
-    FlexStackerStateUpdate,
-    BatchLabwareLocationUpdate,
-)
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import flex_stacker
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
-from opentrons.protocol_engine.commands.flex_stacker.store import StoreImpl
-from opentrons.protocol_engine.types import (
-    OnAddressableAreaLocationSequenceComponent,
-    ModuleLocation,
-    OnModuleLocationSequenceComponent,
-    InStackerHopperLocation,
-    OnCutoutFixtureLocationSequenceComponent,
-    StackerStoredLabwareGroup,
-    StackerLabwareMovementStrategy,
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.flex_stacker.common import (
+    FlexStackerLabwareStoreError,
+    FlexStackerShuttleError,
+    FlexStackerStallOrCollisionError,
 )
+from opentrons.protocol_engine.commands.flex_stacker.store import StoreImpl
 from opentrons.protocol_engine.errors import (
     CannotPerformModuleAction,
-    LabwareNotLoadedOnModuleError,
     FlexStackerLabwarePoolNotYetDefinedError,
+    LabwareNotLoadedOnModuleError,
 )
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import (
-    FlexStackerStallError,
-    FlexStackerShuttleMissingError,
-    FlexStackerShuttleLabwareError,
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import (
+    BatchLabwareLocationUpdate,
+    FlexStackerStateUpdate,
+    StateUpdate,
+)
+from opentrons.protocol_engine.types import (
+    InStackerHopperLocation,
+    ModuleLocation,
+    OnAddressableAreaLocationSequenceComponent,
+    OnCutoutFixtureLocationSequenceComponent,
+    OnModuleLocationSequenceComponent,
+    StackerLabwareMovementStrategy,
+    StackerStoredLabwareGroup,
 )
 
 

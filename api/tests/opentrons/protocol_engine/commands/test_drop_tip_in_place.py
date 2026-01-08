@@ -5,22 +5,22 @@ from datetime import datetime
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.drop_tip_in_place import (
+    DropTipInPlaceImplementation,
+    DropTipInPlaceParams,
+    DropTipInPlaceResult,
+)
 from opentrons.protocol_engine.commands.pipetting_common import (
     TipPhysicallyAttachedError,
 )
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.drop_tip_in_place import (
-    DropTipInPlaceParams,
-    DropTipInPlaceResult,
-    DropTipInPlaceImplementation,
-)
 from opentrons.protocol_engine.errors.exceptions import TipAttachedError
-from opentrons.protocol_engine.execution import TipHandler, GantryMover
+from opentrons.protocol_engine.execution import GantryMover, TipHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state.update_types import (
     PipetteTipStateUpdate,
-    StateUpdate,
     PipetteUnknownFluidUpdate,
+    StateUpdate,
 )
 from opentrons.types import Point
 

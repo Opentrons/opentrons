@@ -4,19 +4,19 @@ import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import FlexStacker
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_close_latch import (
     UnsafeFlexStackerCloseLatchImpl,
     UnsafeFlexStackerCloseLatchParams,
     UnsafeFlexStackerCloseLatchResult,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 
 
 @pytest.fixture

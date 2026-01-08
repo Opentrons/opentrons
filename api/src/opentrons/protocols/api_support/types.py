@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import NamedTuple, TypedDict, Optional
+
+from typing import NamedTuple, Optional, TypedDict
 
 
 class APIVersion(NamedTuple):
