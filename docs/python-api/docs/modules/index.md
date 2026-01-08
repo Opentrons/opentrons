@@ -17,7 +17,7 @@ Pages in this section of the documentation cover:
     - [Magnetic Module](magnetic-module.md)
     - [Temperature Module](temperature-module.md)
     - [Thermocycler Module](thermocycler.md)
-- Using [concurrent module actions](concurrent-module.md) to run modules while the robot performs other protocol steps, like pipetting, gripper, and other module actions. 
+- Using [concurrent module actions](concurrent.md) to run modules while the robot performs other protocol steps, like pipetting, gripper, and other module actions. 
 - Loading [multiple modules of the same type](multiple-same-type.md) in a single protocol.
 
 !!! note

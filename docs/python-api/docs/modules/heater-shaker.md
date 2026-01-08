@@ -113,63 +113,13 @@ In both cases, the API lets you choose whether to perform other protocol steps w
 - **Blocking commands**: The robot will pause and wait, performing no other actions until the module reaches the required temperature or shake speed. 
 - **Concurrent commands**: The robot continues to perform subsequent actions while heating or shaking. For example, continue pipetting, move labware, or run other modules. 
 
-<table>
-    <thead>
-        <tr>
-            <th>Action</th>
-            <th>Method</th>
-            <th>Type</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr> 
-            <td>
-                Heating
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_temperature"><code>set_and_wait_for_temperature()</code></a>
-            </td>
-            <td>
-                Blocking
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Heating
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.HeaterShakerContext.wait_for_temperature"><code>wait_for_temperature()</code></a></td>
-            <td>
-               Blocking
-            </td>
-        </tr>
-        <tr>
-            <td>
-            Heating
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.HeaterShakerContext.set_target_temperature"><code>set_target_temperature()</code></a></td>
-            <td>
-               Concurrent 
-            </td>
-        </tr>
-        <tr>
-            <td>
-            Shaking
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_shake_speed"><code>set_and_wait_for_shake_speed()</code></a></td>
-            <td>
-            Blocking
-            </td>
-        </tr>
-        <tr>
-            <td>  
-            Shaking
-            </td>
-            <td><a href="..api-reference/modules/#opentrons.protocol_api.HeaterShakerContext.set_shake_speed"><code>set_shake_speed()</code></a></td>
-            <td>
-               Concurrent 
-            </td>
-        </tr>  
-    </tbody>
-</table>
+| **Action** | **Method** | **Type** |
+| :----------|----------- | -------- |
+| Heating | [`set_and_wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_temperature] | Blocking |
+| Heating | [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature] | Blocking |
+| Heating | [`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature] | Concurrent |
+| Shaking | [`set_and_wait_for_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_shake_speed] | Blocking |
+| Shaking | [`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed] | Concurrent | 
 
 The sections below cover heating and shaking samples using the Heater-Shaker Module's blocking and concurrent commands. 
 
@@ -187,10 +137,11 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
     pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
     protocol.delay(minutes=1)
-    ``` 
-    When you use a blocking command like [`set_and_wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_temperature], your protocol proceeds completely linearly. No other commands will execute until the Heater-Shaker Module reaches the target temperature. In this example, the robot will perform the pipetting steps and protocol delay only after the module reaches 75 °C. 
+    ```
 
-    *New in version 2.13.*
+    When you use a blocking command like [`set_and_wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_temperature], your protocol proceeds completely linearly. No other commands will execute until the Heater-Shaker Module reaches the target temperature. In this example, the robot will perform the pipetting steps and protocol delay only after the module reaches 75 °C.
+
+    *New in version 2.13*
 
 === "Concurrent"
     ```python
@@ -204,10 +155,9 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
 
     To perform other actions while the module reaches its target temperature, use the concurrent [`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature] command. Here, the robot will continue to perform pipetting steps and a protocol delay while the Heater-Shaker heats to 75 °C.
 
-    *New in version 2.13.*
+    *New in version 2.13*
 
-    *Changed in version 2.27:* Returns a [`Task`](opentrons.protocol_api.Task) that runs in the background of a protocol.*
-
+    *Changed in version 2.27:* Returns a [`Task`][opentrons.protocol_api.Task] that runs in the background of a protocol.
 
 
 If you want the robot to continue pipetting while the module heats to prepare for a sample incubation, you can use [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer]:
@@ -229,7 +179,7 @@ incubation_timer = create_timer(seconds=120)
 protocol.wait_for_tasks([incubation_timer])
 hs_mod.deactivate_heater()
 ```
-*New in version 2.27.*
+*New in version 2.27*
 
 Here, the robot will perform protocol steps placed after the concurrent [`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature] command. Once the protocol reaches the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] command, the robot pauses for two minutes while the module holds at 75 °C.
 
@@ -246,14 +196,15 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
     pipette.drop_tip()
     protocol.delay(minutes=1)
     ```
+
     In this example, no other commands will execute until the Heater-Shaker reaches a shake speed of 500 RPM with the blocking command [`set_and_wait_for_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_and_wait_for_shake_speed]. Because reaching the shake speed takes much less time than heating the module, these actions will take only about 85 seconds total. 
 
-    *New in version 2.13.*
+    *New in version 2.13*
 
 === "Concurrent"
     ```python
     hs_mod.set_shake_speed(500)
-    pipette.pick_up_tip()   
+    pipette.pick_up_tip()
     pipette.aspirate(50, plate["A1"])
     pipette.dispense(50, plate["B1"])
     pipette.drop_tip()
@@ -262,9 +213,9 @@ The examples below use a blocking or concurrent command to set the Heater-Shaker
 
     When you use a concurrent command like [`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed], the robot will continue to perform pipetting steps and a protocol delay while the Heater-Shaker Module reaches the target shake speed. 
 
-    *New in version 2.27.*
+    *New in version 2.27*
 
-You can also use concurrent commands to heat and shake simultaneously. The amount of time it takes for the Heater-Shaker Module to reach either the target temperature or shake speed won't affect other steps in your protocol. The concurrent [`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature] and [`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed] methods also allow some other simultaneous module actions. For more, see the [concurrent module actions][concurrent-module] section. 
+You can also use concurrent commands to heat and shake simultaneously. The amount of time it takes for the Heater-Shaker Module to reach either the target temperature or shake speed won't affect other steps in your protocol. The concurrent [`set_target_temperature()`][opentrons.protocol_api.HeaterShakerContext.set_target_temperature] and [`set_shake_speed()`][opentrons.protocol_api.HeaterShakerContext.set_shake_speed] methods also allow some other simultaneous module actions. For more, see the [concurrent module actions](concurrent.md) section. 
 
 
 ## Deactivating

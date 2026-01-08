@@ -101,7 +101,7 @@ Both examples below set the target temperature to 4 °C. Each takes one paramete
     
     When you use the blocking [`set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.set_temperature] method, the robot won't begin performing other protocol steps until the Temperature Module reaches the target temperature. You can pipette to and from the module only when it is holding at a temperature or idle.
     
-    *New in version 2.0.*
+    *New in version 2.0*
     
 === "Concurrent"
 
@@ -113,9 +113,9 @@ Both examples below set the target temperature to 4 °C. Each takes one paramete
     pipette.drop_tip()
     ```
 
-    Beginning with API version 2.27, you can use the concurrent [`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature] method to move on to further commands while the Temperature Module reaches its target temperature. The method also allows some other simultaneous module actions. For more, see the [concurrent module actions][concurrent-module] section.
+    Beginning with API version 2.27, you can use the concurrent [`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature] method to move on to further commands while the Temperature Module reaches its target temperature. The method also allows some other simultaneous module actions. For more, see the [concurrent module actions](concurrent.md) section.
 
-    *New in version 2.27.*
+    *New in version 2.27*
 
 Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call [`deactivate()`][opentrons.protocol_api.TemperatureModuleContext.deactivate], which will stop heating or cooling and will turn off the fan. 
 
