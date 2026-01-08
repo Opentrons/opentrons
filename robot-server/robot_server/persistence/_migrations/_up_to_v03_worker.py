@@ -1,6 +1,5 @@
 """Code that runs in a worker subprocess for the `up_to_3` migration."""
 
-
 # fmt: off
 
 # We keep a list of all the modules that this file imports
@@ -29,7 +28,7 @@ from robot_server.persistence import (  # noqa: E402
     _legacy_pickle,
     database,
 )
-from robot_server.persistence import (
+from robot_server.persistence import (  # noqa: E402
     pydantic as pydantic_helpers,
 )
 from robot_server.persistence.tables import schema_02, schema_03  # noqa: E402
