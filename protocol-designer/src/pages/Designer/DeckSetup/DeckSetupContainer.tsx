@@ -86,6 +86,7 @@ interface DeckSetupContainerProps {
   setViewBox: Dispatch<SetStateAction<string>>
   viewBox: string
   initialViewBox: string
+  currentStep: any
 }
 export function DeckSetupContainer(
   props: DeckSetupContainerProps
@@ -98,6 +99,7 @@ export function DeckSetupContainer(
     initialViewBox,
     viewBox,
     setViewBox,
+    currentStep,
   } = props
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
   const dispatch = useDispatch<any>()
@@ -371,6 +373,7 @@ export function DeckSetupContainer(
                     setHover={setHoverSlot}
                     addEquipment={addEquipment}
                     activeDeckSetup={activeDeckSetup}
+                    currentStep={currentStep}
                     stagingAreaCutoutIds={stagingAreaFixtures.map(
                       areas => areas.location as CutoutId
                     )}

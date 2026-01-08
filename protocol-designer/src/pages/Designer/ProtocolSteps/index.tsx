@@ -333,6 +333,7 @@ export function ProtocolSteps({
                     hoverSlot={hoverSlot}
                     setHoverSlot={setHoverSlot}
                     robotType={robotType}
+                    currentStep={currentStep}
                   />
                 ) : (
                   <OffDeck setOverflowMenu={showLiquidOverflowMenu} />

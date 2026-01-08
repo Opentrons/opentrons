@@ -14,7 +14,10 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import {
+  FLEX_STACKER_IN_HOPPER_ACTIONS,
+  HOPPER_LABWARE_X_OFFSET,
+} from '/protocol-designer/constants'
 import { getLabwaresOnModuleFromStack } from '/protocol-designer/utils'
 
 import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locations'
@@ -41,6 +44,7 @@ import type { Fixture } from './constants'
 interface HighlightItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
+  currentStep: any
 }
 //  TODO(ja, 1/13/25): get actual coordinates from thermocycler and deck definitions
 const FLEX_TC_POSITION: CoordinateTuple = [-20, 282, 0]
@@ -58,7 +62,7 @@ const SLOTS = [
 ]
 
 export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
-  const { robotType, deckDef } = props
+  const { robotType, deckDef, currentStep } = props
   const { t } = useTranslation('application')
   const { labware, modules, additionalEquipmentOnDeck } = useSelector(
     getDeckSetupForActiveItem
@@ -165,9 +169,13 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
         Object.values(labware)
       )
       const isStacker = moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
-      const onHopperActions = ['Empty', 'Refill', 'Retrieve']
-      const isActionOnShuttle =
-        isStacker && !onHopperActions.includes(text ?? '')
+
+      const stepType: (typeof FLEX_STACKER_IN_HOPPER_ACTIONS)[number] | null =
+        currentStep?.flexStackerFormType ?? null
+
+      const onHopperActions =
+        stepType != null && FLEX_STACKER_IN_HOPPER_ACTIONS.includes(stepType)
+      const isActionOnShuttle = isStacker && !onHopperActions
 
       const position = getPositionFromSlotId(
         moduleOnDeck.slot,

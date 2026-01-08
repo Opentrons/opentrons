@@ -98,6 +98,11 @@ export const FLEX_STACKER_RETRIEVE: 'retrieve' = 'retrieve'
 export const FLEX_STACKER_STORE: 'store' = 'store'
 export const FLEX_STACKER_FILL: 'fill' = 'fill'
 export const FLEX_STACKER_EMPTY: 'empty' = 'empty'
+export const FLEX_STACKER_IN_HOPPER_ACTIONS = [
+  FLEX_STACKER_STORE,
+  FLEX_STACKER_EMPTY,
+  FLEX_STACKER_RETRIEVE,
+]
 
 export const OFFDECK: 'offDeck' = 'offDeck'
 

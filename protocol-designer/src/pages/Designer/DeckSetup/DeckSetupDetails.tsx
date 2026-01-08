@@ -79,6 +79,7 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
+  currentStep: any
   stagingAreaCutoutIds: CutoutId[]
   selectedZoomInSlot?: DeckSlotId
 }
@@ -94,6 +95,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     setHover,
     showGen1MultichannelCollisionWarnings,
     stagingAreaCutoutIds,
+    currentStep,
   } = props
   const { labware: activeLabware } = activeDeckSetup
   const robotType = useSelector(getRobotType)
@@ -724,7 +726,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       })}
 
       {/* highlight items from Protocol steps */}
-      <HighlightItems robotType={robotType} deckDef={deckDef} />
+      <HighlightItems
+        robotType={robotType}
+        deckDef={deckDef}
+        currentStep={currentStep}
+      />
 
       {/* selected hardware + labware */}
       <SelectedItems
