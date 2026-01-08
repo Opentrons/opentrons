@@ -38,7 +38,7 @@ dev = [
     "pytest>=8.4.0,<9",
     "pytest-cov==4.1.0",
     "ruff==0.14.10",
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "mock~=5.1.0",
     "types-mock~=5.1.0",
     "hypothesis<7,>=6.96.1",
