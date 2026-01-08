@@ -82,6 +82,16 @@ describe('LabwareStackToolboxContainer liquids dont match', () => {
             },
           },
         },
+        liquidLocations: {
+          mockLabwareId: {
+            A1: {
+              mockGroupId: {
+                volume: 5,
+              },
+            },
+          },
+        },
+        largestStackInSlot: ['mockLabwareId', 'labware2'],
       },
       setShowBadFormState: vi.fn(),
       setDefineLiquidModal: vi.fn(),
