@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useState } from 'react'
+import clsx from 'clsx'
 
 import { StyledText, Tooltip } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
@@ -132,34 +133,28 @@ export const TextAreaField = forwardRef<
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isKeyboardFocus = useFocusVisible() // Track focus method
 
-  const wrapperClasses = [
+  const wrapperClasses = clsx(
     styles.wrapper,
     error != null ? styles.warning_color : styles.default_color,
-    disabled === true ? styles.disabled : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
+    disabled === true && styles.disabled
+  )
 
-  const textareaClasses = [
+  const textareaClasses = clsx(
     styles.textarea,
-    hasError ? styles.textarea_error : '',
-    hasBackgroundError ? styles.textarea_background_error : '',
-    isKeyboardFocus ? styles.textarea_keyboard_focus : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
+    hasError && styles.textarea_error,
+    hasBackgroundError && styles.textarea_background_error,
+    isKeyboardFocus && styles.textarea_keyboard_focus
+  )
 
-  const titleClasses = [
+  const titleClasses = clsx(
     styles.title_text,
-    textAlign === 'center' ? styles.title_text_center : styles.title_text_left,
-  ].join(' ')
+    textAlign === 'center' ? styles.title_text_center : styles.title_text_left
+  )
 
-  const textareaRowClasses = [
+  const textareaRowClasses = clsx(
     styles.textarea_row,
-    leftIcon !== undefined ? styles.textarea_row_with_icon : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
+    leftIcon !== undefined && styles.textarea_row_with_icon
+  )
 
   return (
     <div className={wrapperClasses}>
@@ -215,7 +210,7 @@ export const TextAreaField = forwardRef<
               placeholder={placeHolder}
               onWheel={event => {
                 event.currentTarget.blur()
-              }}
+              }} // prevent value change with scrolling
               ref={ref}
               disabled={disabled}
               id={id}
