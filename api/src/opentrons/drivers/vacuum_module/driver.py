@@ -136,7 +136,7 @@ class VacuumModuleDriver(AbstractVacuumModuleDriver):
         """Check connection to vacuum module."""
         return await self._connection.is_open()
 
-    async def reset_serial_buffers(self) -> None:
+    def reset_serial_buffers(self) -> None:
         """Reset the input and output serial buffers."""
         self._connection._serial.reset_input_buffer()
         self._connection._serial.reset_output_buffer()

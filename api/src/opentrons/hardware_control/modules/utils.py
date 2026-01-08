@@ -19,6 +19,7 @@ from .thermocycler import Thermocycler
 from .heater_shaker import HeaterShaker
 from .absorbance_reader import AbsorbanceReader
 from .flex_stacker import FlexStacker
+from .vacuum_module import VacuumModule
 
 
 log = logging.getLogger(__name__)
@@ -33,6 +34,7 @@ MODULE_TYPE_BY_NAME = {
     HeaterShaker.name(): HeaterShaker.MODULE_TYPE,
     AbsorbanceReader.name(): AbsorbanceReader.MODULE_TYPE,
     FlexStacker.name(): FlexStacker.MODULE_TYPE,
+    VacuumModule.name(): VacuumModule.MODULE_TYPE,
 }
 
 _MODULE_CLS_BY_TYPE: Dict[ModuleType, Type[AbstractModule]] = {
@@ -42,6 +44,7 @@ _MODULE_CLS_BY_TYPE: Dict[ModuleType, Type[AbstractModule]] = {
     HeaterShaker.MODULE_TYPE: HeaterShaker,
     AbsorbanceReader.MODULE_TYPE: AbsorbanceReader,
     FlexStacker.MODULE_TYPE: FlexStacker,
+    VacuumModule.MODULE_TYPE: VacuumModule,
 }
 
 
