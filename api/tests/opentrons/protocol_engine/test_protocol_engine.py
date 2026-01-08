@@ -77,6 +77,8 @@ from opentrons.protocol_engine.actions import (
     FinishErrorDetails,
     QueueCommandAction,
     HardwareStoppedAction,
+    CreateUserCommandAnnotation,
+    CloseUserCommandAnnotation,
 )
 
 
@@ -1426,6 +1428,47 @@ async def test_use_attached_temp_and_mag_modules(
                 module_live_data={"status": "other-status", "data": {}},
             ),
         ),
+    )
+
+
+def test_create_user_command_annotation(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should create a user command annotation and return an annotation ID."""
+    result = subject.create_user_command_annotation(
+        annotation_name="My annotation",
+        annotation_id="abc123",
+        description="Hello world",
+    )
+
+    assert result == "abc123"
+
+    decoy.verify(
+        action_dispatcher.dispatch(
+            CreateUserCommandAnnotation(
+                annotation_id="abc123",
+                user_defined_name="My annotation",
+                user_description="Hello world",
+                params={},
+            ),
+        ),
+        times=1,
+    )
+
+
+def test_close_user_command_annotation(
+    decoy: Decoy,
+    action_dispatcher: ActionDispatcher,
+    subject: ProtocolEngine,
+) -> None:
+    """It should send the action to close a command annotation."""
+    subject.close_user_command_annotation(annotation_id="abc123")
+
+    decoy.verify(
+        action_dispatcher.dispatch(CloseUserCommandAnnotation(annotation_id="abc123")),
+        times=1,
     )
 
 
