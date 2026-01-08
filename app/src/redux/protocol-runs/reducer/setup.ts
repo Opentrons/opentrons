@@ -53,11 +53,12 @@ export function setupReducer(
       )
 
     case Constants.CAMERA_SETUP_STEP_KEY: {
+      const { runId, ...rest } = action.payload
       return {
         ...state,
         [Constants.CAMERA_SETUP_STEP_KEY]: {
           ...state[Constants.CAMERA_SETUP_STEP_KEY],
-          ...action.payload,
+          ...rest,
         },
       }
     }
