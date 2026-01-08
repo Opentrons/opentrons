@@ -11,72 +11,14 @@ For each module action, the API lets you choose whether to perform other protoco
 - **Blocking commands**: The robot will pause and wait, performing no other actions until the module executes a profile or reaches the target lid or block temperature. 
 - **Concurrent commands**: The robot continues to perform other pipetting and some other module actions while controlling the Thermocycler Module. 
 
-<table>
-    <thead>
-        <tr>
-            <th>Action</th>
-            <th>Method</th>
-            <th>Type</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr> 
-            <td>
-                Lid Control
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.set_lid_temperature"><code>set_lid_temperature()</code></a>
-            </td>
-            <td>
-                Blocking
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Lid Control
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature"><code>start_set_lid_temperature()</code></a></td>
-            <td>
-               Concurrent
-            </td>
-        </tr>
-        <tr>
-            <td>
-            Block Control
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.set_block_temperature"><code>set_block_temperature()</code></a></td>
-            <td>
-               Blocking 
-            </td>
-        </tr>
-        <tr>
-            <td>
-            Block Control
-            </td>
-            <td><a href="../api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature"><code>start_set_block_temperature()</code></a></td>
-            <td>
-            Concurrent
-            </td>
-        </tr>
-        <tr>
-            <td>  
-            Profiles
-            </td>
-            <td><a href="..api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.execute_profile"><code>execute_profile()</code></a></td>
-            <td>
-               Blocking 
-            </td>
-        </tr> 
-        <tr>
-            <td>
-            Profiles
-            </td>
-            <td><a href="..api-reference/modules/#opentrons.protocol_api.ThermocyclerContext.start_execute_profile"><code>start_execute_profile()</code></a></td>
-            <td>
-               Concurrent
-            </td>
-        </tr> 
-    </tbody>
-</table>
+| **Action** | **Method** | **Type** |
+| :----------|----------- | -------- |
+| Lid control | [`set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_lid_temperature] | Blocking |
+| Lid control | [`start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature] | Concurrent |
+| Block control | [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature] | Blocking |
+| Block control | [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] | Concurrent |
+| Profiles | [`execute_profile()`][opentrons.protocol_api.ThermocyclerContext.execute_profile] | Blocking |
+| Profiles | [`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile] | Concurrent |
 
 This section covers using the Thermocycler Module, including its blocking and concurrent commands. The examples in this section will use a Thermocycler Module GEN2 loaded as follows: 
 
@@ -102,7 +44,7 @@ You can also control the temperature of the lid. Acceptable target temperatures 
 
     When you use a blocking method like [`set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_lid_temperature], your protocol will only proceed once the lid temperature reaches 50 °C. This is the case whether the previous temperature was lower than 50 °C (in which case the lid will actively heat) or higher than 50 °C (in which case the lid will passively cool). 
 
-    *New in version 2.0.*
+    *New in version 2.0*
 
 === "Concurrent"
 
@@ -112,7 +54,7 @@ You can also control the temperature of the lid. Acceptable target temperatures 
 
     Use the concurrent [`start_set_lid_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_lid_temperature] method to allow your protocol to proceed while the lid heats. 
 
-    *New in version 2.27.*
+    *New in version 2.27*
 
 You can turn off the lid heater at any time with [`deactivate_lid()`][opentrons.protocol_api.ThermocyclerContext.deactivate_lid].
 
@@ -135,7 +77,7 @@ To set the block temperature inside the Thermocycler, you can use either a block
 
     When you use a blocking method like [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature], your protocol will only proceed once the block temperature reaches 4 °C.
     
-    *New in version 2.0.*
+    *New in version 2.0*
 
 === "Concurrent"
 
@@ -145,7 +87,7 @@ To set the block temperature inside the Thermocycler, you can use either a block
 
     Use the concurrent [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] method to perform other protocol steps while the block reaches its target temperature.
 
-    *New in version 2.27.*
+    *New in version 2.27*
 
 If you don't specify any other parameters, the Thermocycler will hold this temperature until a new temperature is set, [`deactivate_block()`][opentrons.protocol_api.ThermocyclerContext.deactivate_block] is called, or the module is powered off.
 
@@ -169,7 +111,7 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
 
     If you don't specify a hold time, the protocol will proceed as soon as the target temperature is reached.
 
-    *New in version 2.0.*
+    *New in version 2.0*
 
 === "Concurrent"
     ```python
@@ -187,9 +129,9 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
     protocol.wait_for_tasks([block_timer])
     ```
 
-    The concurrent [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] command doesn't accept the same time arguments. Instead, use [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to proceed to the next steps in the protocol. Here, the robot will perform the pipetting actions while the block reaches its target temperature. Once the protocol reaches the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] commands, the robot pauses and waits for the block to finish cooling or holds for the remainder of the timer.
+    The concurrent [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] method doesn't accept hold time arguments. Instead, use [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to proceed to the next steps in the protocol. Here, the robot will perform the pipetting actions while the block reaches its target temperature. Once the protocol reaches the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] commands, the robot pauses and waits for the block to finish cooling or holds for the remainder of the timer.
 
-    *New in version 2.27.*
+    *New in version 2.27*
 
 ### Block max volume
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the `block_max_volume` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.
@@ -205,7 +147,7 @@ It is especially important to specify `block_max_volume` when holding at a tempe
         block_max_volume=80)
     ```
 
-    *New in version 2.0.*
+    *New in version 2.0*
 
 === "Concurrent"
 
@@ -217,10 +159,11 @@ It is especially important to specify `block_max_volume` when holding at a tempe
     # set time to hold the block at temperature
     block_timer = protocol.create_timer(seconds=20)
     # wait for the block to reach and hold at temperature
-    protocol.wait_for_tasks([cool_task, block_timer])
+    protocol.wait_for_tasks([cool_task])
+    protocol.wait_for_tasks([block_timer])
     ```
 
-    *New in version 2.27.*
+    *New in version 2.27*
 
 In both examples, if the Thermocycler assumes these samples are 25 µL, it may not cool them to 4 °C before starting the 20-second timer. In fact, with such a short hold time they may not reach 4 °C at all!
 
@@ -256,7 +199,7 @@ For instance, a PCR prep protocol might define and execute a profile like this:
 
     When you use the blocking [`execute_profile()`][opentrons.protocol_api.ThermocyclerContext.execute_profile] method, your protocol won't proceed until the entire profile is complete. 
 
-    *New in version 2.0.*
+    *New in version 2.0*
 
 === "Concurrent"
 
@@ -272,9 +215,9 @@ For instance, a PCR prep protocol might define and execute a profile like this:
         block_max_volume=32)
     ```
 
-    Beginning with API version 2.27, you can use the concurrent [`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile] method to let the robot perform your next pipetting steps and some other module actions while your protocol runs. For more, see the [concurrent module actions](concurrent-module) section. 
+    Beginning with API version 2.27, you can use the concurrent [`start_execute_profile()`][opentrons.protocol_api.ThermocyclerContext.start_execute_profile] method to let the robot perform your next pipetting steps and some other module actions while your protocol runs. For more, see the [concurrent module actions](concurrent.md) section. 
 
-    *New in version 2.27.*
+    *New in version 2.27*
 
 
 In terms of the actions that the Thermocycler performs, running each of the examples above this would be equivalent to nesting `set_block_temperature()` commands in a `for` loop:
