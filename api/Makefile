@@ -135,6 +135,7 @@ lint:
 .PHONY: format
 format:
 	$(ruff) format src tests integration_testing docs/v2/example_protocols
+	$(ruff) check --select I --fix src tests integration_testing docs/v2/example_protocols
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

@@ -4,10 +4,9 @@ from typing import AsyncGenerator, Iterator, cast
 
 import pytest
 from can import Bus, Message
-
 from opentrons_shared_data.errors.exceptions import CANBusBusError
-from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
 
+from opentrons_hardware.drivers.can_bus import ArbitrationId, CanDriver, CanMessage
 
 pytestmark = pytest.mark.slow
 

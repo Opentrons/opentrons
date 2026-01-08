@@ -1,28 +1,27 @@
 """Test Heater Shaker set shake speed command implementation."""
 
-from decoy import Decoy, matchers
 import pytest
+from decoy import Decoy, matchers
 
 from opentrons.hardware_control.modules import HeaterShaker
-from opentrons.protocol_engine.resources import ModelUtils
-
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
+from opentrons.protocol_engine.actions import Action, ActionDispatcher, StartTaskAction
+from opentrons.protocol_engine.commands import heater_shaker
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.heater_shaker.set_shake_speed import (
+    SetShakeSpeedImpl,
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
     MovementHandler,
     TaskHandler,
 )
-from opentrons.protocol_engine.actions import ActionDispatcher, Action, StartTaskAction
-from opentrons.protocol_engine.commands import heater_shaker
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.heater_shaker.set_shake_speed import (
-    SetShakeSpeedImpl,
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
 )
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import MotorAxis
 from opentrons.protocol_engine.types.tasks import Task
 

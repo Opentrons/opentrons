@@ -1,26 +1,25 @@
 """OE Updater and dependency injection classes."""
 
-import os
 import contextlib
+import enum
+import logging
 import lzma
+import os
+import subprocess
 import tempfile
+from typing import Any, Callable, Generator, Optional, Tuple
 
 from otupdate.common.constants import MODEL_OT3
 from otupdate.common.file_actions import (
-    InvalidRobotType,
-    unzip_update,
-    hash_file,
     HashMismatch,
     InvalidPKGName,
-    verify_signature,
+    InvalidRobotType,
+    hash_file,
     load_version_file,
+    unzip_update,
+    verify_signature,
 )
-from otupdate.common.update_actions import UpdateActionsInterface, Partition
-from typing import Any, Callable, Generator, Optional, Tuple
-import enum
-import subprocess
-
-import logging
+from otupdate.common.update_actions import Partition, UpdateActionsInterface
 
 UPDATE_PKG_OE = ["system-update.zip"]
 UPDATE_PKG_VERSION_FILE = "VERSION.json"

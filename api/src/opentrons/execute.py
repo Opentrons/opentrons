@@ -6,9 +6,9 @@ regular python shells. It also provides a console entrypoint for running a
 protocol from the command line.
 """
 
+import argparse
 import asyncio
 import atexit
-import argparse
 import contextlib
 import logging
 import os
@@ -29,20 +29,41 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons import protocol_api, __version__, should_use_ot3
-
-from opentrons.legacy_commands import types as command_types
-
+from .util import entrypoint_util
+from opentrons import __version__, protocol_api, should_use_ot3
 from opentrons.hardware_control import (
     API as OT2API,
+)
+from opentrons.hardware_control import (
     ThreadManagedHardware,
     ThreadManager,
 )
 from opentrons.hardware_control.types import HardwareFeatureFlags
-
+from opentrons.legacy_commands import types as command_types
+from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
+from opentrons.protocol_api.protocol_context import ProtocolContext
+from opentrons.protocol_engine import (
+    Config,
+    DeckType,
+    EngineStatus,
+    error_recovery_policy,
+)
+from opentrons.protocol_engine.create_protocol_engine import (
+    create_protocol_engine,
+    create_protocol_engine_in_thread,
+)
+from opentrons.protocol_engine.types import PostRunHardwareState
+from opentrons.protocol_reader import ProtocolSource
+from opentrons.protocol_runner import (
+    LiveRunner,
+    RunOrchestrator,
+    create_protocol_runner,
+)
 from opentrons.protocols import parse
 from opentrons.protocols.api_support.deck_type import (
     guess_from_global_config as guess_deck_type_from_global_config,
+)
+from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash,
     should_load_fixed_trash_labware_for_python_protocol,
 )
@@ -53,31 +74,6 @@ from opentrons.protocols.types import (
     Protocol,
     PythonProtocol,
 )
-
-from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
-from opentrons.protocol_api.protocol_context import ProtocolContext
-
-from opentrons.protocol_engine import (
-    Config,
-    DeckType,
-    EngineStatus,
-    error_recovery_policy,
-)
-from opentrons.protocol_engine.create_protocol_engine import (
-    create_protocol_engine_in_thread,
-    create_protocol_engine,
-)
-from opentrons.protocol_engine.types import PostRunHardwareState
-
-from opentrons.protocol_reader import ProtocolSource
-
-from opentrons.protocol_runner import (
-    create_protocol_runner,
-    RunOrchestrator,
-    LiveRunner,
-)
-
-from .util import entrypoint_util
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.types import (

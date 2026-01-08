@@ -1,13 +1,14 @@
 from typing import Dict
 
+from .constants import DeckCalibrationState as State
+from robot_server.robot.calibration.util import SimpleStateMachine, StateTransitionError
 from robot_server.service.session.models.command_definitions import (
-    CommandDefinition,
     CalibrationCommand,
+    CommandDefinition,
+)
+from robot_server.service.session.models.command_definitions import (
     DeckCalibrationCommand as DeckCalCommand,
 )
-from robot_server.robot.calibration.util import SimpleStateMachine, StateTransitionError
-from .constants import DeckCalibrationState as State
-
 
 DECK_CALIBRATION_TRANSITIONS: Dict[State, Dict[CommandDefinition, State]] = {
     State.sessionStarted: {CalibrationCommand.load_labware: State.labwareLoaded},

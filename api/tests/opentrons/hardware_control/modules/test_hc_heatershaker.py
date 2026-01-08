@@ -1,22 +1,22 @@
 import asyncio
 from typing import Any, AsyncGenerator
 
-from decoy import Decoy
 import pytest
+from decoy import Decoy
 
-from opentrons.hardware_control import modules, ExecutionManager, poller
+from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
+from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
+from opentrons.hardware_control import ExecutionManager, modules, poller
 from opentrons.hardware_control.modules.heater_shaker import HeaterShakerReader
 from opentrons.hardware_control.modules.types import (
-    TemperatureStatus,
-    SpeedStatus,
     HeaterShakerStatus,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
+    SpeedStatus,
+    TemperatureStatus,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.types import HeaterShakerLabwareLatchStatus, Temperature, RPM
-from opentrons.drivers.heater_shaker.simulator import SimulatingDriver
-from opentrons.drivers.asyncio.communication.errors import UnhandledGcode, ErrorResponse
 
 
 @pytest.fixture

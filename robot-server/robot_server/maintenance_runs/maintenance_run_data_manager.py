@@ -1,29 +1,27 @@
 """Manage current maintenance run data."""
 
 from datetime import datetime
-from typing import Optional, Callable, Sequence
+from typing import Callable, Optional, Sequence
 
 from opentrons.protocol_engine import (
-    EngineStatus,
-    LegacyLabwareOffsetCreate,
-    LabwareOffsetCreate,
-    StateSummary,
-    CommandSlice,
-    CommandPointer,
     Command,
+    CommandPointer,
+    CommandSlice,
+    EngineStatus,
+    LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    StateSummary,
 )
-
-from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
-from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
-
-from opentrons.protocol_engine.types import DeckConfigurationType
-
-from robot_server.service.notifications import MaintenanceRunsPublisher
 from opentrons.protocol_engine.resources.camera_provider import (
     CameraProvider,
     CameraSettings,
 )
+from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons.system import camera
+
+from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
+from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
+from robot_server.service.notifications import MaintenanceRunsPublisher
 
 
 def _build_run(

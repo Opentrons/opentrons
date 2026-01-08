@@ -1,5 +1,6 @@
 """Tests for OE Updater."""
 
+import lzma
 import os
 from unittest import mock
 from unittest.mock import MagicMock
@@ -12,9 +13,6 @@ from otupdate.openembedded.update_actions import (
     PartitionManager,
     RootFSInterface,
 )
-
-import lzma
-
 
 # test valid partition switch
 

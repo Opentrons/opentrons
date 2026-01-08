@@ -1,55 +1,55 @@
 """Unit tests for the deck_conflict module."""
 
-import pytest
-from typing import ContextManager, Any, NamedTuple, List, Tuple, Literal, cast
-from decoy import Decoy, matchers
 from contextlib import nullcontext as does_not_raise
+from typing import Any, ContextManager, List, Literal, NamedTuple, Tuple, cast
+
+import pytest
+from decoy import Decoy, matchers
+
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.hardware_control import CriticalPoint
-from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning import adjacent_slots_getters
+from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
 from opentrons.motion_planning.adjacent_slots_getters import _MixedTypeSlots
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine import deck_conflict, pipette_movement_conflict
 from opentrons.protocol_api.disposal_locations import (
+    _TRASH_BIN_CUTOUT_FIXTURE,
     TrashBin,
     WasteChute,
-    _TRASH_BIN_CUTOUT_FIXTURE,
 )
 from opentrons.protocol_api.labware import Labware
-from opentrons.protocol_api.core.engine import deck_conflict, pipette_movement_conflict
 from opentrons.protocol_engine import (
     Config,
     DeckSlotLocation,
     ModuleModel,
     StateView,
 )
-from opentrons.protocol_engine.state.geometry import _AbsoluteRobotExtents
-from opentrons.protocol_engine.state.pipettes import PipetteBoundingBoxOffsets
-
 from opentrons.protocol_engine.clients import SyncClient
 from opentrons.protocol_engine.errors import LabwareNotLoadedOnModuleError
-from opentrons.types import (
-    DeckSlotName,
-    Point,
-    StagingSlotName,
-    MountType,
-    NozzleConfigurationType,
-)
-
+from opentrons.protocol_engine.state.geometry import _AbsoluteRobotExtents
+from opentrons.protocol_engine.state.pipettes import PipetteBoundingBoxOffsets
 from opentrons.protocol_engine.types import (
     DeckType,
+    Dimensions,
     LoadedLabware,
     LoadedModule,
-    WellLocation,
-    WellOrigin,
-    WellOffset,
     OnDeckLabwareLocation,
     OnLabwareLocation,
-    Dimensions,
     StagingSlotLocation,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
+)
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import (
+    DeckSlotName,
+    MountType,
+    NozzleConfigurationType,
+    Point,
+    StagingSlotName,
 )
 
 

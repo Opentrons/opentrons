@@ -2,7 +2,7 @@
 
 import pytest
 
-from opentrons.protocol_api import COLUMN, ALL, SINGLE, ROW, ProtocolContext
+from opentrons.protocol_api import ALL, COLUMN, ROW, SINGLE, ProtocolContext
 from opentrons.protocol_api.core.engine.pipette_movement_conflict import (
     PartialTipMovementNotAllowedError,
 )

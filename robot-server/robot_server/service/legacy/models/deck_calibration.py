@@ -3,12 +3,11 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from opentrons_shared_data.util import StrEnum
 from opentrons.calibration_storage.types import SourceType
 from opentrons.hardware_control.util import DeckTransformState
+from opentrons_shared_data.util import StrEnum
 
 from robot_server.service.shared_models import calibration as cal_model
-
 
 # NOTE: this would be more accurately typed as
 # a typing.Tuple[float, float, float], but tuple is

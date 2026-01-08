@@ -6,14 +6,12 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 import logging
 from typing import Optional
 
-from opentrons.drivers.temp_deck.driver import GCODE
-from opentrons.hardware_control.emulation import util
-from opentrons.hardware_control.emulation.parser import Parser, Command
-from opentrons.hardware_control.emulation.settings import TempDeckSettings
-
 from .abstract_emulator import AbstractEmulator
 from .simulations import Temperature
-
+from opentrons.drivers.temp_deck.driver import GCODE
+from opentrons.hardware_control.emulation import util
+from opentrons.hardware_control.emulation.parser import Command, Parser
+from opentrons.hardware_control.emulation.settings import TempDeckSettings
 
 logger = logging.getLogger(__name__)
 

@@ -2,28 +2,27 @@
 
 from __future__ import annotations
 
-from __future__ import annotations
-from typing import Literal, Union, TYPE_CHECKING
-from typing_extensions import Type
+from typing import TYPE_CHECKING, Literal, Union
 
 from pydantic import BaseModel, Field
+from typing_extensions import Type
 
 from opentrons_shared_data.errors.exceptions import FlexStackerStallError
 
-from ..flex_stacker.common import FlexStackerStallOrCollisionError
+from ...errors import ErrorOccurrence
+from ...resources import ModelUtils
 from ..command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    SuccessData,
     DefinedErrorData,
+    SuccessData,
 )
-from ...errors import ErrorOccurrence
-from ...resources import ModelUtils
+from ..flex_stacker.common import FlexStackerStallOrCollisionError
 
 if TYPE_CHECKING:
-    from ...state.state import StateView
     from ...execution import EquipmentHandler
+    from ...state.state import StateView
 
 UnsafeFlexStackerPrepareShuttleCommandType = Literal[
     "unsafe/flexStacker/prepareShuttle"

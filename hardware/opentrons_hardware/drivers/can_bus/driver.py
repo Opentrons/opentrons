@@ -1,18 +1,19 @@
 """The can bus transport."""
 
 from __future__ import annotations
-import logging
+
 import asyncio
-from typing import Optional, Union, Dict, Any
 import concurrent.futures
+import logging
+from typing import Any, Dict, Optional, Union
 
+from can import AsyncBufferedReader, Bus, Message, Notifier
 from opentrons_shared_data.errors.exceptions import CANBusBusError
-from can import Notifier, Bus, AsyncBufferedReader, Message
 
+from .abstract_driver import AbstractCanDriver
+from .settings import PCANParameters, calculate_fdcan_parameters
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.message import CanMessage
-from .abstract_driver import AbstractCanDriver
-from .settings import calculate_fdcan_parameters, PCANParameters
 
 log = logging.getLogger(__name__)
 

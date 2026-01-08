@@ -5,21 +5,22 @@ from typing import Annotated
 
 import fastapi
 
-from robot_server.persistence.fastapi_dependencies import get_images_directory
-from robot_server.file_provider.provider import FileProviderExecutor
+from opentrons.protocol_engine.resources.file_provider import FileProvider
+
+from robot_server.data_files.data_files_store import DataFilesStore
 from robot_server.data_files.dependencies import (
     get_data_files_directory,
     get_data_files_store,
 )
-from robot_server.data_files.data_files_store import DataFilesStore
-from opentrons.protocol_engine.resources.file_provider import FileProvider
 from robot_server.disk_monitor.dependencies import get_disk_monitor
 from robot_server.disk_monitor.monitor import DiskMonitor
-from robot_server.settings import get_settings, RobotServerSettings
+from robot_server.file_provider.provider import FileProviderExecutor
+from robot_server.persistence.fastapi_dependencies import get_images_directory
 from robot_server.service.notifications.publishers import (
     DataFilePublisher,
     get_data_file_publisher,
 )
+from robot_server.settings import RobotServerSettings, get_settings
 
 
 async def get_file_provider_executor(

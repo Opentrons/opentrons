@@ -2,14 +2,13 @@
 
 from decoy import Decoy
 
-from opentrons.protocol_engine.execution import RunControlHandler
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.wait_for_duration import (
+    WaitForDurationImplementation,
     WaitForDurationParams,
     WaitForDurationResult,
-    WaitForDurationImplementation,
 )
+from opentrons.protocol_engine.execution import RunControlHandler
 
 
 async def test_pause_implementation(

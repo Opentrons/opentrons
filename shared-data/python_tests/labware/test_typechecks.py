@@ -2,24 +2,30 @@
 
 from typing import Literal
 
+import pydantic
 import pytest
 import typeguard
-import pydantic
 
+from . import get_ot_defs
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
-    labware_definition_type_adapter as pydantic_labware_definition_type_adapter,
     LabwareDefinition2 as PydanticLabwareDefinition2,
+)
+from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition3 as PydanticLabwareDefinition3,
+)
+from opentrons_shared_data.labware.labware_definition import (
+    labware_definition_type_adapter as pydantic_labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware.types import (
     LabwareDefinition as TypedDictLabwareDefinition,
+)
+from opentrons_shared_data.labware.types import (
     LabwareDefinition2 as TypedDictLabwareDefinition2,
+)
+from opentrons_shared_data.labware.types import (
     LabwareDefinition3 as TypedDictLabwareDefinition3,
 )
-
-
-from . import get_ot_defs
 
 
 @pytest.mark.parametrize("loadname,version", get_ot_defs(schema=2))

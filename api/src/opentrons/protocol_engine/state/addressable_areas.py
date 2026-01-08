@@ -4,39 +4,38 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Dict, List, Optional, Set
 
-from opentrons_shared_data.robot.types import RobotType, RobotDefinition
-from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.deck.types import (
+    CutoutFixture,
     DeckDefinitionV5,
     SlotDefV3,
-    CutoutFixture,
 )
+from opentrons_shared_data.module.types import ModuleOrientation
+from opentrons_shared_data.robot.types import RobotDefinition, RobotType
 
-from opentrons.types import Point, DeckSlotName
-
+from ..actions import (
+    Action,
+    AddAddressableAreaAction,
+    SetDeckConfigurationAction,
+)
+from ..actions.get_state_update import get_state_updates
 from ..errors import (
-    IncompatibleAddressableAreaError,
-    AreaNotInDeckConfigurationError,
-    SlotDoesNotExistError,
     AddressableAreaDoesNotExistError,
+    AreaNotInDeckConfigurationError,
     CutoutDoesNotExistError,
+    IncompatibleAddressableAreaError,
+    SlotDoesNotExistError,
 )
 from ..resources import deck_configuration_provider
 from ..types import (
     AddressableArea,
-    PotentialCutoutFixture,
     DeckConfigurationType,
     Dimensions,
-)
-from ..actions.get_state_update import get_state_updates
-from ..actions import (
-    Action,
-    SetDeckConfigurationAction,
-    AddAddressableAreaAction,
+    PotentialCutoutFixture,
 )
 from . import update_types
+from ._abstract_store import HandlesActions, HasState
 from .config import Config
-from ._abstract_store import HasState, HandlesActions
+from opentrons.types import DeckSlotName, Point
 
 
 @dataclass

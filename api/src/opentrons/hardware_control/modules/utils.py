@@ -2,25 +2,22 @@ import asyncio
 import logging
 from typing import Dict, Optional, Type
 
-from opentrons.drivers.rpi_drivers.types import USBPort
-
 from ..execution_manager import ExecutionManager
-
-from .types import (
-    ModuleDisconnectedCallback,
-    ModuleType,
-    SpeedStatus,
-    ModuleErrorCallback,
-)
-from .mod_abc import AbstractModule
-from .tempdeck import TempDeck
-from .magdeck import MagDeck
-from .thermocycler import Thermocycler
-from .heater_shaker import HeaterShaker
 from .absorbance_reader import AbsorbanceReader
 from .flex_stacker import FlexStacker
+from .heater_shaker import HeaterShaker
+from .magdeck import MagDeck
+from .mod_abc import AbstractModule
+from .tempdeck import TempDeck
+from .thermocycler import Thermocycler
+from .types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+    ModuleType,
+    SpeedStatus,
+)
 from .vacuum_module import VacuumModule
-
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 log = logging.getLogger(__name__)
 

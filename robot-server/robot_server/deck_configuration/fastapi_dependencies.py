@@ -24,7 +24,6 @@ from robot_server.service.notifications import (
     get_deck_configuration_publisher,
 )
 
-
 _accessor = AppStateAccessor[DeckConfigurationStore]("deck_configuration_store")
 
 

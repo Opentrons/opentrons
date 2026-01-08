@@ -8,7 +8,6 @@ import sqlalchemy
 
 from server_utils import sql_utils
 
-
 # A reference to SQLite's built-in ROWID column.
 #
 # https://www.sqlite.org/autoinc.html

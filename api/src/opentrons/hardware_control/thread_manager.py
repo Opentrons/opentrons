@@ -1,26 +1,27 @@
 """Manager for the :py:class:`.hardware_control.API` thread."""
 
-import functools
-import threading
-import logging
 import asyncio
+import functools
 import inspect
+import logging
+import threading
 import weakref
 from typing import (
     Any,
+    AsyncGenerator,
     Awaitable,
     Callable,
     Generic,
-    Optional,
-    TypeVar,
-    cast,
-    Sequence,
     Mapping,
-    AsyncGenerator,
-    Union,
-    Type,
+    Optional,
     ParamSpec,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+    cast,
 )
+
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 from .protocols import (

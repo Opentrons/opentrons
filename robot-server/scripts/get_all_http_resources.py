@@ -39,7 +39,6 @@ import httpx
 
 from tests.integration.robot_client import RobotClient
 
-
 # Certain endpoints are paginated and currently have no nice way to disable pagination.
 # As a workaround, we request a page length of a very high number.
 _MAX_PAGE_LENGTH = 1_000_000

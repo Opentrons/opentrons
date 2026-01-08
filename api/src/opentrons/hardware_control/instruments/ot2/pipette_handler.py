@@ -1,46 +1,45 @@
 """Shared code for managing pipette configuration and storage."""
 
-from dataclasses import dataclass
 import logging
+from dataclasses import dataclass
 from typing import (
+    Any,
     Callable,
     Dict,
     Generic,
-    Optional,
-    Tuple,
-    Any,
-    cast,
-    List,
-    Sequence,
     Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
     TypeVar,
+    cast,
 )
+
 import numpy
 
 from opentrons_shared_data.errors.exceptions import (
-    UnexpectedTipRemovalError,
+    CommandPreconditionViolated,
     UnexpectedTipAttachError,
+    UnexpectedTipRemovalError,
 )
-from opentrons_shared_data.pipette.types import UlPerMmAction
-from opentrons_shared_data.pipette.types import Quirks
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.pipette.types import Quirks, UlPerMmAction
 
+from .pipette import Pipette
 from opentrons import types as top_types
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    HardwareAction,
-    Axis,
-    OT3Mount,
-)
 from opentrons.hardware_control.constants import (
-    SHAKE_OFF_TIPS_SPEED,
-    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
     DROP_TIP_RELEASE_DISTANCE,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
+    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
+    SHAKE_OFF_TIPS_SPEED,
 )
-
 from opentrons.hardware_control.dev_types import PipetteDict
-from .pipette import Pipette
+from opentrons.hardware_control.types import (
+    Axis,
+    CriticalPoint,
+    HardwareAction,
+    OT3Mount,
+)
 
 # TODO both pipette handlers should be combined once the pipette configurations
 # are unified AND we separate out the concept of changing pipette state versus static state

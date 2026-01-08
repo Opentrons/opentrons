@@ -3,18 +3,17 @@
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.wait_for_temperature import (
     WaitForTemperatureImpl,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 
 
 async def test_wait_for_temperature(

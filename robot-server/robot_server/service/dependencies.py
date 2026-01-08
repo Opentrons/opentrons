@@ -1,12 +1,12 @@
-from typing import Annotated
-
 from datetime import datetime, timezone
+from typing import Annotated
 from uuid import uuid4
+
 from fastapi import Depends
 
 from opentrons.hardware_control import HardwareControlAPI, ThreadedAsyncLock
-
 from server_utils.util import call_once
+
 from robot_server.hardware import get_hardware
 from robot_server.service.session.manager import SessionManager
 

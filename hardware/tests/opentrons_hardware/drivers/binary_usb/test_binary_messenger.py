@@ -1,25 +1,24 @@
 """Tests for the can messaging class."""
 
 from __future__ import annotations
+
 import asyncio
 from asyncio import Queue
 
 import pytest
 from mock import AsyncMock, Mock
 
+from opentrons_hardware.drivers.binary_usb.binary_messenger import (
+    BinaryMessageListenerCallback,
+    BinaryMessenger,
+    BinaryWaitableCallback,
+)
 from opentrons_hardware.firmware_bindings.binary_constants import (
     BinaryMessageId,
 )
-
-from opentrons_hardware.drivers.binary_usb.binary_messenger import (
-    BinaryMessenger,
-    BinaryMessageListenerCallback,
-    BinaryWaitableCallback,
-)
-
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    DeviceInfoRequest,
     BinaryMessageDefinition,
+    DeviceInfoRequest,
 )
 
 

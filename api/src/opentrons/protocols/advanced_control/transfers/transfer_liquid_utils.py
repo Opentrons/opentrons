@@ -2,23 +2,24 @@
 
 from __future__ import annotations
 
-from typing import Literal, Sequence, List, Optional, TYPE_CHECKING
 from dataclasses import dataclass
+from typing import TYPE_CHECKING, List, Literal, Optional, Sequence
 
 from opentrons.protocol_engine.errors import (
-    LiquidHeightUnknownError,
     IncompleteLabwareDefinitionError,
+    LiquidHeightUnknownError,
 )
 from opentrons.protocol_engine.state._well_math import (
     wells_covered_by_pipette_configuration,
 )
-from opentrons.types import NozzleMapInterface, NozzleConfigurationType
+from opentrons.types import NozzleConfigurationType, NozzleMapInterface
 
 if TYPE_CHECKING:
     from logging import Logger
-    from opentrons.types import Location
+
     from opentrons.protocol_api.core.engine import WellCore
-    from opentrons.protocol_api.labware import Well, Labware
+    from opentrons.protocol_api.labware import Labware, Well
+    from opentrons.types import Location
 
 
 @dataclass

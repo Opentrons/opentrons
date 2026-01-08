@@ -1,16 +1,18 @@
 """General utilities."""
 
 from __future__ import annotations
+
 import asyncio
 import hashlib
 from dataclasses import dataclass
-from fastapi import UploadFile
+from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
 from types import TracebackType
-from typing import cast, Any, Coroutine, Callable, Optional, Type, TypeVar
+from typing import Any, Callable, Coroutine, Optional, Type, TypeVar, cast
+
+from fastapi import UploadFile
 from typing_extensions import Final
-from datetime import datetime, timezone
 
 
 def _utc_now() -> datetime:

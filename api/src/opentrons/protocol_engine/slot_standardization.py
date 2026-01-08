@@ -22,12 +22,12 @@ from . import commands
 from .types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
     DeckSlotLocation,
     LoadableLabwareLocation,
-    AddressableAreaLocation,
     ModuleLocation,
     OnLabwareLocation,
-    WASTE_CHUTE_LOCATION,
 )
 
 

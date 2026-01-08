@@ -2,20 +2,19 @@ import asyncio
 import re
 from typing import Optional
 
-from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 from .abstract import AbstractVacuumModuleDriver
+from .errors import VacuumModuleErrorCodes
 from .types import (
+    GCODE,
+    HardwareRevision,
     LEDColor,
     LEDPattern,
-    GCODE,
     PressureState,
     PumpState,
     VacuumModuleInfo,
-    HardwareRevision,
     VentState,
 )
-from .errors import VacuumModuleErrorCodes
-
+from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
 
 VM_BAUDRATE = 115200
 DEFAULT_VM_TIMEOUT = 5

@@ -1,34 +1,33 @@
-from typing import TYPE_CHECKING
 from enum import Enum
-
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .types import (
-        DelayCommandId,
-        BlowoutCommandId,
-        PickUpTipCommandId,
-        DropTipCommandId,
-        AspirateCommandId,
-        DispenseCommandId,
-        TouchTipCommandId,
-        MoveToSlotCommandId,
         AirGapCommandId,
-        MagneticModuleEngageCommandId,
+        AspirateCommandId,
+        BlowoutCommandId,
+        DelayCommandId,
+        DispenseCommandId,
+        DropTipCommandId,
         MagneticModuleDisengageCommandId,
-        TemperatureModuleSetTargetCommandId,
+        MagneticModuleEngageCommandId,
+        MoveToSlotCommandId,
+        MoveToWellCommandId,
+        PickUpTipCommandId,
         TemperatureModuleAwaitCommandId,
         TemperatureModuleDeactivateCommandId,
-        ThermocyclerSetTargetBlockCommandId,
-        ThermocyclerSetTargetLidCommandId,
+        TemperatureModuleSetTargetCommandId,
         ThermocyclerAwaitBlockTemperatureCommandId,
         ThermocyclerAwaitLidTemperatureCommandId,
-        ThermocyclerOpenLidCommandId,
-        ThermocyclerCloseLidCommandId,
-        ThermocyclerDeactivateLidCommandId,
-        ThermocyclerDeactivateBlockCommandId,
-        ThermocyclerRunProfileCommandId,
         ThermocyclerAwaitProfileCommandId,
-        MoveToWellCommandId,
+        ThermocyclerCloseLidCommandId,
+        ThermocyclerDeactivateBlockCommandId,
+        ThermocyclerDeactivateLidCommandId,
+        ThermocyclerOpenLidCommandId,
+        ThermocyclerRunProfileCommandId,
+        ThermocyclerSetTargetBlockCommandId,
+        ThermocyclerSetTargetLidCommandId,
+        TouchTipCommandId,
     )
 
 

@@ -1,26 +1,27 @@
 """Utilities for updating the enable/disable state of an OT3 axis."""
 
-from typing import Dict, Set
-import logging
 import asyncio
+import logging
+from typing import Dict, Set
+
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
 )
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    EnableMotorRequest,
-    DisableMotorRequest,
-    GearEnableMotorRequest,
-    GearDisableMotorRequest,
-    GetStatusRequest,
-    GetStatusResponse,
-    GearStatusResponse,
-)
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
     ErrorCode,
     MessageId,
+    NodeId,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    DisableMotorRequest,
+    EnableMotorRequest,
+    GearDisableMotorRequest,
+    GearEnableMotorRequest,
+    GearStatusResponse,
+    GetStatusRequest,
+    GetStatusResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 

@@ -4,23 +4,22 @@ import argparse
 import asyncio
 import dataclasses
 import enum
-import logging
 import json
-from logging.config import dictConfig
-from typing import Set, Optional, Dict
+import logging
 import time
+from logging.config import dictConfig
+from typing import Dict, Optional, Set
 
 from opentrons_hardware.drivers.can_bus import CanDriver
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest,
     DeviceInfoResponse,
 )
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.scripts.can_args import add_can_args
-
 
 log = logging.getLogger(__name__)
 

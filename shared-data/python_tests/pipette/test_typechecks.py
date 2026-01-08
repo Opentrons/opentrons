@@ -1,20 +1,20 @@
+from typing import Generator, Tuple
+
 import pytest
 import typeguard
 
-from typing import Generator, Tuple
-
 from opentrons_shared_data.pipette import (
+    dummy_model_for_name,
+    fuse_specs,
     model_config,
     name_config,
-    fuse_specs,
-    dummy_model_for_name,
 )
 from opentrons_shared_data.pipette.types import (
-    PipetteModelSpecs,
-    PipetteNameSpecs,
     PipetteFusedSpec,
-    PipetteName,
     PipetteModel,
+    PipetteModelSpecs,
+    PipetteName,
+    PipetteNameSpecs,
 )
 
 

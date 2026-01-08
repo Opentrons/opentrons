@@ -2,16 +2,17 @@
 
 from typing import Optional
 
+from . import validation
+from .csv_parameter_interface import CSVParameter
+from .parameter_definition import AbstractParameterDefinition
 from opentrons.protocol_engine.types import (
-    RunTimeParameter,
     CSVParameter as ProtocolEngineCSVParameter,
+)
+from opentrons.protocol_engine.types import (
     FileInfo,
+    RunTimeParameter,
 )
 from opentrons.protocols.api_support.types import APIVersion
-
-from . import validation
-from .parameter_definition import AbstractParameterDefinition
-from .csv_parameter_interface import CSVParameter
 
 
 class CSVParameterDefinition(AbstractParameterDefinition[Optional[bytes]]):

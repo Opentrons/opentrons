@@ -1,20 +1,19 @@
 """A script for sending CAN messages."""
 
+import argparse
 import asyncio
 import dataclasses
 import logging
-import argparse
 from enum import Enum
 from logging.config import dictConfig
-from typing import Type, Sequence, Callable, TypeVar
+from typing import Callable, Sequence, Type, TypeVar
 
 from opentrons_hardware.drivers.binary_usb import build
-from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
-
 from opentrons_hardware.drivers.binary_usb.bin_serial import SerialUsbDriver
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages import (
-    get_binary_definition,
     BinaryMessageDefinition,
+    get_binary_definition,
 )
 
 log = logging.getLogger(__name__)

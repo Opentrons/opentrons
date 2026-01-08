@@ -1,43 +1,42 @@
 """Common flex stacker base models."""
 
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Literal, TYPE_CHECKING, Sequence, Iterator
-from typing_extensions import TypedDict
 from textwrap import dedent
+from typing import TYPE_CHECKING, Iterator, Literal, Sequence
+
+from typing_extensions import TypedDict
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from ...errors import ErrorOccurrence
+from ...state.update_types import StateUpdate
+from ...types import (
+    OFF_DECK_LOCATION,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareLocationSequence,
+    LabwareOffsetLocationSequence,
+    LoadedLabware,
+    ModuleLocation,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    StackerStoredLabwareGroup,
+)
 from opentrons.protocol_engine.errors.exceptions import (
     LabwarePoolNotCompatibleWithModuleError,
 )
 
-
-from ...errors import ErrorOccurrence
-from ...types import (
-    StackerStoredLabwareGroup,
-    InStackerHopperLocation,
-    LoadedLabware,
-    OFF_DECK_LOCATION,
-    OnLabwareLocation,
-    OnLabwareLocationSequenceComponent,
-    LabwareLocationSequence,
-    LabwareLocation,
-    LabwareOffsetLocationSequence,
-    OnLabwareOffsetLocationSequenceComponent,
-    ModuleLocation,
-)
-from ...state.update_types import StateUpdate
-
-
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler
-    from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.resources import ModelUtils
     from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
+    from opentrons.protocol_engine.resources import ModelUtils
     from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+    from opentrons.protocol_engine.state.state import StateView
 
 
 # The stacker cannot dispense labware where there is no gap between the top surface

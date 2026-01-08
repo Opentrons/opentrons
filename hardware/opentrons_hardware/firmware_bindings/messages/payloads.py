@@ -3,37 +3,37 @@
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Iterator, List
 
 from opentrons_shared_data.errors.exceptions import InternalMessageFormatError
 
+from .. import utils
 from . import message_definitions
 from .fields import (
+    BatchSensorDataField,
+    EepromDataField,
+    ErrorCodeField,
+    ErrorSeverityField,
     FirmwareShortSHADataField,
-    VersionFlagsField,
+    FirmwareUpdateDataField,
+    GearMotorIdField,
+    MotorPositionFlagsField,
+    MotorUsageTypeField,
+    MoveStopConditionField,
+    OptionalRevisionField,
+    PipetteNameField,
+    PipetteTipActionTypeField,
+    SensorIdField,
+    SensorOutputBindingField,
+    SensorThresholdModeField,
+    SensorTypeField,
+    SerialDataCodeField,
+    SerialField,
     TaskNameDataField,
     ToolField,
-    FirmwareUpdateDataField,
-    ErrorSeverityField,
-    ErrorCodeField,
-    SensorTypeField,
-    SensorIdField,
-    PipetteNameField,
-    SensorOutputBindingField,
-    EepromDataField,
-    SerialField,
-    SerialDataCodeField,
-    SensorThresholdModeField,
-    PipetteTipActionTypeField,
-    MotorPositionFlagsField,
-    MoveStopConditionField,
-    GearMotorIdField,
-    OptionalRevisionField,
-    MotorUsageTypeField,
-    BatchSensorDataField,
+    VersionFlagsField,
 )
-from .. import utils
 
 
 @dataclass(eq=False)

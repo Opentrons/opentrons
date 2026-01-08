@@ -3,68 +3,64 @@
 import asyncio
 import logging
 from contextlib import asynccontextmanager
-
-from typing import Optional, TypeVar, Callable, AsyncIterator, List, Tuple
+from typing import AsyncIterator, Callable, List, Optional, Tuple, TypeVar
 
 from opentrons_shared_data.errors.exceptions import CommandTimedOutError
 
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    SensorOutputBinding,
-    SensorId,
-    SensorType,
-    MessageId,
-    ErrorCode,
-)
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
-    WaitableCallback,
     MultipleMessagesWaitableCallback,
+    WaitableCallback,
 )
-
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    ReadFromSensorRequest,
-    PeripheralStatusRequest,
-    SetSensorThresholdRequest,
-    WriteToSensorRequest,
-    BaselineSensorRequest,
-    SensorThresholdResponse,
-    ReadFromSensorResponse,
-    BaselineSensorResponse,
-    PeripheralStatusResponse,
-    BindSensorOutputRequest,
-    ErrorMessage,
-)
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    SensorPayload,
-    ReadFromSensorRequestPayload,
-    SetSensorThresholdRequestPayload,
-    WriteToSensorRequestPayload,
-    BaselineSensorRequestPayload,
-    BindSensorOutputRequestPayload,
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import (
+    ErrorCode,
+    MessageId,
+    NodeId,
+    SensorId,
+    SensorOutputBinding,
+    SensorType,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorTypeField,
     SensorIdField,
     SensorOutputBindingField,
     SensorThresholdModeField,
+    SensorTypeField,
 )
-from opentrons_hardware.sensors.types import SensorDataType
-from opentrons_hardware.sensors.sensor_types import SensorInformation
-
-from opentrons_hardware.sensors.utils import (
-    ReadSensorInformation,
-    WriteSensorInformation,
-    BaselineSensorInformation,
-    SensorThresholdInformation,
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    BaselineSensorRequest,
+    BaselineSensorResponse,
+    BindSensorOutputRequest,
+    ErrorMessage,
+    PeripheralStatusRequest,
+    PeripheralStatusResponse,
+    ReadFromSensorRequest,
+    ReadFromSensorResponse,
+    SensorThresholdResponse,
+    SetSensorThresholdRequest,
+    WriteToSensorRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BaselineSensorRequestPayload,
+    BindSensorOutputRequestPayload,
+    ReadFromSensorRequestPayload,
+    SensorPayload,
+    SetSensorThresholdRequestPayload,
+    WriteToSensorRequestPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
     UInt16Field,
     UInt32Field,
+)
+from opentrons_hardware.sensors.sensor_types import SensorInformation
+from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_hardware.sensors.utils import (
+    BaselineSensorInformation,
+    ReadSensorInformation,
+    SensorThresholdInformation,
+    WriteSensorInformation,
 )
 
 log = logging.getLogger(__name__)

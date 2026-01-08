@@ -5,17 +5,18 @@ from __future__ import annotations
 from collections.abc import Container
 from dataclasses import dataclass
 from typing import List, Mapping, NamedTuple, Optional, Set, Union
+
 from typing_extensions import Final
 
 from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.robot.types import RobotType
+
 from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_slots,
-    get_south_slot,
     get_adjacent_slots,
     get_adjacent_staging_slot,
+    get_east_west_slots,
+    get_south_slot,
 )
-
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
 from opentrons.types import DeckSlotName, StagingSlotName
 

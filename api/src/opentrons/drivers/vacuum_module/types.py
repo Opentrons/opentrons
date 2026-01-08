@@ -1,5 +1,5 @@
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
 from typing import Dict
 
 from opentrons_shared_data.util import StrEnum

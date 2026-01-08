@@ -1,19 +1,17 @@
 """A very simple script to set motor currents."""
 
-import os
 import argparse
 import asyncio
 import json
 import logging
+import os
 from logging.config import dictConfig
 from typing import Dict, Tuple
 
 from opentrons_hardware.drivers.can_bus import build
 from opentrons_hardware.firmware_bindings.constants import NodeId
-
 from opentrons_hardware.hardware_control.current_settings import set_currents
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-
 
 log = logging.getLogger(__name__)
 

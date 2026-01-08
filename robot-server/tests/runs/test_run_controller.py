@@ -1,32 +1,36 @@
 """Tests for RunController."""
 
+from datetime import datetime
 from typing import List
 
 import pytest
-from datetime import datetime
 from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
+)
+from opentrons.protocol_engine import (
     commands as pe_commands,
+)
+from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.types import (
-    RunTimeParameter,
     BooleanParameter,
     CommandAnnotation,
     CommandPreconditions,
+    RunTimeParameter,
     SecondOrderCommandAnnotation,
 )
 from opentrons.protocol_runner import RunResult
 
-from robot_server.service.notifications import RunsPublisher, MaintenanceRunsPublisher
-from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
+from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from robot_server.runs.run_store import RunStore
-from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
+from robot_server.service.notifications import MaintenanceRunsPublisher, RunsPublisher
+from robot_server.service.task_runner import TaskRunner
 
 
 @pytest.fixture

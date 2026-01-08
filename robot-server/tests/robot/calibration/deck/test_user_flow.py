@@ -1,30 +1,34 @@
-import pytest
 import datetime
-from mock import call
-from typing import List, Tuple
 from pathlib import Path
+from typing import List, Tuple
+
+import pytest
+from mock import call
+
 from opentrons.calibration_storage import types as cal_types
 from opentrons.calibration_storage.ot2 import models
-from opentrons.types import Mount, Point
-from opentrons.hardware_control.instruments.ot2 import pipette
 from opentrons.config import robot_configs
+from opentrons.hardware_control.instruments.ot2 import pipette
+from opentrons.protocol_api import labware
+from opentrons.types import Mount, Point
 from opentrons_shared_data.pipette import (
     mutable_configurations,
+)
+from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
-from opentrons.protocol_api import labware
+
+from robot_server.robot.calibration.deck.constants import (
+    POINT_ONE_ID,
+    POINT_THREE_ID,
+    POINT_TWO_ID,
+    DeckCalibrationState,
+)
 from robot_server.robot.calibration.deck.user_flow import (
     DeckCalibrationUserFlow,
     tuplefy_cal_point_dicts,
 )
 from robot_server.service.session.models.command_definitions import CalibrationCommand
-from robot_server.robot.calibration.deck.constants import (
-    POINT_ONE_ID,
-    POINT_TWO_ID,
-    POINT_THREE_ID,
-    DeckCalibrationState,
-)
-
 
 PIP_OFFSET = models.v1.InstrumentOffsetModel(
     offset=robot_configs.defaults_ot2.DEFAULT_PIPETTE_OFFSET,

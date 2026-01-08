@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from shutil import copytree
 from tempfile import TemporaryDirectory
-from typing import List, Literal, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, List, Literal, Union
 
 import anyio
 import pytest

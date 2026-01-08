@@ -2,7 +2,6 @@ import logging
 
 from opentrons.drivers.asyncio.communication import SerialConnection
 
-
 log = logging.getLogger(__name__)
 
 

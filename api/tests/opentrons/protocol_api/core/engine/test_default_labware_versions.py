@@ -11,7 +11,6 @@ from opentrons.protocol_api.core.engine._default_labware_versions import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 
-
 _TEST_DEFAULT_LABWARE_VERSIONS = {
     APIVersion(1, 100): {
         "well_plate_a": 3,

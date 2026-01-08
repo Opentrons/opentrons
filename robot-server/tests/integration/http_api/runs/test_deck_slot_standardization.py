@@ -3,8 +3,8 @@ from typing import AsyncGenerator
 import pytest
 from pytest_lazy_fixtures import lf
 
-from ...robot_client import RobotClient
 from ...conftest import _OT3_SESSION_SERVER_PORT
+from ...robot_client import RobotClient
 
 
 @pytest.fixture

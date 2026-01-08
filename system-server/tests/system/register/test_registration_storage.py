@@ -1,12 +1,10 @@
-from system_server.jwt import Registrant
 import sqlalchemy
 
+from system_server import constants
+from system_server.jwt import Registrant, jwt_is_valid
 from system_server.system.register.storage import (
     get_or_create_registration_token,
 )
-
-from system_server.jwt import jwt_is_valid
-from system_server import constants
 
 
 async def test_get_or_create_token(sql_engine: sqlalchemy.engine.Engine) -> None:

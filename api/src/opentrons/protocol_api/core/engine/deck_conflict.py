@@ -1,38 +1,38 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
 
 from __future__ import annotations
+
 import itertools
 import logging
 from typing import (
+    TYPE_CHECKING,
     Collection,
     Dict,
     Optional,
     Tuple,
-    overload,
     Union,
-    TYPE_CHECKING,
+    overload,
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
+from ...disposal_locations import TrashBin, WasteChute
 from opentrons.hardware_control.modules.types import ModuleType
 from opentrons.motion_planning import deck_conflict as wrapped_deck_conflict
-
 from opentrons.protocol_engine import (
-    StateView,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
-    InStackerHopperLocation,
-    WASTE_CHUTE_LOCATION,
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    InStackerHopperLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    StateView,
 )
 from opentrons.protocol_engine.errors.exceptions import LabwareNotLoadedOnModuleError
-from opentrons.types import DeckSlotName, StagingSlotName, Point
-from ...disposal_locations import TrashBin, WasteChute
+from opentrons.types import DeckSlotName, Point, StagingSlotName
 
 if TYPE_CHECKING:
     from ...labware import Labware

@@ -1,26 +1,25 @@
-from typing import NamedTuple, Union, Optional
-
-from opentrons.types import (
-    Mount,
-    DeckLocation,
-    Location,
-    Point,
-    AxisMapType,
-    AxisType,
-    StringAxisMap,
-)
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.legacy_commands import robot_commands as cmds
-from opentrons.legacy_commands import publisher
-from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.protocols.api_support.util import requires_version
-from opentrons.protocols.api_support.types import APIVersion
+from typing import NamedTuple, Optional, Union
 
 from . import validation
-from .core.common import ProtocolCore, RobotCore
-from .module_contexts import ModuleContext
-from .labware import Labware
 from ._types import PipetteActionTypes, PlungerPositionTypes
+from .core.common import ProtocolCore, RobotCore
+from .labware import Labware
+from .module_contexts import ModuleContext
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import publisher
+from opentrons.legacy_commands import robot_commands as cmds
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
+from opentrons.types import (
+    AxisMapType,
+    AxisType,
+    DeckLocation,
+    Location,
+    Mount,
+    Point,
+    StringAxisMap,
+)
 
 
 class HardwareManager(NamedTuple):

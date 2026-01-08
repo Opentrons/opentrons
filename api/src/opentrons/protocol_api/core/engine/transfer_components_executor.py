@@ -4,37 +4,37 @@ from __future__ import annotations
 
 import logging
 from copy import deepcopy
-from enum import Enum
-from typing import TYPE_CHECKING, Optional, Union, Literal
 from dataclasses import dataclass, field, replace
+from enum import Enum
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    PositionReference,
-    Coordinate,
     BlowoutLocation,
+    Coordinate,
+    PositionReference,
 )
 
 from opentrons.protocol_api._liquid_properties import (
-    Submerge,
-    TransferProperties,
     MixProperties,
-    SingleDispenseProperties,
     MultiDispenseProperties,
+    SingleDispenseProperties,
+    Submerge,
     TouchTipProperties,
-)
-from opentrons.types import Location, Point, Mount
-from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
-    LocationCheckDescriptors,
-    check_current_volume_before_dispensing,
+    TransferProperties,
 )
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
 )
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    LocationCheckDescriptors,
+    check_current_volume_before_dispensing,
+)
+from opentrons.types import Location, Mount, Point
 
 if TYPE_CHECKING:
-    from .well import WellCore
-    from .instrument import InstrumentCore
     from ... import TrashBin, WasteChute
+    from .instrument import InstrumentCore
+    from .well import WellCore
 
 log = logging.getLogger(__name__)
 

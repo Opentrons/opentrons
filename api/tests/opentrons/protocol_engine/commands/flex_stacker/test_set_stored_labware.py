@@ -1,30 +1,15 @@
 """Test Flex Stacker set stored labware command implementation."""
 
+from contextlib import nullcontext as does_not_raise
+from typing import Any, ContextManager, cast
+from unittest.mock import sentinel
+
 import pytest
 from decoy import Decoy
-from typing import Any, cast, ContextManager
-from unittest.mock import sentinel
-from contextlib import nullcontext as does_not_raise
 
-from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
-    FlexStackerStateUpdate,
-    FlexStackerPoolConstraint,
-    BatchLabwareLocationUpdate,
-    BatchLoadedLabwareUpdate,
-    LabwareLidUpdate,
-)
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution.equipment import (
-    EquipmentHandler,
-    LoadedLabwarePoolData,
-)
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.flex_stacker.set_stored_labware import (
     SetStoredLabwareImpl,
@@ -32,24 +17,39 @@ from opentrons.protocol_engine.commands.flex_stacker.set_stored_labware import (
     SetStoredLabwareResult,
     StackerStoredLabwareDetails,
 )
+from opentrons.protocol_engine.errors import (
+    FlexStackerNotLogicallyEmptyError,
+)
+from opentrons.protocol_engine.execution.equipment import (
+    EquipmentHandler,
+    LoadedLabwarePoolData,
+)
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import (
+    BatchLabwareLocationUpdate,
+    BatchLoadedLabwareUpdate,
+    FlexStackerPoolConstraint,
+    FlexStackerStateUpdate,
+    LabwareLidUpdate,
+    StateUpdate,
+)
 from opentrons.protocol_engine.types import (
-    OverlapOffset,
-    StackerStoredLabwareGroup,
-    NotOnDeckLocationSequenceComponent,
-    SYSTEM_LOCATION,
     OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
     InStackerHopperLocation,
-    OnLabwareLocationSequenceComponent,
-    OnLabwareLocation,
     LabwareLocation,
     LabwareLocationSequence,
     LoadedLabware,
-)
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-from opentrons.protocol_engine.errors import (
-    FlexStackerNotLogicallyEmptyError,
+    NotOnDeckLocationSequenceComponent,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OverlapOffset,
+    StackerStoredLabwareGroup,
 )
 
 

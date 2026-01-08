@@ -5,7 +5,9 @@ this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
 
 from typing import NewType
-from typing_extensions import Literal, TypedDict, NotRequired
+
+from typing_extensions import Literal, NotRequired, TypedDict
+
 from .constants import (
     CircularType,
     RectangularType,

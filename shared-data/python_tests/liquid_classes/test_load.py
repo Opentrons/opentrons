@@ -1,15 +1,15 @@
 import json
 
 from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.liquid_classes import load_definition, definition_exists
+from opentrons_shared_data.liquid_classes import definition_exists, load_definition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    LiquidClassSchemaV1,
-    PositionReference,
     Coordinate,
-    TipPosition,
-    Submerge,
     DelayParams,
     DelayProperties,
+    LiquidClassSchemaV1,
+    PositionReference,
+    Submerge,
+    TipPosition,
 )
 
 

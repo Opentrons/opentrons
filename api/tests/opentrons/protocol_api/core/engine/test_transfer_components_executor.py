@@ -4,26 +4,27 @@ from typing import Literal, Union
 
 import pytest
 from decoy import Decoy, matchers
+
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutLocation,
+    Coordinate,
     LiquidClassSchemaV1,
     PositionReference,
-    Coordinate,
-    BlowoutLocation,
 )
 
-from opentrons.protocol_api import TrashBin, WasteChute, Labware
+from opentrons.protocol_api import Labware, TrashBin, WasteChute
 from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.protocol_api._liquid_properties import TransferProperties
-from opentrons.protocol_api.core.engine.well import WellCore
 from opentrons.protocol_api.core.engine.instrument import InstrumentCore
 from opentrons.protocol_api.core.engine.transfer_components_executor import (
-    TransferComponentsExecutor,
-    absolute_point_from_position_reference_and_offset,
-    TipState,
-    TransferType,
-    LiquidAndAirGapPair,
     AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP,
+    LiquidAndAirGapPair,
+    TipState,
+    TransferComponentsExecutor,
+    TransferType,
+    absolute_point_from_position_reference_and_offset,
 )
+from opentrons.protocol_api.core.engine.well import WellCore
 from opentrons.protocol_api.disposal_locations import DisposalOffset
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.advanced_control.transfers import (
@@ -32,7 +33,7 @@ from opentrons.protocols.advanced_control.transfers import (
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
 )
-from opentrons.types import Location, Point, Mount
+from opentrons.types import Location, Mount, Point
 
 
 @pytest.fixture

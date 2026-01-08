@@ -1,89 +1,88 @@
 """Class that schedules motion on can bus."""
 
 import asyncio
-from collections import defaultdict
 import logging
-from typing import List, Set, Tuple, Iterator, Union, Optional
-import numpy as np
 import time
+from collections import defaultdict
+from typing import Iterator, List, Optional, Set, Tuple, Union
 
+import numpy as np
 from opentrons_shared_data.errors.exceptions import (
-    GeneralError,
-    MoveConditionNotMetError,
     EnumeratedError,
     EStopActivatedError,
+    GeneralError,
     MotionFailedError,
-    PythonException,
     MotorDriverError,
+    MoveConditionNotMetError,
+    PythonException,
 )
 
+from .constants import (
+    brushed_motor_interrupts_per_sec,
+    interrupts_per_sec,
+    tip_interrupts_per_sec,
+)
+from .types import MotorPositionStatus, NodeDict
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.firmware_bindings import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
     ErrorCode,
     ErrorSeverity,
     GearMotorId,
-    MoveAckId,
     MotorDriverErrorCode,
+    MoveAckId,
+    NodeId,
 )
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    MoveStopConditionField,
+    PipetteTipActionTypeField,
+    SensorIdField,
+    SensorTypeField,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    ClearAllMoveGroupsRequest,
+    AddBrushedLinearMoveRequest,
     AddLinearMoveRequest,
-    MoveCompleted,
+    AddSensorLinearMoveRequest,
+    ClearAllMoveGroupsRequest,
+    ErrorMessage,
     ExecuteMoveGroupRequest,
-    HomeRequest,
     GripperGripRequest,
     GripperHomeRequest,
-    AddBrushedLinearMoveRequest,
+    HomeRequest,
+    MoveCompleted,
+    ReadMotorDriverErrorStatusResponse,
+    StopRequest,
     TipActionRequest,
     TipActionResponse,
-    ErrorMessage,
-    StopRequest,
-    ReadMotorDriverErrorStatusResponse,
-    AddSensorLinearMoveRequest,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     AddLinearMoveRequestPayload,
-    ExecuteMoveGroupRequestPayload,
-    HomeRequestPayload,
-    GripperMoveRequestPayload,
-    TipActionRequestPayload,
-    EmptyPayload,
     AddSensorLinearMoveBasePayload,
+    EmptyPayload,
+    ExecuteMoveGroupRequestPayload,
+    GripperMoveRequestPayload,
+    HomeRequestPayload,
+    TipActionRequestPayload,
 )
-from .constants import (
-    interrupts_per_sec,
-    tip_interrupts_per_sec,
-    brushed_motor_interrupts_per_sec,
+from opentrons_hardware.firmware_bindings.utils import (
+    Int32Field,
+    UInt8Field,
+    UInt32Field,
 )
-from opentrons_hardware.errors import raise_from_error_message
 from opentrons_hardware.hardware_control.motion import (
     MoveGroups,
     MoveGroupSingleAxisStep,
     MoveGroupSingleGripperStep,
     MoveGroupTipActionStep,
+    MoveStopCondition,
     MoveType,
     SingleMoveStep,
 )
-from opentrons_hardware.firmware_bindings.utils import (
-    UInt8Field,
-    UInt32Field,
-    Int32Field,
-)
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    PipetteTipActionTypeField,
-    MoveStopConditionField,
-    SensorIdField,
-    SensorTypeField,
-)
-from opentrons_hardware.hardware_control.motion import MoveStopCondition
 from opentrons_hardware.hardware_control.motor_position_status import (
     extract_motor_status_info,
 )
-
-from .types import NodeDict, MotorPositionStatus
 
 log = logging.getLogger(__name__)
 

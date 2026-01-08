@@ -8,16 +8,16 @@ from typing import (
     Dict,
     List,
     Mapping,
+    NamedTuple,
     Optional,
     Sequence,
     Tuple,
-    NamedTuple,
     Union,
     overload,
 )
+
 from typing_extensions import assert_never
 
-from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import (
@@ -25,50 +25,49 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
     LabwareRole,
+    UserDefinedVolumes,
     WellDefinition2,
     WellDefinition3,
-    UserDefinedVolumes,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
+from .. import errors
+from ..actions import (
+    Action,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    get_state_updates,
+)
+from ..resources import DeckFixedLabware, fixture_validation, labware_validation
+from ..types import (
+    OFF_DECK_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    Dimensions,
+    GripSpecs,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareOffset,
+    LabwareOffsetLocationSequence,
+    LabwareOffsetVector,
+    LegacyLabwareOffsetLocation,
+    LoadedLabware,
+    ModuleLocation,
+    NonStackedLocation,
+    OnDeckLabwareLocation,
+    OnLabwareLocation,
+    OverlapOffset,
+)
+from ._abstract_store import HandlesActions, HasState
+from ._move_types import EdgePathType
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D,
 )
-from opentrons.types import DeckSlotName, StagingSlotName, MountType, Point
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.calibration_storage.helpers import uri_from_details
-
-from .. import errors
-from ..resources import DeckFixedLabware, labware_validation, fixture_validation
-from ..types import (
-    DeckSlotLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
-    NonStackedLocation,
-    Dimensions,
-    GripSpecs,
-    LabwareOffset,
-    LabwareOffsetVector,
-    LabwareOffsetLocationSequence,
-    LegacyLabwareOffsetLocation,
-    InStackerHopperLocation,
-    WASTE_CHUTE_LOCATION,
-    LabwareLocation,
-    LoadedLabware,
-    ModuleLocation,
-    OverlapOffset,
-    OnDeckLabwareLocation,
-    OFF_DECK_LOCATION,
-)
-from ..actions import (
-    Action,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    get_state_updates,
-)
-from ._abstract_store import HasState, HandlesActions
-from ._move_types import EdgePathType
-
+from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.

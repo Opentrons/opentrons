@@ -2,13 +2,14 @@
 
 import asyncio
 import logging
-from typing import Dict, Tuple, Union, cast
 from datetime import datetime, timezone
-from opentrons.util.helpers import utc_now
-from opentrons.config import IS_ROBOT
+from typing import Dict, Tuple, Union, cast
 
-from robot_server.system import errors
+from opentrons.config import IS_ROBOT
+from opentrons.util.helpers import utc_now
+
 from robot_server.service.errors import CommonErrorDef
+from robot_server.system import errors
 
 log = logging.getLogger(__name__)
 

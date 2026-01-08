@@ -2,23 +2,23 @@
 
 from typing import AsyncGenerator, List, Tuple
 
+import pytest
+from mock import AsyncMock
+from opentrons_shared_data.errors.exceptions import CommandTimedOutError
+
+from tests.conftest import CanLoopback
+
 from opentrons_hardware.firmware_bindings import NodeId
+from opentrons_hardware.firmware_bindings.constants import SensorId
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
-    payloads,
     message_definitions,
+    payloads,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import SensorIdField
 from opentrons_hardware.firmware_bindings.utils import UInt8Field
-from opentrons_hardware.firmware_bindings.constants import SensorId
-from tests.conftest import CanLoopback
-
-import pytest
-from mock import AsyncMock
-
 from opentrons_hardware.hardware_control.tip_presence.detector import TipDetector
 from opentrons_hardware.hardware_control.tip_presence.types import TipNotification
-from opentrons_shared_data.errors.exceptions import CommandTimedOutError
 
 
 @pytest.fixture

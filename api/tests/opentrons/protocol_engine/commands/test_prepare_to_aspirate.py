@@ -1,25 +1,26 @@
 """Test prepare to aspirate commands."""
 
 from datetime import datetime
-from opentrons.types import Point
+
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
+
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+from opentrons.protocol_engine.commands.prepare_to_aspirate import (
+    PrepareToAspirateImplementation,
+    PrepareToAspirateParams,
+    PrepareToAspirateResult,
+)
 from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
-
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-from opentrons.protocol_engine.commands.prepare_to_aspirate import (
-    PrepareToAspirateParams,
-    PrepareToAspirateImplementation,
-    PrepareToAspirateResult,
-)
 from opentrons.protocol_engine.execution.gantry_mover import GantryMover
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.state import update_types
-from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
+from opentrons.types import Point
 
 
 @pytest.fixture

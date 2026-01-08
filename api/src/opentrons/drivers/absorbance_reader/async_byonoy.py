@@ -3,24 +3,25 @@ import os
 import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Any, Optional, List, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .hid_protocol import (
     AbsorbanceHidInterface as AbsProtocol,
-    ErrorCodeNames,
-    DeviceStateNames,
-    SlotStateNames,
-    MeasurementConfig,
 )
-from opentrons.drivers.types import (
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderPlatePresence,
-    AbsorbanceReaderDeviceState,
-    ABSMeasurementMode,
+from .hid_protocol import (
+    DeviceStateNames,
+    ErrorCodeNames,
+    MeasurementConfig,
+    SlotStateNames,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.types import (
+    ABSMeasurementMode,
+    AbsorbanceReaderDeviceState,
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
+)
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
-
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 # match semver V0.0.0 (old format) or one integer (latest format)

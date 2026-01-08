@@ -1,23 +1,24 @@
 """Helper functions for liquid-level related calculations inside a given frustum."""
 
-from typing import List, Tuple
-from numpy import pi, iscomplex, roots, real
 from math import isclose
+from typing import List, Tuple
+
+from numpy import iscomplex, pi, real, roots
+
+from opentrons_shared_data.labware.labware_definition import (
+    ConicalFrustum,
+    CuboidalFrustum,
+    InnerWellGeometry,
+    SphericalSegment,
+    SquaredConeSegment,
+    UserDefinedVolumes,
+    WellSegment,
+)
 
 from ..errors.exceptions import InvalidLiquidHeightFound, InvalidUserDefinedVolumesError
-
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
     SimulatedProbeResult,
-)
-from opentrons_shared_data.labware.labware_definition import (
-    InnerWellGeometry,
-    WellSegment,
-    SphericalSegment,
-    ConicalFrustum,
-    CuboidalFrustum,
-    SquaredConeSegment,
-    UserDefinedVolumes,
 )
 
 

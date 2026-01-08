@@ -1,32 +1,25 @@
 import asyncio
-import re
 import base64
+import re
 from typing import List, Optional
 
-from opentrons.drivers.asyncio.communication.errors import (
-    NoResponse,
-    TaskNotReady,
-)
-from opentrons.drivers.command_builder import CommandBuilder
-from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
-
 from .abstract import AbstractFlexStackerDriver
-from .errors import StackerErrorCodes, MotorStallDetected
+from .errors import MotorStallDetected, StackerErrorCodes
 from .types import (
     GCODE,
     ActiveRange,
+    Direction,
+    HardwareRevision,
+    LEDColor,
     LEDPattern,
+    LimitSwitchStatus,
     MeasurementKind,
+    MoveParams,
     MoveResult,
+    PlatformStatus,
     SpadMapID,
     StackerAxis,
-    PlatformStatus,
-    Direction,
     StackerInfo,
-    HardwareRevision,
-    MoveParams,
-    LimitSwitchStatus,
-    LEDColor,
     StallGuardParams,
     TOFConfiguration,
     TOFMeasurement,
@@ -41,7 +34,12 @@ from .utils import (
     NUMBER_OF_BINS,
     validate_histogram_frame,
 )
-
+from opentrons.drivers.asyncio.communication import AsyncResponseSerialConnection
+from opentrons.drivers.asyncio.communication.errors import (
+    NoResponse,
+    TaskNotReady,
+)
+from opentrons.drivers.command_builder import CommandBuilder
 
 FS_BAUDRATE = 115200
 DEFAULT_FS_TIMEOUT = 5

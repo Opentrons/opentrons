@@ -1,24 +1,23 @@
 """Common test fixtures for runs route tests."""
 
-from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 import pytest
 from decoy import Decoy
 
-from robot_server.protocols.protocol_store import ProtocolStore
-from robot_server.runs.run_auto_deleter import RunAutoDeleter
-from robot_server.runs.run_store import RunStore
-from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
-from robot_server.runs.run_data_manager import RunDataManager
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
+from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+
+from robot_server.camera.provider import CameraProviderWrapper
+from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.file_provider.provider import FileProviderExecutor
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
-from robot_server.deck_configuration.store import DeckConfigurationStore
-
-from robot_server.file_provider.provider import FileProviderExecutor
-from robot_server.camera.provider import CameraProviderWrapper
-
-from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.resources import FileProvider, CameraProvider
+from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.runs.run_auto_deleter import RunAutoDeleter
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
+from robot_server.runs.run_store import RunStore
 
 
 @pytest.fixture()

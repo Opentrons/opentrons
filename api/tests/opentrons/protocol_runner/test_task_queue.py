@@ -1,7 +1,9 @@
 """Tests for TaskQueue."""
 
 import asyncio
+
 from decoy import Decoy
+
 from opentrons.protocol_runner.task_queue import TaskQueue
 
 

@@ -1,8 +1,8 @@
 """The versions of standard liquid classes that the Protocol API should load by default."""
 
 from typing import TypeAlias
-from opentrons.protocols.api_support.types import APIVersion
 
+from opentrons.protocols.api_support.types import APIVersion
 
 DefaultLiquidClassVersions: TypeAlias = dict[APIVersion, dict[str, int]]
 

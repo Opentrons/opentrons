@@ -2,48 +2,50 @@
 
 import inspect
 from typing import List
+from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy
-from unittest.mock import sentinel
 
-from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
-    LiquidClasses as VolumeModes,
-)
 from opentrons_shared_data.pipette.pipette_definition import (
     AvailableSensorDefinition,
 )
-from opentrons.types import Point, MountType, DeckSlotName
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons import motion_planning
-
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    WellLocation,
-    LoadedPipette,
-    DeckSlotLocation,
-    CurrentWell,
-    CurrentAddressableArea,
-    MotorAxis,
-    AddressableOffsetVector,
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses as VolumeModes,
 )
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
+)
+from opentrons_shared_data.robot.types import RobotType
+
+from ..pipette_fixtures import get_default_nozzle_map
+from opentrons import motion_planning
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_engine import errors
 from opentrons.protocol_engine.state import _move_types
+from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
 from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.state.geometry import GeometryView
 from opentrons.protocol_engine.state.labware import LabwareView
+from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
+from opentrons.protocol_engine.state.modules import ModuleView
+from opentrons.protocol_engine.state.motion import MotionView, PipetteLocationData
 from opentrons.protocol_engine.state.pipettes import (
-    PipetteView,
-    StaticPipetteConfig,
     BoundingNozzlesOffsets,
     PipetteBoundingBoxOffsets,
+    PipetteView,
+    StaticPipetteConfig,
 )
-from opentrons.protocol_engine.state.addressable_areas import AddressableAreaView
-from opentrons.protocol_engine.state.geometry import GeometryView
-from opentrons.protocol_engine.state.motion import MotionView, PipetteLocationData
-from opentrons.protocol_engine.state.modules import ModuleView
-from opentrons.protocol_engine.state.module_substates import HeaterShakerModuleId
-from opentrons_shared_data.robot.types import RobotType
-from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.types import (
+    AddressableOffsetVector,
+    CurrentAddressableArea,
+    CurrentWell,
+    DeckSlotLocation,
+    LoadedPipette,
+    MotorAxis,
+    WellLocation,
+)
+from opentrons.types import DeckSlotName, MountType, Point
 
 
 @pytest.fixture

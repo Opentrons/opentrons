@@ -1,24 +1,24 @@
 """Parameter definition and associated validators."""
 
-from abc import abstractmethod, ABC
-from typing import Generic, Optional, List, Set, Union
+from abc import ABC, abstractmethod
+from typing import Generic, List, Optional, Set, Union
 
-from opentrons.protocols.parameters.types import (
-    ParamType,
-    ParameterChoice,
-    PrimitiveAllowedTypes,
-)
-from opentrons.protocols.parameters.exceptions import (
-    ParameterValueError,
-    ParameterDefinitionError,
+from opentrons.protocol_engine.types import (
+    BooleanParameter,
+    EnumChoice,
+    EnumParameter,
+    NumberParameter,
+    RunTimeParameter,
 )
 from opentrons.protocols.parameters import validation
-from opentrons.protocol_engine.types import (
-    RunTimeParameter,
-    NumberParameter,
-    BooleanParameter,
-    EnumParameter,
-    EnumChoice,
+from opentrons.protocols.parameters.exceptions import (
+    ParameterDefinitionError,
+    ParameterValueError,
+)
+from opentrons.protocols.parameters.types import (
+    ParameterChoice,
+    ParamType,
+    PrimitiveAllowedTypes,
 )
 from opentrons.util.get_union_elements import get_union_elements
 

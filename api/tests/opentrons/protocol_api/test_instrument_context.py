@@ -1,85 +1,82 @@
 """Tests for the InstrumentContext public interface."""
 
 import inspect
-import pytest
 from collections import OrderedDict
 from datetime import datetime
-from typing import ContextManager, Optional, Any
+from typing import Any, ContextManager, Optional
 from unittest.mock import sentinel
 
+import pytest
 from decoy import Decoy, matchers
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.errors.error_occurrence import (
-    ProtocolCommandFailedError,
-)
-
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocols.advanced_control.transfers.common import (
-    TransferTipPolicyV2,
-    TransferTipPolicyV2Type,
-)
-from opentrons.protocols.advanced_control.transfers import (
-    transfer_liquid_utils as mock_tx_liquid_utils,
-)
-
-from tests.opentrons.protocol_api.partial_tip_configurations import (
-    PipetteReliantNozzleConfigSpec,
-    PIPETTE_RELIANT_TEST_SPECS,
-    NozzleLayoutArgs,
-    PipetteIndependentNozzleConfigSpec,
-    PIPETTE_INDEPENDENT_TEST_SPECS,
-    InstrumentCoreNozzleConfigSpec,
-    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
-    ExpectedCoreArgs,
-)
-from opentrons.protocols.api_support import instrument as mock_instrument_support
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import (
-    APIVersionError,
-    UnsupportedAPIError,
-    FlowRates,
-    PlungerSpeeds,
-)
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    InstrumentContext,
-    Labware,
-    Well,
-    labware,
-    LiquidClass,
-)
-from opentrons.protocol_api.core.common import (
-    InstrumentCore,
-    ProtocolCore,
-    WellCore,
-    LabwareCore,
-)
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-    LegacyInstrumentCore,
-)
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.types import (
-    Location,
-    Mount,
-    Point,
-    NozzleMapInterface,
-    MeniscusTrackingTarget,
-)
-
-from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.robot.types import RobotType
-from . import versions_at_or_above, versions_between, versions_below
+from tests.opentrons.protocol_api.partial_tip_configurations import (
+    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
+    PIPETTE_INDEPENDENT_TEST_SPECS,
+    PIPETTE_RELIANT_TEST_SPECS,
+    ExpectedCoreArgs,
+    InstrumentCoreNozzleConfigSpec,
+    NozzleLayoutArgs,
+    PipetteIndependentNozzleConfigSpec,
+    PipetteReliantNozzleConfigSpec,
+)
+
+from . import versions_at_or_above, versions_below, versions_between
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    InstrumentContext,
+    Labware,
+    LiquidClass,
+    Well,
+    labware,
+)
+from opentrons.protocol_api.core.common import (
+    InstrumentCore,
+    LabwareCore,
+    ProtocolCore,
+    WellCore,
+)
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
+)
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ProtocolCommandFailedError,
+)
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as mock_tx_liquid_utils,
+)
+from opentrons.protocols.advanced_control.transfers.common import (
+    TransferTipPolicyV2,
+    TransferTipPolicyV2Type,
+)
+from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    FlowRates,
+    PlungerSpeeds,
+    UnsupportedAPIError,
+)
+from opentrons.types import (
+    Location,
+    MeniscusTrackingTarget,
+    Mount,
+    NozzleMapInterface,
+    Point,
+)
 
 
 @pytest.fixture(autouse=True)
