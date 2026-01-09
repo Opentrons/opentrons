@@ -27,9 +27,7 @@ export const getStackerMaxPoolCountByHeight = (
         `Invalid max fill height for ${model}: ${maxFillHeight} must be greater than 0`
       )
     }
-    return Math.floor(
-      (maxFillHeight - poolOverlap) / (poolHeight - poolOverlap)
-    )
+    return Math.floor(maxFillHeight / (poolHeight - poolOverlap))
   }
   console.error(`Invalid module model for max pool count by height: ${model}`)
   return 0
