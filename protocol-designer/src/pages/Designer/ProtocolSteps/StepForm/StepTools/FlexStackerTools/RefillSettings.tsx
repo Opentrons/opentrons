@@ -42,17 +42,13 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   )
   const storedEntityName = storedEntity?.def.metadata.displayName
   const isTiprack = storedEntity != null && getIsTiprack(storedEntity.def)
-
   // TODO: figure out a way to not need this use Effect. its hard because
   // you can't rely on generating the uuid in the hydrated form
   useEffect(() => {
-    if (!storedEntity?.labwareDefURI || fillQuantityLocalState == null) return
-
     const quantity = Number(fillQuantityLocalState) ?? 1
-
     const newFill = Array.from(
       { length: quantity },
-      () => `${uuid()}:${storedEntity.labwareDefURI}`
+      () => `${uuid()}:${storedEntity?.labwareDefURI}`
     )
     propsForFields.fillLabwareIds.updateValue(newFill)
   }, [fillQuantityLocalState, storedEntity?.labwareDefURI])
@@ -89,6 +85,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
               'step_edit_form.flex_stacker.fields.fillLabwareIds.caption',
               { max: maxPoolCount }
             )}
+            type="number"
             padding="0"
             setFillQuantityState={setFillQuantityState}
             fillQuantityLocalState={fillQuantityLocalState}
@@ -96,6 +93,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
           <MessageField fieldProps={propsForFields.interventionMessage} />
         </div>
       )}
+
       {storedLabwareDetails == null ? (
         <InlineNotification
           type="error"
