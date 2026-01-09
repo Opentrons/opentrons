@@ -85,7 +85,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
               'step_edit_form.flex_stacker.fields.fillLabwareIds.caption',
               { max: maxPoolCount }
             )}
-            type={'number'}
+            type='number'
             padding="0"
             setFillQuantityState={setFillQuantityState}
             fillQuantityLocalState={fillQuantityLocalState}
