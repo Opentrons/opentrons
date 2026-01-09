@@ -130,26 +130,70 @@ describe('LabwareStackToolboxContainer liquids dont match', () => {
     fireEvent.click(labwareButton, { ctrlKey: true })
     expect(props.selectedLabwareIds).toEqual(['mockLabwareId'])
   })
+})
+
+describe('LabwareStackToolboxContainer liquids match', () => {
+  let props: ComponentProps<typeof LabwareStackToolbox>
+  let setShowLiquidLayoutOverlay: Mock
+
+  beforeEach(() => {
+    setShowLiquidLayoutOverlay = vi.fn()
+    vi.mocked(useDispatch).mockReturnValue(mockDispatch)
+    props = {
+      showBadFormState: false,
+      setShowLiquidLayoutOverlay: setShowLiquidLayoutOverlay,
+      data: {
+        labware: {
+          mockLabwareId: {
+            stack: ['mockLabwareId', 'labware2', 'A2'],
+            id: 'mockLabwareId',
+            labwareDefURI: 'mockLabwareDefURI',
+            pythonName: 'mockPythonName',
+            def: fixture96Plate as LabwareDefinition2,
+          },
+          labware2: {
+            stack: ['labware2', 'A2'],
+            id: 'labware2',
+            labwareDefURI: 'labwareDefURI',
+            pythonName: 'labware2PythonName',
+            def: fixture96Plate as LabwareDefinition2,
+          },
+        },
+        labwareId: 'mockLabwareId',
+        allWellContents: {
+          mockLabwareId: {
+            A1: {
+              groupIds: ['mockGroupId'],
+            },
+          },
+        },
+        liquidLocations: {
+          mockLabwareId: {
+            A1: {
+              mockGroupId: {
+                volume: 5,
+              },
+            },
+          },
+          labware2: {
+            A1: {
+              mockGroupId: {
+                volume: 5,
+              },
+            },
+          },
+        },
+        largestStackInSlot: ['mockLabwareId', 'labware2'],
+      },
+      setShowBadFormState: vi.fn(),
+      setDefineLiquidModal: vi.fn(),
+      selectedLabwareIds: ['mockLabwareId'],
+    }
+    vi.clearAllMocks()
+  })
 
   it('select all labware buttons', () => {
-    const updatedProps = { ...props }
-    ;((updatedProps.data.liquidLocations = {
-      mockLabwareId: {
-        A1: {
-          mockGroupId: {
-            volume: 5,
-          },
-        },
-      },
-      labware2: {
-        A1: {
-          mockGroupId: {
-            volume: 5,
-          },
-        },
-      },
-    }),
-      render(updatedProps))
+    render(props)
     const allLabwareButton = screen.getByRole('button', { name: 'Select all' })
     expect(allLabwareButton).toBeInTheDocument()
     fireEvent.click(allLabwareButton)
