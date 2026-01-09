@@ -26,7 +26,10 @@
   ],
   "dependencies": {
     "ajv": "^6.12.3",
-    "lodash": "4.17.21"
+    "lodash": "4.17.21",
+    "path-browserify": "1.0.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/path-browserify": "1.0.3"
+  }
 }
