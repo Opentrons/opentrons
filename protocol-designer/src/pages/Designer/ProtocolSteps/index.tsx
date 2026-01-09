@@ -64,6 +64,7 @@ import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { FormData } from '/protocol-designer/form-types'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
@@ -140,7 +141,7 @@ export function ProtocolSteps({
       },
     })
 
-  let currentStep
+  let currentStep: FormData | null
   if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
     currentStep = savedStepForms[selectedStepId]
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {

@@ -62,6 +62,7 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentEntity } from '@opentrons/step-generation'
+import type { FormData } from '/protocol-designer/form-types'
 
 const DECK_VIEW_CONTAINER_MAX_HEIGHT = '35rem'
 
@@ -86,7 +87,7 @@ interface DeckSetupContainerProps {
   setViewBox: Dispatch<SetStateAction<string>>
   viewBox: string
   initialViewBox: string
-  currentStep: any
+  currentStep: FormData | null
 }
 export function DeckSetupContainer(
   props: DeckSetupContainerProps

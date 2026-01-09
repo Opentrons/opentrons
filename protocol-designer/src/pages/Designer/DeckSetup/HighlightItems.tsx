@@ -39,12 +39,16 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { AdditionalEquipmentName } from '@opentrons/step-generation'
+import type {
+  FlexStackerFormType,
+  FormData,
+} from '/protocol-designer/form-types'
 import type { Fixture } from './constants'
 
 interface HighlightItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
-  currentStep: any
+  currentStep: FormData | null
 }
 //  TODO(ja, 1/13/25): get actual coordinates from thermocycler and deck definitions
 const FLEX_TC_POSITION: CoordinateTuple = [-20, 282, 0]
@@ -170,11 +174,11 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       )
       const isStacker = moduleOnDeck.type === FLEX_STACKER_MODULE_TYPE
 
-      const stepType: (typeof FLEX_STACKER_IN_HOPPER_ACTIONS)[number] | null =
+      const stepType: FlexStackerFormType | null =
         currentStep?.flexStackerFormType ?? null
-
       const onHopperActions =
-        stepType != null && FLEX_STACKER_IN_HOPPER_ACTIONS.includes(stepType)
+        stepType != null &&
+        (FLEX_STACKER_IN_HOPPER_ACTIONS as string[]).includes(stepType)
       const isActionOnShuttle = isStacker && !onHopperActions
 
       const position = getPositionFromSlotId(
