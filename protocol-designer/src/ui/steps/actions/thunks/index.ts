@@ -13,6 +13,7 @@ import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
 import {
+  getCurrentFormIsPresaved,
   getInitialDeckSetup,
   getSavedStepHierarchy,
   getUnsavedForm,
@@ -363,60 +364,73 @@ export const _saveStepForm = (
 
 /**
  * Take the current unsaved form and save it.
- *
- * Certain forms, when saved, also save a "bonus step" under certain circumstances.
- * e.g. saving a Temperature Module step may also save a "wait for temperature" step.
- * The bonus step might either be mandatory, in which case this thunk will always save it,
- * or optional as decided by the user, in which case the user's preference should be
- * passed in.
  */
-export const saveStepForm: (options?: {
-  userWantsBonusStep?: boolean
-}) => ThunkAction<any> = options => (dispatch, getState) => {
-  const { userWantsBonusStep = false } = options ?? {}
-  const initialState = getState()
-  const unsavedForm = getUnsavedForm(initialState)
-  const enableConcurrentModuleActions =
-    getEnableConcurrentModuleActions(initialState)
+export const saveStepForm: () => ThunkAction<any> =
+  () => (dispatch, getState) => {
+    const initialState = getState()
+    const unsavedForm = getUnsavedForm(initialState)
+    const isFirstTimeSavingThisForm = getCurrentFormIsPresaved(initialState)
+    const enableConcurrentModuleActions =
+      getEnableConcurrentModuleActions(initialState)
 
-  // this check is only for TypeScript. At this point, unsavedForm should always be populated
-  if (unsavedForm == null) {
-    console.assert(
-      false,
-      'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
-    )
-    return
+    // this check is only for TypeScript. At this point, unsavedForm should always be populated
+    if (unsavedForm == null) {
+      console.assert(
+        false,
+        'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
+      )
+      return
+    }
+
+    if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
+      dispatch(
+        tutorialActions.addHint({ hintKey: 'thermocycler_lid_passive_cooling' })
+      )
+    }
+    if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {
+      dispatch(tutorialActions.addHint({ hintKey: 'waste_chute_warning' }))
+    }
+
+    // save the form
+    dispatch(_saveStepForm(unsavedForm, enableConcurrentModuleActions))
+
+    // Save any bonus steps that come with it.
+    const isTempModSetTempForm =
+      unsavedForm.stepType === 'temperature' &&
+      unsavedForm.targetTemperature != null
+    const isHSSetTempForm =
+      unsavedForm.stepType === 'heaterShaker' &&
+      unsavedForm.targetHeaterShakerTemperature != null &&
+      unsavedForm.heaterShakerSetTimer !== true
+    const isThermocyclerProfileForm =
+      unsavedForm.stepType === 'thermocycler' &&
+      unsavedForm.thermocyclerFormType === 'thermocyclerProfile'
+    if (isTempModSetTempForm && isFirstTimeSavingThisForm) {
+      dispatch(saveWaitForTemperatureModuleTemp(unsavedForm))
+      dispatch(
+        tutorialActions.addHint({
+          hintKey: 'wait_for_temperature_module_temp',
+          targetTemperature: unsavedForm.targetTemperature,
+        })
+      )
+    } else if (isHSSetTempForm && isFirstTimeSavingThisForm) {
+      dispatch(saveWaitForHeaterShakerTemp(unsavedForm))
+      dispatch(
+        tutorialActions.addHint({
+          hintKey: 'wait_for_heater_shaker_temp',
+          targetTemperature: unsavedForm.targetHeaterShakerTemperature,
+        })
+      )
+    } else if (isThermocyclerProfileForm && isFirstTimeSavingThisForm) {
+      // The "wait for profile" bonus step should get added by the underlying
+      // reducer, so we don't need to add it here. Just raise the hint to explain it.
+      dispatch(
+        tutorialActions.addHint({
+          hintKey: 'wait_for_thermocycler_profile',
+        })
+      )
+    }
   }
-
-  if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
-    dispatch(
-      tutorialActions.addHint({ hintKey: 'thermocycler_lid_passive_cooling' })
-    )
-  }
-
-  if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {
-    dispatch(tutorialActions.addHint({ hintKey: 'waste_chute_warning' }))
-  }
-
-  // save the form
-  dispatch(_saveStepForm(unsavedForm, enableConcurrentModuleActions))
-
-  // Save any bonus steps that come with it.
-  // NOTE: This logic to decide whether a bonus step is warranted should be kept in sync
-  // with getBonusStepDialogType().
-  const isTempModSetTempForm =
-    unsavedForm?.stepType === 'temperature' &&
-    unsavedForm?.targetTemperature != null
-  const isHSSetTempForm =
-    unsavedForm?.stepType === 'heaterShaker' &&
-    unsavedForm?.targetHeaterShakerTemperature != null &&
-    unsavedForm?.heaterShakerSetTimer !== true
-  if (isTempModSetTempForm && userWantsBonusStep) {
-    dispatch(saveWaitForTemperatureModuleTemp(unsavedForm))
-  } else if (isHSSetTempForm && userWantsBonusStep) {
-    dispatch(saveWaitForHeaterShakerTemp(unsavedForm))
-  }
-}
 
 const saveWaitForTemperatureModuleTemp: (
   unsavedSetTemperatureForm: FormData

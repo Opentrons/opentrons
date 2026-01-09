@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
@@ -22,6 +22,7 @@ import { getHint } from '/protocol-designer/tutorial/selectors'
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { PropsWithChildren } from 'react'
 import type { HintKey } from '/protocol-designer/tutorial'
 
 export const HintsModal = (): JSX.Element | null => {
@@ -38,6 +39,10 @@ export const HintsModal = (): JSX.Element | null => {
 
   if (hint == null) {
     return null
+  }
+
+  const i18nValues = {
+    temperature: 'targetTemperature' in hint ? hint.targetTemperature : null,
   }
 
   let hintContents: JSX.Element | null = null
@@ -69,6 +74,26 @@ export const HintsModal = (): JSX.Element | null => {
         {t(`alert:hint.${hint.hintKey}.body1`)}
       </StyledText>
     )
+  } else if (
+    hint.hintKey === 'wait_for_heater_shaker_temp' ||
+    hint.hintKey === 'wait_for_temperature_module_temp' ||
+    hint.hintKey === 'wait_for_thermocycler_block_temp' ||
+    hint.hintKey === 'wait_for_thermocycler_lid_temp' ||
+    hint.hintKey === 'wait_for_thermocycler_profile'
+  ) {
+    const bodyParagraphs = (
+      <Trans
+        t={t}
+        i18nKey={`alert:hint.${hint.hintKey}.body`}
+        values={i18nValues}
+        components={{ p: <BodyParagraph /> }}
+      />
+    )
+    hintContents = (
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+        {bodyParagraphs}
+      </Flex>
+    )
   }
 
   return createPortal(
@@ -76,7 +101,7 @@ export const HintsModal = (): JSX.Element | null => {
       marginLeft="0"
       type="warning"
       zIndexOverlay={15}
-      title={t(`hint.${hint.hintKey}.title`)}
+      title={t(`hint.${hint.hintKey}.title`, i18nValues)}
       footer={
         <Flex
           alignItems={ALIGN_CENTER}
@@ -108,5 +133,13 @@ export const HintsModal = (): JSX.Element | null => {
       {hintContents}
     </Modal>,
     getMainPagePortalEl()
+  )
+}
+
+function BodyParagraph({ children }: PropsWithChildren): JSX.Element {
+  return (
+    <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
+      {children}
+    </StyledText>
   )
 }
