@@ -564,6 +564,8 @@ flex_stacker_1.set_stored_labware_items(
       `# Set Stored Labware:
 flex_stacker_1.set_stored_labware(
     load_name="fixture_96_plate",
+    namespace="opentrons",
+    version=1,
     count=0
 )`.trimStart()
     )

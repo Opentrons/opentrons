@@ -666,6 +666,8 @@ export const getSetStoredLabware = (
           getSlotInLocationStack(labware.stack) === moduleSlot &&
           !labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
+      // TODO: this doesn't address adapters in the shuttle yet since we dont allow that
+      // as of 1/9/26
       if (labwaresOnHopper.length === 0) {
         if (labwaresOnShuttle.length === 0) {
           return ''
@@ -687,6 +689,8 @@ export const getSetStoredLabware = (
           `load_name=${formatPyStr(
             labwareEntities[nonLid[0]].def.parameters.loadName
           )}`,
+          `namespace=${formatPyStr(labwareEntities[nonLid[0]].def.namespace)}`,
+          `version=${labwareEntities[nonLid[0]].def.version}`,
           'count=0',
           ...(lid != null
             ? [
