@@ -72,7 +72,7 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["opentrons_hardware"]
 [tool.ruff.lint.per-file-ignores]
-"hardware/_version.py" = ["I"]
+"opentrons_hardware/_version.py" = ["I"]
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 override-versions-of=['opentrons_shared_data']
