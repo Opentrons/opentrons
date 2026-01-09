@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Tuple, Union, Unpack, cast
+from typing import Any, List, Optional, Sequence, Tuple, Union, cast
+
+from typing_extensions import Unpack
 
 from opentrons_shared_data.errors.exceptions import (
     CommandParameterLimitViolated,
