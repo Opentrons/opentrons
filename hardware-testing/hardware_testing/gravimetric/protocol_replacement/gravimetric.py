@@ -36,8 +36,8 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": "2.28"}
+metadata = {"protocolName": "Gravimetric QC V2"}
+requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
@@ -1371,7 +1371,6 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             for channel in fixture_settings.channels:
                 _configure_tip_count(fixture_settings, channel)
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
-                channel_aspriate_dict: Dict[int, List[float]]
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 print_info(str(tips))
                 """
@@ -1431,7 +1430,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                         fixture_settings.pipette_channels == 96
                         and not fixture_settings.single_tip_96
                     ):
-                        asp_with_evap = asp_with_evap / fixture_settings.pipette_channels
+                        asp_with_evap = (
+                            asp_with_evap / fixture_settings.pipette_channels
+                        )
                         disp_with_evap = (
                             disp_with_evap / fixture_settings.pipette_channels
                         )
