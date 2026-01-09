@@ -79,6 +79,8 @@ export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
   storedLabwareDetails: null,
   labwareInHopper: null,
   labwareOnShuttle: null,
+  setStoredLabwareCount: 1,
+  fillCount: 1,
 }
 
 export const MODULE_INITIAL_STATE_BY_TYPE: {
