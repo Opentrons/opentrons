@@ -11,7 +11,10 @@ import {
 import { getIsTiprack } from '@opentrons/shared-data'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
-import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import {
+  getLabwareEntities,
+  getSavedStepForms,
+} from '/protocol-designer/step-forms/selectors'
 import { uuid } from '/protocol-designer/utils'
 
 import styles from './flexstackertools.module.css'
@@ -19,39 +22,59 @@ import { MessageField } from './MessageField'
 import { StackerContentItem } from './StackerContentItem'
 
 import type { FlexStackerModuleState } from '@opentrons/step-generation'
+import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
 interface RefillSettingsProps {
+  formData: FormData
   propsForFields: FieldPropsByName
   moduleState: FlexStackerModuleState | null
   maxPoolCount: number
 }
 
 export function RefillSettings(props: RefillSettingsProps): JSX.Element {
-  const { propsForFields, moduleState, maxPoolCount } = props
+  const { formData, propsForFields, moduleState, maxPoolCount } = props
   const { t } = useTranslation('form')
   const { storedLabwareDetails } = moduleState ?? {}
   const labwareEntities = useSelector(getLabwareEntities)
+  const savedStepForms = useSelector(getSavedStepForms)
+  const initialLabwareIds =
+    (savedStepForms[formData.id]?.fillLabwareIds as string[]) ?? []
+  const oldFillQuantity = initialLabwareIds.length
   const [fillQuantityLocalState, setFillQuantityState] = useState<
     string | null
-  >(null)
+    // initialize if saved step form exists
+  >(initialLabwareIds.length > 0 ? String(initialLabwareIds.length) : null)
   const storedEntity = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => {
       return labwareDefURI === storedLabwareDetails?.primaryLabwareURI
     }
   )
+
   const storedEntityName = storedEntity?.def.metadata.displayName
   const isTiprack = storedEntity != null && getIsTiprack(storedEntity.def)
   // TODO: figure out a way to not need this use Effect. its hard because
   // you can't rely on generating the uuid in the hydrated form
   useEffect(() => {
     const quantity = Number(fillQuantityLocalState) ?? 1
-    const newFill = Array.from(
-      { length: quantity },
-      () => `${uuid()}:${storedEntity?.labwareDefURI}`
-    )
-    propsForFields.fillLabwareIds.updateValue(newFill)
+    const difference = quantity - oldFillQuantity
+    if (difference > 0) {
+      const additionalIds = Array.from(
+        { length: difference },
+        () => `${uuid()}:${storedEntity?.labwareDefURI}`
+      )
+      // ensure we preserve the existing labware IDs, even if a user extensively modifies the quantity up/down
+      propsForFields.fillLabwareIds.updateValue([
+        ...initialLabwareIds,
+        ...additionalIds,
+      ])
+    } else if (difference < 0) {
+      propsForFields.fillLabwareIds.updateValue(
+        initialLabwareIds.slice(0, quantity)
+      )
+    }
   }, [fillQuantityLocalState, storedEntity?.labwareDefURI])
+
   return (
     <div className={styles.refill_settings_container}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
