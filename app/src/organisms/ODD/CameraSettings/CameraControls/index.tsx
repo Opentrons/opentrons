@@ -40,17 +40,24 @@ export function CameraControls({
   const returnToHomeView = (settings: CameraImageSettings): void => {
     setIsLoading(true)
 
+    const cameraImageSettings: CameraImageSettings = {
+      zoom: settings.zoom,
+      brightness: settings.brightness,
+      contrast: settings.contrast,
+      saturation: settings.saturation,
+    }
+
     if (runId != null) {
       dispatch(
-        updateCameraSpecificSettings(runId, 'ot_system_camera', {
-          zoom: settings.zoom,
-          brightness: settings.brightness,
-          contrast: settings.contrast,
-          saturation: settings.saturation,
-        })
+        updateCameraSpecificSettings(
+          runId,
+          'ot_system_camera',
+          cameraImageSettings
+        )
       )
+      setActiveSubView(null)
     } else {
-      createCameraImageSettings(settings, {
+      createCameraImageSettings(cameraImageSettings, {
         onSuccess: () => {
           setActiveSubView(null)
         },

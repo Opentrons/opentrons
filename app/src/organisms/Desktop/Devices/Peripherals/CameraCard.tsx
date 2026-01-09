@@ -84,7 +84,6 @@ export function CameraCard({
   const navigateToUsageSettings = (): void => {
     navigate(`/devices/${robotName}/robot-settings/camera`)
   }
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
 
   return (
     <div className={styles.card_container}>
@@ -141,11 +140,7 @@ export function CameraCard({
       )}
       {showControls &&
         createPortal(
-          <CameraControls
-            onClose={toggleControls}
-            runId={null}
-            postCameraImageSettings={createCameraImageSettings}
-          />,
+          <CameraControls onClose={toggleControls} runId={null} />,
           getTopPortalEl()
         )}
     </div>
