@@ -34,7 +34,8 @@ dependencies = [
     "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
-    "aiohttp==3.12.14"
+    "aiohttp==3.12.14",
+    "Pyro5==5.16",
 ]
 
 [dependency-groups]
@@ -56,6 +57,7 @@ robot = [
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14",
+    "Pyro5==5.16",
 ]
 dev = [
     "atomicwrites==1.4.0; sys_platform=='win32'",
@@ -87,6 +89,7 @@ dev = [
     "types-requests~=2.27.1",
     "zipp==3.21.0",
     "opentrons-hardware",
+    "Pyro5==5.16",
 ]
 
 [tool.ruff.lint]

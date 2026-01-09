@@ -32,6 +32,7 @@ dependencies = [
     "pyusb==1.2.1",
     'importlib-metadata >= 1.0 ; python_version < "3.8"',
     "packaging>=25.0",
+    "Pyro5==5.16",
 ]
 
 dynamic = ['version', 'hatch-dependency-coversion']
@@ -48,6 +49,7 @@ robot = [
     "pyusb==1.2.1",
     "zipp==3.21.0",
     "opentrons-hardware[FLEX]==0.0.0",
+    "Pyro5==5.16",
 ]
 # Dev dependencies - from Pipfile [dev-packages]
 # Robot group is always included in dev to ensure dev environment matches robot
@@ -83,6 +85,7 @@ dev = [
     # performance_metrics is needed for type checking (used in TYPE_CHECKING blocks)
     # even though it's optional at runtime
     "performance_metrics==0.0.0",
+    "Pyro5==5.16"
 ]
 
 
