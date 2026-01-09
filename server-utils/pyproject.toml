@@ -44,7 +44,7 @@ dev = [
     "pytest-xdist~=2.5.0",
     "requests==2.31.0",
     "mock==5.1.0",
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "decoy<3,>=2.2.0",
     "httpx==0.26.0",
     "types-requests~=2.31.0",

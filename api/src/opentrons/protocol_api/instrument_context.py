@@ -2974,10 +2974,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
             )
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyInstrumentCore)
-        return cast(LegacyInstrumentCore, self._core).get_speed()
+        return self._core.get_speed()
 
     @property
     @requires_version(2, 0)

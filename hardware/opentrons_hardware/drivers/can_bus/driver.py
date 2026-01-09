@@ -116,5 +116,5 @@ class CanDriver(AbstractCanDriver):
             )
 
         return CanMessage(
-            arbitration_id=ArbitrationId(id=m.arbitration_id), data=m.data
+            arbitration_id=ArbitrationId(id=m.arbitration_id), data=bytes(m.data)
         )

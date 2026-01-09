@@ -92,7 +92,7 @@ async def test_set_shake_speed(
         task = action.task
 
     decoy.when(
-        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))
+        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))  # type: ignore[func-returns-value]
     ).then_do(_capture_task)
     result = await subject.execute(data)
     assert task is not None
@@ -107,7 +107,9 @@ async def test_set_shake_speed(
         public=heater_shaker.SetShakeSpeedResult(
             pipetteRetracted=expect_pipette_retracted, taskId="taskId"
         ),
-        state_update=update_types.StateUpdate(pipette_location=update_types.CLEAR)
-        if expect_pipette_retracted
-        else update_types.StateUpdate(),
+        state_update=(
+            update_types.StateUpdate(pipette_location=update_types.CLEAR)
+            if expect_pipette_retracted
+            else update_types.StateUpdate()
+        ),
     )

@@ -189,7 +189,7 @@ async def test_hardware_stopping_sequence_no_pipette(
     )
 
     decoy.when(
-        mock_tip_handler.cache_tip(
+        mock_tip_handler.cache_tip(  # type: ignore[func-returns-value]
             pipette_id="pipette-id",
             tip=TipGeometry(length=1.0, volume=2.0, diameter=3.0),
         ),

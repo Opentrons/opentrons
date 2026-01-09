@@ -88,7 +88,7 @@ class ModuleContext(CommandPublisher):
         return self._get_type()
 
     def _get_type(self) -> ModuleType:
-        return cast(ModuleType, self._core.MODULE_TYPE.value)
+        return self._core.MODULE_TYPE.value
 
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
@@ -114,13 +114,12 @@ class ModuleContext(CommandPublisher):
         _log.warning(
             "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
         )
-        core = cast(LegacyModuleCore, self._core)
 
-        assert labware.parent == core.geometry, (
+        assert labware.parent == self._core.geometry, (
             "Labware is not configured with this module as its parent"
         )
 
-        return core.geometry.add_labware(labware)
+        return self._core.geometry.add_labware(labware)
 
     def load_labware(  # noqa: C901
         self,
@@ -265,10 +264,10 @@ class ModuleContext(CommandPublisher):
                 version=checked_lid_version,
             )
 
-        if isinstance(self._core, LegacyModuleCore):
-            labware = cast(LegacyModuleCore, self._core).add_labware_core(
-                cast(LegacyLabwareCore, labware_core)
-            )
+        if isinstance(self._core, LegacyModuleCore) and isinstance(
+            labware_core, LegacyLabwareCore
+        ):
+            labware = self._core.add_labware_core(labware_core)
         else:
             labware = Labware(
                 core=labware_core,
@@ -346,10 +345,10 @@ class ModuleContext(CommandPublisher):
             location=self._core,
         )
 
-        if isinstance(self._core, LegacyModuleCore):
-            adapter = cast(LegacyModuleCore, self._core).add_labware_core(
-                cast(LegacyLabwareCore, labware_core)
-            )
+        if isinstance(self._core, LegacyModuleCore) and isinstance(
+            labware_core, LegacyLabwareCore
+        ):
+            adapter = self._core.add_labware_core(labware_core)
         else:
             adapter = Labware(
                 core=labware_core,
@@ -404,7 +403,7 @@ class ModuleContext(CommandPublisher):
             like :py:meth:`model` and :py:meth:`type`
         """
         if isinstance(self._core, LegacyModuleCore):
-            return cast(LegacyModuleCore, self._core).geometry
+            return self._core.geometry
 
         raise UnsupportedAPIError(
             api_element="`ModuleContext.geometry`",

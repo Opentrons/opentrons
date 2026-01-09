@@ -210,7 +210,7 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
             response_model = get_args(return_annotation)[0]
             # and that's what we want to pass to the route method as response_model, so we do it and get the actual
             # function transformer
-            route_decorator = route_method(
+            route_decorator = route_method(  # type: ignore[call-arg]
                 **route_kwargs, response_model=response_model
             )
             # which we then call on the endpoint method to get it registered with the router, and return the results

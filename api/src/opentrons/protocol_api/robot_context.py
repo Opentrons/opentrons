@@ -233,7 +233,9 @@ class RobotContext(publisher.CommandPublisher):
                 top_of_labware = loc.wells()[0].top()
                 loc = top_of_labware.point
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
-            elif location is DeckLocation and not isinstance(location, Location):
+            elif isinstance(location, (int, str)) and not isinstance(
+                location, Location
+            ):
                 slot_name = validation.ensure_and_convert_deck_slot(
                     location,
                     api_version=self._api_version,

@@ -127,7 +127,7 @@ def prompt_payload(
     for f in payload_fields:
         try:
             if not f.name == "message_id":
-                i[f.name] = f.type.from_string(
+                i[f.name] = f.type.from_string(  # type: ignore[union-attr]
                     get_user_input(f"enter {f.name}: ").strip()
                 )
             else:

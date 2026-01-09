@@ -39,7 +39,7 @@ robot = [
 # Robot group is always included in dev to ensure dev environment matches robot
 dev = [
     {include-group = "robot"},
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "ruff==0.14.10",
     "twine==4.0.0",
     "wheel==0.37.1",

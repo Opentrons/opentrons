@@ -1243,10 +1243,8 @@ class ProtocolContext(CommandPublisher):
                 extra_message="To wait automatically for a period of time, use ProtocolContext.delay().",
             )
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyProtocolCore)
-        cast(LegacyProtocolCore, self._core).resume()
+        self._core.resume()
 
     @publish(command=cmds.comment)
     @requires_version(2, 0)
