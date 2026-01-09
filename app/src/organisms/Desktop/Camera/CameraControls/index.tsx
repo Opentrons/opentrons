@@ -1,8 +1,7 @@
-import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useDispatch } from 'react-redux'
 
 import {
-  Icon,
   Modal,
   PrimaryButton,
   SecondaryButton,
@@ -12,56 +11,38 @@ import {
 import { TextOnlyButton } from '/app/atoms/buttons'
 import { Divider } from '/app/atoms/structure'
 import { useCameraSettingsValues } from '/app/local-resources/images/hooks/useCameraSettingsValues'
+import { updateCameraSpecificSettings } from '/app/redux/protocol-runs'
 
 import styles from './cameracontrols.module.css'
 import { PreviewSettings } from './PreviewSettings'
 import { ZoomSettings } from './ZoomSettings'
 
-import type { AxiosError } from 'axios'
-import type { UseMutateFunction } from 'react-query'
-import type {
-  CameraImageSettings,
-  CameraImageSettingsResponse,
-} from '@opentrons/api-client'
 import type { UseCameraSettingsValuesResult } from '/app/local-resources/images/hooks/useCameraSettingsValues'
 
 export interface CameraControlsProps {
   onClose: () => void
   runId: string | null
-  postCameraImageSettings: UseMutateFunction<
-    CameraImageSettingsResponse,
-    AxiosError,
-    CameraImageSettings
-  >
 }
 
 export function CameraControls({
   onClose,
-  postCameraImageSettings,
   runId,
 }: CameraControlsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
-  const settings = useCameraSettingsValues()
-  const [isLoading, setIsLoading] = useState(false)
+  const settings = useCameraSettingsValues(runId)
+  const dispatch = useDispatch()
+
   const handleSave = (): void => {
-    setIsLoading(true)
-    postCameraImageSettings(
-      {
+    dispatch(
+      updateCameraSpecificSettings(runId ?? '', 'ot_system_camera', {
         zoom: settings.zoom,
         brightness: settings.brightness,
         contrast: settings.contrast,
         saturation: settings.saturation,
-      },
-      {
-        onSuccess: () => {
-          onClose()
-        },
-        onSettled: () => {
-          setIsLoading(false)
-        },
-      }
+      })
     )
   }
+
   return (
     <Modal onClose={onClose} title={t('camera_controls')} width="46rem">
       <div className={styles.container}>
@@ -84,11 +65,8 @@ export function CameraControls({
           />
           <div className={styles.buttons}>
             <SecondaryButton onClick={onClose}>{t('Cancel')}</SecondaryButton>
-            <PrimaryButton onClick={handleSave} disabled={isLoading}>
-              <div className={styles.save_button}>
-                {isLoading && <Icon name="ot-spinner" spin size="1rem" />}
-                {t('save')}
-              </div>
+            <PrimaryButton onClick={handleSave}>
+              <div className={styles.save_button}>{t('save')}</div>
             </PrimaryButton>
           </div>
         </div>

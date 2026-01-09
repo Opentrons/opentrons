@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
+import { useSelector } from 'react-redux'
 
 import { useCameraImageSettings } from '@opentrons/react-api-client'
 
+import { getCameraImageSettings } from '/app/redux/protocol-runs'
+
 import { zoomNumberToString, zoomStringToNumber } from '../utils/cameraUtils'
+
+import type { State } from '/app/redux/types'
 
 export type CameraZoomSetting = '1x' | '1.5x' | '2x'
 
@@ -19,13 +24,22 @@ export interface UseCameraSettingsValuesResult {
 }
 
 // Camera image specific settings.
-export function useCameraSettingsValues(): UseCameraSettingsValuesResult {
-  const { data: cameraImageSettings } = useCameraImageSettings()
+export function useCameraSettingsValues(
+  runId: string | null
+): UseCameraSettingsValuesResult {
+  const { data: cameraImageSettingsGlobal } = useCameraImageSettings()
+  const cameraImageSettingsRun = useSelector((state: State) =>
+    getCameraImageSettings(state, runId ?? '', 'ot_system_camera')
+  )
+  const cameraImageSettings =
+    runId != null ? cameraImageSettingsRun : cameraImageSettingsGlobal
+
   const [zoom, setZoom] = useState<CameraZoomSetting>('1x')
   const zoomValue = zoomStringToNumber(zoom)
   const [brightness, setBrightness] = useState(50)
   const [contrast, setContrast] = useState(50)
   const [saturation, setSaturation] = useState(50)
+
   useEffect(() => {
     if (cameraImageSettings) {
       setZoom(
