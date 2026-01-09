@@ -93,7 +93,6 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
             )}
             type="number"
             padding="0"
-            type="number"
             setFillQuantityState={setFillQuantityState}
             fillQuantityLocalState={fillQuantityLocalState}
           />
