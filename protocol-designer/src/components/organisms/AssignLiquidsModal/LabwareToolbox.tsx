@@ -110,19 +110,15 @@ export function LabwareStackToolbox({
   }
 
   const allLabwareLiquidsEqual = (arr: string[]): boolean => {
-    console.log('liquidLocations: ', liquidLocations)
-    const firstValue = liquidLocations[filteredLabwareStack[0]]
-    console.log('firstValue: ', firstValue)
-    console.log('arr: ', arr)
-    return arr.every(
-      item =>
-        item in liquidLocations &&
-        JSON.stringify(liquidLocations[item]) === JSON.stringify(firstValue)
-    )
+    const firstValue = liquidLocations != null ? liquidLocations[filteredLabwareStack[0]] : null
+
+    if (!firstValue) {
+      return true
+    }
+    return arr.every(item => item in liquidLocations && JSON.stringify(liquidLocations[item]) === JSON.stringify(firstValue))
   }
 
   const handleSelectAllLabware = (): void => {
-    console.log('filteredLabwareStack: ', filteredLabwareStack)
     if (!allLabwareLiquidsEqual(filteredLabwareStack)) {
       setShowLiquidLayoutOverlay(true)
       return
