@@ -1,6 +1,8 @@
 import * as Constants from '../constants'
 import { INITIAL_CAMERA_STATE } from '../reducer'
 
+import type { CameraImageSettings } from '@opentrons/api-client'
+import type { CameraId } from '@opentrons/shared-data'
 import type { State } from '../../types'
 import type * as Types from '../types'
 
@@ -91,6 +93,20 @@ export const getCameraUsageState = (
     enabled: cameraStep.cameraEnabled,
     liveStreamEnabled: cameraStep.liveStreamEnabled,
     recoveryEnabled: cameraStep.recoveryEnabled,
+  }
+}
+
+export const getCameraImageSettings = (
+  state: State,
+  runId: string,
+  cameraId: CameraId
+): CameraImageSettings | null => {
+  const cameraStep =
+    state.protocolRuns[runId]?.setup[Constants.CAMERA_SETUP_STEP_KEY]
+  if (cameraStep == null) {
+    return null
+  } else {
+    return cameraStep.cameraImageSettings[cameraId] ?? null
   }
 }
 

@@ -1,5 +1,7 @@
 import * as Constants from '../constants'
 
+import type { CameraImageSettings } from '@opentrons/api-client'
+import type { CameraId } from '@opentrons/shared-data'
 import type * as Types from '../types'
 
 export const updateRunSetupStepsComplete = (
@@ -50,4 +52,13 @@ export const updateCameraUsageSettings = (allCameraArgs: {
 }): Types.UpdateAllCameraSettings => ({
   type: Constants.CAMERA_SETUP_STEP_KEY,
   payload: allCameraArgs,
+})
+
+export const updateCameraSpecificSettings = (
+  runId: string,
+  cameraId: CameraId,
+  cameraImageSettings: CameraImageSettings
+): Types.UpdateCameraSpecificImageSettings => ({
+  type: Constants.CAMERA_SETUP_STEP_KEY,
+  payload: { runId, cameraId, cameraImageSettings },
 })
