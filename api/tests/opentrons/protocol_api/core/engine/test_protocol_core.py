@@ -183,15 +183,21 @@ def mock_sync_hardware_api(decoy: Decoy) -> SyncHardwareAPI:
 
 
 @pytest.fixture
-# APIv2.15 because we're expecting a fixed trash.
-@pytest.mark.parametrize("api_version", [APIVersion(2, 15)])
 def subject(
     decoy: Decoy,
     mock_engine_client: EngineClient,
     api_version: APIVersion,
     mock_sync_hardware_api: SyncHardwareAPI,
+    request: pytest.FixtureRequest,
 ) -> ProtocolCore:
     """Get a ProtocolCore test subject with its dependencies mocked out."""
+    if (
+        hasattr(request.node, "callspec")
+        and "api_version" in request.node.callspec.params
+    ):
+        selected_api_version = request.node.callspec.params["api_version"]
+    else:
+        selected_api_version = api_version
     decoy.when(mock_engine_client.state.labware.get_fixed_trash_id()).then_return(
         "fixed-trash-123"
     )

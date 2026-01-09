@@ -43,7 +43,7 @@ dev = [
     "ruff==0.14.10",
     "twine==4.0.0",
     "wheel==0.37.1",
-    "pytest>=8.4.0,<9",
+    "pytest>=9.0.2",
     "pytest-cov==4.1.0",
     "pytest-xdist~=3.5.0",
     "typeguard~=4.4.4",

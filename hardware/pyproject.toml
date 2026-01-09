@@ -35,7 +35,7 @@ dynamic = ['version', 'hatch-dependency-coversion']
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.0,<9",
+    "pytest>=9.0.2",
     "pytest-cov==4.1.0",
     "ruff==0.14.10",
     "mypy==1.19.1",
