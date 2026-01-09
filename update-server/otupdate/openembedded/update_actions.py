@@ -32,8 +32,8 @@ LOG = logging.getLogger(__name__)
 
 
 class RootPartitions(enum.Enum):
-    TWO: Partition = Partition(2, "/dev/mmcblk0p2", "/media/mmcblk0p2")
-    THREE: Partition = Partition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")
+    TWO = Partition(2, "/dev/mmcblk0p2", "/media/mmcblk0p2")
+    THREE = Partition(3, "/dev/mmcblk0p3", "/media/mmcblk0p3")
 
 
 class PartitionManager:
