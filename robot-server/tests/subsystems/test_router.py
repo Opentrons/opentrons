@@ -1,7 +1,7 @@
 """Tests for /subsystems routes."""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Dict, Set, cast
+from typing import TYPE_CHECKING, Dict, Set
 
 import pytest
 from decoy import Decoy
@@ -88,7 +88,7 @@ def thread_manager(decoy: Decoy, ot3_hardware_api: "OT3API") -> ThreadManagedHar
     manager = decoy.mock(cls=ThreadManagedHardware)
     decoy.when(manager.wrapped()).then_return(ot3_hardware_api)
     decoy.when(manager.wraps_instance(OT3API)).then_return(True)
-    return cast(ThreadManagedHardware, manager)
+    return manager
 
 
 def _build_attached_subsystem(

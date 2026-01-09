@@ -523,7 +523,7 @@ async def test_delete_non_existent_file(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should raise an error if the file ID doesn't exist."""
-    decoy.when(data_files_store.remove_stored("file-id")).then_raise(
+    decoy.when(data_files_store.remove_stored("file-id")).then_raise(  # type: ignore[func-returns-value]
         FileIdNotFoundError(data_file_id="file-id")
     )
 
@@ -538,7 +538,7 @@ async def test_delete_file_in_use(
     data_files_store: DataFilesStore,
 ) -> None:
     """It should raise an error if the file to be deleted is in use."""
-    decoy.when(data_files_store.remove_stored("file-id")).then_raise(
+    decoy.when(data_files_store.remove_stored("file-id")).then_raise(  # type: ignore[func-returns-value]
         FileInUseError(
             data_file_id="file-id", ids_used_in_runs=set(), ids_used_in_analyses=set()
         )

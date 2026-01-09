@@ -145,7 +145,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
         )
     ).then_return(analyzer)
     decoy.when(
-        await analyzer.load_orchestrator(
+        await analyzer.load_orchestrator(  # type: ignore[func-returns-value]
             run_time_param_values={"sample_count": 123},
             run_time_param_paths={},
         )

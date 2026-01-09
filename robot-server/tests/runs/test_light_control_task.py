@@ -298,7 +298,7 @@ async def test_light_control_updates(
 
     if expected is None:
         decoy.when(
-            await hardware_api.set_status_bar_state(state=matchers.Anything())
+            await hardware_api.set_status_bar_state(state=matchers.Anything())  # type: ignore[func-returns-value]
         ).then_raise(RuntimeError("Test failed: unexpected call"))
 
     await subject.update(

@@ -253,9 +253,9 @@ async def test_get_by_protocol(
     resource_3 = _completed_analysis_resource("analysis-id-3", "protocol-id-2")
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-1"))
     protocol_store.insert(make_dummy_protocol_resource("protocol-id-2"))
-    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)
-    decoy.when(memcache.insert("analysis-id-2", resource_2)).then_return(None)
-    decoy.when(memcache.insert("analysis-id-3", resource_3)).then_return(None)
+    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)  # type: ignore[func-returns-value]
+    decoy.when(memcache.insert("analysis-id-2", resource_2)).then_return(None)  # type: ignore[func-returns-value]
+    decoy.when(memcache.insert("analysis-id-3", resource_3)).then_return(None)  # type: ignore[func-returns-value]
     await subject.make_room_and_add(resource_1, [], [])
     await subject.make_room_and_add(resource_2, [], [])
     await subject.make_room_and_add(resource_3, [], [])
@@ -263,7 +263,7 @@ async def test_get_by_protocol(
     decoy.when(memcache.get("analysis-id-2")).then_return(resource_2)
     decoy.when(memcache.contains("analysis-id-1")).then_return(False)
     decoy.when(memcache.contains("analysis-id-2")).then_return(True)
-    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)
+    decoy.when(memcache.insert("analysis-id-1", resource_1)).then_return(None)  # type: ignore[func-returns-value]
     resources = await subject.get_by_protocol("protocol-id-1")
     assert resources == [resource_1, resource_2]
 

@@ -1456,7 +1456,7 @@ async def test_delete_protocol_not_found(
     """It should 404 if the protocol to delete is not found."""
     not_found_error = ProtocolNotFoundError("protocol-id")
 
-    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(
+    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(  # type: ignore[func-returns-value]
         not_found_error
     )
 
@@ -1473,7 +1473,7 @@ async def test_delete_protocol_run_exists(
     """It should 404 if the protocol to delete is not found."""
     run_exists_error = ProtocolUsedByRunError("protocol-id")
 
-    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(
+    decoy.when(protocol_store.remove(protocol_id="protocol-id")).then_raise(  # type: ignore[func-returns-value]
         run_exists_error
     )
 
