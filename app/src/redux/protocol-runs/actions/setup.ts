@@ -42,7 +42,7 @@ export const updateCameraStreamEnablement = (
   payload: { runId, liveStreamEnabled },
 })
 
-export const updateAllCameraSettings = (allCameraArgs: {
+export const updateCameraUsageSettings = (allCameraArgs: {
   runId: string
   cameraEnabled: boolean
   liveStreamEnabled: boolean

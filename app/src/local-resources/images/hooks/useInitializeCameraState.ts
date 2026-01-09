@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 
-import { updateAllCameraSettings } from '/app/redux/protocol-runs'
+import { updateCameraUsageSettings } from '/app/redux/protocol-runs'
 import { useNotifyCamera } from '/app/resources/camera/useNotifyCamera'
 import { useNotifyRunQuery } from '/app/resources/runs'
 
@@ -22,7 +22,7 @@ export function useInitializeCameraState(runId: string): void {
         runCameraSettings
 
       dispatch(
-        updateAllCameraSettings({
+        updateCameraUsageSettings({
           runId,
           cameraEnabled,
           liveStreamEnabled,
@@ -34,7 +34,7 @@ export function useInitializeCameraState(runId: string): void {
         cameraSettings
 
       dispatch(
-        updateAllCameraSettings({
+        updateCameraUsageSettings({
           runId,
           cameraEnabled,
           liveStreamEnabled,
