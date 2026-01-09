@@ -1,3 +1,5 @@
+import { forwardRef } from 'react'
+
 import { withStyleProps } from '../hocs/withStyleProps'
 
 import type { ComponentProps, FC } from 'react'
@@ -9,8 +11,10 @@ import type { StyleProps } from './types'
  * @component
  */
 
-const BoxComponent = (props: ComponentProps<'div'>): JSX.Element => (
-  <div {...props} style={{ minWidth: 0, ...props.style }} />
+const BoxComponent = forwardRef<HTMLDivElement, ComponentProps<'div'>>(
+  (props, ref) => (
+    <div ref={ref} {...props} style={{ minWidth: 0, ...props.style }} />
+  )
 )
 
 export const Box: FC<ComponentProps<'div'> & StyleProps> = withStyleProps(
