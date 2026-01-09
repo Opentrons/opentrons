@@ -30,7 +30,7 @@ interface RefillSettingsProps {
 export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   const { propsForFields, moduleState, maxPoolCount } = props
   const { t } = useTranslation('form')
-  const { storedLabwareDetails } = moduleState ?? {}
+  const { storedLabwareDetails, labwareInHopper } = moduleState ?? {}
   const labwareEntities = useSelector(getLabwareEntities)
   const [fillQuantityLocalState, setFillQuantityState] = useState<
     string | null
@@ -47,15 +47,19 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   // you can't rely on generating the uuid in the hydrated form
   useEffect(() => {
     if (!storedEntity?.labwareDefURI || fillQuantityLocalState == null) return
-
     const quantity = Number(fillQuantityLocalState) ?? 1
-
+    const numberOfLabwareInHopper = labwareInHopper?.length ?? 0
+    const valueTooHigh = quantity > maxPoolCount - numberOfLabwareInHopper
     const newFill = Array.from(
       { length: quantity },
       () => `${uuid()}:${storedEntity.labwareDefURI}`
     )
     propsForFields.fillLabwareIds.updateValue(newFill)
+    if (valueTooHigh) {
+      propsForFields.fillLabwareIds.updateValue([])
+    }
   }, [fillQuantityLocalState, storedEntity?.labwareDefURI])
+
   return (
     <div className={styles.refill_settings_container}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
@@ -90,6 +94,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
               { max: maxPoolCount }
             )}
             padding="0"
+            type="number"
             setFillQuantityState={setFillQuantityState}
             fillQuantityLocalState={fillQuantityLocalState}
           />
