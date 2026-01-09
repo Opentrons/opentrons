@@ -437,7 +437,7 @@ async def test_gripper_error(
 
     # Actual setup for this test:
     decoy.when(
-        await labware_movement.move_labware_with_gripper(
+        await labware_movement.move_labware_with_gripper(  # type: ignore[func-returns-value]
             labware_id=labware_id,
             current_location=origin_location,
             new_location=new_location,
@@ -737,7 +737,7 @@ async def test_move_labware_raises_if_movement_obstructed(
     ).then_return("wowzers-a-new-offset-id")
 
     decoy.when(
-        await labware_movement.ensure_movement_not_obstructed_by_module(
+        await labware_movement.ensure_movement_not_obstructed_by_module(  # type: ignore[func-returns-value]
             labware_id="my-cool-labware-id",
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_6),
         )

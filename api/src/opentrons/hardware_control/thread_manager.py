@@ -11,6 +11,7 @@ from typing import (
     AsyncGenerator,
     Awaitable,
     Callable,
+    Coroutine,
     Generic,
     Mapping,
     Optional,
@@ -42,7 +43,7 @@ P = ParamSpec("P")
 
 async def call_coroutine_threadsafe(
     loop: asyncio.AbstractEventLoop,
-    coro: Callable[P, Awaitable[WrappedReturn]],
+    coro: Callable[P, Coroutine[Any, Any, WrappedReturn]],
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> WrappedReturn:

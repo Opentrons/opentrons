@@ -580,10 +580,8 @@ class Labware:
                 current_version=f"{self._api_version}",
             )
 
-        # TODO(mc, 2023-02-06): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).set_name(new_name)
+        self._core.set_name(new_name)
 
     @property
     @requires_version(2, 0)
@@ -1153,10 +1151,8 @@ class Labware:
                 current_version=f"{self._api_version}",
             )
 
-        # TODO(mc, 2023-02-06): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).set_tip_length(length)
+        self._core.set_tip_length(length)
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
@@ -1224,10 +1220,8 @@ class Labware:
         assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
         fail_if_full = self._api_version < APIVersion(2, 2)
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).get_tip_tracker().use_tips(
+        self._core.get_tip_tracker().use_tips(
             start_well=start_well._core,
             num_channels=num_channels,
             fail_if_full=fail_if_full,
@@ -1268,14 +1262,8 @@ class Labware:
 
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        well_core = (
-            cast(LegacyLabwareCore, self._core)
-            .get_tip_tracker()
-            .previous_tip(num_tips=num_tips)
-        )
+        well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
         return self._wells_by_name[well_core.get_name()] if well_core else None
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
@@ -1314,10 +1302,8 @@ class Labware:
         # This logic is the inverse of :py:meth:`use_tips`
         assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).get_tip_tracker().return_tips(
+        self._core.get_tip_tracker().return_tips(
             start_well=start_well._core, num_channels=num_channels
         )
 

@@ -45,7 +45,7 @@ class CSVParameterDefinition(AbstractParameterDefinition[Optional[bytes]]):
         return self._value
 
     @value.setter
-    def value(self, contents: bytes) -> None:
+    def value(self, contents: Optional[bytes]) -> None:
         self._value = contents
 
     @property

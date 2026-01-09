@@ -391,7 +391,7 @@ class OT3API(
             machine_pos=machine_pos,
             attitude=self._robot_calibration.deck_calibration.attitude,
             offset=self._robot_calibration.carriage_offset,
-            robot_type=cast(RobotType, "OT-3 Standard"),
+            robot_type="OT-3 Standard",
         )
 
     @classmethod
@@ -1525,7 +1525,7 @@ class OT3API(
             deck_pos=target_position,
             attitude=self._robot_calibration.deck_calibration.attitude,
             offset=self._robot_calibration.carriage_offset,
-            robot_type=cast(RobotType, "OT-3 Standard"),
+            robot_type="OT-3 Standard",
         )
         bounds = self._backend.axis_bounds
         to_check = {

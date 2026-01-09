@@ -637,7 +637,7 @@ class AddressableAreaView:
 
     def raise_if_area_not_in_deck_configuration(
         self, addressable_area_name: str
-    ) -> None:
+    ) -> bool:
         """Raise error if an addressable area is not compatible with or in the deck configuration.
 
         For simulated runs/analysis, this will raise if the given addressable area is not compatible with other
@@ -645,6 +645,8 @@ class AddressableAreaView:
         deck slot A1 will raise since those two can't exist in any deck configuration combination.
 
         For an on robot run, it will check if it is in the robot's deck configuration, if not it will raise an error.
+
+        Returns True if it does not raise.
         """
         if self._state.use_simulated_deck_config:
             (
@@ -665,6 +667,7 @@ class AddressableAreaView:
                 raise AreaNotInDeckConfigurationError(
                     f"{addressable_area_name} not provided by deck configuration."
                 )
+        return True
 
     def get_current_potential_cutout_fixtures_for_addressable_area(
         self, addressable_area_name: str

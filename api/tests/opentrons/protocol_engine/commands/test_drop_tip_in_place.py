@@ -94,7 +94,7 @@ async def test_tip_attached_error(
         Point(9, 8, 7)
     )
     decoy.when(
-        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False)
+        await mock_tip_handler.drop_tip(pipette_id="abc", home_after=False)  # type: ignore[func-returns-value]
     ).then_raise(TipAttachedError("Egads!"))
 
     decoy.when(mock_model_utils.generate_id()).then_return("error-id")

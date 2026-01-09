@@ -2808,7 +2808,7 @@ def test_ensure_location_not_occupied_raises(
     module_location = DeckSlotLocation(slotName=DeckSlotName.SLOT_1)
     decoy.when(
         mock_labware_view.raise_if_labware_in_location(module_location)
-    ).then_return(None)
+    ).then_return(True)
     decoy.when(
         mock_module_view.raise_if_module_in_location(module_location)
     ).then_raise(errors.LocationIsOccupiedError("Woops again!"))

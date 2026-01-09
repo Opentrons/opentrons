@@ -68,7 +68,7 @@ async def test_set_target_temperature(
         task = action.task
 
     decoy.when(
-        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))
+        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))  # type: ignore[func-returns-value]
     ).then_do(_capture_task)
     result = await subject.execute(data)
     assert task is not None

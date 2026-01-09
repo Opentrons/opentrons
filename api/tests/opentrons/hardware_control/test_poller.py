@@ -29,7 +29,7 @@ async def mock_reader_flow_control(
         ok_to_finish_read_event.clear()
         await ok_to_finish_read_event.wait()
 
-    decoy.when(await mock_reader.read()).then_do(_mock_read)
+    decoy.when(await mock_reader.read()).then_do(_mock_read)  # type: ignore[func-returns-value]
 
 
 @pytest.fixture()
@@ -124,7 +124,7 @@ async def test_poller_start_error(
     decoy: Decoy, mock_reader: Reader, subject: Poller
 ) -> None:
     """It should raise in start if read errors."""
-    decoy.when(await mock_reader.read()).then_raise(RuntimeError("oh no"))
+    decoy.when(await mock_reader.read()).then_raise(RuntimeError("oh no"))  # type: ignore[func-returns-value]
 
     with pytest.raises(RuntimeError, match="oh no"):
         await subject.start()
@@ -141,7 +141,7 @@ async def test_poller_wait_next_poll_error(
     """It should raise in wait_next_poll if read errors."""
     await subject.start()
 
-    decoy.when(await mock_reader.read()).then_raise(RuntimeError("oh no"))
+    decoy.when(await mock_reader.read()).then_raise(RuntimeError("oh no"))  # type: ignore[func-returns-value]
 
     with pytest.raises(RuntimeError, match="oh no"):
         await subject.wait_next_poll()
