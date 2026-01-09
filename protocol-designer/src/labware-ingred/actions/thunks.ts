@@ -16,10 +16,7 @@ import { getLabwarePythonName, uuid } from '../../utils'
 import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 
 import type { FlexStackerStoredLabwareGroup } from '@opentrons/shared-data'
-import type {
-  FlexStackerModuleState,
-  LabwareEntities,
-} from '@opentrons/step-generation'
+import type { FlexStackerModuleState } from '@opentrons/step-generation'
 import type { NormalizedLabware, NormalizedLabwareById } from '../../step-forms'
 import type { UpdateStackerModuleStateAction } from '../../step-forms/actions/modules'
 import type { ThunkAction } from '../../types'
