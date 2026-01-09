@@ -102,7 +102,10 @@ const valueFromFlattenedInterp = (
 /**
  * Helix Product (Desktop) helpers
  */
-const styleForPairForHelix = (style: string, weight: string) => {
+const styleForPairForHelix = (
+  style: string,
+  weight: string
+): FlattenSimpleInterpolation => {
   const key = `fontStyle${style}${weight}` as keyof typeof PRODUCT.TYPOGRAPHY
   const fontPayload = PRODUCT.TYPOGRAPHY[key] as unknown as string
   return css`
@@ -133,7 +136,10 @@ const fontWeightForPairForHelix = (style: string, weight: string): string => {
 /**
  * Legacy helpers (TYPOGRAPHY is FlattenSimpleInterpolation)
  */
-const styleForPairForLegacy = (style: string, weight: string) => {
+const styleForPairForLegacy = (
+  style: string,
+  weight: string
+): FlattenSimpleInterpolation => {
   const key = `${style}${weight}` as keyof typeof TYPOGRAPHY
   return TYPOGRAPHY[key] as unknown as FlattenSimpleInterpolation
 }
@@ -141,21 +147,25 @@ const styleForPairForLegacy = (style: string, weight: string) => {
 const fontSizeForPairForLegacy = (style: string, weight: string): string => {
   const stylePayload = styleForPairForLegacy(style, weight)
   const sizeStr = valueFromFlattenedInterp(stylePayload, 'font-size:')
-  const sizeInPx = sizeStr ? convertToPx(sizeStr) : ''
-  return sizeStr ? `font-size: ${sizeStr}/${sizeInPx}` : 'font-size: (unknown)'
+  const sizeInPx = sizeStr !== '' ? convertToPx(sizeStr) : ''
+  return sizeStr !== ''
+    ? `font-size: ${sizeStr}/${sizeInPx}`
+    : 'font-size: (unknown)'
 }
 
 const lineHeightForPairForLegacy = (style: string, weight: string): string => {
   const stylePayload = styleForPairForLegacy(style, weight)
   const lhStr = valueFromFlattenedInterp(stylePayload, 'line-height:')
-  const lhInPx = lhStr ? convertToPx(lhStr) : ''
-  return lhStr ? `line-height: ${lhStr}/${lhInPx}` : 'line-height: (unknown)'
+  const lhInPx = lhStr !== '' ? convertToPx(lhStr) : ''
+  return lhStr !== ''
+    ? `line-height: ${lhStr}/${lhInPx}`
+    : 'line-height: (unknown)'
 }
 
 const fontWeightForPairForLegacy = (style: string, weight: string): string => {
   const stylePayload = styleForPairForLegacy(style, weight)
   const fw = valueFromFlattenedInterp(stylePayload, 'font-weight:')
-  return fw ? `font-weight: ${fw}` : 'font-weight: (unknown)'
+  return fw !== '' ? `font-weight: ${fw}` : 'font-weight: (unknown)'
 }
 
 /**
@@ -165,7 +175,7 @@ const styleForPair = (
   style: string,
   weight: string,
   which: TypographyStandard
-) =>
+): FlattenSimpleInterpolation =>
   which === 'Helix Product (Desktop)'
     ? styleForPairForHelix(style, weight)
     : styleForPairForLegacy(style, weight)
