@@ -30,45 +30,45 @@ export const HintsModal = (): JSX.Element | null => {
   const toggleRememberDismissal = useCallback(() => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
-  const hintKey = useSelector(getHint)
+  const hint = useSelector(getHint)
   const dispatch = useDispatch()
   const handleRemoveHint = (hintKey: HintKey): void => {
     dispatch(removeHint(hintKey, rememberDismissal))
   }
 
+  if (hint == null) {
+    return null
+  }
+
   let hintContents: JSX.Element | null = null
-  if (hintKey === 'thermocycler_lid_passive_cooling') {
+  if (hint.hintKey === 'thermocycler_lid_passive_cooling') {
     hintContents = (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t(`alert:hint.${hintKey}.body`)}
+          {t(`alert:hint.${hint.hintKey}.body`)}
         </StyledText>
         <Flex marginLeft={SPACING.spacing16}>
           <ul>
             <li>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t(`alert:hint.${hintKey}.li1`)}
+                {t(`alert:hint.${hint.hintKey}.li1`)}
               </StyledText>
             </li>
             <li>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t(`alert:hint.${hintKey}.li2`)}
+                {t(`alert:hint.${hint.hintKey}.li2`)}
               </StyledText>
             </li>
           </ul>
         </Flex>
       </Flex>
     )
-  } else if (hintKey === 'waste_chute_warning') {
+  } else if (hint.hintKey === 'waste_chute_warning') {
     hintContents = (
       <StyledText desktopStyle="bodyDefaultRegular">
-        {t(`hint.${hintKey}.body1`)}
+        {t(`alert:hint.${hint.hintKey}.body1`)}
       </StyledText>
     )
-  }
-
-  if (hintKey == null) {
-    return null
   }
 
   return createPortal(
@@ -76,7 +76,7 @@ export const HintsModal = (): JSX.Element | null => {
       marginLeft="0"
       type="warning"
       zIndexOverlay={15}
-      title={t(`hint.${hintKey}.title`)}
+      title={t(`hint.${hint.hintKey}.title`)}
       footer={
         <Flex
           alignItems={ALIGN_CENTER}
@@ -96,7 +96,7 @@ export const HintsModal = (): JSX.Element | null => {
           <Flex alignItems={ALIGN_END}>
             <PrimaryButton
               onClick={() => {
-                handleRemoveHint(hintKey)
+                handleRemoveHint(hint.hintKey)
               }}
             >
               {i18n.format(t('shared:confirm'), 'capitalize')}

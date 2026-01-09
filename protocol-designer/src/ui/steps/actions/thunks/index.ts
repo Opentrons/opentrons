@@ -389,11 +389,13 @@ export const saveStepForm: (options?: {
   }
 
   if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
-    dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
+    dispatch(
+      tutorialActions.addHint({ hintKey: 'thermocycler_lid_passive_cooling' })
+    )
   }
 
   if (tutorialSelectors.shouldShowWasteChuteHint(initialState)) {
-    dispatch(tutorialActions.addHint('waste_chute_warning'))
+    dispatch(tutorialActions.addHint({ hintKey: 'waste_chute_warning' }))
   }
 
   // save the form
