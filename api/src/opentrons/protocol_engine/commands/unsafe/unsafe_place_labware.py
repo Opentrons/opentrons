@@ -1,34 +1,35 @@
 """Place labware payload, result, and implementaiton."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
-from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from pydantic import BaseModel, Field
+from opentrons_shared_data.labware.types import LabwareUri
 
+from ...errors.error_occurrence import ErrorOccurrence
+from ...resources import ensure_ot3_hardware
+from ...types import (
+    DeckSlotLocation,
+    GripperMoveType,
+    ModuleModel,
+    OnDeckLabwareLocation,
+)
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 from opentrons.hardware_control.types import Axis, OT3Mount
 from opentrons.motion_planning.waypoints import get_gripper_labware_placement_waypoints
 from opentrons.protocol_engine.errors.exceptions import (
     CannotPerformGripperAction,
     GripperNotAttachedError,
 )
-from ...types import (
-    DeckSlotLocation,
-    ModuleModel,
-    OnDeckLabwareLocation,
-    GripperMoveType,
-)
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
-from ...errors.error_occurrence import ErrorOccurrence
-from ...resources import ensure_ot3_hardware
-
-from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
 
 if TYPE_CHECKING:
-    from ...state.state import StateView
     from ...execution.equipment import EquipmentHandler
+    from ...state.state import StateView
 
 
 UnsafePlaceLabwareCommandType = Literal["unsafe/placeLabware"]

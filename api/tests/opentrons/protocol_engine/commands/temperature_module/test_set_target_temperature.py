@@ -1,21 +1,21 @@
 """Test Temperature Module's set target temperature command implementation."""
 
 from decoy import Decoy, matchers
-from opentrons.hardware_control.modules import TempDeck
 
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    TemperatureModuleSubState,
-    TemperatureModuleId,
-)
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
-from opentrons.protocol_engine.actions import ActionDispatcher, Action, StartTaskAction
+from opentrons.hardware_control.modules import TempDeck
+from opentrons.protocol_engine.actions import Action, ActionDispatcher, StartTaskAction
 from opentrons.protocol_engine.commands import temperature_module
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.temperature_module.set_target_temperature import (
     SetTargetTemperatureImpl,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types.tasks import Task
 
 
@@ -63,7 +63,7 @@ async def test_set_target_temperature(
         task = action.task
 
     decoy.when(
-        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))
+        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))  # type: ignore[func-returns-value]
     ).then_do(_capture_task)
 
     result = await subject.execute(data)

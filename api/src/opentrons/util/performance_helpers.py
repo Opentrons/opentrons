@@ -1,14 +1,17 @@
 """Performance helpers for tracking robot activity."""
 
 import functools
+import typing
 from pathlib import Path
 
 from opentrons_shared_data.robot.types import RobotTypeEnum
-import typing
+
+from opentrons.config import (
+    feature_flags as ff,
+)
 from opentrons.config import (
     get_performance_metrics_data_dir,
     robot_configs,
-    feature_flags as ff,
 )
 
 if typing.TYPE_CHECKING:

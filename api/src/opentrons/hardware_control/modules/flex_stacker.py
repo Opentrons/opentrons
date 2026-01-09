@@ -9,14 +9,30 @@ from typing import (
     Dict,
     List,
     Literal,
-    Optional,
     Mapping,
+    Optional,
     cast,
 )
 
+from opentrons_shared_data.errors.exceptions import (
+    FlexStackerHopperLabwareError,
+    FlexStackerShuttleLabwareError,
+    FlexStackerShuttleMissingError,
+    FlexStackerShuttleNotEmptyError,
+    FlexStackerStallError,
+)
+from opentrons_shared_data.module import load_tof_baseline_data
+
+from opentrons.config import feature_flags as ff
+from opentrons.drivers.flex_stacker.abstract import AbstractFlexStackerDriver
+from opentrons.drivers.flex_stacker.driver import (
+    FlexStackerDriver,
+)
+from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.drivers.flex_stacker.types import (
     AxisParams,
     Direction,
+    HardwareRevision,
     LEDColor,
     LEDPattern,
     MoveParams,
@@ -26,44 +42,28 @@ from opentrons.drivers.flex_stacker.types import (
     TOFDetection,
     TOFMeasurementResult,
     TOFSensor,
-    HardwareRevision,
     TOFSensorMode,
     TOFSensorState,
     TOFSensorStatus,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.flex_stacker.driver import (
-    FlexStackerDriver,
-)
-from opentrons.drivers.flex_stacker.abstract import AbstractFlexStackerDriver
-from opentrons.drivers.flex_stacker.simulator import SimulatingDriver
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
+    FlexStackerData,
     FlexStackerStatus,
     HopperDoorState,
     LatchState,
-    ModuleErrorCallback,
+    LiveData,
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     ModuleType,
     PlatformState,
     StackerAxisState,
     UploadFunction,
-    LiveData,
-    FlexStackerData,
 )
+from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
-from opentrons.config import feature_flags as ff
-
-from opentrons_shared_data.errors.exceptions import (
-    FlexStackerStallError,
-    FlexStackerShuttleMissingError,
-    FlexStackerShuttleLabwareError,
-    FlexStackerHopperLabwareError,
-    FlexStackerShuttleNotEmptyError,
-)
-from opentrons_shared_data.module import load_tof_baseline_data
 
 log = logging.getLogger(__name__)
 

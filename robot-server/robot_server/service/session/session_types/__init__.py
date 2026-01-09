@@ -1,5 +1,5 @@
+from .base_session import BaseSession, SessionMetaData  # noqa: F401
 from .check_session import CheckSession  # noqa: F401
-from .tip_length_calibration import TipLengthCalibration  # noqa: F401
 from .deck_calibration_session import DeckCalibrationSession  # noqa: F401
 from .pipette_offset_calibration import PipetteOffsetCalibrationSession  # noqa: F401
-from .base_session import BaseSession, SessionMetaData  # noqa: F401
+from .tip_length_calibration import TipLengthCalibration  # noqa: F401

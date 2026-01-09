@@ -1,45 +1,44 @@
 """Tests for the sensor scheduler."""
 
-import pytest
-import mock
 import asyncio
 from typing import Iterator, Tuple
-from opentrons_hardware.sensors import scheduler, sensor_types
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    SensorId,
-    SensorType,
-    SensorOutputBinding,
-    ErrorSeverity,
-    ErrorCode,
-)
+
+import mock
+import pytest
+
+from tests.conftest import MockCanMessageNotifier
+
 from opentrons_hardware.firmware_bindings.arbitration_id import (
     ArbitrationId,
     ArbitrationIdParts,
 )
-
-from opentrons_hardware.firmware_bindings.utils import Int32Field
-
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorIdField,
-    SensorTypeField,
-    SensorOutputBindingField,
-    ErrorSeverityField,
-    ErrorCodeField,
+from opentrons_hardware.firmware_bindings.constants import (
+    ErrorCode,
+    ErrorSeverity,
+    NodeId,
+    SensorId,
+    SensorOutputBinding,
+    SensorType,
 )
-
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    ErrorCodeField,
+    ErrorSeverityField,
+    SensorIdField,
+    SensorOutputBindingField,
+    SensorTypeField,
+)
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    ReadFromSensorResponse,
     BindSensorOutputRequest,
     ErrorMessage,
+    ReadFromSensorResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     BindSensorOutputRequestPayload,
-    ReadFromSensorResponsePayload,
     ErrorMessagePayload,
+    ReadFromSensorResponsePayload,
 )
-
-from tests.conftest import MockCanMessageNotifier
+from opentrons_hardware.firmware_bindings.utils import Int32Field
+from opentrons_hardware.sensors import scheduler, sensor_types
 
 
 async def test_capture_output(

@@ -68,6 +68,7 @@ lint:
 .PHONY: format
 format:
 	$(ruff) format system_server tests
+	$(ruff) check --select I --fix system_server tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

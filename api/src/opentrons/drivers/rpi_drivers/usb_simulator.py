@@ -7,12 +7,11 @@ more readable format.
 
 from typing import List, Union
 
+from .interfaces import USBDriverInterface
 from opentrons.hardware_control.modules.types import (
     ModuleAtPort,
     SimulatingModuleAtPort,
 )
-
-from .interfaces import USBDriverInterface
 
 
 class USBBusSimulator(USBDriverInterface):

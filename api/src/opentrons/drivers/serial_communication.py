@@ -1,11 +1,10 @@
-from typing import List, Optional, Iterator
+import contextlib
+import logging
+from typing import Iterator, List, Optional
 
 import serial  # type: ignore[import-untyped]
 from serial import Serial
 from serial.tools import list_ports  # type: ignore[import-untyped]
-import contextlib
-import logging
-
 from serial.tools.list_ports_common import ListPortInfo  # type: ignore[import-untyped]
 
 log = logging.getLogger(__name__)

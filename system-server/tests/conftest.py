@@ -1,12 +1,12 @@
-import pytest
 from pathlib import Path
 from typing import Generator
-from sqlalchemy.engine import Engine as SQLEngine
-import requests
 
-from system_server.persistence.database import create_sql_engine
+import pytest
+import requests
+from sqlalchemy.engine import Engine as SQLEngine
 
 from .dev_server import DevServer
+from system_server.persistence.database import create_sql_engine
 
 
 @pytest.fixture(autouse=True)

@@ -1,7 +1,9 @@
 """Tests for SQL registration table."""
 
 from typing import List, cast
+
 import sqlalchemy
+
 from system_server.persistence.tables import add_tables_to_db
 
 # The statements that we expect to emit when we create a fresh database.

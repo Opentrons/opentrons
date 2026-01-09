@@ -32,6 +32,7 @@ Actual storage access is handled elsewhere.
 
 from dataclasses import dataclass
 from typing import Sequence, Set
+
 from typing_extensions import Protocol as InterfaceShape
 
 

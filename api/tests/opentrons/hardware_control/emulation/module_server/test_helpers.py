@@ -2,12 +2,13 @@ from typing import List
 
 import pytest
 from mock import AsyncMock
+
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.hardware_control.emulation.module_server import (
-    helpers,
     ModuleStatusClient,
+    helpers,
+    models,
 )
-from opentrons.hardware_control.emulation.module_server import models
 from opentrons.hardware_control.modules import ModuleAtPort
 
 

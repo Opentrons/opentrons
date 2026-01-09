@@ -1,15 +1,15 @@
 """Test the InstrumentContext class and its functions"""
 
-import pytest
-from unittest import mock
 from typing import Any, Callable, Dict
+from unittest import mock
 
-from opentrons.types import Mount
-from opentrons.protocols.advanced_control.transfers import transfer as v1_transfer
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.hardware_control import ThreadManagedHardware
+import pytest
 
 import opentrons.protocol_api as papi
+from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.protocols.advanced_control.transfers import transfer as v1_transfer
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import Mount
 
 pytestmark = pytest.mark.ot2_only
 

@@ -1,6 +1,7 @@
 """Helper to build a search query."""
 
 from __future__ import annotations
+
 from typing import Sequence
 
 import sqlalchemy
@@ -12,16 +13,16 @@ from opentrons.protocol_engine import (
     OnModuleOffsetLocationSequenceComponent,
 )
 
-from robot_server.persistence.tables import (
-    labware_offset_table,
-    labware_offset_location_sequence_components_table,
-)
 from .models import (
     ANY_LOCATION,
-    AnyLocation,
     DO_NOT_FILTER,
-    StoredLabwareOffsetLocationSequenceComponents,
+    AnyLocation,
     SearchFilter,
+    StoredLabwareOffsetLocationSequenceComponents,
+)
+from robot_server.persistence.tables import (
+    labware_offset_location_sequence_components_table,
+    labware_offset_table,
 )
 
 

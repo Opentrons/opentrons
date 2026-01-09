@@ -4,20 +4,22 @@ import pytest
 
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.types import DeckSlotName
 from opentrons.protocol_engine import (
-    commands,
-    slot_standardization as subject,
+    OFF_DECK_LOCATION,
     CommandIntent,
     DeckSlotLocation,
-    OnLabwareLocation,
-    LoadableLabwareLocation,
     LabwareMovementStrategy,
     LabwareOffsetVector,
+    LoadableLabwareLocation,
     ModuleLocation,
     ModuleModel,
-    OFF_DECK_LOCATION,
+    OnLabwareLocation,
+    commands,
 )
+from opentrons.protocol_engine import (
+    slot_standardization as subject,
+)
+from opentrons.types import DeckSlotName
 
 
 @pytest.mark.parametrize(

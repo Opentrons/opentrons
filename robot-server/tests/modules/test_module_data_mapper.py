@@ -1,41 +1,42 @@
 """Tests for robot_server.modules.module_data_mapper."""
 
-from decoy import Decoy
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import SubSystem, SubSystemState
 import pytest
+from decoy import Decoy
 
-from opentrons.protocol_engine import ModuleModel, DeckType
-from opentrons.protocol_engine.types import Vec3f
-from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort, PortGroup
+from opentrons.drivers.rpi_drivers.types import PortGroup
+from opentrons.drivers.rpi_drivers.types import USBPort as HardwareUSBPort
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.hardware_control.modules import (
     FlexStackerStatus,
+    HeaterShakerStatus,
     LiveData,
-    ModuleType,
     MagneticStatus,
+    ModuleType,
     PlatformState,
     TemperatureStatus,
-    HeaterShakerStatus,
+)
+from opentrons.hardware_control.modules import (
     types as hc_types,
 )
+from opentrons.hardware_control.types import SubSystem, SubSystemState
+from opentrons.protocol_engine import DeckType, ModuleModel
+from opentrons.protocol_engine.types import Vec3f
 
-
-from robot_server.modules.module_identifier import ModuleIdentity
 from robot_server.modules.module_data_mapper import ModuleDataMapper
-
+from robot_server.modules.module_identifier import ModuleIdentity
 from robot_server.modules.module_models import (
     FlexStackerModule,
     FlexStackerModuleData,
-    UsbPort,
+    HeaterShakerModule,
+    HeaterShakerModuleData,
     MagneticModule,
     MagneticModuleData,
+    ModuleCalibrationData,
     TemperatureModule,
     TemperatureModuleData,
     ThermocyclerModule,
     ThermocyclerModuleData,
-    HeaterShakerModule,
-    HeaterShakerModuleData,
-    ModuleCalibrationData,
+    UsbPort,
 )
 
 

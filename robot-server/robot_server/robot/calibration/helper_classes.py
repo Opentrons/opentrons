@@ -1,15 +1,14 @@
 import typing
+from dataclasses import dataclass, fields
+from enum import Enum
+
+from pydantic import BaseModel, Field
 from typing_extensions import Self
 
-from opentrons.types import Mount
-from enum import Enum
-from dataclasses import dataclass, fields
-from pydantic import BaseModel, Field
-
-from opentrons_shared_data.util import StrEnum
-from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons.protocol_api import labware
-from opentrons.types import DeckLocation
+from opentrons.types import DeckLocation, Mount
+from opentrons_shared_data.labware.types import LabwareDefinition2
+from opentrons_shared_data.util import StrEnum
 
 
 class RobotHealthCheck(Enum):

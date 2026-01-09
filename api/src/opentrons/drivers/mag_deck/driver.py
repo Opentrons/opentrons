@@ -15,10 +15,10 @@ from typing import Dict, Optional
 
 from opentrons_shared_data.util import StrEnum
 
-from opentrons.drivers import utils
-from opentrons.drivers.command_builder import CommandBuilder
-from opentrons.drivers.asyncio.communication import SerialConnection
 from .abstract import AbstractMagDeckDriver
+from opentrons.drivers import utils
+from opentrons.drivers.asyncio.communication import SerialConnection
+from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
 

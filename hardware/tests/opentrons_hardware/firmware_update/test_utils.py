@@ -3,30 +3,29 @@
 import json
 import os
 import secrets
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, cast
+
 import mock
 import pytest
-from typing import cast
+
 from opentrons_hardware.firmware_bindings.constants import (
+    FirmwareTarget,
     NodeId,
     PipetteType,
-    FirmwareTarget,
     USBTarget,
 )
-from opentrons_hardware.hardware_control.types import PCBARevision
-
 from opentrons_hardware.firmware_update.utils import (
-    FirmwareUpdateType,
-    UpdateInfo,
-    load_firmware_manifest,
-    check_firmware_updates,
     _DEFAULT_PCBA_REVS,
     _DEFAULT_PCBA_REVS_PIPETTE,
-    _update_type_for_device,
+    FirmwareUpdateType,
+    UpdateInfo,
     _update_files_from_types,
+    _update_type_for_device,
+    check_firmware_updates,
+    load_firmware_manifest,
 )
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
-
+from opentrons_hardware.hardware_control.types import PCBARevision
 
 manifest_filename = "opentrons-manifest-test.json"
 

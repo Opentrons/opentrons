@@ -11,21 +11,20 @@ tiprack") to points in deck coordinates.
 from __future__ import annotations
 
 import logging
-
 from itertools import dropwhile
 from typing import (
     TYPE_CHECKING,
     Any,
-    List,
-    Dict,
-    Optional,
-    Tuple,
-    cast,
-    Sequence,
-    Mapping,
-    Union,
-    Literal,
     Callable,
+    Dict,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    cast,
 )
 
 from opentrons_shared_data.labware.types import (
@@ -35,47 +34,49 @@ from opentrons_shared_data.labware.types import (
     LabwareParameters3,
 )
 
-from opentrons.types import (
-    Location,
-    Point,
-    NozzleMapInterface,
-    MeniscusTrackingTarget,
-    Mount,
-)
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import (
-    requires_version,
-    APIVersionError,
-    UnsupportedAPIError,
-)
-from opentrons.protocol_engine.types import LiquidTrackingType
-
-# TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
-# remove when their usage is no longer needed
-from opentrons.protocols.labware import (  # noqa: F401
-    get_labware_definition as get_labware_definition,
-    verify_definition as verify_definition,
-    save_definition as save_definition,
-)
-
 from . import validation
 from ._liquid import Liquid
 from ._types import OffDeckType
 from .core import well_grid
+from .core.core_map import LoadedCoreMap
 from .core.engine import (
     ENGINE_CORE_API_VERSION,
     SET_OFFSET_RESTORED_API_VERSION,
 )
 from .core.labware import AbstractLabware
-from .core.module import AbstractModuleCore
-from .core.core_map import LoadedCoreMap
 from .core.legacy.legacy_labware_core import LegacyLabwareCore
 from .core.legacy.legacy_well_core import LegacyWellCore
 from .core.legacy.well_geometry import WellGeometry
+from .core.module import AbstractModuleCore
+from opentrons.protocol_engine.types import LiquidTrackingType
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    UnsupportedAPIError,
+    requires_version,
+)
 
+# TODO(mc, 2022-09-02): re-exports provided for backwards compatibility
+# remove when their usage is no longer needed
+from opentrons.protocols.labware import (  # noqa: F401
+    get_labware_definition as get_labware_definition,
+)
+from opentrons.protocols.labware import (
+    save_definition as save_definition,
+)
+from opentrons.protocols.labware import (
+    verify_definition as verify_definition,
+)
+from opentrons.types import (
+    Location,
+    MeniscusTrackingTarget,
+    Mount,
+    NozzleMapInterface,
+    Point,
+)
 
 if TYPE_CHECKING:
-    from .core.common import LabwareCore, WellCore, ProtocolCore
+    from .core.common import LabwareCore, ProtocolCore, WellCore
     from .protocol_context import ModuleTypes
 
 
@@ -579,10 +580,8 @@ class Labware:
                 current_version=f"{self._api_version}",
             )
 
-        # TODO(mc, 2023-02-06): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).set_name(new_name)
+        self._core.set_name(new_name)
 
     @property
     @requires_version(2, 0)
@@ -1152,10 +1151,8 @@ class Labware:
                 current_version=f"{self._api_version}",
             )
 
-        # TODO(mc, 2023-02-06): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).set_tip_length(length)
+        self._core.set_tip_length(length)
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
     def next_tip(
@@ -1223,10 +1220,8 @@ class Labware:
         assert num_channels > 0, "Bad call to use_tips: num_channels<=0"
         fail_if_full = self._api_version < APIVersion(2, 2)
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).get_tip_tracker().use_tips(
+        self._core.get_tip_tracker().use_tips(
             start_well=start_well._core,
             num_channels=num_channels,
             fail_if_full=fail_if_full,
@@ -1267,14 +1262,8 @@ class Labware:
 
         # This logic is the inverse of :py:meth:`next_tip`
         assert num_tips > 0, "Bad call to previous_tip: num_tips <= 0"
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        well_core = (
-            cast(LegacyLabwareCore, self._core)
-            .get_tip_tracker()
-            .previous_tip(num_tips=num_tips)
-        )
+        well_core = self._core.get_tip_tracker().previous_tip(num_tips=num_tips)
         return self._wells_by_name[well_core.get_name()] if well_core else None
 
     # TODO(mc, 2022-11-09): implementation detail; deprecate public method
@@ -1313,10 +1302,8 @@ class Labware:
         # This logic is the inverse of :py:meth:`use_tips`
         assert num_channels > 0, "Bad call to return_tips: num_channels <= 0"
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyLabwareCore)
-        cast(LegacyLabwareCore, self._core).get_tip_tracker().return_tips(
+        self._core.get_tip_tracker().return_tips(
             start_well=start_well._core, num_channels=num_channels
         )
 

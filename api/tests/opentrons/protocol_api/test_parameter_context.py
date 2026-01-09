@@ -5,22 +5,25 @@ import inspect
 import pytest
 from decoy import Decoy
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
 )
+from opentrons.protocol_api._parameter_context import ParameterContext
+from opentrons.protocol_engine.types import BooleanParameter
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters import (
     csv_parameter_definition as mock_csv_parameter_definition,
+)
+from opentrons.protocols.parameters import (
     parameter_definition as mock_parameter_definition,
+)
+from opentrons.protocols.parameters import (
     validation as mock_validation,
 )
 from opentrons.protocols.parameters.exceptions import (
-    ParameterDefinitionError,
     IncompatibleParameterError,
+    ParameterDefinitionError,
 )
-from opentrons.protocol_engine.types import BooleanParameter
-
-from opentrons.protocol_api._parameter_context import ParameterContext
 
 
 @pytest.fixture(autouse=True)

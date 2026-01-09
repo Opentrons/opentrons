@@ -1,11 +1,8 @@
 import typing
 
-from opentrons.util.helpers import utc_now
-
 from .. import types as local_types
-
 from .models import v1
-
+from opentrons.util.helpers import utc_now
 
 CalibrationType = typing.TypeVar(
     "CalibrationType",

@@ -1,51 +1,52 @@
 """Models and implementation for the ``moveLabware`` command."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any, List
+
+from typing import TYPE_CHECKING, Any, List, Optional, Type
+
+from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import (
+    Literal,
     TypedDict,
     assert_type,
 )  # note: need this instead of typing for py<3.12
 
-from pydantic.json_schema import SkipJsonSchema
-from pydantic import BaseModel, Field
-from typing_extensions import Literal
-
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    LabwareDefinition2,
-    LabwareDefinition3,
-)
 from opentrons_shared_data.errors.exceptions import (
     FailedGripperPickupError,
     LabwareDroppedError,
     StallOrCollisionDetectedError,
 )
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
-
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.types import Point
-from ..types import (
-    ModuleModel,
-    CurrentWell,
-    LoadableLabwareLocation,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
-    LabwareMovementStrategy,
-    LabwareOffsetVector,
-    LabwareLocationSequence,
-    NotOnDeckLocationSequenceComponent,
-    OFF_DECK_LOCATION,
-    WASTE_CHUTE_LOCATION,
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
 )
+
 from ..errors import (
     LabwareMovementNotAllowedError,
-    NotSupportedOnRobotType,
     LabwareOffsetDoesNotExistError,
+    NotSupportedOnRobotType,
 )
-from ..resources import labware_validation, fixture_validation
+from ..errors.error_occurrence import ErrorOccurrence
+from ..resources import fixture_validation, labware_validation
+from ..state.update_types import StateUpdate
+from ..types import (
+    OFF_DECK_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    LabwareLocationSequence,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadableLabwareLocation,
+    ModuleLocation,
+    ModuleModel,
+    NotOnDeckLocationSequenceComponent,
+    OnLabwareLocation,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -53,11 +54,11 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..errors.error_occurrence import ErrorOccurrence
-from ..state.update_types import StateUpdate
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.types import Point
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
+    from ..execution import EquipmentHandler, LabwareMovementHandler, RunControlHandler
     from ..state.state import StateView
 
 

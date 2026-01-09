@@ -1,12 +1,13 @@
 """Handle the snapshot compare and update."""
 
-from dataclasses import dataclass
-from pathlib import Path
-from math import isclose
 import json
-from .test_types import SuccessfulTest, CoordinateMismatch, ResultSummary
-from .stackup_spec import StackupSpec
+from dataclasses import dataclass
+from math import isclose
+from pathlib import Path
+
 from .data import SNAPSHOT_PATH_DEFAULT
+from .stackup_spec import StackupSpec
+from .test_types import CoordinateMismatch, ResultSummary, SuccessfulTest
 
 
 @dataclass(frozen=True)

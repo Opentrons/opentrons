@@ -1,29 +1,65 @@
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Sequence, Tuple, Union
+
 from numpy import interp
-from typing import Optional, Dict, Sequence, Tuple, List, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    TransferProperties as SharedDataTransferProperties,
     AspirateProperties as SharedDataAspirateProperties,
-    SingleDispenseProperties as SharedDataSingleDispenseProperties,
-    MultiDispenseProperties as SharedDataMultiDispenseProperties,
-    TipPosition as SharedDataTipPosition,
-    DelayProperties as SharedDataDelayProperties,
-    DelayParams as SharedDataDelayParams,
-    TouchTipProperties as SharedDataTouchTipProperties,
-    LiquidClassTouchTipParams as SharedDataTouchTipParams,
-    MixProperties as SharedDataMixProperties,
-    MixParams as SharedDataMixParams,
-    BlowoutProperties as SharedDataBlowoutProperties,
-    BlowoutParams as SharedDataBlowoutParams,
-    ByTipTypeSetting as SharedByTipTypeSetting,
-    Submerge as SharedDataSubmerge,
-    RetractAspirate as SharedDataRetractAspirate,
-    RetractDispense as SharedDataRetractDispense,
-    BlowoutLocation,
-    PositionReference,
-    Coordinate,
 )
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutLocation,
+    Coordinate,
+    PositionReference,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutParams as SharedDataBlowoutParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutProperties as SharedDataBlowoutProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    ByTipTypeSetting as SharedByTipTypeSetting,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    DelayParams as SharedDataDelayParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    DelayProperties as SharedDataDelayProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    LiquidClassTouchTipParams as SharedDataTouchTipParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    MixParams as SharedDataMixParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    MixProperties as SharedDataMixProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    MultiDispenseProperties as SharedDataMultiDispenseProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    RetractAspirate as SharedDataRetractAspirate,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    RetractDispense as SharedDataRetractDispense,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    SingleDispenseProperties as SharedDataSingleDispenseProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    Submerge as SharedDataSubmerge,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TipPosition as SharedDataTipPosition,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TouchTipProperties as SharedDataTouchTipProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TransferProperties as SharedDataTransferProperties,
+)
+
 from . import validation
 
 

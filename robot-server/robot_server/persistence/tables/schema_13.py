@@ -1,10 +1,10 @@
 """v13 of our SQLite schema."""
 
 import enum
+
 import sqlalchemy
 
 from robot_server.persistence._utc_datetime import UTCDateTime
-
 
 metadata = sqlalchemy.MetaData()
 

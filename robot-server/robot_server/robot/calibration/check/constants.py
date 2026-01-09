@@ -1,15 +1,15 @@
 from typing import Dict, Union
+
 from typing_extensions import Literal
 
+from opentrons.types import Point
 from opentrons_shared_data.util import StrEnum
 
-from opentrons.types import Point
-
 from robot_server.robot.calibration.constants import (
-    STATE_WILDCARD,
     POINT_ONE_ID,
-    POINT_TWO_ID,
     POINT_THREE_ID,
+    POINT_TWO_ID,
+    STATE_WILDCARD,
 )
 
 

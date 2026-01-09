@@ -3,7 +3,6 @@ from typing import Optional, Sequence
 
 from opentrons.protocol_api.core.well import AbstractWellCore
 
-
 Wells = Sequence[AbstractWellCore]
 WellColumns = Sequence[Wells]
 

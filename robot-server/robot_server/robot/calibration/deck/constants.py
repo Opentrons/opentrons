@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING
 from opentrons_shared_data.util import StrEnum
 
 from robot_server.robot.calibration.constants import (
-    STATE_WILDCARD,
     POINT_ONE_ID,
-    POINT_TWO_ID,
     POINT_THREE_ID,
+    POINT_TWO_ID,
+    STATE_WILDCARD,
 )
 
 if TYPE_CHECKING:

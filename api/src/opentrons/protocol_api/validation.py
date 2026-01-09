@@ -1,53 +1,56 @@
 from __future__ import annotations
+
+from math import isinf, isnan
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     List,
-    Optional,
-    Sequence,
-    Union,
-    Tuple,
     Mapping,
     NamedTuple,
-    TYPE_CHECKING,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
 )
-from math import isinf, isnan
+
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareRole,
 )
-from opentrons_shared_data.pipette.types import PipetteNameType, PIPETTE_API_NAMES_MAP
+from opentrons_shared_data.pipette.types import PIPETTE_API_NAMES_MAP, PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
-from opentrons.types import (
-    Mount,
-    DeckSlotName,
-    StagingSlotName,
-    Location,
-    AxisType,
-    AxisMapType,
-    StringAxisMap,
-)
+from .disposal_locations import TrashBin, WasteChute
 from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    MagneticModuleModel,
-    TemperatureModuleModel,
-    ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
-    MagneticBlockModel,
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
+    HeaterShakerModuleModel,
+    MagneticBlockModel,
+    MagneticModuleModel,
+    ModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
 )
-
-from .disposal_locations import TrashBin, WasteChute
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.types import (
+    AxisMapType,
+    AxisType,
+    DeckSlotName,
+    Location,
+    Mount,
+    StagingSlotName,
+    StringAxisMap,
+)
 
 if TYPE_CHECKING:
     from .labware import Well
+    from opentrons.protocols.advanced_control.transfers.common import (
+        TransferTipPolicyV2,
+    )
 
 
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
@@ -202,7 +205,7 @@ def _check_ot2_axis_type(
             )
     if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
         if any(
-            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]   # type: ignore [union-attr]
+            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]  # type: ignore [union-attr]
             for k in axis_map_keys
         ):
             raise IncorrectAxisError(
@@ -715,8 +718,12 @@ def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
     return float(value[0]), float(value[1]), float(value[2])
 
 
-def ensure_new_tip_policy(value: str) -> TransferTipPolicyV2:
+def ensure_new_tip_policy(value: str) -> "TransferTipPolicyV2":
     """Ensure that new_tip value is a valid TransferTipPolicy value."""
+    from opentrons.protocols.advanced_control.transfers.common import (
+        TransferTipPolicyV2,
+    )
+
     try:
         return TransferTipPolicyV2(value.lower())
     except ValueError:

@@ -1,7 +1,8 @@
 """Dependencies for /system/register endpoints."""
 
-from system_server.jwt import Registrant
 from fastapi import Query
+
+from system_server.jwt import Registrant
 
 
 def create_registrant(

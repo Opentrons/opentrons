@@ -1,45 +1,47 @@
 import logging
-from typing import Dict, List, TYPE_CHECKING, Union
-from opentrons.hardware_control.modules.types import ThermocyclerStep
-from opentrons.protocol_api import (
-    ProtocolContext,
-    MagneticModuleContext,
-    TemperatureModuleContext,
-    ModuleContext,
-    ThermocyclerContext,
+from typing import TYPE_CHECKING, Dict, List, Union
+
+from opentrons_shared_data.protocol.constants import (
+    JsonPipetteCommand,
+    JsonRobotCommand,
 )
 from opentrons_shared_data.protocol.types import (
     MagneticModuleCommand,
     TemperatureModuleCommand,
     ThermocyclerCommand,
 )
-from .execute_json_v3 import _delay, _move_to_slot
-from opentrons.protocols.execution.types import LoadedLabware, Instruments
-from opentrons_shared_data.protocol.constants import (
-    JsonRobotCommand,
-    JsonPipetteCommand,
-)
 
+from .execute_json_v3 import _delay, _move_to_slot
+from opentrons.hardware_control.modules.types import ThermocyclerStep
+from opentrons.protocol_api import (
+    MagneticModuleContext,
+    ModuleContext,
+    ProtocolContext,
+    TemperatureModuleContext,
+    ThermocyclerContext,
+)
+from opentrons.protocols.execution.types import Instruments, LoadedLabware
 
 if TYPE_CHECKING:
     from opentrons_shared_data.protocol.types import (
+        Command,
         JsonProtocolV4,
         JsonProtocolV5,
+        MagneticModuleCommandId,
         MagneticModuleEngageParams,
         ModuleIDParams,
-        TemperatureParams,
-        ThermocyclerSetTargetBlockParams,
-        ThermocyclerRunProfileParams,
-        Command,
         TemperatureModuleCommandId,
-        MagneticModuleCommandId,
+        TemperatureParams,
         ThermocyclerCommandId,
+        ThermocyclerRunProfileParams,
+        ThermocyclerSetTargetBlockParams,
     )
+
     from opentrons.protocols.execution.dev_types import (
-        PipetteDispatch,
         JsonV4MagneticModuleDispatch,
         JsonV4TemperatureModuleDispatch,
         JsonV4ThermocyclerDispatch,
+        PipetteDispatch,
     )
 
 MODULE_LOG = logging.getLogger(__name__)

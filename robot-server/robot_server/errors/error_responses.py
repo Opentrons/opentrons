@@ -1,10 +1,12 @@
 """JSON API errors and response models."""
 
+from typing import Any, Dict, Generic, Optional, Sequence, Type, TypeVar
+
 from pydantic import BaseModel, Field
-from typing import Any, Dict, Generic, Optional, Sequence, TypeVar, Type
+
+from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
 from robot_server.service.json_api import BaseResponseBody, ResourceLinks
-from opentrons_shared_data.errors import EnumeratedError, PythonException, ErrorCodes
 
 
 class ApiError(Exception):

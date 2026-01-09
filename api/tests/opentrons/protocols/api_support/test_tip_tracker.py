@@ -1,8 +1,9 @@
 from typing import List
 
 import pytest
-from opentrons.protocols.api_support.tip_tracker import TipTracker
+
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
+from opentrons.protocols.api_support.tip_tracker import TipTracker
 
 
 @pytest.fixture

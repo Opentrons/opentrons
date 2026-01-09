@@ -1,13 +1,15 @@
 """This module provides utilities for the firmware update module."""
 
-from dataclasses import dataclass
-from typing_extensions import Final, Protocol
-from enum import Enum
 import json
 import logging
 import os
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Union, Tuple, Iterable, Iterator
+from typing import Any, Dict, Iterable, Iterator, Optional, Set, Tuple, Union
+
+from typing_extensions import Final, Protocol
+
 from opentrons_hardware.firmware_bindings.constants import (
     FirmwareTarget,
     NodeId,
@@ -15,7 +17,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     USBTarget,
 )
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
-
 
 _FIRMWARE_MANIFEST_PATH: Final = os.path.abspath(
     "/usr/lib/firmware/opentrons-firmware.json"

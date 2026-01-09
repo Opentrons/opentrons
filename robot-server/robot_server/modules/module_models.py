@@ -1,25 +1,26 @@
 """Request and response models for /modules endpoints."""
 
 from datetime import datetime
-from pydantic import BaseModel, Field
 from typing import Generic, List, Optional, TypeVar, Union
+
+from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
 from opentrons.calibration_storage.types import SourceType
-from opentrons.hardware_control.modules import (
-    ModuleType,
-    TemperatureStatus,
-    MagneticStatus,
-    HeaterShakerStatus,
-    SpeedStatus,
-    AbsorbanceReaderStatus,
-    PlatformState,
-)
 from opentrons.drivers.types import (
-    ThermocyclerLidStatus,
-    HeaterShakerLabwareLatchStatus,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
+    HeaterShakerLabwareLatchStatus,
+    ThermocyclerLidStatus,
+)
+from opentrons.hardware_control.modules import (
+    AbsorbanceReaderStatus,
+    HeaterShakerStatus,
+    MagneticStatus,
+    ModuleType,
+    PlatformState,
+    SpeedStatus,
+    TemperatureStatus,
 )
 from opentrons.hardware_control.modules.types import HopperDoorState, LatchState
 from opentrons.protocol_engine import ModuleModel
@@ -397,6 +398,36 @@ class FlexStackerModule(
     data: FlexStackerModuleData
 
 
+class VacuumModuleData(BaseModel):
+    """Live data from a Vacuum module."""
+
+    status: str = Field(
+        ...,
+        description="Overall status of the module.",
+    )
+    errorDetails: Optional[str] = Field(
+        ...,
+        description=(
+            "Error details, if the module hardware has encountered something"
+            " unexpected and unrecoverable."
+        ),
+    )
+
+
+class VacuumModule(
+    _GenericModule[
+        Literal[ModuleType.VACUUM_MODULE],
+        Literal[ModuleModel.VACUUM_MODULE_V1],
+        VacuumModuleData,
+    ]
+):
+    """An attached Vacuum Module."""
+
+    moduleType: Literal[ModuleType.VACUUM_MODULE]
+    moduleModel: Literal[ModuleModel.VACUUM_MODULE_V1]
+    data: VacuumModuleData
+
+
 AttachedModule = Union[
     TemperatureModule,
     MagneticModule,
@@ -404,6 +435,7 @@ AttachedModule = Union[
     HeaterShakerModule,
     AbsorbanceReaderModule,
     FlexStackerModule,
+    VacuumModule,
 ]
 
 
@@ -414,4 +446,5 @@ AttachedModuleData = Union[
     HeaterShakerModuleData,
     AbsorbanceReaderModuleData,
     FlexStackerModuleData,
+    VacuumModuleData,
 ]

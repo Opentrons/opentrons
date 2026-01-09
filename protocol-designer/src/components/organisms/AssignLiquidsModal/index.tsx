@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
@@ -26,15 +27,12 @@ import {
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
-import {
-  LINE_CLAMP_TEXT_STYLE,
-  NAV_BAR_HEIGHT_REM,
-} from '/protocol-designer/components/atoms'
+import { NAV_BAR_HEIGHT_REM } from '/protocol-designer/components/atoms'
 import { LiquidButton } from '/protocol-designer/components/molecules'
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '/protocol-designer/step-forms'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 import {
@@ -70,7 +68,6 @@ interface AssignLiquidsModalData {
   allWellContents: Record<string, any>
   liquidNamesById: Record<string, string>
   liquidDisplayColors: Record<string, string>
-  enableStacking: boolean
 }
 
 interface AssignLiquidsModalProps {
@@ -101,7 +98,6 @@ export function AssignLiquidsModal(
     liquidNamesById,
     liquidDisplayColors,
     selectedLabwareIds,
-    enableStacking,
   } = data
 
   const [showLiquidLayoutOverlay, setShowLiquidLayoutOverlay] = useState(false)
@@ -143,7 +139,7 @@ export function AssignLiquidsModal(
       position={POSITION_RELATIVE}
     >
       <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
-        {labwareStack.length > 1 && enableStacking ? (
+        {labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
             selectedLabwareIds={selectedLabwareIds}
@@ -182,7 +178,11 @@ export function AssignLiquidsModal(
               />
               <StyledText
                 desktopStyle="headingLargeBold"
-                css={LINE_CLAMP_TEXT_STYLE(3, true)}
+                className={clsx(
+                  lineClampStyles.line_clamp,
+                  lineClampStyles.word_normal
+                )}
+                style={{ WebkitLineClamp: 3 }}
               >
                 {t('add_liquids_to_labware', {
                   labwareName: nickNames[labwareId],
@@ -289,15 +289,12 @@ export function AssignLiquidsModalContainer(
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
-  const labwareId = useSelector(selectors.getMultiSelectSelectedLabwareId)
-
-  const enableStacking = useSelector(getEnableStacking) ?? false
   const liquidNamesById = useSelector(selectors.getLiquidNamesById)
   const liquidDisplayColors = useSelector(selectors.getLiquidDisplayColors)
 
   const data: AssignLiquidsModalData = {
     nickNames,
-    labwareId: labwareId ?? null,
+    labwareId: selectedLabwareId ?? null,
     selectedWells,
     labware,
     labwareEntities,
@@ -305,7 +302,6 @@ export function AssignLiquidsModalContainer(
     liquidNamesById,
     liquidDisplayColors,
     selectedLabwareIds: selectedLabwareIds ?? [],
-    enableStacking,
   }
 
   return (

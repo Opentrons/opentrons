@@ -2,16 +2,19 @@
 
 from __future__ import annotations
 
+from typing import Any, Dict, cast
+
 import pytest
 from decoy import Decoy, matchers
-from typing import Any, Dict, cast
+
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.legacy_commands.types import Command as CommandDict, CommandMessage
 from opentrons.legacy_commands.publisher import (
     CommandPublisher,
     publish,
     publish_context,
 )
+from opentrons.legacy_commands.types import Command as CommandDict
+from opentrons.legacy_commands.types import CommandMessage
 
 
 @pytest.fixture

@@ -1,20 +1,23 @@
 from __future__ import annotations
-from anyio import to_thread
+
 from typing import (
     Any,
+    Callable,
     Dict,
     Generic,
     List,
     Optional,
-    TypeVar,
-    Sequence,
     ParamSpec,
-    Callable,
+    Sequence,
+    TypeVar,
 )
-from typing_extensions import get_args, override
-from pydantic import Field, BaseModel
-from fastapi.responses import JSONResponse
+
+from anyio import to_thread
 from fastapi.dependencies.utils import get_typed_return_annotation
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from typing_extensions import get_args, override
+
 from .resource_links import ResourceLinks as DeprecatedResourceLinks
 
 
@@ -207,7 +210,7 @@ class PydanticResponse(JSONResponse, Generic[ResponseBodyT]):
             response_model = get_args(return_annotation)[0]
             # and that's what we want to pass to the route method as response_model, so we do it and get the actual
             # function transformer
-            route_decorator = route_method(
+            route_decorator = route_method(  # type: ignore[call-arg]
                 **route_kwargs, response_model=response_model
             )
             # which we then call on the endpoint method to get it registered with the router, and return the results

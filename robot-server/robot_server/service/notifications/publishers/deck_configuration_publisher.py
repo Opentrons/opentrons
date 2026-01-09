@@ -7,8 +7,9 @@ from server_utils.fastapi_utils.app_state import (
     AppStateAccessor,
     get_app_state,
 )
-from ..notification_client import NotificationClient, get_notification_client
+
 from .. import topics
+from ..notification_client import NotificationClient, get_notification_client
 
 
 class DeckConfigurationPublisher:

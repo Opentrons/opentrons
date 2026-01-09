@@ -9,11 +9,11 @@ import logging
 import subprocess
 from functools import lru_cache
 from pathlib import Path
-from typing import Callable, Coroutine, Mapping, Any
+from typing import Any, Callable, Coroutine, Mapping
 
 from aiohttp import web
 
-from .constants import RESTART_LOCK_NAME, DEVICE_BOOT_ID_NAME
+from .constants import DEVICE_BOOT_ID_NAME, RESTART_LOCK_NAME
 from .name_management import get_name_synchronizer
 
 LOG = logging.getLogger(__name__)

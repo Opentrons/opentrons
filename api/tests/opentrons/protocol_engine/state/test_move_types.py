@@ -1,12 +1,13 @@
 """Test Protocol Engine motion planning utility methods."""
 
-import pytest
 from typing import List, Optional
 
-from opentrons.types import Point
+import pytest
+
 from opentrons.motion_planning.types import MoveType
 from opentrons.protocol_engine.state import _move_types as subject
 from opentrons.protocol_engine.types import CurrentWell
+from opentrons.types import Point
 
 
 @pytest.mark.parametrize(

@@ -3,33 +3,33 @@
 import pytest
 from decoy import Decoy
 
-from opentrons.drivers.types import (
-    AbsorbanceReaderLidStatus,
-)
-from opentrons.hardware_control.modules import AbsorbanceReader
-from opentrons.protocol_engine import ModuleModel, DeckSlotLocation
-from opentrons.protocol_engine.errors import CannotPerformModuleAction
-
-from opentrons.protocol_engine.execution import EquipmentHandler, LabwareMovementHandler
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    AbsorbanceReaderSubState,
-    AbsorbanceReaderId,
-)
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.absorbance_reader import (
-    OpenLidResult,
-    OpenLidParams,
-)
-from opentrons.protocol_engine.commands.absorbance_reader.open_lid import (
-    OpenLidImpl,
-)
-from opentrons.types import DeckSlotName
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     Parameters2,
 )
+
+from opentrons.drivers.types import (
+    AbsorbanceReaderLidStatus,
+)
+from opentrons.hardware_control.modules import AbsorbanceReader
+from opentrons.protocol_engine import DeckSlotLocation, ModuleModel
+from opentrons.protocol_engine.commands.absorbance_reader import (
+    OpenLidParams,
+    OpenLidResult,
+)
+from opentrons.protocol_engine.commands.absorbance_reader.open_lid import (
+    OpenLidImpl,
+)
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.errors import CannotPerformModuleAction
+from opentrons.protocol_engine.execution import EquipmentHandler, LabwareMovementHandler
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.module_substates import (
+    AbsorbanceReaderId,
+    AbsorbanceReaderSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.types import DeckSlotName
 
 
 @pytest.fixture

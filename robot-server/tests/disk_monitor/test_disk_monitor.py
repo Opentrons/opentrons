@@ -8,8 +8,8 @@ from unittest.mock import Mock, patch
 import pytest
 
 from robot_server.disk_monitor.monitor import (
-    DiskMonitor,
     _FALLBACK_DEFAULT_DISK_SPACE_MB,
+    DiskMonitor,
 )
 from robot_server.settings import RobotServerSettings
 
