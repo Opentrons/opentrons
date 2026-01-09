@@ -269,6 +269,18 @@ importers:
       portfinder:
         specifier: ^1.0.13
         version: 1.0.38
+      postcss-apply:
+        specifier: 0.12.0
+        version: 0.12.0
+      postcss-color-mod-function:
+        specifier: 3.0.3
+        version: 3.0.3
+      postcss-import:
+        specifier: 16.0.0
+        version: 16.0.0(postcss@8.5.6)
+      postcss-preset-env:
+        specifier: 9.3.0
+        version: 9.3.0(postcss@8.5.6)
       prettier:
         specifier: 3.7.4
         version: 3.7.4

@@ -3,8 +3,6 @@ import React from 'react'
 
 import { StyledText } from '../../atoms/StyledText'
 import { COLORS } from '../../helix-design-system'
-import { Box, Flex } from '../../primitives'
-import { ALIGN_FLEX_START, DIRECTION_COLUMN } from '../../styles'
 import { SPACING } from '../../ui-style-constants'
 import styles from './spacing.stories.module.css'
 
@@ -33,31 +31,24 @@ const Template: Story<SpacingsStorybookProps> = args => {
   }
 
   return (
-    <Flex
-      flexDirection={DIRECTION_COLUMN}
-      gridGap={SPACING.spacing8}
-      padding={SPACING.spacing24}
-    >
+    <div className={styles.container}>
       {sortedSpacing.map((spacing, index) => (
-        <Flex
-          key={`spacing_${index}`}
-          flexDirection={DIRECTION_COLUMN}
-          alignItems={ALIGN_FLEX_START}
-          padding={SPACING.spacing16}
-          gridGap={SPACING.spacing8}
-          width="100%"
-          height="6rem"
-        >
+        <div key={`spacing_${index}`} className={styles.item}>
           <StyledText desktopStyle="bodyLargeSemiBold">
             {`${spacing[0]} - ${spacing[1]}: ${convertToPx(spacing[1])}`}
           </StyledText>
-          <Flex gridGap={spacing[1]} backgroundColor={COLORS.blue50}>
-            <Box className={styles.styled_box} />
-            <Box className={styles.styled_box} />
-          </Flex>
-        </Flex>
+          <div
+            className={styles.spacing_example}
+            style={{
+              gap: spacing[1],
+            }}
+          >
+            <div className={styles.styled_box} />
+            <div className={styles.styled_box} />
+          </div>
+        </div>
       ))}
-    </Flex>
+    </div>
   )
 }
 
