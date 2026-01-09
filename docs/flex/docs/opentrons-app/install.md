@@ -20,7 +20,7 @@ The Windows version of the Opentrons App is packaged as an installer. To use it:
 
 </div>
 
-The App opens automatically once installed. Grant it security or firewall permissions, if prompted, to make sure the App can launch and communicate with Flex over your network.
+The app opens automatically once installed. Grant it security or firewall permissions, if prompted, to make sure the app can launch and communicate with Flex over your network.
 
 ### macOS
 
