@@ -1,9 +1,6 @@
 import { Fragment } from 'react'
 
-import {
-  COLORS,
-  Module,
-} from '@opentrons/components'
+import { COLORS, Module } from '@opentrons/components'
 import {
   FLEX_STACKER_MODULE_TYPE,
   getModuleDef,
