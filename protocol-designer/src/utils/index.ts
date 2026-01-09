@@ -196,7 +196,7 @@ export function getMatchingTipLiquidSpecs(
   const tipLength = tiprackDef?.parameters?.tipLength ?? 0
 
   console.assert(
-    tipLength,
+    tipLength > 0,
     `expected to find a tiplength for tiprack ${tiprackDef && getLabwareDefURI(tiprackDef)} but could not`
   )
 
@@ -218,7 +218,7 @@ export function getMatchingTipLiquidSpecs(
     return differenceA - differenceB
   })[0]
   console.assert(
-    matchingTipLiquidSpecs,
+    matchingTipLiquidSpecs != null,
     `expected to find the tip liquid specs but could not for tiprack ${getLabwareDefURI(tiprackDef)}`
   )
 

@@ -84,13 +84,16 @@ function getPipetteCapacityLegacy(
     )
   }
 
-  console.assert(specs, `Expected spec for pipette ${JSON.stringify(pipette)}`)
   console.assert(
-    tiprackDef,
+    specs != null,
+    `Expected spec for pipette ${JSON.stringify(pipette)}`
+  )
+  console.assert(
+    tiprackDef != null,
     `expected tiprack def for pipette ${JSON.stringify(pipette)}`
   )
   console.assert(
-    tiprackDef?.metadata?.tipVolume,
+    tiprackDef?.metadata?.tipVolume != null,
     `expected tiprack volume for tiprack def ${JSON.stringify(
       tiprackDef?.metadata || 'undefined'
     )}`

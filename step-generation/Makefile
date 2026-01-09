@@ -17,3 +17,10 @@ test:
 test-cov:
 	make -C .. test-js-step-generation tests=$(tests) test_opts="$(test_opts)" cov_opts="$(cov_opts)"
 
+.PHONY: build-ts
+build-ts:
+	pnpm tsc --build --emitDeclarationOnly
+
+.PHONY: pack
+pack: build-ts
+	pnpm pack

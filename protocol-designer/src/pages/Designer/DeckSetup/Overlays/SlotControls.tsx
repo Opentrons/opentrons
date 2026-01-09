@@ -103,7 +103,7 @@ export const SlotControls = (props: SlotControlsProps): JSX.Element | null => {
       canDrop: (item: DroppedItem) => {
         const draggedDef = item?.labwareOnDeck?.def
         console.assert(
-          draggedDef,
+          draggedDef != null,
           'no labware def of dragged def, expected it on drop'
         )
         if (moduleType != null && draggedDef != null) {
