@@ -34,7 +34,7 @@
 }
 
 .labware_text_align {
-  text-align: center;
-  padding-top: var(--spacing-8);
   width: 100%;
+  padding-top: var(--spacing-8);
+  text-align: center;
 }
