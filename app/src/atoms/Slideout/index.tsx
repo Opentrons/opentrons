@@ -13,6 +13,7 @@ import {
   Icon,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
+  OVERFLOW_AUTO,
   OVERFLOW_WRAP_ANYWHERE,
   Overlay,
   POSITION_FIXED,
@@ -227,16 +228,22 @@ export const Slideout = (props: SlideoutProps): JSX.Element => {
           )}
           <Divider marginY={0} color={COLORS.grey30} />
           <Box
-            padding={SPACING.spacing16}
             flex="1 1 auto"
-            overflowY="auto"
-            data-testid={`Slideout_body_${
-              typeof title === 'string' ? title : ''
-            }`}
-            ref={slideOutRef}
-            onScroll={handleScroll}
+            overflowY={OVERFLOW_AUTO}
+            padding={SPACING.spacing16}
           >
-            {children}
+            <div
+              style={{
+                height: '100%',
+              }}
+              data-testid={`Slideout_body_${
+                typeof title === 'string' ? title : ''
+              }`}
+              ref={slideOutRef}
+              onScroll={handleScroll}
+            >
+              {children}
+            </div>
           </Box>
           {footer != null ? (
             <Box
