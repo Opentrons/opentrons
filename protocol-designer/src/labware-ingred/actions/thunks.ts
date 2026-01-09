@@ -229,12 +229,12 @@ export const deleteContainer: (
   )
   const labwareSlot = getSlotInLocationStack(labware[labwareId].stack)
   const moduleOnSlot = Object.values(modules).find(
-    module => module.slot === labwareSlot
+    ({ slot: moduleSlot }) => moduleSlot === labwareSlot
   )
 
   const displayCategory =
     labwareEntities[labwareId].def.metadata.displayCategory
-  const labwareOfSameCategory: LabwareEntities = Object.fromEntries(
+  const labwareOfSameCategory = Object.fromEntries(
     Object.entries(labwareEntities).filter(
       ([_, labware]) => labware.def.metadata.displayCategory === displayCategory
     )
