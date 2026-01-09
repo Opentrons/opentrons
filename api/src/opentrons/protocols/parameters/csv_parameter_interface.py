@@ -1,10 +1,9 @@
 import csv
 from tempfile import NamedTemporaryFile
-from typing import Optional, TextIO, Any, List
-
-from opentrons.protocols.api_support.types import APIVersion
+from typing import Any, List, Optional, TextIO
 
 from .exceptions import ParameterValueError, RuntimeParameterRequired
+from opentrons.protocols.api_support.types import APIVersion
 
 
 # TODO(jbl 2024-08-02) This is a public facing class and as such should be moved to the protocol_api folder

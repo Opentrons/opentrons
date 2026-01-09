@@ -215,16 +215,8 @@ class ThermocyclerProfileModal(BasePage):
         # Click on the "Number of cycles" area
         num_cycles_div = cycle_container.locator("div").filter(has_text="Number of cycles").nth(3)
         num_cycles_div.click()
-
-        # Find the input within the cycles section using a shorter variable name
-        cycles_input = (
-            self.page.locator("label:has-text('Number of cycles')")
-            .locator("..")  # label row wrapper
-            .locator("..")  # field wrapper
-            .locator("input")  # the actual textbox
-            .first
-        )
-        cycles_input.fill(count)
+        target = self.page.get_by_text("Number of cycles").locator("..").locator("..").locator("input")
+        target.fill(count)
 
     # ========== Cycle Steps ==========
 

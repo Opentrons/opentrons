@@ -1,26 +1,26 @@
 """Gantry movement wrapper for hardware and simulation based movement."""
 
-from logging import getLogger
-from opentrons.config.types import OT3Config
 from functools import partial
-from typing import Optional, List, Dict, Tuple
+from logging import getLogger
+from typing import Dict, List, Optional, Tuple
+
 from typing_extensions import Protocol as TypingProtocol
 
-from opentrons.types import Point, Mount, MountType
-
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import Axis as HardwareAxis, CriticalPoint
-from opentrons.hardware_control.motion_utilities import (
-    target_axis_map_from_relative,
-    target_axis_map_from_absolute,
-)
 from opentrons_shared_data.errors.exceptions import PositionUnknownError
 
-from opentrons.motion_planning import Waypoint
-
+from ..errors import InvalidAxisForRobotType, MustHomeError
 from ..state.state import StateView
-from ..types import MotorAxis, CurrentWell
-from ..errors import MustHomeError, InvalidAxisForRobotType
+from ..types import CurrentWell, MotorAxis
+from opentrons.config.types import OT3Config
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.motion_utilities import (
+    target_axis_map_from_absolute,
+    target_axis_map_from_relative,
+)
+from opentrons.hardware_control.types import Axis as HardwareAxis
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.motion_planning import Waypoint
+from opentrons.types import Mount, MountType, Point
 
 log = getLogger(__name__)
 

@@ -1,8 +1,8 @@
 """Tracks active connections to the server."""
 
+from dataclasses import dataclass
 from datetime import datetime
 from typing import List
-from dataclasses import dataclass
 
 from system_server.jwt import Registrant
 

@@ -232,7 +232,9 @@ export const reduxActionToAnalyticsEvent = (
           const args = stepArgs as FlexStackerFillItemsArgs
           return {
             name: 'flexStackerFillItemsStep',
-            properties: { labwareURI: args.fillLabwareUri },
+            properties: {
+              labwareUri: args.fillLabwareUri,
+            },
           }
         case 'flexStackerStore':
           return {

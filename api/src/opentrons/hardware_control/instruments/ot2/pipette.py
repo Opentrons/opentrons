@@ -1,71 +1,67 @@
-""" Classes and functions for pipette state tracking
-"""
+"""Classes and functions for pipette state tracking"""
+
 from __future__ import annotations
 
 import functools
-
 import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
-from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    PlungerPositions,
-    MotorConfigurations,
-    SupportedTipsDefinition,
-    PickUpTipConfigurations,
-    DropTipConfigurations,
-    PipetteModelVersionType,
-    PipetteNameType,
-    PipetteLiquidPropertiesDefinition,
-    PressFitPickUpTipConfiguration,
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    InvalidLiquidClassName,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
+)
+from opentrons_shared_data.pipette import (
     types as pip_types,
 )
-from opentrons_shared_data.errors.exceptions import (
-    InvalidLiquidClassName,
-    CommandPreconditionViolated,
+from opentrons_shared_data.pipette.pipette_definition import (
+    DropTipConfigurations,
+    MotorConfigurations,
+    PickUpTipConfigurations,
+    PipetteConfigurations,
+    PipetteLiquidPropertiesDefinition,
+    PipetteModelVersionType,
+    PipetteNameType,
+    PlungerPositions,
+    PressFitPickUpTipConfiguration,
+    SupportedTipsDefinition,
+)
+from opentrons_shared_data.pipette.types import (
+    PipetteModel,
+    PipetteName,
+    PipetteOEMType,
+    UlPerMmAction,
 )
 from opentrons_shared_data.pipette.ul_per_mm import (
-    calculate_ul_per_mm,
     PIPETTING_FUNCTION_FALLBACK_VERSION,
     PIPETTING_FUNCTION_LATEST_VERSION,
+    calculate_ul_per_mm,
 )
 
-
-from opentrons.types import Point, Mount
-from opentrons.config import robot_configs
-from opentrons.config.types import RobotConfig
-from opentrons.drivers.types import MoveSplit
 from ..instrument_abc import AbstractInstrument
-
 from .instrument_calibration import (
     PipetteOffsetByPipetteMount,
     load_pipette_offset,
 )
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    BoardRevision,
-)
-from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.config import robot_configs
+from opentrons.config.types import RobotConfig
+from opentrons.drivers.types import MoveSplit
 from opentrons.hardware_control import nozzle_manager
-
-
-from opentrons_shared_data.pipette.types import (
-    UlPerMmAction,
-    PipetteName,
-    PipetteModel,
-    PipetteOEMType,
-)
 from opentrons.hardware_control.dev_types import InstrumentHardwareConfigs
-
-from opentrons.hardware_control.util import (
-    pick_up_speed_by_configuration,
-    pick_up_distance_by_configuration,
-    pick_up_current_by_configuration,
-    nominal_tip_overlap_dictionary_by_configuration,
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.hardware_control.types import (
+    BoardRevision,
+    CriticalPoint,
 )
+from opentrons.hardware_control.util import (
+    nominal_tip_overlap_dictionary_by_configuration,
+    pick_up_current_by_configuration,
+    pick_up_distance_by_configuration,
+    pick_up_speed_by_configuration,
+)
+from opentrons.types import Mount, Point
 
 RECONFIG_KEYS = {"quirks"}
 

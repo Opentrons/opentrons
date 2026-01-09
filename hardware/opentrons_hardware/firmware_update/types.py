@@ -2,6 +2,7 @@
 
 from enum import Enum, auto
 from typing import Dict, Tuple
+
 from opentrons_hardware.firmware_bindings import NodeId
 
 

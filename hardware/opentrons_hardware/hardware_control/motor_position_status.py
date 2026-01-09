@@ -1,17 +1,25 @@
 """Utilities for gathering motor position/status for an OT3 axis."""
 
 import asyncio
-from typing import Set, Union, Optional
 import logging
+from typing import Optional, Set, Union
 
 from opentrons_shared_data.errors.exceptions import (
-    RoboticsControlError,
     CommandTimedOutError,
+    RoboticsControlError,
 )
+
+from .types import MotorPositionStatus, MoveCompleteAck, NodeMap
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
-    WaitableCallback,
     MultipleMessagesWaitableCallback,
+    WaitableCallback,
+)
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import (
+    MessageId,
+    MotorPositionFlags,
+    NodeId,
 )
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     MotorPositionRequest,
@@ -21,15 +29,6 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     UpdateMotorPositionEstimationRequest,
     UpdateMotorPositionEstimationResponse,
 )
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    MessageId,
-    MotorPositionFlags,
-)
-
-from .types import NodeMap, MotorPositionStatus, MoveCompleteAck
-
 
 log = logging.getLogger(__name__)
 

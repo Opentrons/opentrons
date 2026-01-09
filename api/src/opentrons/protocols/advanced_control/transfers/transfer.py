@@ -1,26 +1,26 @@
 import enum
 from typing import (
+    TYPE_CHECKING,
     Any,
-    Dict,
-    List,
-    Optional,
-    Union,
-    NamedTuple,
     Callable,
+    Dict,
     Generator,
     Iterator,
+    List,
+    NamedTuple,
+    Optional,
     Sequence,
     Tuple,
-    TypedDict,
     TypeAlias,
-    TYPE_CHECKING,
+    TypedDict,
+    Union,
 )
-from opentrons.protocol_api.labware import Labware, Well
-from opentrons import types
-from opentrons.protocols.api_support.types import APIVersion
 
-from . import common as tx_commons
 from ..common import Mix, MixOpts, MixStrategy
+from . import common as tx_commons
+from opentrons import types
+from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocols.api_support.types import APIVersion
 
 AdvancedLiquidHandling = Union[
     Well,

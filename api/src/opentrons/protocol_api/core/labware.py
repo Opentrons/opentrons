@@ -3,20 +3,20 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, List, NamedTuple, Optional, TypeVar, Dict
+from typing import Any, Dict, Generic, List, NamedTuple, Optional, TypeVar
 
 from opentrons_shared_data.labware.types import (
-    LabwareUri,
-    LabwareParameters2,
-    LabwareParameters3,
     LabwareDefinition as LabwareDefinitionDict,
 )
+from opentrons_shared_data.labware.types import (
+    LabwareParameters2,
+    LabwareParameters3,
+    LabwareUri,
+)
 
-from opentrons.types import DeckSlotName, Point, NozzleMapInterface
 from .._liquid import Liquid
-
 from .well import WellCoreType
-
+from opentrons.types import DeckSlotName, NozzleMapInterface, Point
 
 _LabwareParametersDict = LabwareParameters2 | LabwareParameters3
 

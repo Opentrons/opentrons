@@ -1,9 +1,11 @@
 """Tests for motion planning."""
 
+from typing import Dict, Iterator, List, Tuple
+
 import numpy as np
-from hypothesis import given, assume, strategies as st
+from hypothesis import assume, given
+from hypothesis import strategies as st
 from hypothesis.extra import numpy as hynp
-from typing import Iterator, List, Tuple, Dict
 
 from opentrons_hardware.hardware_control.motion_planning import move_manager
 from opentrons_hardware.hardware_control.motion_planning.types import (

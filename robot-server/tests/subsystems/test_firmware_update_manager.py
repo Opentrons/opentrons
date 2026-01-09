@@ -1,39 +1,45 @@
 """Tests for UpdateProgressMonitor."""
 
 from __future__ import annotations
-import asyncio
 
-import pytest
+import asyncio
 from datetime import datetime
 from typing import (
     TYPE_CHECKING,
     AsyncIterator,
-    Set,
     Dict,
     Optional,
+    Set,
 )
-from typing_extensions import Protocol
-from decoy import Decoy
 
+import pytest
+from decoy import Decoy
+from typing_extensions import Protocol
+
+from opentrons.hardware_control.errors import UpdateOngoingError as HWUpdateOngoingError
 from opentrons.hardware_control.types import (
-    UpdateState as HWUpdateState,
     SubSystem as HWSubSystem,
-    UpdateStatus as HWUpdateStatus,
+)
+from opentrons.hardware_control.types import (
     SubSystemState,
 )
-from opentrons.hardware_control.errors import UpdateOngoingError as HWUpdateOngoingError
+from opentrons.hardware_control.types import (
+    UpdateState as HWUpdateState,
+)
+from opentrons.hardware_control.types import (
+    UpdateStatus as HWUpdateStatus,
+)
 
 from robot_server.service.task_runner import TaskRunner
 from robot_server.subsystems.firmware_update_manager import (
     FirmwareUpdateManager,
-    UpdateIdNotFound,
-    UpdateIdExists,
-    UpdateInProgress,
-    SubsystemNotFound,
     NoOngoingUpdate,
+    SubsystemNotFound,
+    UpdateIdExists,
+    UpdateIdNotFound,
+    UpdateInProgress,
 )
-
-from robot_server.subsystems.models import UpdateState, SubSystem
+from robot_server.subsystems.models import SubSystem, UpdateState
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

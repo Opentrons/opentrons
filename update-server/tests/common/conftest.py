@@ -1,7 +1,7 @@
 import lzma
 import os
-import subprocess
 import re
+import subprocess
 import zipfile
 from typing import Tuple
 from unittest import mock
@@ -12,12 +12,11 @@ import pytest
 # Avoid pytest trying to collect TestClient because it begins with "Test".
 from aiohttp.test_utils import TestClient as HTTPTestClient
 
-from otupdate import buildroot, common
+from tests.common.config import FakeRootPartElem
 
-from otupdate import openembedded
+from otupdate import buildroot, common, openembedded
 from otupdate.common.update_actions import Partition
 from otupdate.openembedded import PartitionManager
-from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 one_up = os.path.abspath(os.path.join(__file__, "../../"))

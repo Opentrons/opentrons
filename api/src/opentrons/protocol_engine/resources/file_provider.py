@@ -1,11 +1,13 @@
 """File interaction resource provider."""
 
+import csv
+from dataclasses import dataclass
 from datetime import datetime
 from io import StringIO
-import csv
-from typing import List, Optional, Callable, Awaitable, Dict
-from dataclasses import dataclass
+from typing import Awaitable, Callable, Dict, List, Optional
+
 from pydantic import BaseModel
+
 from opentrons_shared_data.data_files import (
     DataFileInfo,
     MimeType,

@@ -1,18 +1,21 @@
 """Protocol file models."""
 
 from datetime import datetime
-from pydantic import ConfigDict, BaseModel, Field
 from typing import Any, List, Optional
 
+from pydantic import BaseModel, ConfigDict, Field
+
 from opentrons.protocol_reader import (
-    ProtocolType as ProtocolType,
     ProtocolFileRole as ProtocolFileRole,
 )
-from opentrons_shared_data.util import StrEnum
+from opentrons.protocol_reader import (
+    ProtocolType as ProtocolType,
+)
 from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.util import StrEnum
 
-from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
+from robot_server.service.json_api import ResourceModel
 
 
 class ProtocolKind(StrEnum):

@@ -2,17 +2,16 @@
 
 from decoy import Decoy
 
-from opentrons.types import NozzleConfigurationType
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import StateView
-from opentrons.protocol_engine.types import NextTipInfo, NoTipAvailable, NoTipReason
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.get_next_tip import (
+    GetNextTipImplementation,
     GetNextTipParams,
     GetNextTipResult,
-    GetNextTipImplementation,
 )
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine.types import NextTipInfo, NoTipAvailable, NoTipReason
+from opentrons.types import NozzleConfigurationType
 
 
 async def test_get_next_tip_implementation(

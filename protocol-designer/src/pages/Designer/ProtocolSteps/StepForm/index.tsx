@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
 
 import { useConditionalConfirm } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -12,11 +12,16 @@ import {
 } from '/protocol-designer/components/organisms'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
+import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
 import {
   getHydratedForm,
   selectors as stepFormSelectors,
 } from '/protocol-designer/step-forms'
-import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
+import { createLabwareAndQueueForHopper } from '/protocol-designer/step-forms/actions/thunks'
+import {
+  getInvariantContext,
+  getSavedStepForms,
+} from '/protocol-designer/step-forms/selectors'
 import { actions } from '/protocol-designer/steplist'
 import { actions as stepsActions } from '/protocol-designer/ui/steps'
 
@@ -43,6 +48,8 @@ interface StateProps {
 interface DispatchProps {
   cancelStepForm: () => void
   saveStepForm: (options?: { userWantsBonusStep?: boolean }) => void
+  createdLabwareForQueue: (moduleId: string, fillLabwareIds: string[]) => void
+  deleteLabwares: (labwareIds: string[]) => void
 }
 type StepFormManagerProps = StateProps & DispatchProps
 
@@ -57,12 +64,15 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     saveStepForm,
     invariantContext,
     allLabwareDefs,
+    createdLabwareForQueue,
+    deleteLabwares,
   } = props
-
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [dirtyFields, setDirtyFields] = useState<StepFieldName[]>(
     getDirtyFields(isNewStep, formData)
   )
+  const savedStepForms = useSelector(getSavedStepForms)
+  const savedStepForm = formData != null ? savedStepForms[formData.id] : null
 
   const handleBlur = (fieldName: StepFieldName): void => {
     if (fieldName === focusedField) {
@@ -105,6 +115,28 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     if (bonusStepModalType == null) {
       // No dialog to show. Just save the step directly.
       saveStepForm()
+      if (
+        hydratedForm.stepType === 'flexStacker' &&
+        hydratedForm.flexStackerFormType === 'fill'
+      ) {
+        const initialLabwareIds =
+          (savedStepForm?.fillLabwareIds as string[]) ?? null
+        const oldFillQuantity = initialLabwareIds.length
+
+        // delete extraneous labware if fill quantity is decreased
+        if (oldFillQuantity > hydratedForm.fillLabwareIds.length) {
+          const extraneousLabwareIds = initialLabwareIds.slice(
+            hydratedForm.fillLabwareIds.length,
+            oldFillQuantity
+          )
+          deleteLabwares(extraneousLabwareIds)
+        } else {
+          createdLabwareForQueue(
+            hydratedForm.moduleId,
+            hydratedForm.fillLabwareIds
+          )
+        }
+      }
     } else {
       // There's a dialog we have to show before saving the step.
       // Its confirm/cancel handlers will be the thing that saves the step.
@@ -202,13 +234,37 @@ const mapStateToProps = (state: BaseState): StateProps => {
 }
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
-  const cancelStepForm = (): void => dispatch(actions.cancelStepForm())
-  const saveStepForm = (options?: { userWantsBonusStep?: boolean }): void =>
+  const cancelStepForm = (): void => {
+    dispatch(actions.cancelStepForm())
+  }
+
+  const saveStepForm = (options?: { userWantsBonusStep?: boolean }): void => {
     dispatch(stepsActions.saveStepForm(options))
+  }
+
+  const createdLabwareForQueue = (
+    moduleId: string,
+    fillLabwareIds: string[]
+  ): void => {
+    dispatch(
+      createLabwareAndQueueForHopper({
+        moduleId,
+        fillLabwareIds,
+      })
+    )
+  }
+
+  const deleteLabwares = (labwareIds: string[]): void => {
+    for (const labwareId of labwareIds) {
+      dispatch(deleteContainer({ labwareId }))
+    }
+  }
 
   return {
     cancelStepForm,
     saveStepForm,
+    createdLabwareForQueue,
+    deleteLabwares,
   }
 }
 

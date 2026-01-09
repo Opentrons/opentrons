@@ -4,7 +4,6 @@ import pytest
 
 from otupdate.common.name_management import pretty_hostname
 
-
 machine_info_examples = [
     "",
     "FOO=foo",

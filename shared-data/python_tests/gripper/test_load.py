@@ -1,10 +1,11 @@
 import json
+
+from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.gripper import load_definition, load_schema
 from opentrons_shared_data.gripper.gripper_definition import (
-    GripperModel,
     GripperDefinition,
+    GripperModel,
 )
-from opentrons_shared_data import load_shared_data
 
 
 def test_load_schema() -> None:

@@ -1,43 +1,43 @@
 """Utilities for updating the gripper settings."""
 
-import logging
 import asyncio
+import logging
 from dataclasses import dataclass
+
+from .constants import brushed_motor_interrupts_per_sec
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
     WaitableCallback,
 )
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-
+from opentrons_hardware.firmware_bindings.constants import (
+    ErrorCode,
+    GripperJawState,
+    MessageId,
+    NodeId,
+)
 from opentrons_hardware.firmware_bindings.messages import payloads
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    SetBrushedMotorVrefRequest,
-    SetBrushedMotorPwmRequest,
-    SetGripperErrorTolerance,
-    GripperGripRequest,
-    GripperHomeRequest,
     AddBrushedLinearMoveRequest,
     BrushedMotorConfRequest,
     BrushedMotorConfResponse,
-    GripperJawStateRequest,
-    GripperJawStateResponse,
-    SetGripperJawHoldoffRequest,
+    GripperGripRequest,
+    GripperHomeRequest,
     GripperJawHoldoffRequest,
     GripperJawHoldoffResponse,
+    GripperJawStateRequest,
+    GripperJawStateResponse,
+    SetBrushedMotorPwmRequest,
+    SetBrushedMotorVrefRequest,
+    SetGripperErrorTolerance,
+    SetGripperJawHoldoffRequest,
 )
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.utils import (
+    Int32Field,
     UInt8Field,
     UInt32Field,
-    Int32Field,
 )
-from opentrons_hardware.firmware_bindings.constants import (
-    MessageId,
-    NodeId,
-    ErrorCode,
-    GripperJawState,
-)
-from .constants import brushed_motor_interrupts_per_sec
 
 log = logging.getLogger(__name__)
 

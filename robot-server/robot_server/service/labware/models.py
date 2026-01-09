@@ -1,12 +1,12 @@
 import typing
 from datetime import datetime
-
 from functools import partial
-from pydantic import ConfigDict, BaseModel, Field
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from robot_server.service.json_api import (
-    DeprecatedResponseDataModel,
     DeprecatedMultiResponseModel,
+    DeprecatedResponseDataModel,
 )
 
 # NOTE: this would be more accurately typed as

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 from typing import Tuple
+
 from diff_match_patch import diff_match_patch as dmp  # type: ignore
+
 from g_code_parsing.g_code_program.g_code_program import (
     GCodeProgram,
 )

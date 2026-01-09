@@ -39,13 +39,12 @@ Database schema versions:
 import logging
 from datetime import datetime, timezone
 from typing import Optional
-from typing_extensions import Final
 
 import sqlalchemy
+from typing_extensions import Final
 
-from ..tables.schema_02 import analysis_table, migration_table, run_table
 from .. import _legacy_pickle
-
+from ..tables.schema_02 import analysis_table, migration_table, run_table
 
 _LATEST_SCHEMA_VERSION: Final = 2
 

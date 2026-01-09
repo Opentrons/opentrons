@@ -1,29 +1,30 @@
 """Command execution module."""
 
+from ..resources.camera_provider import CameraProvider
+from ..resources.file_provider import FileProvider
 from .command_executor import CommandExecutor
 from .create_queue_worker import create_queue_worker
+from .door_watcher import DoorWatcher
 from .equipment import (
     EquipmentHandler,
-    LoadedLabwareData,
-    LoadedPipetteData,
-    LoadedModuleData,
     LoadedConfigureForVolumeData,
+    LoadedConfigureNozzleLayoutData,
+    LoadedLabwareData,
+    LoadedModuleData,
+    LoadedPipetteData,
     ReloadedLabwareData,
 )
-from .movement import MovementHandler
 from .gantry_mover import GantryMover
+from .hardware_stopper import HardwareStopper
 from .labware_movement import LabwareMovementHandler
+from .movement import MovementHandler
 from .pipetting import PipettingHandler
-from .tip_handler import TipHandler
 from .queue_worker import QueueWorker
 from .rail_lights import RailLightsHandler
 from .run_control import RunControlHandler
-from .hardware_stopper import HardwareStopper
-from .door_watcher import DoorWatcher
 from .status_bar import StatusBarHandler
 from .task_handler import TaskHandler
-from ..resources.file_provider import FileProvider
-from ..resources.camera_provider import CameraProvider
+from .tip_handler import TipHandler
 
 # .thermocycler_movement_flagger omitted from package's public interface.
 
@@ -37,6 +38,7 @@ __all__ = [
     "LoadedPipetteData",
     "LoadedModuleData",
     "LoadedConfigureForVolumeData",
+    "LoadedConfigureNozzleLayoutData",
     "MovementHandler",
     "GantryMover",
     "PipettingHandler",

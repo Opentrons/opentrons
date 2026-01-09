@@ -2,19 +2,18 @@
 
 from .disengage import (
     Disengage,
+    DisengageCommandType,
     DisengageCreate,
     DisengageParams,
     DisengageResult,
-    DisengageCommandType,
 )
 from .engage import (
     Engage,
+    EngageCommandType,
     EngageCreate,
     EngageParams,
     EngageResult,
-    EngageCommandType,
 )
-
 
 __all__ = [
     # magneticModule/disengageMagnet

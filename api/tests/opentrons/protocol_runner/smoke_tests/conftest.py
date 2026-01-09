@@ -4,13 +4,15 @@ These fixtures consist of two "matching" JSON and Python protocols,
 saved to disk.
 """
 
-import pytest
 import json
 import textwrap
 from pathlib import Path
 
+import pytest
+
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.labware import load_definition
+
 from opentrons.protocol_engine import ModuleDefinition
 
 

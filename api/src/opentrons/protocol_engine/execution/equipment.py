@@ -1,32 +1,11 @@
 """Equipment command side-effect logic."""
 
 from dataclasses import dataclass
-from typing import Optional, overload, List
+from typing import List, Optional, overload
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
-from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import MountType
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-    MagDeck,
-    HeaterShaker,
-    TempDeck,
-    Thermocycler,
-    AbsorbanceReader,
-    FlexStacker,
-)
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_engine.state.module_substates import (
-    MagneticModuleId,
-    HeaterShakerModuleId,
-    TemperatureModuleId,
-    ThermocyclerModuleId,
-    AbsorbanceReaderId,
-    FlexStackerId,
-)
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
@@ -34,22 +13,43 @@ from ..errors import (
 )
 from ..resources import (
     LabwareDataProvider,
-    ModuleDataProvider,
     ModelUtils,
+    ModuleDataProvider,
     pipette_data_provider,
 )
-from ..state.state import StateStore
 from ..state.modules import HardwareModule
+from ..state.state import StateStore
 from ..types import (
-    LabwareLocation,
-    DeckSlotLocation,
-    LabwareOffset,
-    ModuleModel,
-    ModuleDefinition,
     AddressableAreaLocation,
+    DeckSlotLocation,
+    LabwareLocation,
+    LabwareOffset,
     LoadedLabware,
+    ModuleDefinition,
+    ModuleModel,
     OnLabwareLocation,
 )
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import (
+    AbsorbanceReader,
+    AbstractModule,
+    FlexStacker,
+    HeaterShaker,
+    MagDeck,
+    TempDeck,
+    Thermocycler,
+)
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine.state.module_substates import (
+    AbsorbanceReaderId,
+    FlexStackerId,
+    HeaterShakerModuleId,
+    MagneticModuleId,
+    TemperatureModuleId,
+    ThermocyclerModuleId,
+)
+from opentrons.types import MountType
 
 
 @dataclass(frozen=True)
@@ -104,6 +104,16 @@ class LoadedLabwarePoolData:
     primary_labware: LoadedLabware
     adapter_labware: Optional[LoadedLabware] = None
     lid_labware: Optional[LoadedLabware] = None
+
+
+@dataclass(frozen=True)
+class LoadedConfigureNozzleLayoutData:
+    """The result of a configure nozzle layout."""
+
+    pipette_id: str
+    serial_number: str
+    nozzle_map: NozzleMap
+    static_config: pipette_data_provider.LoadedStaticPipetteData
 
 
 class EquipmentHandler:
@@ -679,7 +689,8 @@ class EquipmentHandler:
         primary_nozzle: Optional[str] = None,
         front_right_nozzle: Optional[str] = None,
         back_left_nozzle: Optional[str] = None,
-    ) -> NozzleMap:
+        tip_overlap_version: Optional[str] = None,
+    ) -> LoadedConfigureNozzleLayoutData:
         """Ensure the requested nozzle layout is compatible with the current pipette.
 
         Args:
@@ -687,11 +698,17 @@ class EquipmentHandler:
             primary_nozzle: The nozzle which will be used as the main nozzle for positioning.
             front_right_nozzle: The physically front right nozzle.
             back_left_nozzle: The physically back left nozzle.
+            tip_overlap_version: maximum tip overlap version.
 
         Returns:
-            A NozzleMap object or None.
+            A LoadedConfigureNozzleLayoutData object or None.
         """
         use_virtual_pipettes = self._state_store.config.use_virtual_pipettes
+        sanitized_overlap_version = (
+            pipette_data_provider.validate_and_default_tip_overlap_version(
+                tip_overlap_version
+            )
+        )
 
         if not use_virtual_pipettes:
             mount = self._state_store.pipettes.get_mount(pipette_id).to_hw_mount()
@@ -704,6 +721,10 @@ class EquipmentHandler:
             )
             pipette_dict = self._hardware_api.get_attached_instrument(mount)
             nozzle_map = pipette_dict["current_nozzle_map"]
+            serial_number = pipette_dict["pipette_id"]
+            static_pipette_config = pipette_data_provider.get_pipette_static_config(
+                pipette_dict=pipette_dict, tip_overlap_version=sanitized_overlap_version
+            )
 
         else:
             model = self._state_store.pipettes.get_model_name(pipette_id)
@@ -719,8 +740,19 @@ class EquipmentHandler:
                     pipette_id
                 )
             )
+            static_pipette_config = self._virtual_pipette_data_provider.get_virtual_pipette_static_config_by_model_string(
+                pipette_model_string=model,
+                pipette_id=pipette_id,
+                tip_overlap_version=sanitized_overlap_version,
+            )
+            serial_number = self._model_utils.generate_id(prefix="fake-serial-number-")
 
-        return nozzle_map
+        return LoadedConfigureNozzleLayoutData(
+            pipette_id=pipette_id,
+            serial_number=serial_number,
+            static_config=static_pipette_config,
+            nozzle_map=nozzle_map,
+        )
 
     @overload
     def get_module_hardware_api(

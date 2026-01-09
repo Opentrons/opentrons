@@ -118,11 +118,12 @@ test-fast:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
-	$(ruff) check $(ruff_opts) .
+	$(ruff) check .
 
 .PHONY: format
 format:
-	$(ruff) format $(ruff_opts) .
+	$(ruff) format .
+	$(ruff) check --select I --fix .
 
 .PHONY: _dev
 _dev:

@@ -1,47 +1,47 @@
 """Test Flex Stacker fill command implementation."""
 
-import pytest
-from decoy import Decoy
 from typing import cast
 
-from opentrons.protocol_engine.state.update_types import (
-    StateUpdate,
-    FlexStackerStateUpdate,
-    BatchLabwareLocationUpdate,
-    BatchLoadedLabwareUpdate,
-    LabwareLidUpdate,
-)
+import pytest
+from decoy import Decoy
 
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.execution import RunControlHandler, EquipmentHandler
-from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
-from opentrons.protocol_engine.resources import ModelUtils
 from opentrons.protocol_engine.commands.flex_stacker.fill import (
     FillImpl,
     FillParams,
     FillResult,
 )
-from opentrons.protocol_engine.types import (
-    StackerFillEmptyStrategy,
-    DeckSlotLocation,
-    StackerStoredLabwareGroup,
-    LoadedLabware,
-    OFF_DECK_LOCATION,
-    SYSTEM_LOCATION,
-    InStackerHopperLocation,
-    NotOnDeckLocationSequenceComponent,
-)
 from opentrons.protocol_engine.errors import (
     FlexStackerLabwarePoolNotYetDefinedError,
     ModuleNotLoadedError,
 )
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons.protocol_engine.execution import EquipmentHandler, RunControlHandler
+from opentrons.protocol_engine.execution.equipment import LoadedLabwarePoolData
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import (
+    BatchLabwareLocationUpdate,
+    BatchLoadedLabwareUpdate,
+    FlexStackerStateUpdate,
+    LabwareLidUpdate,
+    StateUpdate,
+)
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
+    DeckSlotLocation,
+    InStackerHopperLocation,
+    LoadedLabware,
+    NotOnDeckLocationSequenceComponent,
+    StackerFillEmptyStrategy,
+    StackerStoredLabwareGroup,
+)
 from opentrons.types import DeckSlotName
 
 

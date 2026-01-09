@@ -4,29 +4,30 @@ import re
 import subprocess
 from typing import Annotated, Optional
 
+from fastapi import APIRouter, File, HTTPException, Path, Query, Response, UploadFile
 from starlette import status
 from starlette.responses import JSONResponse
-from fastapi import APIRouter, HTTPException, File, Path, UploadFile, Query, Response
 
-from opentrons_shared_data.errors import ErrorCodes
 from opentrons.system import nmcli, wifi
+from opentrons_shared_data.errors import ErrorCodes
+
 from robot_server.errors.error_responses import LegacyErrorResponse
 from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.legacy.models.networking import (
-    NetworkingStatus,
-    WifiNetworks,
-    WifiNetwork,
-    WifiConfiguration,
-    WifiConfigurationResponse,
-    WifiKeyFiles,
-    WifiKeyFile,
-    EapOptions,
-    EapVariant,
-    EapConfigOption,
-    EapConfigOptionType,
-    WifiNetworkFull,
     AddWifiKeyFileResponse,
     ConnectivityStatus,
+    EapConfigOption,
+    EapConfigOptionType,
+    EapOptions,
+    EapVariant,
+    NetworkingStatus,
+    WifiConfiguration,
+    WifiConfigurationResponse,
+    WifiKeyFile,
+    WifiKeyFiles,
+    WifiNetwork,
+    WifiNetworkFull,
+    WifiNetworks,
 )
 
 log = logging.getLogger(__name__)

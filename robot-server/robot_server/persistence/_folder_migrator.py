@@ -16,15 +16,14 @@ Where each version has its own isolated subdirectory.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 import contextlib
 import logging
 import os
-from pathlib import Path
 import shutil
 import tempfile
+from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Final, Generator, List, Union
-
 
 _log = logging.getLogger(__name__)
 

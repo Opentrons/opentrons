@@ -1,24 +1,24 @@
-import pytest
 import importlib
+from typing import TYPE_CHECKING, Any
+
+import pytest
+
 import opentrons
-from typing import Any, TYPE_CHECKING
 from opentrons.calibration_storage import (
-    save_robot_belt_attitude,
-    get_robot_belt_attitude,
     delete_robot_belt_attitude,
-)
-from opentrons.calibration_storage import (
-    save_robot_deck_attitude,
-    get_robot_deck_attitude,
     delete_robot_deck_attitude,
+    get_robot_belt_attitude,
+    get_robot_deck_attitude,
+    save_robot_belt_attitude,
+    save_robot_deck_attitude,
+)
+from opentrons.calibration_storage.ot2.models.v1 import (
+    DeckCalibrationModel as OT2DeckCalModel,
 )
 
 # needed for proper type checking unfortunately
 from opentrons.calibration_storage.ot3.models.v1 import (
     BeltCalibrationModel as OT3BeltCalModel,
-)
-from opentrons.calibration_storage.ot2.models.v1 import (
-    DeckCalibrationModel as OT2DeckCalModel,
 )
 
 if TYPE_CHECKING:

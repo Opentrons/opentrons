@@ -2,47 +2,45 @@
 
 from datetime import datetime
 
+import pytest
+from decoy import Decoy, matchers
+
 from opentrons_shared_data.errors.exceptions import (
     PipetteOverpressureError,
     StallOrCollisionDetectedError,
 )
-from decoy import matchers, Decoy
-import pytest
 
-from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
-from opentrons.protocol_engine.state import update_types
-from opentrons.types import Point
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import (
-    LiquidHandlingWellLocation,
-    WellOrigin,
-    WellOffset,
     DeckPoint,
+    LiquidHandlingWellLocation,
+    WellOffset,
+    WellOrigin,
 )
-
 from opentrons.protocol_engine.commands.aspirate import (
+    AspirateImplementation,
     AspirateParams,
     AspirateResult,
-    AspirateImplementation,
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
-
-from opentrons.protocol_engine.state.state import StateView
-
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
 from opentrons.protocol_engine.execution import (
     MovementHandler,
     PipettingHandler,
 )
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.types import (
-    CurrentWell,
-    AspiratedFluid,
-    FluidKind,
-    WellLocation,
-    LabwareWellId,
-)
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.notes import CommandNoteAdder
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import (
+    AspiratedFluid,
+    CurrentWell,
+    FluidKind,
+    LabwareWellId,
+    WellLocation,
+)
+from opentrons.types import Point
 
 
 @pytest.fixture
@@ -727,7 +725,7 @@ async def test_overpressure_during_preparation(
         ),
     ).then_return(prep_location)
 
-    decoy.when(await pipetting.prepare_for_aspirate(pipette_id)).then_raise(
+    decoy.when(await pipetting.prepare_for_aspirate(pipette_id)).then_raise(  # type: ignore[func-returns-value]
         PipetteOverpressureError()
     )
     decoy.when(model_utils.generate_id()).then_return(error_id)

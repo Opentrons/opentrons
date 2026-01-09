@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import Optional, Protocol, TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional, Protocol
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.commands import (

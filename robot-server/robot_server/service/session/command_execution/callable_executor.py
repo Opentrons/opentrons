@@ -1,9 +1,9 @@
 import typing
 
 from server_utils.util import duration
-from .base_executor import CommandExecutor
-from .command import Command, CompletedCommand, CommandResult
 
+from .base_executor import CommandExecutor
+from .command import Command, CommandResult, CompletedCommand
 
 CommandHandler = typing.Callable[
     [str, typing.Dict[typing.Any, typing.Any]], typing.Coroutine[None, None, None]

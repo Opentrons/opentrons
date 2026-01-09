@@ -3,12 +3,11 @@ from typing import Dict
 
 from opentrons.drivers.smoothie_drivers.constants import AXES, GCODE_ROUNDING_PRECISION
 from opentrons.drivers.utils import (
+    ParseError,
     parse_key_values,
     parse_number,
     parse_optional_number,
-    ParseError,
 )
-
 
 log = logging.getLogger(__name__)
 

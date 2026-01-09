@@ -6,12 +6,12 @@ protocol_runner.py for more details.
 
 from .protocol_runner import (
     AbstractRunner,
+    AnyRunner,
+    JsonRunner,
+    LiveRunner,
+    PythonAndLegacyRunner,
     RunResult,
     create_protocol_runner,
-    JsonRunner,
-    PythonAndLegacyRunner,
-    LiveRunner,
-    AnyRunner,
 )
 from .run_orchestrator import RunOrchestrator
 

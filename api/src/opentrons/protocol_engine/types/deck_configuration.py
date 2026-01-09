@@ -1,21 +1,21 @@
 """Protocol engine types to do with deck configuration."""
 
 from dataclasses import dataclass
-from typing import FrozenSet, List, Tuple, Optional, Union, Literal
 from enum import Enum
+from typing import FrozenSet, List, Literal, Optional, Tuple, Union
 
-from opentrons.types import DeckSlotName
-
-from opentrons_shared_data.module.types import (
-    ModuleType as SharedDataModuleType,
-    ModuleOrientation,
-)
-from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.deck.types import SlotDefV3
 from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.module.types import (
+    ModuleOrientation,
+)
+from opentrons_shared_data.module.types import (
+    ModuleType as SharedDataModuleType,
+)
+from opentrons_shared_data.util import StrEnum
 
-
-from .util import Vec3f, Dimensions
+from .util import Dimensions, Vec3f
+from opentrons.types import DeckSlotName
 
 
 class AddressableOffsetVector(Vec3f):

@@ -1,58 +1,56 @@
 """Protocol API module implementation logic."""
 
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional, List, Dict, Union, Sequence, TYPE_CHECKING, overload
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Union, overload
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 
-from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
-from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    TemperatureStatus,
-    MagneticStatus,
-    SpeedStatus,
-    module_model_from_string,
+from ... import validation
+from ..module import (
+    AbstractAbsorbanceReaderCore,
+    AbstractFlexStackerCore,
+    AbstractHeaterShakerCore,
+    AbstractMagneticBlockCore,
+    AbstractMagneticModuleCore,
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractThermocyclerCore,
 )
+from . import load_labware_params
+from .exceptions import InvalidMagnetEngageHeightError
+from .labware import LabwareCore
+from .tasks import EngineTaskCore
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-
+from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control import modules as hw_modules
+from opentrons.hardware_control.modules.types import (
+    MagneticStatus,
+    ModuleModel,
+    SpeedStatus,
+    TemperatureStatus,
+    module_model_from_string,
+)
 from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.errors.exceptions import (
+    CannotPerformModuleAction,
+    FlexStackerLabwarePoolNotYetDefinedError,
+    LabwareNotLoadedOnModuleError,
+    NoMagnetEngageHeightError,
+)
 from opentrons.protocol_engine.types import (
     ABSMeasureMode,
     StackerFillEmptyStrategy,
-    StackerStoredLabwareGroup,
     StackerLabwareMovementStrategy,
+    StackerStoredLabwareGroup,
 )
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors.exceptions import (
-    LabwareNotLoadedOnModuleError,
-    NoMagnetEngageHeightError,
-    CannotPerformModuleAction,
-    FlexStackerLabwarePoolNotYetDefinedError,
-)
-
 from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
-
-from ... import validation
-from ..module import (
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractThermocyclerCore,
-    AbstractHeaterShakerCore,
-    AbstractMagneticBlockCore,
-    AbstractAbsorbanceReaderCore,
-    AbstractFlexStackerCore,
-)
-from .exceptions import InvalidMagnetEngageHeightError
-
-from .labware import LabwareCore
-from .tasks import EngineTaskCore
-from . import load_labware_params
+from opentrons.types import DeckSlotName
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore

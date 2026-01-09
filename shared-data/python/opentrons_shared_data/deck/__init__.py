@@ -2,21 +2,22 @@
 opentrons_shared_data.deck: types and bindings for deck definitions
 """
 
-from typing import Dict, List, NamedTuple, cast, overload, TYPE_CHECKING
-from typing_extensions import Final
 import json
+from typing import TYPE_CHECKING, Dict, List, NamedTuple, cast, overload
+
+from typing_extensions import Final
 
 from .. import get_shared_data_root, load_shared_data
 
 if TYPE_CHECKING:
     from .types import (
-        DeckSchema,
         DeckDefinition,
         DeckDefinitionV3,
-        DeckSchemaVersion3,
         DeckDefinitionV4,
-        DeckSchemaVersion4,
         DeckDefinitionV5,
+        DeckSchema,
+        DeckSchemaVersion3,
+        DeckSchemaVersion4,
         DeckSchemaVersion5,
     )
 

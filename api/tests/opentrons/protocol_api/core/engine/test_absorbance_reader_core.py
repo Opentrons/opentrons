@@ -8,11 +8,11 @@ from opentrons.hardware_control.modules import AbsorbanceReader
 from opentrons.hardware_control.modules.types import (
     ModuleType,
 )
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.engine.module_core import AbsorbanceReaderCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors.exceptions import CannotPerformModuleAction
 from opentrons.protocol_engine.state.module_substates import AbsorbanceReaderSubState
 from opentrons.protocol_engine.state.module_substates.absorbance_reader_substate import (

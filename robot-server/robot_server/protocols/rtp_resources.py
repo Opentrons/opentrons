@@ -2,14 +2,15 @@
 
 from __future__ import annotations
 
-import sqlalchemy
 import json
-
 from dataclasses import dataclass
 from typing import Dict, Optional
 
-from robot_server.persistence.tables import PrimitiveParamSQLEnum
+import sqlalchemy
+
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
+
+from robot_server.persistence.tables import PrimitiveParamSQLEnum
 
 
 @dataclass

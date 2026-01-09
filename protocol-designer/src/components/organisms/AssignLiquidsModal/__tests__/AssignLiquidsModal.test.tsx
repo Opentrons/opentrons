@@ -87,7 +87,6 @@ describe('AssignLiquidsModal', () => {
         allWellContents: {},
         liquidNamesById: {},
         liquidDisplayColors: {},
-        enableStacking: true,
       },
     }
   })

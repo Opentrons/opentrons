@@ -1,15 +1,12 @@
 """Unit tests for robot_server.deck_configuration.defaults."""
 
-from typing_extensions import Final
-
 import pytest
+from typing_extensions import Final
 
 from opentrons_shared_data import deck
 
 from robot_server.deck_configuration import defaults as subject
-from robot_server.deck_configuration import validation
-from robot_server.deck_configuration import validation_mapping
-
+from robot_server.deck_configuration import validation, validation_mapping
 
 DECK_DEFINITION_VERSION: Final = 5
 

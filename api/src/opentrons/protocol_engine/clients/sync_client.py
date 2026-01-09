@@ -1,16 +1,16 @@
 """Control a `ProtocolEngine` without async/await."""
 
-from typing import cast, Any, Optional, overload
+from typing import Any, Optional, cast, overload
 
-from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.labware.types import LabwareUri
 
 from .. import commands
 from ..commands.command_unions import CREATE_TYPES_BY_PARAMS_TYPE
 from ..state.state import StateView
 from ..types import (
-    Liquid,
     LabwareOffsetCreate,
+    Liquid,
 )
 from .transports import ChildThreadTransport
 
@@ -189,7 +189,7 @@ class SyncClient:
         self, name: str, color: Optional[str], description: Optional[str]
     ) -> Liquid:
         """Add a liquid to the engine."""
-        return self._transport.call_method(   # type: ignore[no-any-return]
+        return self._transport.call_method(  # type: ignore[no-any-return]
             "add_liquid", name=name, color=color, description=description
         )
 

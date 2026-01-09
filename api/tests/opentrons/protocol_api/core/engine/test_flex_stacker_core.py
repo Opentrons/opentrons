@@ -14,22 +14,21 @@ from opentrons.hardware_control.modules import FlexStacker
 from opentrons.hardware_control.modules.types import (
     ModuleType,
 )
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.types import (
-    OverlapOffset,
-    StackerStoredLabwareGroup,
-    StackerFillEmptyStrategy,
-)
-from opentrons.protocol_api.core.engine.module_core import FlexStackerCore
-from opentrons.protocol_api.core.engine.protocol import ProtocolCore
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
 from opentrons.protocol_api.core.engine import load_labware_params
 from opentrons.protocol_api.core.engine.labware import LabwareCore
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, OFF_DECK
+from opentrons.protocol_api.core.engine.module_core import FlexStackerCore
+from opentrons.protocol_api.core.engine.protocol import ProtocolCore
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors.exceptions import (
     FlexStackerLabwarePoolNotYetDefinedError,
 )
-
+from opentrons.protocol_engine.types import (
+    OverlapOffset,
+    StackerFillEmptyStrategy,
+    StackerStoredLabwareGroup,
+)
 
 SyncFlexStackerHardware = SynchronousAdapter[FlexStacker]
 

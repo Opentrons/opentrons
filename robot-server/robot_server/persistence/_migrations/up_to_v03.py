@@ -18,29 +18,28 @@ Summary of changes from schema 2:
 
 import multiprocessing
 from contextlib import ExitStack
-from pathlib import Path
 from logging import getLogger
+from pathlib import Path
 from typing import List
 
-from opentrons.protocol_engine import StateSummary
 import sqlalchemy
 
-from ..pydantic import pydantic_to_json
+from opentrons.protocol_engine import StateSummary
+
+from .._folder_migrator import Migration
 from ..database import (
     sql_engine_ctx,
     sqlite_rowid,
 )
-from ..tables import schema_02, schema_03
-from .._folder_migrator import Migration
 from ..file_and_directory_names import (
+    DB_FILE,
     DECK_CONFIGURATION_FILE,
     PROTOCOLS_DIRECTORY,
-    DB_FILE,
 )
-from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
-from . import up_to_v02
-from . import _up_to_v03_worker
-
+from ..pydantic import pydantic_to_json
+from ..tables import schema_02, schema_03
+from . import _up_to_v03_worker, up_to_v02
+from ._util import copy_if_exists, copy_rows_unmodified, copytree_if_exists
 
 _log = getLogger(__name__)
 

@@ -2,9 +2,9 @@
 
 import asyncio
 import logging
+from typing import Any, Mapping, Optional
 
 from aiohttp import web
-from typing import Optional, Mapping, Any
 
 from otupdate.common import (
     config,
@@ -14,14 +14,13 @@ from otupdate.common import (
     ssh_key_management,
     update,
 )
-
-from otupdate.openembedded.update_actions import (
-    RootFSInterface,
-    PartitionManager,
-    OT3UpdateActions,
-)
 from otupdate.common.file_actions import load_version_file
 from otupdate.common.update_actions import FILE_ACTIONS_VARNAME
+from otupdate.openembedded.update_actions import (
+    OT3UpdateActions,
+    PartitionManager,
+    RootFSInterface,
+)
 
 OE_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 

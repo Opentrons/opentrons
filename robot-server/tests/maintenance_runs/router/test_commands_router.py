@@ -1,35 +1,37 @@
 """Tests for the /maintenance_runs/.../commands routes."""
 
-import pytest
-
 from datetime import datetime
+
+import pytest
 from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
-    CommandSlice,
     CommandPointer,
+    CommandSlice,
+)
+from opentrons.protocol_engine import (
     commands as pe_commands,
+)
+from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.errors import CommandDoesNotExistError
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import MultiBodyMeta, RequestModel
-
-from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
-    MaintenanceRunOrchestratorStore,
-)
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
 from robot_server.maintenance_runs.maintenance_run_models import (
     MaintenanceRunNotFoundError,
 )
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+)
 from robot_server.maintenance_runs.router.commands_router import (
     create_run_command,
+    get_current_run_from_url,
     get_run_command,
     get_run_commands,
-    get_current_run_from_url,
 )
 from robot_server.runs.command_models import (
     CommandCollectionLinks,
@@ -37,6 +39,7 @@ from robot_server.runs.command_models import (
     CommandLinkMeta,
 )
 from robot_server.runs.run_models import RunCommandSummary
+from robot_server.service.json_api import MultiBodyMeta, RequestModel
 
 
 async def test_get_current_run_from_url(

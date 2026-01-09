@@ -3,14 +3,14 @@
 import json
 import tempfile
 import textwrap
-
 from dataclasses import dataclass
-from typing import Any, Dict, Iterator, List, Optional
 from pathlib import Path
+from typing import Any, Dict, Iterator, List, Optional
 
 import pytest
 from click.testing import CliRunner
-from opentrons.cli.analyze import analyze, AnalysisResult
+
+from opentrons.cli.analyze import AnalysisResult, analyze
 
 
 def _list_fixtures(version: int) -> Iterator[Path]:

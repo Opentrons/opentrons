@@ -1,50 +1,62 @@
 """Tests for /subsystems routes."""
 
 from datetime import datetime
-from typing import Set, Dict, TYPE_CHECKING, cast
-from fastapi import Response, Request
-from starlette.datastructures import URL, MutableHeaders
+from typing import TYPE_CHECKING, Dict, Set
 
 import pytest
 from decoy import Decoy
+from fastapi import Request, Response
+from starlette.datastructures import URL, MutableHeaders
 
-from robot_server.subsystems.models import (
-    UpdateState,
-    UpdateProgressData,
-    SubSystem,
-    UpdateProgressSummary,
-    PresentSubsystem,
+from opentrons.hardware_control import ThreadManagedHardware
+from opentrons.hardware_control.types import (
+    SubSystem as HWSubSystem,
 )
-from robot_server.subsystems.firmware_update_manager import (
-    UpdateProcessHandle,
-    ProcessDetails,
-    UpdateProgress,
-    FirmwareUpdateManager,
-    UpdateIdNotFound as UpdateIdNotFoundExc,
-    UpdateIdExists as UpdateIdExistsExc,
-    UpdateInProgress as UpdateInProgressExc,
-    SubsystemNotFound as SubsystemNotFoundExc,
-    NoOngoingUpdate as NoOngoingUpdateExc,
+from opentrons.hardware_control.types import (
+    SubSystemState,
 )
-
-from robot_server.subsystems.router import (
-    begin_subsystem_update,
-    get_update_process,
-    get_update_processes,
-    get_subsystem_update,
-    get_subsystem_updates,
-    get_attached_subsystem,
-    get_attached_subsystems,
+from opentrons.hardware_control.types import (
+    UpdateState as HWUpdateState,
 )
 
 from robot_server.errors.error_responses import ApiError
-
-from opentrons.hardware_control.types import (
-    SubSystem as HWSubSystem,
-    SubSystemState,
-    UpdateState as HWUpdateState,
+from robot_server.subsystems.firmware_update_manager import (
+    FirmwareUpdateManager,
+    ProcessDetails,
+    UpdateProcessHandle,
+    UpdateProgress,
 )
-from opentrons.hardware_control import ThreadManagedHardware
+from robot_server.subsystems.firmware_update_manager import (
+    NoOngoingUpdate as NoOngoingUpdateExc,
+)
+from robot_server.subsystems.firmware_update_manager import (
+    SubsystemNotFound as SubsystemNotFoundExc,
+)
+from robot_server.subsystems.firmware_update_manager import (
+    UpdateIdExists as UpdateIdExistsExc,
+)
+from robot_server.subsystems.firmware_update_manager import (
+    UpdateIdNotFound as UpdateIdNotFoundExc,
+)
+from robot_server.subsystems.firmware_update_manager import (
+    UpdateInProgress as UpdateInProgressExc,
+)
+from robot_server.subsystems.models import (
+    PresentSubsystem,
+    SubSystem,
+    UpdateProgressData,
+    UpdateProgressSummary,
+    UpdateState,
+)
+from robot_server.subsystems.router import (
+    begin_subsystem_update,
+    get_attached_subsystem,
+    get_attached_subsystems,
+    get_subsystem_update,
+    get_subsystem_updates,
+    get_update_process,
+    get_update_processes,
+)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -76,7 +88,7 @@ def thread_manager(decoy: Decoy, ot3_hardware_api: "OT3API") -> ThreadManagedHar
     manager = decoy.mock(cls=ThreadManagedHardware)
     decoy.when(manager.wrapped()).then_return(ot3_hardware_api)
     decoy.when(manager.wraps_instance(OT3API)).then_return(True)
-    return cast(ThreadManagedHardware, manager)
+    return manager
 
 
 def _build_attached_subsystem(

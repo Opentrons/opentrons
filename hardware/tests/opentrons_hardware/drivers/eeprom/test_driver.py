@@ -1,14 +1,13 @@
 """Tests for the eeprom module."""
 
-import mock
-import pytest
 import tempfile
-
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from datetime import datetime
 from typing import Generator
 
+import mock
+import pytest
 
 from opentrons_hardware.drivers import OT3GPIO
 from opentrons_hardware.drivers.eeprom import (

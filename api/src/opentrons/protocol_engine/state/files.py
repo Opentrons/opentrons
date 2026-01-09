@@ -3,11 +3,10 @@
 from dataclasses import dataclass
 from typing import List
 
+from ..actions import Action
+from ._abstract_store import HandlesActions, HasState
 from opentrons.protocol_engine.actions.get_state_update import get_state_updates
 from opentrons.protocol_engine.state import update_types
-
-from ._abstract_store import HasState, HandlesActions
-from ..actions import Action
 
 
 @dataclass

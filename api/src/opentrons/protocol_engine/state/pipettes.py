@@ -16,39 +16,41 @@ from typing import (
 from typing_extensions import assert_never
 
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons_shared_data.pipette.ul_per_mm import calculate_ul_per_mm
 from opentrons_shared_data.pipette.types import (
-    UlPerMmAction,
     LiquidClasses as VolumeModes,
 )
-
-from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
-from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control import CriticalPoint
-from opentrons.hardware_control.nozzle_manager import (
-    NozzleMap,
+from opentrons_shared_data.pipette.types import (
+    UlPerMmAction,
 )
-from opentrons.types import MountType, Mount as HwMount, Point, NozzleConfigurationType
+from opentrons_shared_data.pipette.ul_per_mm import calculate_ul_per_mm
 
-from . import update_types, fluid_stack
 from .. import errors
-from ..types import (
-    LoadedPipette,
-    MotorAxis,
-    FlowRates,
-    DeckPoint,
-    CurrentWell,
-    CurrentAddressableArea,
-    CurrentPipetteLocation,
-    TipGeometry,
-    LabwareWellId,
-)
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
     get_state_updates,
 )
-from ._abstract_store import HasState, HandlesActions
+from ..types import (
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckPoint,
+    FlowRates,
+    LabwareWellId,
+    LoadedPipette,
+    MotorAxis,
+    TipGeometry,
+)
+from . import fluid_stack, update_types
+from ._abstract_store import HandlesActions, HasState
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
+from opentrons.hardware_control import CriticalPoint
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import (
+    NozzleMap,
+)
+from opentrons.types import Mount as HwMount
+from opentrons.types import MountType, NozzleConfigurationType, Point
 
 LOG = getLogger(__name__)
 

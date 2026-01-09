@@ -7,9 +7,9 @@ treating LiquidState as a private implementation detail.
 
 import pytest
 
-from opentrons.protocol_engine.state.liquids import LiquidState, LiquidView
 from opentrons.protocol_engine import Liquid
-from opentrons.protocol_engine.errors import LiquidDoesNotExistError, InvalidLiquidError
+from opentrons.protocol_engine.errors import InvalidLiquidError, LiquidDoesNotExistError
+from opentrons.protocol_engine.state.liquids import LiquidState, LiquidView
 
 
 @pytest.fixture

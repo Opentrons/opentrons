@@ -1,10 +1,12 @@
 import pytest
 from decoy import Decoy
-from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
+
+from opentrons_hardware.hardware_control.status_bar import StatusBar
+
 from opentrons.hardware_control.backends.status_bar_state import (
     StatusBarStateController,
 )
-from opentrons_hardware.hardware_control.status_bar import StatusBar
+from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
 
 
 @pytest.fixture

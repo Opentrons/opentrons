@@ -1,10 +1,12 @@
 """Global error types."""
 
+from typing import Any, Type
+
 from typing_extensions import Literal
-from typing import Type, Any
+
+from opentrons_shared_data.errors import ErrorCodes
 
 from .error_responses import ErrorDetails
-from opentrons_shared_data.errors import ErrorCodes
 
 
 class UnexpectedError(ErrorDetails):

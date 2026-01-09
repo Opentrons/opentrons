@@ -1,25 +1,24 @@
 """Motion planning types."""
 
 from __future__ import annotations
-import logging
+
 import dataclasses
-import numpy as np
-
-
+import logging
 from typing import (
-    cast,
+    TYPE_CHECKING,
     Any,
     Dict,
-    Tuple,
-    TypeVar,
-    Mapping,
+    Generator,
     Generic,
     Iterable,
-    Generator,
+    Mapping,
+    Tuple,
+    TypeVar,
     Union,
-    TYPE_CHECKING,
+    cast,
 )
 
+import numpy as np
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
 
 if TYPE_CHECKING:

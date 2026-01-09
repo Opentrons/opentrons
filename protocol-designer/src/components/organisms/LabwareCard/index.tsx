@@ -27,7 +27,6 @@ import {
 } from '@opentrons/step-generation'
 
 import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
@@ -52,7 +51,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
-  const enableStacking = useSelector(getEnableStacking)
   const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
   const largestStack = getFullStackFromLabwares(deckSetupLabware, location)
@@ -90,7 +88,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     (isLid && canModifyQuantity)
   ) {
     editButton = t('edit_quantity')
-  } else if (!isAdapterOrTiprack && canModifyQuantity && enableStacking) {
+  } else if (!isAdapterOrTiprack && canModifyQuantity) {
     editButton = t('edit_liquid_and_quantity')
   } else if (!isAdapterOrTiprack || (isLid && !canModifyQuantity)) {
     editButton = t('edit_liquid')

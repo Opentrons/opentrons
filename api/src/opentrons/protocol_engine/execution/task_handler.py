@@ -1,16 +1,19 @@
 """Task handling."""
 
 from __future__ import annotations
-import logging
-from typing import Protocol, AsyncIterator
-from ..state.state import StateStore
-from ..resources import ModelUtils, ConcurrencyProvider
-from ..types import Task
+
 import asyncio
 import contextlib
+import logging
+from typing import AsyncIterator, Protocol
+
+from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
+
 from ..actions import ActionDispatcher, FinishTaskAction, StartTaskAction
 from ..errors import ErrorOccurrence
-from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException
+from ..resources import ConcurrencyProvider, ModelUtils
+from ..state.state import StateStore
+from ..types import Task
 
 log = logging.getLogger(__name__)
 

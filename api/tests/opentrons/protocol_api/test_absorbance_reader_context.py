@@ -4,10 +4,10 @@ import pytest
 from decoy import Decoy
 
 from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocol_api import AbsorbanceReaderContext
-from opentrons.protocol_api.core.common import ProtocolCore, AbsorbanceReaderCore
+from opentrons.protocol_api.core.common import AbsorbanceReaderCore, ProtocolCore
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture

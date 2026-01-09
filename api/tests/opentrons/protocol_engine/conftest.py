@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import pytest
 from typing import TYPE_CHECKING
+
+import pytest
 from decoy import Decoy
 
 from opentrons_shared_data import load_shared_data
@@ -15,18 +16,18 @@ from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons.protocols.api_support.deck_type import (
-    STANDARD_OT2_DECK,
-    SHORT_TRASH_DECK,
-    STANDARD_OT3_DECK,
-)
-from opentrons.protocol_engine.types import ModuleDefinition
 
 from opentrons.hardware_control import HardwareControlAPI, OT2HardwareControlAPI
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.protocols.types import FlexRobotType, OT2RobotType
 from opentrons.protocol_engine.notes import CommandNoteAdder
-from opentrons.protocol_engine.resources import FileProvider, CameraProvider
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+from opentrons.protocol_engine.types import ModuleDefinition
+from opentrons.protocols.api_support.deck_type import (
+    SHORT_TRASH_DECK,
+    STANDARD_OT2_DECK,
+    STANDARD_OT3_DECK,
+)
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
