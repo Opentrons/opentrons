@@ -1991,3 +1991,24 @@ class OT3Controller(FlexBackend):
         )
         assert sensor_data is None or isinstance(sensor_data, SensorDataType)
         return sensor_data.to_float() if sensor_data else None
+
+    def connect_barcode_scanner(
+        self,
+    ) -> bool:
+        """Try and connect to a barcode scanner."""
+        try:
+            self.barcode_scanner: Optional[modules.HoneywellScanner] = (
+                modules.HoneywellScanner()
+            )
+            return True
+        except Exception as e:
+            self.barcode_scanner = None
+            log.error(f"Could not connect to scanner {e}")
+            return False
+
+    def scan_barcode(self) -> Optional[str]:
+        """Try to scan a barcode."""
+        if self.barcode_scanner:
+            return self.barcode_scanner.scan()
+        else:
+            return None

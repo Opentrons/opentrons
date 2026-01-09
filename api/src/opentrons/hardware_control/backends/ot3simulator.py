@@ -902,3 +902,11 @@ class OT3Simulator(FlexBackend):
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         return 0.0
+
+    def connect_barcode_scanner(
+        self,
+    ) -> bool:
+        return True
+
+    def scan_barcode(self) -> Optional[str]:
+        return "12345\r\n"

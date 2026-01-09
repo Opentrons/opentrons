@@ -249,6 +249,7 @@ class OT3API(
         self._gripper_handler = GripperHandler(gripper=None)
         self._gantry_load = GantryLoad.LOW_THROUGHPUT
         self._configured_since_update = True
+        self.barcode_scanner_connected: bool | None = None
         OT3RobotCalibrationProvider.__init__(self, self._config)
         ExecutionManagerProvider.__init__(self, isinstance(backend, OT3Simulator))
 
@@ -3318,3 +3319,13 @@ class OT3API(
         )
         cp = self.critical_point_for(realmount, None)
         return end_point + offset + cp
+
+    def scan_barcode(self) -> Optional[str]:
+        """Scan a barcode."""
+        if self.barcode_scanner_connected is None:
+            self.barcode_scanner_connected = self._backend.connect_barcode_scanner()
+
+        if self.barcode_scanner_connected:
+            return self._backend.scan_barcode()
+        else:
+            return None

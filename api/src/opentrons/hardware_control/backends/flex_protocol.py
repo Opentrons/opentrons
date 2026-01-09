@@ -462,3 +462,13 @@ class FlexBackend(Protocol):
     ) -> Optional[float]:
         """Read and return the current sensor information."""
         ...
+
+    def connect_barcode_scanner(
+        self,
+    ) -> bool:
+        """Try and connect to a barcode scanner."""
+        ...
+
+    def scan_barcode(self) -> Optional[str]:
+        """Try to scan a barcode."""
+        ...

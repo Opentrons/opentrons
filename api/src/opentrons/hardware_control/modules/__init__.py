@@ -9,6 +9,12 @@ from .magdeck import MagDeck
 from .mod_abc import AbstractModule
 from .tempdeck import TempDeck
 from .thermocycler import Thermocycler
+from .heater_shaker import HeaterShaker
+from .absorbance_reader import AbsorbanceReader
+from .flex_stacker import FlexStacker
+from .update import update_firmware
+from .honeywell_scanner import HoneywellScanner
+from .utils import MODULE_TYPE_BY_NAME, build
 from .types import (
     AbsorbanceReaderStatus,
     BundledFirmware,
@@ -71,4 +77,5 @@ __all__ = [
     "module_model_from_string",
     "VacuumModule",
     "VacuumModuleStatus",
+    "HoneywellScanner",
 ]
