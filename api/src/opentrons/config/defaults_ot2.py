@@ -158,7 +158,7 @@ def _build_dict_with_default(
     if not isinstance(from_conf, dict):
         return default
     else:
-        return cast(DictType, from_conf)
+        return from_conf
 
 
 def _build_hw_versioned_current_dict(

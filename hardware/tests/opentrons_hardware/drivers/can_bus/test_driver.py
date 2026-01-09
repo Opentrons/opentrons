@@ -36,7 +36,7 @@ async def subject(bus_channel: str) -> AsyncGenerator[CanDriver, None]:
 async def test_send(subject: CanDriver, can_bus: Bus) -> None:
     """It should send a message."""
     message = CanMessage(
-        arbitration_id=ArbitrationId(id=0x1FFFFFFF), data=bytearray([1, 2, 3, 4])
+        arbitration_id=ArbitrationId(id=0x1FFFFFFF), data=bytes([1, 2, 3, 4])
     )
     await subject.send(message)
 

@@ -463,7 +463,9 @@ def _provide_item_in_state(
         module_id = f"module-id-{_mod_index}"
         _mod_index += 1
         decoy.when(mock_state_view.modules.get_connected_model(module_id)).then_return(
-            item_type
+            # this type ignore makes up for a narrowing failure - mypy thinks item_type can
+            # still be one of the literals
+            item_type  # type: ignore[arg-type]
         )
         decoy.when(mock_state_view.modules.get_location(module_id)).then_return(
             DeckSlotLocation(slotName=DeckSlotName.SLOT_5)
@@ -614,7 +616,7 @@ def test_maps_allows_stacker_labware_double_occupancy(
             new_location=matchers.Anything(),
             robot_type=matchers.Anything(),
         )
-    ).then_return(None)
+    ).then_return(True)
     setup_a = {k: [i for i in v] for k, v in occupancy_check_state_setup1.items()}
     for k, v in occupancy_check_state_setup2.items():
         setup_a[k].extend(v)

@@ -4,6 +4,8 @@ import logging
 from contextlib import ExitStack
 from typing import Any, List, Optional, Sequence, Tuple, Union, cast
 
+from typing_extensions import Unpack
+
 from opentrons_shared_data.errors.exceptions import (
     CommandParameterLimitViolated,
     CommandPreconditionViolated,
@@ -43,7 +45,7 @@ from opentrons.protocols.advanced_control.mix import mix_from_kwargs
 from opentrons.protocols.advanced_control.transfers import transfer as v1_transfer
 from opentrons.protocols.api_support import instrument
 from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.types import APIVersion, TransferArgs
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     FlowRates,
@@ -1854,7 +1856,7 @@ class InstrumentContext(publisher.CommandPublisher):
         source: labware.Well,
         dest: List[labware.Well],
         *args: Any,
-        **kwargs: Any,
+        **kwargs: Unpack[TransferArgs],
     ) -> InstrumentContext:
         """
         Move a volume of liquid from one source to multiple destinations.
@@ -1893,7 +1895,7 @@ class InstrumentContext(publisher.CommandPublisher):
         source: List[labware.Well],
         dest: labware.Well,
         *args: Any,
-        **kwargs: Any,
+        **kwargs: Unpack[TransferArgs],
     ) -> InstrumentContext:
         """
         Move liquid from multiple source wells to a single destination well.
@@ -1924,8 +1926,7 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,
         dest: AdvancedLiquidHandling,
-        trash: bool = True,
-        **kwargs: Any,
+        **kwargs: Unpack[TransferArgs],
     ) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
@@ -2024,23 +2025,27 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         _log.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
+        kwargs.setdefault("mode", "transfer")
+
         blowout_location = kwargs.get("blowout_location")
         instrument.validate_blowout_location(
             self.api_version, "transfer", blowout_location
         )
 
-        kwargs["mode"] = kwargs.get("mode", "transfer")
-
         mix_strategy, mix_opts = mix_from_kwargs(kwargs)
 
+        trash = kwargs.get("trash", True)
         if trash:
             drop_tip = v1_transfer.DropTipStrategy.TRASH
         else:
             drop_tip = v1_transfer.DropTipStrategy.RETURN
 
-        new_tip = kwargs.get("new_tip")
-        if isinstance(new_tip, str):
-            new_tip = types.TransferTipPolicy[new_tip.upper()]
+        new_tip_arg = kwargs.get("new_tip")
+        new_tip = (
+            types.TransferTipPolicy[new_tip_arg.upper()]
+            if isinstance(new_tip_arg, str)
+            else None
+        )
 
         blow_out = kwargs.get("blow_out")
         blow_out_strategy = None
@@ -2969,10 +2974,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
             )
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyInstrumentCore)
-        return cast(LegacyInstrumentCore, self._core).get_speed()
+        return self._core.get_speed()
 
     @property
     @requires_version(2, 0)

@@ -42,7 +42,7 @@ dev = [
     "coverage==7.4.1",
     "atomicwrites==1.4.0; sys_platform=='win32'",
     "colorama==0.4.4; sys_platform=='win32'",
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "decoy<3,>=2.2.0",
     "build~=1.2.0",
     "setuptools==80.9.0",

@@ -221,7 +221,7 @@ def check(
     new_item: DeckItem,
     new_location: Union[DeckSlotName, StagingSlotName],
     robot_type: RobotType,
-) -> None:
+) -> bool:
     """Check a deck layout for conflicts.
 
     Args:
@@ -232,6 +232,9 @@ def check(
 
     Raises:
         DeckConflictError: Adding this item should not be allowed.
+
+    Returns:
+        True if this item can be added (it will raise rather than return False)
     """
     restrictions: List[_DeckRestriction] = []
     # build restrictions driven by existing items
@@ -262,6 +265,7 @@ def check(
                     existing_item=existing_item,
                 )
             )
+    return True
 
 
 def _create_ot2_restrictions(  # noqa: C901

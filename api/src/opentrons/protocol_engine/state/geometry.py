@@ -1889,6 +1889,7 @@ class GeometryView:
         #   position of the liquid or doing dynamic tracking, return the initial height
         if (
             well_location.origin == WellOrigin.MENISCUS
+            and hasattr(well_location, "volumeOffset")
             and not well_location.volumeOffset
         ):
             return initial_handling_height
