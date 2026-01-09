@@ -2,6 +2,7 @@
 import os
 import io
 import json
+from pathlib import Path
 import sys
 from typing import Set, Any, Optional, List, Dict
 import webbrowser
@@ -132,7 +133,7 @@ class google_drive:
             print(f"File '{uploaded_file_id}' was not found after uploading.")
         return uploaded_file_id
 
-    def upload_missing_files(self, storage_directory: str) -> None:
+    def upload_missing_files(self, storage_directory: Path) -> None:
         """Upload missing files to Google Drive."""
         # Read .json files.
         google_drive_files = self.list_folder()
@@ -200,7 +201,7 @@ class google_drive:
         ).execute()
 
     def download_single_file(
-        self, save_directory: str, file_id: str, file_name: str, mime_type: str
+        self, save_directory: Path, file_id: str, file_name: str, mime_type: str
     ) -> str:
         """Download single file."""
         # google sheets: text/csv
