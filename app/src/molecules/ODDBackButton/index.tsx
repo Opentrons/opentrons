@@ -17,7 +17,11 @@ export function ODDBackButton(
   const { onClick, label } = props
 
   return (
-    <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing16}>
+    <Flex
+      alignItems={ALIGN_CENTER}
+      gridGap={SPACING.spacing16}
+      padding={`0 ${SPACING.spacing40} ${SPACING.spacing32}`}
+    >
       <Btn onClick={onClick}>
         <Icon
           color={COLORS.black90}
