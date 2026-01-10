@@ -48,32 +48,15 @@ export interface ThermocyclerProfileGroup {
 
 /**
  * Given a flat array of steps, return the equivalent hierarchy.
- *
- * If enableConcurrentModuleActions is false, this is a no-op.
  */
-export function convertStepArrayToHierarchy(
-  steps: FormData[],
-  enableConcurrentModuleActions: boolean
-): StepHierarchy {
-  if (enableConcurrentModuleActions) {
-    return {
-      topLevelItems: [
-        ..._convertStepArrayToHierarchy(steps, enableConcurrentModuleActions),
-      ],
-    }
-  } else {
-    return {
-      topLevelItems: steps.map(step => ({
-        type: 'standaloneStep',
-        stepId: step.id,
-      })),
-    }
+export function convertStepArrayToHierarchy(steps: FormData[]): StepHierarchy {
+  return {
+    topLevelItems: [..._convertStepArrayToHierarchy(steps)],
   }
 }
 
 function* _convertStepArrayToHierarchy(
-  steps: FormData[],
-  enableConcurrentModuleActions: boolean
+  steps: FormData[]
 ): Generator<StandaloneStep | ThermocyclerProfileGroup> {
   let currentGroup: {
     thermocyclerProfileStepId: StepIdType

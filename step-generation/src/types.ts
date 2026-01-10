@@ -638,6 +638,8 @@ export type ThermocyclerProfileStepArgs = CommonArgs & {
     | ConcurrentThermocyclerProfileStepArgs
   )
 
+// todo(mm, 2026-01-09): PD no longer uses this.
+// We can probably delete step-generation's support for it altogether.
 /**
  * Emits a blocking Thermocycler profile step. The entire profile will complete
  * before the protocol moves on to the next step.
