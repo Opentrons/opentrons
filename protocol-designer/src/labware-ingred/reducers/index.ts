@@ -321,8 +321,14 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
     ): LocationsState => {
       const { wells, labwareId } = action.payload
       const labwareIds = Array.isArray(labwareId) ? labwareId : [labwareId]
-      // fix this to remove the wells from the labware instead of the entire labware or the entire labware if no wells are left
-      return omit(state, labwareIds)
+      return labwareIds.reduce<LocationsState>((acc, id) => {
+        const updatedLabware = omit(acc[id], wells)
+        if (Object.keys(updatedLabware).length > 0) {
+          return { ...acc, [id]: updatedLabware }
+        } else {
+          return omit(acc, id)
+        }
+      }, state)
     },
     DELETE_LIQUID_GROUP: (
       state: LocationsState,
