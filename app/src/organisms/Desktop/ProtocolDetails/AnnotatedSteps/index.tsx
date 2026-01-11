@@ -1,25 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { List, useDynamicRowHeight, useListRef } from 'react-window'
+import { List, useDynamicRowHeight, useListCallbackRef } from 'react-window'
 
-import {
-  COLORS,
-  getLabwareDefinitionsFromCommands,
-  Icon,
-  StyledText,
-} from '@opentrons/components'
+import { getLabwareDefinitionsFromCommands } from '@opentrons/components'
 
 import { ProtocolAnalysisErrorModal } from '../../Devices/ProtocolRun/ProtocolRunHeader/RunHeaderModalContainer/modals'
-import { AnnotatedGroup } from './AnnotatedGroup'
 import styles from './annotatedsteps.module.css'
-import { IndividualCommand } from './IndividualCommand'
+import { AnnotatedStepsRowItem } from './AnnotatedStepsRowItem'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { RowComponentProps } from 'react-window'
 import type {
+  AnalysisError,
   CompletedProtocolAnalysis,
   LabwareDefinition,
-  ProtocolAnalysisError,
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
@@ -53,12 +46,12 @@ interface CommandRow {
 
 interface ErrorRow {
   type: 'errors'
-  errors: ProtocolAnalysisError[]
+  errors: AnalysisError[]
 }
 
 type AnnotatedStepsRow = GroupRow | CommandRow | ErrorRow
 
-interface ItemData {
+export interface ItemData {
   rows: AnnotatedStepsRow[]
   analysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput
   allRunDefs: LabwareDefinition[]
@@ -232,7 +225,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     annotationNames,
   ])
 
-  const listRef = useListRef()
+  const [listRef, listRefCallback] = useListCallbackRef()
   const [listWidth, setListWidth] = useState(0)
   const dynamicRowHeight = useDynamicRowHeight({
     defaultRowHeight: DEFAULT_ROW_HEIGHT_PX,
@@ -243,8 +236,8 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     if (scrollTargetId == null) return
     const rowIndex = rowIndexByCommandId.get(scrollTargetId)
     if (rowIndex == null) return
-    listRef.current?.scrollToRow({ index: rowIndex, align: 'smart' })
-  }, [scrollTargetId, rowIndexByCommandId])
+    listRef?.scrollToRow({ index: rowIndex, align: 'smart' })
+  }, [scrollTargetId, rowIndexByCommandId, listRef])
 
   const handleRowsRendered = useCallback(
     ({ stopIndex }: { startIndex: number; stopIndex: number }) => {
@@ -293,7 +286,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       ) : null}
       <div className={styles.annotated_steps_container}>
         <List
-          listRef={listRef}
+          listRef={listRefCallback}
           className={styles.annotated_steps_list}
           rowCount={rows.length}
           rowHeight={dynamicRowHeight}
@@ -309,74 +302,5 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
         />
       </div>
     </>
-  )
-}
-
-function AnnotatedStepsRowItem({
-  index,
-  style,
-  ariaAttributes,
-  ...data
-}: RowComponentProps<ItemData>): JSX.Element {
-  const row = data.rows[index]
-
-  return (
-    <div style={style} {...ariaAttributes}>
-      <div className={styles.annotated_steps_row}>
-        {row.type === 'group' ? (
-          <AnnotatedGroup
-            scrollTargetId={data.scrollTargetId}
-            analysis={data.analysis}
-            annotationType={row.annotationType}
-            subCommands={row.group.subCommands}
-            commandStartNumber={row.commandStartNumber}
-            allRunDefs={data.allRunDefs}
-            setSelectedCommand={data.setSelectedCommand}
-            handlePause={data.handlePause}
-          />
-        ) : row.type === 'command' ? (
-          <IndividualCommand
-            scrollTargetId={data.scrollTargetId}
-            fromGroup={row.fromGroup}
-            command={row.command}
-            isHighlighted={row.isHighlighted}
-            analysis={data.analysis}
-            allRunDefs={data.allRunDefs}
-            setSelectedCommand={data.setSelectedCommand}
-            commandNumber={row.commandNumber}
-          />
-        ) : (
-          <div className={styles.annotated_steps_error_wrapper}>
-            {row.errors.map(error => (
-              <div
-                className={styles.annotated_steps_error_container}
-                key={error.id}
-                onClick={() => {
-                  data.onShowErrorDetails()
-                }}
-              >
-                <div className={styles.annotated_steps_header}>
-                  <Icon name="ot-alert" size="1rem" color={COLORS.red60} />
-                  <StyledText
-                    desktopStyle="captionSemiBold"
-                    color={COLORS.red60}
-                  >
-                    {data.t('step_error')}
-                  </StyledText>
-                </div>
-                <StyledText desktopStyle="bodyDefaultRegular">
-                  {error.detail}
-                </StyledText>
-              </div>
-            ))}
-            <div className={styles.annotated_steps_final_command}>
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {data.t('unable_to_show_steps_past_errors')}
-              </StyledText>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
   )
 }
