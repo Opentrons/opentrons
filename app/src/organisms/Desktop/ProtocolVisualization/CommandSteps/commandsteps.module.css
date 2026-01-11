@@ -40,12 +40,7 @@
   height: 100%;
   min-height: 0;
   flex: 1;
-  overflow-y: auto;
-}
-
-/* this is for scrolling detection  */
-.bottom_sentinel {
-  height: 1px;
+  overflow: hidden;
 }
 
 .at_bottom {
