@@ -62,7 +62,9 @@ export interface ItemData {
   t: (key: string) => string
 }
 
-const DEFAULT_ROW_HEIGHT_PX = 72
+// Note: Since we're using the height value that appears most frequently in the design,
+// we may need to adjust it later.
+const DEFAULT_ROW_HEIGHT_PX = 64
 
 export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const {
