@@ -148,3 +148,5 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   C4: 'hopperC4',
   D4: 'hopperD4',
 }
+
+export const AIR_GAP_LIQUID_STATE_CONST: '__air_gap__' = '__air_gap__'
