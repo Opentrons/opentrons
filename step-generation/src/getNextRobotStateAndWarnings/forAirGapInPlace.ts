@@ -27,9 +27,13 @@ export function forAirGapInPlace(
   range(channels).forEach((tipIndex): void => {
     const prev = robotState.liquidState.pipettes[pipetteId][tipIndex] ?? {}
 
+    const prevAirGapVolume = prev[AIR_GAP_LIQUID_STATE_CONST]?.volume ?? 0
+
     robotState.liquidState.pipettes[pipetteId][tipIndex] = {
       ...prev,
-      [AIR_GAP_LIQUID_STATE_CONST]: { volume },
+      [AIR_GAP_LIQUID_STATE_CONST]: {
+        volume: prevAirGapVolume + volume, // add previous air gap (if exists) + current
+      },
     }
   })
 }
