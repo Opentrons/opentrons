@@ -135,12 +135,11 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    dispatch(openIngredientSelector(newItem))
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
-      JSON.stringify(allWellContents[newItem]) !==
-        JSON.stringify(allWellContents[labwareId])
+      JSON.stringify(liquidLocations[newItem]) !==
+        JSON.stringify(liquidLocations[labwareId])
     ) {
       // selected labware have different liquid layouts
       setShowLiquidLayoutOverlay(true)
