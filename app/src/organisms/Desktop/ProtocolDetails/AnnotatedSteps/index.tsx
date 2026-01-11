@@ -298,7 +298,6 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
               setListWidth(size.width)
             }
           }}
-          style={{ height: '100%', width: '100%' }}
         />
       </div>
     </>

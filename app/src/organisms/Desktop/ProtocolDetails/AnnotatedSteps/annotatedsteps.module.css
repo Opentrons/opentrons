@@ -75,18 +75,18 @@
 }
 
 .annotated_steps_container {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 .annotated_steps_list {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 .annotated_steps_row {
-  padding-bottom: var(--spacing-4);
   box-sizing: border-box;
+  padding-bottom: var(--spacing-4);
 }
 
 .annotated_steps_error_wrapper {
