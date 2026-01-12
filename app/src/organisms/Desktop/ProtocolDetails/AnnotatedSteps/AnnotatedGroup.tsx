@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import is from 'date-fns/esm/locale/is/index.js'
 
 import { COLORS, Icon, StyledText } from '@opentrons/components'
 
