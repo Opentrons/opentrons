@@ -43,7 +43,7 @@
     "isMagneticModuleCompatible": false
   },
   "stackLimit": 1,
-  "allowedRoles": ["labware"],
+  "allowedRoles": ["adapter"],
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
     "x": -12.5,
