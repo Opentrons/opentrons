@@ -9,6 +9,7 @@ import { GRIPPER_LOCATION } from '../constants'
 import { createStagingAreaForInvariantContext } from './misc'
 
 import type {
+  CompletedProtocolAnalysis,
   PickUpTipRunTimeCommand,
   ProtocolAnalysisOutput,
   RunTimeCommand,
@@ -24,7 +25,7 @@ import type {
 } from '../types'
 
 export function constructInvariantContextFromAnalysis(
-  analysis: ProtocolAnalysisOutput
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
 ): InvariantContext {
   const { labware, modules, pipettes, commands } = analysis
   const labwareDefinitions = getLabwareDefinitionsByURIForProtocol(commands)

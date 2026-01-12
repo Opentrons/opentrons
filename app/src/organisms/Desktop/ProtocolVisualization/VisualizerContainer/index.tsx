@@ -24,7 +24,10 @@ import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 2000
@@ -38,7 +41,8 @@ const GUTTER_WIDTH_PX = 16 // left and right gutters
 type ResizableColumn = 'left' | 'right'
 
 interface VisualizerContainerProps {
-  analysis: ProtocolAnalysisOutput
+  analysisOutput: ProtocolAnalysisOutput
+  completedProtocolAnalysis: CompletedProtocolAnalysis | null
   groupedCommands: GroupedCommands | null
   protocolKey: string
   srcFileNames: string[]
@@ -48,7 +52,8 @@ export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
   const dispatch = useDispatch()
-  const { analysis, groupedCommands, protocolKey, srcFileNames } = props
+  const { completedProtocolAnalysis, analysisOutput, groupedCommands, protocolKey, srcFileNames } = props
+  const analysis = completedProtocolAnalysis ?? analysisOutput
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
@@ -99,7 +104,6 @@ export function VisualizerContainer(
     currentCommandsSlice,
     invariantContextFromAnalysis
   )
-  console.log('frame', frame)
   const handlePlayPause = (): void => {
     setIsPlaying(prev => !prev)
   }
@@ -167,7 +171,7 @@ export function VisualizerContainer(
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
     srcFileNames,
-    analysis
+    analysisOutput
   )
   const percentComplete =
     filteredSelectedCommandIndex != null

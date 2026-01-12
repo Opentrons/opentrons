@@ -8,12 +8,12 @@ import { AnnotatedSteps } from '/app/organisms/Desktop/ProtocolDetails/Annotated
 import styles from './commandsteps.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type { CompletedProtocolAnalysis, ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 interface CommandStepsProps {
   groupedCommands: GroupedCommands | null
-  analysis: ProtocolAnalysisOutput
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
   percentComplete: number
   handlePause: () => void
