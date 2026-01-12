@@ -1,13 +1,12 @@
 """A script for sending CAN messages."""
 
+import argparse
 import asyncio
 import logging
-import argparse
 from logging.config import dictConfig
 from typing import Callable
 
 from opentrons_hardware.drivers.binary_usb import build
-
 from opentrons_hardware.drivers.binary_usb.bin_serial import SerialUsbDriver
 
 log = logging.getLogger(__name__)

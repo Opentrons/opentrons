@@ -1,19 +1,20 @@
 """Module data resource provider."""
 
 from typing import Dict
+
+from opentrons_shared_data.module import load_definition
+
+from ..types import (
+    DeckSlotLocation,
+    ModuleDefinition,
+    ModuleModel,
+    ModuleOffsetData,
+    ModuleOffsetVector,
+)
 from opentrons.hardware_control.modules.module_calibration import (
     load_all_module_calibrations,
 )
-from opentrons_shared_data.module import load_definition
-
 from opentrons.types import DeckSlotName
-from ..types import (
-    ModuleModel,
-    ModuleDefinition,
-    ModuleOffsetVector,
-    ModuleOffsetData,
-    DeckSlotLocation,
-)
 
 
 class ModuleDataProvider:

@@ -1,25 +1,26 @@
 """Tests for the engine based Protocol API module core implementations."""
 
 from typing import cast
+
 import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
+from ... import versions_at_or_above, versions_below
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import (
-    Thermocycler,
-    TemperatureStatus,
     ModuleType,
+    TemperatureStatus,
+    Thermocycler,
 )
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.types import APIVersion
-from ... import versions_below, versions_at_or_above
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 

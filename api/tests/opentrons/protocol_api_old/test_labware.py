@@ -4,27 +4,24 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.types import LabwareDefinition2, WellDefinition2
-from opentrons.protocol_api import Labware
 
+from opentrons.calibration_storage import helpers
 from opentrons.hardware_control.modules.types import (
+    HeaterShakerModuleModel,
     MagneticModuleModel,
+    ModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
-    ModuleModel,
 )
-
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocol_api import labware, validation
+from opentrons.protocol_api import Labware, labware, validation
 from opentrons.protocol_api.core.labware import AbstractLabware
-from opentrons.protocol_api.core.well import AbstractWellCore
 from opentrons.protocol_api.core.legacy import module_geometry
 from opentrons.protocol_api.core.legacy.legacy_labware_core import LegacyLabwareCore
 from opentrons.protocol_api.core.legacy.legacy_well_core import LegacyWellCore
 from opentrons.protocol_api.core.legacy.well_geometry import WellGeometry
-
-from opentrons.calibration_storage import helpers
-from opentrons.types import Point, Location
+from opentrons.protocol_api.core.well import AbstractWellCore
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import Location, Point
 
 test_data: Dict[str, WellDefinition2] = {
     "circular_well_json": {

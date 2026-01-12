@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from logging import getLogger
-from typing import Any, Dict, Final, Optional, Union, Iterator, Sequence, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Final, Iterator, Optional, Sequence, Union
 
 from opentrons_shared_data.errors import ErrorCodes
 from opentrons_shared_data.errors.exceptions import EnumeratedError, PythonException

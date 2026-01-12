@@ -1,11 +1,12 @@
 """Tests for the usb_config module."""
 
-import pytest
-import mock
-from pathlib import Path
 import os
+from pathlib import Path
 
-from ot3usb import usb_config, default_config
+import mock
+import pytest
+
+from ot3usb import default_config, usb_config
 
 # Fake UDC handle to use in tests
 UDC_HANDLE_NAME = "usb123"

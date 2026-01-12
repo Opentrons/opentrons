@@ -1,7 +1,8 @@
 import asyncio
-from mock import call, MagicMock
 
 import pytest
+from mock import MagicMock, call
+
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 

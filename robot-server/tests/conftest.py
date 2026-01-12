@@ -1,57 +1,55 @@
-from contextlib import contextmanager
 import json
 import os
 import pathlib
 import tempfile
+from contextlib import contextmanager
 from datetime import datetime, timezone
-from mock import MagicMock
 from pathlib import Path
 from typing import Callable, Generator, Iterator, cast
-from typing_extensions import NoReturn
-from decoy import Decoy
-
-from sqlalchemy.engine import Engine as SQLEngine
 
 import pytest
+from decoy import Decoy
 from fastapi import routing
+from mock import MagicMock
+from sqlalchemy.engine import Engine as SQLEngine
 from starlette.testclient import TestClient
-
-from opentrons_shared_data.labware.types import LabwareDefinition
+from typing_extensions import NoReturn
 
 from opentrons import config
-from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.calibration_storage import (
     helpers,
     save_robot_deck_attitude,
 )
-from server_utils.fastapi_utils.app_state import AppState, get_app_state
 
 # NOTE(FS 10-24-2023), the fixtures using these functions currently ONLY
 # get pulled in by OT-2 server tests. If this ever changes, we need to
 # conditionally set up ot2/ot3 calibration structures instead of invariably
 # calling the OT2 functions.
 from opentrons.calibration_storage.ot2 import (
-    save_pipette_calibration,
     create_tip_length_data,
+    save_pipette_calibration,
     save_tip_length_calibration,
 )
+from opentrons.hardware_control import API, HardwareControlAPI, ThreadedAsyncLock
 from opentrons.protocol_api import labware
-from opentrons.types import Point, Mount
+from opentrons.types import Mount, Point
+from opentrons_shared_data.labware.types import LabwareDefinition
+from server_utils.fastapi_utils.app_state import AppState, get_app_state
 
 from robot_server.app import app
 from robot_server.hardware import get_hardware, get_ot2_hardware
-from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
-from robot_server.service.session.manager import SessionManager
-from robot_server.persistence.database import sql_engine_ctx
-from robot_server.persistence.tables import metadata
-from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.health.router import ComponentVersions, get_versions
-from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.persistence.database import sql_engine_ctx
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
+from robot_server.persistence.tables import metadata
 from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.run_data_manager import RunDataManager
 from robot_server.service.notifications.notification_client import (
     NotificationClient,
     _notification_client_accessor,
 )
+from robot_server.service.session.manager import SessionManager
+from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
 
 test_router = routing.APIRouter()
 

@@ -6,18 +6,23 @@ import pytest
 from decoy import Decoy
 
 from opentrons_shared_data.labware.labware_definition import (
-    WellDefinition2,
-    RectangularWellDefinition2,
     CircularWellDefinition2,
+    ConicalFrustum,
+    InnerWellGeometry,
+    RectangularWellDefinition2,
+    SphericalSegment,
+    WellDefinition2,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api._liquid import Liquid
+from opentrons.protocol_api.core.engine import WellCore, point_calculations, stringify
 from opentrons.protocol_engine import (
-    WellLocation,
-    WellOrigin,
-    WellOffset,
     LoadedPipette,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
@@ -27,15 +32,7 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import UnsupportedAPIError
-from opentrons.types import Point, Mount, MountType
-from opentrons_shared_data.labware.labware_definition import (
-    InnerWellGeometry,
-    ConicalFrustum,
-    SphericalSegment,
-)
-
-from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api.core.engine import WellCore, point_calculations, stringify
+from opentrons.types import Mount, MountType, Point
 
 
 @pytest.fixture(autouse=True)

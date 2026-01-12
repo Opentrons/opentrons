@@ -2,31 +2,29 @@
 
 from __future__ import annotations
 
-from typing import Iterable, List, Iterator, Optional, Tuple
-
 import binascii
 import enum
+from typing import Iterable, Iterator, List, Optional, Tuple
 
-from opentrons_hardware.firmware_bindings import utils, ErrorCode
+from opentrons_hardware.firmware_bindings import ErrorCode, utils
+from opentrons_hardware.firmware_bindings.binary_constants import (
+    LightAnimationType,
+    LightTransitionType,
+)
 from opentrons_hardware.firmware_bindings.constants import (
-    ToolType,
-    SensorType,
-    SensorId,
-    PipetteName,
-    SensorOutputBinding,
-    SensorThresholdMode,
-    PipetteTipActionType,
-    MotorPositionFlags,
     ErrorSeverity,
-    MoveStopCondition,
     GearMotorId,
+    MotorPositionFlags,
     MotorUsageValueType,
     MoveAckId,
-)
-
-from opentrons_hardware.firmware_bindings.binary_constants import (
-    LightTransitionType,
-    LightAnimationType,
+    MoveStopCondition,
+    PipetteName,
+    PipetteTipActionType,
+    SensorId,
+    SensorOutputBinding,
+    SensorThresholdMode,
+    SensorType,
+    ToolType,
 )
 
 

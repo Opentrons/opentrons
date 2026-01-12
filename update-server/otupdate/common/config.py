@@ -2,9 +2,9 @@
 otupdate.common.config: Handlers for reading update server configuration
 """
 
-import os
-import logging
 import json
+import logging
+import os
 from typing import Any, Dict, Mapping, NamedTuple, Optional, Tuple, cast
 
 from aiohttp.web import Request

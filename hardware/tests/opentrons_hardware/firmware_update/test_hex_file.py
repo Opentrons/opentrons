@@ -3,6 +3,7 @@
 from typing import Iterable, List
 
 import pytest
+
 from opentrons_hardware.firmware_update import hex_file
 
 

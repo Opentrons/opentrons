@@ -1,11 +1,11 @@
 import typing
 from functools import partial
 
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
-from pydantic import model_validator, ConfigDict, BaseModel, Field
 
-from opentrons_shared_data.util import StrEnum
 from opentrons import types
+from opentrons_shared_data.util import StrEnum
 
 
 class MotionTarget(StrEnum):

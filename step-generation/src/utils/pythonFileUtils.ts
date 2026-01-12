@@ -41,6 +41,7 @@ import type {
   LabwareTemporalProperties,
   LiquidEntities,
   ModuleEntities,
+  ModuleTemporalProperties,
   PipetteEntities,
   Timeline,
   TimelineFrame,
@@ -306,7 +307,7 @@ export function getLoadLabware(
       )
       const onModule =
         moduleEntities[labwareSlot] != null ||
-        deckSlot === stackerOnSlot?.[1].slot // special case stacker shuttle labware
+        (deckSlot === stackerOnSlot?.[1].slot && !isLabwareOnHopper) // special case stacker shuttle labware
       const onLabware = allLabwareEntities[labwareSlot] != null
 
       let parentName: string
@@ -597,7 +598,7 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
-    getSetStoredLabware(moduleEntities, labwareEntities, labware),
+    getSetStoredLabware(moduleEntities, labwareEntities, labware, modules),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -647,19 +648,60 @@ export const formatChangeTipArg = (changeTip: ChangeTipOptions): string => {
 export const getSetStoredLabware = (
   moduleEntities: ModuleEntities,
   labwareEntities: LabwareEntities,
-  labware: { [labwareId: string]: LabwareTemporalProperties }
+  labware: { [labwareId: string]: LabwareTemporalProperties },
+  modules: { [moduleId: string]: ModuleTemporalProperties }
 ): string => {
   const pythonSetStoredLabware = Object.values(moduleEntities).map(module => {
     const { id, type, pythonName } = module
 
     if (type === FLEX_STACKER_MODULE_TYPE) {
+      const moduleSlot = modules[id].slot
       const labwaresOnHopper = Object.entries(labware).filter(
         ([_, labware]) =>
           labware.stack.includes(id) &&
           labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
+      const labwaresOnShuttle = Object.entries(labware).filter(
+        ([_, labware]) =>
+          getSlotInLocationStack(labware.stack) === moduleSlot &&
+          !labware.stack.includes(HOPPER_STACKER_LOCATION)
+      )
+      // TODO: this doesn't address adapters in the shuttle yet since we dont allow that
+      // as of 1/9/26
       if (labwaresOnHopper.length === 0) {
-        return ''
+        if (labwaresOnShuttle.length === 0) {
+          return ''
+        }
+
+        const lid = labwaresOnShuttle.find(([id]) =>
+          labwareEntities[id].def.allowedRoles?.includes('lid')
+        )
+
+        const nonLid = labwaresOnShuttle.find(
+          ([id]) => !labwareEntities[id].def.allowedRoles?.includes('lid')
+        )
+
+        if (nonLid == null) {
+          return ''
+        }
+
+        const pythonArgs = [
+          `load_name=${formatPyStr(
+            labwareEntities[nonLid[0]].def.parameters.loadName
+          )}`,
+          `namespace=${formatPyStr(labwareEntities[nonLid[0]].def.namespace)}`,
+          `version=${labwareEntities[nonLid[0]].def.version}`,
+          'count=0',
+          ...(lid != null
+            ? [
+                `lid=${formatPyStr(
+                  labwareEntities[lid[0]].def.parameters.loadName
+                )}`,
+              ]
+            : []),
+        ].join(',\n')
+
+        return `${pythonName}.set_stored_labware(\n${indentPyLines(pythonArgs)}\n)`
       } else {
         const labwarePythonNames = Object.values(labwaresOnHopper).map(
           labware => labwareEntities[labware[0]].pythonName

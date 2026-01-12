@@ -1,55 +1,59 @@
 from __future__ import annotations
+
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Union, cast, Tuple
+from typing import Any, List, Optional, Sequence, Tuple, Union, cast
+
+from typing_extensions import Unpack
+
 from opentrons_shared_data.errors.exceptions import (
-    CommandPreconditionViolated,
     CommandParameterLimitViolated,
+    CommandPreconditionViolated,
     UnexpectedTipRemovalError,
     UnsupportedHardwareCommand,
 )
 
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons import types
-from opentrons.legacy_commands import (
-    commands as cmds,
-    protocol_commands as protocol_cmds,
-)
-
-from opentrons.legacy_commands import publisher
-from opentrons.protocols.advanced_control.mix import mix_from_kwargs
-from opentrons.protocols.advanced_control.transfers import transfer as v1_transfer
-from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support import instrument
-from opentrons.protocols.api_support.util import (
-    FlowRates,
-    PlungerSpeeds,
-    clamp_value,
-    requires_version,
-    APIVersionError,
-    UnsupportedAPIError,
-)
-
-from .core.common import InstrumentCore, ProtocolCore, WellCore
-from .core.core_map import LoadedCoreMap
-from .core.engine import ENGINE_CORE_API_VERSION
-from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
-from .config import Clearances
-from .disposal_locations import TrashBin, WasteChute
-from ._nozzle_layout import NozzleLayout
-from ._liquid import LiquidClass
-from ._transfer_liquid_validation import (
-    verify_and_normalize_transfer_args,
-    resolve_keep_last_tip,
-)
-from . import labware, validation
+from ..protocol_engine.types import LiquidTrackingType
 from ..protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
     TransferTipPolicyV2Type,
 )
-from ..protocol_engine.types import LiquidTrackingType
+from . import labware, validation
+from ._liquid import LiquidClass
+from ._nozzle_layout import NozzleLayout
+from ._transfer_liquid_validation import (
+    resolve_keep_last_tip,
+    verify_and_normalize_transfer_args,
+)
+from .config import Clearances
+from .core.common import InstrumentCore, ProtocolCore, WellCore
+from .core.core_map import LoadedCoreMap
+from .core.engine import ENGINE_CORE_API_VERSION
+from .core.legacy.legacy_instrument_core import LegacyInstrumentCore
+from .disposal_locations import TrashBin, WasteChute
+from opentrons import types
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import (
+    commands as cmds,
+)
+from opentrons.legacy_commands import (
+    protocol_commands as protocol_cmds,
+)
+from opentrons.legacy_commands import publisher
+from opentrons.protocols.advanced_control.mix import mix_from_kwargs
+from opentrons.protocols.advanced_control.transfers import transfer as v1_transfer
+from opentrons.protocols.api_support import instrument
+from opentrons.protocols.api_support.deck_type import NoTrashDefinedError
+from opentrons.protocols.api_support.types import APIVersion, TransferArgs
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    FlowRates,
+    PlungerSpeeds,
+    UnsupportedAPIError,
+    clamp_value,
+    requires_version,
+)
 
 _DEFAULT_ASPIRATE_CLEARANCE = 1.0
 _DEFAULT_DISPENSE_CLEARANCE = 1.0
@@ -1852,7 +1856,7 @@ class InstrumentContext(publisher.CommandPublisher):
         source: labware.Well,
         dest: List[labware.Well],
         *args: Any,
-        **kwargs: Any,
+        **kwargs: Unpack[TransferArgs],
     ) -> InstrumentContext:
         """
         Move a volume of liquid from one source to multiple destinations.
@@ -1891,7 +1895,7 @@ class InstrumentContext(publisher.CommandPublisher):
         source: List[labware.Well],
         dest: labware.Well,
         *args: Any,
-        **kwargs: Any,
+        **kwargs: Unpack[TransferArgs],
     ) -> InstrumentContext:
         """
         Move liquid from multiple source wells to a single destination well.
@@ -1922,8 +1926,7 @@ class InstrumentContext(publisher.CommandPublisher):
         volume: Union[float, Sequence[float]],
         source: AdvancedLiquidHandling,
         dest: AdvancedLiquidHandling,
-        trash: bool = True,
-        **kwargs: Any,
+        **kwargs: Unpack[TransferArgs],
     ) -> InstrumentContext:
         # source: Union[Well, List[Well], List[List[Well]]],
         # dest: Union[Well, List[Well], List[List[Well]]],
@@ -2022,23 +2025,27 @@ class InstrumentContext(publisher.CommandPublisher):
         """
         _log.debug("Transfer {} from {} to {}".format(volume, source, dest))
 
+        kwargs.setdefault("mode", "transfer")
+
         blowout_location = kwargs.get("blowout_location")
         instrument.validate_blowout_location(
             self.api_version, "transfer", blowout_location
         )
 
-        kwargs["mode"] = kwargs.get("mode", "transfer")
-
         mix_strategy, mix_opts = mix_from_kwargs(kwargs)
 
+        trash = kwargs.get("trash", True)
         if trash:
             drop_tip = v1_transfer.DropTipStrategy.TRASH
         else:
             drop_tip = v1_transfer.DropTipStrategy.RETURN
 
-        new_tip = kwargs.get("new_tip")
-        if isinstance(new_tip, str):
-            new_tip = types.TransferTipPolicy[new_tip.upper()]
+        new_tip_arg = kwargs.get("new_tip")
+        new_tip = (
+            types.TransferTipPolicy[new_tip_arg.upper()]
+            if isinstance(new_tip_arg, str)
+            else None
+        )
 
         blow_out = kwargs.get("blow_out")
         blow_out_strategy = None
@@ -2967,10 +2974,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 message="InstrumentContext.speed has been removed. Use InstrumentContext.flow_rate, instead."
             )
 
-        # TODO(mc, 2023-02-13): this assert should be enough for mypy
-        # investigate if upgrading mypy allows the `cast` to be removed
         assert isinstance(self._core, LegacyInstrumentCore)
-        return cast(LegacyInstrumentCore, self._core).get_speed()
+        return self._core.get_speed()
 
     @property
     @requires_version(2, 0)

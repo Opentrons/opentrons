@@ -6,6 +6,8 @@ from io import BytesIO
 from logging import getLogger
 from pickle import (  # noqa: F401
     Unpickler,
+)
+from pickle import (
     # Re-export `dumps()` to allow this module to be used as a drop-in replacement
     # for the `pickle` module, which is useful for `sqlalchemy.PickleType`.
     #
@@ -15,7 +17,6 @@ from pickle import (  # noqa: F401
     dumps as dumps,
 )
 from typing import Any, Dict, List
-
 
 _log = getLogger(__name__)
 

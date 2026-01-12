@@ -1,27 +1,32 @@
 """Pipette config data providers."""
 
+import re
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence
-import re
 
-from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
+from opentrons_shared_data.errors.exceptions import MissingConfigurationData
 from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
-    types as pip_types,
+)
+from opentrons_shared_data.pipette import (
     pipette_definition,
 )
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
+from opentrons_shared_data.pipette import (
+    types as pip_types,
+)
+from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
 
+from ...types import Point
+from ..errors.exceptions import InvalidLoadPipetteSpecsError
+from ..types import FlowRates
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationManager,
     NozzleMap,
 )
-from opentrons_shared_data.errors.exceptions import MissingConfigurationData
-
-from ..errors.exceptions import InvalidLoadPipetteSpecsError
-from ..types import FlowRates
-from ...types import Point
 
 _TIP_OVERLAP_VERSION_RE = re.compile(r"^v\d+$")
 

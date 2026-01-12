@@ -6,14 +6,15 @@ library.
 """
 
 from __future__ import annotations
+
 import ctypes
 from enum import Enum
 from typing import TYPE_CHECKING, Type
 
 from opentrons_hardware.firmware_bindings.constants import (
     FunctionCode,
-    NodeId,
     MessageId,
+    NodeId,
 )
 
 if TYPE_CHECKING:

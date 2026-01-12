@@ -1,24 +1,26 @@
 """Test protocol engine types."""
 
 import pytest
-from pydantic import ValidationError, BaseModel
+from pydantic import BaseModel, ValidationError
 
-from opentrons.protocol_engine.types import (
-    HexColor,
-    SimulatedProbeResult,
-    LiquidTrackingType,
-    WellInfoSummary,
-    ModuleModel,
-)
 from opentrons.hardware_control.modules.types import (
+    AbsorbanceReaderModel,
+    FlexStackerModuleModel,
+    HeaterShakerModuleModel,
+    MagneticBlockModel,
     MagneticModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
-    MagneticBlockModel,
-    AbsorbanceReaderModel,
-    FlexStackerModuleModel,
+)
+from opentrons.hardware_control.modules.types import (
     ModuleModel as HWModuleModel,
+)
+from opentrons.protocol_engine.types import (
+    HexColor,
+    LiquidTrackingType,
+    ModuleModel,
+    SimulatedProbeResult,
+    WellInfoSummary,
 )
 
 

@@ -228,6 +228,14 @@ export const flexStackerLabwareTypeMismatch = (): CommandCreatorError => {
   }
 }
 
+export const flexStackerLabwareTypeMissing = (): CommandCreatorError => {
+  return {
+    type: 'MISSING_STACKER_LABWARE_TYPE',
+    message:
+      'Add labware to the stacker in the starting deck so that you can refill it later',
+  }
+}
+
 export const flexStackerHopperFull = (): CommandCreatorError => {
   return {
     type: 'HOPPER_FULL',
@@ -448,5 +456,12 @@ export const incompletePickup = (): CommandCreatorError => {
   return {
     type: 'INCOMPLETE_PICKUP',
     message: 'At least one of the selected tips is empty',
+  }
+}
+
+export const labwareOnHopper = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_ON_HOPPER',
+    message: 'Labware cannot be moved from the Flex Stacker Hopper',
   }
 }

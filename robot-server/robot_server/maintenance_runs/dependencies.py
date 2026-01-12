@@ -4,20 +4,18 @@ from typing import Annotated
 
 from fastapi import Depends
 
-from opentrons_shared_data.robot.types import RobotType
-
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
-
+from opentrons_shared_data.robot.types import RobotType
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-from robot_server.hardware import get_hardware, get_deck_type, get_robot_type
 
-from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from .maintenance_run_data_manager import MaintenanceRunDataManager
+from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
+from robot_server.hardware import get_deck_type, get_hardware, get_robot_type
 from robot_server.service.notifications import (
     MaintenanceRunsPublisher,
     get_maintenance_runs_publisher,

@@ -1,15 +1,13 @@
 """Prepare to aspirate command request, result, and implementation models."""
 
 from __future__ import annotations
-from pydantic import BaseModel
+
 from typing import TYPE_CHECKING, Optional, Type, Union
+
+from pydantic import BaseModel
 from typing_extensions import Literal
 
-from .pipetting_common import (
-    OverpressureError,
-    PipetteIdMixin,
-    prepare_for_aspirate,
-)
+from ..errors.error_occurrence import ErrorOccurrence
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -17,10 +15,14 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..errors.error_occurrence import ErrorOccurrence
+from .pipetting_common import (
+    OverpressureError,
+    PipetteIdMixin,
+    prepare_for_aspirate,
+)
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover
+    from ..execution import GantryMover, PipettingHandler
     from ..resources import ModelUtils
 
 

@@ -11,6 +11,8 @@ from robot_server.persistence.file_and_directory_names import DB_FILE
 from robot_server.persistence.persistence_directory import make_migration_orchestrator
 from robot_server.persistence.tables import (
     metadata as latest_metadata,
+)
+from robot_server.persistence.tables import (
     schema_02,
     schema_03,
     schema_04,

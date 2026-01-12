@@ -28,9 +28,9 @@ from opentrons.protocol_engine.errors.exceptions import (
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.protocol_engine.state.commands import (
+    CommandErrorSlice,
     CommandStore,
     CommandView,
-    CommandErrorSlice,
 )
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.update_types import StateUpdate

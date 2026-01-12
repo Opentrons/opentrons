@@ -1,29 +1,30 @@
 """Command models to read absorbance."""
 
 from __future__ import annotations
-from datetime import datetime
-from typing import Optional, Dict, TYPE_CHECKING, List, Any
 
-from typing_extensions import Literal, Type
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal, Type
 
 from opentrons_shared_data.data_files import MimeType
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+
 from ...errors import CannotPerformModuleAction
 from ...errors.error_occurrence import ErrorOccurrence
-
+from ...resources import FileProvider
 from ...resources.file_provider import (
     PlateReaderData,
-    ReadData,
     ReadCmdFileNameMetadata,
+    ReadData,
 )
-from ...resources import FileProvider
 from ...state import update_types
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.state.state import StateView
 
 
 def _remove_default(s: dict[str, Any]) -> None:

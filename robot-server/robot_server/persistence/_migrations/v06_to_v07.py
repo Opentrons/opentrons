@@ -8,19 +8,18 @@ Summary of changes from schema 6:
 """
 
 import json
-from pathlib import Path
 from contextlib import ExitStack
+from pathlib import Path
 
 import sqlalchemy
 
-from ._util import add_column, copy_contents
-from ..database import sql_engine_ctx, sqlite_rowid
-from ..tables import schema_07
 from .._folder_migrator import Migration
-
+from ..database import sql_engine_ctx, sqlite_rowid
 from ..file_and_directory_names import (
     DB_FILE,
 )
+from ..tables import schema_07
+from ._util import add_column, copy_contents
 
 
 class Migration6to7(Migration):  # noqa: D101

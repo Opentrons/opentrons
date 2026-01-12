@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Dict, List, Optional, Tuple
+
 from opentrons.drivers.types import (
     ABSMeasurementMode,
-    AbsorbanceReaderLidStatus,
     AbsorbanceReaderDeviceState,
+    AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
 )
 

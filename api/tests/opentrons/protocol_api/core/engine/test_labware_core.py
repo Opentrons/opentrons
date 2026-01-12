@@ -5,19 +5,28 @@ from typing import cast
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.labware.types import (
-    LabwareDefinition as LabwareDefDict,
-    LabwareUri,
-)
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareRole,
     RectangularWellDefinition2,
-    Parameters2 as LabwareDefinition2Parameters,
+)
+from opentrons_shared_data.labware.labware_definition import (
     Metadata as LabwareDefinitionMetadata,
 )
+from opentrons_shared_data.labware.labware_definition import (
+    Parameters2 as LabwareDefinition2Parameters,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition as LabwareDefDict,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareUri,
+)
 
-from opentrons.types import DeckSlotName, Point
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocol_api._liquid import Liquid
+from opentrons.protocol_api.core.engine import LabwareCore, WellCore
+from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import LabwareNotOnDeckError
@@ -28,10 +37,7 @@ from opentrons.protocol_engine.types import (
     OnAddressableAreaOffsetLocationSequenceComponent,
     TipRackWellState,
 )
-from opentrons.protocol_api._liquid import Liquid
-from opentrons.protocol_api.core.labware import LabwareLoadParams
-from opentrons.protocol_api.core.engine import LabwareCore, WellCore
-from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture

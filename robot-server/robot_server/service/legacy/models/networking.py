@@ -1,16 +1,16 @@
 import typing
 
 from pydantic import (
-    field_validator,
-    model_validator,
-    ConfigDict,
     BaseModel,
+    ConfigDict,
     Field,
     SecretStr,
+    field_validator,
+    model_validator,
 )
 
-from opentrons_shared_data.util import StrEnum
 from opentrons.system import wifi
+from opentrons_shared_data.util import StrEnum
 
 
 class ConnectivityStatus(StrEnum):

@@ -2,21 +2,12 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Final, Optional, Type
+
 from pydantic import Field
-from typing import TYPE_CHECKING, Optional, Type, Final
 from typing_extensions import Literal
 
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-
 from ..types import DropTipWellLocation
-from .pipetting_common import (
-    PipetteIdMixin,
-)
-from .movement_common import (
-    DestinationPositionResult,
-    move_to_well,
-    StallOrCollisionError,
-)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -24,10 +15,19 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from .movement_common import (
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
+from .pipetting_common import (
+    PipetteIdMixin,
+)
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 if TYPE_CHECKING:
+    from ..execution import GantryMover, MovementHandler, TipHandler
     from ..state.state import StateView
-    from ..execution import MovementHandler, TipHandler, GantryMover
 
 
 UnsealPipetteFromTipCommandType = Literal["unsealPipetteFromTip"]

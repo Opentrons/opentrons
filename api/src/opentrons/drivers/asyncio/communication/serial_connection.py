@@ -2,20 +2,19 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Type, Literal, AsyncIterator
+from typing import AsyncIterator, Literal, Type
 
-from opentrons.drivers.command_builder import CommandBuilder
-
+from .async_serial import AsyncSerial
 from .errors import (
-    NoResponse,
     AlarmResponse,
-    ErrorResponse,
     BaseErrorCode,
     DefaultErrorCodes,
-    UnhandledGcode,
+    ErrorResponse,
     GCodeCacheFull,
+    NoResponse,
+    UnhandledGcode,
 )
-from .async_serial import AsyncSerial
+from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
 

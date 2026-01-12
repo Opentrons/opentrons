@@ -2,29 +2,28 @@
 
 from typing import List, Optional
 
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_slots,
-    get_north_south_slots,
-)
-
-from ..errors import (
-    PipetteMovementRestrictedByHeaterShakerError,
-    HeaterShakerLabwareLatchNotOpenError,
-    HeaterShakerLabwareLatchStatusUnknown,
-    WrongModuleTypeError,
-)
-from ..state.state import StateStore
-from ..state.module_substates import HeaterShakerModuleSubState
-from ..types import (
-    HeaterShakerMovementRestrictors,
-    HeaterShakerLatchStatus,
-    LabwareLocation,
-    ModuleLocation,
+from ...drivers.types import (
+    HeaterShakerLabwareLatchStatus as HeaterShakerHardwareLatchStatus,
 )
 from ...hardware_control import HardwareControlAPI
 from ...hardware_control.modules import HeaterShaker as HardwareHeaterShaker
-from ...drivers.types import (
-    HeaterShakerLabwareLatchStatus as HeaterShakerHardwareLatchStatus,
+from ..errors import (
+    HeaterShakerLabwareLatchNotOpenError,
+    HeaterShakerLabwareLatchStatusUnknown,
+    PipetteMovementRestrictedByHeaterShakerError,
+    WrongModuleTypeError,
+)
+from ..state.module_substates import HeaterShakerModuleSubState
+from ..state.state import StateStore
+from ..types import (
+    HeaterShakerLatchStatus,
+    HeaterShakerMovementRestrictors,
+    LabwareLocation,
+    ModuleLocation,
+)
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_east_west_slots,
+    get_north_south_slots,
 )
 
 
@@ -39,7 +38,7 @@ class HeaterShakerMovementFlagger:
 
     async def raise_if_labware_latched_on_heater_shaker(
         self, labware_parent: LabwareLocation
-    ) -> None:
+    ) -> bool:
         """Flag unsafe movements to a heater-shaker.
 
         If the given labware is on a heater-shaker, and that heater-shaker's labware
@@ -47,18 +46,18 @@ class HeaterShakerMovementFlagger:
         hardware API (for non-virtual modules), raises HeaterShakerLabwareLatchNotOpenError.
         If it is a virtual module, checks only for heater-shaker latch state in engine.
 
-        Otherwise, no-ops.
+        Otherwise, returns True.
         """
         if isinstance(labware_parent, ModuleLocation):
             module_id = labware_parent.moduleId
         else:
-            return  # Labware not on a module.
+            return True  # Labware not on a module.
         try:
             hs_substate = self._state_store.modules.get_heater_shaker_module_substate(
                 module_id=module_id
             )
         except WrongModuleTypeError:
-            return  # Labware on a module, but not a Heater-Shaker.
+            return True  # Labware on a module, but not a Heater-Shaker.
 
         if hs_substate.labware_latch_status == HeaterShakerLatchStatus.CLOSED:
             raise HeaterShakerLabwareLatchNotOpenError(
@@ -73,6 +72,7 @@ class HeaterShakerMovementFlagger:
         # do a hardware state check to be sure that the latch is truly open
         if not self._state_store.config.use_virtual_modules:
             await self._check_hardware_module_latch_status(hs_substate)
+        return True
 
     async def _check_hardware_module_latch_status(
         self, hs_substate: HeaterShakerModuleSubState
@@ -151,8 +151,11 @@ class HeaterShakerMovementFlagger:
         destination_slot: int,
         is_multi_channel: bool,
         destination_is_tip_rack: bool,
-    ) -> None:
-        """Flag restricted movement around/to a Heater-Shaker."""
+    ) -> bool:
+        """Flag restricted movement around/to a Heater-Shaker.
+
+        Returns True if it does not raise.
+        """
         for hs_movement_restrictor in hs_movement_restrictors:
             dest_east_west = destination_slot in get_east_west_slots(
                 hs_movement_restrictor.deck_slot
@@ -202,6 +205,7 @@ class HeaterShakerMovementFlagger:
                     raise PipetteMovementRestrictedByHeaterShakerError(
                         "Cannot move 8-Channel pipette to non-tip-rack labware directly in front of or behind a Heater-Shaker"
                     )
+        return True
 
     class _HardwareHeaterShakerMissingError(Exception):
         pass

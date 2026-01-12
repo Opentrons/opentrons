@@ -3,7 +3,7 @@ from typing import Optional, Union
 
 from opentrons.types import Point
 
-from .models import TipComparisonMap, PipetteOffsetComparisonMap, DeckComparisonMap
+from .models import DeckComparisonMap, PipetteOffsetComparisonMap, TipComparisonMap
 
 WILDCARD = "*"
 

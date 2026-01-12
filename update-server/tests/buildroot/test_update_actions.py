@@ -7,8 +7,8 @@ import binascii
 import hashlib
 import os
 import subprocess
-from unittest import mock
 import zipfile
+from unittest import mock
 
 import pytest
 

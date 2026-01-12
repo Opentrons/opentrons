@@ -2,20 +2,20 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional, Dict, Union, TypeVar, Generic
+from typing import Dict, Generic, Optional, TypeVar, Union
 
 from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers import utils
-from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.asyncio.communication import (
-    SerialConnection,
     AsyncResponseSerialConnection,
     AsyncSerial,
+    SerialConnection,
     UnhandledGcode,
 )
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
-from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
+from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
 
 log = logging.getLogger(__name__)
 

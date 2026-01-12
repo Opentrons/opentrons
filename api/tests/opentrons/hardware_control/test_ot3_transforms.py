@@ -1,11 +1,14 @@
-import pytest
 from typing import Dict, Optional
 from unittest import mock
+
+import pytest
+
+from opentrons_shared_data.pipette import name_for_model
+from opentrons_shared_data.pipette.types import PipetteModel
+
 from opentrons import types
 from opentrons.hardware_control import ot3api
 from opentrons.hardware_control.types import Axis
-from opentrons_shared_data.pipette import name_for_model
-from opentrons_shared_data.pipette.types import PipetteModel
 
 
 @pytest.mark.parametrize(
@@ -50,7 +53,8 @@ async def test_transform_values(
     }
     sim = await ot3api.OT3API.build_hardware_simulator(attached_instruments=attached)
     target = types.Point(20, 30, 40)
-    with mock.patch.object(
+    # mypy has some support for mock.patch.object but not for magicmock
+    with mock.patch.object(  # type: ignore[call-overload]
         sim._backend,
         "move",
         mock.MagicMock(side_effect=sim._backend.move),
@@ -72,7 +76,8 @@ async def test_transform_values(
         assert mock_move.call_args[0][1][Axis.Y] == point[1]
         assert mock_move.call_args[0][1][Axis.Z_R] == point[2]
 
-    with mock.patch.object(
+    # mypy has some support for mock.patch.object but not for magicmock
+    with mock.patch.object(  # type: ignore[call-overload]
         sim._backend,
         "move",
         mock.MagicMock(side_effect=sim._backend.move),

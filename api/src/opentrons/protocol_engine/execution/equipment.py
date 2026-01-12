@@ -1,32 +1,11 @@
 """Equipment command side-effect logic."""
 
 from dataclasses import dataclass
-from typing import Optional, overload, List
+from typing import List, Optional, overload
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 
-from opentrons.calibration_storage.helpers import uri_from_details
-from opentrons.types import MountType
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import (
-    AbstractModule,
-    MagDeck,
-    HeaterShaker,
-    TempDeck,
-    Thermocycler,
-    AbsorbanceReader,
-    FlexStacker,
-)
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_engine.state.module_substates import (
-    MagneticModuleId,
-    HeaterShakerModuleId,
-    TemperatureModuleId,
-    ThermocyclerModuleId,
-    AbsorbanceReaderId,
-    FlexStackerId,
-)
 from ..errors import (
     FailedToLoadPipetteError,
     LabwareDefinitionDoesNotExistError,
@@ -34,22 +13,43 @@ from ..errors import (
 )
 from ..resources import (
     LabwareDataProvider,
-    ModuleDataProvider,
     ModelUtils,
+    ModuleDataProvider,
     pipette_data_provider,
 )
-from ..state.state import StateStore
 from ..state.modules import HardwareModule
+from ..state.state import StateStore
 from ..types import (
-    LabwareLocation,
-    DeckSlotLocation,
-    LabwareOffset,
-    ModuleModel,
-    ModuleDefinition,
     AddressableAreaLocation,
+    DeckSlotLocation,
+    LabwareLocation,
+    LabwareOffset,
     LoadedLabware,
+    ModuleDefinition,
+    ModuleModel,
     OnLabwareLocation,
 )
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import (
+    AbsorbanceReader,
+    AbstractModule,
+    FlexStacker,
+    HeaterShaker,
+    MagDeck,
+    TempDeck,
+    Thermocycler,
+)
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine.state.module_substates import (
+    AbsorbanceReaderId,
+    FlexStackerId,
+    HeaterShakerModuleId,
+    MagneticModuleId,
+    TemperatureModuleId,
+    ThermocyclerModuleId,
+)
+from opentrons.types import MountType
 
 
 @dataclass(frozen=True)

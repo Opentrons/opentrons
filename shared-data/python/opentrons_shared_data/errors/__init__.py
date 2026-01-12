@@ -8,11 +8,11 @@ our static analysis and dev setup.
 """
 
 from .categories import ErrorCategories, ErrorCategory
-from .codes import ErrorCodes, ErrorCode
+from .codes import ErrorCode, ErrorCodes
 from .exceptions import (
     EnumeratedError,
-    PythonException,
     GeneralError,
+    PythonException,
     RoboticsControlError,
     RoboticsInteractionError,
 )

@@ -1,14 +1,14 @@
 from typing import Optional
+
 from typing_extensions import Protocol
 
-from opentrons.types import Point
-from opentrons.hardware_control.types import CriticalPoint, TipScrapeType
-from .types import MountArgType, CalibrationType, ConfigType
-
+from .calibratable import Calibratable
+from .configurable import Configurable
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
-from .configurable import Configurable
-from .calibratable import Calibratable
+from .types import CalibrationType, ConfigType, MountArgType
+from opentrons.hardware_control.types import CriticalPoint, TipScrapeType
+from opentrons.types import Point
 
 
 class LiquidHandler(

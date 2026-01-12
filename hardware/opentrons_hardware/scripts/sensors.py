@@ -1,16 +1,11 @@
 """A script for sending and receiving data from sensors on the OT3."""
 
-import logging
-import asyncio
 import argparse
+import asyncio
+import logging
 from enum import Enum
-from typing import Type, Sequence, Callable, Tuple
 from logging.config import dictConfig
-
-from opentrons_hardware.drivers.can_bus import build
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
+from typing import Callable, Sequence, Tuple, Type
 
 from .sensor_utils import (
     SensorRun,
@@ -18,6 +13,10 @@ from .sensor_utils import (
     handle_environment_sensor,
     handle_pressure_sensor,
 )
+from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorType
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]

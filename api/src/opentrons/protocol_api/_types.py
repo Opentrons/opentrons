@@ -1,6 +1,8 @@
 from __future__ import annotations
-from typing_extensions import Final
+
 import enum
+
+from typing_extensions import Final
 
 
 # Implemented with an enum to support type narrowing via `== OFF_DECK`.

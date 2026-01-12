@@ -1,41 +1,42 @@
 """Tests for the EngineStore interface."""
 
 from datetime import datetime
-from textwrap import dedent
 from pathlib import Path
+from textwrap import dedent
+
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-
-from opentrons.protocol_engine.error_recovery_policy import never_recover
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI, API
-from opentrons.hardware_control.types import (
-    EstopStateNotification,
-    EstopState,
-    AsynchronousModuleErrorNotification,
-)
+from opentrons.hardware_control import API, HardwareControlAPI
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
+from opentrons.hardware_control.types import (
+    AsynchronousModuleErrorNotification,
+    EstopState,
+    EstopStateNotification,
+)
 from opentrons.protocol_engine import (
     StateSummary,
+)
+from opentrons.protocol_engine import (
     types as pe_types,
 )
-from opentrons.protocol_runner import RunResult, RunOrchestrator
+from opentrons.protocol_engine.error_recovery_policy import never_recover
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_engine.resources import FileProvider
-from opentrons.protocol_engine.resources import CameraProvider
+from opentrons.protocol_runner import RunOrchestrator, RunResult
+from opentrons.types import DeckSlotName
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
+from opentrons_shared_data.robot.types import RobotType
 
+from robot_server.protocols.protocol_models import ProtocolKind
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
-    RunConflictError,
     NoRunOrchestrator,
+    RunConflictError,
+    RunOrchestratorStore,
     handle_hardware_event,
 )
-from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.protocols.protocol_models import ProtocolKind
 
 
 def mock_notify_publishers() -> None:

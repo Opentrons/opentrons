@@ -64,7 +64,7 @@ export function Collapsible({
         <Icon
           size={SIZE_1}
           name={expanded ? collapse : expand}
-          aria-label={`expandedIcon` ?? 'plus'}
+          aria-label={expandedIcon != null ? 'expandedIcon' : 'plus'}
         />
       </Flex>
       <Box css={expanded ? EXPANDED_STYLE : COLLAPSED_STYLE}>{children}</Box>

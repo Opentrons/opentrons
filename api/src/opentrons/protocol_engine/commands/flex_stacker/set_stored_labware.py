@@ -1,43 +1,44 @@
 """Command models to configure the stored labware pool of a Flex Stacker.."""
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING, Annotated
-from typing_extensions import Type
+
+from typing import TYPE_CHECKING, Annotated, Literal, Optional
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Type
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors import (
     ErrorOccurrence,
 )
 from ...errors.exceptions import FlexStackerNotLogicallyEmptyError
 from ...types import (
-    StackerStoredLabwareGroup,
+    SYSTEM_LOCATION,
+    InStackerHopperLocation,
     LabwareLocationSequence,
     NotOnDeckLocationSequenceComponent,
-    InStackerHopperLocation,
-    SYSTEM_LOCATION,
+    StackerStoredLabwareGroup,
 )
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from .common import (
     INITIAL_COUNT_DESCRIPTION,
     INITIAL_STORED_LABWARE_DESCRIPTION,
+    adapter_location_sequences_with_default,
     build_ids_to_fill,
     build_or_assign_labware_to_hopper,
-    labware_locations_for_group,
     labware_location_base_sequence,
-    primary_location_sequences,
-    adapter_location_sequences_with_default,
+    labware_locations_for_group,
     lid_location_sequences_with_default,
+    primary_location_sequences,
     validate_labware_pool_compatible_with_stacker,
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
     from opentrons.protocol_engine.resources import ModelUtils
+    from opentrons.protocol_engine.state.state import StateView
 
 SetStoredLabwareCommandType = Literal["flexStacker/setStoredLabware"]
 

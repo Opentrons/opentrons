@@ -1,24 +1,24 @@
 """Pipetting command handling."""
 
-from typing import Optional, Iterator, Tuple
-from typing_extensions import Protocol as TypingProtocol
 from contextlib import contextmanager
+from typing import Iterator, Optional, Tuple
 
-from opentrons.hardware_control import HardwareControlAPI
+from typing_extensions import Protocol as TypingProtocol
 
-from ..state.state import StateView
-from ..state.pipettes import HardwarePipette
-from ..notes import CommandNoteAdder, CommandNote
 from ..errors.exceptions import (
-    TipNotAttachedError,
     InvalidAspirateVolumeError,
-    InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
+    InvalidPushOutVolumeError,
+    TipNotAttachedError,
 )
+from ..notes import CommandNote, CommandNoteAdder
+from ..state.pipettes import HardwarePipette
+from ..state.state import StateView
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.types import WellLocation
 from opentrons.protocol_engine.types.liquid_level_detection import (
-    SimulatedProbeResult,
     LiquidTrackingType,
+    SimulatedProbeResult,
 )
 from opentrons.types import Point
 

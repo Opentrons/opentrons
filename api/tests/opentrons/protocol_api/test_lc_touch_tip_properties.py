@@ -1,23 +1,25 @@
 """Tests for delay properties in the Opentrons protocol API."""
 
-from pydantic import ValidationError
-import pytest
 from typing import Any, Union
-from hypothesis import given, strategies as st, settings
 
-from opentrons.protocol_api._liquid_properties import _build_touch_tip_properties
+import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
+from pydantic import ValidationError
+
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    TouchTipProperties,
     LiquidClassTouchTipParams,
+    TouchTipProperties,
 )
 
 from . import (
     boolean_looking_values,
     invalid_values,
+    negative_or_zero_floats_and_ints,
     positive_non_zero_floats_and_ints,
     reasonable_numbers,
-    negative_or_zero_floats_and_ints,
 )
+from opentrons.protocol_api._liquid_properties import _build_touch_tip_properties
 
 
 def test_touch_tip_properties_enable_and_disable() -> None:
@@ -51,11 +53,7 @@ def test_touch_tip_properties_none_instantiation_combos() -> None:
         _build_touch_tip_properties(
             TouchTipProperties(
                 enable=None,  # type: ignore
-                params=LiquidClassTouchTipParams(
-                    zOffset=None,  # type: ignore
-                    mmFromEdge=1,
-                    speed=1,
-                ),
+                params=LiquidClassTouchTipParams(zOffset=None, mmFromEdge=1, speed=1),  # type: ignore
             )
         )
     with pytest.raises(ValidationError):

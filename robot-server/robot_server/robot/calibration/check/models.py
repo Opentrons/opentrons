@@ -1,9 +1,10 @@
-from typing import Any, Dict, Optional, List
-from typing_extensions import Literal
 from functools import partial
-from pydantic import ConfigDict, BaseModel, Field
+from typing import Any, Dict, List, Optional
 
-from ..helper_classes import RequiredLabware, AttachedPipette
+from pydantic import BaseModel, ConfigDict, Field
+from typing_extensions import Literal
+
+from ..helper_classes import AttachedPipette, RequiredLabware
 
 # NOTE: this would be more accurately typed as
 # a typing.Tuple[float, float, float], but tuple is

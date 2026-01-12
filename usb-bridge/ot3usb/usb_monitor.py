@@ -24,9 +24,10 @@ reading new data.
 
 """
 
-import pyudev  # type: ignore[import-untyped]
 import logging
 import os
+
+import pyudev  # type: ignore[import-untyped]
 
 LOG = logging.getLogger(__name__)
 

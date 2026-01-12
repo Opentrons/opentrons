@@ -1,26 +1,29 @@
 """Tests for Protocol API thermocycler module contexts."""
 
 import inspect
+
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons.legacy_broker import LegacyBroker
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules import TemperatureStatus
-from opentrons.protocol_api.tasks import Task
-from opentrons.protocols.api_support.types import APIVersion
+from opentrons.legacy_broker import LegacyBroker
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     ThermocyclerContext,
+)
+from opentrons.protocol_api import (
     validation as mock_validation,
 )
 from opentrons.protocol_api.core.common import (
+    LabwareCore,
     ProtocolCore,
     ThermocyclerCore,
-    LabwareCore,
 )
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
 from opentrons.protocol_api.labware import Labware, Well
+from opentrons.protocol_api.tasks import Task
+from opentrons.protocols.api_support.types import APIVersion
 
 
 @pytest.fixture(autouse=True)

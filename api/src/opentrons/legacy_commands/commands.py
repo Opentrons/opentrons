@@ -1,19 +1,18 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Sequence, Union, overload, Optional
 
+from typing import TYPE_CHECKING, List, Optional, Sequence, Union, overload
 
-from .helpers import (
-    stringify_location,
-    stringify_disposal_location,
-    stringify_well_list,
-    listify,
-)
 from . import types as command_types
-
-from opentrons.types import Location
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from .helpers import (
+    listify,
+    stringify_disposal_location,
+    stringify_location,
+    stringify_well_list,
+)
 from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.types import Location
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext

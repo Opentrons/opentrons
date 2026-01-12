@@ -57,6 +57,7 @@ describe('flexStackerEmpty', () => {
       {
         moduleId,
         strategy: 'logical',
+        message: 'Take everything out of the Stacker',
       },
       invariantContext,
       robotState
@@ -69,12 +70,13 @@ describe('flexStackerEmpty', () => {
           params: {
             moduleId,
             strategy: 'logical',
-            message: undefined,
+            message: 'Take everything out of the Stacker',
             count: undefined,
           },
         },
       ],
-      python: 'mock_flex_stacker_1.empty()',
+      python:
+        'mock_flex_stacker_1.empty(message="Take everything out of the Stacker")',
     })
   })
   it('creates returns error if bad module state', () => {

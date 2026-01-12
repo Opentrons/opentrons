@@ -1,10 +1,11 @@
 """Interface for interacting with JWT's."""
 
-import jwt
 import logging
-from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from typing import Optional
+
+import jwt
 
 _log = logging.getLogger(__name__)
 

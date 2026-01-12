@@ -7,25 +7,24 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.protocol_engine.resources import labware_validation
-from opentrons.protocol_engine.execution import LoadedLabwareData, EquipmentHandler
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.types import (
-    OnLabwareLocation,
-    OnLabwareLocationSequenceComponent,
-    OnAddressableAreaLocationSequenceComponent,
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.load_lid import (
+    LoadLidImplementation,
+    LoadLidParams,
+    LoadLidResult,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedLabwareData
+from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.state.update_types import (
     LabwareLidUpdate,
     LoadedLabwareUpdate,
     StateUpdate,
 )
-from opentrons.protocol_engine.commands.command import SuccessData
-
-from opentrons.protocol_engine.commands.load_lid import (
-    LoadLidParams,
-    LoadLidResult,
-    LoadLidImplementation,
+from opentrons.protocol_engine.types import (
+    OnAddressableAreaLocationSequenceComponent,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
 )
 
 

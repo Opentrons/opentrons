@@ -1,33 +1,20 @@
 import { forwardRef, useEffect, useState } from 'react'
-import styled, { css } from 'styled-components'
+import clsx from 'clsx'
 
-import {
-  ALIGN_CENTER,
-  BORDERS,
-  COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  Icon,
-  PRODUCT,
-  SPACING,
-  StyledText,
-  TEXT_ALIGN_RIGHT,
-  Tooltip,
-  TYPOGRAPHY,
-  useHoverTooltip,
-} from '@opentrons/components'
+import { StyledText, Tooltip } from '../../atoms'
+import { COLORS } from '../../helix-design-system'
+import { Icon } from '../../icons'
+import { useHoverTooltip } from '../../tooltips/useHoverTooltip'
+import { SPACING } from '../../ui-style-constants'
+import styles from './textareafield.module.css'
 
-import type { FlattenSimpleInterpolation } from 'styled-components'
 import type {
   ChangeEventHandler,
   FocusEvent,
   MouseEvent,
   MutableRefObject,
 } from 'react'
-import type { IconName } from '@opentrons/components'
-
-const COLOR_WARNING_DARK = '#9e5e00' // ToDo (kk:08/13/2024) replace this with COLORS
+import type { IconName } from '../../icons'
 
 // hook to detect tab focus vs mouse focus
 const useFocusVisible = (): boolean => {
@@ -55,7 +42,7 @@ const useFocusVisible = (): boolean => {
   return isKeyboardFocus
 }
 
-export interface TextAreaFieldProps {
+interface TextAreaFieldProps {
   /** field is disabled if value is true */
   disabled?: boolean
   /** change handler */
@@ -132,7 +119,12 @@ export const TextAreaField = forwardRef<
     caption,
     resize = 'none',
     id,
-    ...textAreaProps
+    name,
+    onChange,
+    onFocus,
+    onBlur,
+    readOnly,
+    autoFocus,
   } = props
 
   const hasError = error != null
@@ -141,176 +133,119 @@ export const TextAreaField = forwardRef<
   const [targetProps, tooltipProps] = useHoverTooltip()
   const isKeyboardFocus = useFocusVisible() // Track focus method
 
+  const wrapperClasses = clsx(
+    styles.wrapper,
+    error != null ? styles.warning_color : styles.default_color,
+    disabled === true && styles.disabled
+  )
+
+  const textareaClasses = clsx(
+    styles.textarea,
+    hasError && styles.textarea_error,
+    hasBackgroundError && styles.textarea_background_error,
+    isKeyboardFocus && styles.textarea_keyboard_focus
+  )
+
+  const titleClasses = clsx(
+    styles.title_text,
+    textAlign === 'center' ? styles.title_text_center : styles.title_text_left
+  )
+
+  const textareaRowClasses = clsx(
+    styles.textarea_row,
+    leftIcon !== undefined && styles.textarea_row_with_icon
+  )
+
   return (
-    <Flex
-      width="100%"
-      alignItems={ALIGN_CENTER}
-      color={error ? COLOR_WARNING_DARK : COLORS.black90}
-      opacity={disabled === true ? 0.5 : ''}
-    >
-      <Flex flexDirection={DIRECTION_COLUMN} width="100%">
+    <div className={wrapperClasses}>
+      <div className={styles.column_container}>
         {title != null && (
-          <Flex
-            flexDirection={DIRECTION_ROW}
-            gridGap={SPACING.spacing8}
-            alignItems={ALIGN_CENTER}
-          >
+          <div className={styles.title_row}>
             <StyledText
               desktopStyle="bodyDefaultRegular"
-              htmlFor={id}
-              css={TITLE_STYLE(textAlign)}
+              className={titleClasses}
             >
               {title}
             </StyledText>
             {tooltipText != null && (
               <>
-                <Flex {...targetProps}>
+                <div {...targetProps} className={styles.tooltip_wrapper}>
                   <Icon
                     name="information"
                     size={SPACING.spacing12}
                     color={COLORS.grey60}
                     data-testid="tooltip-icon"
                   />
-                </Flex>
+                </div>
                 <Tooltip tooltipProps={tooltipProps}>{tooltipText}</Tooltip>
               </>
             )}
-          </Flex>
+          </div>
         )}
-        <Flex
-          width="100%"
-          flexDirection={DIRECTION_COLUMN}
+        <div
+          className={styles.clickable_column}
           onClick={!disabled ? props.onClick : undefined}
         >
-          <Flex
-            alignItems={ALIGN_CENTER}
-            gridGap={leftIcon !== undefined ? SPACING.spacing8 : 0}
-          >
+          <div className={textareaRowClasses}>
             {leftIcon !== undefined && (
-              <Flex>
+              <div className={styles.left_icon_wrapper}>
                 <Icon
                   name={leftIcon}
                   color={COLORS.grey60}
                   size="1.25rem"
                   data-testid="left-icon"
                 />
-              </Flex>
+              </div>
             )}
-            <StyledTextArea
+            <textarea
               data-testid="TextAreaField"
-              hasBackgroundError={hasBackgroundError}
-              hasError={hasError}
-              height={height}
-              padding={padding}
-              borderRadius={borderRadius}
-              resize={resize}
-              {...textAreaProps}
+              className={textareaClasses}
+              style={{
+                borderRadius: borderRadius ?? undefined,
+                padding: padding ?? undefined,
+                height: height ?? undefined,
+                resize: resize,
+              }}
               value={value}
               placeholder={placeHolder}
               onWheel={event => {
                 event.currentTarget.blur()
               }} // prevent value change with scrolling
               ref={ref}
-              isKeyboardFocus={isKeyboardFocus}
               disabled={disabled}
+              id={id}
+              name={name}
+              onChange={onChange}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              readOnly={readOnly}
+              autoFocus={autoFocus}
             />
             {showDeleteIcon && (
-              <Flex
-                alignSelf={TEXT_ALIGN_RIGHT}
-                onClick={onDelete}
-                cursor="pointer"
-              >
+              <div className={styles.delete_icon_wrapper} onClick={onDelete}>
                 <Icon name="close" size="1.75rem" />
-              </Flex>
+              </div>
             )}
-          </Flex>
-        </Flex>
+          </div>
+        </div>
         {caption != null && (
           <StyledText
             desktopStyle="bodyDefaultRegular"
-            css={FORM_BOTTOM_SPACE_STYLE}
+            className={styles.caption_text}
             color={COLORS.grey60}
           >
             {caption}
           </StyledText>
         )}
         {hasError && (
-          <StyledText desktopStyle="bodyDefaultRegular" css={ERROR_TEXT_STYLE}>
+          <StyledText
+            desktopStyle="bodyDefaultRegular"
+            className={styles.error_text}
+          >
             {props.error}
           </StyledText>
         )}
-      </Flex>
-    </Flex>
+      </div>
+    </div>
   )
 })
-
-interface StyledTextAreaProps {
-  resize: 'none' | 'vertical' | 'horizontal' | 'both'
-  hasBackgroundError: boolean
-  hasError?: boolean
-  height?: string
-  padding?: string
-  borderRadius?: string
-  isKeyboardFocus: boolean
-  disabled?: boolean
-}
-
-// Styled component with correct focus behavior
-const StyledTextArea = styled.textarea<StyledTextAreaProps>`
-  background-color: ${({ hasBackgroundError }) =>
-    hasBackgroundError ? COLORS.red30 : COLORS.white};
-  border-radius: ${({ borderRadius }) => borderRadius ?? BORDERS.borderRadius4};
-  padding: ${({ padding }) => padding ?? SPACING.spacing8};
-  border: ${({ hasBackgroundError, hasError }) =>
-    hasBackgroundError
-      ? 'none'
-      : `1px ${BORDERS.styleSolid} ${
-          hasError === true ? COLORS.red50 : COLORS.grey50
-        }`};
-  font-size: ${PRODUCT.TYPOGRAPHY.fontSizeBodyDefaultSemiBold};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-  width: 100%;
-  height: ${({ height }) => height ?? '100%'};
-  resize: ${({ resize }) => resize};
-
-  &:focus {
-    border: 1px ${BORDERS.styleSolid}
-      ${({ hasError }) => (hasError === true ? COLORS.red50 : COLORS.blue50)};
-    outline: none;
-  }
-
-  ${({ isKeyboardFocus }) =>
-    isKeyboardFocus &&
-    `
-      &:focus {
-        border: 1px ${BORDERS.styleSolid} ${COLORS.blue50};
-        outline: 2px ${BORDERS.styleSolid} ${COLORS.blue50};
-        outline-offset: 2px;
-      }
-    `}
-
-  &:disabled {
-    border: 1px ${BORDERS.styleSolid} ${COLORS.grey30};
-    background-color: ${COLORS.grey20};
-  }
-`
-
-const FORM_BOTTOM_SPACE_STYLE = css`
-  padding-top: ${SPACING.spacing4};
-`
-
-const TITLE_STYLE = (
-  textAlign: 'left' | 'center'
-): FlattenSimpleInterpolation => css`
-  color: ${COLORS.grey60};
-  padding-bottom: ${SPACING.spacing4};
-  text-align: ${textAlign};
-  font-size: ${TYPOGRAPHY.fontSizeH3};
-  line-height: ${TYPOGRAPHY.lineHeight20};
-  font-weight: ${TYPOGRAPHY.fontWeightRegular};
-`
-
-const ERROR_TEXT_STYLE = css`
-  color: ${COLORS.red50};
-  padding-top: ${SPACING.spacing4};
-`

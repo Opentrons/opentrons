@@ -3,23 +3,22 @@
 import argparse
 import asyncio
 import logging
-from numpy import float64
 from logging.config import dictConfig
 
-from opentrons_hardware.drivers.can_bus import build, CanMessenger
-from opentrons_hardware.firmware_bindings.constants import NodeId
+from numpy import float64
 
+from opentrons_hardware.drivers.can_bus import CanMessenger, build
+from opentrons_hardware.drivers.gpio import OT3GPIO
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     EnableMotorRequest,
 )
 from opentrons_hardware.hardware_control.motion import (
-    MoveGroupSingleAxisStep,
     MoveGroups,
+    MoveGroupSingleAxisStep,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-
-from opentrons_hardware.drivers.gpio import OT3GPIO
 
 log = logging.getLogger(__name__)
 

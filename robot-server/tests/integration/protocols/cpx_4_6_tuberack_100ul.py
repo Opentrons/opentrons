@@ -1,7 +1,7 @@
 from typing import List
+
 from opentrons import protocol_api
 from opentrons.protocol_api.labware import Labware, Well
-
 
 PIPETTE_MOUNT = "right"
 PIPETTE_NAME = "p20_single_gen2"

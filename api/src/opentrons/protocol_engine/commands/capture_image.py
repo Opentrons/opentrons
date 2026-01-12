@@ -1,42 +1,42 @@
 """Command models to capture an image with a camera."""
 
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Tuple, Any
-from datetime import datetime
 
-from typing_extensions import Literal, Type
+from datetime import datetime
+from typing import TYPE_CHECKING, Any, Optional, Tuple
+
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal, Type
 
 from opentrons_shared_data.data_files import MimeType
-from opentrons.system.camera import (
-    CONTRAST_DEFAULT,
-    BRIGHTNESS_DEFAULT,
-    SATURATION_DEFAULT,
-    ZOOM_MIN,
-    ZOOM_MAX,
-    ZOOM_DEFAULT,
-    RESOLUTION_MIN,
-    RESOLUTION_MAX,
-    RESOLUTION_DEFAULT,
-)
-from ..types import PreconditionTypes
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+
 from ..errors import (
     CameraDisabledError,
     CameraSettingsInvalidError,
     FileNameInvalidError,
 )
 from ..errors.error_occurrence import ErrorOccurrence
-
+from ..resources import CameraProvider, FileProvider
+from ..resources.camera_provider import ImageParameters
 from ..resources.file_provider import (
+    SPECIAL_CHARACTERS,
     ImageCaptureCmdFileNameMetadata,
 )
-from ..resources import FileProvider
-from ..resources.file_provider import SPECIAL_CHARACTERS
-from ..resources import CameraProvider
-from ..resources.camera_provider import ImageParameters
 from ..state import update_types
+from ..types import PreconditionTypes
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.system.camera import (
+    BRIGHTNESS_DEFAULT,
+    CONTRAST_DEFAULT,
+    RESOLUTION_DEFAULT,
+    RESOLUTION_MAX,
+    RESOLUTION_MIN,
+    SATURATION_DEFAULT,
+    ZOOM_DEFAULT,
+    ZOOM_MAX,
+    ZOOM_MIN,
+)
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.state.state import StateView

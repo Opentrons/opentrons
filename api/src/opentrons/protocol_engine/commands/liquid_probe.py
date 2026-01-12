@@ -1,39 +1,21 @@
 """The liquidProbe and tryLiquidProbe commands."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, NamedTuple, Optional, Type, Union, Any
 
-from typing_extensions import Literal
+from typing import TYPE_CHECKING, Any, NamedTuple, Optional, Type, Union
+
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal
 
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.errors.exceptions import (
-    MustHomeError,
-    PipetteNotReadyToAspirateError,
-    TipNotEmptyError,
-    IncompleteLabwareDefinitionError,
-    TipNotAttachedError,
-)
-from opentrons.types import MountType
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
-    UnsupportedHardwareCommand,
     PipetteOverpressureError,
+    UnsupportedHardwareCommand,
 )
 
+from ..errors.error_occurrence import ErrorOccurrence
 from ..types import DeckPoint, LiquidTrackingType
-from .pipetting_common import (
-    LiquidNotFoundError,
-    PipetteIdMixin,
-    OverpressureError,
-)
-from .movement_common import (
-    WellLocationMixin,
-    DestinationPositionResult,
-    StallOrCollisionError,
-    move_to_well,
-)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -41,11 +23,29 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-
-from ..errors.error_occurrence import ErrorOccurrence
+from .movement_common import (
+    DestinationPositionResult,
+    StallOrCollisionError,
+    WellLocationMixin,
+    move_to_well,
+)
+from .pipetting_common import (
+    LiquidNotFoundError,
+    OverpressureError,
+    PipetteIdMixin,
+)
+from opentrons.protocol_engine.errors.exceptions import (
+    IncompleteLabwareDefinitionError,
+    MustHomeError,
+    PipetteNotReadyToAspirateError,
+    TipNotAttachedError,
+    TipNotEmptyError,
+)
+from opentrons.protocol_engine.state import update_types
+from opentrons.types import MountType
 
 if TYPE_CHECKING:
-    from ..execution import MovementHandler, PipettingHandler, GantryMover
+    from ..execution import GantryMover, MovementHandler, PipettingHandler
     from ..resources import ModelUtils
     from ..state.state import StateView
 

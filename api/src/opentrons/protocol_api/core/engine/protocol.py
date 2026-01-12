@@ -1,21 +1,87 @@
 """ProtocolEngine-based Protocol API core implementation."""
 
 from __future__ import annotations
-from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING, Sequence
 
-from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Type, Union
+
+from opentrons_shared_data import liquid_classes
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data import liquid_classes
+from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
+from ... import validation
+from ..._liquid import Liquid, LiquidClass
+from ..._types import OffDeckType
+from ...disposal_locations import TrashBin, WasteChute
+from ..labware import LabwareLoadParams
+from ..protocol import AbstractProtocol
+from . import (
+    _default_liquid_class_versions,
+    deck_conflict,
+    load_labware_params,
+    overlap_versions,
+)
+from .exceptions import InvalidModuleLocationError
+from .instrument import InstrumentCore
+from .labware import LabwareCore
+from .module_core import (
+    AbsorbanceReaderCore,
+    FlexStackerCore,
+    HeaterShakerModuleCore,
+    MagneticBlockCore,
+    MagneticModuleCore,
+    ModuleCore,
+    NonConnectedModuleCore,
+    TemperatureModuleCore,
+    ThermocyclerModuleCore,
+)
+from .robot import RobotCore
+from .tasks import EngineTaskCore
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine import (
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadedLabware,
+    LoadedModule,
+    ModuleLocation,
+    OnLabwareLocation,
+)
+from opentrons.protocol_engine import (
+    ModuleModel as EngineModuleModel,
+)
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.commands import LoadModuleResult
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnLabwareError,
+    LabwareNotLoadedOnModuleError,
+)
+from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    LoadableLabwareLocation,
+    NonStackedLocation,
+)
+from opentrons.protocol_engine.types import (
+    ModuleModel as ProtocolEngineModuleModel,
+)
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
@@ -24,69 +90,6 @@ from opentrons.types import (
     Point,
     StagingSlotName,
 )
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
-from opentrons.hardware_control.types import DoorState
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
-from opentrons.protocols.api_support.types import APIVersion
-
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons.protocol_engine import (
-    DeckSlotLocation,
-    AddressableAreaLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    ModuleModel as EngineModuleModel,
-    LabwareMovementStrategy,
-    LabwareOffsetVector,
-    LoadedLabware,
-    LoadedModule,
-)
-from opentrons.protocol_engine.types import (
-    ModuleModel as ProtocolEngineModuleModel,
-    OFF_DECK_LOCATION,
-    SYSTEM_LOCATION,
-    LoadableLabwareLocation,
-    WASTE_CHUTE_LOCATION,
-    NonStackedLocation,
-)
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors import (
-    LabwareNotLoadedOnModuleError,
-    LabwareNotLoadedOnLabwareError,
-)
-
-from ... import validation
-from ..._types import OffDeckType
-from ..._liquid import Liquid, LiquidClass
-from ...disposal_locations import TrashBin, WasteChute
-from ..protocol import AbstractProtocol
-from ..labware import LabwareLoadParams
-from .labware import LabwareCore
-from .tasks import EngineTaskCore
-from .instrument import InstrumentCore
-from .robot import RobotCore
-from .module_core import (
-    ModuleCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    ThermocyclerModuleCore,
-    HeaterShakerModuleCore,
-    NonConnectedModuleCore,
-    MagneticBlockCore,
-    AbsorbanceReaderCore,
-    FlexStackerCore,
-)
-from .exceptions import InvalidModuleLocationError
-from . import (
-    load_labware_params,
-    deck_conflict,
-    overlap_versions,
-    _default_liquid_class_versions,
-)
-from opentrons.protocol_engine.resources import labware_validation
 
 if TYPE_CHECKING:
     from ...labware import Labware

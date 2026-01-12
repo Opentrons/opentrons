@@ -1,7 +1,8 @@
 """Tests for the default values in built-in liquid class definitions."""
 
-import pytest
 from typing import List
+
+import pytest
 
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.liquid_classes import load_definition

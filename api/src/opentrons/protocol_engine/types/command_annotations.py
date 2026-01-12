@@ -1,9 +1,10 @@
 """Protocol Engine types dealing with command annotations."""
 
-from typing import List, Literal, Dict, Any, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Union
+
 from pydantic import (
-    ConfigDict,
     BaseModel,
+    ConfigDict,
     Field,
 )
 
