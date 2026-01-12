@@ -19,6 +19,7 @@ Protocol Designer protocols can control Opentrons modules on the Flex or OT-2, a
 | Magnetic Block | <ul><li>Up to 11 modules</li><li>GEN1 only</li><li>Slots A1–D3</li></ul> | Not compatible |
 | Magnetic Module | Not compatible | <ul><li>1 module only</li><li>GEN1 or GEN2</li><li>Slot 1, 3, 4, 6, 7, 9, or 10</li></ul> |
 | Temperature Module | <ul><li>Up to 7 modules</li><li>GEN2 only</li><li>Slots A1–D1 or A3–D3</li></ul> | <ul><li>1 module only</li><li>GEN1 or GEN2 only</li><li>Slot 1, 3, 4, 6, 7, 9, or 10</li></ul> |
+| Flex Stacker Module | <ul><li>Up to 4 modules</li><li>GEN1 only</li><li>Slots A4–D4 | Not compatible |
 
 
 On the Flex, you can also customize fixtures, including the waste chute, trash bin, and staging areas, to optimize deck space. 
