@@ -40,11 +40,11 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   const savedStepForms = useSelector(getSavedStepForms)
   const initialLabwareIds =
     (savedStepForms[formData.id]?.fillLabwareIds as string[]) ?? []
-  const oldFillQuantity = initialLabwareIds.length
+  const oldFillQuantity = initialLabwareIds?.length ?? 0
   const [fillQuantityLocalState, setFillQuantityState] = useState<
     string | null
     // initialize if saved step form exists
-  >(initialLabwareIds.length > 0 ? String(initialLabwareIds.length) : null)
+  >(oldFillQuantity > 0 ? String(initialLabwareIds.length) : null)
   const storedEntity = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => {
       return labwareDefURI === storedLabwareDetails?.primaryLabwareURI
@@ -70,6 +70,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
     // and raise an error.
     if (valueTooHigh) {
       propsForFields.fillLabwareIds.updateValue([])
+    }
     if (difference > 0) {
       const additionalIds = Array.from(
         { length: difference },
