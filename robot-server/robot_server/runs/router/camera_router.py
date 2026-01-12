@@ -214,7 +214,17 @@ async def get_camera_capture_image_settings(
         robot_type: Used to validate robot type for live stream service.
         camera_provider: Access to the camera settings and related services.
     """
-    result = run_orchestrator_store.get_camera_capture_image_settings()
+    result = run_orchestrator_store.get_camera_capture_image_settings(
+        camera_id=cameraId
+    )
+
+    if result.cameraId != cameraId:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(
+                f"No stored camera image settings for Camera ID: {cameraId}, current settings are for {result.cameraId}."
+            ),
+        )
 
     return result
 

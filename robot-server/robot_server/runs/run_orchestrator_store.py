@@ -459,10 +459,17 @@ class RunOrchestratorStore:
         return self.run_orchestrator.get_is_run_terminal()
 
     def get_camera_capture_image_settings(
-        self,
+        self, camera_id: str
     ) -> CameraCaptureImageSettings:
         """Get camera capture image settings to state."""
         settings = self.run_orchestrator.get_camera_capture_image_settings()
+
+        # todo(chb, 2026-01-12): Currently we only store one set of camera settings in the camera store at a time.
+        # Storing multiple will mean updating get_camera_capture_image_settings() to return specific cameras.
+        if camera_id != settings["camera_id"]:
+            _log.info(
+                f"Stored camera ID does not match provided ID, returning stored data for camera ID {settings['camera_id']}."
+            )
         return CameraCaptureImageSettings(
             cameraId=settings["camera_id"],
             resolution=settings["resolution"],
