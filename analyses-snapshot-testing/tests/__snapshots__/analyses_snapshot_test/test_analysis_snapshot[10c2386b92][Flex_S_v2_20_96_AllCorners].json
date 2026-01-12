@@ -7092,7 +7092,8 @@
               "stagingAreaRightSlot",
               "stagingAreaSlotWithMagneticBlockV1",
               "stagingAreaSlotWithWasteChuteRightAdapterCovered",
-              "stagingAreaSlotWithWasteChuteRightAdapterNoCover"
+              "stagingAreaSlotWithWasteChuteRightAdapterNoCover",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
