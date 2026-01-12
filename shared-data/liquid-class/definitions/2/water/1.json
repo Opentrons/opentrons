@@ -125,7 +125,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -216,7 +224,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -383,7 +399,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -474,7 +498,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -641,7 +673,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -727,7 +767,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -889,7 +937,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -975,7 +1031,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1142,7 +1206,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1233,7 +1305,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1400,7 +1480,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1491,7 +1579,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1658,7 +1754,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1744,7 +1848,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1906,7 +2018,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -1992,7 +2112,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2159,7 +2287,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 318.0
+                  "flowRate": 318.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2243,7 +2379,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 478.0
+                  "flowRate": 478.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2409,7 +2553,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 478.0
+                  "flowRate": 478.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2493,7 +2645,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 478.0
+                  "flowRate": 478.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2655,7 +2815,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2735,7 +2903,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2893,7 +3069,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -2973,7 +3157,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3131,7 +3323,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3211,7 +3411,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3369,7 +3577,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3449,7 +3665,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3616,7 +3840,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 478.0
+                  "flowRate": 478.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3700,7 +3932,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 478.0
+                  "flowRate": 478.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3866,7 +4106,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 478.0
+                  "flowRate": 478.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -3950,7 +4198,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 478.0
+                  "flowRate": 478.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4112,7 +4368,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4192,7 +4456,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4350,7 +4622,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4430,7 +4710,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4588,7 +4876,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4668,7 +4964,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4826,7 +5130,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -4906,7 +5218,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 716.0
+                  "flowRate": 716.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5073,7 +5393,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5164,7 +5492,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5331,7 +5667,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5422,7 +5766,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 50.0
+                  "flowRate": 50.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5585,7 +5937,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5665,7 +6025,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5823,7 +6191,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -5908,7 +6284,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6067,7 +6451,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6152,7 +6544,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6310,7 +6710,15 @@
                 "enable": true,
                 "params": {
                   "location": "destination",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6395,7 +6803,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 80.0
+                  "flowRate": 80.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6558,7 +6974,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6638,7 +7062,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6796,7 +7228,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -6876,7 +7316,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7034,7 +7482,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7114,7 +7570,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7272,7 +7736,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7352,7 +7824,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7510,7 +7990,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7590,7 +8078,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7748,7 +8244,15 @@
                 "enable": false,
                 "params": {
                   "location": "destination",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 2
+                    }
+                  }
                 }
               },
               "touchTip": {
@@ -7828,7 +8332,15 @@
                 "enable": true,
                 "params": {
                   "location": "trash",
-                  "flowRate": 200.0
+                  "flowRate": 200.0,
+                  "blowoutPosition": {
+                    "positionReference": "well-top",
+                    "offset": {
+                      "x": 0,
+                      "y": 0,
+                      "z": 0
+                    }
+                  }
                 }
               },
               "touchTip": {
