@@ -24,6 +24,7 @@ import {
 } from '@opentrons/components'
 import {
   getSlotInLocationStack,
+  HOPPER_STACKER_LOCATION,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
@@ -131,6 +132,8 @@ export function AssignLiquidsModal(
     ),
   }
 
+  const labwareIsOnHopper = labwareStack.includes(HOPPER_STACKER_LOCATION)
+
   return (
     <Flex
       height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
@@ -139,7 +142,7 @@ export function AssignLiquidsModal(
       position={POSITION_RELATIVE}
     >
       <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
-        {labwareStack.length > 1 ? (
+        {labwareIsOnHopper && labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
             selectedLabwareIds={selectedLabwareIds}
