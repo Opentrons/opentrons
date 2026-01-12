@@ -68,7 +68,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
 
   const [fillQuantityLocalState, setFillQuantityState] = useState<
     string | null
-  // initialize if saved step form exists
+    // initialize if saved step form exists
   >(oldGroupQuantity > 0 ? String(oldGroupQuantity) : null)
 
   const numberOfGroupsInHopper = labwareInHopper?.length ?? 0
@@ -82,8 +82,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   useEffect(() => {
     const newGroupQuantity = Number(fillQuantityLocalState) ?? 1
     const difference = newGroupQuantity - oldGroupQuantity
-    const valueTooHigh =
-      newGroupQuantity > maxRefillGroupQuantity
+    const valueTooHigh = newGroupQuantity > maxRefillGroupQuantity
     // Form errors do not have acccess to module state, so this logic is used
     // to clear out the fillLabwareIds value if the quantity entered is too high
     // and raise an error.
