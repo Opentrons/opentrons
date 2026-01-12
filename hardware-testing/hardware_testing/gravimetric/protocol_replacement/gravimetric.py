@@ -642,6 +642,7 @@ def _get_tips_for_test(
         and fixture_settings.channels[0] == 0
         and not fixture_settings.cavity_test
     ):
+        # Liquid class testing use whole tip rack
         return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
