@@ -12,11 +12,11 @@ Labware encompasses more than just the objects placed on the deck and used in a 
 
 ## Labware as hardware
 
-Think of labware as the durable components and consumable items that you work with, reuse, or discard while running a protocol. Single-use items like well plates, reservoirs, tubes, tip racks, and lids are labware. So are reusable items like aluminum blocks. Other items that go on or in the deck, like modules and the standard deck slots themselves, are not considered labware in the robot's software.
+Think of labware as the durable components and consumable items that you work with, reuse, or discard while running a protocol. Single-use items like well plates, reservoirs, tubes, tip racks, and lids are labware. So are reusable items like aluminum blocks. Other items that go on the deck, like modules, are not considered labware in the robot's software.
 
 ## Opentrons-verified labware
 
-Opentrons has prepared information about common labware for our Labware Library. This information is stored in Javascript object notation (JSON) files with `.json` file extensions. A JSON file includes spatial dimensions (length, width, height), volumetric capacity (µL, mL), and other metrics that define the labware's surface features, their shapes, and locations. Newer labware definitions also include information about the internal shapes of wells within labware. When running a protocol, the OT-2 reads the data in these files to know what labware is on the deck and how to work with it.
+Opentrons has prepared information about common labware for our Labware Library. This information is stored in Javascript object notation (JSON) files with `.json` file extensions. A JSON file includes spatial dimensions (length, width, height), volumetric capacity (µL, mL), and other metrics that define the labware's surface features, their shapes, and locations. When running a protocol, the OT-2 reads the data in these files to know what labware is on the deck and how to work with it.
 
 ## Custom labware
 
