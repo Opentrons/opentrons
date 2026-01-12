@@ -39,11 +39,11 @@ robot = [
 # Robot group is always included in dev to ensure dev environment matches robot
 dev = [
     {include-group = "robot"},
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "ruff==0.14.10",
     "twine==4.0.0",
     "wheel==0.37.1",
-    "pytest>=8.4.0,<9",
+    "pytest>=9.0.2",
     "pytest-cov==4.1.0",
     "pytest-xdist~=3.5.0",
     "typeguard~=4.4.4",
@@ -75,7 +75,7 @@ build-backend = 'hatchling.build'
 #[tool.setuptools_scm]
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90", "I"]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "python/opentrons_shared_data/load.py" = ["D"]
@@ -83,8 +83,10 @@ ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 "python/opentrons_shared_data/labware/*" = ["D"]
 "python/opentrons_shared_data/module/*" = ["D"]
 "python/opentrons_shared_data/pipette/*" = ["D"]
+"python/opentrons_shared_data/pipette/scripts/*" = ["T201"]
 "python/opentrons_shared_data/protocol/*" = ["D"]
-"python_tests/*" = ["ANN", "D"]
+"python_tests/*" = ["ANN", "D", "T201"]
+"tools/*" = ["T201"]
 "python/opentrons_shared_data/_version.py" = ["I"]
 
 [tool.ruff.lint.pydocstyle]

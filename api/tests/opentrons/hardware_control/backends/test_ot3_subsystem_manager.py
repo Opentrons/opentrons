@@ -133,7 +133,7 @@ async def can_messenger(decoy: Decoy) -> can_bus.CanMessenger:
         listeners.append(listener)
 
     decoy.when(
-        mock_messenger.add_listener(
+        mock_messenger.add_listener(  # type: ignore[func-returns-value]
             cast(Any, matchers.Anything()), cast(Any, matchers.Anything())
         )
     ).then_do(_add)
@@ -184,7 +184,7 @@ async def can_messenger(decoy: Decoy) -> can_bus.CanMessenger:
             )
 
     decoy.when(
-        await mock_messenger.send(
+        await mock_messenger.send(  # type: ignore[func-returns-value]
             node_id=NodeId.broadcast, message=GetMotorUsageRequest()
         )
     ).then_do(_send_response)
@@ -279,7 +279,7 @@ class ToolDetectionController:
         async def _adder() -> None:
             await self._detection_queue.put(results)
 
-        self._decoy.when(await self._tool_detector.check_once()).then_do(_adder)
+        self._decoy.when(await self._tool_detector.check_once()).then_do(_adder)  # type: ignore[func-returns-value]
         return results
 
     async def add_detection_immediate(

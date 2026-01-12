@@ -150,11 +150,11 @@ def prompt_payload(
             # we have to hack around message_index for now until we update to 3.10
             # then message index can work like everything else. see payloads.py
             if not (f.name == "message_index"):
-                i[f.name] = f.type.from_string(
+                i[f.name] = f.type.from_string(  # type: ignore[union-attr]
                     get_user_input(f"enter {f.name}: ").strip()
                 )
             else:
-                message_index = f.type.from_string(
+                message_index = f.type.from_string(  # type: ignore[union-attr]
                     get_user_input(f"enter {f.name}: ").strip()
                 )
         except ValueError as e:

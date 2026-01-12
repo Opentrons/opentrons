@@ -137,7 +137,7 @@ async def test_set_does_not_persist_invalid_avahi_service_name(
     https://github.com/Opentrons/opentrons/issues/9960
     """
     decoy.when(
-        await mock_avahi_client.start_advertising("danger!", TEST_MACHINE_TYPE)
+        await mock_avahi_client.start_advertising("danger!", TEST_MACHINE_TYPE)  # type: ignore[func-returns-value]
     ).then_raise(Exception("oh the humanity"))
 
     with pytest.raises(Exception, match="oh the humanity"):

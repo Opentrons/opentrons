@@ -247,7 +247,6 @@ def _build_log_files_with_default(
     from_conf: Any,
     default: Optional[Dict[InstrumentProbeType, str]],
 ) -> Optional[Dict[InstrumentProbeType, str]]:
-    print(f"from_conf {from_conf} default {default}")
     if not isinstance(from_conf, dict):
         if default is None:
             return None
@@ -268,7 +267,6 @@ def _build_log_files_with_default(
                     pass
                 else:
                     validated[enumval] = v
-        print(f"result {validated}")
         return validated
 
 

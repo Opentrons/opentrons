@@ -60,13 +60,13 @@ export function HopperLabwareRenders(
   } = props
   const { primaryLabwareId, adapterLabwareId, lidLabwareId } = topLabwareGroup
   const primaryLabware = labwaresOnDeck[primaryLabwareId]
+  if (primaryLabware == null) {
+    return null
+  }
   const labwareInterfaceBoundingBox = {
     xDimension: primaryLabware.def.dimensions.xDimension,
     yDimension: primaryLabware.def.dimensions.yDimension,
     zDimension: 0,
-  }
-  if (primaryLabware == null) {
-    return null
   }
   return (
     <>

@@ -1429,10 +1429,13 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
-  const loadedLabware = stackerState?.storedLabwareDetails?.primaryLabwareURI
-  const labwareToBeStoredEntity = invariantContext.labwareEntities[labwareId]
-  const { labwareDefURI: labwareURIToBeStored } = labwareToBeStoredEntity ?? {}
-  return loadedLabware == null || loadedLabware === labwareURIToBeStored
+  const storedLabwareURIs = Object.values(
+    stackerState?.storedLabwareDetails ?? {}
+  ).reduce<string[]>((acc, val) => {
+    return val != null ? [...acc, val] : acc
+  }, [])
+  const labwareEntity = invariantContext.labwareEntities[labwareId]
+  return storedLabwareURIs.some(uri => labwareEntity?.labwareDefURI === uri)
 }
 
 export const getIsSpaceInHopper = (

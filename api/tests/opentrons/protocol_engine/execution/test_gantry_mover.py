@@ -269,7 +269,7 @@ async def test_move_relative_must_home(
         )
     )
     decoy.when(
-        await mock_hardware_api.move_rel(
+        await mock_hardware_api.move_rel(  # type: ignore[func-returns-value]
             mount=Mount.LEFT,
             delta=Point(x=1, y=2, z=3),
             fail_on_not_homed=True,

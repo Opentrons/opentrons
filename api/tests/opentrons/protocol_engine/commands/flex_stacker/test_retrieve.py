@@ -734,7 +734,7 @@ async def test_retrieve_raises_recoverable_error(
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
 
     decoy.when(
-        await stacker_hardware.dispense_labware(
+        await stacker_hardware.dispense_labware(  # type: ignore[func-returns-value]
             labware_height=16,
         )
     ).then_raise(shared_data_error)

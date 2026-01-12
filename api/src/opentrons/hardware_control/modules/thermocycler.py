@@ -636,7 +636,7 @@ class Thermocycler(mod_abc.AbstractModule):
         hold_time_seconds = step.get("hold_time_seconds", None)
         ramp_rate = step.get("ramp_rate", None)
         await self._set_temperature_no_pause(
-            temperature=temperature,  # type: ignore
+            temperature=temperature,
             hold_time_minutes=hold_time_minutes,
             hold_time_seconds=hold_time_seconds,
             ramp_rate=ramp_rate,

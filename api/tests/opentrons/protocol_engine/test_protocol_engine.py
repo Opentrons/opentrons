@@ -279,7 +279,7 @@ def test_add_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -351,7 +351,7 @@ def test_add_fixit_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -459,7 +459,7 @@ async def test_add_and_execute_command(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -547,7 +547,7 @@ async def test_add_and_execute_command_wait_for_recovery(
     )
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             QueueCommandAction(
                 command_id="command-id-validated",
                 created_at=created_at,
@@ -886,7 +886,7 @@ async def test_finish_stops_hardware_if_queue_worker_join_fails(
     """It should be able to stop the engine."""
     exception = RuntimeError("oh no")
     decoy.when(
-        await queue_worker.join(),
+        await queue_worker.join(),  # type: ignore[func-returns-value]
     ).then_raise(exception)
 
     decoy.when(state_store.commands.get_is_stopped_by_async_error()).then_return(False)
@@ -1309,7 +1309,7 @@ def test_add_labware_definition(
         ).then_return(LabwareUri("some/definition/uri"))
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             AddLabwareDefinitionAction(definition=well_plate_def)
         )
     ).then_do(_stub_get_definition_uri)

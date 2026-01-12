@@ -286,7 +286,7 @@ async def test_store_raises_if_stall(
     decoy.when(model_utils.generate_id()).then_return(error_id)
     decoy.when(model_utils.get_timestamp()).then_return(error_timestamp)
 
-    decoy.when(await stacker_hardware.store_labware(labware_height=4)).then_raise(
+    decoy.when(await stacker_hardware.store_labware(labware_height=4)).then_raise(  # type: ignore[func-returns-value]
         shared_data_error
     )
 

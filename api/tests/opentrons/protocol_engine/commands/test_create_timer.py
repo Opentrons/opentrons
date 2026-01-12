@@ -46,7 +46,7 @@ async def test_create_timer_implementation(
             raise RuntimeError("Wrong kind of action.")
 
     decoy.when(
-        action_dispatcher.dispatch(
+        action_dispatcher.dispatch(  # type: ignore[func-returns-value]
             StartTaskAction(
                 task=Task(
                     id="taskid",

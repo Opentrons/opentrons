@@ -100,7 +100,7 @@ async def test_home_command_with_stall_detected(
     decoy.when(model_utils.generate_id()).then_return(err_id)
     decoy.when(model_utils.get_timestamp()).then_return(err_timestamp)
 
-    decoy.when(await stacker_hardware.home_all(False)).then_raise(
+    decoy.when(await stacker_hardware.home_all(False)).then_raise(  # type: ignore[func-returns-value]
         FlexStackerStallError(serial="123", axis=StackerAxis.Z)
     )
 

@@ -72,7 +72,12 @@ export function InputStepFormField(
             setIsPristine(false)
           }
         }}
-        value={fillQuantityLocalState ?? value?.toString()}
+        value={
+          fillQuantityLocalState ??
+          (typeof value === 'string' || Array.isArray(value)
+            ? value.length
+            : null)
+        }
         units={units}
         placeholder={placeholder}
       />

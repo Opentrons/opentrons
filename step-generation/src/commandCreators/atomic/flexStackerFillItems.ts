@@ -29,16 +29,18 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     lwId => labwareEntities[lwId]?.pythonName
   )
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
-
   const indentedLabwarePythonNames = labwareChunks
     .map(chunk => INDENT + chunk.join(', '))
     .join(',\n')
-
   const formattedPythonLabwareNames =
     labwarePythonNames.length < 4
       ? labwarePythonNames.join(', ')
       : `\n${indentedLabwarePythonNames}\n`
-
+  if (flexStackerState?.storedLabwareDetails === null) {
+    return {
+      errors: [errorCreators.flexStackerLabwareTypeMissing()],
+    }
+  }
   if (!isSpace) {
     return {
       errors: [errorCreators.flexStackerHopperFull()],

@@ -37,7 +37,7 @@ robot = [
 ]
 dev = [
     "ruff==0.14.10",
-    "pytest>=8,<9",
+    "pytest>=9.0.2",
     "pytest-asyncio<2,>=1",
     "pytest-watch~=4.2.0",
     "pytest-cov==4.1.0",
@@ -46,7 +46,7 @@ dev = [
     "coverage==7.4.1",
     "atomicwrites==1.4.0; sys_platform=='win32'",
     "colorama==0.4.4; sys_platform=='win32'",
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "decoy<3,>=2.2.0",
     "mock~=5.1.0",
     "types-mock~=5.1.0",
@@ -60,7 +60,7 @@ dev = [
 "Documentation" = "https://docs.opentrons.com"
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90", "I"]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ANN", "D"]

@@ -94,8 +94,9 @@ const selectedMultipleContainerIds: Reducer<
     case 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR':
       return action.payload
     case 'CLOSE_INGREDIENT_SELECTOR':
-    default:
       return null
+    default:
+      return state ?? null
   }
 }
 
@@ -319,7 +320,15 @@ export const ingredLocations: Reducer<LocationsState, any> = handleActions(
       action: RemoveWellsContentsAction
     ): LocationsState => {
       const { wells, labwareId } = action.payload
-      return { ...state, [labwareId]: { ...omit(state[labwareId], wells) } }
+      const labwareIds = Array.isArray(labwareId) ? labwareId : [labwareId]
+      return labwareIds.reduce<LocationsState>((acc, id) => {
+        const updatedLabware = omit(acc[id], wells)
+        if (Object.keys(updatedLabware).length > 0) {
+          return { ...acc, [id]: updatedLabware }
+        } else {
+          return omit(acc, id)
+        }
+      }, state)
     },
     DELETE_LIQUID_GROUP: (
       state: LocationsState,

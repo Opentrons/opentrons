@@ -1,6 +1,6 @@
 """Tests for complex commands executor."""
 
-from typing import Literal, Union
+from typing import Literal, Union, cast
 
 import pytest
 from decoy import Decoy, matchers
@@ -1275,8 +1275,8 @@ def test_retract_after_dispense_with_blowout_in_destination(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = (
-        BlowoutLocation.DESTINATION
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.DESTINATION
     )
 
     subject = TransferComponentsExecutor(
@@ -1384,7 +1384,9 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.TRASH
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -1511,7 +1513,9 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.TRASH
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -1715,8 +1719,8 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = (
-        BlowoutLocation.DESTINATION
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.DESTINATION
     )
 
     subject = TransferComponentsExecutor(
@@ -1798,7 +1802,9 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.TRASH
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -1881,7 +1887,9 @@ def test_retract_after_dispense_touch_tip(
 
     sample_transfer_props.dispense.retract.touch_tip.enabled = True
     sample_transfer_props.dispense.retract.blowout.enabled = True
-    sample_transfer_props.dispense.retract.blowout.location = blowout_location
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, blowout_location
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,

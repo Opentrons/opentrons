@@ -44,6 +44,7 @@ import type { LabwareEntities, PipetteEntity } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
   HydratedCommentFormData,
+  HydratedFlexStackerFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -454,6 +455,12 @@ const DISPENSE_TOUCH_TIP_MM_FROM_EDGE_OUT_OF_RANGE: FormError = {
   location: ['field'],
   page: 2,
   tab: 'dispense',
+}
+const QUANTITY_OUT_OF_RANGE: FormError = {
+  title: 'Value falls outside of expected range',
+  dependentFields: ['fillLabwareIds'],
+  showOnReopen: true,
+  location: ['field'],
 }
 const ASPIRATE_TOUCH_TIP_MM_FROM_EDGE_REQUIRED: FormError = {
   title: 'Value required',
@@ -952,6 +959,15 @@ export const shakeTimeRequired = (
     error = SHAKER_TIME_FORMAT
   }
   return error
+}
+export const fillQuantityOutOfRange = (
+  fields: HydratedFlexStackerFormData
+): FormError | null => {
+  const { fillLabwareIds, flexStackerFormType } = fields
+  return (fillLabwareIds === null || fillLabwareIds.length === 0) &&
+    flexStackerFormType === 'fill'
+    ? QUANTITY_OUT_OF_RANGE
+    : null
 }
 
 export const temperatureRequired = (

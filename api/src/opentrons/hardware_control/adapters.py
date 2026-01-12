@@ -2,7 +2,7 @@
 
 import asyncio
 import functools
-from typing import Any, Awaitable, Callable, Generic, TypeVar, cast
+from typing import Any, Callable, Coroutine, Generic, TypeVar, cast
 
 from .protocols.asyncio_configurable import AsyncioConfigurable
 
@@ -53,7 +53,7 @@ class SynchronousAdapter(Generic[WrappedObj]):
     @staticmethod
     def call_coroutine_sync(
         loop: asyncio.AbstractEventLoop,
-        to_call: Callable[..., Awaitable[WrappedReturn]],
+        to_call: Callable[..., Coroutine[Any, Any, WrappedReturn]],
         *args: Any,
         **kwargs: Any,
     ) -> WrappedReturn:

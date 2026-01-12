@@ -464,7 +464,7 @@ def _test_for_finding_liquid_height(  # noqa: C901
                     need_to_transfer_per_ch,
                     src_well.meniscus(z=ASPIRATE_MM_FROM_MENISCUS, target="end"),
                     dispense_loc,
-                    new_tips="never",
+                    new_tip="never",
                     touch_tip=True,
                     air_gap=5,
                 )
