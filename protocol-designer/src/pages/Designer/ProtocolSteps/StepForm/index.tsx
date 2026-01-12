@@ -208,8 +208,8 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           displayModule={
             formData.moduleId != null
               ? getModuleDisplayName(
-                invariantContext.moduleEntities[formData.moduleId].model
-              )
+                  invariantContext.moduleEntities[formData.moduleId].model
+                )
               : ''
           }
           handleAddPauseClick={handleAddPauseClick}
