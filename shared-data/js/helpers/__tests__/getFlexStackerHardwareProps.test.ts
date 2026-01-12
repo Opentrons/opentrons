@@ -45,7 +45,6 @@ describe('getLabwareOverlapOffset()', () => {
 
   it('should return the labware overlap offset for a given module model', () => {
     const result = getLabwareOverlapOffset(
-      FLEX_STACKER_MODULE_V1,
       mockLabwareDefinition,
       'labware-name'
     )
@@ -57,7 +56,6 @@ describe('getLabwareOverlapOffset()', () => {
       .spyOn(console, 'error')
       .mockImplementation(() => {})
     const result = getLabwareOverlapOffset(
-      MAGNETIC_MODULE_V1,
       mockLabwareDefinition,
       'labware-name'
     )
