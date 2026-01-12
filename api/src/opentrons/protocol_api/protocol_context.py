@@ -959,8 +959,9 @@ class ProtocolContext(CommandPublisher):
                   :py:class:`HeaterShakerContext`,
                   :py:class:`MagneticBlockContext`,
                   :py:class:`MagneticModuleContext`,
-                  :py:class:`TemperatureModuleContext`, or
-                  :py:class:`ThermocyclerContext`,
+                  :py:class:`TemperatureModuleContext`,
+                  :py:class:`ThermocyclerContext`, or
+                  :py:class:`VacuumModuleContext`,
                   depending on what you requested with ``module_name``.
 
                   .. versionchanged:: 2.13
@@ -1890,7 +1891,7 @@ def _create_module_context(
     elif isinstance(module_core, AbstractFlexStackerCore):
         module_cls = FlexStackerContext
     elif isinstance(module_core, AbstractVacuumModuleCore):
-        module_cls = FlexStackerContext
+        module_cls = VacuumModuleContext
     else:
         assert False, "Unsupported module type"
 
