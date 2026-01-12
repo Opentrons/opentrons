@@ -362,8 +362,8 @@ async def test_action_not_allowed(
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
     decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
-    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)
-    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)
+    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)  # type: ignore[func-returns-value]
+    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)  # type: ignore[func-returns-value]
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
         subject.create_action(

@@ -33,13 +33,15 @@ def raise_if_location_inside_liquid(
     well_core: WellCore,
     location_check_descriptors: LocationCheckDescriptors,
     logger: Logger,
-) -> None:
+) -> bool:
     """Raise an error if the location in question would be inside the liquid.
 
     This checker will raise an error if we can find the liquid height
     AND the location in question is below this height.
 
     If we can't find the liquid height, then we simply log the details and no error is raised.
+
+    Returns True if it doesn't raise.
     """
     try:
         liquid_height_from_bottom = well_core.current_liquid_height()
@@ -69,6 +71,7 @@ def raise_if_location_inside_liquid(
             f" Proceeding without verifying if {location_check_descriptors.location_type}"
             f" location is outside the liquid."
         )
+    return True
 
 
 def group_wells_for_multi_channel_transfer(

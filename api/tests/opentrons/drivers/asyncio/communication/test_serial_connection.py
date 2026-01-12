@@ -36,7 +36,7 @@ SerialKind = Union[AsyncResponseSerialConnection, SerialConnection]
 # Async because SerialConnection.__init__() needs an event loop,
 # so this fixture needs to run in an event loop.
 @pytest.fixture(
-    params=[AsyncResponseSerialConnection, SerialConnection],  # type: ignore[return]
+    params=[AsyncResponseSerialConnection, SerialConnection],
 )
 async def subject(
     request: SubRequest, mock_serial_port: AsyncMock, ack: str
@@ -66,6 +66,8 @@ async def subject(
             error_keyword="error",
             alarm_keyword="alarm",
         )
+    else:
+        raise AssertionError(f"Unexpected serial_class: {serial_class}")
 
 
 @pytest.fixture

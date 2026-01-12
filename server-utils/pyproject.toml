@@ -44,7 +44,7 @@ dev = [
     "pytest-xdist~=2.5.0",
     "requests==2.31.0",
     "mock==5.1.0",
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "decoy<3,>=2.2.0",
     "httpx==0.26.0",
     "types-requests~=2.31.0",
@@ -54,7 +54,7 @@ dev = [
 ]
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90", "I"]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"

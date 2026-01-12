@@ -250,7 +250,7 @@ async def test_tip_attached_error(
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
-        await mock_tip_handler.drop_tip(
+        await mock_tip_handler.drop_tip(  # type: ignore[func-returns-value]
             pipette_id="abc",
             home_after=None,
             do_not_ignore_tip_presence=False,

@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 from typing import (
-    TYPE_CHECKING,
     Any,
     Awaitable,
     Callable,
@@ -28,18 +27,6 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.module.types import (
-        AbsorbanceReaderType,
-        FlexStackerModuleType,
-        HeaterShakerModuleType,
-        MagneticBlockType,
-        MagneticModuleType,
-        TemperatureModuleType,
-        ThermocyclerModuleType,
-        VacuumModuleType,
-    )
 
 
 class ThermocyclerStepBase(TypedDict):
@@ -199,14 +186,14 @@ class LiveData(TypedDict):
 
 
 class ModuleType(StrEnum):
-    THERMOCYCLER: ThermocyclerModuleType = "thermocyclerModuleType"
-    TEMPERATURE: TemperatureModuleType = "temperatureModuleType"
-    MAGNETIC: MagneticModuleType = "magneticModuleType"
-    HEATER_SHAKER: HeaterShakerModuleType = "heaterShakerModuleType"
-    MAGNETIC_BLOCK: MagneticBlockType = "magneticBlockType"
-    ABSORBANCE_READER: AbsorbanceReaderType = "absorbanceReaderType"
-    FLEX_STACKER: FlexStackerModuleType = "flexStackerModuleType"
-    VACUUM_MODULE: VacuumModuleType = "VacuumModuleType"
+    THERMOCYCLER = "thermocyclerModuleType"
+    TEMPERATURE = "temperatureModuleType"
+    MAGNETIC = "magneticModuleType"
+    HEATER_SHAKER = "heaterShakerModuleType"
+    MAGNETIC_BLOCK = "magneticBlockType"
+    ABSORBANCE_READER = "absorbanceReaderType"
+    FLEX_STACKER = "flexStackerModuleType"
+    VACUUM_MODULE = "VacuumModuleType"
 
     @classmethod
     def from_model(cls, model: ModuleModel) -> ModuleType:
@@ -251,38 +238,38 @@ class ModuleType(StrEnum):
 
 
 class MagneticModuleModel(StrEnum):
-    MAGNETIC_V1: str = "magneticModuleV1"
-    MAGNETIC_V2: str = "magneticModuleV2"
+    MAGNETIC_V1 = "magneticModuleV1"
+    MAGNETIC_V2 = "magneticModuleV2"
 
 
 class TemperatureModuleModel(StrEnum):
-    TEMPERATURE_V1: str = "temperatureModuleV1"
-    TEMPERATURE_V2: str = "temperatureModuleV2"
+    TEMPERATURE_V1 = "temperatureModuleV1"
+    TEMPERATURE_V2 = "temperatureModuleV2"
 
 
 class ThermocyclerModuleModel(StrEnum):
-    THERMOCYCLER_V1: str = "thermocyclerModuleV1"
-    THERMOCYCLER_V2: str = "thermocyclerModuleV2"
+    THERMOCYCLER_V1 = "thermocyclerModuleV1"
+    THERMOCYCLER_V2 = "thermocyclerModuleV2"
 
 
 class HeaterShakerModuleModel(StrEnum):
-    HEATER_SHAKER_V1: str = "heaterShakerModuleV1"
+    HEATER_SHAKER_V1 = "heaterShakerModuleV1"
 
 
 class MagneticBlockModel(StrEnum):
-    MAGNETIC_BLOCK_V1: str = "magneticBlockV1"
+    MAGNETIC_BLOCK_V1 = "magneticBlockV1"
 
 
 class AbsorbanceReaderModel(StrEnum):
-    ABSORBANCE_READER_V1: str = "absorbanceReaderV1"
+    ABSORBANCE_READER_V1 = "absorbanceReaderV1"
 
 
 class FlexStackerModuleModel(StrEnum):
-    FLEX_STACKER_V1: str = "flexStackerModuleV1"
+    FLEX_STACKER_V1 = "flexStackerModuleV1"
 
 
 class VacuumModuleModel(StrEnum):
-    VACUUM_MODULE_V1: str = "VacuumModuleV1"
+    VACUUM_MODULE_V1 = "VacuumModuleV1"
 
 
 def module_model_from_string(model_string: str) -> ModuleModel:

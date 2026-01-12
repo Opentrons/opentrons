@@ -243,7 +243,7 @@ class AsyncByonoy:
             ),
         )
         self._raise_if_error(err.name, f"Error getting measurement: {err}")
-        return measurements if isinstance(measurements[0], List) else [measurements]  # type: ignore
+        return measurements if isinstance(measurements[0], List) else [measurements]
 
     async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
         """Get the state of the plate for the reader."""

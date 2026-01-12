@@ -375,7 +375,7 @@ async def test_delete_run_with_bad_id(
 ) -> None:
     """It should 404 if the run ID does not exist."""
     decoy.when(
-        await mock_maintenance_run_data_manager.delete(
+        await mock_maintenance_run_data_manager.delete(  # type: ignore[func-returns-value]
             "run-id", None, camera_provider=mock_camera_provider
         )
     ).then_raise(MaintenanceRunNotFoundError("uh oh"))
@@ -400,7 +400,7 @@ async def test_delete_active_run(
 ) -> None:
     """It should 409 if the run is not finished."""
     decoy.when(
-        await mock_maintenance_run_data_manager.delete(
+        await mock_maintenance_run_data_manager.delete(  # type: ignore[func-returns-value]
             "run-id", None, camera_provider=mock_camera_provider
         )
     ).then_raise(RunConflictError("oh no"))

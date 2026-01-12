@@ -725,7 +725,7 @@ async def test_overpressure_during_preparation(
         ),
     ).then_return(prep_location)
 
-    decoy.when(await pipetting.prepare_for_aspirate(pipette_id)).then_raise(
+    decoy.when(await pipetting.prepare_for_aspirate(pipette_id)).then_raise(  # type: ignore[func-returns-value]
         PipetteOverpressureError()
     )
     decoy.when(model_utils.generate_id()).then_return(error_id)

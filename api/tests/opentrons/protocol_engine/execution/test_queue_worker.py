@@ -132,7 +132,7 @@ async def test_unhandled_exception_breaks_loop(
     subject: QueueWorker,
 ) -> None:
     """It should raise any unhandled exceptions in `join`."""
-    decoy.when(await command_executor.execute(command_id="command-id-1")).then_raise(
+    decoy.when(await command_executor.execute(command_id="command-id-1")).then_raise(  # type: ignore[func-returns-value]
         RuntimeError("oh no")
     )
 

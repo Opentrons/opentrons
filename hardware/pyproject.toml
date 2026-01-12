@@ -38,7 +38,7 @@ dev = [
     "pytest>=8.4.0,<9",
     "pytest-cov==4.1.0",
     "ruff==0.14.10",
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "mock~=5.1.0",
     "types-mock~=5.1.0",
     "hypothesis<7,>=6.96.1",
@@ -63,7 +63,7 @@ requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency
 build-backend = 'hatchling.build'
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90", "I"]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D105", "D107", "D400", "D401", "D402", "D403", "D404", "D415", "D418"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -72,7 +72,8 @@ max-complexity = 9
 [tool.ruff.lint.isort]
 known-local-folder = ["opentrons_hardware"]
 [tool.ruff.lint.per-file-ignores]
-"g_code_parsing/_version.py" = ["I"]
+"opentrons_hardware/_version.py" = ["I"]
+"opentrons_hardware/scripts/*" = ["T201"]
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 override-versions-of=['opentrons_shared_data']

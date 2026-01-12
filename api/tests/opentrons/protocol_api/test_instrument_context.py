@@ -3202,7 +3202,7 @@ def test_transfer_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -3615,7 +3615,7 @@ def test_distribute_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -4049,7 +4049,7 @@ def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))

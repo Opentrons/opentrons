@@ -79,7 +79,7 @@ def check(
     existing_module_ids: Collection[str],
     existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_labware_id: str,
-) -> None:
+) -> bool:
     pass
 
 
@@ -91,7 +91,7 @@ def check(
     existing_module_ids: Collection[str],
     existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_module_id: str,
-) -> None:
+) -> bool:
     pass
 
 
@@ -103,7 +103,7 @@ def check(
     existing_module_ids: Collection[str],
     existing_disposal_locations: Collection[Union[Labware, WasteChute, TrashBin]],
     new_trash_bin: TrashBin,
-) -> None:
+) -> bool:
     pass
 
 
@@ -120,7 +120,7 @@ def check(
     new_labware_id: Optional[str] = None,
     new_module_id: Optional[str] = None,
     new_trash_bin: Optional[TrashBin] = None,
-) -> None:
+) -> bool:
     """Check for conflicts between items on the deck.
 
     This is a Protocol-Engine-friendly wrapper around
@@ -138,6 +138,9 @@ def check(
     Raises:
         opentrons.motion_planning.deck_conflict.DeckConflictError:
             If the newly-added item conflicts with one of the existing items.
+
+    Returns:
+        True if there are no conflicts (it raises rather than return False).
     """
 
     if new_labware_id is not None:
@@ -149,7 +152,7 @@ def check(
 
     if new_location_and_item is None:
         # The new item should be excluded from deck conflict checking. Nothing to do.
-        return
+        return True
 
     new_location, new_item = new_location_and_item
 
@@ -184,7 +187,7 @@ def check(
                 existing_items[existing_location], existing_item, existing_location
             )
 
-    wrapped_deck_conflict.check(
+    return wrapped_deck_conflict.check(
         existing_items=existing_items,
         new_item=new_item,
         new_location=new_location,

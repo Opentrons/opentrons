@@ -208,7 +208,8 @@ def load_and_update_file_from_config(
                 value_to_update if value_to_update else geometry["nozzleOffset"]
             )
             geometry["nozzleMap"] = build_nozzle_map(
-                nozzle_to_use, model_to_update.pipette_channels
+                nozzle_to_use,  # type: ignore[arg-type]
+                model_to_update.pipette_channels,
             )
         elif config_to_update[0] == "nozzle_offset":
             geometry["nozzleMap"] = build_nozzle_map(

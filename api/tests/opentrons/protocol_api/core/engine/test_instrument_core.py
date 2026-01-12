@@ -1948,7 +1948,7 @@ def test_liquid_probe_without_recovery_unsafe(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     decoy.when(
-        pipette_movement_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(  # type: ignore[func-returns-value]
             engine_state=mock_engine_client.state,
             pipette_id=subject.pipette_id,
             labware_id=well_core.labware_id,
@@ -2020,7 +2020,7 @@ def test_liquid_probe_with_recovery_unsafe(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     decoy.when(
-        pipette_movement_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(  # type: ignore[func-returns-value]
             engine_state=mock_engine_client.state,
             pipette_id=subject.pipette_id,
             labware_id=well_core.labware_id,
@@ -2036,7 +2036,7 @@ def test_liquid_probe_with_recovery_unsafe(
     )
 
     decoy.when(
-        mock_engine_client.execute_command(
+        mock_engine_client.execute_command(  # type: ignore[func-returns-value]
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
@@ -2629,7 +2629,7 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
         mock_engine_client.state.pipettes.get_working_volume("abc123")
     ).then_return(100)
     decoy.when(
-        tx_commons.check_valid_liquid_class_volume_parameters(
+        tx_commons.check_valid_liquid_class_volume_parameters(  # type: ignore[func-returns-value]
             aspirate_volume=123,
             air_gap=test_transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                 123

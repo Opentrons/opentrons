@@ -1103,7 +1103,7 @@ async def test_load_pipette_raises_if_pipette_not_attached(
     decoy.when(model_utils.generate_id()).then_return("unique-id")
 
     decoy.when(
-        await hardware_api.cache_instruments(
+        await hardware_api.cache_instruments(  # type: ignore[func-returns-value]
             {HwMount.LEFT: PipetteNameType.P300_SINGLE.value}
         )
     ).then_raise(
