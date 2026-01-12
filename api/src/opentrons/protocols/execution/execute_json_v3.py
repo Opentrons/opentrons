@@ -1,28 +1,29 @@
 import logging
-from typing import Dict, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict
 
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, Labware, Well
-from opentrons.protocols.api_support.labware_like import LabwareLike
-from opentrons.types import Point, Location
 from opentrons_shared_data.protocol.constants import (
     JsonPipetteCommand,
     JsonRobotCommand,
 )
 
+from opentrons.protocol_api import InstrumentContext, Labware, ProtocolContext, Well
+from opentrons.protocols.api_support.labware_like import LabwareLike
+from opentrons.types import Location, Point
 
 if TYPE_CHECKING:
     from opentrons_shared_data.protocol.types import (
-        JsonProtocolV3,
-        JsonProtocol,
-        PipetteAccessParams,
-        StandardLiquidHandlingParams,
+        BlowoutParams,
         DelayParams,
         FlowRateParams,
-        TouchTipParams,
-        PipetteAccessWithOffsetParams,
-        BlowoutParams,
+        JsonProtocol,
+        JsonProtocolV3,
         MoveToSlotParams,
+        PipetteAccessParams,
+        PipetteAccessWithOffsetParams,
+        StandardLiquidHandlingParams,
+        TouchTipParams,
     )
+
     from opentrons.protocols.execution.dev_types import PipetteDispatch
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -265,7 +266,9 @@ def dispatch_json(
         # different `_command` helpers take different args
         if command_type in pipette_commands:
             dispatcher_map[command_type](  # type: ignore[call-arg]
-                instruments, loaded_labware, params  # type: ignore[arg-type]
+                instruments,  # type: ignore[arg-type]
+                loaded_labware,  # type: ignore[arg-type]
+                params,  # type: ignore[arg-type]
             )
         elif command_type == JsonRobotCommand.delay.value:
             dispatcher_map[command_type](context, params)  # type: ignore

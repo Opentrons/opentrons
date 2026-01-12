@@ -2,9 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   FLEX_STACKER_MODULE_TYPE,
-  getHeightOfLabwareStackFromDefinitions,
-  getLabwareOverlapOffset,
-  getStackerMaxPoolCountByHeight,
   SYSTEM_LOCATION,
 } from '@opentrons/shared-data'
 
@@ -13,7 +10,6 @@ import { getInitialRobotStateStandard, makeContext } from '../../fixtures'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
   forFlexStackerEmpty,
-  forFlexStackerFill,
   forFlexStackerRetrieve,
   forFlexStackerStore,
 } from '../stackerUpdates'
@@ -107,83 +103,6 @@ describe('flex stacker state updates forFlexStackerEmpty', () => {
   })
 })
 
-describe('flex stacker state updates forFlexStackerFill', () => {
-  const invariantContext = makeContext()
-  const robotState = getInitialRobotStateStandard(invariantContext)
-  beforeEach(() => {
-    vi.mocked(getLabwareOverlapOffset).mockReturnValue({ x: 0, y: 0, z: 10 })
-    vi.mocked(getHeightOfLabwareStackFromDefinitions).mockReturnValue(10)
-    vi.mocked(getStackerMaxPoolCountByHeight).mockReturnValue(10)
-    robotState.modules[FLEX_STACKER_ID] = {
-      slot: '1',
-      moduleState: {
-        type: FLEX_STACKER_MODULE_TYPE,
-        labwareInHopper: [
-          {
-            primaryLabwareId: 'labware1',
-            adapterLabwareId: null,
-            lidLabwareId: null,
-          },
-          {
-            primaryLabwareId: 'labware2',
-            adapterLabwareId: null,
-            lidLabwareId: null,
-          },
-          {
-            primaryLabwareId: 'labware3',
-            adapterLabwareId: null,
-            lidLabwareId: null,
-          },
-        ],
-        storedLabwareDetails: {
-          primaryLabwareURI: LABWARE_ID,
-        },
-        labwareOnShuttle: null,
-      },
-    }
-  })
-
-  it('should add the specified number of items to the stored stacker list', () => {
-    const props = {
-      count: 1,
-      moduleId: FLEX_STACKER_ID,
-      strategy: 'logical' as const,
-    }
-    forFlexStackerFill(props, invariantContext, {
-      robotState: robotState,
-      warnings: [],
-    })
-
-    const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
-    expect(moduleState?.labwareInHopper).toHaveLength(4)
-  })
-
-  it('should not add labware to the list if count is null', () => {
-    const props = {
-      moduleId: FLEX_STACKER_ID,
-      strategy: 'logical' as const,
-    }
-    forFlexStackerFill(props, invariantContext, {
-      robotState: robotState,
-      warnings: [],
-    })
-
-    const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
-    expect(moduleState?.labwareInHopper).toHaveLength(3)
-  })
-
-  it('should not add labware to the list if count is greater than maxPoolCount', () => {
-    const props = {
-      count: 15,
-      moduleId: FLEX_STACKER_ID,
-      strategy: 'logical' as const,
-    }
-    forFlexStackerFill(props, invariantContext, { robotState, warnings: [] })
-    const moduleState = flexStackerStateGetter(robotState, FLEX_STACKER_ID)
-    expect(moduleState?.labwareInHopper).toHaveLength(3)
-  })
-})
-
 describe('flex stacker state updates forFlexStackerRetrieve', () => {
   const invariantContext = makeContext()
   const robotState = getInitialRobotStateStandard(invariantContext)
@@ -269,7 +188,7 @@ describe('flex stacker state updates forFlexStackerRetrieve', () => {
       },
     ])
     expect(robotState.labware.tiprack1Id).toEqual({
-      stack: ['tiprack1Id', FLEX_STACKER_ID, '1'],
+      stack: ['tiprack1Id', '1'],
     })
   })
 })

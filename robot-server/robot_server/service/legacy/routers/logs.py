@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Query, Response
 from typing import Annotated, Dict
+
+from fastapi import APIRouter, Query, Response
 
 from opentrons.system import log_control
 
-from robot_server.service.legacy.models.logs import LogIdentifier, LogFormat
+from robot_server.service.legacy.models.logs import LogFormat, LogIdentifier
 
 router = APIRouter()
 

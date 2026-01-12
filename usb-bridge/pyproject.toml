@@ -36,11 +36,8 @@ robot = [
     "pyudev==0.23.2",
 ]
 dev = [
-    "flake8==7.0.0",
-    "flake8-annotations~=3.0.1",
-    "flake8-docstrings~=1.7.0",
-    "flake8-noqa~=1.4.0",
-    "pytest>=8,<9",
+    "ruff==0.14.10",
+    "pytest>=9.0.2",
     "pytest-asyncio<2,>=1",
     "pytest-watch~=4.2.0",
     "pytest-cov==4.1.0",
@@ -49,8 +46,7 @@ dev = [
     "coverage==7.4.1",
     "atomicwrites==1.4.0; sys_platform=='win32'",
     "colorama==0.4.4; sys_platform=='win32'",
-    "mypy==1.11.0",
-    "black==22.3.0",
+    "mypy==1.19.1",
     "decoy<3,>=2.2.0",
     "mock~=5.1.0",
     "types-mock~=5.1.0",
@@ -62,6 +58,21 @@ dev = [
 "opentrons.com" = "https://www.opentrons.com"
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/usb-bridge"
 "Documentation" = "https://docs.opentrons.com"
+
+[tool.ruff.lint]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
+ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN", "D"]
+"ot3usb/_version.py" = ["I"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+[tool.ruff.lint.isort]
+known-first-party = ["opentrons", "opentrons_hardware", "opentrons_shared_data", "robot_server" ]
+known-local-folder = ["usb_bridge"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file = "ot3usb/_version.py"

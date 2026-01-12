@@ -1,5 +1,6 @@
 from __future__ import annotations
-from typing import NamedTuple, TypedDict, Optional
+
+from typing import Callable, Literal, NamedTuple, Optional, Tuple, TypedDict
 
 
 class APIVersion(NamedTuple):
@@ -17,6 +18,26 @@ class APIVersion(NamedTuple):
 
     def __str__(self) -> str:
         return f"{self.major}.{self.minor}"
+
+
+class TransferArgs(TypedDict, total=False):
+    """
+    The common arguments for the transfer functions `InstrumentContext.transfer()`,
+    `InstrumentContext.distribute()`, `InstrumentContext.consolidate()`.
+    """
+
+    mode: Literal["transfer", "distribute", "consolidate"]  # internal use only
+    new_tip: Literal["once", "always", "never"]
+    trash: bool
+    touch_tip: bool
+    blow_out: bool
+    blowout_location: Literal["trash", "source well", "destination well"]
+    mix_before: Tuple[int, float]
+    mix_after: Tuple[int, float]
+    disposal_volume: float
+    air_gap: float
+    carryover: bool  # this does nothing!
+    gradient_function: Callable[[float], float]  # very mysterious
 
 
 class ThermocyclerStepBase(TypedDict):

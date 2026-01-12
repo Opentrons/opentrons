@@ -130,12 +130,12 @@ test-ot2:
 .PHONY: lint
 lint:
 	$(python) -m mypy src tests integration_testing
-	$(python) -m black --check src tests integration_testing docs/v2/example_protocols
-	$(python) -m flake8 src tests integration_testing
+	$(ruff) check src tests integration_testing docs/v2/example_protocols
 
 .PHONY: format
 format:
-	$(python) -m black src tests integration_testing docs/v2/example_protocols
+	$(ruff) format src tests integration_testing docs/v2/example_protocols
+	$(ruff) check --select I --fix src tests integration_testing docs/v2/example_protocols
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

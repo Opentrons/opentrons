@@ -1,25 +1,24 @@
 import asyncio
-import mock
 from typing import Any, AsyncGenerator, cast
 
+import mock
 import pytest
 from decoy import Decoy
 
-from opentrons.hardware_control.modules.types import (
-    ModuleErrorCallback,
-    ModuleDisconnectedCallback,
-)
-from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
+from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
 from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.thermocycler import SimulatingDriver
-from opentrons.hardware_control import modules, ExecutionManager
-from opentrons.hardware_control.poller import Poller
+from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
+from opentrons.hardware_control import ExecutionManager, modules
 from opentrons.hardware_control.modules.thermocycler import (
-    ThermocyclerReader,
     ThermocyclerError,
+    ThermocyclerReader,
 )
-from opentrons.drivers.asyncio.communication.errors import ErrorResponse, UnhandledGcode
-
+from opentrons.hardware_control.modules.types import (
+    ModuleDisconnectedCallback,
+    ModuleErrorCallback,
+)
+from opentrons.hardware_control.poller import Poller
 
 POLL_PERIOD = 1.0
 SIMULATING_POLL_PERIOD = POLL_PERIOD / 20.0

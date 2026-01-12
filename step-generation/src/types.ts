@@ -48,6 +48,10 @@ export interface LabwareTemporalProperties {
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
+  // this is needed for PV to determine which labware is being moved
+  // into the hopper based on the setStoredLabware count
+  setStoredLabwareCount?: number
+  fillCount?: number
 }
 
 export interface PipetteTemporalProperties {
@@ -155,6 +159,10 @@ export interface FlexStackerModuleState {
   // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
+  // this is needed in order to differentiate between the different
+  // off-deck labwares and when they get loaded onto the hopper for setStoredLabware
+  setStoredLabwareCount?: number
+  fillCount?: number
 }
 
 export type ModuleState =
@@ -725,7 +733,7 @@ export interface FlexStackerFillItemsArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerFillItems'
   fillLabwareUri: string | null
-  fillQuantity: number | null
+  fillLabwareIds: string[]
   interventionMessage: string | null
 }
 export interface FlexStackerStoreArgs extends CommonArgs {
@@ -874,11 +882,13 @@ export type ErrorType =
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
+  | 'LABWARE_ON_HOPPER'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
   | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
   | 'MISSING_PROFILE_STEP'
+  | 'MISSING_STACKER_LABWARE_TYPE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'

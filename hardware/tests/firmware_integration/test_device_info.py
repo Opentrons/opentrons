@@ -1,15 +1,16 @@
 """Test device info."""
+
 import asyncio
 
 import pytest
 
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 from opentrons_hardware.firmware_bindings import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DeviceInfoRequest,
     DeviceInfoResponse,
 )
-from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
-from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
 
 
 def filter_func(arb: ArbitrationId) -> bool:

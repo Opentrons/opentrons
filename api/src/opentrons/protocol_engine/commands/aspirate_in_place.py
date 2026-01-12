@@ -1,36 +1,37 @@
 """Aspirate in place command request, result, and implementation models."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional, Type, Union
+
 from typing_extensions import Literal
 
-from opentrons.hardware_control import HardwareControlAPI
-
-from .pipetting_common import (
-    PipetteIdMixin,
-    AspirateVolumeMixin,
-    FlowRateMixin,
-    BaseLiquidHandlingResult,
-    OverpressureError,
-    aspirate_in_place,
-    DEFAULT_CORRECTION_VOLUME,
-)
+from ..errors.exceptions import PipetteNotReadyToAspirateError
+from ..state.update_types import CLEAR
+from ..types import CurrentWell
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    SuccessData,
     DefinedErrorData,
+    SuccessData,
 )
-from ..errors.exceptions import PipetteNotReadyToAspirateError
-from ..state.update_types import CLEAR
-from ..types import CurrentWell
+from .pipetting_common import (
+    DEFAULT_CORRECTION_VOLUME,
+    AspirateVolumeMixin,
+    BaseLiquidHandlingResult,
+    FlowRateMixin,
+    OverpressureError,
+    PipetteIdMixin,
+    aspirate_in_place,
+)
+from opentrons.hardware_control import HardwareControlAPI
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover
+    from ..execution import GantryMover, PipettingHandler
+    from ..notes import CommandNoteAdder
     from ..resources import ModelUtils
     from ..state.state import StateView
-    from ..notes import CommandNoteAdder
 
 AspirateInPlaceCommandType = Literal["aspirateInPlace"]
 
@@ -170,9 +171,9 @@ class AspirateInPlace(
     params: AspirateInPlaceParams
     result: Optional[AspirateInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[AspirateInPlaceImplementation] = (
         AspirateInPlaceImplementation
-    ] = AspirateInPlaceImplementation
+    )
 
 
 class AspirateInPlaceCreate(BaseCommandCreate[AspirateInPlaceParams]):

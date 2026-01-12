@@ -7,17 +7,18 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Dict,
+    List,
     Mapping,
+    NamedTuple,
+    Optional,
     Tuple,
     Union,
-    Optional,
-    NamedTuple,
     cast,
-    List,
 )
 
-from opentrons.config import CONFIG
 from opentrons_shared_data.robot.types import RobotTypeEnum
+
+from opentrons.config import CONFIG
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -151,8 +152,7 @@ settings = [
         _id="enableOT3HardwareController",
         title="Enable experimental OT-3 hardware controller",
         description=(
-            "Do not enable. This is an Opentrons-internal setting to test "
-            "new hardware."
+            "Do not enable. This is an Opentrons-internal setting to test new hardware."
         ),
         restart_required=True,
         robot_type=[RobotTypeEnum.FLEX],

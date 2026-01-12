@@ -1,27 +1,27 @@
 """Unit tests for `error_recovery_mapping`."""
+
 import pytest
 from decoy import Decoy
 
-from opentrons_shared_data.robot.types import RobotType
-
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.commands.command import (
     DefinedErrorData,
 )
 from opentrons.protocol_engine.commands.command_unions import CommandDefinedErrorData
 from opentrons.protocol_engine.commands.liquid_probe import LiquidProbe
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
 from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType
+from opentrons_shared_data.robot.types import RobotType
 
 from robot_server.runs.error_recovery_mapping import (
     create_error_recovery_policy_from_rules,
 )
 from robot_server.runs.error_recovery_models import (
-    ErrorRecoveryRule,
-    MatchCriteria,
     CommandMatcher,
     ErrorMatcher,
+    ErrorRecoveryRule,
+    MatchCriteria,
     ReactionIfMatch,
 )
 

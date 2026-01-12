@@ -10,16 +10,20 @@ import {
   RobotCoordsForeignDiv,
   StyledText,
 } from '@opentrons/components'
-import { getFullStackFromLabwares } from '@opentrons/step-generation'
+import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
+import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
+import { getFullStackFromLabwaresOnDeck } from '/protocol-designer/utils'
 
 import { DECK_CONTROLS_STYLE } from '../constants'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { CoordinateTuple, Dimensions } from '@opentrons/shared-data'
+import type { FlexStackerModuleState } from '@opentrons/step-generation'
 import type { DeckSetupTerminalIdType } from '../../types'
 
 interface ActiveLabwareControlsProps extends DeckSetupTerminalIdType {
@@ -42,9 +46,39 @@ export function ActiveLabwareControls(
     setHover,
   } = props
   const { t } = useTranslation('starting_deck_state')
+  const pendingCreationStateForHopper = useSelector(getPendingCreationState)
+  const isSlotAHopper = getIsSlotAHopper(itemId)
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const fullStack = getFullStackFromLabwares(activeDeckSetup.labware, itemId)
+  const fullStack = pendingCreationStateForHopper
+    ? []
+    : getFullStackFromLabwaresOnDeck(
+        Object.values(activeDeckSetup.labware),
+        itemId,
+        isSlotAHopper
+      )
+
+  const stackerModuleId = fullStack.find(
+    id =>
+      activeDeckSetup.modules[id] != null &&
+      activeDeckSetup.modules[id].type === FLEX_STACKER_MODULE_TYPE
+  )
+  const stackerModuleState: FlexStackerModuleState | null =
+    stackerModuleId != null
+      ? (activeDeckSetup.modules[stackerModuleId]
+          .moduleState as FlexStackerModuleState)
+      : null
+  const stackerHopperLabware: string[] =
+    stackerModuleState?.labwareInHopper?.reduce<string[]>((acc, hopper) => {
+      acc.push(hopper.primaryLabwareId)
+      if (hopper.adapterLabwareId) {
+        acc.push(hopper.adapterLabwareId)
+      }
+      if (hopper.lidLabwareId) {
+        acc.push(hopper.lidLabwareId)
+      }
+      return acc
+    }, []) ?? []
   const filteredStack = fullStack.filter(
     item => activeDeckSetup.labware[item] != null
   )
@@ -63,7 +97,11 @@ export function ActiveLabwareControls(
           closeModal={() => {
             setShowSlotDetailModal(false)
           }}
-          stackOfLabware={filteredStack}
+          stackOfLabware={
+            stackerHopperLabware.length > 0
+              ? stackerHopperLabware
+              : filteredStack
+          }
         />
       ) : null}
 

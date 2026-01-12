@@ -3,19 +3,17 @@ from typing import Optional
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api._parameters import Parameters
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.execution import execute_json_v3, execute_json_v4
 from opentrons.protocols.execution.execute_python import exec_run
 from opentrons.protocols.execution.json_dispatchers import (
+    magnetic_module_command_map,
     pipette_command_map,
     temperature_module_command_map,
-    magnetic_module_command_map,
     thermocycler_module_command_map,
 )
-from opentrons.protocols.execution import execute_json_v4, execute_json_v3
-
-from opentrons.protocols.types import PythonProtocol, Protocol
-from opentrons.protocols.api_support.types import APIVersion
-
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
+from opentrons.protocols.types import Protocol, PythonProtocol
 
 MODULE_LOG = logging.getLogger(__name__)
 

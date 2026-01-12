@@ -4,14 +4,15 @@ from typing import Annotated
 import fastapi
 import sqlalchemy
 
+from opentrons.system.camera import DEFAULT_SYSTEM_CAMERA
+
 from robot_server.persistence.fastapi_dependencies import get_sql_engine
 from robot_server.persistence.tables import (
-    boolean_setting_table,
     BooleanSettingKey,
+    boolean_setting_table,
     camera_capture_image_settings_table,
 )
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
-from opentrons.system.camera import DEFAULT_SYSTEM_CAMERA
 
 # All camera behavior is disabled by default
 _CAMERA_ENABLED_DEFAULT = False
@@ -197,7 +198,7 @@ class CameraSettingStore:
 
 
 async def get_camera_setting_store(
-    sql_engine: Annotated[sqlalchemy.engine.Engine, fastapi.Depends(get_sql_engine)]
+    sql_engine: Annotated[sqlalchemy.engine.Engine, fastapi.Depends(get_sql_engine)],
 ) -> CameraSettingStore:
     """A FastAPI dependency to return the server's CameraSettingStore."""
     # Since the store itself has no state, and no asyncio.Locks or anything,

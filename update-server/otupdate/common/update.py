@@ -3,26 +3,24 @@ endpoints for running software updates
 
 This has endpoints like update session management, validation, and execution
 """
+
 import asyncio
 import functools
 import logging
 import os
 from pathlib import Path
-
 from subprocess import CalledProcessError
-
 from typing import Optional
-from typing_extensions import Protocol
 
-from aiohttp import web, BodyPartReader, MultipartReader
+from aiohttp import BodyPartReader, MultipartReader, web
+from typing_extensions import Protocol
 
 from . import config, update_actions
 from .constants import APP_VARIABLE_PREFIX, RESTART_LOCK_NAME
 from .handler_type import Handler
-from .session import UpdateSession, Stages
-
-from otupdate.openembedded.update_actions import UPDATE_PKG_OE
+from .session import Stages, UpdateSession
 from otupdate.buildroot.update_actions import UPDATE_PKG_BR
+from otupdate.openembedded.update_actions import UPDATE_PKG_OE
 
 VALID_UPDATE_PKG = UPDATE_PKG_OE + UPDATE_PKG_BR
 
@@ -38,8 +36,7 @@ class _HandlerWithSession(Protocol):
 
     async def __call__(
         self, request: web.Request, session: UpdateSession
-    ) -> web.Response:
-        ...
+    ) -> web.Response: ...
 
 
 def session_from_request(request: web.Request) -> Optional[UpdateSession]:

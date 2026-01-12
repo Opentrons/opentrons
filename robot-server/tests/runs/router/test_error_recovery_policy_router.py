@@ -34,7 +34,7 @@ async def test_put_raises_not_active_run(
     """It should raise that the run is not current."""
     policies = decoy.mock(cls=er_models.ErrorRecoveryPolicy)
     decoy.when(
-        mock_run_data_manager.set_error_recovery_rules(
+        mock_run_data_manager.set_error_recovery_rules(  # type: ignore[func-returns-value]
             run_id="run-id", rules=policies.policyRules
         )
     ).then_raise(RunNotCurrentError())

@@ -1,29 +1,65 @@
 from dataclasses import dataclass
+from typing import Dict, List, Optional, Sequence, Tuple, Union
+
 from numpy import interp
-from typing import Optional, Dict, Sequence, Tuple, List, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    TransferProperties as SharedDataTransferProperties,
     AspirateProperties as SharedDataAspirateProperties,
-    SingleDispenseProperties as SharedDataSingleDispenseProperties,
-    MultiDispenseProperties as SharedDataMultiDispenseProperties,
-    TipPosition as SharedDataTipPosition,
-    DelayProperties as SharedDataDelayProperties,
-    DelayParams as SharedDataDelayParams,
-    TouchTipProperties as SharedDataTouchTipProperties,
-    LiquidClassTouchTipParams as SharedDataTouchTipParams,
-    MixProperties as SharedDataMixProperties,
-    MixParams as SharedDataMixParams,
-    BlowoutProperties as SharedDataBlowoutProperties,
-    BlowoutParams as SharedDataBlowoutParams,
-    ByTipTypeSetting as SharedByTipTypeSetting,
-    Submerge as SharedDataSubmerge,
-    RetractAspirate as SharedDataRetractAspirate,
-    RetractDispense as SharedDataRetractDispense,
-    BlowoutLocation,
-    PositionReference,
-    Coordinate,
 )
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutLocation,
+    Coordinate,
+    PositionReference,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutParams as SharedDataBlowoutParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutProperties as SharedDataBlowoutProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    ByTipTypeSetting as SharedByTipTypeSetting,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    DelayParams as SharedDataDelayParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    DelayProperties as SharedDataDelayProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    LiquidClassTouchTipParams as SharedDataTouchTipParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    MixParams as SharedDataMixParams,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    MixProperties as SharedDataMixProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    MultiDispenseProperties as SharedDataMultiDispenseProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    RetractAspirate as SharedDataRetractAspirate,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    RetractDispense as SharedDataRetractDispense,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    SingleDispenseProperties as SharedDataSingleDispenseProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    Submerge as SharedDataSubmerge,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TipPosition as SharedDataTipPosition,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TouchTipProperties as SharedDataTouchTipProperties,
+)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    TransferProperties as SharedDataTransferProperties,
+)
+
 from . import validation
 
 
@@ -106,7 +142,6 @@ class LiquidHandlingPropertyByVolume:
 # values will cause the protocol to fail analysis, rather than silently passing.
 @dataclass(slots=True)
 class TipPosition:
-
     _position_reference: PositionReference
     _offset: Coordinate
 
@@ -148,7 +183,6 @@ class TipPosition:
 
 @dataclass(slots=True)
 class DelayProperties:
-
     _enabled: bool
     _duration: Optional[float]
 
@@ -183,7 +217,6 @@ class DelayProperties:
 
 @dataclass(slots=True)
 class TouchTipProperties:
-
     _enabled: bool
     _z_offset: Optional[float]
     _mm_from_edge: Optional[float]
@@ -255,7 +288,6 @@ class TouchTipProperties:
 
 @dataclass(slots=True)
 class MixProperties:
-
     _enabled: bool
     _repetitions: Optional[int]
     _volume: Optional[float]
@@ -308,7 +340,6 @@ class MixProperties:
 
 @dataclass(slots=True)
 class BlowoutProperties:
-
     _enabled: bool
     _location: Optional[BlowoutLocation]
     _flow_rate: Optional[float]
@@ -362,7 +393,6 @@ class BlowoutProperties:
 
 @dataclass(slots=True)
 class _SubmergeRetractCommon:
-
     _speed: float
     _delay: DelayProperties
 
@@ -382,7 +412,6 @@ class _SubmergeRetractCommon:
 
 @dataclass(slots=True)
 class Submerge(_SubmergeRetractCommon):
-
     _start_position: TipPosition
 
     @property
@@ -399,7 +428,6 @@ class Submerge(_SubmergeRetractCommon):
 
 @dataclass(slots=True)
 class RetractAspirate(_SubmergeRetractCommon):
-
     _end_position: TipPosition
     _air_gap_by_volume: LiquidHandlingPropertyByVolume
     _touch_tip: TouchTipProperties
@@ -462,7 +490,6 @@ class RetractDispense(_SubmergeRetractCommon):
 
 @dataclass(slots=True)
 class _BaseLiquidHandlingProperties:
-
     _submerge: Submerge
     _flow_rate_by_volume: LiquidHandlingPropertyByVolume
     _correction_by_volume: LiquidHandlingPropertyByVolume
@@ -487,7 +514,6 @@ class _BaseLiquidHandlingProperties:
 
 @dataclass(slots=True)
 class AspirateProperties(_BaseLiquidHandlingProperties):
-
     _aspirate_position: TipPosition
     _retract: RetractAspirate
     _pre_wet: bool
@@ -529,7 +555,6 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
 
 @dataclass(slots=True)
 class SingleDispenseProperties(_BaseLiquidHandlingProperties):
-
     _dispense_position: TipPosition
     _retract: RetractDispense
     _push_out_by_volume: LiquidHandlingPropertyByVolume
@@ -566,7 +591,6 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
 
 @dataclass(slots=True)
 class MultiDispenseProperties(_BaseLiquidHandlingProperties):
-
     _dispense_position: TipPosition
     _retract: RetractDispense
     _conditioning_by_volume: LiquidHandlingPropertyByVolume

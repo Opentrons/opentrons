@@ -1,4 +1,5 @@
 from typing import Any
+
 from typing_extensions import Protocol
 
 from .types import ConfigType
@@ -20,8 +21,7 @@ class Configurable(Protocol[ConfigType]):
         ...
 
     @property
-    def hardware_feature_flags(self) -> HardwareFeatureFlags:
-        ...
+    def hardware_feature_flags(self) -> HardwareFeatureFlags: ...
 
     @hardware_feature_flags.setter
     def hardware_feature_flags(self, feature_flags: HardwareFeatureFlags) -> None:
@@ -29,12 +29,10 @@ class Configurable(Protocol[ConfigType]):
         ...
 
     @property
-    def config(self) -> ConfigType:
-        ...
+    def config(self) -> ConfigType: ...
 
     @config.setter
-    def config(self, config: ConfigType) -> None:
-        ...
+    def config(self, config: ConfigType) -> None: ...
 
     async def update_config(self, **kwargs: Any) -> None:
         """Update values of the robot's configuration.

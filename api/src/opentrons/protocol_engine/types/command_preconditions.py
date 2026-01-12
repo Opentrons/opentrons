@@ -1,5 +1,6 @@
 """Protocol Engine types dealing with command preconditions."""
-from pydantic import Field, BaseModel
+
+from pydantic import BaseModel, Field
 
 from opentrons_shared_data.util import StrEnum
 

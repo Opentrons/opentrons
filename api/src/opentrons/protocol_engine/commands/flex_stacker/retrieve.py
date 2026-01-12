@@ -1,56 +1,57 @@
 """Command models to retrieve a labware from a Flex Stacker."""
 
 from __future__ import annotations
-from typing import Literal, TYPE_CHECKING, Any, Union
-from typing_extensions import Type
+
+from typing import TYPE_CHECKING, Any, Literal, Union
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Type
 
 from opentrons_shared_data.errors.exceptions import (
-    FlexStackerStallError,
-    FlexStackerShuttleMissingError,
     FlexStackerHopperLabwareError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleMissingError,
     FlexStackerShuttleNotEmptyError,
+    FlexStackerStallError,
 )
 
-from ..command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-    SuccessData,
-    DefinedErrorData,
-)
 from ...errors import (
-    ErrorOccurrence,
     CannotPerformModuleAction,
-    LocationIsOccupiedError,
+    ErrorOccurrence,
     FlexStackerLabwarePoolNotYetDefinedError,
+    LocationIsOccupiedError,
 )
 from ...resources import ModelUtils
 from ...state import update_types
 from ...types import (
-    ModuleLocation,
-    LabwareLocationSequence,
     InStackerHopperLocation,
+    LabwareLocationSequence,
+    ModuleLocation,
+)
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
 )
 from .common import (
-    labware_locations_for_group,
-    build_retrieve_labware_move_updates,
-    FlexStackerStallOrCollisionError,
-    FlexStackerShuttleError,
     FlexStackerHopperError,
     FlexStackerLabwareRetrieveError,
+    FlexStackerShuttleError,
     FlexStackerShuttleOccupiedError,
-    primary_location_sequence,
+    FlexStackerStallOrCollisionError,
     adapter_location_sequence,
+    build_retrieve_labware_move_updates,
+    labware_locations_for_group,
     lid_location_sequence,
+    primary_location_sequence,
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.state.state import StateView
 
 RetrieveCommandType = Literal["flexStacker/retrieve"]
 
@@ -125,9 +126,9 @@ class RetrieveResult(BaseModel):
     originalPrimaryLocationSequence: LabwareLocationSequence = Field(
         ..., description="The original location of the just-retrieved primary labware"
     )
-    originalAdapterLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description="The original location of an adapter labware if any")
+    originalAdapterLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description="The original location of an adapter labware if any")
+    )
     originalLidLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = Field(
         None, description="The original location of a lid labware if any"
     )

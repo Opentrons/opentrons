@@ -1,19 +1,18 @@
-from starlette import status
-from fastapi import APIRouter, Depends, Query
 from typing import Annotated, Optional, cast
 
+from fastapi import APIRouter, Depends, Query
+from starlette import status
+
 from opentrons.calibration_storage import types as cal_types
-from opentrons.calibration_storage.ot2 import tip_length, models
-
-from robot_server.hardware import get_ot2_hardware
-from robot_server.errors.error_responses import ErrorBody
-from robot_server.service.tip_length import models as tl_models
-from robot_server.service.errors import RobotServerError, CommonErrorDef
-from robot_server.service.shared_models import calibration as cal_model
-
+from opentrons.calibration_storage.ot2 import models, tip_length
 from opentrons.hardware_control import API
 from opentrons_shared_data.pipette.types import LabwareUri
 
+from robot_server.errors.error_responses import ErrorBody
+from robot_server.hardware import get_ot2_hardware
+from robot_server.service.errors import CommonErrorDef, RobotServerError
+from robot_server.service.shared_models import calibration as cal_model
+from robot_server.service.tip_length import models as tl_models
 
 router = APIRouter()
 

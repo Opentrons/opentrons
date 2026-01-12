@@ -1,15 +1,9 @@
 import { css } from 'styled-components'
 
-import {
-  ALIGN_CENTER,
-  Box,
-  DIRECTION_COLUMN,
-  Flex,
-  PRODUCT,
-  SPACING,
-  Text,
-  TYPOGRAPHY,
-} from '@opentrons/components'
+import { PRODUCT } from '../../helix-design-system'
+import { Box, Flex, Text } from '../../primitives'
+import { ALIGN_CENTER, DIRECTION_COLUMN } from '../../styles'
+import { SPACING, TYPOGRAPHY } from '../../ui-style-constants'
 
 import type { Meta, Story } from '@storybook/react'
 import type { FlattenSimpleInterpolation } from 'styled-components'

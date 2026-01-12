@@ -1,18 +1,22 @@
 """Pytest shared fixtures."""
-from typing import List, Tuple, Optional
-from typing_extensions import Protocol
+
+from typing import List, Optional, Tuple
 
 import pytest
 from mock.mock import AsyncMock
-from opentrons_hardware.firmware_bindings import ArbitrationId, ArbitrationIdParts
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings import NodeId
+from typing_extensions import Protocol
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     MessageListenerCallback,
     MessageListenerCallbackFilter,
 )
+from opentrons_hardware.firmware_bindings import (
+    ArbitrationId,
+    ArbitrationIdParts,
+    NodeId,
+)
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 
 
 class MockCanMessageNotifier:

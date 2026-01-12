@@ -13,8 +13,8 @@ that expects this field to be present.
 
 from pathlib import Path
 
-from ._util import copy_contents
 from .._folder_migrator import Migration
+from ._util import copy_contents
 
 
 class Migration11to12(Migration):  # noqa: D101

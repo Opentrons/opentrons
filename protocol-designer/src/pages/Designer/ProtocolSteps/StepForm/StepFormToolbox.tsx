@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 import get from 'lodash/get'
 
 import {
@@ -29,7 +30,6 @@ import {
   FORM_WARNINGS_EVENT,
 } from '/protocol-designer/analytics/constants'
 import {
-  LINE_CLAMP_TEXT_STYLE,
   LINK_BUTTON_STYLE,
   NAV_BAR_HEIGHT_REM,
 } from '/protocol-designer/components/atoms'
@@ -56,6 +56,7 @@ import {
 import { actions } from '/protocol-designer/steplist'
 import { maskField } from '/protocol-designer/steplist/fieldLevel'
 import { updateFieldsForLiquidClass } from '/protocol-designer/steplist/formLevel/handleFormChange/utils'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 import { getTimelineWarningsForSelectedStep } from '/protocol-designer/top-selectors/timelineWarnings'
 import {
   hoverSelection,
@@ -553,7 +554,11 @@ export function StepFormToolbox(props: StepFormToolboxProps): JSX.Element {
             <Icon size="1rem" name={icon} minWidth="1rem" />
             <StyledText
               desktopStyle="bodyLargeSemiBold"
-              css={LINE_CLAMP_TEXT_STYLE(2, true)}
+              className={clsx(
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_normal
+              )}
+              style={{ WebkitLineClamp: 2 }}
             >
               {/* TODO: use  module object from form.json instead */}
               {formData.stepType === 'flexStacker'

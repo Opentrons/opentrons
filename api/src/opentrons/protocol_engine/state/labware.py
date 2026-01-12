@@ -8,16 +8,16 @@ from typing import (
     Dict,
     List,
     Mapping,
+    NamedTuple,
     Optional,
     Sequence,
     Tuple,
-    NamedTuple,
     Union,
     overload,
 )
+
 from typing_extensions import assert_never
 
-from opentrons.protocol_engine.state import update_types
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.gripper.constants import LABWARE_GRIP_FORCE
 from opentrons_shared_data.labware.labware_definition import (
@@ -25,50 +25,49 @@ from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareDefinition2,
     LabwareRole,
+    UserDefinedVolumes,
     WellDefinition2,
     WellDefinition3,
-    UserDefinedVolumes,
 )
 from opentrons_shared_data.pipette.types import LabwareUri
 
+from .. import errors
+from ..actions import (
+    Action,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    get_state_updates,
+)
+from ..resources import DeckFixedLabware, fixture_validation, labware_validation
+from ..types import (
+    OFF_DECK_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    Dimensions,
+    GripSpecs,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareOffset,
+    LabwareOffsetLocationSequence,
+    LabwareOffsetVector,
+    LegacyLabwareOffsetLocation,
+    LoadedLabware,
+    ModuleLocation,
+    NonStackedLocation,
+    OnDeckLabwareLocation,
+    OnLabwareLocation,
+    OverlapOffset,
+)
+from ._abstract_store import HandlesActions, HasState
+from ._move_types import EdgePathType
+from opentrons.calibration_storage.helpers import uri_from_details
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
     AxisAlignedBoundingBox3D,
 )
-from opentrons.types import DeckSlotName, StagingSlotName, MountType, Point
 from opentrons.protocols.api_support.constants import OPENTRONS_NAMESPACE
-from opentrons.calibration_storage.helpers import uri_from_details
-
-from .. import errors
-from ..resources import DeckFixedLabware, labware_validation, fixture_validation
-from ..types import (
-    DeckSlotLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
-    NonStackedLocation,
-    Dimensions,
-    GripSpecs,
-    LabwareOffset,
-    LabwareOffsetVector,
-    LabwareOffsetLocationSequence,
-    LegacyLabwareOffsetLocation,
-    InStackerHopperLocation,
-    WASTE_CHUTE_LOCATION,
-    LabwareLocation,
-    LoadedLabware,
-    ModuleLocation,
-    OverlapOffset,
-    OnDeckLabwareLocation,
-    OFF_DECK_LOCATION,
-)
-from ..actions import (
-    Action,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    get_state_updates,
-)
-from ._abstract_store import HasState, HandlesActions
-from ._move_types import EdgePathType
-
+from opentrons.types import DeckSlotName, MountType, Point, StagingSlotName
 
 # URIs of labware whose definitions accidentally specify an engage height
 # in units of half-millimeters instead of millimeters.
@@ -220,23 +219,23 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 version=loaded_labware_update.definition.version,
             )
 
-            self._state.definitions_by_uri[
-                definition_uri
-            ] = loaded_labware_update.definition
+            self._state.definitions_by_uri[definition_uri] = (
+                loaded_labware_update.definition
+            )
 
             location = loaded_labware_update.new_location
 
             display_name = loaded_labware_update.display_name
 
-            self._state.labware_by_id[
-                loaded_labware_update.labware_id
-            ] = LoadedLabware.model_construct(
-                id=loaded_labware_update.labware_id,
-                location=location,
-                loadName=loaded_labware_update.definition.parameters.loadName,
-                definitionUri=definition_uri,
-                offsetId=loaded_labware_update.offset_id,
-                displayName=display_name,
+            self._state.labware_by_id[loaded_labware_update.labware_id] = (
+                LoadedLabware.model_construct(
+                    id=loaded_labware_update.labware_id,
+                    location=location,
+                    loadName=loaded_labware_update.definition.parameters.loadName,
+                    definitionUri=definition_uri,
+                    offsetId=loaded_labware_update.offset_id,
+                    displayName=display_name,
+                )
             )
 
     def _add_batch_loaded_labwares(
@@ -265,9 +264,9 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 ].version,
             )
 
-            self._state.definitions_by_uri[
-                definition_uri
-            ] = batch_loaded_labware_update.definitions_by_id[labware_id]
+            self._state.definitions_by_uri[definition_uri] = (
+                batch_loaded_labware_update.definitions_by_id[labware_id]
+            )
 
             location = batch_loaded_labware_update.new_locations_by_id[labware_id]
 
@@ -291,18 +290,18 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                 load_name=loaded_lid_stack_update.stack_object_definition.parameters.loadName,
                 version=loaded_lid_stack_update.stack_object_definition.version,
             )
-            self.state.definitions_by_uri[
-                stack_definition_uri
-            ] = loaded_lid_stack_update.stack_object_definition
-            self._state.labware_by_id[
-                loaded_lid_stack_update.stack_id
-            ] = LoadedLabware.construct(
-                id=loaded_lid_stack_update.stack_id,
-                location=loaded_lid_stack_update.stack_location,
-                loadName=loaded_lid_stack_update.stack_object_definition.parameters.loadName,
-                definitionUri=stack_definition_uri,
-                offsetId=None,
-                displayName=None,
+            self.state.definitions_by_uri[stack_definition_uri] = (
+                loaded_lid_stack_update.stack_object_definition
+            )
+            self._state.labware_by_id[loaded_lid_stack_update.stack_id] = (
+                LoadedLabware.construct(
+                    id=loaded_lid_stack_update.stack_id,
+                    location=loaded_lid_stack_update.stack_location,
+                    loadName=loaded_lid_stack_update.stack_object_definition.parameters.loadName,
+                    definitionUri=stack_definition_uri,
+                    offsetId=None,
+                    displayName=None,
+                )
             )
 
             # Add the Lids on top of the stack object
@@ -317,9 +316,9 @@ class LabwareStore(HasState[LabwareState], HandlesActions):
                     version=loaded_lid_stack_update.definition.version,
                 )
 
-                self._state.definitions_by_uri[
-                    definition_uri
-                ] = loaded_lid_stack_update.definition
+                self._state.definitions_by_uri[definition_uri] = (
+                    loaded_lid_stack_update.definition
+                )
 
                 location = loaded_lid_stack_update.new_locations_by_id[labware_id]
 
@@ -437,8 +436,11 @@ class LabwareView:
             f"There is not labware loaded onto labware {self.get_display_name(labware_id)}"
         )
 
-    def raise_if_labware_has_non_lid_labware_on_top(self, labware_id: str) -> None:
-        """Raise if labware has another labware that is not its lid on top."""
+    def raise_if_labware_has_non_lid_labware_on_top(self, labware_id: str) -> bool:
+        """Raise if labware has another labware that is not its lid on top.
+
+        Returns True if it does not raise.
+        """
         lid_id = self.get_lid_id_by_labware_id(labware_id)
         for candidate_id, candidate_labware in self._state.labware_by_id.items():
             if (
@@ -450,9 +452,13 @@ class LabwareView:
                     f"Cannot access labware {self.get_display_name(labware_id)} because it has"
                     " a non-lid labware stacked on top."
                 )
+        return True
 
-    def raise_if_labware_has_labware_on_top(self, labware_id: str) -> None:
-        """Raise if labware has another labware on top."""
+    def raise_if_labware_has_labware_on_top(self, labware_id: str) -> bool:
+        """Raise if labware has another labware on top.
+
+        Returns True if it does not raise.
+        """
         for labware in self._state.labware_by_id.values():
             if (
                 isinstance(labware.location, OnLabwareLocation)
@@ -462,18 +468,26 @@ class LabwareView:
                     f"Cannot access labware {self.get_display_name(labware_id)} because it has"
                     " another labware stacked on top."
                 )
+        return True
 
-    def raise_if_not_tip_rack(self, labware_id: str) -> None:
-        """Raise if a labware is not a tip rack."""
+    def raise_if_not_tip_rack(self, labware_id: str) -> bool:
+        """Raise if a labware is not a tip rack.
+
+        Returns True if it does not raise.
+        """
         if not self.is_tiprack(labware_id):
             raise errors.LabwareIsNotTipRackError(
                 f"Labware {self.get_display_name(labware_id)} is not a tip rack and cannot have its well states set."
             )
+        return True
 
     def raise_if_wells_are_invalid(
         self, labware_id: str, well_names: List[str]
-    ) -> None:
-        """Raise if given wells do not exist with the given labware ID."""
+    ) -> bool:
+        """Raise if given wells do not exist with the given labware ID.
+
+        Return True if it does not raise.
+        """
         non_existent_wells = set(well_names) - set(
             self.get_definition(labware_id).wells
         )
@@ -481,6 +495,7 @@ class LabwareView:
             raise errors.WellDoesNotExistError(
                 f"Tip rack {self.get_display_name(labware_id)} does not have wells: {', '.join(non_existent_wells)}"
             )
+        return True
 
     def get_by_slot(
         self,
@@ -853,12 +868,10 @@ class LabwareView:
     @overload
     def get_uri_from_definition_unless_none(
         self, labware_definition: LabwareDefinition
-    ) -> str:
-        ...
+    ) -> str: ...
 
     @overload
-    def get_uri_from_definition_unless_none(self, labware_definition: None) -> None:
-        ...
+    def get_uri_from_definition_unless_none(self, labware_definition: None) -> None: ...
 
     def get_uri_from_definition_unless_none(
         self, labware_definition: LabwareDefinition | None
@@ -1073,32 +1086,43 @@ class LabwareView:
     def raise_if_labware_in_location(
         self,
         location: OnDeckLabwareLocation,
-    ) -> None:
-        """Raise an error if the specified location has labware in it."""
+    ) -> bool:
+        """Raise an error if the specified location has labware in it.
+
+        Returns True if it does not raise.
+        """
         for labware in self.get_all():
             if labware.location == location:
                 raise errors.LocationIsOccupiedError(
                     f"Labware {labware.loadName} is already present at {location}."
                 )
+        return True
 
     def raise_if_labware_cannot_be_ondeck(
         self,
         location: LabwareLocation,
         labware_definition: LabwareDefinition,
-    ) -> None:
-        """Raise an error if the labware cannot be in the specified location."""
+    ) -> bool:
+        """Raise an error if the labware cannot be in the specified location.
+
+        Returns True if it does not raise.
+        """
         if isinstance(
             location, (DeckSlotLocation, AddressableAreaLocation)
         ) and not labware_validation.validate_labware_can_be_ondeck(labware_definition):
             raise errors.LabwareCannotSitOnDeckError(
                 f"{labware_definition.parameters.loadName} cannot sit in a slot by itself."
             )
+        return True
 
     def raise_if_labware_incompatible_with_plate_reader(
         self,
         labware_definition: LabwareDefinition,
-    ) -> None:
-        """Raise an error if the labware is not compatible with the plate reader."""
+    ) -> bool:
+        """Raise an error if the labware is not compatible with the plate reader.
+
+        Returns True if it does not raise.
+        """
         load_name = labware_definition.parameters.loadName
         number_of_wells = len(labware_definition.wells)
         if number_of_wells != 96:
@@ -1114,14 +1138,18 @@ class LabwareView:
                 f"Cannot move '{load_name}' into plate reader because the"
                 f" maximum allowed labware height is {_PLATE_READER_MAX_LABWARE_Z_MM}mm."
             )
+        return True
 
     def raise_if_stacker_labware_pool_is_not_valid(
         self,
         primary_labware_definition: LabwareDefinition,
         lid_labware_definition: LabwareDefinition | None,
         adapter_labware_definition: LabwareDefinition | None,
-    ) -> None:
-        """Raise if the primary, lid, and adapter do not go together."""
+    ) -> bool:
+        """Raise if the primary, lid, and adapter do not go together.
+
+        Returns True if it does not raise.
+        """
         if lid_labware_definition:
             if not labware_validation.validate_definition_is_lid(
                 lid_labware_definition
@@ -1153,6 +1181,7 @@ class LabwareView:
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {adapter_labware_definition.parameters.loadName} cannot be used as an adapter for {primary_labware_definition.parameters.loadName}"
                 )
+        return True
 
     def stacker_labware_pool_to_ordered_list(
         self,
@@ -1190,8 +1219,11 @@ class LabwareView:
 
     def raise_if_labware_cannot_be_stacked(  # noqa: C901
         self, top_labware_definition: LabwareDefinition, bottom_labware_id: str
-    ) -> None:
-        """Raise if the specified labware definition cannot be placed on top of the bottom labware."""
+    ) -> bool:
+        """Raise if the specified labware definition cannot be placed on top of the bottom labware.
+
+        Returns True if it does not raise.
+        """
         if labware_validation.validate_definition_is_adapter(top_labware_definition):
             raise errors.LabwareCannotBeStackedError(
                 f"Labware {top_labware_definition.parameters.loadName} is defined as an adapter and cannot be placed"
@@ -1257,6 +1289,7 @@ class LabwareView:
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded"
                     f" onto labware on top of adapter"
                 )
+        return True
 
     def _is_magnetic_module_uri_in_half_millimeter(self, labware_id: str) -> bool:
         """Check whether the labware uri needs to be calculated in half a millimeter."""

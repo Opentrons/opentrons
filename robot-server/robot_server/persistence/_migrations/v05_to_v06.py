@@ -17,22 +17,21 @@ Summary of changes from schema 5:
   non-nullable (NULL was semantically equivalent to "standard"), and adds an index.
 """
 
-from pathlib import Path
 from contextlib import ExitStack
+from pathlib import Path
 
 import sqlalchemy
 
-from ..database import sql_engine_ctx, sqlite_rowid
-from ..tables import schema_05, schema_06
 from .._folder_migrator import Migration
-
-from ._util import copy_rows_unmodified, copy_if_exists, copytree_if_exists
+from ..database import sql_engine_ctx, sqlite_rowid
 from ..file_and_directory_names import (
-    DECK_CONFIGURATION_FILE,
-    PROTOCOLS_DIRECTORY,
     DATA_FILES_DIRECTORY,
     DB_FILE,
+    DECK_CONFIGURATION_FILE,
+    PROTOCOLS_DIRECTORY,
 )
+from ..tables import schema_05, schema_06
+from ._util import copy_if_exists, copy_rows_unmodified, copytree_if_exists
 
 
 class Migration5to6(Migration):  # noqa: D101

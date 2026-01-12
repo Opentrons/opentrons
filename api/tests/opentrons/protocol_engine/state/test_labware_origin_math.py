@@ -1,66 +1,69 @@
 """Test suite for _labware_origin_math.py module."""
-from typing import NamedTuple, List, Optional
+
+from typing import List, NamedTuple, Optional
+
 import pytest
 
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.labware.labware_definition import (
+    AxisAlignedBoundingBox3D,
+    Dimensions,
+    Extents,
+    GripperOffsets,
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
+    LabwareRole,
+    Parameters2,
+    Parameters3,
+    Vector3D,
+)
+from opentrons_shared_data.labware.types import (
+    FlatSupportThermalCouplingAsChildFeature,
+    HeaterShakerUniversalFlatAdapterFeature,
+    LocatingFeatures,
+    OpentronsFlexTipRackLidAsChildFeature,
+    OpentronsFlexTipRackLidAsParentFeature,
+    ScrewAnchoredAsChildFeature,
+    ScrewAnchoredAsParentFeature,
+    SlotFootprintAsChildFeature,
+    SlotFootprintAsParentFeature,
+    Vector2D,
+)
+from opentrons_shared_data.module.types import ModuleOrientation
+
+from opentrons.protocol_engine.state.labware_origin_math.errors import (
+    InvalidLabwarePlacementError,
+)
+from opentrons.protocol_engine.state.labware_origin_math.stackup_origin_to_labware_origin import (
+    LabwareOriginContext,
+    LabwareStackupAncestorDefinition,
+    get_stackup_origin_to_labware_origin,
+)
+from opentrons.protocol_engine.types import (
+    AddressableArea,
+    AddressableAreaLocation,
+    AddressableOffsetVector,
+    AreaType,
+    DeckSlotLocation,
+    LabwareLocation,
+    LabwareMovementOffsetData,
+    LabwareOffsetVector,
+    ModuleDefinition,
+    ModuleDimensions,
+    ModuleLocation,
+    ModuleModel,
+    OnLabwareLocation,
+)
+from opentrons.protocol_engine.types import (
+    Dimensions as AddressableAreaDimensions,
+)
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
-from opentrons_shared_data.deck import load as load_deck
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    LabwareDefinition2,
-    LabwareDefinition3,
-    Vector3D,
-    Extents,
-    AxisAlignedBoundingBox3D,
-    Dimensions,
-    Parameters2,
-    Parameters3,
-    GripperOffsets,
-    LabwareRole,
-)
-from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.labware.types import (
-    LocatingFeatures,
-    SlotFootprintAsChildFeature,
-    SlotFootprintAsParentFeature,
-    Vector2D,
-    OpentronsFlexTipRackLidAsChildFeature,
-    OpentronsFlexTipRackLidAsParentFeature,
-    HeaterShakerUniversalFlatAdapterFeature,
-    FlatSupportThermalCouplingAsChildFeature,
-    ScrewAnchoredAsParentFeature,
-    ScrewAnchoredAsChildFeature,
-)
-
-from opentrons.types import Point, DeckSlotName
-from opentrons_shared_data.module.types import ModuleOrientation
-from opentrons.protocol_engine.state.labware_origin_math.stackup_origin_to_labware_origin import (
-    get_stackup_origin_to_labware_origin,
-    LabwareOriginContext,
-    LabwareStackupAncestorDefinition,
-)
-from opentrons.protocol_engine.state.labware_origin_math.errors import (
-    InvalidLabwarePlacementError,
-)
-from opentrons.protocol_engine.types import (
-    ModuleModel,
-    ModuleDefinition,
-    ModuleDimensions,
-    AddressableArea,
-    AreaType,
-    AddressableOffsetVector,
-    Dimensions as AddressableAreaDimensions,
-    ModuleLocation,
-    AddressableAreaLocation,
-    OnLabwareLocation,
-    DeckSlotLocation,
-    LabwareMovementOffsetData,
-    LabwareOffsetVector,
-    LabwareLocation,
-)
-
+from opentrons.types import DeckSlotName, Point
 
 # Test fixtures for labware definitions
 _LW_V2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
@@ -194,7 +197,9 @@ _AR_LID_V2 = LabwareDefinition2.model_construct(  # type: ignore[call-arg]
     stackingOffsetWithLabware={"default": Vector3D(x=0, y=0, z=0)},
     dimensions=Dimensions(xDimension=1000, yDimension=1200, zDimension=750),
     stackingOffsetWithModule={},
-    parameters=Parameters2.model_construct(loadName="opentrons_flex_lid_absorbance_plate_reader_module"),  # type: ignore[call-arg]
+    parameters=Parameters2.model_construct(
+        loadName="opentrons_flex_lid_absorbance_plate_reader_module"
+    ),  # type: ignore[call-arg]
     gripperOffsets={
         "default": GripperOffsets(
             pickUpOffset=Vector3D(x=7, y=14, z=21),

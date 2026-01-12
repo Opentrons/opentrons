@@ -1,10 +1,12 @@
-import pytest
-from pytest_lazy_fixtures import lf as lazy_fixture
 from typing import Dict, Generator, Optional
 from unittest.mock import MagicMock, patch
 
-from opentrons.config import advanced_settings, CONFIG
+import pytest
+from pytest_lazy_fixtures import lf as lazy_fixture
+
 from opentrons_shared_data.robot.types import RobotTypeEnum
+
+from opentrons.config import CONFIG, advanced_settings
 
 
 @pytest.fixture

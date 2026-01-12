@@ -1,11 +1,11 @@
 import logging
-from typing import Optional, List, Dict, Any, Union, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from pydantic import field_validator, BaseModel, Field, create_model
+from pydantic import BaseModel, Field, create_model, field_validator
 
-from opentrons_shared_data.util import StrEnum
-from opentrons_shared_data.pipette import model_constants
 from opentrons.config.reset import ResetOptionId
+from opentrons_shared_data.pipette import model_constants
+from opentrons_shared_data.util import StrEnum
 
 
 class AdvancedSetting(BaseModel):
@@ -119,7 +119,7 @@ class FactoryResetOption(BaseModel):
     )
     name: str = Field(..., description="A short human-readable name for the setting")
     description: str = Field(
-        ..., description="A longer human-readable description of the " "setting"
+        ..., description="A longer human-readable description of the setting"
     )
 
 
@@ -157,7 +157,7 @@ class PipetteSettingsInfo(BaseModel):
 
     name: str = Field(..., description='A pipette name (e.g. "p300_single")')
     model: str = Field(
-        ..., description='The exact pipette model (e.g. "' 'p300_single_v1.5")'
+        ..., description='The exact pipette model (e.g. "p300_single_v1.5")'
     )
 
 
@@ -193,7 +193,6 @@ PipetteSettingsFields.__doc__ = "The fields of the pipette settings"
 
 
 class PipetteSettings(BaseModel):
-
     info: PipetteSettingsInfo
     setting_fields: PipetteSettingsFields = Field(..., alias="fields")  # type: ignore
 

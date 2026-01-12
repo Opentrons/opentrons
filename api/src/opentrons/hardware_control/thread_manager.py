@@ -1,25 +1,28 @@
 """Manager for the :py:class:`.hardware_control.API` thread."""
-import functools
-import threading
-import logging
+
 import asyncio
+import functools
 import inspect
+import logging
+import threading
 import weakref
 from typing import (
     Any,
+    AsyncGenerator,
     Awaitable,
     Callable,
+    Coroutine,
     Generic,
-    Optional,
-    TypeVar,
-    cast,
-    Sequence,
     Mapping,
-    AsyncGenerator,
-    Union,
-    Type,
+    Optional,
     ParamSpec,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+    cast,
 )
+
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
 from .protocols import (
@@ -40,7 +43,7 @@ P = ParamSpec("P")
 
 async def call_coroutine_threadsafe(
     loop: asyncio.AbstractEventLoop,
-    coro: Callable[P, Awaitable[WrappedReturn]],
+    coro: Callable[P, Coroutine[Any, Any, WrappedReturn]],
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> WrappedReturn:
@@ -58,7 +61,6 @@ async def execute_asyncgen_threadsafe(
     *args: P.args,
     **kwargs: P.kwargs,
 ) -> AsyncGenerator[WrappedYield, None]:
-
     # This function should bridge an async generator function between two asyncio
     # loops running in different threads. There are several stages to this because
     # there are several stages to generator execution.
@@ -214,7 +216,7 @@ class ThreadManager(Generic[WrappedObj]):
 
     @staticmethod
     def nonblocking_builder(
-        builder: Callable[Builder, Awaitable[Built]]
+        builder: Callable[Builder, Awaitable[Built]],
     ) -> Callable[Builder, Awaitable[Built]]:
         """Wrap an instance of a builder function to make initializes that use it nonblocking.
 

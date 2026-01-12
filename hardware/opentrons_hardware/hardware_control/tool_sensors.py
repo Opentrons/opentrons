@@ -1,35 +1,34 @@
 """Functions for commanding motion limited by tool sensors."""
+
 import asyncio
-from contextlib import AsyncExitStack
+from contextlib import AsyncExitStack, asynccontextmanager
 from functools import partial
-from typing import (
-    Union,
-    List,
-    Iterator,
-    Tuple,
-    Dict,
-    Callable,
-    AsyncContextManager,
-    Optional,
-    AsyncIterator,
-    Mapping,
-)
 from logging import getLogger
-from numpy import float64
 from math import copysign
+from typing import (
+    AsyncContextManager,
+    AsyncIterator,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
+
+from numpy import float64
 from typing_extensions import Literal
-from contextlib import asynccontextmanager
+
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
+    ErrorCode,
     NodeId,
     SensorId,
-    SensorType,
     SensorOutputBinding,
-    ErrorCode,
     SensorThresholdMode,
-)
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    SendAccumulatedSensorDataPayload,
-    BindSensorOutputRequestPayload,
+    SensorType,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorIdField,
@@ -40,27 +39,30 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
     SendAccumulatedSensorDataRequest,
 )
-from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
-from opentrons_hardware.sensors.types import (
-    sensor_fixed_point_conversion,
-    SensorDataType,
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BindSensorOutputRequestPayload,
+    SendAccumulatedSensorDataPayload,
 )
-from opentrons_hardware.sensors.sensor_types import (
-    SensorInformation,
-    PressureSensor,
-    CapacitiveSensor,
-)
-from opentrons_hardware.sensors.scheduler import SensorScheduler
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.hardware_control.motion import (
+    MoveGroupStep,
     MoveStopCondition,
     create_step,
-    MoveGroupStep,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.types import (
     MotorPositionStatus,
     MoveCompleteAck,
+)
+from opentrons_hardware.sensors.scheduler import SensorScheduler
+from opentrons_hardware.sensors.sensor_driver import LogListener, SensorDriver
+from opentrons_hardware.sensors.sensor_types import (
+    CapacitiveSensor,
+    PressureSensor,
+    SensorInformation,
+)
+from opentrons_hardware.sensors.types import (
+    SensorDataType,
+    sensor_fixed_point_conversion,
 )
 
 LOG = getLogger(__name__)

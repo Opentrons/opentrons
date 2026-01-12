@@ -12,7 +12,6 @@ labware.
 # https://github.com/taverntesting/tavern/issues/833 is resolved. We need to upload
 # multiple files into the `files` field of the `POST /protocols` endpoint.
 
-
 import asyncio
 import textwrap
 from pathlib import Path
@@ -22,7 +21,6 @@ import anyio
 import pytest
 
 from tests.integration.robot_client import RobotClient
-
 
 INTEGRATION_TEST_PROTOCOLS_DIR = Path(__file__).parent / "../../protocols"
 LABWARE_PATH = INTEGRATION_TEST_PROTOCOLS_DIR / "test_1_reservoir_5ul.json"

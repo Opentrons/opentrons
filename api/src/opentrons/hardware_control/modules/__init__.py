@@ -1,40 +1,40 @@
+from .absorbance_reader import AbsorbanceReader
+from .errors import (
+    AbsorbanceReaderDisconnectedError,
+    UpdateError,
+)
+from .flex_stacker import FlexStacker
+from .heater_shaker import HeaterShaker
+from .magdeck import MagDeck
 from .mod_abc import AbstractModule
 from .tempdeck import TempDeck
-from .magdeck import MagDeck
 from .thermocycler import Thermocycler
-from .heater_shaker import HeaterShaker
-from .absorbance_reader import AbsorbanceReader
-from .flex_stacker import FlexStacker
-from .update import update_firmware
-from .utils import MODULE_TYPE_BY_NAME, build
 from .types import (
-    ThermocyclerStep,
-    UploadFunction,
-    BundledFirmware,
-    ModuleAtPort,
-    SimulatingModuleAtPort,
-    SimulatingModule,
-    ModuleType,
-    ModuleModel,
-    TemperatureStatus,
-    MagneticStatus,
-    HeaterShakerStatus,
     AbsorbanceReaderStatus,
-    PlatformState,
-    StackerAxisState,
+    BundledFirmware,
     FlexStackerStatus,
-    SpeedStatus,
+    HeaterShakerStatus,
     LiveData,
+    MagneticStatus,
+    ModuleAtPort,
     ModuleData,
     ModuleDataValidator,
+    ModuleModel,
+    ModuleType,
+    PlatformState,
+    SimulatingModule,
+    SimulatingModuleAtPort,
+    SpeedStatus,
+    StackerAxisState,
+    TemperatureStatus,
+    ThermocyclerStep,
+    UploadFunction,
+    VacuumModuleStatus,
     module_model_from_string,
 )
-
-from .errors import (
-    UpdateError,
-    AbsorbanceReaderDisconnectedError,
-)
-
+from .update import update_firmware
+from .utils import MODULE_TYPE_BY_NAME, build
+from .vacuum_module import VacuumModule
 
 __all__ = [
     "MODULE_TYPE_BY_NAME",
@@ -69,4 +69,6 @@ __all__ = [
     "PlatformState",
     "StackerAxisState",
     "module_model_from_string",
+    "VacuumModule",
+    "VacuumModuleStatus",
 ]

@@ -1,46 +1,44 @@
 """Manage current and historical run data."""
 
 from datetime import datetime
-from typing import Dict, List, Optional, Callable, Union, Mapping, Sequence
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
-from opentrons_shared_data.data_files import RunFileNameMetadata
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
 from opentrons import config
-from opentrons.types import NozzleMapInterface
 from opentrons.protocol_engine import (
+    Command,
+    CommandErrorSlice,
+    CommandPointer,
+    CommandSlice,
     EngineStatus,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
-    CommandSlice,
-    CommandErrorSlice,
-    CommandPointer,
-    Command,
 )
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
 from opentrons.protocol_engine.types import (
-    PrimitiveRunTimeParamValuesType,
     CSVRuntimeParamPaths,
+    DeckConfigurationType,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
 )
+from opentrons.system import camera
+from opentrons.types import NozzleMapInterface
+from opentrons_shared_data.data_files import RunFileNameMetadata
+from opentrons_shared_data.errors.exceptions import EnumeratedError, InvalidStoredData
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
-from robot_server.camera.settings.store import CameraSettingStore
-from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.service.task_runner import TaskRunner
-from robot_server.service.notifications import RunsPublisher
 from . import error_recovery_mapping
 from .error_recovery_models import ErrorRecoveryRule
-
+from .run_models import BadRun, Run, RunDataError
 from .run_orchestrator_store import RunOrchestratorStore
-from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
-from .run_models import Run, BadRun, RunDataError
-
-from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
-from opentrons.protocol_engine.resources.file_provider import FileProvider
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
-from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
-from opentrons.system import camera
+from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
+from robot_server.camera.settings.store import CameraSettingStore
+from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.service.notifications import RunsPublisher
+from robot_server.service.task_runner import TaskRunner
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -417,13 +415,13 @@ class RunDataManager:
             run_result = await self._run_orchestrator_store.clear()
             state_summary = run_result.state_summary
             parameters = run_result.parameters
-            run_resource: Union[
-                RunResource, BadRunResource
-            ] = self._run_store.update_run_state(
-                run_id=run_id,
-                summary=run_result.state_summary,
-                commands=run_result.commands,
-                run_time_parameters=run_result.parameters,
+            run_resource: Union[RunResource, BadRunResource] = (
+                self._run_store.update_run_state(
+                    run_id=run_id,
+                    summary=run_result.state_summary,
+                    commands=run_result.commands,
+                    run_time_parameters=run_result.parameters,
+                )
             )
             self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
             self._file_provider.clear_run_metadata()

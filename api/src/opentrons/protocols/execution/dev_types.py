@@ -1,31 +1,31 @@
-from typing import Callable, Dict, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable, Dict
 
 from typing_extensions import Protocol, TypedDict
 
 from opentrons_shared_data.protocol.types import (
     BlowoutParams,
     DelayParams,
+    MagneticModuleEngageParams,
+    ModuleIDParams,
+    MoveToSlotParams,
+    MoveToWellParams,
     PipetteAccessParams,
     StandardLiquidHandlingParams,
-    TouchTipParams,
-    MoveToSlotParams,
     TemperatureParams,
-    ModuleIDParams,
-    MagneticModuleEngageParams,
     ThermocyclerRunProfileParams,
     ThermocyclerSetTargetBlockParams,
-    MoveToWellParams,
+    TouchTipParams,
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocol_api.protocol_context import ProtocolContext
     from opentrons.protocol_api.instrument_context import InstrumentContext
+    from opentrons.protocol_api.labware import Labware
     from opentrons.protocol_api.module_contexts import (
         MagneticModuleContext,
-        ThermocyclerContext,
         TemperatureModuleContext,
+        ThermocyclerContext,
     )
-    from opentrons.protocol_api.labware import Labware
+    from opentrons.protocol_api.protocol_context import ProtocolContext
 
 
 # this file defines types that require dev dependencies
@@ -45,8 +45,7 @@ if Protocol is not None:
         not a type (https://github.com/python/mypy/issues/3915)
         """
 
-        async def _asdict(self) -> Dict[Any, Any]:
-            ...
+        async def _asdict(self) -> Dict[Any, Any]: ...
 
 
 # using a lot of string literals here instead of the enum values from

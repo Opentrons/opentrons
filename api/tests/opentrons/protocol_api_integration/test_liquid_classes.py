@@ -1,10 +1,12 @@
 """Tests for the APIs around liquid classes."""
-from typing import Dict, Any
+
+from typing import Any, Dict
 
 import pytest
 
-from opentrons.protocol_api import ProtocolContext
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
+
+from opentrons.protocol_api import ProtocolContext
 
 
 @pytest.mark.ot3_only

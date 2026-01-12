@@ -1,6 +1,5 @@
 import { POST, request } from '../request'
 
-import type { CameraId } from '@opentrons/shared-data'
 import type {
   CameraImageSettings,
   CameraImageSettingsResponse,
@@ -10,12 +9,11 @@ import type { HostConfig } from '../types'
 
 export function createCameraImageSettings(
   config: HostConfig,
-  data: CameraImageSettings,
-  cameraId: CameraId
+  data: CameraImageSettings
 ): ResponsePromise<CameraImageSettingsResponse> {
   return request<CameraImageSettingsResponse, { data: CameraImageSettings }>(
     POST,
-    `/camera/cameraSettings/${cameraId}`,
+    `/camera/cameraSettings`,
     { data },
     config
   )

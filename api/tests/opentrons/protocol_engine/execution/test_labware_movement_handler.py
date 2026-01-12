@@ -3,52 +3,50 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Union, Optional
+from typing import TYPE_CHECKING, Optional, Union
 
-from decoy import Decoy, matchers
 import pytest
+from decoy import Decoy, matchers
 
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
-from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.types import DeckSlotName, Point
-
-from opentrons.hardware_control.types import OT3Mount, Axis
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareOffset,
-    LegacyLabwareOffsetLocation,
-    LabwareOffsetVector,
-    LabwareLocation,
-    NonStackedLocation,
-    Dimensions,
-    GripperMoveType,
-    GripSpecs,
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.protocol_engine.errors import (
+    GripperNotAttachedError,
+    HardwareNotSupportedError,
+    HeaterShakerLabwareLatchNotOpenError,
+    LabwareMovementNotAllowedError,
+    ThermocyclerNotOpenError,
 )
-from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
-    ThermocyclerPlateLifter,
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
+    HeaterShakerMovementFlagger,
+)
+from opentrons.protocol_engine.execution.labware_movement import (
+    LabwareMovementHandler,
 )
 from opentrons.protocol_engine.execution.thermocycler_movement_flagger import (
     ThermocyclerMovementFlagger,
 )
-from opentrons.protocol_engine.execution.heater_shaker_movement_flagger import (
-    HeaterShakerMovementFlagger,
-)
-
-from opentrons.protocol_engine.execution.labware_movement import (
-    LabwareMovementHandler,
-)
-from opentrons.protocol_engine.errors import (
-    HardwareNotSupportedError,
-    GripperNotAttachedError,
-    LabwareMovementNotAllowedError,
-    ThermocyclerNotOpenError,
-    HeaterShakerLabwareLatchNotOpenError,
+from opentrons.protocol_engine.execution.thermocycler_plate_lifter import (
+    ThermocyclerPlateLifter,
 )
 from opentrons.protocol_engine.state.state import StateStore
+from opentrons.protocol_engine.types import (
+    DeckSlotLocation,
+    Dimensions,
+    GripperMoveType,
+    GripSpecs,
+    LabwareLocation,
+    LabwareOffset,
+    LabwareOffsetVector,
+    LegacyLabwareOffsetLocation,
+    ModuleLocation,
+    NonStackedLocation,
+    OnLabwareLocation,
+)
+from opentrons.types import DeckSlotName, Point
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
@@ -549,7 +547,7 @@ async def test_ensure_movement_obstructed_by_thermocycler_raises(
         state_store.labware.get_parent_location(labware_id="labware-id")
     ).then_return(from_loc)
     decoy.when(
-        await thermocycler_movement_flagger.ensure_labware_in_open_thermocycler(
+        await thermocycler_movement_flagger.ensure_labware_in_open_thermocycler(  # type: ignore[func-returns-value]
             labware_parent=ModuleLocation(moduleId="a-thermocycler-id")
         )
     ).then_raise(ThermocyclerNotOpenError("Thou shall not pass!"))

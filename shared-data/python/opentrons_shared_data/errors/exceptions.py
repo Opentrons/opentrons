@@ -1,26 +1,26 @@
 """Exception hierarchy for error codes."""
 
 from __future__ import annotations
-from typing import (
-    Dict,
-    Any,
-    Optional,
-    List,
-    Iterator,
-    Union,
-    Sequence,
-    overload,
-    Type,
-    TypeVar,
-)
-from logging import getLogger
-from traceback import format_exception_only, format_tb
+
 import inspect
 import sys
+from logging import getLogger
+from traceback import format_exception_only, format_tb
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
-from .codes import ErrorCodes
 from .categories import ErrorCategories
-
+from .codes import ErrorCodes
 
 log = getLogger(__name__)
 
@@ -60,7 +60,7 @@ class EnumeratedError(Exception):
     def __str__(self) -> str:
         """Get a human-readable string."""
         _node = self.detail.get("node")
-        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}{f" ({_node})" if _node else ""}'
+        return f"Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f': {self.message}' if self.message else ''}{f' ({_node})' if _node else ''}"
 
     def __eq__(self, other: object) -> bool:
         """Compare if two enumerated errors match."""

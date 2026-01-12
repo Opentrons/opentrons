@@ -1,19 +1,18 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING, List, Sequence, Union, overload, Optional
 
+from typing import TYPE_CHECKING, List, Optional, Sequence, Union, overload
 
-from .helpers import (
-    stringify_location,
-    stringify_disposal_location,
-    stringify_well_list,
-    listify,
-)
 from . import types as command_types
-
-from opentrons.types import Location
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from .helpers import (
+    listify,
+    stringify_disposal_location,
+    stringify_location,
+    stringify_well_list,
+)
 from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.types import Location
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
@@ -193,17 +192,15 @@ def transfer(
 
 
 @overload
-def transform_volumes(volumes: Union[float, int]) -> float:
-    ...
+def transform_volumes(volumes: Union[float, int]) -> float: ...
 
 
 @overload
-def transform_volumes(volumes: List[float]) -> List[float]:
-    ...
+def transform_volumes(volumes: List[float]) -> List[float]: ...
 
 
 def transform_volumes(
-    volumes: Union[float, int, List[float]]
+    volumes: Union[float, int, List[float]],
 ) -> Union[float, List[float]]:
     if not isinstance(volumes, list):
         return float(volumes)
@@ -262,10 +259,10 @@ def dynamic_mix(
 
 
 def blow_out(
-    instrument: InstrumentContext, location: Location
+    instrument: InstrumentContext, location: Location, flow_rate: float
 ) -> command_types.BlowOutCommand:
     location_text = stringify_location(location)
-    text = f"Blowing out at {location_text}"
+    text = f"Blowing out into {location_text} at {flow_rate} uL/sec"
 
     return {
         "name": command_types.BLOW_OUT,
@@ -274,10 +271,12 @@ def blow_out(
 
 
 def blow_out_in_disposal_location(
-    instrument: InstrumentContext, location: Union[TrashBin, WasteChute]
+    instrument: InstrumentContext,
+    location: Union[TrashBin, WasteChute],
+    flow_rate: float,
 ) -> command_types.BlowOutInDisposalLocationCommand:
     location_text = stringify_disposal_location(location)
-    text = f"Blowing out into {location_text}"
+    text = f"Blowing out into {location_text} at {flow_rate} uL/sec"
 
     return {
         "name": command_types.BLOW_OUT_IN_DISPOSAL_LOCATION,

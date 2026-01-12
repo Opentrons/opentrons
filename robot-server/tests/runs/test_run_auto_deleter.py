@@ -1,8 +1,7 @@
 """Unit tests for `run_auto_deleter`."""
 
-
-from datetime import datetime
 import logging
+from datetime import datetime
 from typing import List, Union
 
 import pytest
@@ -10,12 +9,12 @@ from decoy import Decoy
 
 from opentrons.protocol_reader import ProtocolSource
 
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
 from robot_server.deletion_planner import RunDeletionPlanner
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource, ProtocolStore
 from robot_server.runs.run_auto_deleter import RunAutoDeleter
-from robot_server.runs.run_store import RunStore, RunResource, BadRunResource
-from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
+from robot_server.runs.run_store import BadRunResource, RunResource, RunStore
 
 
 def _make_dummy_run_resource(run_id: str, protocol_id: str) -> RunResource:

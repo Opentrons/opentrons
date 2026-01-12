@@ -1,12 +1,12 @@
 from typing import AsyncGenerator
 
 import pytest
+
+from .build_module import build_module
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
 from opentrons.hardware_control.modules import HeaterShaker
-
-from .build_module import build_module
 
 TEMP_ROOM_LOW = TEMPERATURE_ROOM - 0.7
 TEMP_ROOM_HIGH = TEMPERATURE_ROOM + 0.7

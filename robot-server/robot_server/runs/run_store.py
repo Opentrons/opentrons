@@ -5,49 +5,47 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
-from typing import Dict, List, Optional, Literal, Union
+from typing import Dict, List, Literal, Optional, Union
 
 import sqlalchemy
 from pydantic import TypeAdapter, ValidationError
 from sqlalchemy import and_
 
-from opentrons.util.helpers import utc_now
 from opentrons.protocol_engine import (
-    StateSummary,
-    CommandSlice,
-    CommandIntent,
-    ErrorOccurrence,
     CommandErrorSlice,
+    CommandIntent,
+    CommandSlice,
     CommandStatus,
+    ErrorOccurrence,
+    StateSummary,
 )
 from opentrons.protocol_engine.commands import Command, CommandAdapter
 from opentrons.protocol_engine.types import RunTimeParameter
-
+from opentrons.util.helpers import utc_now
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
-    PythonException,
     InvalidStoredData,
+    PythonException,
 )
 
-from robot_server.persistence.database import sqlite_rowid
-from robot_server.persistence.tables import (
-    run_table,
-    run_command_table,
-    action_table,
-    run_csv_rtp_table,
-    input_data_files_table,
-    output_data_files_table,
-)
-from robot_server.persistence.pydantic import (
-    json_to_pydantic,
-    pydantic_to_json,
-    pydantic_list_to_json,
-)
-from robot_server.protocols.protocol_store import ProtocolNotFoundError
-
+from ..persistence.tables import CommandStatusSQLEnum
 from .action_models import RunAction, RunActionType
 from .run_models import RunNotFoundError
-from ..persistence.tables import CommandStatusSQLEnum
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.pydantic import (
+    json_to_pydantic,
+    pydantic_list_to_json,
+    pydantic_to_json,
+)
+from robot_server.persistence.tables import (
+    action_table,
+    input_data_files_table,
+    output_data_files_table,
+    run_command_table,
+    run_csv_rtp_table,
+    run_table,
+)
+from robot_server.protocols.protocol_store import ProtocolNotFoundError
 
 log = logging.getLogger(__name__)
 
@@ -298,9 +296,9 @@ class RunStore:
             try:
                 transaction.execute(insert)
             except sqlalchemy.exc.IntegrityError:
-                assert (
-                    run.protocol_id is not None
-                ), "Insert run failed due to unexpected IntegrityError"
+                assert run.protocol_id is not None, (
+                    "Insert run failed due to unexpected IntegrityError"
+                )
                 raise ProtocolNotFoundError(protocol_id=run.protocol_id)
 
         self._clear_caches()
@@ -767,9 +765,9 @@ def _convert_row_to_run(
     # other way to delete it. It's also unclear how it could happen without the table schema
     # changing out from under us.
     assert isinstance(run_id, str), f"Run ID {run_id} is not a string"
-    assert protocol_id is None or isinstance(
-        protocol_id, str
-    ), f"Protocol ID {protocol_id} is not a string or None"
+    assert protocol_id is None or isinstance(protocol_id, str), (
+        f"Protocol ID {protocol_id} is not a string or None"
+    )
     try:
         actions = [
             RunAction(

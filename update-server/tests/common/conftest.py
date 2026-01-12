@@ -1,7 +1,7 @@
 import lzma
 import os
-import subprocess
 import re
+import subprocess
 import zipfile
 from typing import Tuple
 from unittest import mock
@@ -12,12 +12,11 @@ import pytest
 # Avoid pytest trying to collect TestClient because it begins with "Test".
 from aiohttp.test_utils import TestClient as HTTPTestClient
 
-from otupdate import buildroot, common
+from tests.common.config import FakeRootPartElem
 
-from otupdate import openembedded
+from otupdate import buildroot, common, openembedded
 from otupdate.common.update_actions import Partition
 from otupdate.openembedded import PartitionManager
-from tests.common.config import FakeRootPartElem
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 one_up = os.path.abspath(os.path.join(__file__, "../../"))
@@ -154,7 +153,7 @@ def extracted_update_file_consolidated(request, tmpdir):
         ),
     ]
 
-    for (rootfs, sha256, sig) in list_of_extracted_files:
+    for rootfs, sha256, sig in list_of_extracted_files:
         rootfs_path = os.path.join(tmpdir, rootfs)
         hash_path = os.path.join(tmpdir, sha256)
         uncomp_xz_hash_path = os.path.join(tmpdir, "tmp_uncomp_xz_hash_path")
@@ -165,7 +164,6 @@ def extracted_update_file_consolidated(request, tmpdir):
         if request.node.get_closest_marker("bad_hash"):
             hashval = b"0oas0ajcs0asd0asjc0ans0d9ajsd0ian0s9djas"
         else:
-
             hashval = re.match(
                 b"^([a-z0-9]+) ",
                 gen_hash_val_direct(rootfs_path),

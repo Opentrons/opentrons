@@ -1,26 +1,25 @@
 """HTTP routes and handlers for /health endpoints."""
-from dataclasses import dataclass
-from fastapi import APIRouter, Depends, status
-from typing import Annotated, Dict, cast
-import logging
+
 import json
+import logging
+from dataclasses import dataclass
+from typing import Annotated, Dict, cast
+
+from fastapi import APIRouter, Depends, status
 
 from opentrons import __version__, config, protocol_api
 from opentrons.hardware_control import HardwareControlAPI
-
+from opentrons_shared_data.robot.types import RobotType
 from server_utils.util import call_once
 
+from .models import DiskDetails, Health, HealthLinks
+from robot_server.disk_monitor.dependencies import get_disk_monitor
+from robot_server.disk_monitor.monitor import DiskMonitor
 from robot_server.hardware import get_hardware, get_robot_type
 from robot_server.persistence.fastapi_dependencies import (
     get_sql_engine as ensure_sql_engine_is_ready,
 )
 from robot_server.service.legacy.models import V1BasicResponse
-from robot_server.disk_monitor.monitor import DiskMonitor
-from robot_server.disk_monitor.dependencies import get_disk_monitor
-
-from opentrons_shared_data.robot.types import RobotType
-
-from .models import Health, HealthLinks, DiskDetails
 
 _log = logging.getLogger(__name__)
 

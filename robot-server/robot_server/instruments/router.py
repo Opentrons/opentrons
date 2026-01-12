@@ -1,55 +1,54 @@
 """Instruments routes."""
-from typing import Annotated, Optional, Dict, List, cast
 
-from fastapi import status, Depends
-from server_utils.fastapi_utils.light_router import LightRouter
+from typing import Annotated, Dict, List, Optional, cast
 
+from fastapi import Depends, status
+
+from opentrons.hardware_control import (
+    HardwareControlAPI,
+    OT3HardwareControlAPI,
+)
+from opentrons.hardware_control.dev_types import (
+    GripperDict,
+    PipetteDict,
+    PipetteStateDict,
+)
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     PipetteOffsetSummary,
 )
-from opentrons.protocol_engine.errors import HardwareNotSupportedError
-
-from robot_server.hardware import get_hardware
-from robot_server.service.json_api import (
-    SimpleMultiBody,
-    PydanticResponse,
-    MultiBodyMeta,
-)
-
-from opentrons.types import Mount, MountType
-from opentrons.protocol_engine.types import Vec3f
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from opentrons.hardware_control import (
-    HardwareControlAPI,
-)
 from opentrons.hardware_control.types import (
     OT3Mount,
+)
+from opentrons.hardware_control.types import (
     SubSystem as HWSubSystem,
 )
-from opentrons.hardware_control.dev_types import (
-    PipetteDict,
-    PipetteStateDict,
-    GripperDict,
-)
+from opentrons.protocol_engine.errors import HardwareNotSupportedError
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+from opentrons.protocol_engine.types import Vec3f
+from opentrons.types import Mount, MountType
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
+from server_utils.fastapi_utils.light_router import LightRouter
 
 from .instrument_models import (
-    PipetteData,
-    Pipette,
-    InstrumentCalibrationData,
-    GripperData,
-    Gripper,
     AttachedItem,
     BadGripper,
     BadPipette,
-    PipetteState,
+    Gripper,
+    GripperData,
     InconsistentCalibrationFailure,
+    InstrumentCalibrationData,
+    Pipette,
+    PipetteData,
+    PipetteState,
 )
-
+from robot_server.hardware import get_hardware
+from robot_server.service.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleMultiBody,
+)
 from robot_server.subsystems.models import SubSystem
 from robot_server.subsystems.router import status_route_for, update_route_for
-
-from opentrons.hardware_control import OT3HardwareControlAPI
 
 instruments_router = LightRouter()
 

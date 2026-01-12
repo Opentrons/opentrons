@@ -1,11 +1,13 @@
 """Protocol source value objects."""
+
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+
 from typing_extensions import Literal
 
-from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.util import StrEnum
 
 from opentrons.protocols.api_support.types import APIVersion
 

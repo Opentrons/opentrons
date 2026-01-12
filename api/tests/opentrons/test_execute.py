@@ -1,22 +1,25 @@
 """Tests for `opentrons.execute`."""
 
 from __future__ import annotations
+
 import io
 import json
 import textwrap
-import mock
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Callable, Generator, List, TextIO, cast, Iterator
+from typing import TYPE_CHECKING, Any, Callable, Generator, Iterator, List, TextIO, cast
 
+import mock
 import pytest
 from _pytest.fixtures import SubRequest
 
 from opentrons_shared_data import get_shared_data_root, load_shared_data
-from opentrons_shared_data.pipette.types import PipetteModel
 from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
 )
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
+from opentrons_shared_data.pipette.types import PipetteModel
 
 from opentrons import execute, types
 from opentrons.hardware_control import Controller, api
@@ -200,7 +203,7 @@ def test_execute_function_json_v3(
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
         "Touching tip",
-        "Blowing out at B1 of Dest Plate on 3",
+        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
         "Moving to 5",
         "Dropping tip into A1 of Trash on 12",
     ]
@@ -239,7 +242,7 @@ def test_execute_function_json_v4(
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
         "Touching tip",
-        "Blowing out at B1 of Dest Plate on 3",
+        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
         "Moving to 5",
         "Dropping tip into A1 of Trash on 12",
     ]
@@ -278,7 +281,7 @@ def test_execute_function_json_v5(
         "Delaying for 0 minutes and 42.0 seconds",
         "Dispensing 4.5 uL into B1 of Dest Plate on 3 at 2.5 uL/sec",
         "Touching tip",
-        "Blowing out at B1 of Dest Plate on 3",
+        "Blowing out into B1 of Dest Plate on 3 at 2.0 uL/sec",
         "Moving to 5",
         "Moving to B2 of Dest Plate on 3",
         "Moving to B2 of Dest Plate on 3",
@@ -319,18 +322,18 @@ def test_execute_function_bundle_apiv2(
     assert [item["payload"]["text"] for item in entries if item["$"] == "before"] == [
         "Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
         "Picking up tip from A1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
-        "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at" " 5.0 uL/sec",
-        "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
+        "Aspirating 1.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
+        "Dispensing 1.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
         "Picking up tip from B1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
+        "Dispensing 2.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
         "Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1",
         "Picking up tip from C1 of Opentrons OT-2 96 Tip Rack 10 µL on 3",
         "Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 5.0 uL/sec",
-        "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at" " 10.0 uL/sec",
+        "Dispensing 3.0 uL into A4 of FAKE example labware on 1 at 10.0 uL/sec",
         "Dropping tip into A1 of Opentrons Fixed Trash on 12",
     ]
 

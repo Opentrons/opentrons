@@ -1,12 +1,12 @@
 import json
-import pytest
-from typing import Any, Dict
 from pathlib import Path
+from typing import Any, Dict
 
-from opentrons_shared_data import load_shared_data
-from opentrons_shared_data.protocol.models import protocol_schema_v7
+import pytest
 
 from . import list_fixtures
+from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.protocol.models import protocol_schema_v7
 
 
 @pytest.mark.parametrize("defpath", list_fixtures(7))

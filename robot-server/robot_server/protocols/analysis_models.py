@@ -1,28 +1,29 @@
 """Response models for protocol analysis."""
+
 # TODO(mc, 2021-08-25): add modules to simulation result
-from typing import List, Optional, Union, NamedTuple
+from typing import List, NamedTuple, Optional, Union
 
-from typing_extensions import Literal
 from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
-from opentrons_shared_data.util import StrEnum
-from opentrons.protocol_engine.types import (
-    RunTimeParameter,
-    PrimitiveRunTimeParamValuesType,
-    CSVRunTimeParamFilesType,
-    CommandAnnotation,
-    CommandPreconditions,
-)
-from opentrons_shared_data.robot.types import RobotType
 from opentrons.protocol_engine import (
     Command,
     ErrorOccurrence,
+    Liquid,
+    LiquidClassRecordWithId,
     LoadedLabware,
     LoadedModule,
     LoadedPipette,
-    Liquid,
-    LiquidClassRecordWithId,
 )
+from opentrons.protocol_engine.types import (
+    CommandAnnotation,
+    CommandPreconditions,
+    CSVRunTimeParamFilesType,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+)
+from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.util import StrEnum
 
 
 class AnalysisStatus(StrEnum):

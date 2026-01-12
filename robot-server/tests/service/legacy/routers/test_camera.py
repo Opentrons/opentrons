@@ -1,29 +1,32 @@
 import os
-from mock import patch
-import pytest
 import tempfile
 from pathlib import Path
-from opentrons.system import camera
+
+import pytest
 from decoy import Decoy
+from fastapi.responses import FileResponse
+from mock import patch
+
+from opentrons.system import camera
+
+from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.runs.run_data_manager import (
-    RunStore,
-    RunOrchestratorStore,
     RunDataManager,
+    RunOrchestratorStore,
+    RunStore,
 )
 from robot_server.service.json_api import RequestModel
-from robot_server.service.legacy.routers.camera import (
-    post_camera_preview_image,
-    add_camera_capture_image_settings,
-)
 from robot_server.service.legacy.models.settings import CameraCaptureImageSettings
-from robot_server.camera.settings.store import CameraSettingStore
-from fastapi.responses import FileResponse
+from robot_server.service.legacy.routers.camera import (
+    add_camera_capture_image_settings,
+    post_camera_preview_image,
+)
 
 
 @pytest.fixture
 def mock_take_picture():
     with patch(
-        "robot_server.service.legacy.routers." "camera.camera.take_picture",
+        "robot_server.service.legacy.routers.camera.camera.take_picture",
         spec=camera.take_picture,
     ) as m:
         yield m

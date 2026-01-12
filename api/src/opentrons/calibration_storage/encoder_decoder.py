@@ -1,8 +1,9 @@
-""" opentrons.calibration_storage.encoder_decoder: classes that
+"""opentrons.calibration_storage.encoder_decoder: classes that
 allow you to customize serialization to/from json.
 """
-import json
+
 import datetime
+import json
 from typing import Any, cast
 
 

@@ -1,10 +1,12 @@
+from typing import Dict, List, Union
+
 import pytest
+
+from g_code_parsing.errors import UnparsableGCodeError
+from g_code_parsing.g_code import GCode
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     Explanation,
 )
-from g_code_parsing.g_code import GCode
-from g_code_parsing.errors import UnparsableGCodeError
-from typing import List, Dict, Union
 
 
 def smoothie_g_codes() -> List[GCode]:
@@ -133,7 +135,7 @@ def smoothie_g_codes() -> List[GCode]:
         if len(g_code) > 1:
             g_codes = ", ".join([code.g_code for code in g_code])
             raise Exception(
-                "Hey, you forgot to put a comma between the G-Codes for " f"{g_codes}"
+                f"Hey, you forgot to put a comma between the G-Codes for {g_codes}"
             )
 
     return [code[0] for code in g_code_list]
@@ -166,7 +168,7 @@ def magdeck_g_codes() -> List[GCode]:
         if len(g_code) > 1:
             g_codes = ", ".join(code.g_code for code in g_code)
             raise Exception(
-                "Hey, you forgot to put a comma between the G-Codes for " f"{g_codes}"
+                f"Hey, you forgot to put a comma between the G-Codes for {g_codes}"
             )
 
     return [code[0] for code in g_code_list]
@@ -267,7 +269,7 @@ def thermocycler_g_codes() -> List[GCode]:
         if len(g_code) > 1:
             g_codes = ", ".join([code.g_code for code in g_code])
             raise Exception(
-                "Hey, you forgot to put a comma between the G-Codes for " f"{g_codes}"
+                f"Hey, you forgot to put a comma between the G-Codes for {g_codes}"
             )
 
     return [code[0] for code in g_code_list]
@@ -315,7 +317,7 @@ def heater_shaker_g_codes() -> List[GCode]:
         if len(g_code) > 1:
             g_codes = ", ".join([code.g_code for code in g_code])
             raise Exception(
-                "Hey, you forgot to put a comma between the G-Codes for " f"{g_codes}"
+                f"Hey, you forgot to put a comma between the G-Codes for {g_codes}"
             )
 
     return [code[0] for code in g_code_list]
@@ -803,7 +805,7 @@ def explanations() -> List[Explanation]:
             command_name="PUSH_SPEED",
             response="",
             provided_args={},
-            command_explanation="Saving current speed so temporary" " speed can be set",
+            command_explanation="Saving current speed so temporary speed can be set",
         ),
         Explanation(  # Test 21
             code="M121",
@@ -859,8 +861,7 @@ def explanations() -> List[Explanation]:
             command_name="WRITE_INSTRUMENT_ID",
             response="",
             provided_args={
-                "L": "5032305356323032303230303730313031"
-                "000000000000000000000000000000"
+                "L": "5032305356323032303230303730313031000000000000000000000000000000"
             },
             command_explanation="Writing instrument ID 50323053563230323032303037303130"
             "31000000000000000000000000000000 for Left pipette",
@@ -879,8 +880,7 @@ def explanations() -> List[Explanation]:
             command_name="WRITE_INSTRUMENT_MODEL",
             response="",
             provided_args={
-                "L": "7032305f6d756c74695f76322e"
-                "30000000000000000000000000000000000000"
+                "L": "7032305f6d756c74695f76322e30000000000000000000000000000000000000"
             },
             command_explanation="Writing instrument model 7032305f6d756c74695f76322e3"
             "0000000000000000000000000000000000000 for Left pipette",

@@ -3,37 +3,37 @@
 # TODO (amit, 2022-01-26): Figure out why using annotations import ruins
 #  dataclass fields interpretation.
 #  from __future__ import annotations
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from typing import Iterator, List
 
 from opentrons_shared_data.errors.exceptions import InternalMessageFormatError
 
+from .. import utils
 from . import message_definitions
 from .fields import (
+    BatchSensorDataField,
+    EepromDataField,
+    ErrorCodeField,
+    ErrorSeverityField,
     FirmwareShortSHADataField,
-    VersionFlagsField,
+    FirmwareUpdateDataField,
+    GearMotorIdField,
+    MotorPositionFlagsField,
+    MotorUsageTypeField,
+    MoveStopConditionField,
+    OptionalRevisionField,
+    PipetteNameField,
+    PipetteTipActionTypeField,
+    SensorIdField,
+    SensorOutputBindingField,
+    SensorThresholdModeField,
+    SensorTypeField,
+    SerialDataCodeField,
+    SerialField,
     TaskNameDataField,
     ToolField,
-    FirmwareUpdateDataField,
-    ErrorSeverityField,
-    ErrorCodeField,
-    SensorTypeField,
-    SensorIdField,
-    PipetteNameField,
-    SensorOutputBindingField,
-    EepromDataField,
-    SerialField,
-    SerialDataCodeField,
-    SensorThresholdModeField,
-    PipetteTipActionTypeField,
-    MotorPositionFlagsField,
-    MoveStopConditionField,
-    GearMotorIdField,
-    OptionalRevisionField,
-    MotorUsageTypeField,
-    BatchSensorDataField,
+    VersionFlagsField,
 )
-from .. import utils
 
 
 @dataclass(eq=False)
@@ -57,7 +57,8 @@ class EmptyPayload(utils.BinarySerializable):
     # to work around this in binary_serializable.build() and can_comm.prompt_payload
     # we ignore the message_index when constructing args and then set the value manually after
     message_index: utils.UInt32Field = field(
-        init=False, default_factory=lambda: utils.UInt32Field(None)  # type: ignore[arg-type]
+        init=False,
+        default_factory=lambda: utils.UInt32Field(None),  # type: ignore[arg-type]
     )
 
 
@@ -339,7 +340,10 @@ class FirmwareUpdateData(FirmwareUpdateWithAddress):
 
     @classmethod
     def create(
-        cls, address: int, data: bytes, message_index: int = None  # type: ignore[assignment]
+        cls,
+        address: int,
+        data: bytes,
+        message_index: int = None,  # type: ignore[assignment]
     ) -> "FirmwareUpdateData":
         """Create a firmware update data payload."""
         # this is a special case, we normally instansiate message_index

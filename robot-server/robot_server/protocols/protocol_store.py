@@ -2,35 +2,35 @@
 
 from __future__ import annotations
 
+import shutil
 from dataclasses import dataclass
 from datetime import datetime
 from functools import lru_cache
 from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Optional, Set
-import shutil
 
-from anyio import Path as AsyncPath, create_task_group
 import sqlalchemy
+from anyio import Path as AsyncPath
+from anyio import create_task_group
 
-from opentrons.protocols.parse import PythonParseMode
 from opentrons.protocol_reader import ProtocolReader, ProtocolSource
+from opentrons.protocols.parse import PythonParseMode
+from opentrons_shared_data.data_files import DataFileSource
 
 from robot_server.data_files.models import DataFile
-from opentrons_shared_data.data_files import DataFileSource
 from robot_server.persistence.database import sqlite_rowid
 from robot_server.persistence.tables import (
-    analysis_table,
-    protocol_table,
-    run_table,
-    analysis_primitive_type_rtp_table,
-    analysis_csv_rtp_table,
-    data_files_table,
-    run_csv_rtp_table,
     ProtocolKindSQLEnum,
+    analysis_csv_rtp_table,
+    analysis_primitive_type_rtp_table,
+    analysis_table,
+    data_files_table,
+    protocol_table,
+    run_csv_rtp_table,
+    run_table,
 )
 from robot_server.protocols.protocol_models import ProtocolKind
-
 
 _CACHE_ENTRIES = 32
 
@@ -592,12 +592,12 @@ def _convert_sql_row_to_dataclass(
     protocol_kind = sql_row.protocol_kind
 
     assert isinstance(protocol_id, str), f"Protocol ID {protocol_id} not a string"
-    assert protocol_key is None or isinstance(
-        protocol_key, str
-    ), f"Protocol Key {protocol_key} not a string or None"
-    assert isinstance(
-        protocol_kind, ProtocolKindSQLEnum
-    ), f"Protocol Kind {protocol_kind} not the expected enum"
+    assert protocol_key is None or isinstance(protocol_key, str), (
+        f"Protocol Key {protocol_key} not a string or None"
+    )
+    assert isinstance(protocol_kind, ProtocolKindSQLEnum), (
+        f"Protocol Kind {protocol_kind} not the expected enum"
+    )
 
     return _DBProtocolResource(
         protocol_id=protocol_id,

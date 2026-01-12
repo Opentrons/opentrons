@@ -22,7 +22,7 @@ const updatePatchOnFlexStackerFormType = (
       ...patch,
       ...getDefaultFields(
         'fillLabwareUri',
-        'fillQuantity',
+        'fillLabwareIds',
         'interventionMessage'
       ),
     }

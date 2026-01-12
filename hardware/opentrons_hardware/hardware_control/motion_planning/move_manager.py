@@ -1,19 +1,22 @@
 """Move manager."""
+
 import logging
-from typing import List, Tuple, Generic, Dict
+import math
+from typing import Dict, Generic, List, Tuple
+
+from numpy import isclose
+
+from opentrons_hardware.firmware_bindings.constants import NodeId
+from opentrons_hardware.hardware_control.motion import MoveGroup
 from opentrons_hardware.hardware_control.motion_planning import move_utils
 from opentrons_hardware.hardware_control.motion_planning.types import (
+    AxisKey,
     Coordinates,
+    CoordinateValue,
     Move,
     MoveTarget,
     SystemConstraints,
-    AxisKey,
-    CoordinateValue,
 )
-from opentrons_hardware.hardware_control.motion import MoveGroup
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from numpy import isclose
-import math
 
 log = logging.getLogger(__name__)
 
@@ -129,7 +132,10 @@ class MoveManager(Generic[AxisKey]):
                 pipette_speed = 0.0
                 # Iterate through the move group and find the top speed.
                 for step in move_group:
-                    pipette_speed = max(pipette_speed, step[node].velocity_mm_sec.item())  # type: ignore [union-attr]
+                    pipette_speed = max(
+                        pipette_speed,
+                        step[node].velocity_mm_sec.item(),  # type: ignore [union-attr]
+                    )
                 if not isclose(pipette_speed, check_speed):
                     return (
                         True,
@@ -169,7 +175,7 @@ class MoveManager(Generic[AxisKey]):
                 log.debug(
                     f"built {len(self._blend_log[i])} moves with "
                     f"{sum(list(m.nonzero_blocks for m in self._blend_log[i]))} "
-                    f"non-zero blocks after {i+1} iteration(s)"
+                    f"non-zero blocks after {i + 1} iteration(s)"
                 )
                 return True, self._blend_log
             else:

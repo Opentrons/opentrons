@@ -1,9 +1,12 @@
 """opentrons.system.ffmpeg: Functions and data for interacting with FFMPEG."""
+
 import asyncio
 import logging
 from typing import Tuple
-from opentrons.protocol_engine.resources.camera_provider import CameraError
+
 from opentrons_shared_data.robot.types import RobotType
+
+from opentrons.protocol_engine.resources.camera_provider import CameraError
 
 log = logging.getLogger(__name__)
 

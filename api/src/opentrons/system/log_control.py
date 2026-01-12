@@ -4,11 +4,11 @@ opentrons.system.log_control: functions for talking to syslog and journald
 This is the implementation of the endpoints in
 :py:mod:`opentrons.server.endpoints.logs` and friends.
 """
+
 import asyncio
 import logging
 import subprocess
 from typing import List
-
 
 LOG = logging.getLogger(__name__)
 

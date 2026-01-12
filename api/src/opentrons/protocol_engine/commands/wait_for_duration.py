@@ -1,13 +1,15 @@
 """Wait for duration command request, result, and implementation models."""
+
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any
+
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
     from ..execution import RunControlHandler
@@ -62,9 +64,9 @@ class WaitForDuration(
     params: WaitForDurationParams
     result: Optional[WaitForDurationResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[WaitForDurationImplementation] = (
         WaitForDurationImplementation
-    ] = WaitForDurationImplementation
+    )
 
 
 class WaitForDurationCreate(BaseCommandCreate[WaitForDurationParams]):

@@ -1,10 +1,10 @@
-from typing import Optional, Dict, Union
+from typing import Dict, Optional, Union
 
 from opentrons.drivers.smoothie_drivers.constants import (
+    AXES,
+    DISABLE_AXES,
     HOMED_POSITION,
     Y_BOUND_OVERRIDE,
-    DISABLE_AXES,
-    AXES,
 )
 from opentrons.drivers.types import MoveSplits
 

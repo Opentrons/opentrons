@@ -1,14 +1,14 @@
 """Fixtures to be used by Tavern tests."""
 
-
 from box import Box
 from requests import Response
+
+from opentrons import __version__, config
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
-from opentrons import __version__, config
 from opentrons_shared_data.module.types import ModuleModel
 
 

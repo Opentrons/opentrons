@@ -1,18 +1,17 @@
 from enum import Enum
-from typing import Any, List, Optional, Dict, Union
+from typing import Any, Dict, List, Optional, Union
+
+from pydantic import BaseModel, ConfigDict, Field
 from typing_extensions import Literal
 
-from pydantic import BaseModel, Field, ConfigDict
-
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.command import known_schema_ids
-
 from .shared_models import (
+    DesignerApplication,
     Liquid,
     Metadata,
-    DesignerApplication,
     Robot,
 )
+from opentrons_shared_data.command import known_schema_ids
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
 
 class Command(BaseModel):

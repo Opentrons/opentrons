@@ -1,55 +1,56 @@
 """Command models to store a labware in a Flex Stacker."""
 
 from __future__ import annotations
-from typing import Optional, Literal, TYPE_CHECKING, Type, Union, cast
+
+from typing import TYPE_CHECKING, Literal, Optional, Type, Union, cast
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 from opentrons_shared_data.errors.exceptions import (
-    FlexStackerStallError,
-    FlexStackerShuttleMissingError,
     FlexStackerShuttleLabwareError,
+    FlexStackerShuttleMissingError,
+    FlexStackerStallError,
 )
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from ..command import (
-    AbstractCommandImpl,
-    BaseCommand,
-    BaseCommandCreate,
-    SuccessData,
-    DefinedErrorData,
-)
-from ..flex_stacker.common import (
-    FlexStackerStallOrCollisionError,
-    FlexStackerShuttleError,
-    FlexStackerLabwareStoreError,
-    labware_locations_for_group,
-    labware_location_base_sequence,
-    primary_location_sequence,
-    adapter_location_sequence,
-    lid_location_sequence,
-)
 from ...errors import (
-    ErrorOccurrence,
     CannotPerformModuleAction,
-    LabwareNotLoadedOnModuleError,
+    ErrorOccurrence,
     FlexStackerLabwarePoolNotYetDefinedError,
+    LabwareNotLoadedOnModuleError,
 )
 from ...resources import ModelUtils
 from ...state import update_types
 from ...types import (
-    LabwareLocationSequence,
     InStackerHopperLocation,
-    StackerStoredLabwareGroup,
+    LabwareLocationSequence,
     ModuleLocation,
     StackerLabwareMovementStrategy,
+    StackerStoredLabwareGroup,
+)
+from ..command import (
+    AbstractCommandImpl,
+    BaseCommand,
+    BaseCommandCreate,
+    DefinedErrorData,
+    SuccessData,
+)
+from ..flex_stacker.common import (
+    FlexStackerLabwareStoreError,
+    FlexStackerShuttleError,
+    FlexStackerStallOrCollisionError,
+    adapter_location_sequence,
+    labware_location_base_sequence,
+    labware_locations_for_group,
+    lid_location_sequence,
+    primary_location_sequence,
 )
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
-    from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
     from opentrons.protocol_engine.execution import EquipmentHandler
+    from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+    from opentrons.protocol_engine.state.state import StateView
 
 
 StoreCommandType = Literal["flexStacker/store"]
@@ -82,15 +83,15 @@ class StoreResult(BaseModel):
             "The full location in which all labware moved by this command will eventually reside."
         ),
     )
-    primaryOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description=("The origin location of the primary labware."))
+    primaryOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description=("The origin location of the primary labware."))
+    )
     primaryLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The primary labware in the stack that was stored."
     )
-    adapterOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[
-        None
-    ] = Field(None, description=("The origin location of the adapter labware, if any."))
+    adapterOriginLocationSequence: LabwareLocationSequence | SkipJsonSchema[None] = (
+        Field(None, description=("The origin location of the adapter labware, if any."))
+    )
     adapterLabwareId: str | SkipJsonSchema[None] = Field(
         None, description="The adapter in the stack that was stored, if any."
     )

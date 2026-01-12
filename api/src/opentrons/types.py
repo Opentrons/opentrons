@@ -1,16 +1,17 @@
 from __future__ import annotations
+
 import enum
-from math import sqrt, isclose
+from math import isclose, sqrt
 from typing import (
     TYPE_CHECKING,
     Any,
-    NamedTuple,
+    Dict,
     Iterator,
-    Union,
     List,
+    NamedTuple,
     Optional,
     Protocol,
-    Dict,
+    Union,
 )
 
 from opentrons_shared_data.robot.types import RobotType
@@ -18,10 +19,10 @@ from opentrons_shared_data.robot.types import RobotType
 from .protocols.api_support.labware_like import LabwareLike
 
 if TYPE_CHECKING:
-    from .protocol_api.labware import Labware, Well
-    from .protocol_api.core.legacy.module_geometry import ModuleGeometry
-    from .protocol_api.module_contexts import ModuleContext
     from .protocol_api._types import OffDeckType
+    from .protocol_api.core.legacy.module_geometry import ModuleGeometry
+    from .protocol_api.labware import Labware, Well
+    from .protocol_api.module_contexts import ModuleContext
 
 
 class PipetteNotAttachedError(KeyError):
@@ -81,16 +82,13 @@ class Point(NamedTuple):
 
 class _HasXYZ(Protocol):
     @property
-    def x(self) -> float:
-        ...
+    def x(self) -> float: ...
 
     @property
-    def y(self) -> float:
-        ...
+    def y(self) -> float: ...
 
     @property
-    def z(self) -> float:
-        ...
+    def z(self) -> float: ...
 
 
 LocationLabware = Union[

@@ -11,6 +11,8 @@ from robot_server.persistence.file_and_directory_names import DB_FILE
 from robot_server.persistence.persistence_directory import make_migration_orchestrator
 from robot_server.persistence.tables import (
     metadata as latest_metadata,
+)
+from robot_server.persistence.tables import (
     schema_02,
     schema_03,
     schema_04,
@@ -1635,9 +1637,10 @@ def test_migrated_db_matches_db_created_from_metadata(tmp_path: Path) -> None:
 
     expected_statements = EXPECTED_STATEMENTS_LATEST
 
-    with sql_engine_ctx(
-        active_subdirectory / DB_FILE
-    ) as sql_engine, sql_engine.begin() as transaction:
+    with (
+        sql_engine_ctx(active_subdirectory / DB_FILE) as sql_engine,
+        sql_engine.begin() as transaction,
+    ):
         actual_statements = (
             transaction.execute(
                 sqlalchemy.text("SELECT sql FROM sqlite_schema WHERE sql IS NOT NULL")

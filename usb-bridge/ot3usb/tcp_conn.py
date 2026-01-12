@@ -1,6 +1,7 @@
 """Provides an interface to open & close the TCP interface on."""
-import socket
+
 import logging
+import socket
 from typing import Optional, Tuple
 
 LOG = logging.getLogger(__name__)

@@ -1,39 +1,39 @@
 """Complete FW updater."""
-import logging
-import asyncio
-import os
-from typing import Optional, Dict, Tuple, AsyncIterator, Any
 
+import asyncio
+import logging
+import os
+from typing import Any, AsyncIterator, Dict, Optional, Tuple
 
 from opentrons_shared_data.errors.exceptions import (
-    InternalUSBCommunicationError,
-    FirmwareUpdateFailedError,
     EnumeratedError,
+    FirmwareUpdateFailedError,
+    InternalUSBCommunicationError,
     PythonException,
 )
 
-from opentrons_hardware.drivers.can_bus import CanMessenger
+from .types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
+from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.firmware_bindings import (
-    NodeId,
     FirmwareTarget,
+    NodeId,
     USBTarget,
-)
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    FirmwareUpdateStartApp,
 )
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     EnterBootloaderRequest,
 )
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    FirmwareUpdateStartApp,
+)
 from opentrons_hardware.firmware_update import (
-    FirmwareUpdateInitiator,
     FirmwareUpdateDownloader,
     FirmwareUpdateEraser,
+    FirmwareUpdateInitiator,
     HexRecordProcessor,
 )
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
 from opentrons_hardware.firmware_update.target import Target
-from .types import FirmwareUpdateStatus, StatusElement
 
 logger = logging.getLogger(__name__)
 DFU_PID = "df11"
@@ -173,11 +173,13 @@ class RunUpdate:
         """Initialize RunUpdate class.
 
         Args:
-            messenger: The can messenger to use.
+            can_messenger: The canbus messenger
+            usb_messenger: The USB messenger
             update_details: Dict of nodes to be updated and their firmware files.
             retry_count: Number of times to retry.
             timeout_seconds: How much to wait for responses.
             erase: Whether to erase flash before updating.
+            erase_timeout_seconds: A unique timeout for erase.
 
         Returns:
             None
@@ -276,7 +278,6 @@ class RunUpdate:
         erase: Optional[bool],
         erase_timeout_seconds: float = 60,
     ) -> float:
-
         target = Target.from_single_node(node_id)
 
         logger.info(f"Initiating FW Update on {target}.")

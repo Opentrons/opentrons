@@ -1,13 +1,10 @@
 import pytest
+
 from opentrons.legacy_commands import protocol_commands
 
 
 @pytest.mark.parametrize(
-    argnames="seconds,"
-    "minutes,"
-    "expected_seconds,"
-    "expected_minutes,"
-    "expected_text",
+    argnames="seconds,minutes,expected_seconds,expected_minutes,expected_text",
     argvalues=[
         [10, 0, 10, 0, "Delaying for 0 minutes and 10.0 seconds"],
         [10, 9, 10, 9, "Delaying for 9 minutes and 10.0 seconds"],

@@ -3,7 +3,6 @@ from typing import Tuple
 # Avoid pytest trying to collect TestClient because it begins with "Test".
 from aiohttp.test_utils import TestClient as _TC
 from aiohttp.web import Application, BaseRequest
-
 from decoy import Decoy
 
 from otupdate.common.name_management.name_synchronizer import NameSynchronizer
@@ -18,7 +17,7 @@ async def test_get_name(
 ) -> None:
     decoy.when(await mock_name_synchronizer.get_name()).then_return("the returned name")
 
-    response = await (test_cli[0].get("/server/name"))
+    response = await test_cli[0].get("/server/name")
     assert response.status == 200
 
     body = await response.json()

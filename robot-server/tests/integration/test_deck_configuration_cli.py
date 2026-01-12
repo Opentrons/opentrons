@@ -7,12 +7,11 @@ import sys
 
 import pytest
 
-from .dev_server import DevServer
-from .robot_client import RobotClient
-
 from opentrons.calibration_storage import deserialize_deck_configuration
 from opentrons.calibration_storage.types import CutoutFixturePlacement
 
+from .dev_server import DevServer
+from .robot_client import RobotClient
 
 # Our Tavern tests have servers that stay up for the duration of the test session.
 # We need to pick a different port for our servers to avoid colliding with those.
@@ -33,9 +32,9 @@ async def run_cli(persistence_directory: pathlib.Path) -> bytes:
         stderr=asyncio.subprocess.PIPE,
     )
     stdout, stderr = await proc.communicate()
-    assert (
-        proc.returncode == 0
-    ), f"Subprocess exited with failure.\nstdout:\n{stdout!r}\nstderr:\n{stderr.decode()}"
+    assert proc.returncode == 0, (
+        f"Subprocess exited with failure.\nstdout:\n{stdout!r}\nstderr:\n{stderr.decode()}"
+    )
     return stdout
 
 

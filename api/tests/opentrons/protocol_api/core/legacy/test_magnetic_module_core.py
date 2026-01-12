@@ -1,19 +1,19 @@
 """Tests for the legacy Protocol API module core implementations."""
+
 import pytest
 from decoy import Decoy
 
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import MagDeck, MagneticStatus
 from opentrons.hardware_control.modules.types import MagneticModuleModel
-from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
-
-from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
-    LegacyProtocolCore,
-)
 from opentrons.protocol_api.core.legacy.legacy_module_core import (
     LegacyMagneticModuleCore,
     create_module_core,
 )
+from opentrons.protocol_api.core.legacy.legacy_protocol_core import (
+    LegacyProtocolCore,
+)
+from opentrons.protocol_api.core.legacy.module_geometry import ModuleGeometry
 
 
 @pytest.fixture

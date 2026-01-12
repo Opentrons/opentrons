@@ -11,7 +11,7 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
@@ -36,6 +36,8 @@ dependencies = [
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14"
 ]
+[tool.uv.dependency-groups]
+dev = {requires-python = ">=3.11"}
 
 [dependency-groups]
 # Robot dependencies - exact versions for robot deployment
@@ -61,23 +63,19 @@ dev = [
     "atomicwrites==1.4.0; sys_platform=='win32'",
     "colorama==0.4.4; sys_platform=='win32'",
     "aiohttp==3.12.14",
-    "black==22.3.0",
+    "ruff==0.14.10",
     "build~=1.2.0",
     "click==8.1.2",
     "decoy>=2.2.0,<3",
-    "flake8==7.0.0",
-    "flake8-annotations~=3.0.1",
-    "flake8-docstrings~=1.7.0",
-    "flake8-noqa~=1.4.0",
     "hypothesis>=6.128,<7",
     "httpx==0.26.0",
     "idna==3.3",
     "mock~=5.0.1",
-    "mypy==1.11.0",
+    "mypy==1.19.1",
     "numpy>=1.26.3,<2",
     "pyusb==1.2.1",
-    "pytest>=7,<8",
-    "pytest-asyncio>=0.23.0,<2",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0,<2",
     "pytest-cov==4.1.0",
     "pytest-lazy-fixtures>=1.1.4,<2",
     "pytest-xdist~=2.5.0",
@@ -85,13 +83,38 @@ dev = [
     "requests==2.27.1",
     "rpds-py==0.18.1",
     "sqlalchemy2-stubs==0.0.2a21",
-    "tavern>=2.9.1,<3",
+    "tavern>=3.0.2",
     "types-mock~=5.1.0",
     "types-paho-mqtt==1.6.0.20240106",
     "types-requests~=2.27.1",
     "zipp==3.21.0",
     "opentrons-hardware",
 ]
+
+[tool.ruff.lint]
+exclude = ["tests/integration/persistence_snapshots/**/*"]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
+ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
+[tool.ruff.lint.per-file-ignores]
+"robot_server/settings.py" = ["ANN","D"]
+"robot_server/robot/*" = ["D"]
+"robot_server/service/*" = ["D"]
+"tests/integration/*" = ["ANN","D"]
+"tests/robot/*" = ["ANN","D"]
+"tests/service/*" = ["ANN","D"]
+"tests/conftest.py" = ["ANN","D"]
+"robot_server/_version.py" = ["I"]
+"scripts/*" = ["T201"]
+[tool.ruff.lint.isort]
+known-local-folder = ["robot_server"]
+known-first-party = ["opentrons", "opentrons_shared_data", "server_utils"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+[tool.ruff.format]
+exclude = ["tests/integration/persistence_snapshots"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]

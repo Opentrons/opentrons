@@ -1,4 +1,4 @@
-""" opentrons.simulate: functions and entrypoints for simulating protocols
+"""opentrons.simulate: functions and entrypoints for simulating protocols
 
 This module has functions that provide a console entrypoint for simulating
 a protocol from the command line.
@@ -7,83 +7,85 @@ a protocol from the command line.
 import argparse
 import asyncio
 import atexit
-from contextlib import ExitStack, contextmanager
-import sys
 import logging
 import os
 import pathlib
 import queue
+import sys
+from contextlib import ExitStack, contextmanager
 from typing import (
     TYPE_CHECKING,
-    Generator,
     Any,
+    BinaryIO,
     Dict,
+    Generator,
+    Iterator,
     List,
     Mapping,
+    Optional,
     TextIO,
     Tuple,
-    BinaryIO,
-    Optional,
     Union,
-    Iterator,
 )
+
 from typing_extensions import Literal
 
+from opentrons_shared_data.labware.labware_definition import (
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.robot.types import RobotType
 
 import opentrons
-from opentrons import should_use_ot3
+from .util import entrypoint_util
+from opentrons import protocol_api, should_use_ot3
+from opentrons.config import IS_ROBOT
 from opentrons.hardware_control import (
     API as OT2API,
-    ThreadManager,
-    ThreadManagedHardware,
 )
-from opentrons.hardware_control.types import HardwareFeatureFlags
-
+from opentrons.hardware_control import (
+    ThreadManagedHardware,
+    ThreadManager,
+)
 from opentrons.hardware_control.simulator_setup import load_simulator
+from opentrons.hardware_control.types import HardwareFeatureFlags
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import types as command_types
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
-from opentrons.protocol_engine.create_protocol_engine import (
-    create_protocol_engine_in_thread,
-    create_protocol_engine,
-)
 from opentrons.protocol_engine import error_recovery_policy
+from opentrons.protocol_engine.create_protocol_engine import (
+    create_protocol_engine,
+    create_protocol_engine_in_thread,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
 from opentrons.protocol_runner import RunOrchestrator
-from opentrons.protocols.duration import DurationEstimator
-from opentrons.protocols.execution import execute
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.config import IS_ROBOT
-from opentrons import protocol_api
-from opentrons.legacy_commands import types as command_types
-
-from opentrons.protocols import parse, bundle
-from opentrons.protocols.types import (
-    ApiDeprecationError,
-    Protocol,
-    PythonProtocol,
-    BundleContents,
-)
+from opentrons.protocol_runner.protocol_runner import LiveRunner, create_protocol_runner
+from opentrons.protocols import bundle, parse
 from opentrons.protocols.api_support.deck_type import (
     for_simulation as deck_type_for_simulation,
+)
+from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash,
     should_load_fixed_trash_labware_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.labware.labware_definition import (
-    labware_definition_type_adapter,
+from opentrons.protocols.duration import DurationEstimator
+from opentrons.protocols.execution import execute
+from opentrons.protocols.types import (
+    ApiDeprecationError,
+    BundleContents,
+    Protocol,
+    PythonProtocol,
 )
-
-from .util import entrypoint_util
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.types import (
         LabwareDefinition as LabwareDefinitionDict,
     )
+
     from opentrons.protocol_engine import ProtocolEngine
 
 
@@ -832,10 +834,9 @@ def _create_live_context_pe(
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
 
     @contextmanager
-    def _cleanup_hardware_with_engine() -> (
-        Iterator[tuple["ProtocolEngine", asyncio.AbstractEventLoop]]
-    ):
-
+    def _cleanup_hardware_with_engine() -> Iterator[
+        tuple["ProtocolEngine", asyncio.AbstractEventLoop]
+    ]:
         try:
             with create_protocol_engine_in_thread(
                 hardware_api=hardware_api_wrapped,

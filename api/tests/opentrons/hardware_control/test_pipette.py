@@ -1,29 +1,41 @@
+from pathlib import Path
+from typing import Callable, Union
+
 import pytest
 from mock import patch
-from typing import Union, Callable
-from pathlib import Path
-from opentrons_shared_data.errors.exceptions import InvalidLiquidClassName
-from opentrons.calibration_storage import types as cal_types
-from opentrons.types import Point, Mount
 from pytest_lazy_fixtures import lf as lazy_fixture
+
+from opentrons_shared_data.errors.exceptions import InvalidLiquidClassName
+from opentrons_shared_data.pipette import (
+    load_data as load_pipette_data,
+)
+from opentrons_shared_data.pipette import (
+    mutable_configurations,
+    pipette_definition,
+)
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
+from opentrons_shared_data.pipette import (
+    types as pip_types,
+)
+from opentrons_shared_data.pipette.types import PipetteModel
+
+from opentrons.calibration_storage import types as cal_types
+from opentrons.hardware_control import types
+from opentrons.hardware_control.instruments.ot2 import (
+    instrument_calibration,
+)
 from opentrons.hardware_control.instruments.ot2 import (
     pipette as ot2_pipette,
-    instrument_calibration,
+)
+from opentrons.hardware_control.instruments.ot3 import (
+    instrument_calibration as ot3_calibration,
 )
 from opentrons.hardware_control.instruments.ot3 import (
     pipette as ot3_pipette,
-    instrument_calibration as ot3_calibration,
 )
-from opentrons.hardware_control import types
-from opentrons_shared_data.pipette import (
-    pipette_definition,
-    pipette_load_name_conversions as pipette_load_name,
-    load_data as load_pipette_data,
-    mutable_configurations,
-    types as pip_types,
-)
-
-from opentrons_shared_data.pipette.types import PipetteModel
+from opentrons.types import Mount, Point
 
 OT2_PIP_CAL = instrument_calibration.PipetteOffsetByPipetteMount(
     offset=Point(0, 0, 0),
@@ -251,7 +263,7 @@ def test_volume_tracking(
 def test_config_update(
     hardware_pipette_ot2: Callable[
         [Union[str, pipette_definition.PipetteModelVersionType]], ot2_pipette.Pipette
-    ]
+    ],
 ) -> None:
     hw_pipette = hardware_pipette_ot2("p10_single_v1")
     sample_plunger_pos = {"top": 19.5}
@@ -396,7 +408,7 @@ def test_reset_instrument_offset(
 def test_save_instrument_offset_ot2(
     hardware_pipette_ot2: Callable[
         [Union[str, pipette_definition.PipetteModelVersionType]], ot2_pipette.Pipette
-    ]
+    ],
 ) -> None:
     # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
     # an InstrumentCalibrationProvider class (like robot calibration provider)
@@ -413,7 +425,7 @@ def test_save_instrument_offset_ot2(
 def test_save_instrument_offset_ot3(
     hardware_pipette_ot3: Callable[
         [Union[str, pipette_definition.PipetteModelVersionType]], ot3_pipette.Pipette
-    ]
+    ],
 ) -> None:
     # TODO (lc 10-31-2022) These tests would be much cleaner/easier to mock with
     # an InstrumentCalibrationProvider class (like robot calibration provider)
@@ -424,9 +436,10 @@ def test_save_instrument_offset_ot3(
     )
 
     assert hw_pipette.pipette_offset.offset == Point(0, 0, 0)
-    with patch(
-        f"{path_to_calibrations}.save_pipette_offset_calibration"
-    ) as save_cal, patch(f"{path_to_calibrations}.load_pipette_offset") as load_cal:
+    with (
+        patch(f"{path_to_calibrations}.save_pipette_offset_calibration") as save_cal,
+        patch(f"{path_to_calibrations}.load_pipette_offset") as load_cal,
+    ):
         hw_pipette.save_pipette_offset(types.OT3Mount.LEFT, Point(1.0, 2.0, 3.0))
 
         save_cal.assert_called_once_with(
@@ -461,7 +474,7 @@ def test_reload_instrument_cal_ot3(
 def test_tip_type_changing(
     hardware_pipette_ot3: Callable[
         [Union[str, pipette_definition.PipetteModelVersionType]], ot3_pipette.Pipette
-    ]
+    ],
 ) -> None:
     pip = hardware_pipette_ot3(
         pipette_load_name.convert_pipette_model(PipetteModel("p1000_single_v3.3"))
@@ -483,7 +496,7 @@ def test_tip_type_changing(
 def test_liquid_class_changing(
     hardware_pipette_ot3: Callable[
         [Union[str, pipette_definition.PipetteModelVersionType]], ot3_pipette.Pipette
-    ]
+    ],
 ) -> None:
     pip = hardware_pipette_ot3(
         pipette_load_name.convert_pipette_model(PipetteModel("p50_multi_v3.3"))

@@ -1,34 +1,33 @@
 """Motion state store and getters."""
 
+import logging
 from dataclasses import dataclass
 from typing import List, Optional, Union
-import logging
 
-from opentrons.types import MountType, Point, StagingSlotName
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_slots,
-    get_adjacent_slots,
-)
-from opentrons import motion_planning
-
-from . import _move_types
 from .. import errors
 from ..types import (
+    AddressableOffsetVector,
+    CurrentPipetteLocation,
+    CurrentWell,
+    LiquidHandlingWellLocation,
     MotorAxis,
     WellLocation,
-    LiquidHandlingWellLocation,
-    CurrentWell,
-    CurrentPipetteLocation,
-    AddressableOffsetVector,
 )
-from .config import Config
-from .labware import LabwareView
-from .pipettes import PipetteView
+from . import _move_types
 from .addressable_areas import AddressableAreaView
+from .config import Config
 from .geometry import GeometryView
-from .modules import ModuleView
+from .labware import LabwareView
 from .module_substates import HeaterShakerModuleId
+from .modules import ModuleView
+from .pipettes import PipetteView
+from opentrons import motion_planning
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_adjacent_slots,
+    get_east_west_slots,
+)
+from opentrons.types import MountType, Point, StagingSlotName
 
 log = logging.getLogger(__name__)
 

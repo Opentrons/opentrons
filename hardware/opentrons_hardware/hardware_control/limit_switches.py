@@ -1,17 +1,17 @@
 """Utilities for reading the current status of the OT3 limit switches."""
+
 import asyncio
 import logging
-from typing import Dict, Set, Callable, cast
+from typing import Callable, Dict, Set, cast
 
 from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import MessageId
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
 from opentrons_hardware.firmware_bindings.messages import MessageDefinition
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     ReadLimitSwitchRequest,
     ReadLimitSwitchResponse,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId
 
 log = logging.getLogger(__name__)
 

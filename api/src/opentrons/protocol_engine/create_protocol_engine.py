@@ -1,33 +1,32 @@
 """Main ProtocolEngine factory."""
+
 import asyncio
 import contextlib
 import typing
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import DoorState
-from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (
-    ErrorRecoveryHardwareStateSynchronizer,
-)
-from opentrons.protocol_engine.resources.labware_data_provider import (
-    LabwareDataProvider,
-)
-from opentrons.protocol_engine.resources.camera_provider import CameraProvider
-from opentrons.util.async_helpers import async_context_manager_in_thread
-
 from opentrons_shared_data.robot import load as load_robot
 
 from .actions.action_dispatcher import ActionDispatcher
+from .engine_support import create_run_orchestrator
 from .error_recovery_policy import ErrorRecoveryPolicy
 from .execution.door_watcher import DoorWatcher
 from .execution.hardware_stopper import HardwareStopper
 from .plugins import PluginStarter
 from .protocol_engine import ProtocolEngine
-from .resources import DeckDataProvider, ModuleDataProvider, FileProvider, ModelUtils
+from .resources import DeckDataProvider, FileProvider, ModelUtils, ModuleDataProvider
 from .state.config import Config
 from .state.state import StateStore
-from .types import PostRunHardwareState, DeckConfigurationType
-
-from .engine_support import create_run_orchestrator
+from .types import DeckConfigurationType, PostRunHardwareState
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine.execution.error_recovery_hardware_state_synchronizer import (
+    ErrorRecoveryHardwareStateSynchronizer,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.labware_data_provider import (
+    LabwareDataProvider,
+)
+from opentrons.util.async_helpers import async_context_manager_in_thread
 
 
 # TODO(mm, 2023-06-16): Arguably, this not being a context manager makes us prone to forgetting to

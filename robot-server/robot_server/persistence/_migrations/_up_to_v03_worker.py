@@ -1,32 +1,38 @@
 """Code that runs in a worker subprocess for the `up_to_3` migration."""
 
-
 # fmt: off
 
 # We keep a list of all the modules that this file imports
 # so we can preload them when launching the subprocesses.
 from types import ModuleType
+
 _imports: "list[ModuleType]" = []
 
 import contextlib  # noqa: E402
 import pathlib  # noqa: E402
 import typing  # noqa: E402
+
 _imports.extend([contextlib, pathlib, typing])
 
 import pydantic  # noqa: E402
 import sqlalchemy  # noqa: E402
+
 _imports.extend([pydantic, sqlalchemy])
 
 from opentrons.protocol_engine import commands  # noqa: E402
 from server_utils import sql_utils  # noqa: E402
+
 _imports.extend([commands, sql_utils])
 
-from robot_server.persistence.tables import schema_02, schema_03  # noqa: E402
 from robot_server.persistence import (  # noqa: E402
-    database,
-    pydantic as pydantic_helpers,
     _legacy_pickle,
+    database,
 )
+from robot_server.persistence import (  # noqa: E402
+    pydantic as pydantic_helpers,
+)
+from robot_server.persistence.tables import schema_02, schema_03  # noqa: E402
+
 _imports.extend([schema_02, schema_03, database, pydantic_helpers, _legacy_pickle])
 
 # fmt: on
@@ -57,20 +63,20 @@ def migrate_commands_for_run(
             there are conflicts, we'd have to deal with SQLite retrying transactions or
             raising SQLITE_BUSY. A Python-level lock is simpler and more reliable.
     """
-    with contextlib.suppress(
-        # The format that we're migrating from is prone to bugs where our latest
-        # code can't read records created by older code. (See RSS-98).
-        # If that happens, it's better to silently drop the run than to fail the
-        # whole migration.
-        #
-        # TODO(mm, 2024-02-14): Log these somehow. Logging is a little tricky from
-        # subprocesses.
-        Exception
-    ), database.sql_engine_ctx(
-        source_db_file
-    ) as source_engine, database.sql_engine_ctx(
-        dest_db_file
-    ) as dest_engine:
+    with (
+        contextlib.suppress(
+            # The format that we're migrating from is prone to bugs where our latest
+            # code can't read records created by older code. (See RSS-98).
+            # If that happens, it's better to silently drop the run than to fail the
+            # whole migration.
+            #
+            # TODO(mm, 2024-02-14): Log these somehow. Logging is a little tricky from
+            # subprocesses.
+            Exception
+        ),
+        database.sql_engine_ctx(source_db_file) as source_engine,
+        database.sql_engine_ctx(dest_db_file) as dest_engine,
+    ):
         select_old_commands = sqlalchemy.select(schema_02.run_table.c.commands).where(
             schema_02.run_table.c.id == run_id
         )

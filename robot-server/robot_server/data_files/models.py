@@ -1,11 +1,12 @@
 """Data files models."""
+
 from datetime import datetime
-from typing import Literal, Set, Optional
+from typing import Literal, Optional, Set
 
-from pydantic import Field, BaseModel
+from pydantic import BaseModel, Field
 
-from opentrons_shared_data.errors import GeneralError
 from opentrons_shared_data.data_files import DataFileSource, MimeType
+from opentrons_shared_data.errors import GeneralError
 
 from robot_server.errors.error_responses import ErrorDetails
 from robot_server.service.json_api import ResourceModel

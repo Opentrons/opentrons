@@ -59,12 +59,12 @@ test:
 .PHONY: lint
 lint:
 	$(python) -m mypy otupdate tests
-	$(python) -m black --check ./otupdate ./tests
-	$(python) -m flake8 otupdate tests
+	$(ruff) check otupdate tests
 
 .PHONY: format
 format:
-	$(python) -m black otupdate tests
+	$(ruff) format otupdate tests
+	$(ruff) check --select I --fix otupdate tests
 
 .PHONY: wheel
 wheel: export OPENTRONS_PROJECT=$(PROJECT)

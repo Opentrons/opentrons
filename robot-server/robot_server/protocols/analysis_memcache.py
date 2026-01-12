@@ -1,8 +1,8 @@
 """A simple size-limited memory cache used for large resources."""
-from typing import Generic, TypeVar, Deque, Type, Dict
-from logging import getLogger
 
 from collections import deque
+from logging import getLogger
+from typing import Deque, Dict, Generic, Type, TypeVar
 
 _log = getLogger(__name__)
 

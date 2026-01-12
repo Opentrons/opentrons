@@ -1,8 +1,9 @@
 """Types and functions for accessing liquid class definitions."""
-from pathlib import Path
-from .. import load_shared_data, get_shared_data_root
-from .liquid_class_definition import LiquidClassSchemaV1
 
+from pathlib import Path
+
+from .. import get_shared_data_root, load_shared_data
+from .liquid_class_definition import LiquidClassSchemaV1
 
 DEFAULT_SCHEMA_VERSION = 1
 DEFAULT_LC_VERSION = 1

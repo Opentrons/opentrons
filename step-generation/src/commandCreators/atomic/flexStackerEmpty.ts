@@ -1,6 +1,6 @@
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
-import { uuid } from '../../utils'
+import { formatPyStr, uuid } from '../../utils'
 
 import type { FlexStackerEmptyCreateCommand } from '@opentrons/shared-data'
 import type { CommandCreator, CommandCreatorError } from '../../types'
@@ -38,6 +38,8 @@ export const flexStackerEmpty: CommandCreator<
         },
       },
     ],
-    python: `${pythonName}.empty()`,
+    python: `${pythonName}.empty(${
+      args.message ? `message=${formatPyStr(args.message)}` : ''
+    })`,
   }
 }

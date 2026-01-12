@@ -1,20 +1,22 @@
 """Request and response models for /instruments endpoints."""
+
 from __future__ import annotations
 
-from typing_extensions import Literal
-from typing import Optional, TypeVar, Union, Generic, Dict, List
 from datetime import datetime
-from pydantic import BaseModel, Field
+from typing import Dict, Generic, List, Optional, TypeVar, Union
 
+from pydantic import BaseModel, Field
+from typing_extensions import Literal
 
 from opentrons.calibration_storage.types import SourceType
 from opentrons.protocol_engine.types import Vec3f
-from opentrons_shared_data.pipette.types import (
-    PipetteName,
-    PipetteModel,
-    ChannelCount,
-)
 from opentrons_shared_data.gripper.gripper_definition import GripperModelStr
+from opentrons_shared_data.pipette.types import (
+    ChannelCount,
+    PipetteModel,
+    PipetteName,
+)
+
 from robot_server.subsystems.models import SubSystem
 
 InstrumentModelT = TypeVar(

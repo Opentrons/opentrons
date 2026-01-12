@@ -5,72 +5,71 @@ Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
 
-import pytest
-from math import isclose
-from pytest_lazy_fixtures import lf as lazy_fixture
-
 from contextlib import nullcontext as does_not_raise
+from math import isclose
 from typing import (
+    Any,
     ContextManager,
     Dict,
+    List,
     NamedTuple,
     Optional,
+    Set,
     Type,
     Union,
-    Any,
-    List,
-    Set,
     cast,
 )
 
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.deck.types import DeckDefinitionV5
+import pytest
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data import load_shared_data
-from opentrons.types import DeckSlotName, MountType, Point
-from opentrons.protocol_engine import errors
-from opentrons.protocol_engine.types import (
-    LoadedModule,
-    DeckSlotLocation,
-    ModuleDefinition,
-    ModuleModel,
-    LabwareOffsetVector,
-    DeckType,
-    ModuleOffsetData,
-    HeaterShakerLatchStatus,
-    AddressableArea,
-    DeckConfigurationType,
-    PotentialCutoutFixture,
-)
-from opentrons.protocol_engine.state.modules import (
-    ModuleView,
-    ModuleState,
-    HardwareModule,
-)
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaState,
-)
+from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
+from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.resources import deck_configuration_provider
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaView,
+)
 from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-    MagneticModuleSubState,
-    MagneticModuleId,
-    TemperatureModuleSubState,
-    TemperatureModuleId,
-    ThermocyclerModuleSubState,
-    ThermocyclerModuleId,
     FlexStackerId,
     FlexStackerSubState,
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
     ModuleSubStateType,
+    TemperatureModuleId,
+    TemperatureModuleSubState,
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
 )
-from opentrons_shared_data.deck import load as load_deck
+from opentrons.protocol_engine.state.modules import (
+    HardwareModule,
+    ModuleState,
+    ModuleView,
+)
+from opentrons.protocol_engine.types import (
+    AddressableArea,
+    DeckConfigurationType,
+    DeckSlotLocation,
+    DeckType,
+    HeaterShakerLatchStatus,
+    LabwareOffsetVector,
+    LoadedModule,
+    ModuleDefinition,
+    ModuleModel,
+    ModuleOffsetData,
+    PotentialCutoutFixture,
+)
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT3_DECK,
 )
-from opentrons.protocol_engine.resources import deck_configuration_provider
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Vector3D
+from opentrons.types import DeckSlotName, MountType, Point
 
 
 @pytest.fixture(scope="session")
@@ -137,10 +136,10 @@ def make_module_view(
         for module_id in slot_by_module_id:
             deck_slot = slot_by_module_id[module_id]
             if deck_slot is not None:
-                load_location_by_module_id[
-                    module_id
-                ] = deck_configuration_provider.get_cutout_id_by_deck_slot_name(
-                    deck_slot
+                load_location_by_module_id[module_id] = (
+                    deck_configuration_provider.get_cutout_id_by_deck_slot_name(
+                        deck_slot
+                    )
                 )
             else:
                 load_location_by_module_id[module_id] = None

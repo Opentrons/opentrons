@@ -1,11 +1,12 @@
-from typing import List, Tuple
-import pytest
 import platform
+from typing import List, Tuple
+
+import pytest
 from decoy import Decoy
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
 
 
@@ -218,9 +219,9 @@ def test_csv_parameter_trailing_empties(
     subject = CSVParameter(csv_file, api_version)
     parsed_csv = subject.parse_as_csv()
 
-    assert (
-        parsed_csv == expected_output
-    ), f"Expected {expected_output}, but got {parsed_csv}"
-    assert len(parsed_csv) == len(
-        expected_output
-    ), f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"
+    assert parsed_csv == expected_output, (
+        f"Expected {expected_output}, but got {parsed_csv}"
+    )
+    assert len(parsed_csv) == len(expected_output), (
+        f"Expected {len(expected_output)} rows, but got {len(parsed_csv)}"
+    )

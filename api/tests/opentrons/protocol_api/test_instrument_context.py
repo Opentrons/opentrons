@@ -1,85 +1,82 @@
 """Tests for the InstrumentContext public interface."""
 
 import inspect
-import pytest
 from collections import OrderedDict
 from datetime import datetime
-from typing import ContextManager, Optional, Any
+from typing import Any, ContextManager, Optional
 from unittest.mock import sentinel
 
+import pytest
 from decoy import Decoy, matchers
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.errors.error_occurrence import (
-    ProtocolCommandFailedError,
-)
-
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocols.advanced_control.transfers.common import (
-    TransferTipPolicyV2,
-    TransferTipPolicyV2Type,
-)
-from opentrons.protocols.advanced_control.transfers import (
-    transfer_liquid_utils as mock_tx_liquid_utils,
-)
-
-from tests.opentrons.protocol_api.partial_tip_configurations import (
-    PipetteReliantNozzleConfigSpec,
-    PIPETTE_RELIANT_TEST_SPECS,
-    NozzleLayoutArgs,
-    PipetteIndependentNozzleConfigSpec,
-    PIPETTE_INDEPENDENT_TEST_SPECS,
-    InstrumentCoreNozzleConfigSpec,
-    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
-    ExpectedCoreArgs,
-)
-from opentrons.protocols.api_support import instrument as mock_instrument_support
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import (
-    APIVersionError,
-    UnsupportedAPIError,
-    FlowRates,
-    PlungerSpeeds,
-)
-from opentrons.protocol_api import (
-    MAX_SUPPORTED_VERSION,
-    InstrumentContext,
-    Labware,
-    Well,
-    labware,
-    LiquidClass,
-)
-from opentrons.protocol_api.core.common import (
-    InstrumentCore,
-    ProtocolCore,
-    WellCore,
-    LabwareCore,
-)
-from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
-    LegacyInstrumentCore,
-)
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
-from opentrons.types import (
-    Location,
-    Mount,
-    Point,
-    NozzleMapInterface,
-    MeniscusTrackingTarget,
-)
-
-from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.errors.exceptions import (
     CommandPreconditionViolated,
 )
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from opentrons_shared_data.robot.types import RobotType
-from . import versions_at_or_above, versions_between
+from tests.opentrons.protocol_api.partial_tip_configurations import (
+    INSTRUMENT_CORE_NOZZLE_LAYOUT_TEST_SPECS,
+    PIPETTE_INDEPENDENT_TEST_SPECS,
+    PIPETTE_RELIANT_TEST_SPECS,
+    ExpectedCoreArgs,
+    InstrumentCoreNozzleConfigSpec,
+    NozzleLayoutArgs,
+    PipetteIndependentNozzleConfigSpec,
+    PipetteReliantNozzleConfigSpec,
+)
+
+from . import versions_at_or_above, versions_below, versions_between
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    InstrumentContext,
+    Labware,
+    LiquidClass,
+    Well,
+    labware,
+)
+from opentrons.protocol_api.core.common import (
+    InstrumentCore,
+    LabwareCore,
+    ProtocolCore,
+    WellCore,
+)
+from opentrons.protocol_api.core.core_map import LoadedCoreMap
+from opentrons.protocol_api.core.legacy.legacy_instrument_core import (
+    LegacyInstrumentCore,
+)
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.error_occurrence import (
+    ProtocolCommandFailedError,
+)
+from opentrons.protocols.advanced_control.transfers import (
+    transfer_liquid_utils as mock_tx_liquid_utils,
+)
+from opentrons.protocols.advanced_control.transfers.common import (
+    TransferTipPolicyV2,
+    TransferTipPolicyV2Type,
+)
+from opentrons.protocols.api_support import instrument as mock_instrument_support
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    FlowRates,
+    PlungerSpeeds,
+    UnsupportedAPIError,
+)
+from opentrons.types import (
+    Location,
+    MeniscusTrackingTarget,
+    Mount,
+    NozzleMapInterface,
+    Point,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -622,7 +619,10 @@ def test_dynamic_aspirate_validation(
     with pytest.raises(ValueError):
         # Raises if end location is well
         subject.aspirate(
-            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+            volume=42.0,
+            location=input_location,
+            rate=1.23,
+            end_location=mock_well,  # type: ignore[arg-type]
         )
 
 
@@ -723,16 +723,18 @@ def test_blow_out_to_well(
     top_location = Location(point=Point(1, 2, 3), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
     decoy.when(mock_well.top()).then_return(top_location)
-    subject.blow_out(location=mock_well)
+    subject.blow_out(location=mock_well, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=top_location, well_core=mock_well._core, in_place=False
+            location=top_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=123,
         ),
         times=1,
     )
@@ -749,15 +751,17 @@ def test_blow_out_to_well_location(
     input_location = Location(point=Point(2, 2, 2), labware=mock_well)
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=mock_well._core, in_place=False
+            location=input_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=123,
         ),
         times=1,
     )
@@ -793,14 +797,16 @@ def test_blow_out_to_well_meniscus_location(
     )
     last_location = Location(point=Point(9, 9, 9), labware=None)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     mock_instrument_core.blow_out(
-        location=input_location_absolute, well_core=mock_well._core, in_place=False
+        location=input_location_absolute,
+        well_core=mock_well._core,
+        in_place=False,
+        flow_rate=123,
     )
 
 
@@ -814,16 +820,15 @@ def test_blow_out_to_location(
     input_location = Location(point=Point(2, 2, 2), labware=None)
     last_location = input_location  # to demonstrate how we set in_place=True
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
-
     decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
         last_location
     )
 
-    subject.blow_out(location=input_location)
+    subject.blow_out(location=input_location, flow_rate=123)
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=input_location, well_core=None, in_place=True
+            location=input_location, well_core=None, in_place=True, flow_rate=123
         ),
         times=1,
     )
@@ -839,14 +844,44 @@ def test_blow_out_with_trash_last_location(
     """It should blow out into a previously accessed disposal location."""
     mock_chute = decoy.mock(cls=WasteChute)
     decoy.when(mock_instrument_core.get_mount()).then_return(Mount.LEFT)
+    decoy.when(mock_instrument_core.get_blow_out_flow_rate(1.0)).then_return(111)
     decoy.when(mock_protocol_core.get_last_location(mount=Mount.LEFT)).then_return(
         mock_chute
     )
+
     subject.blow_out()
 
     decoy.verify(
         mock_instrument_core.blow_out(
-            location=mock_chute, well_core=None, in_place=True
+            location=mock_chute, well_core=None, in_place=True, flow_rate=111
+        ),
+        times=1,
+    )
+
+
+def test_blow_out_uses_previously_set_flow_rate(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should blow out to a well."""
+    mock_well = decoy.mock(cls=Well)
+    top_location = Location(point=Point(1, 2, 3), labware=mock_well)
+    last_location = Location(point=Point(9, 9, 9), labware=None)
+    decoy.when(mock_instrument_core.get_mount()).then_return(Mount.RIGHT)
+    decoy.when(mock_instrument_core.get_blow_out_flow_rate(1.0)).then_return(111)
+    decoy.when(mock_protocol_core.get_last_location(Mount.RIGHT)).then_return(
+        last_location
+    )
+    decoy.when(mock_well.top()).then_return(top_location)
+    subject.blow_out(location=mock_well)
+    decoy.verify(
+        mock_instrument_core.blow_out(
+            location=top_location,
+            well_core=mock_well._core,
+            in_place=False,
+            flow_rate=111,
         ),
         times=1,
     )
@@ -1542,7 +1577,10 @@ def test_dynamic_dispense_validation(
     with pytest.raises(ValueError):
         # Raises if end location is well
         subject.dispense(
-            volume=42.0, location=input_location, rate=1.23, end_location=mock_well  # type: ignore[arg-type]
+            volume=42.0,
+            location=input_location,
+            rate=1.23,
+            end_location=mock_well,  # type: ignore[arg-type]
         )
 
 
@@ -1669,6 +1707,49 @@ def test_touch_tip_raises_if_trash_last_location(
     decoy.when(mock_protocol_core.get_last_location()).then_return(mock_chute)
     with pytest.raises(RuntimeError, match="not valid for touch tip"):
         subject.touch_tip()
+
+
+@pytest.mark.parametrize("api_version", versions_below(APIVersion(2, 28), False))
+def test_touch_tip_noops_for_older_api_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should no-op for labware with `touchTipDisabled` quirk for older API versions."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+    decoy.when(mock_well.top(z=4.56)).then_return(
+        Location(point=Point(1, 2, 3), labware=mock_well)
+    )
+    subject.touch_tip(mock_well, v_offset=4.56, speed=42.0)
+    decoy.verify(
+        mock_instrument_core.touch_tip(
+            location=Location(point=Point(1, 2, 3), labware=mock_well),
+            well_core=mock_well._core,
+            radius=1,
+            z_offset=4.56,
+            speed=42.0,
+        ),
+        times=0,
+    )
+
+
+@pytest.mark.parametrize("api_version", versions_at_or_above(APIVersion(2, 28)))
+def test_touch_tip_raises_if_labware_is_untouchable(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    subject: InstrumentContext,
+    mock_protocol_core: ProtocolCore,
+) -> None:
+    """It should raise if the labware has quirk 'touchTipDisabled' for API v2.28 & above."""
+    mock_well = decoy.mock(cls=Well)
+    decoy.when(mock_instrument_core.has_tip()).then_return(True)
+    decoy.when(mock_well.parent.quirks).then_return(["touchTipDisabled"])
+
+    with pytest.raises(RuntimeError, match="Touch tip not allowed on labware"):
+        subject.touch_tip(mock_well)
 
 
 def test_return_height(
@@ -3121,7 +3202,7 @@ def test_transfer_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -3534,7 +3615,7 @@ def test_distribute_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))
@@ -3968,7 +4049,7 @@ def test_consolidate_liquid_raises_for_non_liquid_handling_locations(
     decoy.when(mock_nozzle_map.tip_count).then_return(1)
     decoy.when(mock_instrument_core.get_nozzle_map()).then_return(mock_nozzle_map)
     decoy.when(
-        mock_instrument_support.validate_takes_liquid(
+        mock_instrument_support.validate_takes_liquid(  # type: ignore[func-returns-value]
             mock_well.top(), reject_module=True, reject_adapter=True
         )
     ).then_raise(ValueError("Uh oh"))

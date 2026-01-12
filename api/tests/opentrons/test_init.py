@@ -1,5 +1,6 @@
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 def test_find_smoothie_file(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:

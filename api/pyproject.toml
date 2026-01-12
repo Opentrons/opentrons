@@ -56,10 +56,11 @@ dev = [
     "atomicwrites==1.4.0; sys_platform == 'win32'",
     "colorama==0.4.4; sys_platform == 'win32'",
     "coverage==7.4.1",
-    "mypy==1.11.0",
+    "ruff==0.14.10",
+    "mypy==1.19.1",
     "numpydoc==0.9.1",
-    "pytest>=8,<9",
-    "pytest-asyncio>=0.23.0,<2",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0,<2",
     "pytest-cov==4.1.0",
     "pytest-xdist~=2.5.0",
     "sphinx==5.0.1",
@@ -70,12 +71,7 @@ dev = [
     "sphinxext-opengraph==0.8.1",
     "sphinx-tabs>=3.4.1,<4",
     "mock==5.1.0",
-    "flake8==7.0.0",
-    "flake8-annotations~=3.0.1",
-    "flake8-docstrings~=1.7.0",
-    "flake8-noqa~=1.4.0",
     "decoy>=2.2.0,<3",
-    "black==22.3.0",
     "types-mock~=5.1.0",
     "types-setuptools==57.0.2",
     "typing-extensions>=4.0.0,<5",
@@ -105,6 +101,61 @@ build-backend = 'hatchling.build'
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 override-versions-of=['opentrons-shared-data', 'opentrons-hardware']
+
+[tool.ruff.lint]
+exclude = ["docs/v2/example_protocols/*"]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
+ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
+[tool.ruff.lint.per-file-ignores]
+"src/opentrons/__init__.py" = ["ANN","D"]
+"src/opentrons/execute.py" = ["ANN","D","T201"]
+"src/opentrons/simulate.py" = ["ANN","D","T201"]
+"src/opentrons/cli/*" = ["T201"]
+"src/opentrons/protocol_engine/commands/generate_command_schema.py" = ["T201"]
+"src/opentrons/types.py" = ["ANN","D"]
+"src/opentrons/calibration_storage/*" = ["ANN","D"]
+"src/opentrons/legacy_commands/*" =[ "D"]
+"src/opentrons/config/*" = ["ANN","D"]
+"src/opentrons/drivers/*" = ["ANN","D"]
+"src/opentrons/hardware_control/*" = ["ANN","D"]
+"src/opentrons/hardware_control/scripts/*" = ["ANN","D","T201"]
+"src/opentrons/protocol_api/*" = ["ANN","D"]
+"src/opentrons/protocols/*" = ["ANN","D"]
+"src/opentrons/resources/*" = ["ANN","D"]
+"src/opentrons/system/*" = ["ANN","D"]
+"src/opentrons/tools/*" = ["ANN","D","T201"]
+"src/opentrons/util/async_helpers.py" = ["ANN","D"]
+"src/opentrons/util/logging_config.py" = ["ANN","D"]
+"src/opentrons/util/linal.py" = ["ANN","D"]
+"src/opentrons/util/entrypoint_util.py" = ["ANN","D"]
+"src/opentrons/util/helpers.py" = ["ANN","D"]
+"src/opentrons/_version.py" = ["I"]
+"tests/opentrons/test_init.py" = ["ANN","D"]
+"tests/opentrons/test_types.py" = ["ANN","D"]
+"tests/opentrons/conftest.py" = ["ANN","D"]
+"tests/opentrons/calibration_storage/*" = ["ANN","D"]
+"tests/opentrons/legacy_commands/*" = ["ANN","D"]
+"tests/opentrons/config/*" = ["ANN","D"]
+"tests/opentrons/data/*" = ["ANN","D"]
+"tests/opentrons/drivers/*" = ["ANN","D"]
+"tests/opentrons/hardware_control/*" = ["ANN","D"]
+"tests/opentrons/protocol_api_old/*" = ["ANN","D"]
+"tests/opentrons/protocols/*" = ["ANN","D"]
+"tests/opentrons/system/*" = ["ANN","D"]
+"tests/opentrons/tools/*" = ["ANN","D"]
+"tests/opentrons/util/test_async_helpers.py" = ["ANN","D"]
+"tests/opentrons/util/test_linal.py" = ["ANN","D"]
+"tests/opentrons/util/test_entrypoint_util.py" = ["ANN","D"]
+"integration_testing/*" = ["T201"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+[tool.ruff.format]
+exclude = ["docs/v2/example_protocols/*"]
+[tool.ruff.lint.isort]
+known-first-party = ["opentrons_shared_data", "opentrons_hardware"]
+known-local-folder = ["opentrons"]
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]

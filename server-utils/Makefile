@@ -90,14 +90,12 @@ test-cov:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(tests)
-	$(python) -m black --check .
-	$(python) -m flake8 $(SRC_PATH) $(tests)
+	$(ruff) check .
 
 .PHONY: format
 format:
-	$(python) -m black .
-
-
+	$(ruff) format .
+	$(ruff) check --select I --fix .
 
 .PHONY: push
 push: wheel

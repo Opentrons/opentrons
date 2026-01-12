@@ -1,16 +1,18 @@
 """Common test fixtures for runs route tests."""
+
 import pytest
 from decoy import Decoy
 
-from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
-    MaintenanceRunOrchestratorStore,
-)
+from opentrons.protocol_engine import ProtocolEngine
+
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.maintenance_runs.maintenance_run_data_manager import (
     MaintenanceRunDataManager,
 )
+from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
+    MaintenanceRunOrchestratorStore,
+)
 from robot_server.runs.run_data_manager import RunDataManager
-from opentrons.protocol_engine import ProtocolEngine
-from robot_server.deck_configuration.store import DeckConfigurationStore
 
 
 @pytest.fixture()

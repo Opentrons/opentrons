@@ -1,16 +1,17 @@
 """Test update-position-estimator commands."""
+
 from decoy import Decoy
 
-from opentrons.protocol_engine.commands.unsafe.unsafe_engage_axes import (
-    UnsafeEngageAxesParams,
-    UnsafeEngageAxesResult,
-    UnsafeEngageAxesImplementation,
-)
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.execution import GantryMover
-from opentrons.protocol_engine.types import MotorAxis
 from opentrons.hardware_control import OT3HardwareControlAPI
 from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.unsafe.unsafe_engage_axes import (
+    UnsafeEngageAxesImplementation,
+    UnsafeEngageAxesParams,
+    UnsafeEngageAxesResult,
+)
+from opentrons.protocol_engine.execution import GantryMover
+from opentrons.protocol_engine.types import MotorAxis
 
 
 async def test_engage_axes_implementation(
@@ -45,7 +46,7 @@ async def test_engage_axes_implementation(
     ).then_return([Axis.Z_L, Axis.P_L, Axis.X, Axis.Y])
 
     decoy.when(
-        await ot3_hardware_api.update_axis_position_estimations(
+        await ot3_hardware_api.update_axis_position_estimations(  # type: ignore[func-returns-value]
             [Axis.Z_L, Axis.P_L, Axis.X, Axis.Y]
         )
     ).then_return(None)
