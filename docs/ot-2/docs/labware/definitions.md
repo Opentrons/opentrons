@@ -210,28 +210,6 @@ A schema is a framework for organizing data. It sets the rules about what inform
       <td>Object</td>
       <td>For labware that can stack on top of a module. Used to determine z-height (module labware offset z + labware z - overlap). See <code>coordinates</code> in the JSON definitions section below.</td>
     </tr>
-    <tr>
-      <td><code>gripperOffsets</code></td>
-      <td>Object</td>
-      <td>
-        Offsets added when calculating the coordinates the gripper should go to when picking up or dropping other labware on this labware. Includes a <code>default</code> object that includes two properties:
-        <ul>
-          <li><code>pickUpOffset</code>: Offset added to calculate the pick-up coordinates of labware placed on this labware.</li>
-          <li><code>dropOffset</code>: Offset added to calculate the drop-off coordinates of labware placed on this labware.</li>
-        </ul>
-        See <code>coordinates</code> in the JSON definitions section below.
-      </td>
-    </tr>
-    <tr>
-      <td><code>gripForce</code></td>
-      <td>Number</td>
-      <td>Measured in newtons, this is the force which the gripper uses to grasp labware. Recommended values are between 5 and 16.</td>
-    </tr>
-    <tr>
-      <td><code>gripHeightFrom<wbr>LabwareBottom</code></td>
-      <td>Number</td>
-      <td>Recommended z-axis height, from the labware bottom to the center of the gripper pads.</td>
-    </tr>
   </tbody>
 </table>
 
