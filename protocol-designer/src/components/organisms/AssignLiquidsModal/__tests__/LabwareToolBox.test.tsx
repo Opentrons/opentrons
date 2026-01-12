@@ -75,13 +75,6 @@ describe('LabwareStackToolboxContainer liquids dont match', () => {
           },
         },
         labwareId: 'mockLabwareId',
-        allWellContents: {
-          mockLabwareId: {
-            A1: {
-              groupIds: ['mockGroupId'],
-            },
-          },
-        },
         liquidLocations: {
           mockLabwareId: {
             A1: {
@@ -160,13 +153,6 @@ describe('LabwareStackToolboxContainer liquids match', () => {
           },
         },
         labwareId: 'mockLabwareId',
-        allWellContents: {
-          mockLabwareId: {
-            A1: {
-              groupIds: ['mockGroupId'],
-            },
-          },
-        },
         liquidLocations: {
           mockLabwareId: {
             A1: {
