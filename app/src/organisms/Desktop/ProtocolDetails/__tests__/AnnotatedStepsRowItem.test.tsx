@@ -34,7 +34,11 @@ describe('AnnotatedStepsRowItem', () => {
   ): RowComponentProps<ItemData> => ({
     index,
     style: { height: 10 },
-    ariaAttributes: { role: 'listitem', 'aria-posinset': index + 1, 'aria-setsize': data.rows.length },
+    ariaAttributes: {
+      role: 'listitem',
+      'aria-posinset': index + 1,
+      'aria-setsize': data.rows.length,
+    },
     ...data,
   })
 
