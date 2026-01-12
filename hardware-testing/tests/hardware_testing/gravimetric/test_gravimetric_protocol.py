@@ -7,8 +7,11 @@ import subprocess
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 from pathlib import Path
-
+import glob
+import csv
 import pytest
+
+from hardware_testing.gravimetric.protocol_replacement.gravimetric import CSVSettings
 
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 
@@ -79,6 +82,19 @@ def _get_analysis_result(
             json_output=json_output,
             stdout_stderr=process.stdout,
         )
+
+
+def test_all_csvs_are_valid() -> None:
+    all_csvs = glob.glob(
+        str(GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH) + "/**/*.csv", recursive=True
+    )
+    for csv_file in all_csvs:
+        with open(csv_file) as input_file:
+            # Print the file name to help with debugging when a test fail
+            print(csv_file)
+            reader = csv.reader(input_file)
+            csv_params = [row for row in reader]
+            CSVSettings.parse_csv(csv_params, False)
 
 
 @pytest.mark.parametrize(

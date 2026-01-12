@@ -1,7 +1,7 @@
 """Gravimetric QC protocol."""
 
 from typing import List, Dict, Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 import os
 import sys
 from time import time
@@ -130,16 +130,11 @@ fast_simulate_measurement = MeasurementData(
 )
 
 
-@dataclass
-class FixtureSettings:
-    """Dataclass to hold all the options for a gravimetric script."""
-
-    ctx: ProtocolContext
+@dataclass(kw_only=True)
+class CSVSettings:
     name: str
     increment: bool
-    run_id: str
     mount: str
-    pipette: InstrumentContext
     pipette_volume: int
     pipette_channels: int
     tip_sizes: List[int]
@@ -148,39 +143,32 @@ class FixtureSettings:
     return_tip: bool
     touch_tip: bool
     liquid_name: str
-    liquid: Liquid
-    liquid_class: LiquidClass
+    liquid_desc: str
+    liquid_col: str
+    liquid_vol_estimate: float
     tips: Dict[int, List[str]]
-    liquid_source: Well
     volumes: Dict[int, List[float]]
     extra_volumes: Dict[int, List[float]]
-    scale: Scale
-    recorder: GravimetricRecorder
-    env_sensor: AsairDriver.AsairSensorBase
-    robot_serial: str
-    scale_serial: str
-    env_serial: str
-    pipette_tag: str
-    test_report: report.CSVReport
+    volumes_flat: List[float]
     scale_delay: int
     blank_trials: int
     submerge_depth: float
-    retracted_offset: float
-    isolate_volumes: bool
     extra: bool
     labware_on_scale: str
+    labware_on_scale_well_name: str
     slot_scale: str
-    fast_simulate: bool
     retract_discontinuity: float
     disc_ver_cuttoff: int
     lld_every_tip: bool
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
+    retracted_offset: float
+    gantry_speed: float
 
     @classmethod
-    def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
-        """Parse the CSV file and build the fixture settings."""
+    def parse_csv(cls, csv_params: List[List[str]], simulating: bool) -> "CSVSettings":
+        """Extract all of the data from the CSV runtime param."""
 
         def lookup_key(key: str, csv: List[List[str]]) -> List[str]:
             for line in csv:
@@ -188,11 +176,12 @@ class FixtureSettings:
                     return [e for e in line[1:] if e != ""]
             raise ValueError(f"{key} is not defined in the csv params.")
 
-        csv_params = (
-            ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
-        )
+        retracted_offset = 5.0
+        # TODO maybe make this a CSV option
+        # retracted_offset = float(lookup_key("retracted_offset", csv_params)[0])
+
         name = lookup_key("name", csv_params)[0]
-        if ctx.is_simulating():
+        if simulating:
             name = f"{name}-simulate"
         increment = bool(lookup_key("increment", csv_params)[0] == "TRUE")
         mount = lookup_key("mount", csv_params)[0]
@@ -222,9 +211,6 @@ class FixtureSettings:
         scale_delay = int(lookup_key("scale_delay", csv_params)[0])
         blank_trials = int(lookup_key("blank_trials", csv_params)[0])
         submerge_depth = float(lookup_key("submerge_depth", csv_params)[0])
-        retracted_offset = 5.0
-        # TODO maybe make this a CSV option
-        # retracted_offset = float(lookup_key("retracted_offset", csv_params)[0])
         volumes_to_test_20ul = [
             float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
         ]
@@ -264,11 +250,24 @@ class FixtureSettings:
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
         cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
         touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
+
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
             200: volumes_to_test_200ul,
             1000: volumes_to_test_1000ul,
+        }
+        extra_volumes = {
+            20: extra_volumes_to_test_20ul,
+            50: extra_volumes_to_test_50ul,
+            200: extra_volumes_to_test_200ul,
+            1000: extra_volumes_to_test_1000ul,
+        }
+        tips = {
+            20: tipracks_20ul,
+            50: tipracks_50ul,
+            200: tipracks_200ul,
+            1000: tipracks_1000ul,
         }
         volumes_flat = (
             volumes_to_test_20ul
@@ -280,32 +279,86 @@ class FixtureSettings:
             + extra_volumes_to_test_200ul
             + extra_volumes_to_test_1000ul
         )
+        return CSVSettings(
+            name=name,
+            increment=increment,
+            mount=mount,
+            pipette_volume=pipette_volume,
+            pipette_channels=pipette_channels,
+            tip_sizes=tip_sizes,
+            trials=trials,
+            channels=channels,
+            return_tip=return_tip,
+            touch_tip=touch_tip,
+            liquid_name=liquid_name,
+            liquid_desc=liquid_desc,
+            liquid_col=liquid_col,
+            liquid_vol_estimate=liquid_vol_estimate,
+            tips=tips,
+            volumes=volumes,
+            extra_volumes=extra_volumes,
+            volumes_flat=volumes_flat,
+            scale_delay=scale_delay,
+            blank_trials=blank_trials,
+            submerge_depth=submerge_depth,
+            extra=extra,
+            labware_on_scale=labware_on_scale,
+            labware_on_scale_well_name=labware_on_scale_well_name,
+            slot_scale=slot_scale,
+            retract_discontinuity=retract_discontinuity,
+            disc_ver_cuttoff=disc_ver_cuttoff,
+            lld_every_tip=lld_every_tip,
+            single_tip_96=single_tip_96,
+            cavity_test=cavity_test,
+            touch_blank=touch_blank,
+            retracted_offset=retracted_offset,
+            gantry_speed=gantry_speed,
+        )
 
-        extra_volumes = {
-            20: extra_volumes_to_test_20ul,
-            50: extra_volumes_to_test_50ul,
-            200: extra_volumes_to_test_200ul,
-            1000: extra_volumes_to_test_1000ul,
-        }
 
-        tips = {
-            20: tipracks_20ul,
-            50: tipracks_50ul,
-            200: tipracks_200ul,
-            1000: tipracks_1000ul,
-        }
+@dataclass
+class FixtureSettings(CSVSettings):
+    """Dataclass to hold all the options for a gravimetric script."""
 
-        source_well = ctx.load_labware(labware_on_scale, slot_scale)[
-            labware_on_scale_well_name
-        ]
-        liquid_class = ctx.get_liquid_class(liquid_name)
-        liquid = ctx.define_liquid(liquid_name, liquid_desc, liquid_col)
-        source_well.load_liquid(liquid, liquid_vol_estimate)
+    ctx: ProtocolContext
+    run_id: str
+    pipette: InstrumentContext
+    liquid: Liquid
+    liquid_class: LiquidClass
+    liquid_source: Well
+    scale: Scale
+    recorder: GravimetricRecorder
+    env_sensor: AsairDriver.AsairSensorBase
+    robot_serial: str
+    scale_serial: str
+    env_serial: str
+    pipette_tag: str
+    test_report: report.CSVReport
+    isolate_volumes: bool
+    fast_simulate: bool
+
+    @classmethod
+    def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
+        """Parse the CSV file and build the fixture settings."""
+        csv_params = (
+            ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
+        )
+        csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
+
+        source_well = ctx.load_labware(
+            csv_settings.labware_on_scale, csv_settings.slot_scale
+        )[csv_settings.labware_on_scale_well_name]
+        liquid_class = ctx.get_liquid_class(csv_settings.liquid_name)
+        liquid = ctx.define_liquid(
+            csv_settings.liquid_name, csv_settings.liquid_desc, csv_settings.liquid_col
+        )
+        source_well.load_liquid(liquid, csv_settings.liquid_vol_estimate)
 
         pipette = ctx.load_instrument(
-            f"flex_{pipette_channels}channel_{pipette_volume}", mount
+            f"flex_{csv_settings.pipette_channels}channel_{csv_settings.pipette_volume}",
+            csv_settings.mount,
         )
-        pipette.default_speed = gantry_speed
+        pipette.default_speed = csv_settings.gantry_speed
         simulating = ctx.is_simulating()
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             helpers._override_check_safe_for_pipette_movement
@@ -313,15 +366,17 @@ class FixtureSettings:
         if simulating:
             pipette_tag = "pipette"
         else:
-            pipette_tag = helpers._get_tag_from_pipette(pipette, increment, False)
+            pipette_tag = helpers._get_tag_from_pipette(
+                pipette, csv_settings.increment, False
+            )
         run_id = create_run_id()
         fast_simulate = IS_ROBOT and simulating
 
         test_report = report.create_csv_test_report(
-            volumes=volumes_flat,
-            pipette_channels=channels,
-            trials=trials,
-            name=name,
+            volumes=csv_settings.volumes_flat,
+            pipette_channels=csv_settings.channels,
+            trials=csv_settings.trials,
+            name=csv_settings.name,
             run_id=run_id,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
@@ -329,11 +384,11 @@ class FixtureSettings:
         os.makedirs(f"{test_report.parent}", exist_ok=True)
         set_output_file(f"{test_report.parent}/run_output.txt")
 
-        print_info(f"volumes flat {volumes_flat}")
-        print_info(f"channels {pipette_channels}")
-        print_info(f"increment {increment}")
-        print_info(f"trials {trials}")
-        print_info(f"name {name}")
+        print_info(f"volumes flat {csv_settings.volumes_flat}")
+        print_info(f"channels {csv_settings.pipette_channels}")
+        print_info(f"increment {csv_settings.increment}")
+        print_info(f"trials {csv_settings.trials}")
+        print_info(f"name {csv_settings.name}")
 
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
@@ -341,7 +396,7 @@ class FixtureSettings:
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
-                test_name=name,
+                test_name=csv_settings.name,
                 run_id=run_id,
                 tag=pipette_tag,
                 start_time=time(),
@@ -401,7 +456,7 @@ class FixtureSettings:
             },
             scale=recorder.serial_number,
             environment=env_serial,
-            liquid=liquid_name,
+            liquid=csv_settings.liquid_name,
         )
         # todo fix set serial to take robot name and serial separate
         # do this after the set serial to overwrite where the name.
@@ -409,25 +464,11 @@ class FixtureSettings:
         ctx.load_trash_bin("A3")
         return cls(
             ctx=ctx,
-            name=name,
-            increment=increment,
             run_id=run_id,
-            mount=mount,
             pipette=pipette,
-            pipette_volume=pipette_volume,
-            pipette_channels=pipette_channels,
-            tip_sizes=tip_sizes,
-            trials=trials,
-            channels=channels,
-            return_tip=return_tip,
-            touch_tip=touch_tip,
-            liquid_name=liquid_name,
             liquid=liquid,
             liquid_class=liquid_class,
-            tips=tips,
             liquid_source=source_well,
-            volumes=volumes,
-            extra_volumes=extra_volumes,
             scale=scale,
             recorder=recorder,
             env_sensor=env_sensor,
@@ -436,21 +477,9 @@ class FixtureSettings:
             env_serial=env_serial,
             pipette_tag=pipette_tag,
             test_report=test_report,
-            scale_delay=scale_delay,
-            blank_trials=blank_trials,
-            submerge_depth=submerge_depth,
-            retracted_offset=retracted_offset,
             isolate_volumes=False,
-            extra=extra,
-            labware_on_scale=labware_on_scale,
-            slot_scale=slot_scale,
             fast_simulate=fast_simulate,
-            retract_discontinuity=retract_discontinuity,
-            disc_ver_cuttoff=disc_ver_cuttoff,
-            lld_every_tip=lld_every_tip,
-            single_tip_96=single_tip_96,
-            cavity_test=cavity_test,
-            touch_blank=touch_blank,
+            **asdict(csv_settings),
         )
 
     def validate_settings(self) -> bool:
