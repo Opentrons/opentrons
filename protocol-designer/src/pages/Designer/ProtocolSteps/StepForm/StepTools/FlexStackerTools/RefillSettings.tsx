@@ -35,16 +35,16 @@ interface RefillSettingsProps {
 export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   const { formData, propsForFields, moduleState, maxPoolCount } = props
   const { t } = useTranslation('form')
-  const { storedLabwareDetails } = moduleState ?? {}
+  const { storedLabwareDetails, labwareInHopper } = moduleState ?? {}
   const labwareEntities = useSelector(getLabwareEntities)
   const savedStepForms = useSelector(getSavedStepForms)
   const initialLabwareIds =
     (savedStepForms[formData.id]?.fillLabwareIds as string[]) ?? []
-  const oldFillQuantity = initialLabwareIds.length
+  const oldFillQuantity = initialLabwareIds?.length ?? 0
   const [fillQuantityLocalState, setFillQuantityState] = useState<
     string | null
     // initialize if saved step form exists
-  >(initialLabwareIds.length > 0 ? String(initialLabwareIds.length) : null)
+  >(oldFillQuantity > 0 ? String(initialLabwareIds.length) : null)
   const storedEntity = Object.values(labwareEntities).find(
     ({ labwareDefURI }) => {
       return labwareDefURI === storedLabwareDetails?.primaryLabwareURI
@@ -57,7 +57,20 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   // you can't rely on generating the uuid in the hydrated form
   useEffect(() => {
     const quantity = Number(fillQuantityLocalState) ?? 1
+    const numberOfLabwareInHopper = labwareInHopper?.length ?? 0
     const difference = quantity - oldFillQuantity
+    const valueTooHigh = quantity > maxPoolCount - numberOfLabwareInHopper
+    const newFill = Array.from(
+      { length: quantity },
+      () => `${uuid()}:${storedEntity?.labwareDefURI}`
+    )
+    propsForFields.fillLabwareIds.updateValue(newFill)
+    // Form errors do not have acccess to module state, so this logic is used
+    // to clear out the fillLabwareIds value if the quantity entered is too high
+    // and raise an error.
+    if (valueTooHigh) {
+      propsForFields.fillLabwareIds.updateValue([])
+    }
     if (difference > 0) {
       const additionalIds = Array.from(
         { length: difference },

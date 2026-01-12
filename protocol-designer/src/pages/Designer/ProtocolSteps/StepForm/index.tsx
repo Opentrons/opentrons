@@ -121,7 +121,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       ) {
         const initialLabwareIds =
           (savedStepForm?.fillLabwareIds as string[]) ?? null
-        const oldFillQuantity = initialLabwareIds.length
+        const oldFillQuantity = initialLabwareIds?.length ?? 0
 
         // delete extraneous labware if fill quantity is decreased
         if (oldFillQuantity > hydratedForm.fillLabwareIds.length) {
