@@ -59,6 +59,7 @@ describe('getAAsToFixtureIdFromDeckDefWithFakes', () => {
         'absorbanceReaderV1LidDockA4',
       ],
       flexStackerModuleV1: ['flexStackerModuleV1A4', 'A3'],
+      vacuumModuleMilliporeV1: ['vacuumModuleMilliporeV1A3', 'A4'],
     })
   })
 
@@ -76,6 +77,7 @@ describe('getAAsToFixtureIdFromDeckDefWithFakes', () => {
       fakeStagingSlotWithMagBlockV1: ['magneticBlockV1D3', 'fakeD4'],
       fakeWasteChuteWithEmptySlot: ['1ChannelWasteChute', 'fakeD4'],
       flexStackerModuleV1: ['flexStackerModuleV1D4', 'D3'],
+      vacuumModuleMilliporeV1: ['vacuumModuleMilliporeV1D3', 'D4'],
       flexStackerModuleV1WithMagneticBlockV1: [
         'flexStackerModuleV1D4',
         'magneticBlockV1D3',
