@@ -286,6 +286,7 @@ export function AssignLiquidsModalContainer(
   const selectedLabwareIds =
     useSelector(selectors.getSelectedLabwareIds) ??
     ([selectedLabwareId] as string[])
+  // change this to use liquid locations instead of this method and remove the method
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
