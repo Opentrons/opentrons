@@ -37,7 +37,7 @@ robot = [
 ]
 dev = [
     "ruff==0.14.10",
-    "pytest>=8,<9",
+    "pytest>=9.0.2",
     "pytest-asyncio<2,>=1",
     "pytest-watch~=4.2.0",
     "pytest-cov==4.1.0",
