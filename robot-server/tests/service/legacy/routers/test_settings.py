@@ -1,34 +1,34 @@
 import logging
-from mock import patch, call, MagicMock
 from dataclasses import make_dataclass
-from typing import Generator, Optional
 from pathlib import Path
+from typing import Generator, Optional
 
 import pytest
-
 from decoy import Decoy
+from mock import MagicMock, call, patch
 
-from opentrons.config.reset import ResetOptionId
 from opentrons.config import advanced_settings
+from opentrons.config.reset import ResetOptionId
+from opentrons.types import Mount
 from opentrons_shared_data.pipette import (
-    types as pip_types,
     pipette_definition as pip_def,
 )
-from opentrons.types import Mount
+from opentrons_shared_data.pipette import (
+    types as pip_types,
+)
 from opentrons_shared_data.robot.types import RobotTypeEnum
-
 
 from robot_server.app import app
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store_failsafe,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
-from robot_server.persistence.persistence_directory import PersistenceResetter
-from robot_server.persistence.images_directory import ImagesResetter
 from robot_server.persistence.fastapi_dependencies import (
-    get_persistence_resetter,
     get_images_resetter,
+    get_persistence_resetter,
 )
+from robot_server.persistence.images_directory import ImagesResetter
+from robot_server.persistence.persistence_directory import PersistenceResetter
 
 
 def test_get_robot_settings(api_client, hardware):

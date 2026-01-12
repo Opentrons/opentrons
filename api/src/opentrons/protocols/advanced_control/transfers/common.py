@@ -2,7 +2,7 @@
 
 import enum
 import math
-from typing import Iterable, Generator, Tuple, TypeVar, Literal, List, Union
+from typing import Generator, Iterable, List, Literal, Tuple, TypeVar, Union
 
 from opentrons.protocol_api._liquid_properties import (
     LiquidHandlingPropertyByVolume,

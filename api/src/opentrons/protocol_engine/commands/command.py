@@ -3,30 +3,29 @@
 from __future__ import annotations
 
 import dataclasses
+import enum
 from abc import ABC, abstractmethod
 from datetime import datetime
-import enum
 from typing import (
     TYPE_CHECKING,
-    Generic,
-    Optional,
-    TypeVar,
-    List,
-    Type,
-    Union,
     Any,
     Dict,
+    Generic,
+    List,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
 )
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.state.update_types import StateUpdate
-
-from ..resources import ModelUtils
 from ..errors import ErrorOccurrence
 from ..notes import CommandNote, CommandNoteAdder
+from ..resources import ModelUtils
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.state.update_types import StateUpdate
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:

@@ -9,10 +9,11 @@ High level overview of the script:
 - Profit
 """
 
-from dataclasses import dataclass
-import os
 import json
+import os
+from dataclasses import dataclass
 from typing import Optional
+
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.instruments.pipettes.serials import serial_val_from_parts
 

@@ -5,11 +5,14 @@ and end-to-end tests.
 """
 
 from __future__ import annotations
+
 import asyncio
 import contextlib
 from logging import getLogger
 from typing import Annotated, Any, AsyncGenerator, Awaitable, Callable, Set
+
 from fastapi import Depends
+
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,

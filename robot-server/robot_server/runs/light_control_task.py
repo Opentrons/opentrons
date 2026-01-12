@@ -1,20 +1,20 @@
 """Background task to drive the Flex's status bar."""
 
-from typing import Optional, List
-from logging import getLogger
 import asyncio
 from dataclasses import dataclass
+from logging import getLogger
+from typing import List, Optional
 
-from .run_orchestrator_store import RunOrchestratorStore
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.types import EngineStatus
 from opentrons.hardware_control.types import (
-    StatusBarState,
     EstopState,
+    StatusBarState,
     SubSystem,
     UpdateState,
 )
+from opentrons.protocol_engine.types import EngineStatus
 
+from .run_orchestrator_store import RunOrchestratorStore
 
 log = getLogger(__name__)
 

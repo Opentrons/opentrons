@@ -7,44 +7,45 @@ treating PipetteState as a private implementation detail.
 
 import pytest
 
+from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
     LiquidClasses as VolumeModes,
 )
-from opentrons_shared_data.pipette import pipette_definition
-
-from opentrons.protocol_engine.state import update_types
-from opentrons.types import MountType, Point
-from opentrons.protocol_engine.types import (
-    CurrentAddressableArea,
-    DeckPoint,
-    LoadedPipette,
-    FlowRates,
-    CurrentWell,
-    TipGeometry,
-    AspiratedFluid,
-    FluidKind,
-    LabwareWellId,
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
 )
+
+from ..pipette_fixtures import get_default_nozzle_map
+from .command_fixtures import create_comment_command
 from opentrons.protocol_engine.actions import (
     SetPipetteMovementSpeedAction,
     SucceedCommandAction,
 )
-from opentrons.protocol_engine.state.pipettes import (
-    PipetteStore,
-    PipetteState,
-    CurrentDeckPoint,
-    StaticPipetteConfig,
-    BoundingNozzlesOffsets,
-    PipetteBoundingBoxOffsets,
-)
 from opentrons.protocol_engine.resources.pipette_data_provider import (
     LoadedStaticPipetteData,
 )
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.fluid_stack import FluidStack
-
-from .command_fixtures import create_comment_command
-from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.state.pipettes import (
+    BoundingNozzlesOffsets,
+    CurrentDeckPoint,
+    PipetteBoundingBoxOffsets,
+    PipetteState,
+    PipetteStore,
+    StaticPipetteConfig,
+)
+from opentrons.protocol_engine.types import (
+    AspiratedFluid,
+    CurrentAddressableArea,
+    CurrentWell,
+    DeckPoint,
+    FlowRates,
+    FluidKind,
+    LabwareWellId,
+    LoadedPipette,
+    TipGeometry,
+)
+from opentrons.types import MountType, Point
 
 
 @pytest.fixture

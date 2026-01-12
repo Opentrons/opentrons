@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 """blow away and reset EEPROM file systems."""
 
+import argparse
 import asyncio
 import logging
-import argparse
 from logging.config import dictConfig
-from typing import Dict, Any
+from typing import Any, Dict
+
 from typing_extensions import Final
 
-from opentrons_hardware.drivers.can_bus import build, CanMessenger
+from opentrons_hardware.drivers.can_bus import CanMessenger, build
 from opentrons_hardware.firmware_bindings import utils
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
+    fields,
     message_definitions,
     payloads,
-    fields,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 logger = logging.getLogger(__name__)

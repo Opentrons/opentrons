@@ -1,12 +1,14 @@
 """Handle parsing and providing pipette information."""
 
 import re
-from typing import Dict, Tuple
 import struct
+from typing import Dict, Tuple
+
 from opentrons_shared_data.errors.exceptions import (
     InvalidInstrumentData,
     PythonException,
 )
+
 from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 

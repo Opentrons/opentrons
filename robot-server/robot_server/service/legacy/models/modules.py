@@ -1,5 +1,6 @@
 import typing
-from pydantic import ConfigDict, BaseModel, Field
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TemperatureModuleLiveData(BaseModel):

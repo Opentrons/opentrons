@@ -1,6 +1,6 @@
+from pydantic import BaseModel, ValidationError
 from pytest import raises
 
-from pydantic import BaseModel, ValidationError
 from robot_server.service.json_api.resource_links import ResourceLinks
 
 

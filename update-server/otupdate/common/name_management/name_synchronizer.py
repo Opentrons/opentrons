@@ -6,10 +6,9 @@ from typing import AsyncGenerator, Optional
 
 from aiohttp import web
 
-from otupdate.common.constants import APP_VARIABLE_PREFIX
 from .avahi import AvahiClient, alternative_service_name
 from .pretty_hostname import get_pretty_hostname, persist_pretty_hostname
-
+from otupdate.common.constants import APP_VARIABLE_PREFIX
 
 _NAME_SYNCHRONIZER_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
 _log = getLogger(__name__)

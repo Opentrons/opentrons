@@ -1,23 +1,14 @@
 """Aspirate command request, result, and implementation models."""
 
 from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional, Type, Union
+
 from typing_extensions import Literal
 
-from .pipetting_common import (
-    OverpressureError,
-    PipetteIdMixin,
-    AspirateVolumeMixin,
-    FlowRateMixin,
-    BaseLiquidHandlingResult,
-    aspirate_while_tracking,
-)
-from .movement_common import (
-    DynamicLiquidHandlingWellLocationMixin,
-    DestinationPositionResult,
-    StallOrCollisionError,
-    move_to_well,
-)
+from ..errors.exceptions import PipetteNotReadyToAspirateError
+from ..state.update_types import CLEAR, StateUpdate
+from ..types import DeckPoint
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -25,17 +16,27 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..state.update_types import StateUpdate
-from ..errors.exceptions import PipetteNotReadyToAspirateError
+from .movement_common import (
+    DestinationPositionResult,
+    DynamicLiquidHandlingWellLocationMixin,
+    StallOrCollisionError,
+    move_to_well,
+)
+from .pipetting_common import (
+    AspirateVolumeMixin,
+    BaseLiquidHandlingResult,
+    FlowRateMixin,
+    OverpressureError,
+    PipetteIdMixin,
+    aspirate_while_tracking,
+)
 from opentrons.hardware_control import HardwareControlAPI
-from ..state.update_types import CLEAR
-from ..types import DeckPoint
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover, MovementHandler
+    from ..execution import GantryMover, MovementHandler, PipettingHandler
+    from ..notes import CommandNoteAdder
     from ..resources import ModelUtils
     from ..state.state import StateView
-    from ..notes import CommandNoteAdder
 
 
 AspirateWhileTrackingCommandType = Literal["aspirateWhileTracking"]

@@ -1,16 +1,17 @@
 """Configure for volume command request, result, and implementation models."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any
+
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import Literal
 
-from .pipetting_common import PipetteIdMixin
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import PipetteIdMixin
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler

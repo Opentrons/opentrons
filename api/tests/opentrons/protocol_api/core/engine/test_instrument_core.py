@@ -1,90 +1,89 @@
 """Test for the ProtocolEngine-based instrument API core."""
 
-from typing import cast, Optional
+from typing import Optional, cast
+
+import pytest
+from decoy import Decoy, errors, matchers
 
 from opentrons_shared_data.errors.exceptions import (
-    PipetteLiquidNotFoundError,
     CommandPreconditionViolated,
+    PipetteLiquidNotFoundError,
 )
-import pytest
-from decoy import Decoy, matchers
-from decoy import errors
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    Coordinate,
     LiquidClassSchemaV1,
     PositionReference,
-    Coordinate,
 )
-
 from opentrons_shared_data.pipette.types import PipetteNameType
 
+from ... import versions_at_or_above, versions_below, versions_between
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.protocol_api._liquid_properties import TransferProperties
-from opentrons.protocol_api.core.engine import transfer_components_executor, LabwareCore
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
+from opentrons.protocol_api.core.engine import (
+    InstrumentCore,
+    LabwareCore,
+    ProtocolCore,
+    WellCore,
+    pipette_movement_conflict,
+    transfer_components_executor,
+)
 from opentrons.protocol_api.core.engine.transfer_components_executor import (
+    LiquidAndAirGapPair,
+    TipState,
     TransferComponentsExecutor,
     TransferType,
-    TipState,
-    LiquidAndAirGapPair,
+)
+from opentrons.protocol_api.disposal_locations import (
+    DisposalOffset,
+    TrashBin,
+    WasteChute,
 )
 from opentrons.protocol_engine import (
     DeckPoint,
-    LoadedPipette,
-    MotorAxis,
-    WellLocation,
-    LiquidHandlingWellLocation,
-    PickUpTipWellLocation,
-    WellOffset,
-    WellOrigin,
-    PickUpTipWellOrigin,
     DropTipWellLocation,
     DropTipWellOrigin,
+    LiquidHandlingWellLocation,
+    LoadedPipette,
+    MotorAxis,
+    PickUpTipWellLocation,
+    PickUpTipWellOrigin,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
 from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.clients.sync_client import SyncClient
 from opentrons.protocol_engine.commands import GetNextTipResult
 from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import (
-    FlowRates,
-    TipGeometry,
-    NozzleLayoutConfigurationType,
-    RowNozzleLayoutConfiguration,
-    SingleNozzleLayoutConfiguration,
-    ColumnNozzleLayoutConfiguration,
     AddressableOffsetVector,
+    ColumnNozzleLayoutConfiguration,
+    FlowRates,
     LiquidClassRecord,
     NextTipInfo,
     NoTipAvailable,
     NoTipReason,
+    NozzleLayoutConfigurationType,
+    RowNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    TipGeometry,
     WellLocationFunction,
 )
-from opentrons.protocol_api.disposal_locations import (
-    TrashBin,
-    WasteChute,
-    DisposalOffset,
-)
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
-from opentrons.protocol_api._liquid import LiquidClass
-from opentrons.protocol_api.core.engine import (
-    InstrumentCore,
-    WellCore,
-    ProtocolCore,
-    pipette_movement_conflict,
-)
+from opentrons.protocols.advanced_control.transfers import common as tx_commons
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.advanced_control.transfers import common as tx_commons
 from opentrons.types import (
     Location,
+    MeniscusTrackingTarget,
     Mount,
     MountType,
-    Point,
     NozzleConfigurationType,
-    MeniscusTrackingTarget,
+    Point,
 )
-
-from ... import versions_below, versions_at_or_above, versions_between
 
 
 @pytest.fixture
@@ -1949,7 +1948,7 @@ def test_liquid_probe_without_recovery_unsafe(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     decoy.when(
-        pipette_movement_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(  # type: ignore[func-returns-value]
             engine_state=mock_engine_client.state,
             pipette_id=subject.pipette_id,
             labware_id=well_core.labware_id,
@@ -2021,7 +2020,7 @@ def test_liquid_probe_with_recovery_unsafe(
         name="my cool well", labware_id="123abc", engine_client=mock_engine_client
     )
     decoy.when(
-        pipette_movement_conflict.check_safe_for_pipette_movement(
+        pipette_movement_conflict.check_safe_for_pipette_movement(  # type: ignore[func-returns-value]
             engine_state=mock_engine_client.state,
             pipette_id=subject.pipette_id,
             labware_id=well_core.labware_id,
@@ -2037,7 +2036,7 @@ def test_liquid_probe_with_recovery_unsafe(
     )
 
     decoy.when(
-        mock_engine_client.execute_command(
+        mock_engine_client.execute_command(  # type: ignore[func-returns-value]
             cmd.LiquidProbeParams(
                 pipetteId=subject.pipette_id,
                 wellLocation=WellLocation(
@@ -2630,7 +2629,7 @@ def test_aspirate_liquid_class_raises_for_more_than_max_volume(
         mock_engine_client.state.pipettes.get_working_volume("abc123")
     ).then_return(100)
     decoy.when(
-        tx_commons.check_valid_liquid_class_volume_parameters(
+        tx_commons.check_valid_liquid_class_volume_parameters(  # type: ignore[func-returns-value]
             aspirate_volume=123,
             air_gap=test_transfer_properties.aspirate.retract.air_gap_by_volume.get_for_volume(
                 123

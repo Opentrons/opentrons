@@ -1,7 +1,8 @@
+from typing import Any, Dict
+
 import pytest
 from mock import MagicMock
 from starlette.testclient import TestClient
-from typing import Dict, Any
 
 from opentrons import types
 from opentrons.protocol_engine.resources import ot3_validation

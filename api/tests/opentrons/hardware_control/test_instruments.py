@@ -1,21 +1,21 @@
 import asyncio
-from _pytest.fixtures import SubRequest
-import mock
-
-import pytest
-from decoy import Decoy
 from typing import (
     Any,
     Awaitable,
-    Dict,
     Callable,
     Coroutine,
+    Dict,
     Iterator,
-    Tuple,
     Optional,
+    Tuple,
     TypeAlias,
     Union,
 )
+
+import mock
+import pytest
+from _pytest.fixtures import SubRequest
+from decoy import Decoy
 
 try:
     import aionotify  # type: ignore[import-untyped]
@@ -23,14 +23,14 @@ except (OSError, ModuleNotFoundError):
     aionotify = None
 
 
-from opentrons.hardware_control.ot3api import OT3API
+from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.pipette.types import PipetteName
+
 from opentrons import types
 from opentrons.hardware_control import API
-from opentrons.hardware_control.types import Axis, OT3Mount, HardwareFeatureFlags
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import Axis, HardwareFeatureFlags, OT3Mount
 from opentrons.types import Mount
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-
 
 LEFT_PIPETTE_PREFIX = "p10_single"
 LEFT_PIPETTE_MODEL = "{}_v1".format(LEFT_PIPETTE_PREFIX)

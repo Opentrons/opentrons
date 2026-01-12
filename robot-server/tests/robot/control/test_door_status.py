@@ -2,8 +2,9 @@
 
 import pytest
 from decoy import Decoy
-from opentrons.hardware_control.types import DoorState
+
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import DoorState
 
 from robot_server.robot.control.router import get_door_status
 

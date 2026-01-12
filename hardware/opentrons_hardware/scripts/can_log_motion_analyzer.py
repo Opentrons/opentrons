@@ -1,25 +1,26 @@
 #!/usr/bin/env python3
 """Analyze a can log of a motion and display encoder variance over time"""
 
-from dataclasses import dataclass
-import re
-import sys
 import argparse
 import io
+import re
+import sys
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+from itertools import chain, tee
 from typing import (
-    Optional,
-    List,
-    Iterator,
-    Union,
-    TypeVar,
-    Type,
-    Set,
     TYPE_CHECKING,
     Any,
+    Iterator,
+    List,
+    Optional,
+    Set,
+    Type,
+    TypeVar,
+    Union,
 )
+
 from typing_extensions import Literal
-from itertools import chain, tee
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec

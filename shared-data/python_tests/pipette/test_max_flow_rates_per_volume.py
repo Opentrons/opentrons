@@ -1,18 +1,18 @@
 import os
-import pytest
 from typing import Iterator
-from opentrons_shared_data import get_shared_data_root
-from opentrons_shared_data.pipette.pipette_load_name_conversions import (
-    convert_pipette_model,
-)
-from opentrons_shared_data.pipette.load_data import load_definition
-from opentrons_shared_data.pipette.ul_per_mm import piecewise_volume_conversion
 
-from opentrons_shared_data.pipette.types import PipetteModel
+import pytest
+
+from opentrons_shared_data import get_shared_data_root
+from opentrons_shared_data.pipette.load_data import load_definition
 from opentrons_shared_data.pipette.pipette_definition import (
     ulPerMMDefinition,
 )
-
+from opentrons_shared_data.pipette.pipette_load_name_conversions import (
+    convert_pipette_model,
+)
+from opentrons_shared_data.pipette.types import PipetteModel
+from opentrons_shared_data.pipette.ul_per_mm import piecewise_volume_conversion
 
 DEFAULT_MAX_SPEED_HIGH_THROUGHPUT_OT3_AXIS_KIND_P = 15
 DEFAULT_MAX_SPEED_LOW_THROUGHPUT_OT3_AXIS_KIND_P = 70

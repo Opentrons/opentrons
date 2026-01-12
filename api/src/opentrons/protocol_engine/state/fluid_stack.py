@@ -8,7 +8,9 @@ and we do so as a logical stack because that's physically relevant.
 """
 
 from logging import getLogger
+
 from numpy import isclose
+
 from ..types import AspiratedFluid, FluidKind
 
 _LOG = getLogger(__name__)

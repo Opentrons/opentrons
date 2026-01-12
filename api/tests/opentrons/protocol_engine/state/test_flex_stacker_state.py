@@ -1,35 +1,35 @@
 """Tests for the module state store handling flex stacker state."""
 
-import pytest
-from typing import Optional, Dict, Set, cast
+from typing import Dict, Optional, Set, cast
 from unittest.mock import sentinel
 
+import pytest
+
+from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
 )
+from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocol_engine.state.modules import ModuleStore, ModuleView
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
+import opentrons.protocol_engine.errors as errors
+from opentrons.protocol_engine import actions
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaView,
 )
 from opentrons.protocol_engine.state.config import Config
-
-from opentrons.protocol_engine import actions
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.state.modules import ModuleStore, ModuleView
 from opentrons.protocol_engine.types import (
+    AddressableArea,
+    DeckConfigurationType,
     DeckType,
     ModuleDefinition,
-    AddressableArea,
     PotentialCutoutFixture,
-    DeckConfigurationType,
     StackerStoredLabwareGroup,
-)
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.deck.types import DeckDefinitionV5
-import opentrons.protocol_engine.errors as errors
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaState,
 )
 
 

@@ -1,15 +1,14 @@
-from typing import Optional, Dict, Union
-from opentrons.hardware_control import SyncHardwareAPI
+from typing import Dict, Optional, Union
 
-from opentrons.types import Mount, MountType, Point, AxisType, AxisMapType
 from opentrons_shared_data.pipette import types as pip_types
+
+from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.protocol_api._types import PipetteActionTypes, PlungerPositionTypes
+from opentrons.protocol_api.core.robot import AbstractRobot
 from opentrons.protocol_engine import commands as cmd
 from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocol_engine.types import DeckPoint, MotorAxis
-
-from opentrons.protocol_api.core.robot import AbstractRobot
-
+from opentrons.types import AxisMapType, AxisType, Mount, MountType, Point
 
 _AXIS_TYPE_TO_MOTOR_AXIS = {
     AxisType.X: MotorAxis.X,

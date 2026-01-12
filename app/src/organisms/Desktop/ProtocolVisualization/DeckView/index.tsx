@@ -148,6 +148,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
           height="100%"
           width="100%"
           deckDef={deckDef}
+          adjustViewBoxForStacker={true}
           viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
           {() => (

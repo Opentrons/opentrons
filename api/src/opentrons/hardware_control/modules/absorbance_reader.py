@@ -1,34 +1,33 @@
 import asyncio
 import logging
-from typing import Any, Callable, Dict, Optional, Mapping, List, Tuple
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple
 
-from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.absorbance_reader import (
-    AbstractAbsorbanceReaderDriver,
     AbsorbanceReaderDriver,
+    AbstractAbsorbanceReaderDriver,
     SimulatingDriver,
 )
+from opentrons.drivers.rpi_drivers.types import USBPort
 from opentrons.drivers.types import (
+    ABSMeasurementConfig,
+    ABSMeasurementMode,
+    AbsorbanceReaderDeviceState,
     AbsorbanceReaderLidStatus,
     AbsorbanceReaderPlatePresence,
-    AbsorbanceReaderDeviceState,
-    ABSMeasurementMode,
-    ABSMeasurementConfig,
 )
-
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.modules import mod_abc
+from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
 from opentrons.hardware_control.modules.types import (
+    AbsorbanceReaderData,
+    AbsorbanceReaderStatus,
+    LiveData,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
     ModuleType,
-    AbsorbanceReaderStatus,
-    LiveData,
-    AbsorbanceReaderData,
     UploadFunction,
 )
-from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
+from opentrons.hardware_control.poller import Poller, Reader
 
 log = logging.getLogger(__name__)
 

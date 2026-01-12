@@ -5,18 +5,17 @@ A class to convert info from the usb bus into a
 more readable format.
 """
 
-import subprocess
 import os
+import subprocess
 from typing import List, Union
 
+from .interfaces import USBDriverInterface
+from .types import BUS_PATH, USBPort
 from opentrons.hardware_control.modules.types import (
     ModuleAtPort,
     SimulatingModuleAtPort,
 )
 from opentrons.hardware_control.types import BoardRevision
-
-from .interfaces import USBDriverInterface
-from .types import BUS_PATH, USBPort
 
 
 class USBBus(USBDriverInterface):

@@ -1,27 +1,27 @@
 """Test the dependency for locking endpoints based on Estop."""
 
-from decoy import Decoy, matchers
-import pytest
 from typing import TYPE_CHECKING, Optional
 
+import pytest
+from decoy import Decoy, matchers
 from fastapi import status
 
 from opentrons.hardware_control import ThreadManagedHardware
 from opentrons.hardware_control.api import API
 from opentrons.hardware_control.types import (
-    EstopState,
-    EstopPhysicalStatus,
     EstopOverallStatus,
+    EstopPhysicalStatus,
+    EstopState,
 )
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
 
-from opentrons_shared_data.errors.codes import ErrorCodes, ErrorCode
+from opentrons_shared_data.errors.codes import ErrorCode, ErrorCodes
 
-from robot_server.robot.control.dependencies import require_estop_in_good_state
 from robot_server.errors.error_responses import ApiError
+from robot_server.robot.control.dependencies import require_estop_in_good_state
 
 
 @pytest.fixture

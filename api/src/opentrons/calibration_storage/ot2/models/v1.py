@@ -1,13 +1,13 @@
 import typing
-
-from typing_extensions import Literal
-from pydantic import field_validator, BaseModel, Field, PlainSerializer
 from datetime import datetime
+
+from pydantic import BaseModel, Field, PlainSerializer, field_validator
+from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.types import LabwareUri
 
-from opentrons.types import Point
 from opentrons.calibration_storage import types
+from opentrons.types import Point
 
 DatetimeType = typing.Annotated[
     datetime,

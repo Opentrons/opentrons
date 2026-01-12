@@ -1,11 +1,12 @@
-from typing import List, Tuple
-import pytest
 import platform
+from typing import List, Tuple
+
+import pytest
 from decoy import Decoy
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.definitions import MAX_SUPPORTED_VERSION
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.parameters.csv_parameter_interface import CSVParameter
 
 

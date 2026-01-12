@@ -95,6 +95,7 @@ lint:
 .PHONY: format
 format:
 	$(ruff) format .
+	$(ruff) check --select I --fix .
 
 .PHONY: push
 push: wheel

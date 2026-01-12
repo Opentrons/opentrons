@@ -1,9 +1,11 @@
 """Entrypoint for the USB-TCP bridge application."""
 
 import logging
+
+import uvicorn
+
 from . import systemd
 from .cli import build_root_parser
-import uvicorn
 
 LOG = logging.getLogger(__name__)
 

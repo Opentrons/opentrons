@@ -1,28 +1,27 @@
 """Tests for the legacy ModuleGeometry interface."""
 
-import pytest
-import mock
-
-from typing import ContextManager, Any, Optional
-from pytest_lazy_fixtures import lf as lazy_fixture
 from contextlib import nullcontext as does_not_raise
-from opentrons.types import Location, Point
+from typing import Any, ContextManager, Optional
 
-from opentrons.hardware_control.modules.types import ModuleType, HeaterShakerModuleModel
-
-from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
-from opentrons.protocol_api.core.legacy.module_geometry import (
-    create_geometry,
-    ModuleGeometry,
-    HeaterShakerGeometry,
-    PipetteMovementRestrictedByHeaterShakerError,
-)
-from opentrons.protocol_api.core.legacy.deck import Deck
+import mock
+import pytest
+from pytest_lazy_fixtures import lf as lazy_fixture
 
 from opentrons_shared_data.module.types import (
-    ModuleDefinitionV3,
     ModuleDefinitionV1,
+    ModuleDefinitionV3,
 )
+
+from opentrons.hardware_control.modules.types import HeaterShakerModuleModel, ModuleType
+from opentrons.protocol_api.core.legacy.deck import Deck
+from opentrons.protocol_api.core.legacy.module_geometry import (
+    HeaterShakerGeometry,
+    ModuleGeometry,
+    PipetteMovementRestrictedByHeaterShakerError,
+    create_geometry,
+)
+from opentrons.protocols.api_support.deck_type import STANDARD_OT2_DECK
+from opentrons.types import Location, Point
 
 
 @pytest.fixture

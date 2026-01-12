@@ -14,8 +14,7 @@ from pathlib import Path
 
 import pydantic
 
-from .encoder_decoder import DateTimeEncoder, DateTimeDecoder
-
+from .encoder_decoder import DateTimeDecoder, DateTimeEncoder
 
 _log = logging.getLogger(__name__)
 

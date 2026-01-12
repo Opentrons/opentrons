@@ -1,18 +1,19 @@
 from __future__ import annotations
 
-from typing_extensions import Literal, Final, TypedDict
-from typing import Optional, List, Sequence, TYPE_CHECKING, Union, Tuple
+from typing import TYPE_CHECKING, List, Optional, Sequence, Tuple, Union
+
+from typing_extensions import Final, Literal, TypedDict
+
 from opentrons.hardware_control.modules import ThermocyclerStep
 
 if TYPE_CHECKING:
     from opentrons.protocol_api import InstrumentContext
-    from opentrons.protocol_api.labware import Well
-    from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
     from opentrons.protocol_api._liquid import LiquidClass
     from opentrons.protocol_api._nozzle_layout import NozzleLayout
+    from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
+    from opentrons.protocol_api.labware import Well
 
-from opentrons.types import Location, Mount, AxisMapType
-
+from opentrons.types import AxisMapType, Location, Mount
 
 # type for subscriptions
 COMMAND: Final = "command"

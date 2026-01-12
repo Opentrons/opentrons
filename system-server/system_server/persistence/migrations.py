@@ -18,9 +18,9 @@ Database schema versions:
 import logging
 from datetime import datetime, timezone
 from typing import Optional
-from typing_extensions import Final
 
 import sqlalchemy
+from typing_extensions import Final
 
 from .tables import migration_table
 

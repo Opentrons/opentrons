@@ -7,26 +7,29 @@ from typing import Iterable
 import anyio
 from pydantic import ValidationError as PydanticValidationError
 
+from opentrons_shared_data.errors.exceptions import PythonException
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV6 as JsonProtocolV6,
+)
+from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV7 as JsonProtocolV7,
+)
+from opentrons_shared_data.protocol.models import (
     ProtocolSchemaV8 as JsonProtocolV8,
 )
-from opentrons_shared_data.errors.exceptions import PythonException
-
-from opentrons.protocols.models.json_protocol import Model as JsonProtocolUpToV5
 
 from .file_identifier import (
+    IdentifiedData,
     IdentifiedFile,
     IdentifiedJsonMain,
-    IdentifiedPythonMain,
     IdentifiedLabwareDefinition,
-    IdentifiedData,
+    IdentifiedPythonMain,
 )
 from .protocol_files_invalid_error import ProtocolFilesInvalidError
+from opentrons.protocols.models.json_protocol import Model as JsonProtocolUpToV5
 
 
 class FileFormatValidationError(ProtocolFilesInvalidError):

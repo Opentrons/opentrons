@@ -1,11 +1,11 @@
 from opentrons.protocol_engine.clients.sync_client import SyncClient
 from opentrons.protocol_engine.types import (
+    AddressableAreaLocation,
     DeckSlotLocation,
+    InStackerHopperLocation,
     LabwareLocation,
     ModuleLocation,
     OnLabwareLocation,
-    AddressableAreaLocation,
-    InStackerHopperLocation,
 )
 
 

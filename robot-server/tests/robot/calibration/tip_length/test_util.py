@@ -1,5 +1,7 @@
-import pytest
 from typing import List, Tuple
+
+import pytest
+
 from robot_server.robot.calibration import util
 
 

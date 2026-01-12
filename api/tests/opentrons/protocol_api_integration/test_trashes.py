@@ -1,14 +1,14 @@
 """Tests for the APIs around waste chutes and trash bins."""
 
+import contextlib
+import re
+from typing import ContextManager, Optional, Type
+
+import pytest
+
 from opentrons import protocol_api
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.api_support.util import UnsupportedAPIError
-
-import contextlib
-from typing import ContextManager, Optional, Type
-import re
-
-import pytest
 
 
 @pytest.mark.parametrize(

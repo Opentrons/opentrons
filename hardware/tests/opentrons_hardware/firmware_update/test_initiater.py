@@ -3,19 +3,23 @@
 import pytest
 from mock import AsyncMock, call
 
+from tests.conftest import MockCanMessageNotifier
+
 from opentrons_hardware.firmware_bindings import (
-    NodeId,
     ArbitrationId,
     ArbitrationIdParts,
+    NodeId,
 )
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition, fields
-from opentrons_hardware.firmware_bindings.messages import message_definitions, payloads
-from opentrons_hardware.firmware_bindings.utils import UInt32Field, UInt8Field
-
+from opentrons_hardware.firmware_bindings.messages import (
+    MessageDefinition,
+    fields,
+    message_definitions,
+    payloads,
+)
+from opentrons_hardware.firmware_bindings.utils import UInt8Field, UInt32Field
 from opentrons_hardware.firmware_update import initiator
 from opentrons_hardware.firmware_update.errors import BootloaderNotReady
 from opentrons_hardware.firmware_update.target import Target
-from tests.conftest import MockCanMessageNotifier
 
 
 @pytest.fixture

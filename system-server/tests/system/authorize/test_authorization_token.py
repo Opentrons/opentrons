@@ -1,12 +1,13 @@
 """This module keeps track of current authorization."""
 
-from datetime import timedelta
 import uuid
+from datetime import timedelta
+
 import jwt
 
-from system_server.system.authorize.authorization import authorize_token
-from system_server.jwt import create_jwt, Registrant, jwt_is_valid
 from system_server.constants import AUTHORIZATION_AUDIENCE, REGISTRATION_AUDIENCE
+from system_server.jwt import Registrant, create_jwt, jwt_is_valid
+from system_server.system.authorize.authorization import authorize_token
 
 
 async def test_authorize_token() -> None:

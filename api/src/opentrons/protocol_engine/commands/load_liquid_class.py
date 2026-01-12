@@ -2,22 +2,22 @@
 
 from __future__ import annotations
 
-from typing import Optional, Type, TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional, Type
 
-from typing_extensions import Literal
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal
 
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors import LiquidClassDoesNotExistError
 from ..errors.error_occurrence import ErrorOccurrence
 from ..errors.exceptions import LiquidClassRedefinitionError
 from ..state.update_types import LiquidClassLoadedUpdate, StateUpdate
 from ..types import LiquidClassRecord
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from ..state.state import StateView
     from ..resources import ModelUtils
+    from ..state.state import StateView
 
 LoadLiquidClassCommandType = Literal["loadLiquidClass"]
 

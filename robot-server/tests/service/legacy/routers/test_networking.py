@@ -1,12 +1,14 @@
 import os
 import random
 import tempfile
-from mock import patch
+from typing import Optional
 
 import pytest
+from mock import patch
+
 from opentrons.system import nmcli, wifi
+
 from robot_server.service.legacy.routers.networking import _massage_nmcli_error
-from typing import Optional
 
 
 def test_networking_status(api_client, monkeypatch):

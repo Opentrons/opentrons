@@ -7,11 +7,11 @@ This schema version adds the camera_capture_image_settings_table which contains 
 
 from pathlib import Path
 
-from ._util import copy_contents
+from .._folder_migrator import Migration
 from ..database import sql_engine_ctx
 from ..file_and_directory_names import DB_FILE
 from ..tables import schema_14
-from .._folder_migrator import Migration
+from ._util import copy_contents
 
 
 class Migration13to14(Migration):  # noqa: D101

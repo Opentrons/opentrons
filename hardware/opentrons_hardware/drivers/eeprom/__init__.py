@@ -1,20 +1,18 @@
 """The eeprom interface package."""
 
 from .eeprom import (
-    EEPROMDriver,
-    DEFAULT_BUS,
     DEFAULT_ADDRESS,
+    DEFAULT_BUS,
     DEFAULT_READ_SIZE,
+    EEPROMDriver,
 )
-
 from .types import (
+    FORMAT_VERSION,
+    EEPROMData,
+    Property,
     PropId,
     PropType,
-    Property,
-    EEPROMData,
-    FORMAT_VERSION,
 )
-
 
 __all__ = [
     "PropId",

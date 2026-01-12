@@ -1,51 +1,49 @@
 from __future__ import annotations
 
 import logging
-from typing import List, Dict, Optional, Union, cast, Iterator, Sequence
+from typing import Dict, Iterator, List, Optional, Sequence, Union, cast
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
-
-from opentrons.protocol_engine.types import ABSMeasureMode
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
 
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.legacy_commands import module_commands as cmds
-from opentrons.legacy_commands.publisher import CommandPublisher, publish
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
-from opentrons.protocols.api_support.util import (
-    APIVersionError,
-    requires_version,
-    UnsupportedAPIError,
-)
-
 from .core.common import (
-    ProtocolCore,
-    LabwareCore,
-    ModuleCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    ThermocyclerCore,
-    HeaterShakerCore,
-    MagneticBlockCore,
     AbsorbanceReaderCore,
     FlexStackerCore,
+    HeaterShakerCore,
+    LabwareCore,
+    MagneticBlockCore,
+    MagneticModuleCore,
+    ModuleCore,
+    ProtocolCore,
+    TemperatureModuleCore,
+    ThermocyclerCore,
     VacuumModuleCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
+from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
 from .core.legacy.legacy_module_core import LegacyModuleCore
 from .core.legacy.module_geometry import ModuleGeometry as LegacyModuleGeometry
-from .core.legacy.legacy_labware_core import LegacyLabwareCore as LegacyLabwareCore
-
-from .module_validation_and_errors import (
-    validate_heater_shaker_temperature,
-    validate_heater_shaker_speed,
-)
 from .labware import Labware
-from . import validation
-from . import Task
-from opentrons.drivers.thermocycler.driver import BLOCK_VOL_MIN, BLOCK_VOL_MAX
+from .module_validation_and_errors import (
+    validate_heater_shaker_speed,
+    validate_heater_shaker_temperature,
+)
+from opentrons.drivers.thermocycler.driver import BLOCK_VOL_MAX, BLOCK_VOL_MIN
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import module_commands as cmds
+from opentrons.legacy_commands.publisher import CommandPublisher, publish
+from opentrons.protocol_engine.types import ABSMeasureMode
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.util import (
+    APIVersionError,
+    UnsupportedAPIError,
+    requires_version,
+)
+
+from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
+from .tasks import Task  # isort: skip
 
 _MAGNETIC_MODULE_HEIGHT_PARAM_REMOVED_IN = APIVersion(2, 14)
 
@@ -91,7 +89,7 @@ class ModuleContext(CommandPublisher):
         return self._get_type()
 
     def _get_type(self) -> ModuleType:
-        return cast(ModuleType, self._core.MODULE_TYPE.value)
+        return self._core.MODULE_TYPE.value
 
     @requires_version(2, 0)
     def load_labware_object(self, labware: Labware) -> Labware:
@@ -117,13 +115,12 @@ class ModuleContext(CommandPublisher):
         _log.warning(
             "`ModuleContext.load_labware_object` is an internal, deprecated method. Use `ModuleContext.load_labware` or `load_labware_by_definition` instead."
         )
-        core = cast(LegacyModuleCore, self._core)
 
-        assert labware.parent == core.geometry, (
+        assert labware.parent == self._core.geometry, (
             "Labware is not configured with this module as its parent"
         )
 
-        return core.geometry.add_labware(labware)
+        return self._core.geometry.add_labware(labware)
 
     def load_labware(  # noqa: C901
         self,
@@ -268,10 +265,10 @@ class ModuleContext(CommandPublisher):
                 version=checked_lid_version,
             )
 
-        if isinstance(self._core, LegacyModuleCore):
-            labware = cast(LegacyModuleCore, self._core).add_labware_core(
-                cast(LegacyLabwareCore, labware_core)
-            )
+        if isinstance(self._core, LegacyModuleCore) and isinstance(
+            labware_core, LegacyLabwareCore
+        ):
+            labware = self._core.add_labware_core(labware_core)
         else:
             labware = Labware(
                 core=labware_core,
@@ -349,10 +346,10 @@ class ModuleContext(CommandPublisher):
             location=self._core,
         )
 
-        if isinstance(self._core, LegacyModuleCore):
-            adapter = cast(LegacyModuleCore, self._core).add_labware_core(
-                cast(LegacyLabwareCore, labware_core)
-            )
+        if isinstance(self._core, LegacyModuleCore) and isinstance(
+            labware_core, LegacyLabwareCore
+        ):
+            adapter = self._core.add_labware_core(labware_core)
         else:
             adapter = Labware(
                 core=labware_core,
@@ -407,7 +404,7 @@ class ModuleContext(CommandPublisher):
             like :py:meth:`model` and :py:meth:`type`
         """
         if isinstance(self._core, LegacyModuleCore):
-            return cast(LegacyModuleCore, self._core).geometry
+            return self._core.geometry
 
         raise UnsupportedAPIError(
             api_element="`ModuleContext.geometry`",

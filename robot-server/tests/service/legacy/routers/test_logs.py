@@ -3,7 +3,7 @@ import json
 import pytest
 from mock import patch
 
-from opentrons.system.log_control import MAX_RECORDS, DEFAULT_RECORDS
+from opentrons.system.log_control import DEFAULT_RECORDS, MAX_RECORDS
 
 
 def test_get_serial_log_with_defaults(api_client):

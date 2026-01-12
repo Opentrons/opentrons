@@ -1,13 +1,14 @@
 """Create or reset the server's persistence directory."""
 
-from pathlib import Path
 from logging import getLogger
+from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
 from typing import Optional
-from typing_extensions import Final
 
-from anyio import Path as AsyncPath, to_thread
+from anyio import Path as AsyncPath
+from anyio import to_thread
+from typing_extensions import Final
 
 from ._folder_migrator import MigrationOrchestrator
 from ._migrations import (

@@ -1,17 +1,17 @@
 """Motion planning package."""
 
 from .move_manager import MoveManager
+from .move_utils import unit_vector_multiplication
 from .types import (
-    Coordinates,
+    AxisConstraints,
     Block,
+    Coordinates,
+    CoordinateValue,
     Move,
     MoveTarget,
-    AxisConstraints,
-    ZeroLengthMoveError,
     SystemConstraints,
-    CoordinateValue,
+    ZeroLengthMoveError,
 )
-from .move_utils import unit_vector_multiplication
 
 __all__ = [
     "MoveManager",
