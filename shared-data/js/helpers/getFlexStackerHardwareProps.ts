@@ -1,5 +1,6 @@
 import { FLEX_STACKER_MODULE_V1 } from '../constants'
 import { getModuleDef } from '../modules'
+import { getLabwareDefURI } from './getLabwareDefURI'
 import { getSchema2Dimensions } from './positionMath'
 
 import type { LabwareDefinition, ModuleModel, Vector3D } from '../types'
@@ -37,14 +38,14 @@ export const getStackerMaxPoolCountByHeight = (
 export const getLabwareOverlapOffset = (
   model: ModuleModel,
   definition: LabwareDefinition,
-  belowLabwareLoadName: string
+  belowLabwareURI: string
 ): Vector3D => {
   if (model !== FLEX_STACKER_MODULE_V1) {
     console.error(`Invalid module model for labware overlap offset: ${model}`)
     return { x: 0, y: 0, z: 0 }
   }
   return (
-    definition.stackingOffsetWithLabware?.[belowLabwareLoadName] ??
+    definition.stackingOffsetWithLabware?.[belowLabwareURI] ??
     definition.stackingOffsetWithLabware?.default ?? { x: 0, y: 0, z: 0 }
   )
 }
@@ -60,8 +61,8 @@ export const getHeightOfLabwareStackFromDefinitions = (
   for (const lower_def of definitions.slice(1)) {
     const overlap = getLabwareOverlapOffset(
       FLEX_STACKER_MODULE_V1,
-      lower_def,
-      upper_def.parameters.loadName
+      upper_def,
+      lower_def.parameters.loadName
     ).z
     total_height += getSchema2Dimensions(upper_def).zDimension - overlap
     upper_def = lower_def
@@ -87,11 +88,12 @@ export const getMaxPoolCount = (args: {
     ...(lid != null ? [lid] : []),
   ])
   const bottomLabwareDefinition = adapter != null ? adapter : primary
+  const bottomLabwareURI = getLabwareDefURI(bottomLabwareDefinition)
 
   const poolOverlap = getLabwareOverlapOffset(
     model,
     topDefinition,
-    bottomLabwareDefinition.parameters.loadName
+    bottomLabwareURI
   )
   return getStackerMaxPoolCountByHeight(model, poolHeight, poolOverlap.z)
 }
