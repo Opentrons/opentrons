@@ -5,7 +5,7 @@ title: "Opentrons OT-2: Instruments"
 Instruments are a class of gantry-mounted hardware you attach to an Opentrons liquid handling robot. For an OT-2, this includes single- and multi-channel GEN1 and GEN2 pipettes only.
 
 - Review the information in this section if you need help identifying your OT-2 pipettes.
-- See the [Pipettes section](../system-description/pipettes.md) in the System Description chapter for information and technical specifications about the OT-2 GEN2 pipettes.
+- See the [Pipettes section](../system-description/pipettes.md) in the System Description chapter for information and technical specifications about OT-2 GEN2 pipettes.
 
 !!! note
     Instruments made for an OT-2 are not compatible with the Opentrons Flex. Flex instruments are not compatible with an OT-2.
