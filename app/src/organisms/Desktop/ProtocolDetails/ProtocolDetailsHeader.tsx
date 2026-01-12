@@ -22,6 +22,7 @@ import {
   Tag,
   WRAP,
 } from '@opentrons/components'
+import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import {
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
@@ -169,12 +170,14 @@ export function ProtocolDetailsHeader({
                 {protocolDisplayName}
               </StyledText>
               <Flex gridGap={SPACING.spacing8}>
-                <SecondaryButton
-                  onClick={handleClickTimeline}
-                  cursor={CURSOR_POINTER}
-                >
-                  {t('visualize')}
-                </SecondaryButton>
+                {robotType === OT2_ROBOT_TYPE ? null : (
+                  <SecondaryButton
+                    onClick={handleClickTimeline}
+                    cursor={CURSOR_POINTER}
+                  >
+                    {t('visualize')}
+                  </SecondaryButton>
+                )}
                 <PrimaryButton
                   onClick={() => {
                     handleRunProtocolButtonClick()

@@ -512,7 +512,7 @@ export function ProtocolDetails(
                   </LegacyStyledText>
                 </Flex>
                 <Flex gridGap={SPACING.spacing4} justifySelf={JUSTIFY_END}>
-                  {enableProtocolTimeline ? (
+                  {enableProtocolTimeline && robotType === FLEX_ROBOT_TYPE ? (
                     <SecondaryButton
                       onClick={handleClickTimeline}
                       cursor={CURSOR_POINTER}
