@@ -83,7 +83,7 @@ async def test_camera_settings(
     assert result.status_code == 201
 
     get_settings_result = await get_camera_capture_image_settings(
-        cameraId=image_settings.cameraId,
+        cameraId="cool_cam",
         run_orchestrator_store=mock_run_orchestrator_store,
     )
 
