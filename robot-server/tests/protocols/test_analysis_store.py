@@ -255,7 +255,7 @@ async def test_update_adds_details_and_completes_analysis(
         value=2.0,
         default=3.0,
     )
-    command_annotation = pe_types.CustomCommandAnnotation(commandKeys=["abc", "xyz"])
+    command_annotation = pe_types.CustomCommandAnnotationLegacy(commandKeys=["abc", "xyz"])
     subject.add_pending(
         protocol_id="protocol-id", analysis_id="analysis-id", run_time_parameters=[]
     )
