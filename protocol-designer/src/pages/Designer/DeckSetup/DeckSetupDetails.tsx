@@ -65,6 +65,7 @@ import type {
   ModuleTemporalProperties,
   ThermocyclerModuleState,
 } from '@opentrons/step-generation'
+import type { FormData } from '../../../form-types'
 import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
@@ -79,7 +80,7 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
-  currentStep: any
+  currentStep: FormData | null
   stagingAreaCutoutIds: CutoutId[]
   selectedZoomInSlot?: DeckSlotId
 }
