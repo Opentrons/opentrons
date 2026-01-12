@@ -101,7 +101,6 @@ describe('LabwareStackToolboxContainer liquids dont match', () => {
     expect(labwareButton).toBeInTheDocument()
     fireEvent.click(labwareButton, { ctrlKey: true })
     expect(setShowLiquidLayoutOverlay).toHaveBeenCalledWith(true)
-    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   it('selects a single labware when ctrl key is not pressed', () => {

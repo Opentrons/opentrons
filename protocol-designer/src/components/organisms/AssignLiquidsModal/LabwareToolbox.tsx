@@ -22,10 +22,10 @@ import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
 import {
   createContainer,
   multipleIngredientsSelector,
+  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
-import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 
 import { LabwareButtonBasket } from '../../molecules'
 import { useKitchen } from '../Kitchen/useKitchen'
@@ -127,6 +127,7 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
+    dispatch(openIngredientSelector(newItem))
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
@@ -215,9 +216,7 @@ export function LabwareStackToolboxContainer({
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const { labware } = useSelector(getInitialDeckSetup)
   const initialRobotState = useSelector(getInitialRobotState)
-  const liquidLocations = useSelector(
-    labwareIngredSelectors.getLiquidsByLabwareId
-  )
+
   const labwareStack: string[] =
     labwareId != null ? (labware[labwareId]?.stack ?? []) : []
   const slot = getSlotInLocationStack(labwareStack)
@@ -225,6 +224,9 @@ export function LabwareStackToolboxContainer({
   const largestStackInSlot = getLargestStackInSlot(
     initialRobotState.labware,
     slot
+  )
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
   )
   const data: LabwareStackToolboxData = {
     labwareId: labwareId ?? null,
