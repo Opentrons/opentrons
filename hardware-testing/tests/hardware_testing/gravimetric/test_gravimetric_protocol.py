@@ -85,6 +85,7 @@ def _get_analysis_result(
 
 
 def test_all_csvs_are_valid() -> None:
+    """Check that all of the test csv's in the source code are vaild."""
     all_csvs = glob.glob(
         str(GRAVIMETRIC_PROTOCOL_PARENT_FILEPATH) + "/**/*.csv", recursive=True
     )
