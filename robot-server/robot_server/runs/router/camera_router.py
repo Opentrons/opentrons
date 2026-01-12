@@ -186,6 +186,39 @@ async def add_camera_capture_image_settings(
     )
 
 
+@PydanticResponse.wrap_route(
+    camera_router.get,
+    path="/runs/{runId}/cameraSettings/{cameraId}",
+    summary="Query run specific camera capture image settings.",
+    description=(
+        "Query run specific camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's `data` will be the image capture settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def get_camera_capture_image_settings(
+    cameraId: str,
+    run_orchestrator_store: Annotated[
+        RunOrchestratorStore, Depends(get_run_orchestrator_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Query the run specific camera capture image settings.
+
+    Args:
+        cameraId: Camera ID for the camera settings to query.
+        run_orchestrator_store: Engine storage interface.
+        run: Run response data by ID from URL; ensures 404 if run not found.
+        robot_type: Used to validate robot type for live stream service.
+        camera_provider: Access to the camera settings and related services.
+    """
+    result = run_orchestrator_store.get_camera_capture_image_settings()
+
+    return result
+
+
 @camera_router.post(
     path="/runs/{runId}/camera/capturePreviewImage",
     summary="Capture a preview image based on provided settings and the run specific camera enablement.",

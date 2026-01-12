@@ -458,6 +458,21 @@ class RunOrchestratorStore:
         """Get whether run is in a terminal state."""
         return self.run_orchestrator.get_is_run_terminal()
 
+    def get_camera_capture_image_settings(
+        self,
+    ) -> CameraCaptureImageSettings:
+        """Get camera capture image settings to state."""
+        settings = self.run_orchestrator.get_camera_capture_image_settings()
+        return CameraCaptureImageSettings(
+            cameraId=settings["camera_id"],
+            resolution=settings["resolution"],
+            zoom=settings["zoom"],
+            pan=settings["pan"],
+            contrast=settings["contrast"],
+            brightness=settings["brightness"],
+            saturation=settings["saturation"],
+        )
+
     def run_was_started(self) -> bool:
         """Get whether the run has started."""
         return self.run_orchestrator.run_has_started()

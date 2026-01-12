@@ -12,6 +12,7 @@ from opentrons.protocol_engine import EngineStatus
 
 from robot_server.runs.router.camera_router import (
     add_camera_capture_image_settings,
+    get_camera_capture_image_settings,
     post_camera_preview_image,
 )
 from robot_server.runs.run_models import Run
@@ -80,6 +81,13 @@ async def test_camera_settings(
 
     assert result.content.data == image_settings
     assert result.status_code == 201
+
+    get_settings_result = await get_camera_capture_image_settings(
+        cameraId=image_settings.cameraId,
+        run_orchestrator_store=mock_run_orchestrator_store,
+    )
+
+    assert get_settings_result == image_settings
 
 
 async def test_camera_preview_image(
