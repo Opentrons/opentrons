@@ -53,6 +53,9 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
       () => `${uuid()}:${storedEntity?.labwareDefURI}`
     )
     propsForFields.fillLabwareIds.updateValue(newFill)
+    // Form errors do not have acccess to module state, so this logic is used
+    // to clear out the fillLabwareIds value if the quantity entered is too high
+    // and raise an error.
     if (valueTooHigh) {
       propsForFields.fillLabwareIds.updateValue([])
     }
