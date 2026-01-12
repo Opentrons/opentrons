@@ -9,6 +9,7 @@ import {
   StyledText,
 } from '@opentrons/components'
 import { getIsTiprack } from '@opentrons/shared-data'
+import { BOTTOM_UP_STORED_LABWARE_URI_KEYS } from '@opentrons/step-generation'
 
 import { InputStepFormField } from '/protocol-designer/components/molecules'
 import {
@@ -21,7 +22,10 @@ import styles from './flexstackertools.module.css'
 import { MessageField } from './MessageField'
 import { StackerContentItem } from './StackerContentItem'
 
-import type { FlexStackerModuleState } from '@opentrons/step-generation'
+import type {
+  FlexStackerModuleState,
+  LabwareEntity,
+} from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
 
@@ -40,53 +44,66 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   const savedStepForms = useSelector(getSavedStepForms)
   const initialLabwareIds =
     (savedStepForms[formData.id]?.fillLabwareIds as string[]) ?? []
-  const oldFillQuantity = initialLabwareIds?.length ?? 0
+  const [storedAdapterEntity, storedPrimaryEntity, storedLidEntity] =
+    BOTTOM_UP_STORED_LABWARE_URI_KEYS.map(lwKey =>
+      Object.values(labwareEntities).find(({ labwareDefURI }) => {
+        return labwareDefURI === storedLabwareDetails?.[lwKey]
+      })
+    )
+  const nonNullEntities = [
+    storedAdapterEntity,
+    storedPrimaryEntity,
+    storedLidEntity,
+  ].filter(entity => entity != null) as LabwareEntity[]
+  const numEntitiesInGroup = nonNullEntities.length
+  // flooring to be safe in case the lengath does not evenly divide (should not fire)
+  if (initialLabwareIds.length % numEntitiesInGroup !== 0) {
+    console.warn(
+      'initialLabwareIds.length does not evenly divide by numEntitiesInGroup'
+    )
+  }
+  const oldGroupQuantity = Math.floor(
+    initialLabwareIds.length / numEntitiesInGroup
+  )
+
   const [fillQuantityLocalState, setFillQuantityState] = useState<
     string | null
     // initialize if saved step form exists
-  >(oldFillQuantity > 0 ? String(initialLabwareIds.length) : null)
-  const storedEntity = Object.values(labwareEntities).find(
-    ({ labwareDefURI }) => {
-      return labwareDefURI === storedLabwareDetails?.primaryLabwareURI
-    }
-  )
+  >(oldGroupQuantity > 0 ? String(oldGroupQuantity) : null)
 
-  const storedEntityName = storedEntity?.def.metadata.displayName
-  const isTiprack = storedEntity != null && getIsTiprack(storedEntity.def)
+  const storedEntityName = storedPrimaryEntity?.def.metadata.displayName
+  const isPrimaryTiprack =
+    storedPrimaryEntity != null && getIsTiprack(storedPrimaryEntity.def)
   // TODO: figure out a way to not need this use Effect. its hard because
   // you can't rely on generating the uuid in the hydrated form
   useEffect(() => {
-    const quantity = Number(fillQuantityLocalState) ?? 1
-    const numberOfLabwareInHopper = labwareInHopper?.length ?? 0
-    const difference = quantity - oldFillQuantity
-    const valueTooHigh = quantity > maxPoolCount - numberOfLabwareInHopper
-    const newFill = Array.from(
-      { length: quantity },
-      () => `${uuid()}:${storedEntity?.labwareDefURI}`
-    )
-    propsForFields.fillLabwareIds.updateValue(newFill)
+    const newGroupQuantity = Number(fillQuantityLocalState) ?? 1
+    const numberOfGroupsInHopper = labwareInHopper?.length ?? 0
+    const difference = newGroupQuantity - oldGroupQuantity
+    const valueTooHigh =
+      newGroupQuantity > maxPoolCount - numberOfGroupsInHopper
     // Form errors do not have acccess to module state, so this logic is used
     // to clear out the fillLabwareIds value if the quantity entered is too high
     // and raise an error.
     if (valueTooHigh) {
       propsForFields.fillLabwareIds.updateValue([])
+    } else {
+      if (difference > 0) {
+        const additionalIds = Array.from({ length: difference }, () =>
+          nonNullEntities.map(entity => `${uuid()}:${entity.labwareDefURI}`)
+        ).flat()
+        // ensure we preserve the existing labware IDs, even if a user extensively modifies the quantity up/down
+        propsForFields.fillLabwareIds.updateValue([
+          ...initialLabwareIds,
+          ...additionalIds,
+        ])
+      } else if (difference < 0) {
+        propsForFields.fillLabwareIds.updateValue(
+          initialLabwareIds.slice(0, newGroupQuantity * numEntitiesInGroup)
+        )
+      }
     }
-    if (difference > 0) {
-      const additionalIds = Array.from(
-        { length: difference },
-        () => `${uuid()}:${storedEntity?.labwareDefURI}`
-      )
-      // ensure we preserve the existing labware IDs, even if a user extensively modifies the quantity up/down
-      propsForFields.fillLabwareIds.updateValue([
-        ...initialLabwareIds,
-        ...additionalIds,
-      ])
-    } else if (difference < 0) {
-      propsForFields.fillLabwareIds.updateValue(
-        initialLabwareIds.slice(0, quantity)
-      )
-    }
-  }, [fillQuantityLocalState, storedEntity?.labwareDefURI])
+  }, [fillQuantityLocalState, storedPrimaryEntity?.labwareDefURI])
 
   return (
     <div className={styles.refill_settings_container}>
@@ -99,7 +116,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
             <StackerContentItem
               primaryLabwareName={storedEntityName}
               hasLid={storedLabwareDetails.lidLabwareURI != null}
-              isTiprack={isTiprack}
+              isTiprack={isPrimaryTiprack}
             />
           ) : null}
         </div>
