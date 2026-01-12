@@ -22,7 +22,6 @@ import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
 import {
   createContainer,
   multipleIngredientsSelector,
-  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
@@ -49,7 +48,6 @@ interface LabwareStackToolboxData {
     [labwareId: string]: LabwareOnDeck
   }
   labwareId: string | null
-  allWellContents: Record<string, any>
   liquidLocations: LabwareLiquidState
   largestStackInSlot: string[]
 }
@@ -71,13 +69,7 @@ export function LabwareStackToolbox({
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { makeSnackbar } = useKitchen()
 
-  const {
-    labware,
-    labwareId,
-    allWellContents,
-    liquidLocations,
-    largestStackInSlot,
-  } = data
+  const { labware, labwareId, liquidLocations, largestStackInSlot } = data
 
   const filteredLabwareStack = largestStackInSlot.filter(
     id => labware[id] != null
@@ -223,9 +215,6 @@ export function LabwareStackToolboxContainer({
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const { labware } = useSelector(getInitialDeckSetup)
   const initialRobotState = useSelector(getInitialRobotState)
-  const allWellContents = useSelector(
-    wellContentsSelectors.getWellContentsForLabwareStack
-  )
   const liquidLocations = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
@@ -240,7 +229,6 @@ export function LabwareStackToolboxContainer({
   const data: LabwareStackToolboxData = {
     labwareId: labwareId ?? null,
     labware,
-    allWellContents,
     liquidLocations,
     largestStackInSlot,
   }
