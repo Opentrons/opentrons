@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -8,6 +8,10 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
 import { useToaster } from '/app/organisms/ToasterOven'
+import {
+  ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 
@@ -19,6 +23,7 @@ vi.mock('react-router-dom')
 vi.mock('/app/redux/config')
 vi.mock('/app/resources/analysis/hooks/useStoredProtocolAnalysis')
 vi.mock('/app/organisms/ToasterOven')
+vi.mock('/app/redux/analytics')
 
 const mockRunId = 'mockRunId'
 const mockRobotName = 'mockRobotName'
@@ -61,6 +66,7 @@ const render = (props: ComponentProps<typeof RunHeaderSectionLower>) => {
     i18nInstance: i18n,
   })
 }
+let mockTrackEvent: Mock
 
 describe('RunHeaderSectionLower', () => {
   let props: ComponentProps<typeof RunHeaderSectionLower>
@@ -80,6 +86,8 @@ describe('RunHeaderSectionLower', () => {
     when(vi.mocked(useFeatureFlag))
       .calledWith('protocolTimeline')
       .thenReturn(false)
+    mockTrackEvent = vi.fn()
+    when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
   })
   afterEach(() => {
     vi.resetAllMocks()
@@ -173,5 +181,9 @@ describe('RunHeaderSectionLower', () => {
     expect(mockNavigate).toHaveBeenCalledWith(
       '/devices/mockRobotName/mockRunId/--%3A--%3A--/null/visualization'
     )
+    expect(mockTrackEvent).toHaveBeenCalledWith({
+      name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
+      properties: {sourceLocation: 'protocol run'},
+    })
   })
 })
