@@ -44,12 +44,22 @@ export const getLabwareOverlapOffset = (
   )
 }
 
+/**
+ * Calculates the total height of a stack of labware given their definitions,
+ * ordered from bottom to top. Accounts for stacking overlaps between
+ * consecutive labware pieces according to their definitions.
+ *
+ * @param bottomUpDefinitions - Array of LabwareDefinitions, ordered bottom (first) to top (last)
+ * @returns The total stack height (in mm) as a number.
+ */
 export const getHeightOfLabwareStackFromDefinitions = (
   bottomUpDefinitions: LabwareDefinition[]
 ): number => {
   if (bottomUpDefinitions.length === 0) {
+    console.warn('bottomUpDefinitions array is empty')
     return 0
   }
+
   let lowerDef: LabwareDefinition = bottomUpDefinitions[0]
   let total_height = getSchema2Dimensions(lowerDef).zDimension
   for (const upperDef of bottomUpDefinitions.slice(1)) {
