@@ -65,7 +65,6 @@ from .actions import (
     HardwareStoppedAction,
     SetPipetteMovementSpeedAction,
     CreateUserCommandAnnotation,
-    CloseUserCommandAnnotation,
 )
 
 
@@ -785,12 +784,6 @@ class ProtocolEngine:
             )
         )
         return annotation_id
-
-    def close_user_command_annotation(self, annotation_id: str) -> None:
-        """Closes an existing user generated command annotation."""
-        self._action_dispatcher.dispatch(
-            CloseUserCommandAnnotation(annotation_id=annotation_id)
-        )
 
     def clear_command_history(self) -> None:
         """Clear command history."""

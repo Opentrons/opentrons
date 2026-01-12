@@ -1374,7 +1374,7 @@ def test_get_errors_slice() -> None:
 
 
 def test_create_and_close_command_annotations() -> None:
-    """It should create an enabled command annotation and then disable it."""
+    """It should create an enabled command annotation."""
     subject = CommandStore(
         config=_make_config(),
         error_recovery_policy=_placeholder_error_recovery_policy,
@@ -1399,15 +1399,3 @@ def test_create_and_close_command_annotations() -> None:
         userSpecifiedDescription="foo",
         params={"a": 1},
     )
-    assert subject_view.get_command_annotation_enabled_status("abc123")
-
-    subject.handle_action(actions.CloseUserCommandAnnotation(annotation_id="abc123"))
-
-    annotation = subject_view.get_command_annotation("abc123")
-    assert annotation == UserCommandAnnotation(
-        annotationId="abc123",
-        userSpecifiedName="bar",
-        userSpecifiedDescription="foo",
-        params={"a": 1},
-    )
-    assert not subject_view.get_command_annotation_enabled_status("abc123")

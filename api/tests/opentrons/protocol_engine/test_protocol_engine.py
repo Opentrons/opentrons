@@ -78,7 +78,6 @@ from opentrons.protocol_engine.actions import (
     QueueCommandAction,
     HardwareStoppedAction,
     CreateUserCommandAnnotation,
-    CloseUserCommandAnnotation,
 )
 
 
@@ -1454,20 +1453,6 @@ def test_create_user_command_annotation(
                 params={},
             ),
         ),
-        times=1,
-    )
-
-
-def test_close_user_command_annotation(
-    decoy: Decoy,
-    action_dispatcher: ActionDispatcher,
-    subject: ProtocolEngine,
-) -> None:
-    """It should send the action to close a command annotation."""
-    subject.close_user_command_annotation(annotation_id="abc123")
-
-    decoy.verify(
-        action_dispatcher.dispatch(CloseUserCommandAnnotation(annotation_id="abc123")),
         times=1,
     )
 

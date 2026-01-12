@@ -321,13 +321,6 @@ class CreateUserCommandAnnotation:
     params: Dict[str, Union[str, float, int]]
 
 
-@dataclasses.dataclass(frozen=True)
-class CloseUserCommandAnnotation:
-    """Closes and ends a command annotation."""
-
-    annotation_id: str
-
-
 Action = Union[
     PlayAction,
     PauseAction,
@@ -351,7 +344,6 @@ Action = Union[
     SetPipetteMovementSpeedAction,
     SetErrorRecoveryPolicyAction,
     CreateUserCommandAnnotation,
-    CloseUserCommandAnnotation,
     StartTaskAction,
     FinishTaskAction,
 ]
