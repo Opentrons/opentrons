@@ -107,3 +107,14 @@ include = ['ot3usb', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.pytest]
 addopts = ["--cov=ot3usb", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--color=yes", "--strict-markers"]
+
+[tool.mypy]
+show_error_codes = true
+warn_unused_configs = true
+strict = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true

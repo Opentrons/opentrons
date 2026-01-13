@@ -150,3 +150,20 @@ tavern-global-cfg = ["tests/integration/common.yaml"]
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
 ]
+
+[tool.mypy]
+show_error_codes = true
+warn_unused_configs = true
+strict = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+# The systemd package will not be installed in non-Linux dev environments.
+# Permit mypy to find them missing wherever we try importing them.
+[[tool.mypy.overrides]]
+module = "systemd.*"
+ignore_missing_imports = true

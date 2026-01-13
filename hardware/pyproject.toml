@@ -117,6 +117,11 @@ filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
 ]
 
+[tool.mypy]
+show_error_codes = true
+warn_unused_configs = true
+strict = true
+
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
 # For local development: UV will use these editable local paths instead of PyPI,
