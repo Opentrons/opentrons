@@ -72,3 +72,9 @@ class CreateProtocolWizard(BasePage):
         """Click the wizard Confirm button."""
 
         self.click_button("Confirm")
+
+    def name_protocol(self, protocol_name: str) -> None:
+        """Fill in the protocol name input box."""
+
+        self.page.locator("input[name=\"fields.name\"]").fill(protocol_name)
+

@@ -1,0 +1,91 @@
+import pytest
+from playwright.sync_api import Page
+
+from automation.pd_pages.plate_reader_page import PlateReaderPage
+from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
+from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
+from test_pd_create_new_flex import test_flex_onboarding_workflow
+
+@pytest.mark.pdE2E
+@pytest.mark.slow
+
+def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
+    plate_reader_page = PlateReaderPage(page)
+    protocol_editor = ProtocolEditorPage(page)
+    create_protocol = CreateProtocolWizard(page)
+
+    # Create new Flex protocol setup
+    ## Note This will need to be refactored to a reusable function later
+    test_flex_onboarding_workflow(page, base_url)
+
+    # Configure deck hardware
+    ## Snapshot: Validate Absorbance Plate Reader module configuration option
+    plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
+    create_protocol.name_protocol("test")
+    plate_reader_page.button_selection("Confirm")
+
+
+    # Edit protocol in Protocol Editor - adding labware to the deck
+    plate_reader_page.button_selection("Edit protocol")
+    plate_reader_page.dimiss_deck_hardware_modal()
+    protocol_editor.add_labware_to_slot("D1")
+    protocol_editor.select_labware_category_by_name("Well plates")
+    protocol_editor.select_labware_by_name("Opentrons Tough 96 Well Plate")
+
+    # Add plate reader multi-initialization step
+    protocol_editor.add_step("Absorbance Plate Reader")
+    ## Snapshot: Validate Plate Reader form
+    plate_reader_page.define_initialization("Multi", 700)
+    ## Snapshot: Validate Multi-initialization configuration
+
+    # Add plate reader step to change lid position, to prep for moving labware onto plate reader
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.change_lid_position("Open")
+    ## Snapshot: Validate Change Lid Position to Open
+    plate_reader_page.save_pr_step()
+    protocol_editor.add_step("Move")
+    protocol_editor.move_labware(
+        labware="D1 Opentrons Tough 96 Well Plate",
+        new_location="B3 Absorbance Plate Reader"
+    )
+
+    # Add plate reader step to close lid and read labware
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.change_lid_position("Closed")
+    ## Snapshot: Validate Change Lid Position to Closed
+    plate_reader_page.save_pr_step()
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.read_labware('test 1')
+    ## Snapshot: Validate Read Labware Form
+    plate_reader_page.save_pr_step()
+
+    # Add plate reader step to open lid and move labware off plate reader
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.change_lid_position("Open")
+    plate_reader_page.save_pr_step()
+    protocol_editor.add_step("Move")
+    protocol_editor.move_labware(
+        labware="B3 Opentrons Tough 96 Well Plate",
+        new_location="D1"
+    )
+
+    # Add plate reader step to prep to change 
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.define_initialization("Single", 450)
+    ## Snapshot: Validate Single-initialization configuration
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.change_lid_position("Open")
+    plate_reader_page.save_pr_step()
+    protocol_editor.add_step("Move")
+    protocol_editor.move_labware(
+        labware="D1 Opentrons Tough 96 Well Plate",
+        new_location="B3 Absorbance Plate Reader"
+    )
+
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.change_lid_position("Closed")
+    plate_reader_page.save_pr_step()
+    protocol_editor.add_step("Absorbance Plate Reader")
+    plate_reader_page.read_labware('test 2')
+    plate_reader_page.save_pr_step()
+
