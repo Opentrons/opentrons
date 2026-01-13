@@ -102,6 +102,39 @@ export function getResultingTimelineFrameFromRunCommands(
               const sequence = sequenceMap[id]
               if (sequence != null) {
                 acc[id] = { stack: getStackForLabwareLocation(sequence) }
+              } else {
+                const location = command.params.location
+                if (locationIsOffDeck(location)) {
+                  acc[id] = { stack: [id, location] }
+                } else if ('slotName' in location) {
+                  acc[id] = { stack: [id, location.slotName] }
+                } else {
+                  acc[id] = { stack: [id, 'offDeck'] }
+                }
+              }
+              return acc
+            },
+            {}
+          )
+          return {
+            ...acc,
+            ...labwareStacks,
+          }
+        } else {
+          const location = command.params.location
+          const labwareStacks = labwareIds.reduce(
+            (acc: Record<string, { stack: string[] }>, id) => {
+              if (locationIsOffDeck(location)) {
+                acc[id] = { stack: [id, location] }
+              } else if ('slotName' in location) {
+                acc[id] = { stack: [id, location.slotName] }
+              } else if ('moduleId' in location) {
+                const moduleId = location.moduleId
+                acc[id] = {
+                  stack: [id, moduleId, moduleLocations[moduleId].slot],
+                }
+              } else {
+                acc[id] = { stack: [id, 'offDeck'] }
               }
               return acc
             },
@@ -123,12 +156,27 @@ export function getResultingTimelineFrameFromRunCommands(
         } else if ('slotName' in command.params.location) {
           stack.push(command.params.location.slotName)
         } else if ('moduleId' in command.params.location) {
+          const moduleId = command.params.location.moduleId
+          if (moduleLocations[moduleId] == null) {
+            console.warn(
+              `Module ${moduleId} not found when processing loadLabware/loadLid command. `
+            )
+            return acc
+          }
           stack.push(
             command.params.location.moduleId,
             moduleLocations[command.params.location.moduleId].slot
           )
         } else if ('labwareId' in command.params.location) {
           const labwareId = command.params.location.labwareId
+          if (acc[labwareId] == null) {
+            console.warn(
+              `Parent labware ${labwareId} not found when processing loadLabware/loadLid command. `
+            )
+            acc[labwareId] = {
+              stack: [labwareId, 'offDeck'],
+            }
+          }
           const labwareIdStack = acc[labwareId].stack
           stack.push(labwareId, ...labwareIdStack)
         } else {
