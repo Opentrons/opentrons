@@ -14,6 +14,10 @@ import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/Comma
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
 import {
+  ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import {
   stepDetailViewerCloseAction,
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
@@ -48,6 +52,7 @@ export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
   const dispatch = useDispatch()
+  const trackEvent = useTrackEvent()
   const { analysis, groupedCommands, protocolKey, srcFileNames } = props
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
@@ -313,6 +318,10 @@ export function VisualizerContainer(
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
             if (selectedRunTimeCommand != null && selectedSlot != null) {
+              trackEvent({
+                name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
+                properties: {},
+              })
               dispatch(
                 stepDetailViewerOpenAction({
                   protocolKey,
