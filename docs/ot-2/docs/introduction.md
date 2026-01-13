@@ -15,7 +15,7 @@ This manual is organized to help you get started and operate your OT-2 efficient
 
 - **[System Description](./system-description/index.md):** Learn about the OT-2's components, features, and technical specifications.
 - **Installation and Relocation:** Follow step-by-step instructions for setting up your robot for the first time or moving it to a new location.
-- **[Instruments and Modules](modules.md):** Find out how to attach, calibrate, and use pipettes and on-deck modules.
+- **[Instruments and Modules](./attachments/index.md):** Find out how to attach, calibrate, and use pipettes and on-deck modules.
 - **[Labware](labware/index.md):** Understand labware compatibility and how to use different types in your protocols.
 - **[Software](software.md):** Get acquainted with the Opentrons App and how to control your robot.
 - **[Maintenance](./maintenance/index.md):** Learn how to keep your OT-2 in good working order with routine cleaning and maintenance procedures.
