@@ -35,6 +35,7 @@ import {
   engageHeightRangeExceeded,
   engageHeightRequired,
   fileNameRequired,
+  fillQuantityOutOfRange,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
@@ -293,7 +294,7 @@ const stepFormHelperMap: {
     getErrors: composeErrors(),
   },
   flexStacker: {
-    getErrors: composeErrors(),
+    getErrors: composeErrors(fillQuantityOutOfRange),
   },
 }
 

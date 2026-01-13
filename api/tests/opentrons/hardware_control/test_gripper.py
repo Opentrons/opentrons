@@ -25,9 +25,9 @@ def fake_offset() -> GripperCalibrationOffset:
     return instrument_calibration.load_gripper_calibration_offset("fakeid123")
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
-def fake_jaw_cal() -> GripperJawWidthData:
+def fake_jaw_cal(request: pytest.FixtureRequest) -> GripperJawWidthData:
+    request.node.add_marker("ot3_only")
     return instrument_calibration.load_gripper_jaw_width("fakeid123")
 
 
