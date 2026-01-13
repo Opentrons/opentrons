@@ -27,9 +27,14 @@ Now our pipette holds 300 µL.
 
 ### Aspirate by well or location
 
-The `aspirate()` method includes a `location` parameter that accepts either a `Well` or a `Location`.
+The `aspirate()` method includes the location parameters `location` and `end_location`. Each accepts different location types: 
 
-If you specify a well, like `plate["A1"]`, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the `aspirate` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
+- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
+- `end_location` can only be used in combination with the `location` parameter. Both must be a [`Location`][opentrons.types.Location].
+
+*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations during an aspirate.
+
+If you specify a single `location` like the well `"A1"`, the pipette will aspirate from a default position 1 mm above the bottom center of that well. To change the default clearance, first set the `aspirate` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
 
 ```python
 pipette.pick_up_tip()
@@ -37,7 +42,7 @@ pipette.well_bottom_clearance.aspirate = 2  # tip is 2 mm above well bottom
 pipette.aspirate(200, plate["A1"])
 ```
 
-You can also aspirate from a location along the center vertical axis within a well using the [`Well.top()`][opentrons.protocol_api.Well.top] and [`Well.bottom()`][opentrons.protocol_api.Well.bottom] methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
+You can also aspirate from a [`Location`][opentrons.types.Location] along the center vertical axis within a well using the [`Well.top()`][opentrons.protocol_api.Well.top] and [`Well.bottom()`][opentrons.protocol_api.Well.bottom] methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
 
 ```python
 pipette.pick_up_tip()
@@ -62,17 +67,37 @@ pipette.aspirate(
 # aspirates at 1 mm below the liquid meniscus
 ```
 
-The liquid meniscus changes when you aspirate liquid from a well. Set `target="end"` to ensure the pipette stays submerged while aspirating. For more information, see [Meniscus][meniscus].
+*New in version 2.23*: Set `target="start"` or `"end"` to target the liquid meniscus during an aspirate.
 
-`measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
+!!!note
+    `measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
+    
+Use the `location` and `end_location` parameters in combination to direct the pipette to move to specific locations while aspirating: 
 
-*New in version 2.23*
+```python
+pipette.pick_up_tip()
+well_top = plate["A1"].top(z=-1)
+depth = plate["A1"].bottom(z=2)
+pipette.aspirate(
+    volume=200,
+    location=well_top,
+    end_location=depth
+)
+```
+
+Here, the pipette begins aspirating at 1 mm below the well top, and finishes aspirating at 2 mm above the well bottom.
+
+!!!note
+    When you use both the `location` and `end_location` parameters, you can optionally specify a `movement_delay` to ensure the pipette waits a set amount of time in seconds before moving to the `end_location`. This can be useful when pipetting viscous liquids. An additional 1 second `movement_delay` can help build up pressure in the tip before liquid starts to flow.
+
+*New in version 2.2.7*: Use the `end_location` and `movement_delay` parameters when specifying multiple locations in a single aspirate.
 
 See also:
 
 - [Default Positions][default-positions] for information about controlling pipette height for a particular pipette.
 - [Position Relative to Labware][position-relative-to-labware] for information about controlling pipette height from within a well.
 - [Move To][move-to] for information about moving a pipette to any reachable deck location.
+- [Meniscus][meniscus] for information about pipetting relative to the liquid meniscus as it changes during an aspirate.
 
 ### Aspiration flow rates
 
@@ -119,16 +144,21 @@ pipette.dispense(100)     # dispense 100 µL at current position
 
 ### Dispense by well or location
 
-The `dispense()` method includes a `location` parameter that accepts either a `Well` or a `Location`.
+The `dispense()` method includes the location parameters `location` and `end_location`. Each accepts different location types: 
 
-If you specify a well, like `plate["B1"]`, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, set the `dispense` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
+- `location` accepts either a [`Well`][opentrons.protocol_api.Well] or a [`Location`][opentrons.types.Location]. 
+- `end_location` can only be used in combination iwth the `location` parameter. Both must be a [`Location`][opentrons.types.Location]. 
+
+*Changed in version 2.27*: Use the `end_location` parameter to specify multiple locations during a dispense.
+
+If you specify a single `location` like the well `"B1"`, the pipette will dispense from a default position 1 mm above the bottom center of that well. To change the default clearance, set the `dispense` attribute of [`well_bottom_clearance`][opentrons.protocol_api.InstrumentContext.well_bottom_clearance]:
 
 ```python
 pipette.well_bottom_clearance.dispense = 2 # tip is 2 mm above well bottom
 pipette.dispense(200, plate["B1"])
 ```
 
-You can also dispense from a location along the center vertical axis within a well using the [`Well.top()`][opentrons.protocol_api.Well.top] and [`Well.bottom()`][opentrons.protocol_api.Well.bottom] methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
+You can also dispense from a `location` along the center vertical axis within a well using the [`Well.top()`][opentrons.protocol_api.Well.top] and [`Well.bottom()`][opentrons.protocol_api.Well.bottom] methods. These methods move the pipette to a specified distance relative to the top or bottom center of a well:
 
 ```python
 depth = plate["B1"].bottom(z=2) # tip is 2 mm above well bottom
@@ -151,17 +181,36 @@ pipette.dispense(
 # dispenses at 1 mm below the liquid meniscus
 ```
 
-The liquid meniscus changes when you dispense liquid into a well. Set `target="start"` to ensure the pipette begins the dispense at the liquid meniscus. For more information, see [Meniscus][meniscus].
+*Changed in version 2.23*: Set `target="start"` or `"end"` to target the liquid meniscus during a dispense.
 
-`measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
+To ensure the pipette begins the dispense at the liquid meniscus, set `target="start"`. See the [meniscus][meniscus] section for more details on pipetting relative to the liquid meniscus.
 
-*New in version 2.23*
+!!!note
+    `measure_liquid_height()` works best with a new pipette tip each time. To save time and tips throughout your protocol, use `Labware.load_liquid` instead to specify starting liquid volumes.
+
+You can use the `location` and `end_location` parameters in combination to direct the pipette to move to specific locations while dispensing:
+
+```python
+well_top = plate["B1"].top(z=-1)
+depth = plate["B1"].bottom(z=2)
+pipette.dispense(
+    volume=200,
+    location=depth,
+    end_location=well_top,
+    movement_delay=1
+)
+```
+
+Here, the pipette begins dispensing at 2 mm above the well bottom, and finishes dispensing at 1 mm below the well top. When you use both the `location` and `end_location` parameters, you can optionally specify a `movement_delay` to ensure the pipette waits a set amount of time, like 1 second, before moving to the `end_location`. 
+
+*Changed in version 2.27*: Use the `end_location` and `movement_delay` parameters when specifying multiple locations in a single dispense.
 
 See also:
 
 - [Default Positions][default-positions] for information about controlling pipette height for a particular pipette.
 - [Position Relative to Labware][position-relative-to-labware] for information about controlling pipette height from within a well.
 - [Move To][move-to] for information about moving a pipette to any reachable deck location.
+- [Meniscus][meniscus] for information about pipetting relative to the liquid meniscus as it changes during a dispense.
 
 ### Dispense flow rates
 
@@ -251,6 +300,7 @@ Set `push_out` to override the default if you observe problems with dispensing. 
 To disable `push_out` during any dispense action, set `push_out=0`. You can use this to avoid multiple `push_out` actions during a mix step.
 
 *New in version 2.15*
+
 
 ## Blow out { #blow-out-building-block }
 
@@ -392,7 +442,29 @@ pipette.mix(repetitions=3, volume=100, final_push_out=10)
 
 *Changed in version 2.24:* Adds the `aspirate_flow_rate`, `dispense_flow_rate`, `aspirate_delay`, `dispense_delay`, and `final_push_out` parameters.
 
-<!-- ## Dynamic Mix TK -->
+## Dynamic mix
+The [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] method lets you aspirate and dispense repeatedly in multiple locations. Like the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, it's designed to mix the contents of a well together using a single command rather than using multiple `aspirate()` and `dispense()` calls. Both methods include arguments that let you specify the number of times to mix, the volume (in µL) of liquid, and the well that contains the liquid you want to mix. [`dynamic_mix()`][opentrons.protocol_api.InstrumentContext.dynamic_mix] lets you additionally specify multiple aspirate and dispense locations: 
+
+```python
+depth = plate["A1"].bottom(z=2)
+well_top = plate["A1"].top(z=-1)
+pipette.dynamic_mix(
+    aspirate_start_location=depth,
+    aspirate_end_location=well_top,
+    dispense_start_location=well_top,
+    dispense_end_location=depth,
+    repetitions=3,
+    volume=100
+)
+```
+
+Like with the [`mix()`][opentrons.protocol_api.InstrumentContext.mix] method, you can use other optional arguments to customize your dynamic mix: 
+
+- Specify the aspirate, dispense, or mix flow rate.
+- Add a delay after as aspirate or dispense, or a `movement_delay` before moving to an `end_location`.
+- Include a push out after an aspirate or dispense in the mix.
+
+*New in version 2.27*
 
 ## Air gap { #air-gap-building-block }
 

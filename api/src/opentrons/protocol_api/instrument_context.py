@@ -247,15 +247,15 @@ class InstrumentContext(publisher.CommandPublisher):
                 [Pipette Flow Rates][pipette-flow-rates].
             flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
                 is specified, `rate` must not be set.
-            end_location (Location): Tells the robot to move between `location` and
+            end_location (Location): Tells the robot to move from the specified `location` to the specified
                 `end_location` while aspirating liquid. When this argument is used, the
-                `location` and `end_location` must both be
+                `location` and `end_location` must both be a
                 [`Location`][opentrons.types.Location].
-            movement_delay (float, optional): Delay the x/y/z movement during a dynamic
-                aspirate. This option is only valid when using `end_location`. When this
-                argument is used, the x/y/z movement will wait `movement_delay` seconds
+            movement_delay (float, optional): Time in seconds to delay after the pipette starts aspirating and before it begins moving
+                from the `location` to the `end_location`. This option is only valid when using `end_location`. When this
+                argument is used, the pipette will wait the specified time 
                 after the pipette starts to aspirate before moving. This may help when
-                dispensing very viscous liquids that need to build up some pressure
+                aspirating very viscous liquids that need to build up some pressure
                 before liquid starts to flow.
 
         Returns:
@@ -268,6 +268,8 @@ class InstrumentContext(publisher.CommandPublisher):
             `pipette.aspirate(location=plate['A1'])`.
 
         *Changed in version 2.24*: Added the `flow_rate` parameter.
+
+        *Changed in version 2.27*: Added the `end_location` and `movement_delay` parameters.
         """
         if flow_rate is not None:
             if self.api_version < APIVersion(2, 24):
@@ -481,14 +483,14 @@ class InstrumentContext(publisher.CommandPublisher):
             flow_rate (float, optional): The absolute flow rate in µL/s. If `flow_rate`
                 is specified, `rate` must not be set.
 
-            end_location (`Location`): Tells the robot to move between `location` and
+            end_location (`Location`): Tells the robot to move from the specified `location` to the specified
                 `end_location` while dispensing liquid held in the pipette. When this
                 argument is used, the `location` and `end_location` must both be a
                 [`Location`][opentrons.types.Location].
 
-            movement_delay (float): Delay the x/y/z movement during a dynamic dispense.
+            movement_delay (float): Time in seconds to delay after the pipette starts dispensing and before it begins moving from the `location` to the `end_location`. 
                 This option is only valid when using `end_location`. When this argument
-                is used, the x/y/z movement will wait `movement_delay` seconds after the
+                is used, the pipette will wait the specified time after the
                 pipette starts to dispense before moving. This may help when dispensing
                 very viscous liquids that need to build up some pressure before liquid
                 starts to flow.
@@ -510,6 +512,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         *Changed in version 2.24*: `location` is no longer required if the pipette just
         moved to, dispensed, or blew out into a trash bin or waste chute.
+
+        *Changed in version 2.27*: Added the `end_location` and `movement_delay` parameters.
         """
         if self.api_version < APIVersion(2, 15) and push_out:
             raise APIVersionError(
@@ -860,7 +864,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Mix a volume of liquid by repeatedly aspirating and dispensing it in multiple
         locations.
 
-        See Dynamic Mix for examples.
+        See [dynamic mix][dynamic-mix] for examples.
 
         Args:
             repetitions (int, optional): Number of times to mix (default is 1).
@@ -873,15 +877,13 @@ class InstrumentContext(publisher.CommandPublisher):
                 volume of the pipette. On API levels at or above 2.16, no liquid will
                 be mixed.
             aspirate_start_location (opentrons.types.Location): The location where the
-                pipette will aspirate from.
-            aspirate_end_location (opentrons.types.Location, optional): If this argument
-                is supplied, the pipette will move between `aspirate_start_location` and
+                pipette will start aspirating from.
+            aspirate_end_location (opentrons.types.Location, optional): If specified, the pipette will move between `aspirate_start_location` and
                 `aspirate_end_location` while performing the aspirate.
             dispense_start_location (opentrons.types.Location): The location where the
-                pipette will dispense to.
-            dispense_end_location (opentrons.types.Location, optional): If this argument
-                is supplied, the pipette will move between `dispense_start_location` and
-                `dispense_end_location` while performing the dispense.
+                pipette will start dispensing to.
+            dispense_end_location (opentrons.types.Location, optional): If specified, the pipette will move between the `dispense_start_location` and
+                the `dispense_end_location` while performing the dispense.
             rate (float, optional): How quickly the pipette aspirates and dispenses
                 liquid while mixing. The aspiration flow rate is calculated as `rate`
                 multiplied by
@@ -904,11 +906,14 @@ class InstrumentContext(publisher.CommandPublisher):
                 repetitions. If not specified or `None`, the pipette will push out the
                 default non-zero amount. See
                 [Push Out After Dispense][push-out-after-dispense].
-            movement_delay (float, optional): Delay the x/y/z movement during a dynamic
-                mix. This option is only valid when using `aspirate_end_location` or
-                `dispense_end_location`. When this argument is used, the x/y/z movement
-                will wait `movement_delay` seconds after the pipette starts to
-                aspirate/dispense before moving. This may help when mixing very viscous
+            movement_delay (float, optional): Time in seconds to delay after the pipette starts aspirating or dispensing
+                and before it begins moving from the `aspirate_start_location` or `dispense_start_location`
+                to the `aspirate_end_location` or `dispense_end_location`.
+                
+                This option is only valid when using `aspirate_end_location` or
+                `dispense_end_location`. When this argument is used, the pipette
+                will wait the specified amount of time after the pipette starts to
+                aspirate or dispense before moving. This may help when mixing very viscous
                 liquids that need to build up some pressure before liquid starts to
                 flow.
 
@@ -917,6 +922,9 @@ class InstrumentContext(publisher.CommandPublisher):
 
         Returns:
             InstrumentContext: This instance.
+
+        !!!note 
+            The `aspirate_start_location` and `dispense_start_location` arguments of `dynamic_mix()` are required.
         """
         _log.debug(
             "mixing {}uL with {} repetitions in {} and {} at rate={}".format(

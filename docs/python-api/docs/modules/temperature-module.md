@@ -4,7 +4,7 @@ title: "Python API: Temperature Module"
 
 The Temperature Module acts as both a cooling and heating device. It can control the temperature of its deck between 4 °C and 95 °C with a resolution of 1 °C.
 
-The Temperature Module is represented in code by a [`TemperatureModuleContext`][opentrons.protocol_api.TemperatureModuleContext] object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module GEN2 and loading a well plate on top of it.
+The Temperature Module is represented in code by a [`TemperatureModuleContext`][opentrons.protocol_api.TemperatureModuleContext] object, which has methods for setting target temperatures and reading the module's status. This example demonstrates loading a Temperature Module GEN2 on the deck.
 
 ```python
 temp_mod = protocol.load_module(
@@ -86,16 +86,44 @@ temp_combo = temp_mod.load_labware(
 
 ## Temperature control
 
-The primary function of the module is to control the temperature of its deck, using [`set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.set_temperature], which takes one parameter: `celsius`. For example, to set the Temperature Module to 4 °C:
-```python
-temp_mod.set_temperature(celsius=4)
-```
-When using `set_temperature()`, your protocol will wait until the target temperature is reached before proceeding to further commands. You can pipette to or from the Temperature Module when it is holding at a temperature or idle, but not while it is actively changing temperature. Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call [`deactivate()`][opentrons.protocol_api.TemperatureModuleContext.deactivate], which will stop heating or cooling and will turn off the fan.
+The primary function of the module is to control the temperature of its deck. As of API version 2.27, it provides both blocking and concurrent temperature commands to control how your protocol proceeds.
+
+Both examples below set the target temperature to 4 °C. Each takes one parameter: `celsius`. 
+
+=== "Blocking"
+    ```python
+    temp_mod.set_temperature(celsius=4)
+    pipette.pick_up_tip()
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
+    pipette.drop_tip()
+    ```
+    
+    When you use the blocking [`set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.set_temperature] method, the robot won't begin performing other protocol steps until the Temperature Module reaches the target temperature. You can pipette to and from the module only when it is holding at a temperature or idle.
+    
+    *New in version 2.0*
+    
+=== "Concurrent"
+
+    ```python
+    temp_mod.start_set_temperature(celsius=4)
+    pipette.pick_up_tip()
+    pipette.aspirate(50, plate["A1"])
+    pipette.dispense(50, plate["B1"])
+    pipette.drop_tip()
+    ```
+
+    Beginning with API version 2.27, you can use the concurrent [`start_set_temperature()`][opentrons.protocol_api.TemperatureModuleContext.start_set_temperature] method to move on to further commands while the Temperature Module reaches its target temperature. The method also allows some other simultaneous module actions. For more, see the [concurrent module actions](concurrent.md) section.
+
+    *New in version 2.27*
+
+Whenever the module reaches its target temperature, it will hold the temperature until you set a different target or call [`deactivate()`][opentrons.protocol_api.TemperatureModuleContext.deactivate], which will stop heating or cooling and will turn off the fan. 
+
+
 
 !!! note
-    Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App or run `deactivate()` in Jupyter notebook.
+    Your robot will not automatically deactivate the Temperature Module at the end of a protocol. If you need to deactivate the module after a protocol is completed or canceled, use the Temperature Module controls on the device detail page in the Opentrons App.
 
-*New in version 2.0*
 
 ## Temperature status
 
