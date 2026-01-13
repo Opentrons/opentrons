@@ -4144,6 +4144,7 @@
     react-select "5.4.0"
     react-simple-keyboard "^3.7.0"
     react-viewport-list "6.3.0"
+    react-window "2.2.4"
     redux "5.0.1"
     redux-observable "1.1.0"
     redux-thunk "3.1.0"
@@ -17764,6 +17765,11 @@ react-viewport-list@6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/react-viewport-list/-/react-viewport-list-6.3.0.tgz#dc73210d590c2a10f49be8902d86bb5e04a4b47e"
   integrity sha512-IV7/yeqpurCa2FytCnUWyY664kbDxg5EgQQJHQhI6X2zUZXEq8BlQLfDoPRF2MA8YsVihsC7y3iEf2wGt+Lluw==
+
+react-window@2.2.4:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-2.2.4.tgz#add661da4e0ebc4c1129c41a92d1891d44da565f"
+  integrity sha512-FiZsQHvt2qbnTz6cN+/FXvX62v2xukQ+AajUivkm/Ivdp9rnU3bp0B1eDcCNpQXNaDBdqkEVGNYHlvIUGU9yBw==
 
 react@18.2.0:
   version "18.2.0"

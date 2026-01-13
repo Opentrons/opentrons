@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { pickBy } from 'lodash'
+import pickBy from 'lodash/pickBy'
 
 import { uuid } from '/protocol-designer/utils'
 
