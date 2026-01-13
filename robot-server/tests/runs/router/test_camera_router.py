@@ -82,6 +82,10 @@ async def test_camera_settings(
     assert result.content.data == image_settings
     assert result.status_code == 201
 
+    decoy.when(
+        mock_run_orchestrator_store.get_camera_capture_image_settings("cool_cam")
+    ).then_return(image_settings)
+
     get_settings_result = await get_camera_capture_image_settings(
         cameraId="cool_cam",
         run_orchestrator_store=mock_run_orchestrator_store,

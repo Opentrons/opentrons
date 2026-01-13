@@ -186,8 +186,7 @@ async def add_camera_capture_image_settings(
     )
 
 
-@PydanticResponse.wrap_route(
-    camera_router.get,
+@camera_router.get(
     path="/runs/{runId}/cameraSettings/{cameraId}",
     summary="Query run specific camera capture image settings.",
     description=(
