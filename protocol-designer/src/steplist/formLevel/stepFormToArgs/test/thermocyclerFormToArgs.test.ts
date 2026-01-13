@@ -238,17 +238,6 @@ describe('thermocyclerFormToArgs', () => {
             ],
           },
         },
-        blockIsActiveHold: true,
-        // @ts-expect-error - See comment above.
-        // blockTargetTemp and blockTargetTempHold can never be null according to their castValue,
-        // but that might be unintentional. thermocyclerFormToArgs() does try to handle the null case
-        // and emit null blockTargetTempHold / blockTargetTemp. We need to clarify what's intended
-        // and possibly fix these fields' castValue.
-        blockTargetTempHold: null,
-        lidIsActiveHold: true,
-        // @ts-expect-error - See comment above.
-        lidTargetTempHold: '5',
-        lidOpenHold: true,
         blockIsActive: false,
       },
       expected: {
@@ -362,12 +351,6 @@ describe('thermocyclerFormToArgs', () => {
             ],
           },
         },
-        blockIsActiveHold: true,
-        blockTargetTempHold: 0,
-        lidIsActiveHold: true,
-        lidTargetTempHold: 5,
-        lidOpenHold: true,
-        blockIsActive: false,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
@@ -481,12 +464,6 @@ describe('thermocyclerFormToArgs', () => {
             ],
           },
         },
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        blockIsActive: false,
-        blockTargetTempHold: 0,
-        lidTargetTempHold: 0,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
