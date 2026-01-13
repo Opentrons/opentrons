@@ -5,6 +5,10 @@ import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { SecondaryButton } from '@opentrons/components'
 
 import { useToaster } from '/app/organisms/ToasterOven'
+import {
+  ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
+  useTrackEvent,
+} from '/app/redux/analytics'
 import { useFeatureFlag } from '/app/redux/config'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis/hooks/useStoredProtocolAnalysis'
 import {
@@ -34,6 +38,7 @@ export function RunHeaderSectionLower({
   const { t } = useTranslation('run_details')
   const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const navigate = useNavigate()
+  const trackEvent = useTrackEvent()
   const { startedAt, completedAt } = useRunTimestamps(runId)
   const startedAtTimestamp =
     startedAt != null ? formatTimestamp(startedAt) : EMPTY_TIMESTAMP
@@ -69,6 +74,10 @@ export function RunHeaderSectionLower({
     // need to encode URL to avoid spaces and slashes
     const encodedTimestamp = encodeURIComponent(createdAtTimestamp)
     const targetPath = `/devices/${robotName}/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
+    trackEvent({
+      name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
+      properties: { sourceLocation: 'protocol run' },
+    })
     navigate(targetPath)
   }
 
