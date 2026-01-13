@@ -258,6 +258,8 @@ class MoveGroupRunner:
     async def _send_groups(self, can_messenger: CanMessenger) -> None:
         """Send commands to set up the message groups."""
         for group_i, group in enumerate(self._move_groups):
+            seq_count = len(group)
+            log.debug(f"Sending move group {group_i + self._start_at_index} with {seq_count} sequences")
             for seq_i, sequence in enumerate(group):
                 for node, step in sequence.items():
                     await can_messenger.send(
@@ -266,6 +268,7 @@ class MoveGroupRunner:
                             step, group_i + self._start_at_index, seq_i
                         ),
                     )
+            log.debug(f"Completed sending {seq_count} sequences for group {group_i + self._start_at_index}")
 
     def _convert_velocity(
         self, velocity: Union[float, np.float64], interrupts: int
@@ -677,8 +680,14 @@ class MoveScheduler:
             log.error(f"received error trying to execute move group: {str(error)}")
 
         expected_time = max(3.0, self._durations[group_id - self._start_at_index] * 1.1)
-        full_timeout = max(10.0, self._durations[group_id - self._start_at_index] * 2)
+        # S-curve moves with many segments may need extra timeout buffer
+        # Use 3x for safety instead of 2x, with minimum of 15s
+        full_timeout = max(15.0, self._durations[group_id - self._start_at_index] * 3.0)
         start_time = time.time()
+        log.debug(
+            f"Move group {group_id} timing: expected={expected_time:.2f}s, "
+            f"timeout={full_timeout:.2f}s, base_duration={self._durations[group_id - self._start_at_index]:.2f}s"
+        )
 
         try:
             # The staged timeout handles some times when a move takes a liiiittle extra

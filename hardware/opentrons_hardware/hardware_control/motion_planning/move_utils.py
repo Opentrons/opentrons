@@ -31,7 +31,9 @@ MINIMUM_DISPLACEMENT = 0.05
 MINIMUM_VECTOR_COMPONENT = np.float64(0.001)
 
 # Minimum duration per S-curve sub-segment (seconds). Conservative to ensure FW handles timing reliably.
-_MIN_SEGMENT_TIME_SEC: float = 0.04  # 40 ms
+# Must be low enough to allow S-curve activation with typical OT3 accelerations (1500mm/s²)
+# but high enough to prevent firmware buffer issues. 35ms is validated on real hardware.
+_MIN_SEGMENT_TIME_SEC: float = 0.035  # 35 ms
 # Conservative cap on total sequences per move group for stepper moves.
 # Each accel and decel contributes N segments; optional plateau adds 1.
 _MAX_SEQS_PER_GROUP: int = 60
@@ -40,12 +42,13 @@ _MAX_SEQS_PER_GROUP: int = 60
 # - Each move group has a limited number of sequences that can be buffered by firmware.
 #   While the transport permits up to 255 (UInt8), the practical firmware buffer is lower.
 #   Keep a conservative cap to avoid timeouts when using many small S-curve segments.
-_FIRMWARE_MAX_SEQS_PER_GROUP = 12
+# With 16 sequences: allows up to 7 segments (2*7 + 1 = 15 ≤ 16) - validated on hardware
+# _FIRMWARE_MAX_SEQS_PER_GROUP = 16
+_FIRMWARE_MAX_SEQS_PER_GROUP = 20  # For 9 segments
 
 # The minimum block duration that will be transmitted to firmware. Shorter blocks are
 # skipped in create_move_group(); avoid creating sub-segments below this duration.
 _MIN_FW_BLOCK_TIME = 3.0 / interrupts_per_sec
-_TIME_SAFETY_FACTOR = 2.0  # be conservative: target segments at least 2x the min
 
 
 def apply_constraint(constraint: np.float64, input: np.float64) -> np.float64:
@@ -602,6 +605,21 @@ def build_blocks_scurve(
     _SHORT_BLOCK_TIME_SEC = 0.25
     if min(float(trap_first.time), float(trap_final.time)) < _SHORT_BLOCK_TIME_SEC:
         N_effective = min(N_effective, 3)
+    
+    # Check if resulting segments would be too short
+    # S-curve creates variable segment durations with ~1.5x spread (shortest to average)
+    # Require 1.5x headroom: (time / N) >= 1.5 * MIN_SEGMENT_TIME
+    estimated_accel_seg_time = float(trap_first.time) / N_effective
+    estimated_decel_seg_time = float(trap_final.time) / N_effective
+    required_avg_time = 1.5 * _MIN_SEGMENT_TIME_SEC
+    if min(estimated_accel_seg_time, estimated_decel_seg_time) < required_avg_time:
+        log.info(
+            f"S-curve fallback to trapezoid: estimated segment times too short "
+            f"(accel: {estimated_accel_seg_time:.4f}s, decel: {estimated_decel_seg_time:.4f}s "
+            f"< {required_avg_time:.4f}s required for {_MIN_SEGMENT_TIME_SEC*1000:.0f}ms min)"
+        )
+        return (trap_first, trap_coast, trap_final)
+    
     if N_effective < 3:
         # Fallback to trapezoid if constraints make S-curve impractical
         log.info(
@@ -609,10 +627,14 @@ def build_blocks_scurve(
         )
         return (trap_first, trap_coast, trap_final)
 
-    log.debug(
-        f"S-curve using N={N_effective} (requested={requested}, coast={n_coast}, "
+    log.info(
+        f"✓ S-curve ACTIVE: N={N_effective} segments (requested={requested}, coast={n_coast}, "
         f"by_group={max_n_by_group}, by_fw={max_n_by_fw}, by_time={max_n_by_time}); "
         f"min seg time {_MIN_SEGMENT_TIME_SEC:.6f}s"
+    )
+    log.debug(
+        f"S-curve block times: accel={float(trap_first.time):.3f}s, "
+        f"coast={float(trap_coast.time):.3f}s, decel={float(trap_final.time):.3f}s"
     )
 
     segments: List[Block] = []
@@ -775,11 +797,36 @@ def build_blocks_scurve(
             f"S-curve fallback to trapezoid due to sequence cap: total={total_sequences}, cap={_FIRMWARE_MAX_SEQS_PER_GROUP}"
         )
         return (trap_first, trap_coast, trap_final)
+    
+    # Validate all segments have reasonable durations
+    min_seg_time = min(float(seg.time) for seg in segments)
+    max_seg_time = max(float(seg.time) for seg in segments)
+    total_time = sum(float(seg.time) for seg in segments)
+    log.debug(
+        f"S-curve final: {total_sequences} segments, "
+        f"time range [{min_seg_time:.4f}s - {max_seg_time:.4f}s], "
+        f"total={total_time:.3f}s"
+    )
+    # Check against the configured minimum segment time, not just firmware minimum
+    if min_seg_time < _MIN_SEGMENT_TIME_SEC:
+        log.warning(
+            f"S-curve has segment below minimum ({min_seg_time*1000:.1f}ms < {_MIN_SEGMENT_TIME_SEC*1000:.1f}ms); "
+            f"falling back to trapezoid for stability"
+        )
+        return (trap_first, trap_coast, trap_final)
+    # Also check firmware absolute minimum as a safety net
+    if min_seg_time < _MIN_FW_BLOCK_TIME:
+        log.warning(
+            f"S-curve has very short segment ({min_seg_time:.6f}s < {_MIN_FW_BLOCK_TIME:.6f}s); "
+            f"falling back to trapezoid for stability"
+        )
+        return (trap_first, trap_coast, trap_final)
+    
     return tuple(segments)
 
 
 _PROFILE: str = "trapezoid"
-_SCURVE_SEGMENTS: int = 9
+_SCURVE_SEGMENTS: int = 5  # Good balance of smoothness and reliability; will auto-scale up to 7 for long moves
 
 
 def set_motion_profile(profile: str) -> None:

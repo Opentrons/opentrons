@@ -241,9 +241,8 @@ DEFAULT_RUN_CURRENT: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryLoa
 DEFAULT_MOTION_PROFILE: Final[str] = "s-curve"
 # Default number of segments for S-curve approximation (odd >= 3)
 # Note: The planner will automatically cap the effective segments based on
-# per-segment time and a firmware-safe sequence budget. Values of 5 are a
-# good reliability/smoothness balance across gantry and Z moves; higher values
-# may be used for longer moves but can be capped by runtime constraints.
+# per-segment time and a firmware-safe sequence budget. Value of 5 provides
+# a good balance of smoothness and reliability. Will auto-scale up to 7 for longer moves.
 DEFAULT_SCURVE_SEGMENTS: Final[int] = 5
 
 
