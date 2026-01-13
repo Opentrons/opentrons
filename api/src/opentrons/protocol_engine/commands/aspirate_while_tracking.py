@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Optional, Type, Union
 
 from typing_extensions import Literal
 
+from opentrons_shared_data.pipette.types import LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
+
 from ..errors.exceptions import PipetteNotReadyToAspirateError
 from ..state.update_types import CLEAR, StateUpdate
 from ..types import DeckPoint
@@ -16,6 +18,7 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from .liquid_probe import LiquidProbeImplementation, _CommonParams
 from .movement_common import (
     DestinationPositionResult,
     DynamicLiquidHandlingWellLocationMixin,
@@ -31,6 +34,7 @@ from .pipetting_common import (
     aspirate_while_tracking,
 )
 from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.types import WellLocation, WellOffset, WellOrigin, LiquidHandlingWellLocation
 
 if TYPE_CHECKING:
     from ..execution import GantryMover, MovementHandler, PipettingHandler
@@ -49,9 +53,7 @@ class AspirateWhileTrackingParams(
     DynamicLiquidHandlingWellLocationMixin,
 ):
     """Parameters required to aspirate from a specific well."""
-
-    pass
-
+    auto_probe_enable: bool
 
 class AspirateWhileTrackingResult(BaseLiquidHandlingResult, DestinationPositionResult):
     """Result data from execution of an Aspirate command."""
@@ -64,6 +66,19 @@ _ExecuteReturn = Union[
     DefinedErrorData[OverpressureError] | DefinedErrorData[StallOrCollisionError],
 ]
 
+def _need_liq_info(params: AspirateWhileTrackingParams) -> bool:
+    return params.trackFromLocation.origin == WellOrigin.MENISCUS or
+           params.trackToLocation.origin == WellOrigin.MENISCUS
+
+def _maybe_convert_meniscus(location: LiquidHandlingWellLocation, liquid_height: LiquidTrackingType, operation_volume: float) -> LiquidHandlingWellLocation:
+    if location.origin == WellOrigin.MENISCUS:
+        return LiquidHandlingWellLocation(
+            origin=WellOrigin.BOTTOM
+            offset=WellOffset(x=location.offset.x, location.offset.y, location.offset.z + liquid_height)
+            volumeOffset=location.volumeOffset
+        )
+    else:
+        return location
 
 class AspirateWhileTrackingImplementation(
     AbstractCommandImpl[AspirateWhileTrackingParams, _ExecuteReturn]
@@ -107,6 +122,42 @@ class AspirateWhileTrackingImplementation(
                 " can be reset in a known safe position."
             )
         state_update = StateUpdate()
+        """START: Everything between here and END is what we need in the app we can ignore most of this logic and just use the logic in _need_liq_info"""
+        if (params.auto_probe_enable and self._state_view.wells.get_last_liquid_update(params.labwareI, params.wellName) is None and _need_liq_info(params)):
+            # We are re-attempting this aspiration with a fresh tip. re-do a probe so that we can properly do the retry.
+            retry_command = LiquidProbeImplementation(
+                self._state_view,
+                self._movement,
+                self._gantry_mover,
+                self._pipetting,
+                self._model_utils,
+            )
+            vect_offset = LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP
+            # build a new retry location, this is the standard location used for all probes.
+            retry_location = WellLocation(
+                origin=WellOrigin.TOP,
+                offset=WellOffset(x=vect_offset.x, y=vect_offset.y, z=vect_offset.z),
+            )
+            # the params are a different type from what this command uses but we have all the data we need.
+            retry_params = _CommonParams(
+                pipetteId=params.pipetteId,
+                labwareId=params.labwareId,
+                wellName=params.wellName,
+                wellLocation=retry_location,
+            )
+            retry_result = retry_command.execute(retry_params)
+            """End. Everything after this is just to fudge the engine state which we won't have to do if we're doing it as its own command."""
+            if isinstance(retry_result,DefinedErrorData):
+                return retry_result
+            else:
+                #make sure the state update persists.
+                state_update.append(retry_result.state_update)
+                meniscus_height = retry_result.public.z_position
+
+            # We're gonna re-convert the params now because the state around the rest of the system will not reflect this probe yet.
+            params.trackFromLocation = _maybe_convert_meniscus(params.trackFromLocation, meniscus_height)
+            params.trackToLocation = _maybe_convert_meniscus(params.trackFromLocation, meniscus_height)
+
 
         end_point = self._state_view.geometry.get_well_position(
             labware_id=params.labwareId,

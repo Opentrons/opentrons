@@ -294,6 +294,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                         flowRate=flow_rate,
                         correctionVolume=correction_volume,
                         movement_delay=movement_delay,
+                        auto_probe_enable=self._liquid_presence_detection
                     )
                 )
             else:
