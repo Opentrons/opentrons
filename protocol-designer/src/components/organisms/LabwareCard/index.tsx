@@ -111,7 +111,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           labwareId={labware.id}
           allLabwareIdsOnStack={filteredStack}
           isOnHopper={isOnHopper}
-          location={location}
         />
       ) : null}
       <Box position={POSITION_RELATIVE}>
