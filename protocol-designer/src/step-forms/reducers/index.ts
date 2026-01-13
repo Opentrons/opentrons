@@ -361,8 +361,6 @@ export const savedStepForms = (
         action,
         originalOrderedStepIds: rootState.orderedStepIds,
         originalStepFormsById: savedStepForms,
-        enableConcurrentModuleActions:
-          action.payload.enableConcurrentModuleActions,
       })
       return newStepFormsById
     }
@@ -1616,8 +1614,6 @@ export const orderedStepIds = (
         action,
         originalOrderedStepIds: orderedStepIds,
         originalStepFormsById: rootState.savedStepForms,
-        enableConcurrentModuleActions:
-          action.payload.enableConcurrentModuleActions,
       })
       return newOrderedStepIds
     }
@@ -1726,7 +1722,6 @@ interface SaveStepFormHelperArgs {
   action: SaveStepFormAction
   originalOrderedStepIds: StepIdType[]
   originalStepFormsById: Record<StepIdType, FormData>
-  enableConcurrentModuleActions: boolean
 }
 interface SaveStepFormHelperResult {
   newOrderedStepIds: StepIdType[]
@@ -1735,12 +1730,7 @@ interface SaveStepFormHelperResult {
 function saveStepFormHelper(
   args: SaveStepFormHelperArgs
 ): SaveStepFormHelperResult {
-  const {
-    action,
-    originalOrderedStepIds,
-    originalStepFormsById,
-    enableConcurrentModuleActions,
-  } = args
+  const { action, originalOrderedStepIds, originalStepFormsById } = args
 
   const newForm = action.payload.form
   const originalStep: FormData | null =
@@ -1749,10 +1739,8 @@ function saveStepFormHelper(
   const originalOrderedSteps = originalOrderedStepIds.map(
     id => originalStepFormsById[id]
   )
-  const originalStepHierarchy = convertStepArrayToHierarchy(
-    originalOrderedSteps,
-    action.payload.enableConcurrentModuleActions
-  )
+  const originalStepHierarchy =
+    convertStepArrayToHierarchy(originalOrderedSteps)
 
   const findResult = findStep(originalStepHierarchy, newForm.id)
 
@@ -1761,7 +1749,6 @@ function saveStepFormHelper(
     // If it's a Thermocycler profile, also pair it with a "wait for profile to complete" step.
 
     const newPauseForm: PauseFormData | null =
-      enableConcurrentModuleActions &&
       getThermocyclerFormType(newForm) === 'thermocyclerProfile'
         ? getThermocyclerProfilePauseForm(
             newForm as ThermocyclerFormData,
@@ -1810,12 +1797,10 @@ function saveStepFormHelper(
       // 1) Potentially find a new position to move it to, since we can't allow Thermocycler profiles to nest.
       // 2) Create a hidden "wait for profile to complete" step that it will be permanently paired with.
 
-      const newPauseForm = enableConcurrentModuleActions
-        ? getThermocyclerProfilePauseForm(
-            newForm as ThermocyclerFormData,
-            action.payload.thermocyclerPauseStepId
-          )
-        : null
+      const newPauseForm = getThermocyclerProfilePauseForm(
+        newForm as ThermocyclerFormData,
+        action.payload.thermocyclerPauseStepId
+      )
 
       // If the edited step was is inside a Thermocycler profile, we'll move it to just after the profile.
       // null means "leave the edited step in-place."

@@ -4,7 +4,6 @@ import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import * as featureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
 import * as tutorialSelectors from '/protocol-designer/tutorial/selectors'
@@ -266,9 +265,6 @@ describe('steps actions', () => {
       vi.mocked(tutorialSelectors.shouldShowWasteChuteHint).mockReturnValue(
         false
       )
-      vi.mocked(
-        featureFlagSelectors.getEnableConcurrentModuleActions
-      ).mockReturnValue(true)
     })
 
     afterEach(() => {
@@ -326,7 +322,6 @@ describe('steps actions', () => {
             payload: {
               form: temperatureForm,
               thermocyclerPauseStepId: expect.any(String),
-              enableConcurrentModuleActions: true,
             },
           })
 
@@ -401,7 +396,6 @@ describe('steps actions', () => {
             payload: {
               form: heaterShakerForm,
               thermocyclerPauseStepId: expect.any(String),
-              enableConcurrentModuleActions: true,
             },
           })
 
