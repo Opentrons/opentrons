@@ -65,7 +65,10 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   )
   let quantity: number
   if (lidId != null) {
-    const onlyLabware = filteredStack.filter(id => id !== lidId)
+    const lidDisplayName = deckSetupLabware[lidId].def.metadata.displayName
+    const onlyLabware = filteredStack.filter(
+      id => deckSetupLabware[id].def.metadata.displayName !== lidDisplayName
+    )
     quantity = onlyLabware.length
   } else {
     quantity = filteredStack.length
