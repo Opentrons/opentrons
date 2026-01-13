@@ -41,13 +41,6 @@ describe('thermocyclerFormToArgs', () => {
         // @ts-expect-error - See comment above.
         lidTargetTemp: '40',
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        // @ts-expect-error - See comment above.
-        blockTargetTempHold: null,
-        // @ts-expect-error - See comment above.
-        lidTargetTempHold: null,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -78,11 +71,6 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: 40,
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        blockTargetTempHold: 0,
-        lidTargetTempHold: 0,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -119,13 +107,6 @@ describe('thermocyclerFormToArgs', () => {
         // @ts-expect-error - See comment above.
         lidTargetTemp: '40',
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        // @ts-expect-error - See comment above.
-        blockTargetTempHold: null,
-        // @ts-expect-error - See comment above.
-        lidTargetTempHold: null,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -156,11 +137,6 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: 40,
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        blockTargetTempHold: 0,
-        lidTargetTempHold: 0,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
