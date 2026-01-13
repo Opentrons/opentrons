@@ -2,7 +2,7 @@ import sum from 'lodash/sum'
 
 import { COLORS } from '@opentrons/components'
 import {
-  getLiquidIdsOnLabware,
+  getLiquidIdsOnLabwareStack,
   getVolumesPerLiquid,
 } from '@opentrons/step-generation'
 
@@ -19,7 +19,7 @@ export const getLiquidDetailInfo = (
   wellContents: ContentsByWell,
   liquids: Liquid[]
 ): LiquidDetailInfo[] => {
-  const individualIds = getLiquidIdsOnLabware(wellContents)
+  const individualIds = getLiquidIdsOnLabwareStack([wellContents])
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
   const liquidInfo: LiquidDetailInfo[] = individualIds.map(liquidId => {
     const totalVolume = sum(Object.values(volumesPerLiquid[liquidId]))

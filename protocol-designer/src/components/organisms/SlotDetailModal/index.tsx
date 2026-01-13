@@ -20,7 +20,7 @@ import {
   Tag,
 } from '@opentrons/components'
 import {
-  getLiquidIdsOnLabware,
+  getLiquidIdsOnLabwareStack,
   getSlotInLocationStack,
   getVolumesPerLiquid,
   wellFillFromWellContents,
@@ -77,7 +77,7 @@ export const SlotDetailModal = (
     wellContents,
     liquidDisplayColors
   )
-  const individualIds = getLiquidIdsOnLabware(wellContents)
+  const individualIds = getLiquidIdsOnLabwareStack([wellContents])
 
   const volumesPerLiquid = getVolumesPerLiquid(wellContents, individualIds)
 
@@ -153,9 +153,8 @@ export const SlotDetailModal = (
                     ? allWellContentsForActiveItem[selectedLabwareId]
                     : null
 
-                const individualIdsForNewlySelected = getLiquidIdsOnLabware(
-                  wellContentsForNewlySelected
-                )
+                const individualIdsForNewlySelected =
+                  getLiquidIdsOnLabwareStack([wellContentsForNewlySelected])
 
                 setSelectedLabware(selectedLabwareId)
                 setSelectedLiquidId(

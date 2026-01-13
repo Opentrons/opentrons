@@ -19,7 +19,10 @@ export function getAllWellsForLabware(def: LabwareDefinition2): string[] {
 }
 
 export type ContentsByWell = Record<string, WellContents> | null
-
+const EMPTY_WELL_CONTENTS: WellContents = {
+  groupIds: [],
+  ingreds: {},
+}
 const _wellContentsForWell = (
   liquidVolState: LocationLiquidState,
   wellName: string
@@ -42,15 +45,17 @@ export const _wellContentsForLabware = (
   labwareDef: LabwareDefinition2
 ): ContentsByWell => {
   const allWellsForContainer = getAllWellsForLabware(labwareDef)
+
   return reduce(
     allWellsForContainer,
-    (wellAcc, well: string): Record<string, WellContents> => {
-      const wellHasContents = labwareLiquids && labwareLiquids[well]
+    (wellAcc: Record<string, WellContents>, well: string) => {
+      const wellHasContents = labwareLiquids?.[well]
+
       return {
         ...wellAcc,
         [well]: wellHasContents
           ? _wellContentsForWell(labwareLiquids[well], well)
-          : {},
+          : EMPTY_WELL_CONTENTS,
       }
     },
     {}
@@ -85,15 +90,17 @@ export const getVolumesPerLiquid = (
   return volumesPerLiquid
 }
 
-export const getLiquidIdsOnLabware = (
-  wellContents: ContentsByWell
+export const getLiquidIdsOnLabwareStack = (
+  wellContents: ContentsByWell[]
 ): string[] => {
-  const allLiquidIdsOnLabware =
-    wellContents != null
-      ? Object.values(wellContents)
-          .flatMap(contents => contents.groupIds)
-          ?.filter(group => group !== AIR)
-      : []
+  const allLiquidIdsOnLabware = wellContents.flatMap(contentsByWell =>
+    contentsByWell == null
+      ? []
+      : Object.values(contentsByWell).flatMap(contents =>
+          contents.groupIds.filter(group => group !== AIR)
+        )
+  )
+
   return Array.from(new Set(allLiquidIdsOnLabware))
 }
 
