@@ -15,7 +15,9 @@ class BaseCommandAnnotation(BaseModel):
     annotationType: str = Field(
         ..., description="The type of annotation (for machine parsing)"
     )
-    annotationId: str = Field(..., description="Blah blah blah")
+    annotationId: str = Field(
+        ..., description="A unique identifier for the command annotation."
+    )
 
 
 class UserCommandAnnotation(BaseCommandAnnotation):
