@@ -1,5 +1,6 @@
 import {
   getLabwareDefinitionsByURIForProtocol,
+  getLabwareDefURI,
   getModuleType,
   getPipetteSpecsV2,
 } from '@opentrons/shared-data'
@@ -65,6 +66,31 @@ export function constructInvariantContextFromAnalysis(
     },
     {}
   )
+  const labwareEntitiesWithLidStacks = commands.reduce<LabwareEntities>(
+    (acc, command) => {
+      if (command.commandType === 'loadLidStack' && command.result != null) {
+        const { stackLabwareId, lidStackDefinition } = command.result
+        if (
+          stackLabwareId != null &&
+          lidStackDefinition != null &&
+          acc[stackLabwareId] == null &&
+          lidStackDefinition.schemaVersion !== 3
+        ) {
+          return {
+            ...acc,
+            [stackLabwareId]: {
+              id: stackLabwareId,
+              labwareDefURI: getLabwareDefURI(lidStackDefinition),
+              def: lidStackDefinition,
+              pythonName: 'n/a',
+            },
+          }
+        }
+      }
+      return acc
+    },
+    labwareEntities
+  )
 
   const pipetteEntities = pipettes.reduce<PipetteEntities>((acc, pipette) => {
     const { id, pipetteName } = pipette
@@ -74,7 +100,8 @@ export function constructInvariantContextFromAnalysis(
         command.commandType === 'pickUpTip' && command.params.pipetteId === id
     )
     const matchingLabwareEntities = tiprackIdsAssosciatedWithPipette.map(
-      pickUpTipCommand => labwareEntities[pickUpTipCommand.params.labwareId]
+      pickUpTipCommand =>
+        labwareEntitiesWithLidStacks[pickUpTipCommand.params.labwareId]
     )
     const tiprackDefURIs = Array.from(
       new Set(matchingLabwareEntities.map(entity => entity.labwareDefURI))
@@ -196,7 +223,7 @@ export function constructInvariantContextFromAnalysis(
     }
   )
   return {
-    labwareEntities,
+    labwareEntities: labwareEntitiesWithLidStacks,
     pipetteEntities,
     moduleEntities,
     ...otherEntities,

@@ -40,6 +40,7 @@ export function getResultingTimelineFrameFromRunCommands(
   commands: RunTimeCommand[],
   invariantContext: InvariantContext
 ): ResultingTimelineFrame {
+  console.log('getResultingTimelineFrameFromRunCommands', commands)
   const pipetteLocations = commands.reduce<RobotState['pipettes']>(
     (acc, command) => {
       if (command.commandType === 'loadPipette' && command.result != null) {
@@ -80,6 +81,25 @@ export function getResultingTimelineFrameFromRunCommands(
         const { result } = command
         const locationSequences = result.locationSequences
         const labwareIds = result.labwareIds
+        const stackLabwareId = result.stackLabwareId
+        const stackLocationSequence = result.stackLocationSequence
+
+        const getLocationStack = (
+          location: typeof command.params.location
+        ): string[] => {
+          if (locationIsOffDeck(location)) {
+            return [location]
+          } else if ('slotName' in location) {
+            return [location.slotName]
+          } else if ('moduleId' in location) {
+            const moduleSlot =
+              moduleLocations[location.moduleId]?.slot ?? 'offDeck'
+            return [location.moduleId, moduleSlot]
+          } else if ('addressableAreaName' in location) {
+            return [location.addressableAreaName]
+          }
+          return ['offDeck']
+        }
 
         if (locationSequences != null) {
           const sequenceMap = locationSequences.reduce(
@@ -116,9 +136,18 @@ export function getResultingTimelineFrameFromRunCommands(
             },
             {}
           )
+          const stackLabwareStack =
+            stackLabwareId != null
+              ? stackLocationSequence != null
+                ? getStackForLabwareLocation(stackLocationSequence)
+                : [stackLabwareId, ...getLocationStack(command.params.location)]
+              : null
           return {
             ...acc,
             ...labwareStacks,
+            ...(stackLabwareId != null && stackLabwareStack != null
+              ? { [stackLabwareId]: { stack: stackLabwareStack } }
+              : {}),
           }
         } else {
           const location = command.params.location
@@ -140,9 +169,16 @@ export function getResultingTimelineFrameFromRunCommands(
             },
             {}
           )
+          const stackLabwareStack =
+            stackLabwareId != null
+              ? [stackLabwareId, ...getLocationStack(location)]
+              : null
           return {
             ...acc,
             ...labwareStacks,
+            ...(stackLabwareId != null && stackLabwareStack != null
+              ? { [stackLabwareId]: { stack: stackLabwareStack } }
+              : {}),
           }
         }
       } else if (
