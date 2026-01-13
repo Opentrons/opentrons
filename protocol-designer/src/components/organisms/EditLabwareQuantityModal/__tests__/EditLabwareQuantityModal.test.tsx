@@ -10,12 +10,16 @@ import {
   createContainer,
   deleteContainer,
 } from '/protocol-designer/labware-ingred/actions'
-import { getLabwareEntities } from '/protocol-designer/step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getLabwareEntities,
+} from '/protocol-designer/step-forms/selectors'
 
 import { EditLabwareQuantityModal } from '..'
 
 import type { ComponentProps } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 
 vi.mock('/protocol-designer/labware-ingred/actions')
 vi.mock('/protocol-designer/step-forms/selectors')
@@ -49,6 +53,7 @@ describe('EditLabwareQuantityModal', () => {
       labwareId: 'mockId',
       allLabwareIdsOnStack: ['mockId'],
       isOnHopper: false,
+      location: 'A1',
     }
     vi.mocked(getLabwareEntities).mockReturnValue({
       mockId: labwareEntity1,
@@ -56,6 +61,9 @@ describe('EditLabwareQuantityModal', () => {
     vi.mocked(getLabwareDefsByURI).mockReturnValue({
       mockURI: { ...fixture96Plate, stackLimit: 3 } as LabwareDefinition2,
     })
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
+      modules: {},
+    } as AllTemporalPropertiesForTimelineFrame)
   })
 
   it('renders the text and changes the quantity to 2', () => {
