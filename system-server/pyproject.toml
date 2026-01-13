@@ -142,3 +142,11 @@ dependency-metadata = [
     { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
     ] },
 ]
+
+[tool.pytest]
+addopts = ["--cov=system_server", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+tavern-global-cfg = ["tests/integration/common.yaml"]
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+]

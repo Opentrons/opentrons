@@ -168,3 +168,9 @@ packages = ['python/opentrons_shared_data']
 'robot/schemas' = 'opentrons_shared_data/data/robot/schemas'
 'robot/definitions' = 'opentrons_shared_data/data/robot/definitions'
 'LICENSE' = 'LICENSE'
+
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+]

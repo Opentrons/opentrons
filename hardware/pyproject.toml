@@ -105,6 +105,18 @@ packages = ['opentrons_hardware']
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons_hardware/LICENSE'
 
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "slow: mark test as slow",
+    "requires_emulator: mark test as requiring emulator",
+    "can_filter_func: can message filtering function",
+]
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+]
+
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
 # For local development: UV will use these editable local paths instead of PyPI,

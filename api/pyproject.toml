@@ -193,3 +193,16 @@ packages = ['src/opentrons']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons/LICENSE'
+
+[tool.pytest]
+addopts = ["-m", "not stackup_testing", "--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "apiv2_non_pe_only: This test invocation requires a legacy PAPI context, not backed by Protocol Engine",
+    "ot2_only: Test only functions using the OT2 hardware",
+    "ot3_only: Test only functions using the OT3 hardware",
+    "stackup_testing: marks tests as stackup regression tests",
+]
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+]
