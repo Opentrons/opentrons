@@ -19,11 +19,11 @@ OT-2 GEN1 pipettes are black and marked by a white Opentrons drop logo. They do 
 ![OT2 GEN1 multi channel pipette](../images/OT2-gen1-multi.png)
 </figure>
 
-GEN1 pipettes are no longer manufactured or supported.
+GEN1 pipettes are no longer manufactured or supported. They have been replaced by the GEN2 models.
 
 ## GEN2 pipettes
 
-OT-2 GEN2 pipettes are different than their GEN1 predecessors. GEN2 pipettes are longer than the GEN1, they have a black and sliver housing, and display exterior markings that identify these instruments as a GEN2 pipettes.
+OT-2 GEN2 pipettes are different than their GEN1 predecessors. GEN2 pipettes are longer than the GEN1, they have a black and sliver housing, and display exterior markings that identify these instruments as a GEN2 pipettes along with their volumetric capacity.
 
 <figure class="side-by-side" markdown>
 ![OT2 GEN2 single channel pipette](../images/gen2-p300-single.png)
