@@ -46,7 +46,7 @@ interface LabwareCardProps {
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { labware, lidId, quantity, location } = props
-  console.log("🚀 ~ LabwareCard ~ quantity:", quantity)
+  console.log('🚀 ~ LabwareCard ~ quantity:', quantity)
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
