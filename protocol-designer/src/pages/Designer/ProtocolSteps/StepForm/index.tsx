@@ -10,6 +10,7 @@ import {
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
 } from '/protocol-designer/components/organisms'
+import { FLEX_STACKER_FILL } from '/protocol-designer/constants'
 import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import { selectors as labwareDefSelectors } from '/protocol-designer/labware-defs'
 import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
@@ -117,20 +118,32 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
       saveStepForm()
       if (
         hydratedForm.stepType === 'flexStacker' &&
-        hydratedForm.flexStackerFormType === 'fill'
+        hydratedForm.flexStackerFormType === FLEX_STACKER_FILL
       ) {
-        const initialLabwareIds =
-          (savedStepForm?.fillLabwareIds as string[]) ?? null
-        const oldFillQuantity = initialLabwareIds.length
+        // logic for editing a fill step form
+        if (savedStepForm != null) {
+          const initialLabwareIds =
+            (savedStepForm.fillLabwareIds as string[] | null) ?? []
+          const oldFillQuantity = initialLabwareIds.length
 
-        // delete extraneous labware if fill quantity is decreased
-        if (oldFillQuantity > hydratedForm.fillLabwareIds.length) {
-          const extraneousLabwareIds = initialLabwareIds.slice(
-            hydratedForm.fillLabwareIds.length,
-            oldFillQuantity
-          )
-          deleteLabwares(extraneousLabwareIds)
+          // if new fill quantity is less than the preivously saved quantity, delete the extraneous labware
+          if (oldFillQuantity > hydratedForm.fillLabwareIds.length) {
+            const extraneousLabwareIds = initialLabwareIds.slice(
+              hydratedForm.fillLabwareIds.length,
+              oldFillQuantity
+            )
+            deleteLabwares(extraneousLabwareIds)
+          }
+          // if new fill quantity is greater than the preivously saved quantity, create the new labware
+          else if (oldFillQuantity < hydratedForm.fillLabwareIds.length) {
+            const newLabwareIds = hydratedForm.fillLabwareIds.slice(
+              oldFillQuantity,
+              hydratedForm.fillLabwareIds.length
+            )
+            createdLabwareForQueue(hydratedForm.moduleId, newLabwareIds)
+          }
         } else {
+          // if no saved step form exists, create all the new labware
           createdLabwareForQueue(
             hydratedForm.moduleId,
             hydratedForm.fillLabwareIds
