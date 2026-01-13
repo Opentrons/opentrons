@@ -179,7 +179,7 @@ type MoveStepResult =
   | { isMoveAllowed: false }
 
 /**
- * Recursively search the tree for a given step ID. It can either point to a
+ * Recursively search the tree for a given step ID. The step ID can either point to a
  * standalone step, or to the root of a group.
  *
  * The match's location in the tree is returned: either the top-level `StepHierarchy`,
@@ -188,7 +188,7 @@ type MoveStepResult =
  *
  * Returns `null` if there's no match.
  */
-function findStep(
+export function findStep(
   stepHierarchy: StepHierarchy,
   stepIdToFind: StepIdType
 ): null | {
