@@ -21,7 +21,7 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getLiquidIdsOnLabware,
+  getLiquidIdsOnLabwareStack,
   getPrimaryLabwareInAllLabwareStacks,
   HOPPER_STACKER_LOCATION,
 } from '@opentrons/step-generation'
@@ -39,13 +39,12 @@ import type { ThunkDispatch } from '/protocol-designer/types'
 
 interface LabwareCardProps {
   labware: LabwareOnDeck
-  quantity: number
   location: string // slotId, off-deck, fake hopper location
   lidId?: string
 }
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
-  const { labware, lidId, quantity, location } = props
+  const { labware, lidId, location } = props
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
@@ -64,6 +63,14 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         ? deckSetupLabware[id].def.allowedRoles?.includes('adapter')
         : !deckSetupLabware[id].def.allowedRoles?.includes('adapter'))
   )
+  let quantity: number
+  if (lidId != null) {
+    const onlyLabware = filteredStack.filter(id => id !== lidId)
+    quantity = onlyLabware.length
+  } else {
+    quantity = filteredStack.length
+  }
+
   const isOnHopper = labware.stack.includes(HOPPER_STACKER_LOCATION)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
@@ -71,13 +78,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
   const wellContents =
     allWellContentsForActiveItem != null
-      ? allWellContentsForActiveItem[labware.id]
-      : null
+      ? Object.values(allWellContentsForActiveItem)
+      : []
   const displayName = def.metadata.displayName
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
   const isLid = def.allowedRoles?.includes('lid')
-  const liquidIds = getLiquidIdsOnLabware(wellContents)
+  const liquidIds = getLiquidIdsOnLabwareStack(wellContents)
   const canModifyQuantity =
     isOnHopper || (def.stackLimit != null && def.stackLimit > 1)
 
@@ -154,11 +161,13 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                       text={
                         liquidIds.length === 0
                           ? t('no_liquids_added')
-                          : t('num_liquid', { count: liquidIds.length })
+                          : liquidIds.length === 1
+                            ? t('num_liquid', { count: liquidIds.length })
+                            : t('multiple_liquid_layouts')
                       }
                     />
                   ) : null}
-                  {quantity > 1 ? (
+                  {quantity >= 1 ? (
                     <LiquidInfoDisplay
                       text={`Quantity: ${quantity.toString()}`}
                     />

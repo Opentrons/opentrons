@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 import {
-  getLiquidIdsOnLabware,
+  getLiquidIdsOnLabwareStack,
   getPrimaryLabwareInAllLabwareStacks,
 } from '@opentrons/step-generation'
 
@@ -58,7 +58,6 @@ describe('LabwareCard', () => {
         def: fixture96Plate as LabwareDefinition2,
       },
       lidId: 'lidId',
-      quantity: 1,
       location: 'A1',
     }
     vi.mocked(getPrimaryLabwareInAllLabwareStacks).mockReturnValue([
@@ -75,7 +74,7 @@ describe('LabwareCard', () => {
     vi.mocked(
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
-    vi.mocked(getLiquidIdsOnLabware).mockReturnValue([])
+    vi.mocked(getLiquidIdsOnLabwareStack).mockReturnValue([])
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
       modules: {},
       pipettes: {},
@@ -114,24 +113,23 @@ describe('LabwareCard', () => {
     screen.getByText('mock LabwareCardOverflowMenu')
   })
   it('renders a labware card with 2 liquids added', () => {
-    vi.mocked(getLiquidIdsOnLabware).mockReturnValue(['0', '1'])
+    vi.mocked(getLiquidIdsOnLabwareStack).mockReturnValue(['0', '1'])
     render(props)
-    screen.getByText('2 liquids')
+    screen.getByText('Multiple liquid layouts')
   })
   it('renders a labware card with 1 liquid added', () => {
-    vi.mocked(getLiquidIdsOnLabware).mockReturnValue(['0'])
+    vi.mocked(getLiquidIdsOnLabwareStack).mockReturnValue(['0'])
     render(props)
     screen.getByText('1 liquid')
   })
   it('renders a labware card with the quantity tag', () => {
-    props.quantity = 2
     props.labware = {
       ...props.labware,
       def: { ...fixture96Plate, stackLimit: 4 } as LabwareDefinition2,
     }
     render(props)
     screen.getByText('ANSI 96 Standard Microplate')
-    screen.getByText('Quantity: 2')
+    screen.getByText('No liquids added')
     screen.getByText('Edit liquid and quantity')
   })
   it('renders a labware card with edit quantity copy and pressing button renders modal', () => {

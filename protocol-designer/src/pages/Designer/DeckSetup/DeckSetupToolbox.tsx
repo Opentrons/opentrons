@@ -121,13 +121,6 @@ export function DeckSetupToolbox(
       })
     )
   }
-  const labwareInHopper =
-    createdModuleForSlot?.type === FLEX_STACKER_MODULE_TYPE &&
-    isHopperSlot &&
-    'labwareInHopper' in createdModuleForSlot.moduleState
-      ? createdModuleForSlot.moduleState.labwareInHopper
-      : null
-
   const slotFull =
     (createdAdapterForSlot != null && createdStackForSlot.length > 0) ||
     (createdStackForSlot.length > 0 && deckSetup.labware[slot] != null)
@@ -355,20 +348,11 @@ export function DeckSetupToolbox(
                   createdStackForSlot.includes(createdLidForSlot?.id)
                     ? {}
                     : { lidId: createdLidForSlot?.id })}
-                  quantity={
-                    labwareInHopper != null
-                      ? labwareInHopper.length
-                      : createdStackForSlot.length
-                  }
                   location={slot}
                 />
               ) : null}
               {createdAdapterForSlot != null ? (
-                <LabwareCard
-                  labware={createdAdapterForSlot}
-                  quantity={1}
-                  location={slot}
-                />
+                <LabwareCard labware={createdAdapterForSlot} location={slot} />
               ) : null}
               {slotFull ? (
                 <StyledText
