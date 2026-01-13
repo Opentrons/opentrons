@@ -25,19 +25,18 @@ export function ProtocolVisualization(): JSX.Element {
   const storedProtocol = useSelector((state: State) =>
     getStoredProtocol(state, protocolKey)
   )
-  const robotProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+  const completedProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const groupedCommands = useSelector((state: State) =>
     getStoredProtocolGroupedCommands(state, protocolKey)
   )
   useEffect(() => {
     dispatch(fetchProtocols())
   }, [])
-  console.log('robotProtocolAnalysis', robotProtocolAnalysis, protocolKey)
   return storedProtocol != null && storedProtocol.mostRecentAnalysis != null ? (
     <div className={styles.top_container}>
       <VisualizerContainer
         analysisOutput={storedProtocol.mostRecentAnalysis}
-        completedProtocolAnalysis={robotProtocolAnalysis}
+        completedProtocolAnalysis={completedProtocolAnalysis}
         groupedCommands={groupedCommands}
         protocolKey={protocolKey}
         srcFileNames={storedProtocol.srcFileNames}

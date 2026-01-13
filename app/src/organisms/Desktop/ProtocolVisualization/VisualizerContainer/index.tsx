@@ -52,7 +52,14 @@ export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
   const dispatch = useDispatch()
-  const { completedProtocolAnalysis, analysisOutput, groupedCommands, protocolKey, srcFileNames } = props
+
+  const {
+    completedProtocolAnalysis,
+    analysisOutput,
+    groupedCommands,
+    protocolKey,
+    srcFileNames,
+  } = props
   const analysis = completedProtocolAnalysis ?? analysisOutput
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
