@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { fireEvent, screen } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, Mock, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
@@ -17,6 +17,7 @@ import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 
 import { RunHeaderSectionLower } from '../RunHeaderContent/RunHeaderSectionLower'
 
+import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
 vi.mock('react-router-dom')
@@ -183,7 +184,7 @@ describe('RunHeaderSectionLower', () => {
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
-      properties: {sourceLocation: 'protocol run'},
+      properties: { sourceLocation: 'protocol run' },
     })
   })
 })
