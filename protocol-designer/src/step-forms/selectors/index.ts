@@ -442,16 +442,9 @@ export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
   )
 
 export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
-  createSelector(
-    getOrderedSavedForms,
-    featureFlagSelectors.getEnableConcurrentModuleActions,
-    (orderedSavedForms, enableConcurrentModuleActions) => {
-      return convertStepArrayToHierarchy(
-        orderedSavedForms,
-        enableConcurrentModuleActions
-      )
-    }
-  )
+  createSelector(getOrderedSavedForms, orderedSavedForms => {
+    return convertStepArrayToHierarchy(orderedSavedForms)
+  })
 
 /**
  * A mapping from step IDs to the step's user-visible index in the timeline.
@@ -753,13 +746,7 @@ export const getArgsAndErrorsByStepId: Selector<
   getOrderedSavedForms,
   getInvariantContext,
   labwareDefSelectors.getLabwareDefsByURI,
-  featureFlagSelectors.getEnableConcurrentModuleActions,
-  (
-    stepForms,
-    contextualState,
-    allLabwareDefs,
-    enableConcurrentModuleActions
-  ) => {
+  (stepForms, contextualState, allLabwareDefs) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
@@ -773,8 +760,7 @@ export const getArgsAndErrorsByStepId: Selector<
           ? {
               stepArgs: stepFormToArgs(
                 { ...hydratedForm, stepNumber: index + 1 },
-                contextualState,
-                enableConcurrentModuleActions
+                contextualState
               ),
             }
           : {

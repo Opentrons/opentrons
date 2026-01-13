@@ -10,7 +10,6 @@ import {
 } from '@opentrons/shared-data'
 
 import { PAUSE_UNTIL_TEMP } from '/protocol-designer/constants'
-import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 import * as fileDataSelectors from '/protocol-designer/file-data/selectors'
 import {
   getCurrentFormIsPresaved,
@@ -340,14 +339,9 @@ export interface SaveStepFormAction {
      * If no wait step needs to be created, this is ignored.
      */
     thermocyclerPauseStepId: StepIdType
-
-    enableConcurrentModuleActions: boolean
   }
 }
-export const _saveStepForm = (
-  form: FormData,
-  enableConcurrentModuleActions: boolean
-): SaveStepFormAction => {
+export const _saveStepForm = (form: FormData): SaveStepFormAction => {
   // if presaved, transform pseudo ID to real UUID upon save
   const id = form.id === PRESAVED_STEP_ID ? uuid() : form.id
   const adjustedForm = { ...form, id }
@@ -357,7 +351,6 @@ export const _saveStepForm = (
     payload: {
       form: adjustedForm,
       thermocyclerPauseStepId: uuid(),
-      enableConcurrentModuleActions,
     },
   }
 }
@@ -370,8 +363,6 @@ export const saveStepForm: () => ThunkAction<any> =
     const initialState = getState()
     const unsavedForm = getUnsavedForm(initialState)
     const isFirstTimeSavingThisForm = getCurrentFormIsPresaved(initialState)
-    const enableConcurrentModuleActions =
-      getEnableConcurrentModuleActions(initialState)
 
     // this check is only for TypeScript. At this point, unsavedForm should always be populated
     if (unsavedForm == null) {
@@ -392,7 +383,7 @@ export const saveStepForm: () => ThunkAction<any> =
     }
 
     // save the form
-    dispatch(_saveStepForm(unsavedForm, enableConcurrentModuleActions))
+    dispatch(_saveStepForm(unsavedForm))
 
     // Save any bonus steps that come with it.
     const isTempModSetTempForm =
@@ -435,8 +426,6 @@ export const saveStepForm: () => ThunkAction<any> =
 const saveWaitForTemperatureModuleTemp: (
   unsavedSetTemperatureForm: FormData
 ) => ThunkAction<any> = unsavedSetTemperatureForm => (dispatch, getState) => {
-  const enableConcurrentModuleActions =
-    getEnableConcurrentModuleActions(getState())
   const tempertureModuleId = unsavedSetTemperatureForm?.moduleId
   const temperature = unsavedSetTemperatureForm.targetTemperature
 
@@ -478,7 +467,7 @@ const saveWaitForTemperatureModuleTemp: (
   // finally save the new pause form
   const unsavedPauseForm = getUnsavedForm(getState())
   if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm, enableConcurrentModuleActions))
+    dispatch(_saveStepForm(unsavedPauseForm))
   } else {
     // this conditional is for TypeScript, the unsaved form should always exist
     console.assert(
@@ -491,8 +480,6 @@ const saveWaitForTemperatureModuleTemp: (
 const saveWaitForHeaterShakerTemp: (
   unsavedHeaterShakerForm: FormData
 ) => ThunkAction<any> = unsavedHeaterShakerForm => (dispatch, getState) => {
-  const enableConcurrentModuleActions =
-    getEnableConcurrentModuleActions(getState())
   const heaterShakerModuleId = unsavedHeaterShakerForm.moduleId
   const temperature = unsavedHeaterShakerForm.targetHeaterShakerTemperature
 
@@ -529,7 +516,7 @@ const saveWaitForHeaterShakerTemp: (
   // finally save the new pause form
   const unsavedPauseForm = getUnsavedForm(getState())
   if (unsavedPauseForm != null) {
-    dispatch(_saveStepForm(unsavedPauseForm, enableConcurrentModuleActions))
+    dispatch(_saveStepForm(unsavedPauseForm))
   } else {
     // this conditional is for TypeScript, the unsaved form should always exist
     console.assert(
