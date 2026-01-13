@@ -7,6 +7,7 @@ When you add modules to the robot deck, available module steps appear in the "Ad
 | Module and generation | Opentrons Flex | Opentrons OT-2 |
 | --------------------- | :--------------: | :--------: |
 | Absorbance Plate Reader Module GEN1 | :octicons-check-16: | :octicons-x-16: |
+| Flex Stacker Module GEN1 | :octicons-check-16: | :octicons-x-16: |
 | Heater-Shaker Module GEN1 | :octicons-check-16: | :octicons-x-16: |
 | Magnetic Module GEN1 | :octicons-x-16: | :octicons-check-16: |
 | Magnetic Module GEN2 | :octicons-x-16: | :octicons-check-16: |
@@ -17,7 +18,24 @@ When you add modules to the robot deck, available module steps appear in the "Ad
 | Thermocycler Module GEN2 | :octicons-check-16: | :octicons-check-16: |
 
 
-You can add multiple modules of the same type only on the Flex. Only one Thermocycler can be used on the Flex and the OT-2. 
+You can add multiple modules of the same type only on the Flex. Only one Thermocycler can be used on the Flex or the OT-2 deck. 
+
+## Flex Stacker Module steps
+
+You can add up to 4 Flex Stacker Modules in column 4, on the right side of your Flex. An attached Stacker Module can store additional well plates, tip racks, or reservoirs to use in your protocol. 
+
+Each Stacker Module includes the Stacker itself, which holds a labware stack of up to...
+
+There are three ways to add labware to the Stacker:
+
+- In the protocol starting deck, click the Stacker Module to add labware. Choose a labware type and quantity. 
+
+      When adding tip racks, enter a quantity and choose whether to add a lid to each tip rack in the menu.  
+
+      For well plates or reservoirs, select your labware from the list, then click **Edit liquid and quantity** in the labware menu on the right. Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. 
+
+- During the protocol, move labware to the Stacker shuttle in column 4. 
+
 
 ## Absorbance Plate Reader Module steps
 

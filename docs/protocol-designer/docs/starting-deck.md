@@ -19,7 +19,7 @@ To start, the deck includes your chosen modules and fixtures. Click **Deck hardw
 
 Next, click **Liquids** in the upper left. First, define a liquid to use in your protocol with a name, description, and color. You can also define the liquid as an Opentrons-verified liquid class to apply optimized pipetting settings during transfer and mix steps. 
 
-You'll also be able to add liquids to labware already on the robot deck.
+You'll also be able to define and add liquids in labware already on the robot deck.
 
 ## Labware
 
@@ -49,7 +49,7 @@ You can stack up to five lids to use later in your protocol in an open deck slot
 
 Click at the bottom of the labware list to upload a JSON file and use custom labware in your protocol. 
 
-Click **Edit liquid** in the labware menu on the right to add liquids you've already defined in your protocol. In the labware graphic, click and drag to select wells across rows and columns. From the dropdown menu, select your liquid and enter the starting volume for each well in microliters (µL). Click **Save** for each liquid added to your labware before clicking **Done**.  
+When editing labware, click **Edit liquid** in the labware menu on the right to define and add liquids. In the labware graphic, click and drag to select wells across rows and columns. From the dropdown menu, select your liquid and enter the starting volume for each well in microliters (µL). Click **Save** for each liquid added to your labware before clicking **Done**.  
 
 <figure class="screenshot" markdown>
   ![Add liquid](images/add_liquid.png)
@@ -64,7 +64,7 @@ To add labware to a module, click any open module and choose **Edit labware**.
   <figcaption>Add compatible labware to the Temperature Module. </figcaption>
 </figure>
 
-Protocol Designer only shows recommended labware in the list of available options. You can choose to view all labware, including labware that may be incompatible with the module. Add compatible adapters for modules on the deck from the "adapter" labware category. 
+Protocol Designer only shows recommended labware in the list of available options. You can choose to view more labware, including labware that may be incompatible with the module. Add compatible adapters for modules on the deck from the "adapter" labware category. 
 
 Use the toggle switch at the upper right of the protocol starting deck if you need to add any off-deck labware. You can place compatible labware on or off-deck and move to a module later in your protocol. You'll need to use a move step to add any labware to the Absorbance Plate Reader Module. 
 
