@@ -25,8 +25,7 @@ Opentrons offers a variety of hardware modules for our liquid handling robots. H
 | HEPA Module                | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
 | HEPA/UV Module             | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
 | Magnetic Block GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
-| Magnetic Module GEN1       | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
-| Magnetic Module GEN2       | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
+| Magnetic Module GEN1 & GEN2       | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
 | Stacker Module GEN1        | :octicons-x-12:{ .red } | :material-check-bold:{ .opentrons-blue } |
 | Temperature Module GEN1    | :material-check-bold:{ .opentrons-blue } | :octicons-x-12:{ .red } |
 | Temperature Module GEN2    | :material-check-bold:{ .opentrons-blue } | :material-check-bold:{ .opentrons-blue } |

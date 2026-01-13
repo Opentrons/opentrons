@@ -23,6 +23,7 @@ nav:
           - Modules: attachments/modules/index.md
           - Heater-Shaker: attachments/modules/heater-shaker.md
           - HEPA: attachments/modules/hepa.md
+          - Magnetic Module: attachments/modules/magnetic-module.md
   - Labware:
       - Labware: labware/index.md
       - Labware Concepts: labware/concepts.md
