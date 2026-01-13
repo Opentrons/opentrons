@@ -128,7 +128,7 @@ export function ProtocolDetailsHeader({
   const handleClickTimeline = (): void => {
     trackEvent({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
-      properties: {sourceLocation: 'protocol details header'},
+      properties: { sourceLocation: 'protocol details header' },
     })
     navigate(`/protocols/${protocolKey}/visualization`)
   }
