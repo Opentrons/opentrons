@@ -1,7 +1,7 @@
 """Protocol editor page object."""
 
 import re
-from typing import List, Literal, Optional, Union
+from typing import Literal
 
 from playwright.sync_api import Page
 
@@ -16,7 +16,7 @@ class PlateReaderPage(BasePage):
 
     def configure_module(self, slot: Literal["A3", "B3", "C3", "D3"], module: str) -> None:
         """Configure the Plate Reader module.
-        
+
         Args:
             slot: Either column 3 slot locations compatible with Plate Reader module
             module: Module name as appears in the module selection list
@@ -30,19 +30,23 @@ class PlateReaderPage(BasePage):
         """Dismiss the deck hardware modal if it appears."""
         self.page.get_by_test_id("Toast_info").get_by_role("button").click()
 
-    def define_initialization(self, init_setting: Literal["Single", "Multi"], wavelength: int | None = None,) -> None:
+    def define_initialization(
+        self,
+        init_setting: Literal["Single", "Multi"],
+        wavelength: int | None = None,
+    ) -> None:
         """Define initialization settings for the Plate Reader.
 
         Args:
             init_setting: Either "Single" or "Multi"
-            wavelength: Wavelength value for defining own wavelength ("Other") selection, or None if not doing custom wavelength
+            wavelength: Wavelength value for defining own wavelength ("Other") selection, or None if not
         """
         define_init = self.page.locator("div").filter(has_text=re.compile(r"^Define initialization settings$")).nth(1)
         change_lid = self.page.locator("div").filter(has_text=re.compile(r"^Change intialization settings$")).nth(1)
-        
+
         if define_init.is_visible() or change_lid.is_visible():
             if define_init.is_visible():
-                define_init.click()    
+                define_init.click()
             elif change_lid.is_visible():
                 change_lid.click()
 
@@ -54,7 +58,7 @@ class PlateReaderPage(BasePage):
         elif init_setting == "Multi":
             self._multi_initialization(4, wavelength)
             self.save_pr_step()
-    
+
     def change_lid_position(self, position: Literal["Open", "Closed"]) -> None:
         self.page.get_by_text("Change lid position").click()
         self.page.locator("div").filter(has_text=re.compile(r"^Change lid position$")).nth(1).click()
@@ -71,19 +75,19 @@ class PlateReaderPage(BasePage):
     def save_pr_step(self) -> None:
         """Click save transfer step button in transfer step."""
         self.page.get_by_text("Save", exact=True).click()
-    
+
     def button_selection(self, button_name: str) -> None:
         self.page.get_by_role("button", name=button_name).click()
 
     def _single_initialization(
-            self, 
-            nm_value: Literal["nm (blue)", "nm (green)", "nm (orange)", "nm (red)", "Other"], 
-            ref_wavelength_bool: bool, 
-            ref_nm: Literal["nm (blue)", "nm (green)", "nm (orange)", "nm (red)", "Other"] | None = None,
-            wavelength: int | None = None,) -> None:
-        
+        self,
+        nm_value: Literal["nm (blue)", "nm (green)", "nm (orange)", "nm (red)", "Other"],
+        ref_wavelength_bool: bool,
+        ref_nm: Literal["nm (blue)", "nm (green)", "nm (orange)", "nm (red)", "Other"] | None = None,
+        wavelength: int | None = None,
+    ) -> None:
         """Define single-wavelength initialization.
-        
+
         Args:
             nm_value: predefined wavelength selections from dropdown
             ref_wavelength_bool: Boolean to indicate whether to add a reference wavelength  or not
@@ -94,26 +98,34 @@ class PlateReaderPage(BasePage):
         self.page.locator("div").filter(has_text=re.compile(r"^Single$")).nth(1).click()
         self.page.get_by_test_id("dropdownMenu").locator("svg").click()
         if nm_value == "Other":
+            assert wavelength is not None, "wavelength must be provided when nm_value is 'Other'"
             self.button_selection(nm_value)
             self._define_custom_wavelength(wavelength)
         else:
             self.button_selection(nm_value)
 
-        if ref_wavelength_bool == True:
-            self.page.get_by_test_id("ListButton_noActive").locator("div").filter(has_text="Add reference wavelength?").locator("div").click()
+        if ref_wavelength_bool:
+            self.page.get_by_test_id("ListButton_noActive").locator("div").filter(
+                has_text="Add reference wavelength?"
+            ).locator("div").click()
             self.page.get_by_test_id("dropdownMenu").locator("svg").last.click()
             if ref_nm == "Other":
+                assert wavelength is not None, "wavelength must be provided when reference wavelength is 'Other'"
                 self.button_selection(ref_nm)
                 self._define_custom_wavelength(wavelength)
             else:
+                assert ref_nm is not None, "reference wavelength must be provided when ref_wavelength_bool is True"
                 self.button_selection(ref_nm)
-            
-        
-    def _multi_initialization(self, num_wavelengths: int, wavelength: int | None = None,) -> None:
+
+    def _multi_initialization(
+        self,
+        num_wavelengths: int,
+        wavelength: int | None = None,
+    ) -> None:
         """Define multi-wavelength initialization.
 
         Args:
-            num_wavelengths: Number of wavelengths to select (1-6) will be selecting 4 simply for testing each wavelength
+            num_wavelengths: Number of wavelengths to select (1-6), selecting 4 simply for testing each wavelength
             wavelength: Wavelength value for "Other" selection, e.g. "500"
         """
         nm = ["nm (green)", "nm (orange)", "nm (red)", "Other"]
@@ -127,7 +139,7 @@ class PlateReaderPage(BasePage):
             for i in range(num_wavelengths):
                 label = nm[i]
                 self.page.get_by_test_id("EmptySelectorButton_click").click()
-                self.page.get_by_test_id("dropdownMenu").nth(i+1).click()
+                self.page.get_by_test_id("dropdownMenu").nth(i + 1).click()
                 self.button_selection(label)
                 if label == "Other" and wavelength is not None:
                     self._define_custom_wavelength(wavelength)

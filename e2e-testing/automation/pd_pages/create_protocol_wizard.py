@@ -76,5 +76,4 @@ class CreateProtocolWizard(BasePage):
     def name_protocol(self, protocol_name: str) -> None:
         """Fill in the protocol name input box."""
 
-        self.page.locator("input[name=\"fields.name\"]").fill(protocol_name)
-
+        self.page.locator('input[name="fields.name"]').fill(protocol_name)
