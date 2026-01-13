@@ -19,7 +19,9 @@ nav:
   - Instruments and Modules:
       - Instruments and Modules: attachments/index.md
       - Instruments: attachments/instruments.md
-      - Modules: attachments/modules.md
+      - Modules:
+          - Modules: attachments/modules/index.md
+          - Heater-Shaker: attachments/modules/heater-shaker.md
   - Labware:
       - Labware: labware/index.md
       - Labware Concepts: labware/concepts.md

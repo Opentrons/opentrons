@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Modules"
 ---
 
-Modules are a class of deck- or externally-mounted hardware hardware. You can use an OT-2 with several hardware modules that add features and capabilities to the robot. The OT-2 communicates with and controls most modules through a USB connection.
+Modules are a class of deck- or externally-mounted hardware. You can use an OT-2 with several hardware modules that add features and capabilities to the robot. The OT-2 communicates with and controls most modules through a USB connection.
 
 This chapter summarizes the functions and physical specifications of modules that are compatible with the OT-2.
 
@@ -11,6 +11,10 @@ This chapter summarizes the functions and physical specifications of modules tha
     - For information about integrating modules into your protocols, see the [Protocol Designer Instruction Manual](https://docs.opentrons.com/protocol-designer/) or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
 
 ## Supported modules
+
+
+
+## Compatibility table
 
 Opentrons offers a variety of hardware modules for our liquid handling robots. However, not all modules are compatible with the OT-2. The table below identifies which modules you can use. A :material-check-bold:{ .opentrons-blue } indicates OT-2 compatibility, and a :octicons-x-12:{ .red } indicates the module is incompatible.
 
