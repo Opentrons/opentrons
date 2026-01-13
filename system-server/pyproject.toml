@@ -118,7 +118,7 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['system_server', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['system_server', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel]
 packages = ['system_server']

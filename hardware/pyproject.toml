@@ -97,7 +97,7 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['opentrons_hardware', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['opentrons_hardware', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel]
 packages = ['opentrons_hardware']

@@ -141,11 +141,7 @@ include = [
    'robot/schemas',
    'robot/definitions',
    'LICENSE',
-   'mypy.ini',
-   'pytest.ini',
-   '.flake8',
-   'Pipfile',
-   'Pipfile.lock',
+   'uv.lock',
 ]
 
 [tool.hatch.build.targets.wheel]

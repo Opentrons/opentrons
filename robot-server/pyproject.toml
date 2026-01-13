@@ -168,9 +168,6 @@ include = [
     "robot_server",
     "LICENSE",
     "tests",
-    "mypy.ini",
-    "pytest.ini",
-    ".flake8",
     "uv.lock",
 ]
 

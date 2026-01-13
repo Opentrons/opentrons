@@ -100,7 +100,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ['ot3usb', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['ot3usb', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'ot3usb/LICENSE'

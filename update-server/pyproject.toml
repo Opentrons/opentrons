@@ -95,5 +95,6 @@ exclude = [
 'LICENSE' = 'opentrons/LICENSE'
 
 [tool.hatch.build.target.sdist]
-include = ['otupdate', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['otupdate', 'LICENSE', 'tests', 'uv.lock']
+
 

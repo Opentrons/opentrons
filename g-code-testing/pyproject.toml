@@ -104,10 +104,18 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ['g_code_parsing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['g_code_parsing', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'g_code_parsing/LICENSE'
+
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "slow: mark test as slow",
+    "g_code_confirm: mark test as a G-Code confirmation test",
+]
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
