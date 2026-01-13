@@ -22,7 +22,7 @@ import {
 } from '@opentrons/components'
 import {
   getFullStackFromLabwares,
-  getLiquidIdsOnLabware,
+  getLiquidIdsOnLabwareStack,
   HOPPER_STACKER_LOCATION,
 } from '@opentrons/step-generation'
 
@@ -30,7 +30,6 @@ import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
@@ -63,22 +62,19 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         : !deckSetupLabware[id].def.allowedRoles?.includes('adapter'))
   )
   const isOnHopper = labware.stack.includes(HOPPER_STACKER_LOCATION)
-  const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
   const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
-  const wellContents =
+  const allFullWellContents =
     allWellContentsForActiveItem != null
-      ? allWellContentsForActiveItem[labware.id]
-      : null
+      ? Object.values(allWellContentsForActiveItem)
+      : []
   const displayName = def.metadata.displayName
-  const nickName = nickNames[labware.id]
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
   const isLid = def.allowedRoles?.includes('lid')
-  const isNicknameDifferent = nickName !== displayName
-  const liquidIds = getLiquidIdsOnLabware(wellContents)
+  const liquidIds = getLiquidIdsOnLabwareStack(allFullWellContents)
   const canModifyQuantity =
     isOnHopper || (def.stackLimit != null && def.stackLimit > 1)
 
@@ -137,16 +133,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText desktopStyle="bodyDefaultSemiBold">
-                  {nickName}
+                  {displayName}
                 </StyledText>
-                {isNicknameDifferent ? (
-                  <StyledText
-                    desktopStyle="bodyDefaultRegular"
-                    color={COLORS.grey60}
-                  >
-                    {displayName}
-                  </StyledText>
-                ) : null}
                 {lidId != null && deckSetupLabware[lidId] != null ? (
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
@@ -163,11 +151,11 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                       text={
                         liquidIds.length === 0
                           ? t('no_liquids_added')
-                          : t('num_liquid', { count: liquidIds.length })
+                          : t('multiple_liquid_layouts')
                       }
                     />
                   ) : null}
-                  {quantity > 1 ? (
+                  {quantity >= 1 ? (
                     <LiquidInfoDisplay
                       text={`Quantity: ${quantity.toString()}`}
                     />
