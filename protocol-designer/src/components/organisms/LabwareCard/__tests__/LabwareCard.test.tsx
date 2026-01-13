@@ -3,8 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { fixture96Plate } from '@opentrons/shared-data'
 import {
-  getFullStackFromLabwares,
   getLiquidIdsOnLabware,
+  getPrimaryLabwareInAllLabwareStacks,
 } from '@opentrons/step-generation'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
@@ -61,7 +61,7 @@ describe('LabwareCard', () => {
       quantity: 1,
       location: 'A1',
     }
-    vi.mocked(getFullStackFromLabwares).mockReturnValue([
+    vi.mocked(getPrimaryLabwareInAllLabwareStacks).mockReturnValue([
       'lidId',
       'labwreId',
       'A1',

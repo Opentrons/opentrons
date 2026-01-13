@@ -21,8 +21,8 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  getFullStackFromLabwares,
   getLiquidIdsOnLabware,
+  getPrimaryLabwareInAllLabwareStacks,
   HOPPER_STACKER_LOCATION,
 } from '@opentrons/step-generation'
 
@@ -46,14 +46,16 @@ interface LabwareCardProps {
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { labware, lidId, quantity, location } = props
-  console.log('🚀 ~ LabwareCard ~ quantity:', quantity)
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
   const { def } = labware
   const [showQuantityModal, setShowQuantityModal] = useState<boolean>(false)
   const { labware: deckSetupLabware } = useSelector(getDeckSetupForActiveItem)
-  const largestStack = getFullStackFromLabwares(deckSetupLabware, location)
+  const largestStack = getPrimaryLabwareInAllLabwareStacks(
+    deckSetupLabware,
+    location
+  )
   const isLabwareCardForAdapter = labware.def.allowedRoles?.includes('adapter')
   const filteredStack = largestStack.filter(
     id =>
