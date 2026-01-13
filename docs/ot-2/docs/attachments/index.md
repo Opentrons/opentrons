@@ -9,21 +9,3 @@ The OT-2 is a remarkable robot by itself, but it needs specialized gantry and de
 - [Modules](./modules/index.md) are hardware deck-mounted hardware modules that add features and capabilities to the robot. The OT-2 communicates and controls most modules through a USB connection.
 
 This chapter summarizes the functions and physical specifications of Opentrons modules that are compatible with an OT-2.
-
-## Supported modules
-
-- Pipettes
-- Attaching
-- Calibration
-
-
-
-
-## Modules
-
-- HEPA
-- Magnetic
-- Temperature
-- TC
-
-## Chemical compatibility

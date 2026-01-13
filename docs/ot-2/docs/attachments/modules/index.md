@@ -12,7 +12,7 @@ This chapter summarizes the functions and physical specifications of modules tha
 
 ## Supported modules
 
-
+- The [Heater-Shaker Module](./heater-shaker.md) provides on-deck heating and orbital shaking. The module can be heated to 95 °C, and can shake samples from 200 to 3000 rpm.
 
 ## Compatibility table
 
