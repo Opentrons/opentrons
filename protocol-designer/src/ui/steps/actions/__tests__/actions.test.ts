@@ -327,7 +327,11 @@ describe('steps actions', () => {
           const actions = store.getActions()
           expect(actions[0]).toEqual({
             type: 'SAVE_STEP_FORM',
-            payload: temperatureForm,
+            payload: {
+              form: temperatureForm,
+              thermocyclerPauseStepId: expect.any(String),
+              enableConcurrentModuleActions: true,
+            },
           })
           if (shouldAddBonusStep) {
             expect(actions[1].type).toStrictEqual('ADD_STEP')
@@ -391,7 +395,11 @@ describe('steps actions', () => {
           const actions = store.getActions()
           expect(actions[0]).toEqual({
             type: 'SAVE_STEP_FORM',
-            payload: heaterShakerForm,
+            payload: {
+              form: heaterShakerForm,
+              thermocyclerPauseStepId: expect.any(String),
+              enableConcurrentModuleActions: true,
+            },
           })
           if (shouldAddBonusStep) {
             expect(actions[1].type).toStrictEqual('ADD_STEP')
@@ -407,65 +415,6 @@ describe('steps actions', () => {
               )
               expect(actions[5].type).toStrictEqual('SAVE_STEP_FORM')
             }
-          }
-        }
-      )
-    })
-
-    describe('thermocycler profile form', () => {
-      it.each([
-        {
-          description:
-            'should automatically add bonus step when enableConcurrentModuleActions is true',
-          enableConcurrentModuleActions: true,
-          shouldAddBonusStep: true,
-        },
-        {
-          description:
-            'should NOT add bonus step when enableConcurrentModuleActions is false',
-          enableConcurrentModuleActions: false,
-          shouldAddBonusStep: false,
-        },
-      ])(
-        '$description',
-        ({ enableConcurrentModuleActions, shouldAddBonusStep }) => {
-          const thermocyclerForm: FormData = {
-            id: 'step_123',
-            stepType: 'thermocycler',
-            thermocyclerFormType: 'thermocyclerProfile',
-            moduleId: 'thermocyclerId',
-          }
-
-          when(vi.mocked(stepFormSelectors.getUnsavedForm))
-            .calledWith(expect.anything())
-            .thenReturn(thermocyclerForm)
-          when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
-            .calledWith(expect.anything())
-            .thenReturn(true)
-          when(vi.mocked(featureFlagSelectors.getEnableConcurrentModuleActions))
-            .calledWith(expect.anything())
-            .thenReturn(enableConcurrentModuleActions)
-
-          const store: any = mockStore()
-          store.dispatch(saveStepForm())
-
-          const actions = store.getActions()
-          expect(actions[0]).toEqual({
-            type: 'SAVE_STEP_FORM',
-            payload: thermocyclerForm,
-          })
-
-          if (shouldAddBonusStep) {
-            expect(actions[1].type).toStrictEqual('ADD_STEP')
-            expect(actions[2].payload.update.pauseAction).toStrictEqual(
-              'untilThermocyclerProfileComplete'
-            )
-            expect(actions[3].payload.update.moduleId).toStrictEqual(
-              'thermocyclerId'
-            )
-            expect(actions[4].type).toStrictEqual('SAVE_STEP_FORM')
-          } else {
-            expect(actions.length).toStrictEqual(1)
           }
         }
       )
