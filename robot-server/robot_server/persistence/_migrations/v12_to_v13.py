@@ -81,7 +81,7 @@ def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) ->
     for table_row in old_boolean_settings:
         connection.execute(
             sqlalchemy.insert(schema_13.boolean_setting_table).values(
-                key=table_row.key, value=table_row.value
+                key=table_row.key.value, value=table_row.value
             )
         )
     new_rows = [
