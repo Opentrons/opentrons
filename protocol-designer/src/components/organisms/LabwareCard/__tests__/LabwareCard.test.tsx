@@ -13,7 +13,6 @@ import { i18n } from '../../../../assets/localization'
 import { openIngredientSelector } from '../../../../labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '../../../../top-selectors/labware-locations'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
-import { getLabwareNicknamesById } from '../../../../ui/labware/selectors'
 import { EditLabwareQuantityModal } from '../../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../../LabwareCardOverflowMenu'
 import { LabwareCard } from '../index'
@@ -73,9 +72,6 @@ describe('LabwareCard', () => {
     vi.mocked(LabwareCardOverflowMenu).mockReturnValue(
       <div>mock LabwareCardOverflowMenu</div>
     )
-    vi.mocked(getLabwareNicknamesById).mockReturnValue({
-      labwareId: 'mock NickName',
-    })
     vi.mocked(
       wellContentsSelectors.getAllWellContentsForActiveItem
     ).mockReturnValue(null)
@@ -108,7 +104,6 @@ describe('LabwareCard', () => {
 
   it('renders a labware card with the liquids button and overflow menu', () => {
     render(props)
-    screen.getByText('mock NickName')
     screen.getByText('ANSI 96 Standard Microplate')
     screen.getByText('No liquids added')
     screen.getByText('with mock lid')
@@ -135,7 +130,6 @@ describe('LabwareCard', () => {
       def: { ...fixture96Plate, stackLimit: 4 } as LabwareDefinition2,
     }
     render(props)
-    screen.getByText('mock NickName')
     screen.getByText('ANSI 96 Standard Microplate')
     screen.getByText('Quantity: 2')
     screen.getByText('Edit liquid and quantity')

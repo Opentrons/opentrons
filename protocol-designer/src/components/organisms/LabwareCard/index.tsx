@@ -30,7 +30,6 @@ import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
-import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
 
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
@@ -47,6 +46,7 @@ interface LabwareCardProps {
 
 export function LabwareCard(props: LabwareCardProps): JSX.Element {
   const { labware, lidId, quantity, location } = props
+  console.log("🚀 ~ LabwareCard ~ quantity:", quantity)
   const navigate = useNavigate()
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { t } = useTranslation('starting_deck_state')
@@ -63,7 +63,6 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
         : !deckSetupLabware[id].def.allowedRoles?.includes('adapter'))
   )
   const isOnHopper = labware.stack.includes(HOPPER_STACKER_LOCATION)
-  const nickNames = useSelector(getLabwareNicknamesById)
   const allWellContentsForActiveItem = useSelector(
     wellContentsSelectors.getAllWellContentsForActiveItem
   )
@@ -73,11 +72,9 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
       ? allWellContentsForActiveItem[labware.id]
       : null
   const displayName = def.metadata.displayName
-  const nickName = nickNames[labware.id]
   const isAdapterOrTiprack =
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
   const isLid = def.allowedRoles?.includes('lid')
-  const isNicknameDifferent = nickName !== displayName
   const liquidIds = getLiquidIdsOnLabware(wellContents)
   const canModifyQuantity =
     isOnHopper || (def.stackLimit != null && def.stackLimit > 1)
@@ -137,16 +134,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
             >
               <Flex flexDirection={DIRECTION_COLUMN}>
                 <StyledText desktopStyle="bodyDefaultSemiBold">
-                  {nickName}
+                  {displayName}
                 </StyledText>
-                {isNicknameDifferent ? (
-                  <StyledText
-                    desktopStyle="bodyDefaultRegular"
-                    color={COLORS.grey60}
-                  >
-                    {displayName}
-                  </StyledText>
-                ) : null}
                 {lidId != null && deckSetupLabware[lidId] != null ? (
                   <StyledText
                     desktopStyle="bodyDefaultRegular"
