@@ -183,6 +183,8 @@ async def get_camera_capture_image_settings(
     result = camera_settings_store.get_camera_capture_image_settings(
         camera_id=cameraId if DEFAULT_CAMERA_ID not in cameraId else DEFAULT_CAMERA_PATH
     )
+    # todo(chb, 2025-01-14): At some point we need to dereference camera devices and camera ids, and dedicate entirely one way or another.
+    # This isn't done now because of how the device field is pulled as a default camera by other sources for ffmpeg.
 
     return result
 
