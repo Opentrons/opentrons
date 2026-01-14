@@ -21,7 +21,6 @@ describe('thermocyclerFormToArgs', () => {
   const testCases: Array<{
     formData: GetCastFormData<HydratedThermocyclerFormData>
     expected: ThermocyclerStateStepArgs | ThermocyclerProfileStepArgs
-    enableConcurrentModuleActions: boolean
     testName: string
   }> = [
     {
@@ -65,7 +64,6 @@ describe('thermocyclerFormToArgs', () => {
         lidTargetTemp: 40,
         lidOpen: false,
       },
-      enableConcurrentModuleActions: true,
     },
     {
       testName: 'all active temps',
@@ -101,7 +99,6 @@ describe('thermocyclerFormToArgs', () => {
         lidTargetTemp: 40,
         lidOpen: false,
       },
-      enableConcurrentModuleActions: true,
     },
     {
       testName: 'inactive block - wrong (?) types',
@@ -144,7 +141,6 @@ describe('thermocyclerFormToArgs', () => {
         lidTargetTemp: 40,
         lidOpen: false,
       },
-      enableConcurrentModuleActions: true,
     },
     {
       testName: 'inactive block',
@@ -180,7 +176,6 @@ describe('thermocyclerFormToArgs', () => {
         lidTargetTemp: 40,
         lidOpen: false,
       },
-      enableConcurrentModuleActions: true,
     },
     {
       testName: 'profile with cycles - wrong (?) types',
@@ -238,6 +233,9 @@ describe('thermocyclerFormToArgs', () => {
             ],
           },
         },
+        blockIsActive: false,
+        // Hold options are deprecated and should be ignored:
+        lidOpenHold: true,
         blockIsActiveHold: true,
         // @ts-expect-error - See comment above.
         // blockTargetTemp and blockTargetTempHold can never be null according to their castValue,
@@ -248,17 +246,12 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActiveHold: true,
         // @ts-expect-error - See comment above.
         lidTargetTempHold: '5',
-        lidOpenHold: true,
-        blockIsActive: false,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
-        concurrent: false,
+        concurrent: true,
         moduleId: tcModuleId,
         description: 'mock details',
-        blockTargetTempHold: null,
-        lidOpenHold: true,
-        lidTargetTempHold: 5,
         profileElements: [
           // top-level step
           { celsius: 5, holdSeconds: 50 },
@@ -309,7 +302,6 @@ describe('thermocyclerFormToArgs', () => {
           ],
         },
       },
-      enableConcurrentModuleActions: false,
     },
     {
       testName: 'profile with cycles',
@@ -362,131 +354,13 @@ describe('thermocyclerFormToArgs', () => {
             ],
           },
         },
+        blockIsActive: false,
+        // Hold options are deprecated and should be ignored:
+        lidOpenHold: true,
         blockIsActiveHold: true,
-        blockTargetTempHold: 0,
+        blockTargetTempHold: 999,
         lidIsActiveHold: true,
-        lidTargetTempHold: 5,
-        lidOpenHold: true,
-        blockIsActive: false,
-      },
-      expected: {
-        commandCreatorFnName: THERMOCYCLER_PROFILE,
-        concurrent: false,
-        moduleId: tcModuleId,
-        description: 'mock details',
-        // todo(mm, 2025-10-09): See comments above about blockTargetTemp and blockTargetTempHold nullability.
-        blockTargetTempHold: 0,
-        lidOpenHold: true,
-        lidTargetTempHold: 5,
-        profileElements: [
-          // top-level step
-          { celsius: 5, holdSeconds: 50 },
-          // cycle
-          {
-            steps: [
-              { celsius: 12, holdSeconds: 62 },
-              { celsius: 99, holdSeconds: 45 },
-            ],
-            repetitions: 2,
-          },
-        ],
-        profileTargetLidTemp: 40,
-        profileVolume: 4,
-        meta: {
-          rawProfileItems: [
-            {
-              type: 'profileStep',
-              id: 'profileItem1',
-              title: 'Top level step',
-              temperature: '5',
-              durationMinutes: '',
-              durationSeconds: '50',
-            },
-            {
-              id: 'profileItem2',
-              type: 'profileCycle',
-              repetitions: '2',
-              steps: [
-                {
-                  type: 'profileStep',
-                  id: 'item2A',
-                  title: 'Step A in cycle',
-                  temperature: '12',
-                  durationMinutes: '1',
-                  durationSeconds: '2',
-                },
-                {
-                  type: 'profileStep',
-                  id: 'item2B',
-                  title: 'Step B in cycle',
-                  temperature: '99',
-                  durationMinutes: '',
-                  durationSeconds: '45',
-                },
-              ],
-            },
-          ],
-        },
-      },
-      enableConcurrentModuleActions: false,
-    },
-    {
-      testName: 'concurrent profile',
-      formData: {
-        ...getDefaultsForStepType('thermocycler'),
-        stepType: 'thermocycler',
-        id: 'testId',
-        stepName: 'mock name',
-        stepDetails: 'mock details',
-        moduleId: tcModuleId,
-        thermocyclerFormType: THERMOCYCLER_PROFILE,
-        blockTargetTemp: 9999,
-        lidIsActive: true,
-        lidTargetTemp: 40,
-        lidOpen: false,
-        profileVolume: '4',
-        profileTargetLidTemp: '40',
-        orderedProfileItems: ['profileItem1', 'profileItem2'],
-        stepNumber: 1,
-        profileItemsById: {
-          profileItem1: {
-            type: 'profileStep',
-            id: 'profileItem1',
-            title: 'Top level step',
-            temperature: '5',
-            durationMinutes: '',
-            durationSeconds: '50',
-          },
-          profileItem2: {
-            id: 'profileItem2',
-            type: 'profileCycle',
-            repetitions: '2',
-            steps: [
-              {
-                type: 'profileStep',
-                id: 'item2A',
-                title: 'Step A in cycle',
-                temperature: '12',
-                durationMinutes: '1',
-                durationSeconds: '2',
-              },
-              {
-                type: 'profileStep',
-                id: 'item2B',
-                title: 'Step B in cycle',
-                temperature: '99',
-                durationMinutes: '',
-                durationSeconds: '45',
-              },
-            ],
-          },
-        },
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        blockIsActive: false,
-        blockTargetTempHold: 0,
-        lidTargetTempHold: 0,
+        lidTargetTempHold: 999,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
@@ -543,17 +417,12 @@ describe('thermocyclerFormToArgs', () => {
           ],
         },
       },
-      enableConcurrentModuleActions: true,
     },
   ]
 
-  testCases.forEach(
-    ({ formData, expected, enableConcurrentModuleActions, testName }) => {
-      it(`should translate "thermocyclerState" to args: ${testName}`, () => {
-        expect(
-          thermocyclerFormToArgs(formData, enableConcurrentModuleActions)
-        ).toEqual(expected)
-      })
-    }
-  )
+  testCases.forEach(({ formData, expected, testName }) => {
+    it(`should translate "thermocyclerState" to args: ${testName}`, () => {
+      expect(thermocyclerFormToArgs(formData)).toEqual(expected)
+    })
+  })
 })

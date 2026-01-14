@@ -24,6 +24,7 @@ import {
 } from '@opentrons/components'
 import {
   getSlotInLocationStack,
+  HOPPER_STACKER_LOCATION,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
@@ -113,6 +114,7 @@ export function AssignLiquidsModal(
   const labwareStack = labware[labwareId].stack
   const labwareDef = labwareEntities[labwareId]?.def
   const wellContents = allWellContents[labwareId]
+
   const selectableLabwareProps: {
     wellLabelOption: typeof WELL_LABEL_OPTIONS.SHOW_LABEL_INSIDE
     definition: typeof labwareDef
@@ -130,6 +132,8 @@ export function AssignLiquidsModal(
     ),
   }
 
+  const labwareIsOnHopper = labwareStack.includes(HOPPER_STACKER_LOCATION)
+
   return (
     <Flex
       height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
@@ -138,7 +142,7 @@ export function AssignLiquidsModal(
       position={POSITION_RELATIVE}
     >
       <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
-        {labwareStack.length > 1 ? (
+        {labwareIsOnHopper && labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
             selectedLabwareIds={selectedLabwareIds}
@@ -278,12 +282,14 @@ export function AssignLiquidsModalContainer(
 
   // All selectors moved here
   const nickNames = useSelector(getLabwareNicknamesById)
-  const labwareId = useSelector(selectors.getSelectedLabwareId)
+  const selectedLabwareId = useSelector(selectors.getSelectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const selectedLabwareIds =
-    useSelector(selectors.getSelectedLabwareIds) ?? ([labwareId] as string[])
+    useSelector(selectors.getSelectedLabwareIds) ??
+    ([selectedLabwareId] as string[])
+  // TODO(tz, 2026-01-12): change this to use liquid locations instead of this method and remove getWellContentsForLabwareStack method
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
   )
@@ -292,7 +298,7 @@ export function AssignLiquidsModalContainer(
 
   const data: AssignLiquidsModalData = {
     nickNames,
-    labwareId: labwareId ?? null,
+    labwareId: selectedLabwareId ?? null,
     selectedWells,
     labware,
     labwareEntities,

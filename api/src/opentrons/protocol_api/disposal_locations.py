@@ -78,7 +78,7 @@ class _DisposalLocation(TypingProtocol):
 class TrashBin(_DisposalLocation):
     """Represents a Flex or OT-2 trash bin.
 
-    See :py:meth:`.ProtocolContext.load_trash_bin`.
+    See [`load_trash_bin()`][opentrons.protocol_api.ProtocolContext.load_trash_bin].
     """
 
     def __init__(
@@ -103,11 +103,11 @@ class TrashBin(_DisposalLocation):
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> TrashBin:
         """Add a location offset to a trash bin.
 
-        The default location (``x``, ``y``, and ``z`` all set to ``0``) is the center of
+        The default location (`x`, `y`, and `z` all set to `0`) is the center of
         the bin on the x- and y-axes, and slightly below its physical top on the z-axis.
 
         Offsets can be positive or negative and are measured in mm.
-        See :ref:`protocol-api-deck-coords`.
+        See [Position Relative to the Deck][position-relative-to-the-deck].
         """
         return TrashBin(
             location=self._location,
@@ -163,7 +163,7 @@ class TrashBin(_DisposalLocation):
 class WasteChute(_DisposalLocation):
     """Represents a Flex waste chute.
 
-    See :py:meth:`.ProtocolContext.load_waste_chute`.
+    See [`load_waste_chute()`][opentrons.protocol_api.ProtocolContext.load_waste_chute].
     """
 
     def __init__(
@@ -180,13 +180,13 @@ class WasteChute(_DisposalLocation):
     def top(self, x: float = 0, y: float = 0, z: float = 0) -> WasteChute:
         """Add a location offset to a waste chute.
 
-        The default location (``x``, ``y``, and ``z`` all set to ``0``) is the center of
+        The default location (`x`, `y`, and `z` all set to `0`) is the center of
         the chute's opening on the x- and y-axes, and slightly below its physical top
-        on the z-axis. See :ref:`configure-waste-chute` for more information on possible
+        on the z-axis. See [Waste Chute][waste-chute-api] for more information on possible
         configurations of the chute.
 
         Offsets can be positive or negative and are measured in mm.
-        See :ref:`protocol-api-deck-coords`.
+        See [Position Relative to the Deck][position-relative-to-the-deck].
         """
         return WasteChute(
             engine_client=self._engine_client,

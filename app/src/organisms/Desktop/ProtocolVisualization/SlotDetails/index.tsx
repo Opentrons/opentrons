@@ -1,5 +1,9 @@
 import { getIsTiprack } from '@opentrons/shared-data'
-import { getFullStackFromLabwares } from '@opentrons/step-generation'
+import {
+  FAKE_HOPPER_LOCATION_MAP,
+  getFullStackFromLabwares,
+  HOPPER_FAKE_LOCATIONS,
+} from '@opentrons/step-generation'
 
 import { SlotDetailsEmptyState } from '/app/molecules/SlotDetailsEmptyState'
 
@@ -14,7 +18,11 @@ import type {
   ProtocolAnalysisOutput,
   RunTimeCommand,
 } from '@opentrons/shared-data'
-import type { InvariantContext, RobotState } from '@opentrons/step-generation'
+import type {
+  HopperLocationMapKey,
+  InvariantContext,
+  RobotState,
+} from '@opentrons/step-generation'
 
 interface SlotDetailsProps {
   slotId: string
@@ -37,8 +45,12 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
   } = invariantContext
   const { commands } = analysis
   const stackOfLabwareOnSlot = getFullStackFromLabwares(labware, slotId)
+  const isHopperSlot = HOPPER_FAKE_LOCATIONS.includes(slotId)
+  const mappedSlot = isHopperSlot
+    ? FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]
+    : slotId
   const moduleOnSlot = Object.entries(modules).find(
-    ([id, module]) => module.slot === slotId
+    ([id, module]) => module.slot === mappedSlot
   )
   const topMostLabwareOnSlot =
     stackOfLabwareOnSlot?.length > 1 ? stackOfLabwareOnSlot[0] : null

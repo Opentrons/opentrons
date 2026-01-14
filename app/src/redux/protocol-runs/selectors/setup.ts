@@ -83,7 +83,7 @@ export const getCameraUsageState = (
   runId: string
 ): Types.CameraState => {
   const cameraStep =
-    state.protocolRuns[runId]?.setup[Constants.CAMERA_SETUP_STEP_KEY]
+    state.protocolRuns[runId]?.setup?.[Constants.CAMERA_SETUP_STEP_KEY]
   if (cameraStep == null) {
     return INITIAL_CAMERA_STATE
   }
