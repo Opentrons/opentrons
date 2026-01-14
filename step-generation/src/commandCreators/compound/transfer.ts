@@ -443,10 +443,15 @@ export const transfer: CommandCreator<TransferArgs> = (
   const destTrashPythonName =
     trashBinEntities[destLabware]?.pythonName ??
     wasteChuteEntities[destLabware]?.pythonName
+  // The transfer_with_liquid_class(trash_location=...) argument is normally meant for
+  // the tip drop location. However, PD manually issues a drop_tip() after the transfer,
+  // so we don't need to specify the tip drop location in trash_location.
+  // On the other hand, PD lets the user choose a blowout location that's DIFFERENT from
+  // the tip drop location. The API normally does not support this, because if you say
+  // `blowout: {location: "trash"}`, that means to blow out that the trash_location.
+  // To support PD's use case, we're going to abuse the API, and set the trash_location
+  // to the BLOWOUT LOCATION instead if we're blowing out to a trash fixture.
   const trashPythonName =
-    trashBinEntities[dropTipLocation]?.pythonName ??
-    wasteChuteEntities[dropTipLocation]?.pythonName
-  const blowoutTrashPythonName =
     blowoutLocation == null
       ? null
       : (trashBinEntities[blowoutLocation]?.pythonName ??
@@ -515,14 +520,8 @@ export const transfer: CommandCreator<TransferArgs> = (
       pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPythonName
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
-    ...(isReturnTip
-      ? [
-          'return_tip=True',
-          ...(blowoutTrashPythonName != null
-            ? [`trash_location=${blowoutTrashPythonName}`]
-            : []),
-        ]
-      : [`trash_location=${trashPythonName}`, 'keep_last_tip=True']),
+    ...(trashPythonName ? [`trash_location=${trashPythonName}`] : []),
+    ...(isReturnTip ? ['return_tip=True'] : ['keep_last_tip=True']),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [

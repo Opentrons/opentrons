@@ -167,7 +167,6 @@ mock_pipette.transfer_with_liquid_class(
     source=[mock_source_plate["A1"]],
     dest=[mock_dest_plate["B2"]],
     new_tip="always",
-    trash_location=waste_chute,
     keep_last_tip=True,
     tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
@@ -359,7 +358,6 @@ mock_pipette.transfer_with_liquid_class(
     source=[mock_source_plate["A1"]],
     dest=[mock_dest_plate["B2"]],
     new_tip="never",
-    trash_location=trash_bin_1,
     keep_last_tip=True,
     tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
@@ -613,7 +611,6 @@ mock_pipette.transfer_with_liquid_class(
     source=[mock_source_plate["A1"], mock_source_plate["A2"]],
     dest=[mock_dest_plate["B2"], mock_dest_plate["C2"]],
     new_tip="never",
-    trash_location=trash_bin_1,
     keep_last_tip=True,
     tip_racks=[mock_tip_rack_1, mock_tip_rack_2],
     liquid_class=protocol.define_liquid_class(
