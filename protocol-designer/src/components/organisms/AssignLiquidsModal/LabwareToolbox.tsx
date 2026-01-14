@@ -137,15 +137,14 @@ export function LabwareStackToolbox({
           })
         )
         // add on-deck labware
-      } else {
-        if (labware[labwareId].labwareDefURI)
-          dispatch(
-            createContainer({
-              labwareDefURIStack: [labware[labwareId]?.labwareDefURI ?? ''],
-              slot: labwareId,
-              updateSelectedLabwareId: true,
-            })
-          )
+      } else if (labware[labwareId].labwareDefURI) {
+        dispatch(
+          createContainer({
+            labwareDefURIStack: [labware[labwareId]?.labwareDefURI ?? ''],
+            slot: labwareId,
+            updateSelectedLabwareId: true,
+          })
+        )
       }
     } else {
       makeSnackbar(t('no_more_space_in_slot') as string)
