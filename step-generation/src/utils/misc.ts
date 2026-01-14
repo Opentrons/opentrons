@@ -89,7 +89,7 @@ import type {
 export const AIR: '__air__' = '__air__'
 export const SOURCE_WELL_BLOWOUT_DESTINATION: 'source_well' = 'source_well'
 export const DEST_WELL_BLOWOUT_DESTINATION: 'dest_well' = 'dest_well'
-
+type LabwareOnDeck = LabwareEntity & LabwareTemporalProperties
 type trashOrLabware = 'wasteChute' | 'trashBin' | 'labware' | null
 
 export const getCutoutIdByAddressableArea = (
@@ -1063,7 +1063,7 @@ export const getFullStackFromLabwares = (
 
 export const getPrimaryLabwareInAllLabwareStacks = (
   labware: {
-    [labwareId: string]: LabwareTemporalProperties
+    [labwareId: string]: LabwareOnDeck
   },
   slot: string
 ): string[] => {
@@ -1075,7 +1075,9 @@ export const getPrimaryLabwareInAllLabwareStacks = (
     .filter(
       lw =>
         lw.stack.includes(mappedLocation) &&
-        lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
+        lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
+        !lw.def.allowedRoles?.includes('adapter') &&
+        !lw.def.allowedRoles?.includes('lid')
     )
     .map(lw => lw.stack[0])
 }
