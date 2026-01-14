@@ -108,6 +108,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
 
   return (
     <div className={styles.refill_settings_container}>
+      <div className={styles.selected_labware_container}>
       <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
         {t('step_edit_form.flex_stacker.selected_labware')}
       </StyledText>
@@ -128,9 +129,11 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
           </StyledText>
         </ListItem>
       )}
+      </div>
+      
 
       {storedEntityName != null && (
-        <div>
+        <div className={styles.refill_settings_input_container}>
           <InputStepFormField
             title={t('step_edit_form.flex_stacker.fields.fillLabwareIds.title')}
             {...propsForFields.fillLabwareIds}
