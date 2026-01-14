@@ -133,6 +133,7 @@ fast_simulate_measurement = MeasurementData(
 @dataclass(kw_only=True)
 class CSVSettings:
     """All of the settings that are loaded from the CSV runtime parameter."""
+
     name: str
     increment: bool
     mount: str
