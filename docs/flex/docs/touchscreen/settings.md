@@ -71,7 +71,7 @@ Batch delete certain types of information from the robot, such as calibrations, 
 
 Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the ToF sensor detects if labware is loaded in the Stacker before this external module attempts to dispense or store it.
 
-You should disable this setting only when using specialized labware that causes detection errors (false positives or negatives). Sometimes these errors can occur with labware that is opaque or has an irregular shape that interferes with the sensor's ability to "see" labware in the Stacker.
+You should disable this setting only when using labware that causes detection errors (false positives or negatives). Sometimes these errors can occur with labware that has an irregular shape or interferes with the sensor's ability to "see" labware in the Stacker.
 
 !!! note
     When disabled, the Stacker will always try to store or dispense labware, even if it is empty.
