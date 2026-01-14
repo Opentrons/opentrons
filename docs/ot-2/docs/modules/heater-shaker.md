@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: Heater-Shaker"
 ---
 
-![Heater-Shaker image](../../images/heater-shaker-module.png)
+![Heater-Shaker image](../images/heater-shaker-module.png)
 
 !!! info "Additional Documentation"
     For complete instructions on module installation and use, see the [Heater-Shaker Instruction Manual](https://docs.opentrons.com/heater-shaker/).
@@ -34,22 +34,22 @@ A compatible thermal adapter is required for adding labware to the Heater-Shaker
 <div class="parts-list" markdown>
 
 <figure markdown>
-![Universal flat adapter](../../images/heater-shaker-adapter-universal.png)
+![Universal flat adapter](../images/heater-shaker-adapter-universal.png)
 <figcaption>Universal Flat Adapter</figcaption>
 </figure>
 
 <figure markdown>
-![PCR adapter](../../images/heater-shaker-adapter-pcr.png)
+![PCR adapter](../images/heater-shaker-adapter-pcr.png)
 <figcaption>PCR Adapter</figcaption>
 </figure>
 
 <figure markdown>
-![Deep well adapter](../../images/heater-shaker-adapter-deep-well.png)
+![Deep well adapter](../images/heater-shaker-adapter-deep-well.png)
 <figcaption>Deep Well Adapter</figcaption>
 </figure>
 
 <figure markdown>
-![96 well flat bottom adapter](../../images/heater-shaker-adapter-flat-bottom.png)
+![96 well flat bottom adapter](../images/heater-shaker-adapter-flat-bottom.png)
 <figcaption>96 Flat Bottom Adapter</figcaption>
 </figure>
 

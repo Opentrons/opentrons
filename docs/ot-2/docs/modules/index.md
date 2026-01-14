@@ -4,6 +4,8 @@ title: "Opentrons OT-2: Modules"
 
 Modules are a class of deck or externally-mounted hardware. You can use an OT-2 with several hardware modules that add features and capabilities to the robot. The OT-2 communicates with and controls most modules through a USB connection.
 
+are hardware deck-mounted hardware modules that add features and capabilities to the robot. The OT-2 communicates and controls most modules through a USB connection.
+
 This chapter summarizes the functions and physical specifications of modules that are compatible with the OT-2.
 
 !!! tip
