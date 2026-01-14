@@ -27,7 +27,7 @@ The module can shake samples from 200 to 3000 rpm, with the following shaking pr
 
 The module has a powered labware latch for securing plates to the module prior to shaking.
 
-### Thermal adapters
+### Thermal adapters { #thermal-adapters-ot2 }
 
 A compatible thermal adapter is required for adding labware to the Heater-Shaker. Currently available Thermal Adapters include:
 

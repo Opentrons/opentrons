@@ -2,17 +2,21 @@
 title: "Opentrons OT-2: Modules"
 ---
 
-Modules are a class of deck- or externally-mounted hardware. You can use an OT-2 with several hardware modules that add features and capabilities to the robot. The OT-2 communicates with and controls most modules through a USB connection.
+Modules are a class of deck or externally-mounted hardware. You can use an OT-2 with several hardware modules that add features and capabilities to the robot. The OT-2 communicates with and controls most modules through a USB connection.
 
 This chapter summarizes the functions and physical specifications of modules that are compatible with the OT-2.
 
 !!! tip
-    - For complete instructions on module installation and use, refer to the quickstart guide that shipped with your unit or find its manual in the [Modules section](https://docs.opentrons.com/modules/) of the Opentrons Documentation website.
+    - For complete instructions on module installation and use, refer to the guide that shipped with your unit.
     - For information about integrating modules into your protocols, see the [Protocol Designer Instruction Manual](https://docs.opentrons.com/protocol-designer/) or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
 
 ## Supported modules
 
 - The [Heater-Shaker Module](./heater-shaker.md) provides on-deck heating and orbital shaking. The module can be heated to 95 °C, and can shake samples from 200 to 3000 rpm.
+
+- The [HEPA Module](./hepa.md) is a positive-pressure clean air system for use with the OT-2 only. It streams purified air into the OT-2 enclosure to help displace airborne contaminants.
+
+- The [Magnetic Module](./magnetic-module.md) uses high-strength N52 neodymium to help pull particles out of suspension and hold them in a well plate during elution.
 
 ## Compatibility table
 
