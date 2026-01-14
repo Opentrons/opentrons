@@ -555,7 +555,9 @@ export function LiquidToolboxContainer({
   const selectedLabwareId = useSelector(
     labwareIngredSelectors.getSelectedLabwareId
   )
-  const labwareId = multipleSelectedLabwareIds?.[0] ?? selectedLabwareId
+  const labwareId = useSelector(
+    labwareIngredSelectors.getMultiSelectSelectedLabwareId
+  )
   const selectedWellGroups = useSelector(getSelectedWells)
   const nickNames = useSelector(getLabwareNicknamesById)
   const liquidLocations = useSelector(

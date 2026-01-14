@@ -48,6 +48,10 @@ export interface LabwareTemporalProperties {
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
+  // this is needed for PV to determine which labware is being moved
+  // into the hopper based on the setStoredLabware count
+  setStoredLabwareCount?: number
+  fillCount?: number
 }
 
 export interface PipetteTemporalProperties {
@@ -155,6 +159,10 @@ export interface FlexStackerModuleState {
   // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
+  // this is needed in order to differentiate between the different
+  // off-deck labwares and when they get loaded onto the hopper for setStoredLabware
+  setStoredLabwareCount?: number
+  fillCount?: number
 }
 
 export type ModuleState =
@@ -630,6 +638,8 @@ export type ThermocyclerProfileStepArgs = CommonArgs & {
     | ConcurrentThermocyclerProfileStepArgs
   )
 
+// todo(mm, 2026-01-09): PD no longer uses this.
+// We can probably delete step-generation's support for it altogether.
 /**
  * Emits a blocking Thermocycler profile step. The entire profile will complete
  * before the protocol moves on to the next step.

@@ -4,14 +4,21 @@ import * as selectors from './selectors'
 
 import type { RootState } from './reducers'
 
-type HintKey =
+type HintParams =
   // normal hints
-  | 'thermocycler_lid_passive_cooling'
-  | 'waste_chute_warning'
+  | { hintKey: 'thermocycler_lid_passive_cooling' }
+  | { hintKey: 'wait_for_heater_shaker_temp'; targetTemperature: number }
+  | { hintKey: 'wait_for_temperature_module_temp'; targetTemperature: number }
+  | { hintKey: 'wait_for_thermocycler_block_temp'; targetTemperature: number }
+  | { hintKey: 'wait_for_thermocycler_lid_temp'; targetTemperature: number }
+  | { hintKey: 'wait_for_thermocycler_profile' }
+  | { hintKey: 'waste_chute_warning' }
   // blocking hints
-  | 'change_magnet_module_model'
-  | 'no_commands'
-  | 'has_errors'
+  | { hintKey: 'change_magnet_module_model' }
+  | { hintKey: 'has_errors' }
+  | { hintKey: 'no_commands' }
+
+type HintKey = HintParams['hintKey']
 
 // DEPRECATED HINTS (keep a record to avoid name collisions with old persisted dismissal states)
 // | 'export_v4_protocol'
@@ -31,4 +38,4 @@ type HintKey =
 // | 'unused_hardware'
 
 export { actions, rootReducer, selectors }
-export type { RootState, HintKey }
+export type { RootState, HintParams, HintKey }

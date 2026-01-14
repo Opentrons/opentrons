@@ -35,7 +35,7 @@ dynamic = ["version", "hatch-dependency-coversion"]
 dev = [
     "ruff==0.14.10",
     "diff-match-patch==20230430",
-    "pytest>=8,<9",
+    "pytest>=9.0.2",
     "pytest-asyncio<2,>=1",
     "pytest-aiohttp==1.0.5",
     "pytest-cov==4.1.0",
@@ -49,7 +49,7 @@ dev = [
 
 [tool.ruff.lint]
 # TODO(sfoster, 12/24/25) probably check annotations and docstrings here
-select = ["E", "C90", "I"]
+select = ["E", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741"]
 
 [tool.ruff.lint.pydocstyle]
@@ -61,6 +61,7 @@ known-local-folder = ["g_code_testing"]
 known-first-party = ["opentrons", "opentrons_shared_data"]
 [tool.ruff.lint.per-file-ignores]
 "g_code_parsing/_version.py" = ["I"]
+"cli.py" = ["T201"]
 
 # uv: global settings and dependency tweaks
 [tool.uv]
@@ -103,10 +104,30 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.sdist]
-include = ['g_code_parsing', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['g_code_parsing', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'g_code_parsing/LICENSE'
+
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "slow: mark test as slow",
+    "g_code_confirm: mark test as a G-Code confirmation test",
+]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]
+ignore_missing_imports = false
+check_untyped_defs = true
+show_error_codes = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]

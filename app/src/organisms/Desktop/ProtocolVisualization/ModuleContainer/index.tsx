@@ -51,7 +51,7 @@ export function ModuleContainer({
           blockTemperatureText = t('deactivated')
           break
         case 'blockDeactivated':
-          blockTemperatureText = t('deactivated')
+          blockTemperatureText = t('idle')
           break
         default:
           currentBlockActivity satisfies never
@@ -68,7 +68,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {lidTargetTemp != null
                 ? t('temperature', { temp: lidTargetTemp })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="lid_status">
@@ -90,7 +90,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemp != null
                 ? t('temperature', { temp: targetTemp })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="target_speed">
@@ -138,7 +138,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemperature != null
                 ? t('temperature', { temp: targetTemperature })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
         </div>
@@ -191,15 +191,15 @@ export function ModuleContainer({
       break
     }
     case FLEX_STACKER_MODULE_TYPE: {
-      //  TODO: add this in when the flex stacker module state is finalized for PD
-      //   const {
-      //     maxPoolCount,
-      //     storedLabwareDetails,
-      //     labwareInHopper,
-      //     labwareOnShuttle,
-      //   } = moduleState
-      console.error(
-        "TODO: update this when PD's flex stacker module state is finalized"
+      const { labwareInHopper } = moduleState
+      moduleDetails = (
+        <div className={styles.module_details_status_container}>
+          <ModuleStatusContainer title={t('number_of_labware_in_stacker')}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {labwareInHopper != null ? labwareInHopper.length : 0}
+            </StyledText>
+          </ModuleStatusContainer>
+        </div>
       )
       break
     }
@@ -212,7 +212,6 @@ export function ModuleContainer({
         `ran into the default moduleContainer moduleState with module ${moduleDisplayName}`
       )
   }
-
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>

@@ -9,6 +9,11 @@ from typing import Any, Dict, Generator
 import pytest
 import requests
 
+from opentrons.calibration_storage.ot2 import (
+    clear_pipette_offset_calibrations,
+    clear_tip_length_calibration,
+)
+
 from .dev_server import DevServer
 from .robot_client import RobotClient
 from robot_server.versioning import API_VERSION_HEADER, LATEST_API_VERSION_HEADER_VALUE
@@ -34,8 +39,8 @@ def pytest_tavern_beta_before_every_test_run(
 def pytest_tavern_beta_after_every_response(
     expected: Any, response: requests.Response
 ) -> None:
-    print(response.url)
-    print(json.dumps(response.json(), indent=4))
+    print(response.url)  # noqa: T201
+    print(json.dumps(response.json(), indent=4))  # noqa: T201
 
 
 @pytest.fixture
@@ -181,3 +186,9 @@ async def _reset_error_recovery_settings(robot_client: RobotClient) -> None:
 
 async def _delete_labware_offsets(robot_client: RobotClient) -> None:
     await robot_client.delete_all_labware_offsets()
+
+
+@pytest.fixture
+def clean_ot2_calibrations(server_temp_directory: str) -> None:
+    clear_tip_length_calibration()
+    clear_pipette_offset_calibrations()

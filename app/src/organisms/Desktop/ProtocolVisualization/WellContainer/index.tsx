@@ -79,15 +79,16 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
     ('wellLocation' in params ? params.wellLocation.x : 1)
   const roundedXPositionPixels = round(xPositionPixels, PIXEL_DECIMALS)
 
-  const { tipColor, tipCurrentVolume } =
+  const { tipColor, tipCurrentVolume, airGapVolume } =
     pipetteLocationLiquidState != null
       ? getTipSvgInfo(pipetteLocationLiquidState, liquids)
-      : { tipColor: COLORS.grey40, tipCurrentVolume: 0 }
+      : { tipColor: COLORS.grey40, tipCurrentVolume: 0, airGapVolume: 0 }
 
   const totalVolumeInWell =
     labwareLocationLiquidState != null
       ? getWellVolume(labwareLocationLiquidState)
       : 0
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -109,6 +110,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
                   color={tipColor}
                   setIsHovered={setIsTipHovered}
                   isHovered={isTipHovered}
+                  airGapVolume={airGapVolume}
                 />
                 {isTipHovered ? (
                   <div className={styles.tip_details_volume}>

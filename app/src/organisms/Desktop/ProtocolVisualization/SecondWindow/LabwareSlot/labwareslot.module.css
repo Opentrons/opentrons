@@ -27,3 +27,14 @@
   border-radius: var(--border-radius-4);
   background-color: var(--grey-10);
 }
+
+.header_container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.labware_text_align {
+  width: 100%;
+  padding-top: var(--spacing-8);
+  text-align: center;
+}

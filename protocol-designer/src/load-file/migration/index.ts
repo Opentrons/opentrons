@@ -20,6 +20,7 @@ import { migrateFile as migrateFileEightFiveFive } from './8_5_5'
 import { migrateFile as migrateFileEightSix } from './8_6_0'
 import { migrateFile as migrateFileEightSeven } from './8_7_0'
 import { migrateFile as migrateFileEightEight } from './8_8_0'
+import { migrateFile as migrateFileEightNine } from './8_9_0'
 
 import type {
   PDProtocolFile,
@@ -80,8 +81,8 @@ const allMigrationsByVersion: MigrationsByVersion = {
   '8.7.0': migrateFileEightSeven,
   // @ts-expect-error
   '8.8.0': migrateFileEightEight,
-  // todo(mm, 2025-12-19): After v8.8.0 is in its own release branch, add v8.9.0 here,
-  // probably at the same time as removing the concurrent module actions feature flag.
+  // @ts-expect-error
+  '8.9.0': migrateFileEightNine,
 }
 export const migration = (
   file: any

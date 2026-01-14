@@ -200,6 +200,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
       ) : null}
       {formData.flexStackerFormType === FLEX_STACKER_FILL ? (
         <RefillSettings
+          formData={formData}
           propsForFields={propsForFields}
           moduleState={moduleState}
           maxPoolCount={maxPoolCount}

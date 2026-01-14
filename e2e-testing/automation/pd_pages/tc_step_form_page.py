@@ -118,30 +118,6 @@ class ThermocyclerStepPage(BasePage):
         lid_input.click()
         lid_input.fill(temp)
 
-    def set_block_temperature_hold(self, temp: str) -> None:
-        """
-        Set the block temperature hold value in profile mode.
-
-        Args:
-            temp: Temperature value (e.g., "90").
-        """
-        hold_input = self.page.locator('input[name="blockTargetTempHold"]')
-        self.wait_for_visible(hold_input)
-        hold_input.click()
-        hold_input.fill(temp)
-
-    def set_lid_temperature_hold(self, temp: str) -> None:
-        """
-        Set the lid temperature hold value in profile mode.
-
-        Args:
-            temp: Temperature value (e.g., "40").
-        """
-        hold_input = self.page.locator('input[name="lidTargetTempHold"]')
-        self.wait_for_visible(hold_input)
-        hold_input.click()
-        hold_input.fill(temp)
-
     # ========== Profile Programming Modal ==========
 
     def open_profile_programmer(self) -> "ThermocyclerProfileModal":

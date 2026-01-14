@@ -77,6 +77,15 @@ const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
 const getSelectedLabwareId: Selector<RootSlice, SelectedContainerId> =
   createSelector(rootSelector, rootState => rootState.selectedContainerId)
 
+const getMultiSelectSelectedLabwareId: Selector<
+  RootSlice,
+  SelectedContainerId
+> = createSelector(
+  rootSelector,
+  rootState =>
+    rootState.selectedMultipleContainerIds?.[0] ?? rootState.selectedContainerId
+)
+
 const getMultipleSelectedLabwareIds: Selector<
   RootSlice,
   SelectedMultipleContainerIds
@@ -189,6 +198,7 @@ export const selectors = {
   getNextLiquidGroupId,
   getSelectedLabwareId,
   getSelectedLabwareIds: getMultipleSelectedLabwareIds,
+  getMultiSelectSelectedLabwareId,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,
   allIngredientGroupFields,
