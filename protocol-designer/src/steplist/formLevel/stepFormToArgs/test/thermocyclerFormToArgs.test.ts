@@ -41,13 +41,6 @@ describe('thermocyclerFormToArgs', () => {
         // @ts-expect-error - See comment above.
         lidTargetTemp: '40',
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        // @ts-expect-error - See comment above.
-        blockTargetTempHold: null,
-        // @ts-expect-error - See comment above.
-        lidTargetTempHold: null,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -78,11 +71,6 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: 40,
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        blockTargetTempHold: 0,
-        lidTargetTempHold: 0,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -119,13 +107,6 @@ describe('thermocyclerFormToArgs', () => {
         // @ts-expect-error - See comment above.
         lidTargetTemp: '40',
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        // @ts-expect-error - See comment above.
-        blockTargetTempHold: null,
-        // @ts-expect-error - See comment above.
-        lidTargetTempHold: null,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -156,11 +137,6 @@ describe('thermocyclerFormToArgs', () => {
         lidIsActive: true,
         lidTargetTemp: 40,
         lidOpen: false,
-        blockIsActiveHold: false,
-        lidIsActiveHold: false,
-        lidOpenHold: false,
-        blockTargetTempHold: 0,
-        lidTargetTempHold: 0,
         orderedProfileItems: [],
         profileItemsById: {},
         profileTargetLidTemp: null,
@@ -234,18 +210,6 @@ describe('thermocyclerFormToArgs', () => {
           },
         },
         blockIsActive: false,
-        // Hold options are deprecated and should be ignored:
-        lidOpenHold: true,
-        blockIsActiveHold: true,
-        // @ts-expect-error - See comment above.
-        // blockTargetTemp and blockTargetTempHold can never be null according to their castValue,
-        // but that might be unintentional. thermocyclerFormToArgs() does try to handle the null case
-        // and emit null blockTargetTempHold / blockTargetTemp. We need to clarify what's intended
-        // and possibly fix these fields' castValue.
-        blockTargetTempHold: null,
-        lidIsActiveHold: true,
-        // @ts-expect-error - See comment above.
-        lidTargetTempHold: '5',
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
@@ -355,12 +319,6 @@ describe('thermocyclerFormToArgs', () => {
           },
         },
         blockIsActive: false,
-        // Hold options are deprecated and should be ignored:
-        lidOpenHold: true,
-        blockIsActiveHold: true,
-        blockTargetTempHold: 999,
-        lidIsActiveHold: true,
-        lidTargetTempHold: 999,
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,

@@ -448,11 +448,6 @@ describe('createPresavedStepForm', () => {
               profileTargetLidTemp: null,
               orderedProfileItems: [],
               profileItemsById: {},
-              blockIsActiveHold: false,
-              blockTargetTempHold: null,
-              lidIsActiveHold: false,
-              lidTargetTempHold: null,
-              lidOpenHold: null,
             },
           }
           args.orderedStepIds = ['prevStepId']
@@ -460,16 +455,11 @@ describe('createPresavedStepForm', () => {
 
         expect(createPresavedStepForm(args)).toEqual({
           blockIsActive: !timelineHasErrors,
-          blockIsActiveHold: false,
           blockTargetTemp: timelineHasErrors ? null : 42,
-          blockTargetTempHold: null,
           id: stepId,
           lidIsActive: !timelineHasErrors,
-          lidIsActiveHold: false,
           lidOpen: !timelineHasErrors,
-          lidOpenHold: null,
           lidTargetTemp: timelineHasErrors ? null : 43,
-          lidTargetTempHold: null,
           moduleId: 'someThermocyclerModuleId',
           orderedProfileItems: [],
           profileItemsById: {},

@@ -118,19 +118,14 @@ export type StepFieldName = string
 
 /* MODULE FIELDS */
 // | 'blockIsActive'
-// | 'blockIsActiveHold'
-// | 'blockTargetTempHold'
 // | 'engageHeight'
 // | 'heaterShakerSetTimer'
 // | 'heaterShakerTimerMinutes'
 // | 'heaterShakerTimerSeconds'
 // | 'latchOpen'
 // | 'lidIsActive'
-// | 'lidIsActiveHold'
 // | 'lidOpen'
-// | 'lidOpenHold'
 // | 'lidTargetTemp'
-// | 'lidTargetTempHold'
 // | 'magnetAction'
 // | 'moduleId'
 // | 'orderedProfileItems'
@@ -498,18 +493,6 @@ export interface HydratedThermocyclerFormData extends AnnotationFields {
   profileItemsById: Record<string, ProfileItem>
   profileTargetLidTemp: string | null
   profileVolume: string | null
-
-  // https://opentrons.atlassian.net/browse/EXEC-2141
-  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
-  blockIsActiveHold: boolean
-  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
-  blockTargetTempHold: string | null
-  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
-  lidIsActiveHold: boolean
-  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
-  lidTargetTempHold: string | null
-  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
-  lidOpenHold: boolean
 }
 
 export type AbsorbanceReaderFormType =

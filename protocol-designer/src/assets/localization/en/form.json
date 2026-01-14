@@ -343,7 +343,6 @@
           "toggleOn": "On",
           "valid_range": "Valid range between 4 and 96°C"
         },
-        "ending_hold": "Ending hold",
         "lid": {
           "engage": "Lid",
           "label": "Lid",
