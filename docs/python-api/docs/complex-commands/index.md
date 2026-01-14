@@ -11,9 +11,9 @@ Complex liquid handling commands combine multiple [building block commands](../b
         <th>Legacy</th>
         <td>
             <ul>
-                <li><a href="../api-reference/instruments/#opentrons.protocol_api.InstrumentContext.transfer"><code>transfer()</code></a></li>
-                <li><a href="../api-reference/instruments/#opentrons.protocol_api.InstrumentContext.distribute"><code>distribute()</code></a></li>
-                <li><a href="../api-reference/instruments/#opentrons.protocol_api.InstrumentContext.consolidate"><code>consolidate()</code></a></li>
+                <li><a href="../reference/instruments/#opentrons.protocol_api.InstrumentContext.transfer"><code>transfer()</code></a></li>
+                <li><a href="../reference/instruments/#opentrons.protocol_api.InstrumentContext.distribute"><code>distribute()</code></a></li>
+                <li><a href="../reference/instruments/#opentrons.protocol_api.InstrumentContext.consolidate"><code>consolidate()</code></a></li>
             </ul>
         </td>
     </tr>
@@ -21,9 +21,9 @@ Complex liquid handling commands combine multiple [building block commands](../b
         <th>Liquid Class</th>
         <td>
             <ul>
-                <li><a href="../api-reference/instruments/#opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class"><code>transfer_with_liquid_class()</code></a></li>
-                <li><a href="../api-reference/instruments/#opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class"><code>distribute_with_liquid_class()</code></a></li>
-                <li><a href="../api-reference/instruments/#opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class"><code>consolidate_with_liquid_class()</code></a></li>
+                <li><a href="../reference/instruments/#opentrons.protocol_api.InstrumentContext.transfer_with_liquid_class"><code>transfer_with_liquid_class()</code></a></li>
+                <li><a href="../reference/instruments/#opentrons.protocol_api.InstrumentContext.distribute_with_liquid_class"><code>distribute_with_liquid_class()</code></a></li>
+                <li><a href="../reference/instruments/#opentrons.protocol_api.InstrumentContext.consolidate_with_liquid_class"><code>consolidate_with_liquid_class()</code></a></li>
             </ul>
         </td>
     </tr>
