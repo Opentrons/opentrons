@@ -34,7 +34,8 @@ dependencies = [
     "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
-    "aiohttp==3.12.14"
+    "aiohttp==3.12.14",
+    "Pyro5>=5.16,<6",
 ]
 [tool.uv.dependency-groups]
 dev = {requires-python = ">=3.11"}
@@ -58,6 +59,7 @@ robot = [
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14",
+    "Pyro5==5.16",
 ]
 dev = [
     "atomicwrites==1.4.0; sys_platform=='win32'",
