@@ -105,7 +105,7 @@ function getAllImages(): Record<string, string> {
   const imageKeyToUrl: Record<string, string> = {}
   for (const imgPath in imageModules) {
     const filename = basename(imgPath)
-    const base = basename(filename)
+    const base = filename.replace(/\.[^.]+$/, '')
     const varName = base.replace(/\./g, '_').replace(/-/g, '_')
     imageKeyToUrl[varName] = imageModules[imgPath] as string
   }
