@@ -60,7 +60,7 @@ async def test_camera_settings(
 ) -> None:
     """It should be able to modify the capture image settings for a run."""
     image_settings = CameraCaptureImageSettings(
-        cameraId="cool_cam",
+        cameraId="ot_system_camera",
         resolution=(1, 2),
         zoom=1.5,
         pan=(3, 4),
@@ -83,11 +83,13 @@ async def test_camera_settings(
     assert result.status_code == 201
 
     decoy.when(
-        mock_run_orchestrator_store.get_camera_capture_image_settings("cool_cam")
+        mock_run_orchestrator_store.get_camera_capture_image_settings(
+            "ot_system_camera"
+        )
     ).then_return(image_settings)
 
     get_settings_result = await get_camera_capture_image_settings(
-        cameraId="cool_cam",
+        cameraId="ot_system_camera",
         run_orchestrator_store=mock_run_orchestrator_store,
     )
 

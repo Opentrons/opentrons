@@ -162,7 +162,7 @@ async def get_camera(
     description=(
         "Query general camera capture image settings returning the implemented settings."
         "\n\n"
-        "The response body's `data` will be the image capture settings provided once set."
+        "The response body's data will be the camera capture image settings provided once set."
     ),
     responses={
         status.HTTP_503_SERVICE_UNAVAILABLE: {},
