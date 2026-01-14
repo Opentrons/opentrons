@@ -245,7 +245,7 @@ export function DeckSetupToolbox(
 
   const displaySlot = getIsSlotAHopper(slot)
     ? t('shared:stacker', {
-        slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey],
+        slot: FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey].charAt(0),
       })
     : slot
   return (

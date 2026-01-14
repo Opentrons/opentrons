@@ -1,17 +1,18 @@
 import clsx from 'clsx'
 
-import { PlaceholderStyledText } from '../../atoms'
+import { StyledText } from '../../atoms/StyledText/StyledText'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './robotinfolabel.module.css'
 
+import type { HelixStyles } from '../../atoms/StyledText'
 import type { IconName } from '../../icons'
 
 export interface RobotInfoLabelProps {
   deckLabel?: string
   iconName?: IconName
   highlight?: boolean
-  size?: 'large' | 'default'
+  size?: 'large' | 'default' | 'extraLarge'
   height?: string | number
   width?: string | number
   svgSize?: string | number
@@ -38,7 +39,17 @@ export function RobotInfoLabel({
       [styles.has_deck_label]: deckLabel != null,
     }
   )
-
+  let textSize: HelixStyles = 'captionBold'
+  switch (size) {
+    case 'large':
+      textSize = 'headingSmallBold'
+      break
+    case 'extraLarge':
+      textSize = 'headingLargeBold'
+      break
+    default:
+      textSize = 'captionBold'
+  }
   return (
     <div
       className={labelClass}
@@ -58,13 +69,13 @@ export function RobotInfoLabel({
           aria-label={iconName}
         />
       ) : (
-        <PlaceholderStyledText
-          desktopStyle={size === 'large' ? 'headingSmallBold' : 'captionBold'}
+        <StyledText
+          desktopStyle={textSize}
           oddStyle="smallBodyTextBold"
           color={highlight ? COLORS.white : COLORS.black90}
         >
           {deckLabel}
-        </PlaceholderStyledText>
+        </StyledText>
       )}
     </div>
   )
