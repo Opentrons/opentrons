@@ -102,6 +102,19 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
   } else if (!isAdapterOrTiprack || (isLid && !canModifyQuantity)) {
     editButton = t('edit_liquid')
   }
+  const numofUniqueLiquids = liquidIds.length
+  let liquidText: string = ''
+  switch (numofUniqueLiquids) {
+    case 0:
+      liquidText = t('no_liquids_added')
+      break
+    case 1:
+      liquidText = t('num_liquid', { count: liquidIds.length })
+      break
+    case 2:
+      liquidText = t('multiple_liquid_layouts')
+      break
+  }
 
   const handleOnClick = (): void => {
     if (editButton === t('edit_quantity')) {
@@ -160,15 +173,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
                 ) : null}
                 <Flex gridGap={SPACING.spacing8} paddingTop={SPACING.spacing8}>
                   {!isAdapterOrTiprack && !isLid ? (
-                    <LiquidInfoDisplay
-                      text={
-                        liquidIds.length === 0
-                          ? t('no_liquids_added')
-                          : liquidIds.length === 1
-                            ? t('num_liquid', { count: liquidIds.length })
-                            : t('multiple_liquid_layouts')
-                      }
-                    />
+                    <LiquidInfoDisplay text={liquidText} />
                   ) : null}
                   {quantity >= 1 ? (
                     <LiquidInfoDisplay
