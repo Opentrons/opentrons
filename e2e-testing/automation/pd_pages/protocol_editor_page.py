@@ -390,3 +390,20 @@ class ProtocolEditorPage(BasePage):
         mouse = self.page.mouse
         ## Ask mouse to double click
         mouse.click(start_x, start_y, click_count=2)
+
+    def export_protocol(self) -> str:
+        """Export the current protocol and return the download path."""
+
+        with self.page.expect_download() as download_info:
+            self.page.get_by_role("button", name="Export protocol").click()
+            # Protocol has no steps confirmation modal
+            continue_button = self.page.get_by_role("button", name="Continue with export")
+            try:
+                continue_button.wait_for(state="visible", timeout=2000)
+                continue_button.click()
+            except TimeoutError:
+                pass
+        download = download_info.value
+        download_path = download.path()
+        assert download_path is not None, "Download path should not be None"
+        return download_path
