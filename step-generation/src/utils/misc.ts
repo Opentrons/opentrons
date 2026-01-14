@@ -1076,8 +1076,7 @@ export const getPrimaryLabwareInAllLabwareStacks = (
       lw =>
         lw.stack.includes(mappedLocation) &&
         lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper &&
-        !lw.def.allowedRoles?.includes('adapter') &&
-        !lw.def.allowedRoles?.includes('lid')
+        !lw.def.allowedRoles?.includes('adapter') 
     )
     .map(lw => lw.stack[0])
 }
