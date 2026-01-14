@@ -112,8 +112,6 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
         blockTargetTemp,
         lidOpen,
         thermocyclerFormType,
-        lidOpenHold,
-        blockTargetTempHold,
         profileTargetLidTemp,
         profileVolume,
       } = currentStep
@@ -152,20 +150,6 @@ export function StepSummary(props: StepSummaryProps): JSX.Element | null {
               tagText={`${profileTargetLidTemp}${t(
                 'application:units.degrees'
               )}`}
-            />
-            <StyledTrans
-              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.block"
-              tagText={`${blockTargetTempHold}${t(
-                'application:units.degrees'
-              )}`}
-            />
-            <StyledTrans
-              i18nKey="protocol_steps:thermocycler_module.thermocycler_profile.end_hold.lid_position"
-              tagText={t(
-                `protocol_steps:thermocycler_module.lid_position.${
-                  lidOpenHold ? 'open' : 'closed'
-                }`
-              )}
             />
           </div>
         )

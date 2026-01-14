@@ -55,6 +55,7 @@ import { getTopPortalEl } from '/app/App/portal'
 import { Divider } from '/app/atoms/structure'
 import { ChooseRobotToRunProtocolSlideout } from '/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout'
 import {
+  ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
 } from '/app/redux/analytics'
@@ -381,6 +382,10 @@ export function ProtocolDetails(
   }
 
   const handleClickTimeline = (): void => {
+    trackEvent({
+      name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
+      properties: { sourceLocation: 'protocol details' },
+    })
     navigate(`/protocols/${protocolKey}/visualization`)
   }
 
