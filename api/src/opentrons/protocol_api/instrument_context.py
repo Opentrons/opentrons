@@ -253,7 +253,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 [`Location`][opentrons.types.Location].
             movement_delay (float, optional): Time in seconds to delay after the pipette starts aspirating and before it begins moving
                 from the `location` to the `end_location`. This option is only valid when using `end_location`. When this
-                argument is used, the pipette will wait the specified time 
+                argument is used, the pipette will wait the specified time
                 after the pipette starts to aspirate before moving. This may help when
                 aspirating very viscous liquids that need to build up some pressure
                 before liquid starts to flow.
@@ -488,7 +488,7 @@ class InstrumentContext(publisher.CommandPublisher):
                 argument is used, the `location` and `end_location` must both be a
                 [`Location`][opentrons.types.Location].
 
-            movement_delay (float): Time in seconds to delay after the pipette starts dispensing and before it begins moving from the `location` to the `end_location`. 
+            movement_delay (float): Time in seconds to delay after the pipette starts dispensing and before it begins moving from the `location` to the `end_location`.
                 This option is only valid when using `end_location`. When this argument
                 is used, the pipette will wait the specified time after the
                 pipette starts to dispense before moving. This may help when dispensing
@@ -909,7 +909,7 @@ class InstrumentContext(publisher.CommandPublisher):
             movement_delay (float, optional): Time in seconds to delay after the pipette starts aspirating or dispensing
                 and before it begins moving from the `aspirate_start_location` or `dispense_start_location`
                 to the `aspirate_end_location` or `dispense_end_location`.
-                
+
                 This option is only valid when using `aspirate_end_location` or
                 `dispense_end_location`. When this argument is used, the pipette
                 will wait the specified amount of time after the pipette starts to
@@ -923,7 +923,7 @@ class InstrumentContext(publisher.CommandPublisher):
         Returns:
             InstrumentContext: This instance.
 
-        !!!note 
+        !!!note
             The `aspirate_start_location` and `dispense_start_location` arguments of `dynamic_mix()` are required.
         """
         _log.debug(
@@ -1075,6 +1075,11 @@ class InstrumentContext(publisher.CommandPublisher):
                 position.
 
                 *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
+        <!-- TODO: uncomment when 2.28 is released
+            flow_rate: The absolute flow rate in µL/s.
+
+                *New in version 2.28*
+        -->
 
         Raises:
             RuntimeError: If no location is specified and the location cache is `None`.
@@ -1083,16 +1088,8 @@ class InstrumentContext(publisher.CommandPublisher):
                 [`aspirate()`][opentrons.protocol_api.InstrumentContext.aspirate] or
                 [`dispense()`][opentrons.protocol_api.InstrumentContext.dispense].
 
-        :param flow_rate: The absolute flow rate in µL/s.
-        :type flow_rate: float
-
         Returns:
             InstrumentContext: This instance.
-
-        *Changed in version 2.24*: `location` is no longer required if the pipette just
-        moved to, dispensed, or blew out into a trash bin or waste chute.
-        .. versionchanged:: 2.28
-            Added ``flow_rate`` argument.
         """
         if flow_rate is not None:
             if self.api_version < APIVersion(2, 28):
@@ -1233,9 +1230,12 @@ class InstrumentContext(publisher.CommandPublisher):
         Returns:
             InstrumentContext: This instance.
 
-        *Changed in version 2.24*: Added the `mm_from_edge` parameter.
-        .. versionchanged:: 2.28
-                Raises error if touching tip on a labware with `touchTipDisabled` quirk.
+        *Changed in version 2.24:* Added the `mm_from_edge` parameter.
+
+        <!-- TODO: uncomment when 2.28 is released
+        *Changed in version 2.28:*
+            Raises an error if touching tip on a labware with the `touchTipDisabled` quirk.
+        -->
         """
         if not self._core.has_tip():
             raise UnexpectedTipRemovalError("touch_tip", self.name, self.mount)
