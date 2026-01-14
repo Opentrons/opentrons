@@ -143,49 +143,10 @@ describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray(
     flat: FormData[]
     hierarchy: StepHierarchy
   }>)('$label', ({ flat, hierarchy }) => {
-    const hierarchyResult = convertStepArrayToHierarchy(flat, true)
+    const hierarchyResult = convertStepArrayToHierarchy(flat)
     expect(hierarchyResult).toStrictEqual(hierarchy)
     const flatResult = convertStepHierarchyToArray(hierarchyResult)
     expect(flatResult).toStrictEqual(flat.map(element => element.id))
-  })
-
-  it('should no-op if enableConcurrentModuleActions is false', () => {
-    const input: FormData[] = [
-      {
-        id: 'a',
-        stepType: 'comment',
-      },
-      {
-        id: 'b',
-        stepType: 'thermocycler',
-        thermocyclerFormType: THERMOCYCLER_PROFILE,
-      },
-      {
-        id: 'c',
-        stepType: 'comment',
-      },
-      {
-        id: 'd',
-        stepType: 'comment',
-      },
-      {
-        id: 'e',
-        stepType: 'pause',
-        pauseAction: PAUSE_UNTIL_TC_PROFILE_COMPLETE,
-      },
-      {
-        id: 'f',
-        stepType: 'comment',
-      },
-    ]
-    const result = convertStepArrayToHierarchy(input, false)
-    const expectedResult: typeof result = {
-      topLevelItems: input.map(step => ({
-        type: 'standaloneStep',
-        stepId: step.id,
-      })),
-    }
-    expect(result).toStrictEqual(expectedResult)
   })
 })
 

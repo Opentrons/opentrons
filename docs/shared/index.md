@@ -38,6 +38,6 @@
 
     Code your own automated biology lab protocols for Flex or OT-2.
 
-    [:octicons-arrow-right-24: Documentation and Reference](https://docs.opentrons.com/v2/)
+    [:octicons-arrow-right-24: Documentation and Reference](python-api/index.md)
 
 </div>

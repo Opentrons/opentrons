@@ -1429,6 +1429,10 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
+  // permissive if no stored labware details configured
+  if (stackerState?.storedLabwareDetails == null) {
+    return true
+  }
   const storedLabwareURIs = Object.values(
     stackerState?.storedLabwareDetails ?? {}
   ).reduce<string[]>((acc, val) => {
