@@ -200,7 +200,7 @@ The working end of a pipette. Flex pipettes pick up disposable tips by pressing 
 
 ##### Opentrons App
 
-Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](opentrons-app.md).
+Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](./opentrons-app/index.md).
 
 ##### Paddle
 
