@@ -97,13 +97,30 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['opentrons_hardware', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['opentrons_hardware', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel]
 packages = ['opentrons_hardware']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons_hardware/LICENSE'
+
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "slow: mark test as slow",
+    "requires_emulator: mark test as requiring emulator",
+    "can_filter_func: can message filtering function",
+]
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+]
+
+[tool.mypy]
+show_error_codes = true
+warn_unused_configs = true
+strict = true
 
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]

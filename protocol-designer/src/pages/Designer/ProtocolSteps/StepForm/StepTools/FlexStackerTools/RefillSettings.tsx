@@ -71,6 +71,9 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
     // initialize if saved step form exists
   >(oldGroupQuantity > 0 ? String(oldGroupQuantity) : null)
 
+  const numberOfGroupsInHopper = labwareInHopper?.length ?? 0
+  const maxRefillGroupQuantity = maxPoolCount - numberOfGroupsInHopper
+
   const storedEntityName = storedPrimaryEntity?.def.metadata.displayName
   const isPrimaryTiprack =
     storedPrimaryEntity != null && getIsTiprack(storedPrimaryEntity.def)
@@ -78,10 +81,8 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
   // you can't rely on generating the uuid in the hydrated form
   useEffect(() => {
     const newGroupQuantity = Number(fillQuantityLocalState) ?? 1
-    const numberOfGroupsInHopper = labwareInHopper?.length ?? 0
     const difference = newGroupQuantity - oldGroupQuantity
-    const valueTooHigh =
-      newGroupQuantity > maxPoolCount - numberOfGroupsInHopper
+    const valueTooHigh = newGroupQuantity > maxRefillGroupQuantity
     // Form errors do not have acccess to module state, so this logic is used
     // to clear out the fillLabwareIds value if the quantity entered is too high
     // and raise an error.
@@ -136,7 +137,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
             showTooltip={false}
             caption={t(
               'step_edit_form.flex_stacker.fields.fillLabwareIds.caption',
-              { max: maxPoolCount }
+              { max: maxRefillGroupQuantity }
             )}
             type="number"
             padding="0"

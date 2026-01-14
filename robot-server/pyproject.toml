@@ -34,7 +34,8 @@ dependencies = [
     "systemd-python==234; sys_platform == 'linux'",
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
-    "aiohttp==3.12.14"
+    "aiohttp==3.12.14",
+    "Pyro5>=5.16,<6",
 ]
 [tool.uv.dependency-groups]
 dev = {requires-python = ">=3.11"}
@@ -58,6 +59,7 @@ robot = [
     "sqlalchemy==1.4.51",
     "paho-mqtt==1.6.1",
     "aiohttp==3.12.14",
+    "Pyro5==5.16",
 ]
 dev = [
     "atomicwrites==1.4.0; sys_platform=='win32'",
@@ -168,9 +170,6 @@ include = [
     "robot_server",
     "LICENSE",
     "tests",
-    "mypy.ini",
-    "pytest.ini",
-    ".flake8",
     "uv.lock",
 ]
 
@@ -179,3 +178,58 @@ packages = ["robot_server"]
 
 [tool.hatch.build.targets.wheel.force_include]
 "LICENSE" = "robot_server/LICENSE"
+
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "ot2_only: Test only functions using the OT2 hardware",
+    "ot3_only: Test only functions using the OT3 hardware",
+    "slow: Marks tests that are especially slow. Commonly, this means the test starts and stops its own dev server process, which takes several seconds, instead of reusing a session-scoped one. Exclude this mark to run only the tests that are fast.",
+]
+filterwarnings = [
+    "error::sqlalchemy.exc.RemovedIn20Warning",
+    "error::pydantic.PydanticDeprecatedSince20",
+]
+
+[tool.mypy]
+plugins = ["pydantic.mypy", "decoy.mypy", "sqlalchemy.ext.mypy.plugin"]
+show_error_codes = true
+strict = true
+# `(?x)` for a verbose regex (so it ignores whitespace and can have comments).
+exclude = """(?x)(
+    tests/(
+      # TODO(mc, 2021-09-12): remove these exclusions
+      robot
+      | service/labware
+      | service/legacy
+      | service/pipette_offset
+      | service/session
+      | service/tip_length
+    )
+    # Ignore Python Protocol API files that are used as opaque test input.
+    | tests/integration/persistence_snapshots
+    | tests/integration/protocols
+  )"""
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+# TODO(mc, 2021-09-08): fix and remove any / all of the
+# overrides below whenever able
+[[tool.mypy.overrides]]
+module = "robot_server.service.session.*"
+no_implicit_reexport = false
+
+[[tool.mypy.overrides]]
+module = "tests.service.json_api.*"
+disallow_any_generics = false
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[[tool.mypy.overrides]]
+module = "tests.service.test_logging"
+disallow_untyped_defs = false

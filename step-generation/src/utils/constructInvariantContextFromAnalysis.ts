@@ -16,6 +16,7 @@ import type {
 import type {
   InvariantContext,
   LabwareEntities,
+  LiquidEntities,
   ModuleEntities,
   PipetteEntities,
   StagingAreaEntities,
@@ -23,11 +24,49 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
+// PD 8.4.3 introduced airGapInPlace which was released sometime on March 18, 2025, so any
+// PD versions prior to that, we will not show the liquid state - this is a gross
+// way to calculate which PD version it was but idk how else to do so since we don't
+// have explicit access to the PD version in the analysis?
+const PD_CUT_OFF_FOR_LIQUID_STATE_TRACKING = new Date('2025-03-19T00:00:00Z')
+
+// API v2.22 is when airGapInPlace was introduced, so any API versions lower than
+// that, we will not support showing the liquid state
+const API_MAJOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING = 2
+const API_MINOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING = 22
+
 export function constructInvariantContextFromAnalysis(
   analysis: ProtocolAnalysisOutput
 ): InvariantContext {
-  const { labware, modules, pipettes, commands } = analysis
+  const { labware, modules, pipettes, commands, liquids, config, createdAt } =
+    analysis
+  const apiVersion = config.protocolType === 'python' ? config.apiVersion : null
+  const isSupportingLiquidsPython =
+    apiVersion != null &&
+    apiVersion[0] >= API_MAJOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING &&
+    apiVersion[1] >= API_MINOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING
+
+  const createdDate = new Date(createdAt)
+  const isSupportingLiquidsPD =
+    config.protocolType === 'json' &&
+    createdDate >= PD_CUT_OFF_FOR_LIQUID_STATE_TRACKING
+
   const labwareDefinitions = getLabwareDefinitionsByURIForProtocol(commands)
+
+  const liquidEntities = liquids.reduce<LiquidEntities>((acc, liquid) => {
+    const { id, description, displayName, displayColor } = liquid
+
+    return {
+      ...acc,
+      [id]: {
+        description,
+        displayName: displayName ?? 'Unknown Liquid',
+        pythonName: 'n/a',
+        displayColor: displayColor ?? '#B7B8B9', // this is COLORS.grey40 which step-generation doesn't have access to
+        liquidGroupId: id,
+      },
+    }
+  }, {})
 
   const moduleEntities = modules.reduce<ModuleEntities>((acc, module) => {
     const { id, model } = module
@@ -97,11 +136,15 @@ export function constructInvariantContextFromAnalysis(
 
     return acc
   }, {})
+
   const otherEntities = commands.reduce(
     (
       acc: Omit<
         InvariantContext,
-        'labwareEntities' | 'moduleEntities' | 'pipetteEntities'
+        | 'labwareEntities'
+        | 'moduleEntities'
+        | 'pipetteEntities'
+        | 'liquidEntities'
       >,
       command: RunTimeCommand
     ) => {
@@ -189,9 +232,6 @@ export function constructInvariantContextFromAnalysis(
       stagingAreaEntities: {},
       //  the timeline scrubber doesn't visualize gripper right now
       gripperEntities: {},
-      //  this util is used for the timeline scrubber. It grabs liquid info from analysis
-      //  so this will not be wired up right now
-      liquidEntities: {},
       config: { OT_PD_DISABLE_MODULE_RESTRICTIONS: true },
     }
   )
@@ -199,6 +239,8 @@ export function constructInvariantContextFromAnalysis(
     labwareEntities,
     pipetteEntities,
     moduleEntities,
+    liquidEntities:
+      isSupportingLiquidsPython || isSupportingLiquidsPD ? liquidEntities : {},
     ...otherEntities,
   }
 }
