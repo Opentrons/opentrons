@@ -66,7 +66,9 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     modifiedLocation = tcDisplayLocation
   } else if (getIsSlotAHopper(location)) {
     modifiedLocation = t('stacker', {
-      slot: FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey],
+      slot: FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey].charAt(
+        0
+      ),
     })
   }
 

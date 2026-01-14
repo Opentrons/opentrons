@@ -872,12 +872,21 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-export const getSlotInLocationStack = (stack?: string[]): string => {
+export const getSlotInLocationStack = (
+  stack?: string[],
+  isStacker?: boolean
+): string => {
+  console.log('🚀 ~ getSlotInLocationStack ~ stack:', stack)
   if (stack == null) {
     console.error('expected to find stack but could not')
     return 'unknown slot'
   } else {
-    return stack[stack.length - 1]
+    const slot = stack[stack.length - 1]
+    if (isStacker) {
+      return 'STACKER' + ' ' + slot.charAt(0)
+    } else {
+      return slot
+    }
   }
 }
 
