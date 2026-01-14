@@ -79,7 +79,8 @@ describe('VisualizerContainer', () => {
 
   beforeEach(() => {
     props = {
-      analysis: mockAnalysis,
+      analysisOutput: mockAnalysis,
+      runId: null,
       groupedCommands: [],
       protocolKey: mockProtocolKey,
       srcFileNames: mockSrcFileNames,
