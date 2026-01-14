@@ -37,15 +37,10 @@
 }
 
 .command_step_groups {
+  overflow: hidden;
   height: 100%;
   min-height: 0;
   flex: 1;
-  overflow-y: auto;
-}
-
-/* this is for scrolling detection  */
-.bottom_sentinel {
-  height: 1px;
 }
 
 .at_bottom {

@@ -500,15 +500,15 @@ export interface HydratedThermocyclerFormData extends AnnotationFields {
   profileVolume: string | null
 
   // https://opentrons.atlassian.net/browse/EXEC-2141
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
   blockIsActiveHold: boolean
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
   blockTargetTempHold: string | null
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
   lidIsActiveHold: boolean
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
   lidTargetTempHold: string | null
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
+  /** @deprecated Ignored now. Use a separate Thermocycler step instead. */
   lidOpenHold: boolean
 }
 

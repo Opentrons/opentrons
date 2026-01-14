@@ -52,6 +52,7 @@ const mockAnalysis = {
   modules: [],
   labware: [],
   pipettes: [],
+  liquids: [],
   result: 'ok',
   robotType: 'OT-3 Standard',
   runTimeParameters: [],
