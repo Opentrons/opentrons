@@ -12,7 +12,7 @@ export const thermocyclerRunExtendedProfile: CommandCreator<
   TCExtendedProfileParams
 > = (args, invariantContext, prevRobotState) => {
   const { moduleId, profileElements, blockMaxVolumeUl } = args
-  const pythonName = invariantContext.moduleEntities[args.moduleId].pythonName
+  const pythonName = invariantContext.moduleEntities[moduleId].pythonName
 
   const repetitionsForPython =
     getThermocyclerProfileRepetitionsForPython(profileElements)

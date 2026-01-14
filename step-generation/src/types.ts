@@ -619,6 +619,11 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
+/**
+ * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
+ * step immediately after the profile starts, and the profile will continue in the
+ * background.
+ */
 export type ThermocyclerProfileStepArgs = CommonArgs & {
   commandCreatorFnName: THERMOCYCLER_PROFILE
 
@@ -633,38 +638,6 @@ export type ThermocyclerProfileStepArgs = CommonArgs & {
   }
 
   message?: string
-} & (
-    | BlockingThermocyclerProfileStepArgs
-    | ConcurrentThermocyclerProfileStepArgs
-  )
-
-// todo(mm, 2026-01-09): PD no longer uses this.
-// We can probably delete step-generation's support for it altogether.
-/**
- * Emits a blocking Thermocycler profile step. The entire profile will complete
- * before the protocol moves on to the next step.
- *
- * In this mode, we can do some extra things immediately after the profile ends,
- * like open the lid or set final temperatures. ("Hold" steps.)
- */
-interface BlockingThermocyclerProfileStepArgs {
-  concurrent: false
-  blockTargetTempHold: number | null
-  lidOpenHold: boolean
-  lidTargetTempHold: number | null
-}
-
-/**
- * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
- * step immediately after the profile starts, and the profile will continue in the
- * background.
- *
- * Because of limitations in Protocol Engine and the Python Protocol API, this mode lacks
- * support for running "hold" steps immediately after the profile ends, so those
- * properties are omitted here.
- */
-interface ConcurrentThermocyclerProfileStepArgs {
-  concurrent: true
 }
 
 export interface ThermocyclerStateStepArgs extends CommonArgs {
