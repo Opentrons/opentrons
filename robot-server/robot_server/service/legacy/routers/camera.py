@@ -181,7 +181,7 @@ async def get_camera_capture_image_settings(
         camera_provider: Access to the camera settings and related services.
     """
     result = camera_settings_store.get_camera_capture_image_settings(
-        camera_id=cameraId if cameraId != DEFAULT_CAMERA_ID else DEFAULT_CAMERA_PATH
+        camera_id=cameraId if DEFAULT_CAMERA_ID not in cameraId else DEFAULT_CAMERA_PATH
     )
 
     return result
