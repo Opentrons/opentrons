@@ -22,6 +22,7 @@ nav:
       - HEPA: modules/hepa.md
       - Magnetic Module: modules/magnetic-module.md
       - Temperature Module: modules/temperature.md
+      - Thermocycler: modules/thermocycler.md
   - Labware:
       - Labware: labware/index.md
       - Labware Concepts: labware/concepts.md
