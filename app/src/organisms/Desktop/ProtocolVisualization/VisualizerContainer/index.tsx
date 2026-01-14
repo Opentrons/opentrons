@@ -54,9 +54,9 @@ export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
   const dispatch = useDispatch()
-
   const { runId, analysisOutput, groupedCommands, protocolKey, srcFileNames } =
     props
+  const createdDate = new Date(analysisOutput.createdAt)
   const completedProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const trackEvent = useTrackEvent()
   const analysis = completedProtocolAnalysis ?? analysisOutput
@@ -104,8 +104,11 @@ export function VisualizerContainer(
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromAnalysis =
-    constructInvariantContextFromAnalysis(analysis)
+  const invariantContextFromAnalysis = constructInvariantContextFromAnalysis(
+    analysis,
+    analysisOutput.config,
+    createdDate
+  )
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
     invariantContextFromAnalysis
