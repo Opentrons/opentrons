@@ -876,7 +876,6 @@ export const getSlotInLocationStack = (
   stack?: string[],
   isStacker?: boolean
 ): string => {
-  console.log('🚀 ~ getSlotInLocationStack ~ stack:', stack)
   if (stack == null) {
     console.error('expected to find stack but could not')
     return 'unknown slot'
