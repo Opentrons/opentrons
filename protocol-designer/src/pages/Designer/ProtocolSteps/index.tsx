@@ -140,16 +140,16 @@ export function ProtocolSteps({
         dispatch(saveProtocolFile())
       },
     })
-
   let currentStep: FormData | null
-  if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
+  if (formData?.stepType === 'flexStacker') {
+    currentStep = formData
+  } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
     currentStep = savedStepForms[selectedStepId]
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
     currentStep = null
   } else {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
   }
-
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
   const showTimelineAlerts =
