@@ -18,16 +18,14 @@ import {
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
 } from '/app/redux/shell'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { StepDetailContainer } from '../StepDetailContainer'
 import styles from './visualizercontainer.module.css'
 
 import type { MouseEvent } from 'react'
-import type {
-  CompletedProtocolAnalysis,
-  ProtocolAnalysisOutput,
-} from '@opentrons/shared-data'
+import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 const INITIAL_MILLISECONDS_PER_FRAME = 2000
@@ -42,7 +40,7 @@ type ResizableColumn = 'left' | 'right'
 
 interface VisualizerContainerProps {
   analysisOutput: ProtocolAnalysisOutput
-  completedProtocolAnalysis: CompletedProtocolAnalysis | null
+  runId: string | null
   groupedCommands: GroupedCommands | null
   protocolKey: string
   srcFileNames: string[]
@@ -53,13 +51,10 @@ export function VisualizerContainer(
 ): JSX.Element {
   const dispatch = useDispatch()
 
-  const {
-    completedProtocolAnalysis,
-    analysisOutput,
-    groupedCommands,
-    protocolKey,
-    srcFileNames,
-  } = props
+  const { runId, analysisOutput, groupedCommands, protocolKey, srcFileNames } =
+    props
+  const completedProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+
   const analysis = completedProtocolAnalysis ?? analysisOutput
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
