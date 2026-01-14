@@ -31,8 +31,13 @@ export function useCameraSettingsValues(
   const cameraImageSettingsRun = useSelector((state: State) =>
     getCameraImageSettings(state, runId ?? '', 'ot_system_camera')
   )
+
   const cameraImageSettings =
-    runId != null ? cameraImageSettingsRun : cameraImageSettingsGlobal
+    runId != null &&
+    cameraImageSettingsRun != null &&
+    Object.keys(cameraImageSettingsRun).length > 0
+      ? cameraImageSettingsRun
+      : cameraImageSettingsGlobal
 
   const [zoom, setZoom] = useState<CameraZoomSetting>('1x')
   const zoomValue = zoomStringToNumber(zoom)
