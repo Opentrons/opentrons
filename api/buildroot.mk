@@ -5,9 +5,10 @@
 ################################################################################
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
+OT_PYTHON := python3
 
 define OTAPI_CALL_PBU
-	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py api $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
+	$(shell python3 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py api $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
 
 PYTHON_OPENTRONS_API_VERSION = $(call OTAPI_CALL_PBU,get_version)
