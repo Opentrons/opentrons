@@ -156,6 +156,35 @@ async def get_camera(
     )
 
 
+@router.get(
+    path="/camera/cameraSettings/{cameraId}",
+    summary="Query general camera capture image settings.",
+    description=(
+        "Query general camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's data will be the camera capture image settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def get_camera_capture_image_settings(
+    cameraId: str,
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Query the general camera capture image settings.
+
+    Args:
+        cameraId: Camera ID for the camera settings to query.
+        camera_provider: Access to the camera settings and related services.
+    """
+    result = camera_settings_store.get_camera_capture_image_settings(camera_id=cameraId)
+
+    return result
+
+
 @router.post(
     path="/camera/cameraSettings",
     summary="Add general camera capture image settings to be used in place of the system image capture defaults.",
