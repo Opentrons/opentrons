@@ -55,8 +55,6 @@ robot = [
 # Robot group is always included in dev to ensure dev environment matches robot
 dev = [
     {include-group = "robot"},
-    "atomicwrites==1.4.0; sys_platform == 'win32'",
-    "colorama==0.4.4; sys_platform == 'win32'",
     "coverage==7.4.1",
     "ruff==0.14.10",
     "mypy==1.19.1",

@@ -66,8 +66,6 @@ dev = [
     "pytest-xdist~=2.5.0",
     "tavern>=3.0.2",
     "coverage==7.4.0",
-    "atomicwrites==1.4.0; sys_platform=='win32'",
-    "colorama==0.4.4; sys_platform=='win32'",
     "sqlalchemy2-stubs==0.0.2a21",
     "mypy==1.19.1",
     "decoy<3,>=2.2.0",
