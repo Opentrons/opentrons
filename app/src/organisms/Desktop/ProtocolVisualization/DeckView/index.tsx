@@ -20,6 +20,7 @@ import {
   getDeckDefFromRobotType,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -90,10 +91,14 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     wasteChuteEntities,
     stagingAreaEntities,
     labwareEntities,
+    moduleEntities,
   } = invariantContext
   const { labware, modules, pipettes } = robotState
   const loadLabwareCommands = commands.filter(
     command => command.commandType === 'loadLabware'
+  )
+  const hasFlexStacker = Object.values(moduleEntities).some(
+    module => module.type === FLEX_STACKER_MODULE_TYPE
   )
   const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
     (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
@@ -148,7 +153,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
           height="100%"
           width="100%"
           deckDef={deckDef}
-          adjustViewBoxForStacker={true}
+          adjustViewBoxForStacker={hasFlexStacker}
           viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
         >
           {() => (
