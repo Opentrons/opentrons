@@ -16,11 +16,11 @@ import {
   WasteChuteStagingAreaFixture,
 } from '@opentrons/components'
 import {
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForAddressableArea,
   getDeckDefFromRobotType,
   isAddressableAreaStandardSlot,
   OT2_ROBOT_TYPE,
-  FLEX_STACKER_MODULE_TYPE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
