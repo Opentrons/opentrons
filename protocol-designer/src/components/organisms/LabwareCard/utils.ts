@@ -18,3 +18,16 @@ export const getCanModifyLabwareQuantity = (
   labwareDef: LabwareDefinition,
   isOnHopper: boolean
 ): boolean => getIsLid(labwareDef) || isOnHopper
+
+export const getLiquidText = (numOfUniqueLiquids: number, t: any): string => {
+  switch (numOfUniqueLiquids) {
+    case 0:
+      return t('no_liquids_added')
+    case 1:
+      return t('num_liquid', { count: 1 })
+    case 2:
+      return t('multiple_liquid_layouts')
+    default:
+      return ''
+  }
+}
