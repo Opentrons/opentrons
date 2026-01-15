@@ -24,10 +24,11 @@ import {
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 
+import { ProtocolDetailsContents } from '..'
+
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import { ProtocolDetailsContents } from '..'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/custom-labware/selectors')
