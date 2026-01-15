@@ -7,6 +7,11 @@ import {
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   replaceCutoutFixtureWithComboFixture,
   THERMOCYCLER_V2_REAR_FIXTURE,
+  FLEX_CUTOUT_BY_SLOT_ID,
+  COMBO_FIXTURES,
+  TRASH_BIN_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+  TRASH_BIN_ADAPTER_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { deleteModule } from '/protocol-designer/modules'
@@ -20,7 +25,6 @@ import {
 } from '/protocol-designer/step-forms/actions/additionalItems'
 
 import {
-  getFixtureNameFromAddresableArea,
   getModuleModel,
 } from '../HardwareConfigurator/utils'
 import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
@@ -38,13 +42,6 @@ import type {
 } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type { MakeSnackbar } from '../Kitchen/KitchenContext'
-
-const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
-  cutoutA3: 'A4',
-  cutoutB3: 'B4',
-  cutoutC3: 'C4',
-  cutoutD3: 'D4',
-}
 
 interface UpdateInitialDeckSetupProps {
   values: CutoutConfigMap[]
@@ -99,37 +96,32 @@ export const updateInitialDeckState = (
     )
   })
   console.log('updatedDeckConfig: ', updatedDeckConfig)
-  dispatch(editDeckConfiguration({ deckConfig: updatedDeckConfig ?? [] }))
   values.forEach(value => {
     if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
       return
     }
-    const fixtureName = getFixtureNameFromAddresableArea(
-      value.addressableAreaId as AddressableAreaName
-    )
-
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
-    const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
-      ae => ae.name === fixtureName && ae.location === value.cutoutId
-    )
-    const fourthColumnSlot =
-      matchingFixture != null
-        ? map3rdColumnCutoutTo4thColumnSlot[matchingFixture.location]
-        : null
+    // look for the same fixture in the same location
+    // const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
+    //   ae => ae.name === fixtureName && ae.location === value.cutoutId
+    // )
+    // get the slot name from the cutout id
+    const slotName =
+      FLEX_CUTOUT_BY_SLOT_ID[value.cutoutId]
 
     const matchingModule = Object.values(moduleOnDeck).find(
       module =>
         module.model === getModuleModel(value.addressableAreaId) &&
         getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
-    const matching4thColumnLabware =
-      matchingFixture != null &&
-      matchingFixture.name === 'stagingArea' &&
-      fourthColumnSlot != null
+
+    // check if there is labware on the slot
+    const matching4thColumnLabware =value.cutoutFixtureId in COMBO_FIXTURES
         ? (Object.values(labwareOnDeck).find(labware =>
-            labware.stack.includes(fourthColumnSlot)
+            labware.stack.includes(slotName)
           ) ?? null)
         : null
+
     const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
       getHardwareInSlotInUse(
         savedSteps,
@@ -172,8 +164,7 @@ export const updateInitialDeckState = (
       } else {
         //  if creating a trashBin or wasteChute and there is a labware on the slot
         if (
-          hasLabwareOnSlot &&
-          (fixtureName === 'trashBin' || fixtureName === 'wasteChute')
+          hasLabwareOnSlot && value.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE || value.cutoutFixtureId in WASTE_CHUTE_FIXTURES
         ) {
           makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
         } else {

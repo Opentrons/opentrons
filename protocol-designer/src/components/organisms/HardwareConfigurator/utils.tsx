@@ -428,22 +428,22 @@ export const getAvailableOptions = (
   return availableOptions
 }
 
-export const getFixtureNameFromAddresableArea = (
-  addressableArea: AddressableAreaName
-): FixtureName | null => {
-  let fixtureName: FixtureName | null = null
-  if (WASTE_CHUTE_ADDRESSABLE_AREAS.includes(addressableArea)) {
-    fixtureName = 'wasteChute'
-  } else if (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(addressableArea)) {
-    fixtureName = 'trashBin'
-  } else if (
-    FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(addressableArea)
-  ) {
-    fixtureName = 'stagingArea'
-  }
+// export const getFixtureNameFromAddresableArea = (
+//   addressableArea: AddressableAreaName
+// ): FixtureName | null => {
+//   let fixtureName: FixtureName | null = null
+//   if (WASTE_CHUTE_ADDRESSABLE_AREAS.includes(addressableArea)) {
+//     fixtureName = 'wasteChute'
+//   } else if (MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(addressableArea)) {
+//     fixtureName = 'trashBin'
+//   } else if (
+//     FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS.includes(addressableArea)
+//   ) {
+//     fixtureName = 'stagingArea'
+//   }
 
-  return fixtureName
-}
+//   return fixtureName
+// }
 
 export const getModuleModel = (
   addressableAreaId: AddressableAreaNamesWithFakes

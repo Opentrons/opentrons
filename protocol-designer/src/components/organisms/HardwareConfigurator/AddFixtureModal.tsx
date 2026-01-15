@@ -45,7 +45,6 @@ import { getLabwareCompatibleForEditHardware } from '../utils'
 import {
   getAllFixtureOptions,
   getAvailableOptions,
-  getFixtureNameFromAddresableArea,
   getModuleModel,
   getModuleOptions,
 } from './utils'
@@ -66,7 +65,6 @@ import type {
 } from '@opentrons/shared-data'
 import type { FormModules, ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { Fixtures, WizardFormState } from '../types'
-import { values } from 'lodash'
 
 const ADDRESSABLE_AREA_D3 = 'D3'
 export interface ModuleExtended extends ModuleOnDeck {
