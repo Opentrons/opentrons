@@ -866,6 +866,9 @@ def test_deck_conflict_raises_for_bad_pipette_move(
     decoy.when(mock_state_view.modules.get_by_slot(DeckSlotName.SLOT_B3)).then_return(
         stacker
     )
+    decoy.when(mock_state_view.modules.get_by_slot(DeckSlotName.SLOT_C2)).then_return(
+        None
+    )
     decoy.when(mock_state_view.modules.is_column_4_module(stacker.model)).then_return(
         True
     )
