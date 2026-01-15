@@ -378,7 +378,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
       defaultValue: 0,
     }) ?? 0
 
-  /** needed for python generation! > */
+  /** needed for python generation! */
   const destTrashPythonName =
     trashBinEntities[destLabware]?.pythonName ??
     wasteChuteEntities[destLabware]?.pythonName

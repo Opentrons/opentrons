@@ -424,7 +424,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
       defaultValue: 0,
     }) ?? 0
 
-  /** needed for python generation! > */
+  /** needed for python generation! */
   const destTrashPythonName =
     trashBinEntities[destLabware]?.pythonName ??
     wasteChuteEntities[destLabware]?.pythonName
