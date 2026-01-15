@@ -1,4 +1,3 @@
-import assert from 'assert'
 import * as React from 'react'
 import Ajv from 'ajv'
 import { saveAs } from 'file-saver'
@@ -75,6 +74,12 @@ import type { LabwareCreatorErrors } from './formLevelValidation'
 // better type-guarding.
 const ajv = new Ajv()
 const validateLabwareSchema2 = ajv.compile(labwareSchemaV2)
+
+const assert = (condition: unknown, message: string): asserts condition => {
+  if (!condition) {
+    throw new Error(message)
+  }
+}
 
 type WizardStep =
   | 'intro'
