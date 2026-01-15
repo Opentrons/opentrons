@@ -200,7 +200,11 @@ export function ProtocolSteps({
         })
         setViewBox(zoomedInViewBox)
       }
-    } else if (zoomedInOnOffDeck) {
+    } else if (
+      zoomedInOnOffDeck &&
+      selectedTerminalItemId != null &&
+      selectedTerminalItemId === START_TERMINAL_ITEM_ID
+    ) {
       setDeckView(rightString)
     }
   }, [zoomedInSlot, labware, zoomedInOnOffDeck])
