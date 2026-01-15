@@ -5,8 +5,10 @@
 ################################################################################
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
+OT_PYTHON := python3
+
 define OTSYSTEMSERVER_CALL_PBU
-	$(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py server-utils $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
+	$(shell python3 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py server-utils $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
 
 PYTHON_OPENTRONS_SERVER_UTILS_VERSION = $(call OTSYSTEMSERVER_CALL_PBU,get_version)
