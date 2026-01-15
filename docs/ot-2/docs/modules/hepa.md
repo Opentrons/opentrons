@@ -2,7 +2,7 @@
 title: "Opentrons OT-2: HEPA Module"
 ---
 
-<font color="red">PLACEHOLDER FOR OT-2 HEPA IMAGE</font>
+![OT-2 HEPA Module](../images/ot2-hepa-hero.png)
 
 ## HEPA Module features
 
