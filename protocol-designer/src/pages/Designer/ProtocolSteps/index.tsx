@@ -202,8 +202,7 @@ export function ProtocolSteps({
       }
     } else if (
       zoomedInOnOffDeck &&
-      selectedTerminalItemId != null &&
-      selectedTerminalItemId === START_TERMINAL_ITEM_ID
+      selectedTerminalItemId! === START_TERMINAL_ITEM_ID
     ) {
       setDeckView(rightString)
     }
