@@ -43,3 +43,17 @@ def test_definition_exists() -> None:
     assert definition_exists(name="glycerol_50", version=1) is True
     assert definition_exists(name="glycerol_oh_no", version=1) is False
     assert definition_exists(name="glycerol_50", version=9999) is False
+
+
+def test_load_definition_with_blowout_position() -> None:
+    """It should accept and load definitions that have blowout positions."""
+    fixture_data = load_shared_data(
+        "liquid-class/fixtures/1/fixture_water_with_blowout_positions.json"
+    )
+    liquid_class_model = LiquidClassSchemaV1.model_validate_json(fixture_data)
+    liquid_class_model.byPipette[0].byTipType[
+        0
+    ].singleDispense.retract.blowout.params.blowoutPosition = TipPosition(
+        position_reference=PositionReference.WELL_TOP,
+        offset=Coordinate(x=1, y=2, z=3),
+    )

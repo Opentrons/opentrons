@@ -251,6 +251,12 @@ class BlowoutParams(BaseLiquidClassModel):
         alias="flow_rate",
         description="Flow rate for blow out, in microliters per second.",
     )
+    blowoutPosition: Optional[TipPosition] | SkipJsonSchema[None] = Field(
+        None,
+        alias="blowout_position",
+        description="Position of the tip during blowout.",
+        json_schema_extra=_remove_default,
+    )
 
 
 class BlowoutProperties(BaseLiquidClassModel):
