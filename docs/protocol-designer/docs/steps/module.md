@@ -20,22 +20,6 @@ When you add modules to the robot deck, available module steps appear in the "Ad
 
 You can add multiple modules of the same type only on the Flex. Only one Thermocycler can be used on the Flex or the OT-2 deck. 
 
-## Flex Stacker Module steps
-
-You can add up to 4 Flex Stacker Modules in column 4, on the right side of your Flex. An attached Stacker Module can store additional well plates, tip racks, or reservoirs to use in your protocol. 
-
-Each Stacker Module includes the Stacker itself, which holds a labware stack of up to...
-
-There are three ways to add labware to the Stacker:
-
-- In the protocol starting deck, click the Stacker Module to add labware. Choose a labware type and quantity. 
-
-      When adding tip racks, enter a quantity and choose whether to add a lid to each tip rack in the menu.  
-
-      For well plates or reservoirs, select your labware from the list, then click **Edit liquid and quantity** in the labware menu on the right. Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. 
-
-- During the protocol, move labware to the Stacker shuttle in column 4. 
-
 
 ## Absorbance Plate Reader Module steps
 
@@ -79,7 +63,35 @@ Follow the instructions to add a total of six Absorbance Plate Reader steps to y
 
 </div>
 
-Protocol Designer includes Absorbance Plate Reader step details to help you keep track of all six steps. Hover over each step in the timeline to view details below the deck map. 
+Protocol Designer includes Absorbance Plate Reader step details to help you keep track of all six steps. Hover over each step in the timeline to view details below the deck map.
+
+## Flex Stacker Module steps
+
+You can add up to 4 Flex Stacker Modules in column 4, on the right side of your Flex. An attached Stacker Module can store additional well plates, tip racks, or reservoirs to use in your protocol. During a protocol, the module's attached shuttle moves stored labware labware from the botttom of the stack to the Flex deck. 
+
+In your protocol starting deck, click the Stacker Module on the right side of the Flex deck to add labware. Choose a labware type and quantity: 
+
+- When adding tip racks, enter a quantity and choose whether to add a lid to each tip rack in the stack. 
+- For well plates or reservoirs, enter a quantity. Then, click **Edit liquid and quantity** in the labware menu on the right. 
+
+    Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. 
+
+*screenshot of edit liquid menu for the entire stack*
+
+Each Stacker can only store a single type of labware in a protocol. If you need to store more than one kind of labware, you'll need to use multiple Stacker Modules. 
+
+Click in the bottom left to add a Stacker step to your Protocol Designer protocol. The step menu shows the labware currently in the Stacker Module and any labware on the attached shuttle. 
+
+*screenshot of Stacker step menu*
+
+Choose from the available module controls to: 
+
+- **Retrieve** a single piece of labware loaded in the Stacker. The labware at the bottom of the stack will be moved onto the shuttle. Add a move step to transfer the labware elsewhere on the Flex deck, either manually or with the Flex Gripper. 
+- **Store** a single piece of labware on the shuttle in the Stacker. The labware will be stored at the bottom of the stack.
+- **Refill** the Stacker with the same type of labware originally loaded in the protocol starting deck. Select the labware type and quantity, and add an optional message to display on the Flex touchscreen.
+- **Empty** all labware from the Stacker. Add an optional message to display on the Flex touchscreen.
+
+Any labware filled into or emptied from the Stacker comes from the Flex's off-deck location, but you don't need to add it there yourself. When you add a refill or empty Stacker step, Protocol Designer creates the off-deck labware for you. Click the toggle switch at the top right of the deck view to see the off-deck labware at any point. 
 
 ## Heater-Shaker Module steps
 
