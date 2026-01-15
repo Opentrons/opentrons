@@ -25,7 +25,7 @@ On macOS, we rely on:
 - [pyenv][] to install and manage Python
 - [uv][] to manage Python dependencies for all Python projects
 
-The setup below is compatible with both Intel and ARM (e.g. M1-M4) machines. It assumes you are using the system default shell of `zsh`.
+The setup below is compatible with both Intel and ARM (Apple silicon M-series) machines. It assumes you are using the system default shell of `zsh`.
 
 #### 0. Install `brew` and general dependencies
 
