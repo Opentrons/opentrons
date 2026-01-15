@@ -30,14 +30,9 @@ def test_move_labware_flex(page: Page, base_url: str) -> None:
     - Made test for OT2 (only manual moves)
     """
     # Import setup protocol and open editor
-    landing = LandingPage(page)
-    editor = ProtocolEditorPage(page)
+    _import_protocol_and_open_editor(page, PROTOCOL_PATH, migration=True)
 
-    landing.wait_for_page_load()
-    landing.confirm_welcome_modal()
-    landing.click_import_existing_protocol()
-    landing.upload_protocol_file(PROTOCOL_PATH)
-    landing.edit_protocol()
+    editor = ProtocolEditorPage(page)
 
     # Add Manual Move to move PCR Lid to Opentrons Tough Wellplate in Thermocycler
     editor.open_add_step_menu()

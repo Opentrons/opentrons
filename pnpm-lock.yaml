@@ -503,6 +503,9 @@ importers:
       react-viewport-list:
         specifier: 6.3.0
         version: 6.3.0(react@18.2.0)
+      react-window:
+        specifier: 2.2.4
+        version: 2.2.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       redux:
         specifier: 5.0.1
         version: 5.0.1
@@ -10012,6 +10015,12 @@ packages:
     resolution: {integrity: sha512-IV7/yeqpurCa2FytCnUWyY664kbDxg5EgQQJHQhI6X2zUZXEq8BlQLfDoPRF2MA8YsVihsC7y3iEf2wGt+Lluw==}
     peerDependencies:
       react: '>=17.0.0'
+
+  react-window@2.2.4:
+    resolution: {integrity: sha512-FiZsQHvt2qbnTz6cN+/FXvX62v2xukQ+AajUivkm/Ivdp9rnU3bp0B1eDcCNpQXNaDBdqkEVGNYHlvIUGU9yBw==}
+    peerDependencies:
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
 
   react@18.2.0:
     resolution: {integrity: sha512-/3IjMdb2L9QbBdWiW5e3P2/npwMBaU9mHCSCUzNln0ZCYbcfTsGbTJrU/kGemdH2IWmB2ioZ+zkxtmq6g09fGQ==}
@@ -22911,6 +22920,11 @@ snapshots:
   react-viewport-list@6.3.0(react@18.2.0):
     dependencies:
       react: 18.2.0
+
+  react-window@2.2.4(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
 
   react@18.2.0:
     dependencies:
