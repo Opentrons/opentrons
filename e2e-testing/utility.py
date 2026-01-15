@@ -1,4 +1,5 @@
 import functools
+import re
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, TimeoutError, expect
@@ -77,9 +78,29 @@ def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: 
 
 
 def _dismiss_migration_modal(page: Page) -> None:
-    """Dismiss the migration modal if it appears during import."""
-
     overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
-    if overlay.is_visible():
-        page.get_by_role("button", name="Import", exact=True).click(force=True)
-        expect(overlay).not_to_be_visible()
+
+    try:
+        overlay.wait_for(state="visible", timeout=2000)
+        print("✓ Migration modal detected")
+    except Exception:
+        print("✗ Migration modal not found")
+        return
+
+    import_buttons = overlay.locator('button[class*="PrimaryButton"]').filter(
+        has_text=re.compile(r"^Import$", re.IGNORECASE)
+    )
+
+    button_count = import_buttons.count()
+    print(f"Found {button_count} Import buttons")
+
+    if button_count > 0:
+        migration_import_btn = import_buttons.nth(button_count - 1)
+        migration_import_btn.wait_for(state="visible", timeout=2000)
+        page.wait_for_timeout(100)
+
+        print("Clicking Import button...")
+        migration_import_btn.click(force=True)
+
+        overlay.wait_for(state="hidden", timeout=5000)
+        print("✓ Modal dismissed successfully")

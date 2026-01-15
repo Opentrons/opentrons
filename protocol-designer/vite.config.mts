@@ -8,6 +8,7 @@ import postCssImport from 'postcss-import'
 import postCssPresetEnv from 'postcss-preset-env'
 import { defineConfig } from 'vite'
 import { analyzer } from 'vite-bundle-analyzer'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 import createGitVersionToolkit from '../scripts/git-version-v2.mjs'
 import { latestLabwareVersions } from '../scripts/git-version.mjs'
@@ -15,26 +16,18 @@ import { cssModuleSideEffect } from './cssModuleSideEffect'
 
 import type { UserConfig } from 'vite'
 
-const REQUIRED_APP_VERSION = '8.8.0' // PD requires this robot stack version or higher
+const REQUIRED_APP_VERSION = '8.8.0'
 const { getVersion, generateBuildInfoHtml } = createGitVersionToolkit({
   project: 'protocol-designer',
 })
 
 const isCI = process.env.CI === 'true'
-
 const hasSentryCreds =
   !!process.env.SENTRY_AUTH_TOKEN &&
   !!process.env.SENTRY_ORG &&
   !!process.env.SENTRY_PROJECT
-
-// Local opt-in only: devs can enable the plugin by exporting SENTRY_* env vars.
-// When enabled locally, the plugin will upload sourcemaps under the `local-dev`
-// release name. The runtime SDK is configured to report the same release so local
-// events can resolve uploaded sourcemaps.
-// CI should use getsentry/action-release for releases/sourcemaps.
 const enableSentryLocalPlugin = !isCI && hasSentryCreds
 
-// eslint-disable-next-line import/no-default-export
 export default defineConfig(async (): Promise<UserConfig> => {
   const OT_PD_VERSION = await getVersion()
   const OT_PD_BUILD_DATE = new Date().toUTCString()
@@ -42,66 +35,47 @@ export default defineConfig(async (): Promise<UserConfig> => {
     await latestLabwareVersions(REQUIRED_APP_VERSION)
 
   return {
-    // this makes imports relative rather than absolute
     base: '',
     build: {
-      // Relative to the root
       outDir: 'dist',
-      // Not hidden: emit normal sourcemaps so devtools + Sentry can auto-detect.
-      // Emit in CI (so action-release can upload) and in local builds.
       sourcemap: true,
       rollupOptions: {
         external: ['react/compiler-runtime'],
         output: {
-          // Manually split out vendor chunks
           manualChunks(id) {
-            if (id.includes('node_modules')) {
-              return 'vendor'
-            }
+            if (id.includes('node_modules')) return 'vendor'
           },
         },
       },
     },
     plugins: [
+      nodePolyfills({
+        include: ['assert', 'buffer', 'process', 'util'],
+        globals: { Buffer: true, global: true, process: true },
+      }),
       react({
         include: '**/*.tsx',
-        babel: {
-          // Use babel.config.js files 1Code has comments. Press enter to view.
-          configFile: true,
-        },
+        babel: { configFile: true },
         jsxRuntime: 'automatic',
       }),
       cssModuleSideEffect(),
       {
         name: 'markdown-loader',
         transform(code, id) {
-          if (id.endsWith('.md')) {
+          if (id.endsWith('.md'))
             return `export default ${JSON.stringify(code)}`
-          }
         },
       },
-
       ...(enableSentryLocalPlugin
         ? [
             sentryVitePlugin({
               org: process.env.SENTRY_ORG,
               project: process.env.SENTRY_PROJECT,
               authToken: process.env.SENTRY_AUTH_TOKEN,
-              telemetry: false,
-              reactComponentAnnotation: { enabled: true },
-
-              // Local opt-in behavior:
-              // - Upload sourcemaps via the plugin (requires SENTRY_* env vars)
-              // - Use the `local-dev` release name
-              // CI continues to upload via getsentry/action-release.
-              release: {
-                name: 'local-dev',
-                inject: false,
-              },
+              release: { name: 'local-dev', inject: false },
             }),
           ]
         : []),
-
       {
         name: 'build-info-generator',
         closeBundle: async () => {
@@ -117,11 +91,8 @@ export default defineConfig(async (): Promise<UserConfig> => {
       ...(process.env.ANALYZE_DEBUG === 'true' ? [analyzer()] : []),
     ],
     optimizeDeps: {
-      esbuildOptions: {
-        target: 'es2020',
-      },
-      // For unknown reasons, PD whitescreens on launch unless we have this.
-      include: ['tslib'],
+      esbuildOptions: { target: 'es2020' },
+      include: ['tslib'], // Restored to your original specific list
     },
     css: {
       postcss: {
@@ -135,7 +106,6 @@ export default defineConfig(async (): Promise<UserConfig> => {
       },
     },
     define: {
-      // NOTE: For security, only include environment variables here if they're explicitly allowlisted.
       _FF_ENV_VARS_: getFeatureFlagEnvVars(),
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
       _OT_PD_BUILD_DATE_: JSON.stringify(OT_PD_BUILD_DATE),
@@ -156,14 +126,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
     },
     resolve: {
       conditions: ['browser'],
-      // For unknown reasons, PD whitescreens on launch unless we have this.
       dedupe: ['tslib'],
       alias: {
         tslib: path.resolve('node_modules/tslib'),
-        // todo(mm, 2025-10-27): These cross-project aliases cause trouble like
-        // files being processed with the wrong config (the config from the
-        // consuming project vs. the config from the source project).
-        // Can these be replaced with regular package.json dependencies?
         '@opentrons/components/styles/global': path.resolve(
           '../components/src/styles/global.css'
         ),
@@ -175,17 +140,11 @@ export default defineConfig(async (): Promise<UserConfig> => {
         '/protocol-designer/': path.resolve('./src/') + '/',
       },
     },
-    server: {
-      port: 5178,
-    },
+    server: { port: 5178 },
   }
 })
 
 function getFeatureFlagEnvVars(): Record<string, string | undefined> {
-  // If we change the prefix to something like "OT_PD_FF_...", we could automatically
-  // scrape process.env instead of having this explicit list. We don't want to scrape
-  // process.env as long as the prefix is just "OT_PD_..." because it might accidentally
-  // include something like "OT_PD_SUPER_SECRET_DEPLOY_KEY".
   const envVarNames = new Set([
     'OT_PD_PRERELEASE_MODE',
     'OT_PD_DISABLE_MODULE_RESTRICTIONS',
@@ -204,6 +163,6 @@ function getFeatureFlagEnvVars(): Record<string, string | undefined> {
     'OT_PD_ENABLE_CAMERA_SUPPORT',
   ])
   return Object.fromEntries(
-    Object.entries(process.env).filter(([key, _value]) => envVarNames.has(key))
+    Object.entries(process.env).filter(([key]) => envVarNames.has(key))
   )
 }
