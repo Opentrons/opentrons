@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 
-import { StyledText } from '../../atoms/StyledText/StyledText'
+import { PlaceholderStyledText } from '../../atoms'
 import { COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
 import styles from './robotinfolabel.module.css'
@@ -49,6 +49,7 @@ export function RobotInfoLabel({
         return 'captionBold'
     }
   }
+
   return (
     <div
       className={labelClass}
@@ -68,13 +69,13 @@ export function RobotInfoLabel({
           aria-label={iconName}
         />
       ) : (
-        <StyledText
+        <PlaceholderStyledText
           desktopStyle={getTextSize(size)}
           oddStyle="smallBodyTextBold"
           color={highlight ? COLORS.white : COLORS.black90}
         >
           {deckLabel}
-        </StyledText>
+        </PlaceholderStyledText>
       )}
     </div>
   )
