@@ -15,6 +15,7 @@ import type { LeafNode } from '/app/redux/protocol-storage'
 
 interface AnnotatedGroupProps {
   scrollTargetId: string | null
+  listElement: HTMLElement | null
   annotationType: string
   subCommands: LeafNode[]
   analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
@@ -33,6 +34,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
     handlePause,
     commandStartNumber,
     scrollTargetId,
+    listElement,
   } = props
   const [isExpanded, setIsExpanded] = useState(() =>
     subCommands.some(command => command.isHighlighted)
@@ -65,6 +67,7 @@ export function AnnotatedGroup(props: AnnotatedGroupProps): JSX.Element {
           {subCommands.map((subCommand, index) => (
             <IndividualCommand
               scrollTargetId={scrollTargetId}
+              listElement={listElement}
               fromGroup={false}
               key={`${subCommand.command.id}_${index}`}
               command={subCommand.command}

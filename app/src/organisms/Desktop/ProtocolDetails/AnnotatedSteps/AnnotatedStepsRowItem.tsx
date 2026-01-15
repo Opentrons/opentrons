@@ -18,6 +18,7 @@ export function AnnotatedStepsRowItem(
         {row.type === 'group' ? (
           <AnnotatedGroup
             scrollTargetId={data.scrollTargetId}
+            listElement={data.listElement}
             analysis={data.analysis}
             annotationType={row.annotationType}
             subCommands={row.group.subCommands}
@@ -29,6 +30,7 @@ export function AnnotatedStepsRowItem(
         ) : row.type === 'command' ? (
           <IndividualCommand
             scrollTargetId={data.scrollTargetId}
+            listElement={data.listElement}
             fromGroup={row.fromGroup}
             command={row.command}
             isHighlighted={row.isHighlighted}
