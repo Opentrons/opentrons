@@ -81,6 +81,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
         labware_id: ID of the labware we are moving to
         well_name: Name of the well to move to
         well_location: exact location within the well to move to
+        version: the API version of the protocol
     """
     # TODO (spp, 2023-02-06): remove this check after thorough testing.
     #  This function is capable of checking for movement conflict regardless of
