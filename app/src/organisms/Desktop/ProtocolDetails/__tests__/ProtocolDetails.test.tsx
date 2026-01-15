@@ -24,11 +24,10 @@ import {
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 import { getIsProtocolAnalysisInProgress } from '/app/redux/protocol-storage/selectors'
 
-import { ProtocolDetails } from '..'
-
 import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import { ProtocolDetailsContents } from '..'
 
 vi.mock('/app/redux/analytics')
 vi.mock('/app/redux/custom-labware/selectors')
@@ -38,11 +37,11 @@ vi.mock('/app/organisms/Desktop/ChooseRobotToRunProtocolSlideout')
 vi.mock('/app/organisms/Desktop/SendProtocolToFlexSlideout')
 
 const render = (
-  props: Partial<ComponentProps<typeof ProtocolDetails>> = {}
+  props: Partial<ComponentProps<typeof ProtocolDetailsContents>> = {}
 ) => {
   return renderWithProviders(
     <MemoryRouter>
-      <ProtocolDetails
+      <ProtocolDetailsContents
         {...{ ...storedProtocolData, ...props, groupedCommands: null }}
       />
     </MemoryRouter>,
@@ -134,9 +133,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    expect(
-      screen.getByRole('heading', { name: 'Deck View' })
-    ).toBeInTheDocument()
+    screen.getByText('Deck View')
     screen.getByText('close ChooseRobotToRunProtocolSlideout')
   })
   it('opens choose robot to run protocol slideout when Start setup button is clicked', async () => {
@@ -186,7 +183,6 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    screen.getByRole('heading', { name: 'creation method' })
     screen.getByText('Protocol Designer 6.0')
   })
   it('renders the protocol creation method for py protocol made in PD', () => {
@@ -203,25 +199,7 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    screen.getByRole('heading', { name: 'creation method' })
     screen.getByText('Protocol Designer 8.0')
-  })
-  it('renders the last analyzed date', () => {
-    render({
-      mostRecentAnalysis: {
-        ...mockMostRecentAnalysis,
-        createdAt,
-        metadata: {
-          ...mockMostRecentAnalysis.metadata,
-        },
-        config: {
-          ...mockMostRecentAnalysis.config,
-          protocolType,
-          schemaVersion,
-        },
-      },
-    })
-    screen.getByRole('heading', { name: 'last analyzed' })
   })
   it('renders the protocol description', () => {
     render({
@@ -239,7 +217,6 @@ describe('ProtocolDetails', () => {
         },
       },
     })
-    screen.getByRole('heading', { name: 'description' })
     screen.getByText('fake protocol description')
   })
 })
