@@ -517,14 +517,12 @@ export function ProtocolDetails(
                   </LegacyStyledText>
                 </Flex>
                 <Flex gridGap={SPACING.spacing4} justifySelf={JUSTIFY_END}>
-                  {enableProtocolTimeline ? (
                     <SecondaryButton
                       onClick={handleClickTimeline}
                       cursor={CURSOR_POINTER}
                     >
                       {t('visualize')}
                     </SecondaryButton>
-                  ) : null}
                   <PrimaryButton
                     onClick={() => {
                       handleRunProtocolButtonClick()
