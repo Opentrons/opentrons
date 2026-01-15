@@ -428,6 +428,7 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const destTrashPythonName =
     trashBinEntities[destLabware]?.pythonName ??
     wasteChuteEntities[destLabware]?.pythonName
+  //
   const trashPythonName =
     trashBinEntities[dropTipLocation]?.pythonName ??
     wasteChuteEntities[dropTipLocation]?.pythonName
