@@ -39,16 +39,15 @@ export function RobotInfoLabel({
       [styles.has_deck_label]: deckLabel != null,
     }
   )
-  let textSize: HelixStyles = 'captionBold'
-  switch (size) {
-    case 'large':
-      textSize = 'headingSmallBold'
-      break
-    case 'extraLarge':
-      textSize = 'headingLargeBold'
-      break
-    default:
-      textSize = 'captionBold'
+  const getTextSize = (size: string): HelixStyles => {
+    switch (size) {
+      case 'large':
+        return 'headingSmallBold'
+      case 'extraLarge':
+        return 'headingLargeBold'
+      default:
+        return 'captionBold'
+    }
   }
   return (
     <div
@@ -70,7 +69,7 @@ export function RobotInfoLabel({
         />
       ) : (
         <StyledText
-          desktopStyle={textSize}
+          desktopStyle={getTextSize(size)}
           oddStyle="smallBodyTextBold"
           color={highlight ? COLORS.white : COLORS.black90}
         >

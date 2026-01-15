@@ -873,8 +873,8 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
 }
 
 export const getSlotInLocationStack = (
-  stack?: string[],
-  isStacker?: boolean
+  stack: string[] | null,
+  isStacker: boolean = false
 ): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')

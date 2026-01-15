@@ -171,7 +171,7 @@ export function AssignLiquidsModal(
               gap={SPACING.spacing10}
             >
               <RobotInfoLabel
-                size={'extraLarge'}
+                size="extraLarge"
                 deckLabel={
                   getSlotInLocationStack(
                     labware[labwareId].stack as string[],
