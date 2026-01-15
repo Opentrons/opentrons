@@ -428,7 +428,8 @@ export const distribute: CommandCreator<DistributeArgs> = (
   const destTrashPythonName =
     trashBinEntities[destLabware]?.pythonName ??
     wasteChuteEntities[destLabware]?.pythonName
-  //
+  // Hack hack hack: distribute_with_liquid_class(trash_location=...) is meant for the
+  // tip drop location, but we manuallywith a separate drop_tip().
   const trashPythonName =
     trashBinEntities[dropTipLocation]?.pythonName ??
     wasteChuteEntities[dropTipLocation]?.pythonName
