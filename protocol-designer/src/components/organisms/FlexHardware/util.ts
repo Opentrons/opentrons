@@ -4,6 +4,8 @@ import {
   getDeckDefFromRobotType,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
+  replaceCutoutFixtureWithComboFixture,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -86,6 +88,18 @@ export const updateInitialDeckState = (
     labware: labwareOnDeck,
   } = initialDeckSetup
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  console.log('values in updateInitialDeckState', values)
+  console.log('deckConfig in updateInitialDeckState', deckConfig)
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig ?? [])
+  const updatedAddedCutoutConfigs = replaceCutoutFixtureWithComboFixture(values, deckConfigWithAA, values[0].cutoutId)
+  console.log('updatedAddedCutoutConfigs in updateInitialDeckState', updatedAddedCutoutConfigs)
+  const updatedDeckConfig = deckConfig?.map(config => {
+    return (
+      updatedAddedCutoutConfigs.find(c => c.cutoutId === config.cutoutId) ?? config
+    )
+  })
+  console.log('updatedDeckConfig: ', updatedDeckConfig)
+  dispatch(editDeckConfiguration({ deckConfig: updatedDeckConfig ?? [] }))
   values.forEach(value => {
     if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
       return

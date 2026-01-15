@@ -66,6 +66,7 @@ import type {
 } from '@opentrons/shared-data'
 import type { FormModules, ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { Fixtures, WizardFormState } from '../types'
+import { values } from 'lodash'
 
 const ADDRESSABLE_AREA_D3 = 'D3'
 export interface ModuleExtended extends ModuleOnDeck {
@@ -87,7 +88,7 @@ interface AddFixtureModalProps {
   setValue?: UseFormSetValue<WizardFormState>
   //  used for updating the initialDeckState in redux in overview and
   //  starting deck state
-  updateInitialDeckState?: (value: CutoutConfigMap[]) => void
+  updateInitialDeckState?: (value: CutoutConfigMap[], deckConfig: DeckConfiguration) => void
   existingCutoutFixtureId?: CutoutFixtureId
 }
 export type OptionStage =
@@ -128,8 +129,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     ? 'moduleOptions'
     : 'modulesOrFixtures'
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
-  const deckConfigWithAA =
-    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
+
   // Bind allFixtureOptions with useEffect
   const [allFixtureOptions, setAllFixtureOptions] = useState<
     CutoutConfigMap[][]
@@ -253,11 +253,16 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     ) {
       makeSnackbar(t('thermocycler_blocked') as string)
     } else {
+      const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
       const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
         addedCutoutConfigs,
         deckConfigWithAA,
         cutoutId
       )
+      console.log('deckConfigWithAA in AddFixtureModal', deckConfigWithAA)
+      console.log('addedCutoutConfigsWithCombo in AddFixtureModal', addedCutoutConfigsWithCombo)
+      console.log('deckConfig in AddFixtureModal', deckConfig)
       const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
         return (
           addedCutoutConfigsWithCombo.find(
@@ -335,7 +340,10 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       if (labwareCompatible) {
         dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
       }
-      updateInitialDeckState?.(addedCutoutConfigs)
+      console.log('addedCutoutConfigs: ', addedCutoutConfigs)
+      const updatedAddedCutoutConfigs = replaceCutoutFixtureWithComboFixture(addedCutoutConfigs, deckConfigWithAA, cutoutId)
+      console.log('updatedAddedCutoutConfigs: ', updatedAddedCutoutConfigs)
+      updateInitialDeckState?.(addedCutoutConfigs, deckConfig)
       closeModal()
     }
   }
