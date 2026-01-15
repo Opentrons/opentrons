@@ -13,7 +13,7 @@ The [Opentrons Temperature Module](https://opentrons.com/products/temperature-mo
 
 ### Heating and cooling
 
-The Temperature Module is designed to achieve and maintain a target temperature on the top plate surface, within its performance specifications. The thermal block, labware, and sample volumes will affect the temperature of the sample, relative to the temperature of the top plate surface. Opentrons recommends testing the temperature within the sample to determine if additional adjustments are needed to meet the requirements of your application. If you have additional questions please contact Opentrons Support.
+The Temperature Module is designed to achieve and maintain a target temperature on the top plate surface, within its performance specifications. The thermal block, labware, and sample volumes will affect the temperature of the sample, relative to the temperature of the top plate surface. Opentrons recommends testing the temperature within the sample to determine if additional adjustments are needed to meet the requirements of your application. If you have additional questions, please contact Opentrons Support.
 
 Additionally, Opentrons has tested the Temperature Module’s temperature profile with both the 24-well and 96-well thermal blocks. The module can generally reach its minimum temperature in 12 to 18 minutes, depending on the block and contents. The module can reach a hot temperature (65 °C) in six minutes. For more details, see the [Temperature Module White Paper](https://insights.opentrons.com/hubfs/Products/Modules/Temperature%20Module%20White%20Paper.pdf).
 
@@ -46,13 +46,12 @@ Outside of protocols, the Opentrons App can display the current status of the Te
       <td>1.5 kg</td>
     </tr>
     <tr>
-      <td><strong>Module power</strong></td>
-      <td>
-        <ul>
-          <li>Input: 100–240 VAC, 50/60 Hz, 4.0 A</li>
-          <li>Output: 36 VDC, 6.1 A, 219.6 W max</li>
-        </ul>
-      </td>
+      <td><strong>Module power input</strong></td>
+      <td>36 VDC, 6.1 A (219.6 W max)</td>
+    </tr>
+    <tr>
+      <td><strong>Power adapter input</strong></td>
+      <td>100–240 VAC, 50/60 Hz, 4.0 A</td>
     </tr>
     <tr>
       <td><strong>Environmental conditions</strong></td>

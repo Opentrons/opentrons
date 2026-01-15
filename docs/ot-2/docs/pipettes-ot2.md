@@ -5,7 +5,7 @@ title: "Opentrons OT-2: Pipettes"
 OT-2 pipettes are a class of gantry-mounted instruments you attach to an Opentrons OT-2 liquid handling robot. For an OT-2, this class includes single- and multi-channel GEN1 and GEN2 pipettes. Pipettes move liquids throughout the working area during protocol execution.
 
 !!! note
-    OT-2 pipettes are not compatible with the Opentrons Flex. Flex pipettesf are not compatible with an OT-2.
+    OT-2 pipettes are not compatible with the Opentrons Flex. Flex pipettes are not compatible with an OT-2.
 
 ## GEN1 pipettes
 
@@ -14,13 +14,14 @@ OT-2 GEN1 pipettes are black and marked by a white Opentrons drop logo. They do 
 <figure class="side-by-side" markdown>
 ![OT2 GEN1 single channel pipette](./images/OT2-gen1-single.png)
 ![OT2 GEN1 multi channel pipette](./images/OT2-gen1-multi.png)
+<figcaption>GEN1 single- and multi-channel pipettes</figcaption>
 </figure>
 
 GEN1 pipettes are no longer manufactured or supported. They have been replaced by the GEN2 models.
 
 ## GEN2 pipettes
 
-OT-2 GEN2 pipettes are different than their GEN1 predecessors. GEN2 pipettes are longer than the GEN1, they have a black and sliver housing, and display exterior markings that identify these instruments as a GEN2 pipettes along with their volumetric capacity.
+OT-2 GEN2 pipettes are different than their GEN1 predecessors. GEN2 pipettes are longer than the GEN1, they have a black and silver housing, and display exterior markings that identify these instruments as GEN2 pipettes along with their volumetric capacity.
 
 <figure class="side-by-side" markdown>
 ![OT2 GEN2 single channel pipette](./images/gen2-p300-single.png)
@@ -112,7 +113,7 @@ The following tables list the accuracy and precision specifications for OT-2 pip
       <td>±4%</td>
       <td>0.8 µL</td>
       <td>±2.5%</td>
-      <td>0.05 µL</td>
+      <td>0.5 µL</td>
     </tr>
     <tr>
       <td></td>

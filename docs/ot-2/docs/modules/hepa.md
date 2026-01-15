@@ -6,14 +6,14 @@ title: "Opentrons OT-2: HEPA Module"
 
 ## HEPA Module features
 
-The [Opentrons HEPA Module](https://opentrons.com/products/hepa-module?sku=999-00137) is a positive pressure clean air system for use with the OT-2 liquid handling robot. The HEPA Module introduces a steady stream of filtered air into the OT-2 enclosure, displacing contaminates and providing a positive pressure air boundary to prevent introduction of airborne contaminants.
+The [Opentrons HEPA Module](https://opentrons.com/products/hepa-module?sku=999-00137) is a positive pressure clean air system for use with the OT-2 liquid handling robot. The HEPA Module introduces a steady stream of filtered air into the OT-2 enclosure, displacing contaminants and providing a positive pressure air boundary to prevent introduction of airborne contaminants.
 
 !!! note
     The OT-2 HEPA module is not compatible with Opentrons Flex. The [Flex HEPA/UV module](https://opentrons.com/products/opentrons-flex-hepa-uv-module) is not compatible with the OT-2.
 
 ## Intended use
 
-The intended use of the HEPA (high-efficiency particulate air) Module is optional equipment with the Opentrons OT-2. It is designed to clean the air of the OT-2 workspace using a HEPA filter to reduce the amount of particles in the workspace. The filter fan continuously will move air through the workspace and vent through the sides of the OT-2 to maintain a clean workspace.
+The HEPA (high-efficiency particulate air) Module is optional equipment with the Opentrons OT-2. It is designed to clean the air of the OT-2 workspace using a HEPA filter to reduce the amount of particles in the workspace. The filter fan continuously moves air through the workspace and vents through the sides of the OT-2 to maintain a clean workspace.
 
 !!! warning
     The HEPA Module is not a biosafety cabinet. Do not use it with pathogens, volatile chemicals, or potentially hazardous aerosols.
@@ -51,7 +51,7 @@ The intended use of the HEPA (high-efficiency particulate air) Module is optiona
     </tr>
     <tr>
       <td>Air flow</td>
-      <td>Vertical airflow, 0.5 m/s–1.0 m/s</td>
+      <td>Vertical downflow, 0.5 m/s–1.0 m/s</td>
     </tr>
     <tr>
       <td>HEPA filter grade/ efficiency</td>

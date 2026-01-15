@@ -6,10 +6,10 @@ title: "Opentrons OT-2: Thermocycler"
 
 ## Thermocycler features
 
-The [Opentrons Thermocycler Module](https://opentrons.com/products/thermocycler-module-1?sku=991-00114) is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with the Flex Gripper, other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
+The [Opentrons Thermocycler Module](https://opentrons.com/products/thermocycler-module-1?sku=991-00114) is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
 
 !!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
+    For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](https://docs.opentrons.com/thermocycler/).
 
 ### Heating and cooling
 
@@ -27,7 +27,7 @@ The Thermocycler's block can heat and cool, and its lid can heat, with the follo
 
 The automated lid can be opened or closed as needed during protocol execution.
 
-### Thermocycler profiles
+### Thermocycler profiles { #thermocycler-profiles-ot2 }
 
 The Thermocycler can execute *profiles*: automatically cycling through a sequence of block temperatures to perform heat-sensitive reactions.
 
@@ -46,7 +46,7 @@ The Thermocycler is compatible with two different plate seals to help protect yo
 
 ### Opentrons Tough PCR lids
 
-The Opentrons Tough PCR Auto-sealing lids are single-use lids that prevent cross-contamination and evaporation during Thermocycler incubation periods. They are gripper-compatible and can be stacked directly on the deck or placed in a specialized [deck riser](https://opentrons.com/products/opentrons-flex-deck-riser).
+The Opentrons Tough PCR Auto-sealing lids are single-use lids that prevent cross-contamination and evaporation during Thermocycler incubation periods.
 
 ![Tough PCR lid image](../images/autoseal-lids.png)
 
@@ -66,16 +66,15 @@ Unlike the Opentrons Tough PCR lids, reuseable seals are not sterile. They must 
 
 ## Thermocycler specifications
 
-| Specification                    | Details                                          |
-|----------------------------------|--------------------------------------------------|
-| **Dimensions (lid open)**        | 244.95 × 172 × 310.1 mm (L/W/H)                  |
-| **Dimensions (lid closed)**      | 244.95 × 172 × 170.35 mm (L/W/H)                 |
-| **Weight (including rear duct)** | 8.4 kg                                           |
-| **Power adapter voltage**        | 100–240 V at 50/60 Hz                            |
-| **Power adapter current**        | 8.5–5 A                                          |
-| **Overvoltage**                  | Category II                                      |
-| **Environmental conditions**     | Indoor use only                                  |
-| **Ambient temperature**          | 20–25 °C (ideal); 2–40 °C (acceptable)           |
-| **Relative humidity**            | 30–80%, non-condensing                           |
-| **Altitude**                     | Up to 2000 m above sea level                     |
-| **Ventilation requirements**     | At least 20 cm / 8 in between the unit and a wall|
+| Specification | Details |
+| :--- | :--- |
+| **Dimensions (lid open)** | 244.95 × 172 × 310.1 mm (L/W/H) |
+| **Dimensions (lid closed)** | 244.95 × 172 × 170.35 mm (L/W/H) |
+| **Weight (including rear duct)** | 8.4 kg |
+| **Power adapter input** | 100–240 VAC, 50/60 Hz, 8.5–5 A |
+| **Overvoltage** | Category II |
+| **Environmental conditions** | Indoor use only |
+| **Ambient temperature** | 20–25 °C (ideal); 2–40 °C (acceptable) |
+| **Relative humidity** | 30–80%, non-condensing |
+| **Altitude** | Up to 2000 m above sea level |
+| **Ventilation requirements** | At least 20 cm / 8 in between the unit and a wall |
