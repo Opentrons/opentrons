@@ -379,10 +379,10 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     }) ?? 0
 
   /** needed for python generation! > */
-  const destTrashPipetteName =
+  const destTrashPythonName =
     trashBinEntities[destLabware]?.pythonName ??
     wasteChuteEntities[destLabware]?.pythonName
-  const trashPipetteName =
+  const trashPythonName =
     trashBinEntities[dropTipLocation]?.pythonName ??
     wasteChuteEntities[dropTipLocation]?.pythonName
   const blowoutTrashPythonName =
@@ -449,7 +449,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=${
-      pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
+      pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPythonName
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     ...(isReturnTip
@@ -459,7 +459,7 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
             ? [`trash_location=${blowoutTrashPythonName}`]
             : []),
         ]
-      : [`trash_location=${trashPipetteName}`, 'keep_last_tip=True']),
+      : [`trash_location=${trashPythonName}`, 'keep_last_tip=True']),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [
