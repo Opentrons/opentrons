@@ -2635,6 +2635,50 @@ def test_get_tip_drop_explicit_location(
     )
 
 
+def test_get_tip_drop_location_raises_for_partial_with_tip_rack(
+    decoy: Decoy,
+    mock_labware_view: LabwareView,
+    mock_pipette_view: PipetteView,
+    subject: GeometryView,
+    tip_rack_def: LabwareDefinition,
+    reservoir_def: LabwareDefinition,
+) -> None:
+    """It should raise if version gate is True and the labware is tip rack, and not raise otherwise."""
+    decoy.when(mock_labware_view.get_definition("tip-rack-id")).then_return(
+        tip_rack_def
+    )
+
+    with pytest.raises(errors.UnexpectedProtocolError):
+        subject.get_checked_tip_drop_location(
+            pipette_id="pipette-id",
+            labware_id="tip-rack-id",
+            well_location=DropTipWellLocation(
+                origin=DropTipWellOrigin.DEFAULT,
+                offset=WellOffset(x=1, y=2, z=3),
+            ),
+            partially_configured_version_gate=True,
+        )
+
+    decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
+        reservoir_def
+    )
+
+    location = subject.get_checked_tip_drop_location(
+        pipette_id="pipette-id",
+        labware_id="labware-id",
+        well_location=DropTipWellLocation(
+            origin=DropTipWellOrigin.DEFAULT,
+            offset=WellOffset(x=1, y=2, z=3),
+        ),
+        partially_configured_version_gate=True,
+    )
+
+    assert location == WellLocation(
+        origin=WellOrigin.TOP,
+        offset=WellOffset(x=1, y=2, z=3),
+    )
+
+
 def test_get_ancestor_slot_name(
     decoy: Decoy,
     mock_labware_view: LabwareView,
