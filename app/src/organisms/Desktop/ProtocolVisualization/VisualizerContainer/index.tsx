@@ -22,6 +22,7 @@ import {
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
 } from '/app/redux/shell'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { StepDetailContainer } from '../StepDetailContainer'
@@ -42,7 +43,8 @@ const GUTTER_WIDTH_PX = 16 // left and right gutters
 type ResizableColumn = 'left' | 'right'
 
 interface VisualizerContainerProps {
-  analysis: ProtocolAnalysisOutput
+  analysisOutput: ProtocolAnalysisOutput
+  runId: string | null
   groupedCommands: GroupedCommands | null
   protocolKey: string
   srcFileNames: string[]
@@ -52,8 +54,12 @@ export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
   const dispatch = useDispatch()
+  const { runId, analysisOutput, groupedCommands, protocolKey, srcFileNames } =
+    props
+  const createdDate = new Date(analysisOutput.createdAt)
+  const completedProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const trackEvent = useTrackEvent()
-  const { analysis, groupedCommands, protocolKey, srcFileNames } = props
+  const analysis = completedProtocolAnalysis ?? analysisOutput
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
@@ -98,13 +104,15 @@ export function VisualizerContainer(
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromAnalysis =
-    constructInvariantContextFromAnalysis(analysis)
+  const invariantContextFromAnalysis = constructInvariantContextFromAnalysis(
+    analysis,
+    analysisOutput.config,
+    createdDate
+  )
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
     invariantContextFromAnalysis
   )
-  console.log('frame', frame)
   const handlePlayPause = (): void => {
     setIsPlaying(prev => !prev)
   }
@@ -172,7 +180,7 @@ export function VisualizerContainer(
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
     srcFileNames,
-    analysis
+    analysisOutput
   )
   const percentComplete =
     filteredSelectedCommandIndex != null

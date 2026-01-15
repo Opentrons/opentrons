@@ -9,6 +9,7 @@ import {
   computeStepSwap,
   convertStepArrayToHierarchy,
   convertStepHierarchyToArray,
+  findStep,
   getPairedSteps,
 } from '/protocol-designer/steplist/utils/stepHierarchy'
 
@@ -142,49 +143,10 @@ describe('convertFlatStepArrayToHierarchy() and convertStepHierarchyToFlatArray(
     flat: FormData[]
     hierarchy: StepHierarchy
   }>)('$label', ({ flat, hierarchy }) => {
-    const hierarchyResult = convertStepArrayToHierarchy(flat, true)
+    const hierarchyResult = convertStepArrayToHierarchy(flat)
     expect(hierarchyResult).toStrictEqual(hierarchy)
     const flatResult = convertStepHierarchyToArray(hierarchyResult)
     expect(flatResult).toStrictEqual(flat.map(element => element.id))
-  })
-
-  it('should no-op if enableConcurrentModuleActions is false', () => {
-    const input: FormData[] = [
-      {
-        id: 'a',
-        stepType: 'comment',
-      },
-      {
-        id: 'b',
-        stepType: 'thermocycler',
-        thermocyclerFormType: THERMOCYCLER_PROFILE,
-      },
-      {
-        id: 'c',
-        stepType: 'comment',
-      },
-      {
-        id: 'd',
-        stepType: 'comment',
-      },
-      {
-        id: 'e',
-        stepType: 'pause',
-        pauseAction: PAUSE_UNTIL_TC_PROFILE_COMPLETE,
-      },
-      {
-        id: 'f',
-        stepType: 'comment',
-      },
-    ]
-    const result = convertStepArrayToHierarchy(input, false)
-    const expectedResult: typeof result = {
-      topLevelItems: input.map(step => ({
-        type: 'standaloneStep',
-        stepId: step.id,
-      })),
-    }
-    expect(result).toStrictEqual(expectedResult)
   })
 })
 
@@ -582,6 +544,75 @@ describe('computeStepSwap()', () => {
     }
     const result = computeStepSwap(originalHierarchy, 'nonexistent', 'up')
     expect(result).toStrictEqual(originalHierarchy)
+  })
+})
+
+describe('findStep()', () => {
+  const stepHierarchy: StepHierarchy = {
+    topLevelItems: [
+      { type: 'standaloneStep', stepId: 'standalone_1' },
+      { type: 'standaloneStep', stepId: 'standalone_2' },
+      {
+        type: 'thermocyclerProfileGroup',
+        thermocyclerProfileStepId: 'tc_profile_root',
+        concurrentSteps: [
+          { type: 'standaloneStep', stepId: 'concurrent_1' },
+          { type: 'standaloneStep', stepId: 'concurrent_2' },
+          { type: 'standaloneStep', stepId: 'concurrent_3' },
+        ],
+        waitForThermocyclerProfileStepId: 'tc_wait',
+      },
+      { type: 'standaloneStep', stepId: 'standalone_3' },
+    ],
+  }
+
+  it('should find a standalone step at the top level', () => {
+    const result = findStep(stepHierarchy, 'standalone_3')
+    expect(result).not.toBeNull()
+    expect(result?.foundNode).toStrictEqual({
+      type: 'standaloneStep',
+      stepId: 'standalone_3',
+    })
+    expect(result?.enclosingNode).toBe(stepHierarchy)
+    expect(result?.indexInEnclosingNode).toBe(3)
+  })
+
+  it('should find a thermocycler profile group root step', () => {
+    const result = findStep(stepHierarchy, 'tc_profile_root')
+    expect(result).not.toBeNull()
+    expect(result?.foundNode).toBe(stepHierarchy.topLevelItems[2])
+    expect(result?.enclosingNode).toBe(stepHierarchy)
+    expect(result?.indexInEnclosingNode).toBe(2)
+  })
+
+  it('should find a concurrent step within a thermocycler profile group', () => {
+    const result = findStep(stepHierarchy, 'concurrent_2')
+    expect(result).not.toBeNull()
+    expect(result?.foundNode).toStrictEqual({
+      type: 'standaloneStep',
+      stepId: 'concurrent_2',
+    })
+    expect(result?.enclosingNode).toBe(stepHierarchy.topLevelItems[2])
+    expect(result?.indexInEnclosingNode).toBe(1)
+  })
+
+  it('should return null for the wait step of a thermocycler profile group', () => {
+    expect(stepHierarchy.topLevelItems[2].type).toStrictEqual(
+      'thermocyclerProfileGroup'
+    )
+    const thermocyclerProfileGroup = stepHierarchy
+      .topLevelItems[2] as ThermocyclerProfileGroup
+
+    const result = findStep(
+      stepHierarchy,
+      thermocyclerProfileGroup.waitForThermocyclerProfileStepId
+    )
+    expect(result).toBeNull()
+  })
+
+  it('should return null for a nonexistent step', () => {
+    const result = findStep(stepHierarchy, 'nonexistent_step')
+    expect(result).toBeNull()
   })
 })
 

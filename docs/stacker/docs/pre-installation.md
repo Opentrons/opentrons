@@ -8,7 +8,7 @@ Review this section for important information about Stacker placement, deck adap
 
 You attach a Stacker to the right side of the robot with its deck slot adapter. You can install the adapter in any available column 3 deck slot (A3 to D3). The adapter also provides labware storage in column 3, so you don’t lose any deck space.
 
-Once attached, the Stacker becomes part of column 4, like a [staging area slot](https://opentrons.com/products/opentrons-flex-deck-expansion-set-4-count). Refer to deck coordinates for column 4 (A4 to D4) when programming the robot to access the Stacker. See [Hardware Modules](https://docs.opentrons.com/v2/new_modules.html) in our API documentation for more information.
+Once attached, the Stacker becomes part of column 4, like a [staging area slot](https://opentrons.com/products/opentrons-flex-deck-expansion-set-4-count). Refer to deck coordinates for column 4 (A4 to D4) when programming the robot to access the Stacker. See our [API documentation](../python-api/modules/flex-stacker.md#loading-and-deck-slots) for more information.
 
 After your Stacker is attached to the deck and powered on, instructions and animated images on the touchscreen take you through a guided setup.
 

@@ -20,7 +20,7 @@ export function StackerContentItem(
       <StyledText desktopStyle="bodyDefaultRegular">
         {primaryLabwareName}
       </StyledText>
-      {hasLid != null ? (
+      {hasLid ? (
         <StyledText desktopStyle="bodyDefaultRegular">
           {t(
             `step_edit_form.flex_stacker.with_lid.${isTiprack ? 'tiprack' : 'standard'}`

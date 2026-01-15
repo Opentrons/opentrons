@@ -153,10 +153,7 @@ Click **Add step** to create a step, like an initial denaturation, that only nee
 Cycles are made up of steps that are repeated a set number of times
 in your experiment. Click **Add cycle** to add steps to a cycle. At the
 bottom of the menu, enter the number of times the cycle should
-repeat before saving your work. Define the ending hold after all
-cycles and steps are complete with a block temperature, lid
-temperature, and lid position before saving your Thermocycler
-Module step. 
+repeat before saving your work.
 
 When adding a Thermocycler Module step, labware in the module is not automatically displayed. Load labware in the Thermocycler on the protocol starting deck or move your labware to the Thermocycler module in a move step. To move labware to and from the Thermocycler, first open the lid by clicking **Change Thermocycler state**.
 
