@@ -33,6 +33,7 @@ import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-co
 
 import { EditLabwareQuantityModal } from '../EditLabwareQuantityModal'
 import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
+import { getCanModifyLabwareQuantity } from './utils'
 
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
@@ -78,8 +79,8 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
     def.allowedRoles?.includes('adapter') || def.parameters.isTiprack
   const isLid = def.allowedRoles?.includes('lid')
   const liquidIds = getLiquidIdsOnLabware(wellContents)
-  const canModifyQuantity =
-    isOnHopper || (def.stackLimit != null && def.stackLimit > 1)
+
+  const canModifyQuantity = getCanModifyLabwareQuantity(def, isOnHopper)
 
   let editButton: null | string = null
   if (
@@ -111,6 +112,7 @@ export function LabwareCard(props: LabwareCardProps): JSX.Element {
           labwareId={labware.id}
           allLabwareIdsOnStack={filteredStack}
           isOnHopper={isOnHopper}
+          location={location}
         />
       ) : null}
       <Box position={POSITION_RELATIVE}>

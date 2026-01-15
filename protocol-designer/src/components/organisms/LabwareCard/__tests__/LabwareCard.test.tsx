@@ -123,17 +123,6 @@ describe('LabwareCard', () => {
     render(props)
     screen.getByText('1 liquid')
   })
-  it('renders a labware card with the quantity tag', () => {
-    props.quantity = 2
-    props.labware = {
-      ...props.labware,
-      def: { ...fixture96Plate, stackLimit: 4 } as LabwareDefinition2,
-    }
-    render(props)
-    screen.getByText('ANSI 96 Standard Microplate')
-    screen.getByText('Quantity: 2')
-    screen.getByText('Edit liquid and quantity')
-  })
   it('renders a labware card with edit quantity copy and pressing button renders modal', () => {
     props.labware = {
       ...props.labware,
