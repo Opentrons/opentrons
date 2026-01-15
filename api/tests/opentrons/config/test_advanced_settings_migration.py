@@ -453,6 +453,7 @@ def v38_config(v37_config: Dict[str, Any]) -> Dict[str, Any]:
     )
     return r
 
+
 @pytest.fixture
 def v39_config(v38_config: Dict[str, Any]) -> Dict[str, Any]:
     r = v38_config.copy()
@@ -600,6 +601,6 @@ def test_ensures_config() -> None:
         "enableOEMMode": None,
         "enablePerformanceMetrics": None,
         "disableFlexStackerLabwareDetection": None,
-        "enableProtocolSubprocess": False,
-        "enableHardwareSubprocess": False,
+        "enableProtocolSubprocess": None,
+        "enableHardwareSubprocess": None,
     }
