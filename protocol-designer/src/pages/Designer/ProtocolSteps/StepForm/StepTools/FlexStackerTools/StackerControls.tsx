@@ -41,7 +41,7 @@ export function StackerControls(props: StackerControlsProps): JSX.Element {
     isStackerEmptyEnabled,
   } = props
   const { t } = useTranslation('form')
-  const [targetProps, tooltipProps] = useHoverTooltip({})
+  const [targetProps, tooltipProps] = useHoverTooltip()
   const handleRadioButtonChange = (value: FlexStackerFormType): void => {
     propsForFields.flexStackerFormType.updateValue(value)
   }
@@ -53,7 +53,7 @@ export function StackerControls(props: StackerControlsProps): JSX.Element {
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {t('step_edit_form.flex_stacker.module_controls.title')}
         </StyledText>
-        <div {...targetProps}>
+        <div {...targetProps} className={styles.tooltip_anchor}>
           <Icon name="information" size="1rem" color={COLORS.grey60} />
           <Tooltip tooltipProps={tooltipProps}>
             {t('step_edit_form.flex_stacker.module_controls.tooltip')}

@@ -59,3 +59,9 @@
   padding: var(--spacing-16) 0;
   gap: var(--spacing-12);
 }
+
+.tooltip_anchor {
+  display: inline-flex;    
+  flex-direction: column;
+  position: relative;
+}
