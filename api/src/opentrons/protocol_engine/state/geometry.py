@@ -773,13 +773,26 @@ class GeometryView:
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
+        partially_configured_version_gate: bool = False,
         override_default_offset: float | None = None,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette.
 
         This makes sure that the well location has an appropriate origin & offset
         if one is not already set previously.
+
+        In API levels before 2.28, we did not support dropping tips in a tip rack
+        while in a partial configuration. The boolean variable `partially_configured_version_gate`
+        will be set to True if called by a protocol API layer and the API level is both below
+        v2.28 and the pipette is partially configured.
         """
+        if (
+            partially_configured_version_gate
+            and self._labware.get_definition(labware_id).parameters.isTiprack
+        ):
+            raise errors.UnexpectedProtocolError(
+                "Cannot return tip to a tiprack while the pipette is configured for partial tip."
+            )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
                 origin=WellOrigin(well_location.origin.value),

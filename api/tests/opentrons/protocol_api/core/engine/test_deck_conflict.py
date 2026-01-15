@@ -769,6 +769,7 @@ module = LoadedModule(
 def test_deck_conflict_raises_for_bad_pipette_move(
     decoy: Decoy,
     mock_state_view: StateView,
+    api_version: APIVersion,
     pipette_bounds: Tuple[Point, Point, Point, Point],
     expected_raise: ContextManager[Any],
     y_value: float,
@@ -970,6 +971,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            version=api_version,
         )
 
 
@@ -980,6 +982,7 @@ def test_deck_conflict_raises_for_bad_pipette_move(
 def test_deck_conflict_raises_for_collision_with_tc_lid(
     decoy: Decoy,
     mock_state_view: StateView,
+    api_version: APIVersion,
 ) -> None:
     """It should raise an error if pipette might collide with thermocycler lid on the Flex."""
     destination_well_point = Point(x=123, y=123, z=123)
@@ -1077,6 +1080,7 @@ def test_deck_conflict_raises_for_collision_with_tc_lid(
             labware_id="destination-labware-id",
             well_name="A2",
             well_location=WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)),
+            version=api_version,
         )
 
 

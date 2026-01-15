@@ -26,7 +26,10 @@ from opentrons.protocol_engine.types import (
     StagingSlotLocation,
     WellLocationType,
 )
+from opentrons.protocols.api_support.types import APIVersion
 from opentrons.types import DeckSlotName, Point, StagingSlotName
+
+_PARTIAL_TIP_RETURN_VERSION_GATE = APIVersion(2, 28)
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
@@ -68,6 +71,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
     labware_id: str,
     well_name: str,
     well_location: WellLocationType,
+    version: APIVersion,
 ) -> None:
     """Check if the labware is safe to move to with a pipette in partial tip configuration.
 
@@ -90,6 +94,9 @@ def check_safe_for_pipette_movement(  # noqa: C901
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_location=well_location,
+            # TODO (jbl, 2026-01-14) check if partially configured if the above TODO is addressed
+            partially_configured_version_gate=version
+            < _PARTIAL_TIP_RETURN_VERSION_GATE,
         )
     well_location_point = engine_state.geometry.get_well_position(
         labware_id=labware_id,
