@@ -1,3 +1,5 @@
+import { forwardRef } from 'react'
+
 import { withStyleProps } from '../hocs/withStyleProps'
 import style from './btn.module.css'
 
@@ -14,16 +16,18 @@ export const BUTTON_TYPE_BUTTON: 'button' = 'button'
  * @component
  */
 
-const BtnComponent: FC<ComponentProps<'button'> & StyleProps> = ({
-  className,
-  ...props
-}) => {
+const BtnComponent = forwardRef<
+  HTMLButtonElement,
+  ComponentProps<'button'> & StyleProps
+>(({ className, ...props }, ref) => {
   const combinedClassName =
     className != null && className !== ''
       ? `${style.btn_container} ${className}`
       : style.btn_container
-  return <button {...props} className={combinedClassName} />
-}
+  return <button {...props} ref={ref} className={combinedClassName} />
+})
+
+BtnComponent.displayName = 'BtnComponent'
 
 export const Btn: FC<ComponentProps<'button'> & StyleProps> = withStyleProps(
   BtnComponent

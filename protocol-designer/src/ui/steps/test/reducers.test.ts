@@ -8,6 +8,8 @@ import {
   TERMINAL_ITEM_SELECTION_TYPE,
 } from '../reducers'
 
+import type { FormData } from '/protocol-designer/form-types'
+import type { SaveStepFormAction } from '../actions/thunks'
 import type { SelectMultipleStepsAction } from '../actions/types'
 import type { SelectableItem } from '../reducers'
 
@@ -31,8 +33,10 @@ describe('selectedItem reducer', () => {
     const stepId = '123'
     const action = {
       type: 'SAVE_STEP_FORM',
-      payload: { id: stepId },
-    }
+      payload: {
+        form: { id: stepId } as FormData,
+      },
+    } as SaveStepFormAction
     expect(selectedItem(null, action)).toEqual({
       selectionType: SINGLE_STEP_SELECTION_TYPE,
       id: stepId,

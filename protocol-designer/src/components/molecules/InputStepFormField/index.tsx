@@ -44,6 +44,13 @@ export function InputStepFormField(
     fillQuantityLocalState,
     ...otherProps
   } = props
+  const verifiedValue: string | number | null =
+    fillQuantityLocalState ??
+    (Array.isArray(value)
+      ? value.length
+      : typeof value === 'string' || typeof value === 'number'
+        ? value
+        : null)
   const { t } = useTranslation('tooltip')
   return (
     <Flex padding={padding} width="100%">
@@ -72,12 +79,7 @@ export function InputStepFormField(
             setIsPristine(false)
           }
         }}
-        value={
-          fillQuantityLocalState ??
-          (typeof value === 'string' || Array.isArray(value)
-            ? value.length
-            : null)
-        }
+        value={verifiedValue}
         units={units}
         placeholder={placeholder}
       />

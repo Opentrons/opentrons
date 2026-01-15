@@ -60,6 +60,7 @@
     "react-select": "5.4.0",
     "react-simple-keyboard": "^3.7.0",
     "react-viewport-list": "6.3.0",
+    "react-window": "2.2.4",
     "redux": "5.0.1",
     "redux-observable": "1.1.0",
     "redux-thunk": "3.1.0",

@@ -44,8 +44,3 @@ class LandingPage(BasePage):
     def edit_protocol(self) -> None:
         """Click the 'Edit' button for a specific protocol."""
         self.page.get_by_role("button", name="Edit protocol").click()
-
-    def dismiss_migration_modal(self) -> None:
-        """Dismiss the migration modal if it appears during import."""
-
-        self.page.get_by_role("button", name="Import", exact=True).click()
