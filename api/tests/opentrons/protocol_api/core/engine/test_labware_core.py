@@ -414,6 +414,55 @@ def test_reset_tips_raises_if_not_tip_rack(
         subject.reset_tips()
 
 
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            ordering=[],
+            wells={
+                "A1": RectangularWellDefinition2.model_construct(),  # type: ignore[call-arg]
+                "H12": RectangularWellDefinition2.model_construct(),  # type: ignore[call-arg]
+            },
+            parameters=LabwareDefinition2Parameters.model_construct(isTiprack=True),  # type: ignore[call-arg]
+        )
+    ],
+)
+def test_set_empty(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should set the tip states to empty."""
+    subject.set_empty()
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.SetTipStateParams(
+                labwareId="cool-labware",
+                wellNames=["A1", "H12"],
+                tipWellState=TipRackWellState.EMPTY,
+            )
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "labware_definition",
+    [
+        LabwareDefinition2.model_construct(  # type: ignore[call-arg]
+            ordering=[],
+            parameters=LabwareDefinition2Parameters.model_construct(isTiprack=False),  # type: ignore[call-arg]
+            metadata=LabwareDefinitionMetadata.model_construct(  # type: ignore[call-arg]
+                displayName="Cool Display Name"
+            ),
+        )
+    ],
+)
+def test_set_empty_raises_if_not_tip_rack(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
+) -> None:
+    """It should raise an exception if the labware isn't a tip rack."""
+    with pytest.raises(TypeError, match="Cool Display Name is not a tip rack"):
+        subject.set_empty()
+
+
 def test_get_tip_length(
     decoy: Decoy, mock_engine_client: EngineClient, subject: LabwareCore
 ) -> None:
