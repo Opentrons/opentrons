@@ -16,10 +16,14 @@ import {
   useOnClickOutside,
 } from '@opentrons/components'
 import {
+  FAKE_HOPPER_LOCATION_MAP,
   getFullStackFromLabwares,
   getIsSlotAHopper,
   getTopLocationInStack,
 } from '@opentrons/step-generation'
+
+import { getStackerModuleStateFromSlot } from '/protocol-designer/components/organisms/AssignLiquidsModal/utils'
+import { updateStackerModuleState } from '/protocol-designer/step-forms/actions'
 
 import {
   ConfirmDeleteEntityInUseModal,
@@ -39,6 +43,7 @@ import { getIsLabwareOnSlotInUse } from './utils'
 
 import type { MouseEvent, SetStateAction } from 'react'
 import type { CoordinateTuple, DeckSlotId } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '@opentrons/step-generation'
 import type { ThunkDispatch } from '../../../types'
 
 const ROBOT_BOTTOM_HALF_SLOTS = [
@@ -105,7 +110,7 @@ export function SlotOverflowMenu(
 
   const { makeSnackbar } = useKitchen()
 
-  const { labware: deckSetupLabware } = deckSetup
+  const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
 
   const isOffDeckLocation = deckSetupLabware[location] != null
 
@@ -147,12 +152,44 @@ export function SlotOverflowMenu(
       ? getIsLabwareOnSlotInUse(savedSteps, topLabwareOnSlot, adapterOnSlot)
       : false
 
-  const handleClear = (): void => {
-    labwareStackOnSlot.forEach(labware => {
-      dispatch(deleteContainer({ labwareId: deckSetupLabware[labware].id }))
-    })
-  }
   const isOnHopper = getIsSlotAHopper(location)
+  const handleClear = (): void => {
+    if (isOnHopper) {
+      const slot = FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey]
+      const moduleOnSlot = Object.values(deckSetupModules).find(
+        module => module.slot === slot
+      )
+      const stackerModuleState = getStackerModuleStateFromSlot({
+        modules: deckSetupModules,
+        slot,
+      })
+      const { labwareInHopper } = stackerModuleState ?? {}
+      const labwaresToDelete =
+        labwareInHopper?.reduce<string[]>((acc, group) => {
+          return [...acc, ...Object.values(group).filter(id => id != null)]
+        }, []) ?? []
+      // delete all hopper labwares
+      labwaresToDelete.forEach(labware => {
+        dispatch(deleteContainer({ labwareId: labware }))
+      })
+      // un-set the stored labware details of the module
+      if (moduleOnSlot != null && stackerModuleState != null) {
+        dispatch(
+          updateStackerModuleState({
+            moduleId: moduleOnSlot.id,
+            moduleState: {
+              ...stackerModuleState,
+              storedLabwareDetails: null,
+            },
+          })
+        )
+      }
+    } else {
+      labwareStackOnSlot.forEach(labware => {
+        dispatch(deleteContainer({ labwareId: deckSetupLabware[labware].id }))
+      })
+    }
+  }
   const showDuplicateBtn =
     !isLabwareAnAdapter && labwareStackOnSlot.length > 0 && !isOnHopper
 
