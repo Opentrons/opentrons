@@ -81,5 +81,5 @@ def _dismiss_migration_modal(page: Page) -> None:
 
     overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
     if overlay.is_visible():
-        page.get_by_role("button", name="Import", exact=True).click()
+        page.get_by_role("button", name="Import", exact=True).click(force=True)
         expect(overlay).not_to_be_visible()

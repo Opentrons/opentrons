@@ -7,8 +7,7 @@ from automation.pd_pages import LandingPage, MixStepForm, ProtocolEditorPage
 
 PROTOCOL_PATH = "fixtures/protocol/8/doItAllV8.json"
 # ToDo fix after merge pnpm pr
-# LABWARE_OPTION = "B4 Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt"
-LABWARE_OPTION = "A1+B1 Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt"
+LABWARE_OPTION = "B4 Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt"
 PIPETTE_OPTION = "Flex 1-Channel 1000 µL"
 TIPRACK_OPTION = "Opentrons Flex 96 Tip Rack 1000 µL"
 
