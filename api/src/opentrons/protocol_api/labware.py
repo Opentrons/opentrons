@@ -1383,7 +1383,11 @@ class Labware:
 
         When this is called, all tip wells in the tip rack will be marked as empty. Any tips
         that are dropped into this empty tip rack will be marked as used, and therefore will not
-        be
+        be available to pick up via automatic tip tracking. If an empty well is filled with tips,
+        [`reset()`][opentrons.protocol_api.InstrumentContext.reset] can be called to treat it as
+        a fresh tip rack.
+
+        This will raise if the labware is not a tip rack.
         """
         self._core.set_empty()
 
