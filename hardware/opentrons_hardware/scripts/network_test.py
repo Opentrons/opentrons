@@ -8,17 +8,22 @@ logs and stats about how well the test went, and possibly augment with
 linux built-in canbus statistics from netutils.
 """
 
-from enum import Enum, auto
+import argparse
 import asyncio
 import dataclasses
 import logging
-from logging.config import dictConfig
-import argparse
-import sys
 import re
+import sys
 import time
-from typing import Optional, AsyncGenerator, TextIO, Type, Union, Set, Tuple
+from enum import Enum, auto
+from logging.config import dictConfig
+from typing import AsyncGenerator, Optional, Set, TextIO, Tuple, Type, Union
 
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.build import build_driver
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
     MessageDefinition,
 )
@@ -28,14 +33,8 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     HeartbeatResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import EmptyPayload
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.can_bus.build import build_driver
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.hardware_control.network import NetworkInfo
-
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 IS_LINUX = sys.platform.startswith("linux")
 

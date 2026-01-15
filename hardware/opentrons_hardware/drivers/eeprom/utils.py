@@ -4,14 +4,13 @@ import struct
 from typing import Any, Optional, Set, Tuple
 
 from .types import (
-    PropId,
-    Property,
-    PropType,
+    MAX_DATA_LEN,
     PROP_ID_TYPES,
     PROP_TYPE_SIZE,
-    MAX_DATA_LEN,
+    Property,
+    PropId,
+    PropType,
 )
-
 
 ParsedData = Tuple[Set[Property], bytes]
 

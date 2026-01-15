@@ -3,6 +3,8 @@ import typeguard
 
 from opentrons_shared_data.deck import (
     list_names as list_deck_definition_names,
+)
+from opentrons_shared_data.deck import (
     load as load_deck_definition,
 )
 from opentrons_shared_data.deck.types import (

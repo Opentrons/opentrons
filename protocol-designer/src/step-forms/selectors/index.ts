@@ -5,7 +5,6 @@ import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
 
 import {
-  FLEX_STACKER_MODULE_TYPE,
   getLabwareDefURI,
   getPipetteSpecsV2,
   HEATERSHAKER_MODULE_TYPE,
@@ -44,7 +43,6 @@ import type {
 import type {
   AdditionalEquipmentEntities,
   AdditionalEquipmentEntity,
-  FlexStackerModuleState,
   GripperEntities,
   InvariantContext,
   LabwareEntities,
@@ -58,7 +56,6 @@ import type {
   TrashBinEntities,
   WasteChuteEntities,
 } from '@opentrons/step-generation'
-import type { BonusStepModalType } from '/protocol-designer/components/organisms'
 import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   FormData,
@@ -94,12 +91,16 @@ import type {
 } from '../types'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
+
 const labwareIngredRootSelector = (state: BaseState): LabwareIngredRootState =>
   state.labwareIngred
 
 const _getInitialDeckSetupStepFormRootState: (
   arg: RootState
 ) => FormData = rs => rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
+export const getPendingCreationState = (state: BaseState): boolean =>
+  rootSelector(state).stackerLabwareReducer.pendingCreation
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
   rootSelector(state).presavedStepForm
@@ -204,17 +205,8 @@ export const getAdditionalEquipment: Selector<
 export const getInitialDeckSetupStepForm: Selector<BaseState, FormData> =
   createSelector(rootSelector, _getInitialDeckSetupStepFormRootState)
 
-// todo(mm, 2025-12-12): Temporarily defining FLEX_STACKER_INITIAL_STATE here until step-generation supports it.
-const FLEX_STACKER_INITIAL_STATE: FlexStackerModuleState = {
-  type: FLEX_STACKER_MODULE_TYPE,
-  storedLabwareDetails: null,
-  labwareInHopper: null,
-  labwareOnShuttle: null,
-}
-
 const MODULE_INITIAL_STATES_MAP = {
   ...STEP_GENERATION_MODULE_INITIAL_STATE_BY_TYPE,
-  [FLEX_STACKER_MODULE_TYPE]: FLEX_STACKER_INITIAL_STATE,
 } as const
 MODULE_INITIAL_STATES_MAP satisfies Record<
   ModuleType,
@@ -450,16 +442,9 @@ export const getOrderedSavedForms: Selector<BaseState, FormData[]> =
   )
 
 export const getSavedStepHierarchy: Selector<BaseState, StepHierarchy> =
-  createSelector(
-    getOrderedSavedForms,
-    featureFlagSelectors.getEnableConcurrentModuleActions,
-    (orderedSavedForms, enableConcurrentModuleActions) => {
-      return convertStepArrayToHierarchy(
-        orderedSavedForms,
-        enableConcurrentModuleActions
-      )
-    }
-  )
+  createSelector(getOrderedSavedForms, orderedSavedForms => {
+    return convertStepArrayToHierarchy(orderedSavedForms)
+  })
 
 /**
  * A mapping from step IDs to the step's user-visible index in the timeline.
@@ -761,13 +746,7 @@ export const getArgsAndErrorsByStepId: Selector<
   getOrderedSavedForms,
   getInvariantContext,
   labwareDefSelectors.getLabwareDefsByURI,
-  featureFlagSelectors.getEnableConcurrentModuleActions,
-  (
-    stepForms,
-    contextualState,
-    allLabwareDefs,
-    enableConcurrentModuleActions
-  ) => {
+  (stepForms, contextualState, allLabwareDefs) => {
     return reduce(
       stepForms,
       (acc, stepForm, index) => {
@@ -781,8 +760,7 @@ export const getArgsAndErrorsByStepId: Selector<
           ? {
               stepArgs: stepFormToArgs(
                 { ...hydratedForm, stepNumber: index + 1 },
-                contextualState,
-                enableConcurrentModuleActions
+                contextualState
               ),
             }
           : {
@@ -793,53 +771,6 @@ export const getArgsAndErrorsByStepId: Selector<
       },
       {}
     )
-  }
-)
-
-export const getBonusStepModalType = createSelector(
-  getUnsavedForm,
-  getCurrentFormIsPresaved,
-  featureFlagSelectors.getEnableConcurrentModuleActions,
-  (
-    unsavedForm,
-    currentFormIsPresaved,
-    enableConcurrentModuleActions
-  ): BonusStepModalType | null => {
-    // NOTE: This logic to decide whether a bonus step is warranted should be kept in
-    // sync with saveStepForm().
-
-    const isTempModSetTempForm =
-      unsavedForm?.stepType === 'temperature' &&
-      unsavedForm?.targetTemperature != null
-    const isHSSetTempForm =
-      unsavedForm?.stepType === 'heaterShaker' &&
-      unsavedForm?.targetHeaterShakerTemperature != null &&
-      unsavedForm?.heaterShakerSetTimer !== true
-    const isTCProfileForm =
-      unsavedForm?.stepType === 'thermocycler' &&
-      unsavedForm?.thermocyclerFormType === 'thermocyclerProfile'
-
-    const isFirstTimeSavingThisForm = currentFormIsPresaved
-
-    // todo(mm, 2025-11-24): These should also be conditional on "Don't show again"
-    // not having been clicked before. https://opentrons.atlassian.net/browse/EXEC-1925
-    if (isTempModSetTempForm && isFirstTimeSavingThisForm) {
-      return enableConcurrentModuleActions
-        ? 'explainWaitForTemperatureModuleTemp'
-        : 'optionallyWaitForTemp'
-    } else if (isHSSetTempForm && isFirstTimeSavingThisForm) {
-      return enableConcurrentModuleActions
-        ? 'explainWaitForHeaterShakerTemp'
-        : 'optionallyWaitForTemp'
-    } else if (
-      enableConcurrentModuleActions &&
-      isTCProfileForm &&
-      isFirstTimeSavingThisForm
-    ) {
-      return 'explainWaitForThermocyclerProfile'
-    } else {
-      return null
-    }
   }
 )
 

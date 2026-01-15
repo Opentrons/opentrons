@@ -2,15 +2,13 @@
 
 import pytest
 
-from opentrons.ordered_set import OrderedSet
-
-from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
-from opentrons.protocol_engine.state.command_history import CommandHistory, CommandEntry
-from opentrons.protocol_engine.commands import CommandIntent, CommandStatus
-
 from .command_fixtures import (
     create_queued_command,
 )
+from opentrons.ordered_set import OrderedSet
+from opentrons.protocol_engine.commands import CommandIntent, CommandStatus
+from opentrons.protocol_engine.errors.exceptions import CommandDoesNotExistError
+from opentrons.protocol_engine.state.command_history import CommandEntry, CommandHistory
 
 
 def create_queued_command_entry(

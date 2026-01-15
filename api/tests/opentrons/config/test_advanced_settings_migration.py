@@ -3,7 +3,8 @@ from typing import Any, Dict, cast
 import pytest
 from _pytest.fixtures import SubRequest
 from pytest_lazy_fixtures import lf as lazy_fixture
-from opentrons.config.advanced_settings import _migrate, _ensure
+
+from opentrons.config.advanced_settings import _ensure, _migrate
 
 
 @pytest.fixture

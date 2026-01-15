@@ -6,7 +6,6 @@ import pytest
 from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
-
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
@@ -14,26 +13,25 @@ from opentrons_shared_data.labware.labware_definition import (
 )
 
 from opentrons.protocol_engine import (
+    DeckPoint,
     DropTipWellLocation,
     DropTipWellOrigin,
     WellLocation,
     WellOffset,
-    DeckPoint,
 )
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
+from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.commands.unseal_pipette_from_tip import (
+    UnsealPipetteFromTipImplementation,
     UnsealPipetteFromTipParams,
     UnsealPipetteFromTipResult,
-    UnsealPipetteFromTipImplementation,
 )
-from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
 from opentrons.protocol_engine.errors.exceptions import TipAttachedError
+from opentrons.protocol_engine.execution import GantryMover, MovementHandler, TipHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.execution import MovementHandler, GantryMover, TipHandler
-from opentrons.protocol_engine.types import TipGeometry, LabwareWellId
-
+from opentrons.protocol_engine.types import LabwareWellId, TipGeometry
 from opentrons.types import Point
 
 
@@ -252,7 +250,7 @@ async def test_tip_attached_error(
         )
     ).then_return(Point(x=111, y=222, z=333))
     decoy.when(
-        await mock_tip_handler.drop_tip(
+        await mock_tip_handler.drop_tip(  # type: ignore[func-returns-value]
             pipette_id="abc",
             home_after=None,
             do_not_ignore_tip_presence=False,

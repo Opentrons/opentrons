@@ -6,6 +6,7 @@ from typing import Any, Mapping, Optional
 
 from aiohttp import web
 
+from . import update_actions
 from otupdate.common import (
     config,
     constants,
@@ -14,9 +15,7 @@ from otupdate.common import (
     ssh_key_management,
     update,
 )
-from . import update_actions
 from otupdate.common.file_actions import load_version_file
-
 
 BR_BUILTIN_VERSION_FILE = "/etc/VERSION.json"
 #: Location of the builtin system version

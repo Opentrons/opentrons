@@ -1,12 +1,13 @@
 import pytest
 from mock import AsyncMock, MagicMock
+
 from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
+from opentrons.drivers.vacuum_module import types
 from opentrons.drivers.vacuum_module.driver import (
     VacuumModuleDriver,
 )
-from opentrons.drivers.vacuum_module import types
 
 
 @pytest.fixture
@@ -135,14 +136,14 @@ async def test_set_vacuum_state(
     # With duration and rate
     connection.send_command.return_value = "M120"
 
-    await subject.set_vacuum_state(True, -600, 500, rate=10)
+    await subject.set_vacuum_state(True, -600, 500, rate=-10)
 
     set_pressure = (
         types.GCODE.SET_PRESSURE_STATE.build_command()
         .add_int("S", 1)
         .add_float("P", -600)
         .add_int("D", 500)
-        .add_float("R", 10)
+        .add_float("R", -10)
     )
 
     connection.send_command.assert_any_call(set_pressure)

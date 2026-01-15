@@ -48,6 +48,10 @@ export interface LabwareTemporalProperties {
   // we currently use this property only to track if a lid has been placed on a "pipettable" labware that could presumably contain liquid
   // we can expand this type in the future to track other types of sterility for various labware types
   sterility?: typeof TOUCHED_PIPETTABLE_LABWARE
+  // this is needed for PV to determine which labware is being moved
+  // into the hopper based on the setStoredLabware count
+  setStoredLabwareCount?: number
+  fillCount?: number
 }
 
 export interface PipetteTemporalProperties {
@@ -155,6 +159,10 @@ export interface FlexStackerModuleState {
   // labware in hopper is the bottom up
   labwareInHopper: FlexStackerStoredLabwareGroup[] | null
   labwareOnShuttle: FlexStackerStoredLabwareGroup | null
+  // this is needed in order to differentiate between the different
+  // off-deck labwares and when they get loaded onto the hopper for setStoredLabware
+  setStoredLabwareCount?: number
+  fillCount?: number
 }
 
 export type ModuleState =
@@ -611,6 +619,11 @@ interface ProfileCycleItem {
 // TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
+/**
+ * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
+ * step immediately after the profile starts, and the profile will continue in the
+ * background.
+ */
 export type ThermocyclerProfileStepArgs = CommonArgs & {
   commandCreatorFnName: THERMOCYCLER_PROFILE
 
@@ -625,36 +638,6 @@ export type ThermocyclerProfileStepArgs = CommonArgs & {
   }
 
   message?: string
-} & (
-    | BlockingThermocyclerProfileStepArgs
-    | ConcurrentThermocyclerProfileStepArgs
-  )
-
-/**
- * Emits a blocking Thermocycler profile step. The entire profile will complete
- * before the protocol moves on to the next step.
- *
- * In this mode, we can do some extra things immediately after the profile ends,
- * like open the lid or set final temperatures. ("Hold" steps.)
- */
-interface BlockingThermocyclerProfileStepArgs {
-  concurrent: false
-  blockTargetTempHold: number | null
-  lidOpenHold: boolean
-  lidTargetTempHold: number | null
-}
-
-/**
- * Emits a concurrent Thermocycler profile step. The protocol will proceed to the next
- * step immediately after the profile starts, and the profile will continue in the
- * background.
- *
- * Because of limitations in Protocol Engine and the Python Protocol API, this mode lacks
- * support for running "hold" steps immediately after the profile ends, so those
- * properties are omitted here.
- */
-interface ConcurrentThermocyclerProfileStepArgs {
-  concurrent: true
 }
 
 export interface ThermocyclerStateStepArgs extends CommonArgs {
@@ -725,7 +708,7 @@ export interface FlexStackerFillItemsArgs extends CommonArgs {
   moduleId: string
   commandCreatorFnName: 'flexStackerFillItems'
   fillLabwareUri: string | null
-  fillQuantity: number | null
+  fillLabwareIds: string[]
   interventionMessage: string | null
 }
 export interface FlexStackerStoreArgs extends CommonArgs {
@@ -874,11 +857,13 @@ export type ErrorType =
   | 'LABWARE_DOES_NOT_EXIST'
   | 'LABWARE_OFF_DECK'
   | 'LABWARE_ON_ANOTHER_ENTITY'
+  | 'LABWARE_ON_HOPPER'
   | 'MISMATCHED_SOURCE_DEST_WELLS'
   | 'MISMATCHED_STACKER_LABWARE_TYPE'
   | 'MISSING_96_CHANNEL_TIPRACK_ADAPTER'
   | 'MISSING_MODULE'
   | 'MISSING_PROFILE_STEP'
+  | 'MISSING_STACKER_LABWARE_TYPE'
   | 'MISSING_TEMPERATURE_STEP'
   | 'MODULE_PIPETTE_COLLISION_DANGER'
   | 'MULTI_ASPIRATE_VOLUME_TOO_HIGH'
@@ -901,6 +886,7 @@ export type ErrorType =
   | 'SUBMERGE_BELOW_ASPIRATE'
   | 'SUBMERGE_BELOW_DISPENSE'
   | 'TALL_LABWARE_EAST_WEST_OF_HEATER_SHAKER'
+  | 'THERMOCYCLER_BUSY_WITH_PROFILE'
   | 'THERMOCYCLER_LID_CLOSED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'TIPRACK_LID_NOT_ALLOWED_ON_DECK'

@@ -1,47 +1,49 @@
 """Test load module command."""
 
 from typing import cast
+
 import pytest
 from decoy import Decoy
 
-from opentrons.protocol_engine.errors import LocationIsOccupiedError
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.update_types import StateUpdate
-from opentrons_shared_data.robot.types import RobotType
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleModel,
-    AddressableAreaLocation,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleData
-from opentrons.protocol_engine import ModuleModel as EngineModuleModel
-from opentrons.hardware_control.modules import ModuleType
-
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.commands.load_module import (
-    LoadModuleParams,
-    LoadModuleResult,
-    LoadModuleImplementation,
-)
-from opentrons.hardware_control.modules.types import (
-    ModuleModel as HardwareModuleModel,
-    TemperatureModuleModel,
-    MagneticModuleModel,
-    ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
-    FlexStackerModuleModel,
-)
+from opentrons_shared_data.deck import load as load_deck
 from opentrons_shared_data.deck.types import (
     DeckDefinitionV5,
     SlotDefV3,
 )
-from opentrons_shared_data.deck import load as load_deck
+from opentrons_shared_data.robot.types import RobotType
+
+from opentrons.hardware_control.modules import ModuleType
+from opentrons.hardware_control.modules.types import (
+    FlexStackerModuleModel,
+    HeaterShakerModuleModel,
+    MagneticModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+)
+from opentrons.hardware_control.modules.types import (
+    ModuleModel as HardwareModuleModel,
+)
+from opentrons.protocol_engine import ModuleModel as EngineModuleModel
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.commands.load_module import (
+    LoadModuleImplementation,
+    LoadModuleParams,
+    LoadModuleResult,
+)
+from opentrons.protocol_engine.errors import LocationIsOccupiedError
+from opentrons.protocol_engine.execution import EquipmentHandler, LoadedModuleData
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.state.update_types import LoadModuleUpdate, StateUpdate
+from opentrons.protocol_engine.types import (
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    ModuleModel,
+)
 from opentrons.protocols.api_support.deck_type import (
     STANDARD_OT2_DECK,
     STANDARD_OT3_DECK,
 )
-from opentrons.protocol_engine.state.update_types import LoadModuleUpdate
+from opentrons.types import DeckSlotName
 
 
 @pytest.mark.parametrize(

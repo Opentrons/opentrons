@@ -1,13 +1,14 @@
 """Script that can process previous real world data to test lld processes."""
 
+import argparse
 import csv
 import os
-import argparse
 import sys
-from typing import List, Optional, Tuple, Any, Dict
+from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Tuple
+
 import matplotlib.pyplot as plot
 import numpy
-from abc import ABC, abstractmethod
 
 impossible_pressure = 9001.0
 accepted_error = 0.5

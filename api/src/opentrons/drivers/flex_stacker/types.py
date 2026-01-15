@@ -1,6 +1,6 @@
-from enum import Enum
 from dataclasses import dataclass, fields
-from typing import List, Dict, Optional
+from enum import Enum
+from typing import Dict, List, Optional
 
 from opentrons_shared_data.util import StrEnum
 

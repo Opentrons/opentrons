@@ -1,6 +1,7 @@
 """Protocol engine types to do with engine execution."""
 
 from enum import Enum
+
 from opentrons_shared_data.util import StrEnum
 
 

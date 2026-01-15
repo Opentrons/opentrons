@@ -1,20 +1,21 @@
-from typing import Optional, Callable
-import pytest
-from unittest import mock
 from datetime import datetime
+from typing import Callable, Optional
+from unittest import mock
 
-from opentrons.types import Point
-from opentrons.calibration_storage import types as cal_types
-from opentrons.hardware_control.instruments.ot3 import gripper, instrument_calibration
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.config import gripper_config
-from opentrons_shared_data.gripper import GripperModel
+import pytest
+
 from opentrons_shared_data.errors.exceptions import MotionFailedError
+from opentrons_shared_data.gripper import GripperModel
 
+from opentrons.calibration_storage import types as cal_types
+from opentrons.config import gripper_config
+from opentrons.hardware_control.instruments.ot3 import gripper, instrument_calibration
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
     GripperJawWidthData,
 )
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.types import Point
 
 fake_gripper_conf = gripper_config.load(GripperModel.v1)
 
@@ -24,9 +25,9 @@ def fake_offset() -> GripperCalibrationOffset:
     return instrument_calibration.load_gripper_calibration_offset("fakeid123")
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
-def fake_jaw_cal() -> GripperJawWidthData:
+def fake_jaw_cal(request: pytest.FixtureRequest) -> GripperJawWidthData:
+    request.node.add_marker("ot3_only")
     return instrument_calibration.load_gripper_jaw_width("fakeid123")
 
 

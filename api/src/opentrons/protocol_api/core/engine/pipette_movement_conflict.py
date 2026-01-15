@@ -1,32 +1,32 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
 
 from __future__ import annotations
+
 import logging
 from typing import (
+    List,
     Tuple,
     Union,
-    List,
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
-from opentrons.protocol_engine.errors import LocationIsStagingSlotError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
+from . import point_calculations
 from opentrons.motion_planning import adjacent_slots_getters
-
 from opentrons.protocol_engine import (
-    StateView,
     DeckSlotLocation,
-    OnLabwareLocation,
     DropTipWellLocation,
+    OnLabwareLocation,
+    StateView,
 )
+from opentrons.protocol_engine.errors import LocationIsStagingSlotError
 from opentrons.protocol_engine.types import (
+    LoadedModule,
     StagingSlotLocation,
     WellLocationType,
-    LoadedModule,
 )
-from opentrons.types import DeckSlotName, StagingSlotName, Point
-from . import point_calculations
+from opentrons.types import DeckSlotName, Point, StagingSlotName
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):

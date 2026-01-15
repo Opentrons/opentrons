@@ -1,21 +1,27 @@
 """Test estop handler wrapper class."""
 
-from decoy import Decoy
+from typing import TYPE_CHECKING, List, Tuple
+
 import pytest
-from typing import List, Tuple, TYPE_CHECKING
+from decoy import Decoy
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API
 
-from robot_server.robot.control.estop_handler import EstopHandler
-from robot_server.robot.control.models import (
-    EstopState,
-    EstopPhysicalStatus,
+from opentrons.hardware_control.types import (
+    EstopOverallStatus,
+)
+from opentrons.hardware_control.types import (
+    EstopPhysicalStatus as HwEstopPhysicalStatus,
 )
 from opentrons.hardware_control.types import (
     EstopState as HwEstopState,
-    EstopPhysicalStatus as HwEstopPhysicalStatus,
-    EstopOverallStatus,
+)
+
+from robot_server.robot.control.estop_handler import EstopHandler
+from robot_server.robot.control.models import (
+    EstopPhysicalStatus,
+    EstopState,
 )
 
 

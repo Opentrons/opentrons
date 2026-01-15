@@ -3,18 +3,18 @@ Update session object for tracking state across multiple calls
 """
 
 import base64
-from collections import namedtuple
 import enum
+import functools
 import logging
 import os
 import shutil
-from typing import Mapping, Optional, Union
 import uuid
-
-import functools
-from . import constants, config
+from collections import namedtuple
+from typing import Mapping, Optional, Union
 
 from aiohttp import web
+
+from . import config, constants
 
 SESSION_VARNAME = constants.APP_VARIABLE_PREFIX + "session"
 LOG = logging.getLogger(__name__)

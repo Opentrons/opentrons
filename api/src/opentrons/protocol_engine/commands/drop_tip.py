@@ -1,27 +1,16 @@
 """Drop tip command request, result, and implementation models."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any
+
+from typing import TYPE_CHECKING, Any, Optional, Type
 
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
-
 from typing_extensions import Literal
 
-from opentrons.protocol_engine.errors.exceptions import TipAttachedError
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-
+from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
 from ..types import DropTipWellLocation, TipRackWellState
-from .pipetting_common import (
-    PipetteIdMixin,
-    TipPhysicallyAttachedError,
-)
-from .movement_common import (
-    DestinationPositionResult,
-    move_to_well,
-    StallOrCollisionError,
-)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -29,11 +18,21 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..errors.error_occurrence import ErrorOccurrence
+from .movement_common import (
+    DestinationPositionResult,
+    StallOrCollisionError,
+    move_to_well,
+)
+from .pipetting_common import (
+    PipetteIdMixin,
+    TipPhysicallyAttachedError,
+)
+from opentrons.protocol_engine.errors.exceptions import TipAttachedError
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
 
 if TYPE_CHECKING:
-    from ..state.state import StateView
     from ..execution import MovementHandler, TipHandler
+    from ..state.state import StateView
 
 from opentrons.hardware_control.types import TipScrapeType
 

@@ -1,8 +1,11 @@
 """HTTP request and response models for /health endpoints."""
 
 import typing
+
 from pydantic import BaseModel, Field
+
 from opentrons_shared_data.deck.types import RobotModel
+
 from robot_server.service.json_api import BaseResponseBody
 
 

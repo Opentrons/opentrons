@@ -8,12 +8,12 @@ import hashlib
 import ipaddress
 import logging
 import os
-from aiohttp import web
 from pathlib import Path
-from typing import Any, Generator, IO, List, Tuple
+from typing import IO, Any, Generator, List, Tuple
+
+from aiohttp import web
 
 from .handler_type import Handler
-
 
 LOG = logging.getLogger(__name__)
 SSH_DIR = Path(os.path.expanduser("~/.ssh"))

@@ -5,17 +5,17 @@ All labware offsets are set via `/run` endpoints.
 """
 
 from typing import Annotated, Optional
-from typing_extensions import Literal, NoReturn
 
 from fastapi import Depends, status
-from server_utils.fastapi_utils.light_router import LightRouter
+from typing_extensions import Literal, NoReturn
 
 from opentrons_shared_data.errors import ErrorCodes
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.versioning import get_requested_version
-from robot_server.service.labware import models as lw_models
-from robot_server.service.errors import RobotServerError, CommonErrorDef
+from server_utils.fastapi_utils.light_router import LightRouter
 
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.service.errors import CommonErrorDef, RobotServerError
+from robot_server.service.labware import models as lw_models
+from robot_server.versioning import get_requested_version
 
 router = LightRouter()
 

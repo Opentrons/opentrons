@@ -1,10 +1,9 @@
 import enum
 from dataclasses import dataclass
+from typing import Dict, List, Mapping, NewType, Tuple, Union, cast
 
 from pydantic import BaseModel
 from typing_extensions import Literal, TypedDict
-from typing import Dict, List, Mapping, NewType, Union, Tuple, cast
-
 
 # TODO(mc, 2022-06-16): remove type alias when able
 # and when certain removal will not break any pickling

@@ -1,23 +1,24 @@
 """Tests for current settings."""
 
+from typing import Dict, Tuple
+
 import pytest
 from mock import AsyncMock
-from typing import Dict, Tuple
 
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
 )
 from opentrons_hardware.firmware_bindings.messages.payloads import MotorCurrentPayload
+from opentrons_hardware.firmware_bindings.utils import (
+    UInt32Field,
+)
 from opentrons_hardware.hardware_control.current_settings import (
+    CompleteCurrentSettings,
+    PartialCurrentSettings,
     set_currents,
     set_hold_current,
     set_run_current,
-    CompleteCurrentSettings,
-    PartialCurrentSettings,
-)
-from opentrons_hardware.firmware_bindings.utils import (
-    UInt32Field,
 )
 
 

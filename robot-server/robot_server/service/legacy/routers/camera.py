@@ -1,41 +1,43 @@
+import io
 import logging
 import os
-import io
 import tempfile
-from typing import Annotated
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, Depends, Response
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import FileResponse
 from starlette import status
 from starlette.background import BackgroundTask
 from starlette.responses import StreamingResponse
+
+from opentrons.config import IS_ROBOT
+from opentrons.protocol_engine import EngineStatus
+from opentrons.protocol_engine.resources.camera_provider import ImageParameters
 from opentrons.system import camera
-from opentrons.system.camera import StreamConfigurationKeys, PREVIEW_IMAGE
-from robot_server.errors.error_responses import LegacyErrorResponse
+from opentrons.system.camera import PREVIEW_IMAGE, StreamConfigurationKeys
 from opentrons_shared_data.errors import ErrorCodes
-from robot_server.errors.error_responses import ErrorBody
+from opentrons_shared_data.robot.types import RobotType
+
+from robot_server.camera.settings.store import (
+    CameraSettingStore,
+    get_camera_setting_store,
+)
+from robot_server.data_files.models import FileNotFound
+from robot_server.errors.error_responses import ErrorBody, LegacyErrorResponse
+from robot_server.hardware import get_robot_type
+from robot_server.persistence.fastapi_dependencies import get_images_directory
+from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.service.json_api import RequestModel
 from robot_server.service.legacy.models.settings import (
+    CameraCaptureImageSettings,
     CameraEnable,
     LiveStreamData,
     LiveStreamSettings,
     Resolution,
     StreamStatusType,
-    CameraCaptureImageSettings,
 )
-from robot_server.service.json_api import RequestModel
-from opentrons.config import IS_ROBOT
-from robot_server.runs.dependencies import get_run_data_manager
-from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.hardware import get_robot_type
-from opentrons_shared_data.robot.types import RobotType
-from opentrons.protocol_engine import EngineStatus
-from robot_server.camera.settings.store import (
-    CameraSettingStore,
-    get_camera_setting_store,
-)
-from opentrons.protocol_engine.resources.camera_provider import ImageParameters
-from robot_server.persistence.fastapi_dependencies import get_images_directory
-from robot_server.data_files.models import FileNotFound
 
 log = logging.getLogger(__name__)
 
@@ -152,6 +154,39 @@ async def get_camera(
         liveStreamEnabled=live_status,
         errorRecoveryCameraEnabled=error_recovery_camera_status,
     )
+
+
+@router.get(
+    path="/camera/cameraSettings/{cameraId}",
+    summary="Query general camera capture image settings.",
+    description=(
+        "Query general camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's data will be the camera capture image settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def get_camera_capture_image_settings(
+    cameraId: str,
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Query the general camera capture image settings.
+
+    Args:
+        cameraId: Camera ID for the camera settings to query.
+        camera_provider: Access to the camera settings and related services.
+    """
+    result = camera_settings_store.get_camera_capture_image_settings(
+        camera_id=cameraId if DEFAULT_CAMERA_ID not in cameraId else DEFAULT_CAMERA_PATH
+    )
+    # todo(chb, 2025-01-14): At some point we need to dereference camera devices and camera ids, and dedicate entirely one way or another.
+    # This isn't done now because of how the device field is pulled as a default camera by other sources for ffmpeg.
+
+    return result
 
 
 @router.post(

@@ -1,24 +1,21 @@
 """The usb binary protocol over serial transport."""
 
 import asyncio
-import logging
 import concurrent.futures
+import logging
 from functools import partial
-from typing import Optional, Type, Tuple
+from typing import Optional, Tuple, Type
 
 import serial  # type: ignore[import-untyped]
+from opentrons_shared_data.errors.exceptions import InternalUSBCommunicationError
 from serial.tools.list_ports import comports  # type: ignore[import-untyped]
 
-from opentrons_shared_data.errors.exceptions import InternalUSBCommunicationError
-
+from opentrons_hardware.firmware_bindings import utils
+from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     BinaryMessageDefinition,
     get_binary_definition,
 )
-
-
-from opentrons_hardware.firmware_bindings import utils
-from opentrons_hardware.firmware_bindings.binary_constants import BinaryMessageId
 
 log = logging.getLogger(__name__)
 

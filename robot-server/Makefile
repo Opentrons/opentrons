@@ -107,9 +107,13 @@ wheel: $(ot_sources)
 test:
 	$(pytest) $(tests) $(test_opts)
 
-.PHONY: test-cov
-test-cov:
-	$(pytest) $(tests) $(test_opts) $(cov_opts)
+.PHONY: test-unit-cov
+test-unit-cov:
+	$(pytest) $(tests) $(test_opts) -m 'not integration' $(cov_opts)
+
+.PHONY: test-integration-cov
+test-integration-cov:
+	$(pytest) tests/integration $(test_opts) $(cov_opts)
 
 .PHONY: test-fast
 test-fast:
@@ -118,11 +122,12 @@ test-fast:
 .PHONY: lint
 lint:
 	$(python) -m mypy $(SRC_PATH) $(SCRIPTS_PATH) $(TESTS_PATH)
-	$(ruff) check $(ruff_opts) .
+	$(ruff) check .
 
 .PHONY: format
 format:
-	$(ruff) format $(ruff_opts) .
+	$(ruff) format .
+	$(ruff) check --select I --fix .
 
 .PHONY: _dev
 _dev:

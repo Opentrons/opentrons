@@ -1,14 +1,15 @@
 """Firmware update package."""
 
 from typing import Type
+
+from .downloader import FirmwareUpdateDownloader
+from .eraser import FirmwareUpdateEraser
+from .hex_file import HexRecordProcessor, from_hex_file, from_hex_file_path
 from .initiator import (
     FirmwareUpdateInitiator,
 )
-from .downloader import FirmwareUpdateDownloader
-from .hex_file import from_hex_file_path, from_hex_file, HexRecordProcessor
-from .eraser import FirmwareUpdateEraser
 from .run import RunUpdate
-from .utils import check_firmware_updates, UpdateChecker
+from .utils import UpdateChecker, check_firmware_updates
 
 
 class FirmwareUpdate:

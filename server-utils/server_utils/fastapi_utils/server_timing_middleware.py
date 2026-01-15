@@ -11,7 +11,6 @@ from typing import Awaitable, Callable
 
 from fastapi import Request, Response
 
-
 # These are inserted into the HTTP response header raw, so they should be short and
 # avoid special characters.
 #

@@ -1,8 +1,9 @@
 from __future__ import annotations
-from typing import List, Optional
-from opentrons.drivers.asyncio.communication import SerialConnection
-from dataclasses import dataclass
 
+from dataclasses import dataclass
+from typing import List, Optional
+
+from opentrons.drivers.asyncio.communication import SerialConnection
 from opentrons.hardware_control.emulation.settings import Settings
 
 

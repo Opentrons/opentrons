@@ -3,25 +3,25 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, List, Optional, Union, Mapping
-from logging import getLogger
 from dataclasses import dataclass
+from logging import getLogger
+from typing import Dict, List, Mapping, Optional, Union
 
-import sqlalchemy
 import anyio.to_thread
+import sqlalchemy
+
 from opentrons.protocols.parameters.types import PrimitiveAllowedTypes
 
-from robot_server.persistence.database import sqlite_rowid
-from robot_server.persistence.tables import (
-    analysis_table,
-    analysis_primitive_type_rtp_table,
-    analysis_csv_rtp_table,
-)
-from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
-
-from .analysis_models import CompletedAnalysis
 from .analysis_memcache import MemoryCache
-from .rtp_resources import PrimitiveParameterResource, CSVParameterResource
+from .analysis_models import CompletedAnalysis
+from .rtp_resources import CSVParameterResource, PrimitiveParameterResource
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.pydantic import json_to_pydantic, pydantic_to_json
+from robot_server.persistence.tables import (
+    analysis_csv_rtp_table,
+    analysis_primitive_type_rtp_table,
+    analysis_table,
+)
 
 _log = getLogger(__name__)
 

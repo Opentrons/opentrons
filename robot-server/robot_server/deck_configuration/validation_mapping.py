@@ -3,8 +3,7 @@
 import dataclasses
 from typing import Iterable, List
 
-from . import models
-from . import validation
+from . import models, validation
 
 
 def map_in(request: models.DeckConfigurationRequest) -> List[validation.Placement]:

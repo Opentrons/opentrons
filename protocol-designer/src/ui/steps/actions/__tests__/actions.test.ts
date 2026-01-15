@@ -4,7 +4,6 @@ import { thunk } from 'redux-thunk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import * as featureFlagSelectors from '/protocol-designer/feature-flags/selectors'
 import { getRobotStateTimeline } from '/protocol-designer/file-data/selectors'
 import * as stepFormSelectors from '/protocol-designer/step-forms/selectors'
 import * as tutorialSelectors from '/protocol-designer/tutorial/selectors'
@@ -16,10 +15,15 @@ import {
   getSelectedStepId,
 } from '../../selectors'
 import { deselectAllSteps, selectAllSteps } from '../actions'
-import { duplicateSelectedSteps, saveStepForm } from '../thunks'
+import {
+  duplicateSelectedSteps,
+  reorderSelectedStep,
+  saveStepForm,
+} from '../thunks'
 
 import type { Timeline } from '@opentrons/step-generation/src/types'
 import type { FormData } from '/protocol-designer/form-types'
+import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 import type {
   DuplicateSelectedStepsAction,
   SelectMultipleStepsAction,
@@ -261,9 +265,6 @@ describe('steps actions', () => {
       vi.mocked(tutorialSelectors.shouldShowWasteChuteHint).mockReturnValue(
         false
       )
-      vi.mocked(
-        featureFlagSelectors.getEnableConcurrentModuleActions
-      ).mockReturnValue(true)
     })
 
     afterEach(() => {
@@ -274,38 +275,32 @@ describe('steps actions', () => {
     describe('temperature module form', () => {
       it.each([
         {
-          description:
-            'should add bonus step when enableConcurrentModuleActions is false and userWantsBonusStep is true',
+          description: 'should save the temperature step plus a pause step',
           isPresaved: true,
-          userWantsBonusStep: true,
-          shouldAddBonusStep: true,
-          expectedPauseTemperature: 25,
+          targetTemperature: 25,
+          expectingPauseStep: true,
         },
         {
           description:
-            'should NOT add bonus step when userWantsBonusStep is false',
-          isPresaved: true,
-          userWantsBonusStep: false,
-          shouldAddBonusStep: false,
+            'should not add the pause step when the temperature step is not brand new',
+          isPresaved: false,
+          targetTemperature: 25,
+          expectingPauseStep: false,
         },
         {
-          description: 'should add bonus step when userWantsBonusStep is true',
+          description:
+            'should not add the pause step when there is no target temperature',
           isPresaved: true,
-          userWantsBonusStep: true,
-          shouldAddBonusStep: true,
+          targetTemperature: null,
+          expectingPauseStep: false,
         },
       ])(
         '$description',
-        ({
-          isPresaved,
-          userWantsBonusStep,
-          shouldAddBonusStep,
-          expectedPauseTemperature,
-        }) => {
+        ({ isPresaved, targetTemperature, expectingPauseStep }) => {
           const temperatureForm: FormData = {
             id: 'step_123',
             stepType: 'temperature',
-            targetTemperature: 25,
+            targetTemperature,
             moduleId: 'temperatureId',
           }
 
@@ -317,29 +312,35 @@ describe('steps actions', () => {
             .thenReturn(isPresaved)
 
           const store: any = mockStore()
-          store.dispatch(saveStepForm({ userWantsBonusStep }))
+          store.dispatch(saveStepForm())
 
           const actions = store.getActions()
+
+          // Main step:
           expect(actions[0]).toEqual({
             type: 'SAVE_STEP_FORM',
-            payload: temperatureForm,
+            payload: {
+              form: temperatureForm,
+              thermocyclerPauseStepId: expect.any(String),
+            },
           })
-          if (shouldAddBonusStep) {
+
+          // Bonus "wait for temperature" step:
+          if (expectingPauseStep) {
             expect(actions[1].type).toStrictEqual('ADD_STEP')
             expect(actions[2].payload.update.pauseAction).toStrictEqual(
               'untilTemperature'
             )
-            if (expectedPauseTemperature !== undefined) {
-              expect(actions[3].payload.update.moduleId).toStrictEqual(
-                'temperatureId'
-              )
-              expect(actions[4].payload.update.pauseTemperature).toStrictEqual(
-                expectedPauseTemperature
-              )
-              expect(actions[5].type).toStrictEqual('SAVE_STEP_FORM')
-            }
+            expect(actions[3].payload.update.moduleId).toStrictEqual(
+              'temperatureId'
+            )
+            expect(actions[4].payload.update.pauseTemperature).toStrictEqual(
+              targetTemperature
+            )
+            expect(actions[5].type).toStrictEqual('SAVE_STEP_FORM')
+            expect(actions[6].type).toStrictEqual('ADD_HINT')
           } else {
-            expect(actions.length).toStrictEqual(1)
+            expect(actions).toHaveLength(1)
           }
         }
       )
@@ -348,28 +349,32 @@ describe('steps actions', () => {
     describe('heater shaker form', () => {
       it.each([
         {
-          description: 'should add bonus step when userWantsBonusStep is true',
-          userWantsBonusStep: true,
-          shouldAddBonusStep: true,
-          expectedPauseTemperature: '10',
+          description: 'should save the Heater-Shaker step plus a pause step',
+          isPresaved: true,
+          targetHeaterShakerTemperature: 25,
+          expectingPauseStep: true,
         },
         {
           description:
-            'should NOT add bonus step when userWantsBonusStep is false',
-          userWantsBonusStep: false,
-          shouldAddBonusStep: false,
+            'should not add the pause step when the Heater-Shaker step is not brand new',
+          isPresaved: false,
+          targetHeaterShakerTemperature: 25,
+          expectingPauseStep: false,
+        },
+        {
+          description:
+            'should not add the pause step when there is no target temperature',
+          isPresaved: true,
+          targetHeaterShakerTemperature: null,
+          expectingPauseStep: false,
         },
       ])(
         '$description',
-        ({
-          userWantsBonusStep,
-          shouldAddBonusStep,
-          expectedPauseTemperature,
-        }) => {
+        ({ isPresaved, targetHeaterShakerTemperature, expectingPauseStep }) => {
           const heaterShakerForm: FormData = {
             id: 'step_123',
             stepType: 'heaterShaker',
-            targetHeaterShakerTemperature: '10',
+            targetHeaterShakerTemperature,
             moduleId: 'heaterShakerId',
           }
 
@@ -378,92 +383,100 @@ describe('steps actions', () => {
             .thenReturn(heaterShakerForm)
           when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
             .calledWith(expect.anything())
-            .thenReturn(true)
-
-          const store: any = mockStore()
-          store.dispatch(saveStepForm({ userWantsBonusStep }))
-
-          const actions = store.getActions()
-          expect(actions[0]).toEqual({
-            type: 'SAVE_STEP_FORM',
-            payload: heaterShakerForm,
-          })
-          if (shouldAddBonusStep) {
-            expect(actions[1].type).toStrictEqual('ADD_STEP')
-            expect(actions[2].payload.update.pauseAction).toStrictEqual(
-              'untilTemperature'
-            )
-            if (expectedPauseTemperature !== undefined) {
-              expect(actions[3].payload.update.moduleId).toStrictEqual(
-                'heaterShakerId'
-              )
-              expect(actions[4].payload.update.pauseTemperature).toStrictEqual(
-                expectedPauseTemperature
-              )
-              expect(actions[5].type).toStrictEqual('SAVE_STEP_FORM')
-            }
-          }
-        }
-      )
-    })
-
-    describe('thermocycler profile form', () => {
-      it.each([
-        {
-          description:
-            'should automatically add bonus step when enableConcurrentModuleActions is true',
-          enableConcurrentModuleActions: true,
-          shouldAddBonusStep: true,
-        },
-        {
-          description:
-            'should NOT add bonus step when enableConcurrentModuleActions is false',
-          enableConcurrentModuleActions: false,
-          shouldAddBonusStep: false,
-        },
-      ])(
-        '$description',
-        ({ enableConcurrentModuleActions, shouldAddBonusStep }) => {
-          const thermocyclerForm: FormData = {
-            id: 'step_123',
-            stepType: 'thermocycler',
-            thermocyclerFormType: 'thermocyclerProfile',
-            moduleId: 'thermocyclerId',
-          }
-
-          when(vi.mocked(stepFormSelectors.getUnsavedForm))
-            .calledWith(expect.anything())
-            .thenReturn(thermocyclerForm)
-          when(vi.mocked(stepFormSelectors.getCurrentFormIsPresaved))
-            .calledWith(expect.anything())
-            .thenReturn(true)
-          when(vi.mocked(featureFlagSelectors.getEnableConcurrentModuleActions))
-            .calledWith(expect.anything())
-            .thenReturn(enableConcurrentModuleActions)
+            .thenReturn(isPresaved)
 
           const store: any = mockStore()
           store.dispatch(saveStepForm())
 
           const actions = store.getActions()
+
+          // Main step:
           expect(actions[0]).toEqual({
             type: 'SAVE_STEP_FORM',
-            payload: thermocyclerForm,
+            payload: {
+              form: heaterShakerForm,
+              thermocyclerPauseStepId: expect.any(String),
+            },
           })
 
-          if (shouldAddBonusStep) {
+          // Bonus "wait for temperature" step:
+          if (expectingPauseStep) {
             expect(actions[1].type).toStrictEqual('ADD_STEP')
             expect(actions[2].payload.update.pauseAction).toStrictEqual(
-              'untilThermocyclerProfileComplete'
+              'untilTemperature'
             )
             expect(actions[3].payload.update.moduleId).toStrictEqual(
-              'thermocyclerId'
+              'heaterShakerId'
             )
-            expect(actions[4].type).toStrictEqual('SAVE_STEP_FORM')
+            expect(actions[4].payload.update.pauseTemperature).toStrictEqual(
+              targetHeaterShakerTemperature
+            )
+            expect(actions[5].type).toStrictEqual('SAVE_STEP_FORM')
+            expect(actions[6].type).toStrictEqual('ADD_HINT')
           } else {
-            expect(actions.length).toStrictEqual(1)
+            expect(actions).toHaveLength(1)
           }
         }
       )
+    })
+  })
+
+  describe('reorderSelectedStep', () => {
+    const mockStepHierarchy: StepHierarchy = {
+      topLevelItems: [
+        {
+          stepId: 'step_1',
+          type: 'standaloneStep',
+        },
+        {
+          stepId: 'step_2',
+          type: 'standaloneStep',
+        },
+        {
+          stepId: 'step_3',
+          type: 'standaloneStep',
+        },
+      ],
+    }
+
+    beforeEach(() => {
+      when(vi.mocked(stepFormSelectors.getSavedStepHierarchy))
+        .calledWith(expect.anything())
+        .thenReturn(mockStepHierarchy)
+    })
+
+    afterEach(() => {
+      vi.resetAllMocks()
+      vi.restoreAllMocks()
+    })
+
+    it('should dispatch REORDER_STEPS action when a step is selected', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn('step_2')
+
+      const store: any = mockStore()
+      store.dispatch(reorderSelectedStep('up'))
+
+      expect(store.getActions()).toStrictEqual([
+        {
+          type: 'REORDER_STEPS',
+          payload: {
+            stepIds: ['step_2', 'step_1', 'step_3'],
+          },
+        },
+      ])
+    })
+
+    it('should not dispatch any action when no step is selected', () => {
+      when(vi.mocked(getSelectedStepId))
+        .calledWith(expect.anything())
+        .thenReturn(null)
+
+      const store: any = mockStore()
+      store.dispatch(reorderSelectedStep('up'))
+
+      expect(store.getActions()).toStrictEqual([])
     })
   })
 })

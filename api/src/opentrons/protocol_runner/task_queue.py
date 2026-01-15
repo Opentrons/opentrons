@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from typing import Any, Awaitable, Callable, Optional, ParamSpec, Concatenate
+from typing import Any, Awaitable, Callable, Concatenate, Optional, ParamSpec
 
 log = logging.getLogger(__name__)
 

@@ -5,30 +5,32 @@ from __future__ import annotations
 import dataclasses
 import enum
 import typing
-from typing_extensions import Self
 from datetime import datetime
+
+from typing_extensions import Self
+
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+from opentrons_shared_data.pipette.types import PipetteNameType
 
 from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.resources import pipette_data_provider
 from opentrons.protocol_engine.types import (
+    ABSMeasureMode,
+    AspiratedFluid,
     DeckPoint,
     LabwareLocation,
+    LabwareWellId,
+    LiquidClassRecord,
+    LiquidTrackingType,
+    ModuleDefinition,
+    ModuleModel,
     OnLabwareLocation,
+    PreconditionTypes,
+    StackerStoredLabwareGroup,
     TipGeometry,
     TipRackWellState,
-    AspiratedFluid,
-    LiquidClassRecord,
-    ABSMeasureMode,
-    LiquidTrackingType,
-    StackerStoredLabwareGroup,
-    ModuleModel,
-    ModuleDefinition,
-    LabwareWellId,
-    PreconditionTypes,
 )
-from opentrons.types import MountType, DeckSlotName
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.pipette.types import PipetteNameType
+from opentrons.types import DeckSlotName, MountType
 
 
 class _NoChangeEnum(enum.Enum):

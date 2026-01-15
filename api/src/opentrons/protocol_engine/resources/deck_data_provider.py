@@ -2,25 +2,27 @@
 
 from dataclasses import dataclass
 from typing import List, Optional, cast
-from typing_extensions import final
 
 import anyio
+from typing_extensions import final
 
 from opentrons_shared_data.deck import (
-    load as load_deck,
     DEFAULT_DECK_DEFINITION_VERSION,
+)
+from opentrons_shared_data.deck import (
+    load as load_deck,
 )
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.types import DeckSlotName
 
 from ..types import (
+    DeckConfigurationType,
     DeckSlotLocation,
     DeckType,
     LabwareLocation,
-    DeckConfigurationType,
 )
 from .labware_data_provider import LabwareDataProvider
+from opentrons.types import DeckSlotName
 
 
 @final

@@ -9,11 +9,10 @@ import httpx
 import pytest
 
 from tests.integration.dev_server import DevServer
+from tests.integration.protocol_files import get_json_protocol, get_py_protocol
 from tests.integration.robot_client import RobotClient, poll_until_all_analyses_complete
-from tests.integration.protocol_files import get_py_protocol, get_json_protocol
 
 from .persistence_snapshots_dir import PERSISTENCE_SNAPSHOTS_DIR
-
 
 pytestmark = pytest.mark.slow
 
@@ -70,6 +69,7 @@ async def _wait_until_initialization_failed(robot_client: RobotClient) -> None:
             )
 
 
+@pytest.mark.slow
 async def test_upload_protocols_and_reset_persistence_dir() -> None:
     """Test resetting runs history.
 
@@ -120,6 +120,7 @@ async def test_upload_protocols_and_reset_persistence_dir() -> None:
             server.stop()
 
 
+@pytest.mark.slow
 async def test_reset_is_available_even_with_corrupt_persistence_directory() -> None:
     """Test resetting runs history when the persistence directory is corrupted."""
     port = "15555"

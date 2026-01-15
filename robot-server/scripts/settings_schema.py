@@ -3,6 +3,7 @@
 """Generate a JSON schema representing the server's settings."""
 
 from sys import argv
+
 from robot_server.settings import RobotServerSettings
 
 if __name__ == "__main__":

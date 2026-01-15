@@ -5,21 +5,25 @@ The purpose is to provide a fake backend that responds to GCODE commands.
 
 import logging
 from typing import Optional
+
+from . import util
+from .abstract_emulator import AbstractEmulator
+from .simulations import Temperature, TemperatureWithHold
 from opentrons.drivers.thermocycler.driver import (
     GCODE,
     TC_GEN2_ACK,
     TC_GEN2_SERIAL_ACK,
-    TC_ACK as TC_GEN1_ACK,
+)
+from opentrons.drivers.thermocycler.driver import (
     SERIAL_ACK as TC_GEN1_SERIAL_ACK,
 )
+from opentrons.drivers.thermocycler.driver import (
+    TC_ACK as TC_GEN1_ACK,
+)
 from opentrons.drivers.types import ThermocyclerLidStatus
-from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
-from opentrons.hardware_control.emulation.parser import Parser, Command
+from opentrons.hardware_control.emulation.parser import Command, Parser
 from opentrons.hardware_control.emulation.settings import ThermocyclerSettings
-
-from .abstract_emulator import AbstractEmulator
-from .simulations import Temperature, TemperatureWithHold
-from . import util
+from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
 
 logger = logging.getLogger(__name__)
 

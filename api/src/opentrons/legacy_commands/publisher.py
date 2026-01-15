@@ -4,14 +4,17 @@ from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Optional, TypeVar, cast
 from uuid import uuid4
 
-from opentrons.legacy_broker import LegacyBroker
-
 from .types import (
     COMMAND as COMMAND_TOPIC,
+)
+from .types import (
     Command as CommandPayload,
+)
+from .types import (
     CommandMessage,
     MessageSequenceId,
 )
+from opentrons.legacy_broker import LegacyBroker
 
 
 class CommandPublisher:

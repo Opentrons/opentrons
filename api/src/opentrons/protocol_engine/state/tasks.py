@@ -3,16 +3,17 @@
 from dataclasses import dataclass
 from itertools import chain
 from typing import Iterable
-from ..types import Task, TaskSummary, FinishedTask
-from ._abstract_store import HasState, HandlesActions
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.errors.exceptions import NoTaskFoundError
+
 from ..actions import (
-    get_state_updates,
     Action,
-    StartTaskAction,
     FinishTaskAction,
+    StartTaskAction,
+    get_state_updates,
 )
+from ..types import FinishedTask, Task, TaskSummary
+from ._abstract_store import HandlesActions, HasState
+from opentrons.protocol_engine.errors.exceptions import NoTaskFoundError
+from opentrons.protocol_engine.state import update_types
 
 
 @dataclass

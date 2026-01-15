@@ -20,6 +20,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
 import { LabwareOnDeck } from '../../../components/organisms'
 import { getSlotsWithCollisions } from '../../../components/organisms/utils'
@@ -64,6 +65,7 @@ import type {
   ModuleTemporalProperties,
   ThermocyclerModuleState,
 } from '@opentrons/step-generation'
+import type { FormData } from '../../../form-types'
 import type {
   InitialDeckSetup,
   LabwareOnDeck as LabwareOnDeckType,
@@ -78,6 +80,7 @@ interface DeckSetupDetailsProps extends DeckSetupTerminalIdType {
   hover: string | null
   setHover: Dispatch<SetStateAction<string | null>>
   showGen1MultichannelCollisionWarnings: boolean
+  currentStep: FormData | null
   stagingAreaCutoutIds: CutoutId[]
   selectedZoomInSlot?: DeckSlotId
 }
@@ -93,6 +96,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     setHover,
     showGen1MultichannelCollisionWarnings,
     stagingAreaCutoutIds,
+    currentStep,
   } = props
   const { labware: activeLabware } = activeDeckSetup
   const robotType = useSelector(getRobotType)
@@ -100,11 +104,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     activeDeckSetup,
     robotType
   )
+  const pendingCreationStateForHopper = useSelector(getPendingCreationState)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
   const dispatch = useDispatch<any>()
-
   // handling module<>labware compat when moving labware to empty module
   // is handled by SlotControls. But when swapping labware when at least
   // one is on a module, we need to be aware of not only what labware is
@@ -149,6 +153,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       deckSetup: activeDeckSetup,
       slot: selectedZoomInSlot ?? '',
       deckDef,
+      pendingCreationStateForHopper,
     })
   }, [activeDeckSetup, selectedZoomInSlot])
 
@@ -180,7 +185,9 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     selectedZoomInSlot,
   ])
 
-  const allLabware = Object.values(activeLabware)
+  const allLabware = pendingCreationStateForHopper
+    ? []
+    : Object.values(activeLabware)
 
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =
@@ -720,7 +727,11 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       })}
 
       {/* highlight items from Protocol steps */}
-      <HighlightItems robotType={robotType} deckDef={deckDef} />
+      <HighlightItems
+        robotType={robotType}
+        deckDef={deckDef}
+        currentStep={currentStep}
+      />
 
       {/* selected hardware + labware */}
       <SelectedItems

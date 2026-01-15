@@ -2,21 +2,21 @@
 
 from decoy import Decoy
 
-from opentrons.types import MountType
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state import update_types
+from opentrons.hardware_control import OT3HardwareControlAPI
+from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.unsafe.unsafe_blow_out_in_place import (
+    UnsafeBlowOutInPlaceImplementation,
     UnsafeBlowOutInPlaceParams,
     UnsafeBlowOutInPlaceResult,
-    UnsafeBlowOutInPlaceImplementation,
 )
-from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.execution import (
     PipettingHandler,
 )
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.motion import PipetteLocationData
-from opentrons.hardware_control import OT3HardwareControlAPI
-from opentrons.hardware_control.types import Axis
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.types import MountType
 
 
 async def test_blow_out_in_place_implementation(

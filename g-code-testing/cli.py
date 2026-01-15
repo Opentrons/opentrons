@@ -1,25 +1,24 @@
 """Command Line Interface for making use of G-Code Parsing Commands."""
 
 from __future__ import annotations
-import asyncio
-from functools import partial
-import os
-import sys
-import re
+
 import argparse
-from dataclasses import dataclass
-from pathlib import PurePath
+import asyncio
+import os
+import re
+import sys
 import time
+from dataclasses import dataclass
+from functools import partial
+from pathlib import PurePath
 from typing import (
+    Any,
     Callable,
     Dict,
-    Any,
     List,
     Optional,
     Union,
 )
-
-from opentrons import APIVersion
 
 from g_code_parsing.errors import UnparsableCLICommandError
 from g_code_parsing.g_code_differ import GCodeDiffer
@@ -29,6 +28,7 @@ from g_code_test_data.g_code_configuration import (
 )
 from g_code_test_data.http.http_configurations import HTTP_CONFIGURATIONS
 from g_code_test_data.protocol.protocol_configurations import PROTOCOL_CONFIGURATIONS
+from opentrons import APIVersion
 
 
 @dataclass

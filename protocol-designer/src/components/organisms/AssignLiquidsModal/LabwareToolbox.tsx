@@ -13,20 +13,34 @@ import {
   Toolbox,
 } from '@opentrons/components'
 import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
+import {
+  getFullStackFromLabwares,
+  getLargestStackInSlot,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
+import { getInitialRobotState } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import {
   createContainer,
   multipleIngredientsSelector,
+  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import { createContainerAboveModule } from '/protocol-designer/step-forms/actions/thunks'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
-import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 
 import { LabwareButtonBasket } from '../../molecules'
 import { useKitchen } from '../Kitchen/useKitchen'
 import styles from './labwareToolbox.module.css'
+import {
+  getStackerModuleStateFromSlot,
+  getStackLimitFromDef,
+  getTopDownPrimaryLabwareInHopper,
+} from './utils'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { LabwareLiquidState } from '@opentrons/step-generation'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 
@@ -42,7 +56,8 @@ interface LabwareStackToolboxData {
     [labwareId: string]: LabwareOnDeck
   }
   labwareId: string | null
-  allWellContents: Record<string, any>
+  liquidLocations: LabwareLiquidState
+  largestStackInSlot: string[]
 }
 
 interface LabwareStackToolboxProps {
@@ -52,34 +67,77 @@ interface LabwareStackToolboxProps {
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   data: LabwareStackToolboxData
   selectedLabwareIds: string[]
+  slot: string
 }
 export function LabwareStackToolbox({
   setShowLiquidLayoutOverlay,
   data,
   selectedLabwareIds,
-}: LabwareStackToolboxProps): JSX.Element {
+  slot,
+}: LabwareStackToolboxProps): JSX.Element | null {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const { makeSnackbar } = useKitchen()
+  const labwareDefsByURI = useSelector(getLabwareDefsByURI)
 
-  const { labware, labwareId, allWellContents } = data
-  const labwareStack: string[] =
-    labwareId != null ? (labware[labwareId]?.stack ?? []) : []
-  const filteredLabwareStack = labwareStack.filter(id => labware[id] != null)
-  const hopperStackLimit =
-    labwareId != null
-      ? getMaxPoolCount({
-          labwareDefinitions: {
-            primary: labware[labwareId].def,
-            adapter: null,
-            lid: null,
-          },
-          model: FLEX_STACKER_MODULE_V1,
-        })
-      : 0
+  const { labware, labwareId, liquidLocations } = data
+  const { modules } = useSelector(getInitialDeckSetup)
+
+  if (labwareId == null) {
+    console.error('No labware ID found for LabwareStackToolbox')
+    return null
+  }
+
+  const stackerModuleState = getStackerModuleStateFromSlot({ slot, modules })
+  let stackLimit: number = 0
+  let topDownStackIds: string[] = []
+
+  // for hopper primary labware
+  if (stackerModuleState != null) {
+    const { storedLabwareDetails } = stackerModuleState ?? {}
+    stackLimit = getMaxPoolCount({
+      labwareDefinitions: {
+        primary:
+          labwareDefsByURI[storedLabwareDetails?.primaryLabwareURI ?? ''],
+        adapter:
+          labwareDefsByURI[storedLabwareDetails?.adapterLabwareURI ?? ''] ??
+          null,
+        lid:
+          labwareDefsByURI[storedLabwareDetails?.lidLabwareURI ?? ''] ?? null,
+      },
+      model: FLEX_STACKER_MODULE_V1,
+    })
+    topDownStackIds = getTopDownPrimaryLabwareInHopper({
+      slot,
+      modules,
+    })
+    // for on-deck labware
+  } else if (labwareId != null && labware[labwareId]?.def != null) {
+    stackLimit = getStackLimitFromDef(labware[labwareId].def)
+    topDownStackIds = getFullStackFromLabwares(labware, labwareId)
+  }
+
   const handleAddAnotherLabware = (): void => {
-    if (filteredLabwareStack.length < hopperStackLimit && labwareId != null) {
-      if (labware[labwareId].labwareDefURI)
+    if (topDownStackIds.length < stackLimit && labwareId != null) {
+      // create labware groups for hopper
+      if (stackerModuleState?.storedLabwareDetails != null) {
+        const { storedLabwareDetails } = stackerModuleState
+        dispatch(
+          createContainerAboveModule({
+            slot,
+            labwareDefURIGroup: {
+              adapterDefURI: storedLabwareDetails.adapterLabwareURI ?? null,
+              topLabwareDefURI: storedLabwareDetails.primaryLabwareURI,
+              lidDefURI: storedLabwareDetails.lidLabwareURI ?? null,
+            },
+            stackerInfo: {
+              stackerPosition: 'hopper',
+              amount: 1,
+            },
+          })
+        )
+        // add on-deck labware
+      } else if (labware[labwareId].labwareDefURI) {
         dispatch(
           createContainer({
             labwareDefURIStack: [labware[labwareId]?.labwareDefURI ?? ''],
@@ -87,35 +145,44 @@ export function LabwareStackToolbox({
             updateSelectedLabwareId: true,
           })
         )
+      }
     } else {
       makeSnackbar(t('no_more_space_in_slot') as string)
     }
   }
 
-  const handleSelectAllLabware = (): void => {
-    const currentLiquidContents = labwareId && allWellContents[labwareId]
-    const allEqual = filteredLabwareStack.every(
-      item =>
-        JSON.stringify(allWellContents[item]) ===
-        JSON.stringify(currentLiquidContents)
-    )
+  const allLabwareLiquidsEqual = (arr: string[]): boolean => {
+    const firstValue =
+      liquidLocations != null ? liquidLocations[topDownStackIds[0]] : null
 
-    if (!allEqual) {
+    if (!firstValue) {
+      return true
+    }
+    return arr.every(
+      item =>
+        item in liquidLocations &&
+        JSON.stringify(liquidLocations[item]) === JSON.stringify(firstValue)
+    )
+  }
+
+  const handleSelectAllLabware = (): void => {
+    if (!allLabwareLiquidsEqual(topDownStackIds)) {
       setShowLiquidLayoutOverlay(true)
       return
     }
-    dispatch(multipleIngredientsSelector(filteredLabwareStack))
+    dispatch(multipleIngredientsSelector(topDownStackIds))
   }
 
   const handleAssignToLabware = (
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
+    dispatch(openIngredientSelector(newItem))
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
-      JSON.stringify(allWellContents[newItem]) !==
-        JSON.stringify(allWellContents[labwareId])
+      JSON.stringify(liquidLocations[newItem]) !==
+        JSON.stringify(liquidLocations[labwareId])
     ) {
       // selected labware have different liquid layouts
       setShowLiquidLayoutOverlay(true)
@@ -161,10 +228,10 @@ export function LabwareStackToolbox({
         </StyledText>
       }
     >
-      {filteredLabwareStack.length > 0 ? (
+      {topDownStackIds.length > 0 ? (
         <div className={styles.container}>
           <LabwareButtonBasket
-            stackOfLabware={filteredLabwareStack}
+            stackOfLabware={topDownStackIds}
             labware={labware}
             setSelectedLabware={handleAssignToLabware}
             selectedLabware={selectedLabwareIds}
@@ -198,14 +265,24 @@ export function LabwareStackToolboxContainer({
   // All selectors moved here
   const labwareId = useSelector(labwareIngredSelectors.getSelectedLabwareId)
   const { labware } = useSelector(getInitialDeckSetup)
-  const allWellContents = useSelector(
-    wellContentsSelectors.getWellContentsForLabwareStack
-  )
+  const initialRobotState = useSelector(getInitialRobotState)
 
+  const labwareStack: string[] =
+    labwareId != null ? (labware[labwareId]?.stack ?? []) : []
+  const slot = getSlotInLocationStack(labwareStack)
+
+  const largestStackInSlot = getLargestStackInSlot(
+    initialRobotState.labware,
+    slot
+  )
+  const liquidLocations = useSelector(
+    labwareIngredSelectors.getLiquidsByLabwareId
+  )
   const data: LabwareStackToolboxData = {
     labwareId: labwareId ?? null,
     labware,
-    allWellContents,
+    liquidLocations,
+    largestStackInSlot,
   }
 
   return (
@@ -216,6 +293,7 @@ export function LabwareStackToolboxContainer({
       setDefineLiquidModal={setDefineLiquidModal}
       selectedLabwareIds={selectedLabwareIds}
       data={data}
+      slot={slot}
     />
   )
 }

@@ -6,34 +6,33 @@ from typing import (
     Any,
     Awaitable,
     Callable,
-    Optional,
     Mapping,
+    Optional,
 )
 
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
+from opentrons.drivers.vacuum_module.driver import (
+    VacuumModuleDriver,
+)
+from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.drivers.vacuum_module.types import (
     LEDColor,
     LEDPattern,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.vacuum_module.driver import (
-    VacuumModuleDriver,
-)
-from opentrons.drivers.vacuum_module.abstract import AbstractVacuumModuleDriver
-from opentrons.drivers.vacuum_module.simulator import SimulatingDriver
 from opentrons.hardware_control.execution_manager import ExecutionManager
-from opentrons.hardware_control.poller import Reader, Poller
 from opentrons.hardware_control.modules import mod_abc, update
 from opentrons.hardware_control.modules.types import (
-    ModuleErrorCallback,
+    LiveData,
     ModuleDisconnectedCallback,
+    ModuleErrorCallback,
     ModuleType,
     UploadFunction,
-    LiveData,
     VacuumModuleData,
     VacuumModuleStatus,
 )
+from opentrons.hardware_control.poller import Poller, Reader
 from opentrons.hardware_control.types import StatusBarState, StatusBarUpdateEvent
-
 
 log = logging.getLogger(__name__)
 
@@ -236,7 +235,7 @@ class VacuumModule(mod_abc.AbstractModule):
                 self._handle_status_bar_event(event), self._loop
             )
 
-    async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:
+    async def _handle_status_bar_event(self, event: StatusBarUpdateEvent) -> None:  # noqa: C901
         if event.enabled and self.initialized:
             match event.state:
                 case StatusBarState.RUNNING:

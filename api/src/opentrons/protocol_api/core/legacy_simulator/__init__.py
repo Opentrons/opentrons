@@ -8,8 +8,8 @@ Protocol API v2 context's implementation, to simulate certain things at the leve
 the Protocol API, avoiding certain calls to the underlying hardware API.
 """
 
-from .legacy_protocol_core import LegacyProtocolCoreSimulator
 from .legacy_instrument_core import LegacyInstrumentCoreSimulator
+from .legacy_protocol_core import LegacyProtocolCoreSimulator
 
 __all__ = [
     "LegacyProtocolCoreSimulator",

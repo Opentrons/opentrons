@@ -1,9 +1,8 @@
 from abc import ABC, abstractmethod
-from typing import Any, Optional, Generic, TypeVar, Dict
+from typing import Any, Dict, Generic, Optional, TypeVar
 
-from opentrons.types import Point
 from opentrons.hardware_control.types import CriticalPoint
-
+from opentrons.types import Point
 
 InstrumentConfig = TypeVar("InstrumentConfig")
 

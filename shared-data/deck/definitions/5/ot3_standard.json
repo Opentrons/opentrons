@@ -977,19 +977,6 @@
         "orientation": "right"
       },
       {
-        "id": "vacuumModuleMilliporeV1D3",
-        "areaType": "vacuumModule",
-        "offsetFromCutoutFixture": [161.0, 0.0, 31.0],
-        "boundingBox": {
-          "xDimension": 128.0,
-          "yDimension": 86.0,
-          "zDimension": 0
-        },
-        "displayName": "Vacuum Module in D3",
-        "features": {},
-        "orientation": "right"
-      },
-      {
         "id": "vacuumModuleMilliporeV1A3",
         "areaType": "vacuumModule",
         "offsetFromCutoutFixture": [161.0, 0.0, 31.0],
@@ -1430,10 +1417,9 @@
     {
       "id": "vacuumModuleMilliporeV1",
       "expectOpentronsModuleSerialNumber": true,
-      "mayMountTo": ["cutoutD3", "cutoutA3"],
+      "mayMountTo": ["cutoutA3"],
       "displayName": "Slot With a Vacuum Module Millipore Base",
       "providesAddressableAreas": {
-        "cutoutD3": ["vacuumModuleMilliporeV1D3", "D4"],
         "cutoutA3": ["vacuumModuleMilliporeV1A3", "A4"]
       },
       "fixtureGroup": {},

@@ -1,13 +1,13 @@
 from typing import (
     Dict,
-    Optional,
-    Protocol,
     List,
     Literal,
+    Optional,
+    Protocol,
     Tuple,
+    TypeVar,
     Union,
     runtime_checkable,
-    TypeVar,
 )
 
 Response = TypeVar("Response")

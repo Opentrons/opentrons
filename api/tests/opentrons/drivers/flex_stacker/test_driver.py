@@ -1,13 +1,16 @@
 import base64
-from typing import Generator, Dict, List, Any
-import pytest
 from binascii import Error as BinError
+from typing import Any, Dict, Generator, List
+
+import pytest
 from decoy import Decoy
 from mock import AsyncMock, MagicMock
+
 from opentrons.drivers.asyncio.communication.errors import NoResponse
 from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
+from opentrons.drivers.flex_stacker import types
 from opentrons.drivers.flex_stacker.driver import (
     DEFAULT_FS_TIMEOUT,
     FS_MOVE_TIMEOUT,
@@ -15,7 +18,6 @@ from opentrons.drivers.flex_stacker.driver import (
     FS_TOF_TIMEOUT,
     FlexStackerDriver,
 )
-from opentrons.drivers.flex_stacker import types
 from opentrons.drivers.flex_stacker.errors import MotorStallDetected
 
 

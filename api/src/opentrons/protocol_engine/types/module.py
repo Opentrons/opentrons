@@ -1,33 +1,35 @@
 """Protocol engine types to do with modules."""
 
 from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
 from typing import (
-    TypeGuard,
-    Literal,
-    Optional,
-    List,
-    Dict,
     Any,
+    Dict,
+    List,
+    Literal,
     NamedTuple,
+    Optional,
+    TypeGuard,
 )
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
-from opentrons_shared_data.util import StrEnum
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Extents
+from opentrons_shared_data.labware.labware_definition import Extents, LabwareDefinition
 from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.util import StrEnum
 
+from .labware_movement import LabwareMovementOffsetData
+from .labware_offset_vector import LabwareOffsetVector
+from .location import DeckSlotLocation
 from opentrons.hardware_control.modules import (
-    ModuleType as ModuleType,
     ModuleModel as HardwareModuleModel,
 )
-
-from .location import DeckSlotLocation
-from .labware_offset_vector import LabwareOffsetVector
-from .labware_movement import LabwareMovementOffsetData
+from opentrons.hardware_control.modules import (
+    ModuleType as ModuleType,
+)
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.types.ModuleModel

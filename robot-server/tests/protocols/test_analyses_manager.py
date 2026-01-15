@@ -1,30 +1,31 @@
 """Tests for the Analyses Manager interface."""
 
-import pytest
-from decoy import Decoy, matchers
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+from decoy import Decoy, matchers
+
 from opentrons.protocol_engine import ErrorOccurrence
 from opentrons.protocol_engine.types import BooleanParameter
-from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
+from opentrons.protocol_reader import JsonProtocolConfig, ProtocolSource
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes
 from opentrons_shared_data.robot.types import RobotType
 
+import robot_server.errors.error_mappers as em
 from robot_server.protocols import protocol_analyzer
-from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.analyses_manager import (
     AnalysesManager,
     FailedToInitializeAnalyzer,
 )
 from robot_server.protocols.analysis_models import (
-    AnalysisSummary,
     AnalysisStatus,
+    AnalysisSummary,
 )
 from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.service.task_runner import TaskRunner
-import robot_server.errors.error_mappers as em
 
 
 @pytest.fixture
@@ -144,7 +145,7 @@ async def test_raises_error_and_saves_result_if_initialization_errors(
         )
     ).then_return(analyzer)
     decoy.when(
-        await analyzer.load_orchestrator(
+        await analyzer.load_orchestrator(  # type: ignore[func-returns-value]
             run_time_param_values={"sample_count": 123},
             run_time_param_paths={},
         )

@@ -1,7 +1,8 @@
 from http import HTTPStatus
 
 from opentrons_shared_data.errors import ErrorCodes
-from robot_server.service.errors import ErrorDef, ErrorCreateDef
+
+from robot_server.service.errors import ErrorCreateDef, ErrorDef
 
 
 class CalibrationError(ErrorDef):

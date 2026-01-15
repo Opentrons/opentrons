@@ -1,14 +1,14 @@
 import asyncio
 import logging
 import os
-from pathlib import Path
+from contextlib import asynccontextmanager
 from glob import glob
+from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Tuple, Union
 
 from .errors import UpdateError
 from .mod_abc import AbstractModule
 from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
-from contextlib import asynccontextmanager
 
 log = logging.getLogger(__name__)
 

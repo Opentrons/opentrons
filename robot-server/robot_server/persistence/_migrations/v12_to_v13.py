@@ -10,18 +10,19 @@ Summary of changes from schema 13:
   output_data_files_table) to commands, so existing files are not included in the migration.
 """
 
-from pathlib import Path
 import json
+from pathlib import Path
 from typing import Dict, List
 
-from ._util import copy_contents, add_column
-from .._folder_migrator import Migration
 import sqlalchemy
-from ..database import sql_engine_ctx
 
 from opentrons_shared_data.data_files import MimeType
-from robot_server.persistence.tables import schema_11, schema_13
+
+from .._folder_migrator import Migration
+from ..database import sql_engine_ctx
+from ._util import add_column, copy_contents
 from robot_server.persistence.file_and_directory_names import DB_FILE
+from robot_server.persistence.tables import schema_11, schema_13
 
 
 class Migration12to13(Migration):  # noqa: D101
@@ -81,7 +82,7 @@ def _migrate_boolean_settings_table(connection: sqlalchemy.engine.Connection) ->
     for table_row in old_boolean_settings:
         connection.execute(
             sqlalchemy.insert(schema_13.boolean_setting_table).values(
-                key=table_row.key, value=table_row.value
+                key=table_row.key.value, value=table_row.value
             )
         )
     new_rows = [

@@ -195,11 +195,10 @@ export function getMatchingTipLiquidSpecs(
 ): SupportedTip {
   const tipLength = tiprackDef?.parameters?.tipLength ?? 0
 
-  if (tipLength === 0) {
-    console.error(
-      `expected to find a tiplength for tiprack ${getLabwareDefURI(tiprackDef)} but could not`
-    )
-  }
+  console.assert(
+    tipLength,
+    `expected to find a tiplength for tiprack ${tiprackDef && getLabwareDefURI(tiprackDef)} but could not`
+  )
 
   const isLowVolumePipette = Object.keys(pipetteSpecs.liquids).some(
     key => key === 'lowVolumeDefault'

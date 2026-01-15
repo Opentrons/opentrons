@@ -14,7 +14,6 @@ import {
   useMenuHandleClickOutside,
   useOnClickOutside,
 } from '@opentrons/components'
-import { useCreateCameraImageSettings } from '@opentrons/react-api-client'
 
 import { getTopPortalEl } from '/app/App/portal'
 import systemCameraFlex from '/app/assets/images/system_camera_flex.png'
@@ -26,7 +25,6 @@ import {
   useCameraAnalytics,
 } from '/app/redux-resources/analytics/'
 import { useRobotType } from '/app/redux-resources/robots'
-import { useFeatureFlag } from '/app/redux/config'
 
 import styles from './inputdevices.module.css'
 
@@ -85,7 +83,6 @@ export function CameraCard({
   const navigateToUsageSettings = (): void => {
     navigate(`/devices/${robotName}/robot-settings/camera`)
   }
-  const { createCameraImageSettings } = useCreateCameraImageSettings()
 
   return (
     <div className={styles.card_container}>
@@ -118,35 +115,25 @@ export function CameraCard({
           </Flex>
         </div>
       </div>
-      <div className={styles.card_overflow_btn}>
+      <div className={styles.card_overflow_btn} ref={cardOverflowWrapperRef}>
         <OverflowBtn
           aria-label="overflow"
           onClick={handleOverflowClick}
           disabled={isRobotBusy}
         />
-      </div>
-      {showOverflowMenu && (
-        <div
-          ref={cardOverflowWrapperRef}
-          onClick={() => {
-            setShowOverflowMenu(false)
-          }}
-        >
+        {showOverflowMenu && (
           <CameraCardOverflowMenu
             cameraEnabled={isCameraEnabled}
             handleToggleCamera={handleToggleCamera}
             toggleControls={toggleControls}
             navigateToUsageSettings={navigateToUsageSettings}
+            setShowOverflowMenu={setShowOverflowMenu}
           />
-        </div>
-      )}
+        )}
+      </div>
       {showControls &&
         createPortal(
-          <CameraControls
-            onClose={toggleControls}
-            runId={null}
-            postCameraImageSettings={createCameraImageSettings}
-          />,
+          <CameraControls onClose={toggleControls} runId={null} />,
           getTopPortalEl()
         )}
     </div>
@@ -158,26 +145,44 @@ function CameraCardOverflowMenu({
   handleToggleCamera,
   toggleControls,
   navigateToUsageSettings,
+  setShowOverflowMenu,
 }: {
   cameraEnabled: boolean
   handleToggleCamera: () => void
   toggleControls: () => void
   navigateToUsageSettings: () => void
+  setShowOverflowMenu: (show: boolean) => void
 }): JSX.Element {
   const { t } = useTranslation('device_details')
-  const cameraControlsEnabled = useFeatureFlag('camera')
+
+  const handleItemClick = (action: () => void): void => {
+    setShowOverflowMenu(false)
+    action()
+  }
 
   return (
     <div className={styles.card_overflow_menu_container}>
       <div className={styles.card_overflow_menu_content_container}>
-        <MenuItem onClick={handleToggleCamera}>
+        <MenuItem
+          onClick={() => {
+            handleItemClick(handleToggleCamera)
+          }}
+        >
           {cameraEnabled ? t('disable_camera') : t('enable_camera')}
         </MenuItem>
-        {cameraControlsEnabled && (
-          <MenuItem onClick={toggleControls}>{t('edit_settings')}</MenuItem>
-        )}
+        <MenuItem
+          onClick={() => {
+            handleItemClick(toggleControls)
+          }}
+        >
+          {t('edit_settings')}
+        </MenuItem>
         <Divider />
-        <MenuItem onClick={navigateToUsageSettings}>
+        <MenuItem
+          onClick={() => {
+            handleItemClick(navigateToUsageSettings)
+          }}
+        >
           {t('usage_settings')}
         </MenuItem>
       </div>

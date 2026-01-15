@@ -2,25 +2,25 @@
 
 from datetime import datetime
 
-from decoy import Decoy, matchers
 import pytest
+from decoy import Decoy, matchers
 
 from opentrons_shared_data.errors.exceptions import StallOrCollisionDetectedError
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons.protocol_engine import DeckPoint, AddressableOffsetVector, LoadedPipette
-from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.types import Point, MountType
 
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine import AddressableOffsetVector, DeckPoint, LoadedPipette
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.move_to_addressable_area import (
+    MoveToAddressableAreaImplementation,
     MoveToAddressableAreaParams,
     MoveToAddressableAreaResult,
-    MoveToAddressableAreaImplementation,
 )
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
+from opentrons.protocol_engine.execution import MovementHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.types import MountType, Point
 
 
 @pytest.fixture

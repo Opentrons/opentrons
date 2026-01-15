@@ -1,30 +1,29 @@
 import argparse
 import csv
 import json
-from ast import literal_eval
-from typing import Optional, Dict, Union, Any, List
-from pathlib import Path
-from pydantic import BaseModel
 import math
+from ast import literal_eval
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+from pydantic import BaseModel
 
 from ... import get_shared_data_root
 from ..pipette_definition import (
+    AvailableSensorDefinition,
+    DropTipConfigurations,
+    MotorConfigurations,
+    PartialTipDefinition,
+    PickUpTipConfigurations,
     PipetteGeometryDefinition,
     PipetteLiquidPropertiesDefinition,
     PipettePhysicalPropertiesDefinition,
-    PlungerPositions,
-    SupportedTipsDefinition,
-    MotorConfigurations,
-    PartialTipDefinition,
-    AvailableSensorDefinition,
-    PickUpTipConfigurations,
-    PressFitPickUpTipConfiguration,
-    DropTipConfigurations,
     PlungerEjectDropTipConfiguration,
+    PlungerPositions,
+    PressFitPickUpTipConfiguration,
+    SupportedTipsDefinition,
 )
-
 from ..types import PipetteModelSpec
-
 
 PIPETTE_DEFINITION_ROOT = Path("pipette") / "definitions" / "2"
 GEOMETRY_ROOT = get_shared_data_root() / PIPETTE_DEFINITION_ROOT / "geometry"

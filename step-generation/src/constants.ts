@@ -17,6 +17,7 @@ import type {
   ModuleModel,
   ModuleType,
   OT2AddressableAreaName,
+  StackerStoredLabwareDefinitionURIs,
 } from '@opentrons/shared-data'
 import type {
   AbsorbanceReaderState,
@@ -79,6 +80,8 @@ export const FLEX_STACKER_MODULE_INITIAL_STATE: FlexStackerModuleState = {
   storedLabwareDetails: null,
   labwareInHopper: null,
   labwareOnShuttle: null,
+  setStoredLabwareCount: 1,
+  fillCount: 1,
 }
 
 export const MODULE_INITIAL_STATE_BY_TYPE: {
@@ -136,6 +139,9 @@ export type HopperLocationMapKey = keyof typeof FAKE_HOPPER_LOCATION_MAP
 export const BOTTOM_UP_LABWARE_POOL_KEYS: Array<
   keyof FlexStackerStoredLabwareGroup
 > = ['adapterLabwareId', 'primaryLabwareId', 'lidLabwareId']
+export const BOTTOM_UP_STORED_LABWARE_URI_KEYS: Array<
+  keyof StackerStoredLabwareDefinitionURIs
+> = ['adapterLabwareURI', 'primaryLabwareURI', 'lidLabwareURI']
 
 export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   DeckSlotId,
@@ -146,3 +152,5 @@ export const SLOT_LOCATIONS_TO_FAKE_HOPPER_LOCATIONS: Record<
   C4: 'hopperC4',
   D4: 'hopperD4',
 }
+
+export const AIR_GAP_LIQUID_STATE_CONST: '__air_gap__' = '__air_gap__'

@@ -2935,7 +2935,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -3178,7 +3179,8 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1"
+                "stagingAreaSlotWithMagneticBlockV1",
+                "vacuumModuleMilliporeV1"
               ]
             }
           ],
@@ -3204,7 +3206,8 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1"
+                "stagingAreaSlotWithMagneticBlockV1",
+                "vacuumModuleMilliporeV1"
               ]
             }
           ],
@@ -3234,49 +3237,12 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1"
+                "stagingAreaSlotWithMagneticBlockV1",
+                "vacuumModuleMilliporeV1"
               ]
             }
           ],
           [
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
-            {
-              "addressableAreaName": "A4",
-              "kind": "onAddressableArea"
-            },
-            {
-              "cutoutId": "cutoutA3",
-              "kind": "onCutoutFixture",
-              "possibleCutoutFixtureIds": [
-                "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1"
-              ]
-            }
-          ],
-          [
-            {
-              "kind": "onLabware",
-              "labwareId": "UUID"
-            },
             {
               "kind": "onLabware",
               "labwareId": "UUID"
@@ -3306,7 +3272,47 @@
               "kind": "onCutoutFixture",
               "possibleCutoutFixtureIds": [
                 "stagingAreaRightSlot",
-                "stagingAreaSlotWithMagneticBlockV1"
+                "stagingAreaSlotWithMagneticBlockV1",
+                "vacuumModuleMilliporeV1"
+              ]
+            }
+          ],
+          [
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "kind": "onLabware",
+              "labwareId": "UUID"
+            },
+            {
+              "addressableAreaName": "A4",
+              "kind": "onAddressableArea"
+            },
+            {
+              "cutoutId": "cutoutA3",
+              "kind": "onCutoutFixture",
+              "possibleCutoutFixtureIds": [
+                "stagingAreaRightSlot",
+                "stagingAreaSlotWithMagneticBlockV1",
+                "vacuumModuleMilliporeV1"
               ]
             }
           ]
@@ -3326,7 +3332,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -9839,7 +9846,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.38999999999999,
+        "tipLength": 85.31,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -10176,7 +10183,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.38999999999999,
+        "tipLength": 85.26499999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -10923,7 +10930,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.38999999999999,
+        "tipLength": 85.72399999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -13398,7 +13405,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -17184,7 +17192,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.38999999999999,
+        "tipLength": 85.31,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -18036,7 +18044,7 @@
           "z": 110.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.31,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -20313,7 +20321,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.38999999999999,
+        "tipLength": 85.26499999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
@@ -21158,7 +21166,7 @@
           "z": 110.0
         },
         "tipDiameter": 5.47,
-        "tipLength": 85.26499999999999,
+        "tipLength": 85.38999999999999,
         "tipVolume": 1000.0
       },
       "startedAt": "TIMESTAMP",
