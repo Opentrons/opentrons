@@ -75,7 +75,7 @@ import type { LabwareCreatorErrors } from './formLevelValidation'
 const ajv = new Ajv()
 const validateLabwareSchema2 = ajv.compile(labwareSchemaV2)
 
-const assert = (condition: unknown, message: string): asserts condition => {
+function assert(condition: unknown, message: string): asserts condition {
   if (!condition) {
     throw new Error(message)
   }
