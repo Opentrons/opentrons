@@ -30,10 +30,8 @@
   },
   "captions_for_fields": {
     "blockTargetTemp": "Valid range between 4 and 99 °C",
-    "blockTargetTempHold": "Valid range between 4 and 99 °C",
     "heaterShakerTimer": "Use the format hh:mm:ss",
     "lidTargetTemp": "Valid range between 37 and 110 °C",
-    "lidTargetTempHold": "Valid range between 37 and 110 °C",
     "targetHeaterShakerTemperature": "Valid range between 20 and 95 °C",
     "targetSpeed": "Valid range between 200 and 3000 rpm",
     "targetTemperature": "Valid range between 4 and 95 °C",
@@ -238,10 +236,6 @@
     "repeat": "Repeat {{repetitions}} times",
     "substep_settings": "<text>Set block temperature to</text><tagTemperature/><text>for</text><tagDuration/>",
     "thermocycler_profile": {
-      "end_hold": {
-        "block": "<text>End with block at</text><tag/>",
-        "lid_position": "<text>and lid</text><tag/>"
-      },
       "lid_temperature": "<text>and lid temperature at</text><tag/>",
       "volume": "<text>Run thermocycler profile with</text><tag/>"
     },

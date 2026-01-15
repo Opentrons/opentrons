@@ -151,10 +151,9 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                     })
 
                     const stackingProps: StackingProps | null =
-                      isLidValid &&
-                      (isOnHopper ||
-                        (stackingLabwareDefUris.length === 1 &&
-                          slot !== 'offDeck'))
+                      isOnHopper ||
+                      (stackingLabwareDefUris.length === 1 &&
+                        slot !== 'offDeck')
                         ? {
                             inputTitle: t('labware_quantity'),
                             errorMessage: t('unsupported_range'),
@@ -178,7 +177,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                             }),
                             checked: selectedLidLabware != null,
                             onCheckboxChange:
-                              !isTiprack && isOnHopper
+                              (!isTiprack && isOnHopper) || !isLidValid
                                 ? undefined
                                 : () => {
                                     dispatch(

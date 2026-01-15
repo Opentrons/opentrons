@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Callable, Generator, Iterator, cast
 
 import pytest
+from _pytest.mark import deselect_by_mark
 from decoy import Decoy
 from fastapi import routing
 from mock import MagicMock
@@ -60,6 +61,34 @@ async def always_raise() -> NoReturn:
 
 
 app.include_router(test_router)
+
+
+def pytest_collection_modifyitems(
+    session: pytest.Session, config: pytest.Config, items: list[pytest.Item]
+) -> None:
+    """Hook to implement not collecting integration tests if not needed.
+
+    https://docs.pytest.org/en/stable/reference/reference.html#pytest.hookspec.pytest_collection_modifyitems
+
+    The normal way to do this is to mark tests with a custom mark. But that's a lot of tests.
+    The next way to do this is to apply a mark dynamically in a fixture (which we do below) but that
+    happens after collection time, so we can only skip the tests rather than not collecting them.
+
+    By writing a collection hook, we can skip collecting the tests altogether. We can do this by
+    - At collection time, adding the mark to any test defined in a path under integration/
+    - Make sure that we rerun the logic that discards tests if they don't match some mark expression
+
+    Unfortunately that last part is a part of pytest internals, so we have to poke in there, but
+    it's only one place so maybe it's okay. It also may not be necessary (because maybe pytest forces
+    internal hooks to run after external hooks) but there's no formal guarantee that it isn't, so we do it.
+    """
+    for item in items:
+        # https://docs.pytest.org/en/stable/reference/reference.html#pytest.Item.location
+        itempath = item.location[0]
+        if os.path.join("tests", "integration") in itempath:
+            item.add_marker(pytest.mark.integration)
+    # https://github.com/pytest-dev/pytest/blob/main/src/_pytest/mark/__init__.py#L255
+    deselect_by_mark(items=items, config=config)
 
 
 @pytest.fixture()
