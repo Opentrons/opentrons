@@ -65,6 +65,15 @@ convention = "google"
 [tool.ruff.lint.mccabe]
 max-complexity = 9
 
+# uv: global settings and dependency tweaks
+[tool.uv]
+# Provide static metadata so uv can resolve systemd-python without building its sdist on
+# macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+    ] },
+]
+
 # local editable sources satisfying the 0.0.0 placeholders
 [tool.uv.sources]
 server-utils = { path = "../server-utils", editable = true }
