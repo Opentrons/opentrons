@@ -73,7 +73,7 @@ export function RunHeaderSectionLower({
     }
     // need to encode URL to avoid spaces and slashes
     const encodedTimestamp = encodeURIComponent(createdAtTimestamp)
-    const targetPath = `/devices/${robotName}/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
+    const targetPath = `/devices/${robotName}/protocol-runs/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
     trackEvent({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
       properties: { sourceLocation: 'protocol run' },

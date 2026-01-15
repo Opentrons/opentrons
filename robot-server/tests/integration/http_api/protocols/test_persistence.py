@@ -15,6 +15,7 @@ from robot_server.persistence.file_and_directory_names import LATEST_VERSION_DIR
 pytestmark = pytest.mark.slow
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("protocol", [(get_py_protocol), (get_json_protocol)])
 async def test_protocols_and_analyses_persist(
     protocol: Callable[[str], IO[bytes]],
@@ -79,6 +80,7 @@ async def test_protocols_and_analyses_persist(
             server.stop()
 
 
+@pytest.mark.slow
 async def test_protocol_labware_files_persist() -> None:
     """Upload a python protocol and 2 custom labware files.
 

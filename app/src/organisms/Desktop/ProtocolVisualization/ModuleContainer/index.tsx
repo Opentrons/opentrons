@@ -51,7 +51,7 @@ export function ModuleContainer({
           blockTemperatureText = t('deactivated')
           break
         case 'blockDeactivated':
-          blockTemperatureText = t('deactivated')
+          blockTemperatureText = t('idle')
           break
         default:
           currentBlockActivity satisfies never
@@ -68,7 +68,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {lidTargetTemp != null
                 ? t('temperature', { temp: lidTargetTemp })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="lid_status">
@@ -90,7 +90,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemp != null
                 ? t('temperature', { temp: targetTemp })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="target_speed">
@@ -138,7 +138,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemperature != null
                 ? t('temperature', { temp: targetTemperature })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
         </div>

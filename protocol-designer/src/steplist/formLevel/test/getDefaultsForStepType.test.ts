@@ -225,11 +225,6 @@ describe('getDefaultsForStepType', () => {
         profileTargetLidTemp: null,
         orderedProfileItems: [],
         profileItemsById: {},
-        blockIsActiveHold: false,
-        blockTargetTempHold: null,
-        lidIsActiveHold: false,
-        lidTargetTempHold: null,
-        lidOpenHold: null,
       })
     })
     it('should default to an empty object', () => {

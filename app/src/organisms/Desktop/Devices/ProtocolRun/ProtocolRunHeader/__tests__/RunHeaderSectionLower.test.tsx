@@ -180,7 +180,7 @@ describe('RunHeaderSectionLower', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Visualize' }))
     expect(mockNavigate).toHaveBeenCalledWith(
-      '/devices/mockRobotName/mockRunId/--%3A--%3A--/null/visualization'
+      '/devices/mockRobotName/protocol-runs/mockRunId/--%3A--%3A--/null/visualization'
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
