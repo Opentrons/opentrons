@@ -8,7 +8,7 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons App Changes in 8.8.1
 
-The 8.8.1 hotfix release includes a small fix to allow all robots to properly reboot after an upgrade to v8.8.0.
+There are no changes to the Opentrons App in v8.8.1, but it allows all robots to properly reboot after updating the robot software to v8.8.0.
 
 ## Opentrons App Changes in 8.8.0
 
