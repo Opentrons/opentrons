@@ -101,8 +101,7 @@ export const ABSORBANCE_READER_TYPE: 'absorbanceReaderType' =
   'absorbanceReaderType'
 export const FLEX_STACKER_MODULE_TYPE: 'flexStackerModuleType' =
   'flexStackerModuleType'
-export const VACUUM_MODULE_TYPE: 'vacuumModuleType' =
-  'vacuumModuleType'
+export const VACUUM_MODULE_TYPE: 'vacuumModuleType' = 'vacuumModuleType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 
@@ -696,7 +695,8 @@ export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStacke
   'flexStackerModuleV1WithWasteChuteRightAdapterNoCover'
 export const FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE: 'flexStackerModuleV1WithMagneticBlockV1' =
   'flexStackerModuleV1WithMagneticBlockV1'
-export const VACUUM_MODULE_MILLIPORE_V1_FIXTURE: 'vacuumModuleMilliporeV1' = 'vacuumModuleMilliporeV1'
+export const VACUUM_MODULE_MILLIPORE_V1_FIXTURE: 'vacuumModuleMilliporeV1' =
+  'vacuumModuleMilliporeV1'
 
 export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [moduleModel in ModuleModel]?: AreaType
@@ -717,7 +717,7 @@ export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
   THERMOCYCLER_V2_FRONT_FIXTURE,
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_STACKER_V1_FIXTURE,
-  VACUUM_MODULE_MILLIPORE_V1_FIXTURE
+  VACUUM_MODULE_MILLIPORE_V1_FIXTURE,
 ]
 
 export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureIdsWithFakes[] = [
