@@ -456,8 +456,6 @@ export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
 export const VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA: 'vacuumModuleMilliporeV1A3' =
   'vacuumModuleMilliporeV1A3'
-export const VACUUM_MODULE_MILLIPORE_D3_ADDRESSABLE_AREA: 'vacuumModuleMilliporeV1D3' =
-  'vacuumModuleMilliporeV1D3'
 
 export const exactMatchOnlyLoadNames = new Set([
   'milliplex_microtiter_plate',
@@ -530,7 +528,6 @@ export const FLEX_STACKER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
 
 export const VACUUM_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA,
-  VACUUM_MODULE_MILLIPORE_D3_ADDRESSABLE_AREA,
 ]
 
 export const FLEX_USB_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
