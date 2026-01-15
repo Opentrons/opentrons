@@ -4,7 +4,7 @@ title: "Opentrons OT-2: Thermocycler"
 
 <font color="red">check and fix links</font>
 
-![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](../images/thermocycler.png "Thermocycler")
+![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](../../../flex/docs/images/thermocycler.png)
 
 !!! info "Additional Documentation"
     For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
