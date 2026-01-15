@@ -2,16 +2,14 @@
 title: "Opentrons OT-2: Thermocycler"
 ---
 
-<font color="red">check and fix links</font>
-
-![The Thermocycler as seen from the top right. The lid is open to show the thermal block inside.](../../../flex/docs/images/thermocycler.png)
-
-!!! info "Additional Documentation"
-    For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
+![Thermocycler](../images/thermocycler.png)
 
 ## Thermocycler features
 
-The Opentrons Thermocycler Module is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with the Flex Gripper, other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
+The [Opentrons Thermocycler Module](https://opentrons.com/products/thermocycler-module-1?sku=991-00114) is a fully automated on-deck thermocycler designed for hands-free PCR in a 96-well plate format. It is compatible with the Flex Gripper, other deck-mounted hardware, and is fully supported in the Opentrons App and Python API. When used with a reusable rubber seal or single-use PCR plate lid, the module's heated lid provides a tight seal that helps ensure efficient sample heating and minimizes evaporation, crucial for reliable and repeatable experimental results.
+
+!!! info "Additional Documentation"
+    For complete instructions on module installation and use, see the [Thermocycler Module Instruction Manual](../../thermocycler/index.md).
 
 ### Heating and cooling
 
