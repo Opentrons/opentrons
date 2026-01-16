@@ -99,7 +99,8 @@ export function getInitialSummaryState(
     blowOutDispense:
       path !== 'multiDispense'
         ? {
-            location: trashConfigCutout,
+            // blowout location should default to same fixture as dropTipLocation below
+            location: state.dropTipLocation ?? trashConfigCutout,
             flowRate: flowRatesForSupportedTip.defaultDispenseFlowRate.default,
           }
         : undefined,
