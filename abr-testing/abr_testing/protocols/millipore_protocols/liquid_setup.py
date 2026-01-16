@@ -91,7 +91,6 @@ def run(protocol: ProtocolContext) -> None:
             [nest_deepwell["G1"], nest_deepwell["H1"]],
             blow_out=True,
             new_tip="once",
-            blowout_destination="destination well",
         )
         pipette.configure_nozzle_layout(
             style=SINGLE, tip_racks=[tip_rack_partial_1], start="A1"
@@ -102,7 +101,6 @@ def run(protocol: ProtocolContext) -> None:
             nest_deepwell["A1"].bottom(z=2),
             blow_out=True,
             new_tip="once",
-            blowout_destination="destination well",
         )
         pipette.configure_nozzle_layout(
             style=COLUMN, tip_racks=[tip_rack_partial_2], start="A12"
@@ -119,7 +117,6 @@ def run(protocol: ProtocolContext) -> None:
             ],
             blow_out=True,
             new_tip="once",
-            blowout_destination="destination well",
         )
 
     if protocol_name == "duolink_day1_round":
@@ -137,7 +134,6 @@ def run(protocol: ProtocolContext) -> None:
                 nest_deepwell["A2"],
             ],
             blow_out=True,
-            blowout_destination="destination well",
             new_tip="once",
         )
     if protocol_name == "duolink_day1_square":
@@ -155,7 +151,6 @@ def run(protocol: ProtocolContext) -> None:
                 nest_deepwell["A2"],
             ],
             blow_out=True,
-            blowout_destination="destination well",
             new_tip="once",
         )
     if protocol_name == "duolink_day2_round":
@@ -179,7 +174,6 @@ def run(protocol: ProtocolContext) -> None:
                 reservoir_12well["A8"],
             ],
             blow_out=True,
-            blowout_destination="destination well",
             new_tip="once",
         )
         pipette.distribute(
@@ -193,7 +187,6 @@ def run(protocol: ProtocolContext) -> None:
                 nest_deepwell["A5"],
             ],
             blow_out=True,
-            blowout_destination="destination well",
             new_tip="once",
         )
 
@@ -221,7 +214,6 @@ def run(protocol: ProtocolContext) -> None:
                 reservoir_12well["A8"],
             ],
             blow_out=True,
-            blowout_destination="destination well",
             new_tip="once",
         )
         pipette.distribute(
@@ -235,7 +227,6 @@ def run(protocol: ProtocolContext) -> None:
                 nest_deepwell["A5"],
             ],
             blow_out=True,
-            blowout_destination="destination well",
             new_tip="once",
         )
     if protocol_name == "pure_proteome":
@@ -258,8 +249,6 @@ def run(protocol: ProtocolContext) -> None:
             src_reservoir["A1"],
             axygen_plate["A1"].bottom(z=2),
             blow_out=True,
-            blowout_destination="destination well",
-            trash_tips=False,
         )
         pipette.configure_nozzle_layout(
             style=COLUMN, tip_racks=[tip_rack_partial_1], start="A12"
@@ -270,7 +259,6 @@ def run(protocol: ProtocolContext) -> None:
             [reservoir_12well["A3"], reservoir_12well["A10"]],
             blow_out=True,
             new_tip="once",
-            blowout_destination="destination well",
         )
     if protocol_name == "milliplex_day1":
         reservoir_12well = protocol.load_labware(
@@ -298,7 +286,6 @@ def run(protocol: ProtocolContext) -> None:
             ],
             blow_out=True,
             new_tip="once",
-            blowout_destination="destination well",
         )
         pipette.configure_nozzle_layout(
             style=SINGLE, tip_racks=[tip_rack_partial_1], start="A1"
@@ -314,5 +301,4 @@ def run(protocol: ProtocolContext) -> None:
             ],
             new_tip="once",
             blow_out=True,
-            blowout_destination="destination well",
         )
