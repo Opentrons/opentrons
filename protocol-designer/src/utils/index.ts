@@ -305,6 +305,7 @@ export const getDefaultBlowoutFlowRate = (
   const liquidsObject = isInLowVolumeMode
     ? liquids.lowVolumeDefault
     : liquids.default
+  // if the tiprack is not in the pipette's supportedTips, we'll just return null:
   return liquidsObject.supportedTips[
     `t${tiprackDef.wells.A1.totalLiquidVolume}`
   ]?.defaultBlowOutFlowRate.default
