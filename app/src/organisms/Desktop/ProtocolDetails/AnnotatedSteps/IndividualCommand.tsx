@@ -73,12 +73,14 @@ export function IndividualCommand({
         <div className={styles.individual_command} key={command.id}>
           <div className={styles.individual_command_header}>
             <CommandIcon command={command} color={iconColor} />
-            <CommandText
-              command={command}
-              robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
-              commandTextData={analysis}
-              allRunDefs={allRunDefs}
-            />
+            <div className={styles.individual_command_text}>
+              <CommandText
+                command={command}
+                robotType={analysis?.robotType ?? FLEX_ROBOT_TYPE}
+                commandTextData={analysis}
+                allRunDefs={allRunDefs}
+              />
+            </div>
           </div>
         </div>
       </div>
