@@ -9,7 +9,6 @@ import {
   ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useFeatureFlag } from '/app/redux/config'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis/hooks/useStoredProtocolAnalysis'
 import {
   EMPTY_TIMESTAMP,
@@ -36,7 +35,6 @@ export function RunHeaderSectionLower({
   robotName,
 }: RunHeaderContentProps): JSX.Element {
   const { t } = useTranslation('run_details')
-  const enableProtocolTimeline = useFeatureFlag('protocolTimeline')
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const { startedAt, completedAt } = useRunTimestamps(runId)
@@ -87,7 +85,7 @@ export function RunHeaderSectionLower({
         <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
         <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
       </div>
-      {enableProtocolTimeline && runStatus === RUN_STATUS_IDLE ? (
+      {runStatus === RUN_STATUS_IDLE ? (
         <div className={styles.button_container}>
           <SecondaryButton onClick={handleVisualizeClick}>
             {t('visualize')}
