@@ -110,11 +110,7 @@ format:
 dev:
 	$(UV) run $(run_dev)
 
-.PHONY: push
-push: wheel
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/usr/lib/python3.10/site-packages/)
-	$(call push-systemd-unit,$(host),$(ssh_key),$(ssh_opts),./opentrons-robot-server.service)
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
+# Note: No `push` target, since this project only runs on Flex (OT-3), not OT-2.
 
 .PHONY: push-ot3
 push-ot3: wheel
