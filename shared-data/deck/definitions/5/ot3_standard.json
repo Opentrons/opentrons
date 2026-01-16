@@ -988,6 +988,19 @@
         "displayName": "Vacuum Module in A3",
         "features": {},
         "orientation": "right"
+      },
+      {
+        "id": "vacuumModuleMilliporeV1DockA4",
+        "areaType": "lidDock",
+        "offsetFromCutoutFixture": [161.0, 0.0, 31.0],
+        "boundingBox": {
+          "xDimension": 128.5,
+          "yDimension": 86.5,
+          "zDimension": 0
+        },
+        "displayName": "Vacuum Module Dock in A4",
+        "features": {},
+        "orientation": "right"
       }
     ],
     "cutouts": [
@@ -1420,7 +1433,7 @@
       "mayMountTo": ["cutoutA3"],
       "displayName": "Slot With a Vacuum Module Millipore Base",
       "providesAddressableAreas": {
-        "cutoutA3": ["vacuumModuleMilliporeV1A3", "A4"]
+        "cutoutA3": ["vacuumModuleMilliporeV1A3", "vacuumModuleMilliporeV1DockA4"]
       },
       "fixtureGroup": {},
       "height": 10.65

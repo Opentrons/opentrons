@@ -69,6 +69,7 @@ export type FlexAddressableAreaName =
   | 'flexStackerModuleV1C4'
   | 'flexStackerModuleV1D4'
   | 'vacuumModuleMilliporeV1A3'
+  | 'vacuumModuleMilliporeV1DockA4'
 
 export type OT2AddressableAreaName =
   | '1'
