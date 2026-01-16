@@ -975,6 +975,19 @@
         "displayName": "Flex Stacker in A4",
         "features": {},
         "orientation": "right"
+      },
+      {
+        "id": "vacuumModuleMilliporeV1A3",
+        "areaType": "vacuumModule",
+        "offsetFromCutoutFixture": [161.0, 0.0, 31.0],
+        "boundingBox": {
+          "xDimension": 128.0,
+          "yDimension": 86.0,
+          "zDimension": 0
+        },
+        "displayName": "Vacuum Module in A3",
+        "features": {},
+        "orientation": "right"
       }
     ],
     "cutouts": [
@@ -1397,6 +1410,17 @@
         "cutoutC3": ["flexStackerModuleV1C4", "C3"],
         "cutoutB3": ["flexStackerModuleV1B4", "B3"],
         "cutoutA3": ["flexStackerModuleV1A4", "A3"]
+      },
+      "fixtureGroup": {},
+      "height": 10.65
+    },
+    {
+      "id": "vacuumModuleMilliporeV1",
+      "expectOpentronsModuleSerialNumber": true,
+      "mayMountTo": ["cutoutA3"],
+      "displayName": "Slot With a Vacuum Module Millipore Base",
+      "providesAddressableAreas": {
+        "cutoutA3": ["vacuumModuleMilliporeV1A3", "A4"]
       },
       "fixtureGroup": {},
       "height": 10.65
