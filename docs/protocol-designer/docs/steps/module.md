@@ -67,7 +67,7 @@ Protocol Designer includes Absorbance Plate Reader step details to help you keep
 
 ## Flex Stacker Module steps
 
-You can add up to 4 Flex Stacker Modules in column 4, on the right side of your Flex. An attached Stacker Module can store additional well plates, tip racks, or reservoirs to use in your protocol. During a protocol, the module's attached shuttle moves stored labware labware from the botttom of the stack to the Flex deck. 
+You can add up to 4 Flex Stacker Modules in column 4, on the right side of your Flex. An attached Stacker Module can store additional well plates, tip racks, or reservoirs. During a protocol, the module's attached shuttle moves stored labware labware from the botttom of the stack to the Flex deck. 
 
 In your protocol starting deck, click the Stacker Module on the right side of the Flex deck to add labware. Choose a labware type and quantity: 
 
@@ -76,13 +76,19 @@ In your protocol starting deck, click the Stacker Module on the right side of th
 
     Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. 
 
-*screenshot of edit liquid menu for the entire stack*
+<figure class="screenshot" markdown>
+  ![Edit Stacker labware](../images/stacker-labware.png)
+  <figcaption>Edit labware stored inside the Stacker Module, including adding liquids to individual well plates or reservoirs.</figcaption>
+</figure>
 
 Each Stacker can only store a single type of labware in a protocol. If you need to store more than one kind of labware, you'll need to use multiple Stacker Modules. 
 
 Click in the bottom left to add a Stacker step to your Protocol Designer protocol. The step menu shows the labware currently in the Stacker Module and any labware on the attached shuttle. 
 
-*screenshot of Stacker step menu*
+<figure class="screenshot" markdown>
+  ![Add a Stacker step](../images/stacker-steps.png)
+  <figcaption>Add a Stacker step to store or retrieve labware, or refill or empty your Stacker Module.</figcaption>
+</figure>
 
 Choose from the available module controls to: 
 
@@ -91,7 +97,9 @@ Choose from the available module controls to:
 - **Refill** the Stacker with the same type of labware originally loaded in the protocol starting deck. Select the labware type and quantity, and add an optional message to display on the Flex touchscreen.
 - **Empty** all labware from the Stacker. Add an optional message to display on the Flex touchscreen.
 
-Any labware filled into or emptied from the Stacker comes from the Flex's off-deck location, but you don't need to add it there yourself. When you add a refill or empty Stacker step, Protocol Designer creates the off-deck labware for you. Click the toggle switch at the top right of the deck view to see the off-deck labware at any point. 
+You'll only be able to add a Stacker step to retrieve or store labware if the shuttle is empty or contains labware, respectively. 
+
+Any labware filled into or emptied from the Stacker comes from the Flex's off-deck location, but you don't need to add it there yourself! When you add a refill or empty Stacker step, Protocol Designer creates the off-deck labware for you. Click the toggle switch at the top right of the deck view to see the off-deck labware at any point. 
 
 ## Heater-Shaker Module steps
 
@@ -113,7 +121,7 @@ Set a custom time for your Heater-Shaker step by enabling the timer. The timer w
 If your Heater-Shaker step doesn't include a set time, Protocol Designer will ask if you'd like to pause your protocol. Because reaching a target temperature takes more time than changing the shaking speed, you can set the Heater-Shaker to reach a target temperature while your protocol proceeds to the next step. 
 
 <figure class="screenshot" markdown>
-  ![Heater-Shaker pause](../images/heater_shaker_pause.png)
+  ![Heater-Shaker pause](../images/heater-shaker-pause.png)
   <figcaption>Build a pause step now or later in your protocol.</figcaption>
 </figure>
 
