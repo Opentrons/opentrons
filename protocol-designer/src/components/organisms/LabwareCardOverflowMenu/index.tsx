@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -51,6 +52,7 @@ export function LabwareCardOverflowMenu(
 ): JSX.Element | null {
   const { labwareIds, setShowOverflowMenu, lidId } = props
   const { t } = useTranslation('starting_deck_state')
+  const navigate = useNavigate()
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
   const [showNotCompatibleModal, setShowNotCompatibleModal] =
@@ -124,15 +126,12 @@ export function LabwareCardOverflowMenu(
     const availableLabware = Object.values(deckSetupLabware).filter(
       lw => lw.id !== topLabwareId && lw.stack.includes(slotName)
     )
-    const labwareOnDeck = Object.values(deckSetupLabware).filter(
-      lw => lw.id !== topLabwareId && !lw.stack.includes(slotName)
-    )
     const newLabwareId =
-      availableLabware.length > 0
-        ? availableLabware[0].id
-        : labwareOnDeck[0]?.id
-          ? labwareOnDeck[0].id
-          : ''
+      availableLabware.length > 0 ? availableLabware[0].id : ''
+    if (newLabwareId === '') {
+      console.log('No more labware in stacker')
+      navigate('/designer')
+    }
     dispatch(openIngredientSelector(newLabwareId))
     dispatch(multipleIngredientsSelector([newLabwareId]))
   }
