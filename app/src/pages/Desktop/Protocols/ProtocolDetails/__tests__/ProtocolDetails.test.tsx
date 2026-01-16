@@ -5,7 +5,7 @@ import { when } from 'vitest-when'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
+import { ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
 import { getStoredProtocol } from '/app/redux/protocol-storage'
 import { storedProtocolData } from '/app/redux/protocol-storage/__fixtures__'
 

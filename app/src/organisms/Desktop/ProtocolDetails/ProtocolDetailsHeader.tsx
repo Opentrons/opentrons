@@ -39,10 +39,17 @@ import type {
   PythonConfig,
   RobotType,
 } from '@opentrons/shared-data'
+import type {
+  GroupedCommands,
+  StoredProtocolData,
+} from '/app/redux/protocol-storage'
 import type { AnalysisStatus } from '/app/transformations/analysis'
-import type { ProtocolDetailsProps } from './UpdatedProtocolDetails'
 
 const MAX_DESCRIPTION_LENGTH = 220
+
+interface ProtocolDetailsProps extends StoredProtocolData {
+  groupedCommands: GroupedCommands | null
+}
 
 interface ProtocolDetailsHeaderProps {
   analysisStatus: AnalysisStatus

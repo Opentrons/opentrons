@@ -40,7 +40,6 @@ vi.mock('/app/pages/Desktop/Protocols/ProtocolsLanding')
 vi.mock('/app/pages/Desktop/Devices/ProtocolRunDetails')
 vi.mock('/app/pages/Desktop/Devices/RobotSettings')
 vi.mock('/app/organisms/Desktop/Alerts/AlertsModal')
-vi.mock('/app/pages/Desktop/Protocols/ProtocolDetails/ProtocolTimeline')
 vi.mock('/app/redux/config')
 vi.mock('/app/redux-resources/robots')
 vi.mock('../hooks')
@@ -57,9 +56,6 @@ const render = (path = '/') => {
 
 describe('DesktopApp', () => {
   beforeEach(() => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('protocolTimeline')
-      .thenReturn(true)
     vi.mocked(CalibrationDashboard).mockReturnValue(
       <div>Mock CalibrationDashboard</div>
     )
