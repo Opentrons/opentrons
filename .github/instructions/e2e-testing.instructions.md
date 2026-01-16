@@ -231,17 +231,17 @@ Preferred usage in tests:
 ```python
 from playwright.sync_api import Page
 
-from eyes import eyes_check_window
+from eyes import eyes_check
 
 
 def test_my_feature(page: Page, base_url: str) -> None:
     # ... use page objects to navigate ...
-    eyes_check_window(page, test_name="test_my_feature", checkpoint_name="After navigation")
+    eyes_check(page, test_name="test_my_feature", checkpoint_name="After navigation")
 ```
 
 Behavior:
 
-- If `APPLITOOLS_API_KEY` is missing, `eyes_check_window()` no-ops (so visual checks can be enabled per-environment).
+- If `APPLITOOLS_API_KEY` is missing, `eyes_check()` no-ops (so visual checks can be enabled per-environment).
 
 ## Common Patterns
 
