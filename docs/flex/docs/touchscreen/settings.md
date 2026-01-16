@@ -4,13 +4,16 @@ title: "Opentrons Flex: Settings"
 
 The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.
 
-<font color="red">IMAGE PLACEHOLDER</font>
+<figure class="screenshot" markdown>
+![List of all settings on Flex touchscreen](../images/touchscreen-settings.png)
+<figcaption>Flex settings. Yours may look different. On the touchscreen, scroll the list to see all the settings.</figcaption>
+</figure>
 
 The following sections summarize the currently available settings.
 
-## Section title tbd here
+## Settings list
 
-All of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time.
+Many of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time.
 
 ### Camera
 
