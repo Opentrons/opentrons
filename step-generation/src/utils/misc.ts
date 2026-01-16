@@ -882,7 +882,7 @@ export const getSlotInLocationStack = (
   } else {
     const slot = stack[stack.length - 1]
     if (isStacker) {
-      return 'STACKER' + ' ' + slot.charAt(0)
+      return 'STACKER' + ' ' + slot.slice(-1, -2)
     } else {
       return slot
     }
