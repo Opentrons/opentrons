@@ -54,7 +54,7 @@ clean_all_cmd = $(clean_cmd) dist
 #     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
 #   * Doing `uv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
 #     probably POSIX-only.
-dev_port ?= "31951"
+dev_port ?= "33950"
 dev_host ?= "localhost"
 run_dev ?= uvicorn "auth_server.app:app" --host $(dev_host) --port $(dev_port) --reload --reload-dir auth_server
 
