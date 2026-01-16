@@ -33,6 +33,7 @@ export function RunHeaderSectionLower({
   runId,
   runStatus,
   robotName,
+  numberOfAtomicCommands,
 }: RunHeaderContentProps): JSX.Element {
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
@@ -74,7 +75,7 @@ export function RunHeaderSectionLower({
     const targetPath = `/devices/${robotName}/protocol-runs/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
     trackEvent({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
-      properties: { sourceLocation: 'protocol run' },
+      properties: { sourceLocation: 'protocol run', numberOfAtomicCommands },
     })
     navigate(targetPath)
   }
