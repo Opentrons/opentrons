@@ -27,6 +27,8 @@ import {
 import {
   deleteContainer,
   editSlotInfo,
+  multipleIngredientsSelector,
+  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
@@ -54,6 +56,10 @@ export function LabwareCardOverflowMenu(
   const [showNotCompatibleModal, setShowNotCompatibleModal] =
     useState<boolean>(false)
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
+  console.log(
+    '🚀 ~ LabwareCardOverflowMenu ~ deckSetupLabware:',
+    deckSetupLabware
+  )
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] =
     useState<boolean>(false)
@@ -119,7 +125,14 @@ export function LabwareCardOverflowMenu(
         : { labwareDefURI: null, lidDefURI: null, amount: 1 }),
     }
     dispatch(editSlotInfo(newSlotInfo))
+    const availableLabware = Object.values(deckSetupLabware).filter(
+      lw => lw.id !== topLabwareId && lw.stack.includes(slotName)
+    )
+    const newLabwareId = availableLabware[0].id
+    dispatch(openIngredientSelector(newLabwareId))
+    dispatch(multipleIngredientsSelector([newLabwareId]))
   }
+
   const handleConfirmDeleteEntityInUseModal = (): void => {
     labwareIds.forEach(labwareId => {
       dispatch(deleteContainer({ labwareId }))
