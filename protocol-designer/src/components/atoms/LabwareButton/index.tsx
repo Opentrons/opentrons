@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import clsx from 'clsx'
+import { LabwareCardOverflowMenu } from 'protocol-designer/src/components/organisms/LabwareCardOverflowMenu'
 
-import { StyledText, Tag } from '@opentrons/components'
+import {
+  Box,
+  OverflowBtn,
+  POSITION_RELATIVE,
+  StyledText,
+  Tag,
+} from '@opentrons/components'
 
 import styles from './labwarebutton.module.css'
 
@@ -22,6 +29,7 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   //  The tagHover is annoying to keep track of state locally in this Ts component
   //  but no other way to put it in css modules since its a tag prop
   const [tagHover, setTagHover] = useState<boolean>(false)
+  const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
 
   return (
     <button
@@ -46,6 +54,21 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
           shrinkToContent
         />
         <StyledText desktopStyle="bodyDefaultRegular">{displayName}</StyledText>
+
+        <Box position={POSITION_RELATIVE}>
+          <OverflowBtn
+            data-testid="LabwareCard_overflowBtn"
+            onClick={() => {
+              setShowOverflowMenu(true)
+            }}
+          />
+          {showOverflowMenu ? (
+            <LabwareCardOverflowMenu
+              labwareIds={[id]}
+              setShowOverflowMenu={setShowOverflowMenu}
+            />
+          ) : null}
+        </Box>
       </div>
     </button>
   )
