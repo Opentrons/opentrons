@@ -4,10 +4,11 @@ import { LabwareCardOverflowMenu } from 'protocol-designer/src/components/organi
 
 import {
   Box,
+  COLORS,
   OverflowBtn,
+  POSITION_ABSOLUTE,
   POSITION_RELATIVE,
   StyledText,
-  COLORS,
   Tag,
 } from '@opentrons/components'
 
@@ -31,7 +32,6 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
   //  but no other way to put it in css modules since its a tag prop
   const [tagHover, setTagHover] = useState<boolean>(false)
   const [showOverflowMenu, setShowOverflowMenu] = useState<boolean>(false)
-
   return (
     <button
       data-testid={`LabwareButton-${numberInStack}`}
@@ -55,6 +55,7 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
           shrinkToContent
         />
         <StyledText desktopStyle="bodyDefaultRegular">{displayName}</StyledText>
+
         {isSelected ? (
           <Box position={POSITION_RELATIVE}>
             <OverflowBtn
@@ -65,10 +66,12 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
               fillColor={COLORS.white}
             />
             {showOverflowMenu ? (
-              <LabwareCardOverflowMenu
-                labwareIds={[id]}
-                setShowOverflowMenu={setShowOverflowMenu}
-              />
+              <Box position={POSITION_ABSOLUTE} left="3rem" top="-0.4rem">
+                <LabwareCardOverflowMenu
+                  labwareIds={[id]}
+                  setShowOverflowMenu={setShowOverflowMenu}
+                />
+              </Box>
             ) : null}
           </Box>
         ) : null}

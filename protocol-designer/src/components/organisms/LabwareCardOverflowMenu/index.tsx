@@ -124,7 +124,15 @@ export function LabwareCardOverflowMenu(
     const availableLabware = Object.values(deckSetupLabware).filter(
       lw => lw.id !== topLabwareId && lw.stack.includes(slotName)
     )
-    const newLabwareId = availableLabware[0].id
+    const labwareOnDeck = Object.values(deckSetupLabware).filter(
+      lw => lw.id !== topLabwareId && !lw.stack.includes(slotName)
+    )
+    const newLabwareId =
+      availableLabware.length > 0
+        ? availableLabware[0].id
+        : labwareOnDeck[0]?.id
+          ? labwareOnDeck[0].id
+          : ''
     dispatch(openIngredientSelector(newLabwareId))
     dispatch(multipleIngredientsSelector([newLabwareId]))
   }
