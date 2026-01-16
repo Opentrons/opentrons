@@ -36,6 +36,7 @@ describe('AnnotatedGroup', () => {
   beforeEach(() => {
     props = {
       scrollTargetId: 'mockTargetId',
+      listElement: null,
       annotationType: 'mockAnnotationType',
       subCommands: [],
       analysis: {} as any,
