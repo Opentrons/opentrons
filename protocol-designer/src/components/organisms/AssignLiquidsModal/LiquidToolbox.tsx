@@ -177,16 +177,18 @@ function LiquidToolbox({
   }
 
   const handleClearAllWells: () => void = () => {
-    if (labwareId != null && activeItemHasLiquids) {
-      if (
-        global.confirm(t('application:are_you_sure_clear_all_wells') as string)
-      ) {
-        dispatch(
-          removeWellsContents({
-            labwareId,
-            wells: allWellsForActiveItem,
-          })
-        )
+    if (
+      global.confirm(t('application:are_you_sure_clear_all_wells') as string)
+    ) {
+      for (const labwareId of selectedLabwareIds) {
+        if (labwareId != null && activeItemHasLiquids) {
+          dispatch(
+            removeWellsContents({
+              labwareId,
+              wells: allWellsForActiveItem,
+            })
+          )
+        }
       }
     }
   }

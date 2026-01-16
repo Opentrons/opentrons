@@ -9,6 +9,7 @@ import { GRIPPER_LOCATION } from '../constants'
 import { createStagingAreaForInvariantContext } from './misc'
 
 import type {
+  CompletedProtocolAnalysis,
   PickUpTipRunTimeCommand,
   ProtocolAnalysisOutput,
   RunTimeCommand,
@@ -36,17 +37,16 @@ const API_MAJOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING = 2
 const API_MINOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING = 22
 
 export function constructInvariantContextFromAnalysis(
-  analysis: ProtocolAnalysisOutput
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis,
+  config: ProtocolAnalysisOutput['config'],
+  createdDate: Date
 ): InvariantContext {
-  const { labware, modules, pipettes, commands, liquids, config, createdAt } =
-    analysis
+  const { labware, modules, pipettes, commands, liquids } = analysis
   const apiVersion = config.protocolType === 'python' ? config.apiVersion : null
   const isSupportingLiquidsPython =
     apiVersion != null &&
     apiVersion[0] >= API_MAJOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING &&
     apiVersion[1] >= API_MINOR_VERSION_AIR_GAP_IN_PLACE_STARTED_SUPPORTING
-
-  const createdDate = new Date(createdAt)
   const isSupportingLiquidsPD =
     config.protocolType === 'json' &&
     createdDate >= PD_CUT_OFF_FOR_LIQUID_STATE_TRACKING

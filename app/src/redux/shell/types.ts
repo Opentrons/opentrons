@@ -2,6 +2,7 @@ import type { ReleaseNoteInfo } from 'builder-util-runtime'
 import type { IpcMainEvent } from 'electron'
 import type { UpdateFileInfo } from 'electron-updater'
 import type {
+  CompletedProtocolAnalysis,
   Liquid,
   ProtocolAnalysisOutput,
   RunTimeCommand,
@@ -210,7 +211,7 @@ export interface StepDetailViewerOpenAction {
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext
-    analysis: ProtocolAnalysisOutput
+    analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
     liquids: Liquid[]
   }
   meta: {
@@ -226,7 +227,7 @@ export interface StepDetailViewerUpdateAction {
     command: RunTimeCommand
     robotState: RobotState
     invariantContext: InvariantContext
-    analysis: ProtocolAnalysisOutput
+    analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
     liquids: Liquid[]
   }
   meta: {

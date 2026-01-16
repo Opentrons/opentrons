@@ -12,7 +12,6 @@ import {
   ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
   useTrackEvent,
 } from '/app/redux/analytics'
-import { useFeatureFlag } from '/app/redux/config'
 import { useStoredProtocolAnalysis } from '/app/resources/analysis'
 
 import { RunHeaderSectionLower } from '../RunHeaderContent/RunHeaderSectionLower'
@@ -21,7 +20,6 @@ import type { Mock } from 'vitest'
 import type { ComponentProps } from 'react'
 
 vi.mock('react-router-dom')
-vi.mock('/app/redux/config')
 vi.mock('/app/resources/analysis/hooks/useStoredProtocolAnalysis')
 vi.mock('/app/organisms/ToasterOven')
 vi.mock('/app/redux/analytics')
@@ -77,6 +75,7 @@ describe('RunHeaderSectionLower', () => {
       runId: mockRunId,
       runStatus: null,
       robotName: mockRobotName,
+      numberOfAtomicCommands: 10,
     }
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
@@ -84,9 +83,6 @@ describe('RunHeaderSectionLower', () => {
       eatToast: vi.fn(),
     })
     vi.mocked(useNavigate).mockReturnValue(mockNavigate)
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('protocolTimeline')
-      .thenReturn(false)
     mockTrackEvent = vi.fn()
     when(vi.mocked(useTrackEvent)).calledWith().thenReturn(mockTrackEvent)
   })
@@ -104,9 +100,6 @@ describe('RunHeaderSectionLower', () => {
   })
 
   it('should render visualize button when runStatus is idle', () => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('protocolTimeline')
-      .thenReturn(true)
     props = {
       ...props,
       runStatus: RUN_STATUS_IDLE,
@@ -116,9 +109,6 @@ describe('RunHeaderSectionLower', () => {
   })
 
   it('should call makeSnackbar when protocol is not supported python protocol', () => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('protocolTimeline')
-      .thenReturn(true)
     const nonSupportedProtocolAnalysis = {
       ...STORED_PROTOCOL_ANALYSIS,
       config: {
@@ -142,9 +132,6 @@ describe('RunHeaderSectionLower', () => {
   })
 
   it('should call makeSnackbar when protocol is not supported json protocol', () => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('protocolTimeline')
-      .thenReturn(true)
     const nonSupportedProtocolAnalysis = {
       ...STORED_PROTOCOL_ANALYSIS,
       config: {
@@ -167,9 +154,6 @@ describe('RunHeaderSectionLower', () => {
   })
 
   it('should call mock function when clicking visualize button', () => {
-    when(vi.mocked(useFeatureFlag))
-      .calledWith('protocolTimeline')
-      .thenReturn(true)
     when(vi.mocked(useStoredProtocolAnalysis))
       .calledWith(mockRunId)
       .thenReturn(STORED_PROTOCOL_ANALYSIS as any)
@@ -180,11 +164,14 @@ describe('RunHeaderSectionLower', () => {
     render(props)
     fireEvent.click(screen.getByRole('button', { name: 'Visualize' }))
     expect(mockNavigate).toHaveBeenCalledWith(
-      '/devices/mockRobotName/mockRunId/--%3A--%3A--/null/visualization'
+      '/devices/mockRobotName/protocol-runs/mockRunId/--%3A--%3A--/null/visualization'
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
-      properties: { sourceLocation: 'protocol run' },
+      properties: {
+        sourceLocation: 'protocol run',
+        numberOfAtomicCommands: 10,
+      },
     })
   })
 })

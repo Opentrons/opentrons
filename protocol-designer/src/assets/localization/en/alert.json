@@ -285,6 +285,10 @@
         "link": "Edit starting deck",
         "title": "Tip rack adapter required"
       },
+      "THERMOCYCLER_BUSY_WITH_PROFILE": {
+        "title": "Thermocycler is busy running a profile",
+        "body": "This step cannot run while the Thermocycler is running a profile. Move the step outside the profile."
+      },
       "MISSING_MODULE": {
         "body": "This step tries to use a module not in the protocol. Add the module to your protocol or remove this step.",
         "title": "Module not in protocol"
