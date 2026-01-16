@@ -10,10 +10,10 @@ TESTS_PATH = tests
 # Find the version of the wheel from git using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,robot-server,$(project_rs_default),auth_server,$(BUILD_NUMBER))
+wheel_file = dist/$(call python_get_wheelname,auth-server,$(project_rs_default),auth_server,$(BUILD_NUMBER))
 
 # Find the branch, sha, version that will be used to update the VERSION.json file
-version_file = $(call python_get_git_version,robot-server,$(project_rs_default),auth_server)
+version_file = $(call python_get_git_version,auth-server,$(project_rs_default),auth_server)
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -114,5 +114,5 @@ dev:
 
 .PHONY: push-ot3
 push-ot3: wheel
-	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-robot-server/)
-	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-robot-server)
+	$(call push-python,$(host),$(ssh_key),$(ssh_opts),$(wheel_file),/opt/opentrons-auth-server/)
+	$(call restart-service,$(host),$(ssh_key),$(ssh_opts),opentrons-auth-server)
