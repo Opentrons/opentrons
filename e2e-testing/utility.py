@@ -80,6 +80,10 @@ def _dismiss_migration_modal(page: Page) -> None:
     """Dismiss the migration modal if it appears during import."""
 
     overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+    overlay.wait_for(state="visible", timeout=5000)
     if overlay.is_visible():
         page.get_by_role("button", name="Import", exact=True).click()
         expect(overlay).not_to_be_visible()
+    else:
+        print("Migration modal did not appear, proceeding with test.")
+        pass

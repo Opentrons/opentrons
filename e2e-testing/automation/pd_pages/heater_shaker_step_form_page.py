@@ -68,7 +68,7 @@ class HeaterShakerStepPage(BasePage):
 
     def pause_confirm(self) -> None:
         """Confirm the pause in the step editor."""
-        self.page.get_by_role("button", name="Confirm").click()
+        self.page.get_by_role("button", name="Add pause step").click()
 
     ## Composite step
 
