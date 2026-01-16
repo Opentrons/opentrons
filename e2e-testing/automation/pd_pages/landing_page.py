@@ -1,5 +1,7 @@
 """Landing page for Protocol Designer."""
 
+from pathlib import Path
+
 from playwright.sync_api import Page, expect
 
 from .base_page import BasePage
@@ -37,9 +39,17 @@ class LandingPage(BasePage):
         """Click the 'Import existing protocol' button."""
         self.page.get_by_text("Import existing protocol").click()
 
-    def upload_protocol_file(self, file_path: str) -> None:
+    def upload_protocol_file(self, file_path: str | Path) -> None:
         """Upload a protocol file from the landing page import input."""
-        self.page.get_by_label("Import_from_landing").set_input_files(file_path)
+        self.page.get_by_label("Import_from_landing").set_input_files(str(file_path))
+
+    def dismiss_migration_modal(self) -> None:
+        """Dismiss the migration modal if it appears during import."""
+
+        overlay = self.page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+        if overlay.is_visible():
+            self.page.get_by_role("button", name="Import", exact=True).click()
+            expect(overlay).not_to_be_visible()
 
     def edit_protocol(self) -> None:
         """Click the 'Edit protocol' button."""

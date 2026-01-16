@@ -1,6 +1,7 @@
 """Protocol editor page object."""
 
 import re
+from pathlib import Path
 from typing import Sequence
 
 from playwright.sync_api import Page, TimeoutError, expect
@@ -391,8 +392,8 @@ class ProtocolEditorPage(BasePage):
         ## Ask mouse to double click
         mouse.click(start_x, start_y, click_count=2)
 
-    def export_protocol(self) -> str:
-        """Export the current protocol and return the download path."""
+    def export_protocol(self) -> Path:
+        """Export the current protocol and return the downloaded file path."""
 
         with self.page.expect_download() as download_info:
             self.page.get_by_role("button", name="Export protocol").click()

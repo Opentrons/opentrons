@@ -87,3 +87,6 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
+.PHONY: prep
+prep: format check test-unit test-pd-local
