@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import clsx from 'clsx'
-import { LabwareCardOverflowMenu } from 'protocol-designer/src/components/organisms/LabwareCardOverflowMenu'
 
 import {
   Box,
@@ -12,6 +11,7 @@ import {
   Tag,
 } from '@opentrons/components'
 
+import { LabwareCardOverflowMenu } from '../LabwareCardOverflowMenu'
 import styles from './labwarebutton.module.css'
 
 import type { MouseEvent } from 'react'

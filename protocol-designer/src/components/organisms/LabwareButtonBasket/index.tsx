@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 
 import { StyledText } from '@opentrons/components'
 
-import { LabwareButton } from '../../atoms'
+import { LabwareButton } from '../LabwareButton'
 import styles from './labwarebuttonbasket.module.css'
 
 import type { MouseEvent } from 'react'
