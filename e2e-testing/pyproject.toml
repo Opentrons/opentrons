@@ -29,7 +29,7 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 120
 target-version = "py312"
-extend-exclude = ['fixtures/protocol/9/*']
+extend-exclude = ['fixtures/*']
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I"]
