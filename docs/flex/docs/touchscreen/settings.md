@@ -6,10 +6,10 @@ The Settings screen provides additional controls you can use to customize the be
 
 <figure class="screenshot" markdown>
 ![List of all settings on Flex touchscreen](../images/touchscreen-settings.png)
-<figcaption>Flex settings. Yours may look different. On the touchscreen, scroll the list to see all the settings.</figcaption>
+<figcaption>Flex touchscreen settings. Yours may look different. On the touchscreen, scroll the list to see all the settings.</figcaption>
 </figure>
 
-The following sections summarize the currently available settings.
+The following list describes all the currently available settings.
 
 ## Settings list
 
@@ -29,7 +29,7 @@ Batch delete certain types of information from the robot, such as calibrations, 
 
 ### Disable Stacker sensors for labware detection in z- and x-axis
 
-Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the ToF sensor detects if labware is loaded in the Stacker before this external module attempts to dispense or store it.
+Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the ToF sensor detects if labware is loaded in the Stacker before attempting to dispense or store it.
 
 You should disable this setting only when using labware that causes detection errors (false positives or negatives). Sometimes these errors can occur with labware that has an irregular shape or interferes with the sensor's ability to "see" labware in the Stacker.
 
