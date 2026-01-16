@@ -2,10 +2,12 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  filterAAByAreaType,
   FLEX_ROBOT_TYPE,
   FLEX_SIMPLEST_DECK_CONFIG,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
@@ -45,6 +47,20 @@ export function HardwareConfigurator(
   const dispatch = useDispatch()
   const { deckConfig } = useSelector(getDeckConfiguration)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+  console.log('deckConfig in HardwareConfigurator', deckConfig)
+  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
+  console.log('deckConfigWithAA in HardwareConfigurator', deckConfigWithAA)
+  
+  const emptySlotLikeItems = filterAAByAreaType(
+    deckConfigWithAA,
+    deckDef,
+    'slot'
+  )
+
+  const updatedDeckConfig = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
+  console.log('updatedDeckConfig in HardwareConfigurator', updatedDeckConfig)
+
+  console.log('emptySlotLikeItems in HardwareConfigurator', emptySlotLikeItems)
   const simpleDeckConfig: DeckConfiguration = FLEX_SIMPLEST_DECK_CONFIG.filter(
     ({ cutoutId }) => {
       const hasModule = Object.values(modules).some(
@@ -62,6 +78,7 @@ export function HardwareConfigurator(
       return !hasModule && !hasFixture && !hasTCAndCutoutA1
     }
   )
+
   const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
     (module: FormModule | ModuleExtended): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
@@ -92,6 +109,9 @@ export function HardwareConfigurator(
     })
   )
 
+  console.log('simpleDeckConfig in HardwareConfigurator', simpleDeckConfig)
+  console.log('moduleConfig in HardwareConfigurator', moduleConfig)
+  console.log('additionalEquipmentConfig in HardwareConfigurator', additionalEquipmentConfig)
   //  initiate deck config
   useEffect(() => {
     dispatch(

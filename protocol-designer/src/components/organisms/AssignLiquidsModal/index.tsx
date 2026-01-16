@@ -53,6 +53,7 @@ import type {
   LabwareEntities,
 } from '@opentrons/step-generation'
 import type { LabwareOnDeck } from '/protocol-designer/step-forms'
+import { openIngredientSelector } from '/protocol-designer/labware-ingred/actions'
 
 const CONTAINER_WIDTH = '49.8125rem'
 
@@ -280,9 +281,12 @@ export function AssignLiquidsModalContainer(
 ): JSX.Element | null {
   const { showLiquidOverflowMenu, setDefineLiquidModal } = props
 
+  // dispatch(openIngredientSelector(labwareId))
+
   // All selectors moved here
   const nickNames = useSelector(getLabwareNicknamesById)
   const selectedLabwareId = useSelector(selectors.getSelectedLabwareId)
+  console.log('selectedLabwareId in AssignLiquidsModalContainer', selectedLabwareId)
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
