@@ -204,7 +204,7 @@ Use the one-call helper when you want to capture a visual checkpoint:
 ```python
 from playwright.sync_api import Page
 
-from eyes import eyes_check_window
+from eyes import eyes_check
 
 
 def test_visual_checkpoint(page: Page) -> None:
