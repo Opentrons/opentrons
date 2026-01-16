@@ -219,6 +219,30 @@ from playwright.sync_api import expect
 expect(page.get_by_text("Success")).to_be_visible()
 ```
 
+## Visual Snapshots (Applitools Eyes)
+
+This suite supports opt-in Applitools visual checks.
+
+- Use the helper functions in [e2e-testing/eyes.py](e2e-testing/eyes.py) (do not create pytest fixtures for Eyes).
+- `python-dotenv` is used to load a local `.env` file. Configure `APPLITOOLS_API_KEY` to enable checks.
+
+Preferred usage in tests:
+
+```python
+from playwright.sync_api import Page
+
+from eyes import eyes_check_window
+
+
+def test_my_feature(page: Page, base_url: str) -> None:
+    # ... use page objects to navigate ...
+    eyes_check_window(page, test_name="test_my_feature", checkpoint_name="After navigation")
+```
+
+Behavior:
+
+- If `APPLITOOLS_API_KEY` is missing, `eyes_check_window()` no-ops (so visual checks can be enabled per-environment).
+
 ## Common Patterns
 
 ### Adding a New Test

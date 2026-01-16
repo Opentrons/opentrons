@@ -176,3 +176,42 @@ All tests automatically generate comprehensive reports and recordings:
 5. Keep page objects environment-aware (use `self.is_sandbox`)
 6. Add type annotations (enforced by mypy)
 7. Document with comments and print statements the steps the test is trying to take in the UI. With this additional documentation agents are much more effective at maintaining and extending tests.
+
+## Visual Snapshots (Applitools Eyes)
+
+This project includes an opt-in helper to take Applitools visual snapshots from any test.
+
+### Setup
+
+1. Create a `.env` file inside `e2e-testing/` there is an example file `.env.example` (you can just copy it):
+
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Add your Applitools API key:
+
+   ```bash
+   APPLITOOLS_API_KEY=...your_key...
+   ```
+
+`python-dotenv` will load the nearest `.env` automatically during the test run.
+
+### Usage
+
+Use the one-call helper when you want to capture a visual checkpoint:
+
+```python
+from playwright.sync_api import Page
+
+from eyes import eyes_check_window
+
+
+def test_visual_checkpoint(page: Page) -> None:
+   # ... navigate using page objects ...
+   eyes_check(page, test_name="test_visual_checkpoint", checkpoint_name="Main Page")
+```
+
+Notes:
+
+- If `APPLITOOLS_API_KEY` is not set, `eyes_check()` will automatically no-op.

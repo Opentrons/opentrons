@@ -5,6 +5,7 @@ from test_pd_create_new_flex import test_flex_onboarding_workflow
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
+from eyes import eyes_check
 
 
 @pytest.mark.pdE2E
@@ -78,3 +79,4 @@ def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
     protocol_editor.add_step("Absorbance Plate Reader")
     plate_reader_page.read_labware("test 2")
     plate_reader_page.save_pr_step()
+    eyes_check(page, test_name="test_flex_absorbance_reader_setup", checkpoint_name="Fully Configured Plate Reader")

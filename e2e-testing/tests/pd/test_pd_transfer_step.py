@@ -10,6 +10,7 @@ from automation.pd_pages import (
     ProtocolEditorPage,
     TransferPage,
 )
+from eyes import eyes_check
 from utility import _import_protocol_and_open_editor
 
 SOURCE_LABWARE = "Opentrons Tough 300 mL 1 Well Reservoir"
@@ -87,6 +88,7 @@ def test_96_channel_workflow(page: Page) -> None:
         blowout_location="Source well",
         blowout_flow_rate=150,
     )
+    eyes_check(page, test_name="test_96_channel_workflow", checkpoint_name="Dispense Advanced Settings")
     transfer_page.set_mix_settings(mix_times=2, mix_volume=20, aspirate=False)
     transfer_page.transfer_continue_to_next_step()
     transfer_page.tip_change_strategy("Once", drop_location="Tip rack")
