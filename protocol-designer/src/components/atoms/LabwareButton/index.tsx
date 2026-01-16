@@ -7,6 +7,7 @@ import {
   OverflowBtn,
   POSITION_RELATIVE,
   StyledText,
+  COLORS,
   Tag,
 } from '@opentrons/components'
 
@@ -54,21 +55,23 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
           shrinkToContent
         />
         <StyledText desktopStyle="bodyDefaultRegular">{displayName}</StyledText>
-
-        <Box position={POSITION_RELATIVE}>
-          <OverflowBtn
-            data-testid="LabwareCard_overflowBtn"
-            onClick={() => {
-              setShowOverflowMenu(true)
-            }}
-          />
-          {showOverflowMenu ? (
-            <LabwareCardOverflowMenu
-              labwareIds={[id]}
-              setShowOverflowMenu={setShowOverflowMenu}
+        {isSelected ? (
+          <Box position={POSITION_RELATIVE}>
+            <OverflowBtn
+              data-testid="LabwareCard_overflowBtn"
+              onClick={() => {
+                setShowOverflowMenu(true)
+              }}
+              fillColor={COLORS.white}
             />
-          ) : null}
-        </Box>
+            {showOverflowMenu ? (
+              <LabwareCardOverflowMenu
+                labwareIds={[id]}
+                setShowOverflowMenu={setShowOverflowMenu}
+              />
+            ) : null}
+          </Box>
+        ) : null}
       </div>
     </button>
   )
