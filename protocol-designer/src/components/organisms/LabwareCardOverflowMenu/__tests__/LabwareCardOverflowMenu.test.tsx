@@ -15,7 +15,10 @@ import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labw
 import { LabwareCardOverflowMenu } from '../index'
 
 import type { ComponentProps } from 'react'
+import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+
+const mockNavigate = vi.fn()
 
 vi.mock('/protocol-designer/components/organisms/EditNickNameModal')
 vi.mock('/protocol-designer/top-selectors/labware-locations')
@@ -23,6 +26,13 @@ vi.mock('/protocol-designer/step-forms/selectors')
 vi.mock('/protocol-designer/labware-ingred/actions')
 vi.mock('/protocol-designer/pages/Designer/DeckSetup/utils')
 vi.mock('/protocol-designer/components/organisms/ConfirmDeleteEntityInUseModal')
+vi.mock('react-router-dom', async importOriginal => {
+  const actual = await importOriginal<NavigateFunction>()
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  }
+})
 const render = (props: ComponentProps<typeof LabwareCardOverflowMenu>) => {
   return renderWithProviders(<LabwareCardOverflowMenu {...props} />, {
     i18nInstance: i18n,
