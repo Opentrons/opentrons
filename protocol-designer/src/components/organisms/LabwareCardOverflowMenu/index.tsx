@@ -56,10 +56,6 @@ export function LabwareCardOverflowMenu(
   const [showNotCompatibleModal, setShowNotCompatibleModal] =
     useState<boolean>(false)
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
-  console.log(
-    '🚀 ~ LabwareCardOverflowMenu ~ deckSetupLabware:',
-    deckSetupLabware
-  )
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] =
     useState<boolean>(false)
