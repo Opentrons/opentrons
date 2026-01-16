@@ -166,11 +166,10 @@ export function LabwareStackToolbox({
   }
 
   const handleSelectAllLabware = (): void => {
+    dispatch(multipleIngredientsSelector(topDownStackIds))
     if (!allLabwareLiquidsEqual(topDownStackIds)) {
       setShowLiquidLayoutOverlay(true)
-      return
     }
-    dispatch(multipleIngredientsSelector(topDownStackIds))
   }
 
   const handleAssignToLabware = (

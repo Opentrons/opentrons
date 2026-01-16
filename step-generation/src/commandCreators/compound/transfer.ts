@@ -439,11 +439,11 @@ export const transfer: CommandCreator<TransferArgs> = (
       defaultValue: 0,
     }) ?? 0
 
-  /** needed for python generation! > */
-  const destTrashPipetteName =
+  /** needed for python generation! */
+  const destTrashPythonName =
     trashBinEntities[destLabware]?.pythonName ??
     wasteChuteEntities[destLabware]?.pythonName
-  const trashPipetteName =
+  const trashPythonName =
     trashBinEntities[dropTipLocation]?.pythonName ??
     wasteChuteEntities[dropTipLocation]?.pythonName
   const blowoutTrashPythonName =
@@ -512,7 +512,7 @@ export const transfer: CommandCreator<TransferArgs> = (
     `volume=${volume}`,
     `source=[${pythonSourceWells}]`,
     `dest=${
-      pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPipetteName
+      pythonDestWells != null ? `[${pythonDestWells}]` : destTrashPythonName
     }`,
     `new_tip=${formatPyStr(formatChangeTipArg(changeTip))}`,
     ...(isReturnTip
@@ -522,7 +522,7 @@ export const transfer: CommandCreator<TransferArgs> = (
             ? [`trash_location=${blowoutTrashPythonName}`]
             : []),
         ]
-      : [`trash_location=${trashPipetteName}`, 'keep_last_tip=True']),
+      : [`trash_location=${trashPythonName}`, 'keep_last_tip=True']),
     ...(pipetteSpecs.channels > 1 ? [`group_wells=False`] : []),
     ...(tipracks.filteredSortedTiprackIds.length > 0
       ? [

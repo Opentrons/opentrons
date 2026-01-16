@@ -17,7 +17,11 @@ import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
 
 import type { FlexStackerStoredLabwareGroup } from '@opentrons/shared-data'
 import type { FlexStackerModuleState } from '@opentrons/step-generation'
-import type { NormalizedLabware, NormalizedLabwareById } from '../../step-forms'
+import type {
+  ModuleOnDeck,
+  NormalizedLabware,
+  NormalizedLabwareById,
+} from '../../step-forms'
 import type { UpdateStackerModuleStateAction } from '../../step-forms/actions/modules'
 import type { ThunkAction } from '../../types'
 import type {
@@ -208,6 +212,9 @@ export interface EditMultipleLabwareAction {
 
 interface DeleteContainerArgs {
   labwareId: string
+  // needed to override the hopper/module checks below, since when we enter `deleteContainer`
+  // from deleting multiple steps, the active deck setup contains an empty object for modules and labware
+  stacker?: ModuleOnDeck
 }
 export const deleteContainer: (
   args: DeleteContainerArgs
@@ -216,18 +223,21 @@ export const deleteContainer: (
   | EditMultipleLabwareAction
   | UpdateStackerModuleStateAction
 > = args => (dispatch, getState) => {
-  const { labwareId } = args
+  const { labwareId, stacker } = args
   const state = getState()
   const labwareEntities = getLabwareEntities(state)
   const deckSetup = getDeckSetupForActiveItem(state)
   const { modules, labware } = deckSetup
-  const isLabwareOnHopper = labware[labwareId].stack.includes(
-    HOPPER_STACKER_LOCATION
-  )
-  const labwareSlot = getSlotInLocationStack(labware[labwareId].stack)
-  const moduleOnSlot = Object.values(modules).find(
-    ({ slot: moduleSlot }) => moduleSlot === labwareSlot
-  )
+  const isLabwareOnHopper =
+    stacker != null ||
+    labware[labwareId].stack.includes(HOPPER_STACKER_LOCATION)
+  const labwareSlot =
+    stacker?.slot ?? getSlotInLocationStack(labware[labwareId].stack)
+  const moduleOnSlot =
+    stacker ??
+    Object.values(modules).find(
+      ({ slot: moduleSlot }) => moduleSlot === labwareSlot
+    )
 
   const displayCategory =
     labwareEntities[labwareId].def.metadata.displayCategory
