@@ -307,7 +307,7 @@ export const getDefaultBlowoutFlowRate = (
     : liquids.default
   return liquidsObject.supportedTips[
     `t${tiprackDef.wells.A1.totalLiquidVolume}`
-  ].defaultBlowOutFlowRate.default
+  ]?.defaultBlowOutFlowRate.default
 }
 
 export const getDefaultPushOutVolume = (
