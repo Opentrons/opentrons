@@ -1,55 +1,58 @@
 """Router for /dataFiles endpoints."""
+
 import asyncio
 from datetime import datetime
 from pathlib import Path
 from textwrap import dedent
-from typing import Annotated, Optional, Literal, Union, Final, AsyncIterator
+from typing import Annotated, AsyncIterator, Final, Literal, Optional, Union
 
-from fastapi import UploadFile, File, Form, Depends, Response, status, Query
+from fastapi import Depends, File, Form, Query, Response, UploadFile, status
 from fastapi.responses import FileResponse, StreamingResponse
+
 from opentrons import config
 from opentrons.protocol_reader import FileHasher, FileReaderWriter
-from robot_server.protocols.protocol_store import ProtocolStore
-from robot_server.runs.dependencies import get_run_data_manager, get_run_store
-from robot_server.runs.router.base_router import RunNotFound
-from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.runs.run_models import RunNotFoundError
-from robot_server.runs.run_store import RunStore
+from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
 from server_utils.fastapi_utils.light_router import LightRouter
 
-from robot_server.service.json_api import (
-    SimpleBody,
-    SimpleMultiBody,
-    PydanticResponse,
-    MultiBodyMeta,
-    SimpleEmptyBody,
-)
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from .dependencies import (
-    get_data_files_directory,
-    get_data_files_store,
-    get_data_file_auto_deleter,
-)
-from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
-from .data_files_store import DataFilesStore
-from opentrons_shared_data.data_files import DataFileInfo, DataFileSource, MimeType
-from .file_auto_deleter import DataFileAutoDeleter
-from .models import (
-    DataFile,
-    FileIdNotFoundError,
-    FileIdNotFound,
-    FileInUseError,
-    ImageFileMetadata,
-    NoImagesFound,
-    ZipCreationFailed,
-    DataFileMetadataResponse,
-)
 from ..protocols.dependencies import (
     get_file_hasher,
     get_file_reader_writer,
     get_protocol_store,
 )
 from ..service.dependencies import get_current_time, get_unique_id
+from .data_files_store import DataFilesStore
+from .dependencies import (
+    get_data_file_auto_deleter,
+    get_data_files_directory,
+    get_data_files_store,
+)
+from .file_auto_deleter import DataFileAutoDeleter
+from .models import (
+    DataFile,
+    DataFileMetadataResponse,
+    FileIdNotFound,
+    FileIdNotFoundError,
+    FileInUseError,
+    FileNotFound,
+    ImageFileMetadata,
+    NoImagesFound,
+    ZipCreationFailed,
+)
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
+from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.runs.dependencies import get_run_data_manager, get_run_store
+from robot_server.runs.router.base_router import RunNotFound
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.run_store import RunStore
+from robot_server.service.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
+)
+from robot_server.service.legacy.routers.camera import DEFAULT_CAMERA_ID
 from robot_server.service.notifications.publishers import (
     DataFilePublisher,
     get_data_file_publisher,
@@ -73,13 +76,6 @@ class NoDataFileSourceProvided(ErrorDetails):
 
     id: Literal["NoDataFileSourceProvided"] = "NoDataFileSourceProvided"
     title: str = "No data file source provided"
-
-
-class FileNotFound(ErrorDetails):
-    """An error returned when specified file path was not found on the robot."""
-
-    id: Literal["FileNotFound"] = "FileNotFound"
-    title: str = "Specified file path not found on the robot"
 
 
 class UnexpectedFileFormat(ErrorDetails):

@@ -1,9 +1,9 @@
 import asyncio
 import logging
-from typing import Callable, Dict, Tuple, List
+from typing import Callable, Dict, List, Tuple
 
+from .types import GPIOPin, gpio_group
 from opentrons.hardware_control.types import BoardRevision, DoorState
-from .types import gpio_group, GPIOPin
 
 MODULE_LOG = logging.getLogger(__name__)
 

@@ -12,12 +12,11 @@ the subject's methods in a synchronous context in a child thread to ensure:
 import pytest
 from decoy import Decoy
 
-
-from opentrons_shared_data.labware.types import LabwareUri
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
+from opentrons_shared_data.labware.types import LabwareUri
 
 from opentrons.protocol_engine import commands
-from opentrons.protocol_engine.clients import SyncClient, ChildThreadTransport
+from opentrons.protocol_engine.clients import ChildThreadTransport, SyncClient
 from opentrons.protocol_engine.types import DeckPoint, DeckSlotLocation, Liquid
 from opentrons.types import DeckSlotName
 

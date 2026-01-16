@@ -1,35 +1,39 @@
 """Tests for the /runs/.../commands routes."""
-import pytest
 
 from datetime import datetime
+
+import pytest
 from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
-    CommandSlice,
-    CommandPointer,
     CommandNote,
+    CommandPointer,
+    CommandSlice,
+)
+from opentrons.protocol_engine import (
     commands as pe_commands,
+)
+from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import MultiBodyMeta, RequestModel
-
 from robot_server.runs.command_models import (
     CommandCollectionLinks,
     CommandLink,
     CommandLinkMeta,
 )
-from robot_server.runs.run_store import CommandNotFoundError, RunStore
-from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
-from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
 from robot_server.runs.router.commands_router import (
     create_run_command,
+    get_current_run_from_url,
     get_run_command,
     get_run_commands,
-    get_current_run_from_url,
 )
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_models import RunCommandSummary, RunNotFoundError
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
+from robot_server.runs.run_store import CommandNotFoundError, RunStore
+from robot_server.service.json_api import MultiBodyMeta, RequestModel
 
 
 async def test_get_current_run_from_url(

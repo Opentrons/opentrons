@@ -1,7 +1,9 @@
-""" Type definitions for modules in this tree """
+"""Type definitions for modules in this tree"""
+
 from dataclasses import dataclass
-from typing import Any, Dict, List, NamedTuple, Optional
 from enum import Enum
+from typing import Any, Dict, List, NamedTuple, Optional
+
 from opentrons_shared_data.util import StrEnum
 
 

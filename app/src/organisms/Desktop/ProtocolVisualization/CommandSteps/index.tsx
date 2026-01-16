@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { COLORS, StyledText } from '@opentrons/components'
@@ -7,12 +8,15 @@ import { AnnotatedSteps } from '/app/organisms/Desktop/ProtocolDetails/Annotated
 import styles from './commandsteps.module.css'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
+import type {
+  CompletedProtocolAnalysis,
+  ProtocolAnalysisOutput,
+} from '@opentrons/shared-data'
 import type { GroupedCommands } from '/app/redux/protocol-storage'
 
 interface CommandStepsProps {
   groupedCommands: GroupedCommands | null
-  analysis: ProtocolAnalysisOutput
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   setSelectedCommand: Dispatch<SetStateAction<string | null>>
   percentComplete: number
   handlePause: () => void
@@ -28,6 +32,8 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
     currentCommandIndex,
   } = props
   const { t } = useTranslation('protocol_visualization')
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(false)
+
   return (
     <div className={styles.detail_container}>
       <div className={styles.command_step}>
@@ -39,13 +45,16 @@ export function CommandSteps(props: CommandStepsProps): JSX.Element {
             {t('percent_complete', { percent: percentComplete.toFixed(0) })}
           </StyledText>
         </div>
-        <div className={styles.command_step_groups}>
+        <div
+          className={`${styles.command_step_groups} ${isAtBottom ? styles.at_bottom : ''}`}
+        >
           <AnnotatedSteps
             currentCommandIndex={currentCommandIndex}
             analysis={analysis}
             groupedCommands={groupedCommands}
             setSelectedCommand={setSelectedCommand}
             handlePause={handlePause}
+            setIsAtBottom={setIsAtBottom}
           />
         </div>
       </div>

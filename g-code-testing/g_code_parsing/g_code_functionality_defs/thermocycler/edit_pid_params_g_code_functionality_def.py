@@ -1,6 +1,7 @@
-from typing import Dict
-from string import Template
 from enum import StrEnum
+from string import Template
+from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -25,7 +26,7 @@ class EditPIDParamsGCodeFunctionalityDef(GCodeFunctionalityDefBase):
                 message = message_temp.substitute(val=g_code_arg_val)
                 message_list.append(message)
 
-        return f'Editing PID values to the following:{"".join(message_list)}'
+        return f"Editing PID values to the following:{''.join(message_list)}"
 
     @classmethod
     def _generate_response_explanation(cls, response: str) -> str:

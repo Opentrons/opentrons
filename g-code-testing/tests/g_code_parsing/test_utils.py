@@ -1,7 +1,9 @@
-import pytest
-from g_code_parsing.g_code import reverse_enum
-from typing import Dict, Type
 from enum import StrEnum
+from typing import Dict, Type
+
+import pytest
+
+from g_code_parsing.g_code import reverse_enum
 
 
 class InputEnum(StrEnum):

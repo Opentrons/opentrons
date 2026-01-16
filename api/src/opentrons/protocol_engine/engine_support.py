@@ -1,9 +1,9 @@
 """Support for create_protocol_engine module."""
-from . import ProtocolEngine
-from ..hardware_control import HardwareControlAPI
 
-from opentrons.protocol_runner import protocol_runner, RunOrchestrator
+from ..hardware_control import HardwareControlAPI
+from . import ProtocolEngine
 from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_runner import RunOrchestrator, protocol_runner
 
 
 def create_run_orchestrator(

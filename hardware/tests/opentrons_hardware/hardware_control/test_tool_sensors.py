@@ -1,60 +1,61 @@
 """Test the tool-sensor coordination code."""
-import logging
-from mock import patch, AsyncMock, call
-import pytest
-from contextlib import asynccontextmanager
-from typing import Iterator, List, Tuple, AsyncIterator, Any, Dict, Callable
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    ExecuteMoveGroupRequest,
-    MoveCompleted,
-    ReadFromSensorResponse,
-    Acknowledgement,
-    BindSensorOutputRequest,
-    AddLinearMoveRequest,
-)
-from opentrons_hardware.firmware_bindings.messages import MessageDefinition
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    EmptyPayload,
-    MoveCompletedPayload,
-    ReadFromSensorResponsePayload,
-    BindSensorOutputRequestPayload,
-)
-from opentrons_hardware.firmware_bindings.utils import (
-    UInt8Field,
-    UInt32Field,
-    Int32Field,
-)
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.messages.fields import (
-    SensorIdField,
-    SensorTypeField,
-    MotorPositionFlagsField,
-    SensorOutputBindingField,
-)
 
+import logging
+from contextlib import asynccontextmanager
+from typing import Any, AsyncIterator, Callable, Dict, Iterator, List, Tuple
+
+import pytest
+from mock import AsyncMock, call, patch
 
 from tests.conftest import CanLoopback
 
-from opentrons_hardware.hardware_control.tool_sensors import (
-    capacitive_probe,
-    capacitive_pass,
-    liquid_probe,
-    check_overpressure,
-    InstrumentProbeTarget,
-    PipetteProbeTarget,
-)
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
     SensorId,
-    SensorType,
-    SensorThresholdMode,
     SensorOutputBinding,
+    SensorThresholdMode,
+    SensorType,
+)
+from opentrons_hardware.firmware_bindings.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.messages.fields import (
+    MotorPositionFlagsField,
+    SensorIdField,
+    SensorOutputBindingField,
+    SensorTypeField,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    Acknowledgement,
+    AddLinearMoveRequest,
+    BindSensorOutputRequest,
+    ExecuteMoveGroupRequest,
+    MoveCompleted,
+    ReadFromSensorResponse,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BindSensorOutputRequestPayload,
+    EmptyPayload,
+    MoveCompletedPayload,
+    ReadFromSensorResponsePayload,
+)
+from opentrons_hardware.firmware_bindings.utils import (
+    Int32Field,
+    UInt8Field,
+    UInt32Field,
 )
 from opentrons_hardware.hardware_control.constants import interrupts_per_sec
+from opentrons_hardware.hardware_control.tool_sensors import (
+    InstrumentProbeTarget,
+    PipetteProbeTarget,
+    capacitive_pass,
+    capacitive_probe,
+    check_overpressure,
+    liquid_probe,
+)
 from opentrons_hardware.sensors.scheduler import SensorScheduler
 from opentrons_hardware.sensors.sensor_driver import SensorDriver
-from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.sensor_types import SensorInformation
+from opentrons_hardware.sensors.types import SensorDataType
 from opentrons_hardware.sensors.utils import SensorThresholdInformation
 
 

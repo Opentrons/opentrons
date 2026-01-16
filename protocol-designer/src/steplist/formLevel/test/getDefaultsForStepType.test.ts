@@ -171,6 +171,7 @@ describe('getDefaultsForStepType', () => {
         labwareLocationUpdate: {},
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -224,11 +225,6 @@ describe('getDefaultsForStepType', () => {
         profileTargetLidTemp: null,
         orderedProfileItems: [],
         profileItemsById: {},
-        blockIsActiveHold: false,
-        blockTargetTempHold: null,
-        lidIsActiveHold: false,
-        lidTargetTempHold: null,
-        lidOpenHold: null,
       })
     })
     it('should default to an empty object', () => {
@@ -240,7 +236,7 @@ describe('getDefaultsForStepType', () => {
     it('should get the correct defaults', () => {
       expect(getDefaultsForStepType('flexStacker')).toEqual({
         fillLabwareUri: null,
-        fillQuantity: null,
+        fillLabwareIds: null,
         flexStackerFormType: null,
         interventionMessage: null,
         moduleId: null,

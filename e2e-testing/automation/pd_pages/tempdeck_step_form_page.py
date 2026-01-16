@@ -13,7 +13,7 @@ class TemperatureStepPage(BasePage):
         super().__init__(page)
         self._save_button = self.page.get_by_role("button", name="Save")
         self._target_temp_toggle_turn_on = self.page.locator('[data-testid^="ToggleButton_"]')
-        self._pause_button = self.page.get_by_role("button", name="Add pause step")
+        self._pause_button = self.page.get_by_role("button", name="Add pause")
         self._temp_module_label = self.page.get_by_text("Temperature Module state", exact=True)
 
     def wait_for_form_load(self) -> None:

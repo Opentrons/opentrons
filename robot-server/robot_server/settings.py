@@ -1,14 +1,14 @@
-import typing
-import typing_extensions
 import logging
+import typing
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
+import typing_extensions
 from dotenv import load_dotenv
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from opentrons.config import infer_config_base_dir
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 log = logging.getLogger(__name__)
 

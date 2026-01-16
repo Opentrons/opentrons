@@ -1,12 +1,12 @@
-import pytest
 from pathlib import Path
 from typing import Generator
-from sqlalchemy.engine import Engine as SQLEngine
-import requests
 
-from system_server.persistence.database import create_sql_engine
+import pytest
+import requests
+from sqlalchemy.engine import Engine as SQLEngine
 
 from .dev_server import DevServer
+from system_server.persistence.database import create_sql_engine
 
 
 @pytest.fixture(autouse=True)
@@ -43,13 +43,17 @@ def run_server() -> Generator[DevServer, None, None]:
     server.start()
 
     with requests.Session() as session:
+        print("Starting server")
         while True:
             try:
-                session.get("http://localhost:32950")
+                session.get(f"http://localhost:{server.port}")
             except requests.exceptions.ConnectionError:
                 pass
             else:
                 break
+        print("server started")
 
     yield server
+    print("stopping server")
     server.stop()
+    print("server stopped")

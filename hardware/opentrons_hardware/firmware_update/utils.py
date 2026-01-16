@@ -1,14 +1,15 @@
 """This module provides utilities for the firmware update module."""
 
-
-from dataclasses import dataclass
-from typing_extensions import Final, Protocol
-from enum import Enum
 import json
 import logging
 import os
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, Optional, Set, Union, Tuple, Iterable, Iterator
+from typing import Any, Dict, Iterable, Iterator, Optional, Set, Tuple, Union
+
+from typing_extensions import Final, Protocol
+
 from opentrons_hardware.firmware_bindings.constants import (
     FirmwareTarget,
     NodeId,
@@ -16,7 +17,6 @@ from opentrons_hardware.firmware_bindings.constants import (
     USBTarget,
 )
 from opentrons_hardware.hardware_control.network import DeviceInfoCache
-
 
 _FIRMWARE_MANIFEST_PATH: Final = os.path.abspath(
     "/usr/lib/firmware/opentrons-firmware.json"
@@ -318,7 +318,7 @@ def _update_info_for_type(
 
 
 def _update_files_from_types(
-    info: Iterable[Tuple[FirmwareTarget, int, Dict[str, str], str]]
+    info: Iterable[Tuple[FirmwareTarget, int, Dict[str, str], str]],
 ) -> Iterator[Tuple[FirmwareTarget, int, str]]:
     for target, next_version, files_by_revision, revision in info:
         # if we have a force set, we always update (we're only checking nodes in the force set anyway)
@@ -338,7 +338,12 @@ def _info_for_required_updates(
         if not update_info:
             continue
         if _should_update(version_cache, update_info, force):
-            yield version_cache.target, update_info.version, update_info.files_by_revision, rev
+            yield (
+                version_cache.target,
+                update_info.version,
+                update_info.files_by_revision,
+                rev,
+            )
 
 
 def check_firmware_updates(

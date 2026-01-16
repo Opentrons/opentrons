@@ -1,22 +1,19 @@
 """Tip state tracking."""
 
 from dataclasses import dataclass
-from typing import Dict, Iterable, Optional, List, Set
+from typing import Dict, Iterable, List, Optional, Set
 
-from opentrons.types import NozzleMapInterface, NozzleConfigurationType
+from ..actions import Action, get_state_updates
+from ._abstract_store import HandlesActions, HasState
+from ._well_math import (
+    wells_covered_by_physical_pipette,
+    wells_covered_by_pipette_configuration,
+    wells_covered_dense,
+)
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.types import TipRackWellState
-
-from ._abstract_store import HasState, HandlesActions
-from ._well_math import (
-    wells_covered_dense,
-    wells_covered_by_pipette_configuration,
-    wells_covered_by_physical_pipette,
-)
-from ..actions import Action, get_state_updates
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-
+from opentrons.types import NozzleConfigurationType, NozzleMapInterface
 
 _TipRackStateByWellName = Dict[str, TipRackWellState]
 

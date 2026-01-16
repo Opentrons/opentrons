@@ -1,39 +1,40 @@
 """Tests for the DataFilesStore interface."""
+
+from datetime import datetime, timezone
 from pathlib import Path
-import sqlalchemy
 
 import pytest
-from datetime import datetime, timezone
-
+import sqlalchemy
 from decoy import Decoy
-
-from opentrons_shared_data.data_files import (
-    InputDataFileInfo,
-    OutputDataFileInfo,
-    CmdDataFileInfo,
-)
-from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
 from sqlalchemy.engine import Engine as SQLEngine
+
+from opentrons.protocol_reader import JsonProtocolConfig, ProtocolSource
+from opentrons_shared_data.data_files import (
+    CmdDataFileInfo,
+    DataFileInfo,
+    InputDataFileInfo,
+    MimeType,
+    OutputDataFileInfo,
+)
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
 )
-from opentrons_shared_data.data_files import DataFileInfo, MimeType
-from robot_server.deletion_planner import FileUsageInfo
 from robot_server.data_files.models import (
     FileIdNotFoundError,
     FileInUseError,
 )
+from robot_server.deletion_planner import FileUsageInfo
 from robot_server.persistence.tables import run_table
 from robot_server.protocols.analysis_memcache import MemoryCache
 from robot_server.protocols.analysis_models import (
-    CompletedAnalysis,
-    AnalysisStatus,
     AnalysisResult,
+    AnalysisStatus,
+    CompletedAnalysis,
 )
 from robot_server.protocols.completed_analysis_store import (
-    CompletedAnalysisStore,
     CompletedAnalysisResource,
+    CompletedAnalysisStore,
 )
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource, ProtocolStore

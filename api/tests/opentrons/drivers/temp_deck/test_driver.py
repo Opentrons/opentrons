@@ -1,17 +1,17 @@
-from mock import AsyncMock
 import pytest
+from mock import AsyncMock
 
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.asyncio.communication.serial_connection import (
     SerialConnection,
 )
-from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
-from opentrons.drivers.temp_deck.driver import (
-    TempDeckDriver,
-    TEMP_DECK_COMMAND_TERMINATOR,
-)
 from opentrons.drivers.command_builder import CommandBuilder
-from opentrons.drivers.utils import TEMPDECK_GCODE_ROUNDING_PRECISION
+from opentrons.drivers.temp_deck.driver import (
+    TEMP_DECK_COMMAND_TERMINATOR,
+    TempDeckDriver,
+)
 from opentrons.drivers.types import Temperature
+from opentrons.drivers.utils import TEMPDECK_GCODE_ROUNDING_PRECISION
 
 
 @pytest.fixture
@@ -51,7 +51,7 @@ async def test_set_temperature(driver: TempDeckDriver, connection: AsyncMock) ->
 
 async def test_get_temperature(driver: TempDeckDriver, connection: AsyncMock) -> None:
     """It should send a get temperature command and parse response"""
-    connection.send_command.return_value = "T:132 C:25 ok\r\nok\r\n" ""
+    connection.send_command.return_value = "T:132 C:25 ok\r\nok\r\n"
 
     response = await driver.get_temperature()
 

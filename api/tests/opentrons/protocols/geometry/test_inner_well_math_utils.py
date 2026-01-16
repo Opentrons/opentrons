@@ -1,34 +1,37 @@
+from math import isclose, pi
+from typing import Any, Dict, List, cast
+
 import pytest
-from math import pi, isclose
-from typing import Any, List, cast, Dict
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from opentrons_shared_data.labware.labware_definition import (
     ConicalFrustum,
     CuboidalFrustum,
-    SphericalSegment,
-    InnerWellGeometry,
-    UserDefinedVolumes,
     HeightVolumePair,
+    InnerWellGeometry,
+    SphericalSegment,
+    UserDefinedVolumes,
 )
+
+from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 from opentrons.protocol_engine.state.inner_well_math_utils import (
-    _cross_section_area_rectangular,
     _cross_section_area_circular,
-    _reject_unacceptable_heights,
-    _rectangular_frustum_polynomial_roots,
-    _volume_from_height_rectangular,
-    _volume_from_height_circular,
-    _volume_from_height_spherical,
+    _cross_section_area_rectangular,
+    _get_segment_capacity,
     _height_from_volume_circular,
     _height_from_volume_rectangular,
     _height_from_volume_spherical,
+    _rectangular_frustum_polynomial_roots,
+    _reject_unacceptable_heights,
+    _volume_from_height_circular,
+    _volume_from_height_rectangular,
+    _volume_from_height_spherical,
     find_height_inner_well_geometry,
-    find_volume_inner_well_geometry,
     find_height_user_defined_volumes,
+    find_volume_inner_well_geometry,
     find_volume_user_defined_volumes,
-    _get_segment_capacity,
 )
-from opentrons.protocol_engine.errors.exceptions import InvalidLiquidHeightFound
 
 
 @pytest.fixture
@@ -267,9 +270,7 @@ def test_volume_and_height_circular(well: List[Any], target_height_st: Any) -> N
                     )
                 )
                 r_y = (target_height / segment_height) * (a - b) + b
-                expected_volume = (pi * target_height / 3) * (
-                    b**2 + b * r_y + r_y**2
-                )
+                expected_volume = (pi * target_height / 3) * (b**2 + b * r_y + r_y**2)
                 found_volume = _volume_from_height_circular(
                     target_height=target_height,
                     segment=segment,
@@ -314,9 +315,7 @@ def test_volume_and_height_rectangular(well: List[Any]) -> None:
             # test volume within a bunch of arbitrary heights
             for target_height in range(round(total_height)):
                 expected_volume = (
-                    a * (target_height**3)
-                    + b * (target_height**2)
-                    + c * target_height
+                    a * (target_height**3) + b * (target_height**2) + c * target_height
                 )
                 found_volume = _volume_from_height_rectangular(
                     target_height=target_height,
@@ -405,7 +404,7 @@ def test_volume_at_section_boundary_heights(well: List[Any]) -> None:
 
 
 def test_user_volumes_raises_error_for_invalid_target(
-    user_defined_volumes_params: Dict[str, Any]
+    user_defined_volumes_params: Dict[str, Any],
 ) -> None:
     """Test that UserDefinedVolumes calculations reject target inputs that are not allowed."""
     user_defined_volumes_obj = user_defined_volumes_params["obj"]

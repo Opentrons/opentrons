@@ -13,7 +13,8 @@ You will need the following tools installed to develop on the Opentrons platform
 - curl
 - ssh
 - Python v3.12.12
-- Node.js v22.12.0
+- Node.js v22.22.0
+- [uv][] (Python package manager) - required for all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`)
 
 ### macOS
 
@@ -22,8 +23,9 @@ On macOS, we rely on:
 - [Homebrew][brew] to install general dependencies, like `git`
 - [Node Version Switcher][nvs] to install and manage Node.js
 - [pyenv][] to install and manage Python
+- [uv][] to manage Python dependencies for all Python projects
 
-The setup below is compatible with both Intel and ARM (e.g. M1) machines. It assumes you are using the system default shell of `zsh`.
+The setup below is compatible with both Intel and ARM (Apple silicon M-series) machines. It assumes you are using the system default shell of `zsh`.
 
 #### 0. Install `brew` and general dependencies
 
@@ -60,12 +62,6 @@ brew install git
 If you haven't used `git` before, **be sure to complete [first-time Git setup][]**.
 
 #### 1. Install Node.js
-
-Our recommended installation instructions for Node.js differ between `x86_64` (Intel) and `ARM` (M1) Macs.
-
-##### x86-64 Mac (Intel) & ARM Mac(M1)
-
-On x86, we recommend [nvs][] to install Node.js because it works well and is compatible with macOS, Windows, and Linux.
 
 1. Go to [https://github.com/jasongin/nvs][nvs]
 2. Follow the instructions for "Mac, Linux" setup
@@ -148,7 +144,29 @@ eval "$(pyenv init -)"
 # ...
 ```
 
-#### 3. Install `jpeg` if on ARM Mac (M1/M2/M3)
+#### 3. Install `uv`
+
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+
+Install `uv` using the official installer:
+
+```shell
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Close and re-open your terminal to verify that `uv` is installed:
+
+```shell
+uv --version
+```
+
+If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.zprofile`:
+
+```shell
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zprofile
+```
+
+#### 4. Install `jpeg` if on ARM Mac (M series)
 
 `/hardware` depends on the Python library Pillow. On ARM Macs, `pip` will build Pillow from source, which requires [jpeg](https://formulae.brew.sh/formula/jpeg) to be installed.
 
@@ -165,6 +183,7 @@ On Windows, we rely on:
 - [scoop][] to install general dependencies and Python
 - [Node Version Switcher][nvs] to install and manage Node.js
 - [Visual Studio][visual studio] to run electron-rebuild
+- [uv][] to manage Python dependencies for all Python projects
 
 #### 0. Install `scoop` and general dependencies
 
@@ -172,7 +191,23 @@ On Windows, we rely on:
 
 #### 2. Install Python
 
-#### 3. Install build tools via Visual Studio Installer
+#### 3. Install `uv`
+
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+
+Install `uv` using the official installer:
+
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Close and re-open your terminal to verify that `uv` is installed:
+
+```powershell
+uv --version
+```
+
+#### 4. Install build tools via Visual Studio Installer
 
 ### Linux
 
@@ -185,6 +220,28 @@ Linux setup is broadly similar to macOS setup, but it will depend heavily on you
 #### 1. Install `nvs` and Node.js
 
 #### 2. Install `pyenv` and Python
+
+#### 3. Install `uv`
+
+[uv][] is a fast Python package installer and resolver that we use for dependency management in all Python projects (`api`, `update-server`, `robot-server`, `server-utils`, `shared-data`, `g-code-testing`, `hardware`, `usb-bridge`, `system-server`).
+
+Install `uv` using the official installer:
+
+```shell
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+Close and re-open your terminal to verify that `uv` is installed:
+
+```shell
+uv --version
+```
+
+If the `uv` command isn't working, make sure `~/.local/bin` (or `~/.cargo/bin` on some systems) is in your `PATH`. You may need to add it to your `~/.bashrc` or `~/.profile`:
+
+```shell
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+```
 
 ## Repository Setup
 
@@ -202,7 +259,7 @@ Once you are inside the repository for the first time, you should do two things:
 3. Run `python --version` to confirm your chosen version. If you get the incorrect version and you're using an Apple silicon Mac, try running `eval "$(pyenv init --path)"` and then `pyenv local 3.12.12`. Then check `python --version` again.
 
 ```shell
-# confirm Node v22.12.0 or greater
+# confirm Node v22.22.0 or greater
 node --version
 
 # set Python version, and confirm
@@ -222,6 +279,8 @@ Finally, you need to download and install all of our various development depende
 make setup
 ```
 
+**Note:** All Python projects in this repository use [uv][] for dependency management. These projects will automatically set up their Python environments using `uv` when you run `make setup`. The `uv` tool creates virtual environments in `.venv` directories within each project and manages dependencies via `pyproject.toml` and `uv.lock` files.
+
 Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide][] for more information. If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
 
 [file an issue]: https://github.com/Opentrons/opentrons/issues
@@ -234,5 +293,5 @@ Once `make setup` completes, you're ready to start developing! Check out our gen
 [visual studio]: https://visualstudio.microsoft.com/downloads/
 [pyenv]: https://github.com/pyenv/pyenv
 [yarn]: https://classic.yarnpkg.com/
-[pipenv]: https://github.com/pypa/pipenv
+[uv]: https://github.com/astral-sh/uv
 [contributing guide]: ./CONTRIBUTING.md

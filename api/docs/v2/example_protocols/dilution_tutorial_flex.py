@@ -27,7 +27,10 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # loop through each row
     for i in range(8):
+<<<<<<< HEAD
+=======
 
+>>>>>>> 8eb38b8f14 (restore tutorial protocol files)
         # save the destination row to a variable
         row = plate.rows()[i]
 

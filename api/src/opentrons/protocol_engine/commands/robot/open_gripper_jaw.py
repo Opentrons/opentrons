@@ -1,9 +1,8 @@
 """Command models for opening a gripper jaw."""
 
 from __future__ import annotations
-from typing import Literal, Type, Optional, TYPE_CHECKING
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.resources import ensure_ot3_hardware
+
+from typing import TYPE_CHECKING, Literal, Optional, Type
 
 from pydantic import BaseModel
 
@@ -13,7 +12,9 @@ from ..command import (
     BaseCommandCreate,
     SuccessData,
 )
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.errors.error_occurrence import ErrorOccurrence
+from opentrons.protocol_engine.resources import ensure_ot3_hardware
 
 if TYPE_CHECKING:
     from ...state.state import StateView
@@ -72,9 +73,9 @@ class OpenGripperJaw(
     params: OpenGripperJawParams
     result: Optional[OpenGripperJawResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[OpenGripperJawImplementation] = (
         OpenGripperJawImplementation
-    ] = OpenGripperJawImplementation
+    )
 
 
 class OpenGripperJawCreate(BaseCommandCreate[OpenGripperJawParams]):

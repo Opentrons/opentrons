@@ -1,17 +1,17 @@
 """Hex file tools."""
+
 from __future__ import annotations
-from pathlib import Path
+
+import binascii
+import logging
+import struct
 from dataclasses import dataclass
 from enum import Enum
-from typing import Iterable, List, Generator, TextIO
-import binascii
-import struct
-import logging
+from pathlib import Path
+from typing import Generator, Iterable, List, TextIO
 
 from opentrons_shared_data.errors.exceptions import FirmwareUpdateFailedError
-
 from typing_extensions import Final
-
 
 log = logging.getLogger(__name__)
 

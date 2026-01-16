@@ -2,8 +2,8 @@
 
 from typing import List, NamedTuple, cast
 
-from opentrons.legacy_commands.types import CommandMessage
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
+from opentrons.legacy_commands.types import CommandMessage
 
 
 def _my_command(arg1: int, arg2: str = "", arg3: str = "") -> CommandMessage:

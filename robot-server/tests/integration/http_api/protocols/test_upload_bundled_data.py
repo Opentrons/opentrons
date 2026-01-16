@@ -4,14 +4,16 @@
 
 
 import os
-
 import secrets
 from pathlib import Path
 
+import pytest
+
+from tests.integration.protocol_files import get_bundled_data, get_py_protocol
 from tests.integration.robot_client import RobotClient
-from tests.integration.protocol_files import get_py_protocol, get_bundled_data
 
 
+@pytest.mark.slow
 async def test_upload_protocols_with_bundled_data(
     ot2_server_base_url: str,
 ) -> None:

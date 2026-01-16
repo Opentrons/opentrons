@@ -1,16 +1,13 @@
 """Blow-out in place command request, result, and implementation models."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Union
-from typing_extensions import Literal
-from pydantic import BaseModel
 
-from .pipetting_common import (
-    OverpressureError,
-    PipetteIdMixin,
-    FlowRateMixin,
-    blow_out_in_place,
-)
+from typing import TYPE_CHECKING, Optional, Type, Union
+
+from pydantic import BaseModel
+from typing_extensions import Literal
+
+from ..errors.error_occurrence import ErrorOccurrence
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -18,15 +15,18 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..errors.error_occurrence import ErrorOccurrence
-
+from .pipetting_common import (
+    FlowRateMixin,
+    OverpressureError,
+    PipetteIdMixin,
+    blow_out_in_place,
+)
 from opentrons.hardware_control import HardwareControlAPI
 
-
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover
-    from ..state.state import StateView
+    from ..execution import GantryMover, PipettingHandler
     from ..resources import ModelUtils
+    from ..state.state import StateView
 
 
 BlowOutInPlaceCommandType = Literal["blowOutInPlace"]
@@ -105,9 +105,9 @@ class BlowOutInPlace(
     params: BlowOutInPlaceParams
     result: Optional[BlowOutInPlaceResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[BlowOutInPlaceImplementation] = (
         BlowOutInPlaceImplementation
-    ] = BlowOutInPlaceImplementation
+    )
 
 
 class BlowOutInPlaceCreate(BaseCommandCreate[BlowOutInPlaceParams]):

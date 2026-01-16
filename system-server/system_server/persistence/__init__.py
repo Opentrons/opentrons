@@ -1,25 +1,26 @@
 """system_server.persistence: provides interface for persistent database storage."""
+
 import logging
-from pathlib import Path
-from fastapi import Depends
-from typing_extensions import Final
-import sqlalchemy
 from asyncio import Lock
+from pathlib import Path
 from uuid import UUID
 
-from .database import create_sql_engine
-from .tables import registration_table, migration_table
-from .persistent_directory import create_persistent_directory
-from .system_uuid import get_system_uuid
+import sqlalchemy
+from fastapi import Depends
+from typing_extensions import Final
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-from system_server.settings import get_settings
-from system_server.connection import AuthorizationTracker
 
+from .database import create_sql_engine
+from .persistent_directory import create_persistent_directory
+from .system_uuid import get_system_uuid
+from .tables import migration_table, registration_table
+from system_server.connection import AuthorizationTracker
+from system_server.settings import get_settings
 
 _sql_engine_accessor = AppStateAccessor[sqlalchemy.engine.Engine]("sql_engine")
 _persistence_directory_accessor = AppStateAccessor[Path]("persistence_directory")

@@ -1,7 +1,8 @@
-import { Fragment, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { clsx } from 'clsx'
 import { format } from 'date-fns'
 import { css } from 'styled-components'
 
@@ -21,8 +22,9 @@ import {
 import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { PeripheralsInfo } from '/protocol-designer/pages/ProtocolOverview/PeripheralsInfo'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
-import { COLUMN_STYLE, LINE_CLAMP_TEXT_STYLE } from '../../components/atoms'
+import { COLUMN_STYLE } from '../../components/atoms'
 import { EndUserAgreementFooter } from '../../components/molecules'
 import {
   EditInstrumentsModal,
@@ -136,7 +138,7 @@ export function ProtocolOverview(): JSX.Element {
   ]
 
   return (
-    <Fragment>
+    <>
       {showEditMetadataModal ? (
         <EditProtocolMetadataModal
           onClose={() => {
@@ -179,7 +181,11 @@ export function ProtocolOverview(): JSX.Element {
           <Flex flex="1">
             <StyledText
               desktopStyle="displayBold"
-              css={LINE_CLAMP_TEXT_STYLE(3)}
+              className={clsx(
+                lineClampStyles.line_clamp,
+                lineClampStyles.word_break_all
+              )}
+              style={{ WebkitLineClamp: 3 }}
             >
               {protocolName != null && protocolName !== ''
                 ? protocolName
@@ -217,7 +223,7 @@ export function ProtocolOverview(): JSX.Element {
         </Flex>
         <Flex gridGap={SPACING.spacing80} flexWrap={WRAP}>
           <Flex
-            flex="1.27"
+            flex="1"
             flexDirection={DIRECTION_COLUMN}
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing40}
@@ -244,6 +250,7 @@ export function ProtocolOverview(): JSX.Element {
             <StepsInfo savedStepForms={savedStepForms} />
           </Flex>
           <Flex
+            flex="1"
             flexDirection={DIRECTION_COLUMN}
             css={COLUMN_STYLE}
             gridGap={SPACING.spacing12}
@@ -256,6 +263,6 @@ export function ProtocolOverview(): JSX.Element {
         </Flex>
       </Flex>
       <EndUserAgreementFooter />
-    </Fragment>
+    </>
   )
 }

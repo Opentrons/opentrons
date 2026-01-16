@@ -1,23 +1,20 @@
-from typing import List, Optional, Dict
-
-from opentrons.drivers.flex_stacker.utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
-from opentrons.util.async_helpers import ensure_yield
+from typing import Dict, List, Optional
 
 from .abstract import AbstractFlexStackerDriver
 from .types import (
     ActiveRange,
+    Direction,
+    HardwareRevision,
     LEDColor,
     LEDPattern,
+    LimitSwitchStatus,
     MeasurementKind,
+    MoveParams,
     MoveResult,
+    PlatformStatus,
     SpadMapID,
     StackerAxis,
-    PlatformStatus,
-    Direction,
     StackerInfo,
-    HardwareRevision,
-    MoveParams,
-    LimitSwitchStatus,
     StallGuardParams,
     TOFConfiguration,
     TOFMeasurement,
@@ -27,6 +24,8 @@ from .types import (
     TOFSensorState,
     TOFSensorStatus,
 )
+from opentrons.drivers.flex_stacker.utils import NUMBER_OF_BINS, NUMBER_OF_ZONES
+from opentrons.util.async_helpers import ensure_yield
 
 
 class SimulatingDriver(AbstractFlexStackerDriver):

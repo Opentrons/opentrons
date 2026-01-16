@@ -131,7 +131,7 @@ export interface DuplicateLabwareAction {
 export interface RemoveWellsContentsAction {
   type: 'REMOVE_WELLS_CONTENTS'
   payload: {
-    labwareId: string
+    labwareId: string | string[]
     liquidGroupId?: string
     wells: string[]
   }

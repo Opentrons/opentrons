@@ -11,7 +11,6 @@ import {
   PAUSE_UNTIL_TEMP,
   PAUSE_UNTIL_TIME,
 } from '/protocol-designer/constants'
-import { getEnableConcurrentModuleActions } from '/protocol-designer/feature-flags/selectors'
 
 import { useStepText } from '../useStepText'
 
@@ -32,7 +31,6 @@ describe('useStepText', () => {
       id: 'test-step-id',
       stepName: 'Custom Step Name',
     }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(false)
     const { result } = render(mockStep)
     expect(result.current).toStrictEqual({
       text: 'Custom Step Name',
@@ -46,7 +44,6 @@ describe('useStepText', () => {
       id: 'test-step-id',
       stepName: undefined,
     }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(false)
     const { result } = render(mockStep)
     expect(result.current).toStrictEqual({
       text: 'absorbance plate reader',
@@ -60,25 +57,9 @@ describe('useStepText', () => {
       id: 'test-step-id',
       stepName: '',
     }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(false)
     const { result } = render(mockStep)
     expect(result.current).toStrictEqual({
       text: 'absorbance plate reader',
-      subtext: null,
-    })
-  })
-
-  it('should return null subtext when feature flag is disabled', () => {
-    const mockStep: FormData = {
-      stepType: 'pause',
-      id: 'test-step-id',
-      stepName: 'Custom Step Name',
-      pauseAction: PAUSE_UNTIL_RESUME,
-    }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(false)
-    const { result } = render(mockStep)
-    expect(result.current).toStrictEqual({
-      text: 'Custom Step Name',
       subtext: null,
     })
   })
@@ -90,7 +71,6 @@ describe('useStepText', () => {
       stepName: 'Custom Step Name',
       pauseAction: PAUSE_UNTIL_RESUME,
     }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(true)
     const { result } = render(mockStep)
     expect(result.current).toStrictEqual({
       text: 'Custom Step Name',
@@ -105,7 +85,6 @@ describe('useStepText', () => {
       stepName: 'Custom Step Name',
       pauseAction: PAUSE_UNTIL_RESUME,
     }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(true)
     const { result } = render(mockStep)
     expect(result.current).toStrictEqual({
       text: 'Custom Step Name',
@@ -121,7 +100,6 @@ describe('useStepText', () => {
       pauseAction: PAUSE_UNTIL_TEMP,
       pauseTemperature: '25',
     }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(true)
     const { result } = render(mockStep)
     expect(result.current).toStrictEqual({
       text: 'Custom Step Name',
@@ -137,7 +115,6 @@ describe('useStepText', () => {
       pauseAction: PAUSE_UNTIL_TIME,
       pauseTime: '1:2:34',
     }
-    vi.mocked(getEnableConcurrentModuleActions).mockReturnValue(true)
     const { result } = render(mockStep)
     expect(result.current).toStrictEqual({
       text: 'Custom Step Name',

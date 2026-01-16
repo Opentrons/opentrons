@@ -37,22 +37,38 @@ export function ModuleContainer({
 
   switch (moduleState.type) {
     case THERMOCYCLER_MODULE_TYPE: {
-      const { blockTargetTemp, lidOpen, lidTargetTemp } = moduleState
+      const { currentBlockActivity, lidOpen, lidTargetTemp } = moduleState
+
+      let blockTemperatureText
+      switch (currentBlockActivity.type) {
+        case 'blockTargetTemp':
+          blockTemperatureText = t('temperature', {
+            temp: currentBlockActivity.blockTargetTemp,
+          })
+          break
+        case 'profile':
+          // todo(mm, 2025-12-12): As a placeholder, this is showing the block as 'deactivated' when there's a profile ongoing.
+          blockTemperatureText = t('deactivated')
+          break
+        case 'blockDeactivated':
+          blockTemperatureText = t('idle')
+          break
+        default:
+          currentBlockActivity satisfies never
+      }
 
       moduleDetails = (
         <div className={styles.module_details_status_container}>
           <ModuleStatusContainer title="target_block_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
-              {blockTargetTemp != null
-                ? t('temperature', { temp: blockTargetTemp })
-                : t('deactivated')}
+              {blockTemperatureText}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="target_lid_temperature">
             <StyledText desktopStyle="bodyDefaultRegular">
               {lidTargetTemp != null
                 ? t('temperature', { temp: lidTargetTemp })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="lid_status">
@@ -74,7 +90,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemp != null
                 ? t('temperature', { temp: targetTemp })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
           <ModuleStatusContainer title="target_speed">
@@ -122,7 +138,7 @@ export function ModuleContainer({
             <StyledText desktopStyle="bodyDefaultRegular">
               {targetTemperature != null
                 ? t('temperature', { temp: targetTemperature })
-                : t('deactivated')}
+                : t('idle')}
             </StyledText>
           </ModuleStatusContainer>
         </div>
@@ -175,15 +191,15 @@ export function ModuleContainer({
       break
     }
     case FLEX_STACKER_MODULE_TYPE: {
-      //  TODO: add this in when the flex stacker module state is finalized for PD
-      //   const {
-      //     maxPoolCount,
-      //     storedLabwareDetails,
-      //     labwareInHopper,
-      //     labwareOnShuttle,
-      //   } = moduleState
-      console.error(
-        "TODO: update this when PD's flex stacker module state is finalized"
+      const { labwareInHopper } = moduleState
+      moduleDetails = (
+        <div className={styles.module_details_status_container}>
+          <ModuleStatusContainer title={t('number_of_labware_in_stacker')}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {labwareInHopper != null ? labwareInHopper.length : 0}
+            </StyledText>
+          </ModuleStatusContainer>
+        </div>
       )
       break
     }
@@ -196,7 +212,6 @@ export function ModuleContainer({
         `ran into the default moduleContainer moduleState with module ${moduleDisplayName}`
       )
   }
-
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>

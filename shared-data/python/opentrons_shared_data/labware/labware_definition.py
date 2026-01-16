@@ -6,35 +6,34 @@ shared-data. It's been modified by hand to be more friendly.
 from __future__ import annotations
 
 from enum import Enum
-from math import sqrt, asin
-from typing import Final
-from numpy import pi, trapz
 from functools import cached_property
+from math import asin, sqrt
+from typing import Final
 
+from numpy import pi, trapz
 from pydantic import (
-    ConfigDict,
     BaseModel,
+    ConfigDict,
     Discriminator,
     Field,
-    StrictInt,
     StrictFloat,
+    StrictInt,
     TypeAdapter,
 )
 from typing_extensions import Annotated, Literal
 
 from ..util import StrEnum
-
-from .types import LocatingFeatures
 from .constants import (
+    Circular,
     Conical,
     Cuboidal,
-    RoundedCuboid,
-    SquaredCone,
-    Spherical,
-    WellShape,
-    Circular,
     Rectangular,
+    RoundedCuboid,
+    Spherical,
+    SquaredCone,
+    WellShape,
 )
+from .types import LocatingFeatures
 
 SAFE_STRING_REGEX = "^[a-z0-9._]+$"
 RECURSIVE_SEARCH_VOLUME_TOLERANCE = 0.001
@@ -589,9 +588,9 @@ class LabwareDefinition2(BaseModel):
     gripHeightFromLabwareBottom: float | None = None
     stackLimit: int | None = None
     compatibleParentLabware: list[str] | None = None
-    innerLabwareGeometry: dict[
-        str, InnerWellGeometry | UserDefinedVolumes
-    ] | None = None
+    innerLabwareGeometry: dict[str, InnerWellGeometry | UserDefinedVolumes] | None = (
+        None
+    )
 
 
 class LabwareDefinition3(BaseModel):

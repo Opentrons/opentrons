@@ -4,7 +4,6 @@ import pytest
 
 from otupdate.common.name_management import pretty_hostname
 
-
 machine_info_examples = [
     "",
     "FOO=foo",
@@ -19,12 +18,12 @@ def test_rewrite_machine_info_updates_pretty_hostname(initial_contents: str) -> 
     rewrite = pretty_hostname._rewrite_machine_info_str(
         initial_contents, "new_pretty_hostname"
     )
-    assert (
-        "PRETTY_HOSTNAME=new_pretty_hostname" in rewrite.splitlines()
-    ), "new PRETTY_HOSTNAME should be present."
-    assert (
-        rewrite.count("PRETTY_HOSTNAME") == 1
-    ), "Old PRETTY_HOSTNAME should be deleted."
+    assert "PRETTY_HOSTNAME=new_pretty_hostname" in rewrite.splitlines(), (
+        "new PRETTY_HOSTNAME should be present."
+    )
+    assert rewrite.count("PRETTY_HOSTNAME") == 1, (
+        "Old PRETTY_HOSTNAME should be deleted."
+    )
 
 
 @pytest.mark.parametrize("initial_contents", machine_info_examples)

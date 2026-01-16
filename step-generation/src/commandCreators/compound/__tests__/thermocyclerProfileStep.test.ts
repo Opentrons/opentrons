@@ -30,9 +30,6 @@ describe('thermocyclerProfileStep', () => {
       testName: 'should generate expected commands',
       args: {
         commandCreatorFnName: 'thermocyclerProfile',
-        blockTargetTempHold: 4,
-        lidTargetTempHold: null,
-        lidOpenHold: true,
         moduleId: thermocyclerId,
         profileElements: [
           {
@@ -63,7 +60,7 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
-          commandType: 'thermocycler/runExtendedProfile',
+          commandType: 'thermocycler/startRunExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
@@ -77,60 +74,34 @@ describe('thermocyclerProfileStep', () => {
               },
             ],
             blockMaxVolumeUl: 42,
-          },
-        },
-        {
-          commandType: 'thermocycler/openLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
-          commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-            celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
+            taskId: 'mock_thermocycler_task_1',
           },
         },
       ],
       expectedPython: `
 mock_thermocycler.close_lid()
 mock_thermocycler.set_lid_temperature(55)
-mock_thermocycler.execute_profile(
+mock_thermocycler_task_1 = mock_thermocycler.start_execute_profile(
     [
         {"temperature": 30, "hold_time_seconds": 10},
         {"temperature": 40, "hold_time_seconds": 20},
     ],
     4,
     block_max_volume=42,
-)
-mock_thermocycler.open_lid()
-mock_thermocycler.set_block_temperature(4)
-mock_thermocycler.deactivate_lid()`.trimStart(),
+)`.trimStart(),
     },
     {
       testName:
-        'should omit the setTargetLidTemperature when lid temp is already at desired temp',
+        'should omit the setTargetLidTemperature before the profile when the lid temp is already at the desired temp',
       initialThermocyclerModuleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: 55,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         commandCreatorFnName: 'thermocyclerProfile',
-        blockTargetTempHold: 4,
-        lidTargetTempHold: null,
-        lidOpenHold: true,
         moduleId: thermocyclerId,
         profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
@@ -138,63 +109,37 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       },
       expected: [
         {
-          commandType: 'thermocycler/runExtendedProfile',
+          commandType: 'thermocycler/startRunExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             profileElements: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
-          },
-        },
-        {
-          commandType: 'thermocycler/openLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
-          commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-            celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
+            taskId: 'mock_thermocycler_task_1',
           },
         },
       ],
       expectedPython: `
-mock_thermocycler.execute_profile(
+mock_thermocycler_task_1 = mock_thermocycler.start_execute_profile(
     [
         {"temperature": 61, "hold_time_seconds": 99},
     ],
     1,
     block_max_volume=42,
-)
-mock_thermocycler.open_lid()
-mock_thermocycler.set_block_temperature(4)
-mock_thermocycler.deactivate_lid()`.trimStart(),
+)`.trimStart(),
     },
     {
       testName:
         'should close the lid before running the profile if the lid open state is null',
       initialThermocyclerModuleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: 55,
         lidOpen: null,
+        numProfilesStarted: 0,
       },
       args: {
         commandCreatorFnName: 'thermocyclerProfile',
-        blockTargetTempHold: 4,
-        lidTargetTempHold: null,
-        lidOpenHold: true,
         moduleId: thermocyclerId,
         profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
@@ -209,64 +154,38 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
           },
         },
         {
-          commandType: 'thermocycler/runExtendedProfile',
+          commandType: 'thermocycler/startRunExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             profileElements: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
-          },
-        },
-        {
-          commandType: 'thermocycler/openLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
-          commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-            celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
+            taskId: 'mock_thermocycler_task_1',
           },
         },
       ],
       expectedPython: `
 mock_thermocycler.close_lid()
-mock_thermocycler.execute_profile(
+mock_thermocycler_task_1 = mock_thermocycler.start_execute_profile(
     [
         {"temperature": 61, "hold_time_seconds": 99},
     ],
     1,
     block_max_volume=42,
-)
-mock_thermocycler.open_lid()
-mock_thermocycler.set_block_temperature(4)
-mock_thermocycler.deactivate_lid()`.trimStart(),
+)`.trimStart(),
     },
     {
       testName:
         'should omit the closeLid when the lid open state is false before running a profile',
       initialThermocyclerModuleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: 55,
         lidOpen: false,
+        numProfilesStarted: 0,
       },
       args: {
         commandCreatorFnName: 'thermocyclerProfile',
-        blockTargetTempHold: 4,
-        lidTargetTempHold: null,
-        lidOpenHold: true,
         moduleId: thermocyclerId,
         profileElements: [{ celsius: 61, holdSeconds: 99 }],
         profileTargetLidTemp: 55,
@@ -274,48 +193,24 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
       },
       expected: [
         {
-          commandType: 'thermocycler/runExtendedProfile',
+          commandType: 'thermocycler/startRunExtendedProfile',
           key: expect.any(String),
           params: {
             moduleId: 'thermocyclerId',
             profileElements: [{ celsius: 61, holdSeconds: 99 }],
             blockMaxVolumeUl: 42,
-          },
-        },
-        {
-          commandType: 'thermocycler/openLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-          },
-        },
-        {
-          commandType: 'thermocycler/setTargetBlockTemperature',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
-            celsius: 4,
-          },
-        },
-        {
-          commandType: 'thermocycler/deactivateLid',
-          key: expect.any(String),
-          params: {
-            moduleId: 'thermocyclerId',
+            taskId: 'mock_thermocycler_task_1',
           },
         },
       ],
       expectedPython: `
-mock_thermocycler.execute_profile(
+mock_thermocycler_task_1 = mock_thermocycler.start_execute_profile(
     [
         {"temperature": 61, "hold_time_seconds": 99},
     ],
     1,
     block_max_volume=42,
-)
-mock_thermocycler.open_lid()
-mock_thermocycler.set_block_temperature(4)
-mock_thermocycler.deactivate_lid()`.trimStart(),
+)`.trimStart(),
     },
   ]
 
@@ -351,7 +246,7 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
     }
   )
 
-  it('should return timeline error with bad moduleId', () => {
+  it('should return a timeline error when given a bad moduleId', () => {
     const { robotState, invariantContext } = getStateAndContextTempTCModules({
       temperatureModuleId,
       thermocyclerId,
@@ -359,9 +254,6 @@ mock_thermocycler.deactivate_lid()`.trimStart(),
 
     const args: ThermocyclerProfileStepArgs = {
       commandCreatorFnName: 'thermocyclerProfile',
-      blockTargetTempHold: 4,
-      lidTargetTempHold: null,
-      lidOpenHold: true,
       moduleId: 'badModuleId',
       profileElements: [],
       profileTargetLidTemp: 55,

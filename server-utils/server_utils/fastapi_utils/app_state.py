@@ -9,10 +9,10 @@ https://www.starlette.io/applications/#storing-state-on-the-app-instance
 This module has helpers for working with the global application state object.
 """
 
+from typing import Generic, Optional, TypeVar, cast
 
 from fastapi import Request, WebSocket
 from starlette.datastructures import State as AppState  # Re-exported.
-from typing import cast, Generic, Optional, TypeVar
 
 
 async def get_app_state(

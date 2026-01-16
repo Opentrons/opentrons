@@ -29,7 +29,7 @@ The Summary tab shows:
 The Parameters tab lists all of the runtime parameters that you can configure from the touchscreen while setting up the protocol. The Default Value column shows the value that the protocol will use if you don't change it. The Range column shows the maximum and minimum, list of choices, or number of choices depending on the parameter type.
 
 !!! note
-    Runtime parameters are only available in Python protocols that define their names, descriptions, and possible values. See [Runtime Parameters](https://docs.opentrons.com/v2/runtime_parameters.html) in the Python API documentation for information on defining parameters and using their values. JSON protocols do not currently support this feature.
+    Runtime parameters are only available in Python protocols that define their names, descriptions, and possible values. See [Runtime Parameters](../../python-api/runtime-parameters/index.md) in the Python API documentation for information on defining parameters and using their values. JSON protocols do not currently support this feature.
 
 ## Hardware tab
 

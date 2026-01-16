@@ -1,32 +1,33 @@
 """Store and retrieve information about uploaded data files from the database."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, List, Set
+from typing import List, Optional, Set
 
 import sqlalchemy.engine
 
-from robot_server.deletion_planner import FileUsageInfo
-from robot_server.persistence.database import sqlite_rowid
-from robot_server.persistence.tables import (
-    data_files_table,
-    input_data_files_table,
-    output_data_files_table,
-    analysis_csv_rtp_table,
-    run_csv_rtp_table,
-)
 from opentrons_shared_data.data_files import (
-    DataFileInfo,
-    InputDataFileInfo,
-    OutputDataFileInfo,
-    IODataFileInfo,
     CmdDataFileInfo,
-    MimeType,
+    DataFileInfo,
     DataFileInfoWithCommands,
+    InputDataFileInfo,
+    IODataFileInfo,
+    MimeType,
+    OutputDataFileInfo,
 )
 
 from .models import FileIdNotFoundError, FileInUseError
+from robot_server.deletion_planner import FileUsageInfo
+from robot_server.persistence.database import sqlite_rowid
+from robot_server.persistence.tables import (
+    analysis_csv_rtp_table,
+    data_files_table,
+    input_data_files_table,
+    output_data_files_table,
+    run_csv_rtp_table,
+)
 
 
 @dataclass(frozen=True)

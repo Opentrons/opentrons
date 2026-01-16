@@ -1,10 +1,10 @@
 """Router for all /system/connected endpoints."""
+
 from fastapi import APIRouter, Depends, status
 
+from .models import Connection, GetConnectedResponse
 from system_server.connection import AuthorizationTracker
 from system_server.persistence import get_authorization_tracker
-
-from .models import GetConnectedResponse, Connection
 
 connected_router = APIRouter()
 

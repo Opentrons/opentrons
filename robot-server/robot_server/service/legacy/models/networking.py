@@ -1,16 +1,16 @@
 import typing
 
 from pydantic import (
-    field_validator,
-    model_validator,
-    ConfigDict,
     BaseModel,
+    ConfigDict,
     Field,
     SecretStr,
+    field_validator,
+    model_validator,
 )
 
-from opentrons_shared_data.util import StrEnum
 from opentrons.system import wifi
+from opentrons_shared_data.util import StrEnum
 
 
 class ConnectivityStatus(StrEnum):
@@ -309,12 +309,11 @@ class EapConfigOption(BaseModel):
 
     name: str = Field(..., description="The name of the config option")
     displayName: str = Field(
-        ..., description="A human-readable and nicely formatted name for " "the option"
+        ..., description="A human-readable and nicely formatted name for the option"
     )
     required: bool = Field(
         ...,
-        description="Whether the option is required for this EAP variant"
-        " or optional",
+        description="Whether the option is required for this EAP variant or optional",
     )
     type: EapConfigOptionType = Field(
         ...,
@@ -331,7 +330,7 @@ class EapVariant(BaseModel):
 
     name: str = Field(..., description="The identifier for the EAP variant")
     displayName: str = Field(
-        ..., description="A human-readable formatted name for the EAP " "variant"
+        ..., description="A human-readable formatted name for the EAP variant"
     )
     options: typing.List[EapConfigOption] = Field(
         ...,

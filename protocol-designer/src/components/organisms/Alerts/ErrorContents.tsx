@@ -13,10 +13,11 @@ import { LINK_BUTTON_STYLE } from '/protocol-designer/components/atoms'
 import { START_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { selectTerminalItem } from '/protocol-designer/ui/steps/actions/actions'
 
+import type { ErrorType } from '@opentrons/step-generation'
 import type { AlertLevel } from './types'
 
 interface ErrorContentsProps {
-  errorType: string
+  errorType: ErrorType
   level: AlertLevel
 }
 export const ErrorContents = (

@@ -3,6 +3,7 @@ import reduce from 'lodash/reduce'
 
 import { DEFAULT_LIQUID_COLORS } from '@opentrons/shared-data'
 
+import { AIR_GAP_LIQUID_STATE_CONST } from '../constants'
 import { AIR } from './misc'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -119,13 +120,16 @@ const ingredIdsToColor = (
   groupIds: string[],
   displayColors: Record<string, string> // liquidGroupId -> color
 ): string | null | undefined => {
-  const filteredIngredIds = groupIds.filter(id => id !== AIR)
-  if (filteredIngredIds.length === 0) return null
+  const filteredIngredIds = groupIds.filter(
+    id => id !== AIR && id !== AIR_GAP_LIQUID_STATE_CONST
+  )
+  if (filteredIngredIds.length === 0) {
+    return null
+  }
 
   if (filteredIngredIds.length === 1) {
     return (
-      displayColors[Number(filteredIngredIds[0])] ??
-      swatchColors(filteredIngredIds[0])
+      displayColors[filteredIngredIds[0]] ?? swatchColors(filteredIngredIds[0])
     )
   }
 

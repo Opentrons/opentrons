@@ -1,28 +1,28 @@
 """SQL database schemas."""
 
 # Re-export the latest schema.
-from .schema_13 import (
-    metadata,
-    protocol_table,
-    analysis_table,
-    analysis_primitive_type_rtp_table,
-    analysis_csv_rtp_table,
-    run_table,
-    run_command_table,
-    action_table,
-    run_csv_rtp_table,
-    data_files_table,
-    input_data_files_table,
-    output_data_files_table,
-    boolean_setting_table,
-    labware_offset_table,
-    labware_offset_location_sequence_components_table,
-    PrimitiveParamSQLEnum,
-    ProtocolKindSQLEnum,
+from .schema_14 import (
     BooleanSettingKey,
     CommandStatusSQLEnum,
+    PrimitiveParamSQLEnum,
+    ProtocolKindSQLEnum,
+    action_table,
+    analysis_csv_rtp_table,
+    analysis_primitive_type_rtp_table,
+    analysis_table,
+    boolean_setting_table,
+    camera_capture_image_settings_table,
+    data_files_table,
+    input_data_files_table,
+    labware_offset_location_sequence_components_table,
+    labware_offset_table,
+    metadata,
+    output_data_files_table,
+    protocol_table,
+    run_command_table,
+    run_csv_rtp_table,
+    run_table,
 )
-
 
 __all__ = [
     "metadata",
@@ -38,6 +38,7 @@ __all__ = [
     "input_data_files_table",
     "output_data_files_table",
     "boolean_setting_table",
+    "camera_capture_image_settings_table",
     "labware_offset_table",
     "labware_offset_location_sequence_components_table",
     "PrimitiveParamSQLEnum",

@@ -1,22 +1,27 @@
-from typing import Any, Dict, cast, List, Iterable, Tuple, Optional
-from typing_extensions import Final
-from dataclasses import asdict
+from __future__ import annotations
 
-from opentrons.hardware_control.types import OT3AxisKind, InstrumentProbeType
+from dataclasses import asdict
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Tuple, cast
+
+from typing_extensions import Final
+
 from .types import (
-    OT3Config,
     ByGantryLoad,
+    CapacitivePassSettings,
+    EdgeSenseSettings,
+    LiquidProbeSettings,
+    Offset,
+    OT3AxisKind,
+    OT3CalibrationSettings,
+    OT3Config,
     OT3CurrentSettings,
     OT3MotionSettings,
     OT3Transform,
-    Offset,
-    OT3CalibrationSettings,
-    CapacitivePassSettings,
-    LiquidProbeSettings,
     ZSenseSettings,
-    EdgeSenseSettings,
 )
 
+if TYPE_CHECKING:
+    from opentrons.hardware_control.types import InstrumentProbeType
 
 DEFAULT_PIPETTE_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODULE_OFFSET = [0.0, 0.0, 0.0]
@@ -128,32 +133,32 @@ DEFAULT_ACCELERATIONS: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = ByGantryL
     },
 )
 
-DEFAULT_MAX_SPEED_DISCONTINUITY: Final[
-    ByGantryLoad[Dict[OT3AxisKind, float]]
-] = ByGantryLoad(
-    high_throughput_1000={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 5,
-        OT3AxisKind.Z_G: 5,
-        OT3AxisKind.Q: 5,
-    },
-    high_throughput_200={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 5,
-        OT3AxisKind.Z_G: 5,
-        OT3AxisKind.Q: 5,
-    },
-    low_throughput={
-        OT3AxisKind.X: 10,
-        OT3AxisKind.Y: 10,
-        OT3AxisKind.Z: 5,
-        OT3AxisKind.P: 10,
-        OT3AxisKind.Z_G: 5,
-    },
+DEFAULT_MAX_SPEED_DISCONTINUITY: Final[ByGantryLoad[Dict[OT3AxisKind, float]]] = (
+    ByGantryLoad(
+        high_throughput_1000={
+            OT3AxisKind.X: 10,
+            OT3AxisKind.Y: 10,
+            OT3AxisKind.Z: 5,
+            OT3AxisKind.P: 5,
+            OT3AxisKind.Z_G: 5,
+            OT3AxisKind.Q: 5,
+        },
+        high_throughput_200={
+            OT3AxisKind.X: 10,
+            OT3AxisKind.Y: 10,
+            OT3AxisKind.Z: 5,
+            OT3AxisKind.P: 5,
+            OT3AxisKind.Z_G: 5,
+            OT3AxisKind.Q: 5,
+        },
+        low_throughput={
+            OT3AxisKind.X: 10,
+            OT3AxisKind.Y: 10,
+            OT3AxisKind.Z: 5,
+            OT3AxisKind.P: 10,
+            OT3AxisKind.Z_G: 5,
+        },
+    )
 )
 
 DEFAULT_DIRECTION_CHANGE_SPEED_DISCONTINUITY: Final[
@@ -242,7 +247,6 @@ def _build_log_files_with_default(
     from_conf: Any,
     default: Optional[Dict[InstrumentProbeType, str]],
 ) -> Optional[Dict[InstrumentProbeType, str]]:
-    print(f"from_conf {from_conf} default {default}")
     if not isinstance(from_conf, dict):
         if default is None:
             return None
@@ -250,6 +254,9 @@ def _build_log_files_with_default(
             return {k: v for k, v in default.items()}
     else:
         validated: Dict[InstrumentProbeType, str] = {}
+        # Inline import prevents circular import from hardware_control.types
+        from opentrons.hardware_control.types import InstrumentProbeType
+
         for k, v in from_conf.items():
             if isinstance(k, InstrumentProbeType):
                 validated[k] = v
@@ -260,7 +267,6 @@ def _build_log_files_with_default(
                     pass
                 else:
                     validated[enumval] = v
-        print(f"result {validated}")
         return validated
 
 
@@ -480,6 +486,9 @@ def build_with_defaults(robot_settings: Dict[str, Any]) -> OT3Config:
 
 
 def serialize(config: OT3Config) -> Dict[str, Any]:
+    # inline import prevents circular import error from hardware_control.types
+    from opentrons.hardware_control.types import InstrumentProbeType
+
     def _build_dict(pairs: Iterable[Tuple[Any, Any]]) -> Dict[str, Any]:
         def _normalize_key(key: Any) -> Any:
             if isinstance(key, OT3AxisKind) or isinstance(key, InstrumentProbeType):

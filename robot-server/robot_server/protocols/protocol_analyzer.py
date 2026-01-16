@@ -1,29 +1,27 @@
 """Protocol analysis module."""
-import logging
-import asyncio
-from typing import Optional, List
 
-from opentrons_shared_data.robot.types import RobotType
+import asyncio
+import logging
+from typing import List, Optional
 
 import opentrons.protocol_runner.create_simulating_orchestrator as simulating_runner
+import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_engine.errors import ErrorOccurrence
-from opentrons.util.performance_helpers import TrackingFunctions
 from opentrons.protocol_engine.types import (
+    CSVRuntimeParamPaths,
     PrimitiveRunTimeParamValuesType,
     RunTimeParameter,
-    CSVRuntimeParamPaths,
 )
-import opentrons.util.helpers as datetime_helper
 from opentrons.protocol_runner import (
     RunOrchestrator,
 )
 from opentrons.protocol_runner.run_orchestrator import ParseMode
-
+from opentrons.util.performance_helpers import TrackingFunctions
+from opentrons_shared_data.robot.types import RobotType
 
 import robot_server.errors.error_mappers as em
-
-from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.protocols.analysis_store import AnalysisStore
+from robot_server.protocols.protocol_store import ProtocolResource
 
 log = logging.getLogger(__name__)
 

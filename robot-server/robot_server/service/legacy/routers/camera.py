@@ -1,36 +1,43 @@
+import io
 import logging
 import os
-import io
 import tempfile
-from typing import Annotated
 from pathlib import Path
-from fastapi import APIRouter, HTTPException, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi.responses import FileResponse
 from starlette import status
 from starlette.background import BackgroundTask
 from starlette.responses import StreamingResponse
+
+from opentrons.config import IS_ROBOT
+from opentrons.protocol_engine import EngineStatus
+from opentrons.protocol_engine.resources.camera_provider import ImageParameters
 from opentrons.system import camera
-from opentrons.system.camera import StreamConfigurationKeys
-from robot_server.errors.error_responses import LegacyErrorResponse
+from opentrons.system.camera import PREVIEW_IMAGE, StreamConfigurationKeys
 from opentrons_shared_data.errors import ErrorCodes
+from opentrons_shared_data.robot.types import RobotType
+
+from robot_server.camera.settings.store import (
+    CameraSettingStore,
+    get_camera_setting_store,
+)
+from robot_server.data_files.models import FileNotFound
+from robot_server.errors.error_responses import ErrorBody, LegacyErrorResponse
+from robot_server.hardware import get_robot_type
+from robot_server.persistence.fastapi_dependencies import get_images_directory
+from robot_server.runs.dependencies import get_run_data_manager
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.service.json_api import RequestModel
 from robot_server.service.legacy.models.settings import (
+    CameraCaptureImageSettings,
     CameraEnable,
     LiveStreamData,
     LiveStreamSettings,
     Resolution,
     StreamStatusType,
 )
-from robot_server.service.json_api import RequestModel
-from opentrons.config import IS_ROBOT
-from robot_server.runs.dependencies import get_run_data_manager
-from robot_server.runs.run_data_manager import RunDataManager
-from robot_server.hardware import get_robot_type
-from opentrons_shared_data.robot.types import RobotType
-from opentrons.protocol_engine import EngineStatus
-from robot_server.camera.settings.store import (
-    CameraSettingStore,
-    get_camera_setting_store,
-)
-
 
 log = logging.getLogger(__name__)
 
@@ -149,12 +156,169 @@ async def get_camera(
     )
 
 
-# todo(chb, 2025-09-08): Implement POST/GET /camera/picture/settings for picture taking settings when in protocol run
+@router.get(
+    path="/camera/cameraSettings/{cameraId}",
+    summary="Query general camera capture image settings.",
+    description=(
+        "Query general camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's data will be the camera capture image settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def get_camera_capture_image_settings(
+    cameraId: str,
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Query the general camera capture image settings.
+
+    Args:
+        cameraId: Camera ID for the camera settings to query.
+        camera_provider: Access to the camera settings and related services.
+    """
+    result = camera_settings_store.get_camera_capture_image_settings(
+        camera_id=cameraId if DEFAULT_CAMERA_ID not in cameraId else DEFAULT_CAMERA_PATH
+    )
+    # todo(chb, 2025-01-14): At some point we need to dereference camera devices and camera ids, and dedicate entirely one way or another.
+    # This isn't done now because of how the device field is pulled as a default camera by other sources for ffmpeg.
+
+    return result
+
+
+@router.post(
+    path="/camera/cameraSettings",
+    summary="Add general camera capture image settings to be used in place of the system image capture defaults.",
+    description=(
+        "Add general camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's `data` will be the image capture settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def add_camera_capture_image_settings(
+    request_body: RequestModel[CameraCaptureImageSettings],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Add general camera capture image settings to be used in place of the global camera image capture settings.
+
+    Args:
+        request_body: New camera capture image settings from request body.
+        camera_provider: Access to the camera settings and related services.
+    """
+    if IS_ROBOT and not camera.camera_exists():
+        # todo(chb): Eventually we'll have mulitple camera ids that can be sent, so this should be able to verify more than just the default
+        raise LegacyErrorResponse(
+            message="Video device is unavailable.",
+            errorCode=ErrorCodes.GENERAL_ERROR.value.code,
+        ).as_error(status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    camera_settings_store.set_camera_capture_image_settings(settings=request_body.data)
+
+    # Get the newly set database settings
+    result = camera_settings_store.get_camera_capture_image_settings()
+
+    return result
+
+
+@router.post(
+    "/camera/capturePreviewImage",
+    description="Return a preview image based on provided capture image settings.",
+    responses={
+        status.HTTP_404_NOT_FOUND: {"model": ErrorBody[FileNotFound]},
+    },
+)
+async def post_camera_preview_image(
+    request_body: RequestModel[CameraCaptureImageSettings],
+    run_data_manager: Annotated[RunDataManager, Depends(get_run_data_manager)],
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+    images_directory: Annotated[Path, Depends(get_images_directory)],
+    robot_type: Annotated[RobotType, Depends(get_robot_type)],
+) -> Response:
+    """
+    Return a preview image based on the provided capture image settings.
+    """
+    if run_data_manager.current_run_id is not None and (
+        run_data_manager.get(run_data_manager.current_run_id).status
+        not in [EngineStatus.STOPPED, EngineStatus.FAILED, EngineStatus.SUCCEEDED]
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str("Cannot capture preview photo, run is active."),
+        )
+
+    _validate_camera_present()
+
+    if not camera_settings_store.get_camera_enabled():
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str("Cannot capture preview photo, camera is disabled on robot."),
+        )
+
+    image_data = await camera.image_capture(
+        robot_type=robot_type,
+        parameters=ImageParameters(
+            resolution=request_body.data.resolution,
+            zoom=request_body.data.zoom,
+            pan=request_body.data.pan,
+            contrast=(
+                (request_body.data.contrast / 100) * 2.0
+                if request_body.data.contrast is not None
+                else None
+            ),
+            brightness=(
+                int(((request_body.data.brightness * 256) // 100) - 128) * -1
+                if request_body.data.brightness is not None
+                else None
+            ),
+            saturation=(
+                (request_body.data.saturation / 100) * 2.0
+                if request_body.data.saturation is not None
+                else None
+            ),
+        ),
+    )
+
+    file_path = images_directory / PREVIEW_IMAGE
+
+    if IS_ROBOT:
+        if isinstance(image_data, bytes):
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
+
+            with open(file=file_path, mode="wb") as f:
+                f.write(image_data)
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=str(
+                    f"Preview image capture failed with the following: {image_data.message}"
+                ),
+            )
+
+        if not file_path.exists():
+            raise FileNotFound(detail="Preview image file not found.").as_error(
+                status.HTTP_404_NOT_FOUND
+            )
+
+    return FileResponse(
+        path=file_path,
+        media_type="image/jpeg",
+        filename=PREVIEW_IMAGE,
+    )
 
 
 @router.post(
     "/camera/picture",
-    description="Capture an image from the OT-2's on-board camera " "and return it",
+    description="Capture an image from the OT-2's on-board camera and return it",
     responses={status.HTTP_200_OK: {"content": {JPG: {}}, "description": "The image"}},
 )
 async def post_picture_capture(

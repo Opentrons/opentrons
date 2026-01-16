@@ -1,6 +1,5 @@
-from datetime import datetime
-
 import typing
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 from typing_extensions import Literal
@@ -9,6 +8,8 @@ from opentrons_shared_data.util import StrEnum
 
 from robot_server.robot.calibration.check.models import (
     CalibrationCheckSessionStatus,
+)
+from robot_server.robot.calibration.check.models import (
     SessionCreateParams as CalCheckCreateParams,
 )
 from robot_server.robot.calibration.deck.models import DeckCalibrationSessionStatus
@@ -18,10 +19,10 @@ from robot_server.robot.calibration.pipette_offset.models import (
 )
 from robot_server.robot.calibration.tip_length.models import TipCalibrationSessionStatus
 from robot_server.service.json_api import (
-    RequestModel,
-    DeprecatedResponseModel,
-    DeprecatedResponseDataModel,
     DeprecatedMultiResponseModel,
+    DeprecatedResponseDataModel,
+    DeprecatedResponseModel,
+    RequestModel,
 )
 
 
@@ -54,14 +55,13 @@ class CalibrationCheckCreateAttributes(BaseModel):
 class TipLengthCalibrationCreateAttributes(BaseModel):
     """The tip length calibration create request."""
 
-    sessionType: Literal[
+    sessionType: Literal[SessionType.tip_length_calibration] = (
         SessionType.tip_length_calibration
-    ] = SessionType.tip_length_calibration
+    )
     createParams: SessionCreateParams
 
 
-class _NoParams(BaseModel):
-    ...
+class _NoParams(BaseModel): ...
 
 
 class DeckCalibrationCreateAttributes(BaseModel):
@@ -74,9 +74,9 @@ class DeckCalibrationCreateAttributes(BaseModel):
 class PipetteOffsetCalibrationCreateAttributes(BaseModel):
     """Pipette offset calibration create request."""
 
-    sessionType: Literal[
+    sessionType: Literal[SessionType.pipette_offset_calibration] = (
         SessionType.pipette_offset_calibration
-    ] = SessionType.pipette_offset_calibration
+    )
     createParams: SessionCreateParams
 
 

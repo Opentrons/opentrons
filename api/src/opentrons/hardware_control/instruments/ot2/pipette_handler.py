@@ -1,45 +1,45 @@
 """Shared code for managing pipette configuration and storage."""
-from dataclasses import dataclass
+
 import logging
+from dataclasses import dataclass
 from typing import (
+    Any,
     Callable,
     Dict,
     Generic,
-    Optional,
-    Tuple,
-    Any,
-    cast,
-    List,
-    Sequence,
     Iterator,
+    List,
+    Optional,
+    Sequence,
+    Tuple,
     TypeVar,
+    cast,
 )
+
 import numpy
 
 from opentrons_shared_data.errors.exceptions import (
-    UnexpectedTipRemovalError,
+    CommandPreconditionViolated,
     UnexpectedTipAttachError,
+    UnexpectedTipRemovalError,
 )
-from opentrons_shared_data.pipette.types import UlPerMmAction
-from opentrons_shared_data.pipette.types import Quirks
-from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
+from opentrons_shared_data.pipette.types import Quirks, UlPerMmAction
 
+from .pipette import Pipette
 from opentrons import types as top_types
-from opentrons.hardware_control.types import (
-    CriticalPoint,
-    HardwareAction,
-    Axis,
-    OT3Mount,
-)
 from opentrons.hardware_control.constants import (
-    SHAKE_OFF_TIPS_SPEED,
-    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
     DROP_TIP_RELEASE_DISTANCE,
     SHAKE_OFF_TIPS_DROP_DISTANCE,
+    SHAKE_OFF_TIPS_PICKUP_DISTANCE,
+    SHAKE_OFF_TIPS_SPEED,
 )
-
 from opentrons.hardware_control.dev_types import PipetteDict
-from .pipette import Pipette
+from opentrons.hardware_control.types import (
+    Axis,
+    CriticalPoint,
+    HardwareAction,
+    OT3Mount,
+)
 
 # TODO both pipette handlers should be combined once the pipette configurations
 # are unified AND we separate out the concept of changing pipette state versus static state
@@ -256,9 +256,9 @@ class PipetteHandlerProvider(Generic[MountType]):
                 alvl: self.plunger_speed(instr, fr, "aspirate")
                 for alvl, fr in instr.aspirate_flow_rates_lookup.items()
             }
-            result[
-                "pipette_bounding_box_offsets"
-            ] = instr.config.pipette_bounding_box_offsets
+            result["pipette_bounding_box_offsets"] = (
+                instr.config.pipette_bounding_box_offsets
+            )
             result["lld_settings"] = instr.config.lld_settings
             result["plunger_positions"] = {
                 "top": instr.plunger_positions.top,
@@ -546,9 +546,9 @@ class PipetteHandlerProvider(Generic[MountType]):
         if asp_vol == 0:
             return None
 
-        assert instrument.ok_to_add_volume(
-            asp_vol
-        ), "Cannot aspirate more than pipette max volume"
+        assert instrument.ok_to_add_volume(asp_vol), (
+            "Cannot aspirate more than pipette max volume"
+        )
 
         dist = self.plunger_position(
             instrument, instrument.current_volume + asp_vol, "aspirate"

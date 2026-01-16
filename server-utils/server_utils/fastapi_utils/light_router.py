@@ -5,10 +5,9 @@ from __future__ import annotations
 import dataclasses
 import enum
 import typing
-import typing_extensions
 
 import fastapi
-
+import typing_extensions
 
 _FASTAPI_ROUTE_METHOD_NAMES = {
     "get",
@@ -219,10 +218,12 @@ def _merge_kwargs(
         merge_result.update(remaining_from_child)
     else:
         a_collisions: dict[object, object] = {
-            k: remaining_from_parent[k] for k in colliding_keys  # type: ignore[literal-required]
+            k: remaining_from_parent[k]  # type: ignore[literal-required]
+            for k in colliding_keys
         }
         b_collisions: dict[object, object] = {
-            k: remaining_from_child[k] for k in colliding_keys  # type: ignore[literal-required]
+            k: remaining_from_child[k]  # type: ignore[literal-required]
+            for k in colliding_keys
         }
         raise NotImplementedError(
             f"These FastAPI keyword arguments appear at different levels "

@@ -5,21 +5,49 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Tuple, Union
+
 from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
-from opentrons.ordered_set import OrderedSet
-
+from ..actions import (
+    Action,
+    DoorChangeAction,
+    FailCommandAction,
+    FinishAction,
+    HardwareStoppedAction,
+    PauseAction,
+    PlayAction,
+    QueueCommandAction,
+    StopAction,
+    SucceedCommandAction,
+)
+from ..commands import Command, CommandCreate, CommandIntent, CommandStatus
+from ..errors import (
+    ErrorOccurrence,
+    FixitCommandNotAllowedError,
+    PauseNotAllowedError,
+    ProtocolCommandFailedError,
+    ResumeFromRecoveryNotAllowedError,
+    RobotDoorOpenError,
+    RunStoppedError,
+    SetupCommandNotAllowedError,
+    UnexpectedProtocolError,
+)
+from ..types import EngineStatus
+from ._abstract_store import HandlesActions, HasState
+from .command_history import (
+    CommandEntry,
+    CommandHistory,
+)
+from .config import Config
 from opentrons.hardware_control.types import DoorState
+from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     RunCommandAction,
     SetErrorRecoveryPolicyAction,
-)
-from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
-    UnsafeUngripLabwareCommandType,
 )
 from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_close_latch import (
     UnsafeFlexStackerCloseLatchCommandType,
@@ -27,45 +55,15 @@ from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_close_latch import
 from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_open_latch import (
     UnsafeFlexStackerOpenLatchCommandType,
 )
+from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
+    UnsafeUngripLabwareCommandType,
+)
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.protocol_engine.state import update_types
-
-from ..actions import (
-    Action,
-    QueueCommandAction,
-    SucceedCommandAction,
-    FailCommandAction,
-    PlayAction,
-    PauseAction,
-    StopAction,
-    FinishAction,
-    HardwareStoppedAction,
-    DoorChangeAction,
-)
-
-from ..commands import Command, CommandStatus, CommandIntent, CommandCreate
-from ..errors import (
-    RunStoppedError,
-    ErrorOccurrence,
-    RobotDoorOpenError,
-    SetupCommandNotAllowedError,
-    FixitCommandNotAllowedError,
-    ResumeFromRecoveryNotAllowedError,
-    PauseNotAllowedError,
-    UnexpectedProtocolError,
-    ProtocolCommandFailedError,
-)
-from ..types import EngineStatus
-from ._abstract_store import HasState, HandlesActions
-from .command_history import (
-    CommandEntry,
-    CommandHistory,
-)
-from .config import Config
 
 
 class QueueStatus(enum.Enum):
@@ -281,7 +279,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             has_entered_error_recovery=False,
         )
 
-    def handle_action(self, action: Action) -> None:
+    def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
         match action:
             case QueueCommandAction():

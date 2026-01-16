@@ -1,20 +1,22 @@
 """An interface for managing interactions with the notification broker and relevant lifecycle utilities."""
+
 import contextlib
-import random
 import logging
+import random
+from enum import Enum
+from typing import Annotated, Any, Dict, Generator, Optional
+
 import paho.mqtt.client as mqtt
 from fastapi import Depends
-from typing import Annotated, Any, Dict, Generator, Optional
-from enum import Enum
 
-
-from .topics import TopicName
-from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
+
+from ..json_api import NotifyRefetchBody, NotifyUnsubscribeBody
+from .topics import TopicName
 
 log: logging.Logger = logging.getLogger(__name__)
 
@@ -200,7 +202,7 @@ def get_notification_client(
 ) -> NotificationClient:
     """Intended to be used by endpoint functions as a FastAPI dependency."""
     notification_client = _notification_client_accessor.get_from(app_state)
-    assert (
-        notification_client is not None
-    ), "Forgot to initialize notification client as part of server startup?"
+    assert notification_client is not None, (
+        "Forgot to initialize notification client as part of server startup?"
+    )
     return notification_client

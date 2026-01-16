@@ -1,19 +1,21 @@
 """Definition of Binary messages."""
-from dataclasses import dataclass, field, fields, MISSING
+
+import logging
+from dataclasses import MISSING, dataclass, field, fields
 from functools import lru_cache
-from typing import Type, Union, Optional, cast
+from typing import Optional, Type, Union, cast
+
 from typing_extensions import get_args
 
-from ..binary_constants import BinaryMessageId, LightTransitionType, LightAnimationType
 from .. import utils
-import logging
+from ..binary_constants import BinaryMessageId, LightAnimationType, LightTransitionType
 from .fields import (
-    FirmwareShortSHADataField,
-    VersionFlagsField,
-    OptionalRevisionField,
-    LightTransitionTypeField,
-    LightAnimationTypeField,
     EepromDataField,
+    FirmwareShortSHADataField,
+    LightAnimationTypeField,
+    LightTransitionTypeField,
+    OptionalRevisionField,
+    VersionFlagsField,
 )
 
 log = logging.getLogger(__name__)

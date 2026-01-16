@@ -31,13 +31,9 @@
     "title": "Allow two temperature modules on OT-2",
     "description": "This experimental setting may cause collisions, and Opentrons will not be responsible for any damage resulting from its use."
   },
-  "OT_PD_ENABLE_STACKING": {
-    "title": "Enable more labware capabilities",
-    "description": "Ability to stack labwares and add the Flex Stacker"
-  },
   "OT_PD_ENABLE_CONCURRENT_MODULE_ACTIONS": {
-    "title": "Enable concurrent module actions",
-    "description": "Features and design changes for running steps while waiting for modules to do stuff."
+    "title": "Enable experimental concurrent module actions",
+    "description": "Features and design changes related to doing stuff with modules while other steps run at the same time"
   },
   "OT_PD_ENABLE_BY_VOLUME_BUILDER": {
     "title": "Enable by-volume builder",

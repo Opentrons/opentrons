@@ -118,7 +118,7 @@ export function AddStepButton({
     const isStackerInSlot = Object.values(modules).some(
       module =>
         module.type === FLEX_STACKER_MODULE_TYPE &&
-        moduleAtLastState[module.id].slot === slot
+        moduleAtLastState[module.id]?.slot === slot
     )
     return (
       !isInaccessible &&

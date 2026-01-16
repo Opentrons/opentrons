@@ -3,13 +3,13 @@ from datetime import datetime
 
 from pydantic import Field
 
-from opentrons_shared_data.util import StrEnum
 from opentrons.calibration_storage.types import SourceType
+from opentrons_shared_data.util import StrEnum
 
 from robot_server.service.json_api import (
-    DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
     DeprecatedResponseDataModel,
+    DeprecatedResponseModel,
 )
 from robot_server.service.shared_models import calibration as cal_model
 
@@ -43,8 +43,7 @@ class PipetteOffsetCalibration(DeprecatedResponseDataModel):
     )
     tiprackUri: str = Field(
         ...,
-        description="The standard labware uri of the tiprack "
-        "used in this calibration",
+        description="The standard labware uri of the tiprack used in this calibration",
     )
     lastModified: datetime = Field(
         ..., description="When this calibration was last modified"

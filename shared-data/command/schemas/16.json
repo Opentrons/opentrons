@@ -3210,7 +3210,8 @@
         "heaterShakerModuleV1",
         "magneticBlockV1",
         "absorbanceReaderV1",
-        "flexStackerModuleV1"
+        "flexStackerModuleV1",
+        "vacuumModuleMilliporeV1"
       ],
       "title": "ModuleModel",
       "type": "string"

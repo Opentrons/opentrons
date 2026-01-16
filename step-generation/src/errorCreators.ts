@@ -99,6 +99,13 @@ export function missingTemperatureStep(): CommandCreatorError {
   }
 }
 
+export function missingProfileStep(): CommandCreatorError {
+  return {
+    message: 'This module is not currently running a profile.',
+    type: 'MISSING_PROFILE_STEP',
+  }
+}
+
 export function tipVolumeExceeded(args: {
   actionName: string
   volume: string | number
@@ -133,6 +140,14 @@ export const modulePipetteCollisionDanger = (): CommandCreatorError => {
     type: 'MODULE_PIPETTE_COLLISION_DANGER',
     message:
       'Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to modules.',
+  }
+}
+
+export const thermocyclerBusyWithProfile = (): CommandCreatorError => {
+  return {
+    type: 'THERMOCYCLER_BUSY_WITH_PROFILE',
+    message:
+      'This step cannot run while the Thermocycler is running a profile. Move the step outside the profile.',
   }
 }
 
@@ -218,6 +233,14 @@ export const flexStackerLabwareTypeMismatch = (): CommandCreatorError => {
   return {
     type: 'MISMATCHED_STACKER_LABWARE_TYPE',
     message: 'The stacker can only store a single type of labware at a time',
+  }
+}
+
+export const flexStackerLabwareTypeMissing = (): CommandCreatorError => {
+  return {
+    type: 'MISSING_STACKER_LABWARE_TYPE',
+    message:
+      'Add labware to the stacker in the starting deck so that you can refill it later',
   }
 }
 
@@ -441,5 +464,12 @@ export const incompletePickup = (): CommandCreatorError => {
   return {
     type: 'INCOMPLETE_PICKUP',
     message: 'At least one of the selected tips is empty',
+  }
+}
+
+export const labwareOnHopper = (): CommandCreatorError => {
+  return {
+    type: 'LABWARE_ON_HOPPER',
+    message: 'Labware cannot be moved from the Flex Stacker Hopper',
   }
 }

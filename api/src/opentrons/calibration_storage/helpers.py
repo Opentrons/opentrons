@@ -1,15 +1,14 @@
-""" opentrons.calibration_storage.helpers: various miscellaneous
+"""opentrons.calibration_storage.helpers: various miscellaneous
 functions
 
 This module has functions that you can import to save robot or
 labware calibration to its designated file location.
 """
+
 import json
-from typing import Any, Union, List, Dict, TYPE_CHECKING, cast, Tuple
-from dataclasses import is_dataclass, asdict
-
-
+from dataclasses import asdict, is_dataclass
 from hashlib import sha256
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union, cast
 
 from . import types as local_types
 
@@ -31,9 +30,9 @@ def convert_to_dict(obj: Any) -> Dict[str, Any]:
     # https://github.com/python/mypy/issues/6568
     # Unfortunately, since it's not currently supported I have an
     # assert check instead.
-    assert is_dataclass(obj) and not isinstance(
-        obj, type
-    ), "This function is intended for dataclasses only"
+    assert is_dataclass(obj) and not isinstance(obj, type), (
+        "This function is intended for dataclasses only"
+    )
     return asdict(obj, dict_factory=dict_filter_none)
 
 

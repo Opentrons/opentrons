@@ -1,4 +1,4 @@
-""" opentrons.protocol_api.module_geometry: classes and functions for modules
+"""opentrons.protocol_api.module_geometry: classes and functions for modules
 as deck objects
 
 This module provides things like :py:class:`ModuleGeometry` and
@@ -6,6 +6,7 @@ This module provides things like :py:class:`ModuleGeometry` and
 objects on the deck (as opposed to calling commands on them, which is handled
 by :py:mod:`.module_contexts`)
 """
+
 from __future__ import annotations
 
 import logging
@@ -14,25 +15,24 @@ from typing import TYPE_CHECKING, Optional
 import numpy as np
 from numpy.typing import NDArray
 
-from opentrons_shared_data.util import StrEnum
 from opentrons_shared_data import module
-from opentrons_shared_data.module.types import ModuleDefinitionV3
 from opentrons_shared_data.module import OLD_TC_GEN2_LABWARE_OFFSET
-
-from opentrons.types import Location, Point, LocationLabware
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_north_south_slots,
-    get_east_west_slots,
-    get_adjacent_slots,
-)
+from opentrons_shared_data.module.types import ModuleDefinitionV3
+from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control.modules.types import (
     ModuleModel,
     ModuleType,
-    module_model_from_string,
     ThermocyclerModuleModel,
+    module_model_from_string,
 )
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_adjacent_slots,
+    get_east_west_slots,
+    get_north_south_slots,
+)
+from opentrons.types import Location, LocationLabware, Point
 
 if TYPE_CHECKING:
     from opentrons.protocol_api.labware import Labware
@@ -268,10 +268,10 @@ class ThermocyclerGeometry(ModuleGeometry):
     # Thermocycler `configuration="semi"` does not work properly and should be removed
     # https://opentrons.atlassian.net/browse/RSS-106
     def labware_accessor(self, labware: Labware) -> Labware:
-        from opentrons.protocol_api.labware import Labware
         from opentrons.protocol_api.core.legacy.legacy_labware_core import (
             LegacyLabwareCore,
         )
+        from opentrons.protocol_api.labware import Labware
 
         definition = labware._core.get_definition()
 
@@ -388,9 +388,9 @@ class HeaterShakerGeometry(ModuleGeometry):
 
         heater_shaker_slot = self.parent
 
-        assert isinstance(
-            heater_shaker_slot, str
-        ), "Could not determine module slot location"
+        assert isinstance(heater_shaker_slot, str), (
+            "Could not determine module slot location"
+        )
 
         return heater_shaker_slot == pipette_location_slot or int(
             pipette_location_slot
@@ -419,9 +419,9 @@ class HeaterShakerGeometry(ModuleGeometry):
 
         heater_shaker_slot = self.parent
 
-        assert isinstance(
-            heater_shaker_slot, str
-        ), "Could not determine module slot location"
+        assert isinstance(heater_shaker_slot, str), (
+            "Could not determine module slot location"
+        )
 
         return heater_shaker_slot == pipette_location_slot or int(
             pipette_location_slot

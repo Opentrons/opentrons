@@ -1,13 +1,16 @@
-from opentrons.protocols.execution.errors import ExceptionInProtocolError
-from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
-import pytest
 from typing import Any
+
+import pytest
+
+from tests.opentrons.conftest import Protocol
+
 from opentrons.protocol_api import ParameterContext
+from opentrons.protocol_api.protocol_context import ProtocolContext
 from opentrons.protocols.api_support.types import APIVersion
 from opentrons.protocols.execution import execute, execute_python
+from opentrons.protocols.execution.errors import ExceptionInProtocolError
 from opentrons.protocols.parse import parse
-from opentrons.protocol_api.protocol_context import ProtocolContext
-from tests.opentrons.conftest import Protocol
+from opentrons.protocols.types import MalformedPythonProtocolError, PythonProtocol
 
 
 def test_api2_runfunc() -> None:

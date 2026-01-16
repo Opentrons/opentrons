@@ -1,35 +1,38 @@
 """Move to addressable area command request, result, and implementation models."""
+
 from __future__ import annotations
-from pydantic import Field
+
 from typing import TYPE_CHECKING, Optional, Type
+
+from pydantic import Field
 from typing_extensions import Literal
 
 from opentrons_shared_data.pipette.types import PipetteNameType
 
 from ..errors import LocationNotAccessibleByPipetteError
-from ..types import AddressableOffsetVector
 from ..resources import fixture_validation
-from .pipetting_common import (
-    PipetteIdMixin,
-)
-from .movement_common import (
-    MovementMixin,
-    DestinationPositionResult,
-    move_to_addressable_area,
-    StallOrCollisionError,
-)
+from ..types import AddressableOffsetVector
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
     BaseCommandCreate,
-    SuccessData,
     DefinedErrorData,
+    SuccessData,
+)
+from .movement_common import (
+    DestinationPositionResult,
+    MovementMixin,
+    StallOrCollisionError,
+    move_to_addressable_area,
+)
+from .pipetting_common import (
+    PipetteIdMixin,
 )
 
 if TYPE_CHECKING:
     from ..execution import MovementHandler
-    from ..state.state import StateView
     from ..resources.model_utils import ModelUtils
+    from ..state.state import StateView
 
 MoveToAddressableAreaCommandType = Literal["moveToAddressableArea"]
 
@@ -162,9 +165,9 @@ class MoveToAddressableArea(
     params: MoveToAddressableAreaParams
     result: Optional[MoveToAddressableAreaResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[MoveToAddressableAreaImplementation] = (
         MoveToAddressableAreaImplementation
-    ] = MoveToAddressableAreaImplementation
+    )
 
 
 class MoveToAddressableAreaCreate(BaseCommandCreate[MoveToAddressableAreaParams]):

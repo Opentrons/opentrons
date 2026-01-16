@@ -1,12 +1,14 @@
 """Functionality to interface with the registration table."""
-import sqlalchemy
-from typing import Optional, Dict, Tuple
-from datetime import timedelta
-import logging
 
-from system_server.persistence import registration_table
-from system_server.jwt import Registrant, create_jwt, jwt_is_valid
+import logging
+from datetime import timedelta
+from typing import Dict, Optional, Tuple
+
+import sqlalchemy
+
 from system_server.constants import REGISTRATION_AUDIENCE, REGISTRATION_DURATION_DAYS
+from system_server.jwt import Registrant, create_jwt, jwt_is_valid
+from system_server.persistence import registration_table
 
 _log = logging.getLogger(__name__)
 

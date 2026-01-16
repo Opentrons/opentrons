@@ -52,7 +52,9 @@
   color: var(--black-90);
   cursor: pointer;
   gap: var(--spacing-4);
-  transition: background-color 500ms ease-out, border-color 500ms ease-out;
+  transition:
+    background-color 500ms ease-out,
+    border-color 500ms ease-out;
 }
 
 .individual_command_wrap_highlighted {
@@ -72,26 +74,31 @@
   gap: var(--spacing-8);
 }
 
+.individual_command_text {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: break-all;
+}
+
 .annotated_steps_container {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
+  width: 100%;
+  height: 100%;
 }
 
-.annotated_steps_container::-webkit-scrollbar {
-  display: none;
+.annotated_steps_list {
+  width: 100%;
+  height: 100%;
 }
 
-.annotated_steps_wrap {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-4);
+.annotated_steps_row {
+  box-sizing: border-box;
+  padding-bottom: var(--spacing-4);
 }
 
 .annotated_steps_error_wrapper {
   display: flex;
   flex-direction: column;
-  padding : var(--spacing-8) var(--spacing-12);
+  padding: var(--spacing-8) var(--spacing-12);
   gap: var(--spacing-4);
 }
 
@@ -104,7 +111,9 @@
   cursor: pointer;
   gap: var(--spacing-4);
   overflow-wrap: break-word;
-  transition: background-color 500ms ease-out, border-color 500ms ease-out;
+  transition:
+    background-color 500ms ease-out,
+    border-color 500ms ease-out;
 }
 
 .annotated_steps_header {
@@ -121,5 +130,7 @@
   padding: var(--spacing-8);
   border-radius: var(--border-radius-4);
   background-color: var(--grey-20);
-  transition: background-color 500ms ease-out, border-color 500ms ease-out;
+  transition:
+    background-color 500ms ease-out,
+    border-color 500ms ease-out;
 }

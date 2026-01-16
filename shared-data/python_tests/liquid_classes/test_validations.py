@@ -1,19 +1,21 @@
 """Tests that validate the built-in liquid class definitions."""
+
+from typing import Any, Dict, List
+
 import pytest
-from typing import List, Dict, Any
 
 from opentrons_shared_data import get_shared_data_root
 from opentrons_shared_data.liquid_classes import load_definition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    AspirateProperties,
+    BlowoutLocation,
+    BlowoutProperties,
     DelayProperties,
     MixProperties,
-    TouchTipProperties,
-    BlowoutProperties,
-    BlowoutLocation,
-    AspirateProperties,
+    MultiDispenseProperties,
     PositionReference,
     SingleDispenseProperties,
-    MultiDispenseProperties,
+    TouchTipProperties,
     TransferProperties,
 )
 

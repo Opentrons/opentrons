@@ -433,9 +433,10 @@ export const getStateAndContextTempTCModules = ({
       slot: 'span7_8_10_11',
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        blockTargetTemp: null,
+        currentBlockActivity: { type: 'blockDeactivated' },
         lidTargetTemp: null,
         lidOpen: null,
+        numProfilesStarted: 0,
       },
     },
   }

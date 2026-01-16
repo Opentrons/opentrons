@@ -1,9 +1,10 @@
-from typing import Dict, List, Optional, Mapping
+from typing import Dict, List, Mapping, Optional
+
 from typing_extensions import Protocol
 
-from opentrons.types import Point
 from ..types import Axis, CriticalPoint, MotionChecks
 from .types import MountArgType
+from opentrons.types import Point
 
 
 class MotionController(Protocol[MountArgType]):

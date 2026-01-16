@@ -1,13 +1,14 @@
 """Create or reset the server's persistence directory."""
 
-from pathlib import Path
 from logging import getLogger
+from pathlib import Path
 from shutil import rmtree
 from tempfile import mkdtemp
 from typing import Optional
-from typing_extensions import Final
 
-from anyio import Path as AsyncPath, to_thread
+from anyio import Path as AsyncPath
+from anyio import to_thread
+from typing_extensions import Final
 
 from ._folder_migrator import MigrationOrchestrator
 from ._migrations import (
@@ -22,6 +23,7 @@ from ._migrations import (
     v10_to_v11,
     v11_to_v12,
     v12_to_v13,
+    v13_to_v14,
 )
 from .file_and_directory_names import LATEST_VERSION_DIRECTORY
 
@@ -79,7 +81,8 @@ def make_migration_orchestrator(prepared_root: Path) -> MigrationOrchestrator:
             v09_to_v10.Migration9to10(subdirectory="10"),
             v10_to_v11.Migration10to11(subdirectory="11"),
             v11_to_v12.Migration11to12(subdirectory="12"),
-            v12_to_v13.Migration12to13(subdirectory=LATEST_VERSION_DIRECTORY),
+            v12_to_v13.Migration12to13(subdirectory="13"),
+            v13_to_v14.Migration13to14(subdirectory=LATEST_VERSION_DIRECTORY),
         ],
         temp_file_prefix="temp-",
     )

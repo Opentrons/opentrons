@@ -10,26 +10,28 @@ everything was loaded and run as expected.
 """
 
 from datetime import datetime
-from decoy import matchers
 from pathlib import Path
 
+from decoy import matchers
+
 from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons.types import MountType, DeckSlotName
+
 from opentrons.protocol_engine import (
+    DeckPoint,
     DeckSlotLocation,
+    EngineStatus,
     LoadedLabware,
     LoadedModule,
     LoadedPipette,
     ModuleDefinition,
     ModuleModel,
     commands,
-    DeckPoint,
-    EngineStatus,
 )
 from opentrons.protocol_reader import ProtocolReader
 from opentrons.protocol_runner.create_simulating_orchestrator import (
     create_simulating_orchestrator,
 )
+from opentrons.types import DeckSlotName, MountType
 
 
 async def test_runner_with_python(

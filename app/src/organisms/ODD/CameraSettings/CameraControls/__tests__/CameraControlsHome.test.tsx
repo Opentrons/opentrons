@@ -44,10 +44,11 @@ describe('CameraControlsHome', () => {
       setActiveSubView: vi.fn(),
       toggleShowControls: vi.fn(),
       settings: mockSettings,
+      runId: 'run-id-123',
     }
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
-      imgPath: undefined,
+      imgPath: null,
       takePhoto: vi.fn(),
     })
     vi.mocked(ChildNavigation).mockReturnValue(<div>MOCK_CHILD_NAVIGATION</div>)
@@ -191,7 +192,7 @@ describe('CameraControlsHome', () => {
     const mockTakePhoto = vi.fn()
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: false,
-      imgPath: undefined,
+      imgPath: null,
       takePhoto: mockTakePhoto,
     })
     vi.mocked(ChildNavigation).mockImplementation(({ onClickButton }) => (
@@ -232,7 +233,7 @@ describe('CameraControlsHome', () => {
   it('shows spinner icon when loading and no image path', () => {
     vi.mocked(usePreviewImage).mockReturnValue({
       isLoading: true,
-      imgPath: undefined,
+      imgPath: null,
       takePhoto: vi.fn(),
     })
 

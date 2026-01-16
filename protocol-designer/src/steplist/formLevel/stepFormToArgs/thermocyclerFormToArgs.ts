@@ -73,24 +73,15 @@ export const thermocyclerFormToArgs = (
         profileItemsById: castFormData.profileItemsById,
       })
 
-      return {
+      const args = {
+        commandCreatorFnName: THERMOCYCLER_PROFILE,
+
         // todo(mm, 2025-10-09): form-types.ts is inconsistent about whether moduleId is nullable.
         // This runtime behavior of assuming it can't be nullish here is inherited from prior code.
         // Look into this.
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         moduleId: castFormData.moduleId!,
-        commandCreatorFnName: THERMOCYCLER_PROFILE,
-        blockTargetTempHold:
-          castFormData.blockIsActiveHold &&
-          castFormData.blockTargetTempHold !== null
-            ? Number(castFormData.blockTargetTempHold)
-            : null,
-        lidOpenHold: castFormData.lidOpenHold,
-        lidTargetTempHold:
-          castFormData.lidIsActiveHold &&
-          castFormData.lidTargetTempHold !== null
-            ? Number(castFormData.lidTargetTempHold)
-            : null,
+
         meta: {
           rawProfileItems: castFormData.orderedProfileItems.map(
             (itemId: string | number) => castFormData.profileItemsById[itemId]
@@ -101,6 +92,8 @@ export const thermocyclerFormToArgs = (
         profileVolume: Number(castFormData.profileVolume),
         description: stepDetails,
       }
+
+      return args
     }
   }
 }

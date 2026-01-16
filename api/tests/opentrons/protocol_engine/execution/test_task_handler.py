@@ -1,26 +1,28 @@
 """Task handler."""
 
-import pytest
 import asyncio
 from datetime import datetime
+
+import pytest
 from decoy import Decoy, matchers
-from opentrons.protocol_engine.state.state import (
-    StateStore,
-)
-from opentrons.protocol_engine.errors import ErrorOccurrence
+
 from opentrons_shared_data.errors.codes import ErrorCodes
 from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
-from opentrons.protocol_engine.resources import (
-    ModelUtils,
-)
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     FinishTaskAction,
     StartTaskAction,
 )
-from opentrons.protocol_engine.types import Task
+from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.execution.task_handler import TaskHandler
+from opentrons.protocol_engine.resources import (
+    ModelUtils,
+)
+from opentrons.protocol_engine.state.state import (
+    StateStore,
+)
+from opentrons.protocol_engine.types import Task
 
 
 @pytest.fixture

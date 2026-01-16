@@ -1,6 +1,5 @@
 """Functions used for managing error recovery policy."""
-from opentrons.protocol_engine.state.config import Config
-from robot_server.runs.error_recovery_models import ErrorRecoveryRule, ReactionIfMatch
+
 from opentrons.protocol_engine.commands.command_unions import (
     Command,
     CommandDefinedErrorData,
@@ -9,6 +8,9 @@ from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
 )
+from opentrons.protocol_engine.state.config import Config
+
+from robot_server.runs.error_recovery_models import ErrorRecoveryRule, ReactionIfMatch
 
 
 def create_error_recovery_policy_from_rules(

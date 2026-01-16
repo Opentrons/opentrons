@@ -74,7 +74,7 @@ export const reduxActionToAnalyticsEvent = (
     const a: SaveStepFormAction = action
 
     const argsAndErrors: StepArgsAndErrors =
-      getArgsAndErrorsByStepId(state)[a.payload.id]
+      getArgsAndErrorsByStepId(state)[a.payload.form.id]
 
     const { stepArgs } = argsAndErrors
 
@@ -232,7 +232,9 @@ export const reduxActionToAnalyticsEvent = (
           const args = stepArgs as FlexStackerFillItemsArgs
           return {
             name: 'flexStackerFillItemsStep',
-            properties: { labwareURI: args.fillLabwareUri },
+            properties: {
+              labwareUri: args.fillLabwareUri,
+            },
           }
         case 'flexStackerStore':
           return {

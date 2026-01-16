@@ -1,31 +1,30 @@
 """Functions to use as dependencies in FastAPI routers."""
 
-
 import asyncio
 import logging
 from pathlib import Path
 from typing import Annotated, Awaitable, Callable, Iterable, Optional
-from typing_extensions import Literal
 
-from sqlalchemy.engine import Engine as SQLEngine
 from anyio import to_thread
 from fastapi import Depends, status
+from sqlalchemy.engine import Engine as SQLEngine
+from typing_extensions import Literal
 
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-from robot_server.errors.error_responses import ErrorDetails
 
 from .database import create_sql_engine
 from .file_and_directory_names import DB_FILE
+from .images_directory import ImagesResetter, prepare_images_directory
 from .persistence_directory import (
     PersistenceResetter,
     prepare_active_subdirectory,
     prepare_root,
 )
-from .images_directory import prepare_images_directory, ImagesResetter
+from robot_server.errors.error_responses import ErrorDetails
 
 _log = logging.getLogger(__name__)
 
@@ -181,9 +180,9 @@ async def get_sql_engine(
     appropriate HTTP-facing error to indicate that the server is busy.
     """
     initialize_task = _sql_engine_init_task_accessor.get_from(app_state)
-    assert (
-        initialize_task is not None
-    ), "Forgot to start SQL engine initialization as part of server startup?"
+    assert initialize_task is not None, (
+        "Forgot to start SQL engine initialization as part of server startup?"
+    )
 
     try:
         return initialize_task.result()
@@ -224,9 +223,9 @@ async def get_active_persistence_directory(
     initialize_task = _active_persistence_directory_init_task_accessor.get_from(
         app_state
     )
-    assert (
-        initialize_task is not None
-    ), "Forgot to start persistence directory initialization as part of server startup?"
+    assert initialize_task is not None, (
+        "Forgot to start persistence directory initialization as part of server startup?"
+    )
 
     try:
         return initialize_task.result()
@@ -259,9 +258,9 @@ async def get_active_persistence_directory_failsafe(
     initialize_task = _active_persistence_directory_init_task_accessor.get_from(
         app_state
     )
-    assert (
-        initialize_task is not None
-    ), "Forgot to start persistence directory initialization as part of server startup?"
+    assert initialize_task is not None, (
+        "Forgot to start persistence directory initialization as part of server startup?"
+    )
 
     try:
         return initialize_task.result()
@@ -277,9 +276,9 @@ async def _get_persistence_directory_root(
     It may be undergoing creation or a reset. This will only return after that's done.
     """
     init_task = _root_persistence_directory_init_task_accessor.get_from(app_state)
-    assert (
-        init_task is not None
-    ), "Forgot to initialize persistence directory root as part of server startup?"
+    assert init_task is not None, (
+        "Forgot to initialize persistence directory root as part of server startup?"
+    )
     return await init_task
 
 
@@ -299,9 +298,9 @@ async def initialize_images_directory(
 
     This should be called exactly once, as part of server startup.
     """
-    assert (
-        _images_directory_accessor.get_from(app_state) is None
-    ), "Cannot initialize images directory more than once."
+    assert _images_directory_accessor.get_from(app_state) is None, (
+        "Cannot initialize images directory more than once."
+    )
 
     try:
         prepared_directory = await prepare_images_directory(images_directory_root)
@@ -316,9 +315,9 @@ async def get_images_directory(
 ) -> Path:
     """Return the path to the server's images directory."""
     images_directory = _images_directory_accessor.get_from(app_state)
-    assert (
-        images_directory is not None
-    ), "Forgot to initialize images directory as part of server startup?"
+    assert images_directory is not None, (
+        "Forgot to initialize images directory as part of server startup?"
+    )
     return images_directory
 
 

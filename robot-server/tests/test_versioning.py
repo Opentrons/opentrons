@@ -3,10 +3,12 @@
 These tests are to ensure API versioning plays nicely with FastAPI. Header
 and response tests are in `tests/integration/test_version_headers.tavern.yaml`.
 """
-import pytest
-from fastapi import FastAPI, APIRouter, Request, Depends
-from fastapi.testclient import TestClient
+
 from typing import Annotated, Dict
+
+import pytest
+from fastapi import APIRouter, Depends, FastAPI, Request
+from fastapi.testclient import TestClient
 
 from robot_server.errors.exception_handlers import exception_handlers
 from robot_server.versioning import API_VERSION, check_version_header

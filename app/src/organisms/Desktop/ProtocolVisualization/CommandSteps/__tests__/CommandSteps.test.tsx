@@ -17,6 +17,8 @@ const render = (props: ComponentProps<typeof CommandSteps>) => {
   })
 }
 
+const mockIntersectionObserver = vi.fn()
+
 describe('CommandSteps', () => {
   let props: ComponentProps<typeof CommandSteps>
   beforeEach(() => {
@@ -29,6 +31,12 @@ describe('CommandSteps', () => {
       currentCommandIndex: 1,
     }
     vi.mocked(AnnotatedSteps).mockReturnValue(<div>mock AnnotatedSteps</div>)
+    mockIntersectionObserver.mockReturnValue({
+      observe: () => null,
+      unobserve: () => null,
+      disconnect: () => null,
+    })
+    window.IntersectionObserver = mockIntersectionObserver
   })
   it('should render header text', () => {
     render(props)

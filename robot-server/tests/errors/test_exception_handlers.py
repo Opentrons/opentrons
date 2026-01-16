@@ -1,10 +1,12 @@
 """Tests for the server's exception handlers."""
+
+from typing import List
+
 import pytest
 from decoy import matchers
 from fastapi import FastAPI, Header, status
 from fastapi.testclient import TestClient
 from pydantic import BaseModel
-from typing import List
 
 from robot_server.constants import V1_TAG
 from robot_server.errors.error_responses import ApiError
@@ -168,8 +170,7 @@ def test_handles_body_validation_error(app: FastAPI, client: TestClient) -> None
                 "errorCode": "4000",
                 "id": "InvalidRequest",
                 "title": "Invalid Request",
-                "detail": "Input should be a valid boolean, unable to interpret "
-                "input",
+                "detail": "Input should be a valid boolean, unable to interpret input",
                 "source": {"pointer": "/array_field/0"},
             },
         ]

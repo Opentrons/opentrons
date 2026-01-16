@@ -1,10 +1,11 @@
 # noqa: D100
 
 
-import logging.handlers
 import logging
+import logging.handlers
 from queue import Queue
 from typing import cast
+
 from typing_extensions import override
 
 

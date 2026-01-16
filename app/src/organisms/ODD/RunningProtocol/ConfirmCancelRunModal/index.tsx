@@ -99,10 +99,10 @@ export function ConfirmCancelRunModal({
             isActiveRun ? styles.active_run : styles.inactive_run
           }`}
         >
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('cancel_run_alert_info_flex')}
           </LegacyStyledText>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('cancel_run_module_info')}
           </LegacyStyledText>
         </div>

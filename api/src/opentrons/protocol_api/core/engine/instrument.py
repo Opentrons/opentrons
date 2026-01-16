@@ -1,96 +1,96 @@
 """ProtocolEngine-based InstrumentContext core implementation."""
 
 from __future__ import annotations
-from itertools import dropwhile
+
 from copy import deepcopy
+from itertools import dropwhile
 from typing import (
-    Optional,
     TYPE_CHECKING,
-    cast,
-    Union,
     List,
+    Literal,
+    NamedTuple,
+    Optional,
     Sequence,
     Tuple,
-    NamedTuple,
-    Literal,
+    Union,
+    cast,
 )
-from opentrons.types import (
-    Location,
-    Mount,
-    NozzleConfigurationType,
-    NozzleMapInterface,
-    MeniscusTrackingTarget,
+
+from opentrons_shared_data.errors.exceptions import (
+    CommandPreconditionViolated,
+    UnsupportedHardwareCommand,
 )
+from opentrons_shared_data.liquid_classes.liquid_class_definition import BlowoutLocation
+from opentrons_shared_data.pipette.types import (
+    LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP,
+    PIPETTE_API_NAMES_MAP,
+)
+
+from ...disposal_locations import TrashBin, WasteChute
+from ..instrument import AbstractInstrument
+from . import overlap_versions, pipette_movement_conflict
+from . import transfer_components_executor as tx_comps_executor
+from .labware import LabwareCore
+from .well import WellCore
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.advanced_control.transfers.common import (
-    TransferTipPolicyV2,
-    NoLiquidClassPropertyError,
-)
-from opentrons.protocols.advanced_control.transfers import common as tx_commons
-from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
-    check_current_volume_before_dispensing,
-)
-from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocol_engine import (
+    AllNozzleLayoutConfiguration,
+    ColumnNozzleLayoutConfiguration,
     DeckPoint,
     DropTipWellLocation,
     DropTipWellOrigin,
-    WellLocation,
-    WellOrigin,
-    WellOffset,
-    AllNozzleLayoutConfiguration,
-    SingleNozzleLayoutConfiguration,
-    RowNozzleLayoutConfiguration,
-    ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
+    WellLocation,
+    WellOffset,
+    WellOrigin,
 )
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
+from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
 from opentrons.protocol_engine.types import (
     PRIMARY_NOZZLE_LITERAL,
-    NozzleLayoutConfigurationType,
     AddressableOffsetVector,
     LiquidClassRecord,
-    NextTipInfo,
-    PickUpTipWellLocation,
     LiquidHandlingWellLocation,
-)
-from opentrons.protocol_engine.types import (
     LiquidTrackingType,
+    NextTipInfo,
+    NozzleLayoutConfigurationType,
+    PickUpTipWellLocation,
     WellLocationFunction,
 )
 from opentrons.protocol_engine.types.automatic_tip_selection import (
     NoTipAvailable,
     NoTipReason,
 )
-from opentrons.protocol_engine.errors.exceptions import TipNotAttachedError
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons_shared_data.pipette.types import (
-    PIPETTE_API_NAMES_MAP,
-    LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP,
+from opentrons.protocols.advanced_control.transfers import common as tx_commons
+from opentrons.protocols.advanced_control.transfers.common import (
+    NoLiquidClassPropertyError,
+    TransferTipPolicyV2,
 )
-from opentrons_shared_data.errors.exceptions import (
-    UnsupportedHardwareCommand,
-    CommandPreconditionViolated,
+from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
+    check_current_volume_before_dispensing,
 )
-from opentrons_shared_data.liquid_classes.liquid_class_definition import BlowoutLocation
-from opentrons.protocol_api._nozzle_layout import NozzleLayout
-from . import overlap_versions, pipette_movement_conflict
-from . import transfer_components_executor as tx_comps_executor
-
-from .well import WellCore
-from .labware import LabwareCore
-from ..instrument import AbstractInstrument
-from ...disposal_locations import TrashBin, WasteChute
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import FlowRates, find_value_for_api_version
+from opentrons.types import (
+    Location,
+    MeniscusTrackingTarget,
+    Mount,
+    NozzleConfigurationType,
+    NozzleMapInterface,
+)
 
 if TYPE_CHECKING:
     from .protocol import ProtocolCore
     from opentrons.protocol_api._liquid import LiquidClass
     from opentrons.protocol_api._liquid_properties import (
-        TransferProperties,
         MultiDispenseProperties,
         SingleDispenseProperties,
+        TransferProperties,
     )
 
 _DISPENSE_VOLUME_VALIDATION_ADDED_IN = APIVersion(2, 17)
@@ -455,15 +455,16 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
         location: Union[Location, TrashBin, WasteChute],
         well_core: Optional[WellCore],
         in_place: bool,
+        flow_rate: float,
     ) -> None:
         """Blow liquid out of the tip.
 
         Args:
             location: The location to blow out into.
             well_core: The well to blow out into.
-            in_place: whether this is a in-place command.
+            in_place: Whether this is an in-place command.
+            flow_rate: The absolute flow rate in µL/s.
         """
-        flow_rate = self.get_blow_out_flow_rate(1.0)
         if well_core is None:
             if not in_place:
                 if isinstance(location, (TrashBin, WasteChute)):
@@ -594,9 +595,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             increment: Customize the movement "distance" of the pipette to press harder.
             prep_after: Not used by this core, pipette preparation will always happen.
         """
-        assert (
-            presses is None and increment is None
-        ), "Tip pick-up with custom presses or increment deprecated"
+        assert presses is None and increment is None, (
+            "Tip pick-up with custom presses or increment deprecated"
+        )
 
         well_name = well_core.get_name()
         labware_id = well_core.labware_id
@@ -1244,9 +1245,10 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             assert (
                 # We make sure to set these nozzles in the calling function
                 # if using QUADRANT or PARTIAL_COLUMN. Asserting only for type verification here.
-                front_right_nozzle is not None
-                and back_left_nozzle is not None
-            ), f"Both front right and back left nozzles are required for {style} configuration."
+                front_right_nozzle is not None and back_left_nozzle is not None
+            ), (
+                f"Both front right and back left nozzles are required for {style} configuration."
+            )
             configuration_model = QuadrantNozzleLayoutConfiguration(
                 primaryNozzle=cast(PRIMARY_NOZZLE_LITERAL, primary_nozzle),
                 frontRightNozzle=front_right_nozzle,
@@ -1420,9 +1422,9 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             )
 
         prev_src: Optional[Tuple[Location, WellCore]] = None
-        prev_dest: Optional[
-            Union[Tuple[Location, WellCore], TrashBin, WasteChute]
-        ] = None
+        prev_dest: Optional[Union[Tuple[Location, WellCore], TrashBin, WasteChute]] = (
+            None
+        )
         post_disp_tip_contents = [
             tx_comps_executor.LiquidAndAirGapPair(
                 liquid=0,

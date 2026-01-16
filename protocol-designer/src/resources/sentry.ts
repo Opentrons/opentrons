@@ -72,6 +72,18 @@ export const initializeSentry = (state: BaseState): void => {
           // https://github.com/getsentry/sentry-javascript/issues/3440
           'Non-Error promise rejection captured with value: Object Not Found Matching Id:',
         ],
+        beforeBreadcrumb(breadcrumb, hint) {
+          if (
+            // Sentry records breadcrumbs for HTTP requests we issue, but the Mixpanel
+            // request is huge and not useful:
+            breadcrumb.data?.url?.includes('/api.mixpanel.com/track') ||
+            // We console.debug() every time we send an event to Mixpanel, ignore it too:
+            (breadcrumb.category === 'console' && breadcrumb.level === 'debug')
+          ) {
+            return null
+          }
+          return breadcrumb
+        },
       })
       isSentryInitialized = true
       console.log('Sentry.init done')

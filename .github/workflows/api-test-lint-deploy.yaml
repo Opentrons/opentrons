@@ -57,14 +57,11 @@ jobs:
           fetch-depth: 0
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.21.1'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.12'
-
-      - uses: './.github/actions/python/setup'
+          node-version: '22.22.0'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
+          python-version: '3.12'
       - name: Lint with opentrons_hardware
         run: make -C api lint
   test:
@@ -94,25 +91,20 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.21.1'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: ${{ matrix.python }}
+          node-version: '22.22.0'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
           python-version: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Remove OT-3 hardware package
         run: make -C api setup-ot2
-        env:
-          OT_VIRTUALENV_VERSION: ${{ matrix.python }}
       - if: ${{ matrix.with-ot-hardware == 'false' }}
         name: Test without opentrons_hardware
         run: make -C api test-ot2
@@ -147,21 +139,12 @@ jobs:
         run: |
           git fetch -f origin ${{ github.ref }}:${{ github.ref }}
           git checkout ${{ github.ref }}
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: ${{matrix.python}}
       - name: Set up package-testing
         id: setup
-        if: ${{ matrix.os != 'windows-2022' }}
-        working-directory: package-testing
-        shell: bash
-        run: make setup
-      - name: Set up package-testing (Windows)
-        id: setup-windows
-        if: ${{ matrix.os == 'windows-2022' }}
-        working-directory: package-testing
-        shell: pwsh
-        run: make setup-windows
+        uses: './.github/actions/python/setup-uv'
+        with:
+          project: 'package-testing'
+          python-version: '3.12'
       - name: Run the tests
         if: ${{ matrix.os != 'windows-2022' }}
         shell: bash
@@ -174,7 +157,7 @@ jobs:
         working-directory: package-testing
         run: make test-windows
       - name: Save the test results
-        if: ${{ always() && steps.setup.outcome == 'success' || steps.setup-windows.outcome == 'success' }}
+        if: ${{ always() && steps.setup.outcome == 'success' }}
         id: results
         uses: actions/upload-artifact@v4
         with:
@@ -207,23 +190,20 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.21.1'
-      - uses: 'actions/setup-python@v4'
-        with:
-          python-version: '3.12'
+          node-version: '22.22.0'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
           script: |
             const { buildComplexEnvVars, } = require(`${process.env.GITHUB_WORKSPACE}/.github/workflows/utils.js`)
             buildComplexEnvVars(core, context)
-      - uses: './.github/actions/python/setup'
+      - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
+          python-version: '3.12'
       - name: 'build api distributables'
         shell: bash
         run: make -C api sdist wheel
-
       # creds and repository configuration for deploying python wheels
       - if: ${{ !env.OT_TAG }}
         name: 'upload to test pypi'

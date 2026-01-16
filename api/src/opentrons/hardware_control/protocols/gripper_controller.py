@@ -1,9 +1,12 @@
 """Protocol specifying API gripper control."""
-from typing import Optional
+
+from typing import TYPE_CHECKING, Optional
+
 from typing_extensions import Protocol
 
-from opentrons.hardware_control.dev_types import GripperDict
-from opentrons.hardware_control.instruments.ot3.gripper import Gripper
+if TYPE_CHECKING:
+    from opentrons.hardware_control.dev_types import GripperDict
+    from opentrons.hardware_control.instruments.ot3.gripper import Gripper
 
 
 class GripperController(Protocol):
@@ -11,11 +14,9 @@ class GripperController(Protocol):
 
     async def grip(
         self, force_newtons: Optional[float] = None, stay_engaged: bool = True
-    ) -> None:
-        ...
+    ) -> None: ...
 
-    async def home_gripper_jaw(self, recalibrate_jaw_width: bool = False) -> None:
-        ...
+    async def home_gripper_jaw(self, recalibrate_jaw_width: bool = False) -> None: ...
 
     async def ungrip(self, force_newtons: Optional[float] = None) -> None:
         """Release gripped object.
@@ -46,11 +47,11 @@ class GripperController(Protocol):
         """Ensure that a gripper pickup succeeded."""
 
     @property
-    def attached_gripper(self) -> Optional[GripperDict]:
+    def attached_gripper(self) -> Optional["GripperDict"]:
         """Get a dict of all attached grippers."""
         ...
 
     @property
-    def hardware_gripper(self) -> Optional[Gripper]:
+    def hardware_gripper(self) -> Optional["Gripper"]:
         """Get attached gripper, if present."""
         ...

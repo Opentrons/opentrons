@@ -82,7 +82,7 @@ export function RunFailedModal({
   }: ErrorContentProps): JSX.Element => {
     return (
       <>
-        <LegacyStyledText as="p" className={styles.error_info_text}>
+        <LegacyStyledText forwardedAs="p" className={styles.error_info_text}>
           {isSingleError
             ? t('error_info', {
                 errorType: errors[0].errorType,
@@ -100,7 +100,7 @@ export function RunFailedModal({
           <div className={styles.error_list}>
             {errors.map((error, index) => (
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 className={styles.error_detail_text}
                 key={index}
               >
@@ -135,7 +135,7 @@ export function RunFailedModal({
             isSingleError={!!highestPriorityError}
           />
         </div>
-        <LegacyStyledText as="p" className={styles.contact_text}>
+        <LegacyStyledText forwardedAs="p" className={styles.contact_text}>
           {t('branded:contact_information')}
         </LegacyStyledText>
         <SmallButton

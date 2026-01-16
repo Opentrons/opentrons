@@ -1,12 +1,13 @@
 """Tests for the transfer APIs using liquid classes."""
-import pytest
+
 import mock
+import pytest
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.core.engine import InstrumentCore
 from opentrons.protocol_api.core.engine.transfer_components_executor import (
-    TransferType,
     LiquidAndAirGapPair,
+    TransferType,
 )
 from opentrons.protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2Type,
@@ -1408,7 +1409,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense(
     water_props = water.get_for(pipette_1k, tiprack)
 
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
+    water_props.multi_dispense.retract.blowout.location = "destination"
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
 
@@ -1626,7 +1627,7 @@ def test_order_of_water_distribution_steps_using_multi_dispense_without_conditio
     water_props = water.get_for(pipette_1k, tiprack)
 
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
+    water_props.multi_dispense.retract.blowout.location = "destination"
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
     disposal_volume = 5.5
@@ -2006,7 +2007,7 @@ def test_order_of_water_distribution_steps_using_mixed_dispense(
     water = simulated_protocol_context.get_liquid_class("water")
     water_props = water.get_for(pipette_1k, tiprack)
     assert water_props.multi_dispense is not None
-    water_props.multi_dispense.retract.blowout.location = "destination"  # type: ignore[assignment]
+    water_props.multi_dispense.retract.blowout.location = "destination"
     water_props.multi_dispense.retract.blowout.flow_rate = pipette_1k.flow_rate.blow_out
     water_props.multi_dispense.retract.blowout.enabled = True
     expected_conditioning_volume = (

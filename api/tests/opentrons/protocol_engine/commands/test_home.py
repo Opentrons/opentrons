@@ -1,17 +1,17 @@
 """Test home commands."""
-from decoy import Decoy
 
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.types import MotorAxis
-from opentrons.types import MountType
-from opentrons.protocol_engine.execution import MovementHandler
+from decoy import Decoy
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.home import (
+    HomeImplementation,
     HomeParams,
     HomeResult,
-    HomeImplementation,
 )
+from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.types import MotorAxis
+from opentrons.types import MountType
 
 
 async def test_home_implementation(decoy: Decoy, movement: MovementHandler) -> None:

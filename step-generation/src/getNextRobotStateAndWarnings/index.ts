@@ -7,6 +7,7 @@ import {
   forAbsorbanceReaderInitialize,
   forAbsorbanceReaderOpenLid,
 } from './absorbanceReaderUpdates'
+import { forAirGapInPlace } from './forAirGapInPlace'
 import { forAspirate } from './forAspirate'
 import { forBlowout } from './forBlowout'
 import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
@@ -17,6 +18,7 @@ import { forMoveLabware } from './forMoveLabware'
 import { forMoveToAddressableArea } from './forMoveToAddressableArea'
 import { forMoveToWell } from './forMoveToWell'
 import { forPickUpTip } from './forPickUpTip'
+import { forWaitForTasks } from './forWaitForTasks'
 import {
   forHeaterShakerCloseLatch,
   forHeaterShakerDeactivateHeater,
@@ -32,6 +34,8 @@ import {
   forFlexStackerFill,
   forFlexStackerFillItems,
   forFlexStackerRetrieve,
+  forFlexStackerSetStoredLabware,
+  forFlexStackerSetStoredLabwareItems,
   forFlexStackerStore,
 } from './stackerUpdates'
 import {
@@ -51,6 +55,7 @@ import {
   forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
+  forThermocyclerStartRunExtendedProfile,
 } from './thermocyclerUpdates'
 
 import type { CreateCommand } from '@opentrons/shared-data'
@@ -80,6 +85,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
       }
       break
 
+    case 'airGapInPlace':
+      forAirGapInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'dispenseWhileTracking':
     case 'dispense':
     case 'dispenseInPlace':
@@ -120,21 +128,35 @@ function _getNextRobotStateAndWarningsSingleCommand(
       forMoveLabware(command.params, invariantContext, robotStateAndWarnings)
       break
 
-    //  for concurrent modules
-    //  TODO: wire these up if they change state
-    //  for concurrent module support
-    case 'createTimer':
     case 'waitForTasks':
+      forWaitForTasks(command.params, invariantContext, robotStateAndWarnings)
       break
-    // setStoredLabware and setStoredLabwareItems handled in the python file while adding a labware on the stacker. no need to update state
+
+    // setStoredLabware state update is only needed for PV
     case 'flexStacker/setStoredLabware':
-    case 'flexStacker/setStoredLabwareItems':
+      forFlexStackerSetStoredLabware(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
+    // setStoredLabwareItems state update is not actually in use yet
+    // it will be used when PD allows changing the labwareType midway through
+    // the protocol
+    case 'flexStacker/setStoredLabwareItems':
+      forFlexStackerSetStoredLabwareItems(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+
     // unsafe commands, no need to update state
     case 'flexStacker/prepareShuttle':
     case 'flexStacker/closeLatch':
     case 'flexStacker/openLatch':
       break
+
     case 'flexStacker/empty':
       forFlexStackerEmpty(
         command.params,
@@ -189,7 +211,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'custom': // fall-back
     case 'comment':
     case 'captureImage':
-    case 'airGapInPlace':
     case 'prepareToAspirate':
     case 'liquidProbe':
     case 'loadLiquidClass':
@@ -204,6 +225,7 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'unsealPipetteFromTip':
     case 'verifyTipPresence':
     case 'pressureDispense': //  evo tip specific command
+    case 'createTimer':
       break
 
     case 'moveToAddressableArea':
@@ -332,6 +354,13 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
     case 'thermocycler/runExtendedProfile':
       forThermocyclerRunExtendedProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'thermocycler/startRunExtendedProfile':
+      forThermocyclerStartRunExtendedProfile(
         command.params,
         invariantContext,
         robotStateAndWarnings

@@ -1,15 +1,14 @@
 import typing
+from dataclasses import dataclass, fields
+from enum import Enum
+
+from pydantic import BaseModel, Field
 from typing_extensions import Self
 
-from opentrons.types import Mount
-from enum import Enum
-from dataclasses import dataclass, fields
-from pydantic import BaseModel, Field
-
-from opentrons_shared_data.util import StrEnum
-from opentrons_shared_data.labware.types import LabwareDefinition2
 from opentrons.protocol_api import labware
-from opentrons.types import DeckLocation
+from opentrons.types import DeckLocation, Mount
+from opentrons_shared_data.labware.types import LabwareDefinition2
+from opentrons_shared_data.util import StrEnum
 
 
 class RobotHealthCheck(Enum):
@@ -106,7 +105,7 @@ class AttachedPipette(BaseModel):
         " version string",
     )
     name: typing.Optional[str] = Field(
-        None, description="Short name of pipette model without" "generation version"
+        None, description="Short name of pipette model withoutgeneration version"
     )
     tipLength: typing.Optional[float] = Field(
         None, description="The default tip length for this pipette"

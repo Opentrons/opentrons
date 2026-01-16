@@ -1,46 +1,43 @@
 """Command side-effect execution logic container."""
+
 import asyncio
 from logging import getLogger
-from typing import Optional, List, Protocol
+from typing import List, Optional, Protocol
 
-from opentrons.hardware_control import HardwareControlAPI
-
+from opentrons_shared_data.data_files import MimeType
 from opentrons_shared_data.errors.exceptions import (
-    EStopActivatedError,
     EnumeratedError,
+    EStopActivatedError,
     PythonException,
 )
-from opentrons_shared_data.data_files import MimeType
 
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.notes import make_error_recovery_debug_note
-
-from ..state.state import StateStore
-from ..resources import ModelUtils, FileProvider, CameraProvider
-from ..resources.file_provider import ImageCaptureCmdFileNameMetadata
-from ..resources.camera_provider import ImageParameters
-from ..commands import CommandStatus
 from ..actions import (
     ActionDispatcher,
+    FailCommandAction,
     RunCommandAction,
     SucceedCommandAction,
-    FailCommandAction,
 )
+from ..commands import Command, CommandStatus
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
 from ..notes import CommandNote, CommandNoteTracker
+from ..resources import CameraProvider, FileProvider, ModelUtils
+from ..resources.camera_provider import ImageParameters
+from ..resources.file_provider import ImageCaptureCmdFileNameMetadata
+from ..state.state import StateStore
 from .equipment import EquipmentHandler
-from .movement import MovementHandler
 from .gantry_mover import GantryMover
 from .labware_movement import LabwareMovementHandler
+from .movement import MovementHandler
 from .pipetting import PipettingHandler
-from .tip_handler import TipHandler
-from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
+from .run_control import RunControlHandler
 from .status_bar import StatusBarHandler
 from .task_handler import TaskHandler
-from ..commands import Command
-
+from .tip_handler import TipHandler
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.notes import make_error_recovery_debug_note
 
 log = getLogger(__name__)
 

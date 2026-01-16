@@ -16,39 +16,41 @@ from typing import (
 from typing_extensions import assert_never
 
 from opentrons_shared_data.pipette import pipette_definition
-from opentrons_shared_data.pipette.ul_per_mm import calculate_ul_per_mm
 from opentrons_shared_data.pipette.types import (
-    UlPerMmAction,
     LiquidClasses as VolumeModes,
 )
-
-from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
-from opentrons.hardware_control.dev_types import PipetteDict
-from opentrons.hardware_control import CriticalPoint
-from opentrons.hardware_control.nozzle_manager import (
-    NozzleMap,
+from opentrons_shared_data.pipette.types import (
+    UlPerMmAction,
 )
-from opentrons.types import MountType, Mount as HwMount, Point, NozzleConfigurationType
+from opentrons_shared_data.pipette.ul_per_mm import calculate_ul_per_mm
 
-from . import update_types, fluid_stack
 from .. import errors
-from ..types import (
-    LoadedPipette,
-    MotorAxis,
-    FlowRates,
-    DeckPoint,
-    CurrentWell,
-    CurrentAddressableArea,
-    CurrentPipetteLocation,
-    TipGeometry,
-    LabwareWellId,
-)
 from ..actions import (
     Action,
     SetPipetteMovementSpeedAction,
     get_state_updates,
 )
-from ._abstract_store import HasState, HandlesActions
+from ..types import (
+    CurrentAddressableArea,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckPoint,
+    FlowRates,
+    LabwareWellId,
+    LoadedPipette,
+    MotorAxis,
+    TipGeometry,
+)
+from . import fluid_stack, update_types
+from ._abstract_store import HandlesActions, HasState
+from opentrons.config.defaults_ot2 import Z_RETRACT_DISTANCE
+from opentrons.hardware_control import CriticalPoint
+from opentrons.hardware_control.dev_types import PipetteDict
+from opentrons.hardware_control.nozzle_manager import (
+    NozzleMap,
+)
+from opentrons.types import Mount as HwMount
+from opentrons.types import MountType, NozzleConfigurationType, Point
 
 LOG = getLogger(__name__)
 
@@ -197,9 +199,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
                 attached_tip = state_update.pipette_tip_state.tip_geometry
 
                 self._state.attached_tip_by_id[pipette_id] = attached_tip
-                self._state.tip_source_by_id[
-                    pipette_id
-                ] = state_update.pipette_tip_state.tip_source
+                self._state.tip_source_by_id[pipette_id] = (
+                    state_update.pipette_tip_state.tip_source
+                )
 
                 static_config = self._state.static_config_by_id.get(pipette_id)
                 if static_config:
@@ -282,48 +284,48 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
     def _update_pipette_config(self, state_update: update_types.StateUpdate) -> None:
         if state_update.pipette_config != update_types.NO_CHANGE:
             config = state_update.pipette_config.config
-            self._state.static_config_by_id[
-                state_update.pipette_config.pipette_id
-            ] = StaticPipetteConfig(
-                serial_number=state_update.pipette_config.serial_number,
-                model=config.model,
-                display_name=config.display_name,
-                min_volume=config.min_volume,
-                max_volume=config.max_volume,
-                channels=config.channels,
-                tip_configuration_lookup_table=config.tip_configuration_lookup_table,
-                nominal_tip_overlap=config.nominal_tip_overlap,
-                home_position=config.home_position,
-                nozzle_offset_z=config.nozzle_offset_z,
-                pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
-                    back_left_corner=config.back_left_corner_offset,
-                    front_right_corner=config.front_right_corner_offset,
-                    back_right_corner=Point(
-                        config.front_right_corner_offset.x,
-                        config.back_left_corner_offset.y,
-                        config.back_left_corner_offset.z,
+            self._state.static_config_by_id[state_update.pipette_config.pipette_id] = (
+                StaticPipetteConfig(
+                    serial_number=state_update.pipette_config.serial_number,
+                    model=config.model,
+                    display_name=config.display_name,
+                    min_volume=config.min_volume,
+                    max_volume=config.max_volume,
+                    channels=config.channels,
+                    tip_configuration_lookup_table=config.tip_configuration_lookup_table,
+                    nominal_tip_overlap=config.nominal_tip_overlap,
+                    home_position=config.home_position,
+                    nozzle_offset_z=config.nozzle_offset_z,
+                    pipette_bounding_box_offsets=PipetteBoundingBoxOffsets(
+                        back_left_corner=config.back_left_corner_offset,
+                        front_right_corner=config.front_right_corner_offset,
+                        back_right_corner=Point(
+                            config.front_right_corner_offset.x,
+                            config.back_left_corner_offset.y,
+                            config.back_left_corner_offset.z,
+                        ),
+                        front_left_corner=Point(
+                            config.back_left_corner_offset.x,
+                            config.front_right_corner_offset.y,
+                            config.back_left_corner_offset.z,
+                        ),
                     ),
-                    front_left_corner=Point(
-                        config.back_left_corner_offset.x,
-                        config.front_right_corner_offset.y,
-                        config.back_left_corner_offset.z,
+                    bounding_nozzle_offsets=BoundingNozzlesOffsets(
+                        back_left_offset=config.nozzle_map.back_left_nozzle_offset,
+                        front_right_offset=config.nozzle_map.front_right_nozzle_offset,
                     ),
-                ),
-                bounding_nozzle_offsets=BoundingNozzlesOffsets(
-                    back_left_offset=config.nozzle_map.back_left_nozzle_offset,
-                    front_right_offset=config.nozzle_map.front_right_nozzle_offset,
-                ),
-                default_nozzle_map=config.nozzle_map,
-                lld_settings=config.pipette_lld_settings,
-                plunger_positions=config.plunger_positions,
-                shaft_ul_per_mm=config.shaft_ul_per_mm,
-                available_sensors=config.available_sensors,
-                volume_mode=config.volume_mode,
-                available_volume_modes_min_vol=config.available_volume_modes_min_vol,
+                    default_nozzle_map=config.nozzle_map,
+                    lld_settings=config.pipette_lld_settings,
+                    plunger_positions=config.plunger_positions,
+                    shaft_ul_per_mm=config.shaft_ul_per_mm,
+                    available_sensors=config.available_sensors,
+                    volume_mode=config.volume_mode,
+                    available_volume_modes_min_vol=config.available_volume_modes_min_vol,
+                )
             )
-            self._state.flow_rates_by_id[
-                state_update.pipette_config.pipette_id
-            ] = config.flow_rates
+            self._state.flow_rates_by_id[state_update.pipette_config.pipette_id] = (
+                config.flow_rates
+            )
             self._state.nozzle_configuration_by_id[
                 state_update.pipette_config.pipette_id
             ] = config.nozzle_map
@@ -368,9 +370,9 @@ class PipetteStore(HasState[PipetteState], HandlesActions):
         self, update: update_types.PipetteAspiratedFluidUpdate
     ) -> None:
         if self._state.pipette_contents_by_id[update.pipette_id] is None:
-            self._state.pipette_contents_by_id[
-                update.pipette_id
-            ] = fluid_stack.FluidStack()
+            self._state.pipette_contents_by_id[update.pipette_id] = (
+                fluid_stack.FluidStack()
+            )
 
         self._fluid_stack_log_if_empty(update.pipette_id).add_fluid(update.fluid)
 

@@ -1,5 +1,6 @@
 import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 
+import { stackerLabwareCreationFinish, stackerLabwareCreationStart } from '.'
 import { createContainer } from '../../labware-ingred/actions'
 import { changeSavedStepForm } from '../../steplist/actions'
 import { getDeckSetupForActiveItem } from '../../top-selectors/labware-locations'
@@ -97,7 +98,7 @@ export const createContainerAboveModule: (
     // create containers
     dispatch(
       createContainer({
-        slot: moduleId,
+        slot, // shuttle stacks ignore the moduleId and pretend they are on a column 4 slot
         labwareDefURIStack,
         uuids,
       })
@@ -124,7 +125,8 @@ export const createContainerAboveModule: (
   } else {
     // create containers
     if (topLabwareDefURI != null) {
-      Array.from({ length: stackerInfo.amount }).forEach(() => {
+      let accumulatedModuleState = currentModuleState
+      for (let _ = 0; _ < stackerInfo.amount; _++) {
         // create containers for the labware
         const primaryLabwareUuid = topLabwareDefURI != null ? uuid() : null
         const adapterLabwareUuid = adapterDefURI != null ? uuid() : null
@@ -150,25 +152,27 @@ export const createContainerAboveModule: (
             uuids,
           })
         )
+        // Build up the state incrementally
+        accumulatedModuleState = {
+          ...accumulatedModuleState,
+          storedLabwareDetails: {
+            primaryLabwareURI: topLabwareDefURI,
+            adapterLabwareURI: adapterDefURI,
+            lidLabwareURI: lidDefURI,
+          },
+          labwareInHopper:
+            accumulatedModuleState.labwareInHopper != null
+              ? [...accumulatedModuleState.labwareInHopper, hopperUpdate]
+              : [hopperUpdate],
+        }
         // handle hopper state update
         dispatch(
           updateStackerModuleState({
             moduleId: module.id,
-            moduleState: {
-              ...currentModuleState,
-              storedLabwareDetails: {
-                primaryLabwareURI: topLabwareDefURI,
-                adapterLabwareURI: adapterDefURI,
-                lidLabwareURI: lidDefURI,
-              },
-              labwareInHopper:
-                currentModuleState.labwareInHopper != null
-                  ? [...currentModuleState.labwareInHopper, hopperUpdate]
-                  : [hopperUpdate],
-            },
+            moduleState: accumulatedModuleState,
           })
         )
-      })
+      }
     }
   }
 }
@@ -213,4 +217,41 @@ export const createModuleEntityAndChangeForm: (
         })
       )
     })
+  }
+
+interface CreateLabwareAndQueueForHopperArgs {
+  fillLabwareIds: string[]
+  moduleId: string
+}
+
+export const createLabwareAndQueueForHopper =
+  (args: CreateLabwareAndQueueForHopperArgs): ThunkAction<any> =>
+  async (dispatch, getState) => {
+    const { fillLabwareIds, moduleId } = args
+    dispatch(stackerLabwareCreationStart())
+
+    const state = getState()
+    const deckSetup = getDeckSetupForActiveItem(state)
+    const { modules } = deckSetup
+    const module = modules[moduleId]
+
+    if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
+      // collect all container creation promises
+      const containerPromises = fillLabwareIds.map(labwareId => {
+        const [id, uri] = labwareId.split(':')
+        // dispatch can return a promise if createContainer is async
+        return dispatch(
+          createContainer({
+            labwareDefURIStack: [uri],
+            slot: 'offDeck',
+            uuids: [id],
+          })
+        )
+      })
+
+      // wait for all containers to finish
+      await Promise.all(containerPromises)
+    }
+
+    dispatch(stackerLabwareCreationFinish())
   }

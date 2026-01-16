@@ -29,8 +29,10 @@ is more important than preserving a linear history of protocols.
 This module only handles the abstract planning of what to delete.
 Actual storage access is handled elsewhere.
 """
+
 from dataclasses import dataclass
 from typing import Sequence, Set
+
 from typing_extensions import Protocol as InterfaceShape
 
 

@@ -40,6 +40,7 @@ import type {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
+  VACUUM_MODULE_MILLIPORE_V1,
 } from './constants'
 import type { PipetteName } from './pipettes'
 
@@ -398,6 +399,8 @@ export type AbsorbanceReaderModel = typeof ABSORBANCE_READER_V1
 
 export type FlexStackerModuleModel = typeof FLEX_STACKER_MODULE_V1
 
+export type VacuumModuleModel = typeof VACUUM_MODULE_MILLIPORE_V1
+
 export type ModuleModel =
   | MagneticModuleModel
   | TemperatureModuleModel
@@ -406,6 +409,7 @@ export type ModuleModel =
   | MagneticBlockModel
   | AbsorbanceReaderModel
   | FlexStackerModuleModel
+  | VacuumModuleModel
 
 export type GripperModel =
   | typeof GRIPPER_V1
@@ -496,6 +500,7 @@ export type AreaType =
   | 'magneticBlock'
   | 'absorbanceReader'
   | 'flexStacker'
+  | 'vacuumModule'
 
 export interface AddressableArea {
   id: AddressableAreaName

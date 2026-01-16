@@ -14,11 +14,6 @@ from pathlib import Path
 
 import sqlalchemy
 
-from opentrons_shared_data.deck import load as load_deck
-
-from opentrons.protocols.api_support.deck_type import (
-    guess_from_global_config as guess_deck_type_from_global_config,
-)
 from opentrons.protocol_engine import (
     DeckType,
     StateSummary,
@@ -26,7 +21,13 @@ from opentrons.protocol_engine import (
 from opentrons.protocol_engine.labware_offset_standardization import (
     legacy_offset_location_to_offset_location_sequence,
 )
+from opentrons.protocols.api_support.deck_type import (
+    guess_from_global_config as guess_deck_type_from_global_config,
+)
+from opentrons_shared_data.deck import load as load_deck
 
+from .._folder_migrator import Migration
+from ._util import copy_contents
 from robot_server.persistence.database import sql_engine_ctx
 from robot_server.persistence.file_and_directory_names import DB_FILE
 from robot_server.persistence.pydantic import (
@@ -34,10 +35,6 @@ from robot_server.persistence.pydantic import (
     pydantic_to_json,
 )
 from robot_server.persistence.tables import schema_11
-
-from ._util import copy_contents
-from .._folder_migrator import Migration
-
 
 _log = logging.getLogger(__name__)
 
@@ -47,9 +44,10 @@ class Migration10to11(Migration):  # noqa: D101
         """Migrate the persistence directory from schema 10 to 11."""
         copy_contents(source_dir=source_dir, dest_dir=dest_dir)
 
-        with sql_engine_ctx(
-            dest_dir / DB_FILE
-        ) as engine, engine.begin() as transaction:
+        with (
+            sql_engine_ctx(dest_dir / DB_FILE) as engine,
+            engine.begin() as transaction,
+        ):
             _add_new_index(transaction)
             _upmigrate_labware_offsets_in_runs(transaction)
 

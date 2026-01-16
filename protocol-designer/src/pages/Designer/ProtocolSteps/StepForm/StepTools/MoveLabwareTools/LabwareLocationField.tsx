@@ -3,11 +3,15 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+  FLEX_STACKER_MODULE_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
-import { getSlotInLocationStack } from '@opentrons/step-generation'
+import {
+  getFullStackFromLabwares,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -60,17 +64,30 @@ export function LabwareLocationField(
         t,
       })
     : []
-  const isLabwareOffDeck =
-    labware != null
-      ? getSlotInLocationStack(robotState?.labware[labware]?.stack ?? []) ===
-        'offDeck'
-      : false
+  const labwareSlot = getSlotInLocationStack(
+    robotState?.labware[labware]?.stack ?? []
+  )
+  const isLabwareOffDeck = labware != null ? labwareSlot === 'offDeck' : false
   const isLabwareALid =
     deckSetupLabware[labware]?.def.allowedRoles?.includes('lid') ?? false
   const isLabwareATiprackLid =
     deckSetupLabware[labware]?.def.parameters.loadName === TIPRACK_LID_LOADNAME
   const unoccupiedLabwareLocationsOptionsSelector =
     useSelector(getUnoccupiedLabwareLocationOptions) ?? []
+  const fullStackFromLabwares = getFullStackFromLabwares(
+    robotState?.labware ?? {},
+    labwareSlot,
+    labware
+  )
+  const stackHasANonTiprackLid = fullStackFromLabwares.some(id => {
+    if (!(id in labwareEntities)) {
+      return false
+    }
+    const { def } = labwareEntities[id]
+    const isLid = def.allowedRoles?.includes('lid') ?? false
+    return isLid && def.parameters.loadName !== TIPRACK_LID_LOADNAME
+  })
+
   const robotType = useSelector(getRobotType)
   // invalid offDeck move filter
   let unoccupiedLabwareLocationsOptions = [
@@ -136,6 +153,16 @@ export function LabwareLocationField(
         option => !allSlotNames.includes(option.value as AddressableAreaName)
       )
   }
+
+  if (stackHasANonTiprackLid) {
+    unoccupiedLabwareLocationsOptions =
+      unoccupiedLabwareLocationsOptions.filter(
+        ({ value }) =>
+          robotState?.modules?.[value]?.moduleState.type !==
+          FLEX_STACKER_MODULE_TYPE
+      )
+  }
+
   const optionsSorted =
     robotState != null
       ? getSortedAddressableArea(

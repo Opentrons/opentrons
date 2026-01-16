@@ -1,42 +1,40 @@
 """Main FastAPI application."""
+
 import contextlib
-from typing import AsyncGenerator, Optional
 from pathlib import Path
+from typing import AsyncGenerator, Optional
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_redoc_html
 from fastapi.responses import HTMLResponse
 
-from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
-
 from opentrons import __version__
+from server_utils.fastapi_utils.server_timing_middleware import server_timing_middleware
 
 from .errors.exception_handlers import exception_handlers
 from .hardware import (
     FrontButtonLightBlinker,
-    start_initializing_hardware,
     clean_up_hardware,
+    start_initializing_hardware,
 )
 from .persistence.fastapi_dependencies import (
-    start_initializing_persistence,
     clean_up_persistence,
     initialize_images_directory,
+    start_initializing_persistence,
 )
 from .router import router
+from .runs.dependencies import (
+    mark_light_control_startup_finished,
+    start_light_control_task,
+)
 from .service.logging import initialize_logging
+from .service.notifications import (
+    initialize_pe_publisher_notifier,
+    set_up_notification_client,
+)
 from .service.task_runner import set_up_task_runner
 from .settings import RobotServerSettings, get_settings
-from .runs.dependencies import (
-    start_light_control_task,
-    mark_light_control_startup_finished,
-)
-
-from .service.notifications import (
-    set_up_notification_client,
-    initialize_pe_publisher_notifier,
-)
-
 
 _REDOC_CDN_URL = "https://cdn.jsdelivr.net/npm/redoc@2/bundles/redoc.standalone.js"
 

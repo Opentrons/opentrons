@@ -1,10 +1,10 @@
 import collections
-import os
 import json
+import os
 import re
 import subprocess
-from unittest import mock
 import zipfile
+from unittest import mock
 
 import pytest
 

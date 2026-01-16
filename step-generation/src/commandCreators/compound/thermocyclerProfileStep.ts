@@ -2,9 +2,8 @@ import * as errorCreators from '../../errorCreators'
 import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
-import { thermocyclerRunExtendedProfile } from '../atomic/thermocyclerRunExtendedProfile'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
-import { thermocyclerStateStep } from './thermocyclerStateStep'
+import { thermocyclerStartRunExtendedProfile } from '../atomic/thermocyclerStartRunExtendedProfile'
 
 import type {
   CommandCreator,
@@ -15,22 +14,17 @@ import type {
 export const thermocyclerProfileStep: CommandCreator<
   ThermocyclerProfileStepArgs
 > = (args, invariantContext, prevRobotState) => {
-  const {
-    blockTargetTempHold,
-    lidTargetTempHold,
-    lidOpenHold,
-    moduleId,
-    profileElements,
-    profileTargetLidTemp,
-    profileVolume,
-  } = args
+  const { moduleId, profileElements, profileTargetLidTemp, profileVolume } =
+    args
   const thermocyclerState = thermocyclerStateGetter(prevRobotState, moduleId)
-
   if (thermocyclerState === null) {
     return {
       errors: [errorCreators.missingModuleError()],
     }
   }
+
+  const thermocyclerPythonName =
+    invariantContext.moduleEntities[moduleId].pythonName
 
   const commandCreators: CurriedCommandCreator[] = []
 
@@ -51,23 +45,17 @@ export const thermocyclerProfileStep: CommandCreator<
     )
   }
 
+  // This is going to get used as a Python variable name, so it's snake_case.
+  const taskId = `${thermocyclerPythonName}_task_${thermocyclerState.numProfilesStarted + 1}`
   commandCreators.push(
-    curryCommandCreator(thermocyclerRunExtendedProfile, {
+    curryCommandCreator(thermocyclerStartRunExtendedProfile, {
       moduleId,
       profileElements,
       blockMaxVolumeUl: profileVolume,
+      taskId,
     })
   )
 
-  commandCreators.push(
-    curryCommandCreator(thermocyclerStateStep, {
-      commandCreatorFnName: 'thermocyclerState',
-      moduleId,
-      blockTargetTemp: blockTargetTempHold,
-      lidTargetTemp: lidTargetTempHold,
-      lidOpen: lidOpenHold,
-    })
-  )
   return reduceCommandCreators(
     commandCreators,
     invariantContext,

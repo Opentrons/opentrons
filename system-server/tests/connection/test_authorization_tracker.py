@@ -1,9 +1,10 @@
-import pytest
+from datetime import datetime, timedelta
 from typing import List
+
+import pytest
 
 from system_server.connection import AuthorizationTracker
 from system_server.jwt import Registrant
-from datetime import datetime, timedelta
 
 
 @pytest.fixture

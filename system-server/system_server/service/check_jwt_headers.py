@@ -1,10 +1,12 @@
 """HTTP API registration token logic."""
-from fastapi import Header, Request, HTTPException, status, Depends
-from uuid import UUID
-import logging
 
+import logging
+from uuid import UUID
+
+from fastapi import Depends, Header, HTTPException, Request, status
+
+from system_server.constants import AUTHORIZATION_AUDIENCE, REGISTRATION_AUDIENCE
 from system_server.jwt import jwt_is_valid
-from system_server.constants import REGISTRATION_AUDIENCE, AUTHORIZATION_AUDIENCE
 from system_server.persistence import get_persistent_uuid
 
 _log = logging.getLogger(__name__)
@@ -34,9 +36,9 @@ async def check_registration_token_header(
 
 async def get_registration_token_header(request: Request) -> str:
     """Gets the registration token from a request."""
-    assert isinstance(
-        request.state.authentication_bearer, str
-    ), "No authentication_bearer in request state; is endpoint properly configured?"
+    assert isinstance(request.state.authentication_bearer, str), (
+        "No authentication_bearer in request state; is endpoint properly configured?"
+    )
 
     return request.state.authentication_bearer
 
@@ -65,8 +67,8 @@ async def check_authorization_token_header(
 
 async def get_authorization_token_header(request: Request) -> str:
     """Gets the authorization token from a request."""
-    assert isinstance(
-        request.state.authorization_authentication_bearer, str
-    ), "No authorization_authentication_bearer in request state; is endpoint properly configured?"
+    assert isinstance(request.state.authorization_authentication_bearer, str), (
+        "No authorization_authentication_bearer in request state; is endpoint properly configured?"
+    )
 
     return request.state.authorization_authentication_bearer
