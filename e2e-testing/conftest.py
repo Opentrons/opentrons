@@ -15,6 +15,22 @@ from _pytest.fixtures import FixtureRequest
 from playwright.sync_api import BrowserContext, Page, Video
 from playwright.sync_api import Error as PlaywrightError
 
+from utility import troubleshoot_and_pause
+
+
+def pytest_collection_modifyitems(config, items):
+    """
+    Automatically wrap all tests in the decorator if headed mode is detected
+    via CLI flag or HEADLESS environment variable.
+    """
+    # Check for the pytest-playwright flag OR the env var used by your Makefile
+    is_headed = config.getoption("--headed") or os.getenv("HEADLESS") == "false"
+
+    if is_headed:
+        for item in items:
+            # item.obj is the actual test function
+            item.obj = troubleshoot_and_pause(item.obj)
+
 
 def _ensure_test_results_dir() -> None:
     """Ensure the test-results directory exists."""

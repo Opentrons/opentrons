@@ -76,6 +76,15 @@ def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: 
     return ProtocolEditorPage(page)
 
 
+def edit_step_form_for_snapshot(page, test_name: str, checkpoint_name: str) -> None:
+    """Edit the step form for a specific snapshot."""
+    protocol_editor = ProtocolEditorPage(page)
+    protocol_editor.wait_for_page_load()
+    protocol_editor.select_step(test_name)
+    protocol_editor.open_step_form()
+    protocol_editor.set_checkpoint(checkpoint_name)
+
+
 def _dismiss_migration_modal(page: Page) -> None:
     """Dismiss the migration modal if it appears during import."""
 

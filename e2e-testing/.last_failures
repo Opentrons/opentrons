@@ -1,0 +1,76 @@
+============================= test session starts ==============================
+collected 56 items / 36 deselected / 20 selected
+
+tests/pd/test_pd_create_new_flex.py 
+Starting protocol-designer preview server...
+Building Protocol Designer (this may take 2-3 minutes)...
+================================================================================
+shx rm -rf dist
+vite build
+Browserslist: caniuse-lite is outdated. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+  Still waiting for server... (20s elapsed)
+vite v7.1.11 building for production...
+✅ Preview server is ready on http://localhost:4173
+================================================================================
+.
+tests/pd/test_pd_create_new_ot2.py .
+tests/pd/test_pd_drag_and_drop.py .
+tests/pd/test_pd_home.py .
+tests/pd/test_pd_import.py ..
+tests/pd/test_pd_mix_step.py ..
+tests/pd/test_pd_move_labware.py .
+tests/pd/test_pd_plate_reader.py ..
+tests/pd/test_pd_sanity.py ✓ Protocol Designer loaded successfully at http://localhost:4173
+.Running full onboarding test against: http://localhost:4173
+✓ Main page loaded
+✓ Pipette selection modal opened
+✓ Pipette and modules configured
+✓ Deck configured with modules and fixtures
+✓ Protocol named and entered edit mode
+✓ Labware added and liquid configured
+✓ Transfer step configured
+
+✅ Full onboarding flow completed successfully!
+.
+tests/pd/test_pd_settings.py .
+tests/pd/test_pd_skeleton.py .
+tests/pd/test_pd_smoke_test_flex.py ✓ File uploaded, ready for module steps
+✓ Temperature step set to 50°C and Pause step added.
+Warning: Could not set Heater-Shaker timer. Error: Locator.click: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name=\"heaterShakerTimer\"]")
+
+F
+tests/pd/test_pd_transfer_step.py .
+tests/pd/test_pd_url_navigation.py ...
+Stopping dev server...
+
+
+=================================== FAILURES ===================================
+____________________ test_pd_combined_smoke_flow[chromium] _____________________
+tests/pd/test_pd_smoke_test_flex.py:51: in test_pd_combined_smoke_flow
+    _add_heater_shaker_step(page, "50", "300", "00:30")
+automation/pd_pages/heater_shaker_step_form_page.py:101: in _add_heater_shaker_step
+    hs_page.pause_confirm()
+automation/pd_pages/heater_shaker_step_form_page.py:71: in pause_confirm
+    self.page.get_by_role("button", name="Add potato").click()
+.venv/lib/python3.12/site-packages/playwright/sync_api/_generated.py:15543: in click
+    self._sync(
+.venv/lib/python3.12/site-packages/playwright/_impl/_locator.py:160: in click
+    return await self._frame.click(self._selector, strict=True, **params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/playwright/_impl/_frame.py:549: in click
+    await self._channel.send("click", self._timeout, locals_to_params(locals()))
+.venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:69: in send
+    return await self._connection.wrap_api_call(
+.venv/lib/python3.12/site-packages/playwright/_impl/_connection.py:558: in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+E   playwright._impl._errors.TimeoutError: Locator.click: Timeout 10000ms exceeded.
+E   Call log:
+E     - waiting for get_by_role("button", name="Add potato")
+- Generated html report: file:///Users/alexcopperman/Downloads/Opentrons_General/playing_with_Chromatic/opentrons/e2e-testing/test-results/report.html -
+=========================== short test summary info ============================
+FAILED tests/pd/test_pd_smoke_test_flex.py::test_pd_combined_smoke_flow[chromium]
+====== 1 failed, 19 passed, 36 deselected, 1 warning in 158.03s (0:02:38) ======

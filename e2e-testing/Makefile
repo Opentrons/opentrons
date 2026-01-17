@@ -34,8 +34,17 @@ test-pd:
 
 .PHONY: test-pd-local
 test-pd-local:
-	@echo "use PYTEST_ARGS to pass additional arguments"
 	TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS)
+	@echo "use PYTEST_ARGS to pass additional arguments"
+	@echo "Please view /opentrons/e2e-testing/test-results/report.html for report"
+	@echo "Please use /opentrons/e2e-testing/test-result to see videos"
+	@echo "Please use 'make troubleshoot' to view and troubleshoot failed tests"
+	@echo "combining make troubleshoot and report.html will identify test root cause failure"
+
+.PHONY: troubleshoot
+troubleshoot:
+	@echo "🛠️ Re-running last failures in headed mode..."
+	-TEST_ENV=local uv run pytest --lf --headed -s --tb=short
 
 .PHONY: test-pd-local-headed
 test-pd-local-headed:
