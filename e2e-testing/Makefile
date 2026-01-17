@@ -34,12 +34,15 @@ test-pd:
 
 .PHONY: test-pd-local
 test-pd-local:
-	TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS)
-	@echo "use PYTEST_ARGS to pass additional arguments"
-	@echo "Please view /opentrons/e2e-testing/test-results/report.html for report"
-	@echo "Please use /opentrons/e2e-testing/test-result to see videos"
-	@echo "Please use 'make troubleshoot' to view and troubleshoot failed tests"
-	@echo "combining make troubleshoot and report.html will identify test root cause failure"
+	# Running the command with '-' ignores the failure exit code so the echos run
+	-TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS)
+	@echo ""
+	@echo "---------------------------------------------------------"
+	@echo "🧪 Tests Finished!"
+	@echo "View /opentrons/e2e-testing/test-results/report.html for report"
+	@echo "Use /opentrons/e2e-testing/test-result to see videos"
+	@echo "Use 'make troubleshoot' to view and troubleshoot failed tests"
+	@echo "---------------------------------------------------------"
 
 .PHONY: troubleshoot
 troubleshoot:

@@ -8,28 +8,28 @@ import time
 import urllib.request
 from collections.abc import Generator
 from pathlib import Path
-from typing import Any
+from typing import Any, List
 
 import pytest
+from _pytest.config import Config
 from _pytest.fixtures import FixtureRequest
+from _pytest.nodes import Item
+from _pytest.python import Function
 from playwright.sync_api import BrowserContext, Page, Video
 from playwright.sync_api import Error as PlaywrightError
 
 from utility import troubleshoot_and_pause
 
 
-def pytest_collection_modifyitems(config, items):
-    """
-    Automatically wrap all tests in the decorator if headed mode is detected
-    via CLI flag or HEADLESS environment variable.
-    """
-    # Check for the pytest-playwright flag OR the env var used by your Makefile
-    is_headed = config.getoption("--headed") or os.getenv("HEADLESS") == "false"
+def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
+    is_headed = bool(config.getoption("--headed", False)) or os.getenv("HEADLESS") == "false"
 
     if is_headed:
         for item in items:
-            # item.obj is the actual test function
-            item.obj = troubleshoot_and_pause(item.obj)
+            # Check if it's a function-based test (it usually is)
+            if isinstance(item, Function):
+                # Now the type checker knows 'item' has the 'obj' attribute
+                item.obj = troubleshoot_and_pause(item.obj)
 
 
 def _ensure_test_results_dir() -> None:
