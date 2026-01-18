@@ -42,6 +42,7 @@ test-pd-local:
 	@echo "View /opentrons/e2e-testing/test-results/report.html for report"
 	@echo "Use /opentrons/e2e-testing/test-result to see videos"
 	@echo "Use 'make troubleshoot' to view and troubleshoot failed tests"
+	@echo "Run the python file run_many_tests in /e2e-testing to auto-format"
 	@echo "---------------------------------------------------------"
 
 .PHONY: troubleshoot
