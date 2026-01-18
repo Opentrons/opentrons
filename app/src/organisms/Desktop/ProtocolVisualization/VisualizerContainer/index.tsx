@@ -15,6 +15,7 @@ import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
 import {
   ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
+  ANALYTICS_NOTIFICATION_PROTOCOL_VISUALIZATION_VIEWPORT_SIZES,
   useTrackEvent,
 } from '/app/redux/analytics'
 import {
@@ -59,6 +60,7 @@ export function VisualizerContainer(
   const createdDate = new Date(analysisOutput.createdAt)
   const completedProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
   const trackEvent = useTrackEvent()
+  const trackEventRef = useRef(trackEvent)
   const analysis = completedProtocolAnalysis ?? analysisOutput
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
@@ -89,6 +91,12 @@ export function VisualizerContainer(
   useEffect(() => {
     rightWidthRef.current = rightWidth
   }, [rightWidth])
+
+  // Note: This useEffect is used to update the trackEventRef.current with the trackEvent prop.
+  // This prevents sending duplicate events when the trackEvent prop changes.
+  useEffect(() => {
+    trackEventRef.current = trackEvent
+  }, [trackEvent])
 
   // temporarily filter out loadCommands and home commands for the PV MVP
   const filteredCommands = commands.filter(
@@ -280,6 +288,20 @@ export function VisualizerContainer(
       dispatch(stepDetailViewerCloseAction({ protocolKey }))
     }
   }, [dispatch, protocolKey])
+
+  useEffect(() => {
+    return () => {
+      trackEventRef.current({
+        name: ANALYTICS_NOTIFICATION_PROTOCOL_VISUALIZATION_VIEWPORT_SIZES,
+        properties: {
+          'Window Width': window.innerWidth,
+          'Window Height': window.innerHeight,
+          'Left Column Width': leftWidthRef.current,
+          'Right Column Width': rightWidthRef.current,
+        },
+      })
+    }
+  }, [])
 
   return (
     <div ref={containerRef} className={styles.layout_container}>
