@@ -77,6 +77,7 @@ const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
 const getSelectedLabwareId: Selector<RootSlice, SelectedContainerId> =
   createSelector(rootSelector, rootState => rootState.selectedContainerId)
 
+// TODO: (tz, 2026-01-16): remove this selector when we find a way to only use multiple selected
 const getMultiSelectSelectedLabwareId: Selector<
   RootSlice,
   SelectedContainerId
