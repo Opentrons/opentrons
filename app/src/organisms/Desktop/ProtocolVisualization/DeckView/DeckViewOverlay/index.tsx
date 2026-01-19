@@ -175,7 +175,7 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
     )
   } else {
     const { width, x, y, height } = getOT2HoverDimensions(
-      hasTCOnSlot != null,
+      hasTCOnSlot,
       slotPosition
     )
 
