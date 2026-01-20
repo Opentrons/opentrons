@@ -139,6 +139,15 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           hydratedForm.fillLabwareIds
         )
       }
+    } else if (
+      hydratedForm.stepType === 'flexStacker' &&
+      savedStepForm?.flexStackerFormType === FLEX_STACKER_FILL &&
+      hydratedForm.flexStackerFormType !== FLEX_STACKER_FILL
+    ) {
+      // logic for deleting fill labware if the stacker form type changes from fill to something else
+      const fillLabwareIds =
+        (savedStepForm.fillLabwareIds as string[] | null) ?? []
+      deleteLabwares(fillLabwareIds)
     }
   }
 
