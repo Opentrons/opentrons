@@ -1775,13 +1775,17 @@ class InstrumentContext(publisher.CommandPublisher):
         # Set the default for alternate_drop_location, preserving historical behavior:
         if alternate_drop_location is None:
             if location is None:
-                # When location is None, we alternated the drop position since API 2.15
+                # When location is None, we alternated the drop position since API 2.15.
                 alternate_drop_location = (
                     self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN
                 )
             elif isinstance(location, (TrashBin, WasteChute)):
-                # When the location is a trash bin, we alternated the drop position during
-                # API 2.15 to 2.17
+                # In 2.16 (when we first added support for location=TrashBin/WasteChute)
+                # and 2.17, we would always automatically alternate tip drop locations
+                # regardless of whether you explicitly passed in the disposal location or
+                # if none was provided. Then starting in 2.18, passing in the location
+                # bypassed the automatic behavior and instead went to the fixed offset or
+                # the XY center if none is provided.
                 alternate_drop_location = (
                     self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN
                     and self.api_version < _DISPOSAL_LOCATION_OFFSET_ADDED_IN
