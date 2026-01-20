@@ -6,6 +6,8 @@
 OT_PYTHON := python3
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
+OT_PYTHON := python3
+
 define OTHARDWARE_CALL_PBU
 	$(shell python3 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py hardware $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
