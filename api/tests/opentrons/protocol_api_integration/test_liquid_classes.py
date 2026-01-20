@@ -4,9 +4,14 @@ from typing import Any, Dict
 
 import pytest
 
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    Coordinate,
+    PositionReference,
+)
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 
 from opentrons.protocol_api import ProtocolContext
+from opentrons.protocol_api._liquid_properties import TipPosition
 
 
 @pytest.mark.ot3_only
@@ -112,3 +117,55 @@ def test_custom_liquid_class_w_multi_dispense_creation_and_property_fetching(
         custom_water.get_for(
             "flex_8channel_50", "opentrons/opentrons_flex_96_tiprack_50ul/1"
         )
+
+
+@pytest.mark.ot3_only
+@pytest.mark.parametrize(
+    "simulated_protocol_context", [("2.28", "Flex")], indirect=True
+)
+def test_adding_blowout_position_to_liquid_classes(
+    simulated_protocol_context: ProtocolContext,
+    custom_pip_n_tip_transfer_properties_dict_v2: Dict[str, Dict[str, Any]],
+) -> None:
+    """It should accept a blowout position in liquid class properties."""
+    pip_type = "a_custom_pipette_type"
+    tiprack = "a_custom_tiprack_uri"
+    custom_pip_n_tip_transfer_properties_dict_v2[pip_type][tiprack]["dispense"][
+        "retract"
+    ]["blowout"] = {
+        "enable": True,
+        "location": "source",
+        "flow_rate": 321,
+        "blowout_position": {
+            "position_reference": "well-top",
+            "offset": {"x": 11, "y": 22, "z": 33},
+        },
+    }
+    custom_water = simulated_protocol_context.define_liquid_class(
+        name="water_50",
+        properties=custom_pip_n_tip_transfer_properties_dict_v2,
+        display_name="Custom Aqueous",
+    )
+    assert (
+        custom_water.get_for(
+            pip_type, tiprack
+        ).dispense.retract.blowout.blowout_position.position_reference.value  # type: ignore[union-attr]
+        == "well-top"
+    )
+    assert custom_water.get_for(
+        pip_type, tiprack
+    ).dispense.retract.blowout.blowout_position.offset == Coordinate(x=11, y=22, z=33)  # type: ignore[union-attr]
+
+    # This fails right now cuz of no setter. Fix that
+    # custom_water.get_for(pip_type, tiprack).dispense.retract.blowout.blowout_position = None
+    # assert custom_water.get_for(pip_type, tiprack).dispense.retract.blowout.blowout_position is None
+
+    assert (
+        custom_water.get_for(
+            pip_type, tiprack
+        ).dispense.dispense_position.position_reference.value
+        == "well-top"
+    )
+    assert custom_water.get_for(
+        pip_type, tiprack
+    ).dispense.dispense_position.offset == Coordinate(x=1, y=2, z=3)

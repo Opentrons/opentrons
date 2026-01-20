@@ -343,6 +343,7 @@ class BlowoutProperties:
     _enabled: bool
     _location: Optional[BlowoutLocation]
     _flow_rate: Optional[float]
+    _blowout_position: Optional[TipPosition]
 
     @property
     def enabled(self) -> bool:
@@ -374,12 +375,20 @@ class BlowoutProperties:
         validated_flow_rate = validation.ensure_greater_than_zero_float(new_flow_rate)
         self._flow_rate = validated_flow_rate
 
+    # TODO: add a blowout_position setter
+    @property
+    def blowout_position(self) -> Optional[TipPosition]:
+        return self._blowout_position
+
     def _get_shared_data_params(self) -> Optional[SharedDataBlowoutParams]:
         """Get the mix params in schema v1 shape."""
         if self._location is not None and self._flow_rate is not None:
             return SharedDataBlowoutParams(
                 location=self._location,
                 flowRate=self._flow_rate,
+                blowoutPosition=self._blowout_position.as_shared_data_model()
+                if self._blowout_position is not None
+                else None,
             )
         else:
             return None
@@ -702,11 +711,18 @@ def _build_blowout_properties(
     if blowout_properties.params is not None:
         location = blowout_properties.params.location
         flow_rate = blowout_properties.params.flowRate
+        blowout_position = blowout_properties.params.blowoutPosition
     else:
         location = None
         flow_rate = None
+        blowout_position = None
     return BlowoutProperties(
-        _enabled=blowout_properties.enable, _location=location, _flow_rate=flow_rate
+        _enabled=blowout_properties.enable,
+        _location=location,
+        _flow_rate=flow_rate,
+        _blowout_position=_build_tip_position(blowout_position)
+        if blowout_position is not None
+        else None,
     )
 
 

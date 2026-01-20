@@ -1117,9 +1117,9 @@ class HeaterShakerContext(ModuleContext):
         Set target temperature and return immediately.
 
         Sets the Heater-Shaker's target temperature and returns immediately without
-        waiting for the target to be reached. Allows the protocol to proceed while the module reaches the target temperature. 
+        waiting for the target to be reached. Allows the protocol to proceed while the module reaches the target temperature.
 
-    
+
         Use [`wait_for_temperature()`][opentrons.protocol_api.HeaterShakerContext.wait_for_temperature]
         to delay protocol execution for API levels below 2.27.
 
