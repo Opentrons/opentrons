@@ -77,6 +77,11 @@ module.exports = {
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
           },
+          {
+            name: 'lodash',
+            message:
+              'Use a granular import, like `import isEqual from "lodash/isEqual"`, instead of like `import { isEqual } from "lodash"`',
+          },
         ],
       },
     ],

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
@@ -84,6 +84,22 @@ export function Controls(props: ControlsProps): JSX.Element {
       value: currentProgress,
     },
   ]
+
+  // handlePlayPause by space key
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === ' ') {
+        event.preventDefault()
+        handlePlayPause()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handlePlayPause])
 
   return (
     <div className={styles.container}>

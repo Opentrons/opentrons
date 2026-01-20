@@ -538,3 +538,15 @@ class AbstractFlexStackerCore(
         stacking_offset_z: float | None = None,
     ) -> None:
         """Configure the kind of labware that the stacker stores."""
+
+
+class AbstractVacuumModuleCore(
+    AbstractModuleCore[LabwareCoreType], Generic[LabwareCoreType]
+):
+    """Core control interface for an attached Vacuum Module."""
+
+    MODULE_TYPE: ClassVar = ModuleType.VACUUM_MODULE
+
+    @abstractmethod
+    def get_serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
