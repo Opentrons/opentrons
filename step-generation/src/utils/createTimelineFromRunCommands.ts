@@ -40,7 +40,6 @@ export function getResultingTimelineFrameFromRunCommands(
   commands: RunTimeCommand[],
   invariantContext: InvariantContext
 ): ResultingTimelineFrame {
-  console.log('getResultingTimelineFrameFromRunCommands', commands)
   const pipetteLocations = commands.reduce<RobotState['pipettes']>(
     (acc, command) => {
       if (command.commandType === 'loadPipette' && command.result != null) {
