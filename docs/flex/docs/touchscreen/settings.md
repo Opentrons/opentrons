@@ -4,16 +4,19 @@ title: "Opentrons Flex: Settings"
 
 The Settings screen provides additional controls you can use to customize the behavior of your Flex. Tap a setting to toggle it on or off, or to open another screen that displays related adjustment controls.
 
-<figure class="screenshot" markdown>
-![List of all settings on Flex touchscreen](../images/touchscreen-settings.png)
-<figcaption>Flex touchscreen settings. Yours may look different. On the touchscreen, scroll the list to see all the settings.</figcaption>
-</figure>
+## Settings example
 
-The following list describes all the currently available settings.
+The image below shows an example of the Settings section on the Flex touchscreen. Because Opentrons frequently updates the robot's software, the options on your screen may be different. Scroll through on the touchscreen to see all the currently available settings. Refer to the [Settings list section](#settings-list) for definitions of the currently released features.
+
+
+<figure class="screenshot" markdown>
+![Example of settings on Flex touchscreen](../images/touchscreen-settings.png)
+<figcaption>Flex touchscreen settings. Yours may look different.</figcaption>
+</figure>
 
 ## Settings list
 
-Many of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time.
+Many of these settings are covered when you [first set up your Flex](../installation/first-run.md). However, you can change them at any time. The following list describes all the currently available settings.
 
 ### Camera
 
