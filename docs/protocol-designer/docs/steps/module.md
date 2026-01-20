@@ -18,7 +18,7 @@ When you add modules to the robot deck, available module steps appear in the "Ad
 | Thermocycler Module GEN2 | :octicons-check-16: | :octicons-check-16: |
 
 
-You can add multiple modules of the same type only on the Flex. Only one Thermocycler can be used on the Flex or the OT-2 deck. 
+You can add multiple modules of the same type only on the Flex. However, both robots are limited to a single Thermocycler. 
 
 
 ## Absorbance Plate Reader Module steps
@@ -92,12 +92,10 @@ Click in the bottom left to add a Stacker step to your Protocol Designer protoco
 
 Choose from the available module controls to: 
 
-- **Retrieve** a single piece of labware loaded in the Stacker. The labware at the bottom of the stack will be moved onto the shuttle. Add a move step to transfer the labware elsewhere on the Flex deck, either manually or with the Flex Gripper. 
+- **Retrieve** a single piece of labware loaded in the Stacker. The labware at the bottom of the stack will be moved onto the shuttle. Add a move step to transfer the labware elsewhere on the Flex deck, either manually or with the Flex Gripper. The shuttle must be empty to retrieve labware.
 - **Store** a single piece of labware on the shuttle in the Stacker. The labware will be stored at the bottom of the stack.
 - **Refill** the Stacker with the same type of labware originally loaded in the protocol starting deck. Select the labware type and quantity, and add an optional message to display on the Flex touchscreen.
 - **Empty** all labware from the Stacker. Add an optional message to display on the Flex touchscreen.
-
-You'll only be able to add a Stacker step to retrieve or store labware if the shuttle is empty or contains labware, respectively. 
 
 Any labware filled into or emptied from the Stacker comes from the Flex's off-deck location, but you don't need to add it there yourself! When you add a refill or empty Stacker step, Protocol Designer creates the off-deck labware for you. Click the toggle switch at the top right of the deck view to see the off-deck labware at any point. 
 

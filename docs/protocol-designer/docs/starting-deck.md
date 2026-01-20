@@ -19,7 +19,7 @@ To start, the deck includes your chosen modules and fixtures. Click **Deck hardw
 
 Next, click **Liquids** in the upper left. First, define a liquid to use in your protocol with a name, description, and color. You can also define the liquid as an Opentrons-verified liquid class to apply optimized pipetting settings during transfer and mix steps. 
 
-You'll also be able to define and add liquids in labware already on the robot deck.
+You'll also be able to define and add liquids in labware already added in your protocol.
 
 ## Labware
 
