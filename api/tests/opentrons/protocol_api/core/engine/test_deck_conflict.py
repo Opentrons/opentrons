@@ -1299,7 +1299,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_above(
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
             well_location=DropTipWellLocation(),
-            partially_configured_version_gate=False,
+            api_version_allows_partial_return_tip=True,
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
 
@@ -1453,7 +1453,7 @@ def test_check_safe_for_pipette_movement_partial_tip_version_gate_below(
             pipette_id="pipette-id",
             labware_id="destination-labware-id",
             well_location=DropTipWellLocation(),
-            partially_configured_version_gate=True,
+            api_version_allows_partial_return_tip=False,
         )
     ).then_return(WellLocation(origin=WellOrigin.TOP, offset=WellOffset(z=10)))
 

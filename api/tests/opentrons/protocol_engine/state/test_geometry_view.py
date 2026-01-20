@@ -2643,7 +2643,7 @@ def test_get_tip_drop_location_raises_for_partial_with_tip_rack(
     tip_rack_def: LabwareDefinition,
     reservoir_def: LabwareDefinition,
 ) -> None:
-    """It should raise if version gate is True and the labware is tip rack, and not raise otherwise."""
+    """It should raise if version gate is False and the labware is tip rack, and not raise otherwise."""
     decoy.when(mock_labware_view.get_definition("tip-rack-id")).then_return(
         tip_rack_def
     )
@@ -2656,7 +2656,7 @@ def test_get_tip_drop_location_raises_for_partial_with_tip_rack(
                 origin=DropTipWellOrigin.DEFAULT,
                 offset=WellOffset(x=1, y=2, z=3),
             ),
-            partially_configured_version_gate=True,
+            api_version_allows_partial_return_tip=False,
         )
 
     decoy.when(mock_labware_view.get_definition("labware-id")).then_return(
@@ -2670,7 +2670,7 @@ def test_get_tip_drop_location_raises_for_partial_with_tip_rack(
             origin=DropTipWellOrigin.DEFAULT,
             offset=WellOffset(x=1, y=2, z=3),
         ),
-        partially_configured_version_gate=True,
+        api_version_allows_partial_return_tip=False,
     )
 
     assert location == WellLocation(

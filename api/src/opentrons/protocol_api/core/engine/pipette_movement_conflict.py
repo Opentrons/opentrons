@@ -96,8 +96,8 @@ def check_safe_for_pipette_movement(  # noqa: C901
             labware_id=labware_id,
             well_location=well_location,
             # TODO (jbl, 2026-01-14) check if partially configured if the above TODO is addressed
-            partially_configured_version_gate=version
-            < _PARTIAL_TIP_RETURN_VERSION_GATE,
+            api_version_allows_partial_return_tip=version
+            >= _PARTIAL_TIP_RETURN_VERSION_GATE,
         )
     well_location_point = engine_state.geometry.get_well_position(
         labware_id=labware_id,
