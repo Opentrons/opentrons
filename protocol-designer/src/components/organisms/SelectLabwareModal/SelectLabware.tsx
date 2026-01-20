@@ -150,45 +150,45 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
 
                     const stackingProps: StackingProps | null =
                       isOnHopper ||
-                        (stackingLabwareDefUris.length === 1 &&
-                          slot !== 'offDeck')
+                      (stackingLabwareDefUris.length === 1 &&
+                        slot !== 'offDeck')
                         ? {
-                          inputTitle: t('labware_quantity'),
-                          errorMessage: t('unsupported_range'),
-                          inputCaption: t('valid_range', {
-                            max: isOnHopper
-                              ? hopperStackLimit
-                              : defs[stackingLabwareDefUris[0]].stackLimit,
-                          }),
-                          definition: defs[stackingLabwareDefUris[0]],
-                          inputFieldValue: selectedTopLabware.amount ?? 0,
-                          onInputFieldChange: (e: ChangeEvent<any>) => {
-                            dispatch(
-                              selectTopLabwareAmount({
-                                amount: parseInt(e.target.value as string),
-                              })
-                            )
-                          },
-                          checkboxCaption: t('with_lid', {
-                            name: defs[stackingLabwareDefUris[0]].metadata
-                              .displayName,
-                          }),
-                          checked: selectedLidLabware != null,
-                          onCheckboxChange:
-                            (!isTiprack && isOnHopper) || !isLidValid
-                              ? undefined
-                              : () => {
-                                dispatch(
-                                  selectLid({
-                                    labwareDefURI:
-                                      selectedLidLabware ===
-                                        stackingLabwareDefUris[0]
-                                        ? null
-                                        : stackingLabwareDefUris[0],
-                                  })
-                                )
-                              },
-                        }
+                            inputTitle: t('labware_quantity'),
+                            errorMessage: t('unsupported_range'),
+                            inputCaption: t('valid_range', {
+                              max: isOnHopper
+                                ? hopperStackLimit
+                                : defs[stackingLabwareDefUris[0]].stackLimit,
+                            }),
+                            definition: defs[stackingLabwareDefUris[0]],
+                            inputFieldValue: selectedTopLabware.amount ?? 0,
+                            onInputFieldChange: (e: ChangeEvent<any>) => {
+                              dispatch(
+                                selectTopLabwareAmount({
+                                  amount: parseInt(e.target.value as string),
+                                })
+                              )
+                            },
+                            checkboxCaption: t('with_lid', {
+                              name: defs[stackingLabwareDefUris[0]].metadata
+                                .displayName,
+                            }),
+                            checked: selectedLidLabware != null,
+                            onCheckboxChange:
+                              (!isTiprack && isOnHopper) || !isLidValid
+                                ? undefined
+                                : () => {
+                                    dispatch(
+                                      selectLid({
+                                        labwareDefURI:
+                                          selectedLidLabware ===
+                                          stackingLabwareDefUris[0]
+                                            ? null
+                                            : stackingLabwareDefUris[0],
+                                      })
+                                    )
+                                  },
+                          }
                         : null
                     return searchFilter(def.metadata.displayName) &&
                       !getIsLabwareFiltered(def) ? (
