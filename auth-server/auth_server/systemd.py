@@ -10,8 +10,8 @@ from typing import Dict, Union
 
 try:
     # systemd journal is available, we can use its handler
-    import systemd.daemon  # type: ignore[import-not-found]
-    import systemd.journal  # type: ignore[import-not-found]
+    import systemd.daemon  # type: ignore
+    import systemd.journal  # type: ignore
 
     def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
         """Initialize log handler."""
