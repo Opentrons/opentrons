@@ -25,6 +25,8 @@ nav:
   - Software:
       - Opentrons App: opentrons-app/index.md
       - App Installation and Management: opentrons-app/installation.md
+      - Transferring Protocols: opentrons-app/transfer-protocols.md
+      - Controlling Modules: opentrons-app/control-modules.md
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
