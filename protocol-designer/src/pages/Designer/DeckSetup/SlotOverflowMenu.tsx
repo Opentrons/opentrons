@@ -180,6 +180,7 @@ export function SlotOverflowMenu(
             moduleState: {
               ...stackerModuleState,
               storedLabwareDetails: null,
+              labwareInHopper: null,
             },
           })
         )

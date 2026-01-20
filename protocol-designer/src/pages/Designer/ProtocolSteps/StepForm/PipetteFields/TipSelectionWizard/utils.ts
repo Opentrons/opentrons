@@ -112,7 +112,7 @@ export const getHoveredOffsetFromWell = (args: {
 }
 
 export const getColumnFromWellName = (wellName: string): string =>
-  wellName.slice(1, wellName.length)
+  wellName.slice(-2, -1)
 
 export const getIsPickupCompatibleWithPossibleAdapter = (
   stack: string[],
