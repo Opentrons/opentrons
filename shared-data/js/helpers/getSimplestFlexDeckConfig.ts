@@ -1,5 +1,10 @@
 import { getAddressableAreasInProtocol, getDeckDefFromRobotType } from '.'
-import { FLEX_ROBOT_TYPE } from '../constants'
+import {
+  FLEX_ROBOT_TYPE,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
+} from '../constants'
 import { getAddressableAreaFromSlotId } from '../fixtures'
 import { getMainFixtureIdForAA } from './deckConfiguration/getFixtureFrom'
 
@@ -43,6 +48,26 @@ export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[]
     ...config,
     requiredAddressableAreas: [],
   }))
+
+export const getEmptyDeckConfiguration = (
+  deckDef: DeckDefinition
+): DeckConfiguration => {
+  const singleSlotItems = deckDef.cutoutFixtures.filter(
+    fixture =>
+      fixture.id === SINGLE_LEFT_SLOT_FIXTURE ||
+      fixture.id === SINGLE_CENTER_SLOT_FIXTURE ||
+      fixture.id === SINGLE_RIGHT_SLOT_FIXTURE
+  )
+  // Map cutoutId to cutout fixture config
+  const emptyDeckConfiguration = singleSlotItems.flatMap(
+    fixture =>
+      Object.keys(fixture.providesAddressableAreas).map(cutoutId => ({
+        cutoutId,
+        cutoutFixtureId: fixture.id,
+      })) as DeckConfiguration
+  )
+  return emptyDeckConfiguration
+}
 
 export function getSimplestDeckConfigForProtocol(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null

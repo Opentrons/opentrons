@@ -6,6 +6,11 @@ import {
   FLEX_SIMPLEST_DECK_CONFIG,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
+  getDeckDefWithFakes,
+  getEmptyDeckConfiguration,
+  SINGLE_CENTER_SLOT_FIXTURE,
+  SINGLE_LEFT_SLOT_FIXTURE,
+  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
@@ -45,7 +50,8 @@ export function HardwareConfigurator(
   const dispatch = useDispatch()
   const { deckConfig } = useSelector(getDeckConfiguration)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  const simpleDeckConfig: DeckConfiguration = FLEX_SIMPLEST_DECK_CONFIG.filter(
+  const emptyDeckConfiguration = getEmptyDeckConfiguration(deckDef)
+  const simpleDeckConfig: DeckConfiguration = emptyDeckConfiguration.filter(
     ({ cutoutId }) => {
       const hasModule = Object.values(modules).some(
         module => module.cutoutId === cutoutId
@@ -62,6 +68,10 @@ export function HardwareConfigurator(
       return !hasModule && !hasFixture && !hasTCAndCutoutA1
     }
   )
+
+  console.log('emptyDeckConfiguration: ', emptyDeckConfiguration)
+
+  console.log('simpleDeckConfig in HardwareConfigurator', simpleDeckConfig)
   const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
     (module: FormModule | ModuleExtended): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
@@ -83,6 +93,7 @@ export function HardwareConfigurator(
       ]
     }
   )
+  console.log('moduleConfig: ', moduleConfig)
   const additionalEquipmentConfig: DeckConfiguration = Object.values(
     fixtures
   ).map(
@@ -91,6 +102,13 @@ export function HardwareConfigurator(
       cutoutFixtureId: ae.cutoutFixtureId,
     })
   )
+  console.log('additionalEquipmentConfig: ', additionalEquipmentConfig)
+  const updatedDeckConfig = [
+    ...simpleDeckConfig,
+    ...moduleConfig,
+    ...additionalEquipmentConfig,
+  ]
+  console.log('updatedDeckConfig: ', updatedDeckConfig)
 
   //  initiate deck config
   useEffect(() => {
