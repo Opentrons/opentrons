@@ -5,9 +5,15 @@ import { Flex, SPACING, Tabs } from '@opentrons/components'
 import { useFeatureFlag } from '/app/redux/config'
 
 import type { ProtocolAnalysisOutput } from '@opentrons/shared-data'
-import type { ProtocolDetailsTab } from './UpdatedProtocolDetails'
 
-interface ProtocolDetailsTabsProps {
+type ProtocolDetailsTab =
+  | 'robot_config'
+  | 'labware'
+  | 'liquids'
+  | 'stats'
+  | 'parameters'
+
+export interface ProtocolDetailsTabsProps {
   mostRecentAnalysis: ProtocolAnalysisOutput | null
   currentTab: ProtocolDetailsTab
   setCurrentTab: (tab: ProtocolDetailsTab) => void

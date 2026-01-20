@@ -1015,6 +1015,7 @@ dependencies = [
     { name = "packaging" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyro5" },
     { name = "pyserial" },
     { name = "pyusb" },
     { name = "typing-extensions" },
@@ -1033,6 +1034,7 @@ requires-dist = [
     { name = "packaging", specifier = ">=25.0" },
     { name = "pydantic", specifier = ">=2.0.0,<3" },
     { name = "pydantic-settings", specifier = ">=2,<3" },
+    { name = "pyro5", specifier = ">=5.16,<6" },
     { name = "pyserial", specifier = ">=3.5" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "typing-extensions", specifier = ">=4.0.0,<5" },
@@ -1058,6 +1060,7 @@ dev = [
     { name = "performance-metrics", editable = "../performance-metrics" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "pyro5", specifier = "==5.16" },
     { name = "pytest", specifier = ">=9.0.2" },
     { name = "pytest-asyncio", specifier = ">=1.3.0,<2" },
     { name = "pytest-cov", specifier = "==4.1.0" },
@@ -1086,6 +1089,7 @@ robot = [
     { name = "packaging", specifier = "==25.0" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "pyro5", specifier = "==5.16" },
     { name = "pyusb", specifier = "==1.2.1" },
     { name = "zipp", specifier = "==3.21.0" },
 ]
@@ -1509,6 +1513,18 @@ wheels = [
 ]
 
 [[package]]
+name = "pyro5"
+version = "5.16"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "serpent" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6e/ab/38d7adb02f735f409e6af78951630f887590a885b2583c83cfe93a60b576/pyro5-5.16.tar.gz", hash = "sha256:d40418ed2acee0d9093daf5023ed0b0cb485a6b62342934adb9e801956f5738b", size = 448592, upload-time = "2025-12-21T18:33:58.552Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/4d/7713c06c1a9eaa35142e232e89da5300cac09156977204c730b28f37eaec/pyro5-5.16-py3-none-any.whl", hash = "sha256:ea33cad29993fd44ce394ef45950e8dc5805ee12c4dd76541a8dd11c40694706", size = 79294, upload-time = "2025-12-21T18:33:57.096Z" },
+]
+
+[[package]]
 name = "pyrsistent"
 version = "0.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1810,6 +1826,7 @@ dependencies = [
     { name = "paho-mqtt" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyro5" },
     { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "server-utils" },
@@ -1862,6 +1879,7 @@ robot = [
     { name = "paho-mqtt" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
+    { name = "pyro5" },
     { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "server-utils" },
@@ -1882,6 +1900,7 @@ requires-dist = [
     { name = "paho-mqtt", specifier = "==1.6.1" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "pyro5", specifier = ">=5.16,<6" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "python-multipart", specifier = "==0.0.6" },
     { name = "server-utils", editable = "../server-utils" },
@@ -1934,6 +1953,7 @@ robot = [
     { name = "paho-mqtt", specifier = "==1.6.1" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.4.0" },
+    { name = "pyro5", specifier = "==5.16" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "python-multipart", specifier = "==0.0.6" },
     { name = "server-utils", editable = "../server-utils" },
@@ -2091,6 +2111,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/f2/1c/d7b67ab43f30013b47c12b42d1acd354c195351a3f7a1d67f59e54227ede/ruff-0.14.10-py3-none-win32.whl", hash = "sha256:104c49fc7ab73f3f3a758039adea978869a918f31b73280db175b43a2d9b51d6", size = 13196187, upload-time = "2025-12-18T19:29:19.006Z" },
     { url = "https://files.pythonhosted.org/packages/fb/9c/896c862e13886fae2af961bef3e6312db9ebc6adc2b156fe95e615dee8c1/ruff-0.14.10-py3-none-win_amd64.whl", hash = "sha256:466297bd73638c6bdf06485683e812db1c00c7ac96d4ddd0294a338c62fdc154", size = 14661283, upload-time = "2025-12-18T19:29:30.16Z" },
     { url = "https://files.pythonhosted.org/packages/74/31/b0e29d572670dca3674eeee78e418f20bdf97fa8aa9ea71380885e175ca0/ruff-0.14.10-py3-none-win_arm64.whl", hash = "sha256:e51d046cf6dda98a4633b8a8a771451107413b0f07183b2bef03f075599e44e6", size = 13729839, upload-time = "2025-12-18T19:28:48.636Z" },
+]
+
+[[package]]
+name = "serpent"
+version = "1.42"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/06/3c/7ecf39b48121cb6490634bfcb1b1c5cac7d7a216805d889b0676a2e8493f/serpent-1.42.tar.gz", hash = "sha256:8ea082b01f8ba07ecd74e34a9118ac4521bc4594938d912b808c89f1da425506", size = 90352, upload-time = "2025-10-26T21:58:13.871Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/07/24/73031e6bd25d8f94811b3752b0b217efbdb20a67b65c6838c9af4e50c2e2/serpent-1.42-py3-none-any.whl", hash = "sha256:a02f5a4fcf3b41ee6204b36c3cf026bf0433ffe15b6a7fc8a37e0bff74d87575", size = 9663, upload-time = "2025-10-26T21:58:12.565Z" },
 ]
 
 [[package]]

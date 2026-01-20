@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { useTranslation } from 'react-i18next'
+import { Trans, useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
@@ -22,6 +22,7 @@ import { getHint } from '/protocol-designer/tutorial/selectors'
 
 import { getMainPagePortalEl } from '../Portal'
 
+import type { PropsWithChildren } from 'react'
 import type { HintKey } from '/protocol-designer/tutorial'
 
 export const HintsModal = (): JSX.Element | null => {
@@ -30,45 +31,69 @@ export const HintsModal = (): JSX.Element | null => {
   const toggleRememberDismissal = useCallback(() => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
-  const hintKey = useSelector(getHint)
+  const hint = useSelector(getHint)
   const dispatch = useDispatch()
   const handleRemoveHint = (hintKey: HintKey): void => {
     dispatch(removeHint(hintKey, rememberDismissal))
   }
 
+  if (hint == null) {
+    return null
+  }
+
+  const i18nValues = {
+    temperature: 'targetTemperature' in hint ? hint.targetTemperature : null,
+  }
+
   let hintContents: JSX.Element | null = null
-  if (hintKey === 'thermocycler_lid_passive_cooling') {
+  if (hint.hintKey === 'thermocycler_lid_passive_cooling') {
     hintContents = (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
         <StyledText desktopStyle="bodyDefaultRegular">
-          {t(`alert:hint.${hintKey}.body`)}
+          {t(`alert:hint.${hint.hintKey}.body`)}
         </StyledText>
         <Flex marginLeft={SPACING.spacing16}>
           <ul>
             <li>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t(`alert:hint.${hintKey}.li1`)}
+                {t(`alert:hint.${hint.hintKey}.li1`)}
               </StyledText>
             </li>
             <li>
               <StyledText desktopStyle="bodyDefaultRegular">
-                {t(`alert:hint.${hintKey}.li2`)}
+                {t(`alert:hint.${hint.hintKey}.li2`)}
               </StyledText>
             </li>
           </ul>
         </Flex>
       </Flex>
     )
-  } else if (hintKey === 'waste_chute_warning') {
+  } else if (hint.hintKey === 'waste_chute_warning') {
     hintContents = (
       <StyledText desktopStyle="bodyDefaultRegular">
-        {t(`hint.${hintKey}.body1`)}
+        {t(`alert:hint.${hint.hintKey}.body1`)}
       </StyledText>
     )
-  }
-
-  if (hintKey == null) {
-    return null
+  } else if (
+    hint.hintKey === 'wait_for_heater_shaker_temp' ||
+    hint.hintKey === 'wait_for_temperature_module_temp' ||
+    hint.hintKey === 'wait_for_thermocycler_block_temp' ||
+    hint.hintKey === 'wait_for_thermocycler_lid_temp' ||
+    hint.hintKey === 'wait_for_thermocycler_profile'
+  ) {
+    const bodyParagraphs = (
+      <Trans
+        t={t}
+        i18nKey={`alert:hint.${hint.hintKey}.body`}
+        values={i18nValues}
+        components={{ p: <BodyParagraph /> }}
+      />
+    )
+    hintContents = (
+      <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
+        {bodyParagraphs}
+      </Flex>
+    )
   }
 
   return createPortal(
@@ -76,7 +101,7 @@ export const HintsModal = (): JSX.Element | null => {
       marginLeft="0"
       type="warning"
       zIndexOverlay={15}
-      title={t(`hint.${hintKey}.title`)}
+      title={t(`hint.${hint.hintKey}.title`, i18nValues)}
       footer={
         <Flex
           alignItems={ALIGN_CENTER}
@@ -96,7 +121,7 @@ export const HintsModal = (): JSX.Element | null => {
           <Flex alignItems={ALIGN_END}>
             <PrimaryButton
               onClick={() => {
-                handleRemoveHint(hintKey)
+                handleRemoveHint(hint.hintKey)
               }}
             >
               {i18n.format(t('shared:confirm'), 'capitalize')}
@@ -108,5 +133,13 @@ export const HintsModal = (): JSX.Element | null => {
       {hintContents}
     </Modal>,
     getMainPagePortalEl()
+  )
+}
+
+function BodyParagraph({ children }: PropsWithChildren): JSX.Element {
+  return (
+    <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.black90}>
+      {children}
+    </StyledText>
   )
 }

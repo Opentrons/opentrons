@@ -2,10 +2,8 @@ import { useState } from 'react'
 import { connect, useSelector } from 'react-redux'
 
 import { useConditionalConfirm } from '@opentrons/components'
-import { getModuleDisplayName } from '@opentrons/shared-data'
 
 import {
-  BonusStepModal,
   CLOSE_STEP_FORM_WITH_CHANGES,
   CLOSE_UNSAVED_STEP_FORM,
   ConfirmDeleteModal,
@@ -31,7 +29,6 @@ import { getDirtyFields } from './utils'
 
 import type { ConnectedComponent } from 'react-redux'
 import type { InvariantContext } from '@opentrons/step-generation'
-import type { BonusStepModalType } from '/protocol-designer/components/organisms'
 import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { LabwareDefByDefURI } from '/protocol-designer/labware-defs'
 import type { BaseState, ThunkDispatch } from '/protocol-designer/types'
@@ -40,7 +37,6 @@ interface StateProps {
   canSave: boolean
   formHasChanges: boolean
   isNewStep: boolean
-  bonusStepModalType: BonusStepModalType | null
   invariantContext: InvariantContext
   allLabwareDefs: LabwareDefByDefURI
   enableConcurrentModuleActions: boolean
@@ -61,7 +57,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     formHasChanges,
     cancelStepForm,
     isNewStep,
-    bonusStepModalType,
     saveStepForm,
     invariantContext,
     allLabwareDefs,
@@ -93,9 +88,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     cancel: cancelClose,
   } = useConditionalConfirm(cancelStepForm, isNewStep || formHasChanges)
 
-  const [currentBonusStepDialogType, setCurrentBonusStepDialogType] =
-    useState<BonusStepModalType | null>(null)
-
   // no form selected
   if (formData == null) {
     return null
@@ -113,56 +105,50 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   }
 
   const handleSave = (): void => {
-    if (bonusStepModalType == null) {
-      // No dialog to show. Just save the step directly.
-      saveStepForm()
-      if (
-        hydratedForm.stepType === 'flexStacker' &&
-        hydratedForm.flexStackerFormType === FLEX_STACKER_FILL
-      ) {
-        // logic for editing a fill step form
-        if (savedStepForm != null) {
-          const initialLabwareIds =
-            (savedStepForm.fillLabwareIds as string[] | null) ?? []
-          const oldFillQuantity = initialLabwareIds.length
+    saveStepForm()
+    if (
+      hydratedForm.stepType === 'flexStacker' &&
+      hydratedForm.flexStackerFormType === FLEX_STACKER_FILL
+    ) {
+      // logic for editing a fill step form
+      if (savedStepForm != null) {
+        const initialLabwareIds =
+          (savedStepForm.fillLabwareIds as string[] | null) ?? []
+        const oldFillQuantity = initialLabwareIds.length
 
-          // if new fill quantity is less than the preivously saved quantity, delete the extraneous labware
-          if (oldFillQuantity > hydratedForm.fillLabwareIds.length) {
-            const extraneousLabwareIds = initialLabwareIds.slice(
-              hydratedForm.fillLabwareIds.length,
-              oldFillQuantity
-            )
-            deleteLabwares(extraneousLabwareIds)
-          }
-          // if new fill quantity is greater than the preivously saved quantity, create the new labware
-          else if (oldFillQuantity < hydratedForm.fillLabwareIds.length) {
-            const newLabwareIds = hydratedForm.fillLabwareIds.slice(
-              oldFillQuantity,
-              hydratedForm.fillLabwareIds.length
-            )
-            createdLabwareForQueue(hydratedForm.moduleId, newLabwareIds)
-          }
-        } else {
-          // if no saved step form exists, create all the new labware
-          createdLabwareForQueue(
-            hydratedForm.moduleId,
-            hydratedForm.fillLabwareIds
+        // if new fill quantity is less than the preivously saved quantity, delete the extraneous labware
+        if (oldFillQuantity > hydratedForm.fillLabwareIds.length) {
+          const extraneousLabwareIds = initialLabwareIds.slice(
+            hydratedForm.fillLabwareIds.length,
+            oldFillQuantity
           )
+          deleteLabwares(extraneousLabwareIds)
         }
+        // if new fill quantity is greater than the preivously saved quantity, create the new labware
+        else if (oldFillQuantity < hydratedForm.fillLabwareIds.length) {
+          const newLabwareIds = hydratedForm.fillLabwareIds.slice(
+            oldFillQuantity,
+            hydratedForm.fillLabwareIds.length
+          )
+          createdLabwareForQueue(hydratedForm.moduleId, newLabwareIds)
+        }
+      } else {
+        // if no saved step form exists, create all the new labware
+        createdLabwareForQueue(
+          hydratedForm.moduleId,
+          hydratedForm.fillLabwareIds
+        )
       }
-    } else {
-      // There's a dialog we have to show before saving the step.
-      // Its confirm/cancel handlers will be the thing that saves the step.
-      setCurrentBonusStepDialogType(bonusStepModalType)
+    } else if (
+      hydratedForm.stepType === 'flexStacker' &&
+      savedStepForm?.flexStackerFormType === FLEX_STACKER_FILL &&
+      hydratedForm.flexStackerFormType !== FLEX_STACKER_FILL
+    ) {
+      // logic for deleting fill labware if the stacker form type changes from fill to something else
+      const fillLabwareIds =
+        (savedStepForm.fillLabwareIds as string[] | null) ?? []
+      deleteLabwares(fillLabwareIds)
     }
-  }
-  const handleSkipPauseClick = (): void => {
-    saveStepForm({ userWantsBonusStep: false })
-    setCurrentBonusStepDialogType(null)
-  }
-  const handleAddPauseClick = (): void => {
-    saveStepForm({ userWantsBonusStep: true })
-    setCurrentBonusStepDialogType(null)
   }
 
   return (
@@ -174,46 +160,6 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
           }
           onCancelClick={cancelClose}
           onContinueClick={confirmClose}
-        />
-      )}
-
-      {currentBonusStepDialogType === 'explainWaitForTemperatureModuleTemp' && (
-        <BonusStepModal
-          modalType={currentBonusStepDialogType}
-          displayTemperature={formData.targetTemperature ?? '?'}
-          handleAddPauseClick={handleAddPauseClick}
-        />
-      )}
-      {currentBonusStepDialogType === 'explainWaitForHeaterShakerTemp' && (
-        <BonusStepModal
-          modalType={currentBonusStepDialogType}
-          displayTemperature={formData.targetHeaterShakerTemperature ?? '?'}
-          handleAddPauseClick={handleAddPauseClick}
-        />
-      )}
-      {currentBonusStepDialogType === 'explainWaitForThermocyclerProfile' && (
-        <BonusStepModal
-          modalType={currentBonusStepDialogType}
-          handleAddPauseClick={handleAddPauseClick}
-        />
-      )}
-      {currentBonusStepDialogType === 'optionallyWaitForTemp' && (
-        <BonusStepModal
-          modalType="optionallyWaitForTemp"
-          displayTemperature={
-            formData.targetTemperature ??
-            formData.targetHeaterShakerTemperature ??
-            '?'
-          }
-          displayModule={
-            formData.moduleId != null
-              ? getModuleDisplayName(
-                  invariantContext.moduleEntities[formData.moduleId].model
-                )
-              : ''
-          }
-          handleAddPauseClick={handleAddPauseClick}
-          handleSkipPauseClick={handleSkipPauseClick}
         />
       )}
 
@@ -239,7 +185,6 @@ const mapStateToProps = (state: BaseState): StateProps => {
     formData: stepFormSelectors.getUnsavedForm(state),
     formHasChanges: stepFormSelectors.getCurrentFormHasUnsavedChanges(state),
     isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
-    bonusStepModalType: stepFormSelectors.getBonusStepModalType(state),
     invariantContext: getInvariantContext(state),
     allLabwareDefs: labwareDefSelectors.getLabwareDefsByURI(state),
     enableConcurrentModuleActions: getEnableConcurrentModuleActions(state),
@@ -251,8 +196,8 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
     dispatch(actions.cancelStepForm())
   }
 
-  const saveStepForm = (options?: { userWantsBonusStep?: boolean }): void => {
-    dispatch(stepsActions.saveStepForm(options))
+  const saveStepForm = (): void => {
+    dispatch(stepsActions.saveStepForm())
   }
 
   const createdLabwareForQueue = (

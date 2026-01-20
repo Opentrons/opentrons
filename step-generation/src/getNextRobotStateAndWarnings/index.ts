@@ -7,6 +7,7 @@ import {
   forAbsorbanceReaderInitialize,
   forAbsorbanceReaderOpenLid,
 } from './absorbanceReaderUpdates'
+import { forAirGapInPlace } from './forAirGapInPlace'
 import { forAspirate } from './forAspirate'
 import { forBlowout } from './forBlowout'
 import { forConfigureNozzleLayout } from './forConfigureNozzleLayout'
@@ -84,6 +85,9 @@ function _getNextRobotStateAndWarningsSingleCommand(
       }
       break
 
+    case 'airGapInPlace':
+      forAirGapInPlace(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'dispenseWhileTracking':
     case 'dispense':
     case 'dispenseInPlace':
@@ -207,7 +211,6 @@ function _getNextRobotStateAndWarningsSingleCommand(
     case 'custom': // fall-back
     case 'comment':
     case 'captureImage':
-    case 'airGapInPlace':
     case 'prepareToAspirate':
     case 'liquidProbe':
     case 'loadLiquidClass':

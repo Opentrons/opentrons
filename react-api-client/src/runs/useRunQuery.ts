@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useQuery, useQueryClient } from 'react-query'
-import { some } from 'lodash'
+import some from 'lodash/some'
 
 import { getRun } from '@opentrons/api-client'
 

@@ -872,12 +872,20 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-export const getSlotInLocationStack = (stack?: string[]): string => {
+export const getSlotInLocationStack = (
+  stack: string[] | null,
+  isStacker: boolean = false
+): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
     return 'unknown slot'
   } else {
-    return stack[stack.length - 1]
+    const slot = stack[stack.length - 1]
+    if (isStacker) {
+      return `STACKER ${slot.slice(-2, -1)}`
+    } else {
+      return slot
+    }
   }
 }
 
@@ -1429,6 +1437,10 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
+  // permissive if no stored labware details configured
+  if (stackerState?.storedLabwareDetails == null) {
+    return true
+  }
   const storedLabwareURIs = Object.values(
     stackerState?.storedLabwareDetails ?? {}
   ).reduce<string[]>((acc, val) => {

@@ -5,7 +5,6 @@ import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
-  ALIGN_NORMAL,
   BORDERS,
   Box,
   COLORS,
@@ -24,6 +23,7 @@ import {
 } from '@opentrons/components'
 import {
   getSlotInLocationStack,
+  HOPPER_STACKER_LOCATION,
   wellFillFromWellContents,
 } from '@opentrons/step-generation'
 
@@ -131,6 +131,8 @@ export function AssignLiquidsModal(
     ),
   }
 
+  const labwareIsOnHopper = labwareStack.includes(HOPPER_STACKER_LOCATION)
+
   return (
     <Flex
       height={`calc(100vh - ${NAV_BAR_HEIGHT_REM}rem)`}
@@ -139,7 +141,7 @@ export function AssignLiquidsModal(
       position={POSITION_RELATIVE}
     >
       <Flex width="100%" overflow={OVERFLOW_AUTO} padding={SPACING.spacing16}>
-        {labwareStack.length > 1 ? (
+        {labwareIsOnHopper && labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
             selectedLabwareIds={selectedLabwareIds}
@@ -165,14 +167,15 @@ export function AssignLiquidsModal(
           >
             <Flex
               height="100%"
-              alignItems={ALIGN_NORMAL}
+              alignItems={ALIGN_CENTER}
               gap={SPACING.spacing10}
             >
               <RobotInfoLabel
-                size="large"
+                size="extraLarge"
                 deckLabel={
                   getSlotInLocationStack(
-                    labware[labwareId].stack as string[]
+                    labware[labwareId].stack as string[],
+                    labwareIsOnHopper
                   ) ?? ''
                 }
               />

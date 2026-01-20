@@ -14,10 +14,16 @@ import { CommandSteps } from '/app/organisms/Desktop/ProtocolVisualization/Comma
 import { Controls } from '/app/organisms/Desktop/ProtocolVisualization/Controls'
 import { DeckView } from '/app/organisms/Desktop/ProtocolVisualization/DeckView'
 import {
+  ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
+  ANALYTICS_NOTIFICATION_PROTOCOL_VISUALIZATION_VIEWPORT_SIZES,
+  useTrackEvent,
+} from '/app/redux/analytics'
+import {
   stepDetailViewerCloseAction,
   stepDetailViewerOpenAction,
   stepDetailViewerUpdateAction,
 } from '/app/redux/shell'
+import { useMostRecentCompletedAnalysis } from '/app/resources/runs'
 import { getProtocolDisplayName } from '/app/transformations/protocols'
 
 import { StepDetailContainer } from '../StepDetailContainer'
@@ -38,7 +44,8 @@ const GUTTER_WIDTH_PX = 16 // left and right gutters
 type ResizableColumn = 'left' | 'right'
 
 interface VisualizerContainerProps {
-  analysis: ProtocolAnalysisOutput
+  analysisOutput: ProtocolAnalysisOutput
+  runId: string | null
   groupedCommands: GroupedCommands | null
   protocolKey: string
   srcFileNames: string[]
@@ -48,7 +55,13 @@ export function VisualizerContainer(
   props: VisualizerContainerProps
 ): JSX.Element {
   const dispatch = useDispatch()
-  const { analysis, groupedCommands, protocolKey, srcFileNames } = props
+  const { runId, analysisOutput, groupedCommands, protocolKey, srcFileNames } =
+    props
+  const createdDate = new Date(analysisOutput.createdAt)
+  const completedProtocolAnalysis = useMostRecentCompletedAnalysis(runId)
+  const trackEvent = useTrackEvent()
+  const trackEventRef = useRef(trackEvent)
+  const analysis = completedProtocolAnalysis ?? analysisOutput
   const { commands, robotType, liquids } = analysis
   const [isPlaying, setIsPlaying] = useState<boolean>(false)
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null)
@@ -79,6 +92,12 @@ export function VisualizerContainer(
     rightWidthRef.current = rightWidth
   }, [rightWidth])
 
+  // Note: This useEffect is used to update the trackEventRef.current with the trackEvent prop.
+  // This prevents sending duplicate events when the trackEvent prop changes.
+  useEffect(() => {
+    trackEventRef.current = trackEvent
+  }, [trackEvent])
+
   // temporarily filter out loadCommands and home commands for the PV MVP
   const filteredCommands = commands.filter(
     command =>
@@ -93,13 +112,15 @@ export function VisualizerContainer(
   )
 
   const currentCommandsSlice = commands.slice(0, selectedCommandIndex + 1)
-  const invariantContextFromAnalysis =
-    constructInvariantContextFromAnalysis(analysis)
+  const invariantContextFromAnalysis = constructInvariantContextFromAnalysis(
+    analysis,
+    analysisOutput.config,
+    createdDate
+  )
   const { frame, invariantContext } = getResultingTimelineFrameFromRunCommands(
     currentCommandsSlice,
     invariantContextFromAnalysis
   )
-  console.log('frame', frame)
   const handlePlayPause = (): void => {
     setIsPlaying(prev => !prev)
   }
@@ -167,7 +188,7 @@ export function VisualizerContainer(
   const protocolDisplayName = getProtocolDisplayName(
     protocolKey,
     srcFileNames,
-    analysis
+    analysisOutput
   )
   const percentComplete =
     filteredSelectedCommandIndex != null
@@ -268,6 +289,20 @@ export function VisualizerContainer(
     }
   }, [dispatch, protocolKey])
 
+  useEffect(() => {
+    return () => {
+      trackEventRef.current({
+        name: ANALYTICS_NOTIFICATION_PROTOCOL_VISUALIZATION_VIEWPORT_SIZES,
+        properties: {
+          'Window Width': window.innerWidth,
+          'Window Height': window.innerHeight,
+          'Left Column Width': leftWidthRef.current,
+          'Right Column Width': rightWidthRef.current,
+        },
+      })
+    }
+  }, [])
+
   return (
     <div ref={containerRef} className={styles.layout_container}>
       {/* Left Column is resizable */}
@@ -313,6 +348,10 @@ export function VisualizerContainer(
           setSelectedSlot={slot => {
             setSelectedSlot(slot)
             if (selectedRunTimeCommand != null && selectedSlot != null) {
+              trackEvent({
+                name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW,
+                properties: {},
+              })
               dispatch(
                 stepDetailViewerOpenAction({
                   protocolKey,
