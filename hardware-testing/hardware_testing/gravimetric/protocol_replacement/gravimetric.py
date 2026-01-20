@@ -167,6 +167,7 @@ class CSVSettings:
     touch_blank: bool
     retracted_offset: float
     gantry_speed: float
+    liquid_class_test: bool
 
     @classmethod
     def parse_csv(cls, csv_params: List[List[str]], simulating: bool) -> "CSVSettings":
@@ -252,6 +253,9 @@ class CSVSettings:
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
         cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
         touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
+        liquid_class_test = bool(
+            lookup_key("liquid_class_test", csv_params)[0] == "TRUE"
+        )
 
         volumes = {
             20: volumes_to_test_20ul,
@@ -315,6 +319,7 @@ class CSVSettings:
             touch_blank=touch_blank,
             retracted_offset=retracted_offset,
             gantry_speed=gantry_speed,
+            liquid_class_test=liquid_class_test,
         )
 
 
@@ -667,12 +672,8 @@ def _get_tips_for_test(
             return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         else:
             return _get_tips_for_test_96(fixture_settings, tip, blank)
-    if (
-        fixture_settings.pipette_channels == 8
-        and len(fixture_settings.channels) == 1
-        and fixture_settings.channels[0] == 0
-        and not fixture_settings.cavity_test
-    ):
+    if fixture_settings.pipette_channels == 8 and fixture_settings.liquid_class_test:
+        # Liquid class testing uses the whole tip rack with one channel so dont use the special pattern
         return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
