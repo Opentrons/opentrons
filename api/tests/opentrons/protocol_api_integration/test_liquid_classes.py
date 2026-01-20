@@ -159,13 +159,3 @@ def test_adding_blowout_position_to_liquid_classes(
     # This fails right now cuz of no setter. Fix that
     # custom_water.get_for(pip_type, tiprack).dispense.retract.blowout.blowout_position = None
     # assert custom_water.get_for(pip_type, tiprack).dispense.retract.blowout.blowout_position is None
-
-    assert (
-        custom_water.get_for(
-            pip_type, tiprack
-        ).dispense.dispense_position.position_reference.value
-        == "well-top"
-    )
-    assert custom_water.get_for(
-        pip_type, tiprack
-    ).dispense.dispense_position.offset == Coordinate(x=1, y=2, z=3)

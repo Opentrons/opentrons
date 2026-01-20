@@ -519,8 +519,6 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     labwareId=labware_id,
                     wellName=well_name,
                     wellLocation=well_location,
-                    # TODO(jbl 2022-11-07) PAPIv2 does not have an argument for rate and
-                    #   this also needs to be refactored along with other flow rate related issues
                     flowRate=flow_rate,
                 )
             )
