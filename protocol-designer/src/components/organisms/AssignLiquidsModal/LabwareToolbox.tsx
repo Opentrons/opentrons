@@ -72,7 +72,7 @@ interface LabwareStackToolboxProps {
 export function LabwareStackToolbox({
   setShowLiquidLayoutOverlay,
   data,
-  selectedLabwareIds,
+  // selectedLabwareIds,
   slot,
 }: LabwareStackToolboxProps): JSX.Element | null {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
@@ -116,6 +116,10 @@ export function LabwareStackToolbox({
     stackLimit = getStackLimitFromDef(labware[labwareId].def)
     topDownStackIds = getFullStackFromLabwares(labware, labwareId)
   }
+
+  console.log('topDownStackIds: ', topDownStackIds)
+  const selectedLabwareIds =
+    topDownStackIds.length > 0 ? topDownStackIds[0] : [labwareId]
 
   const handleAddAnotherLabware = (): void => {
     if (topDownStackIds.length < stackLimit && labwareId != null) {
@@ -274,6 +278,8 @@ export function LabwareStackToolboxContainer({
     initialRobotState.labware,
     slot
   )
+
+  console.log('largestStackInSlot: ', largestStackInSlot)
   const liquidLocations = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
@@ -283,6 +289,11 @@ export function LabwareStackToolboxContainer({
     liquidLocations,
     largestStackInSlot,
   }
+
+  console.log('selectedLabwareIds: ', selectedLabwareIds)
+  console.log('labwareId: ', labwareId)
+  console.log('labware: ', labware)
+  console.log('liquidLocations: ', liquidLocations)
 
   return (
     <LabwareStackToolbox
