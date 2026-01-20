@@ -136,10 +136,11 @@ export function getResultingTimelineFrameFromRunCommands(
             {}
           )
           const stackLabwareStack =
-            stackLabwareId != null
-              ? stackLocationSequence != null
-                ? getStackForLabwareLocation(stackLocationSequence)
-                : [stackLabwareId, ...getLocationStack(command.params.location)]
+            stackLabwareId != null && stackLocationSequence != null
+              ? [
+                  stackLabwareId,
+                  ...getStackForLabwareLocation(stackLocationSequence),
+                ]
               : null
           return {
             ...acc,
