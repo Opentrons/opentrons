@@ -177,6 +177,7 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
+    liquid_class_test: bool
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -264,6 +265,10 @@ class FixtureSettings:
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
         cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
         touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
+        liquid_class_test = bool(
+            lookup_key("liquid_class_test", csv_params)[0] == "TRUE"
+        )
+
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
@@ -451,6 +456,7 @@ class FixtureSettings:
             single_tip_96=single_tip_96,
             cavity_test=cavity_test,
             touch_blank=touch_blank,
+            liquid_class_test=liquid_class_test,
         )
 
     def validate_settings(self) -> bool:
@@ -636,13 +642,8 @@ def _get_tips_for_test(
             return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         else:
             return _get_tips_for_test_96(fixture_settings, tip, blank)
-    if (
-        fixture_settings.pipette_channels == 8
-        and len(fixture_settings.channels) == 1
-        and fixture_settings.channels[0] == 0
-        and not fixture_settings.cavity_test
-    ):
-        # Liquid class testing use whole tip rack
+    if fixture_settings.pipette_channels == 8 and fixture_settings.liquid_class_test:
+        # Liquid class testing uses the whole tip rack with one channel so dont use the special pattern
         return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
@@ -1376,7 +1377,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 print_info(str(tips))
                 if channel == 7:
                     # we're doing an 8 channel test and just swapped over to the front channel.
-                    print_info("Switching to channel 7, running LLD again and skipping evap loss application.")
+                    print_info(
+                        "Switching to channel 7, running LLD again and skipping evap loss application."
+                    )
                     pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
                     fixture_settings.pipette.require_liquid_presence(
                         fixture_settings.liquid_source
