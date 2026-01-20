@@ -72,11 +72,12 @@ export function DeckViewOverlay(props: SlotOverlayProps): JSX.Element | null {
   const slotMapped = HOPPER_FAKE_LOCATIONS.includes(slotId)
     ? FAKE_HOPPER_LOCATION_MAP[slotId as HopperLocationMapKey]
     : slotId
-  const hasTCOnSlot = Object.entries(modules).some(
-    ([id, module]) =>
-      module.slot === slotMapped &&
-      moduleEntities[id].type === THERMOCYCLER_MODULE_TYPE
-  )
+  const hasTCOnSlot = Object.entries(modules).some(([id, module]) => {
+    const entity = moduleEntities[id]
+    return (
+      module.slot === slotMapped && entity?.type === THERMOCYCLER_MODULE_TYPE
+    )
+  })
   const tcSlots = robotType === FLEX_ROBOT_TYPE ? ['A1'] : ['8', '10', '11']
   const stagingAreaLocations = Object.values(stagingAreaEntities)?.map(
     stagingArea => stagingArea.location as string
