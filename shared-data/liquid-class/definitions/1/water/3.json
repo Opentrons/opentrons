@@ -6584,7 +6584,7 @@
                 "z": 2
               }
             },
-            "flowRateByVolume": [[1.0, 200.0]],
+            "flowRateByVolume": [[50.0,80]],
             "correctionByVolume": [[0.0, 0.0]],
             "mix": {
               "enable": false,
