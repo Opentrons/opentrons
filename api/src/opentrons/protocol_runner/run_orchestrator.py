@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import enum
-from typing import AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Union
+from typing import Any, AsyncGenerator, Dict, List, Mapping, Optional, Tuple, Union
 
 from anyio import move_on_after
 
@@ -355,6 +355,20 @@ class RunOrchestrator:
     def get_is_run_terminal(self) -> bool:
         """Get whether engine is in a terminal state."""
         return self._protocol_engine.state_view.commands.get_is_terminal()
+
+    def get_camera_capture_image_settings(
+        self,
+    ) -> Dict[str, Any]:
+        """Get camera capture image settings."""
+        return {
+            "camera_id": self._protocol_engine.state_view.camera.get_camera_id(),
+            "resolution": self._protocol_engine.state_view.camera.get_resolution(),
+            "zoom": self._protocol_engine.state_view.camera.get_zoom(),
+            "pan": self._protocol_engine.state_view.camera.get_pan(),
+            "contrast": self._protocol_engine.state_view.camera.get_contrast(),
+            "brightness": self._protocol_engine.state_view.camera.get_brightness(),
+            "saturation": self._protocol_engine.state_view.camera.get_saturation(),
+        }
 
     def run_has_started(self) -> bool:
         """Get whether the run has started."""

@@ -24,6 +24,7 @@ import {
 } from '@opentrons/components'
 
 import {
+  ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
   ANALYTICS_PROTOCOL_PROCEED_TO_RUN,
   useTrackEvent,
 } from '/app/redux/analytics'
@@ -38,10 +39,17 @@ import type {
   PythonConfig,
   RobotType,
 } from '@opentrons/shared-data'
+import type {
+  GroupedCommands,
+  StoredProtocolData,
+} from '/app/redux/protocol-storage'
 import type { AnalysisStatus } from '/app/transformations/analysis'
-import type { ProtocolDetailsProps } from './UpdatedProtocolDetails'
 
 const MAX_DESCRIPTION_LENGTH = 220
+
+interface ProtocolDetailsProps extends StoredProtocolData {
+  groupedCommands: GroupedCommands | null
+}
 
 interface ProtocolDetailsHeaderProps {
   analysisStatus: AnalysisStatus
@@ -70,7 +78,7 @@ export function ProtocolDetailsHeader({
   const navigate = useNavigate()
   const trackEvent = useTrackEvent()
   const [isReadMore, setIsReadMore] = useState(true)
-
+  const numberOfAtomicCommands = mostRecentAnalysis?.commands.length ?? 0
   const protocolDescription = mostRecentAnalysis?.metadata.description ?? ''
   const slicedDescription = protocolDescription.slice(0, MAX_DESCRIPTION_LENGTH)
   const isDescriptionTruncated =
@@ -125,6 +133,13 @@ export function ProtocolDetailsHeader({
   }
 
   const handleClickTimeline = (): void => {
+    trackEvent({
+      name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
+      properties: {
+        sourceLocation: 'protocol details header',
+        numberOfAtomicCommands,
+      },
+    })
     navigate(`/protocols/${protocolKey}/visualization`)
   }
 

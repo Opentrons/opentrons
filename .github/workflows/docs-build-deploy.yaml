@@ -3,6 +3,7 @@ name: 'Docs build and deploy'
 on:
   pull_request:
     paths:
+      - 'api/**'
       - 'docs/**'
       - '.github/workflows/docs-build-deploy.yaml'
       - 'scripts/static-deploy/**'

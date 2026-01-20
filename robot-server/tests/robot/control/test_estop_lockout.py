@@ -29,9 +29,9 @@ async def hardware_ot2(decoy: Decoy) -> API:
     return decoy.mock(cls=API)
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
-async def hardware_ot3(decoy: Decoy) -> "OT3API":
+async def hardware_ot3(decoy: Decoy, request: pytest.FixtureRequest) -> "OT3API":
+    request.node.add_marker("ot3_only")
     return decoy.mock(cls="OT3API")
 
 
@@ -42,11 +42,11 @@ async def thread_manager_ot2(decoy: Decoy, hardware_ot2: API) -> ThreadManagedHa
     return thread_manager
 
 
-@pytest.mark.ot3_only
 @pytest.fixture
 async def thread_manager_ot3(
-    decoy: Decoy, hardware_ot3: "OT3API"
+    decoy: Decoy, hardware_ot3: "OT3API", request: pytest.FixtureRequest
 ) -> ThreadManagedHardware:
+    request.node.add_marker("ot3_only")
     thread_manager = decoy.mock(cls=ThreadManagedHardware)
     decoy.when(thread_manager.wraps_instance(matchers.Anything())).then_return(True)
     decoy.when(thread_manager.wrapped()).then_return(hardware_ot3)

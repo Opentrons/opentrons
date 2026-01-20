@@ -56,7 +56,13 @@ nav:
       - Quick Transfer: touchscreen/quick-transfer.md
       - Instrument Management: touchscreen/instruments.md
       - Robot Settings: touchscreen/settings.md
-  - Opentrons App: opentrons-app.md
+  - Opentrons App:
+      - Opentrons App: opentrons-app/index.md
+      - App Installation and Management: opentrons-app/install.md
+      - Downgrading Flex Software: opentrons-app/flex-downgrade.md
+      - Transferring Protocols: opentrons-app/protocol-transfer.md
+      - Controlling Modules: opentrons-app/module-control.md
+      - Using the Camera: opentrons-app/camera.md
   - Advanced Operations:
       - Advanced Operations: advanced-operation/index.md
       - Flex Log Files: advanced-operation/log-files.md
