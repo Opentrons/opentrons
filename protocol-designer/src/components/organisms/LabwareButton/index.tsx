@@ -66,7 +66,7 @@ export function LabwareButton(props: LabwareButtonProps): JSX.Element {
               fillColor={COLORS.white}
             />
             {showOverflowMenu ? (
-              <Box position={POSITION_ABSOLUTE} left="3rem" top="-4px">
+              <Box position={POSITION_ABSOLUTE} left="3rem" bottom="40px">
                 <LabwareCardOverflowMenu
                   labwareIds={[id]}
                   setShowOverflowMenu={setShowOverflowMenu}
