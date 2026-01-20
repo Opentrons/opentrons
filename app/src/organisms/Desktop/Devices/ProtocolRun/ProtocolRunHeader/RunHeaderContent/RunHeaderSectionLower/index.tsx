@@ -87,8 +87,7 @@ export function RunHeaderSectionLower({
         <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
         <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
       </div>
-      {runStatus === RUN_STATUS_IDLE &&
-      robotType === FLEX_ROBOT_TYPE ? (
+      {runStatus === RUN_STATUS_IDLE && robotType === FLEX_ROBOT_TYPE ? (
         <div className={styles.button_container}>
           <SecondaryButton onClick={handleVisualizeClick}>
             {t('visualize')}
