@@ -13,7 +13,7 @@ _log = logging.getLogger(__name__)
 
 
 @dataclass
-class ParsedArgs:
+class _ParsedArgs:
     port: int
     host: str
     uds: str | None
@@ -21,7 +21,7 @@ class ParsedArgs:
     reload: bool
 
 
-def _parse_args() -> ParsedArgs:
+def _parse_args() -> _ParsedArgs:
     parser = argparse.ArgumentParser(description="Opentrons auth server")
     parser.add_argument(
         "-p",
@@ -54,7 +54,7 @@ def _parse_args() -> ParsedArgs:
     )
 
     parse_result = parser.parse_args()
-    return ParsedArgs(
+    return _ParsedArgs(
         port=parse_result.port,
         host=parse_result.host,
         uds=parse_result.uds,
