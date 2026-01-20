@@ -19,6 +19,7 @@ import {
   StyledText,
   Tag,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_V1 } from '@opentrons/shared-data'
 import {
   getLiquidIdsOnLabware,
   getSlotInLocationStack,
@@ -27,6 +28,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
+import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
@@ -66,7 +68,7 @@ export const SlotDetailModal = (
   const allIngredientGroupFields = useSelector(
     selectors.allIngredientGroupFields
   )
-  const { labware } = activeDeckSetup
+  const { labware, modules } = activeDeckSetup
   const labwareOnDeck = labware[selectedLabware]
 
   const wellContents =
@@ -101,14 +103,25 @@ export const SlotDetailModal = (
 
   const isAdapter = getIsAdapterFromDef(labwareOnDeck.def)
   const slotName = getSlotInLocationStack(labwareOnDeck.stack)
+  const isHopper = Object.values(modules).some(
+    module =>
+      module.slot === slotName && module.model === FLEX_STACKER_MODULE_V1
+  )
+  const deckLabel = (() => {
+    if (slotName === 'offDeck') {
+      return t('off_deck')
+    }
+    if (isHopper) {
+      return t('shared:stacker', { slot: getColumnFromWellName(slotName) })
+    }
+    return slotName
+  })()
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
-      <RobotInfoLabel
-        deckLabel={slotName === 'offDeck' ? t('off_deck') : slotName}
-      />
+      <RobotInfoLabel deckLabel={deckLabel} />
     </Flex>
   )
 
@@ -122,7 +135,6 @@ export const SlotDetailModal = (
       closeOnOutsideClick
       childrenPadding={0}
       width="47rem"
-      overflowY="hidden"
       headerTagElement={
         stackOfLabware.length > 1 ? (
           <Tag

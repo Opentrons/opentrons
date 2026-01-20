@@ -69,16 +69,20 @@ export function ActiveLabwareControls(
           .moduleState as FlexStackerModuleState)
       : null
   const stackerHopperLabware: string[] =
-    stackerModuleState?.labwareInHopper?.reduce<string[]>((acc, hopper) => {
-      acc.push(hopper.primaryLabwareId)
-      if (hopper.adapterLabwareId) {
-        acc.push(hopper.adapterLabwareId)
-      }
-      if (hopper.lidLabwareId) {
-        acc.push(hopper.lidLabwareId)
-      }
-      return acc
-    }, []) ?? []
+    stackerModuleState?.labwareInHopper?.reduceRight<string[]>(
+      (acc, hopper) => {
+        if (hopper.lidLabwareId) {
+          acc.push(hopper.lidLabwareId)
+        }
+        if (hopper.adapterLabwareId) {
+          acc.push(hopper.adapterLabwareId)
+        }
+        acc.push(hopper.primaryLabwareId)
+        return acc
+      },
+      []
+    ) ?? []
+
   const filteredStack = fullStack.filter(
     item => activeDeckSetup.labware[item] != null
   )
