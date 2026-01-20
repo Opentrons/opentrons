@@ -10,7 +10,7 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 There are no changes to the Opentrons App in v8.8.1.
 
-Installing robot software v8.8.1 allows all robots to properly reboot after a recent upgrade to robot software to v8.8.0.
+Installing robot software v8.8.1 allows all robots to properly reboot after a recent upgrade to robot software v8.8.0.
 
 ## Opentrons App Changes in 8.8.0
 
