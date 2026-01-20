@@ -164,7 +164,8 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
 
   const moduleItems = highlightItems.highlightModuleItems.reduce<JSX.Element[]>(
     (acc, { module: moduleOnDeck, selection, isSelected = false }) => {
-      const { text } = selection
+      let text = ''
+
       if (moduleOnDeck == null) {
         return acc
       }
@@ -176,6 +177,11 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
 
       const stepType: FlexStackerFormType | null =
         currentStep?.flexStackerFormType ?? null
+      if (stepType != null) {
+        text = stepType.charAt(0).toUpperCase() + stepType.slice(1)
+      } else {
+        text = selection.text ?? ''
+      }
       const onHopperActions =
         stepType != null &&
         (FLEX_STACKER_IN_HOPPER_ACTIONS as string[]).includes(stepType)

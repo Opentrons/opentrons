@@ -1377,6 +1377,20 @@ class Labware:
         """
         self._core.reset_tips()
 
+    @requires_version(2, 28)
+    def set_empty(self) -> None:
+        """Mark a tip rack as completely empty of tips.
+
+        When this is called, all tip wells in the tip rack will be marked as empty. Any tips
+        that are dropped into this empty tip rack will be marked as used, and therefore will not
+        be available to pick up via automatic tip tracking. If an empty well is filled with tips,
+        [`reset()`][opentrons.protocol_api.InstrumentContext.reset] can be called to treat it as
+        a fresh tip rack.
+
+        This will raise if the labware is not a tip rack.
+        """
+        self._core.set_empty()
+
     @requires_version(2, 22)
     def load_liquid(
         self, wells: Sequence[Union[str, Well]], volume: float, liquid: Liquid

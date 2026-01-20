@@ -7,7 +7,10 @@ import { convertStepHierarchyToArray } from '/protocol-designer/steplist/utils/s
 
 import type { MouseEvent } from 'react'
 import type { StepIdType } from '/protocol-designer/form-types'
-import type { SavedStepFormState } from '/protocol-designer/step-forms'
+import type {
+  ModuleOnDeck,
+  SavedStepFormState,
+} from '/protocol-designer/step-forms'
 import type { StepHierarchy } from '/protocol-designer/steplist/utils/stepHierarchy'
 
 export const capitalizeFirstLetterAfterNumber = (title: string): string =>
@@ -150,20 +153,25 @@ export const getMouseClickKeyInfo = (
 
 export const getUserOS = (): string | undefined => new UAParser().getOS().name
 
-export const getFillLabwareIdsToDelete = (
+interface FillLabwareToDeleteData {
+  labwareIds: string[]
+  module: ModuleOnDeck
+}
+
+export const getFillLabwareToDeleteData = (
   stepIds: string[],
-  savedStepForms: SavedStepFormState
-): string[] => {
-  return stepIds.reduce<string[]>((acc, stepId) => {
+  savedStepForms: SavedStepFormState,
+  deckSetupModules: Record<string, ModuleOnDeck>
+): FillLabwareToDeleteData[] => {
+  return stepIds.reduce<FillLabwareToDeleteData[]>((acc, stepId) => {
     const formData = savedStepForms[stepId]
-
-    if (
-      formData?.stepType === 'flexStacker' &&
-      formData.fillLabwareIds != null
-    ) {
-      acc.push(...(formData.fillLabwareIds as string[]))
-    }
-
-    return acc
+    const module = Object.values(deckSetupModules).find(
+      module => formData.moduleId === module.id
+    )
+    return formData?.stepType === 'flexStacker' &&
+      formData.fillLabwareIds != null &&
+      module != null
+      ? [...acc, { labwareIds: formData.fillLabwareIds as string[], module }]
+      : acc
   }, [])
 }

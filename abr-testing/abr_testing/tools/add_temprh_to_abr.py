@@ -3,6 +3,7 @@
 from abr_testing.automation import google_sheets_tool
 from abr_testing.automation import google_drive_tool
 import argparse
+from pathlib import Path
 import csv
 import sys
 import os
@@ -68,7 +69,7 @@ def read_csv_as_dict(file_path: str) -> List[Dict[str, Any]]:
 
 
 def connect_and_download(
-    sheets: Dict[str, str], storage_directory: str
+    sheets: Dict[str, str], storage_directory: Path
 ) -> Tuple[List[str], str]:
     """Connect to google sheet and download."""
     try:

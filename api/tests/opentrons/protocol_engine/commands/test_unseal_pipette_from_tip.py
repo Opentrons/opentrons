@@ -128,15 +128,10 @@ async def test_drop_tip_implementation(
     ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
 
     decoy.when(
-        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
-    ).then_return(False)
-
-    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
-            partially_configured=False,
             override_default_offset=0,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
@@ -222,15 +217,10 @@ async def test_tip_attached_error(
     )
 
     decoy.when(
-        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
-    ).then_return(False)
-
-    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
-            partially_configured=False,
             override_default_offset=0,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))
@@ -299,15 +289,10 @@ async def test_stall_error(
     ).then_return(TipGeometry(length=10, diameter=20, volume=1000))
 
     decoy.when(
-        mock_state_view.pipettes.get_is_partially_configured(pipette_id="abc")
-    ).then_return(False)
-
-    decoy.when(
         mock_state_view.geometry.get_checked_tip_drop_location(
             pipette_id="abc",
             labware_id="123",
             well_location=DropTipWellLocation(offset=WellOffset(x=1, y=2, z=3)),
-            partially_configured=False,
             override_default_offset=0,
         )
     ).then_return(WellLocation(offset=WellOffset(x=4, y=5, z=6)))

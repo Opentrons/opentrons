@@ -15,10 +15,7 @@ import {
   makeInitialRobotState,
 } from '@opentrons/step-generation'
 
-import {
-  DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-  DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
-} from '../constants'
+import { DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP } from '../constants'
 
 import type {
   CutoutConfig,
@@ -34,6 +31,7 @@ import type {
   LabwareEntities,
   PipetteEntities,
   RobotState,
+  SharedTransferLikeArgs,
   TransferArgs,
   TrashBinEntities,
   WasteChuteEntities,
@@ -447,8 +445,8 @@ export function generateQuickTransferArgs(
   const touchTipAfterAspirateOffsetMmFromTop =
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
-  const commonFields = {
-    stepId: 1,
+  const commonFields: SharedTransferLikeArgs = {
+    stepNumber: 1,
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
     sourceLabware: sourceLabwareEntity?.id!,
@@ -463,7 +461,6 @@ export function generateQuickTransferArgs(
       quickTransferState.path === 'multiDispense'
         ? (quickTransferState.disposalVolumeDispenseSettings?.flowRate ?? 0)
         : (quickTransferState.blowOutDispense?.flowRate ?? 0),
-    blowoutOffsetFromTopMm: DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
     changeTip: quickTransferState.changeTip,
     preWetTip: quickTransferState.preWetTip,
     aspirateDelay:

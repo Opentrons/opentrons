@@ -75,6 +75,7 @@ describe('RunHeaderSectionLower', () => {
       runId: mockRunId,
       runStatus: null,
       robotName: mockRobotName,
+      numberOfAtomicCommands: 10,
     }
     vi.mocked(useToaster).mockReturnValue({
       makeSnackbar: mockMakeSnackbar,
@@ -167,7 +168,10 @@ describe('RunHeaderSectionLower', () => {
     )
     expect(mockTrackEvent).toHaveBeenCalledWith({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
-      properties: { sourceLocation: 'protocol run' },
+      properties: {
+        sourceLocation: 'protocol run',
+        numberOfAtomicCommands: 10,
+      },
     })
   })
 })

@@ -965,8 +965,7 @@ class ProtocolContext(CommandPublisher):
                 [`MagneticBlockContext`][opentrons.protocol_api.MagneticBlockContext],
                 [`MagneticModuleContext`][opentrons.protocol_api.MagneticModuleContext],
                 [`TemperatureModuleContext`][opentrons.protocol_api.TemperatureModuleContext],
-                [`ThermocyclerContext`][opentrons.protocol_api.ThermocyclerContext],
-                or [`VacuumModuleContext`][opentrons.protocol_api.VacuumModuleContext],
+                or [`ThermocyclerContext`][opentrons.protocol_api.ThermocyclerContext],
                 depending on what you requested with `module_name`.
 
                 *Changed in version 2.13:*

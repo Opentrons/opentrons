@@ -86,6 +86,19 @@ export const getVolumesPerLiquid = (
   return volumesPerLiquid
 }
 
+export const getLiquidIdsOnLabwareStack = (
+  wellContents: ContentsByWell[]
+): string[] => {
+  const allLiquidIdsOnLabware = wellContents.flatMap(contentsByWell =>
+    contentsByWell == null
+      ? []
+      : Object.values(contentsByWell).flatMap(contents =>
+          contents.groupIds.filter(group => group !== AIR)
+        )
+  )
+  return Array.from(new Set(allLiquidIdsOnLabware))
+}
+
 export const getLiquidIdsOnLabware = (
   wellContents: ContentsByWell
 ): string[] => {

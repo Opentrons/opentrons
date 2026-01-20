@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { SecondaryButton } from '@opentrons/components'
+import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { useToaster } from '/app/organisms/ToasterOven'
 import {
@@ -33,6 +34,7 @@ export function RunHeaderSectionLower({
   runId,
   runStatus,
   robotName,
+  numberOfAtomicCommands,
 }: RunHeaderContentProps): JSX.Element {
   const { t } = useTranslation('run_details')
   const navigate = useNavigate()
@@ -43,7 +45,7 @@ export function RunHeaderSectionLower({
   const completedAtTimestamp =
     completedAt != null ? formatTimestamp(completedAt) : EMPTY_TIMESTAMP
   const createdAtTimestamp = useRunCreatedAtTimestamp(runId)
-  const { protocolKey } = useProtocolDetailsForRun(runId)
+  const { protocolKey, robotType } = useProtocolDetailsForRun(runId)
   const { makeSnackbar } = useToaster()
 
   const storedProtocolAnalysis = useStoredProtocolAnalysis(runId)
@@ -74,7 +76,7 @@ export function RunHeaderSectionLower({
     const targetPath = `/devices/${robotName}/protocol-runs/${runId}/${encodedTimestamp}/${protocolKey}/visualization`
     trackEvent({
       name: ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION,
-      properties: { sourceLocation: 'protocol run' },
+      properties: { sourceLocation: 'protocol run', numberOfAtomicCommands },
     })
     navigate(targetPath)
   }
@@ -85,7 +87,7 @@ export function RunHeaderSectionLower({
         <LabeledValue label={t('protocol_start')} value={startedAtTimestamp} />
         <LabeledValue label={t('protocol_end')} value={completedAtTimestamp} />
       </div>
-      {runStatus === RUN_STATUS_IDLE ? (
+      {runStatus === RUN_STATUS_IDLE && robotType === FLEX_ROBOT_TYPE ? (
         <div className={styles.button_container}>
           <SecondaryButton onClick={handleVisualizeClick}>
             {t('visualize')}

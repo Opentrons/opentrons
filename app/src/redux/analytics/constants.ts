@@ -46,10 +46,16 @@ export const ANALYTICS_ODD_APP_ERROR = 'oddError'
 export const ANALYTICS_DESKTOP_APP_ERROR = 'desktopAppError'
 export const ANALYTICS_NOTIFICATION_PORT_BLOCK_ERROR =
   'notificationPortBlockError'
+
+/**
+ * Protocol Visualization Analytics
+ */
 export const ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION =
   'launchProtocolVisualization'
 export const ANALYTICS_LAUNCH_PROTOCOL_VISUALIZATION_SPOTLIGHT_WINDOW =
   'launchProtocolVisualizationSpotlightWindow'
+export const ANALYTICS_NOTIFICATION_PROTOCOL_VISUALIZATION_VIEWPORT_SIZES =
+  'notificationProtocolVisualizationViewportSizes'
 
 const ANALYTICS_PROTOCOL_PROCEED_BUTTON_TEXT = [
   ANALYTICS_PROCEED_TO_CAMERA_SETUP_STEP,
