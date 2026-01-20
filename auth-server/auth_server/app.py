@@ -1,4 +1,4 @@
-"""The public export of the server's ASGI app object."""
+"""The server's ASGI app object."""
 
 import logging
 from contextlib import asynccontextmanager
@@ -13,11 +13,7 @@ _log = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    systemd.configure_logging(level=logging.INFO)
-
-    _log.info("Server is up.")
     systemd.notify_up()
-
     yield
 
 

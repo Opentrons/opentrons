@@ -42,21 +42,7 @@ clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
 clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
-# Uvicorn command to run the server in dev mode.
-#
-# todo(mm, 2021-07-08): Figure out how to run the server with Python development
-# mode enabled, to expose more errors and warnings.
-#   * Using a Makefile target-specific variable to set PYTHONDEVMODE=1
-#     doesn't work because it applies the variable to the whole `uv run`
-#     command, and we only want our inner server process running under dev mode,
-#     not the outer uv process.
-#   * Adding PYTHONDEVMODE=1 to the .env file specified by
-#     OT_ROBOT_SERVER_DOT_ENV_PATH doesn't work because that's read too late.
-#   * Doing `uv run env PYTHONDEVMODE=1 uvicorn ...` works, except it's
-#     probably POSIX-only.
 dev_port ?= "33950"
-dev_host ?= "localhost"
-run_dev ?= uvicorn "auth_server.app:app" --host $(dev_host) --port $(dev_port) --reload --reload-dir auth_server
 
 .PHONY: all
 all: clean wheel
@@ -108,7 +94,7 @@ format:
 
 .PHONY: dev
 dev:
-	$(UV) run $(run_dev)
+	$(python) -m auth_server --port $(dev_port) --reload --log-level=debug
 
 # Note: No `push` target, since this project only runs on Flex (OT-3), not OT-2.
 
