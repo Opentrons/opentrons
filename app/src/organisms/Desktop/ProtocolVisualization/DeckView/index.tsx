@@ -72,6 +72,7 @@ interface DeckViewProps {
 
 const lightFill = COLORS.grey35
 const darkFill = COLORS.grey60
+const extraSize = 260
 
 export function DeckView(props: DeckViewProps): JSX.Element {
   const {
@@ -100,6 +101,18 @@ export function DeckView(props: DeckViewProps): JSX.Element {
   const hasFlexStacker = Object.values(moduleEntities).some(
     module => module.type === FLEX_STACKER_MODULE_TYPE
   )
+  const baseViewBox = `${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`
+  const stackerViewBox = useMemo(() => {
+    if (!hasFlexStacker) return baseViewBox
+    const [originX, originY] = deckDef.cornerOffsetFromOrigin
+    const [deckWidth, deckHeight] = deckDef.dimensions
+
+    return `${originX} ${originY} ${deckWidth + extraSize} ${deckHeight}`
+  }, [baseViewBox, deckDef, hasFlexStacker])
+  const viewBoxWidth = hasFlexStacker
+    ? deckDef.dimensions[0] + extraSize
+    : deckDef.dimensions[0]
+
   const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
     (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
       const matchingCommand =
@@ -149,155 +162,162 @@ export function DeckView(props: DeckViewProps): JSX.Element {
         </StyledText>
       </div>
       <div className={styles.body_container}>
-        <RobotCoordinateSpaceWithRef
-          height="100%"
-          width="100%"
-          deckDef={deckDef}
-          adjustViewBoxForStacker={hasFlexStacker}
-          viewBox={`${deckDef.cornerOffsetFromOrigin[0]} ${deckDef.cornerOffsetFromOrigin[1]} ${deckDef.dimensions[0]} ${deckDef.dimensions[1]}`}
-        >
-          {() => (
-            <>
-              {robotType === OT2_ROBOT_TYPE ? (
-                <>
-                  <DeckFromLayers
-                    robotType={robotType}
-                    layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
-                  />
-                  <FixedTrashText />
-                </>
-              ) : (
-                <>
-                  {filteredAddressableAreas.map(addressableArea => {
-                    const cutoutId = getCutoutIdForAddressableArea(
-                      addressableArea.id,
-                      deckDef.cutoutFixtures
-                    )
-                    const labwareOnSlot = Object.entries(labware).find(
-                      ([_, lw]) =>
-                        getSlotInLocationStack(lw.stack) === addressableArea.id
-                    )
-                    const { isActiveLayerVisible } =
-                      labwareOnSlot != null
-                        ? getActiveLayer(
-                            labwareOnSlot[0],
-                            selectedRunTimeCommand
-                          )
-                        : { isActiveLayerVisible: false }
+        <div className={styles.deck_svg_wrapper}>
+          <RobotCoordinateSpaceWithRef
+            height="100%"
+            width="100%"
+            deckDef={deckDef}
+            zoomed={true}
+            viewBox={stackerViewBox}
+          >
+            {() => (
+              <>
+                {robotType === OT2_ROBOT_TYPE ? (
+                  <>
+                    <DeckFromLayers
+                      robotType={robotType}
+                      layerBlocklist={OT2_STANDARD_DECK_VIEW_LAYER_BLOCK_LIST}
+                    />
+                    <FixedTrashText />
+                  </>
+                ) : (
+                  <>
+                    {filteredAddressableAreas.map(addressableArea => {
+                      const cutoutId = getCutoutIdForAddressableArea(
+                        addressableArea.id,
+                        deckDef.cutoutFixtures
+                      )
+                      const labwareOnSlot = Object.entries(labware).find(
+                        ([_, lw]) =>
+                          getSlotInLocationStack(lw.stack) ===
+                          addressableArea.id
+                      )
+                      const { isActiveLayerVisible } =
+                        labwareOnSlot != null
+                          ? getActiveLayer(
+                              labwareOnSlot[0],
+                              selectedRunTimeCommand
+                            )
+                          : { isActiveLayerVisible: false }
 
-                    return cutoutId != null ? (
-                      <SingleSlotFixture
-                        key={addressableArea.id}
-                        cutoutId={cutoutId}
+                      return cutoutId != null ? (
+                        <SingleSlotFixture
+                          key={addressableArea.id}
+                          cutoutId={cutoutId}
+                          deckDefinition={deckDef}
+                          showExpansion={cutoutId === 'cutoutA1'}
+                          fixtureBaseColor={
+                            isActiveLayerVisible ||
+                            getIsCutoutA1Active(
+                              labware,
+                              modules,
+                              cutoutId,
+                              selectedRunTimeCommand
+                            )
+                              ? COLORS.purple30
+                              : lightFill
+                          }
+                          slotClipColor={darkFill}
+                        />
+                      ) : null
+                    })}
+                    {Object.values(stagingAreaEntities).map(entity => (
+                      <StagingAreaFixture
+                        key={entity.id}
+                        cutoutId={entity.location as StagingAreaLocation}
                         deckDefinition={deckDef}
-                        showExpansion={cutoutId === 'cutoutA1'}
-                        fixtureBaseColor={
-                          isActiveLayerVisible ||
-                          getIsCutoutA1Active(
-                            labware,
-                            modules,
-                            cutoutId,
-                            selectedRunTimeCommand
-                          )
-                            ? COLORS.purple30
-                            : lightFill
-                        }
+                        fixtureBaseColor={lightFill}
                         slotClipColor={darkFill}
                       />
-                    ) : null
-                  })}
-                  {Object.values(stagingAreaEntities).map(entity => (
-                    <StagingAreaFixture
-                      key={entity.id}
-                      cutoutId={entity.location as StagingAreaLocation}
-                      deckDefinition={deckDef}
-                      fixtureBaseColor={lightFill}
-                      slotClipColor={darkFill}
-                    />
-                  ))}
-                  {Object.values(trashBinEntities).length > 0
-                    ? trashBinFixtures.map(({ cutoutId, slot, id }) => {
+                    ))}
+                    {Object.values(trashBinEntities).length > 0
+                      ? trashBinFixtures.map(({ cutoutId, slot, id }) => {
+                          const isPipetteOverTrash = getIsPipetteOverTrash(
+                            pipettes,
+                            id,
+                            selectedRunTimeCommand
+                          )
+
+                          return (
+                            <Fragment key={cutoutId}>
+                              <SingleSlotFixture
+                                cutoutId={cutoutId}
+                                deckDefinition={deckDef}
+                                slotClipColor={COLORS.transparent}
+                                fixtureBaseColor={
+                                  isPipetteOverTrash
+                                    ? COLORS.purple30
+                                    : lightFill
+                                }
+                              />
+                              <FlexTrash
+                                robotType={robotType}
+                                trashIconColor={lightFill}
+                                trashCutoutId={cutoutId as TrashCutoutId}
+                                backgroundColor={COLORS.grey50}
+                                onClick={() => {
+                                  setSelectedSlot(slot)
+                                }}
+                              />
+                            </Fragment>
+                          )
+                        })
+                      : null}
+                    {Object.values(wasteChuteEntities).map(
+                      ({ id, location }) => {
                         const isPipetteOverTrash = getIsPipetteOverTrash(
                           pipettes,
                           id,
                           selectedRunTimeCommand
                         )
-
                         return (
-                          <Fragment key={cutoutId}>
-                            <SingleSlotFixture
-                              cutoutId={cutoutId}
-                              deckDefinition={deckDef}
-                              slotClipColor={COLORS.transparent}
-                              fixtureBaseColor={
-                                isPipetteOverTrash ? COLORS.purple30 : lightFill
-                              }
-                            />
-                            <FlexTrash
-                              robotType={robotType}
-                              trashIconColor={lightFill}
-                              trashCutoutId={cutoutId as TrashCutoutId}
-                              backgroundColor={COLORS.grey50}
-                              onClick={() => {
-                                setSelectedSlot(slot)
-                              }}
-                            />
-                          </Fragment>
+                          <WasteChuteFixture
+                            key={id}
+                            cutoutId={location as typeof WASTE_CHUTE_CUTOUT}
+                            deckDefinition={deckDef}
+                            fixtureBaseColor={
+                              isPipetteOverTrash ? COLORS.purple30 : lightFill
+                            }
+                          />
                         )
-                      })
-                    : null}
-                  {Object.values(wasteChuteEntities).map(({ id, location }) => {
-                    const isPipetteOverTrash = getIsPipetteOverTrash(
-                      pipettes,
-                      id,
-                      selectedRunTimeCommand
-                    )
-                    return (
-                      <WasteChuteFixture
-                        key={id}
-                        cutoutId={location as typeof WASTE_CHUTE_CUTOUT}
+                      }
+                    )}
+                    {wasteChuteStagingAreaFixtures.map(fixture => (
+                      <WasteChuteStagingAreaFixture
+                        key={fixture.id}
+                        cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
                         deckDefinition={deckDef}
-                        fixtureBaseColor={
-                          isPipetteOverTrash ? COLORS.purple30 : lightFill
-                        }
+                        fixtureBaseColor={lightFill}
+                        slotClipColor={darkFill}
                       />
-                    )
-                  })}
-                  {wasteChuteStagingAreaFixtures.map(fixture => (
-                    <WasteChuteStagingAreaFixture
-                      key={fixture.id}
-                      cutoutId={fixture.location as typeof WASTE_CHUTE_CUTOUT}
-                      deckDefinition={deckDef}
-                      fixtureBaseColor={lightFill}
-                      slotClipColor={darkFill}
-                    />
-                  ))}
-                </>
-              )}
-              <DeckViewDetails
-                labwareEntitiesExtended={labwareEntitiesExtended}
-                liquids={liquids}
-                hoveredSlot={hoveredSlot}
-                setHoveredSlot={setHoveredSlot}
-                robotType={robotType}
-                setSelectedSlot={setSelectedSlot}
-                robotState={robotState}
-                invariantContext={invariantContext}
-                stagingAreaCutoutIds={Object.values(stagingAreaEntities).map(
-                  areas => areas.location as CutoutId
+                    ))}
+                  </>
                 )}
-                {...{
-                  deckDef,
-                }}
-                selectedRunTimeCommand={selectedRunTimeCommand}
-              />
-              <SlotLabels
-                robotType={robotType}
-                show4thColumn={Object.values(stagingAreaEntities).length > 0}
-              />
-            </>
-          )}
-        </RobotCoordinateSpaceWithRef>
+                <DeckViewDetails
+                  labwareEntitiesExtended={labwareEntitiesExtended}
+                  liquids={liquids}
+                  hoveredSlot={hoveredSlot}
+                  setHoveredSlot={setHoveredSlot}
+                  robotType={robotType}
+                  setSelectedSlot={setSelectedSlot}
+                  robotState={robotState}
+                  invariantContext={invariantContext}
+                  stagingAreaCutoutIds={Object.values(stagingAreaEntities).map(
+                    areas => areas.location as CutoutId
+                  )}
+                  {...{
+                    deckDef,
+                  }}
+                  selectedRunTimeCommand={selectedRunTimeCommand}
+                />
+                <SlotLabels
+                  robotType={robotType}
+                  show4thColumn={Object.values(stagingAreaEntities).length > 0}
+                />
+              </>
+            )}
+          </RobotCoordinateSpaceWithRef>
+        </div>
       </div>
     </div>
   )
