@@ -42,7 +42,7 @@ clean_cmd = $(SHX) rm -rf build .coverage coverage.xml '*.egg-info'
 clean_cache_cmd = $(SHX) rm -rf '**/__pycache__' '**/*.pyc' '**/.mypy_cache'
 clean_wheel_cmd = $(clean_cmd) dist/*.whl
 clean_all_cmd = $(clean_cmd) dist
-# Uvicorn command to run the robot server in dev mode.
+# Uvicorn command to run the server in dev mode.
 #
 # todo(mm, 2021-07-08): Figure out how to run the server with Python development
 # mode enabled, to expose more errors and warnings.
