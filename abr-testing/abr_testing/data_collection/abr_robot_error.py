@@ -115,7 +115,7 @@ def compare_current_trh_to_average(
     start_time: Any,
     end_time: Optional[Any],
     protocol_name: str,
-    storage_directory: str,
+    storage_directory: Path,
 ) -> str:
     """Get average temp/rh for errored run and compare to average."""
     # Connect to ABR ambient conditions sheet
@@ -203,7 +203,7 @@ def compare_current_trh_to_average(
 
 
 def compare_lpc_to_historical_data(
-    labware_dict: Dict[str, Any], robot: str, storage_directory: str
+    labware_dict: Dict[str, Any], robot: str, storage_directory: Path
 ) -> str:
     """Compare LPC data of slot error occurred in to historical relevant data."""
     # Connect to LPC Google Sheet and get data.
@@ -434,7 +434,7 @@ def get_robot_state(
 
 
 def get_run_error_info_from_robot(
-    ip: str, one_run: str, storage_directory: str, protocol_found: bool
+    ip: str, one_run: str, storage_directory: Path, protocol_found: bool
 ) -> Tuple[str, str, str, List[str], List[str], str, str]:
     """Get error information from robot to fill out ticket."""
     description = dict()
@@ -757,7 +757,7 @@ if __name__ == "__main__":
             headers_lpc,
         ) = abr_google_drive.create_data_dictionary(
             run_id,
-            error_folder_path,
+            Path(error_folder_path),
             issue_url,
             file_values,
         )

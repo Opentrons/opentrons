@@ -10,6 +10,8 @@ import {
   useTrackEvent,
 } from '/app/redux/analytics'
 
+import { getRunTimeParameterDataFromRun } from './utils'
+
 import type { Run } from '@opentrons/api-client'
 import type {
   CompletedProtocolAnalysis,
@@ -58,12 +60,14 @@ export function useCompatibleAnalysis(
   useEffect(() => {
     if (isFlex && mostRecentAnalysis != null && !hasProcessedAnalysis.current) {
       hasProcessedAnalysis.current = true
-
+      const runTimeParameterData =
+        runRecord != null ? getRunTimeParameterDataFromRun(runRecord) : {}
       if (!isLocSeqAnalysisType) {
         createProtocolAnalysis(
           {
             forceReAnalyze: true,
             protocolKey: protocolId,
+            ...runTimeParameterData,
           },
           {
             onSuccess: res => {

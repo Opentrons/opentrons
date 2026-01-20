@@ -89,7 +89,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -369,7 +370,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -549,7 +551,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -733,7 +736,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -921,7 +925,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -1113,7 +1118,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]
@@ -13309,7 +13315,8 @@
             "kind": "onCutoutFixture",
             "possibleCutoutFixtureIds": [
               "stagingAreaRightSlot",
-              "stagingAreaSlotWithMagneticBlockV1"
+              "stagingAreaSlotWithMagneticBlockV1",
+              "vacuumModuleMilliporeV1"
             ]
           }
         ]

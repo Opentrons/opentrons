@@ -225,15 +225,10 @@ export function getDefaultsForStepType(
     case 'thermocycler':
       return {
         blockIsActive: false,
-        blockIsActiveHold: false,
         blockTargetTemp: null,
-        blockTargetTempHold: null,
         lidIsActive: false,
-        lidIsActiveHold: false,
         lidOpen: false,
-        lidOpenHold: null,
         lidTargetTemp: null,
-        lidTargetTempHold: null,
         moduleId: null,
         orderedProfileItems: [],
         profileItemsById: {},

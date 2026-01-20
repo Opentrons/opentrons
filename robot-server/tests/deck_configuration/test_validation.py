@@ -232,6 +232,7 @@ def test_unrecognized_cutout_fixture() -> None:
                     "flexStackerModuleV1WithWasteChuteRightAdapterCovered",
                     "flexStackerModuleV1WithWasteChuteRightAdapterNoCover",
                     "flexStackerModuleV1WithMagneticBlockV1",
+                    "vacuumModuleMilliporeV1",
                 ]
             ),
         )

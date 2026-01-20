@@ -3,7 +3,10 @@ import { fireEvent, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useAddCameraSettingsToRunMutation } from '@opentrons/react-api-client'
+import {
+  useAddCameraImageSettingsToRunMutation,
+  useAddCameraSettingsToRunMutation,
+} from '@opentrons/react-api-client'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
@@ -11,7 +14,10 @@ import { SetupRunCameraControls } from '/app/organisms/Desktop/Devices/ProtocolR
 import { SetupRunCameraUsage } from '/app/organisms/Desktop/Devices/ProtocolRun/SetupCamera/SetupRunCameraSettings'
 import { useIsFlex } from '/app/redux-resources/robots'
 import { useFeatureFlag } from '/app/redux/config'
-import { getCameraUsageState } from '/app/redux/protocol-runs'
+import {
+  getCameraImageSettings,
+  getCameraUsageState,
+} from '/app/redux/protocol-runs'
 import { useRobotStorageInfo } from '/app/resources/health/useIsImageStorageLow'
 
 import { SetupCamera } from '..'
@@ -43,10 +49,12 @@ describe('SetupCamera', () => {
   let mockProps: SetupCameraProps
   let mockNavigate: Mock
   let mockAddCameraToRun: Mock
+  let mockAddCameraImageToRun: Mock
 
   beforeEach(() => {
     mockNavigate = vi.fn()
-    mockAddCameraToRun = vi.fn()
+    mockAddCameraToRun = vi.fn().mockResolvedValue(undefined)
+    mockAddCameraImageToRun = vi.fn().mockResolvedValue(undefined)
     mockProps = {
       isCameraRequired: true,
       runId: 'MOCK-RUN-ID',
@@ -74,8 +82,12 @@ describe('SetupCamera', () => {
       recoveryEnabled: true,
       liveStreamEnabled: true,
     })
+    vi.mocked(getCameraImageSettings as Mock).mockReturnValue(null)
     vi.mocked(useAddCameraSettingsToRunMutation).mockReturnValue({
-      addCameraSettingsToRun: mockAddCameraToRun,
+      mutateAsync: mockAddCameraToRun,
+    } as any)
+    vi.mocked(useAddCameraImageSettingsToRunMutation).mockReturnValue({
+      mutateAsync: mockAddCameraImageToRun,
     } as any)
     vi.mocked(useIsFlex).mockReturnValue(true)
   })

@@ -1,4 +1,4 @@
-import { uniq } from 'lodash'
+import uniq from 'lodash/uniq'
 import { css } from 'styled-components'
 
 import { BORDERS, Box, RESPONSIVENESS } from '@opentrons/components'
