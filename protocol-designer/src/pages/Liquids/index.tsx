@@ -28,7 +28,7 @@ export function Liquids(): JSX.Element {
 
   useEffect(() => {
     if (selectedLabware == null) {
-      console.warn('selectedLabware was lost, navigate to deisgner page')
+      console.warn('selectedLabware was lost, navigate to designer page')
       navigate('/designer')
     }
   })
