@@ -87,10 +87,11 @@ def run(protocol: ProtocolContext) -> None:
     protocol.load_trash_bin("A3")
     try:
         tc_mod.open_lid()
-        tc_task = tc_mod.start_set_lid_temperature(105)
+        tc_task_lid = tc_mod.start_set_lid_temperature(105)
+        tc_task_block = tc_mod.start_set_lid_temperature(temperature = 100, ramp_rate = 5) # tries 100°C with 5°C ramp rate
         temp_mod_task = temp_mod.start_set_temperature(4)
         protocol.wait_for_tasks(
-            [tc_task, temp_mod_task],
+            [tc_task_lid, tc_task_block, temp_mod_task],
         )
 
         # LOAD LIQUIDS
@@ -251,7 +252,7 @@ def run(protocol: ProtocolContext) -> None:
                 final_extension_time_min=5,
             )
 
-            block_task = tc_mod.start_set_block_temperature(4)
+            block_task = tc_mod.start_set_block_temperature(temperature = 4, ramp_rate = 1) #try ramping temperature by 1°C/Second
             protocol.wait_for_tasks([block_task])
             tc_mod.open_lid()
             if disposable_lid:
