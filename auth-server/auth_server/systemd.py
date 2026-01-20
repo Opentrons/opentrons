@@ -3,15 +3,15 @@
 
 # todo(mm, 2026-01-20): This is copy-pasted from system-server, which itself copy-pasted
 # from update-server. system-server and auth-server should consolidate their copies into
-# server-utils.
+# server-utils. update-server should probably stay self-contained.
 
 import logging.config
 from typing import Dict, Union
 
 try:
     # systemd journal is available, we can use its handler
-    import systemd.daemon
-    import systemd.journal
+    import systemd.daemon  # type: ignore[import-not-found]
+    import systemd.journal  # type: ignore[import-not-found]
 
     def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
         """Initialize log handler."""
