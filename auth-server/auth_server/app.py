@@ -1,13 +1,12 @@
 """The public export of the server's ASGI app object."""
 
-from typing import AsyncGenerator
+import logging
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
-import logging
 from . import systemd
-
 
 _log = logging.getLogger(__name__)
 

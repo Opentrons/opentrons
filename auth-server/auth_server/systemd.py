@@ -5,7 +5,6 @@
 # from update-server. system-server and auth-server should consolidate their copies into
 # server-utils.
 
-
 import logging.config
 from typing import Dict, Union
 
