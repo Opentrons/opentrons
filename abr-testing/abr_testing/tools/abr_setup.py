@@ -146,14 +146,6 @@ def main(configurations: configparser.ConfigParser) -> None:
     sheet_name = configurations["RUN-LOG"]["sheet_name"]
     hepa_on = input("Are you turning HEPA Fans on or off? ")
     run_hepa_uv(hepa_on.lower(), sheet_name, storage_directory)
-    if hepa_on == "off":
-        continue_str = input(
-            "Type 'continue' to continue with the rest of the set up script."
-        )
-        if continue_str == "continue":
-            print("Script will continue.")
-        else:
-            sys.exit()
     # Run Temperature Sensors
     ambient_conditions_sheet = configurations["TEMP-SENSOR"]["sheet_url"]
     ambient_conditions_sheet_name = configurations["TEMP-SENSOR"]["sheet_name"]
