@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
@@ -83,12 +84,8 @@ export function LabwareStackToolbox({
   const { labware, labwareId, liquidLocations } = data
   const { modules } = useSelector(getInitialDeckSetup)
 
-  if (labwareId == null) {
-    console.error('No labware ID found for LabwareStackToolbox')
-    return null
-  }
-
-  const stackerModuleState = getStackerModuleStateFromSlot({ slot, modules })
+  const stackerModuleState =
+    labwareId != null ? getStackerModuleStateFromSlot({ slot, modules }) : null
   let stackLimit: number = 0
   let topDownStackIds: string[] = []
 
@@ -116,10 +113,21 @@ export function LabwareStackToolbox({
     stackLimit = getStackLimitFromDef(labware[labwareId].def)
     topDownStackIds = getFullStackFromLabwares(labware, labwareId)
   }
+
   // select the top labware in the stack if no selected labware ids are provided
-  useEffeect(() => {
-    dispatch(openIngredientSelector(selectedLabware[0]))
-  }, [])
+  const selectedLabware =
+    selectedLabwareIds != null ? selectedLabwareIds : [topDownStackIds[0]]
+
+  useEffect(() => {
+    if (selectedLabware[0] != null) {
+      dispatch(openIngredientSelector(selectedLabware[0]))
+    }
+  }, [selectedLabware, dispatch])
+
+  if (labwareId == null) {
+    console.error('No labware ID found for LabwareStackToolbox')
+    return null
+  }
 
   const handleAddAnotherLabware = (): void => {
     if (topDownStackIds.length < stackLimit && labwareId != null) {
