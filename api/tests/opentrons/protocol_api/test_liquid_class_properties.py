@@ -1,18 +1,24 @@
 """Tests for LiquidClass properties and related functions."""
 
+from typing import Union
+
 import pytest
 
 from opentrons_shared_data import load_shared_data
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     Coordinate,
     LiquidClassSchemaV1,
+    PositionReference,
 )
+from opentrons_shared_data.liquid_classes.types import TipPositionDict
 
 from opentrons.protocol_api._liquid_properties import (
     LiquidHandlingPropertyByVolume,
+    TipPosition,
     build_aspirate_properties,
     build_multi_dispense_properties,
     build_single_dispense_properties,
+    ensure_validated_tip_position,
 )
 
 
@@ -262,14 +268,30 @@ def test_single_dispense_settings_override() -> None:
     single_dispense_properties.retract.delay.duration = 0.1
     assert single_dispense_properties.retract.delay.duration == 0.1
 
-    single_dispense_properties.dispense_position.position_reference = "liquid-meniscus"
+    single_dispense_properties.retract.blowout.blowout_position = TipPosition(
+        _position_reference=PositionReference.WELL_BOTTOM,
+        _offset=Coordinate(x=10, y=20, z=30),
+    )
+    assert (
+        single_dispense_properties.retract.blowout.blowout_position.position_reference
+        == PositionReference.WELL_BOTTOM
+    )
+    assert (
+        single_dispense_properties.retract.blowout.blowout_position.offset
+        == Coordinate(x=10, y=20, z=30)
+    )
+
+    single_dispense_properties.retract.blowout.blowout_position = None
+    assert single_dispense_properties.retract.blowout.blowout_position is None
+    single_dispense_properties.dispense_position = (
+        single_dispense_properties.submerge.start_position
+    )
     assert (
         single_dispense_properties.dispense_position.position_reference.value
-        == "liquid-meniscus"
+        == "well-bottom"
     )
-    single_dispense_properties.dispense_position.offset = 11, 22, -33
     assert single_dispense_properties.dispense_position.offset == Coordinate(
-        x=11, y=22, z=-33
+        x=3, y=-2, z=1
     )
     single_dispense_properties.mix.enabled = False
     assert single_dispense_properties.mix.enabled is False
@@ -484,3 +506,41 @@ def test_non_existent_property_raises_error() -> None:
 
     with pytest.raises(AttributeError):
         aspirate_properties.mix.enable = True  # type: ignore[attr-defined]
+
+
+@pytest.mark.parametrize(
+    "tip_position, expected_position",
+    [
+        (
+            TipPosition(
+                _position_reference=PositionReference.WELL_BOTTOM,
+                _offset=Coordinate(x=1, y=2, z=3),
+            ),
+            TipPosition(
+                _position_reference=PositionReference.WELL_BOTTOM,
+                _offset=Coordinate(x=1, y=2, z=3),
+            ),
+        ),
+        (
+            {"position_reference": "well-top", "offset": {"x": 10, "y": 20, "z": 30}},
+            TipPosition(
+                _position_reference=PositionReference.WELL_TOP,
+                _offset=Coordinate(x=10, y=20, z=30),
+            ),
+        ),
+    ],
+)
+def test_ensure_validated_tip_position(
+    tip_position: Union[TipPosition, TipPositionDict], expected_position: TipPosition
+) -> None:
+    """It should set tip position properties correctly."""
+    validated_position = ensure_validated_tip_position(tip_position)
+    assert validated_position == expected_position
+
+    with pytest.raises(TypeError):
+        ensure_validated_tip_position("invalid_tip_position")  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError):
+        ensure_validated_tip_position(
+            {"position_reference": "invalid", "offset": {"x": 10, "y": 20, "z": 30}}  # type: ignore[arg-type]
+        )

@@ -2518,11 +2518,9 @@ def test_retract_after_dispense_with_blowout_position_set_for_destination(
     sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
         air_gap_volume, air_gap_correction_by_vol
     )
-    sample_transfer_props.dispense.retract.blowout.blowout_position.position_reference = "well-top"
-    sample_transfer_props.dispense.retract.blowout.blowout_position.offset = {
-        "x": 1,
-        "y": 2,
-        "z": 3,
+    sample_transfer_props.dispense.retract.blowout.blowout_position = {
+        "position_reference": "well-top",
+        "offset": {"x": 1, "y": 2, "z": 3},
     }
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
