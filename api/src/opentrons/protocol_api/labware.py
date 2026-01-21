@@ -24,7 +24,6 @@ from typing import (
     Sequence,
     Tuple,
     Union,
-    cast,
 )
 
 from opentrons_shared_data.labware.types import (
