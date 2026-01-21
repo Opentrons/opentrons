@@ -235,12 +235,14 @@ settings = [
         title="Enable running Protocols as a seperate process",
         description="Protocol execution will run in a seperate process and utilize Pyro to communicate with the robot-server process.",
         robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
     ),
     SettingDefinition(
         _id="enableHardwareSubprocess",
         title="Enable running Hardware Controller as a seperate process",
         description="The Hardware Controller will run in a seperate process hosted by a systemd service and utilize Pyro to communicate with the robot-server and protocol processes.",
         robot_type=[RobotTypeEnum.FLEX],
+        internal_only=True,
     ),
 ]
 
