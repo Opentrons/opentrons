@@ -6,14 +6,14 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI
 
-from . import systemd
+from server_utils import systemd_utils
 
 _log = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    systemd.notify_up()
+    systemd_utils.notify_up()
     yield
 
 

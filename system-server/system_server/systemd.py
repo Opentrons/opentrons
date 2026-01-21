@@ -5,7 +5,6 @@ from typing import Dict, Union
 
 try:
     # systemd journal is available, we can use its handler
-    import systemd.daemon
     import systemd.journal
 
     def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
@@ -16,10 +15,6 @@ try:
             "level": log_level,
             "SYSLOG_IDENTIFIER": topic_name,
         }
-
-    def notify_up() -> None:
-        """Notify systemd that the service is up."""
-        systemd.daemon.notify("READY=1")
 
     SOURCE: str = "systemd"
 
@@ -33,10 +28,6 @@ except ImportError:
             "formatter": "basic",
             "level": log_level,
         }
-
-    def notify_up() -> None:
-        """Notify systemd that the service is up."""
-        pass
 
     SOURCE = "dummy"
 
@@ -67,4 +58,4 @@ def configure_logging(level: int) -> None:
     logging.config.dictConfig(config)
 
 
-__all__ = ["notify_up", "configure_logging"]
+__all__ = ["configure_logging"]
