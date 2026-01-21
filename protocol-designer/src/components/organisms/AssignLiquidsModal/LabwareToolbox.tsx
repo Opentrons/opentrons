@@ -117,6 +117,12 @@ export function LabwareStackToolbox({
     topDownStackIds = getFullStackFromLabwares(labware, labwareId)
   }
 
+  // select the top labware in the stack if no selected labware ids are provided
+  const selectedLabware = selectedLabwareIds
+    ? selectedLabwareIds
+    : [topDownStackIds[0]]
+  dispatch(openIngredientSelector(selectedLabware[0]))
+
   const handleAddAnotherLabware = (): void => {
     if (topDownStackIds.length < stackLimit && labwareId != null) {
       // create labware groups for hopper
@@ -238,7 +244,7 @@ export function LabwareStackToolbox({
             stackOfLabware={topDownStackIds}
             labware={labware}
             setSelectedLabware={handleAssignToLabware}
-            selectedLabware={selectedLabwareIds ?? [topDownStackIds[0]]}
+            selectedLabware={selectedLabware}
           />
         </div>
       ) : (
@@ -280,7 +286,6 @@ export function LabwareStackToolboxContainer({
     slot
   )
 
-  console.log('largestStackInSlot: ', largestStackInSlot)
   const liquidLocations = useSelector(
     labwareIngredSelectors.getLiquidsByLabwareId
   )
@@ -290,11 +295,6 @@ export function LabwareStackToolboxContainer({
     liquidLocations,
     largestStackInSlot,
   }
-
-  console.log('selectedLabwareIds: ', selectedLabwareIds)
-  console.log('labwareId: ', labwareId)
-  console.log('labware: ', labware)
-  console.log('liquidLocations: ', liquidLocations)
 
   return (
     <LabwareStackToolbox
