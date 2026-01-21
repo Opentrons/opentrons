@@ -52,6 +52,11 @@ export function ActiveLabwareControls(
   const isSlotAHopper = getIsSlotAHopper(itemId)
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
+
+  // TODO (ND:2026-01-21): Remove this once we have a way to ensure the stack properties are populated asynchronously.
+  // This check should be superfluous, since any LabwareOnDeck should have a stack
+  // However, there is a timing issue where the labware entities exist but the stack
+  // properties are not populated.
   const allLabwareHaveStack = Object.values(activeDeckSetup.labware).every(
     labware => 'stack' in labware
   )
