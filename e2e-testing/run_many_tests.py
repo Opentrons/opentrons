@@ -12,11 +12,22 @@ MAGENTA = "\033[95m"
 BOLD = "\033[1m"
 RESET = "\033[0m"
 
-# Static Analysis Config: (Check Command, Manual Debug Command, Auto-Fix Command)
+# --- CONFIGURATION ---
+# check: The command to verify state (should return non-zero on failure)
+# fix:   The command to automatically resolve issues (optional)
 STATIC_TASKS = {
-    "Format": ("uv run ruff format --check .", "make format", "make format"),
-    "Lint": ("uv run ruff check .", "make lint", "make lint"),
-    "Typecheck": ("uv run mypy automation tests conftest.py", "make typecheck", "make typecheck"),
+    "Format": {
+        "check": "uv run ruff format --check .",
+        "fix": "make format",
+    },
+    "Lint": {
+        "check": "uv run ruff check .",
+        "fix": "make lint",
+    },
+    "Typecheck": {
+        "check": "uv run mypy automation tests conftest.py",
+        "fix": None,  # Mypy requires manual code changes
+    },
 }
 
 
@@ -35,13 +46,18 @@ def parse_failures(name, stdout, stderr):
     return list(dict.fromkeys(failures))  # Unique items
 
 
-def run_task(name, command, debug_cmd, fix_cmd=None):
+def run_task(name, config):
     """Runs a shell command and captures output/status."""
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(config["check"], shell=True, capture_output=True, text=True)
     success = result.returncode == 0
     fails = [] if success else parse_failures(name, result.stdout, result.stderr)
 
-    return {"name": name, "success": success, "fails": fails, "debug_cmd": debug_cmd, "fix_cmd": fix_cmd}
+    return {
+        "name": name,
+        "success": success,
+        "fails": fails,
+        "fix_cmd": config.get("fix"),
+    }
 
 
 def main():
@@ -52,8 +68,8 @@ def main():
 
     # --- PHASE 1: STATIC ANALYSIS ---
     print(f"\n{BOLD}🛡️  PHASE 1: Static Analysis{RESET}")
-    for name, (cmd, debug, fix) in STATIC_TASKS.items():
-        res = run_task(name, cmd, debug, fix)
+    for name, config in STATIC_TASKS.items():
+        res = run_task(name, config)
         static_results.append(res)
         status = f"{GREEN}✔{RESET}" if res["success"] else f"{RED}✘{RESET}"
         print(f"  {status} {name}")
@@ -74,20 +90,24 @@ def main():
 
         if not res["success"]:
             for f in res["fails"]:
-                print(f"   {YELLOW}└─ {f}{RESET}")
+                print(f"    {YELLOW}└─ {f}{RESET}")
 
     print("─" * 65)
 
     # --- AUTO-FIX / HEALING SECTION ---
-    failed_static = [r for r in static_results if not r["success"]]
-    if failed_static:
+    failed_with_fixes = [r for r in static_results if not r["success"] and r["fix_cmd"]]
+
+    if failed_with_fixes:
         print(f"\n{BOLD}{CYAN}🔧 AUTO-HEALING: Running fixes for Static Analysis...{RESET}")
-        for res in failed_static:
-            if res["fix_cmd"]:
-                print(f"  🚀 Running {BOLD}{res['fix_cmd']}{RESET}...")
-                # Run the fix (e.g., make format)
-                subprocess.run(res["fix_cmd"], shell=True)
+        for res in failed_with_fixes:
+            print(f"  🚀 Running {BOLD}{res['fix_cmd']}{RESET}...")
+            # Run the fix (e.g., make format)
+            subprocess.run(res["fix_cmd"], shell=True)
         print(f"\n{GREEN}✅ Auto-fixes complete. Please re-run to verify clean state.{RESET}")
+
+    elif not all_passed:
+        print(f"\n{YELLOW}⚠️  Issues found but no auto-fixes available. Please fix manually.{RESET}")
+
     else:
         print(f"\n{GREEN}✨ Everything looks good! Ready to commit.{RESET}")
 
