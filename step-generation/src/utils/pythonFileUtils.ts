@@ -703,9 +703,12 @@ export const getSetStoredLabware = (
 
         return `${pythonName}.set_stored_labware(\n${indentPyLines(pythonArgs)}\n)`
       } else {
-        const labwarePythonNames = Object.values(labwaresOnHopper).map(
-          labware => labwareEntities[labware[0]].pythonName
-        )
+        const labwarePythonNames = Object.values(labwaresOnHopper)
+          .filter(labware => {
+            const allowedRoles = labwareEntities[labware[0]]?.def.allowedRoles
+            return allowedRoles == null || !allowedRoles.includes('lid')
+          })
+          .map(labware => labwareEntities[labware[0]].pythonName)
         const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
 
         const indentedLabwarePythonNames = labwareChunks
