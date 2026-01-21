@@ -14,6 +14,7 @@ import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
 import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { SlotDetailModal } from '/protocol-designer/components/organisms/SlotDetailModal'
+import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'
 import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 import { END_TERMINAL_ITEM_ID } from '/protocol-designer/steplist'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
@@ -47,16 +48,23 @@ export function ActiveLabwareControls(
   } = props
   const { t } = useTranslation('starting_deck_state')
   const pendingCreationStateForHopper = useSelector(getPendingCreationState)
+  const timelineIsBeingComputed = useSelector(getTimelineIsBeingComputed)
   const isSlotAHopper = getIsSlotAHopper(itemId)
   const [showSlotDetailModal, setShowSlotDetailModal] = useState<boolean>(false)
   const activeDeckSetup = useSelector(getDeckSetupForActiveItem)
-  const fullStack = pendingCreationStateForHopper
-    ? []
-    : getFullStackFromLabwaresOnDeck(
-        Object.values(activeDeckSetup.labware),
-        itemId,
-        isSlotAHopper
-      )
+  const allLabwareHaveStack = Object.values(activeDeckSetup.labware).every(
+    labware => 'stack' in labware
+  )
+  const fullStack =
+    pendingCreationStateForHopper ||
+    timelineIsBeingComputed ||
+    !allLabwareHaveStack
+      ? []
+      : getFullStackFromLabwaresOnDeck(
+          Object.values(activeDeckSetup.labware),
+          itemId,
+          isSlotAHopper
+        )
 
   const stackerModuleId = fullStack.find(
     id =>
