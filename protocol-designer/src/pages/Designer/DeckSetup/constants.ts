@@ -125,6 +125,10 @@ export const RECOMMENDED_LABWARE_BY_MODULE: { [K in ModuleType]: string[] } = {
     'nest_96_wellplate_2ml_deep',
     'nest_96_wellplate_100ul_pcr_full_skirt',
     'nest_96_wellplate_200ul_flat',
+    // Opentrons-branded reservoirs
+    'opentrons_tough_12_reservoir_22ml',
+    'opentrons_tough_1_reservoir_300ml',
+    'opentrons_tough_4_reservoir_72ml',
   ],
 }
 

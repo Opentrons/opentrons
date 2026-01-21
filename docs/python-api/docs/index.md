@@ -144,7 +144,7 @@ Questions about setting up your robot, using Opentrons software, or troubleshoot
 
 ### Custom protocol service
 
-Don't have the time or resources to write your own protocols? Our [custom protocol development service](https://opentrons.com/instrument-services/) can get you set up in two weeks.
+Don't have the time or resources to write your own protocols? Our [custom protocol development service](https://opentrons.com/instrument-services/) can help you set up and optimize your workflow.
 
 ### Contributing
 

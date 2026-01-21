@@ -3,6 +3,7 @@ import argparse
 import os
 import sys
 import json
+from pathlib import Path
 from datetime import datetime, timedelta
 from abr_testing.data_collection import read_robot_logs
 from typing import Set, Dict, Any, Tuple, List, Union
@@ -40,7 +41,7 @@ def get_modules(file_results: Dict[str, str]) -> Dict[str, Any]:
 
 def create_data_dictionary(
     runs_to_save: Union[Set[str], str],
-    storage_directory: str,
+    storage_directory: Path,
     issue_url: str,
     hellma_plate_standards: List[Dict[str, Any]],
 ) -> Tuple[List[List[Any]], List[str], List[List[Any]], List[str]]:
@@ -186,7 +187,7 @@ def create_data_dictionary(
 
 
 def run(
-    storage_directory: str, folder_name: str, google_sheet_name: str, email: str
+    storage_directory: Path, folder_name: str, google_sheet_name: str, email: str
 ) -> None:
     """Main control function."""
     try:
@@ -243,7 +244,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "storage_directory",
         metavar="STORAGE_DIRECTORY",
-        type=str,
+        type=Path,
         nargs=1,
         help="Path to long term storage directory for run logs.",
     )

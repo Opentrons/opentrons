@@ -5,7 +5,6 @@ import { clsx } from 'clsx'
 
 import {
   ALIGN_CENTER,
-  ALIGN_NORMAL,
   BORDERS,
   Box,
   COLORS,
@@ -168,14 +167,15 @@ export function AssignLiquidsModal(
           >
             <Flex
               height="100%"
-              alignItems={ALIGN_NORMAL}
+              alignItems={ALIGN_CENTER}
               gap={SPACING.spacing10}
             >
               <RobotInfoLabel
-                size="large"
+                size="extraLarge"
                 deckLabel={
                   getSlotInLocationStack(
-                    labware[labwareId].stack as string[]
+                    labware[labwareId].stack as string[],
+                    labwareIsOnHopper
                   ) ?? ''
                 }
               />

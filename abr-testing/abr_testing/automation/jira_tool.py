@@ -4,6 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 import webbrowser
+from pathlib import Path
 import argparse
 from typing import List, Dict, Any, Tuple
 import os
@@ -246,14 +247,14 @@ class JiraTicket:
                 }
         return users
 
-    def save_users_to_file(self, users: Dict[str, Any], storage_directory: str) -> str:
+    def save_users_to_file(self, users: Dict[str, Any], storage_directory: Path) -> str:
         """Save users to a JSON file."""
         file_path = os.path.join(storage_directory, "RABR_Users.json")
         with open(file_path, mode="w") as file:
             json.dump(users, file, indent=4)
         return file_path
 
-    def get_jira_users(self, storage_directory: str) -> str:
+    def get_jira_users(self, storage_directory: Path) -> str:
         """Get all Jira users associated with the project key."""
         try:
             issues = self.get_project_issues("RABR")

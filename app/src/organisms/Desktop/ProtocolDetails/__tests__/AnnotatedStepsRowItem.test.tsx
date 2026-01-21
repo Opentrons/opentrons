@@ -24,6 +24,7 @@ describe('AnnotatedStepsRowItem', () => {
     analysis: { commands: [], errors: [], commandAnnotations: [] } as any,
     allRunDefs: [],
     scrollTargetId: null,
+    listElement: null,
     onShowErrorDetails: vi.fn(),
     t: (key: string) => key,
   }

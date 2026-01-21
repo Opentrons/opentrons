@@ -19,6 +19,9 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
 ) => {
   const { moduleId, interventionMessage, fillLabwareIds } = args
   const { labwareEntities, moduleEntities } = invariantContext
+  if (moduleId == null || moduleEntities[moduleId] == null) {
+    return { errors: [errorCreators.missingModuleError()] }
+  }
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const isSpace = getIsSpaceInHopper(
     flexStackerState,
@@ -36,7 +39,12 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     labwarePythonNames.length < 4
       ? labwarePythonNames.join(', ')
       : `\n${indentedLabwarePythonNames}\n`
-  if (flexStackerState?.storedLabwareDetails === null) {
+
+  if (
+    flexStackerState != null &&
+    flexStackerState.storedLabwareDetails === null &&
+    flexStackerState.labwareInHopper == null
+  ) {
     return {
       errors: [errorCreators.flexStackerLabwareTypeMissing()],
     }
