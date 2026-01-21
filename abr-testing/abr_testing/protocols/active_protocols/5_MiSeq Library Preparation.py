@@ -226,7 +226,8 @@ def run(protocol: ProtocolContext) -> None:
 
         # Initial denaturation
         thermocycler.execute_profile(
-            steps=[{"temperature": 95, "hold_time_seconds": 180, "ramp_rate": 4.25}], repetitions=1
+            steps=[{"temperature": 95, "hold_time_seconds": 180, "ramp_rate": 4.25}],
+            repetitions=1,
         )
 
         # 35 cycles
@@ -298,7 +299,8 @@ def run(protocol: ProtocolContext) -> None:
         thermocycler.set_lid_temperature(105)
         # Initial denaturation
         thermocycler.execute_profile(
-            steps=[{"temperature": 95, "hold_time_seconds": 180, "ramp_rate": 4}], repetitions=1
+            steps=[{"temperature": 95, "hold_time_seconds": 180, "ramp_rate": 4}],
+            repetitions=1,
         )
 
         # 12 cycles

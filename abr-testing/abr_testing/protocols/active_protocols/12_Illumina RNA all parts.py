@@ -2052,7 +2052,11 @@ def run(protocol: ProtocolContext) -> None:
                         {"temperature": 67, "hold_time_minutes": 1, "ramp_rate": 2},
                         {"temperature": 65, "hold_time_minutes": 1, "ramp_rate": 2},
                         {"temperature": 63, "hold_time_minutes": 1, "ramp_rate": 2},
-                        {"temperature": 62, "hold_time_minutes": HYBRIDTIME * 60, "ramp_rate": 2},
+                        {
+                            "temperature": 62,
+                            "hold_time_minutes": HYBRIDTIME * 60,
+                            "ramp_rate": 2,
+                        },
                     ]
                     thermocycler.execute_profile(
                         steps=profile_TAGSTOP, repetitions=1, block_max_volume=100
@@ -2061,7 +2065,9 @@ def run(protocol: ProtocolContext) -> None:
                     if HYBRID_PAUSE:
                         protocol.comment("HYBRIDIZATION PAUSED")
                     protocol.wait_for_tasks([block_task])
-                    thermocycler.start_set_block_temperature(temperature=10, ramp_rate=2)
+                    thermocycler.start_set_block_temperature(
+                        temperature=10, ramp_rate=2
+                    )
                 thermocycler.open_lid()
             else:
                 protocol.comment(
@@ -2076,7 +2082,9 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
                 if ONDECK_THERMO:
-                    tc_block_task = thermocycler.start_set_block_temperature(temperature=58, ramp_rate=4)
+                    tc_block_task = thermocycler.start_set_block_temperature(
+                        temperature=58, ramp_rate=4
+                    )
                     tc_lid_task = thermocycler.start_set_lid_temperature(58)
                     protocol.wait_for_tasks([tc_block_task, tc_lid_task])
             # ============================================================================================

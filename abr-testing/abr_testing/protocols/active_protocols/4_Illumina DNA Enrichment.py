@@ -294,7 +294,9 @@ def run(protocol: ProtocolContext) -> None:
             if DRYRUN is False:
                 if STEP_HYB == 1:
                     protocol.comment("SETTING THERMO and TEMP BLOCK Temperature")
-                    tc_block_task = thermocycler.start_set_block_temperature(4) #No ramping before lid closes
+                    tc_block_task = thermocycler.start_set_block_temperature(
+                        4
+                    )  # No ramping before lid closes
                     tc_lid_task = thermocycler.start_set_lid_temperature(100)
                     temp_block_task = temp_block.start_set_temperature(4)
                     protocol.wait_for_tasks(
@@ -403,7 +405,11 @@ def run(protocol: ProtocolContext) -> None:
                             {"temperature": 67, "hold_time_minutes": 1, "ramp_rate": 2},
                             {"temperature": 65, "hold_time_minutes": 1, "ramp_rate": 2},
                             {"temperature": 63, "hold_time_minutes": 1, "ramp_rate": 2},
-                            {"temperature": 62, "hold_time_minutes": HYBRIDTIME * 60, "ramp_rate": 2},
+                            {
+                                "temperature": 62,
+                                "hold_time_minutes": HYBRIDTIME * 60,
+                                "ramp_rate": 2,
+                            },
                         ]
                         thermocycler.execute_profile(
                             steps=profile_TAGSTOP, repetitions=1, block_max_volume=100
@@ -819,9 +825,21 @@ def run(protocol: ProtocolContext) -> None:
                             steps=profile_PCR_1, repetitions=1, block_max_volume=50
                         )
                         profile_PCR_2: List[ThermocyclerStep] = [
-                            {"temperature": 98, "hold_time_seconds": 30, "ramp_rate": 2},
-                            {"temperature": 60, "hold_time_seconds": 30, "ramp_rate": 2},
-                            {"temperature": 72, "hold_time_seconds": 30, "ramp_rate": 2},
+                            {
+                                "temperature": 98,
+                                "hold_time_seconds": 30,
+                                "ramp_rate": 2,
+                            },
+                            {
+                                "temperature": 60,
+                                "hold_time_seconds": 30,
+                                "ramp_rate": 2,
+                            },
+                            {
+                                "temperature": 72,
+                                "hold_time_seconds": 30,
+                                "ramp_rate": 2,
+                            },
                         ]
                         thermocycler.execute_profile(
                             steps=profile_PCR_2, repetitions=12, block_max_volume=50

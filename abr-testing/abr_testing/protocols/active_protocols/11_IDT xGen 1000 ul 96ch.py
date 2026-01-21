@@ -606,7 +606,7 @@ def run(protocol: ProtocolContext) -> None:
                     thermocycler.execute_profile(
                         steps=profile_LIG, repetitions=1, block_max_volume=50
                     )
-                    thermocycler.start_set_block_temperature(temperature=4, ramp_rate = 4)
+                    thermocycler.start_set_block_temperature(temperature=4, ramp_rate=4)
                 thermocycler.open_lid()
             else:
                 if DRYRUN is False:
