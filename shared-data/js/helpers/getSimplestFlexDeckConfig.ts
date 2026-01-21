@@ -59,12 +59,12 @@ export const getEmptyDeckConfiguration = (
       fixture.id === SINGLE_RIGHT_SLOT_FIXTURE
   )
   // Map cutoutId to cutout fixture config
-  const emptyDeckConfiguration = singleSlotItems.flatMap(
+  const emptyDeckConfiguration: DeckConfiguration = singleSlotItems.flatMap(
     fixture =>
       Object.keys(fixture.providesAddressableAreas).map(cutoutId => ({
-        cutoutId,
-        cutoutFixtureId: fixture.id,
-      })) as DeckConfiguration
+        cutoutId: cutoutId as CutoutId,
+        cutoutFixtureId: fixture.id as CutoutFixtureId,
+      }))
   )
   return emptyDeckConfiguration
 }

@@ -3,14 +3,9 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   FLEX_ROBOT_TYPE,
-  FLEX_SIMPLEST_DECK_CONFIG,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
-  getDeckDefWithFakes,
   getEmptyDeckConfiguration,
-  SINGLE_CENTER_SLOT_FIXTURE,
-  SINGLE_LEFT_SLOT_FIXTURE,
-  SINGLE_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,

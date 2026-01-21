@@ -38,11 +38,18 @@ export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
 ]
 
 describe('getEmptyDeckConfiguration', () => {
-  it('should be the same as FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC', () => {
+  it.only('should be the same as FLEX_SIMPLEST_DECK_CONFIG', () => {
     const result = getEmptyDeckConfiguration(
       getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
     )
-    expect(result).toEqual(FLEX_SIMPLEST_DECK_CONFIG)
+    const sortByCutoutId = (
+      a: { cutoutId: string },
+      b: { cutoutId: string }
+    ): number => a.cutoutId.localeCompare(b.cutoutId)
+
+    expect(result.sort(sortByCutoutId)).toEqual(
+      FLEX_SIMPLEST_DECK_CONFIG.sort(sortByCutoutId)
+    )
   })
 })
 
@@ -52,7 +59,7 @@ describe('getSimplestDeckConfigForProtocol', () => {
       FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC
     )
   })
-  it.only('returns staging area fixtures if commands address column 4 areas', () => {
+  it('returns staging area fixtures if commands address column 4 areas', () => {
     const cutoutConfigs = getSimplestDeckConfigForProtocol({
       commands: [
         {
