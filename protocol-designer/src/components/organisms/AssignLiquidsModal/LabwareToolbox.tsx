@@ -66,13 +66,13 @@ interface LabwareStackToolboxProps {
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
   data: LabwareStackToolboxData
-  selectedLabwareIds: string[]
+  selectedLabwareIds: string[] | null
   slot: string
 }
 export function LabwareStackToolbox({
   setShowLiquidLayoutOverlay,
   data,
-  // selectedLabwareIds,
+  selectedLabwareIds,
   slot,
 }: LabwareStackToolboxProps): JSX.Element | null {
   const { t } = useTranslation(['liquids', 'form', 'shared'])
@@ -116,10 +116,6 @@ export function LabwareStackToolbox({
     stackLimit = getStackLimitFromDef(labware[labwareId].def)
     topDownStackIds = getFullStackFromLabwares(labware, labwareId)
   }
-
-  console.log('topDownStackIds: ', topDownStackIds)
-  const selectedLabwareIds =
-    topDownStackIds.length > 0 ? topDownStackIds[0] : [labwareId]
 
   const handleAddAnotherLabware = (): void => {
     if (topDownStackIds.length < stackLimit && labwareId != null) {
@@ -190,7 +186,7 @@ export function LabwareStackToolbox({
       // selected labware have different liquid layouts
       setShowLiquidLayoutOverlay(true)
     } else if (event.metaKey || event.ctrlKey) {
-      dispatch(multipleIngredientsSelector([...selectedLabwareIds, newItem]))
+      dispatch(multipleIngredientsSelector([...(selectedLabwareIds ?? []), newItem]))
     } else {
       dispatch(multipleIngredientsSelector([newItem]))
     }
@@ -237,7 +233,7 @@ export function LabwareStackToolbox({
             stackOfLabware={topDownStackIds}
             labware={labware}
             setSelectedLabware={handleAssignToLabware}
-            selectedLabware={selectedLabwareIds}
+            selectedLabware={selectedLabwareIds ?? [topDownStackIds[0]]}
           />
         </div>
       ) : (
@@ -255,7 +251,7 @@ interface LabwareStackToolboxContainerProps {
   setShowBadFormState: Dispatch<SetStateAction<boolean>>
   setDefineLiquidModal: Dispatch<SetStateAction<boolean>>
   setShowLiquidLayoutOverlay: Dispatch<SetStateAction<boolean>>
-  selectedLabwareIds: string[]
+  selectedLabwareIds: string[] | null
 }
 
 export function LabwareStackToolboxContainer({
