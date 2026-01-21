@@ -10,8 +10,8 @@ The image below shows an example of the Settings section on the Flex touchscreen
 
 
 <figure class="screenshot" markdown>
-![Example of settings on Flex touchscreen](../images/touchscreen-settings.png)
-<figcaption>Flex touchscreen settings. Yours may look different.</figcaption>
+![Example of settings on Flex touchscreen](../images/touchscreen-settings.png){ width="80%" }
+<figcaption>Flex touchscreen settings.</figcaption>
 </figure>
 
 ## Settings list
