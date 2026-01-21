@@ -116,11 +116,10 @@ export function LabwareStackToolbox({
     stackLimit = getStackLimitFromDef(labware[labwareId].def)
     topDownStackIds = getFullStackFromLabwares(labware, labwareId)
   }
-
   // select the top labware in the stack if no selected labware ids are provided
-  const selectedLabware =
-    selectedLabwareIds != null ? selectedLabwareIds : [topDownStackIds[0]]
-  dispatch(openIngredientSelector(selectedLabware[0]))
+  useEffeect(() => {
+    dispatch(openIngredientSelector(selectedLabware[0]))
+  }, [])
 
   const handleAddAnotherLabware = (): void => {
     if (topDownStackIds.length < stackLimit && labwareId != null) {
