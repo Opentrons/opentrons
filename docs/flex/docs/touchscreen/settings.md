@@ -6,7 +6,7 @@ The Settings screen provides additional controls you can use to customize the be
 
 ## Settings example
 
-The image below shows an example of the Settings section on the Flex touchscreen. Because Opentrons frequently updates the robot's software, the options on your screen may be different. Scroll through on the touchscreen to see all the currently available settings. Refer to the [Settings list section](#settings-list) for definitions of the currently released features.
+Refer to the [Settings list section](#settings-list) below for definitions of the currently released features.
 
 
 <figure class="screenshot" markdown>
