@@ -9,7 +9,6 @@ import { ConfirmDeleteEntityInUseModal } from '/protocol-designer/components/org
 import { EditNickNameModal } from '/protocol-designer/components/organisms/EditNickNameModal'
 import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
-import { ZoomedIntoSlotInfoState } from '/protocol-designer/labware-ingred/types'
 import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
@@ -19,6 +18,7 @@ import { LabwareCardOverflowMenu } from '../index'
 import type { ComponentProps } from 'react'
 import type { NavigateFunction } from 'react-router-dom'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
+import type { ZoomedIntoSlotInfoState } from '/protocol-designer/labware-ingred/types'
 
 const mockNavigate = vi.fn()
 
