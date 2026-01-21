@@ -872,12 +872,20 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-export const getSlotInLocationStack = (stack?: string[]): string => {
+export const getSlotInLocationStack = (
+  stack: string[] | null,
+  isStacker: boolean = false
+): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
     return 'unknown slot'
   } else {
-    return stack[stack.length - 1]
+    const slot = stack[stack.length - 1]
+    if (isStacker) {
+      return `STACKER ${slot.slice(-2, -1)}`
+    } else {
+      return slot
+    }
   }
 }
 
@@ -1429,10 +1437,17 @@ export const labwareMatchesLabwareInHopper = (
   invariantContext: InvariantContext,
   stackerState: FlexStackerModuleState | null
 ): boolean => {
-  const loadedLabware = stackerState?.storedLabwareDetails?.primaryLabwareURI
-  const labwareToBeStoredEntity = invariantContext.labwareEntities[labwareId]
-  const { labwareDefURI: labwareURIToBeStored } = labwareToBeStoredEntity ?? {}
-  return loadedLabware == null || loadedLabware === labwareURIToBeStored
+  // permissive if no stored labware details configured
+  if (stackerState?.storedLabwareDetails == null) {
+    return true
+  }
+  const storedLabwareURIs = Object.values(
+    stackerState?.storedLabwareDetails ?? {}
+  ).reduce<string[]>((acc, val) => {
+    return val != null ? [...acc, val] : acc
+  }, [])
+  const labwareEntity = invariantContext.labwareEntities[labwareId]
+  return storedLabwareURIs.some(uri => labwareEntity?.labwareDefURI === uri)
 }
 
 export const getIsSpaceInHopper = (

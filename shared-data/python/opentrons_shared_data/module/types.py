@@ -24,7 +24,7 @@ HeaterShakerModuleType = Literal["heaterShakerModuleType"]
 MagneticBlockType = Literal["magneticBlockType"]
 AbsorbanceReaderType = Literal["absorbanceReaderType"]
 FlexStackerModuleType = Literal["flexStackerModuleType"]
-VacuumModuleType = Literal["VacuumModuleType"]
+VacuumModuleType = Literal["vacuumModuleType"]
 
 ModuleType = Union[
     MagneticModuleType,
@@ -44,7 +44,7 @@ HeaterShakerModuleModel = Literal["heaterShakerModuleV1"]
 MagneticBlockModel = Literal["magneticBlockV1"]
 AbsorbanceReaderModel = Literal["absorbanceReaderV1"]
 FlexStackerModuleModel = Literal["flexStackerModuleV1"]
-VacuumModuleModel = Literal["VacuumModuleV1"]
+VacuumModuleModel = Literal["vacuumModuleMilliporeV1"]
 
 ModuleModel = Union[
     MagneticModuleModel,

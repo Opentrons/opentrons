@@ -142,6 +142,7 @@ export function useActionButtonProperties({
     protocolRunControls,
     runHeaderModalContainerUtils,
     isCameraReadyToRun,
+    numberOfAtomicCommands: 0,
   })
 
   if (isProtocolNotReady) {

@@ -156,6 +156,39 @@ async def get_camera(
     )
 
 
+@router.get(
+    path="/camera/cameraSettings/{cameraId}",
+    summary="Query general camera capture image settings.",
+    description=(
+        "Query general camera capture image settings returning the implemented settings."
+        "\n\n"
+        "The response body's data will be the camera capture image settings provided once set."
+    ),
+    responses={
+        status.HTTP_503_SERVICE_UNAVAILABLE: {},
+    },
+)
+async def get_camera_capture_image_settings(
+    cameraId: str,
+    camera_settings_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+) -> CameraCaptureImageSettings:
+    """Query the general camera capture image settings.
+
+    Args:
+        cameraId: Camera ID for the camera settings to query.
+        camera_provider: Access to the camera settings and related services.
+    """
+    result = camera_settings_store.get_camera_capture_image_settings(
+        camera_id=cameraId if DEFAULT_CAMERA_ID not in cameraId else DEFAULT_CAMERA_PATH
+    )
+    # todo(chb, 2025-01-14): At some point we need to dereference camera devices and camera ids, and dedicate entirely one way or another.
+    # This isn't done now because of how the device field is pulled as a default camera by other sources for ffmpeg.
+
+    return result
+
+
 @router.post(
     path="/camera/cameraSettings",
     summary="Add general camera capture image settings to be used in place of the system image capture defaults.",
