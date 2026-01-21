@@ -67,22 +67,6 @@ Protocol Designer includes Absorbance Plate Reader step details to help you keep
 
 ## Flex Stacker Module steps
 
-You can add up to 4 Flex Stacker Modules in column 4, on the right side of your Flex. An attached Stacker Module can store additional well plates, tip racks, or reservoirs. During a protocol, the module's attached shuttle moves stored labware labware from the botttom of the stack to the Flex deck. 
-
-In your protocol starting deck, click the Stacker Module on the right side of the Flex deck to add labware. Choose a labware type and quantity: 
-
-- When adding tip racks, enter a quantity and choose whether to add a lid to each tip rack in the stack. 
-- For well plates or reservoirs, enter a quantity. Then, click **Edit liquid and quantity** in the labware menu on the right. 
-
-    Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. 
-
-<figure class="screenshot" markdown>
-  ![Edit Stacker labware](../images/stacker-labware.png)
-  <figcaption>Edit labware stored inside the Stacker Module, including adding liquids to individual well plates or reservoirs.</figcaption>
-</figure>
-
-Each Stacker can only store a single type of labware in a protocol. If you need to store more than one kind of labware, you'll need to use multiple Stacker Modules. 
-
 Click in the bottom left to add a Stacker step to your Protocol Designer protocol. The step menu shows the labware currently in the Stacker Module and any labware on the attached shuttle. 
 
 <figure class="screenshot" markdown>
