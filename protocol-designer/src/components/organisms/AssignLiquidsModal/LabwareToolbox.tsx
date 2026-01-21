@@ -186,7 +186,12 @@ export function LabwareStackToolbox({
       // selected labware have different liquid layouts
       setShowLiquidLayoutOverlay(true)
     } else if (event.metaKey || event.ctrlKey) {
-      dispatch(multipleIngredientsSelector([...(selectedLabwareIds ?? []), newItem]))
+      dispatch(
+        multipleIngredientsSelector([
+          ...(selectedLabwareIds ?? [topDownStackIds[0]]),
+          newItem,
+        ])
+      )
     } else {
       dispatch(multipleIngredientsSelector([newItem]))
     }

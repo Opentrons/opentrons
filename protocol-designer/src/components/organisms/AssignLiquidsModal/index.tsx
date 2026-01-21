@@ -286,8 +286,7 @@ export function AssignLiquidsModalContainer(
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-  const selectedLabwareIds =
-    useSelector(selectors.getSelectedLabwareIds)
+  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds)
   // TODO(tz, 2026-01-12): change this to use liquid locations instead of this method and remove getWellContentsForLabwareStack method
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
