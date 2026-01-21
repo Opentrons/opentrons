@@ -1698,7 +1698,7 @@ class InstrumentContext(publisher.CommandPublisher):
         return self
 
     @requires_version(2, 0)
-    def drop_tip(
+    def drop_tip(  # noqa: C901
         self,
         location: Optional[
             Union[
@@ -1709,6 +1709,7 @@ class InstrumentContext(publisher.CommandPublisher):
             ]
         ] = None,
         home_after: Optional[bool] = None,
+        alternate_drop_location: Optional[bool] = None,
     ) -> InstrumentContext:
         """
         Drop the current tip.
@@ -1741,10 +1742,13 @@ class InstrumentContext(publisher.CommandPublisher):
         the bin. Varying the tip drop location helps prevent tips from piling up in a
         single location.
 
-        Starting in API version 2.18, the API will only vary the tip drop location if
+        Between API version 2.18 and 2.27, the API will only vary the tip drop location if
         `location` is not specified. Specifying a `TrashBin` as the `location` behaves
         the same as specifying [`TrashBin.top()`][opentrons.protocol_api.TrashBin.top],
         which is a fixed position.
+
+        Starting in API version 2.28, you can manually control whether ``drop_tip()`` varies
+        the drop location with ``alternate_drop_location``.
 
         Args:
             location: Where to drop the tip.
@@ -1756,15 +1760,41 @@ class InstrumentContext(publisher.CommandPublisher):
                 When `False`, the pipette does not home its plunger. This can save a few
                 seconds, but is not recommended. Homing helps the robot track the
                 pipette's position.
+            alternate_drop_location:
+                Whether to vary the tip drop position to prevent tips from piling up in
+                one spot.
+                
+                If not specified, the API will vary tip drop position by default when
+                ``location`` is ``None``, and drop the tip to a fixed position when 
+                ``location`` is specified.
 
+                *New in version 2.28*
         Returns:
             This instance.
         """
-        alternate_drop_location: bool = False
+        # Set the default for alternate_drop_location, preserving historical behavior:
+        if alternate_drop_location is None:
+            if location is None:
+                # When location is None, we alternated the drop position since API 2.15.
+                alternate_drop_location = (
+                    self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN
+                )
+            elif isinstance(location, (TrashBin, WasteChute)):
+                # In 2.16 (when we first added support for location=TrashBin/WasteChute)
+                # and 2.17, we would always automatically alternate tip drop locations
+                # regardless of whether you explicitly passed in the disposal location or
+                # if none was provided. Then starting in 2.18, passing in the location
+                # bypassed the automatic behavior and instead went to the fixed offset or
+                # the XY center if none is provided.
+                alternate_drop_location = (
+                    self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN
+                    and self.api_version < _DISPOSAL_LOCATION_OFFSET_ADDED_IN
+                )
+            else:
+                alternate_drop_location = False
+
         if location is None:
             trash_container = self.trash_container
-            if self.api_version >= _DROP_TIP_LOCATION_ALTERNATING_ADDED_IN:
-                alternate_drop_location = True
             if isinstance(trash_container, labware.Labware):
                 well = trash_container.wells()[0]
             else:  # implicit drop tip in disposal location, not well
@@ -1777,7 +1807,7 @@ class InstrumentContext(publisher.CommandPublisher):
                     self._core.drop_tip_in_disposal_location(
                         trash_container,
                         home_after=home_after,
-                        alternate_tip_drop=True,
+                        alternate_tip_drop=alternate_drop_location,
                     )
                 return self
 
@@ -1800,12 +1830,6 @@ class InstrumentContext(publisher.CommandPublisher):
             well = maybe_well
 
         elif isinstance(location, (TrashBin, WasteChute)):
-            # In 2.16 and 2.17, we would always automatically use automatic alternate tip drop locations regardless
-            # of whether you explicitly passed the disposal location as a location or if none was provided. Now, in
-            # 2.18 and moving forward, passing it in will bypass the automatic behavior and instead go to the set
-            # offset or the XY center if none is provided.
-            if self.api_version < _DISPOSAL_LOCATION_OFFSET_ADDED_IN:
-                alternate_drop_location = True
             with publisher.publish_context(
                 broker=self.broker,
                 command=cmds.drop_tip_in_disposal_location(

@@ -272,6 +272,7 @@ export function SelectBasics(props: WizardTileProps): JSX.Element {
                 onChange={() => {
                   setValue('fields.robotType', OT2_ROBOT_TYPE)
                   resetPipettes()
+                  setValue('hasGripper', false)
                   setValue('modules', {})
                   setValue('fixtures', ot2TrashFixture)
                 }}

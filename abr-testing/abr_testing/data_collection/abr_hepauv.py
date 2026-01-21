@@ -7,6 +7,7 @@ import os
 import sys
 from pathlib import Path
 import json
+import gspread  # type: ignore[import]
 
 
 def get_hepa_serials(storage_directory: Path) -> List[List[Any]]:
@@ -146,7 +147,12 @@ def turning_hepa_off_and_uv_on(
     row_indices = [i - 1 for i in row_nums]  # API needs 0-based
     google_sheet.batch_delete_rows(row_indices, "1790601450")
     google_sheet.update_row_index()
-    google_sheet.batch_update_cells(nested_list, "A", starting_row_index, "1790601450")
+    try:
+        google_sheet.batch_update_cells(
+            nested_list, "A", starting_row_index, "1790601450"
+        )
+    except gspread.exceptions.APIError:
+        print("⚠️Warning: Did NOT time stamp turning off hepa/uv.")
 
 
 def run(
