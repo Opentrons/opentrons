@@ -551,9 +551,6 @@ export function LiquidToolboxContainer({
 }: LiquidToolboxContainerProps): JSX.Element {
   // All selectors moved here
   const liquids = useSelector(getLiquidEntities)
-  const multipleSelectedLabwareIds = useSelector(
-    labwareIngredSelectors.getSelectedLabwareIds
-  )
   const selectedLabwareId = useSelector(
     labwareIngredSelectors.getSelectedLabwareId
   )
@@ -599,9 +596,7 @@ export function LiquidToolboxContainer({
       setDefineLiquidModal={setDefineLiquidModal}
       showLiquidLayoutOverlay={showLiquidLayoutOverlay}
       data={data}
-      selectedLabwareIds={
-        multipleSelectedLabwareIds ?? [selectedLabwareId ?? '']
-      }
+      selectedLabwareIds={[selectedLabwareId ?? '']}
     />
   )
 }

@@ -280,13 +280,8 @@ export function AssignLiquidsModalContainer(
 ): JSX.Element | null {
   const { showLiquidOverflowMenu, setDefineLiquidModal } = props
 
-  // All selectors moved here
   const nickNames = useSelector(getLabwareNicknamesById)
   const selectedLabwareId = useSelector(selectors.getSelectedLabwareId)
-  console.log(
-    '🚀 ~ AssignLiquidsModalContainer ~ selectedLabwareId:',
-    selectedLabwareId
-  )
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
