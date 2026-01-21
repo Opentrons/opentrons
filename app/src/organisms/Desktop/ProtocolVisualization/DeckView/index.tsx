@@ -109,9 +109,6 @@ export function DeckView(props: DeckViewProps): JSX.Element {
 
     return `${originX} ${originY} ${deckWidth + extraSize} ${deckHeight}`
   }, [baseViewBox, deckDef, hasFlexStacker])
-  const viewBoxWidth = hasFlexStacker
-    ? deckDef.dimensions[0] + extraSize
-    : deckDef.dimensions[0]
 
   const labwareEntitiesExtended = Object.entries(labwareEntities).reduce(
     (acc: Record<string, LabwareEntityExtended>, [key, entity]) => {
