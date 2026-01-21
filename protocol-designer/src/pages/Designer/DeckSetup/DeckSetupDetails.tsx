@@ -20,6 +20,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { HOPPER_LABWARE_X_OFFSET } from '/protocol-designer/constants'
+import { getTimelineIsBeingComputed } from '/protocol-designer/file-data/selectors'
 import { getPendingCreationState } from '/protocol-designer/step-forms/selectors'
 
 import { LabwareOnDeck } from '../../../components/organisms'
@@ -105,6 +106,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     robotType
   )
   const pendingCreationStateForHopper = useSelector(getPendingCreationState)
+  const timelineIsBeingComputed = useSelector(getTimelineIsBeingComputed)
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const { selectedSlot } = selectedSlotInfo
   const [menuListId, setShowMenuListForId] = useState<DeckSlotId | null>(null)
@@ -139,6 +141,19 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
   const handleHoverEmptySlot = useCallback(() => {
     setHoveredLabware(null)
   }, [])
+  const allLabwareHaveStack = Object.values(activeLabware).every(
+    labware => 'stack' in labware
+  )
+  // This is not an ideal scenario, but this safeguard is necessary until we
+  // can refactor the asynchronous nature of the stacker labware creation.
+  // Some renders of DeckSetupDetails specify the newly-created labware,
+  // but their `stack` properties are not populated.
+  const allLabware =
+    pendingCreationStateForHopper ||
+    timelineIsBeingComputed ||
+    !allLabwareHaveStack
+      ? {}
+      : activeLabware
 
   const {
     createdAdapterForSlot,
@@ -150,7 +165,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     isSlotAHopper,
   } = useMemo(() => {
     return getSlotInformation({
-      deckSetup: activeDeckSetup,
+      deckSetup: { ...activeDeckSetup, labware: allLabware },
       slot: selectedZoomInSlot ?? '',
       deckDef,
       pendingCreationStateForHopper,
@@ -185,10 +200,6 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
     selectedZoomInSlot,
   ])
 
-  const allLabware = pendingCreationStateForHopper
-    ? []
-    : Object.values(activeLabware)
-
   const allModules: ModuleOnDeck[] = values(activeDeckSetup.modules)
   const isMenuListIdForHopper =
     menuListId != null && getIsSlotAHopper(menuListId)
@@ -219,7 +230,8 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
 
   // make sure the top labware (lid) is rendered first in the stack if
   // it gets moved there later on
-  const sortedLabware = [...allLabware].sort((a, b) => {
+  const allLabwareValues = Object.values(allLabware)
+  const sortedLabware = [...allLabwareValues].sort((a, b) => {
     // get how deep each labware is in its stack
     const aDepth = a.stack.length
     const bDepth = b.stack.length
@@ -290,7 +302,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
         }
 
         const { topMostId, rightBelowTopId, hopperTopMostId } =
-          getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabware)
+          getLabwaresOnModuleFromStack(moduleOnDeck.id, allLabwareValues)
         const labwareInterfaceBoundingBox = {
           xDimension: moduleDef.dimensions.labwareInterfaceXDimension ?? 0,
           yDimension: moduleDef.dimensions.labwareInterfaceYDimension ?? 0,
@@ -644,7 +656,7 @@ export function DeckSetupDetails(props: DeckSetupDetailsProps): JSX.Element {
       })}
 
       {/* all nested labwares */}
-      {allLabware.map(labware => {
+      {allLabwareValues.map(labware => {
         if (
           allModules.some(m => labware.stack.includes(m.id)) ||
           getSlotInLocationStack(labware.stack) === 'offDeck'
