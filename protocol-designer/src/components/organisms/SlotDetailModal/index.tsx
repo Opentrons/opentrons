@@ -28,7 +28,6 @@ import {
 } from '@opentrons/step-generation'
 
 import { selectors } from '/protocol-designer/labware-ingred/selectors'
-import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import * as wellContentsSelectors from '/protocol-designer/top-selectors/well-contents'
 import { getLabwareNicknamesById } from '/protocol-designer/ui/labware/selectors'
@@ -38,7 +37,9 @@ import { LabwareButtonBasket } from '../../molecules'
 import { WellTooltip } from '../Labware/WellTooltip'
 import { getMainPagePortalEl } from '../Portal'
 import { LiquidCardList } from './LiquidCardList'
+import { getDeckLabel } from './utils'
 
+import type { TFunction } from 'i18next'
 import type { WellGroup } from '@opentrons/components'
 
 export interface WellContentsByNumber {
@@ -107,21 +108,15 @@ export const SlotDetailModal = (
     module =>
       module.slot === slotName && module.model === FLEX_STACKER_MODULE_V1
   )
-  const deckLabel = (() => {
-    if (slotName === 'offDeck') {
-      return t('off_deck')
-    }
-    if (isHopper) {
-      return t('shared:stacker', { slot: getColumnFromWellName(slotName) })
-    }
-    return slotName
-  })()
+
   const modalTitle = (
     <Flex alignItems={ALIGN_CENTER} gridGap={SPACING.spacing4}>
       <StyledText desktopStyle="bodyLargeSemiBold">
         {t('labware_in')}
       </StyledText>
-      <RobotInfoLabel deckLabel={deckLabel} />
+      <RobotInfoLabel
+        deckLabel={getDeckLabel(slotName, isHopper, t as TFunction)}
+      />
     </Flex>
   )
 
