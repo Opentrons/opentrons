@@ -80,7 +80,7 @@ Protocol Designer only shows recommended labware in the list of available option
 
 #### Absorbance Plate Reader Module
 
-The Absorbance Plate Reader Module needs to be initialized before adding labware. First, add a [step](module.md#absorbance-plate-reader-module-steps) to intialize the module while empty. Then, use a move step to add any labware to the Absorbance Plate Reader Module later in your protocol. 
+The Absorbance Plate Reader Module needs to be initialized before adding labware. First, add a [step]() to intialize the module while empty. Then, use a move step to add any labware to the Absorbance Plate Reader Module later in your protocol. 
 
 #### Flex Stacker Module
 
@@ -93,10 +93,7 @@ In your protocol starting deck, click the Stacker Module on the right side of th
 
     Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. Use command + click to edit multiple labware and their liquids. 
 
-<figure class="screenshot" markdown>
-  ![Edit Stacker labware](../images/stacker-edit-labware.png)
-  <figcaption>Edit labware stored inside the Stacker Module, including adding liquids to individual well plates or reservoirs.</figcaption>
-</figure>
+*insert updated screenshot; mkdocs is giving me hell???*
 
 Each Stacker can only store a single type of labware in a protocol. If you need to store more than one kind of labware, you'll need to use multiple Stacker Modules. 
 
