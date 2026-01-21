@@ -144,7 +144,7 @@ export function AssignLiquidsModal(
         {labwareIsOnHopper && labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
-            selectedLabwareIds={selectedLabwareIds}
+            selectedLabwareIds={selectedLabwareIds ?? null}
             showBadFormState={showBadFormState}
             setShowBadFormState={setShowBadFormState}
             setDefineLiquidModal={setDefineLiquidModal}
@@ -303,7 +303,7 @@ export function AssignLiquidsModalContainer(
     allWellContents,
     liquidNamesById,
     liquidDisplayColors,
-    selectedLabwareIds: selectedLabwareIds,
+    selectedLabwareIds: selectedLabwareIds ?? null,
   }
 
   return (
