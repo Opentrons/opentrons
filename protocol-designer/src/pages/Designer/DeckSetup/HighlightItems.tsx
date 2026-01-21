@@ -111,7 +111,6 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
     SLOTS.includes(hoveredItem.id as AddressableAreaName)
       ? hoveredItem.id
       : null
-    console.log("🚀 ~ HighlightItems ~ hoveredItem:", hoveredItem)
   const selectedItemSlot = selectedDropdownItems.find(
     selected =>
       selected.id != null && SLOTS.includes(selected.id as AddressableAreaName)
@@ -217,18 +216,11 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
 
   const getTrashItems = (): JSX.Element[] => {
     const items: JSX.Element[] = []
-    const findEquipmentByLocation = (
-      equipmentOnDeck: Record<string, any>,
-      location: string
-    ) =>
-      Object.values(equipmentOnDeck).find(e => e.location === location) ?? null
+
     if (hoveredItemTrash != null || selectedItemTrash != null) {
       const selectedTrashOnDeck =
         selectedItemTrash?.id != null
-          ? findEquipmentByLocation(
-              additionalEquipmentOnDeck,
-              selectedItemTrash.id
-            )
+          ? additionalEquipmentOnDeck[selectedItemTrash.id]
           : null
       const trashOnDeck = hoveredItemTrash ?? selectedTrashOnDeck
 
@@ -240,7 +232,6 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
       }
 
       if (hoveredItemTrash != null) {
-        console.log('here')
         items.push(
           <FixtureRender
             key={`${hoveredItemTrash.id}_hovered`}
@@ -288,52 +279,70 @@ export function HighlightItems(props: HighlightItemsProps): JSX.Element | null {
   const getDeckItems = (): JSX.Element[] => {
     const items: JSX.Element[] = []
 
-    const slot = hoveredDeckItem ?? selectedItemSlot?.id
-    if (!slot) return items
+    if (hoveredDeckItem != null || selectedItemSlot != null) {
+      const slot = hoveredDeckItem ?? selectedItemSlot?.id
 
-    const hasTrashContext =
-      hoveredItemTrash != null || selectedItemTrash != null
-    console.log("🚀 ~ getDeckItems ~ hasTrashContext:", slot)
+      if (hoveredItemTrash != null || selectedItemTrash != null) {
+        if (slot === WASTE_CHUTE_CUTOUT) {
+          items.push(
+            <FixtureRender
+              key={`${slot}_wasteChute_selected`}
+              fixture={'wasteChute' as Fixture}
+              cutout={WASTE_CHUTE_CUTOUT as CutoutId}
+              robotType={robotType}
+              deckDef={deckDef}
+              showHighlight={true}
+              tagInfo={[
+                {
+                  text: t('new_location'),
+                  isSelected: selectedItemSlot?.id != null,
+                  isLast: true,
+                  isZoomed: false,
+                },
+              ]}
+            />
+          )
+        } else if (slot != null) {
+          items.push(
+            <FixtureRender
+              key={`${slot}_trashBin_selected`}
+              fixture={'trashBin' as Fixture}
+              cutout={'cutoutA3' as CutoutId}
+              robotType={robotType}
+              deckDef={deckDef}
+              showHighlight={true}
+              tagInfo={[
+                {
+                  text: t('new_location'),
+                  isSelected: true,
+                  isLast: true,
+                  isZoomed: false,
+                },
+              ]}
+            />
+          )
+        }
+      } else {
+        const addressableArea =
+          slot != null && slot !== WASTE_CHUTE_CUTOUT
+            ? getAddressableAreaFromSlotId(slot, deckDef)
+            : null
 
-    if (hasTrashContext && slot === WASTE_CHUTE_CUTOUT) {
-      items.push(
-        <FixtureRender
-          key={`${slot}_wasteChute_selected`}
-          fixture={'wasteChute' as Fixture}
-          cutout={WASTE_CHUTE_CUTOUT as CutoutId}
-          robotType={robotType}
-          deckDef={deckDef}
-          showHighlight={true}
-          tagInfo={[
-            {
-              text: t('new_location'),
-              isSelected: selectedItemSlot?.id != null,
-              isLast: true,
-              isZoomed: false,
-            },
-          ]}
-        />
-      )
-      return items
-    }
+        if (!addressableArea) {
+          console.warn(
+            `addressableArea was null as ${addressableArea}, expected to find a matching entity`
+          )
+          return []
+        }
 
-    if (slot !== WASTE_CHUTE_CUTOUT) {
-      const addressableArea = getAddressableAreaFromSlotId(slot, deckDef)
-
-      if (!addressableArea) {
-        console.warn(
-          `addressableArea was null for slot ${slot}, expected to find a matching entity`
+        items.push(
+          <DeckItemHighlight
+            slotBoundingBox={addressableArea.boundingBox}
+            slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
+            itemId={addressableArea.id}
+          />
         )
-        return items
       }
-
-      items.push(
-        <DeckItemHighlight
-          slotBoundingBox={addressableArea.boundingBox}
-          slotPosition={getPositionFromSlotId(addressableArea.id, deckDef)}
-          itemId={addressableArea.id}
-        />
-      )
     }
 
     return items
