@@ -7,7 +7,6 @@ nav:
   - System Description:
       - System Description: system-description/index.md
       - Robot Components: system-description/robot-components.md
-      - Pipettes: system-description/pipettes.md
       - System Specifications: system-description/specs.md
   - Installation and Relocation:
       - Installation and Relocation: installation/index.md
@@ -16,7 +15,14 @@ nav:
       - First Run: installation/first-run.md
       - Instrument Installation and Calibration: installation/instruments.md
       - Relocation: installation/relocation.md
-  - Instruments and Modules: modules.md
+  - OT-2 Pipettes: pipettes-ot2.md
+  - OT-2 Modules:
+      - Modules: modules/index.md
+      - Heater-Shaker: modules/heater-shaker.md
+      - HEPA: modules/hepa.md
+      - Magnetic Module: modules/magnetic-module.md
+      - Temperature Module: modules/temperature.md
+      - Thermocycler: modules/thermocycler.md
   - Labware:
       - Labware: labware/index.md
       - Labware Concepts: labware/concepts.md

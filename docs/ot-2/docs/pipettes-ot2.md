@@ -2,7 +2,42 @@
 title: "Opentrons OT-2: Pipettes"
 ---
 
-Opentrons OT-2 pipettes are configurable devices used to move liquids throughout the working area during protocol execution. There are several OT-2 pipettes to choose from, which can handle volumes from 1 µL to 1000 µL in single- or multi-channel (8-channel) configurations:
+OT-2 pipettes are a class of gantry-mounted instruments you attach to an Opentrons OT-2 liquid handling robot. For an OT-2, this class includes single- and multi-channel GEN1 and GEN2 pipettes. Pipettes move liquids throughout the working area during protocol execution.
+
+!!! note
+    OT-2 pipettes are not compatible with the Opentrons Flex. Flex pipettes are not compatible with an OT-2.
+
+## GEN1 pipettes
+
+OT-2 GEN1 pipettes are black and marked by a white Opentrons drop logo. They do not include any printed text or other markings to identify them as GEN1 pipettes or their volumetric capacity.
+
+<figure class="side-by-side" markdown>
+![OT2 GEN1 single channel pipette](./images/OT2-gen1-single.png)
+![OT2 GEN1 multi channel pipette](./images/OT2-gen1-multi.png)
+<figcaption>GEN1 single- and multi-channel pipettes</figcaption>
+</figure>
+
+GEN1 pipettes are no longer manufactured or supported. They have been replaced by the GEN2 models.
+
+## GEN2 pipettes
+
+OT-2 GEN2 pipettes are different than their GEN1 predecessors. GEN2 pipettes are longer than the GEN1, they have a black and silver housing, and display exterior markings that identify these instruments as GEN2 pipettes along with their volumetric capacity.
+
+<figure class="side-by-side" markdown>
+![OT2 GEN2 single channel pipette](./images/gen2-p300-single.png)
+![OT2 GEN2 multi channel pipette](./images/GEN2-p300-multi.png)
+<figcaption>GEN2 300 µL (P300) pipettes</figcaption>
+</figure>
+
+## Installing OT-2 pipettes
+
+For instructions on installing pipettes, see the [Instrument Installation and Calibration section](installation/instruments.md).
+
+## Replacing OT-2 pipettes
+
+If you need to replace an older GEN1 pipette or just need another GEN2 pipette, see the [Pipettes section](https://opentrons.com/products/categories/pipettes) of the Opentrons website.
+
+The available OT-2 GEN2 pipettes can handle volumes from 1 µL to 1000 µL in single- or multi-channel (8-channel) configurations:
 
 - P20 Single-Channel (1–20 µL)
 - P300 Single-Channel (20–300 µL)
@@ -10,15 +45,11 @@ Opentrons OT-2 pipettes are configurable devices used to move liquids throughout
 - P20 Multi-Channel (1–20 µL)
 - P300 Multi-Channel (20–300 µL)
 
-<font color="red">PLACEHOLDER FOR GEN2 IMAGES ADD AFTER MERGE TO MAIN BRANCH</font>
-
 A single-channel or multi-channel pipette each occupy one mount (left or right) on the carriage.
-
-For instructions on installing pipettes, see the [Instrument Installation and Calibration section](../installation/instruments.md).
 
 ## Picking up and dropping tips
 
-The pipettes pick up disposable plastic tips by pressing them onto the pipette nozzles, and then aspirate and dispense liquids using the tips. The total force required for pickup increases as more tips are picked up simultaneously.
+OT-2 pipettes pick up disposable plastic tips by pressing them onto the pipette nozzles, and then aspirate and dispense liquids using the tips. The total force required for pickup increases as more tips are picked up simultaneously.
 
 To discard tips (or return them to their rack), the pipette ejector mechanism pushes the tips off of the nozzles.
 
@@ -32,8 +63,7 @@ OT-2 pipettes are designed to handle a wide range of liquid volumes and are comp
 !!!note
     You do not have to calibrate the volume that your pipettes dispense before use. You only have to perform positional calibration.
 
-<!-- reminder: fix link after API docs migrate to mkdocs -->
-The following tables list the accuracy and precision specifications for OT-2 pipettes. For flow rate information, see [OT-2 Pipette Flow Rates](https://docs.opentrons.com/v2/pipettes/characteristics.html#ot-2-pipette-flow-rates) in the Opentrons API documentation.
+The following tables list the accuracy and precision specifications for OT-2 pipettes. For flow rate information, see [OT-2 Pipette Flow Rates](https://docs.opentrons.com/python-api/pipettes/characteristics/#ot-2-pipette-flow-rates) in the Opentrons API documentation.
 
 ### Single-channel pipettes
 
@@ -83,7 +113,7 @@ The following tables list the accuracy and precision specifications for OT-2 pip
       <td>±4%</td>
       <td>0.8 µL</td>
       <td>±2.5%</td>
-      <td>0.05 µL</td>
+      <td>0.5 µL</td>
     </tr>
     <tr>
       <td></td>
