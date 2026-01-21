@@ -3,8 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Literal, Optional, Sequence
+from typing import TYPE_CHECKING, List, Literal, Optional, Sequence, TypeVar, Union
 
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    PositionReference,
+)
+
+from opentrons.protocol_api._liquid_properties import TipPosition
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocol_engine.errors import (
     IncompleteLabwareDefinitionError,
     LiquidHeightUnknownError,
@@ -233,4 +239,34 @@ def check_current_volume_before_dispensing(
         # a negative volume (current_volume - dispense_volume).
         raise RuntimeError(
             f"Cannot dispense {dispense_volume}uL when the tip has only {current_volume}uL."
+        )
+
+
+def get_blowout_location_for_trash(
+    disposal_location: Union[TrashBin, WasteChute],
+    target_tip_position: TipPosition,
+) -> Union[TrashBin, WasteChute]:
+    """Given a reference position and offset, return the blowout location for a trash bin or waste chute."""
+    if target_tip_position.position_reference == PositionReference.WELL_TOP:
+        return disposal_location.top(
+            x=target_tip_position.offset.x,
+            y=target_tip_position.offset.y,
+            z=target_tip_position.offset.z,
+        )
+    elif target_tip_position.position_reference == PositionReference.WELL_BOTTOM:
+        return disposal_location.top(
+            x=target_tip_position.offset.x,
+            y=target_tip_position.offset.y,
+            z=target_tip_position.offset.z - disposal_location.height,
+        )
+    elif target_tip_position.position_reference == PositionReference.WELL_CENTER:
+        return disposal_location.top(
+            x=target_tip_position.offset.x,
+            y=target_tip_position.offset.y,
+            z=target_tip_position.offset.z - disposal_location.height / 2,
+        )
+    else:
+        raise ValueError(
+            f"Position reference of {target_tip_position.position_reference} not allowed for"
+            f"trash bin & waste chute. Use 'well-top', 'well-bottom', or 'well-center' instead."
         )

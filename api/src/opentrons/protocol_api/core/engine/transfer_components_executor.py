@@ -6,7 +6,7 @@ import logging
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from enum import Enum
-from typing import TYPE_CHECKING, Literal, Optional, Union
+from typing import TYPE_CHECKING, Literal, Optional, TypeVar, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     BlowoutLocation,
@@ -14,7 +14,6 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,
 )
 
-from ...disposal_locations import DisposalOffset
 from opentrons.protocol_api._liquid_properties import (
     MixProperties,
     MultiDispenseProperties,
@@ -30,6 +29,7 @@ from opentrons.protocols.advanced_control.transfers import (
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
     check_current_volume_before_dispensing,
+    get_blowout_location_for_trash,
 )
 from opentrons.types import Location, Mount, Point
 
@@ -456,7 +456,7 @@ class TransferComponentsExecutor:
                 )
             )
 
-    def retract_after_dispensing(
+    def retract_after_dispensing(  # noqa: C901
         self,
         trash_location: Union[Location, TrashBin, WasteChute],
         source_location: Optional[Location],
@@ -466,7 +466,7 @@ class TransferComponentsExecutor:
         """Execute post-dispense retraction steps.
         1. Position ref+offset is the ending position. Move to this position using specified speed
         2. If blowout is enabled and “destination”
-            - Do blow-out (at the retract position)
+            - Do blow-out at the position specified by BlowoutPosition. If BlowoutPosition is not specified, blow out at the retract position.
             - Leave plunger down
         3. Touch-tip in the destination well.
         4. If not ready-to-aspirate
@@ -479,12 +479,11 @@ class TransferComponentsExecutor:
                 If this is the last step of the transfer, and we aren't dropping the tip off,
                 then the air gap will be left as is(?).
         6. If blowout is “source” or “trash”
-            - Move to blowout_location (top of Well)
-            - Do blow-out (top of well)
+            - Move to position specified by BlowoutPosition. If BlowoutPosition is not specified, move to the top of Well or TrashBin/WasteChute.
+            - Do blow-out
             - Do touch-tip AGAIN at the source well (if blowout in a non-trash blowout_location)
             - Prepare-to-aspirate (top of well)
             - Do air-gap (top of well)
-        7. If drop tip, move to drop tip blowout_location, drop tip
 
         If target blowout_location is a trash bin or waste chute, the retract movement step is skipped along with touch tip,
         even if it is enabled.
@@ -534,33 +533,16 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            dest_blowout_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.blowout_position is not None:
-                # If blowout position is specified, use that position for blowout
-                # The position would be found by using the dest well core, the well position and offset
-                # in-place = false
-                if isinstance(self._target_location, (TrashBin, WasteChute)):
-                    well_core = None
-                    in_place = False
-                    dest_blowout_location = get_blowout_location_for_trash(
-                        self._target_location,
-                        blowout_props.blowout_position,
+                well_core = self._target_well if self._target_well is not None else None
+                in_place = False
+                dest_blowout_location = (
+                    self._calculate_blowout_position_from_position_info(
+                        blowout_location=self._target_location,
+                        blowout_position=blowout_props.blowout_position,
+                        blowout_well=well_core,
                     )
-                else:
-                    assert self._target_well is not None
-                    well_core = self._target_well
-                    in_place = False
-                    dest_blowout_location = Location(
-                        absolute_point_from_position_reference_and_offset(
-                            well=self._target_well,
-                            well_volume_difference=0,
-                            position_reference=blowout_props.blowout_position.position_reference,
-                            offset=blowout_props.blowout_position.offset,
-                            mount=self._instrument.get_mount(),
-                        ),
-                        self._target_location.labware,
-                    )
-
+                )
             else:
                 well_core = None
                 dest_blowout_location = retract_location
@@ -606,15 +588,12 @@ class TransferComponentsExecutor:
                     )
                 src_blowout_location: Location
                 if blowout_props.blowout_position is not None:
-                    src_blowout_location = Location(
-                        absolute_point_from_position_reference_and_offset(
-                            well=source_well,
-                            well_volume_difference=0,
-                            position_reference=blowout_props.blowout_position.position_reference,
-                            offset=blowout_props.blowout_position.offset,
-                            mount=self._instrument.get_mount(),
-                        ),
-                        source_location.labware,
+                    src_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(  # type: ignore[assignment]
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=source_location,
+                            blowout_well=source_well,
+                        )
                     )
                 else:
                     src_blowout_location = Location(
@@ -640,25 +619,15 @@ class TransferComponentsExecutor:
             else:
                 trash_blowout_location: Union[Location, TrashBin, WasteChute]
                 if blowout_props.blowout_position is not None:
-                    if isinstance(trash_location, (TrashBin, WasteChute)):
-                        trash_blowout_location = get_blowout_location_for_trash(
-                            trash_location,
-                            blowout_props.blowout_position,
-                        )
-                    else:
+                    trash_blowout_location = self._calculate_blowout_position_from_position_info(
+                        blowout_position=blowout_props.blowout_position,
+                        blowout_location=trash_location,
                         # We have already established that trash blowout_location of `Location` type
                         # has its `labware` as `Well` type.
-                        assert trash_location.labware.is_well
-                        trash_blowout_location = Location(
-                            absolute_point_from_position_reference_and_offset(
-                                well=trash_location.labware.as_well()._core,  # type: ignore[arg-type]
-                                well_volume_difference=0,
-                                position_reference=blowout_props.blowout_position.position_reference,
-                                offset=blowout_props.blowout_position.offset,
-                                mount=self._instrument.get_mount(),
-                            ),
-                            trash_location.labware,
-                        )
+                        blowout_well=trash_location.labware.as_well()._core  # type: ignore[arg-type]
+                        if isinstance(trash_location, Location)
+                        else None,
+                    )
                 else:
                     trash_blowout_location = trash_location
                 self._instrument.blow_out(
@@ -766,23 +735,16 @@ class TransferComponentsExecutor:
             assert blowout_props.flow_rate is not None
             dest_blowout_location: Union[Location, TrashBin, WasteChute]
             if blowout_props.blowout_position is not None:
-                # If blowout position is specified, use that position for blowout
-                # The position would be found by using the dest well core, the well position and offset
-                # in-place = false
+                # Destination for multi-dispense is never a disposal location, so we will always have a target well
                 assert self._target_well is not None
                 well_core = self._target_well
                 in_place = False
-                # Destination for multi-dispense is never a disposal location so we can use
-                # `absolute_point_from_position_reference_and_offset()` to find the blowout location
-                dest_blowout_location = Location(
-                    absolute_point_from_position_reference_and_offset(
-                        well=self._target_well,
-                        well_volume_difference=0,
-                        position_reference=blowout_props.blowout_position.position_reference,
-                        offset=blowout_props.blowout_position.offset,
-                        mount=self._instrument.get_mount(),
-                    ),
-                    self._target_location.labware,
+                dest_blowout_location = (
+                    self._calculate_blowout_position_from_position_info(
+                        blowout_position=blowout_props.blowout_position,
+                        blowout_location=self._target_location,
+                        blowout_well=well_core,
+                    )
                 )
             else:
                 well_core = None
@@ -867,15 +829,12 @@ class TransferComponentsExecutor:
                         "Blowout location is 'source' but source location &/or well is not provided."
                     )
                 if blowout_props.blowout_position is not None:
-                    src_blowout_location = Location(
-                        absolute_point_from_position_reference_and_offset(
-                            well=source_well,
-                            well_volume_difference=0,
-                            position_reference=blowout_props.blowout_position.position_reference,
-                            offset=blowout_props.blowout_position.offset,
-                            mount=self._instrument.get_mount(),
-                        ),
-                        source_location.labware,
+                    src_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(  # type: ignore[assignment]
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=source_location,
+                            blowout_well=source_well,
+                        )
                     )
                 else:
                     src_blowout_location = Location(
@@ -901,25 +860,18 @@ class TransferComponentsExecutor:
             else:
                 trash_blowout_location: Union[Location, TrashBin, WasteChute]
                 if blowout_props.blowout_position is not None:
-                    if isinstance(trash_location, (TrashBin, WasteChute)):
-                        trash_blowout_location = get_blowout_location_for_trash(
-                            trash_location,
-                            blowout_props.blowout_position,
+                    blowout_well = (
+                        trash_location._labware.as_well()._core
+                        if isinstance(trash_location, Location)
+                        else None
+                    )
+                    trash_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=trash_location,
+                            blowout_well=blowout_well,  # type: ignore[arg-type]
                         )
-                    else:
-                        # We have already established that trash blowout_location of `Location` type
-                        # has its `labware` as `Well` type.
-                        assert trash_location.labware.is_well
-                        trash_blowout_location = Location(
-                            absolute_point_from_position_reference_and_offset(
-                                well=trash_location.labware.as_well()._core,  # type: ignore[arg-type]
-                                well_volume_difference=0,
-                                position_reference=blowout_props.blowout_position.position_reference,
-                                offset=blowout_props.blowout_position.offset,
-                                mount=self._instrument.get_mount(),
-                            ),
-                            trash_location.labware,
-                        )
+                    )
                 else:
                     trash_blowout_location = trash_location
                 self._instrument.blow_out(
@@ -955,6 +907,31 @@ class TransferComponentsExecutor:
                 location=touch_tip_and_air_gap_location,
                 well=touch_tip_and_air_gap_well,
                 air_gap_volume=air_gap_volume,
+            )
+
+    def _calculate_blowout_position_from_position_info(
+        self,
+        blowout_position: TipPosition,
+        blowout_location: Union[Location, TrashBin, WasteChute],
+        blowout_well: Optional[WellCore],
+    ) -> Union[Location, TrashBin, WasteChute]:
+        """Returns blowout position calculated from blowout position reference & offset."""
+        if isinstance(blowout_location, (TrashBin, WasteChute)):
+            return get_blowout_location_for_trash(
+                blowout_location,
+                blowout_position,
+            )
+        else:
+            assert blowout_well is not None
+            return Location(
+                absolute_point_from_position_reference_and_offset(
+                    well=blowout_well,
+                    well_volume_difference=0,
+                    position_reference=blowout_position.position_reference,
+                    offset=blowout_position.offset,
+                    mount=self._instrument.get_mount(),
+                ),
+                blowout_location.labware,
             )
 
     def _do_touch_tip_and_air_gap_after_dispense(
@@ -1134,33 +1111,3 @@ def absolute_point_from_position_reference_and_offset(
         case _:
             raise ValueError(f"Unknown position reference {position_reference}")
     return reference_point + Point(offset.x, offset.y, offset.z)
-
-
-def get_blowout_location_for_trash(
-    disposal_location: Union[TrashBin, WasteChute],
-    target_tip_position: TipPosition,
-) -> Union[TrashBin, WasteChute]:
-    """Given a reference position and offset, return the blowout location for a trash bin or waste chute."""
-    if target_tip_position.position_reference == PositionReference.WELL_TOP:
-        return disposal_location.top(
-            x=target_tip_position.offset.x,
-            y=target_tip_position.offset.y,
-            z=target_tip_position.offset.z,
-        )
-    elif target_tip_position.position_reference == PositionReference.WELL_BOTTOM:
-        return disposal_location.top(
-            x=target_tip_position.offset.x,
-            y=target_tip_position.offset.y,
-            z=target_tip_position.offset.z - disposal_location.height,
-        )
-    elif target_tip_position.position_reference == PositionReference.WELL_CENTER:
-        return disposal_location.top(
-            x=target_tip_position.offset.x,
-            y=target_tip_position.offset.y,
-            z=target_tip_position.offset.z - disposal_location.height / 2,
-        )
-    else:
-        raise ValueError(
-            f"Position reference of {target_tip_position.position_reference} not allowed for"
-            f"trash bin & waste chute. Use 'well-top', 'well-bottom', or 'well-center' instead."
-        )

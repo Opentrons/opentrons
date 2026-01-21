@@ -2489,3 +2489,118 @@ def test_absolute_point_from_position_reference_and_offset_raises_errors(
             offset=Coordinate(x=0, y=0, z=0),
             mount=Mount.RIGHT,
         )
+
+
+# retract with blowout position set on src, trash, dest
+
+
+def test_retract_after_dispense_with_blowout_position_set_for_destination(
+    decoy: Decoy,
+    mock_instrument_core: InstrumentCore,
+    sample_transfer_props: TransferProperties,
+) -> None:
+    """It should use the blowout position for destination blowout."""
+    source_location = Location(Point(1, 2, 3), labware=None)
+    source_well = decoy.mock(cls=WellCore)
+    dest_well = decoy.mock(cls=WellCore)
+    well_top_point = Point(1, 2, 3)
+    well_bottom_point = Point(4, 5, 6)
+    air_gap_volume = 0.123
+    air_gap_flow_rate_by_vol = 123
+    air_gap_correction_by_vol = 0.321
+
+    sample_transfer_props.dispense.retract.air_gap_by_volume.set_for_volume(
+        0, air_gap_volume
+    )
+    sample_transfer_props.aspirate.flow_rate_by_volume.set_for_volume(
+        air_gap_volume, air_gap_flow_rate_by_vol
+    )
+    sample_transfer_props.aspirate.correction_by_volume.set_for_volume(
+        air_gap_volume, air_gap_correction_by_vol
+    )
+    sample_transfer_props.dispense.retract.blowout.blowout_position.position_reference = "well-top"
+    sample_transfer_props.dispense.retract.blowout.blowout_position.offset = {
+        "x": 1,
+        "y": 2,
+        "z": 3,
+    }
+    subject = TransferComponentsExecutor(
+        instrument_core=mock_instrument_core,
+        transfer_properties=sample_transfer_props,
+        target_location=Location(Point(1, 1, 1), labware=None),
+        target_well=dest_well,
+        tip_state=TipState(),
+        transfer_type=TransferType.ONE_TO_ONE,
+    )
+    decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
+    decoy.when(dest_well.get_bottom(0)).then_return(well_bottom_point)
+    decoy.when(dest_well.get_top(0)).then_return(well_top_point)
+    decoy.when(source_well.get_top(0)).then_return(Point(10, 20, 30))
+    # Assume air gap safe location is below retract location
+    decoy.when(dest_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
+        Point(1, 2, 35)
+    )
+    # Assume air gap safe location for air-gapping at src is below blowout position,
+    # where blowout position is source well top
+    decoy.when(source_well.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
+        Point(10, 20, 29)
+    )
+    subject.retract_after_dispensing(
+        trash_location=Location(Point(), labware=None),
+        source_location=source_location,
+        source_well=source_well,
+        add_final_air_gap=False,
+    )
+    decoy.verify(
+        mock_instrument_core.move_to(
+            location=Location(Point(12, 24, 36), labware=None),
+            well_core=dest_well,
+            force_direct=True,
+            minimum_z_height=None,
+            speed=50,
+        ),
+        mock_instrument_core.delay(10),
+        mock_instrument_core.touch_tip(
+            location=Location(Point(12, 24, 36), labware=None),
+            well_core=dest_well,
+            radius=1,
+            mm_from_edge=0.75,
+            z_offset=-1,
+            speed=30,
+        ),
+        mock_instrument_core.move_to(
+            location=Location(Point(12, 24, 36), labware=None),
+            well_core=dest_well,
+            force_direct=True,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        mock_instrument_core.air_gap_in_place(
+            volume=air_gap_volume,
+            flow_rate=air_gap_flow_rate_by_vol,
+            correction_volume=air_gap_correction_by_vol,
+        ),
+        mock_instrument_core.delay(0.2),
+        mock_instrument_core.blow_out(
+            location=Location(Point(2, 4, 6), labware=None),
+            well_core=source_well,
+            in_place=False,
+            flow_rate=100,
+        ),
+        mock_instrument_core.touch_tip(
+            location=Location(Point(10, 20, 30), labware=None),
+            well_core=source_well,
+            radius=1,
+            mm_from_edge=0.75,
+            z_offset=-1,
+            speed=30,
+        ),
+        mock_instrument_core.move_to(
+            location=Location(Point(10, 20, 30), labware=None),
+            well_core=source_well,
+            force_direct=True,
+            minimum_z_height=None,
+            speed=None,
+        ),
+        mock_instrument_core.prepare_to_aspirate(),
+    )
