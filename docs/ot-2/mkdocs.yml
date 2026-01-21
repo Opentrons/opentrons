@@ -22,9 +22,12 @@ nav:
       - Labware Concepts: labware/concepts.md
       - Labware Types: labware/types.md
       - Labware Definitions: labware/definitions.md
-  - Software:
+  - Opentrons App:
       - Opentrons App: opentrons-app/index.md
       - App Installation and Management: opentrons-app/installation.md
+      - Protocols Tab: opentrons-app/protocols-tab.md
+      - Labware Tab: opentrons-app/labware-tab.md
+      - Devices Tab: opentrons-app/devices-tab.md
       - Transferring Protocols: opentrons-app/transfer-protocols.md
       - Controlling Modules: opentrons-app/control-modules.md
   - Maintenance:
