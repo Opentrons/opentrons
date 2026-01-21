@@ -118,9 +118,8 @@ export function LabwareStackToolbox({
   }
 
   // select the top labware in the stack if no selected labware ids are provided
-  const selectedLabware = selectedLabwareIds
-    ? selectedLabwareIds
-    : [topDownStackIds[0]]
+  const selectedLabware =
+    selectedLabwareIds != null ? selectedLabwareIds : [topDownStackIds[0]]
   dispatch(openIngredientSelector(selectedLabware[0]))
 
   const handleAddAnotherLabware = (): void => {
