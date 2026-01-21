@@ -1,23 +1,25 @@
 from __future__ import annotations
-from enum import Enum
+
 from dataclasses import dataclass
+from pathlib import Path
 from typing import (
+    Any,
+    Awaitable,
+    Callable,
     Dict,
     List,
     NamedTuple,
-    Callable,
-    Any,
-    Tuple,
-    Awaitable,
-    Union,
     Optional,
     Protocol,
-    cast,
-    TYPE_CHECKING,
+    Tuple,
     TypeGuard,
+    Union,
+    cast,
 )
+
 from typing_extensions import TypedDict
-from pathlib import Path
+
+from opentrons_shared_data.util import StrEnum
 
 from opentrons.drivers.flex_stacker.types import (
     LimitSwitchStatus,
@@ -25,17 +27,6 @@ from opentrons.drivers.flex_stacker.types import (
     StackerAxis,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
-
-if TYPE_CHECKING:
-    from opentrons_shared_data.module.types import (
-        ThermocyclerModuleType,
-        MagneticModuleType,
-        TemperatureModuleType,
-        HeaterShakerModuleType,
-        MagneticBlockType,
-        AbsorbanceReaderType,
-        FlexStackerModuleType,
-    )
 
 
 class ThermocyclerStepBase(TypedDict):
@@ -59,8 +50,7 @@ UploadFunction = Callable[[str, str, Dict[str, Any]], Awaitable[Tuple[bool, str]
 class ModuleDisconnectedCallback(Protocol):
     """Protocol for the callback when the module should be disconnected."""
 
-    def __call__(self, port: str, serial: str | None) -> None:
-        ...
+    def __call__(self, model: str, port: str, serial: str | None) -> None: ...
 
 
 class ModuleErrorCallback(Protocol):
@@ -72,8 +62,7 @@ class ModuleErrorCallback(Protocol):
         model: str,
         port: str,
         serial: str | None,
-    ) -> None:
-        ...
+    ) -> None: ...
 
 
 class MagneticModuleData(TypedDict):
@@ -130,6 +119,10 @@ class FlexStackerData(TypedDict):
     errorDetails: str | None
 
 
+class VacuumModuleData(TypedDict):
+    errorDetails: str | None
+
+
 ModuleData = Union[
     Dict[Any, Any],  # This allows an empty dict as module data
     MagneticModuleData,
@@ -138,6 +131,7 @@ ModuleData = Union[
     ThermocyclerData,
     AbsorbanceReaderData,
     FlexStackerData,
+    VacuumModuleData,
 ]
 
 
@@ -178,20 +172,28 @@ class ModuleDataValidator:
     ) -> TypeGuard[FlexStackerData]:
         return data is not None and "platformState" in data.keys()
 
+    @classmethod
+    def is_vacuum_module_data(
+        cls, data: ModuleData | None
+    ) -> TypeGuard[VacuumModuleData]:
+        # TODO: Change platformState to specific key
+        return data is not None and "platformState" in data.keys()
+
 
 class LiveData(TypedDict):
     status: str
     data: ModuleData | None
 
 
-class ModuleType(str, Enum):
-    THERMOCYCLER: ThermocyclerModuleType = "thermocyclerModuleType"
-    TEMPERATURE: TemperatureModuleType = "temperatureModuleType"
-    MAGNETIC: MagneticModuleType = "magneticModuleType"
-    HEATER_SHAKER: HeaterShakerModuleType = "heaterShakerModuleType"
-    MAGNETIC_BLOCK: MagneticBlockType = "magneticBlockType"
-    ABSORBANCE_READER: AbsorbanceReaderType = "absorbanceReaderType"
-    FLEX_STACKER: FlexStackerModuleType = "flexStackerModuleType"
+class ModuleType(StrEnum):
+    THERMOCYCLER = "thermocyclerModuleType"
+    TEMPERATURE = "temperatureModuleType"
+    MAGNETIC = "magneticModuleType"
+    HEATER_SHAKER = "heaterShakerModuleType"
+    MAGNETIC_BLOCK = "magneticBlockType"
+    ABSORBANCE_READER = "absorbanceReaderType"
+    FLEX_STACKER = "flexStackerModuleType"
+    VACUUM_MODULE = "vacuumModuleType"
 
     @classmethod
     def from_model(cls, model: ModuleModel) -> ModuleType:
@@ -209,6 +211,8 @@ class ModuleType(str, Enum):
             return cls.ABSORBANCE_READER
         if isinstance(model, FlexStackerModuleModel):
             return cls.FLEX_STACKER
+        if isinstance(model, VacuumModuleModel):
+            return cls.VACUUM_MODULE
 
     @classmethod
     def to_module_fixture_id(cls, module_type: ModuleType) -> str:
@@ -225,41 +229,47 @@ class ModuleType(str, Enum):
             return "absorbanceReaderV1"
         if module_type == ModuleType.FLEX_STACKER:
             return "flexStackerModuleV1"
+        if module_type == ModuleType.VACUUM_MODULE:
+            return "vacuumModuleMilliporeV1"
         else:
             raise ValueError(
                 f"Module Type {module_type} does not have a related fixture ID."
             )
 
 
-class MagneticModuleModel(str, Enum):
-    MAGNETIC_V1: str = "magneticModuleV1"
-    MAGNETIC_V2: str = "magneticModuleV2"
+class MagneticModuleModel(StrEnum):
+    MAGNETIC_V1 = "magneticModuleV1"
+    MAGNETIC_V2 = "magneticModuleV2"
 
 
-class TemperatureModuleModel(str, Enum):
-    TEMPERATURE_V1: str = "temperatureModuleV1"
-    TEMPERATURE_V2: str = "temperatureModuleV2"
+class TemperatureModuleModel(StrEnum):
+    TEMPERATURE_V1 = "temperatureModuleV1"
+    TEMPERATURE_V2 = "temperatureModuleV2"
 
 
-class ThermocyclerModuleModel(str, Enum):
-    THERMOCYCLER_V1: str = "thermocyclerModuleV1"
-    THERMOCYCLER_V2: str = "thermocyclerModuleV2"
+class ThermocyclerModuleModel(StrEnum):
+    THERMOCYCLER_V1 = "thermocyclerModuleV1"
+    THERMOCYCLER_V2 = "thermocyclerModuleV2"
 
 
-class HeaterShakerModuleModel(str, Enum):
-    HEATER_SHAKER_V1: str = "heaterShakerModuleV1"
+class HeaterShakerModuleModel(StrEnum):
+    HEATER_SHAKER_V1 = "heaterShakerModuleV1"
 
 
-class MagneticBlockModel(str, Enum):
-    MAGNETIC_BLOCK_V1: str = "magneticBlockV1"
+class MagneticBlockModel(StrEnum):
+    MAGNETIC_BLOCK_V1 = "magneticBlockV1"
 
 
-class AbsorbanceReaderModel(str, Enum):
-    ABSORBANCE_READER_V1: str = "absorbanceReaderV1"
+class AbsorbanceReaderModel(StrEnum):
+    ABSORBANCE_READER_V1 = "absorbanceReaderV1"
 
 
-class FlexStackerModuleModel(str, Enum):
-    FLEX_STACKER_V1: str = "flexStackerModuleV1"
+class FlexStackerModuleModel(StrEnum):
+    FLEX_STACKER_V1 = "flexStackerModuleV1"
+
+
+class VacuumModuleModel(StrEnum):
+    VACUUM_MODULE_V1 = "vacuumModuleMilliporeV1"
 
 
 def module_model_from_string(model_string: str) -> ModuleModel:
@@ -271,6 +281,7 @@ def module_model_from_string(model_string: str) -> ModuleModel:
         MagneticBlockModel,
         AbsorbanceReaderModel,
         FlexStackerModuleModel,
+        VacuumModuleModel,
     }:
         try:
             return cast(ModuleModel, model_enum(model_string))
@@ -324,15 +335,16 @@ ModuleModel = Union[
     MagneticBlockModel,
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
+    VacuumModuleModel,
 ]
 
 
-class MagneticStatus(str, Enum):
+class MagneticStatus(StrEnum):
     ENGAGED = "engaged"
     DISENGAGED = "disengaged"
 
 
-class TemperatureStatus(str, Enum):
+class TemperatureStatus(StrEnum):
     HOLDING = "holding at target"
     COOLING = "cooling"
     HEATING = "heating"
@@ -340,7 +352,7 @@ class TemperatureStatus(str, Enum):
     ERROR = "error"
 
 
-class SpeedStatus(str, Enum):
+class SpeedStatus(StrEnum):
     HOLDING = "holding at target"
     ACCELERATING = "speeding up"
     DECELERATING = "slowing down"
@@ -348,33 +360,33 @@ class SpeedStatus(str, Enum):
     ERROR = "error"
 
 
-class HeaterShakerStatus(str, Enum):
+class HeaterShakerStatus(StrEnum):
     IDLE = "idle"
     RUNNING = "running"
     ERROR = "error"
 
 
-class AbsorbanceReaderStatus(str, Enum):
+class AbsorbanceReaderStatus(StrEnum):
     IDLE = "idle"
     MEASURING = "measuring"
     ERROR = "error"
 
 
-class LidStatus(str, Enum):
+class LidStatus(StrEnum):
     ON = "on"
     OFF = "off"
     UNKNOWN = "unknown"
     ERROR = "error"
 
 
-class FlexStackerStatus(str, Enum):
+class FlexStackerStatus(StrEnum):
     IDLE = "idle"
     DISPENSING = "dispensing"
     STORING = "storing"
     ERROR = "error"
 
 
-class PlatformState(str, Enum):
+class PlatformState(StrEnum):
     UNKNOWN = "unknown"
     EXTENDED = "extended"
     RETRACTED = "retracted"
@@ -390,7 +402,7 @@ class PlatformState(str, Enum):
         return cls.UNKNOWN
 
 
-class StackerAxisState(str, Enum):
+class StackerAxisState(StrEnum):
     UNKNOWN = "unknown"
     EXTENDED = "extended"
     RETRACTED = "retracted"
@@ -416,7 +428,7 @@ class StackerAxisState(str, Enum):
         return cls.UNKNOWN
 
 
-class LatchState(str, Enum):
+class LatchState(StrEnum):
     CLOSED = "closed"
     OPENED = "opened"
 
@@ -426,7 +438,7 @@ class LatchState(str, Enum):
         return cls.CLOSED if state == StackerAxisState.EXTENDED else cls.OPENED
 
 
-class HopperDoorState(str, Enum):
+class HopperDoorState(StrEnum):
     CLOSED = "closed"
     OPENED = "opened"
 
@@ -434,3 +446,17 @@ class HopperDoorState(str, Enum):
     def from_state(cls, state: bool) -> "HopperDoorState":
         """Get the hopper door state from the door state boolean."""
         return cls.CLOSED if state else cls.OPENED
+
+
+class VacuumModuleStatus(StrEnum):
+    IDLE = "idle"  # Waiting for input
+    RAMPING = "ramping"  # Moving toward target
+    HOLDING = "holding"  # Maintaining target for duration_s
+    VENTING = "venting"  # Opening valve to atmosphere
+    COMPLETE = "complete"  # Finished cycle
+    ERROR = "error"  # An error has occured
+
+
+class VentState(StrEnum):
+    CLOSED = "closed"
+    OPENED = "opened"

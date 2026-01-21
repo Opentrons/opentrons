@@ -11,9 +11,7 @@ import {
   aspirateTouchTipMmFromEdgeRequired,
   aspirateTouchTipSpeedRequired,
   aspirateWellsRequired,
-  blockTargetTempHoldRange,
   blockTargetTempRange,
-  blockTemperatureHoldRequired,
   blockTemperatureRequired,
   blowoutFlowRateRequired,
   blowoutLocationRequired,
@@ -35,13 +33,12 @@ import {
   engageHeightRangeExceeded,
   engageHeightRequired,
   fileNameRequired,
+  fillQuantityOutOfRange,
   incompatibleAspirateLabware,
   incompatibleDispenseLabware,
   incompatibleLabware,
   labwareToMoveRequired,
-  lidTargetTempHoldRange,
   lidTargetTempRange,
-  lidTemperatureHoldRequired,
   lidTemperatureRequired,
   magnetActionRequired,
   magneticModuleIdRequired,
@@ -71,6 +68,8 @@ import {
   targetTemperatureRequired,
   temperatureRequired,
   timesRequired,
+  tiprackRequired,
+  tipSelectionRequired,
   transferVolumeMin,
   volumeRequired,
   volumeTooHigh,
@@ -93,7 +92,9 @@ import type {
 } from '@opentrons/step-generation'
 import type {
   HydratedAbsorbanceReaderFormData,
+  HydratedCameraFormData,
   HydratedCommentFormData,
+  HydratedFlexStackerFormData,
   HydratedFormData,
   HydratedHeaterShakerFormData,
   HydratedMagnetFormData,
@@ -133,6 +134,8 @@ interface StepFormDataMap {
   temperature: HydratedTemperatureFormData
   thermocycler: HydratedThermocyclerFormData
   comment: HydratedCommentFormData
+  camera: HydratedCameraFormData
+  flexStacker: HydratedFlexStackerFormData
 }
 interface FormHelpers<K extends keyof StepFormDataMap> {
   getErrors: (
@@ -180,7 +183,8 @@ const stepFormHelperMap: {
       pushOutVolumeRequired,
       blowoutFlowRateRequired,
       transferVolumeMin,
-      pipetteRequired
+      pipetteRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
       mixTipPositionInTube,
@@ -232,11 +236,13 @@ const stepFormHelperMap: {
       blowoutFlowRateRequired,
       transferVolumeMin,
       pipetteRequired,
+      tiprackRequired,
       aspirateSubmergeSpeedRequired,
       aspirateRetractSpeedRequired,
       dispenseSubmergeSpeedRequired,
       dispenseRetractSpeedRequired,
-      disposalVolumeRequired
+      disposalVolumeRequired,
+      tipSelectionRequired
     ),
     getWarnings: composeWarnings(
       maxDispenseWellVolume,
@@ -267,10 +273,6 @@ const stepFormHelperMap: {
       lidTemperatureRequired,
       profileVolumeRequired,
       profileTargetLidTempRequired,
-      blockTemperatureHoldRequired,
-      lidTemperatureHoldRequired,
-      lidTargetTempHoldRange,
-      blockTargetTempHoldRange,
       profileVolumeRange,
       profileTargetLidTempRange,
       lidTargetTempRange,
@@ -279,6 +281,12 @@ const stepFormHelperMap: {
   },
   comment: {
     getErrors: composeErrors(messageRequired),
+  },
+  camera: {
+    getErrors: composeErrors(),
+  },
+  flexStacker: {
+    getErrors: composeErrors(fillQuantityOutOfRange),
   },
 }
 
@@ -364,6 +372,21 @@ export const getFormErrors = (
         moduleEntities,
         labwareEntities
       )
+    case 'camera':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedCameraFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    case 'flexStacker':
+      return stepFormHelperMap[stepType].getErrors(
+        formData as HydratedFlexStackerFormData,
+        moduleEntities,
+        labwareEntities
+      )
+    default:
+      stepType satisfies never // if TypeScript complains here, you missed a stepType above
+      throw new Error(`Unknown step type: ${stepType}`)
   }
 }
 

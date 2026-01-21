@@ -4,8 +4,13 @@ import { POSITION_REFERENCE_BOTTOM } from '@opentrons/shared-data'
 
 import { _castForm } from '../index'
 
-import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type {
+  LabwareEntity,
+  PipetteEntity,
+  TipRackWithDef,
+} from '@opentrons/step-generation'
+import type {
+  HydratedCameraFormData,
   HydratedMagnetFormData,
   HydratedMixFormData,
   HydratedMoveLiquidFormData,
@@ -24,7 +29,7 @@ describe('form casting', () => {
       stepName: 'transfer',
       stepDetails: 'some details',
       aspirate_airGap_checkbox: false,
-      aspirate_airGap_volume: 1,
+      aspirate_airGap_volume: '1',
       aspirate_delay_checkbox: false,
       aspirate_delay_seconds: 1,
       aspirate_flowRate: 50,
@@ -54,7 +59,7 @@ describe('form casting', () => {
       dispense_wellOrder_second: 'l2r',
       dispense_wells: ['A1'],
       disposalVolume_checkbox: true,
-      disposalVolume_volume: 1,
+      disposalVolume_volume: '1',
       path: 'single',
       pipette: {} as PipetteEntity,
       preWetTip: false,
@@ -62,7 +67,7 @@ describe('form casting', () => {
       dispense_airGap_checkbox: false,
       dropTip_location: 'some location',
       nozzles: null,
-      tipRack: 'some tiprack',
+      tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       aspirate_retract_position_reference: POSITION_REFERENCE_BOTTOM,
       aspirate_submerge_mmFromBottom: 1,
@@ -83,10 +88,8 @@ describe('form casting', () => {
     }
     expect(_castForm(input)).toEqual({
       ...input,
-      aspirate_mix_times: 0,
-      aspirate_mix_volume: 0,
-      dispense_mix_times: 0,
-      dispense_mix_volume: 0,
+      aspirate_airGap_volume: 1,
+      disposalVolume_volume: 1,
     })
   })
 
@@ -115,7 +118,7 @@ describe('form casting', () => {
       dropTip_location: 'some location',
       mix_touchTip_checkbox: false,
       nozzles: null,
-      tipRack: 'some tiprack',
+      tipRack: { tiprackDefURI: 'some tiprack' } as TipRackWithDef,
       liquidClassesSupported: true,
       pushOut_checkbox: false,
       pushOut_volume: null,
@@ -150,6 +153,27 @@ describe('form casting', () => {
     expect(_castForm(input)).toEqual({
       ...input,
       pauseTemperature: 0,
+    })
+  })
+
+  it('should cast camera form fields', () => {
+    const input: HydratedCameraFormData = {
+      stepNumber: 1,
+      stepName: 'camera',
+      stepDetails: 'captured image',
+      id: 'stepId',
+      stepType: 'camera',
+      homeBefore: false,
+      fileName: 'fileName',
+      resolution: [10, 10],
+      zoom: 2,
+      contrast: 10,
+      brightness: 10,
+      saturation: 10,
+    }
+
+    expect(_castForm(input)).toEqual({
+      ...input,
     })
   })
 
@@ -203,18 +227,11 @@ describe('form casting', () => {
       profileTargetLidTemp: null,
       orderedProfileItems: [],
       profileItemsById: {},
-      blockIsActiveHold: false,
-      blockTargetTempHold: null,
-      lidIsActiveHold: false,
-      lidTargetTempHold: null,
-      lidOpenHold: false,
     }
     expect(_castForm(input)).toEqual({
       ...input,
       blockTargetTemp: 24,
       lidTargetTemp: 44,
-      blockTargetTempHold: 0,
-      lidTargetTempHold: 0,
     })
   })
 })

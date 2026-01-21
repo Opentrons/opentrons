@@ -1,64 +1,72 @@
 """Shared utilities for ot3 hardware control."""
-from typing import Dict, Iterable, List, Set, Tuple, TypeVar, cast, Sequence, Optional
-from typing_extensions import Literal
+
+import copy
 from logging import getLogger
-from opentrons.config.defaults_ot3 import (
-    DEFAULT_EMULSIFYING_PIPETTE_AXIS_MAX_SPEED,
-)
-from opentrons.config.types import OT3MotionSettings, OT3CurrentSettings, GantryLoad
-from opentrons.hardware_control.types import (
-    Axis,
-    OT3AxisKind,
-    OT3AxisMap,
-    CurrentConfig,
-    SubSystem,
-    OT3Mount,
-    InstrumentProbeType,
-    PipetteSubType,
-    UpdateState,
-    UpdateStatus,
-    GripperJawState,
-)
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple, TypeVar, cast
+
 import numpy as np
+from typing_extensions import Literal
 
 from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
     FirmwareTarget,
+    NodeId,
+    PipetteTipActionType,
     PipetteType,
     SensorId,
-    PipetteTipActionType,
     USBTarget,
+)
+from opentrons_hardware.firmware_bindings.constants import (
     GripperJawState as FirmwareGripperjawState,
 )
 from opentrons_hardware.firmware_update.types import FirmwareUpdateStatus, StatusElement
 from opentrons_hardware.hardware_control import network
+from opentrons_hardware.hardware_control.constants import interrupts_per_sec
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroup,
+    MoveGroupSingleAxisStep,
+    MoveStopCondition,
+    MoveType,
+    NodeIdMotionValues,
+    SingleMoveStep,
+    create_backoff_step,
+    create_gripper_jaw_step,
+    create_home_step,
+    create_step,
+    create_tip_action_backoff_step,
+    create_tip_action_step,
+)
 from opentrons_hardware.hardware_control.motion_planning import (
     AxisConstraints,
-    SystemConstraints,
     Coordinates,
-    Move,
     CoordinateValue,
+    Move,
+    SystemConstraints,
+)
+from opentrons_hardware.hardware_control.motion_planning.move_utils import (
+    unit_vector_multiplication,
 )
 from opentrons_hardware.hardware_control.tool_sensors import (
     InstrumentProbeTarget,
     PipetteProbeTarget,
 )
-from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    unit_vector_multiplication,
+
+from opentrons.config.defaults_ot3 import (
+    DEFAULT_EMULSIFYING_PIPETTE_AXIS_MAX_SPEED,
 )
-from opentrons_hardware.hardware_control.motion import (
-    create_step,
-    NodeIdMotionValues,
-    create_home_step,
-    create_backoff_step,
-    create_tip_action_backoff_step,
-    MoveGroup,
-    MoveType,
-    MoveStopCondition,
-    create_gripper_jaw_step,
-    create_tip_action_step,
+from opentrons.config.types import GantryLoad, OT3CurrentSettings, OT3MotionSettings
+from opentrons.hardware_control.types import (
+    Axis,
+    CurrentConfig,
+    GripperJawState,
+    InstrumentProbeType,
+    OT3AxisKind,
+    OT3AxisMap,
+    OT3Mount,
+    PipetteSubType,
+    SubSystem,
+    UpdateState,
+    UpdateStatus,
 )
-from opentrons_hardware.hardware_control.constants import interrupts_per_sec
 
 GRIPPER_JAW_HOME_TIME: float = 10
 GRIPPER_JAW_GRIP_TIME: float = 10
@@ -376,6 +384,40 @@ def motor_nodes(devices: Set[FirmwareTarget]) -> Set[NodeId]:
     return {NodeId(target) for target in motor_nodes if target in NodeId}
 
 
+def add_delay_to_move_group(
+    group: MoveGroup,
+    present_nodes: Iterable[NodeId],
+    delay: Tuple[List[NodeId], float],
+) -> MoveGroup:
+    delay_nodes, delay_time = delay
+    if delay_time == 0.0:
+        return group
+
+    as_single_moves: Dict[NodeId, List[SingleMoveStep]] = {}
+    for node in present_nodes:
+        as_single_moves[node] = [step[node] for step in group]
+
+    delay_step = MoveGroupSingleAxisStep(
+        distance_mm=np.float64(0),
+        velocity_mm_sec=np.float64(0),
+        duration_sec=np.float64(delay_time),
+    )
+    for node in present_nodes:
+        if node in delay_nodes:
+            # Add the delay at the beginning
+            as_single_moves[node] = [copy.deepcopy(delay_step)] + as_single_moves[node]
+        else:
+            # Add the delay at the end.
+            as_single_moves[node] = as_single_moves[node] + [copy.deepcopy(delay_step)]
+
+    new_move_group: MoveGroup = []
+    for i in range(len(group) + 1):
+        new_move_group.append(
+            {node: as_single_moves[node][i] for node in present_nodes}
+        )
+    return new_move_group
+
+
 def create_move_group(
     origin: Coordinates[Axis, CoordinateValue],
     moves: List[Move[Axis]],
@@ -389,7 +431,7 @@ def create_move_group(
         for block in move.blocks:
             if block.time < (3.0 / interrupts_per_sec):
                 LOG.info(
-                    f"Skipping move block with time {block.time} (<{3.0/interrupts_per_sec})"
+                    f"Skipping move block with time {block.time} (<{3.0 / interrupts_per_sec})"
                 )
                 continue
             distances = unit_vector_multiplication(unit_vector, block.distance)

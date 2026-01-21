@@ -55,13 +55,12 @@ describe('AttachProbe', () => {
     mockHandleAttachProbeCheck = vi.fn()
     mockHandleNavToDetachProbe = vi.fn()
 
-    vi.mocked(
-      selectStepInfo
-    ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
-    vi.mocked(
-      selectActivePipetteChannelCount
-    ).mockImplementation((runId: string) => (state: any) =>
-      state[runId]?.activePipette?.channelCount || 1
+    vi.mocked(selectStepInfo).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.steps
+    )
+    vi.mocked(selectActivePipetteChannelCount).mockImplementation(
+      (runId: string) => (state: any) =>
+        state[runId]?.activePipette?.channelCount || 1
     )
 
     props = {

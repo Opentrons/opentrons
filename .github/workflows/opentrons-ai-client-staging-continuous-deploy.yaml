@@ -25,9 +25,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: 'actions/checkout@v4'
-      - uses: 'actions/setup-node@v4'
+      - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.12.0'
+          node-version: '22.22.0'
       - name: 'install udev'
         run: |
           # WORKAROUND: Remove microsoft debian repo due to https://github.com/microsoft/linux-package-repositories/issues/130. Remove line below after it is resolved

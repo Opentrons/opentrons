@@ -37,7 +37,7 @@ import { NavigationMenu } from './NavigationMenu'
 import type { Dispatch, SetStateAction } from 'react'
 import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 
-const NAV_LINKS: Array<typeof ON_DEVICE_DISPLAY_PATHS[number]> = [
+const NAV_LINKS: Array<(typeof ON_DEVICE_DISPLAY_PATHS)[number]> = [
   '/protocols',
   '/quick-transfer',
   '/instruments',
@@ -106,7 +106,7 @@ export function Navigation(props: NavigationProps): JSX.Element {
     })
   }, [])
 
-  function getPathDisplayName(path: typeof NAV_LINKS[number]): string {
+  function getPathDisplayName(path: (typeof NAV_LINKS)[number]): string {
     switch (path) {
       case '/instruments':
         return t('instruments')

@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
-from opentrons.drivers.types import (
-    ABSMeasurementMode,
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderDeviceState,
-    AbsorbanceReaderPlatePresence,
-)
 from opentrons.drivers.absorbance_reader.abstract import (
     AbstractAbsorbanceReaderDriver,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.types import (
+    ABSMeasurementMode,
+    AbsorbanceReaderDeviceState,
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
+)
 
 if TYPE_CHECKING:
     from .async_byonoy import AsyncByonoy as AsyncByonoyType

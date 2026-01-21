@@ -1,48 +1,52 @@
 """Run router dependency-injection wire-up."""
+
 from typing import Annotated
 
 from fastapi import Depends, status
-from robot_server.error_recovery.settings.store import (
-    ErrorRecoverySettingStore,
-    get_error_recovery_setting_store,
-)
-from robot_server.protocols.dependencies import get_protocol_store
-from robot_server.protocols.protocol_models import ProtocolKind
-from robot_server.protocols.protocol_store import ProtocolStore
 from sqlalchemy.engine import Engine as SQLEngine
-
-from opentrons_shared_data.robot.types import RobotType
 
 from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine import DeckType
-
+from opentrons.protocol_engine.resources.file_provider import FileProvider
+from opentrons_shared_data.robot.types import RobotType
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-from robot_server.hardware import (
-    get_hardware,
-    get_deck_type,
-    get_robot_type,
-)
-from robot_server.persistence.fastapi_dependencies import get_sql_engine
-from robot_server.service.task_runner import get_task_runner, TaskRunner
-from robot_server.settings import get_settings
-from robot_server.deletion_planner import RunDeletionPlanner
-from robot_server.service.notifications import (
-    get_runs_publisher,
-    RunsPublisher,
-)
 
+from .light_control_task import LightController, run_light_task
 from .run_auto_deleter import RunAutoDeleter
-from .run_orchestrator_store import RunOrchestratorStore, NoRunOrchestrator
-from .run_store import RunStore
 from .run_data_manager import RunDataManager
+from .run_orchestrator_store import NoRunOrchestrator, RunOrchestratorStore
+from .run_store import RunStore
+from robot_server.camera.settings.store import (
+    CameraSettingStore,
+    get_camera_setting_store,
+)
+from robot_server.data_files.dependencies import get_data_file_auto_deleter
+from robot_server.data_files.file_auto_deleter import DataFileAutoDeleter
+from robot_server.deletion_planner import RunDeletionPlanner
+from robot_server.error_recovery.settings.store import (
+    ErrorRecoverySettingStore,
+    get_error_recovery_setting_store,
+)
 from robot_server.errors.robot_errors import (
     HardwareNotYetInitialized,
 )
-from .light_control_task import LightController, run_light_task
+from robot_server.file_provider.fastapi_dependencies import get_file_provider
+from robot_server.hardware import (
+    get_deck_type,
+    get_hardware,
+    get_robot_type,
+)
+from robot_server.persistence.fastapi_dependencies import get_sql_engine
+from robot_server.service.notifications import (
+    RunsPublisher,
+    get_runs_publisher,
+)
+from robot_server.service.task_runner import TaskRunner, get_task_runner
+from robot_server.settings import get_settings
 
 _run_store_accessor = AppStateAccessor[RunStore]("run_store")
 _run_orchestrator_store_accessor = AppStateAccessor[RunOrchestratorStore](
@@ -165,6 +169,10 @@ async def get_run_data_manager(
     error_recovery_setting_store: Annotated[
         ErrorRecoverySettingStore, Depends(get_error_recovery_setting_store)
     ],
+    camera_setting_store: Annotated[
+        CameraSettingStore, Depends(get_camera_setting_store)
+    ],
+    file_provider: Annotated[FileProvider, Depends(get_file_provider)],
 ) -> RunDataManager:
     """Get a singleton run data manager to keep track of current/historical run data."""
     run_data_manager = _run_data_manager_accessor.get_from(app_state)
@@ -174,8 +182,10 @@ async def get_run_data_manager(
             run_orchestrator_store=run_orchestrator_store,
             run_store=run_store,
             error_recovery_setting_store=error_recovery_setting_store,
+            camera_setting_store=camera_setting_store,
             task_runner=task_runner,
             runs_publisher=runs_publisher,
+            file_provider=file_provider,
         )
         _run_data_manager_accessor.set_on(app_state, run_data_manager)
 
@@ -184,27 +194,13 @@ async def get_run_data_manager(
 
 async def get_run_auto_deleter(
     run_store: Annotated[RunStore, Depends(get_run_store)],
-    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
+    data_file_auto_deleter: Annotated[
+        DataFileAutoDeleter, Depends(get_data_file_auto_deleter)
+    ],
 ) -> RunAutoDeleter:
     """Get an `AutoDeleter` to delete old runs."""
     return RunAutoDeleter(
         run_store=run_store,
-        protocol_store=protocol_store,
         deletion_planner=RunDeletionPlanner(maximum_runs=get_settings().maximum_runs),
-        protocol_kind=ProtocolKind.STANDARD,
-    )
-
-
-async def get_quick_transfer_run_auto_deleter(
-    run_store: Annotated[RunStore, Depends(get_run_store)],
-    protocol_store: Annotated[ProtocolStore, Depends(get_protocol_store)],
-) -> RunAutoDeleter:
-    """Get an `AutoDeleter` to delete old runs for quick transfer prorotocols."""
-    return RunAutoDeleter(
-        run_store=run_store,
-        protocol_store=protocol_store,
-        # NOTE: We dont store quick transfer runs, however we need an additional
-        # run slot so we can clone an active run.
-        deletion_planner=RunDeletionPlanner(maximum_runs=2),
-        protocol_kind=ProtocolKind.QUICK_TRANSFER,
+        data_file_auto_deleter=data_file_auto_deleter,
     )

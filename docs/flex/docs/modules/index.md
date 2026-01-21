@@ -9,7 +9,7 @@ This chapter summarizes the functions and physical specifications of modules tha
 !!! tip
     - For complete instructions on module installation and use, refer to the quickstart guide that shipped with your unit or find its manual in the [Modules category](../../modules/index.md) of the Opentrons Documentation website.
 
-    - For details on integrating modules into your protocols, see the [Protocol Designer section](../protocols/designer.md) of the Protocol Development chapter or the [Hardware Modules section](https://docs.opentrons.com/v2/new_modules.html) of our Python API documentation.
+    - For details on integrating modules into your protocols, see the [Protocol Designer section](../protocols/designer.md) of the Protocol Development chapter or the [Hardware Modules section](../../python-api/modules/index.md) of our Python API documentation.
 
 
 ## Supported modules
@@ -29,6 +29,8 @@ Opentrons Flex is compatible with with the following Opentrons modules:
 - The [**Temperature Module**](temperature.md) is a hot and cold plate module that is able to maintain steady state temperatures between 4 and 95 °C.
 
 - The [**Thermocycler Module**](thermocycler.md) provides on-deck, fully automated thermocycling, enabling automation of upstream and downstream workflow steps. Thermocycler GEN2 is fully compatible with the gripper. Thermocycler GEN1 cannot be used with the gripper, and is therefore not supported on Opentrons Flex.
+
+Certain module tasks, like heating from an ambient temperature to a high temperature or executing a Thermocycler profile, take more time than others. Starting with API version 2.27, you can use [concurrent commands](https://docs.opentrons.com/v2/modules/concurrent_module.html) to continue pipetting and other steps in your Flex protocols. 
 
 Some modules originally designed for the OT-2 are compatible with Flex, as summarized in the table below. A checkmark :material-check-bold:{ .green } indicates compatibility, and an :octicons-x-12:{ .red } indicates incompatibility.
 

@@ -236,7 +236,7 @@ export const ChooseModuleToConfigureModal = (
   const contents =
     fixtureOptions.length > 0 ? (
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('add_this_deck_hardware')}
         </LegacyStyledText>
         <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing8}>
@@ -276,7 +276,7 @@ export const ChooseModuleToConfigureModal = (
             alignItems={ALIGN_CENTER}
           >
             <LegacyStyledText
-              as="h3"
+              forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('add_to_slot', { slotName: displaySlotName })}
@@ -364,7 +364,7 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
     >
       {configuredModuleMatches.length > 0 ? (
         <>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('there_are_other_configured_modules', {
               module: moduleDisplayName,
             })}
@@ -374,7 +374,7 @@ function NoUnconfiguredModules(props: NoUnconfiguredModulesProps): JSX.Element {
         </>
       ) : (
         <>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('there_are_no_unconfigured_modules', {
               module: moduleDisplayName,
               slot: displaySlotName,

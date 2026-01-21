@@ -49,8 +49,10 @@ const PANEL_BY_STEP: Partial<
   [Sessions.PIP_OFFSET_STEP_INSPECTING_TIP]: TipConfirmation,
   [Sessions.PIP_OFFSET_STEP_JOGGING_TO_DECK]: SaveZPoint,
   [Sessions.PIP_OFFSET_STEP_SAVING_POINT_ONE]: SaveXYPoint,
-  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]: PipetteOffsetCalibrationComplete,
-  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]: PipetteOffsetCalibrationComplete,
+  [Sessions.PIP_OFFSET_STEP_TIP_LENGTH_COMPLETE]:
+    PipetteOffsetCalibrationComplete,
+  [Sessions.PIP_OFFSET_STEP_CALIBRATION_COMPLETE]:
+    PipetteOffsetCalibrationComplete,
 }
 const STEPS_IN_ORDER: CalibrationSessionStep[] = [
   Sessions.PIP_OFFSET_STEP_SESSION_STARTED,
@@ -88,9 +90,9 @@ export function CalibratePipetteOffset({
   const errorInfo = useCalibrationError(requestIds, session?.id)
 
   const tipRack: CalibrationLabware | null =
-    labware != null ? labware.find(l => l.isTiprack) ?? null : null
+    labware != null ? (labware.find(l => l.isTiprack) ?? null) : null
   const calBlock: CalibrationLabware | null =
-    labware != null ? labware.find(l => !l.isTiprack) ?? null : null
+    labware != null ? (labware.find(l => !l.isTiprack) ?? null) : null
 
   const isMulti = useMemo(() => {
     const spec =

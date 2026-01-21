@@ -60,18 +60,12 @@ export function ProtocolSetupParameters({
   const navigate = useNavigate()
   const host = useHost()
   const queryClient = useQueryClient()
-  const [
-    chooseValueScreen,
-    setChooseValueScreen,
-  ] = useState<ChoiceParameter | null>(null)
-  const [
-    showNumericalInputScreen,
-    setShowNumericalInputScreen,
-  ] = useState<NumberParameter | null>(null)
-  const [
-    chooseCsvFileScreen,
-    setChooseCsvFileScreen,
-  ] = useState<CsvFileParameter | null>(null)
+  const [chooseValueScreen, setChooseValueScreen] =
+    useState<ChoiceParameter | null>(null)
+  const [showNumericalInputScreen, setShowNumericalInputScreen] =
+    useState<NumberParameter | null>(null)
+  const [chooseCsvFileScreen, setChooseCsvFileScreen] =
+    useState<CsvFileParameter | null>(null)
   const [prevScrollPosition, setPrevScrollPosition] = useState<number | null>(
     null
   )
@@ -175,10 +169,8 @@ export function ProtocolSetupParameters({
     }
   }
 
-  const {
-    createProtocolAnalysis,
-    isLoading: isAnalysisLoading,
-  } = useCreateProtocolAnalysisMutation(protocolId, host)
+  const { createProtocolAnalysis, isLoading: isAnalysisLoading } =
+    useCreateProtocolAnalysisMutation(protocolId, host)
 
   const { uploadCsvFile } = useUploadCsvFileMutation({}, host)
 

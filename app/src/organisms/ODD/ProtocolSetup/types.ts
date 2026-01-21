@@ -4,4 +4,5 @@ export type SetupScreens =
   | 'modules'
   | 'offsets'
   | 'labware'
+  | 'camera'
   | 'view only parameters'

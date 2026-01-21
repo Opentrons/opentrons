@@ -22,16 +22,17 @@ OT_API_ROBOT_CONFIG_FILE variable.
 This module's interface to the rest of the system are the IS_* attributes and
 the CONFIG attribute.
 """
+
 import enum
-import os
 import json
 import logging
-from pathlib import Path
+import os
 import re
 import shutil
 import subprocess
 import sys
 from enum import Enum, auto
+from pathlib import Path
 from typing import Dict, NamedTuple, Optional, cast
 
 _CONFIG_FILENAME = "config.json"
@@ -307,6 +308,13 @@ CONFIG_ELEMENTS = (
         ConfigElementType.DIR,
         "The dir where performance metrics are stored",
     ),
+    ConfigElement(
+        "live_stream_environment_file",
+        "Live Stream Configuration",
+        Path("opentrons-live-stream.env"),
+        ConfigElementType.FILE,
+        "The file storing the Opentrons Live Stream Configuration values.",
+    ),
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
@@ -413,8 +421,7 @@ def _ensure_paths_and_types(index: Dict[str, str]) -> Dict[str, Path]:
             correct_types[key] = it
         else:
             raise RuntimeError(
-                f"unhandled kind in ConfigElements: {key}: "
-                f"{configs_by_name[key].kind}"
+                f"unhandled kind in ConfigElements: {key}: {configs_by_name[key].kind}"
             )
     return correct_types
 

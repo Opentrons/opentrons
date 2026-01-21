@@ -1,11 +1,15 @@
 """Tests for move groups."""
-import asyncio
-import numpy as np
-from typing import Iterator, List, Dict
 
+import asyncio
+from typing import Dict, Iterator, List
+
+import numpy as np
 import pytest
 from _pytest.fixtures import SubRequest
-from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
+
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
+from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId
+from opentrons_hardware.firmware_bindings.messages.fields import MoveStopConditionField
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     AddLinearMoveRequest,
     GetMoveGroupRequest,
@@ -16,15 +20,12 @@ from opentrons_hardware.firmware_bindings.messages.payloads import (
     MoveGroupRequestPayload,
 )
 from opentrons_hardware.firmware_bindings.utils import (
-    UInt8Field,
     Int32Field,
+    UInt8Field,
     UInt32Field,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import MoveStopConditionField
-
-from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
+from opentrons_hardware.hardware_control.motion import create_home_step, create_step
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
-from opentrons_hardware.hardware_control.motion import create_step, create_home_step
 from opentrons_hardware.hardware_control.types import (
     MotorPositionStatus,
     MoveCompleteAck,

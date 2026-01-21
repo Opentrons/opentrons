@@ -1,21 +1,21 @@
 """Test Heater Shaker set shake speed command implementation."""
-from decoy import Decoy
+
 import pytest
+from decoy import Decoy
 
 from opentrons.hardware_control.modules import HeaterShaker
-
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    HeaterShakerModuleSubState,
-    HeaterShakerModuleId,
-)
-from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
 from opentrons.protocol_engine.commands import heater_shaker
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.heater_shaker.set_and_wait_for_shake_speed import (
     SetAndWaitForShakeSpeedImpl,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.module_substates import (
+    HeaterShakerModuleId,
+    HeaterShakerModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import MotorAxis
 
 

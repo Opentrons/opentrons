@@ -1,31 +1,30 @@
 """Test dispense-in-place commands."""
 
 from datetime import datetime
+from typing import Optional
 
 import pytest
 from decoy import Decoy, matchers
-from typing import Optional
 
 from opentrons_shared_data.errors.exceptions import PipetteOverpressureError
 
-from opentrons.types import Point
-from opentrons.protocol_engine.execution import PipettingHandler, GantryMover
-
-from opentrons.protocol_engine.commands.command import SuccessData, DefinedErrorData
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.dispense_in_place import (
+    DispenseInPlaceImplementation,
     DispenseInPlaceParams,
     DispenseInPlaceResult,
-    DispenseInPlaceImplementation,
 )
 from opentrons.protocol_engine.commands.pipetting_common import OverpressureError
+from opentrons.protocol_engine.execution import GantryMover, PipettingHandler
 from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types import (
-    CurrentWell,
-    CurrentPipetteLocation,
     CurrentAddressableArea,
+    CurrentPipetteLocation,
+    CurrentWell,
 )
-from opentrons.protocol_engine.state import update_types
+from opentrons.types import Point
 
 
 @pytest.fixture

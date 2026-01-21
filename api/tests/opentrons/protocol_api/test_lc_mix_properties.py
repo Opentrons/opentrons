@@ -1,22 +1,24 @@
 """Tests for mix properties in the Opentrons protocol API."""
 
-from pydantic import ValidationError
-import pytest
 from typing import Any, Union
-from hypothesis import given, strategies as st, settings
 
-from opentrons.protocol_api._liquid_properties import _build_mix_properties
+import pytest
+from hypothesis import given, settings
+from hypothesis import strategies as st
+from pydantic import ValidationError
+
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    MixProperties,
     MixParams,
+    MixProperties,
 )
 
 from . import (
     boolean_looking_values,
     invalid_values,
-    positive_non_zero_floats_and_ints,
     negative_or_zero_floats_and_ints,
+    positive_non_zero_floats_and_ints,
 )
+from opentrons.protocol_api._liquid_properties import _build_mix_properties
 
 
 def test_mix_properties_enable_and_disable() -> None:
@@ -35,7 +37,9 @@ def test_mix_properties_none_instantiation_combos() -> None:
     with pytest.raises(ValidationError):
         _build_mix_properties(MixProperties(enable=True, params=None))
     with pytest.raises(ValidationError):
-        _build_mix_properties(MixProperties(enable=None, params=MixParams(repetitions=2, volume=10)))  # type: ignore
+        _build_mix_properties(
+            MixProperties(enable=None, params=MixParams(repetitions=2, volume=10))  # type: ignore
+        )
     _build_mix_properties(MixProperties(enable=False, params=None))
 
 

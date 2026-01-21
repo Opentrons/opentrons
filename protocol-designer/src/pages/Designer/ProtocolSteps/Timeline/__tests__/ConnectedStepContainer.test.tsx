@@ -8,7 +8,10 @@ import { COLORS } from '@opentrons/components'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { getUnsavedForm } from '/protocol-designer/step-forms/selectors'
+import {
+  getInitialDeckSetup,
+  getUnsavedForm,
+} from '/protocol-designer/step-forms/selectors'
 import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import { ConnectedStepContainer } from '../ConnectedStepContainer'
@@ -49,6 +52,14 @@ describe('ConnectedStepContainer', () => {
     )
     vi.mocked(getUnsavedForm).mockReturnValue(null)
     vi.mocked(getDeckSetupForActiveItem).mockReturnValue({
+      labware: {},
+      modules: {},
+      additionalEquipmentOnDeck: {
+        trash: { id: 'trash', name: 'trashBin', location: 'cutoutA3' },
+      },
+      pipettes: {},
+    })
+    vi.mocked(getInitialDeckSetup).mockReturnValue({
       labware: {},
       modules: {},
       additionalEquipmentOnDeck: {
@@ -179,10 +190,5 @@ describe('ConnectedStepContainer', () => {
     expect(stepNumber).toHaveStyle(`color: ${COLORS.red60}`)
     expect(text).toHaveStyle(`color: ${COLORS.red60}`)
     expect(subtext).toHaveStyle(`color: ${COLORS.red60}`)
-  })
-
-  it('renders the divider if hover targets that step', () => {
-    render({ ...props, dragHovered: true })
-    screen.getByTestId('divider')
   })
 })

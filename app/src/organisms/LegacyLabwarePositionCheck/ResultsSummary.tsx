@@ -9,7 +9,6 @@ import {
   ALIGN_FLEX_END,
   BORDERS,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -21,6 +20,7 @@ import {
   OVERFLOW_AUTO,
   PrimaryButton,
   RESPONSIVENESS,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -259,7 +259,7 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
             <TableRow key={index}>
               <LeftRoundedTableDatum>
                 <LegacyStyledText
-                  as="p"
+                  forwardedAs="p"
                   textTransform={TYPOGRAPHY.textTransformCapitalize}
                 >
                   {getDisplayLocation(
@@ -271,7 +271,9 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                 </LegacyStyledText>
               </LeftRoundedTableDatum>
               <TableDatum>
-                <LegacyStyledText as="p">{labwareDisplayName}</LegacyStyledText>
+                <LegacyStyledText forwardedAs="p">
+                  {labwareDisplayName}
+                </LegacyStyledText>
               </TableDatum>
               <RightRoundedTableDatum>
                 {isEqual(vector, IDENTITY_VECTOR) ? (
@@ -281,14 +283,14 @@ const OffsetTable = (props: OffsetTableProps): JSX.Element => {
                     {[vector.x, vector.y, vector.z].map((axis, index) => (
                       <Fragment key={index}>
                         <LegacyStyledText
-                          as="p"
+                          forwardedAs="p"
                           marginLeft={index > 0 ? SPACING.spacing8 : 0}
                           marginRight={SPACING.spacing4}
                           fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                         >
                           {['X', 'Y', 'Z'][index]}
                         </LegacyStyledText>
-                        <LegacyStyledText as="p">
+                        <LegacyStyledText forwardedAs="p">
                           {axis.toFixed(1)}
                         </LegacyStyledText>
                       </Fragment>
@@ -332,9 +334,9 @@ export const TerseOffsetTable = (props: OffsetTableProps): JSX.Element => {
             <TerseTableRow key={index}>
               <TerseTableDatum>
                 <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing4}>
-                  <DeckInfoLabel deckLabel={location.slotName} />
+                  <RobotInfoLabel deckLabel={location.slotName} />
                   {location.moduleModel != null ? (
-                    <DeckInfoLabel
+                    <RobotInfoLabel
                       iconName={
                         MODULE_ICON_NAME_BY_TYPE[
                           getModuleType(location.moduleModel)

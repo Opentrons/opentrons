@@ -41,9 +41,7 @@ export function getSchema2Dimensions(
  * Return a bounding box, in coordinates relative to the labware's origin,
  * that encloses the labware when viewed from the top down.
  */
-export function getLabwareViewBox(
-  definition: LabwareDefinition
-): {
+export function getLabwareViewBox(definition: LabwareDefinition): {
   /** The minimum x-coord, i.e. the left of the labware. */
   minX: number
   /** The minimum y-coord, i.e. the front of the labware. */
@@ -116,6 +114,8 @@ export interface ComputeLabwareOriginInput {
 export function computeLabwareOrigin(
   input: ComputeLabwareOriginInput
 ): Vector3D | null {
+  // todo(mm, 2025-12-03): Instead of attempting physical accuracy, simply center the
+  // labware in the underlying slot. https://opentrons.atlassian.net/browse/EXEC-2093
   const stack = getLabwareStackAsArray(input)
 
   if (stack == null) {
@@ -228,12 +228,13 @@ function getLabwareStackAsArray(
       return null
     }
     const deckSlotPosition = coordinateTupleToVector3D(deckSlotPositionTuple)
-    const deckSlotPositionToLabwareOrigin = getModuleParentOriginToLabwareOrigin(
-      deckDefinition.otId,
-      slotId,
-      moduleDefinition,
-      bottomLabware
-    )
+    const deckSlotPositionToLabwareOrigin =
+      getModuleParentOriginToLabwareOrigin(
+        deckDefinition.otId,
+        slotId,
+        moduleDefinition,
+        bottomLabware
+      )
 
     result.push({
       debugInfo: {
@@ -378,11 +379,8 @@ export function getModuleParentOriginToLabwareOrigin(
       // based on locatingFeatures. As a first-pass approximation, this currently just
       // puts the front-left-bottom of the labware at the front-left of the module's
       // child slot, which is the traditional behavior with labware schema 2.
-      const moduleParentOriginToLabwareFrontLeftBottom = getModuleParentOriginToChildSlotOrigin(
-        deckId,
-        slotId,
-        moduleDefinition
-      )
+      const moduleParentOriginToLabwareFrontLeftBottom =
+        getModuleParentOriginToChildSlotOrigin(deckId, slotId, moduleDefinition)
       const labwareOriginToLabwareFrontLeftBottom = {
         x: labwareDefinition.features.slotFootprintAsChild?.backLeft.x ?? 0,
         y: labwareDefinition.features.slotFootprintAsChild?.frontRight.y ?? 0,
@@ -431,17 +429,14 @@ export function getLabwareOriginToLabwareOrigin(
  * deck slot that the module is in, to the origin (again, front-left, -x,-y corner) of
  * the slot atop that module.
  *
+ * Some modules, like the Thermocycler and Heater-Shaker, do not physically have slots.
+ * In those cases, this returns the corner of what I'll call the module's "labware
+ * area", which is roughly a slot-sized area centered over where a labware would go.
+ * We're trying to move away from that idea for actual robot path planning, but it's
+ * good enough for UI purposes.
+ *
  * On a Flex, modules are not really "in deck slots". There, "the deck slot that the
  * module is in" means "the deck slot that the module replaces."
- *
- * @deprecated We are trying to move away from the idea that modules always have slots
- *  atop them and that things should be positioned relative to those slots' -x,-y
- *  corners. That idea is especially untrue for things like the Thermocycler and
- *  Heater-Shaker. You probably want `getModuleParentOriginToLabwareOrigin()` instead,
- *  which is higher-level and can model different ways that a labware can mate with a
- *  module. This is exported to support things like UI controls that want to cover
- *  a module's "labware area" and whose implementations assume the traditional
- *  slot -x,-y corner idea.
  */
 export function getModuleParentOriginToChildSlotOrigin(
   deckId: string | null,
@@ -450,7 +445,7 @@ export function getModuleParentOriginToChildSlotOrigin(
 ): Vector3D {
   const transformsForLocation =
     deckId != null && slotId != null
-      ? moduleDefinition.slotTransforms[deckId]?.[slotId] ?? {}
+      ? (moduleDefinition.slotTransforms[deckId]?.[slotId] ?? {})
       : {}
   const labwareOffsetTransform =
     transformsForLocation.labwareOffset ?? IDENTITY_AFFINE_TRANSFORM
@@ -461,29 +456,6 @@ export function getModuleParentOriginToChildSlotOrigin(
     [1],
   ])
   return { x, y, z }
-}
-
-/**
- * Return the offset from a labware's back-left-bottom (-x, +y, -z) corner to its origin.
- *
- * This is a lower-level helper for the rare cases where we want to position a labware
- * specifically by its back-left corner. Typically, you'll want something higher-level,
- * like `getLabwareViewBox()` or `getDeckSlotOriginToLabwareOrigin()`, instead.
- */
-export function getLabwareBackLeftBottomToOrigin(
-  definition: LabwareDefinition
-): Vector3D {
-  if (definition.schemaVersion === 2) {
-    return {
-      x: 0,
-      y: -definition.dimensions.yDimension,
-      z: 0,
-    }
-  } else {
-    const originToBackLeftBottom = definition.extents.total.backLeftBottom
-    const backLeftBottomToOrigin = getVectorInverse(originToBackLeftBottom)
-    return backLeftBottomToOrigin
-  }
 }
 
 /**

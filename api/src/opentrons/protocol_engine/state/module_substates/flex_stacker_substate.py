@@ -2,16 +2,17 @@
 
 from dataclasses import dataclass
 from typing import NewType
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons.protocol_engine.types.module import (
-    StackerStoredLabwareGroup,
-    StackerPoolDefinition,
-)
-from opentrons.protocol_engine.state.update_types import (
-    FlexStackerStateUpdate,
-    NO_CHANGE,
-)
 
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
+
+from opentrons.protocol_engine.state.update_types import (
+    NO_CHANGE,
+    FlexStackerStateUpdate,
+)
+from opentrons.protocol_engine.types.module import (
+    StackerPoolDefinition,
+    StackerStoredLabwareGroup,
+)
 
 FlexStackerId = NewType("FlexStackerId", str)
 

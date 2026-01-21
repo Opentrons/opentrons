@@ -38,6 +38,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         "DVT2ABR5",
         "DVT2ABR6",
         "PVT1ABR7",
+        "PVT1ABR8",
         "PVT1ABR9",
         "PVT1ABR10",
     ]
@@ -68,6 +69,7 @@ def run(protocol: ProtocolContext) -> None:
     dvt2abr5 = protocol.params.DVT2ABR5  # type: ignore[attr-defined]
     dvt2abr6 = protocol.params.DVT2ABR6  # type: ignore[attr-defined]
     pvt1abr7 = protocol.params.PVT1ABR7  # type: ignore[attr-defined]
+    pvt1abr8 = protocol.params.PVT1ABR8  # type: ignore[attr-defined]
     pvt1abr9 = protocol.params.PVT1ABR9  # type: ignore[attr-defined]
     pvt1abr10 = protocol.params.PVT1ABR10  # type: ignore[attr-defined]
     if pvt1abr7:
@@ -132,6 +134,22 @@ def run(protocol: ProtocolContext) -> None:
         pvt1abr9_labware = [res1, elution_plate, sample_plate]
         for lw in pvt1abr9_labware:
             protocol.move_labware(lw, OFF_DECK, use_gripper=False)
+    if pvt1abr8:
+        protocol.pause("SET UP PVT1ABR8")
+        deepwell = protocol.load_labware("nest_96_wellplate_2ml_deep", "D1")
+        pipette.configure_nozzle_layout(
+            style=COLUMN, start="A1", tip_racks=[tip_rack_partial_1]
+        )
+        pipette.transfer(
+            520,
+            src_reservoir["A1"],
+            [deepwell["A1"].top(), deepwell["A2"].top()],
+            trash=True,
+            blow_out=False,
+            blowout_location="destination well",
+        )
+        pipette.configure_nozzle_layout(style=ALL, tip_racks=[tip_rack])
+        protocol.move_labware(deepwell, OFF_DECK, use_gripper=False)
     if pvt1abr10:
         protocol.pause("SET UP PVT1ABR10")
         res1 = protocol.load_labware(
@@ -297,7 +315,7 @@ def run(protocol: ProtocolContext) -> None:
             dest=[reservoir["A1"], indices_plate["A1"], dna_plate["A1"]],
             trash=False,
             blow_out=False,
-            blowout_destination="destination well",
+            blowout_location="destination well",
         )
         pipette.reset_tipracks()
         # partial tip for pcr_reagents_plate
@@ -385,7 +403,7 @@ def run(protocol: ProtocolContext) -> None:
             source=6 * [src_reservoir["A1"]],
             dest=reservoir.wells()[:6],
             blow_out=False,
-            Trash=True,
+            trash=True,
             blowout_location="destination well",
         )
         # FILL FIRST 5 COLUMNS

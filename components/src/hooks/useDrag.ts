@@ -27,16 +27,15 @@ export interface UseDragResult {
  */
 
 export const useDrag = (position: ElementPosition): UseDragResult => {
-  const [elementPosition, setElementPosition] = useState<ElementPosition>(
-    position
-  )
+  const [elementPosition, setElementPosition] =
+    useState<ElementPosition>(position)
   const [isEnabled, setIsEnabled] = useState<boolean>(true)
   const interactiveRef = useRef(null)
   let { x, y, width, height } = elementPosition
 
   const enable = (): void => {
     if (interactiveRef?.current != null) {
-      interact((interactiveRef.current as unknown) as HTMLElement)
+      interact(interactiveRef.current as unknown as HTMLElement)
         .draggable({
           modifiers: [],
           inertia: false,
@@ -56,7 +55,7 @@ export const useDrag = (position: ElementPosition): UseDragResult => {
   }
   const disable = (): void => {
     if (interactiveRef?.current != null) {
-      interact((interactiveRef.current as unknown) as HTMLElement).unset()
+      interact(interactiveRef.current as unknown as HTMLElement).unset()
     }
   }
 

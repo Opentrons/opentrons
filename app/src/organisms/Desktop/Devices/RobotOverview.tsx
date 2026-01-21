@@ -137,7 +137,7 @@ export function RobotOverview({
                   paddingRight={SPACING.spacing16}
                 >
                   <LegacyStyledText
-                    as="h6"
+                    forwardedAs="h6"
                     color={COLORS.grey60}
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing4}
@@ -159,7 +159,7 @@ export function RobotOverview({
                       />
                     </Flex>
                     <LegacyStyledText
-                      as="p"
+                      forwardedAs="p"
                       color={isRobotViewable ? COLORS.black90 : COLORS.grey40}
                     >
                       {t('lights')}

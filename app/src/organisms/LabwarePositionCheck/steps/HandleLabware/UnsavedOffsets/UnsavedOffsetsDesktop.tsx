@@ -54,7 +54,7 @@ export function UnsavedOffsetsDesktop(
       onClickButton={onGoBack}
     >
       <Flex css={CONTAINER_STYLE}>
-        <Icon name="alert-circle" css={ICON_STYLE} />
+        <Icon name="ot-alert" css={ICON_STYLE} />
         <Flex css={TEXT_CONTAINER}>
           <StyledText desktopStyle="headingSmallBold">
             {t('unsaved_changes_will_be_lost')}

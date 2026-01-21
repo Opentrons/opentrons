@@ -7,7 +7,9 @@ import {
   ListButton,
   ListButtonAccordion,
   ListButtonAccordionContainer,
+  SPACING,
 } from '@opentrons/components'
+import { FLEX_STACKER_MODULE_V1, getMaxPoolCount } from '@opentrons/shared-data'
 
 import { getOnlyLatestDefs } from '../../../labware-defs'
 import { getCustomLabwareDefsByURI } from '../../../labware-defs/selectors'
@@ -36,7 +38,7 @@ interface SelectLabwareProps {
   slot: string
   handleCategoryClick: (category: string, expand?: boolean) => void
   areCategoriesExpanded: CategoryExpand
-  onFlexStacker: boolean
+  isOnHopper: boolean
   filteredLabwareByCategory: Record<string, LabwareInfo[]>
   searchFilter: (termToCheck: string) => boolean
   getIsLabwareFiltered: (labwareDef: LabwareDefinition2) => boolean
@@ -47,7 +49,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
     slot,
     handleCategoryClick,
     areCategoriesExpanded,
-    onFlexStacker,
+    isOnHopper,
     filteredLabwareByCategory,
     universalLid,
     getIsLabwareFiltered,
@@ -58,11 +60,10 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
   const defs = getOnlyLatestDefs()
   const zoomedInSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
-  const {
-    selectedTopLabware,
-    selectedAdapterDefURI,
-    selectedLidLabware,
-  } = zoomedInSlotInfo
+  const { selectedTopLabware, selectedAdapterDefURI, selectedLidLabware } =
+    zoomedInSlotInfo
+  const isStackerShuttleOrHopper =
+    zoomedInSlotInfo.selectedModuleModel === FLEX_STACKER_MODULE_V1
   const lidLoadNames = Object.values(defs)
     .filter(
       def =>
@@ -110,11 +111,13 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
   return (
     <>
       {ORDERED_CATEGORIES.map(category => {
+        const isLidValid = category === 'tipRack' || !isStackerShuttleOrHopper
         if (filteredLabwareByCategory[category].length > 0) {
           return (
             <ListButton
               key={`ListButton_${category}`}
               type="noActive"
+              padding={SPACING.spacing12}
               onClick={() => {
                 handleCategoryClick(category)
               }}
@@ -125,7 +128,9 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                   isExpanded={areCategoriesExpanded[category]}
                 >
                   {filteredLabwareByCategory[category]?.map(({ def, uri }) => {
-                    const loadName = def.parameters.loadName
+                    const { parameters } = def
+                    const { loadName, isTiprack } = parameters
+
                     const isAdapter = def.allowedRoles?.includes('adapter')
                     const stackingLabwareDefUris = getStackerDefinitions(
                       {
@@ -136,13 +141,26 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                       loadName,
                       category
                     )
+                    const hopperStackLimit = getMaxPoolCount({
+                      labwareDefinitions: {
+                        primary: def,
+                        adapter: null,
+                        lid: universalLid?.[1] ?? null,
+                      },
+                      model: FLEX_STACKER_MODULE_V1,
+                    })
+
                     const stackingProps: StackingProps | null =
-                      stackingLabwareDefUris.length === 1 && slot !== 'offDeck'
+                      isOnHopper ||
+                      (stackingLabwareDefUris.length === 1 &&
+                        slot !== 'offDeck')
                         ? {
                             inputTitle: t('labware_quantity'),
                             errorMessage: t('unsupported_range'),
                             inputCaption: t('valid_range', {
-                              max: defs[stackingLabwareDefUris[0]].stackLimit,
+                              max: isOnHopper
+                                ? hopperStackLimit
+                                : defs[stackingLabwareDefUris[0]].stackLimit,
                             }),
                             definition: defs[stackingLabwareDefUris[0]],
                             inputFieldValue: selectedTopLabware.amount ?? 0,
@@ -154,32 +172,36 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                               )
                             },
                             checkboxCaption: t('with_lid', {
-                              name:
-                                defs[stackingLabwareDefUris[0]].metadata
-                                  .displayName,
+                              name: defs[stackingLabwareDefUris[0]].metadata
+                                .displayName,
                             }),
                             checked: selectedLidLabware != null,
-                            onCheckboxChange: () => {
-                              dispatch(
-                                selectLid({
-                                  labwareDefURI:
-                                    selectedLidLabware ===
-                                    stackingLabwareDefUris[0]
-                                      ? null
-                                      : stackingLabwareDefUris[0],
-                                })
-                              )
-                            },
+                            onCheckboxChange:
+                              (!isTiprack && isOnHopper) || !isLidValid
+                                ? undefined
+                                : () => {
+                                    dispatch(
+                                      selectLid({
+                                        labwareDefURI:
+                                          selectedLidLabware ===
+                                          stackingLabwareDefUris[0]
+                                            ? null
+                                            : stackingLabwareDefUris[0],
+                                      })
+                                    )
+                                  },
                           }
                         : null
-
                     return searchFilter(def.metadata.displayName) &&
                       !getIsLabwareFiltered(def) ? (
                       <Fragment key={`${category}_${loadName}`}>
                         <CustomizeExpandButton
+                          customStackLimit={
+                            isOnHopper ? hopperStackLimit : undefined
+                          }
                           isNestedDefALid={getIsNestedDefinitionALid(def)}
                           allowInputField={
-                            onFlexStacker || lidLoadNames.includes(loadName)
+                            isOnHopper || lidLoadNames.includes(loadName)
                           }
                           stackingProps={stackingProps ?? undefined}
                           id={`${category}_${loadName}`}
@@ -209,7 +231,7 @@ export function SelectLabware(props: SelectLabwareProps): JSX.Element | null {
                           isAdapter={isAdapter ?? false}
                           category={category}
                           loadName={loadName}
-                          lidURIs={stackingLabwareDefUris}
+                          lidURIs={isOnHopper ? [] : stackingLabwareDefUris}
                         />
                       </Fragment>
                     ) : null

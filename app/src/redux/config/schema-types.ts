@@ -16,8 +16,6 @@ export type DevInternalFlag =
   | 'enableLabwareCreator'
   | 'reactQueryDevtools'
   | 'reactScan'
-  | 'quickTransferExportJSON'
-  | 'camera'
   | 'quickTransferProtocolContentsLog'
 
 export type FeatureFlags = Partial<Record<DevInternalFlag, boolean | undefined>>
@@ -291,4 +289,15 @@ export type ConfigV26 = Omit<ConfigV25, 'version'> & {
   version: 26
 }
 
-export type Config = ConfigV26
+export type ConfigV27 = Omit<ConfigV26, 'version'> & {
+  version: 27
+}
+
+export type ConfigV28 = Omit<ConfigV27, 'version'> & {
+  version: 28
+  ui: ConfigV27['ui'] & {
+    minHeight: number
+  }
+}
+
+export type Config = ConfigV28

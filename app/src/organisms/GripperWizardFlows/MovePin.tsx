@@ -107,7 +107,8 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
                   createRunCommand({
                     maintenanceRunId,
                     command: {
-                      commandType: 'calibration/moveToMaintenancePosition' as const,
+                      commandType:
+                        'calibration/moveToMaintenancePosition' as const,
                       params: {
                         mount: EXTENSION,
                       },
@@ -264,10 +265,10 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
           i18nKey={'return_pin_error'}
           values={{ error: errorMessage }}
           components={{
-            block: <LegacyStyledText as="p" />,
+            block: <LegacyStyledText forwardedAs="p" />,
             bold: (
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 fontWeight={TYPOGRAPHY.fontWeightSemiBold}
               />
             ),
@@ -279,7 +280,7 @@ export const MovePin = (props: MovePinProps): JSX.Element | null => {
     <GenericWizardTile
       header={header}
       rightHandBody={prepImage}
-      bodyText={<LegacyStyledText as="p">{body}</LegacyStyledText>}
+      bodyText={<LegacyStyledText forwardedAs="p">{body}</LegacyStyledText>}
       proceedButtonText={buttonText}
       proceed={handleOnClick}
       proceedIsDisabled={maintenanceRunId == null}

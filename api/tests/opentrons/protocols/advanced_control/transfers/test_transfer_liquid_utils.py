@@ -1,40 +1,40 @@
 """Tests for transfer_liquid_utils."""
-import pytest
-from logging import Logger
-from decoy import Decoy
-from typing import ContextManager, Any
+
 from contextlib import nullcontext as does_not_raise
+from logging import Logger
+from typing import Any, ContextManager
 
+import pytest
+from decoy import Decoy
 
+from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
+from tests.opentrons.protocol_engine.pipette_fixtures import (
+    EIGHT_CHANNEL_COLS,
+    EIGHT_CHANNEL_MAP,
+    EIGHT_CHANNEL_ROWS,
+    NINETY_SIX_COLS,
+    NINETY_SIX_MAP,
+    NINETY_SIX_ROWS,
+)
+
+from .labware_well_fixtures import WELLS_BY_COLUMN_96, WELLS_BY_COLUMN_384
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_api.core.engine import WellCore
+from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocol_engine import ProtocolEngineError
+from opentrons.protocol_engine.errors import (
+    IncompleteLabwareDefinitionError,
+    LiquidHeightUnknownError,
+)
 from opentrons.protocol_engine.types.liquid_level_detection import (
     LiquidTrackingType,
 )
-from opentrons.protocol_engine.errors import (
-    LiquidHeightUnknownError,
-    IncompleteLabwareDefinitionError,
-)
-from opentrons.types import Location, Point
-from opentrons.protocol_api.core.engine import WellCore
-from opentrons.protocol_api.labware import Well, Labware
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
-    raise_if_location_inside_liquid,
     LocationCheckDescriptors,
     group_wells_for_multi_channel_transfer,
+    raise_if_location_inside_liquid,
 )
-
-from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
-
-from tests.opentrons.protocol_engine.pipette_fixtures import (
-    NINETY_SIX_ROWS,
-    NINETY_SIX_COLS,
-    NINETY_SIX_MAP,
-    EIGHT_CHANNEL_ROWS,
-    EIGHT_CHANNEL_COLS,
-    EIGHT_CHANNEL_MAP,
-)
-from .labware_well_fixtures import WELLS_BY_COLUMN_96, WELLS_BY_COLUMN_384
+from opentrons.types import Location, Point
 
 _96_FULL_MAP = NozzleMap.build(
     physical_nozzles=NINETY_SIX_MAP,

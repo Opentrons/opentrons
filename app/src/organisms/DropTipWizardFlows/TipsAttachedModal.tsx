@@ -39,12 +39,8 @@ export const handleTipsAttachedModal = (
 
 const TipsAttachedModal = NiceModal.create(
   (props: TipsAttachedModalProps): JSX.Element => {
-    const {
-      aPipetteWithTip,
-      host,
-      setTipStatusResolved,
-      ...homePipetteProps
-    } = props
+    const { aPipetteWithTip, host, setTipStatusResolved, ...homePipetteProps } =
+      props
     const { t } = useTranslation(['drop_tip_wizard'])
     const modal = useModal()
 
@@ -85,7 +81,7 @@ const TipsAttachedModal = NiceModal.create(
       <ApiHostProvider {...host} hostname={host?.hostname ?? null}>
         <OddModal header={tipsAttachedHeader}>
           <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing32}>
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               <Trans
                 t={t}
                 i18nKey="liquid_damages_this_pipette"

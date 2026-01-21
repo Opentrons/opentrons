@@ -2,17 +2,17 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends
 
-from opentrons.hardware_control import HardwareControlAPI
 from opentrons.calibration_storage import helpers
+from opentrons.hardware_control import HardwareControlAPI
 
 from robot_server.hardware import get_hardware
 from robot_server.service.legacy.models.deck_calibration import (
     CalibrationStatus,
-    DeckCalibrationStatus,
     DeckCalibrationData,
-    MatrixType,
+    DeckCalibrationStatus,
     InstrumentCalibrationStatus,
     InstrumentOffset,
+    MatrixType,
 )
 from robot_server.service.shared_models import calibration as cal_model
 

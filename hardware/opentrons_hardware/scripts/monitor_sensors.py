@@ -1,27 +1,27 @@
 """Script to monitor sensor output."""
-import asyncio
+
 import argparse
+import asyncio
 import datetime
 from struct import unpack
 
 from opentrons_hardware.drivers.can_bus import (
-    build,
     CanMessenger,
     WaitableCallback,
+    build,
 )
 from opentrons_hardware.firmware_bindings import constants, utils
 from opentrons_hardware.firmware_bindings.messages import (
+    fields,
     message_definitions,
     payloads,
-    fields,
 )
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 from opentrons_hardware.sensors.types import (
     SensorDataType,
     sensor_fixed_point_conversion,
 )
-
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 THRESHOLD_NUM_READS = 20
 

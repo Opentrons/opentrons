@@ -1,115 +1,118 @@
 """Geometry state getters."""
 
-from logging import getLogger
 import enum
-from numpy import array, dot, double as npdouble
-from numpy.typing import NDArray
-from typing import Optional, List, Tuple, Union, cast, TypeVar, Dict, Set
 from dataclasses import dataclass
 from functools import cached_property
+from logging import getLogger
+from typing import Dict, List, Optional, Set, Tuple, TypeVar, Union, cast
 
-from opentrons.types import (
-    Point,
-    DeckSlotName,
-    StagingSlotName,
-    MountType,
-    MeniscusTrackingTarget,
-)
+from numpy import array, dot
+from numpy import double as npdouble
+from numpy.typing import NDArray
 
+from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.errors.exceptions import (
     InvalidStoredData,
     PipetteLiquidNotFoundError,
 )
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
+    InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
-    InnerWellGeometry,
 )
-from opentrons_shared_data.deck.types import CutoutFixture
 from opentrons_shared_data.pipette import PIPETTE_X_SPAN
 from opentrons_shared_data.pipette.types import ChannelCount, LabwareUri
 
 from .. import errors
 from ..errors import (
+    InvalidLabwarePositionError,
+    LabwareMovementNotAllowedError,
     LabwareNotLoadedError,
     LabwareNotLoadedOnLabwareError,
     LabwareNotLoadedOnModuleError,
-    LabwareMovementNotAllowedError,
-    InvalidLabwarePositionError,
     LabwareNotOnDeckError,
 )
 from ..errors.exceptions import (
     InvalidLiquidHeightFound,
 )
 from ..resources import (
-    fixture_validation,
     deck_configuration_provider,
+    fixture_validation,
 )
 from ..types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
-    LoadedLabware,
-    LoadedModule,
-    WellLocation,
-    LiquidHandlingWellLocation,
-    DropTipWellLocation,
-    PickUpTipWellLocation,
-    WellOrigin,
-    DropTipWellOrigin,
-    WellOffset,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    LabwareLocation,
-    ModuleOffsetData,
-    CurrentWell,
-    CurrentPipetteLocation,
-    TipGeometry,
-    InStackerHopperLocation,
-    OnDeckLabwareLocation,
+    WASTE_CHUTE_LOCATION,
+    AccessibleByGripperLocation,
+    AddressableArea,
     AddressableAreaLocation,
     AddressableOffsetVector,
-    StagingSlotLocation,
-    LabwareOffsetLocationSequence,
-    OnModuleOffsetLocationSequenceComponent,
-    OnAddressableAreaOffsetLocationSequenceComponent,
-    OnLabwareOffsetLocationSequenceComponent,
-    OnLabwareLocationSequenceComponent,
-    ModuleModel,
-    PotentialCutoutFixture,
-    LabwareLocationSequence,
-    OnModuleLocationSequenceComponent,
-    OnAddressableAreaLocationSequenceComponent,
-    OnCutoutFixtureLocationSequenceComponent,
-    NotOnDeckLocationSequenceComponent,
     AreaType,
+    CurrentPipetteLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    DropTipWellLocation,
+    DropTipWellOrigin,
+    GripperMoveType,
+    InStackerHopperLocation,
+    LabwareLocation,
+    LabwareLocationSequence,
+    LabwareOffsetLocationSequence,
+    LiquidHandlingWellLocation,
+    LoadedLabware,
+    LoadedModule,
+    ModuleLocation,
+    ModuleModel,
+    ModuleOffsetData,
+    NotOnDeckLocationSequenceComponent,
+    OnAddressableAreaLocationSequenceComponent,
+    OnAddressableAreaOffsetLocationSequenceComponent,
+    OnCutoutFixtureLocationSequenceComponent,
+    OnDeckLabwareLocation,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+    OnLabwareOffsetLocationSequenceComponent,
+    OnModuleLocationSequenceComponent,
+    OnModuleOffsetLocationSequenceComponent,
+    PickUpTipWellLocation,
+    PotentialCutoutFixture,
+    StagingSlotLocation,
+    TipGeometry,
+    WellLocation,
+    WellLocationFunction,
+    WellLocationType,
+    WellOffset,
+    WellOrigin,
     labware_location_is_off_deck,
     labware_location_is_system,
-    WellLocationType,
-    WellLocationFunction,
-    GripperMoveType,
-    AddressableArea,
 )
-from ..types.liquid_level_detection import SimulatedProbeResult, LiquidTrackingType
-from .config import Config
-from .labware import LabwareView
-from .wells import WellView
-from .modules import ModuleView
-from .pipettes import PipetteView
+from ..types.liquid_level_detection import LiquidTrackingType, SimulatedProbeResult
+from ._well_math import nozzles_per_well, wells_covered_by_pipette_configuration
 from .addressable_areas import AddressableAreaView
+from .config import Config
 from .inner_well_math_utils import (
     find_height_inner_well_geometry,
-    find_volume_inner_well_geometry,
     find_height_user_defined_volumes,
+    find_volume_inner_well_geometry,
     find_volume_user_defined_volumes,
 )
-from ._well_math import wells_covered_by_pipette_configuration, nozzles_per_well
+from .labware import LabwareView
 from .labware_origin_math.stackup_origin_to_labware_origin import (
-    get_stackup_origin_to_labware_origin,
     LabwareOriginContext,
     LabwareStackupAncestorDefinition,
+    get_stackup_origin_to_labware_origin,
+)
+from .modules import ModuleView
+from .pipettes import PipetteView
+from .wells import WellView
+from opentrons.types import (
+    DeckSlotName,
+    MeniscusTrackingTarget,
+    MountType,
+    Point,
+    StagingSlotName,
 )
 
 _LOG = getLogger(__name__)
@@ -356,9 +359,9 @@ class GeometryView:
         calibrated_slot_column = self.get_slot_column(calibrated_slot)
         current_slot_column = self.get_slot_column(module_location.slotName)
         # make sure that we have valid colums since we cant have modules in the middle of the deck
-        assert set([calibrated_slot_column, current_slot_column]).issubset(
-            {1, 3}
-        ), f"Module calibration offset is an invalid slot {calibrated_slot}"
+        assert set([calibrated_slot_column, current_slot_column]).issubset({1, 3}), (
+            f"Module calibration offset is an invalid slot {calibrated_slot}"
+        )
 
         # Check if the module has moved from one side of the deck to the other
         if calibrated_slot_column != current_slot_column:
@@ -395,6 +398,11 @@ class GeometryView:
             raise errors.LabwareNotOnDeckError(
                 "Labware does not have a slot or module associated with it"
                 " since it is no longer on the deck."
+            )
+        elif location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                "Labware does not have a slot or module associated with it"
+                " since it is in the waste chute."
             )
 
     def get_labware_origin_position(self, labware_id: str) -> Point:
@@ -459,7 +467,6 @@ class GeometryView:
                 current_definition = self._labware.get_definition(current_labware_id)
             else:
                 break
-
         return definitions_locations_top_to_bottom
 
     def _get_stackup_module_parent_to_child_offset(
@@ -491,7 +498,6 @@ class GeometryView:
     ) -> LabwareStackupAncestorDefinition:
         """Traverse the stackup to find the first non-labware definition."""
         current_location = top_most_lw_location
-
         while True:
             if isinstance(current_location, OnLabwareLocation):
                 current_labware_id = current_location.labwareId
@@ -500,6 +506,7 @@ class GeometryView:
             else:
                 if isinstance(current_location, ModuleLocation):
                     return self._modules.get_definition(current_location.moduleId)
+
                 elif isinstance(current_location, AddressableAreaLocation):
                     return self._addressable_areas.get_addressable_area(
                         current_location.addressableAreaName
@@ -507,6 +514,10 @@ class GeometryView:
                 elif isinstance(current_location, DeckSlotLocation):
                     return self._addressable_areas.get_slot_definition(
                         current_location.slotName.id
+                    )
+                elif current_location == WASTE_CHUTE_LOCATION:
+                    return self._addressable_areas.get_addressable_area(
+                        "gripperWasteChute"
                     )
                 else:
                     raise errors.InvalidLabwarePositionError(
@@ -522,6 +533,8 @@ class GeometryView:
             return self._modules.get_provided_addressable_area(location.moduleId)
         elif isinstance(location, OnLabwareLocation):
             return self.get_ancestor_addressable_area_name(location.labwareId)
+        elif location == WASTE_CHUTE_LOCATION:
+            return "gripperWasteChute"
         else:
             raise errors.InvalidLabwarePositionError(
                 f"Cannot get ancestor slot of location {location}"
@@ -624,7 +637,9 @@ class GeometryView:
         if meniscus_tracking:
             location = LiquidHandlingWellLocation(
                 origin=WellOrigin.MENISCUS,
-                offset=WellOffset(x=0, y=0, z=absolute_point.z),
+                offset=WellOffset(
+                    x=absolute_point.x, y=absolute_point.y, z=absolute_point.z
+                ),
             )
             # TODO(cm): handle operationVolume being a float other than 0
             if meniscus_tracking == MeniscusTrackingTarget.END:
@@ -680,6 +695,9 @@ class GeometryView:
         return well_def.depth
 
     def _get_highest_z_from_labware_data(self, lw_data: LoadedLabware) -> float:
+        if lw_data.location == WASTE_CHUTE_LOCATION:
+            # Returns 0 so that the waste chute height is not added to the height of the lbw
+            return 0
         labware_pos = self.get_labware_position(lw_data.id)
         z_dim = self._labware.get_dimensions(labware_id=lw_data.id).z
         height_over_labware: float = 0
@@ -755,20 +773,26 @@ class GeometryView:
         pipette_id: str,
         labware_id: str,
         well_location: DropTipWellLocation,
-        partially_configured: bool = False,
+        api_version_allows_partial_return_tip: bool = True,
         override_default_offset: float | None = None,
     ) -> WellLocation:
         """Get tip drop location given labware and hardware pipette.
 
         This makes sure that the well location has an appropriate origin & offset
         if one is not already set previously.
+
+        In API levels before 2.28, we did not support dropping tips in a tip rack
+        while in a partial configuration. The boolean variable `api_version_allows_partial_return_tip`
+        will be set to False if called by a protocol API layer and the API level is both below
+        v2.28 and the pipette is partially configured.
         """
         if (
-            self._labware.get_definition(labware_id).parameters.isTiprack
-            and partially_configured
+            not api_version_allows_partial_return_tip
+            and self._labware.get_definition(labware_id).parameters.isTiprack
         ):
             raise errors.UnexpectedProtocolError(
-                "Cannot return tip to a tiprack while the pipette is configured for partial tip."
+                "Cannot return tip to a tip rack while the pipette is"
+                " configured for partial tip before API version 2.28."
             )
         if well_location.origin != DropTipWellOrigin.DEFAULT:
             return WellLocation(
@@ -832,6 +856,11 @@ class GeometryView:
             raise errors.LabwareNotOnDeckError(
                 f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
                 f" since it is no longer on the deck."
+            )
+        elif labware.location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareNotOnDeckError(
+                f"Labware {self._labware.get_display_name(labware_id)} does not have a slot associated with it"
+                f" since it is in the waste chute."
             )
         else:
             _LOG.error(
@@ -1018,9 +1047,7 @@ class GeometryView:
     def get_labware_grip_point(
         self,
         labware_definition: LabwareDefinition,
-        location: Union[
-            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
-        ],
+        location: AccessibleByGripperLocation,
         move_type: GripperMoveType,
         user_additional_offset: Point | None,
     ) -> Point:
@@ -1047,9 +1074,7 @@ class GeometryView:
     def _get_aa_origin_to_nominal_grip_point(
         self,
         labware_definition: LabwareDefinition,
-        location: Union[
-            DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
-        ],
+        location: AccessibleByGripperLocation,
         move_type: GripperMoveType,
     ) -> Point:
         """Get the nominal grip point of a labware.
@@ -1197,9 +1222,7 @@ class GeometryView:
                                     self._config.robot_type
                                 )
                             )
-                        ][
-                            0
-                        ],
+                        ][0],
                     )
                 return [(middle_slot_center.x, middle_slot_center.y)]
         return []
@@ -1253,9 +1276,9 @@ class GeometryView:
             return 4
         row_col_name = slot_name.to_ot3_equivalent()
         slot_name_match = WELL_NAME_PATTERN.match(row_col_name.value)
-        assert (
-            slot_name_match is not None
-        ), f"Slot name {row_col_name} did not match required pattern; please check labware location."
+        assert slot_name_match is not None, (
+            f"Slot name {row_col_name} did not match required pattern; please check labware location."
+        )
 
         row_name, column_name = slot_name_match.group(1, 2)
         return int(column_name)
@@ -1372,9 +1395,9 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot[
-                addressable_area_name
-            ] = _TipDropSection.LEFT
+            self._last_drop_tip_location_spot[addressable_area_name] = (
+                _TipDropSection.LEFT
+            )
         else:
             # Drop tip in RIGHT section
             x_offset = self._get_drop_tip_well_x_offset(
@@ -1384,9 +1407,9 @@ class GeometryView:
                 pipette_mount=pipette_mount,
                 labware_slot_column=labware_slot_column,
             )
-            self._last_drop_tip_location_spot[
-                addressable_area_name
-            ] = _TipDropSection.RIGHT
+            self._last_drop_tip_location_spot[addressable_area_name] = (
+                _TipDropSection.RIGHT
+            )
 
         return AddressableOffsetVector(x=x_offset, y=0, z=0)
 
@@ -1440,9 +1463,16 @@ class GeometryView:
     def ensure_valid_gripper_location(
         location: LabwareLocation,
     ) -> Union[
-        DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+        DeckSlotLocation,
+        ModuleLocation,
+        OnLabwareLocation,
+        AddressableAreaLocation,
     ]:
         """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if location == WASTE_CHUTE_LOCATION:
+            raise errors.LabwareMovementNotAllowedError(
+                "Labware movements out of the waste chute are not supported using the gripper."
+            )
         if not isinstance(
             location,
             (
@@ -1451,6 +1481,28 @@ class GeometryView:
                 OnLabwareLocation,
                 AddressableAreaLocation,
             ),
+        ):
+            raise errors.LabwareMovementNotAllowedError(
+                "Off-deck labware movements are not supported using the gripper."
+            )
+        return location
+
+    @staticmethod
+    def ensure_valid_new_gripper_location(
+        location: LabwareLocation,
+    ) -> AccessibleByGripperLocation:
+        """Ensure valid on-deck location for gripper, otherwise raise error."""
+        if (
+            not isinstance(
+                location,
+                (
+                    DeckSlotLocation,
+                    ModuleLocation,
+                    OnLabwareLocation,
+                    AddressableAreaLocation,
+                ),
+            )
+            and location != WASTE_CHUTE_LOCATION
         ):
             raise errors.LabwareMovementNotAllowedError(
                 "Off-deck labware movements are not supported using the gripper."
@@ -1677,6 +1729,12 @@ class GeometryView:
             return self._recurse_labware_location_from_stacker_hopper(
                 labware_location, building
             )
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            return [
+                NotOnDeckLocationSequenceComponent(
+                    logicalLocationName=WASTE_CHUTE_LOCATION
+                )
+            ]
         else:
             _LOG.warn(f"Unhandled labware location kind: {labware_location}")
             return building
@@ -1804,12 +1862,12 @@ class GeometryView:
         # this function is only called by
         # HardwarePipetteHandler::aspirate/dispense while_tracking, and shouldn't
         # be reached in the case of a simulated liquid_probe
-        assert not isinstance(
-            initial_handling_height, SimulatedProbeResult
-        ), "Initial handling height got SimulatedProbeResult"
-        assert not isinstance(
-            final_height, SimulatedProbeResult
-        ), "final height is SimulatedProbeResult"
+        assert not isinstance(initial_handling_height, SimulatedProbeResult), (
+            "Initial handling height got SimulatedProbeResult"
+        )
+        assert not isinstance(final_height, SimulatedProbeResult), (
+            "final height is SimulatedProbeResult"
+        )
         return final_height - initial_handling_height
 
     def get_well_offset_adjustment(
@@ -1837,6 +1895,7 @@ class GeometryView:
         #   position of the liquid or doing dynamic tracking, return the initial height
         if (
             well_location.origin == WellOrigin.MENISCUS
+            and hasattr(well_location, "volumeOffset")
             and not well_location.volumeOffset
         ):
             return initial_handling_height
@@ -2261,6 +2320,10 @@ class GeometryView:
         ):
             raise errors.LocationNotAccessibleByPipetteError(
                 f"Cannot move pipette to {labware.loadName}, labware is off-deck."
+            )
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            raise errors.LocationNotAccessibleByPipetteError(
+                f"Cannot move pipette to {labware.loadName}, labware is in waste chute."
             )
         elif isinstance(labware_location, ModuleLocation):
             module = self._modules.get(labware_location.moduleId)

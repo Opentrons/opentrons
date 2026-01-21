@@ -45,7 +45,7 @@ export function ResetSettingsModal(
       marginLeft="0"
       title={t(`protocol_steps:reset_settings`, { tab })}
       titleElement1={
-        <Icon name="alert-circle" color={COLORS.yellow50} size="1.25rem" />
+        <Icon name="ot-alert" color={COLORS.yellow50} size="1.25rem" />
       }
       type="info"
       closeOnOutsideClick

@@ -59,9 +59,8 @@ export const SetupFixtureList = (props: SetupFixtureListProps): JSX.Element => {
   const { deckConfigCompatibility, robotName } = props
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const filteredDeckConfigCompatibility = getFilteredDeckConfigFixtureCompatibility(
-    deckConfigCompatibility
-  )
+  const filteredDeckConfigCompatibility =
+    getFilteredDeckConfigFixtureCompatibility(deckConfigCompatibility)
   return (
     <>
       {filteredDeckConfigCompatibility.map(cutoutConfigAndCompatibility => (
@@ -128,18 +127,13 @@ export function FixtureListItem({
     )
   }
 
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
-  const [showNotConfiguredModal, setShowNotConfiguredModal] = useState<boolean>(
-    false
-  )
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
+  const [showNotConfiguredModal, setShowNotConfiguredModal] =
+    useState<boolean>(false)
 
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
 
   const isFourthColumnFixture =
     (partialRequiredCutoutFixtureId != null &&
@@ -244,13 +238,13 @@ export function FixtureListItem({
                   setShowSetupInstructionsModal(true)
                 }}
               >
-                <LegacyStyledText marginLeft={SPACING.spacing4} as="p">
+                <LegacyStyledText marginLeft={SPACING.spacing4} forwardedAs="p">
                   {t('protocol_setup:view_setup_instructions')}
                 </LegacyStyledText>
               </Btn>
             </Flex>
           </Flex>
-          <LegacyStyledText as="p" width="15%">
+          <LegacyStyledText forwardedAs="p" width="15%">
             {displayLocation}
           </LegacyStyledText>
           <Flex
@@ -268,7 +262,7 @@ export function FixtureListItem({
                     : setShowNotConfiguredModal(true)
                 }}
               >
-                <LegacyStyledText as="label" cursor="pointer">
+                <LegacyStyledText forwardedAs="label" cursor="pointer">
                   {t('protocol_setup:resolve')}
                 </LegacyStyledText>
               </TertiaryButton>

@@ -105,6 +105,9 @@ describe('getDefaultsForStepType', () => {
         dispense_y_position: 0,
         liquidClassesSupported: true,
         liquidClass: 'none',
+        tip_tracking: 'automatic',
+        tiprack_selected: null,
+        tips_selected: [],
       })
     })
   })
@@ -145,6 +148,9 @@ describe('getDefaultsForStepType', () => {
         pushOut_checkbox: null,
         pushOut_volume: null,
         mix_position_reference: 'well-bottom',
+        tip_tracking: 'automatic',
+        tiprack_selected: null,
+        tips_selected: [],
       })
     })
   })
@@ -165,6 +171,7 @@ describe('getDefaultsForStepType', () => {
         labwareLocationUpdate: {},
         pipetteLocationUpdate: {},
         moduleLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -218,16 +225,22 @@ describe('getDefaultsForStepType', () => {
         profileTargetLidTemp: null,
         orderedProfileItems: [],
         profileItemsById: {},
-        blockIsActiveHold: false,
-        blockTargetTempHold: null,
-        lidIsActiveHold: false,
-        lidTargetTempHold: null,
-        lidOpenHold: null,
       })
     })
     it('should default to an empty object', () => {
       // @ts-expect-error(sa, 2021-6-15): this case can never actually happen beacuse '' is not a StepType
       expect(getDefaultsForStepType('')).toEqual({})
+    })
+  })
+  describe('flex stacker step', () => {
+    it('should get the correct defaults', () => {
+      expect(getDefaultsForStepType('flexStacker')).toEqual({
+        fillLabwareUri: null,
+        fillLabwareIds: null,
+        flexStackerFormType: null,
+        interventionMessage: null,
+        moduleId: null,
+      })
     })
   })
 })

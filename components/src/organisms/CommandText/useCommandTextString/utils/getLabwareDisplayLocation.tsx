@@ -1,4 +1,5 @@
 import {
+  changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName,
   FLEX_STACKER_MODULE_TYPE,
   getModuleDeckLabel,
   getModuleDisplayName,
@@ -25,15 +26,19 @@ import type {
   LocationSlotOnlyParams,
 } from './getLabwareLocation'
 
-export interface DisplayLocationSlotOnlyParams
-  extends Omit<LocationSlotOnlyParams, 'location'> {
+export interface DisplayLocationSlotOnlyParams extends Omit<
+  LocationSlotOnlyParams,
+  'location'
+> {
   t: TFunction
   isOnDevice?: boolean
   includeSlotText?: boolean
   location?: LabwareLocation | LabwareLocationSequence | null
 }
-export interface DisplayLocationFullParams
-  extends Omit<LocationFullParams, 'location'> {
+export interface DisplayLocationFullParams extends Omit<
+  LocationFullParams,
+  'location'
+> {
   t: TFunction
   isOnDevice?: boolean
   includeSlotText?: boolean
@@ -65,12 +70,12 @@ export function getLabwareDisplayLocation(
 
   const { slotName, moduleModel, adapterName } = locationResult
 
-  if (slotName === 'offDeck' || slotName === 'systemLocation') {
+  if (
+    changeAnyUseOfMeToPreserveStructure_thisIsAnOffDeckLocationInASlotName(
+      slotName
+    )
+  ) {
     return t('off_deck')
-  } else if (slotName === 'systemLocation') {
-    // returning system location for slot name which we'll use to swap out
-    // run log copy, this should never reach the user
-    return slotName
   }
   // Simple slot location
   else if (moduleModel == null && adapterName == null) {

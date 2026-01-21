@@ -5,35 +5,33 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING, List, Optional, cast
 
+from ...labware import Labware
+from ..module import (
+    AbstractHeaterShakerCore,
+    AbstractMagneticModuleCore,
+    AbstractModuleCore,
+    AbstractTemperatureModuleCore,
+    AbstractThermocyclerCore,
+)
+from .legacy_labware_core import LegacyLabwareCore
+from .module_geometry import HeaterShakerGeometry, ModuleGeometry, ThermocyclerGeometry
+from .tasks import LegacyTaskCore
 from opentrons.drivers.types import (
     HeaterShakerLabwareLatchStatus,
     ThermocyclerLidStatus,
 )
-from opentrons.hardware_control import SynchronousAdapter, modules as hw_modules
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control import SynchronousAdapter
+from opentrons.hardware_control import modules as hw_modules
 from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    TemperatureStatus,
-    MagneticStatus,
-    SpeedStatus,
     MagneticModuleModel,
+    MagneticStatus,
+    ModuleModel,
+    SpeedStatus,
+    TemperatureStatus,
     ThermocyclerStep,
 )
+from opentrons.hardware_control.types import Axis
 from opentrons.types import DeckSlotName, Location
-
-
-from ..module import (
-    AbstractModuleCore,
-    AbstractTemperatureModuleCore,
-    AbstractMagneticModuleCore,
-    AbstractThermocyclerCore,
-    AbstractHeaterShakerCore,
-)
-
-from .legacy_labware_core import LegacyLabwareCore
-from .tasks import LegacyTaskCore
-from .module_geometry import ModuleGeometry, ThermocyclerGeometry, HeaterShakerGeometry
-from ...labware import Labware
 
 if TYPE_CHECKING:
     from .legacy_protocol_core import LegacyProtocolCore
@@ -268,7 +266,7 @@ class LegacyThermocyclerCore(
         ramp_rate: Optional[float],
         hold_time_seconds: Optional[float] = None,
         block_max_volume: Optional[float] = None,
-    ) -> LegacyTaskCore:
+    ) -> None:
         """Set the target temperature for the well block, in °C."""
         self._sync_module_hardware.set_target_block_temperature(
             celsius=celsius,
@@ -276,16 +274,27 @@ class LegacyThermocyclerCore(
             volume=block_max_volume,
             ramp_rate=ramp_rate,
         )
-        return LegacyTaskCore()
 
     def wait_for_block_temperature(self) -> None:
         """Wait for target block temperature to be reached."""
         self._sync_module_hardware.wait_for_block_target()
 
-    def set_target_lid_temperature(self, celsius: float) -> LegacyTaskCore:
+    def set_target_lid_temperature(self, celsius: float) -> None:
         """Set the target temperature for the heated lid, in °C."""
         self._sync_module_hardware.set_target_lid_temperature(celsius=celsius)
-        return LegacyTaskCore()
+
+    def start_set_target_lid_temperature(self, celsius: float) -> LegacyTaskCore:
+        """Set the target temperature for the heated lid, in °C."""
+        assert False, "start_set_target_lid_temperature only supported on engine core"
+
+    def start_set_target_block_temperature(
+        self,
+        celsius: float,
+        ramp_rate: Optional[float],
+        block_max_volume: Optional[float] = None,
+    ) -> LegacyTaskCore:
+        """Set the target temperature for the heated block, in °C."""
+        assert False, "start_set_target_block_temperature only supported on engine core"
 
     def wait_for_lid_temperature(self) -> None:
         """Wait for target lid temperature to be reached."""

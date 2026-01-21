@@ -1,13 +1,15 @@
 """Data types for sensors."""
+
 from dataclasses import dataclass
 from typing import List, Union, overload
+
 from typing_extensions import Final
 
 from opentrons_hardware.firmware_bindings.constants import SensorType
+from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 from opentrons_hardware.firmware_bindings.utils.binary_serializable import (
     Int32Field,
 )
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 
 sensor_fixed_point_conversion: Final[float] = 2**16
 
@@ -22,43 +24,35 @@ class SensorDataType:
 
     @overload
     @classmethod
-    def build(cls, data: int, _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: int, _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: float, _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: float, _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: Int32Field, _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: Int32Field, _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: List[int], _type: SensorTypeField) -> "SensorDataType":
-        ...
+    def build(cls, data: List[int], _type: SensorTypeField) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: int, _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: int, _type: SensorType) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: float, _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: float, _type: SensorType) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: Int32Field, _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: Int32Field, _type: SensorType) -> "SensorDataType": ...
 
     @overload
     @classmethod
-    def build(cls, data: List[int], _type: SensorType) -> "SensorDataType":
-        ...
+    def build(cls, data: List[int], _type: SensorType) -> "SensorDataType": ...
 
     @classmethod
     def build(cls, data, _type):  # type: ignore[no-untyped-def]

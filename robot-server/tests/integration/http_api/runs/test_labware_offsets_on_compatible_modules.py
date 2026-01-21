@@ -6,7 +6,6 @@ import pytest
 
 from tests.integration.robot_client import RobotClient, poll_until_run_completes
 
-
 # An arbitrary choice of labware.
 LABWARE_LOAD_NAME = "opentrons_96_aluminumblock_biorad_wellplate_200ul"
 LABWARE_URI = "opentrons/opentrons_96_aluminumblock_biorad_wellplate_200ul/1"
@@ -55,6 +54,7 @@ async def robot_client(
         yield robot_client
 
 
+@pytest.mark.slow
 @pytest.mark.parametrize("use_protocol_engine_backend", [False, True])
 @pytest.mark.parametrize(
     (

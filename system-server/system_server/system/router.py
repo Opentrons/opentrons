@@ -1,9 +1,11 @@
 """Router for all /system/ endpoints."""
+
 from fastapi import APIRouter
-from .register.router import register_router
+
 from .authorize.router import authorize_router
 from .connected.router import connected_router
 from .oem_mode.router import oem_mode_router
+from .register.router import register_router
 
 system_router = APIRouter()
 

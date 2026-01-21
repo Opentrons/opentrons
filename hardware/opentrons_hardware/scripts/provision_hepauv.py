@@ -7,27 +7,28 @@ A log of what has been flashed to the hepauv
 /var/log/provision_hepauv.log
 """
 
-import re
+import argparse
 import asyncio
 import logging
 import logging.config
-import argparse
+import re
 import struct
-from typing import Any, Tuple, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
-from opentrons_hardware.instruments.serial_utils import ensure_serial_length
-from opentrons_hardware.drivers.can_bus import build, CanMessenger
+from opentrons_hardware.drivers.can_bus import CanMessenger, build
 from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.utils import UInt16Field
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.constants import MessageId, NodeId
+from opentrons_hardware.firmware_bindings.messages import (
+    fields,
+    payloads,
+)
 from opentrons_hardware.firmware_bindings.messages import (
     message_definitions as md,
-    payloads,
-    fields,
 )
-from opentrons_hardware.firmware_bindings.constants import NodeId, MessageId
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.utils import UInt16Field
+from opentrons_hardware.instruments.serial_utils import ensure_serial_length
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-
 
 log = logging.getLogger(__name__)
 
@@ -122,9 +123,10 @@ async def update_serial_and_confirm(
 
 async def _main(args: argparse.Namespace) -> None:
     """Script entrypoint."""
-    async with build.driver(build_settings(args)) as driver, CanMessenger(
-        driver
-    ) as messenger:
+    async with (
+        build.driver(build_settings(args)) as driver,
+        CanMessenger(driver) as messenger,
+    ):
         while True:
             try:
                 model, data = await get_serial("Enter serial for hepauv: ")

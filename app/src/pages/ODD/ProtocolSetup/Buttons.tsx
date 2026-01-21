@@ -124,8 +124,8 @@ function getPlayButtonStyle(isEnabled: boolean): FlattenSimpleInterpolation {
 
     &:focus-visible {
       box-shadow: 0 0 0 ${SPACING.spacing4} ${
-    isEnabled ? COLORS.blue50 : COLORS.grey50
-  }
+        isEnabled ? COLORS.blue50 : COLORS.grey50
+      }
       background-color: ${isEnabled ? COLORS.blue50 : COLORS.grey35};
     }
 

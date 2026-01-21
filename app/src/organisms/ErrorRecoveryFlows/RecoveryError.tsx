@@ -97,11 +97,8 @@ export function RecoveryDropTipFlowErrors({
 }: RecoveryContentProps): JSX.Element {
   const { t } = useTranslation('error_recovery')
   const { step } = recoveryMap
-  const {
-    ERROR_WHILE_RECOVERING,
-    OPTION_SELECTION,
-    DROP_TIP_FLOWS,
-  } = RECOVERY_MAP
+  const { ERROR_WHILE_RECOVERING, OPTION_SELECTION, DROP_TIP_FLOWS } =
+    RECOVERY_MAP
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const { proceedToRouteAndStep } = routeUpdateActions
 
@@ -196,7 +193,7 @@ export function ErrorContent({
     <RecoverySingleColumnContentWrapper>
       <Flex css={CONTAINER_STYLE}>
         <Icon
-          name="alert-circle"
+          name="ot-alert"
           color={COLORS.red50}
           data-testid="recovery_error_alert_icon"
           css={ICON_SIZE_ALERT_INFO_STYLE}

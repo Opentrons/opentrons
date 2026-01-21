@@ -200,7 +200,7 @@ The working end of a pipette. Flex pipettes pick up disposable tips by pressing 
 
 ##### Opentrons App
 
-Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](opentrons-app.md).
+Software used to control a Flex (or other Opentrons robots) from a laptop or desktop computer. The Opentrons App is available for Mac, Windows, and Linux. See the [Opentrons App chapter](./opentrons-app/index.md).
 
 ##### Paddle
 
@@ -244,7 +244,7 @@ A protocol script written using the Opentrons *Python Protocol API*. See the [Wr
 
 ##### Python Protocol API
 
-A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the online [Opentrons Python Protocol API documentation](https://docs.opentrons.com/v2/).
+A Python package that exposes a wide range of liquid handling features on Opentrons robots. See the [Python Protocol API section](protocols/python-api.md) in the Protocol Development chapter and the [Opentrons Python Protocol API documentation](../python-api/index.md).
 
 ##### Removable deck slot
 
@@ -272,7 +272,7 @@ Staging area slots are ANSI/SLAS compatible deck pieces that replace the standar
 
 ##### Status light
 
-A strip of color LEDs along the top front of the robot. This light provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states. See the [Touchscreen and LED displays section][touchscreen-and-led-displays] in the System Description chapter.
+A strip of color LEDs along the top front of the robot. This light provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states. See the [Status Light section][status-light-flex] in the System Description chapter.
 
 ##### Thermal adapter
 
@@ -292,7 +292,7 @@ An aluminum bracket used by the 96-channel pipette to attach a full rack of pipe
 
 ##### Touchscreen
 
-The interactive LCD screen mounted to the front of the robot. See the [Touchscreen and LED displays section][touchscreen-and-led-displays] in the System Description chapter.
+The interactive LCD screen mounted to the front of the robot. See the [Touchscreen display section][touchscreen-display] in the System Description chapter.
 
 ##### Trash bin
 

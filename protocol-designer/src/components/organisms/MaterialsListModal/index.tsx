@@ -1,12 +1,12 @@
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
+import { clsx } from 'clsx'
 import sum from 'lodash/sum'
 
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -16,6 +16,7 @@ import {
   ListItemDescriptor,
   Modal,
   ModuleIcon,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -27,12 +28,10 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
 
-import {
-  HandleEnter,
-  LINE_CLAMP_TEXT_STYLE,
-} from '/protocol-designer/components/atoms'
+import { HandleEnter } from '/protocol-designer/components/atoms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { getMainPagePortalEl } from '../Portal'
 
@@ -94,7 +93,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel
+                            <RobotInfoLabel
                               deckLabel={fixture.location.replace('cutout', '')}
                             />
                           </Flex>
@@ -124,7 +123,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel
+                            <RobotInfoLabel
                               deckLabel={formatLocation(hw.slot)}
                             />
                           </Flex>
@@ -167,7 +166,7 @@ export function MaterialsListModal({
                         type="large"
                         description={
                           <Flex minWidth="13.75rem">
-                            <DeckInfoLabel deckLabel={deckLabelSlot} />
+                            <RobotInfoLabel deckLabel={deckLabelSlot} />
                           </Flex>
                         }
                         content={
@@ -241,7 +240,11 @@ export function MaterialsListModal({
                                 <LiquidIcon color={liquid.displayColor ?? ''} />
                                 <StyledText
                                   desktopStyle="bodyDefaultRegular"
-                                  css={LINE_CLAMP_TEXT_STYLE(3)}
+                                  className={clsx(
+                                    lineClampStyles.line_clamp,
+                                    lineClampStyles.word_break_all
+                                  )}
+                                  style={{ WebkitLineClamp: 3 }}
                                 >
                                   {liquid.displayName ?? t('n/a')}
                                 </StyledText>

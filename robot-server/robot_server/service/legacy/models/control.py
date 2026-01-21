@@ -1,13 +1,14 @@
 import typing
 from functools import partial
-from enum import Enum
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
 
 from opentrons import types
-from pydantic import model_validator, ConfigDict, BaseModel, Field
+from opentrons_shared_data.util import StrEnum
 
 
-class MotionTarget(str, Enum):
+class MotionTarget(StrEnum):
     """
     What should be moved. If mount, move the nominal position of the mount;
     if pipette, move the nozzle of the pipette
@@ -17,7 +18,7 @@ class MotionTarget(str, Enum):
     mount = "mount"
 
 
-class HomeTarget(str, Enum):
+class HomeTarget(StrEnum):
     pipette = "pipette"
     robot = "robot"
 
@@ -68,7 +69,7 @@ class RobotPositionsResponse(BaseModel):
     )
 
 
-class Mount(str, Enum):
+class Mount(StrEnum):
     right = "right"
     left = "left"
 
@@ -141,8 +142,7 @@ class RobotHomeTarget(BaseModel):
     )
     mount: typing.Optional[Mount] = Field(
         None,
-        description="Which mount to home, if target is pipette (required"
-        " in that case)",
+        description="Which mount to home, if target is pipette (required in that case)",
     )
 
     @model_validator(mode="after")

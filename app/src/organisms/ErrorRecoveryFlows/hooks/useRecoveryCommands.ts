@@ -7,6 +7,7 @@ import {
   useResumeRunFromRecoveryMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
+import { WELL_ORIGIN_TOP } from '@opentrons/shared-data'
 
 import { getErrorKind } from '/app/organisms/ErrorRecoveryFlows/utils'
 import {
@@ -19,13 +20,17 @@ import { DEFINED_ERROR_TYPES, ERROR_KINDS, RECOVERY_MAP } from '../constants'
 import type { CommandData, IfMatchType, RunAction } from '@opentrons/api-client'
 import type { WellGroup } from '@opentrons/components'
 import type {
+  AspDispWhileTrackingParams,
   AspirateInPlaceRunTimeCommand,
+  AspirateWhileTrackingRunTimeCommand,
   BlowoutInPlaceRunTimeCommand,
   CreateCommand,
   DispenseInPlaceRunTimeCommand,
+  DispenseWhileTrackingRunTimeCommand,
   DropTipInPlaceRunTimeCommand,
   FlexStackerRetrieveRunTimeCommand,
   FlexStackerStoreRunTimeCommand,
+  LiquidProbeCreateCommand,
   LoadedLabware,
   MoveLabwareParams,
   MoveToCoordinatesCreateCommand,
@@ -33,6 +38,8 @@ import type {
   RunCommandError,
   RunCommandErrorOverpressure,
   RunCommandErrorTipPhysicallyAttached,
+  Vector3D,
+  WellLocation,
 } from '@opentrons/shared-data'
 import type { UseRecoveryAnalyticsResult } from '/app/redux-resources/analytics'
 import type { UpdateErrorRecoveryPolicyWithStrategy } from '/app/resources/runs'
@@ -43,6 +50,10 @@ import type { CurrentRecoveryOptionUtils } from './useRecoveryRouting'
 import type { RecoveryToasts } from './useRecoveryToasts'
 import type { FailedCommandBySource } from './useRetainedFailedCommandBySource'
 import type { UseRouteUpdateActionsResult } from './useRouteUpdateActions'
+
+// TODO(jh, 01-14-26): This value exists as a python-exclusive shared-data constant.
+// We should move this constant and the existing shared-data constant to a JSON.
+const LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP: Vector3D = { x: 0, y: 0, z: 2 }
 
 interface UseRecoveryCommandsParams {
   runId: string
@@ -106,12 +117,10 @@ export function useRecoveryCommands({
   const [ignoreErrors, setIgnoreErrors] = useState(false)
 
   const { proceedToRouteAndStep } = routeUpdateActions
-  const {
-    mutateAsync: resumeRunFromRecovery,
-  } = useResumeRunFromRecoveryMutation()
-  const {
-    mutateAsync: resumeRunFromRecoveryAssumingFalsePositive,
-  } = useResumeRunFromRecoveryAssumingFalsePositiveMutation()
+  const { mutateAsync: resumeRunFromRecovery } =
+    useResumeRunFromRecoveryMutation()
+  const { mutateAsync: resumeRunFromRecoveryAssumingFalsePositive } =
+    useResumeRunFromRecoveryAssumingFalsePositiveMutation()
   const { stopRun } = useStopRunMutation()
   const updateErrorRecoveryPolicy = useUpdateRecoveryPolicyWithStrategy(runId)
   const currentRecoveryPolicy = useErrorRecoveryPolicy(runId)?.data?.data
@@ -141,13 +150,19 @@ export function useRecoveryCommands({
     [analytics, selectedRecoveryOption]
   )
 
-  const buildRetryPrepMove = (): MoveToCoordinatesCreateCommand | null => {
+  const buildRetryPrepMove = ():
+    | MoveToCoordinatesCreateCommand
+    | LiquidProbeCreateCommand
+    | null => {
     type InPlaceCommand =
       | AspirateInPlaceRunTimeCommand
       | BlowoutInPlaceRunTimeCommand
       | DispenseInPlaceRunTimeCommand
       | DropTipInPlaceRunTimeCommand
       | PrepareToAspirateRunTimeCommand
+    type CommandsWithDynamicLiquidTracking =
+      | AspirateWhileTrackingRunTimeCommand
+      | DispenseWhileTrackingRunTimeCommand
 
     const IN_PLACE_COMMAND_TYPES = [
       'aspirateInPlace',
@@ -155,6 +170,10 @@ export function useRecoveryCommands({
       'blowOutInPlace',
       'dropTipInPlace',
       'prepareToAspirate',
+    ] as const
+    const REQUIRES_LIQUID_PROBE_COMMAND_TYPES = [
+      'aspirateWhileTracking',
+      'dispenseWhileTracking',
     ] as const
 
     const isInPlace = (
@@ -165,7 +184,7 @@ export function useRecoveryCommands({
         (failedCommand as InPlaceCommand).commandType
       )
 
-    const isTargetedError = (
+    const requiresMoveToError = (
       error?: RunCommandError | null
     ): error is
       | RunCommandErrorOverpressure
@@ -175,24 +194,59 @@ export function useRecoveryCommands({
       (error.errorType === DEFINED_ERROR_TYPES.OVERPRESSURE ||
         error.errorType === DEFINED_ERROR_TYPES.TIP_PHYSICALLY_ATTACHED)
 
-    return isInPlace(unvalidatedFailedCommand) &&
-      isTargetedError(unvalidatedFailedCommand.error) &&
+    const isLiquidProbePreconditionRequired = (
+      failedCommand: FailedCommandBySource['byRunRecord']
+    ): boolean =>
+      REQUIRES_LIQUID_PROBE_COMMAND_TYPES.includes(
+        (failedCommand as CommandsWithDynamicLiquidTracking).commandType
+      )
+
+    if (
+      isInPlace(unvalidatedFailedCommand) &&
+      requiresMoveToError(unvalidatedFailedCommand.error) &&
       // Paranoia: this value comes from the wire and may be unevenly implemented
       typeof unvalidatedFailedCommand.error?.errorInfo?.retryLocation?.at(0) ===
         'number'
-      ? {
-          commandType: 'moveToCoordinates',
-          intent: 'fixit',
-          params: {
-            pipetteId: unvalidatedFailedCommand.params?.pipetteId,
-            coordinates: {
-              x: unvalidatedFailedCommand.error.errorInfo.retryLocation[0],
-              y: unvalidatedFailedCommand.error.errorInfo.retryLocation[1],
-              z: unvalidatedFailedCommand.error.errorInfo.retryLocation[2],
-            },
+    ) {
+      const retryLocation =
+        unvalidatedFailedCommand.error.errorInfo.retryLocation
+
+      return {
+        commandType: 'moveToCoordinates',
+        intent: 'fixit',
+        params: {
+          pipetteId: unvalidatedFailedCommand.params?.pipetteId,
+          coordinates: {
+            x: retryLocation[0],
+            y: retryLocation[1],
+            z: retryLocation[2],
           },
-        }
-      : null
+        },
+      }
+    } else if (
+      failedCommand != null &&
+      isLiquidProbePreconditionRequired(failedCommand.byRunRecord)
+    ) {
+      const liquidParams = failedCommand.byRunRecord
+        .params as AspDispWhileTrackingParams
+
+      const retryLocation: WellLocation = {
+        origin: WELL_ORIGIN_TOP,
+        offset: {
+          x: LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.x,
+          y: LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.y,
+          z: LIQUID_PROBE_START_OFFSET_FROM_WELL_TOP.z,
+        },
+      }
+
+      return {
+        commandType: 'liquidProbe',
+        intent: 'fixit',
+        params: { ...liquidParams, wellLocation: retryLocation },
+      }
+    } else {
+      return null
+    }
   }
 
   const buildOpenLatch = (
@@ -253,10 +307,8 @@ export function useRecoveryCommands({
 
   // Pick up the user-selected tips
   const pickUpTips = useCallback((): Promise<CommandData[]> => {
-    const {
-      selectedTipLocations,
-      relevantPickUpTipLabware,
-    } = failedLabwareUtils
+    const { selectedTipLocations, relevantPickUpTipLabware } =
+      failedLabwareUtils
 
     const pickUpTipCmd = buildPickUpTips(
       selectedTipLocations,
@@ -595,7 +647,7 @@ export const buildPickUpTips = (
   ) {
     return null
   } else {
-    const wellName = head(Object.keys(tipGroup)) as string
+    const wellName = head(Object.keys(tipGroup))!
 
     return {
       commandType: 'pickUpTip',

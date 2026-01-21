@@ -17,16 +17,36 @@ classifiers = [
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "Hardware control for Opentrons Robots."
+readme = "README.md"
 dependencies = [
     "pyserial==3.5",
     "pydantic>=2,<3",
     "pydantic-settings>=2,<3",
     "opentrons_shared_data==0.0.0",
+    "typing-extensions>=4.0.0,<5",
+    "numpy>=1.24.5,<2",
+    "python-can==4.2.2",
 ]
+
 dynamic = ['version', 'hatch-dependency-coversion']
 
 [project.optional-dependencies]
 "FLEX" = ["python-can==4.2.2"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+    "pytest-cov==4.1.0",
+    "ruff==0.14.10",
+    "mypy==1.19.1",
+    "mock~=5.1.0",
+    "types-mock~=5.1.0",
+    "hypothesis<7,>=6.96.1",
+    "pytest-asyncio<2,>=1",
+    "matplotlib",
+    "build~=1.2.0",
+    "pytest-lazy-fixtures<2,>=1.1.4",
+]
 
 [project.urls]
 "Source Code" = "https://github.com/Opentrons/opentrons"
@@ -41,6 +61,19 @@ dynamic = ['version', 'hatch-dependency-coversion']
 [build-system]
 requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency-coversion==0.0.1a4']
 build-backend = 'hatchling.build'
+
+[tool.ruff.lint]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
+ignore = ["E203", "E501", "E741", "ANN401", "D105", "D107", "D400", "D401", "D402", "D403", "D404", "D415", "D418"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+[tool.ruff.lint.isort]
+known-local-folder = ["opentrons_hardware"]
+[tool.ruff.lint.per-file-ignores]
+"opentrons_hardware/_version.py" = ["I"]
+"opentrons_hardware/scripts/*" = ["T201"]
 
 [tool.hatch.metadata.hooks.dependency-coversion]
 override-versions-of=['opentrons_shared_data']
@@ -64,10 +97,35 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['opentrons_hardware', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['opentrons_hardware', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel]
 packages = ['opentrons_hardware']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'opentrons_hardware/LICENSE'
+
+[tool.pytest]
+addopts = ["--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "slow: mark test as slow",
+    "requires_emulator: mark test as requiring emulator",
+    "can_filter_func: can message filtering function",
+]
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+]
+
+[tool.mypy]
+show_error_codes = true
+warn_unused_configs = true
+strict = true
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
+# The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
+# during builds, but for local dev, uv uses these paths directly.
+opentrons-shared-data = { path = "../shared-data", editable = true }

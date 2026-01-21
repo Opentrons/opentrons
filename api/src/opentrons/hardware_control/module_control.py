@@ -1,17 +1,29 @@
 from __future__ import annotations
+
 import asyncio
 import logging
 import re
-from typing import TYPE_CHECKING, List, Optional, Union, Callable
 from glob import glob
+from typing import TYPE_CHECKING, Callable, List, Optional, Union
 
 from opentrons_shared_data.errors.exceptions import EnumeratedError
 
-from opentrons.config import IS_ROBOT, IS_LINUX
-from opentrons.drivers.rpi_drivers import types, interfaces, usb, usb_simulator
+from . import modules
+from .types import (
+    AionotifyEvent,
+    AsynchronousModuleErrorNotification,
+    BoardRevision,
+    HardwareEvent,
+    ModuleDisconnectedNotification,
+    OT3Mount,
+    StatusBarUpdateEvent,
+)
+from opentrons.config import IS_LINUX, IS_ROBOT
+from opentrons.drivers.rpi_drivers import interfaces, types, usb, usb_simulator
 from opentrons.hardware_control.emulation.module_server.helpers import (
     listen_module_connection,
 )
+from opentrons.hardware_control.modules import SimulatingModuleAtPort
 from opentrons.hardware_control.modules.absorbance_reader import AbsorbanceReader
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
@@ -19,19 +31,7 @@ from opentrons.hardware_control.modules.module_calibration import (
     save_module_calibration_offset,
 )
 from opentrons.hardware_control.modules.types import ModuleAtPort, ModuleType
-from opentrons.hardware_control.modules import SimulatingModuleAtPort
-
-
 from opentrons.types import Point
-from .types import (
-    AionotifyEvent,
-    BoardRevision,
-    OT3Mount,
-    StatusBarUpdateEvent,
-    HardwareEvent,
-    AsynchronousModuleErrorNotification,
-)
-from . import modules
 
 if TYPE_CHECKING:
     from .api import API
@@ -44,7 +44,9 @@ MODULE_PORT_REGEX = re.compile(
     # add a negative lookbehind to suppress matches on OT-2 tempfiles udev creates
     r"(?<!\.#ot_module_)"
     # capture all modules by name using alternation
-    + "(" + "|".join(modules.MODULE_TYPE_BY_NAME.keys()) + ")"
+    + "("
+    + "|".join(modules.MODULE_TYPE_BY_NAME.keys())
+    + ")"
     # add a negative lookahead to suppress matches on Flex tempfiles udev creates
     + r"\d+(?!\.tmp-c\d+:\d+)",
     re.I,
@@ -69,10 +71,8 @@ class AttachedModulesControl:
         self._event_callback = event_callback
         if not IS_ROBOT and not api.is_simulator:
             # Start task that registers emulated modules.
-            self._emulation_listen_task: asyncio.Task[
-                None
-            ] | None = api.loop.create_task(
-                listen_module_connection(self.register_modules)
+            self._emulation_listen_task: asyncio.Task[None] | None = (
+                api.loop.create_task(listen_module_connection(self.register_modules))
             )
         else:
             self._emulation_listen_task = None
@@ -164,13 +164,28 @@ class AttachedModulesControl:
         self.subscribe_to_api_event(mod)
         return mod
 
-    def _disconnected_callback(self, port: str, serial: Optional[str]) -> None:
+    def _disconnected_callback(
+        self, model: str, port: str, serial: Optional[str]
+    ) -> None:
         """Used by the module to indicate that it was disconnected and should be deleted."""
         mod = ModuleAtPort(port=port, serial=serial, name="")
         asyncio.run_coroutine_threadsafe(
             self.unregister_modules([mod]),
             self._api.loop,
         )
+        try:
+            self._api.loop.call_soon(
+                self._event_callback,
+                ModuleDisconnectedNotification(
+                    module_serial=serial,
+                    module_model=modules.module_model_from_string(model),
+                    port=port,
+                ),
+            )
+        except Exception:
+            log.exception(
+                f"Module disconnect callback for module {model} {serial} at {port} failed"
+            )
 
     def _async_error_callback(
         self,
@@ -218,10 +233,15 @@ class AttachedModulesControl:
         for removed_mod in removed_modules:
             try:
                 self._available_modules.remove(removed_mod)
+                # Important: this wants to be after the remove because this may trigger
+                # recursion back to here; we therefore want the module to already be
+                # removed so that the recursion terminates next loop
+                removed_mod.disconnected_callback()
             except ValueError:
-                log.exception(
+                log.warning(
                     f"Removed Module {removed_mod} not found in attached modules"
                 )
+
         for removed_mod in removed_modules:
             log.info(
                 f"Module {removed_mod.name()} detached from port {removed_mod.port}"

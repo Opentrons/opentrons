@@ -63,9 +63,8 @@ export function InputPrompt(): JSX.Element {
   const [updateProtocol] = useAtom(updateProtocolChatAtom)
   const [createProtocol] = useAtom(createProtocolChatAtom)
   const isNewProtocol = createProtocol.prompt !== ''
-  const [sendAutoFilledPrompt, setSendAutoFilledPrompt] = useState<boolean>(
-    false
-  )
+  const [sendAutoFilledPrompt, setSendAutoFilledPrompt] =
+    useState<boolean>(false)
   const [regenerateProtocol, setRegenerateProtocol] = useAtom(
     regenerateProtocolAtom
   )
@@ -414,9 +413,9 @@ export function InputPrompt(): JSX.Element {
           {
             role: 'assistant',
             content: reply,
-            protocol_content: (JSON.stringify(
+            protocol_content: JSON.stringify(
               protocol_content
-            ) as unknown) as string,
+            ) as unknown as string,
           },
         ])
         setChatData(chatData => [...chatData, assistantResponse])

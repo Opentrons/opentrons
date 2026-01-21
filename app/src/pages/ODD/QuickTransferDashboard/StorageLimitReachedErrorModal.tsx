@@ -25,7 +25,7 @@ export const StorageLimitReachedErrorModal = (
     <OddModal
       header={{
         title: t('storage_limit_reached'),
-        iconName: 'alert-circle',
+        iconName: 'ot-alert',
         iconColor: COLORS.red50,
       }}
     >

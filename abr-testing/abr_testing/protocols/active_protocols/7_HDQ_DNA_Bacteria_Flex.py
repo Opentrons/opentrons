@@ -23,7 +23,7 @@ metadata = {
 
 requirements = {
     "robotType": "Flex",
-    "apiLevel": "2.25",
+    "apiLevel": "2.27",
 }
 """
 Slot A1: Tips 1000
@@ -59,16 +59,20 @@ def add_parameters(parameters: ParameterContext) -> None:
     helpers.create_deactivate_modules_parameter(parameters)
     helpers.create_probe_liquid_height_parameter(parameters)
     helpers.create_meniscus_z_parameter(parameters)
+    helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    protocol.capture_image(filename="start_of_run")
+    length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     heater_shaker_speed = protocol.params.heater_shaker_speed  # type: ignore[attr-defined]
     mount = protocol.params.pipette_mount  # type: ignore[attr-defined]
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "03")
+
+    helpers.comment_protocol_version(protocol, "05")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -342,13 +346,12 @@ def run(protocol: ProtocolContext) -> None:
 
         helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, A_lysis_time_1, False)
         if not dry_run:
-            h_s.set_and_wait_for_temperature(55)
-            protocol.delay(
-                minutes=A_lysis_time_2,
-                msg="Incubating at 55C "
-                + str(heater_shaker_speed)
-                + " rpm for 10 minutes.",
-            )
+            hs_task = h_s.set_target_temperature(55)
+            protocol.wait_for_tasks([hs_task])
+            protocol.comment("reached 55C")
+            timer_task = protocol.create_timer(seconds=A_lysis_time_2 * 60)
+            protocol.wait_for_tasks([timer_task])
+            protocol.comment("Incubated at 55C for 10 minutes")
             h_s.deactivate_shaker()
 
     def bind(vol: float) -> None:
@@ -490,7 +493,6 @@ def run(protocol: ProtocolContext) -> None:
         m1000.flow_rate.aspirate = 150
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
-        h_s.set_and_wait_for_shake_speed(heater_shaker_speed * 1.1)
         speed_val = heater_shaker_speed * 1.1
         helpers.set_hs_speed(protocol, h_s, speed_val, elute_wash_time, True)
 
@@ -529,6 +531,7 @@ def run(protocol: ProtocolContext) -> None:
         protocol.move_lid(lid, elutionplate, use_gripper=True)
 
         helpers.move_labware_to_hs(protocol, sample_plate, h_s, h_s)
+        protocol.capture_image(filename="movement")
 
         """
         Here is where you can call the methods defined above to fit your specific
@@ -560,13 +563,15 @@ def run(protocol: ProtocolContext) -> None:
             protocol, m1000, [res1, elutionplate], waste_reservoir["A1"]
         )
         helpers.find_liquid_height_of_all_wells(protocol, m1000, end_wells_with_liquid)
+        protocol.capture_image(filename="end_of_run")
+
         if deactivate_modules_bool:
             helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
-            slack_bot.send_run_completed_message(metadata["protocolName"])
+            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_log(
-                slack_bot, metadata["protocolName"], str(e)
+            helpers.send_slack_error_message_with_attachments(
+                slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

@@ -52,10 +52,8 @@ export function SetupTipLengthCalibrationButton({
   const { t } = useTranslation(['protocol_setup', 'shared'])
 
   const { isDeckCalibrated } = useDeckCalibrationData(robotName)
-  const [
-    tipLengthCalLauncher,
-    TipLengthCalWizard,
-  ] = useDashboardCalibrateTipLength(robotName)
+  const [tipLengthCalLauncher, TipLengthCalWizard] =
+    useDashboardCalibrateTipLength(robotName)
   const { deleteCalibration } = useDeleteCalibrationMutation()
   const attachedPipettes = useAttachedPipettes()
   const offsetCalibrations =

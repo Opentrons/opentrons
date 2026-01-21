@@ -1,47 +1,51 @@
 """Tests for Protocol API input validation."""
 
-from typing import ContextManager, List, Type, Union, Optional, Dict, Sequence, Any
-from contextlib import nullcontext as do_not_raise
-
-from decoy import Decoy
-import pytest
 import re
+from contextlib import nullcontext as do_not_raise
+from typing import Any, ContextManager, Dict, List, Optional, Sequence, Type, Union
 
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+import pytest
+from decoy import Decoy
+
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition2,
     LabwareRole,
+)
+from opentrons_shared_data.labware.labware_definition import (
     Parameters2 as LabwareDefinition2Parameters,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.types import (
-    Mount,
-    DeckSlotName,
-    AxisType,
-    AxisMapType,
-    StringAxisMap,
-    StagingSlotName,
-    Location,
-    Point,
-)
 from opentrons.hardware_control.modules.types import (
-    ModuleModel,
+    HeaterShakerModuleModel,
     MagneticModuleModel,
+    ModuleModel,
     TemperatureModuleModel,
     ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
     ThermocyclerStep,
 )
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError
 from opentrons.protocol_api import (
-    validation as subject,
-    Well,
     Labware,
     TrashBin,
     WasteChute,
+    Well,
+)
+from opentrons.protocol_api import (
+    validation as subject,
+)
+from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.types import (
+    AxisMapType,
+    AxisType,
+    DeckSlotName,
+    Location,
+    Mount,
+    Point,
+    StagingSlotName,
+    StringAxisMap,
 )
 
 
@@ -913,3 +917,9 @@ def test_ensure_valid_trash_location_for_transfer_v2_raises(decoy: Decoy) -> Non
         subject.ensure_valid_trash_location_for_transfer_v2(
             Location(point=Point(x=1, y=1, z=1), labware=None)
         )
+
+
+def test_is_96_channel() -> None:
+    """Iterate through the pipette names and make sure that validation identifies 96 channels."""
+    for name in PipetteNameType:
+        assert subject.is_pipette_96_channel(name) == ("96" in name.value)

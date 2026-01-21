@@ -2,7 +2,7 @@
 
 from .bin_serial import SerialUsbDriver
 from .binary_messenger import BinaryMessenger
-from .build import build_rear_panel_messenger, build_rear_panel_driver
+from .build import build_rear_panel_driver, build_rear_panel_messenger
 
 __all__ = [
     "SerialUsbDriver",

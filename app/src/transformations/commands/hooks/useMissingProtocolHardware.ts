@@ -24,10 +24,8 @@ export const useMissingProtocolHardware = (
     last(protocolData?.data.analysisSummaries)?.id ?? null,
     { enabled: protocolData != null }
   )
-  const {
-    requiredProtocolHardware,
-    isLoading,
-  } = useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
+  const { requiredProtocolHardware, isLoading } =
+    useRequiredProtocolHardwareFromAnalysis(analysis ?? null)
 
   return useMissingProtocolHardwareFromRequiredProtocolHardware(
     requiredProtocolHardware,

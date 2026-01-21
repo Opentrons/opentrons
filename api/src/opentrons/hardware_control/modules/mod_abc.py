@@ -3,20 +3,21 @@ import asyncio
 import logging
 import re
 from typing import Any, ClassVar, Mapping, Optional, TypeVar
-from packaging.version import InvalidVersion, parse, Version
-from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
-from opentrons.drivers.rpi_drivers.types import USBPort
+
+from packaging.version import InvalidVersion, Version, parse
 
 from ..execution_manager import ExecutionManager
 from .types import (
     BundledFirmware,
+    HopperDoorState,
+    LiveData,
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
-    UploadFunction,
-    LiveData,
     ModuleType,
-    HopperDoorState,
+    UploadFunction,
 )
+from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
+from opentrons.drivers.rpi_drivers.types import USBPort
 
 mod_log = logging.getLogger(__name__)
 
@@ -105,7 +106,7 @@ class AbstractModule(abc.ABC):
     def disconnected_callback(self) -> None:
         """Called from within the module object to signify the object is no longer connected"""
         if self._disconnected_callback is not None:
-            self._disconnected_callback(self.port, self.serial_number)
+            self._disconnected_callback(self.model(), self.port, self.serial_number)
 
     def error_callback(self, exc: Exception) -> None:
         """Called from within the module object when an asynchronous hardware error occurrs."""

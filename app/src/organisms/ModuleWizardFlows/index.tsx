@@ -71,9 +71,8 @@ export function ModuleWizardFlows(
   const [selectedModule, setSelectedModule] = useState<AttachedModule | null>(
     null
   )
-  const [showLaunchSetup, setShowLaunchSetup] = useState<boolean>(
-    showSetupLauncher
-  )
+  const [showLaunchSetup, setShowLaunchSetup] =
+    useState<boolean>(showSetupLauncher)
   const [createdAdapterId, setCreatedAdapterId] = useState<string | null>(null)
 
   const attachedModules =
@@ -165,7 +164,7 @@ export function ModuleWizardFlows(
               i18nKey="branded:module_setup_failed"
               values={{ error: wizardFlowBaseProps.errorMessage }}
               components={{
-                block: <LegacyStyledText as="p" />,
+                block: <LegacyStyledText forwardedAs="p" />,
               }}
             />
           }
@@ -385,8 +384,10 @@ export function ModuleWizardFlows(
   }
 }
 
-interface ModuleWizardFlowsPropsWithHost
-  extends Omit<ModuleWizardFlowsProps, 'closeFlow'> {
+interface ModuleWizardFlowsPropsWithHost extends Omit<
+  ModuleWizardFlowsProps,
+  'closeFlow'
+> {
   host: HostConfig
 }
 

@@ -102,6 +102,7 @@ stages:
                     6abc123,
                     7abc123,
                   ]
+            commandPreconditions: { isCameraUsed: false }
             pipettes:
               - id: pipetteId
                 pipetteName: p1000_96

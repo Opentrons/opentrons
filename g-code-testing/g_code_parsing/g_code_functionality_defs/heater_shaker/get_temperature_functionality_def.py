@@ -1,5 +1,6 @@
 import re
 from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -20,5 +21,5 @@ class GetTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         if match is not None:
             current_temp = match.groupdict()["current_temp"].strip()
             set_temp = match.groupdict()["set_temp"].strip()
-            message = f"Set temp is {set_temp}C. " f"Current temp is {current_temp}C"
+            message = f"Set temp is {set_temp}C. Current temp is {current_temp}C"
         return message

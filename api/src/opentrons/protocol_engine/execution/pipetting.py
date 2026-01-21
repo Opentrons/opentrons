@@ -1,25 +1,26 @@
 """Pipetting command handling."""
-from typing import Optional, Iterator, Tuple
-from typing_extensions import Protocol as TypingProtocol
+
 from contextlib import contextmanager
+from typing import Iterator, Optional, Tuple
 
-from opentrons.hardware_control import HardwareControlAPI
+from typing_extensions import Protocol as TypingProtocol
 
-from ..state.state import StateView
-from ..state.pipettes import HardwarePipette
-from ..notes import CommandNoteAdder, CommandNote
 from ..errors.exceptions import (
-    TipNotAttachedError,
     InvalidAspirateVolumeError,
-    InvalidPushOutVolumeError,
     InvalidDispenseVolumeError,
-    InvalidLiquidHeightFound,
+    InvalidPushOutVolumeError,
+    TipNotAttachedError,
 )
+from ..notes import CommandNote, CommandNoteAdder
+from ..state.pipettes import HardwarePipette
+from ..state.state import StateView
+from opentrons.hardware_control import HardwareControlAPI
 from opentrons.protocol_engine.types import WellLocation
 from opentrons.protocol_engine.types.liquid_level_detection import (
-    SimulatedProbeResult,
     LiquidTrackingType,
+    SimulatedProbeResult,
 )
+from opentrons.types import Point
 
 # 1e-9 µL (1 femtoliter!) is a good value because:
 # * It's large relative to rounding errors that occur in practice in protocols. For
@@ -61,7 +62,9 @@ class PipettingHandler(TypingProtocol):
         well_name: str,
         volume: float,
         flow_rate: float,
+        end_point: Point,
         command_note_adder: CommandNoteAdder,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and aspirate while tracking."""
 
@@ -72,8 +75,10 @@ class PipettingHandler(TypingProtocol):
         well_name: str,
         volume: float,
         flow_rate: float,
+        end_point: Point,
         push_out: Optional[float],
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and dispense while tracking."""
 
@@ -184,7 +189,9 @@ class HardwarePipettingHandler(PipettingHandler):
         well_name: str,
         volume: float,
         flow_rate: float,
+        end_point: Point,
         command_note_adder: CommandNoteAdder,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and aspirate.
 
@@ -195,22 +202,16 @@ class HardwarePipettingHandler(PipettingHandler):
         hw_pipette, adjusted_volume = self.get_hw_aspirate_params(
             pipette_id, volume, command_note_adder
         )
-        aspirate_z_distance = self._state_view.geometry.get_liquid_handling_z_change(
-            labware_id=labware_id,
-            well_name=well_name,
-            operation_volume=volume * -1,
-            pipette_id=pipette_id,
-        )
-        if isinstance(aspirate_z_distance, SimulatedProbeResult):
-            raise InvalidLiquidHeightFound(
-                "Aspirate distance must be a float in Hardware pipetting handler."
-            )
+
         with self._set_flow_rate(pipette=hw_pipette, aspirate_flow_rate=flow_rate):
             await self._hardware_api.aspirate_while_tracking(
                 mount=hw_pipette.mount,
-                z_distance=aspirate_z_distance,
-                flow_rate=flow_rate,
+                end_point=end_point,
                 volume=adjusted_volume,
+                movement_delay=movement_delay,
+                end_critical_point=self.get_state_view().motion.get_critical_point_for_wells_in_labware(
+                    labware_id
+                ),
             )
         return adjusted_volume
 
@@ -221,8 +222,10 @@ class HardwarePipettingHandler(PipettingHandler):
         well_name: str,
         volume: float,
         flow_rate: float,
+        end_point: Point,
         push_out: Optional[float],
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Set flow-rate and dispense.
 
@@ -231,24 +234,18 @@ class HardwarePipettingHandler(PipettingHandler):
         """
         # get mount and config data from state and hardware controller
         hw_pipette, adjusted_volume = self.get_hw_dispense_params(pipette_id, volume)
-        dispense_z_distance = self._state_view.geometry.get_liquid_handling_z_change(
-            labware_id=labware_id,
-            well_name=well_name,
-            operation_volume=volume,
-            pipette_id=pipette_id,
-        )
-        if isinstance(dispense_z_distance, SimulatedProbeResult):
-            raise InvalidLiquidHeightFound(
-                "Dispense distance must be a float in Hardware pipetting handler."
-            )
+
         with self._set_flow_rate(pipette=hw_pipette, dispense_flow_rate=flow_rate):
             await self._hardware_api.dispense_while_tracking(
                 mount=hw_pipette.mount,
-                z_distance=dispense_z_distance,
-                flow_rate=flow_rate,
+                end_point=end_point,
                 volume=adjusted_volume,
                 push_out=push_out,
                 is_full_dispense=is_full_dispense,
+                movement_delay=movement_delay,
+                end_critical_point=self.get_state_view().motion.get_critical_point_for_wells_in_labware(
+                    labware_id
+                ),
             )
         return adjusted_volume
 
@@ -382,7 +379,7 @@ class HardwarePipettingHandler(PipettingHandler):
 
 
 class VirtualPipettingHandler(PipettingHandler):
-    """Liquid handling, using the virtual pipettes.""" ""
+    """Liquid handling, using the virtual pipettes."""
 
     _state_view: StateView
 
@@ -476,7 +473,9 @@ class VirtualPipettingHandler(PipettingHandler):
         well_name: str,
         volume: float,
         flow_rate: float,
+        end_point: Point,
         command_note_adder: CommandNoteAdder,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Virtually aspirate (no-op)."""
         self._validate_tip_attached(pipette_id=pipette_id, command_name="aspirate")
@@ -495,8 +494,10 @@ class VirtualPipettingHandler(PipettingHandler):
         well_name: str,
         volume: float,
         flow_rate: float,
+        end_point: Point,
         push_out: Optional[float],
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
     ) -> float:
         """Virtually dispense (no-op)."""
         # TODO (tz, 8-23-23): add a check for push_out not larger that the max volume allowed when working on this https://opentrons.atlassian.net/browse/RSS-329

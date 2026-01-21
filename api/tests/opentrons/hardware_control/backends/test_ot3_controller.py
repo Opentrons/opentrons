@@ -1,102 +1,103 @@
-import mock
-import pytest
-from decoy import Decoy
 import asyncio
-
 from contextlib import (
-    nullcontext as does_not_raise,
     AbstractContextManager,
 )
+from contextlib import (
+    nullcontext as does_not_raise,
+)
 from typing import (
-    cast,
+    Any,
+    AsyncIterator,
+    ContextManager,
     Dict,
+    Iterator,
     List,
     Optional,
     Set,
     Tuple,
-    Any,
-    Iterator,
-    AsyncIterator,
-    ContextManager,
+    cast,
 )
 
+import mock
+import pytest
+from decoy import Decoy
+
+from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
+from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
+from opentrons_hardware.drivers.can_bus.can_messenger import (
+    CanMessenger,
+    MessageListenerCallback,
+    MessageListenerCallbackFilter,
+)
+from opentrons_hardware.drivers.eeprom import EEPROMDriver
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import (
+    NodeId,
+    USBTarget,
+)
+from opentrons_hardware.firmware_bindings.constants import (
+    PipetteName as FirmwarePipetteName,
+)
+from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
+from opentrons_hardware.firmware_bindings.utils import UInt8Field
+from opentrons_hardware.hardware_control import current_settings
+from opentrons_hardware.hardware_control.motion import (
+    MoveGroupSingleAxisStep,
+    MoveStopCondition,
+    MoveType,
+)
+from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.network import DeviceInfoCache
+from opentrons_hardware.hardware_control.tools.types import (
+    GripperInformation,
+    PipetteInformation,
+    ToolSummary,
+)
+from opentrons_hardware.hardware_control.types import (
+    MotorPositionStatus,
+    MoveCompleteAck,
+    PCBARevision,
+)
+from opentrons_shared_data.errors.exceptions import (
+    EStopActivatedError,
+    EStopNotPresentError,
+    FailedGripperPickupError,
+    FirmwareUpdateRequiredError,
+    PipetteLiquidNotFoundError,
+)
+
+from opentrons.config.robot_configs import build_config_ot3
+from opentrons.config.types import (
+    GantryLoad,
+    LiquidProbeSettings,
+    OT3Config,
+)
+from opentrons.hardware_control.backends.estop_state import EstopStateMachine
 from opentrons.hardware_control.backends.ot3controller import OT3Controller
 from opentrons.hardware_control.backends.ot3utils import (
-    node_to_axis,
     axis_to_node,
+    node_to_axis,
     sensor_node_for_mount,
     subsystem_to_target,
     target_to_subsystem,
 )
 from opentrons.hardware_control.backends.subsystem_manager import SubsystemManager
-from opentrons_hardware.drivers.eeprom import EEPROMDriver
-from opentrons_hardware.drivers.can_bus.can_messenger import (
-    MessageListenerCallback,
-    MessageListenerCallbackFilter,
-    CanMessenger,
+from opentrons.hardware_control.errors import (
+    InvalidPipetteModel,
+    InvalidPipetteName,
 )
-from opentrons.config.types import (
-    OT3Config,
-    GantryLoad,
-    LiquidProbeSettings,
-)
-from opentrons.config.robot_configs import build_config_ot3
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    PipetteName as FirmwarePipetteName,
-    USBTarget,
-)
-from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-from opentrons_hardware.drivers.binary_usb import SerialUsbDriver
 from opentrons.hardware_control.types import (
     Axis,
-    OT3Mount,
-    OT3AxisMap,
+    CurrentConfig,
+    EstopState,
     MotorStatus,
+    OT3AxisMap,
+    OT3Mount,
     SubSystem,
     SubSystemState,
-    UpdateStatus,
     UpdateState,
-    EstopState,
-    CurrentConfig,
+    UpdateStatus,
 )
-from opentrons.hardware_control.errors import (
-    InvalidPipetteName,
-    InvalidPipetteModel,
-)
-
-from opentrons_hardware.firmware_bindings.utils import UInt8Field
-from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
-from opentrons_hardware.hardware_control.motion import (
-    MoveType,
-    MoveStopCondition,
-    MoveGroupSingleAxisStep,
-)
-from opentrons_hardware.hardware_control.types import (
-    PCBARevision,
-    MotorPositionStatus,
-    MoveCompleteAck,
-)
-from opentrons_hardware.hardware_control import current_settings
-from opentrons_hardware.hardware_control.network import DeviceInfoCache
-from opentrons_hardware.hardware_control.tools.types import (
-    ToolSummary,
-    PipetteInformation,
-    GripperInformation,
-)
-
-from opentrons.hardware_control.backends.estop_state import EstopStateMachine
-
-from opentrons_shared_data.errors.exceptions import (
-    EStopActivatedError,
-    EStopNotPresentError,
-    FirmwareUpdateRequiredError,
-    FailedGripperPickupError,
-    PipetteLiquidNotFoundError,
-)
-
-from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 
 
 @pytest.fixture
@@ -212,7 +213,6 @@ def mock_send_stop_threshold() -> Iterator[mock.AsyncMock]:
 
 @pytest.fixture
 def mock_move_group_run() -> Iterator[mock.AsyncMock]:
-
     with mock.patch(
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner.run",
         autospec=True,
@@ -386,7 +386,7 @@ async def test_home_execute(
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
-        **config
+        **config,
     ) as mock_runner:
         present_axes = set(ax for ax in axes if controller.axis_is_present(ax))
         controller.set_pressure_sensor_available(Axis.P_L, True)
@@ -1189,7 +1189,6 @@ async def test_motor_current(
     with mock.patch.object(controller, "set_active_current") as mock_run_currents:
         with mock.patch.object(controller, "set_hold_current") as mock_hold_currents:
             with mock.patch.object(controller, "set_default_currents") as mock_default:
-
                 async with controller.motor_current(run_currents, hold_currents):
                     await controller.update_position()
 
@@ -1297,6 +1296,7 @@ async def test_engage_motors(
         (80, 79, 0, 0, 1, 92, 60, False),
         (80, 45, 40, 0, 1, 92, 60, True),
         (80, 100, 0, 40, 0, 92, 60, True),
+        (95.5, 84, 0, 5, 5, 94, 60, True),
     ],
 )
 def test_grip_error_detection(
@@ -1323,6 +1323,42 @@ def test_grip_error_detection(
             allowed_error,
             hard_min,
             hard_max,
+        )
+
+
+@pytest.mark.parametrize(
+    "expected_grip_width,actual_grip_width,wider,narrower,allowed_error,hard_max,hard_min,raise_error",
+    [
+        (95.5, 84, 0, 5, 5, 94, 60, False),
+        (95.5, 60, 0, 5, 5, 94, 60, True),
+        (95.5, 94, 0, 5, 5, 94, 60, True),
+    ],
+)
+def test_grip_error_detection_disable_geometry(
+    controller: OT3Controller,
+    expected_grip_width: float,
+    actual_grip_width: float,
+    wider: float,
+    narrower: float,
+    allowed_error: float,
+    hard_max: float,
+    hard_min: float,
+    raise_error: bool,
+) -> None:
+    context = cast(
+        AbstractContextManager[None],
+        pytest.raises(FailedGripperPickupError) if raise_error else does_not_raise(),
+    )
+    with context:
+        controller.check_gripper_position_within_bounds(
+            expected_grip_width,
+            wider,
+            narrower,
+            actual_grip_width,
+            allowed_error,
+            hard_min,
+            hard_max,
+            True,
         )
 
 
@@ -1417,6 +1453,32 @@ def move_group_run_side_effect(
             },
             None,
         ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+            },
+            {
+                Axis.X: 0,  # Zero Length Move, make sure it doesn't raise an error
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.P_L: 0,
+            },
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
     ],
 )
 async def test_controller_move(
@@ -1436,9 +1498,151 @@ async def test_controller_move(
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
-        **config
+        **config,
     ):
         await controller.move(origin_pos, target_pos, 100)
+        position = await controller.update_position()
+        gear_position = controller.gear_motor_position
+
+        assert position == expected_pos
+        assert gear_position == gear_position
+
+
+@pytest.mark.parametrize(
+    argnames=["origin_pos", "target_pos", "expected_pos", "gear_position"],
+    argvalues=[
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.X: 10,
+                Axis.Y: 10,
+                Axis.Z_L: 50,
+                Axis.P_L: 70,
+            },
+            {
+                Axis.X: 10,
+                Axis.Y: 10,
+                Axis.Z_L: 50,
+                Axis.Z_R: 0,
+                Axis.P_L: 70,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.X: 20,
+                Axis.Y: 20,
+                Axis.Z_L: 10,
+                Axis.P_L: 48,
+            },
+            {
+                Axis.X: 20,
+                Axis.Y: 20,
+                Axis.Z_L: 10,
+                Axis.Z_R: 0,
+                Axis.P_L: 48,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.P_L: 70,
+            },
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 70,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+        [
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 0,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            {
+                Axis.P_L: 30,  # Too short to hit top speed
+            },
+            {
+                Axis.X: 0,
+                Axis.Y: 0,
+                Axis.Z_L: 0,
+                Axis.Z_R: 0,
+                Axis.P_L: 30,
+                Axis.P_R: 0,
+                Axis.Z_G: 0,
+                Axis.G: 0,
+            },
+            None,
+        ],
+    ],
+)
+async def test_controller_move_dynamic(
+    controller: OT3Controller,
+    mock_present_devices: mock.AsyncMock,
+    origin_pos: Dict[Axis, float],
+    target_pos: Dict[Axis, float],
+    expected_pos: Dict[Axis, float],
+    gear_position: Optional[float],
+) -> None:
+    from copy import deepcopy
+
+    controller.update_constraints_for_gantry_load(GantryLoad.LOW_THROUGHPUT)
+
+    run_target_pos = deepcopy(target_pos)
+    config = {"run.side_effect": move_group_run_side_effect(controller, run_target_pos)}
+    with mock.patch(  # type: ignore [call-overload]
+        "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
+        spec=MoveGroupRunner,
+        **config,
+    ):
+        await controller.move(origin_pos, target_pos, 70)
         position = await controller.update_position()
         gear_position = controller.gear_motor_position
 
@@ -1461,7 +1665,7 @@ async def test_pressure_disable(
     with mock.patch(  # type: ignore [call-overload]
         "opentrons.hardware_control.backends.ot3controller.MoveGroupRunner",
         spec=MoveGroupRunner,
-        **config
+        **config,
     ):
         with mock.patch.object(controller, "_monitor_overpressure") as monitor:
             controller.set_pressure_sensor_available(Axis.P_L, pipette_has_sensor)

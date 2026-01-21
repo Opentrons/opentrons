@@ -5,58 +5,58 @@ longer helpful. Try to add new tests to test_labware_state.py, where they can be
 tested together, treating LabwareState as a private implementation detail.
 """
 
-from datetime import datetime
-from typing import Dict, Optional, cast, ContextManager, Any, Union, List
 from contextlib import nullcontext as does_not_raise
+from datetime import datetime
+from typing import Any, ContextManager, Dict, List, Optional, Union, cast
 
 import pytest
 from numpy import isclose
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
-from opentrons_shared_data.pipette.types import LabwareUri
 from opentrons_shared_data.labware import load_definition
 from opentrons_shared_data.labware.labware_definition import (
     AxisAlignedBoundingBox3D,
-    Dimensions as LabwareDimensions,
     Extents,
-    labware_definition_type_adapter,
     LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
     LabwareRole,
     Parameters2,
     Vector3D,
+    labware_definition_type_adapter,
 )
-
-from opentrons.types import DeckSlotName, MountType, Point
+from opentrons_shared_data.labware.labware_definition import (
+    Dimensions as LabwareDimensions,
+)
+from opentrons_shared_data.pipette.types import LabwareUri
 
 from opentrons.protocol_engine import errors
+from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
+    AxisAlignedBoundingBox3D as EngineAABB,
+)
+from opentrons.protocol_engine.state._move_types import EdgePathType
+from opentrons.protocol_engine.state.labware import (
+    LabwareLoadParams,
+    LabwareState,
+    LabwareView,
+)
 from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
     DeckSlotLocation,
     Dimensions,
+    GripSpecs,
+    LabwareLocation,
     LabwareOffset,
     LabwareOffsetVector,
     LegacyLabwareOffsetLocation,
     LoadedLabware,
-    ModuleModel,
     ModuleLocation,
-    OnLabwareLocation,
-    LabwareLocation,
-    OFF_DECK_LOCATION,
+    ModuleModel,
     OnAddressableAreaOffsetLocationSequenceComponent,
+    OnLabwareLocation,
     OnModuleOffsetLocationSequenceComponent,
-    GripSpecs,
 )
-from opentrons.protocol_engine.state._move_types import EdgePathType
-from opentrons.protocol_engine.state.labware import (
-    LabwareState,
-    LabwareView,
-    LabwareLoadParams,
-)
-from opentrons.protocol_engine.state._axis_aligned_bounding_box import (
-    AxisAlignedBoundingBox3D as EngineAABB,
-)
-
+from opentrons.types import DeckSlotName, MountType, Point
 
 plate = LoadedLabware(
     id="plate-id",

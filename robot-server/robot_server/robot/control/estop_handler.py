@@ -1,8 +1,11 @@
 """Class to monitor estop status."""
+
 import logging
 from typing import TYPE_CHECKING
-from .models import EstopState, EstopPhysicalStatus
+
 from opentrons.config.feature_flags import require_estop
+
+from .models import EstopPhysicalStatus, EstopState
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API

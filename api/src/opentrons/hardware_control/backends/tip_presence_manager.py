@@ -1,23 +1,25 @@
 import logging
 from functools import partial
-from typing import cast, Callable, Optional, List, Set
-from typing_extensions import TypedDict, Literal
+from typing import Callable, List, Optional, Set, cast
 
-from opentrons.hardware_control.types import TipStateType, OT3Mount, InstrumentProbeType
+from typing_extensions import Literal, TypedDict
 
 from opentrons_hardware.drivers.can_bus import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.hardware_control.tip_presence import (
     TipDetector,
+)
+from opentrons_hardware.hardware_control.tip_presence import (
     types as tip_types,
 )
 from opentrons_shared_data.errors.exceptions import (
+    GeneralError,
     TipDetectorNotFound,
     UnmatchedTipPresenceStates,
-    GeneralError,
 )
 
 from .ot3utils import sensor_id_for_instrument
+from opentrons.hardware_control.types import InstrumentProbeType, OT3Mount, TipStateType
 
 log = logging.getLogger(__name__)
 

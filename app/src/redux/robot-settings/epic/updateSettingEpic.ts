@@ -12,7 +12,9 @@ import type {
 import type { Action, Epic } from '../../types'
 import type { RobotSettings, UpdateSettingAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<UpdateSettingAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  UpdateSettingAction
+> = action => ({
   method: POST,
   path: Constants.SETTINGS_PATH,
   body: { id: action.payload.settingId, value: action.payload.value },

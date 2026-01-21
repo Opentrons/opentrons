@@ -1,31 +1,30 @@
 from typing import Awaitable, Optional, cast
 
-from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
+from robot_server.robot.calibration.check import util
 from robot_server.robot.calibration.check.models import (
+    CalibrationCheckSessionStatus,
     ComparisonStatePerCalibration,
     ComparisonStatePerPipette,
-    CalibrationCheckSessionStatus,
     SessionCreateParams,
 )
-from robot_server.robot.calibration.check import util
-
+from robot_server.robot.calibration.check.user_flow import CheckCalibrationUserFlow
 from robot_server.service.session.command_execution import (
     CallableExecutor,
     Command,
     CompletedCommand,
 )
 from robot_server.service.session.configuration import SessionConfiguration
+from robot_server.service.session.errors import (
+    CommandExecutionException,
+    SessionCreationException,
+)
 from robot_server.service.session.models.session import (
-    SessionType,
     CalibrationCheckResponseAttributes,
+    SessionType,
 )
 from robot_server.service.session.session_types.base_session import (
     BaseSession,
     SessionMetaData,
-)
-from robot_server.service.session.errors import (
-    SessionCreationException,
-    CommandExecutionException,
 )
 
 
@@ -79,9 +78,9 @@ class CheckSession(BaseSession):
 
         if session_controls_lights:
             await configuration.hardware.set_lights(rails=True)
-            shutdown_handler: Optional[
-                Awaitable[None]
-            ] = configuration.hardware.set_lights(rails=False)
+            shutdown_handler: Optional[Awaitable[None]] = (
+                configuration.hardware.set_lights(rails=False)
+            )
         else:
             shutdown_handler = None
 

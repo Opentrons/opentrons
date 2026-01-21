@@ -55,13 +55,17 @@ For a full example of a well plate lid, reference the [Opentrons Tough PCR Auto-
 
 ## Tips and tip racks 
 
-Opentrons Flex tips come in 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters. They're packaged sterile in racks that hold 96 tips and are free of DNase, RNase, protease, pyrogens, human DNA, endotoxins, and PCR inhibitors. Racks also include lot numbers and expiration dates. 
+Opentrons Flex tips come in racks that hold 96 tips. Currently, we offer tips in 50 µL, 200 µL, and 1000 µL sizes. These are clear, non-conducting polypropylene tips that are available with or without filters.
+
+### Tip sterility
+
+Sealed, unopened packages of Opentrons pipette tips are certified to be free of contaminants. Tips are sterilized based on ANSI/AAMI/ISO 11137 standards with irradiation at a Sterility Assurance Level (SAL) of 10<sup>-6</sup>. Each package includes a letter describing our test procedures and certifies that every lot is free of common contaminants such as DNase, RNase, endotoxins (pyrogens), human DNA, PCR inhibitors, and protease.
 
 ### Tip racks 
 
 Unfiltered and filtered tips are bundled into a rack that consists of a reusable base plate, a mid-plate that holds 96 tips, and a lid. 
 
-To help with identification, the tip rack mid-plates are color coded based on tip size: 
+To help with identification, each tip rack package includes an 8-digit lot number in YYYYMMDD format, which reflects the production date. Opentrons recommends using sealed tips within three years from the production date. Additionally, racks are color coded based on the maximum rated volume for each tip type: 
 
 - 50 µL: magenta 
 - 200 µL: yellow 
@@ -83,7 +87,7 @@ Flex pipettes only accept tips with capacities less than or equal to the pipette
 | Pipette capacity | Compatible tips             |
 | :--------------- | :-------------------------- |
 | 1–50 µL          | 50 µL tips only             |
-| 5–1000 µL        | 50 μL, 200 μL, and 1000 µL tips |
+| 5–1000 µL        | 50 µL, 200 µL, and 1000 µL tips |
 
 For best performance, use the smallest tips that can hold the amount of liquid you need to aspirate. See [Pipette specifications][pipette-specifications] for examples. 
 

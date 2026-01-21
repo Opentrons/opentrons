@@ -1,23 +1,26 @@
 """Manage current maintenance run data."""
 
 from datetime import datetime
-from typing import Optional, Callable, Sequence
+from typing import Callable, Optional, Sequence
 
 from opentrons.protocol_engine import (
-    EngineStatus,
-    LegacyLabwareOffsetCreate,
-    LabwareOffsetCreate,
-    StateSummary,
-    CommandSlice,
-    CommandPointer,
     Command,
+    CommandPointer,
+    CommandSlice,
+    EngineStatus,
+    LabwareOffsetCreate,
+    LegacyLabwareOffsetCreate,
+    StateSummary,
 )
-
-from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
-from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
-
+from opentrons.protocol_engine.resources.camera_provider import (
+    CameraProvider,
+    CameraSettings,
+)
 from opentrons.protocol_engine.types import DeckConfigurationType
+from opentrons.system import camera
 
+from .maintenance_run_models import MaintenanceRun, MaintenanceRunNotFoundError
+from .maintenance_run_orchestrator_store import MaintenanceRunOrchestratorStore
 from robot_server.service.notifications import MaintenanceRunsPublisher
 
 
@@ -92,6 +95,7 @@ class MaintenanceRunDataManager:
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
         notify_publishers: Callable[[], None],
+        camera_provider: CameraProvider,
     ) -> MaintenanceRun:
         """Create a new, current maintenance run.
 
@@ -99,7 +103,9 @@ class MaintenanceRunDataManager:
             run_id: Identifier to assign the new run.
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
+            deck_configuration: The deck config to use.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
+            camera_provider: Utility for accessing image capture and camera settings.
 
         Returns:
             The run resource.
@@ -113,6 +119,13 @@ class MaintenanceRunDataManager:
             labware_offsets=labware_offsets,
             deck_configuration=deck_configuration,
             notify_publishers=notify_publishers,
+        )
+
+        await camera.update_live_stream_status(
+            self._run_orchestrator_store._robot_type,
+            True,
+            camera_provider,
+            state_summary.cameraSettings,
         )
 
         maintenance_run_data = _build_run(
@@ -151,11 +164,18 @@ class MaintenanceRunDataManager:
             state_summary=state_summary,
         )
 
-    async def delete(self, run_id: str) -> None:
+    async def delete(
+        self,
+        run_id: str,
+        camera_settings: CameraSettings | None,
+        camera_provider: CameraProvider,
+    ) -> None:
         """Delete a maintenance run.
 
         Args:
             run_id: The identifier of the run to remove.
+            camera_settings: Optional set of camera settings form an external run. If None do not attempt to restart the live stream.
+            camera_provider: Utility for accessing image capture and camera settings.
 
         Raises:
             RunConflictError: If deleting the current run, the current run
@@ -164,7 +184,18 @@ class MaintenanceRunDataManager:
         """
         if run_id == self._run_orchestrator_store.current_run_id:
             await self._run_orchestrator_store.clear()
-            await self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+            await (
+                self._maintenance_runs_publisher.publish_current_maintenance_run_async()
+            )
+
+            if camera_settings is not None:
+                # Restart the live stream for the external run when the maintenance run has ended.
+                await camera.update_live_stream_status(
+                    self._run_orchestrator_store._robot_type,
+                    True,
+                    camera_provider,
+                    camera_settings,
+                )
 
         else:
             raise MaintenanceRunNotFoundError(run_id=run_id)

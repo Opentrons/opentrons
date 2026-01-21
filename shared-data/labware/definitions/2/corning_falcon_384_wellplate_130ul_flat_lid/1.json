@@ -1,0 +1,118 @@
+{
+  "allowedRoles": ["labware", "lid"],
+  "ordering": [],
+  "brand": {
+    "brand": "Corning",
+    "brandId": []
+  },
+  "metadata": {
+    "displayName": "Corning Falcon 384 Well Microtest Plate 130 µL Lid",
+    "displayCategory": "lid",
+    "displayVolumeUnits": "\u00b5L",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127,
+    "yDimension": 84.8,
+    "zDimension": 6.85
+  },
+  "wells": {},
+  "groups": [
+    {
+      "metadata": {},
+      "wells": []
+    }
+  ],
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": -0.71
+  },
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "corning_falcon_384_wellplate_130ul_flat_lid"
+  },
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "stackingOffsetWithModule": {
+    "thermocyclerModuleV2": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "stackingOffsetWithLabware": {
+    "corning_falcon_384_wellplate_130ul_flat": {
+      "x": 0,
+      "y": 0,
+      "z": 2.1
+    },
+    "corning_falcon_384_wellplate_130ul_flat_lid": {
+      "x": 0,
+      "y": 0,
+      "z": 5.9
+    },
+    "opentrons_flex_deck_riser": {
+      "x": 0,
+      "y": 0,
+      "z": 28
+    },
+    "protocol_engine_lid_stack_object": {
+      "x": 0,
+      "y": 0,
+      "z": 0
+    }
+  },
+  "stackLimit": 5,
+  "compatibleParentLabware": [
+    "protocol_engine_lid_stack_object",
+    "opentrons_flex_deck_riser",
+    "corning_falcon_384_wellplate_130ul_flat",
+    "corning_falcon_384_wellplate_130ul_flat_lid",
+    "opentrons_universal_flat_adapter"
+  ],
+  "gripForce": 10,
+  "gripHeightFromLabwareBottom": 7,
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 0,
+        "z": -6
+      }
+    },
+    "lidOffsets": {
+      "pickUpOffset": {
+        "x": 0.5,
+        "y": 0,
+        "z": -5
+      },
+      "dropOffset": {
+        "x": 0.5,
+        "y": 0,
+        "z": -1
+      }
+    },
+    "lidDisposalOffsets": {
+      "pickUpOffset": {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "dropOffset": {
+        "x": 0,
+        "y": 5.0,
+        "z": 50.0
+      }
+    }
+  }
+}

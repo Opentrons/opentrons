@@ -1,19 +1,17 @@
 """Calibrate-pipette command for OT3 hardware. request, result, and implementation models."""
-from typing import Optional, Type
-from typing_extensions import Literal
-from pydantic import BaseModel, Field
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from typing import Optional, Type
+
+from pydantic import BaseModel, Field
+from typing_extensions import Literal
+
 from ...errors.error_occurrence import ErrorOccurrence
 from ...types import InstrumentOffsetVector
-
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-
-
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.hardware_control import ot3_calibration as calibration
-
+from opentrons.hardware_control.types import OT3Mount
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
 from opentrons.types import MountType
 
 CalibratePipetteCommandType = Literal["calibration/calibratePipette"]
@@ -54,9 +52,9 @@ class CalibratePipetteImplementation(
             self._hardware_api,
         )
         ot3_mount = OT3Mount.from_mount(params.mount)
-        assert (
-            ot3_mount is not OT3Mount.GRIPPER
-        ), "Expected a Pipette mount but Gripper mount was provided."
+        assert ot3_mount is not OT3Mount.GRIPPER, (
+            "Expected a Pipette mount but Gripper mount was provided."
+        )
 
         pipette_offset = await calibration.find_pipette_offset(
             hcapi=ot3_api, mount=ot3_mount, slot=5
@@ -82,9 +80,9 @@ class CalibratePipette(
     params: CalibratePipetteParams
     result: Optional[CalibratePipetteResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[CalibratePipetteImplementation] = (
         CalibratePipetteImplementation
-    ] = CalibratePipetteImplementation
+    )
 
 
 class CalibratePipetteCreate(BaseCommandCreate[CalibratePipetteParams]):

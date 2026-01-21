@@ -1,4 +1,4 @@
-from typing import Optional, Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 
 TEMPERATURE_ROOM = 23
 

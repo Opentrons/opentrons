@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useFormContext } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
-import { reduce } from 'lodash'
+import reduce from 'lodash/reduce'
 
 import {
   DIRECTION_COLUMN,
@@ -167,9 +167,8 @@ export function LabwareModal({
                             >
                               {labwareByCategory[category]?.map(
                                 (labwareDef, index) => {
-                                  const labwareURI: string = getLabwareDefURI(
-                                    labwareDef
-                                  )
+                                  const labwareURI: string =
+                                    getLabwareDefURI(labwareDef)
                                   const loadName =
                                     labwareDef.parameters.loadName
                                   const isMatch = searchFilter(

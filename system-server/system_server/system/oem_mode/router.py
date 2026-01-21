@@ -1,22 +1,22 @@
 """Router for /system/register endpoint."""
 
-import re
 import os
+import re
+from pathlib import Path
+
 import filetype  # type: ignore[import-untyped]
 from fastapi import (
     APIRouter,
     Depends,
-    status,
-    Response,
-    UploadFile,
     File,
     HTTPException,
+    Response,
+    UploadFile,
+    status,
 )
-from pathlib import Path
 
-from .models import EnableOEMMode
 from ...settings import SystemServerSettings, get_settings, save_settings
-
+from .models import EnableOEMMode
 
 # regex to sanitize the filename
 FILENAME_REGEX = re.compile(r"[^a-zA-Z0-9-.]")

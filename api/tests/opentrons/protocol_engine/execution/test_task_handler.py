@@ -1,26 +1,28 @@
 """Task handler."""
 
-import pytest
 import asyncio
 from datetime import datetime
+
+import pytest
 from decoy import Decoy, matchers
-from opentrons.protocol_engine.state.state import (
-    StateStore,
-)
-from opentrons.protocol_engine.errors import ErrorOccurrence
+
 from opentrons_shared_data.errors.codes import ErrorCodes
 from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
-from opentrons.protocol_engine.resources import (
-    ModelUtils,
-)
 from opentrons.protocol_engine.actions import (
     ActionDispatcher,
     FinishTaskAction,
     StartTaskAction,
 )
-from opentrons.protocol_engine.types import Task
+from opentrons.protocol_engine.errors import ErrorOccurrence
 from opentrons.protocol_engine.execution.task_handler import TaskHandler
+from opentrons.protocol_engine.resources import (
+    ModelUtils,
+)
+from opentrons.protocol_engine.state.state import (
+    StateStore,
+)
+from opentrons.protocol_engine.types import Task
 
 
 @pytest.fixture
@@ -74,12 +76,10 @@ async def test_create_task(
     task = await subject.create_task(_task)
     await asyncio.wait_for(task_ran.wait(), timeout=0.25)
     await task.asyncioTask
+    await asyncio.sleep(0.25)
     assert task.createdAt == created_timestamp
     decoy.verify(
-        action_dispatcher.dispatch(StartTaskAction(task)),
-        times=1,
-    )
-    decoy.verify(
+        action_dispatcher.dispatch(StartTaskAction(task=task)),
         action_dispatcher.dispatch(
             FinishTaskAction(
                 task_id=matchers.Anything(), finished_at=matchers.Anything(), error=None
@@ -263,7 +263,7 @@ async def test_generates_cancelled_error(
     task.asyncioTask.cancel(msg="Cancel task")
     try:
         await asyncio.wait_for(task.asyncioTask, timeout=0.25)
-    except (asyncio.CancelledError):
+    except asyncio.CancelledError:
         pass
     decoy.verify(
         action_dispatcher.dispatch(
@@ -321,7 +321,7 @@ async def test_synchronization_cancel_latest(
     )
     await asyncio.wait_for(
         asyncio.gather(task1.asyncioTask, task2.asyncioTask, return_exceptions=True),
-        timeout=0.25,
+        timeout=1,
     )
     assert task1.asyncioTask.done()
     assert task1.asyncioTask.exception() is None

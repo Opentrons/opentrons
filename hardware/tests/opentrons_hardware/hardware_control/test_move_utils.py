@@ -1,30 +1,33 @@
 """Tests for move util functions."""
-import pytest
-import numpy as np
+
 from typing import Iterator, List, Union
-from hypothesis import given, strategies as st, assume
+
+import numpy as np
+import pytest
+from hypothesis import assume, given
+from hypothesis import strategies as st
 
 from opentrons_hardware.hardware_control.motion_planning.move_manager import MoveManager
 from opentrons_hardware.hardware_control.motion_planning.move_utils import (
-    find_initial_speed,
-    find_final_speed,
-    targets_to_moves,
-    all_blended,
-    get_unit_vector,
     FLOAT_THRESHOLD,
+    MINIMUM_VECTOR_COMPONENT,
+    all_blended,
+    de_diagonalize_unit_vector,
+    find_final_speed,
+    find_initial_speed,
+    get_unit_vector,
     limit_max_speed,
     split_unit_vector,
-    de_diagonalize_unit_vector,
-    MINIMUM_VECTOR_COMPONENT,
+    targets_to_moves,
 )
 from opentrons_hardware.hardware_control.motion_planning.types import (
     AxisConstraints,
     Block,
+    Coordinates,
     Move,
     MoveTarget,
     SystemConstraints,
     is_unit_vector,
-    Coordinates,
 )
 
 AXES = ["X", "Y", "Z", "A"]

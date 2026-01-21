@@ -5,7 +5,6 @@ import styled from 'styled-components'
 import {
   ALIGN_CENTER,
   COLORS,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
@@ -13,6 +12,7 @@ import {
   JUSTIFY_FLEX_START,
   JUSTIFY_SPACE_BETWEEN,
   LabwareRender,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -20,8 +20,7 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareDefinitionsByURIForProtocol,
-  getSchema2CornerOffsetFromSlot,
-  getSchema2Dimensions,
+  getLabwareViewBox,
   getWellFillFromLabwareId,
 } from '@opentrons/shared-data'
 
@@ -76,9 +75,8 @@ export function SetupLabwareStackView({
     lw => lw.definitionUri === firstDefUri
   )
 
-  const [showLiquidDetailsModal, setShowLiquidDetailsModal] = useState<boolean>(
-    false
-  )
+  const [showLiquidDetailsModal, setShowLiquidDetailsModal] =
+    useState<boolean>(false)
   const [selectedLabware, setSelectedLabware] = useState(labwareInStack[0])
   const selectedLabwareStackPosition =
     labwareInStack.length -
@@ -93,10 +91,7 @@ export function SetupLabwareStackView({
   const hasLiquids = Object.keys(wellFill).length > 0
   const labwareDefinition =
     labwareDefinitionsByURI[selectedLabware.definitionUri]
-  const labwareCornerOffsetFromSlot = getSchema2CornerOffsetFromSlot(
-    labwareDefinition
-  )
-  const labwareDimensions = getSchema2Dimensions(labwareDefinition)
+  const labwareViewBox = getLabwareViewBox(labwareDefinition)
 
   return (
     <>
@@ -123,15 +118,11 @@ export function SetupLabwareStackView({
           flexDirection={DIRECTION_ROW}
           justifyContent={JUSTIFY_FLEX_START}
           alignItems={ALIGN_CENTER}
+          gap={SPACING.spacing12}
         >
           <ODDBackButton onClick={onClickBack} />
-          <StyledText
-            oddStyle="level2HeaderBold"
-            marginRight={SPACING.spacing16}
-          >
-            {t('labware_in')}
-          </StyledText>
-          <DeckInfoLabel
+          <StyledText oddStyle="level2HeaderBold">{t('labware_in')}</StyledText>
+          <RobotInfoLabel
             deckLabel={
               slotName === 'offDeck'
                 ? i18n.format(t('protocol_command_text:off_deck'), 'upperCase')
@@ -183,7 +174,7 @@ export function SetupLabwareStackView({
             </StyledText>
           ) : null}
           <LabwareThumbnail
-            viewBox={`${labwareCornerOffsetFromSlot.x} ${labwareCornerOffsetFromSlot.y} ${labwareDimensions.xDimension} ${labwareDimensions.yDimension}`}
+            viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension} ${labwareViewBox.yDimension}`}
           >
             <g
               onClick={() => {
@@ -195,7 +186,7 @@ export function SetupLabwareStackView({
             >
               <LabwareRender
                 definition={labwareDefinition}
-                positioningMode="offsetInSlot"
+                positioningMode="passThrough"
                 wellFill={wellFill}
               />
             </g>

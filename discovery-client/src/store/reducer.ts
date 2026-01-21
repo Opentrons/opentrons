@@ -153,10 +153,10 @@ export const hostsByIpReducer = (
         port,
         robotName,
         seen: true,
-        healthStatus: newHost ? null : host?.healthStatus ?? null,
-        serverHealthStatus: newHost ? null : host?.serverHealthStatus ?? null,
-        healthError: newHost ? null : host?.healthError ?? null,
-        serverHealthError: newHost ? null : host?.serverHealthError ?? null,
+        healthStatus: newHost ? null : (host?.healthStatus ?? null),
+        serverHealthStatus: newHost ? null : (host?.serverHealthStatus ?? null),
+        healthError: newHost ? null : (host?.healthError ?? null),
+        serverHealthError: newHost ? null : (host?.serverHealthError ?? null),
         advertisedModel: robotModel,
       }
 
@@ -166,14 +166,8 @@ export const hostsByIpReducer = (
     }
 
     case Actions.HEALTH_POLLED: {
-      const {
-        ip,
-        port,
-        health,
-        serverHealth,
-        healthError,
-        serverHealthError,
-      } = action.payload
+      const { ip, port, health, serverHealth, healthError, serverHealthError } =
+        action.payload
       const host: HostState | undefined = state[ip]
       const robotName =
         serverHealth?.name ?? health?.name ?? host?.robotName ?? null

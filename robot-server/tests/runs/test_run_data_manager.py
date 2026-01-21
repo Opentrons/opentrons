@@ -1,60 +1,71 @@
 """Tests for RunDataManager."""
 
 from datetime import datetime
-from typing import Optional, List, Dict
-from unittest.mock import sentinel
+from typing import Dict, List, Optional
+from unittest.mock import Mock, sentinel
 
 import pytest
 from decoy import Decoy, matchers
 
+from opentrons import config
+from opentrons.hardware_control.nozzle_manager import NozzleMap
 from opentrons.protocol_engine import (
-    EngineStatus,
-    StateSummary,
-    commands,
-    types as pe_types,
-    CommandSlice,
     CommandErrorSlice,
     CommandPointer,
+    CommandSlice,
+    EngineStatus,
     ErrorOccurrence,
-    LoadedLabware,
-    LoadedPipette,
-    LoadedModule,
     LabwareOffset,
     Liquid,
+    LoadedLabware,
+    LoadedModule,
+    LoadedPipette,
+    StateSummary,
+    commands,
 )
-from opentrons.protocol_engine.types import BooleanParameter, CSVParameter
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+from opentrons.protocol_engine.types import (
+    BooleanParameter,
+    CommandPreconditions,
+    CSVParameter,
+)
+from opentrons.protocol_reader import ProtocolSource
 from opentrons.protocol_runner import RunResult
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-
+from opentrons_shared_data.data_files import RunFileNameMetadata
 from opentrons_shared_data.errors.exceptions import InvalidStoredData
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition2
 
+from robot_server.camera.provider import CameraProviderWrapper
+from robot_server.camera.settings.store import CameraSettingStore
 from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.file_provider.provider import (
+    FileProviderExecutor,
+)
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs import error_recovery_mapping
 from robot_server.runs.error_recovery_models import ErrorRecoveryRule
 from robot_server.runs.run_data_manager import (
+    PreSerializedCommandsNotAvailableError,
     RunDataManager,
     RunNotCurrentError,
-    PreSerializedCommandsNotAvailableError,
 )
-from robot_server.runs.run_models import Run, BadRun, RunNotFoundError, RunDataError
+from robot_server.runs.run_models import BadRun, Run, RunDataError, RunNotFoundError
 from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
     RunConflictError,
+    RunOrchestratorStore,
 )
 from robot_server.runs.run_store import (
-    RunStore,
-    RunResource,
-    CommandNotFoundError,
     BadStateSummary,
+    CommandNotFoundError,
+    RunResource,
+    RunStore,
 )
 from robot_server.service.notifications import RunsPublisher
 from robot_server.service.task_runner import TaskRunner
-from opentrons.protocol_engine.resources import FileProvider
-from robot_server.file_provider.provider import FileProviderWrapper
 
 
 def mock_notify_publishers() -> None:
@@ -80,6 +91,12 @@ def mock_run_store(decoy: Decoy) -> RunStore:
 def mock_error_recovery_setting_store(decoy: Decoy) -> ErrorRecoverySettingStore:
     """Get a mock ErrorRecoverySettingStore."""
     return decoy.mock(cls=ErrorRecoverySettingStore)
+
+
+@pytest.fixture
+def mock_camera_setting_store(decoy: Decoy) -> CameraSettingStore:
+    """Get a mock CameraSettingStore."""
+    return decoy.mock(cls=CameraSettingStore)
 
 
 @pytest.fixture()
@@ -155,6 +172,12 @@ def command_annotations() -> List[pe_types.CommandAnnotation]:
 
 
 @pytest.fixture
+def command_preconditions() -> CommandPreconditions:
+    """Get a CommandPreconditions result."""
+    return CommandPreconditions(isCameraUsed=False)
+
+
+@pytest.fixture
 def mock_nozzle_maps(decoy: Decoy) -> Dict[str, NozzleMap]:
     """Get a mock NozzleMap."""
     mock_nozzle_map = decoy.mock(cls=NozzleMap)
@@ -162,17 +185,31 @@ def mock_nozzle_maps(decoy: Decoy) -> Dict[str, NozzleMap]:
 
 
 @pytest.fixture()
-def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderWrapper:
-    """Return a mock FileProviderWrapper."""
-    return decoy.mock(cls=FileProviderWrapper)
+def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderExecutor:
+    """Return a mock FileProviderExecutor."""
+    return decoy.mock(cls=FileProviderExecutor)
 
 
 @pytest.fixture()
 def mock_file_provider(
-    decoy: Decoy, mock_file_provider_wrapper: FileProviderWrapper
+    decoy: Decoy, mock_file_provider_wrapper: FileProvider
 ) -> FileProvider:
     """Return a mock FileProvider."""
     return decoy.mock(cls=FileProvider)
+
+
+@pytest.fixture()
+def mock_camera_provider_wrapper(decoy: Decoy) -> CameraProviderWrapper:
+    """Return a mock CameraProviderWrapper."""
+    return decoy.mock(cls=CameraProviderWrapper)
+
+
+@pytest.fixture()
+def mock_camera_provider(
+    decoy: Decoy, mock_camera_provider_wrapper: CameraProviderWrapper
+) -> CameraProvider:
+    """Return a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
 
 
 @pytest.fixture
@@ -204,16 +241,20 @@ def subject(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
+    mock_camera_setting_store: CameraSettingStore,
     mock_task_runner: TaskRunner,
     mock_runs_publisher: RunsPublisher,
+    mock_file_provider: FileProvider,
 ) -> RunDataManager:
     """Get a RunDataManager test subject."""
     return RunDataManager(
         run_orchestrator_store=mock_run_orchestrator_store,
         run_store=mock_run_store,
         error_recovery_setting_store=mock_error_recovery_setting_store,
+        camera_setting_store=mock_camera_setting_store,
         task_runner=mock_task_runner,
         runs_publisher=mock_runs_publisher,
+        file_provider=mock_file_provider,
     )
 
 
@@ -222,6 +263,7 @@ async def test_create(
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
+    mock_file_provider: FileProvider,
     subject: RunDataManager,
     engine_state_summary: StateSummary,
     run_resource: RunResource,
@@ -229,10 +271,19 @@ async def test_create(
     """It should create an engine and a persisted run resource."""
     run_id = "hello world"
     created_at = datetime(year=2021, month=1, day=1)
+    protocol_source = ProtocolSource(
+        directory=sentinel.directory,
+        main_file=sentinel.main_file,
+        content_hash=sentinel.content_hash,
+        files=[Mock()],
+        robot_type=sentinel.robot_type,
+        config=sentinel.config,
+        metadata={"protocolName": "test_protocol"},
+    )
     protocol = ProtocolResource(
         protocol_id=sentinel.protocol_id,
         created_at=datetime(year=2022, month=2, day=2),
-        source=None,  # type: ignore[arg-type]
+        source=protocol_source,
         protocol_key=None,
         protocol_kind=ProtocolKind.STANDARD,
     )
@@ -244,7 +295,8 @@ async def test_create(
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
             protocol=protocol,
             deck_configuration=sentinel.deck_configuration,
-            file_provider=sentinel.file_provider,
+            file_provider=mock_file_provider,
+            camera_provider=sentinel.camera_provider,
             run_time_param_values=sentinel.run_time_param_values,
             run_time_param_paths=sentinel.run_time_param_paths,
             notify_publishers=mock_notify_publishers,
@@ -286,7 +338,7 @@ async def test_create(
         labware_offsets=sentinel.labware_offsets,
         protocol=protocol,
         deck_configuration=sentinel.deck_configuration,
-        file_provider=sentinel.file_provider,
+        camera_provider=sentinel.camera_provider,
         run_time_param_values=sentinel.run_time_param_values,
         run_time_param_paths=sentinel.run_time_param_paths,
         notify_publishers=mock_notify_publishers,
@@ -311,6 +363,16 @@ async def test_create(
         outputFileIds=engine_state_summary.files,
     )
     decoy.verify(
+        mock_file_provider.set_run_metadata(
+            RunFileNameMetadata(
+                robot_name=config.name(),
+                run_id=run_id,
+                run_created_at=created_at,
+                protocol_name="test_protocol",
+            )
+        )
+    )
+    decoy.verify(
         mock_run_store.insert_csv_rtp(
             run_id=run_id, run_time_parameters=[bool_parameter, file_parameter]
         )
@@ -323,6 +385,7 @@ async def test_create_engine_error(
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
     subject: RunDataManager,
 ) -> None:
     """It should not create a resource if engine creation fails."""
@@ -347,6 +410,7 @@ async def test_create_engine_error(
             protocol=None,
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -361,7 +425,7 @@ async def test_create_engine_error(
             labware_offsets=[],
             protocol=None,
             deck_configuration=[],
-            file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -676,11 +740,13 @@ async def test_update_current(
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
     command_annotations: List[pe_types.CommandAnnotation],
+    command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_runs_publisher: RunsPublisher,
+    mock_file_provider: FileProvider,
     subject: RunDataManager,
 ) -> None:
     """It should persist the current run and clear the engine on current=false."""
@@ -692,6 +758,7 @@ async def test_update_current(
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=command_preconditions,
         )
     )
 
@@ -716,6 +783,10 @@ async def test_update_current(
     )
     decoy.verify(
         mock_runs_publisher.publish_runs_advise_refetch(run_id),
+        times=1,
+    )
+    decoy.verify(
+        mock_file_provider.clear_run_metadata(),
         times=1,
     )
     assert result == Run(
@@ -818,12 +889,14 @@ async def test_create_archives_existing(
     engine_state_summary: StateSummary,
     run_time_parameters: List[pe_types.RunTimeParameter],
     command_annotations: List[pe_types.CommandAnnotation],
+    command_preconditions: CommandPreconditions,
     run_resource: RunResource,
     run_command: commands.Command,
     mock_run_orchestrator_store: RunOrchestratorStore,
     mock_run_store: RunStore,
     mock_error_recovery_setting_store: ErrorRecoverySettingStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
     subject: RunDataManager,
 ) -> None:
     """It should persist the previously current run when a new run is created."""
@@ -837,6 +910,7 @@ async def test_create_archives_existing(
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=command_preconditions,
         )
     )
 
@@ -859,6 +933,7 @@ async def test_create_archives_existing(
             initial_error_recovery_policy=sentinel.initial_error_recovery_policy,
             deck_configuration=[],
             file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_time_param_values=None,
             run_time_param_paths=None,
             notify_publishers=mock_notify_publishers,
@@ -879,7 +954,7 @@ async def test_create_archives_existing(
         labware_offsets=[],
         protocol=None,
         deck_configuration=[],
-        file_provider=mock_file_provider,
+        camera_provider=mock_camera_provider,
         run_time_param_values=None,
         run_time_param_paths=None,
         notify_publishers=mock_notify_publishers,

@@ -1,50 +1,52 @@
 """Models and implementation for the ``moveLabware`` command."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Any, List
+
+from typing import TYPE_CHECKING, Any, List, Optional, Type
+
+from pydantic import BaseModel, Field
+from pydantic.json_schema import SkipJsonSchema
 from typing_extensions import (
+    Literal,
     TypedDict,
     assert_type,
 )  # note: need this instead of typing for py<3.12
 
-from pydantic.json_schema import SkipJsonSchema
-from pydantic import BaseModel, Field
-from typing_extensions import Literal
-
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition,
-    LabwareDefinition2,
-    LabwareDefinition3,
-)
 from opentrons_shared_data.errors.exceptions import (
     FailedGripperPickupError,
     LabwareDroppedError,
     StallOrCollisionDetectedError,
 )
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
-
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.types import Point
-from ..types import (
-    ModuleModel,
-    CurrentWell,
-    LoadableLabwareLocation,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    AddressableAreaLocation,
-    LabwareMovementStrategy,
-    LabwareOffsetVector,
-    LabwareLocationSequence,
-    NotOnDeckLocationSequenceComponent,
-    OFF_DECK_LOCATION,
+from opentrons_shared_data.labware.labware_definition import (
+    LabwareDefinition,
+    LabwareDefinition2,
+    LabwareDefinition3,
 )
+
 from ..errors import (
     LabwareMovementNotAllowedError,
-    NotSupportedOnRobotType,
     LabwareOffsetDoesNotExistError,
+    NotSupportedOnRobotType,
 )
-from ..resources import labware_validation, fixture_validation
+from ..errors.error_occurrence import ErrorOccurrence
+from ..resources import fixture_validation, labware_validation
+from ..state.update_types import StateUpdate
+from ..types import (
+    OFF_DECK_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    LabwareLocationSequence,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadableLabwareLocation,
+    ModuleLocation,
+    ModuleModel,
+    NotOnDeckLocationSequenceComponent,
+    OnLabwareLocation,
+)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -52,11 +54,11 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
-from ..errors.error_occurrence import ErrorOccurrence
-from ..state.update_types import StateUpdate
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.types import Point
 
 if TYPE_CHECKING:
-    from ..execution import EquipmentHandler, RunControlHandler, LabwareMovementHandler
+    from ..execution import EquipmentHandler, LabwareMovementHandler, RunControlHandler
     from ..state.state import StateView
 
 
@@ -228,9 +230,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 )
                 eventual_destination_location_sequence = [
                     NotOnDeckLocationSequenceComponent(
-                        logicalLocationName=OFF_DECK_LOCATION
+                        logicalLocationName=WASTE_CHUTE_LOCATION
                     )
                 ]
+
             elif fixture_validation.is_trash(area_name):
                 # When dropping labware in the trash bins we want to ensure they are lids
                 # and enforce a y-axis drop offset to ensure they fall within the trash bin
@@ -351,7 +354,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             validated_new_loc = self._state_view.geometry.ensure_valid_gripper_location(
                 available_new_location,
             )
-
             user_pick_up_offset = (
                 Point.from_xyz_attrs(params.pickUpOffset)
                 if params.pickUpOffset is not None
@@ -393,23 +395,25 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 # todo(mm, 2024-09-26): Catch LabwareNotPickedUpError when that exists and
                 # move_labware_with_gripper() raises it.
             ) as exception:
-                gripper_movement_error: GripperMovementError | None = GripperMovementError(
-                    id=self._model_utils.generate_id(),
-                    createdAt=self._model_utils.get_timestamp(),
-                    errorCode=exception.code.value.code,
-                    detail=exception.code.value.detail,
-                    errorInfo={
-                        "originLocationSequence": origin_location_sequence,
-                        "immediateDestinationLocationSequence": immediate_destination_location_sequence,
-                        "eventualDestinationLocationSequence": eventual_destination_location_sequence,
-                    },
-                    wrappedErrors=[
-                        ErrorOccurrence.from_failed(
-                            id=self._model_utils.generate_id(),
-                            createdAt=self._model_utils.get_timestamp(),
-                            error=exception,
-                        )
-                    ],
+                gripper_movement_error: GripperMovementError | None = (
+                    GripperMovementError(
+                        id=self._model_utils.generate_id(),
+                        createdAt=self._model_utils.get_timestamp(),
+                        errorCode=exception.code.value.code,
+                        detail=exception.code.value.detail,
+                        errorInfo={
+                            "originLocationSequence": origin_location_sequence,
+                            "immediateDestinationLocationSequence": immediate_destination_location_sequence,
+                            "eventualDestinationLocationSequence": eventual_destination_location_sequence,
+                        },
+                        wrappedErrors=[
+                            ErrorOccurrence.from_failed(
+                                id=self._model_utils.generate_id(),
+                                createdAt=self._model_utils.get_timestamp(),
+                                error=exception,
+                            )
+                        ],
+                    )
                 )
             else:
                 gripper_movement_error = None
@@ -464,7 +468,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
             new_location=available_new_location,
             new_offset_id=new_offset_id,
         )
-
         if labware_validation.validate_definition_is_lid(
             definition=self._state_view.labware.get_definition(params.labwareId)
         ):
@@ -498,7 +501,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     parent_labware_ids=parent_updates,
                     lid_ids=lid_updates,
                 )
-
         return SuccessData(
             public=MoveLabwareResult(
                 offsetId=new_offset_id,

@@ -1,33 +1,35 @@
 """A Protocol-Engine-friendly wrapper for opentrons.motion_planning.deck_conflict."""
+
 from __future__ import annotations
+
 import logging
 from typing import (
-    Optional,
+    List,
     Tuple,
     Union,
-    List,
 )
 
 from opentrons_shared_data.errors.exceptions import MotionPlanningFailureError
-from opentrons.protocol_engine.errors import LocationIsStagingSlotError
 from opentrons_shared_data.module import FLEX_TC_LID_COLLISION_ZONE
 
-from opentrons.hardware_control import CriticalPoint
+from . import point_calculations
 from opentrons.motion_planning import adjacent_slots_getters
-
 from opentrons.protocol_engine import (
-    StateView,
     DeckSlotLocation,
-    OnLabwareLocation,
     DropTipWellLocation,
+    OnLabwareLocation,
+    StateView,
 )
+from opentrons.protocol_engine.errors import LocationIsStagingSlotError
 from opentrons.protocol_engine.types import (
+    LoadedModule,
     StagingSlotLocation,
     WellLocationType,
-    LoadedModule,
 )
-from opentrons.types import DeckSlotName, StagingSlotName, Point
-from . import point_calculations
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import DeckSlotName, Point, StagingSlotName
+
+_PARTIAL_TIP_RETURN_VERSION_GATE = APIVersion(2, 28)
 
 
 class PartialTipMovementNotAllowedError(MotionPlanningFailureError):
@@ -69,6 +71,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
     labware_id: str,
     well_name: str,
     well_location: WellLocationType,
+    version: APIVersion,
 ) -> None:
     """Check if the labware is safe to move to with a pipette in partial tip configuration.
 
@@ -78,6 +81,7 @@ def check_safe_for_pipette_movement(  # noqa: C901
         labware_id: ID of the labware we are moving to
         well_name: Name of the well to move to
         well_location: exact location within the well to move to
+        version: the API version of the protocol
     """
     # TODO (spp, 2023-02-06): remove this check after thorough testing.
     #  This function is capable of checking for movement conflict regardless of
@@ -91,7 +95,9 @@ def check_safe_for_pipette_movement(  # noqa: C901
             pipette_id=pipette_id,
             labware_id=labware_id,
             well_location=well_location,
-            partially_configured=True,
+            # TODO (jbl, 2026-01-14) check if partially configured if the above TODO is addressed
+            api_version_allows_partial_return_tip=version
+            >= _PARTIAL_TIP_RETURN_VERSION_GATE,
         )
     well_location_point = engine_state.geometry.get_well_position(
         labware_id=labware_id,
@@ -101,7 +107,9 @@ def check_safe_for_pipette_movement(  # noqa: C901
     )
     primary_nozzle = engine_state.pipettes.get_primary_nozzle(pipette_id)
 
-    destination_cp = _get_critical_point_to_use(engine_state, labware_id)
+    destination_cp = engine_state.motion.get_critical_point_for_wells_in_labware(
+        labware_id
+    )
     pipette_bounds_at_well_location = (
         engine_state.pipettes.get_pipette_bounds_at_specified_move_to_position(
             pipette_id=pipette_id,
@@ -187,21 +195,6 @@ def check_safe_for_pipette_movement(  # noqa: C901
                 f" {labware_slot} with {primary_nozzle} nozzle partial configuration"
                 f" will result in collision with items in staging slot {staging_slot}."
             )
-
-
-def _get_critical_point_to_use(
-    engine_state: StateView, labware_id: str
-) -> Optional[CriticalPoint]:
-    """Return the critical point to use when accessing the given labware."""
-    # TODO (spp, 2024-09-17): looks like Y_CENTER of column is the same as its XY_CENTER.
-    #   I'm using this if-else ladder to be consistent with what we do in
-    #   `MotionPlanning.get_movement_waypoints_to_well()`.
-    #   We should probably use only XY_CENTER in both places.
-    if engine_state.labware.get_should_center_column_on_target_well(labware_id):
-        return CriticalPoint.Y_CENTER
-    elif engine_state.labware.get_should_center_pipette_on_target_well(labware_id):
-        return CriticalPoint.XY_CENTER
-    return None
 
 
 def _slot_has_potential_colliding_object(

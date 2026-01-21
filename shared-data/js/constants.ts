@@ -52,6 +52,8 @@ export const HEATERSHAKER_MODULE_V1: 'heaterShakerModuleV1' =
 export const ABSORBANCE_READER_V1: 'absorbanceReaderV1' = 'absorbanceReaderV1'
 export const FLEX_STACKER_MODULE_V1: 'flexStackerModuleV1' =
   'flexStackerModuleV1'
+export const VACUUM_MODULE_MILLIPORE_V1: 'vacuumModuleMilliporeV1' =
+  'vacuumModuleMilliporeV1'
 
 export const MAGNETIC_BLOCK_V1: 'magneticBlockV1' = 'magneticBlockV1'
 
@@ -69,6 +71,9 @@ export const GRIPPER_MODELS = [
 // robot display name
 export const OT2_DISPLAY_NAME: 'Opentrons OT-2' = 'Opentrons OT-2'
 export const FLEX_DISPLAY_NAME: 'Opentrons Flex' = 'Opentrons Flex'
+
+// robot camera name
+export const OT_SYSTEM_CAMERA = 'ot_system_camera'
 
 // pipette display categories
 export const FLEX: 'FLEX' = 'FLEX'
@@ -96,6 +101,7 @@ export const ABSORBANCE_READER_TYPE: 'absorbanceReaderType' =
   'absorbanceReaderType'
 export const FLEX_STACKER_MODULE_TYPE: 'flexStackerModuleType' =
   'flexStackerModuleType'
+export const VACUUM_MODULE_TYPE: 'vacuumModuleType' = 'vacuumModuleType'
 
 export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
 
@@ -117,6 +123,8 @@ export const ABSORBANCE_READER_MODELS = [ABSORBANCE_READER_V1]
 
 export const FLEX_STACKER_MODULE_MODELS = [FLEX_STACKER_MODULE_V1]
 
+export const VACUUM_MODULE_MODELS = [VACUUM_MODULE_MILLIPORE_V1]
+
 export const MAGNETIC_BLOCK_MODELS = [MAGNETIC_BLOCK_V1]
 
 export const MODULE_MODELS = [
@@ -127,6 +135,7 @@ export const MODULE_MODELS = [
   ...MAGNETIC_BLOCK_MODELS,
   ...ABSORBANCE_READER_MODELS,
   ...FLEX_STACKER_MODULE_MODELS,
+  ...VACUUM_MODULE_MODELS,
 ]
 
 export const MODULE_MODELS_OT2_ONLY = [
@@ -143,6 +152,7 @@ export const MODULE_TYPES = [
   MAGNETIC_BLOCK_TYPE,
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
 ]
 
 export const GEN_ONE_MULTI_PIPETTES = ['p10_multi', 'p50_multi', 'p300_multi']
@@ -444,10 +454,14 @@ export const FLEX_STACKER_C4_ADDRESSABLE_AREA: 'flexStackerModuleV1C4' =
   'flexStackerModuleV1C4'
 export const FLEX_STACKER_D4_ADDRESSABLE_AREA: 'flexStackerModuleV1D4' =
   'flexStackerModuleV1D4'
+export const VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA: 'vacuumModuleMilliporeV1A3' =
+  'vacuumModuleMilliporeV1A3'
 
 export const exactMatchOnlyLoadNames = new Set([
   'milliplex_microtiter_plate',
   'milliplex_microtiter_plate_lid',
+  'corning_falcon_384_wellplate_130ul_flat',
+  'corning_falcon_384_wellplate_130ul_flat_lid',
   'ibidi_96_square_well_plate_300ul',
   'ibidi_96_square_well_plate_300ul_lid',
   'opentrons_96_deep_well_adapter',
@@ -512,11 +526,16 @@ export const FLEX_STACKER_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   FLEX_STACKER_D4_ADDRESSABLE_AREA,
 ]
 
+export const VACUUM_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
+  VACUUM_MODULE_MILLIPORE_A3_ADDRESSABLE_AREA,
+]
+
 export const FLEX_USB_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   THERMOCYCLER_ADDRESSABLE_AREA,
   ...ABSORBANCE_READER_ADDRESSABLE_AREAS,
   ...HEATERSHAKER_ADDRESSABLE_AREAS,
   ...TEMPERATURE_MODULE_ADDRESSABLE_AREAS,
+  ...VACUUM_MODULE_ADDRESSABLE_AREAS,
 ]
 
 export const FLEX_MODULE_ADDRESSABLE_AREAS: AddressableAreaName[] = [
@@ -536,10 +555,8 @@ export const FLEX_STAGING_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   ABSORBANCE_READER_LID_DOCK_D4_ADDRESSABLE_AREA,
 ]
 
-export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] = [
-  ...FLEX_STAGING_ADDRESSABLE_AREAS,
-  ...FAKE_AA,
-]
+export const FLEX_STAGING_ADDRESSABLE_AREAS_WITH_FAKES: AddressableAreaNamesWithFakes[] =
+  [...FLEX_STAGING_ADDRESSABLE_AREAS, ...FAKE_AA]
 
 export const ADDRESSABLE_AREA_1: '1' = '1'
 export const ADDRESSABLE_AREA_2: '2' = '2'
@@ -586,6 +603,25 @@ export const FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   A4_ADDRESSABLE_AREA,
   B4_ADDRESSABLE_AREA,
   C4_ADDRESSABLE_AREA,
+  D4_ADDRESSABLE_AREA,
+]
+
+export const ALL_FLEX_ADDRESSABLE_AREAS_SORTED: AddressableAreaName[] = [
+  A1_ADDRESSABLE_AREA,
+  A2_ADDRESSABLE_AREA,
+  A3_ADDRESSABLE_AREA,
+  A4_ADDRESSABLE_AREA,
+  B1_ADDRESSABLE_AREA,
+  B2_ADDRESSABLE_AREA,
+  B3_ADDRESSABLE_AREA,
+  B4_ADDRESSABLE_AREA,
+  C1_ADDRESSABLE_AREA,
+  C2_ADDRESSABLE_AREA,
+  C3_ADDRESSABLE_AREA,
+  C4_ADDRESSABLE_AREA,
+  D1_ADDRESSABLE_AREA,
+  D2_ADDRESSABLE_AREA,
+  D3_ADDRESSABLE_AREA,
   D4_ADDRESSABLE_AREA,
 ]
 
@@ -656,6 +692,8 @@ export const FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE: 'flexStacke
   'flexStackerModuleV1WithWasteChuteRightAdapterNoCover'
 export const FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE: 'flexStackerModuleV1WithMagneticBlockV1' =
   'flexStackerModuleV1WithMagneticBlockV1'
+export const VACUUM_MODULE_MILLIPORE_V1_FIXTURE: 'vacuumModuleMilliporeV1' =
+  'vacuumModuleMilliporeV1'
 
 export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [moduleModel in ModuleModel]?: AreaType
@@ -666,6 +704,7 @@ export const FLEX_MODULE_AA_TYPE_BY_MODEL: {
   [THERMOCYCLER_MODULE_V2]: 'thermocycler',
   [ABSORBANCE_READER_V1]: 'absorbanceReader',
   [FLEX_STACKER_MODULE_V1]: 'flexStacker',
+  [VACUUM_MODULE_MILLIPORE_V1]: 'vacuumModule',
 }
 
 export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
@@ -675,6 +714,7 @@ export const FLEX_USB_MODULE_FIXTURES: CutoutFixtureId[] = [
   THERMOCYCLER_V2_FRONT_FIXTURE,
   ABSORBANCE_READER_V1_FIXTURE,
   FLEX_STACKER_V1_FIXTURE,
+  VACUUM_MODULE_MILLIPORE_V1_FIXTURE,
 ]
 
 export const MAGNETIC_BLOCK_FIXTURES: CutoutFixtureIdsWithFakes[] = [
@@ -714,10 +754,8 @@ export const WASTE_CHUTE_ONLY_FIXTURES: CutoutFixtureId[] = [
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 ]
 
-export const WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES: CutoutFixtureIdsWithFakes[] = [
-  ...WASTE_CHUTE_ONLY_FIXTURES,
-  FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
-]
+export const WASTE_CHUTE_ONLY_FIXTURES_WITH_FAKES: CutoutFixtureIdsWithFakes[] =
+  [...WASTE_CHUTE_ONLY_FIXTURES, FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE]
 
 export const WASTE_CHUTE_STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
@@ -736,6 +774,10 @@ export const FLEX_STACKER_FIXTURES: CutoutFixtureId[] = [
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
 ]
 
+export const VACUUM_MODULE_FIXTURES: CutoutFixtureId[] = [
+  VACUUM_MODULE_MILLIPORE_V1_FIXTURE,
+]
+
 export const MODULE_FIXTURES_BY_MODEL: {
   [moduleModel in ModuleModel]?: CutoutFixtureId[]
 } = {
@@ -748,9 +790,11 @@ export const MODULE_FIXTURES_BY_MODEL: {
   ],
   [ABSORBANCE_READER_V1]: [ABSORBANCE_READER_V1_FIXTURE],
   [FLEX_STACKER_MODULE_V1]: [FLEX_STACKER_V1_FIXTURE],
+  [VACUUM_MODULE_MILLIPORE_V1]: [VACUUM_MODULE_MILLIPORE_V1_FIXTURE],
 }
 
-export const DEFAULT_AA_FOR_WASTE_CHUTE = ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
+export const DEFAULT_AA_FOR_WASTE_CHUTE =
+  ONE_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA
 
 export const STAGING_AREA_FIXTURES: CutoutFixtureId[] = [
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -778,6 +822,7 @@ export const DEFAULT_LIQUID_COLORS = [
   springGreen,
   tartRed,
 ]
+export const MIXED_WELL_COLOR = '#737578'
 export const DEPRECATED_WHALE_GREY = '#9395a0'
 
 // this can't go in @opentrons/components because its used in a utility
@@ -830,3 +875,7 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FAKE_FIXTURE_IDS,
   ...STAGING_AREA_FIXTURES,
 ]
+
+// a labware location when something has been used already on the deck
+// and moves to a new location that isn't accessible on or off the deck
+export const SYSTEM_LOCATION = 'systemLocation'

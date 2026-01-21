@@ -1,48 +1,53 @@
 """The router for the /subsystems endpoints."""
 
 from datetime import datetime
-from typing import Annotated, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Annotated, Optional
 
-from fastapi import status, Depends, Response, Request
+from fastapi import Depends, Request, Response, status
 from typing_extensions import Literal
 
+from opentrons.hardware_control import ThreadManagedHardware
 from server_utils.fastapi_utils.light_router import LightRouter
-
-from robot_server.service.json_api import (
-    SimpleMultiBody,
-    PydanticResponse,
-    MultiBodyMeta,
-    SimpleBody,
-)
 
 from .firmware_update_manager import (
     FirmwareUpdateManager,
-    UpdateIdNotFound as _UpdateIdNotFound,
-    UpdateIdExists as _UpdateIdExists,
-    UpdateInProgress as _UpdateInProgress,
+)
+from .firmware_update_manager import (
     NoOngoingUpdate as _NoOngoingUpdate,
+)
+from .firmware_update_manager import (
     SubsystemNotFound as _SubsystemNotFound,
 )
-
-from robot_server.errors.error_responses import ErrorDetails, ErrorBody
-from robot_server.errors.robot_errors import NotSupportedOnOT2
+from .firmware_update_manager import (
+    UpdateIdExists as _UpdateIdExists,
+)
+from .firmware_update_manager import (
+    UpdateIdNotFound as _UpdateIdNotFound,
+)
+from .firmware_update_manager import (
+    UpdateInProgress as _UpdateInProgress,
+)
+from .models import (
+    PresentSubsystem,
+    SubSystem,
+    UpdateProgressData,
+    UpdateProgressSummary,
+)
+from robot_server.errors.error_responses import ErrorBody, ErrorDetails
 from robot_server.errors.global_errors import IDNotFound
+from robot_server.errors.robot_errors import NotSupportedOnOT2
 from robot_server.hardware import (
     get_firmware_update_manager,
     get_ot3_hardware,
     get_thread_manager,
 )
-
-from robot_server.service.dependencies import get_unique_id, get_current_time
-
-
-from .models import (
-    UpdateProgressData,
-    UpdateProgressSummary,
-    SubSystem,
-    PresentSubsystem,
+from robot_server.service.dependencies import get_current_time, get_unique_id
+from robot_server.service.json_api import (
+    MultiBodyMeta,
+    PydanticResponse,
+    SimpleBody,
+    SimpleMultiBody,
 )
-from opentrons.hardware_control import ThreadManagedHardware
 
 if TYPE_CHECKING:
     from opentrons.hardware_control.ot3api import OT3API  # noqa: F401

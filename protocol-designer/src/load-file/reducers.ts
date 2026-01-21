@@ -55,8 +55,8 @@ const unsavedChanges = (state: boolean = false, action: Action): boolean => {
     case 'REMOVE_WELLS_CONTENTS':
     case 'SET_WELL_CONTENTS':
     case 'ADD_STEP':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
+    case 'REORDER_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SAVE_FILE_METADATA':
     case 'REPLACE_CUSTOM_LABWARE_DEF':
@@ -80,6 +80,5 @@ export interface RootState {
   fileUploadMessage: FileUploadMessageState
   unsavedChanges: boolean
 }
-export const rootReducer: Reducer<RootState, Action> = combineReducers(
-  _allReducers
-)
+export const rootReducer: Reducer<RootState, Action> =
+  combineReducers(_allReducers)

@@ -1,12 +1,10 @@
 """Auto-delete old resources to make room for new ones."""
 
-
 from logging import getLogger
 
+from .protocol_store import ProtocolStore
 from robot_server.deletion_planner import ProtocolDeletionPlanner
 from robot_server.protocols.protocol_models import ProtocolKind
-from .protocol_store import ProtocolStore
-
 
 _log = getLogger(__name__)
 

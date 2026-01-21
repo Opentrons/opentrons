@@ -1,41 +1,47 @@
 """Protocol engine state management."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, Sequence, TypeVar
+
 from typing_extensions import ParamSpec
 
 from opentrons_shared_data.deck.types import DeckDefinitionV5
 from opentrons_shared_data.robot.types import RobotDefinition
 
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
-from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
-from opentrons.util.change_notifier import ChangeNotifier
-
-from ..resources import DeckFixedLabware
 from ..actions import Action, ActionHandler
-from ._abstract_store import HasState, HandlesActions
-from .commands import CommandState, CommandStore, CommandView
+from ..resources import DeckFixedLabware
+from ..types import DeckConfigurationType
+from ._abstract_store import HandlesActions, HasState
 from .addressable_areas import (
     AddressableAreaState,
     AddressableAreaStore,
     AddressableAreaView,
 )
-from .labware import LabwareState, LabwareStore, LabwareView
-from .pipettes import PipetteState, PipetteStore, PipetteView
-from .modules import ModuleState, ModuleStore, ModuleView
-from .liquids import LiquidState, LiquidView, LiquidStore
-from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
-from .tips import TipState, TipView, TipStore
-from .wells import WellState, WellView, WellStore
-from .geometry import GeometryView
-from .motion import MotionView
-from .files import FileView, FileState, FileStore
+from .camera import CameraState, CameraStore, CameraView
+from .commands import CommandState, CommandStore, CommandView
 from .config import Config
+from .files import FileState, FileStore, FileView
+from .geometry import GeometryView
+from .labware import LabwareState, LabwareStore, LabwareView
+from .liquid_classes import LiquidClassState, LiquidClassStore, LiquidClassView
+from .liquids import LiquidState, LiquidStore, LiquidView
+from .modules import ModuleState, ModuleStore, ModuleView
+from .motion import MotionView
+from .pipettes import PipetteState, PipetteStore, PipetteView
+from .preconditions import (
+    CommandPreconditionState,
+    CommandPreconditionStore,
+    CommandPreconditionView,
+)
 from .state_summary import StateSummary
-from ..types import DeckConfigurationType
-from .tasks import TaskState, TaskView, TaskStore
-
+from .tasks import TaskState, TaskStore, TaskView
+from .tips import TipState, TipStore, TipView
+from .wells import WellState, WellStore, WellView
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryPolicy
+from opentrons.protocol_engine.types import LiquidClassRecordWithId, ModuleOffsetData
+from opentrons.util.change_notifier import ChangeNotifier
 
 _ParamsT = ParamSpec("_ParamsT")
 _ReturnT = TypeVar("_ReturnT")
@@ -56,6 +62,8 @@ class State:
     wells: WellState
     files: FileState
     tasks: TaskState
+    preconditions: CommandPreconditionState
+    camera: CameraState
 
 
 class StateView(HasState[State]):
@@ -76,6 +84,8 @@ class StateView(HasState[State]):
     _files: FileView
     _config: Config
     _tasks: TaskView
+    _preconditions: CommandPreconditionView
+    _camera: CameraView
 
     @property
     def commands(self) -> CommandView:
@@ -143,6 +153,16 @@ class StateView(HasState[State]):
         return self._config
 
     @property
+    def preconditions(self) -> CommandPreconditionView:
+        """Get state view selectors for command preconditions."""
+        return self._preconditions
+
+    @property
+    def camera(self) -> CameraView:
+        """Get state view for the Camera."""
+        return self._camera
+
+    @property
     def tasks(self) -> TaskView:
         """Get state view selectors for task state."""
         return self._tasks
@@ -171,6 +191,7 @@ class StateView(HasState[State]):
                 for liquid_class_id, liquid_class_record in self._liquid_classes.get_all().items()
             ],
             tasks=self._tasks.get_summary(),
+            cameraSettings=self._camera.get_enablement_settings(),
         )
 
 
@@ -241,6 +262,8 @@ class StateStore(StateView, ActionHandler):
         self._well_store = WellStore()
         self._file_store = FileStore()
         self._task_store = TaskStore()
+        self._precondition_store = CommandPreconditionStore()
+        self._camera_store = CameraStore()
 
         self._substores: List[HandlesActions] = [
             self._command_store,
@@ -254,6 +277,8 @@ class StateStore(StateView, ActionHandler):
             self._well_store,
             self._file_store,
             self._task_store,
+            self._precondition_store,
+            self._camera_store,
         ]
         self._config = config
         self._change_notifier = change_notifier or ChangeNotifier()
@@ -378,6 +403,8 @@ class StateStore(StateView, ActionHandler):
             wells=self._well_store.state,
             files=self._file_store.state,
             tasks=self._task_store.state,
+            preconditions=self._precondition_store.state,
+            camera=self._camera_store.state,
         )
 
     def _initialize_state(self) -> None:
@@ -397,6 +424,8 @@ class StateStore(StateView, ActionHandler):
         self._wells = WellView(state.wells)
         self._files = FileView(state.files)
         self._tasks = TaskView(state.tasks)
+        self._preconditions = CommandPreconditionView(state.preconditions)
+        self._camera = CameraView(state.camera)
 
         # Derived states
         self._geometry = GeometryView(
@@ -430,6 +459,7 @@ class StateStore(StateView, ActionHandler):
         self._tips._state = next_state.tips
         self._wells._state = next_state.wells
         self._tasks._state = next_state.tasks
+        self._camera._state = next_state.camera
         self._change_notifier.notify()
         if self._notify_robot_server is not None:
             self._notify_robot_server()

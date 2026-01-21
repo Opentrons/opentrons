@@ -1,15 +1,16 @@
 """Test for constants module."""
+
 from typing import Iterable
 
 import pytest
 
 from opentrons_hardware.firmware_bindings import constants
-from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.arbitration_id import (
-    NODE_ID_BITS,
-    MESSAGE_ID_BITS,
     FUNCTION_CODE_BITS,
+    MESSAGE_ID_BITS,
+    NODE_ID_BITS,
 )
+from opentrons_hardware.firmware_bindings.constants import NodeId
 
 
 @pytest.mark.parametrize(

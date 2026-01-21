@@ -22,9 +22,10 @@ from . import commands
 from .types import (
     OFF_DECK_LOCATION,
     SYSTEM_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
     DeckSlotLocation,
     LoadableLabwareLocation,
-    AddressableAreaLocation,
     ModuleLocation,
     OnLabwareLocation,
 )
@@ -116,6 +117,7 @@ def _standardize_labware_location(
         )
         or original == OFF_DECK_LOCATION
         or original == SYSTEM_LOCATION
+        or original == WASTE_CHUTE_LOCATION
     ):
         return original
 

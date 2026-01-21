@@ -14,9 +14,9 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  TextAreaField,
 } from '@opentrons/components'
 
-import { TextAreaField } from '/protocol-designer/components/molecules'
 import { renameStep } from '/protocol-designer/labware-ingred/actions'
 import { capitalizeFirstLetter } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/utils'
 

@@ -31,12 +31,18 @@ module.exports = {
     'prefer-const': 'error',
     'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
+    'react-hooks/exhaustive-deps': [
+      'warn',
+      {
+        additionalHooks: '(useDrag|useDrop)',
+      },
+    ],
     'no-extra-boolean-cast': 'off',
     'import/no-default-export': 'error',
     '@typescript-eslint/promise-function-async': 'off',
     '@typescript-eslint/default-param-last': 'off',
     '@typescript-eslint/consistent-indexed-object-style': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'warn',
 
     // TODO(mc, 2021-01-29): fix these and remove warning overrides
     'lines-between-class-members': 'warn',
@@ -48,6 +54,7 @@ module.exports = {
     'prefer-regex-literals': 'warn',
     'react/prop-types': 'warn',
     'react/jsx-curly-brace-presence': 'warn',
+    '@typescript-eslint/no-non-null-asserted-optional-chain': 'warn',
 
     // Enforce notification hooks
     'no-restricted-imports': [
@@ -64,9 +71,16 @@ module.exports = {
               'useDeckConfigurationQuery',
               'useAllCommandsAsPreSerializedList',
               'useSearchLabwareOffsets',
+              'useImageFileQuery',
+              'useCamera',
             ],
             message:
               'HTTP hook deprecated. Use the equivalent notification wrapper (useNotifyXYZ).',
+          },
+          {
+            name: 'lodash',
+            message:
+              'Use a granular import, like `import isEqual from "lodash/isEqual"`, instead of like `import { isEqual } from "lodash"`',
           },
         ],
       },
@@ -113,7 +127,6 @@ module.exports = {
         '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
         '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'warn',
         '@typescript-eslint/ban-types': 'warn',
-        '@typescript-eslint/non-nullable-type-assertion-style': 'warn',
         '@typescript-eslint/await-thenable': 'warn',
         '@typescript-eslint/ban-ts-comment': 'warn',
         '@typescript-eslint/unbound-method': 'warn',

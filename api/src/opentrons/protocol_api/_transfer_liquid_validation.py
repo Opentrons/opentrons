@@ -1,8 +1,9 @@
 from dataclasses import dataclass
-from typing import List, Union, Sequence, Optional
+from typing import List, Optional, Sequence, Union
 
-from opentrons.types import Location, NozzleMapInterface
-from opentrons.protocols.api_support import instrument
+from . import validation
+from .disposal_locations import TrashBin, WasteChute
+from .labware import Labware, Well
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_liquid_utils,
 )
@@ -10,23 +11,21 @@ from opentrons.protocols.advanced_control.transfers.common import (
     TransferTipPolicyV2,
     TransferTipPolicyV2Type,
 )
-
-from .disposal_locations import TrashBin, WasteChute
-from .labware import Labware, Well
-from . import validation
+from opentrons.protocols.api_support import instrument
+from opentrons.types import Location, NozzleMapInterface
 
 
 @dataclass
 class TransferInfo:
-
     source: List[Well]
     dest: Union[List[Well], TrashBin, WasteChute]
     tip_policy: TransferTipPolicyV2
     tip_racks: List[Labware]
     trash_location: Union[Location, TrashBin, WasteChute]
+    tips: Optional[List[Well]]
 
 
-def verify_and_normalize_transfer_args(
+def verify_and_normalize_transfer_args(  # noqa: C901
     source: Union[Well, Sequence[Well], Sequence[Sequence[Well]]],
     dest: Union[Well, Sequence[Well], Sequence[Sequence[Well]], TrashBin, WasteChute],
     tip_policy: TransferTipPolicyV2Type,
@@ -36,6 +35,7 @@ def verify_and_normalize_transfer_args(
     group_wells_for_multi_channel: bool,
     current_volume: float,
     trash_location: Union[Location, Well, Labware, TrashBin, WasteChute],
+    tips: Optional[Union[Sequence[Well], Sequence[Sequence[Well]]]],
 ) -> TransferInfo:
     flat_sources_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(source)
     if not isinstance(dest, (TrashBin, WasteChute)):
@@ -57,8 +57,20 @@ def verify_and_normalize_transfer_args(
             reject_adapter=True,
         )
 
+    valid_tips: Optional[List[Well]] = None
+    if tips:
+        flat_tips_list = validation.ensure_valid_flat_wells_list_for_transfer_v2(tips)
+        if group_wells_for_multi_channel and nozzle_map.tip_count > 1:
+            valid_tips = tx_liquid_utils.group_wells_for_multi_channel_transfer(
+                flat_tips_list, nozzle_map, "tip"
+            )
+        else:
+            valid_tips = flat_tips_list
+
     valid_new_tip = validation.ensure_new_tip_policy(tip_policy)
-    if valid_new_tip == TransferTipPolicyV2.NEVER:
+    if valid_tips is not None:
+        valid_tip_racks = [tip.parent for tip in valid_tips]
+    elif valid_new_tip == TransferTipPolicyV2.NEVER:
         if last_tip_well is None:
             raise RuntimeError(
                 "Pipette has no tip attached to perform transfer."
@@ -92,6 +104,7 @@ def verify_and_normalize_transfer_args(
         tip_policy=valid_new_tip,
         tip_racks=valid_tip_racks,
         trash_location=valid_trash_location,
+        tips=valid_tips,
     )
 
 

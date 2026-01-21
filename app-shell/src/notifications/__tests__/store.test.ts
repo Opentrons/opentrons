@@ -4,7 +4,7 @@ import { connectionStore } from '../store'
 
 const MOCK_IP = 'MOCK_IP'
 const MOCK_ROBOT = 'MOCK_ROBOT'
-const MOCK_WINDOW = {} as any
+const MOCK_WINDOW = { once: () => {} } as any
 const MOCK_CLIENT = { connected: true } as any
 const MOCK_TOPIC = 'MOCK_TOPIC' as any
 
@@ -13,10 +13,12 @@ describe('ConnectionStore', () => {
     connectionStore.clearStore()
   })
 
-  describe('getBrowserWindow', () => {
-    it('should return the browser window', () => {
-      connectionStore.setBrowserWindow(MOCK_WINDOW)
-      expect(connectionStore.getBrowserWindow()).toBe(MOCK_WINDOW)
+  describe('getBrowserWindows', () => {
+    it('should return a set containing the browser window', () => {
+      connectionStore.addBrowserWindow(MOCK_WINDOW)
+      const windows = connectionStore.getBrowserWindows()
+      expect(windows).toBeInstanceOf(Set)
+      expect(windows.has(MOCK_WINDOW)).toBe(true)
     })
   })
 
@@ -92,10 +94,11 @@ describe('ConnectionStore', () => {
     })
   })
 
-  describe('setBrowserWindow', () => {
-    it('should set the browser window', () => {
-      connectionStore.setBrowserWindow(MOCK_WINDOW)
-      expect(connectionStore.getBrowserWindow()).toBe(MOCK_WINDOW)
+  describe('addBrowserWindow', () => {
+    it('should add the browser window to the set', () => {
+      connectionStore.addBrowserWindow(MOCK_WINDOW)
+      const windows = connectionStore.getBrowserWindows()
+      expect(windows.has(MOCK_WINDOW)).toBe(true)
     })
   })
 
@@ -211,12 +214,12 @@ describe('ConnectionStore', () => {
   describe('clearStore', () => {
     it('should clear all connections and robot names', async () => {
       await connectionStore.setPendingConnection(MOCK_ROBOT)
-      connectionStore.setBrowserWindow(MOCK_WINDOW)
+      connectionStore.addBrowserWindow(MOCK_WINDOW)
       expect(connectionStore.getAllBrokersInStore()).not.toEqual([])
-      expect(connectionStore.getBrowserWindow()).not.toBeNull()
+      expect(connectionStore.getBrowserWindows().size).toBeGreaterThan(0)
       connectionStore.clearStore()
       expect(connectionStore.getAllBrokersInStore()).toEqual([])
-      expect(connectionStore.getBrowserWindow()).toBeNull()
+      expect(connectionStore.getBrowserWindows().size).toBe(0)
     })
   })
 

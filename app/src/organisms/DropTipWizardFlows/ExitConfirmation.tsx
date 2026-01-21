@@ -33,7 +33,7 @@ export function ExitConfirmation(
   return (
     <>
       <Flex css={CONTAINER_STYLE}>
-        <Icon name="alert-circle" css={ICON_STYLE} />
+        <Icon name="ot-alert" css={ICON_STYLE} />
         <StyledText oddStyle="level3HeaderBold" desktopStyle="headingSmallBold">
           {t('remove_any_attached_tips')}
         </StyledText>

@@ -1,30 +1,26 @@
 """Utilities for managing the CANbus network on the OT3."""
 
 import asyncio
+import logging
 from dataclasses import dataclass
 from itertools import chain
-import logging
-from typing import Any, Dict, Set, Optional, Union, cast, Iterable, Tuple
+from typing import Any, Dict, Iterable, Optional, Set, Tuple, Union, cast
+
 from .types import PCBARevision
-from opentrons_hardware.firmware_bindings import ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import (
-    NodeId,
-    FirmwareTarget,
-    USBTarget,
-    MessageId,
-    MotorUsageValueType,
-)
+from opentrons_hardware.drivers.binary_usb import BinaryMessenger
 from opentrons_hardware.drivers.can_bus.can_messenger import (
     CanMessenger,
 )
-from opentrons_hardware.drivers.binary_usb import BinaryMessenger
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    DeviceInfoRequest as CanDeviceInfoRequest,
-    GetMotorUsageResponse,
-    GetMotorUsageRequest,
+from opentrons_hardware.firmware_bindings import ArbitrationId
+from opentrons_hardware.firmware_bindings.constants import (
+    FirmwareTarget,
+    MessageId,
+    MotorUsageValueType,
+    NodeId,
+    USBTarget,
 )
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    DeviceInfoResponse as CanDeviceInfoResponse,
+from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
+    BinaryMessageDefinition,
 )
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     DeviceInfoRequest as USBDeviceInfoRequest,
@@ -32,8 +28,15 @@ from opentrons_hardware.firmware_bindings.messages.binary_message_definitions im
 from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
     DeviceInfoResponse as USBDeviceInfoResponse,
 )
-from opentrons_hardware.firmware_bindings.messages.binary_message_definitions import (
-    BinaryMessageDefinition,
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    DeviceInfoRequest as CanDeviceInfoRequest,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    DeviceInfoResponse as CanDeviceInfoResponse,
+)
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GetMotorUsageRequest,
+    GetMotorUsageResponse,
 )
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 
@@ -365,9 +368,9 @@ class CanNetworkInfo:
             device_info_cache = _parse_can_device_info_response(message, arbitration_id)
             if not device_info_cache:
                 return
-            nodes[
-                NodeId(device_info_cache.target).application_for()
-            ] = device_info_cache
+            nodes[NodeId(device_info_cache.target).application_for()] = (
+                device_info_cache
+            )
             if expected_nodes and expected_nodes.issubset(
                 {node.application_for() for node in nodes}
             ):

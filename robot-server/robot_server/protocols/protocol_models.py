@@ -1,22 +1,24 @@
 """Protocol file models."""
 
 from datetime import datetime
-from pydantic import ConfigDict, BaseModel, Field
 from typing import Any, List, Optional
-from enum import Enum
+
+from pydantic import BaseModel, ConfigDict, Field
 
 from opentrons.protocol_reader import (
-    ProtocolType as ProtocolType,
     ProtocolFileRole as ProtocolFileRole,
 )
-
+from opentrons.protocol_reader import (
+    ProtocolType as ProtocolType,
+)
 from opentrons_shared_data.robot.types import RobotType
+from opentrons_shared_data.util import StrEnum
 
-from robot_server.service.json_api import ResourceModel
 from .analysis_models import AnalysisSummary
+from robot_server.service.json_api import ResourceModel
 
 
-class ProtocolKind(str, Enum):
+class ProtocolKind(StrEnum):
     """Kind of protocol, standard or quick-transfer."""
 
     STANDARD = "standard"
@@ -26,7 +28,6 @@ class ProtocolKind(str, Enum):
 class ProtocolFile(BaseModel):
     """A file in a protocol."""
 
-    # TODO(mc, 2021-11-12): add unique ID to file resource
     name: str = Field(..., description="The file's basename, including extension")
     role: ProtocolFileRole = Field(..., description="The file's role in the protocol.")
 

@@ -62,7 +62,7 @@ import { UnMatchedModuleWarning } from './UnMatchedModuleWarning'
 import { getFixtureImage } from './utils'
 
 import type { TFunction } from 'i18next'
-import type { CommandData, HostConfig } from '@opentrons/api-client'
+import type { CommandData } from '@opentrons/api-client'
 import type {
   CutoutConfigAndCompatibility,
   CutoutFixtureId,
@@ -85,13 +85,10 @@ interface SetupModulesListProps {
 
 export const SetupModulesList = (props: SetupModulesListProps): JSX.Element => {
   const { robotName, runId, deckConfigCompatibility } = props
-  const moduleRenderInfoForProtocolById = useModuleRenderInfoForProtocolById(
-    runId
-  )
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = useUnmatchedModulesForProtocol(robotName, runId)
+  const moduleRenderInfoForProtocolById =
+    useModuleRenderInfoForProtocolById(runId)
+  const { missingModuleIds, remainingAttachedModules } =
+    useUnmatchedModulesForProtocol(robotName, runId)
 
   const isFlex = useIsFlex(robotName)
   const { robotModel } = useRobot(robotName) ?? {}
@@ -228,7 +225,7 @@ export function ModulesListItem({
     'module_wizard_flows',
     'deck_configuration',
   ])
-  const host = useHost() as HostConfig
+  const host = useHost()!
   const moduleConnectionStatus =
     attachedModuleMatch != null
       ? t('module_connected')
@@ -236,10 +233,8 @@ export function ModulesListItem({
   const [showModuleSetupModal, setShowModuleSetupModal] = useState<
     string | null
   >(null)
-  const [
-    showLocationConflictModal,
-    setShowLocationConflictModal,
-  ] = useState<boolean>(false)
+  const [showLocationConflictModal, setShowLocationConflictModal] =
+    useState<boolean>(false)
 
   const { parseModuleUSBPort } = useModuleUSBPort()
 
@@ -288,7 +283,7 @@ export function ModulesListItem({
         }}
       >
         <Flex flexDirection={DIRECTION_ROW}>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('view_setup_instructions')}
           </LegacyStyledText>
         </Flex>
@@ -297,7 +292,7 @@ export function ModulesListItem({
   } else if (moduleModel === MAGNETIC_BLOCK_V1) {
     subText = (
       <LegacyStyledText
-        as="p"
+        forwardedAs="p"
         marginLeft={SPACING.spacing20}
         color={COLORS.grey50}
       >
@@ -460,11 +455,11 @@ export function ModulesListItem({
             flexDirection={DIRECTION_COLUMN}
             justifyContent={JUSTIFY_CENTER}
           >
-            <LegacyStyledText as="p">
+            <LegacyStyledText forwardedAs="p">
               {getModuleDeckLabel(moduleType, slotName)}
             </LegacyStyledText>
             {portDisplay != null ? (
-              <LegacyStyledText as="p">{portDisplay}</LegacyStyledText>
+              <LegacyStyledText forwardedAs="p">{portDisplay}</LegacyStyledText>
             ) : null}
           </Flex>
           <Flex
@@ -489,7 +484,7 @@ export function ModulesListItem({
                     setShowLocationConflictModal(true)
                   }}
                 >
-                  <LegacyStyledText as="label" cursor="pointer">
+                  <LegacyStyledText forwardedAs="label" cursor="pointer">
                     {t('resolve')}
                   </LegacyStyledText>
                 </TertiaryButton>

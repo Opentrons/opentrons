@@ -7,8 +7,8 @@ import { handleActions } from 'redux-actions'
 
 import {
   FLEX_SIMPLEST_DECK_CONFIG,
+  FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
-  getAllLabwareDefs,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -17,6 +17,12 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { GRIPPER_LOCATION } from '@opentrons/step-generation'
+
+import {
+  convertStepArrayToHierarchy,
+  findStep,
+  getPairedSteps,
+} from '/protocol-designer/steplist/utils/stepHierarchy'
 
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../constants'
 import { getPDMetadata } from '../../file-types'
@@ -51,6 +57,8 @@ import {
   getDeckItemIdInSlot,
   getIdsInRange,
 } from '../utils'
+import { findAndSplice } from '../utils/findAndSplice'
+import { getThermocyclerFormType } from '../utils/getThermocyclerFormType'
 import { nestedCombineReducers } from './nestedCombineReducers'
 
 import type { Reducer } from 'redux'
@@ -83,7 +91,6 @@ import type {
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteMultipleStepsAction,
-  DeleteStepAction,
   FormPatch,
   PopulateFormAction,
   ReorderStepsAction,
@@ -92,9 +99,7 @@ import type { Action } from '../../types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type {
   AddStepAction,
-  DuplicateMultipleStepsAction,
-  DuplicateStepAction,
-  ReorderSelectedStepAction,
+  DuplicateSelectedStepsAction,
   SelectMultipleStepsAction,
   SelectStepAction,
   SelectTerminalItemAction,
@@ -108,7 +113,10 @@ import type {
   DeletePipettesAction,
   ResetBatchEditFieldChangesAction,
   SaveStepFormsMultiAction,
+  StackerLabwareCreationFinishAction,
+  StackerLabwareCreationStartAction,
   SubstituteStepFormPipettesAction,
+  UpdateStackerModuleStateAction,
 } from '../actions'
 import type {
   CreateDeckFixtureAction,
@@ -130,7 +138,6 @@ export type UnsavedFormActions =
   | PopulateFormAction
   | CancelStepFormAction
   | SaveStepFormAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | CreateModuleAction
   | DeleteModuleAction
@@ -160,9 +167,8 @@ export const unsavedForm = (
         orderedStepIds: rootState.orderedStepIds,
         initialDeckSetup: _getInitialDeckSetupRootState(rootState),
         robotStateTimeline: action.meta.robotStateTimeline,
-        additionalEquipmentEntities: _getAdditionalEquipmentEntitiesRootState(
-          rootState
-        ),
+        additionalEquipmentEntities:
+          _getAdditionalEquipmentEntitiesRootState(rootState),
       })
     }
 
@@ -197,7 +203,6 @@ export const unsavedForm = (
     case 'TOGGLE_IS_GRIPPER_REQUIRED':
     case 'CREATE_DECK_FIXTURE':
     case 'DELETE_DECK_FIXTURE':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SELECT_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
@@ -206,12 +211,8 @@ export const unsavedForm = (
 
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
-      const {
-        substitutionMap,
-        startStepId,
-        endStepId,
-        newTiprackURI,
-      } = action.payload
+      const { substitutionMap, startStepId, endStepId, newTiprackURI } =
+        action.payload
       const stepIdsToUpdate = getIdsInRange(
         rootState.orderedStepIds,
         startStepId,
@@ -254,6 +255,7 @@ export const initialDeckSetupStepForm: FormData = {
   labwareLocationUpdate: {},
   pipetteLocationUpdate: {},
   moduleLocationUpdate: {},
+  moduleStateUpdate: {},
   trashBinLocationUpdate: {},
   wasteChuteLocationUpdate: {},
   stagingAreaLocationUpdate: {},
@@ -265,7 +267,6 @@ export const initialSavedStepFormsState: SavedStepFormState = {
 export type SavedStepFormsActions =
   | SaveStepFormAction
   | SaveStepFormsMultiAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | LoadFileAction
   | CreateContainerAction
@@ -274,8 +275,8 @@ export type SavedStepFormsActions =
   | DeletePipettesAction
   | CreateModuleAction
   | DeleteModuleAction
-  | DuplicateStepAction
-  | DuplicateMultipleStepsAction
+  | UpdateStackerModuleStateAction
+  | DuplicateSelectedStepsAction
   | ChangeSavedStepFormAction
   | DuplicateLabwareAction
   | SwapSlotContentsAction
@@ -356,7 +357,12 @@ export const savedStepForms = (
 
   switch (action.type) {
     case 'SAVE_STEP_FORM': {
-      return { ...savedStepForms, [action.payload.id]: action.payload }
+      const { newStepFormsById } = saveStepFormHelper({
+        action,
+        originalOrderedStepIds: rootState.orderedStepIds,
+        originalStepFormsById: savedStepForms,
+      })
+      return newStepFormsById
     }
 
     case 'SAVE_STEP_FORMS_MULTI': {
@@ -368,10 +374,6 @@ export const savedStepForms = (
         }),
         { ...savedStepForms }
       )
-    }
-
-    case 'DELETE_STEP': {
-      return omit(savedStepForms, action.payload)
     }
 
     case 'DELETE_MULTIPLE_STEPS': {
@@ -397,7 +399,16 @@ export const savedStepForms = (
           allLabware,
           latestDefs
         )
-        acc[updatedLabwareId] = location
+        // The `location` can be a labwareId too, so update its version as well.
+        // (We only recently realized that we need to update `location`, so there are
+        // probably saved protocols out there where we hadn't updated `location` and
+        // it refers to a labwareId that doesn't exist in metadata.labware.)
+        const [locationUUID, locationDefURI] = location.split(':')
+        const updatedLocation =
+          locationDefURI && locationDefURI in allLabware
+            ? `${locationUUID}:${getMigratedURI(locationDefURI, allLabware, latestDefs)}`
+            : location
+        acc[updatedLabwareId] = updatedLocation
         return acc
       }, {})
 
@@ -499,46 +510,43 @@ export const savedStepForms = (
       const name = id.split(':')[1]
       const locationUpdate = `${name}LocationUpdate`
 
-      return mapValues(
-        savedStepForms,
-        (form: FormData): FormData => {
-          if (form.stepType === 'manualIntervention') {
-            const updatedLocation = omit(form[locationUpdate] || {}, id)
+      return mapValues(savedStepForms, (form: FormData): FormData => {
+        if (form.stepType === 'manualIntervention') {
+          const updatedLocation = omit(form[locationUpdate] || {}, id)
 
-            return {
-              ...form,
-              [locationUpdate]:
-                Object.keys(updatedLocation).length > 0 ? updatedLocation : {},
-            }
-          } else if (id.includes(form.dropTip_location as string)) {
-            return {
-              ...form,
-              ...handleFormChange(
-                {
-                  dropTip_location: null,
-                },
-                form,
-                _getPipetteEntitiesRootState(rootState),
-                _getLabwareEntitiesRootState(rootState)
-              ),
-            }
-          } else if (id.includes(form.newLocation as string)) {
-            return {
-              ...form,
-              ...handleFormChange(
-                {
-                  newLocation: null,
-                },
-                form,
-                _getPipetteEntitiesRootState(rootState),
-                _getLabwareEntitiesRootState(rootState)
-              ),
-            }
+          return {
+            ...form,
+            [locationUpdate]:
+              Object.keys(updatedLocation).length > 0 ? updatedLocation : {},
           }
-
-          return form
+        } else if (id.includes(form.dropTip_location as string)) {
+          return {
+            ...form,
+            ...handleFormChange(
+              {
+                dropTip_location: null,
+              },
+              form,
+              _getPipetteEntitiesRootState(rootState),
+              _getLabwareEntitiesRootState(rootState)
+            ),
+          }
+        } else if (id.includes(form.newLocation as string)) {
+          return {
+            ...form,
+            ...handleFormChange(
+              {
+                newLocation: null,
+              },
+              form,
+              _getPipetteEntitiesRootState(rootState),
+              _getLabwareEntitiesRootState(rootState)
+            ),
+          }
         }
-      )
+
+        return form
+      })
     }
     case 'TOGGLE_IS_GRIPPER_REQUIRED': {
       const { id } = action.payload
@@ -585,7 +593,6 @@ export const savedStepForms = (
         'expected initial deck setup step to exist, could not handle CREATE_CONTAINER'
       )
       const slot = action.payload.slot
-
       if (!slot) {
         console.warn('no slots available, ignoring action:', action)
         return savedStepForms
@@ -615,7 +622,7 @@ export const savedStepForms = (
       const moduleId = action.payload.id
       // If module is going into a slot occupied by a labware,
       // move the labware on top of the new module
-      const labwareLocationUpdate =
+      const labwareLocationUpdate: Record<string, string> =
         labwareOccupyingDestination == null
           ? prevInitialDeckSetupStep.labwareLocationUpdate
           : {
@@ -657,95 +664,112 @@ export const savedStepForms = (
       })
     }
 
+    case 'UPDATE_STACKER_MODULE_STATE': {
+      const prevInitialDeckSetupStep =
+        savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (formId === INITIAL_DECK_SETUP_STEP_ID) {
+          return {
+            ...prevInitialDeckSetupStep,
+            moduleStateUpdate: {
+              ...(prevInitialDeckSetupStep.moduleStateUpdate || {}),
+              [action.payload.moduleId]: action.payload.moduleState,
+            },
+          }
+        }
+        return savedForm
+      })
+    }
+
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
-      return mapValues(
-        savedStepForms,
-        (savedForm: FormData): FormData => {
-          if (savedForm.stepType === 'manualIntervention') {
-            // swap labware/module slots from all manualIntervention steps
-            // (or place compatible labware in dest slot onto module)
-            const sourceLabwareId = getDeckItemIdInSlot(
-              savedForm.labwareLocationUpdate as Record<string, string>,
-              sourceSlot
-            )
-            const destLabwareId = getDeckItemIdInSlot(
-              savedForm.labwareLocationUpdate as Record<string, string>,
-              destSlot
-            )
-            const sourceModuleId = getDeckItemIdInSlot(
-              savedForm.moduleLocationUpdate as Record<string, string>,
-              sourceSlot
-            )
-            const destModuleId = getDeckItemIdInSlot(
-              savedForm.moduleLocationUpdate as Record<string, string>,
-              destSlot
-            )
+      return mapValues(savedStepForms, (savedForm: FormData): FormData => {
+        if (savedForm.stepType === 'manualIntervention') {
+          // swap labware/module slots from all manualIntervention steps
+          // (or place compatible labware in dest slot onto module)
+          const sourceLabwareId = getDeckItemIdInSlot(
+            savedForm.labwareLocationUpdate as Record<string, string>,
+            sourceSlot
+          )
+          const destLabwareId = getDeckItemIdInSlot(
+            savedForm.labwareLocationUpdate as Record<string, string>,
+            destSlot
+          )
+          const sourceModuleId = getDeckItemIdInSlot(
+            savedForm.moduleLocationUpdate as Record<string, string>,
+            sourceSlot
+          )
+          const destModuleId = getDeckItemIdInSlot(
+            savedForm.moduleLocationUpdate as Record<string, string>,
+            destSlot
+          )
 
-            if (sourceModuleId && destLabwareId) {
-              // moving module to a destination slot with labware
-              const prevInitialDeckSetup = _getInitialDeckSetupRootState(
-                rootState
-              )
+          if (sourceModuleId && destLabwareId) {
+            // moving module to a destination slot with labware
+            const prevInitialDeckSetup =
+              _getInitialDeckSetupRootState(rootState)
 
-              const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
-              const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
-              const isCompat = getLabwareIsCompatible(
-                labwareEntity.def,
-                moduleEntity.type
-              )
-              const moduleIsOccupied =
-                getDeckItemIdInSlot(
-                  savedForm.labwareLocationUpdate as Record<string, string>,
-                  sourceModuleId
-                ) != null
+            const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
+            const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
+            const isCompat = getLabwareIsCompatible(
+              labwareEntity.def,
+              moduleEntity.type
+            )
+            const moduleIsOccupied =
+              getDeckItemIdInSlot(
+                savedForm.labwareLocationUpdate as Record<string, string>,
+                sourceModuleId
+              ) != null
 
-              if (isCompat && !moduleIsOccupied) {
-                // only in this special case, we put module under the labware
-                return {
-                  ...savedForm,
-                  labwareLocationUpdate: {
-                    ...savedForm.labwareLocationUpdate,
-                    [destLabwareId]: sourceModuleId,
-                  },
-                  moduleLocationUpdate: {
-                    ...savedForm.moduleLocationUpdate,
-                    [sourceModuleId]: destSlot,
-                  },
-                }
+            if (
+              isCompat &&
+              !moduleIsOccupied &&
+              moduleEntity.type !== FLEX_STACKER_MODULE_TYPE
+            ) {
+              // only in this special case, we put module under the labware
+              return {
+                ...savedForm,
+                labwareLocationUpdate: {
+                  ...savedForm.labwareLocationUpdate,
+                  [destLabwareId]: sourceModuleId,
+                },
+                moduleLocationUpdate: {
+                  ...savedForm.moduleLocationUpdate,
+                  [sourceModuleId]: destSlot,
+                },
               }
             }
-
-            const labwareLocationUpdate: Record<string, string> = {
-              ...savedForm.labwareLocationUpdate,
-            }
-
-            if (sourceLabwareId != null) {
-              labwareLocationUpdate[sourceLabwareId] = destSlot
-            }
-
-            if (destLabwareId != null) {
-              labwareLocationUpdate[destLabwareId] = sourceSlot
-            }
-
-            const moduleLocationUpdate: Record<string, string> = {
-              ...savedForm.moduleLocationUpdate,
-            }
-
-            if (sourceModuleId != null) {
-              moduleLocationUpdate[sourceModuleId] = destSlot
-            }
-
-            if (destModuleId != null) {
-              moduleLocationUpdate[destModuleId] = sourceSlot
-            }
-
-            return { ...savedForm, labwareLocationUpdate, moduleLocationUpdate }
           }
 
-          return savedForm
+          const labwareLocationUpdate: Record<string, string> = {
+            ...savedForm.labwareLocationUpdate,
+          }
+
+          if (sourceLabwareId != null) {
+            labwareLocationUpdate[sourceLabwareId] = destSlot
+          }
+
+          if (destLabwareId != null) {
+            labwareLocationUpdate[destLabwareId] = sourceSlot
+          }
+
+          const moduleLocationUpdate: Record<string, string> = {
+            ...savedForm.moduleLocationUpdate,
+          }
+
+          if (sourceModuleId != null) {
+            moduleLocationUpdate[sourceModuleId] = destSlot
+          }
+
+          if (destModuleId != null) {
+            moduleLocationUpdate[destModuleId] = sourceSlot
+          }
+
+          return { ...savedForm, labwareLocationUpdate, moduleLocationUpdate }
         }
-      )
+
+        return savedForm
+      })
     }
 
     case 'DELETE_CONTAINER': {
@@ -755,16 +779,16 @@ export const savedStepForms = (
           // remove instances of labware from all manualIntervention steps
           const updatedLabwareLocation = Object.entries(
             savedForm.labwareLocationUpdate as Record<string, string>
-          ).reduce((acc: Record<string, string>, [labwareId, locationId]) => {
+          ).reduce((acc: Record<string, string>, [labwareId, location]) => {
             if (labwareId === labwareIdToDelete) {
               return acc
             }
 
             // If labware is on an adapter and adapter was deleted, update labwareId's location
             const newLocationId =
-              locationId === labwareIdToDelete
+              location === labwareIdToDelete
                 ? savedForm.labwareLocationUpdate[labwareIdToDelete]
-                : locationId
+                : location
 
             acc[labwareId] = newLocationId
             return acc
@@ -813,36 +837,33 @@ export const savedStepForms = (
     case 'DELETE_PIPETTES': {
       // remove references to pipettes that have been deleted
       const deletedPipetteIds = action.payload
-      return mapValues(
-        savedStepForms,
-        (form: FormData): FormData => {
-          if (form.stepType === 'manualIntervention') {
-            return {
-              ...form,
-              pipetteLocationUpdate: omit(
-                form.pipetteLocationUpdate,
-                deletedPipetteIds
-              ),
-            }
-          } else if (deletedPipetteIds.includes(form.pipette as string)) {
-            // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-            return {
-              ...form,
-              ...handleFormChange(
-                {
-                  pipette: null,
-                  tipRack: null,
-                },
-                form,
-                _getPipetteEntitiesRootState(rootState),
-                _getLabwareEntitiesRootState(rootState)
-              ),
-            }
+      return mapValues(savedStepForms, (form: FormData): FormData => {
+        if (form.stepType === 'manualIntervention') {
+          return {
+            ...form,
+            pipetteLocationUpdate: omit(
+              form.pipetteLocationUpdate,
+              deletedPipetteIds
+            ),
           }
-
-          return form
+        } else if (deletedPipetteIds.includes(form.pipette as string)) {
+          // TODO(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+          return {
+            ...form,
+            ...handleFormChange(
+              {
+                pipette: null,
+                tipRack: null,
+              },
+              form,
+              _getPipetteEntitiesRootState(rootState),
+              _getLabwareEntitiesRootState(rootState)
+            ),
+          }
         }
-      )
+
+        return form
+      })
     }
 
     case 'DELETE_MODULE': {
@@ -868,6 +889,7 @@ export const savedStepForms = (
             form.stepType === 'heaterShaker' ||
             form.stepType === 'absorbanceReader' ||
             form.stepType === 'thermocycler' ||
+            form.stepType === 'flexStacker' ||
             form.stepType === 'pause') &&
           form.moduleId === moduleId
         ) {
@@ -879,12 +901,8 @@ export const savedStepForms = (
     }
 
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
-      const {
-        startStepId,
-        endStepId,
-        substitutionMap,
-        newTiprackURI,
-      } = action.payload
+      const { startStepId, endStepId, substitutionMap, newTiprackURI } =
+        action.payload
       const stepIdsToUpdate = getIdsInRange(
         rootState.orderedStepIds,
         startStepId,
@@ -894,8 +912,8 @@ export const savedStepForms = (
         const prevStepForm = savedStepForms[stepId]
         const shouldSubstitute = Boolean(
           prevStepForm && // pristine forms will not exist in savedStepForms
-            prevStepForm.pipette &&
-            prevStepForm.pipette in substitutionMap
+          prevStepForm.pipette &&
+          prevStepForm.pipette in substitutionMap
         )
         if (!shouldSubstitute) return acc
         const updatedFields = handleFormChange(
@@ -955,28 +973,12 @@ export const savedStepForms = (
       }
     }
 
-    case 'DUPLICATE_STEP': {
-      // @ts-expect-error(sa, 2021-6-10): if  stepId is null, we will end up in situation where the entry for duplicateStepId
-      // will be {[duplicateStepId]: {id: duplicateStepId}}, which will be missing the rest of the properties from FormData
-      return {
-        ...savedStepForms,
-        [action.payload.duplicateStepId]: {
-          ...cloneDeep(
-            action.payload.stepId != null
-              ? savedStepForms[action.payload.stepId]
-              : {}
-          ),
-          id: action.payload.duplicateStepId,
-        },
-      }
-    }
-
-    case 'DUPLICATE_MULTIPLE_STEPS': {
+    case 'DUPLICATE_SELECTED_STEPS': {
       return action.payload.steps.reduce(
-        (acc, { stepId, duplicateStepId }) => ({
+        (acc, { originalStepId, duplicateStepId }) => ({
           ...acc,
           [duplicateStepId]: {
-            ...cloneDeep(savedStepForms[stepId]),
+            ...cloneDeep(savedStepForms[originalStepId]),
             id: duplicateStepId,
           },
         }),
@@ -1072,7 +1074,7 @@ type BatchEditFormActions =
   | SaveStepFormsMultiAction
   | SelectStepAction
   | SelectMultipleStepsAction
-  | DuplicateMultipleStepsAction
+  | DuplicateSelectedStepsAction
   | DeleteMultipleStepsAction
 export const batchEditFormChanges = (
   state: BatchEditFormChangesState = {},
@@ -1086,7 +1088,7 @@ export const batchEditFormChanges = (
     case 'SELECT_STEP':
     case 'SAVE_STEP_FORMS_MULTI':
     case 'SELECT_MULTIPLE_STEPS':
-    case 'DUPLICATE_MULTIPLE_STEPS':
+    case 'DUPLICATE_SELECTED_STEPS':
     case 'DELETE_MULTIPLE_STEPS':
     case 'RESET_BATCH_EDIT_FIELD_CHANGES': {
       return {}
@@ -1202,7 +1204,7 @@ export const labwareInvariantProperties: Reducer<
           const latestLabwareId =
             latestDefURI != null
               ? `${labwareIdString}:${latestDefURI}`
-              : labwareDefURI
+              : `${labwareIdString}:${labwareDefURI}`
 
           acc[latestLabwareId] = {
             labwareDefURI: latestDefURI ?? labwareDefURI,
@@ -1342,7 +1344,7 @@ export const pipetteInvariantProperties: Reducer<
     ): NormalizedPipetteById => {
       const { file } = action.payload
       const metadata = getPDMetadata(file)
-      const allLabwareDefs = getAllLabwareDefs()
+      const allLabwareDefs = getAllDefinitions()
       const latestDefs = getOnlyLatestDefs()
       const pipettes = Object.entries(metadata.pipettes).reduce(
         (
@@ -1388,146 +1390,151 @@ export const pipetteInvariantProperties: Reducer<
 
 const initialAdditionalEquipmentState = {}
 
-export const additionalEquipmentInvariantProperties = handleActions<NormalizedAdditionalEquipmentById>(
-  {
-    //  @ts-expect-error
-    LOAD_FILE: (
-      state,
-      action: LoadFileAction
-    ): NormalizedAdditionalEquipmentById => {
-      const { file } = action.payload
-      const savedStepForms = file.designerApplication?.data?.savedStepForms
-      const initialDeckSetup: AdditionalEquipmentLocationUpdate = savedStepForms?.[
-        INITIAL_DECK_SETUP_STEP_ID
-      ] as any
-      const {
-        gripperLocationUpdate,
-        trashBinLocationUpdate,
-        wasteChuteLocationUpdate,
-        stagingAreaLocationUpdate,
-      } = initialDeckSetup
+export const additionalEquipmentInvariantProperties =
+  handleActions<NormalizedAdditionalEquipmentById>(
+    {
+      //  @ts-expect-error
+      LOAD_FILE: (
+        state,
+        action: LoadFileAction
+      ): NormalizedAdditionalEquipmentById => {
+        const { file } = action.payload
+        const savedStepForms = file.designerApplication?.data?.savedStepForms
+        const initialDeckSetup: AdditionalEquipmentLocationUpdate =
+          savedStepForms?.[INITIAL_DECK_SETUP_STEP_ID] as any
+        const {
+          gripperLocationUpdate,
+          trashBinLocationUpdate,
+          wasteChuteLocationUpdate,
+          stagingAreaLocationUpdate,
+        } = initialDeckSetup
 
-      let gripper
-      if (Object.keys(gripperLocationUpdate).length > 0) {
-        const id = Object.keys(gripperLocationUpdate)[0]
-        gripper = {
-          [id]: {
-            name: 'gripper' as const,
-            id,
-            location: GRIPPER_LOCATION,
-          },
-        }
-      }
-      let trashBin
-      if (Object.keys(trashBinLocationUpdate).length > 0) {
-        trashBin = Object.entries(trashBinLocationUpdate).reduce(
-          (acc, [id, location], index) => ({
-            ...acc,
+        let gripper
+        if (Object.keys(gripperLocationUpdate).length > 0) {
+          const id = Object.keys(gripperLocationUpdate)[0]
+          gripper = {
             [id]: {
-              name: 'trashBin' as const,
+              name: 'gripper' as const,
               id,
-              location,
-              pythonName: getAdditionalEquipmentPythonName(
-                'trashBin',
-                index + 1,
-                location
-              ),
+              location: GRIPPER_LOCATION,
             },
-          }),
-          {}
-        )
-      }
-      let wasteChute
-      if (Object.keys(wasteChuteLocationUpdate).length > 0) {
-        const id = Object.keys(wasteChuteLocationUpdate)[0]
-        wasteChute = {
-          [id]: {
-            name: 'wasteChute' as const,
-            id,
-            location: Object.values(wasteChuteLocationUpdate)[0],
-            pythonName: getAdditionalEquipmentPythonName('wasteChute', 1),
-          },
+          }
         }
-      }
-      let stagingArea
-      if (Object.keys(stagingAreaLocationUpdate).length > 0) {
-        stagingArea = Object.entries(stagingAreaLocationUpdate).reduce(
-          (acc, [id, location]) => ({
-            ...acc,
+        let trashBin
+        if (Object.keys(trashBinLocationUpdate).length > 0) {
+          trashBin = Object.entries(trashBinLocationUpdate).reduce(
+            (acc, [id, location], index) => ({
+              ...acc,
+              [id]: {
+                name: 'trashBin' as const,
+                id,
+                location,
+                pythonName: getAdditionalEquipmentPythonName(
+                  'trashBin',
+                  index + 1,
+                  location
+                ),
+              },
+            }),
+            {}
+          )
+        }
+        let wasteChute
+        if (Object.keys(wasteChuteLocationUpdate).length > 0) {
+          const id = Object.keys(wasteChuteLocationUpdate)[0]
+          wasteChute = {
             [id]: {
-              name: 'stagingArea' as const,
+              name: 'wasteChute' as const,
               id,
-              location,
+              location: Object.values(wasteChuteLocationUpdate)[0],
+              pythonName: getAdditionalEquipmentPythonName('wasteChute', 1),
             },
-          }),
-          {}
+          }
+        }
+        let stagingArea
+        if (Object.keys(stagingAreaLocationUpdate).length > 0) {
+          stagingArea = Object.entries(stagingAreaLocationUpdate).reduce(
+            (acc, [id, location]) => ({
+              ...acc,
+              [id]: {
+                name: 'stagingArea' as const,
+                id,
+                location,
+              },
+            }),
+            {}
+          )
+        }
+
+        return {
+          ...state,
+          ...trashBin,
+          ...wasteChute,
+          ...gripper,
+          ...stagingArea,
+        }
+      },
+      //  @ts-expect-error
+      TOGGLE_IS_GRIPPER_REQUIRED: (
+        state: NormalizedAdditionalEquipmentById,
+        action: ToggleIsGripperRequiredAction
+      ): NormalizedAdditionalEquipmentById => {
+        let updatedEquipment = { ...state }
+        const id = action.payload.id
+        const gripperKey = Object.keys(updatedEquipment).find(
+          key => updatedEquipment[key].name === 'gripper'
         )
-      }
 
-      return {
-        ...state,
-        ...trashBin,
-        ...wasteChute,
-        ...gripper,
-        ...stagingArea,
-      }
-    },
-    //  @ts-expect-error
-    TOGGLE_IS_GRIPPER_REQUIRED: (
-      state: NormalizedAdditionalEquipmentById,
-      action: ToggleIsGripperRequiredAction
-    ): NormalizedAdditionalEquipmentById => {
-      let updatedEquipment = { ...state }
-      const id = action.payload.id
-      const gripperKey = Object.keys(updatedEquipment).find(
-        key => updatedEquipment[key].name === 'gripper'
-      )
+        if (gripperKey != null) {
+          updatedEquipment = omit(updatedEquipment, [gripperKey])
+        } else {
+          updatedEquipment = {
+            ...updatedEquipment,
+            [id]: {
+              name: 'gripper' as const,
+              id,
+              location: GRIPPER_LOCATION,
+            },
+          }
+        }
+        return updatedEquipment
+      },
+      //  @ts-expect-error
+      CREATE_DECK_FIXTURE: (
+        state: NormalizedAdditionalEquipmentById,
+        action: CreateDeckFixtureAction
+      ): NormalizedAdditionalEquipmentById => {
+        const { location, id, name } = action.payload
+        const typeCount = Object.values(state).filter(
+          aE => aE.name === name
+        ).length
 
-      if (gripperKey != null) {
-        updatedEquipment = omit(updatedEquipment, [gripperKey])
-      } else {
-        updatedEquipment = {
-          ...updatedEquipment,
+        return {
+          ...state,
           [id]: {
-            name: 'gripper' as const,
+            name,
             id,
-            location: GRIPPER_LOCATION,
+            location,
+            pythonName:
+              name === 'stagingArea'
+                ? undefined
+                : getAdditionalEquipmentPythonName(
+                    name,
+                    typeCount + 1,
+                    location
+                  ),
           },
         }
-      }
-      return updatedEquipment
+      },
+      //  @ts-expect-error
+      DELETE_DECK_FIXTURE: (
+        state: NormalizedAdditionalEquipmentById,
+        action: DeleteDeckFixtureAction
+      ): NormalizedAdditionalEquipmentById => omit(state, action.payload.id),
+      DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
     },
-    //  @ts-expect-error
-    CREATE_DECK_FIXTURE: (
-      state: NormalizedAdditionalEquipmentById,
-      action: CreateDeckFixtureAction
-    ): NormalizedAdditionalEquipmentById => {
-      const { location, id, name } = action.payload
-      const typeCount = Object.values(state).filter(aE => aE.name === name)
-        .length
-
-      return {
-        ...state,
-        [id]: {
-          name,
-          id,
-          location,
-          pythonName:
-            name === 'stagingArea'
-              ? undefined
-              : getAdditionalEquipmentPythonName(name, typeCount + 1, location),
-        },
-      }
-    },
-    //  @ts-expect-error
-    DELETE_DECK_FIXTURE: (
-      state: NormalizedAdditionalEquipmentById,
-      action: DeleteDeckFixtureAction
-    ): NormalizedAdditionalEquipmentById => omit(state, action.payload.id),
-    DEFAULT: (): NormalizedAdditionalEquipmentById => ({}),
-  },
-  initialAdditionalEquipmentState
-)
+    initialAdditionalEquipmentState
+  )
 export const ADD_STEPS_TO_GROUP = 'ADD_STEPS_TO_GROUP'
 export const CREATE_GROUP = 'CREATE_GROUP'
 export const REMOVE_GROUP = 'REMOVE_GROUP'
@@ -1545,10 +1552,8 @@ const stepGroups: Reducer<StepGroupsState, any> = handleActions<
       }
     },
     REMOVE_GROUP: (state, action) => {
-      const {
-        [action.payload.groupName]: removedGroup,
-        ...remainingGroups
-      } = state
+      const { [action.payload.groupName]: removedGroup, ...remainingGroups } =
+        state
       return remainingGroups
     },
     ADD_STEPS_TO_GROUP: (state, action) => {
@@ -1587,100 +1592,68 @@ const unsavedGroup: Reducer<UnsavedGroupState, any> = handleActions<
   initialUnsavedGroupState
 )
 
+type OrderedStepIdsActions =
+  | SaveStepFormAction
+  | DeleteMultipleStepsAction
+  | LoadFileAction
+  | DuplicateSelectedStepsAction
+  | ReorderStepsAction
 export type OrderedStepIdsState = StepIdType[]
 const initialOrderedStepIdsState: string[] = []
-// @ts-expect-error(sa, 2021-6-10): cannot use string literals as action type
-// TODO IMMEDIATELY: refactor this to the old fashioned way if we cannot have type safety: https://github.com/redux-utilities/redux-actions/issues/282#issuecomment-595163081
-export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
-  {
-    SAVE_STEP_FORM: (
-      state: OrderedStepIdsState,
-      action: SaveStepFormAction
-    ) => {
-      const id = action.payload.id
+export const orderedStepIds = (
+  rootState: RootState,
+  action: OrderedStepIdsActions
+): OrderedStepIdsState => {
+  const orderedStepIds = rootState
+    ? rootState.orderedStepIds
+    : initialOrderedStepIdsState
 
-      if (!state.includes(id)) {
-        return [...state, id]
-      }
+  switch (action.type) {
+    case 'SAVE_STEP_FORM': {
+      const { newOrderedStepIds } = saveStepFormHelper({
+        action,
+        originalOrderedStepIds: orderedStepIds,
+        originalStepFormsById: rootState.savedStepForms,
+      })
+      return newOrderedStepIds
+    }
 
-      return state
-    },
-    DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
-      state.filter(stepId => stepId !== action.payload),
-    DELETE_MULTIPLE_STEPS: (
-      state: OrderedStepIdsState,
-      action: DeleteMultipleStepsAction
-    ) => state.filter(id => !action.payload.includes(id)),
-    LOAD_FILE: (
-      state: OrderedStepIdsState,
-      action: LoadFileAction
-    ): OrderedStepIdsState => getPDMetadata(action.payload.file).orderedStepIds,
-    REORDER_SELECTED_STEP: (
-      state: OrderedStepIdsState,
-      action: ReorderSelectedStepAction
-    ): OrderedStepIdsState => {
-      // TODO: BC 2018-11-27 make util function for reordering and use it everywhere
-      const { delta, stepId } = action.payload
-      const stepsWithoutSelectedStep = state.filter(s => s !== stepId)
-      const selectedIndex = state.findIndex(s => s === stepId)
-      const nextIndex = selectedIndex + delta
-      if (delta <= 0 && selectedIndex === 0) return state
-      return [
-        ...stepsWithoutSelectedStep.slice(0, nextIndex),
-        stepId,
-        ...stepsWithoutSelectedStep.slice(nextIndex),
-      ]
-    },
-    DUPLICATE_STEP: (
-      state: OrderedStepIdsState,
-      action: DuplicateStepAction
-    ): OrderedStepIdsState => {
-      const { stepId, duplicateStepId } = action.payload
-      const selectedIndex = state.findIndex(s => s === stepId)
-      return [
-        ...state.slice(0, selectedIndex + 1),
-        duplicateStepId,
-        ...state.slice(selectedIndex + 1, state.length),
-      ]
-    },
-    DUPLICATE_MULTIPLE_STEPS: (
-      state: OrderedStepIdsState,
-      action: DuplicateMultipleStepsAction
-    ): OrderedStepIdsState => {
-      const duplicateStepIds = action.payload.steps.map(
-        ({ duplicateStepId }) => duplicateStepId
-      )
-      const { indexToInsert } = action.payload
-      return [
-        ...state.slice(0, indexToInsert),
-        ...duplicateStepIds,
-        ...state.slice(indexToInsert, state.length),
-      ]
-    },
-    REORDER_STEPS: (
-      state: OrderedStepIdsState,
-      action: ReorderStepsAction
-    ): OrderedStepIdsState => action.payload.stepIds,
-  },
-  initialOrderedStepIdsState
-)
+    case 'DELETE_MULTIPLE_STEPS': {
+      return orderedStepIds.filter(id => !action.payload.includes(id))
+    }
+
+    case 'LOAD_FILE': {
+      return getPDMetadata(action.payload.file).orderedStepIds
+    }
+
+    case 'DUPLICATE_SELECTED_STEPS': {
+      return action.payload.newStepOrder
+    }
+
+    case 'REORDER_STEPS': {
+      return action.payload.stepIds
+    }
+
+    default: {
+      return orderedStepIds
+    }
+  }
+}
 
 const initialDeckConfiguration: DeckConfigurationState = {
   deckConfig: FLEX_SIMPLEST_DECK_CONFIG,
 }
-const deckConfigurationProperties: Reducer<
-  DeckConfigurationState,
-  any
-> = handleActions<DeckConfigurationState, any>(
-  {
-    EDIT_DECK_CONFIGURATION: (state, action) => {
-      return {
-        deckConfig: action.payload.deckConfig,
-      }
+const deckConfigurationProperties: Reducer<DeckConfigurationState, any> =
+  handleActions<DeckConfigurationState, any>(
+    {
+      EDIT_DECK_CONFIGURATION: (state, action) => {
+        return {
+          deckConfig: action.payload.deckConfig,
+        }
+      },
     },
-  },
-  initialDeckConfiguration
-)
+    initialDeckConfiguration
+  )
 
 export type PresavedStepFormState = {
   stepType: StepType
@@ -1688,7 +1661,6 @@ export type PresavedStepFormState = {
 export type PresavedStepFormAction =
   | AddStepAction
   | CancelStepFormAction
-  | DeleteStepAction
   | DeleteMultipleStepsAction
   | SaveStepFormAction
   | SelectTerminalItemAction
@@ -1708,7 +1680,6 @@ export const presavedStepForm = (
       return action.payload === PRESAVED_STEP_ID ? state : null
 
     case 'CANCEL_STEP_FORM':
-    case 'DELETE_STEP':
     case 'DELETE_MULTIPLE_STEPS':
     case 'SAVE_STEP_FORM':
     case 'SELECT_STEP':
@@ -1719,6 +1690,185 @@ export const presavedStepForm = (
       return state
   }
 }
+
+// in stackerLabwareSlice.ts (or wherever your stacker state is)
+export interface StackerLabwareState {
+  pendingCreation: boolean
+}
+
+const initialState: StackerLabwareState = {
+  pendingCreation: false,
+}
+
+export const stackerLabwareReducer = (
+  state: StackerLabwareState = initialState,
+  action: StackerLabwareCreationStartAction | StackerLabwareCreationFinishAction
+): StackerLabwareState => {
+  switch (action.type) {
+    case 'STACKER_LABWARE_CREATION_START':
+      return { ...state, pendingCreation: true }
+    case 'STACKER_LABWARE_CREATION_FINISH':
+      return { ...state, pendingCreation: false }
+    default:
+      return state
+  }
+}
+
+// If/when FormData becomes a proper union, these should automatically pick up the improved property types.
+type ThermocyclerFormData = FormData & { stepType: 'thermocycler' }
+type PauseFormData = FormData & { stepType: 'pause' }
+
+interface SaveStepFormHelperArgs {
+  action: SaveStepFormAction
+  originalOrderedStepIds: StepIdType[]
+  originalStepFormsById: Record<StepIdType, FormData>
+}
+interface SaveStepFormHelperResult {
+  newOrderedStepIds: StepIdType[]
+  newStepFormsById: Record<StepIdType, FormData>
+}
+function saveStepFormHelper(
+  args: SaveStepFormHelperArgs
+): SaveStepFormHelperResult {
+  const { action, originalOrderedStepIds, originalStepFormsById } = args
+
+  const newForm = action.payload.form
+  const originalStep: FormData | null =
+    originalStepFormsById[newForm.id] ?? null
+
+  const originalOrderedSteps = originalOrderedStepIds.map(
+    id => originalStepFormsById[id]
+  )
+  const originalStepHierarchy =
+    convertStepArrayToHierarchy(originalOrderedSteps)
+
+  const findResult = findStep(originalStepHierarchy, newForm.id)
+
+  if (findResult == null) {
+    // We're creating a brand new step. Append it to the end.
+    // If it's a Thermocycler profile, also pair it with a "wait for profile to complete" step.
+
+    const newPauseForm: PauseFormData | null =
+      getThermocyclerFormType(newForm) === 'thermocyclerProfile'
+        ? getThermocyclerProfilePauseForm(
+            newForm as ThermocyclerFormData,
+            action.payload.thermocyclerPauseStepId
+          )
+        : null
+    return {
+      newOrderedStepIds: [
+        ...originalOrderedStepIds,
+        newForm.id,
+        ...(newPauseForm != null ? [newPauseForm.id] : []),
+      ],
+      newStepFormsById: {
+        ...originalStepFormsById,
+        [newForm.id]: newForm,
+        ...(newPauseForm != null && { [newPauseForm.id]: newPauseForm }),
+      },
+    }
+  } else {
+    // We're editing an existing step.
+    if (
+      getThermocyclerFormType(originalStep) === 'thermocyclerProfile' &&
+      getThermocyclerFormType(newForm) !== 'thermocyclerProfile'
+    ) {
+      // An existing Thermocycler profile step is turning into a non-profile step.
+      // We need to delete the hidden "wait for profile to complete" step that it was paired with.
+
+      const pairedStepIds = getPairedSteps(
+        originalStepHierarchy,
+        new Set([originalStep.id])
+      )
+      return {
+        newOrderedStepIds: originalOrderedStepIds.filter(
+          id => !pairedStepIds.has(id)
+        ),
+        newStepFormsById: {
+          ...omit(originalStepFormsById, [...pairedStepIds]),
+          [newForm.id]: newForm,
+        },
+      }
+    } else if (
+      getThermocyclerFormType(originalStep) !== 'thermocyclerProfile' &&
+      getThermocyclerFormType(newForm) === 'thermocyclerProfile'
+    ) {
+      // An existing step is turning into a Thermocycler profile step. We need to:
+      // 1) Potentially find a new position to move it to, since we can't allow Thermocycler profiles to nest.
+      // 2) Create a hidden "wait for profile to complete" step that it will be permanently paired with.
+
+      const newPauseForm = getThermocyclerProfilePauseForm(
+        newForm as ThermocyclerFormData,
+        action.payload.thermocyclerPauseStepId
+      )
+
+      // If the edited step was is inside a Thermocycler profile, we'll move it to just after the profile.
+      // null means "leave the edited step in-place."
+      const stepIdToMoveEditedStepAfter: StepIdType | null =
+        'type' in findResult.enclosingNode &&
+        findResult.enclosingNode.type === 'thermocyclerProfileGroup'
+          ? findResult.enclosingNode.waitForThermocyclerProfileStepId
+          : null
+
+      const { result: newOrderedStepIds, success: spliceSuccess } =
+        findAndSplice({
+          source: originalOrderedStepIds,
+          elementToRemove: originalStep.id,
+          elementToInsertAfter: stepIdToMoveEditedStepAfter,
+          elementsToInsert: [
+            newForm.id,
+            ...(newPauseForm != null ? [newPauseForm.id] : []),
+          ],
+        })
+
+      if (!spliceSuccess) {
+        // This should only happen if there's a bug elsewhere that's messing up the timeline order. See `StepHierarchy`.
+        console.error(
+          'Error rearranging steps for a new Thermocycler profile. Leaving the steps unchanged.'
+        )
+        return {
+          newOrderedStepIds: originalOrderedStepIds,
+          newStepFormsById: originalStepFormsById,
+        }
+      }
+
+      return {
+        newOrderedStepIds,
+        newStepFormsById: {
+          ...originalStepFormsById,
+          [newForm.id]: newForm,
+          ...(newPauseForm != null && { [newPauseForm.id]: newPauseForm }),
+        },
+      }
+    } else {
+      // We're editing an existing step and there's no Thermocycler profile nonsense going on,
+      // so just update the step to its new value and leave the step order unchanged.
+      return {
+        newOrderedStepIds: originalOrderedStepIds,
+        newStepFormsById: {
+          ...originalStepFormsById,
+          [newForm.id]: newForm,
+        },
+      }
+    }
+  }
+}
+
+function getThermocyclerProfilePauseForm(
+  thermocyclerForm: ThermocyclerFormData,
+  id: string
+): PauseFormData {
+  return {
+    id,
+    stepType: 'pause',
+    stepName: 'pause',
+    stepDetails: '',
+
+    pauseAction: 'untilThermocyclerProfileComplete',
+    moduleId: thermocyclerForm.moduleId,
+  }
+}
+
 export interface RootState {
   unsavedGroup: UnsavedGroupState
   stepGroups: StepGroupsState
@@ -1733,6 +1883,7 @@ export interface RootState {
   unsavedForm: FormState
   batchEditFormChanges: BatchEditFormChangesState
   deckConfiguration: DeckConfigurationState
+  stackerLabwareReducer: StackerLabwareState
 }
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
@@ -1741,7 +1892,6 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
   ({ action, state, prevStateFallback }) => ({
     unsavedGroup: unsavedGroup(prevStateFallback.unsavedGroup, action),
     stepGroups: stepGroups(prevStateFallback.stepGroups, action),
-    orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
     labwareInvariantProperties: labwareInvariantProperties(
       prevStateFallback.labwareInvariantProperties,
       action
@@ -1754,16 +1904,18 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
       prevStateFallback.moduleInvariantProperties,
       action
     ),
-    additionalEquipmentInvariantProperties: additionalEquipmentInvariantProperties(
-      prevStateFallback.additionalEquipmentInvariantProperties,
-      action as ReduxActionsAction<NormalizedAdditionalEquipmentById>
-    ),
+    additionalEquipmentInvariantProperties:
+      additionalEquipmentInvariantProperties(
+        prevStateFallback.additionalEquipmentInvariantProperties,
+        action as ReduxActionsAction<NormalizedAdditionalEquipmentById>
+      ),
     labwareDefs: labwareDefsRootReducer(
       prevStateFallback.labwareDefs,
       action as Action
     ),
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action as SavedStepFormsActions),
+    orderedStepIds: orderedStepIds(state, action as OrderedStepIdsActions),
     unsavedForm: unsavedForm(state, action as UnsavedFormActions),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,
@@ -1776,6 +1928,12 @@ export const rootReducer: Reducer<RootState, any> = nestedCombineReducers(
     deckConfiguration: deckConfigurationProperties(
       prevStateFallback.deckConfiguration,
       action
+    ),
+    stackerLabwareReducer: stackerLabwareReducer(
+      prevStateFallback.stackerLabwareReducer,
+      action as
+        | StackerLabwareCreationStartAction
+        | StackerLabwareCreationFinishAction
     ),
   })
 )

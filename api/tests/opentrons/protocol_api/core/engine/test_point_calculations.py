@@ -1,11 +1,11 @@
 """Tests for Protocol API point calculation."""
+
 from typing import Tuple
 
 import pytest
 
-from opentrons.types import Point
-
 from opentrons.protocol_api.core.engine import point_calculations as subject
+from opentrons.types import Point
 
 
 def test_get_relative_offset() -> None:

@@ -5,10 +5,10 @@ import {
   ALIGN_CENTER,
   BORDERS,
   COLORS,
-  DeckInfoLabel,
   Flex,
   LegacyStyledText,
   ModuleIcon,
+  RobotInfoLabel,
   SPACING,
   TYPOGRAPHY,
   WRAP,
@@ -122,13 +122,16 @@ function HardwareItem({
   const hardwareName = useHardwareName(hardware, t as TFunction)
 
   let location: JSX.Element = (
-    <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+    <LegacyStyledText
+      forwardedAs="p"
+      fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+    >
       {i18n.format(getHardwareLocation(hardware, t as TFunction), 'titleCase')}
     </LegacyStyledText>
   )
   if (hardware.hardwareType === 'module') {
     location = (
-      <DeckInfoLabel
+      <RobotInfoLabel
         deckLabel={getModuleDeckLabel(
           getModuleType(hardware.moduleModel),
           hardware.slot
@@ -141,7 +144,7 @@ function HardwareItem({
       hardware.cutoutFixtureId === STAGING_AREA_RIGHT_SLOT_FIXTURE
         ? `${cutoutDisplayName[0]}4`
         : cutoutDisplayName
-    location = <DeckInfoLabel deckLabel={slotName} />
+    location = <RobotInfoLabel deckLabel={slotName} />
   }
   const isMagneticBlockFixture =
     hardware.hardwareType === 'fixture' &&
@@ -170,7 +173,7 @@ function HardwareItem({
               <ModuleIcon moduleType={iconModuleType} size="1.75rem" />
             </Flex>
           ) : null}
-          <LegacyStyledText as="p">{hardwareName}</LegacyStyledText>
+          <LegacyStyledText forwardedAs="p">{hardwareName}</LegacyStyledText>
         </Flex>
       </TableDatum>
     </TableRow>

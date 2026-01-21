@@ -80,11 +80,11 @@ export function MoveLabwareOnDeck(
   const initialCoordinates =
     initialResolvedLocation === 'error' || initialResolvedLocation === 'offDeck'
       ? initialResolvedLocation
-      : computeLabwareOrigin(initialResolvedLocation) ?? 'error'
+      : (computeLabwareOrigin(initialResolvedLocation) ?? 'error')
   const finalCoordinates =
     finalResolvedLocation === 'error' || finalResolvedLocation === 'offDeck'
       ? finalResolvedLocation
-      : computeLabwareOrigin(finalResolvedLocation) ?? 'error'
+      : (computeLabwareOrigin(finalResolvedLocation) ?? 'error')
 
   const referenceForOffDeckCoordinates = (() => {
     if (initialCoordinates !== 'error' && initialCoordinates !== 'offDeck') {

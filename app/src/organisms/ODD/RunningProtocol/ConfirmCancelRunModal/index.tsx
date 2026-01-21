@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import { RUN_STATUS_STOPPED } from '@opentrons/api-client'
 import { COLORS, LegacyStyledText } from '@opentrons/components'
 import {
-  useDeleteRunMutation,
   useDismissCurrentRunMutation,
   useStopRunMutation,
 } from '@opentrons/react-api-client'
@@ -40,22 +39,8 @@ export function ConfirmCancelRunModal({
 }: ConfirmCancelRunModalProps): JSX.Element {
   const { t } = useTranslation(['run_details', 'shared'])
   const { stopRun } = useStopRunMutation()
-  const { deleteRun } = useDeleteRunMutation({
-    onError: error => {
-      setIsCanceling(false)
-      console.error('Error deleting quick transfer run', error)
-    },
-  })
-  const {
-    dismissCurrentRun,
-    isLoading: isDismissing,
-  } = useDismissCurrentRunMutation({
-    onSettled: () => {
-      if (isQuickTransfer) {
-        deleteRun(runId)
-      }
-    },
-  })
+  const { dismissCurrentRun, isLoading: isDismissing } =
+    useDismissCurrentRunMutation()
   const localRobot = useSelector(getLocalRobot)
   const { data, isError: isRunFetchError } = useNotifyRunQuery(runId)
   const runStatus = data?.data.status
@@ -114,10 +99,10 @@ export function ConfirmCancelRunModal({
             isActiveRun ? styles.active_run : styles.inactive_run
           }`}
         >
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('cancel_run_alert_info_flex')}
           </LegacyStyledText>
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('cancel_run_module_info')}
           </LegacyStyledText>
         </div>

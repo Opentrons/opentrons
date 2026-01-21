@@ -1,13 +1,15 @@
 """A script for sending and receiving data from sensors on the OT3."""
-import os
-import logging
-import asyncio
-import argparse
 
-from typing import Callable
+import argparse
+import asyncio
+import logging
+import os
 from logging.config import dictConfig
+from typing import Callable
 
 from opentrons_hardware.drivers.can_bus import build
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
+from opentrons_hardware.firmware_bindings.constants import NodeId
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     DisableMotorRequest,
     ExecuteMoveGroupRequest,
@@ -15,18 +17,16 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
 from opentrons_hardware.firmware_bindings.messages.payloads import (
     ExecuteMoveGroupRequestPayload,
 )
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-from opentrons_hardware.hardware_control.gripper_settings import (
-    set_pwm_param,
-    set_reference_voltage,
-    grip,
-    home,
-)
 from opentrons_hardware.firmware_bindings.utils import (
     UInt8Field,
 )
+from opentrons_hardware.hardware_control.gripper_settings import (
+    grip,
+    home,
+    set_pwm_param,
+    set_reference_voltage,
+)
+from opentrons_hardware.scripts.can_args import add_can_args, build_settings
 
 GetInputFunc = Callable[[str], str]
 OutputFunc = Callable[[str], None]

@@ -1,10 +1,11 @@
 """The types of sensors supported by the system."""
+
 from dataclasses import dataclass
 from typing import List, Union
-from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
 
 from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId, SensorType
-from opentrons_hardware.sensors.types import SensorDataType, EnvironmentSensorDataType
+from opentrons_hardware.firmware_bindings.messages.fields import SensorTypeField
+from opentrons_hardware.sensors.types import EnvironmentSensorDataType, SensorDataType
 
 
 @dataclass

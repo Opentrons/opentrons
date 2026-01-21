@@ -1,9 +1,9 @@
-from enum import Enum
-
 from typing_extensions import Final
 
+from opentrons_shared_data.util import StrEnum
 
-class GCODE(str, Enum):
+
+class GCODE(StrEnum):
     HOME = "G28.2"
     MOVE = "G0"
     DWELL = "G4"

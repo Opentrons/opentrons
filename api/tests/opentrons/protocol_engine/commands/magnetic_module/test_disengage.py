@@ -1,14 +1,8 @@
 """Test magnetic module disengage commands."""
+
 from decoy import Decoy
 
 from opentrons.hardware_control.modules import MagDeck
-
-from opentrons.protocol_engine.execution import EquipmentHandler
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    MagneticModuleSubState,
-    MagneticModuleId,
-)
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.magnetic_module import (
     DisengageParams,
@@ -17,6 +11,12 @@ from opentrons.protocol_engine.commands.magnetic_module import (
 from opentrons.protocol_engine.commands.magnetic_module.disengage import (
     DisengageImplementation,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler
+from opentrons.protocol_engine.state.module_substates import (
+    MagneticModuleId,
+    MagneticModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 
 
 async def test_magnetic_module_disengage_implementation(

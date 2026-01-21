@@ -1,17 +1,16 @@
 """Application routes."""
+
 from fastapi import Depends, status
+
 from server_utils.fastapi_utils.light_router import LightRouter
-
-
-from .constants import V1_TAG
-from .errors.error_responses import LegacyErrorResponse
-from .versioning import check_version_header
 
 from .client_data.router import router as client_data_router
 from .commands.router import commands_router
+from .constants import V1_TAG
 from .data_files.router import datafiles_router
 from .deck_configuration.router import router as deck_configuration_router
 from .error_recovery.settings.router import router as error_recovery_settings_router
+from .errors.error_responses import LegacyErrorResponse
 from .health.router import health_router
 from .instruments.router import instruments_router
 from .labware_offsets.router import router as labware_offset_router
@@ -27,6 +26,7 @@ from .service.session.router import router as deprecated_session_router
 from .service.tip_length.router import router as tl_router
 from .subsystems.router import subsystems_router
 from .system.router import system_router
+from .versioning import check_version_header
 
 router = LightRouter()
 

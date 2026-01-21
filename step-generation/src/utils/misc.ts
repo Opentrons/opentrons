@@ -6,9 +6,12 @@ import reduce from 'lodash/reduce'
 import {
   EIGHT_CHANNEL_WASTE_CHUTE_ADDRESSABLE_AREA,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
   getDeckDefFromRobotType,
   getIsTiprack,
   getLabwareDefURI,
+  getMaxPoolCount,
   getMmFromBottom,
   getWellNamePerMultiTip,
   linearInterpolate,
@@ -34,9 +37,17 @@ import {
   dispenseInTrash,
   dispenseInWasteChute,
 } from '../commandCreators/compound'
-import { CLEAN, EMPTY, ZERO_OFFSET } from '../constants'
+import {
+  CLEAN,
+  EMPTY,
+  FAKE_HOPPER_LOCATION_MAP,
+  HOPPER_FAKE_LOCATIONS,
+  HOPPER_STACKER_LOCATION,
+  STAGING_AREA_SLOTS,
+  ZERO_OFFSET,
+} from '../constants'
 import { curryCommandCreator } from './curryCommandCreator'
-import { reduceCommandCreators } from './index'
+import { reduceCommandCreators, uuid } from './index'
 
 import type {
   AddressableAreaName,
@@ -44,14 +55,20 @@ import type {
   CutoutFixtureId,
   CutoutId,
   LabwareDefinition2,
+  LabwareLocationSequence,
+  LoadLabwareRunTimeCommand,
+  LoadLidParams,
+  LoadLidStackRunTimeCommand,
   PipetteChannels,
   PipetteV2Specs,
   PositionReference,
   RobotType,
 } from '@opentrons/shared-data'
+import type { HopperLocationMapKey } from '../constants'
 import type {
   CommandCreator,
   CurriedCommandCreator,
+  FlexStackerModuleState,
   InvariantContext,
   LabwareEntities,
   LabwareEntity,
@@ -62,6 +79,7 @@ import type {
   PipetteEntity,
   RobotState,
   SourceAndDest,
+  StagingAreaEntities,
   TrashBinEntities,
   TrashBinEntity,
   WasteChuteEntities,
@@ -490,13 +508,8 @@ export const getDispenseAirGapLocation = (args: {
   dispenseAirGapLabware: string
   dispenseAirGapWell: string
 } => {
-  const {
-    blowoutLocation,
-    sourceLabware,
-    destLabware,
-    sourceWell,
-    destWell,
-  } = args
+  const { blowoutLocation, sourceLabware, destLabware, sourceWell, destWell } =
+    args
   return blowoutLocation === SOURCE_WELL_BLOWOUT_DESTINATION &&
     //  note: sourceLabware & sourceWell != null for air gap in a transfer only
     //  since transfer allows you to specify the blowout location as source well
@@ -588,11 +601,9 @@ interface DispenseLocationHelperArgs {
   offsetFromBottomMm?: number
   well?: string
 }
-export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const dispenseLocationHelper: CommandCreator<
+  DispenseLocationHelperArgs
+> = (args, invariantContext, prevRobotState) => {
   const {
     destinationId,
     pipetteId,
@@ -604,11 +615,8 @@ export const dispenseLocationHelper: CommandCreator<DispenseLocationHelperArgs> 
     yOffset,
     tipRack,
   } = args
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { labwareEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -676,11 +684,8 @@ export const moveHelper: CommandCreator<MoveHelperArgs> = (
   prevRobotState
 ) => {
   const { destinationId, pipetteId, zOffset, well } = args
-  const {
-    labwareEntities,
-    wasteChuteEntities,
-    trashBinEntities,
-  } = invariantContext
+  const { labwareEntities, wasteChuteEntities, trashBinEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -748,11 +753,8 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
     sourceWell,
     volume,
   } = args
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { labwareEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -762,16 +764,14 @@ export const airGapLocationHelper: CommandCreator<AirGapLocationArgs> = (
 
   let commands: CurriedCommandCreator[] = []
   if (trashOrLabware === 'labware' && destWell != null) {
-    const {
-      dispenseAirGapLabware,
-      dispenseAirGapWell,
-    } = getDispenseAirGapLocation({
-      blowoutLocation: blowOutLocation,
-      sourceLabware: sourceId,
-      destLabware: destinationId,
-      sourceWell,
-      destWell: destWell,
-    })
+    const { dispenseAirGapLabware, dispenseAirGapWell } =
+      getDispenseAirGapLocation({
+        blowoutLocation: blowOutLocation,
+        sourceLabware: sourceId,
+        destLabware: destinationId,
+        sourceWell,
+        destWell: destWell,
+      })
     commands = [
       curryCommandCreator(airGapInWell, {
         flowRate,
@@ -819,11 +819,8 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   prevRobotState
 ) => {
   const { pipetteId, destinationId, well, zOffset, seconds } = args
-  const {
-    labwareEntities,
-    trashBinEntities,
-    wasteChuteEntities,
-  } = invariantContext
+  const { labwareEntities, trashBinEntities, wasteChuteEntities } =
+    invariantContext
   const trashOrLabware = getTrashOrLabware(
     labwareEntities,
     wasteChuteEntities,
@@ -875,12 +872,20 @@ export const delayLocationHelper: CommandCreator<DelayLocationHelperArgs> = (
   return reduceCommandCreators(commands, invariantContext, prevRobotState)
 }
 
-export const getSlotInLocationStack = (stack?: string[]): string => {
+export const getSlotInLocationStack = (
+  stack: string[] | null,
+  isStacker: boolean = false
+): string => {
   if (stack == null) {
     console.error('expected to find stack but could not')
     return 'unknown slot'
   } else {
-    return stack[stack.length - 1]
+    const slot = stack[stack.length - 1]
+    if (isStacker) {
+      return `STACKER ${slot.slice(-2, -1)}`
+    } else {
+      return slot
+    }
   }
 }
 
@@ -923,6 +928,15 @@ export const getIsLabwareCompatibleWithStack = (
   if (stack.length === 0) {
     return { isCompatible: true, isAboveStackLimit: false }
   }
+  // Determine if labware is on hopper
+  let isOnHopper = false
+  const moduleId = stack.find(id => id in moduleEntities)
+  if (moduleId != null) {
+    const isStackerInStack =
+      moduleEntities[moduleId].type === FLEX_STACKER_MODULE_TYPE
+    isOnHopper = isStackerInStack && stack.includes(HOPPER_STACKER_LOCATION)
+  }
+
   const topIdInStack = getTopLocationInStack(stack)
   let isCompatible: boolean = true
   let isAboveStackLimit: boolean = false
@@ -931,15 +945,55 @@ export const getIsLabwareCompatibleWithStack = (
   if (topIdInStack in labwareEntities) {
     const movingLabwareEntity = labwareEntities[labwareId]
     const topLabwareEntity = labwareEntities[topIdInStack]
+    const labwareIdsInStack = stack.filter(id => labwareEntities[id] != null)
+    const lidInStack = labwareIdsInStack.filter(id =>
+      labwareEntities[id]?.def?.allowedRoles?.includes('lid')
+    )[0]
+    const adapterInStack = labwareIdsInStack.filter(id =>
+      labwareEntities[id]?.def?.allowedRoles?.includes('adapter')
+    )[0]
     const loadNameToCheck = topLabwareEntity.def.parameters.loadName
-    const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
-    const isSameLoadName =
-      loadNameToCheck === movingLabwareEntity.def.parameters.loadName
-    const currentStackAmount = stack.filter(
-      item => labwareEntities[item]?.def.parameters.loadName === loadNameToCheck
-    )?.length
-    isAboveStackLimit =
-      isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+    const primaryLabwareInStack = labwareIdsInStack.filter(
+      id =>
+        !labwareEntities[id]?.def?.allowedRoles?.includes('adapter') &&
+        !labwareEntities[id]?.def?.allowedRoles?.includes('lid')
+    )[0]
+    if (isOnHopper) {
+      // allow labware without a stack limit to be stacked on the stacker
+      const maxPoolCount = getMaxPoolCount({
+        labwareDefinitions: {
+          primary: labwareEntities[primaryLabwareInStack]?.def ?? null,
+          adapter: labwareEntities[adapterInStack]?.def ?? null,
+          lid: labwareEntities[lidInStack]?.def ?? null,
+        },
+        model: FLEX_STACKER_MODULE_V1,
+      })
+      isAboveStackLimit = stack.length > maxPoolCount
+    } else {
+      const topLabwareEntityStackLimit = topLabwareEntity.def.stackLimit ?? 1
+      const isSameLoadName =
+        loadNameToCheck === movingLabwareEntity.def.parameters.loadName
+      const currentStackAmount = stack.filter(
+        item =>
+          labwareEntities[item]?.def.parameters.loadName === loadNameToCheck
+      )?.length
+      isAboveStackLimit =
+        isSameLoadName && currentStackAmount >= topLabwareEntityStackLimit
+    }
+
+    // This is an exception to allow universal lids to be placed on any labware except
+    // tube racks, aluminum blocks, tip racks, or other lids.
+    const isUniversalLid =
+      movingLabwareEntity.def.parameters.loadName ===
+      'opentrons_tough_universal_lid'
+    const isLabwareOnSlotTuberack =
+      topLabwareEntity.def.metadata.displayCategory === 'tubeRack'
+    const isLabwareOnSlotAluminumBlock =
+      topLabwareEntity.def.metadata.displayCategory === 'aluminumBlock'
+    const isLabwareOnSlotTiprack = topLabwareEntity.def.parameters.isTiprack
+    const allowedRoles = topLabwareEntity.def.allowedRoles ?? []
+    const isLidRole = allowedRoles.includes('lid')
+
     isCompatible =
       // check compatible labware key
       movingLabwareEntity.def.compatibleParentLabware?.some(
@@ -948,7 +1002,15 @@ export const getIsLabwareCompatibleWithStack = (
       // check stacking offset map for legacy compatibility
       Object.keys(movingLabwareEntity.def.stackingOffsetWithLabware ?? {}).some(
         lw => lw === loadNameToCheck
-      )
+      ) ||
+      (isUniversalLid &&
+        !isLabwareOnSlotTuberack &&
+        !isLabwareOnSlotAluminumBlock &&
+        !isLabwareOnSlotTiprack &&
+        (topLabwareEntity.def.parameters.loadName ===
+          'opentrons_tough_universal_lid' ||
+          !isLidRole))
+
     // check compatibility with module
   } else if (topIdInStack in moduleEntities) {
     const topModuleEntity = moduleEntities[topIdInStack]
@@ -991,13 +1053,20 @@ export const getFullStackFromLabwares = (
     )
     return []
   }
-  return Object.values(labware)
-    .filter(
-      lw =>
-        lw.stack.includes(slot) &&
-        (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId))
-    )
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+  const isOnHopper = getIsSlotAHopper(slot)
+  const mappedLocation = isOnHopper
+    ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
+    : slot
+  return (
+    Object.values(labware)
+      .filter(
+        lw =>
+          lw.stack.includes(mappedLocation) &&
+          (offDeckOverrideId == null || lw.stack.includes(offDeckOverrideId)) &&
+          lw.stack.includes(HOPPER_STACKER_LOCATION) === isOnHopper
+      )
+      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+  )
 }
 
 export const getTopmostLabwareOnModuleFromStackRobotState = (
@@ -1083,28 +1152,31 @@ export const getTransferPlanAndReferenceVolumes = (args: {
   const minVolumeForMultiAspirateDispense = volume * 2
   const conditioningVolumeForMultiAspirateDispense =
     conditioningByVolume != null
-      ? linearInterpolate(
+      ? (linearInterpolate(
           minVolumeForMultiAspirateDispense,
           conditioningByVolume
-        ) ?? 0
+        ) ?? 0)
       : 0
+
+  const isCustomTiprack = tiprackDefinition?.namespace !== 'opentrons'
   const isMultiDispenseAvailable =
-    conditioningByVolume != null &&
-    disposalByVolume != null &&
-    maxWorkingVolume >=
-      minVolumeForMultiAspirateDispense +
-        conditioningVolumeForMultiAspirateDispense +
-        (linearInterpolate(
-          minVolumeForMultiAspirateDispense,
-          disposalByVolume
-        ) ?? 0) +
-        // don't take air gap into account if conditioning volume is present
-        (conditioningVolumeForMultiAspirateDispense === 0
-          ? linearInterpolate(
-              minVolumeForMultiAspirateDispense,
-              aspirateAirGapByVolume
-            ) ?? 0
-          : 0)
+    isCustomTiprack ||
+    (conditioningByVolume != null &&
+      disposalByVolume != null &&
+      maxWorkingVolume >=
+        minVolumeForMultiAspirateDispense +
+          conditioningVolumeForMultiAspirateDispense +
+          (linearInterpolate(
+            minVolumeForMultiAspirateDispense,
+            disposalByVolume
+          ) ?? 0) +
+          // don't take air gap into account if conditioning volume is present
+          (conditioningVolumeForMultiAspirateDispense === 0
+            ? (linearInterpolate(
+                minVolumeForMultiAspirateDispense,
+                aspirateAirGapByVolume
+              ) ?? 0)
+            : 0))
   const isMultiAspirateAvailable =
     maxWorkingVolume >= minVolumeForMultiAspirateDispense
 
@@ -1282,4 +1354,135 @@ export const getIsRetractSafeForAirGap = (args: {
   }
   const retractZOffsetFromTop = retractMmFromBottom - wellDepth
   return retractZOffsetFromTop >= SAFE_MOVE_TO_WELL_OFFSET_FROM_TOP_MM
+}
+
+export const getStackForLabwareLocation = (
+  locationSequence: LabwareLocationSequence
+): string[] =>
+  locationSequence.reduce<string[]>((acc, item) => {
+    const { kind } = item
+    if (kind === 'onCutoutFixture') {
+      return acc
+    }
+    if (kind === 'onLabware') {
+      return [...acc, item.labwareId]
+    }
+    if (kind === 'onModule' || kind === 'inStackerHopper') {
+      return [...acc, item.moduleId]
+    }
+    if (kind === 'onAddressableArea') {
+      return [...acc, item.addressableAreaName]
+    }
+    return [...acc, item.logicalLocationName]
+  }, [])
+
+const FOURTH_COLUMN_TO_CUTOUT_MAP = {
+  A4: 'cutoutA3',
+  B4: 'cutoutB3',
+  C4: 'cutoutC3',
+  D4: 'cutoutD3',
+}
+
+export function createStagingAreaForInvariantContext(
+  params:
+    | LoadLidStackRunTimeCommand['params']
+    | LoadLabwareRunTimeCommand['params']
+    | LoadLidParams
+): StagingAreaEntities {
+  if (
+    params.location !== 'offDeck' &&
+    params.location !== 'systemLocation' &&
+    params.location !== 'wasteChuteLocation' &&
+    'addressableAreaName' in params.location &&
+    STAGING_AREA_SLOTS.includes(params.location.addressableAreaName)
+  ) {
+    const id = uuid()
+    const addressableAreaName = params.location.addressableAreaName
+    const location =
+      FOURTH_COLUMN_TO_CUTOUT_MAP[
+        addressableAreaName as keyof typeof FOURTH_COLUMN_TO_CUTOUT_MAP
+      ] ?? addressableAreaName // fallback if the addressableArea name doesn't match the map, but shoudln't run into this
+
+    return {
+      [id]: { id, location },
+    }
+  }
+  return {}
+}
+
+export const getLabwareIdOnHopper = (
+  labware: {
+    [labwareId: string]: LabwareTemporalProperties
+  },
+  moduleSlotLocation: string
+): string => {
+  const largestStackInSlot = getLargestStackInSlot(labware, moduleSlotLocation)
+  const indexOfHopper = largestStackInSlot.indexOf(HOPPER_STACKER_LOCATION)
+  const labwareIdOnModule = largestStackInSlot[indexOfHopper - 1]
+  return labwareIdOnModule
+}
+
+export const getIsSlotAHopper = (slot: string): boolean => {
+  return HOPPER_FAKE_LOCATIONS.includes(slot)
+}
+
+export const getLabwareIdOnShuttle = (
+  stackerState: FlexStackerModuleState
+): string | null => {
+  return stackerState.labwareOnShuttle?.primaryLabwareId ?? null
+}
+
+export const labwareMatchesLabwareInHopper = (
+  labwareId: string,
+  invariantContext: InvariantContext,
+  stackerState: FlexStackerModuleState | null
+): boolean => {
+  // permissive if no stored labware details configured
+  if (stackerState?.storedLabwareDetails == null) {
+    return true
+  }
+  const storedLabwareURIs = Object.values(
+    stackerState?.storedLabwareDetails ?? {}
+  ).reduce<string[]>((acc, val) => {
+    return val != null ? [...acc, val] : acc
+  }, [])
+  const labwareEntity = invariantContext.labwareEntities[labwareId]
+  return storedLabwareURIs.some(uri => labwareEntity?.labwareDefURI === uri)
+}
+
+export const getIsSpaceInHopper = (
+  stackerState: FlexStackerModuleState | null,
+  labwareEntities: LabwareEntities
+): boolean => {
+  const { storedLabwareDetails } = stackerState ?? {}
+  if (storedLabwareDetails == null) {
+    return true
+  }
+  const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
+    storedLabwareDetails
+  const primaryLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === primaryLabwareURI
+  )
+  const adapterLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === adapterLabwareURI
+  )
+  const lidLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === lidLabwareURI
+  )
+  if (primaryLabwareEntity == null) {
+    console.error('Primary labware entity not found')
+    return false
+  }
+
+  const maximumAllowedLabware = getMaxPoolCount({
+    labwareDefinitions: {
+      primary: primaryLabwareEntity.def,
+      adapter: adapterLabwareEntity?.def ?? null,
+      lid: lidLabwareEntity?.def ?? null,
+    },
+    model: FLEX_STACKER_MODULE_V1,
+  })
+  const labwareStored = stackerState?.labwareInHopper
+  const numberOfLabwareStored = labwareStored?.length ?? 0
+  return maximumAllowedLabware > numberOfLabwareStored
 }

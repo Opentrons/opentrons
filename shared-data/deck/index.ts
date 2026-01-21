@@ -37,7 +37,7 @@ const latestDeckDefinitions = {
 
 export function getDeckDefinitions(): Record<string, DeckDefinition> {
   return Object.values(
-    (latestDeckDefinitions as unknown) as DeckDefinition[]
+    latestDeckDefinitions as unknown as DeckDefinition[]
   ).reduce<Record<string, DeckDefinition>>((acc, deckDef) => {
     return { ...acc, [deckDef.otId]: deckDef }
   }, {})

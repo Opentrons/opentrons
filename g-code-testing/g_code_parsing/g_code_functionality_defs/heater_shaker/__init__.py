@@ -1,6 +1,7 @@
 from .close_labware_latch_functionality_def import (
     CloseLabwareLatchGCodeFunctionalityDef,
 )
+from .get_error_status_functionality_def import GetErrorStatusFunctionalityDef
 from .get_labware_latch_state_functionality_def import (
     GetLabwareLatchStateGCodeFunctionalityDef,
 )
@@ -22,4 +23,5 @@ __all__ = [
     "OpenLabwareLatchGCodeFunctionalityDef",
     "SetRPMGCodeFunctionalityDef",
     "SetTempGCodeFunctionalityDef",
+    "GetErrorStatusFunctionalityDef",
 ]

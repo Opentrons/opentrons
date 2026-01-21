@@ -2,9 +2,19 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Callable, Optional, List, Dict, Mapping, Union, cast
+from typing import Callable, Dict, List, Mapping, Optional, Union, cast
+
+from ..execution_manager import ExecutionManager
+from . import mod_abc, types, update
+from opentrons.drivers.asyncio.communication.errors import UnhandledGcode
 from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.drivers.types import ThermocyclerLidStatus, Temperature, PlateTemperature
+from opentrons.drivers.thermocycler import (
+    AbstractThermocyclerDriver,
+    SimulatingDriver,
+    ThermocyclerDriverFactory,
+    ThermocyclerDriverV2,
+)
+from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
 from opentrons.hardware_control.modules.lid_temp_status import LidTemperatureStatus
 from opentrons.hardware_control.modules.plate_temp_status import PlateTemperatureStatus
 from opentrons.hardware_control.modules.types import (
@@ -12,17 +22,7 @@ from opentrons.hardware_control.modules.types import (
     ModuleErrorCallback,
     TemperatureStatus,
 )
-from opentrons.hardware_control.poller import Reader, Poller
-
-from ..execution_manager import ExecutionManager
-from . import types, update, mod_abc
-from opentrons.drivers.thermocycler import (
-    AbstractThermocyclerDriver,
-    SimulatingDriver,
-    ThermocyclerDriverV2,
-    ThermocyclerDriverFactory,
-)
-
+from opentrons.hardware_control.poller import Poller, Reader
 
 log = logging.getLogger(__name__)
 
@@ -636,7 +636,7 @@ class Thermocycler(mod_abc.AbstractModule):
         hold_time_seconds = step.get("hold_time_seconds", None)
         ramp_rate = step.get("ramp_rate", None)
         await self._set_temperature_no_pause(
-            temperature=temperature,  # type: ignore
+            temperature=temperature,
             hold_time_minutes=hold_time_minutes,
             hold_time_seconds=hold_time_seconds,
             ramp_rate=ramp_rate,
@@ -711,7 +711,6 @@ class Thermocycler(mod_abc.AbstractModule):
             f"https://support.opentrons.com/en/articles/3469797-thermocycler-module"
             f" for troubleshooting."
         )
-        asyncio.run_coroutine_threadsafe(self.cleanup(), self._loop)
         self.error_callback(error)
 
 
@@ -764,6 +763,17 @@ class ThermocyclerReader(Reader):
         await self.read_lid_status()
         await self.read_lid_temperature()
         await self.read_block_temperature()
+        await self._read_errors()
+
+    async def _read_errors(self) -> None:
+        try:
+            await self._driver.get_error_state()
+        except UnhandledGcode:
+            # This device's firmware cannot accept this command, because it
+            # hasn't been updated or because it's a gen1. Ignore the result.
+            pass
+        # If the error is one we should let pass, raise it so the top level
+        # error handler can take it.
 
     async def read_lid_status(self) -> None:
         self.lid_status = await self._driver.get_lid_status()

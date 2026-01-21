@@ -1,107 +1,104 @@
-""" Tests for behaviors specific to the OT3 hardware controller.
-"""
+"""Tests for behaviors specific to the OT3 hardware controller."""
+
 import asyncio
-from typing import (
-    AsyncIterator,
-    Iterator,
-    Union,
-    Dict,
-    Tuple,
-    List,
-    Any,
-    OrderedDict,
-    Optional,
-    cast,
-    TypedDict,
-)
-from typing_extensions import Literal
-from math import copysign, isclose
-import pytest
 import types
+from math import copysign, isclose
+from typing import (
+    Any,
+    AsyncIterator,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    OrderedDict,
+    Tuple,
+    TypedDict,
+    Union,
+    cast,
+)
+
+import pytest
 from decoy import Decoy
-from mock import AsyncMock, patch, Mock, PropertyMock, MagicMock, call
-from hypothesis import given, strategies, settings, HealthCheck, assume, example
+from hypothesis import HealthCheck, assume, example, given, settings, strategies
+from mock import AsyncMock, MagicMock, Mock, PropertyMock, call, patch
+from typing_extensions import Literal
+
+from opentrons_hardware.firmware_bindings.constants import NodeId, SensorId
+from opentrons_hardware.hardware_control.motion_planning.types import Move
+from opentrons_hardware.sensors.types import SensorDataType
+from opentrons_shared_data.errors.exceptions import (
+    CommandParameterLimitViolated,
+    CommandPreconditionViolated,
+    GripperNotPresentError,
+    PipetteLiquidNotFoundError,
+    UnexpectedTipRemovalError,
+)
+from opentrons_shared_data.gripper.gripper_definition import GripperModel
+from opentrons_shared_data.pipette import (
+    load_data as load_pipette_data,
+)
+from opentrons_shared_data.pipette.types import (
+    LiquidClasses,
+    PipetteChannelType,
+    PipetteModel,
+    PipetteModelType,
+    PipetteOEMType,
+    PipetteVersionType,
+)
 
 from opentrons.calibration_storage.types import CalibrationStatus, SourceType
+from opentrons.config import gripper_config as gc
 from opentrons.config.types import (
-    GantryLoad,
     CapacitivePassSettings,
+    GantryLoad,
     LiquidProbeSettings,
 )
+from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
+from opentrons.hardware_control.backends.types import HWStopCondition
 from opentrons.hardware_control.dev_types import (
     AttachedGripper,
     AttachedPipette,
     GripperDict,
     GripperSpec,
 )
-from opentrons.hardware_control.motion_utilities import target_position_from_plunger
+from opentrons.hardware_control.errors import InvalidCriticalPoint
 from opentrons.hardware_control.instruments.ot3.gripper_handler import GripperHandler
 from opentrons.hardware_control.instruments.ot3.instrument_calibration import (
     GripperCalibrationOffset,
-    PipetteOffsetByPipetteMount,
     GripperJawWidthData,
-)
-from opentrons.hardware_control.instruments.ot3.pipette_handler import (
-    OT3PipetteHandler,
-    TipActionSpec,
-    TipActionMoveSpec,
+    PipetteOffsetByPipetteMount,
 )
 from opentrons.hardware_control.instruments.ot3.pipette import Pipette
-from opentrons.hardware_control.types import (
-    OT3Mount,
-    Axis,
-    OT3AxisKind,
-    CriticalPoint,
-    GripperProbe,
-    InstrumentProbeType,
-    SubSystem,
-    GripperJawState,
-    EstopState,
-    EstopStateNotification,
-    TipStateType,
-)
-from opentrons.hardware_control.errors import InvalidCriticalPoint
-from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control import ThreadManager
-
-from opentrons.hardware_control.backends.ot3simulator import OT3Simulator
-from opentrons_hardware.firmware_bindings.constants import NodeId
-from opentrons.types import Point, Mount, NozzleConfigurationType
-
-from opentrons_hardware.hardware_control.motion_planning.types import Move
-
-from opentrons.config import gripper_config as gc
-from opentrons_shared_data.errors.exceptions import (
-    GripperNotPresentError,
-    CommandPreconditionViolated,
-    CommandParameterLimitViolated,
-    PipetteLiquidNotFoundError,
-    UnexpectedTipRemovalError,
-)
-from opentrons_shared_data.gripper.gripper_definition import GripperModel
-from opentrons_shared_data.pipette.types import (
-    PipetteModelType,
-    PipetteChannelType,
-    PipetteVersionType,
-    LiquidClasses,
-    PipetteOEMType,
-)
-from opentrons_shared_data.pipette import (
-    load_data as load_pipette_data,
-)
-from opentrons_shared_data.pipette.types import PipetteModel
-from opentrons.hardware_control.modules import (
-    Thermocycler,
-    TempDeck,
-    MagDeck,
-    HeaterShaker,
-    SpeedStatus,
+from opentrons.hardware_control.instruments.ot3.pipette_handler import (
+    OT3PipetteHandler,
+    TipActionMoveSpec,
+    TipActionSpec,
 )
 from opentrons.hardware_control.module_control import AttachedModulesControl
-from opentrons.hardware_control.backends.types import HWStopCondition
-
-from opentrons_hardware.firmware_bindings.constants import SensorId
-from opentrons_hardware.sensors.types import SensorDataType
+from opentrons.hardware_control.modules import (
+    HeaterShaker,
+    MagDeck,
+    SpeedStatus,
+    TempDeck,
+    Thermocycler,
+)
+from opentrons.hardware_control.motion_utilities import target_position_from_plunger
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import (
+    Axis,
+    CriticalPoint,
+    EstopState,
+    EstopStateNotification,
+    GripperJawState,
+    GripperProbe,
+    InstrumentProbeType,
+    OT3AxisKind,
+    OT3Mount,
+    SubSystem,
+    TipStateType,
+)
+from opentrons.types import Mount, NozzleConfigurationType, Point
 
 # TODO (spp, 2023-08-22): write tests for ot3api.stop & ot3api.halt
 
@@ -342,13 +339,16 @@ def mock_max_grip_error() -> Iterator[MagicMock]:
 async def mock_instrument_handlers(
     managed_obj: OT3API,
 ) -> AsyncIterator[Tuple[MagicMock, MagicMock]]:
-    with patch.object(
-        managed_obj,
-        "_gripper_handler",
-        MagicMock(spec=GripperHandler),
-    ) as mock_gripper_handler, patch.object(
-        managed_obj, "_pipette_handler", MagicMock(spec=OT3PipetteHandler)
-    ) as mock_pipette_handler:
+    with (
+        patch.object(
+            managed_obj,
+            "_gripper_handler",
+            MagicMock(spec=GripperHandler),
+        ) as mock_gripper_handler,
+        patch.object(
+            managed_obj, "_pipette_handler", MagicMock(spec=OT3PipetteHandler)
+        ) as mock_pipette_handler,
+    ):
         yield mock_gripper_handler, mock_pipette_handler
 
 
@@ -374,9 +374,9 @@ async def gripper_present(
 
 @pytest.fixture
 def hardware_backend(managed_obj: OT3API) -> OT3Simulator:
-    assert isinstance(
-        managed_obj._backend, OT3Simulator
-    ), "Tests only work with simulator"
+    assert isinstance(managed_obj._backend, OT3Simulator), (
+        "Tests only work with simulator"
+    )
     return managed_obj._backend
 
 
@@ -677,9 +677,9 @@ async def prepare_for_mock_blowout(
     with patch.object(
         ot3_hardware, "pick_up_tip", AsyncMock(spec=ot3_hardware.pick_up_tip)
     ) as mock_tip_pickup:
-        mock_tip_pickup.side_effect = (
-            ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]
-        ) = (True)
+        mock_tip_pickup.side_effect = ot3_hardware._pipette_handler.attached_instruments[
+            mount
+        ]["has_tip"] = True
         if not ot3_hardware._pipette_handler.attached_instruments[mount]["has_tip"]:
             await ot3_hardware.pick_up_tip(mount, 100)
     return instr_data, ot3_hardware
@@ -1141,7 +1141,7 @@ async def test_liquid_probe_mount_moves(
 
     with patch.object(
         hardware_backend, "liquid_probe", AsyncMock(spec=hardware_backend.liquid_probe)
-    ):
+    ) as mock_backend_probe:
         fake_max_z_dist = 10.0
         config = ot3_hardware.config.liquid_sense
         mount_speed = config.mount_speed
@@ -1169,6 +1169,7 @@ async def test_liquid_probe_mount_moves(
             probe_start_pos.y,
             probe_start_pos.z + probe_pass_z_offset_mm,
         )
+        mock_backend_probe.return_value = 10
         await ot3_hardware.liquid_probe(mount, fake_max_z_dist)
         expected_moves = [
             call(mount, safe_plunger_pos),
@@ -1609,9 +1610,9 @@ async def test_gripper_action_works_with_gripper(
         return_value=GripperJawWidthData(
             source=SourceType.default,
             status=CalibrationStatus(),
-            encoder_position_at_jaw_closed=None
-            if needs_calibration
-            else fake_jaw_encoder_val,
+            encoder_position_at_jaw_closed=(
+                None if needs_calibration else fake_jaw_encoder_val
+            ),
             last_modified=None,
         ),
         autospec=True,
@@ -1745,7 +1746,7 @@ async def test_gripper_move_to(
             Axis.Y,
             Axis.Z_G,
         ],
-        key=lambda elem: cast(int, elem.value),
+        key=lambda elem: elem.value,
     )
 
 
@@ -1866,14 +1867,17 @@ async def test_aspirate_while_tracking(
         if is_ready:
             await ot3_hardware.prepare_for_aspirate(OT3Mount.LEFT)
 
+    cp = ot3_hardware.critical_point_for(mount)
+    mount_offset = Point(*ot3_hardware._config.left_mount_offset)
+    end_position = Point(477.2, 493.8, 261.475) + cp + mount_offset
     if not tip_present:
         with pytest.raises(UnexpectedTipRemovalError):
-            await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+            await ot3_hardware.aspirate_while_tracking(mount, end_position, 80.0)
     elif not is_ready:
         with pytest.raises(RuntimeError):
-            await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+            await ot3_hardware.aspirate_while_tracking(mount, end_position, 80.0)
     else:
-        await ot3_hardware.aspirate_while_tracking(mount, 8.0, 80.0)
+        await ot3_hardware.aspirate_while_tracking(mount, end_position, 80.0)
         # make sure the move planning math stays the same
         expected_target_pos = {
             Axis.X: 477.2,
@@ -1916,14 +1920,18 @@ async def test_dispense_while_tracking(
     if is_ready:
         pipette.set_current_volume(80.0)
 
+    cp = ot3_hardware.critical_point_for(mount)
+    mount_offset = Point(*ot3_hardware._config.left_mount_offset)
+    end_position = Point(477.2, 493.8, 261.475) + cp + mount_offset
+
     if not tip_present:
         with pytest.raises(UnexpectedTipRemovalError):
             await ot3_hardware.dispense_while_tracking(
-                mount, 8.0, 80.0, push_out=None, is_full_dispense=is_ready
+                mount, end_position, 80.0, push_out=None, is_full_dispense=is_ready
             )
     else:
         await ot3_hardware.dispense_while_tracking(
-            mount, 8.0, 80.0, push_out=None, is_full_dispense=True
+            mount, end_position, 80.0, push_out=None, is_full_dispense=True
         )
         if is_ready:
             # make sure the move planning math stays the same
@@ -2331,15 +2339,18 @@ async def test_update_position_estimation(
     def _axis_is_present(axis: Axis) -> bool:
         return axis in axes_present
 
-    with patch.object(
-        hardware_backend,
-        "update_motor_estimation",
-        AsyncMock(spec=hardware_backend.update_motor_estimation),
-    ) as mock_update, patch.object(
-        hardware_backend,
-        "axis_is_present",
-        Mock(spec=hardware_backend.axis_is_present),
-    ) as mock_axis_is_present:
+    with (
+        patch.object(
+            hardware_backend,
+            "update_motor_estimation",
+            AsyncMock(spec=hardware_backend.update_motor_estimation),
+        ) as mock_update,
+        patch.object(
+            hardware_backend,
+            "axis_is_present",
+            Mock(spec=hardware_backend.axis_is_present),
+        ) as mock_axis_is_present,
+    ):
         mock_axis_is_present.side_effect = _axis_is_present
         await ot3_hardware._update_position_estimation(axes_in)
         mock_update.assert_called_once_with(expected_axes)
@@ -2351,19 +2362,23 @@ async def test_refresh_positions(
     ot3_hardware._current_position.clear()
     ot3_hardware._encoder_position.clear()
 
-    with patch.object(
-        hardware_backend,
-        "update_motor_status",
-        AsyncMock(spec=hardware_backend.update_motor_status),
-    ) as mock_update_status, patch.object(
-        hardware_backend,
-        "update_position",
-        AsyncMock(spec=hardware_backend.update_position),
-    ) as mock_pos, patch.object(
-        hardware_backend,
-        "update_encoder_position",
-        AsyncMock(spec=hardware_backend.update_encoder_position),
-    ) as mock_encoder:
+    with (
+        patch.object(
+            hardware_backend,
+            "update_motor_status",
+            AsyncMock(spec=hardware_backend.update_motor_status),
+        ) as mock_update_status,
+        patch.object(
+            hardware_backend,
+            "update_position",
+            AsyncMock(spec=hardware_backend.update_position),
+        ) as mock_pos,
+        patch.object(
+            hardware_backend,
+            "update_encoder_position",
+            AsyncMock(spec=hardware_backend.update_encoder_position),
+        ) as mock_encoder,
+    ):
         mock_pos.return_value = {ax: 100 for ax in Axis}
         mock_encoder.return_value = {ax: 99 for ax in Axis}
 
@@ -2413,28 +2428,32 @@ async def test_home_axis(
     mock_check_motor.return_value = stepper_ok
     mock_check_encoder.return_value = encoder_ok
 
-    with patch.object(
-        hardware_backend,
-        "move",
-        AsyncMock(
-            spec=hardware_backend.move,
-            wraps=hardware_backend.move,
-        ),
-    ) as mock_hardware_backend_move, patch.object(
-        hardware_backend,
-        "home",
-        AsyncMock(
-            spec=hardware_backend.home,
-            wraps=hardware_backend.home,
-        ),
-    ) as mock_hardware_backend_home, patch.object(
-        hardware_backend,
-        "update_motor_estimation",
-        AsyncMock(
-            spec=hardware_backend.update_motor_estimation,
-            wraps=hardware_backend.update_motor_estimation,
-        ),
-    ) as mock_estimate:
+    with (
+        patch.object(
+            hardware_backend,
+            "move",
+            AsyncMock(
+                spec=hardware_backend.move,
+                wraps=hardware_backend.move,
+            ),
+        ) as mock_hardware_backend_move,
+        patch.object(
+            hardware_backend,
+            "home",
+            AsyncMock(
+                spec=hardware_backend.home,
+                wraps=hardware_backend.home,
+            ),
+        ) as mock_hardware_backend_home,
+        patch.object(
+            hardware_backend,
+            "update_motor_estimation",
+            AsyncMock(
+                spec=hardware_backend.update_motor_estimation,
+                wraps=hardware_backend.update_motor_estimation,
+            ),
+        ) as mock_estimate,
+    ):
         await ot3_hardware._home_axis(axis)
 
         if not stepper_ok and encoder_ok:

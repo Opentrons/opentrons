@@ -1,15 +1,15 @@
 """Set tip state command request, result, and implementation models."""
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Optional, Type
+
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, Type, List
 from typing_extensions import Literal
 
 from ..errors.error_occurrence import ErrorOccurrence
 from ..state.update_types import StateUpdate
 from ..types import TipRackWellState
-
-
 from .command import (
     AbstractCommandImpl,
     BaseCommand,

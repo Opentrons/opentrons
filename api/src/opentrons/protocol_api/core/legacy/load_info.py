@@ -4,14 +4,14 @@ This module is not part of the public Python Protocol API.
 It's only for internal Opentrons use.
 """
 
-
 from dataclasses import dataclass
 from typing import Optional, Union
+
 from opentrons_shared_data.labware.types import LabwareDefinition2
 
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.modules.types import ModuleModel
-from opentrons.types import Mount, DeckSlotName
+from opentrons.types import DeckSlotName, Mount
 
 
 @dataclass(frozen=True)

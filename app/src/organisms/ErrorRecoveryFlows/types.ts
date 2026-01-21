@@ -10,7 +10,7 @@ import type { ErrorRecoveryWizardProps } from './ErrorRecoveryWizard'
  * Misc Recovery Types
  */
 export type FailedCommand = RunCommandSummary
-export type ErrorKind = typeof ERROR_KINDS[keyof typeof ERROR_KINDS]
+export type ErrorKind = (typeof ERROR_KINDS)[keyof typeof ERROR_KINDS]
 
 /**
  * Prop Specific Types
@@ -42,14 +42,14 @@ export type InvalidStep = typeof INVALID
 export type RouteKey = RecoveryMap[keyof RecoveryMap]['ROUTE']
 export type RecoveryRoute = RouteKey
 export type RobotMovingRoute =
-  | typeof RECOVERY_MAP['ROBOT_IN_MOTION']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_RESUMING']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_RETRYING_STEP']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_CANCELING']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_PICKING_UP_TIPS']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_SKIPPING_STEP']['ROUTE']
-  | typeof RECOVERY_MAP['ROBOT_RELEASING_LABWARE']['ROUTE']
-  | typeof RECOVERY_MAP['STACKER_RELEASING_LABWARE_LATCH']['ROUTE']
+  | (typeof RECOVERY_MAP)['ROBOT_IN_MOTION']['ROUTE']
+  | (typeof RECOVERY_MAP)['ROBOT_RESUMING']['ROUTE']
+  | (typeof RECOVERY_MAP)['ROBOT_RETRYING_STEP']['ROUTE']
+  | (typeof RECOVERY_MAP)['ROBOT_CANCELING']['ROUTE']
+  | (typeof RECOVERY_MAP)['ROBOT_PICKING_UP_TIPS']['ROUTE']
+  | (typeof RECOVERY_MAP)['ROBOT_SKIPPING_STEP']['ROUTE']
+  | (typeof RECOVERY_MAP)['ROBOT_RELEASING_LABWARE']['ROUTE']
+  | (typeof RECOVERY_MAP)['STACKER_RELEASING_LABWARE_LATCH']['ROUTE']
 
 type OriginalRouteKey = keyof RecoveryMap
 type StepsForRoute<R extends RouteKey> = RecoveryMap[{

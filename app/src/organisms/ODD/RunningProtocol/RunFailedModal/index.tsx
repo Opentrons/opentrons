@@ -50,8 +50,8 @@ export function RunFailedModal({
       commandErrorList == null || commandErrorList?.data.length === 0
         ? t('run_failed_modal_title')
         : runStatus === RUN_STATUS_SUCCEEDED
-        ? t('warning_details')
-        : t('error_details'),
+          ? t('warning_details')
+          : t('error_details'),
   }
 
   const highestPriorityError = getHighestPriorityError(errors ?? [])
@@ -82,25 +82,25 @@ export function RunFailedModal({
   }: ErrorContentProps): JSX.Element => {
     return (
       <>
-        <LegacyStyledText as="p" className={styles.error_info_text}>
+        <LegacyStyledText forwardedAs="p" className={styles.error_info_text}>
           {isSingleError
             ? t('error_info', {
                 errorType: errors[0].errorType,
                 errorCode: errors[0].errorCode,
               })
             : runStatus === RUN_STATUS_SUCCEEDED
-            ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
-                count: errors.length,
-              })
-            : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
-                count: errors.length,
-              })}
+              ? t(errors.length > 1 ? 'no_of_warnings' : 'no_of_warning', {
+                  count: errors.length,
+                })
+              : t(errors.length > 1 ? 'no_of_errors' : 'no_of_error', {
+                  count: errors.length,
+                })}
         </LegacyStyledText>
         <div className={styles.error_container}>
           <div className={styles.error_list}>
             {errors.map((error, index) => (
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 className={styles.error_detail_text}
                 key={index}
               >
@@ -129,13 +129,13 @@ export function RunFailedModal({
               highestPriorityError
                 ? [highestPriorityError]
                 : commandErrorList?.data && commandErrorList?.data.length > 0
-                ? commandErrorList?.data
-                : []
+                  ? commandErrorList?.data
+                  : []
             }
             isSingleError={!!highestPriorityError}
           />
         </div>
-        <LegacyStyledText as="p" className={styles.contact_text}>
+        <LegacyStyledText forwardedAs="p" className={styles.contact_text}>
           {t('branded:contact_information')}
         </LegacyStyledText>
         <SmallButton

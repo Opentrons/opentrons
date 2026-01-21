@@ -39,13 +39,13 @@
   border: 1px solid var(--grey-20);
   border-radius: var(--border-radius-12);
   background-color: var(--white);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgb(0 0 0 / 5%);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .main_input_container:focus-within {
   border-color: var(--blue-50);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
 }
 
 .attached_files_section {
@@ -56,8 +56,7 @@
 
 .attached_files_list {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   padding: var(--spacing-12) var(--spacing-16);
   gap: var(--spacing-8);
 }

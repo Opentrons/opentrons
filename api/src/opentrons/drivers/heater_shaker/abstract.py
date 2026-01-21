@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
-from opentrons.drivers.types import Temperature, RPM, HeaterShakerLabwareLatchStatus
+from opentrons.drivers.types import RPM, HeaterShakerLabwareLatchStatus, Temperature
 
 
 class AbstractHeaterShakerDriver(ABC):
@@ -73,4 +73,9 @@ class AbstractHeaterShakerDriver(ABC):
     @abstractmethod
     async def enter_programming_mode(self) -> None:
         """Reboot into programming mode"""
+        ...
+
+    @abstractmethod
+    async def get_error_state(self) -> None:
+        """Raise if the module is in an error state."""
         ...

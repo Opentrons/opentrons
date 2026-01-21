@@ -1,22 +1,22 @@
 """Module to read/write to the eeprom on the Flex SOM."""
 
-import re
-import os
 import logging
+import os
+import re
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Set, Type, Tuple, Any
 from types import TracebackType
+from typing import Any, Optional, Set, Tuple, Type
 
 from ..gpio import OT3GPIO
 from .types import (
-    PropId,
-    Property,
     EEPROMData,
+    Property,
+    PropId,
 )
 from .utils import (
-    parse_data,
     generate_packet,
+    parse_data,
 )
 
 logger = logging.getLogger(__name__)
@@ -25,6 +25,10 @@ logger = logging.getLogger(__name__)
 DEFAULT_BUS = 3
 DEFAULT_ADDRESS = "0050"
 DEFAULT_READ_SIZE = 64
+
+# The expected datagram lengths for EEPROM conent
+DEFAULT_MIN_SERIAL_LENGTH = 17
+DEFAULT_MIN_SKU_LENGTH = 9
 
 
 class EEPROMDriver:
@@ -241,7 +245,10 @@ class EEPROMDriver:
         for prop in self._properties:
             if prop.id == PropId.FORMAT_VERSION:
                 self._eeprom_data.format_version = prop.value
-            elif prop.id == PropId.SERIAL_NUMBER and len(prop.value) >= 17:
+            elif (
+                prop.id == PropId.SERIAL_NUMBER
+                and len(prop.value) >= DEFAULT_MIN_SERIAL_LENGTH
+            ):
                 self._eeprom_data.serial_number = prop.value
                 self._eeprom_data.machine_type = prop.value[:3]
                 self._eeprom_data.machine_version = prop.value[3:6]
@@ -250,4 +257,17 @@ class EEPROMDriver:
                     date_string, "%Y%m%d"
                 )
                 self._eeprom_data.unit_number = int(prop.value[14:17])
+            elif (
+                prop.id == PropId.SERIAL_NUMBER
+                and len(prop.value) < DEFAULT_MIN_SERIAL_LENGTH
+            ):
+                logging.error(
+                    f"Could not populate eeprom data with serial number, data length of {DEFAULT_MIN_SERIAL_LENGTH} or higher required."
+                )
+            elif prop.id == PropId.SKU and len(prop.value) >= DEFAULT_MIN_SKU_LENGTH:
+                self._eeprom_data.sku = str(prop.value)
+            elif prop.id == PropId.SKU and len(prop.value) < DEFAULT_MIN_SKU_LENGTH:
+                logging.error(
+                    f"Could not populate eeprom data with device SKU, data length of {DEFAULT_MIN_SKU_LENGTH} or higher required."
+                )
         return self._eeprom_data

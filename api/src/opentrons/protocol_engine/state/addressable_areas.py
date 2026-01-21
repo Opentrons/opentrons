@@ -4,39 +4,38 @@ from dataclasses import dataclass
 from functools import cached_property
 from typing import Dict, List, Optional, Set
 
-from opentrons_shared_data.robot.types import RobotType, RobotDefinition
-from opentrons_shared_data.module.types import ModuleOrientation
 from opentrons_shared_data.deck.types import (
+    CutoutFixture,
     DeckDefinitionV5,
     SlotDefV3,
-    CutoutFixture,
 )
+from opentrons_shared_data.module.types import ModuleOrientation
+from opentrons_shared_data.robot.types import RobotDefinition, RobotType
 
-from opentrons.types import Point, DeckSlotName
-
+from ..actions import (
+    Action,
+    AddAddressableAreaAction,
+    SetDeckConfigurationAction,
+)
+from ..actions.get_state_update import get_state_updates
 from ..errors import (
-    IncompatibleAddressableAreaError,
-    AreaNotInDeckConfigurationError,
-    SlotDoesNotExistError,
     AddressableAreaDoesNotExistError,
+    AreaNotInDeckConfigurationError,
     CutoutDoesNotExistError,
+    IncompatibleAddressableAreaError,
+    SlotDoesNotExistError,
 )
 from ..resources import deck_configuration_provider
 from ..types import (
     AddressableArea,
-    PotentialCutoutFixture,
     DeckConfigurationType,
     Dimensions,
-)
-from ..actions.get_state_update import get_state_updates
-from ..actions import (
-    Action,
-    SetDeckConfigurationAction,
-    AddAddressableAreaAction,
+    PotentialCutoutFixture,
 )
 from . import update_types
+from ._abstract_store import HandlesActions, HasState
 from .config import Config
-from ._abstract_store import HasState, HandlesActions
+from opentrons.types import DeckSlotName, Point
 
 
 @dataclass
@@ -212,9 +211,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                     deck_definition=self._state.deck_definition,
                 )
             )
-            self._state.loaded_addressable_areas_by_name[
-                addressable_area.area_name
-            ] = addressable_area
+            self._state.loaded_addressable_areas_by_name[addressable_area.area_name] = (
+                addressable_area
+            )
 
     def _validate_addressable_area_for_simulation(
         self, addressable_area_name: str
@@ -237,9 +236,9 @@ class AddressableAreaStore(HasState[AddressableAreaState], HandlesActions):
                 set(potential_fixtures)
             )
 
-            self._state.potential_cutout_fixtures_by_cutout_id[
-                cutout_id
-            ] = remaining_fixtures
+            self._state.potential_cutout_fixtures_by_cutout_id[cutout_id] = (
+                remaining_fixtures
+            )
         else:
             self._state.potential_cutout_fixtures_by_cutout_id[cutout_id] = set(
                 potential_fixtures
@@ -638,7 +637,7 @@ class AddressableAreaView:
 
     def raise_if_area_not_in_deck_configuration(
         self, addressable_area_name: str
-    ) -> None:
+    ) -> bool:
         """Raise error if an addressable area is not compatible with or in the deck configuration.
 
         For simulated runs/analysis, this will raise if the given addressable area is not compatible with other
@@ -646,6 +645,8 @@ class AddressableAreaView:
         deck slot A1 will raise since those two can't exist in any deck configuration combination.
 
         For an on robot run, it will check if it is in the robot's deck configuration, if not it will raise an error.
+
+        Returns True if it does not raise.
         """
         if self._state.use_simulated_deck_config:
             (
@@ -666,6 +667,7 @@ class AddressableAreaView:
                 raise AreaNotInDeckConfigurationError(
                     f"{addressable_area_name} not provided by deck configuration."
                 )
+        return True
 
     def get_current_potential_cutout_fixtures_for_addressable_area(
         self, addressable_area_name: str

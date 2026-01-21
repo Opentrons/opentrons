@@ -3,20 +3,20 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, List, NamedTuple, Optional, TypeVar, Dict
+from typing import Any, Dict, Generic, List, NamedTuple, Optional, TypeVar
 
 from opentrons_shared_data.labware.types import (
-    LabwareUri,
-    LabwareParameters2,
-    LabwareParameters3,
     LabwareDefinition as LabwareDefinitionDict,
 )
+from opentrons_shared_data.labware.types import (
+    LabwareParameters2,
+    LabwareParameters3,
+    LabwareUri,
+)
 
-from opentrons.types import DeckSlotName, Point, NozzleMapInterface
 from .._liquid import Liquid
-
 from .well import WellCoreType
-
+from opentrons.types import DeckSlotName, NozzleMapInterface, Point
 
 _LabwareParametersDict = LabwareParameters2 | LabwareParameters3
 
@@ -59,8 +59,7 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         """
 
     @abstractmethod
-    def get_load_params(self) -> LabwareLoadParams:
-        ...
+    def get_load_params(self) -> LabwareLoadParams: ...
 
     @abstractmethod
     def get_display_name(self) -> str:
@@ -71,8 +70,7 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         """Get the user-specified display name of the labware, if set."""
 
     @abstractmethod
-    def get_name(self) -> str:
-        ...
+    def get_name(self) -> str: ...
 
     @abstractmethod
     def get_definition(self) -> LabwareDefinitionDict:
@@ -83,16 +81,13 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         """Get the labware's definition's `parameters` field as a plain dictionary."""
 
     @abstractmethod
-    def get_quirks(self) -> List[str]:
-        ...
+    def get_quirks(self) -> List[str]: ...
 
     @abstractmethod
-    def set_calibration(self, delta: Point) -> None:
-        ...
+    def set_calibration(self, delta: Point) -> None: ...
 
     @abstractmethod
-    def get_calibrated_offset(self) -> Point:
-        ...
+    def get_calibrated_offset(self) -> Point: ...
 
     @abstractmethod
     def is_tip_rack(self) -> bool:
@@ -111,12 +106,13 @@ class AbstractLabware(ABC, Generic[WellCoreType]):
         """Whether the labware is a fixed trash."""
 
     @abstractmethod
-    def get_tip_length(self) -> float:
-        ...
+    def get_tip_length(self) -> float: ...
 
     @abstractmethod
-    def reset_tips(self) -> None:
-        ...
+    def reset_tips(self) -> None: ...
+
+    @abstractmethod
+    def set_empty(self) -> None: ...
 
     @abstractmethod
     def get_next_tip(

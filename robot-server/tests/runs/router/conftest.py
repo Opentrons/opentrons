@@ -1,22 +1,23 @@
 """Common test fixtures for runs route tests."""
-from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
+
 import pytest
 from decoy import Decoy
 
-from robot_server.protocols.protocol_store import ProtocolStore
-from robot_server.runs.run_auto_deleter import RunAutoDeleter
-from robot_server.runs.run_store import RunStore
-from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
-from robot_server.runs.run_data_manager import RunDataManager
+from opentrons.hardware_control import HardwareControlAPI, OT3HardwareControlAPI
+from opentrons.protocol_engine import ProtocolEngine
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
+
+from robot_server.camera.provider import CameraProviderWrapper
+from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.file_provider.provider import FileProviderExecutor
 from robot_server.maintenance_runs.maintenance_run_orchestrator_store import (
     MaintenanceRunOrchestratorStore,
 )
-from robot_server.deck_configuration.store import DeckConfigurationStore
-
-from robot_server.file_provider.provider import FileProviderWrapper
-
-from opentrons.protocol_engine import ProtocolEngine
-from opentrons.protocol_engine.resources import FileProvider
+from robot_server.protocols.protocol_store import ProtocolStore
+from robot_server.runs.run_auto_deleter import RunAutoDeleter
+from robot_server.runs.run_data_manager import RunDataManager
+from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
+from robot_server.runs.run_store import RunStore
 
 
 @pytest.fixture()
@@ -70,17 +71,31 @@ def mock_deck_configuration_store(decoy: Decoy) -> DeckConfigurationStore:
 
 
 @pytest.fixture()
-def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderWrapper:
-    """Return a mock FileProviderWrapper."""
-    return decoy.mock(cls=FileProviderWrapper)
+def mock_file_provider_wrapper(decoy: Decoy) -> FileProviderExecutor:
+    """Return a mock FileProviderExecutor."""
+    return decoy.mock(cls=FileProviderExecutor)
 
 
 @pytest.fixture()
 def mock_file_provider(
-    decoy: Decoy, mock_file_provider_wrapper: FileProviderWrapper
+    decoy: Decoy, mock_file_provider_wrapper: FileProviderExecutor
 ) -> FileProvider:
     """Return a mock FileProvider."""
     return decoy.mock(cls=FileProvider)
+
+
+@pytest.fixture()
+def mock_camera_provider_wrapper(decoy: Decoy) -> CameraProviderWrapper:
+    """Return a mock CameraProviderWrapper."""
+    return decoy.mock(cls=CameraProviderWrapper)
+
+
+@pytest.fixture()
+def mock_camera_provider(
+    decoy: Decoy, mock_camera_provider_wrapper: CameraProviderWrapper
+) -> CameraProvider:
+    """Return a mock CameraProvider."""
+    return decoy.mock(cls=CameraProvider)
 
 
 @pytest.fixture

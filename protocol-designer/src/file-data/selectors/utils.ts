@@ -52,7 +52,7 @@ export const getLoadCommands = (
   const pipettes: MappedPipettes = mapValues(
     initialRobotState.pipettes,
     (
-      pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
+      pipette: (typeof initialRobotState.pipettes)[keyof typeof initialRobotState.pipettes],
       pipetteId: string
     ) => ({
       name: pipetteEntities[pipetteId].name,
@@ -62,7 +62,7 @@ export const getLoadCommands = (
   const loadPipetteCommands = map(
     initialRobotState.pipettes,
     (
-      pipette: typeof initialRobotState.pipettes[keyof typeof initialRobotState.pipettes],
+      pipette: (typeof initialRobotState.pipettes)[keyof typeof initialRobotState.pipettes],
       pipetteId: string
     ): LoadPipetteCreateCommand => {
       const loadPipetteCommand = {
@@ -87,7 +87,7 @@ export const getLoadCommands = (
     initialRobotState.labware,
     (
       acc,
-      labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
+      labware: (typeof initialRobotState.labware)[keyof typeof initialRobotState.labware],
       labwareId: string
     ): LoadLabwareCreateCommand[] => {
       const { def } = labwareEntities[labwareId]
@@ -126,7 +126,7 @@ export const getLoadCommands = (
     initialRobotState.labware,
     (
       acc,
-      labware: typeof initialRobotState.labware[keyof typeof initialRobotState.labware],
+      labware: (typeof initialRobotState.labware)[keyof typeof initialRobotState.labware],
       labwareId: string
     ): LoadLabwareCreateCommand[] => {
       const { def } = labwareEntities[labwareId]
@@ -189,7 +189,7 @@ export const getLoadCommands = (
   const loadModuleCommands = map(
     initialRobotState.modules,
     (
-      module: typeof initialRobotState.modules[keyof typeof initialRobotState.modules],
+      module: (typeof initialRobotState.modules)[keyof typeof initialRobotState.modules],
       moduleId: string
     ): LoadModuleCreateCommand => {
       const model = moduleEntities[moduleId].model

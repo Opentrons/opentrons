@@ -11,28 +11,33 @@ describe('getEquipmentLoadInfoFromCommands', () => {
   it('properly returns the pipettes, modules, and labware info for doItAllV7 fixture', () => {
     const results: EquipmentLoadInfoFromCommands = {
       labware: {
-        '239ceac8-23ec-4900-810a-70aeef880273:opentrons/nest_96_wellplate_200ul_flat/2': {
-          displayName: 'NEST 96 Well Plate 200 µL Flat',
-          labwareDefURI: 'opentrons/nest_96_wellplate_200ul_flat/2',
-        },
-        '23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1': {
-          displayName: 'Opentrons Flex 96 Filter Tip Rack 50 µL',
-          labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
-        },
-        'a793a135-06aa-4ed6-a1d3-c176c7810afa:opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1': {
-          displayName:
-            'Opentrons 24 Well Aluminum Block with NEST 1.5 mL Snapcap',
-          labwareDefURI:
-            'opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1',
-        },
-        'd95bb3be-b453-457c-a947-bd03dc8e56b9:opentrons/opentrons_96_flat_bottom_adapter/1': {
-          displayName: 'Opentrons 96 Flat Bottom Heater-Shaker Adapter',
-          labwareDefURI: 'opentrons/opentrons_96_flat_bottom_adapter/1',
-        },
-        'fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2': {
-          displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
-          labwareDefURI: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
-        },
+        '239ceac8-23ec-4900-810a-70aeef880273:opentrons/nest_96_wellplate_200ul_flat/2':
+          {
+            displayName: 'NEST 96 Well Plate 200 µL Flat',
+            labwareDefURI: 'opentrons/nest_96_wellplate_200ul_flat/2',
+          },
+        '23ed35de-5bfd-4bb0-8f54-da99a2804ed9:opentrons/opentrons_flex_96_filtertiprack_50ul/1':
+          {
+            displayName: 'Opentrons Flex 96 Filter Tip Rack 50 µL',
+            labwareDefURI: 'opentrons/opentrons_flex_96_filtertiprack_50ul/1',
+          },
+        'a793a135-06aa-4ed6-a1d3-c176c7810afa:opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1':
+          {
+            displayName:
+              'Opentrons 24 Well Aluminum Block with NEST 1.5 mL Snapcap',
+            labwareDefURI:
+              'opentrons/opentrons_24_aluminumblock_nest_1.5ml_snapcap/1',
+          },
+        'd95bb3be-b453-457c-a947-bd03dc8e56b9:opentrons/opentrons_96_flat_bottom_adapter/1':
+          {
+            displayName: 'Opentrons 96 Flat Bottom Heater-Shaker Adapter',
+            labwareDefURI: 'opentrons/opentrons_96_flat_bottom_adapter/1',
+          },
+        'fcba73e7-b88e-438e-963e-f8b9a5de0983:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2':
+          {
+            displayName: 'NEST 96 Well Plate 100 µL PCR Full Skirt',
+            labwareDefURI: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/2',
+          },
       },
       modules: {
         '1be16305-74e7-4bdb-9737-61ec726d2b44:magneticBlockType': {

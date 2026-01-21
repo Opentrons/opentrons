@@ -1,4 +1,5 @@
 from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
@@ -13,6 +14,5 @@ class WriteInstrumentIDGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         left_or_right = cls.SIDE_EXPANSION_DICT[l_or_r]
 
         return (
-            f"Writing instrument ID {g_code_args[l_or_r]} for "
-            f"{left_or_right} pipette"
+            f"Writing instrument ID {g_code_args[l_or_r]} for {left_or_right} pipette"
         )

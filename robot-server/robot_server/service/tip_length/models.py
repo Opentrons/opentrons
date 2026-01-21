@@ -3,10 +3,11 @@ from datetime import datetime
 from pydantic import Field
 
 from opentrons.calibration_storage.types import SourceType
+
 from robot_server.service.json_api import (
-    DeprecatedResponseModel,
     DeprecatedMultiResponseModel,
     DeprecatedResponseDataModel,
+    DeprecatedResponseModel,
 )
 from robot_server.service.shared_models import calibration as cal_model
 

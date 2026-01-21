@@ -103,7 +103,9 @@ class Mark10(Mark10Base):
             try:
                 force_val, units = line.split(" ")
                 if units != "N":
-                    self._force_guage.write("N\r\n")  # Set force gauge units to Newtons
+                    self._force_guage.write(
+                        "N\r\n".encode("utf-8")
+                    )  # Set force gauge units to Newtons
                     print(f'Setting gauge units from {units} to "N" (newtons)')
                     continue
                 else:

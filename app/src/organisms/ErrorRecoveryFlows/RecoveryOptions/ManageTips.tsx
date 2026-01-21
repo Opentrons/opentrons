@@ -25,7 +25,6 @@ import {
 import { SelectRecoveryOption } from './SelectRecoveryOption'
 
 import type { FixitCommandTypeUtils } from '/app/organisms/DropTipWizardFlows'
-import type { PipetteWithTip } from '/app/resources/instruments'
 import type { RecoveryContentProps, RecoveryRoute, RouteStep } from '../types'
 
 // The Drop Tip flow entry point. Includes entry from SelectRecoveryOption and CancelRun.
@@ -66,11 +65,8 @@ export function BeginRemoval({
 }: RecoveryContentProps): JSX.Element | null {
   const { t } = useTranslation('error_recovery')
   const { aPipetteWithTip } = tipStatusUtils
-  const {
-    proceedNextStep,
-    handleMotionRouting,
-    proceedToRouteAndStep,
-  } = routeUpdateActions
+  const { proceedNextStep, handleMotionRouting, proceedToRouteAndStep } =
+    routeUpdateActions
   const { cancelRun } = recoveryCommands
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {
@@ -191,7 +187,7 @@ function DropTipFlowsContainer(
   const { setTipStatusResolved } = tipStatusUtils
   const { cancelRun } = recoveryCommands
 
-  const { mount, specs } = tipStatusUtils.aPipetteWithTip as PipetteWithTip // Safe as we have to have tips to get to this point in the flow.
+  const { mount, specs } = tipStatusUtils.aPipetteWithTip! // Safe as we have to have tips to get to this point in the flow.
 
   const onCloseFlow = (): void => {
     if (selectedRecoveryOption === RETRY_NEW_TIPS.ROUTE) {
@@ -388,11 +384,8 @@ export function useDropTipFlowUtils({
 // Handle cases in which there is no pipette that could be used for drop tip wizard by routing
 // to the next step or to option selection, if no special routing is provided.
 function routeAlternativelyIfNoPipette(props: RecoveryContentProps): void {
-  const {
-    routeUpdateActions,
-    currentRecoveryOptionUtils,
-    tipStatusUtils,
-  } = props
+  const { routeUpdateActions, currentRecoveryOptionUtils, tipStatusUtils } =
+    props
   const { proceedToRouteAndStep } = routeUpdateActions
   const { selectedRecoveryOption } = currentRecoveryOptionUtils
   const {

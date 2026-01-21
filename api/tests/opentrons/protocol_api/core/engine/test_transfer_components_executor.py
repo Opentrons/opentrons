@@ -1,28 +1,30 @@
 """Tests for complex commands executor."""
-from typing import Literal, Union
+
+from typing import Literal, Union, cast
 
 import pytest
 from decoy import Decoy, matchers
+
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    BlowoutLocation,
+    Coordinate,
     LiquidClassSchemaV1,
     PositionReference,
-    Coordinate,
-    BlowoutLocation,
 )
 
-from opentrons.protocol_api import TrashBin, WasteChute, Labware
+from opentrons.protocol_api import Labware, TrashBin, WasteChute
 from opentrons.protocol_api._liquid import LiquidClass
 from opentrons.protocol_api._liquid_properties import TransferProperties
-from opentrons.protocol_api.core.engine.well import WellCore
 from opentrons.protocol_api.core.engine.instrument import InstrumentCore
 from opentrons.protocol_api.core.engine.transfer_components_executor import (
-    TransferComponentsExecutor,
-    absolute_point_from_position_reference_and_offset,
-    TipState,
-    TransferType,
-    LiquidAndAirGapPair,
     AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP,
+    LiquidAndAirGapPair,
+    TipState,
+    TransferComponentsExecutor,
+    TransferType,
+    absolute_point_from_position_reference_and_offset,
 )
+from opentrons.protocol_api.core.engine.well import WellCore
 from opentrons.protocol_api.disposal_locations import DisposalOffset
 from opentrons.protocol_api.labware import Well
 from opentrons.protocols.advanced_control.transfers import (
@@ -31,7 +33,7 @@ from opentrons.protocols.advanced_control.transfers import (
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
 )
-from opentrons.types import Location, Point, Mount
+from opentrons.types import Location, Mount, Point
 
 
 @pytest.fixture
@@ -1203,11 +1205,11 @@ def test_retract_after_dispense_with_blowout_in_source(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(10, 20, 30), labware=None),
             well_core=source_well,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(10, 20, 30), labware=None),
@@ -1273,8 +1275,8 @@ def test_retract_after_dispense_with_blowout_in_destination(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = (
-        BlowoutLocation.DESTINATION
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.DESTINATION
     )
 
     subject = TransferComponentsExecutor(
@@ -1313,11 +1315,11 @@ def test_retract_after_dispense_with_blowout_in_destination(
             speed=50,
         ),
         mock_instrument_core.delay(10),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(12, 24, 36), labware=None),
             well_core=None,
             in_place=True,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(12, 24, 36), labware=None),
@@ -1382,7 +1384,9 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.TRASH
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -1441,11 +1445,11 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=trash_location,
             well_core=None,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=trash_location,
@@ -1509,7 +1513,9 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.TRASH
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -1565,11 +1571,11 @@ def test_retract_after_dispense_with_blowout_in_disposal_location(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=trash_location,
             well_core=None,
             in_place=False,
+            flow_rate=100,
         ),
         *(
             add_final_air_gap
@@ -1648,11 +1654,11 @@ def test_retract_after_dispense_in_trash_with_blowout_in_source(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(10, 20, 30), labware=None),
             well_core=source_well,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(10, 20, 30), labware=None),
@@ -1713,8 +1719,8 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = (
-        BlowoutLocation.DESTINATION
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.DESTINATION
     )
 
     subject = TransferComponentsExecutor(
@@ -1743,11 +1749,11 @@ def test_retract_after_dispense_in_trash_with_blowout_in_destination(
     )
     decoy.verify(
         mock_instrument_core.delay(10),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=target_trash,
             well_core=None,
             in_place=True,
+            flow_rate=100,
         ),
         *(
             add_final_air_gap
@@ -1796,7 +1802,9 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
         air_gap_volume, air_gap_correction_by_vol
     )
 
-    sample_transfer_props.dispense.retract.blowout.location = BlowoutLocation.TRASH
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, BlowoutLocation.TRASH
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -1827,11 +1835,11 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=trash_location,
             well_core=None,
             in_place=False,
+            flow_rate=100,
         ),
         *(
             add_final_air_gap
@@ -1879,7 +1887,9 @@ def test_retract_after_dispense_touch_tip(
 
     sample_transfer_props.dispense.retract.touch_tip.enabled = True
     sample_transfer_props.dispense.retract.blowout.enabled = True
-    sample_transfer_props.dispense.retract.blowout.location = blowout_location
+    sample_transfer_props.dispense.retract.blowout.location = cast(
+        str, blowout_location
+    )
 
     subject = TransferComponentsExecutor(
         instrument_core=mock_instrument_core,
@@ -2078,11 +2088,11 @@ def test_retract_after_dispense_with_blowout_in_src_moves_to_safe_loc_for_air_ga
             correction_volume=air_gap_correction_by_vol,
         ),
         mock_instrument_core.delay(0.2),
-        mock_instrument_core.set_flow_rate(blow_out=100),
         mock_instrument_core.blow_out(
             location=Location(Point(10, 20, 30), labware=None),
             well_core=source_well,
             in_place=False,
+            flow_rate=100,
         ),
         mock_instrument_core.touch_tip(
             location=Location(Point(10, 20, 30), labware=None),
@@ -2326,17 +2336,11 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
         *(
             expect_blowout
             and [
-                mock_instrument_core.set_flow_rate(blow_out=10)  # type: ignore[func-returns-value]
-            ]
-            or []
-        ),
-        *(
-            expect_blowout
-            and [
                 mock_instrument_core.blow_out(  # type: ignore[func-returns-value]
                     location=Location(Point(3, 5, 4), labware=None),
                     well_core=None,
                     in_place=True,
+                    flow_rate=10,
                 )
             ]
             or []

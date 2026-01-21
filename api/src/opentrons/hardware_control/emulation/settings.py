@@ -1,8 +1,10 @@
 from typing import List
-from opentrons.hardware_control.emulation.types import ModuleType
-from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
+
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from opentrons.hardware_control.emulation.types import ModuleType
+from opentrons.hardware_control.emulation.util import TEMPERATURE_ROOM
 
 
 class PipetteSettings(BaseModel):
@@ -90,7 +92,7 @@ class Settings(BaseSettings):
     )
     thermocycler: ThermocyclerSettings = ThermocyclerSettings(
         serial_number="thermocycler_emulator",
-        model="v02",
+        model="thermocyclerModuleV2",
         version="v1.1.0",
         lid_temperature=TemperatureModelSettings(),
         plate_temperature=TemperatureModelSettings(),

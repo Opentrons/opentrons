@@ -38,13 +38,13 @@ export interface DeckCalibrationData {
     | [
         [number, number, number],
         [number, number, number],
-        [number, number, number]
+        [number, number, number],
       ]
     | [
         [number, number, number, number],
         [number, number, number, number],
         [number, number, number, number],
-        [number, number, number, number]
+        [number, number, number, number],
       ]
   lastModified: string | null
   pipetteCalibratedWith: string | null // pipette serial number

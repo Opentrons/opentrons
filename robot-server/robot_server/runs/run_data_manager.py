@@ -1,42 +1,44 @@
 """Manage current and historical run data."""
 
 from datetime import datetime
-from typing import Dict, List, Optional, Callable, Union, Mapping, Sequence
+from typing import Callable, Dict, List, Mapping, Optional, Sequence, Union
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-from opentrons_shared_data.errors.exceptions import InvalidStoredData, EnumeratedError
-
-from opentrons.types import NozzleMapInterface
+from opentrons import config
 from opentrons.protocol_engine import (
+    Command,
+    CommandErrorSlice,
+    CommandPointer,
+    CommandSlice,
     EngineStatus,
     LabwareOffsetCreate,
     LegacyLabwareOffsetCreate,
     StateSummary,
-    CommandSlice,
-    CommandErrorSlice,
-    CommandPointer,
-    Command,
 )
-from opentrons.protocol_engine.types import (
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
-)
-
-from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
-from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.service.task_runner import TaskRunner
-from robot_server.service.notifications import RunsPublisher
-from . import error_recovery_mapping
-from .error_recovery_models import ErrorRecoveryRule
-
-from .run_orchestrator_store import RunOrchestratorStore
-from .run_store import RunResource, RunStore, BadRunResource, BadStateSummary
-from .run_models import Run, BadRun, RunDataError
-
-from opentrons.protocol_engine.types import DeckConfigurationType, RunTimeParameter
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.resources.file_provider import FileProvider
 from opentrons.protocol_engine.state.module_substates import FlexStackerSubState
+from opentrons.protocol_engine.types import (
+    CSVRuntimeParamPaths,
+    DeckConfigurationType,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
+)
+from opentrons.system import camera
+from opentrons.types import NozzleMapInterface
+from opentrons_shared_data.data_files import RunFileNameMetadata
+from opentrons_shared_data.errors.exceptions import EnumeratedError, InvalidStoredData
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
+from . import error_recovery_mapping
+from .error_recovery_models import ErrorRecoveryRule
+from .run_models import BadRun, Run, RunDataError
+from .run_orchestrator_store import RunOrchestratorStore
+from .run_store import BadRunResource, BadStateSummary, RunResource, RunStore
+from robot_server.camera.settings.store import CameraSettingStore
+from robot_server.error_recovery.settings.store import ErrorRecoverySettingStore
+from robot_server.protocols.protocol_store import ProtocolResource
+from robot_server.service.notifications import RunsPublisher
+from robot_server.service.task_runner import TaskRunner
 
 _INITIAL_ERROR_RECOVERY_RULES: list[ErrorRecoveryRule] = []
 
@@ -70,6 +72,7 @@ def _build_run(
             liquidClasses=state_summary.liquidClasses,
             outputFileIds=state_summary.files,
             runTimeParameters=run_time_parameters,
+            cameraSettings=state_summary.cameraSettings,
         )
 
     errors: List[EnumeratedError] = []
@@ -158,13 +161,16 @@ class RunDataManager:
         run_orchestrator_store: RunOrchestratorStore,
         run_store: RunStore,
         error_recovery_setting_store: ErrorRecoverySettingStore,
+        camera_setting_store: CameraSettingStore,
         task_runner: TaskRunner,
         runs_publisher: RunsPublisher,
+        file_provider: FileProvider,
     ) -> None:
         self._run_orchestrator_store = run_orchestrator_store
         self._run_store = run_store
 
         self._error_recovery_setting_store = error_recovery_setting_store
+        self._camera_setting_store = camera_setting_store
         # todo(mm, 2024-11-22): Storing the list of error recovery rules is outside the
         # responsibilities of this class. It's also clunky for us to store it like this
         # because we need to remember to clear it whenever the current run changes.
@@ -173,6 +179,7 @@ class RunDataManager:
 
         self._task_runner = task_runner
         self._runs_publisher = runs_publisher
+        self._file_provider = file_provider
 
     @property
     def current_run_id(self) -> Optional[str]:
@@ -185,7 +192,7 @@ class RunDataManager:
         created_at: datetime,
         labware_offsets: Sequence[LabwareOffsetCreate | LegacyLabwareOffsetCreate],
         deck_configuration: DeckConfigurationType,
-        file_provider: FileProvider,
+        camera_provider: CameraProvider,
         run_time_param_values: Optional[PrimitiveRunTimeParamValuesType],
         run_time_param_paths: Optional[CSVRuntimeParamPaths],
         notify_publishers: Callable[[], None],
@@ -198,6 +205,7 @@ class RunDataManager:
             created_at: Creation datetime.
             labware_offsets: Labware offsets to initialize the engine with.
             deck_configuration: A mapping of fixtures to cutout fixtures the deck will be loaded with.
+            camera_provider: Utility for accessing image capture and camera settings.
             notify_publishers: Utilized by the engine to notify publishers of state changes.
             run_time_param_values: Any runtime parameter values to set.
             run_time_param_paths: Any runtime filepath to set.
@@ -229,12 +237,29 @@ class RunDataManager:
             )
         )
 
+        protocol_name = (
+            protocol.source.metadata.get(
+                "protocolName", protocol.source.files[0].path.name
+            )
+            if protocol is not None
+            else None
+        )
+        self._file_provider.set_run_metadata(
+            RunFileNameMetadata(
+                robot_name=config.name(),
+                run_id=run_id,
+                run_created_at=created_at,
+                protocol_name=protocol_name,
+            )
+        )
+
         state_summary = await self._run_orchestrator_store.create(
             run_id=run_id,
             labware_offsets=labware_offsets,
             initial_error_recovery_policy=initial_error_recovery_policy,
             deck_configuration=deck_configuration,
-            file_provider=file_provider,
+            file_provider=self._file_provider,
+            camera_provider=camera_provider,
             protocol=protocol,
             run_time_param_values=run_time_param_values,
             run_time_param_paths=run_time_param_paths,
@@ -255,6 +280,16 @@ class RunDataManager:
             get_recovery_target_command=self.get_recovery_target_command,
             get_state_summary=self._get_good_state_summary,
             run_id=run_id,
+        )
+
+        await camera.update_live_stream_status(
+            self._run_orchestrator_store._robot_type,
+            True,
+            camera_provider,
+            state_summary.cameraSettings,
+        )
+        self._run_orchestrator_store.add_camera_capture_image_settings(
+            capture_image_settings=self._camera_setting_store.get_camera_capture_image_settings()
         )
 
         return _build_run(
@@ -380,15 +415,16 @@ class RunDataManager:
             run_result = await self._run_orchestrator_store.clear()
             state_summary = run_result.state_summary
             parameters = run_result.parameters
-            run_resource: Union[
-                RunResource, BadRunResource
-            ] = self._run_store.update_run_state(
-                run_id=run_id,
-                summary=run_result.state_summary,
-                commands=run_result.commands,
-                run_time_parameters=run_result.parameters,
+            run_resource: Union[RunResource, BadRunResource] = (
+                self._run_store.update_run_state(
+                    run_id=run_id,
+                    summary=run_result.state_summary,
+                    commands=run_result.commands,
+                    run_time_parameters=run_result.parameters,
+                )
             )
             self._runs_publisher.publish_pre_serialized_commands_notification(run_id)
+            self._file_provider.clear_run_metadata()
         else:
             state_summary = self._run_orchestrator_store.get_state_summary()
             parameters = self._run_orchestrator_store.get_run_time_parameters()

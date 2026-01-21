@@ -1,17 +1,19 @@
 """Command models to start heating a Heater-Shaker Module."""
+
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Any
-from typing_extensions import Literal, Type
+
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal, Type
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
+    from opentrons.protocol_engine.state.state import StateView
 
 
 SetTargetTemperatureCommandType = Literal["heaterShaker/setTargetTemperature"]
@@ -82,7 +84,7 @@ class SetTargetTemperatureImpl(
         async def start_set_temperature(task_handler: TaskHandler) -> None:
             if hs_hardware_module is not None:
                 async with task_handler.synchronize_cancel_previous(
-                    hs_module_substate.module_id
+                    hs_module_substate.module_id + "-temp"
                 ):
                     await hs_hardware_module.start_set_temperature(validated_temp)
                     await hs_hardware_module.await_temperature(validated_temp)

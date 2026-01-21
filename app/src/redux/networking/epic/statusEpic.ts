@@ -17,7 +17,9 @@ import type {
   InternetStatus,
 } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchStatusAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchStatusAction
+> = action => ({
   method: GET,
   path: Constants.STATUS_PATH,
 })

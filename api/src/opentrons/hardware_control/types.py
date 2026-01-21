@@ -1,23 +1,30 @@
-from asyncio import Queue
 import enum
 import logging
+from asyncio import Queue
 from dataclasses import dataclass
 from typing import (
-    cast,
-    Tuple,
-    Union,
-    List,
+    TYPE_CHECKING,
     Callable,
     Dict,
-    TypeVar,
+    List,
+    Tuple,
     Type,
-    TYPE_CHECKING,
+    TypeVar,
+    Union,
+    cast,
 )
+
 from typing_extensions import Literal
-from opentrons import types as top_types
-from opentrons_shared_data.pipette.types import PipetteChannelType
+
 from opentrons_shared_data.errors.exceptions import EnumeratedError
+from opentrons_shared_data.pipette.types import PipetteChannelType
+
+from opentrons import types as top_types
 from opentrons.config import feature_flags
+
+# this is an explicit re-export that exists for backward compatibility - this type used
+# to live in this file
+from opentrons.config.types import OT3AxisKind as OT3AxisKind
 
 if TYPE_CHECKING:
     from .modules.types import ModuleModel
@@ -56,35 +63,6 @@ class OT3Mount(enum.Enum):
     @classmethod
     def pipette_mounts(cls) -> List["Literal[OT3Mount.LEFT, OT3Mount.RIGHT]"]:
         return [cls.LEFT, cls.RIGHT]
-
-
-class OT3AxisKind(enum.Enum):
-    """An enum of the different kinds of axis we have.
-
-    The machine may have different numbers of specific axes implementing
-    each axis kind.
-    """
-
-    X = 0
-    #: Gantry X axis
-    Y = 1
-    #: Gantry Y axis
-    Z = 2
-    #: Z axis (of the left and right)
-    P = 3
-    #: Plunger axis (of the left and right pipettes)
-    Z_G = 4
-    #: Gripper Z axis
-    Q = 6
-    #: High-throughput tip grabbing axis
-    OTHER = 6
-    #: The internal axes of high throughput pipettes, for instance
-
-    def __str__(self) -> str:
-        return self.name
-
-    def is_z_axis(self) -> bool:
-        return self in [OT3AxisKind.Z, OT3AxisKind.Z_G]
 
 
 class Axis(enum.Enum):
@@ -399,6 +377,7 @@ class HardwareEventType(enum.Enum):
     ERROR_MESSAGE = enum.auto()
     ESTOP_CHANGE = enum.auto()
     ASYNCHRONOUS_MODULE_ERROR = enum.auto()
+    MODULE_DISCONNECTED = enum.auto()
 
 
 @dataclass
@@ -423,9 +402,9 @@ class HepaUVState:
 
 @dataclass(frozen=True)
 class DoorStateNotification:
-    event: Literal[
+    event: Literal[HardwareEventType.DOOR_SWITCH_CHANGE] = (
         HardwareEventType.DOOR_SWITCH_CHANGE
-    ] = HardwareEventType.DOOR_SWITCH_CHANGE
+    )
     new_state: DoorState = DoorState.CLOSED
     module_serial: str | None = None
 
@@ -449,9 +428,19 @@ class AsynchronousModuleErrorNotification:
     module_serial: str | None
     module_model: "ModuleModel"
     port: str
-    event: Literal[
+    event: Literal[HardwareEventType.ASYNCHRONOUS_MODULE_ERROR] = (
         HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
-    ] = HardwareEventType.ASYNCHRONOUS_MODULE_ERROR
+    )
+
+
+@dataclass(frozen=True)
+class ModuleDisconnectedNotification:
+    module_serial: str | None
+    module_model: "ModuleModel"
+    port: str
+    event: Literal[HardwareEventType.MODULE_DISCONNECTED] = (
+        HardwareEventType.MODULE_DISCONNECTED
+    )
 
 
 # new event types get new dataclasses
@@ -461,6 +450,7 @@ HardwareEvent = Union[
     ErrorMessageNotification,
     EstopStateNotification,
     AsynchronousModuleErrorNotification,
+    ModuleDisconnectedNotification,
 ]
 
 HardwareEventHandler = Callable[[HardwareEvent], None]

@@ -31,7 +31,6 @@ import {
   useAttachedPipetteCalibrations,
   useAttachedPipettes,
 } from '/app/resources/instruments'
-import { useRunStatuses } from '/app/resources/runs'
 
 import { AskForCalibrationBlockModal } from '../CalibrateTipLength/AskForCalibrationBlockModal'
 
@@ -46,6 +45,7 @@ interface CalibrationHealthCheckProps {
   dispatchRequests: DispatchRequestsType
   isPending: boolean
   robotName: string
+  isRobotBusy: boolean
 }
 
 const attachedPipetteCalPresent: (
@@ -64,6 +64,7 @@ export function CalibrationHealthCheck({
   dispatchRequests,
   isPending,
   robotName,
+  isRobotBusy,
 }: CalibrationHealthCheckProps): JSX.Element {
   const { t } = useTranslation([
     'device_settings',
@@ -81,8 +82,6 @@ export function CalibrationHealthCheck({
   const attachedPipettes = useAttachedPipettes()
   const attachedPipetteCalibrations = useAttachedPipetteCalibrations()
 
-  const { isRunRunning: isRunning } = useRunStatuses()
-
   const pipetteCalPresent = attachedPipetteCalPresent(
     attachedPipettes,
     attachedPipetteCalibrations
@@ -94,16 +93,18 @@ export function CalibrationHealthCheck({
   const configHasCalibrationBlock = useSelector(Config.getHasCalibrationBlock)
 
   const healthCheckIsPossible =
-    !([
-      Calibration.DECK_CAL_STATUS_SINGULARITY,
-      Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
-      Calibration.DECK_CAL_STATUS_IDENTITY,
-    ] as Array<typeof deckCalibrationStatus>).includes(deckCalibrationStatus) &&
+    !(
+      [
+        Calibration.DECK_CAL_STATUS_SINGULARITY,
+        Calibration.DECK_CAL_STATUS_BAD_CALIBRATION,
+        Calibration.DECK_CAL_STATUS_IDENTITY,
+      ] as Array<typeof deckCalibrationStatus>
+    ).includes(deckCalibrationStatus) &&
     pipetteCalPresent &&
     pipettePresent
 
   const calCheckButtonDisabled = healthCheckIsPossible
-    ? Boolean(buttonDisabledReason) || isPending || isRunning
+    ? Boolean(buttonDisabledReason) || isPending || isRobotBusy
     : true
 
   const handleHealthCheck = (
@@ -143,10 +144,13 @@ export function CalibrationHealthCheck({
       justifyContent={JUSTIFY_SPACE_BETWEEN}
     >
       <Flex gridGap={SPACING.spacing8} flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="h3"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {t('calibration_health_check_title')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('calibration_health_check_description')}
         </LegacyStyledText>
       </Flex>

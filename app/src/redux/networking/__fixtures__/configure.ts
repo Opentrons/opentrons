@@ -15,17 +15,15 @@ const {
   failureMeta,
   success,
   failure,
-}: ResponseFixtures<
-  WifiConfigureResponse,
-  { message: string }
-> = makeResponseFixtures({
-  method: POST,
-  path: WIFI_CONFIGURE_PATH,
-  successStatus: 200,
-  successBody: { ssid: 'network-name', message: 'connected' },
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+}: ResponseFixtures<WifiConfigureResponse, { message: string }> =
+  makeResponseFixtures({
+    method: POST,
+    path: WIFI_CONFIGURE_PATH,
+    successStatus: 200,
+    successBody: { ssid: 'network-name', message: 'connected' },
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  })
 
 export {
   successMeta as mockWifiConfigureSuccessMeta,

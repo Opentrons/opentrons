@@ -1,12 +1,16 @@
 import base64
-from typing import Generator, Dict, List, Any
-import pytest
 from binascii import Error as BinError
+from typing import Any, Dict, Generator, List
+
+import pytest
 from decoy import Decoy
 from mock import AsyncMock, MagicMock
+
+from opentrons.drivers.asyncio.communication.errors import NoResponse
 from opentrons.drivers.asyncio.communication.serial_connection import (
     AsyncResponseSerialConnection,
 )
+from opentrons.drivers.flex_stacker import types
 from opentrons.drivers.flex_stacker.driver import (
     DEFAULT_FS_TIMEOUT,
     FS_MOVE_TIMEOUT,
@@ -14,7 +18,6 @@ from opentrons.drivers.flex_stacker.driver import (
     FS_TOF_TIMEOUT,
     FlexStackerDriver,
 )
-from opentrons.drivers.flex_stacker import types
 from opentrons.drivers.flex_stacker.errors import MotorStallDetected
 
 
@@ -591,7 +594,7 @@ async def test_get_tof_histogram_frame(
     get_measurement = types.GCODE.GET_TOF_MEASUREMENT.build_command().add_element(
         types.TOFSensor.X.name
     )
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
     # Test cancel transfer
@@ -611,7 +614,7 @@ async def test_get_tof_histogram_frame(
         .add_element(types.TOFSensor.X.name)
         .add_element("R")
     )
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
     # Test invalid index response
@@ -643,7 +646,7 @@ def get_histogram_payload(frames: int) -> Generator[str, None, None]:
         rest[4] = frame_id
         data = first if frame_id == 0 else rest
         encoded = base64.b64encode(data).decode("utf-8")
-        yield f"M226 X I:{frame_id+1} D:{encoded}"
+        yield f"M226 X I:{frame_id + 1} D:{encoded}"
         frame_id += 1
         length += 1
 
@@ -675,7 +678,7 @@ async def test_get_tof_histogram(
         types.TOFSensor.X.name
     )
     connection.send_command.assert_any_call(manage_measurement)
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
     # Test invalid frame_id
@@ -699,7 +702,36 @@ async def test_get_tof_histogram(
         types.TOFSensor.X.name
     )
     connection.send_command.assert_any_call(manage_measurement)
-    connection.send_command.assert_any_call(get_measurement)
+    connection.send_command.assert_any_call(get_measurement, retries=0)
+    connection.reset_mock()
+
+    # Test resend mechanism
+    get_measurement = (
+        types.GCODE.GET_TOF_MEASUREMENT.build_command()
+        .add_element(types.TOFSensor.X.name)
+        .add_element("R")
+    )
+    payload = [p for p in get_histogram_payload(30)]
+    connection.send_command.side_effect = (
+        [
+            "M215 X:1 T:2 M:3",
+            "M225 X K:0 C:1 L:3840",
+            payload[0],
+            payload[1],
+            # We raise NoResponse on frame 3 to simulate a timeout and force a resend
+            NoResponse("", "Timeout"),
+            # After the timeout we expect the same packet to be resent
+            payload[2],
+            # Then the rest of the packets
+        ]
+        + payload[3:]
+    )
+
+    response = await subject.get_tof_histogram(types.TOFSensor.X)
+
+    connection.send_command.assert_any_call(manage_measurement)
+    # Assert that the M226 GCODE with `R` (resend) element was sent
+    connection.send_command.assert_any_call(get_measurement, retries=0)
     connection.reset_mock()
 
 

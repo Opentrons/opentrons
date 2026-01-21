@@ -63,9 +63,8 @@ export function SelectDestWells(props: SelectDestWellsProps): JSX.Element {
     setShowNumberWellsSelectedErrorModal,
   ] = useState(false)
   const [selectedWells, setSelectedWells] = useState(destinationWellGroup)
-  const [isNumberWellsSelectedError, setIsNumberWellsSelectedError] = useState(
-    false
-  )
+  const [isNumberWellsSelectedError, setIsNumberWellsSelectedError] =
+    useState(false)
 
   const selectedWellCount = Object.keys(selectedWells).length
   const sourceWellCount = state.sourceWells?.length ?? 0
@@ -244,7 +243,7 @@ function NumberWellsSelectedErrorModal({
         setShowNumberWellsSelectedErrorModal(false)
       }}
     >
-      <LegacyStyledText as="p">
+      <LegacyStyledText forwardedAs="p">
         {t('number_wells_selected_error_learn_more', {
           wellCount,
           selectionUnit,

@@ -27,10 +27,12 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getIsLid,
   getIsTiprack,
   HEATERSHAKER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  SYSTEM_LOCATION,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -89,9 +91,8 @@ export function AddStepButton({
   )
   const isStepCreationDisabled = useSelector(getIsMultiSelectMode)
   const { modules } = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const [showStepOverflowMenu, setShowStepOverflowMenu] = useState<boolean>(
-    false
-  )
+  const [showStepOverflowMenu, setShowStepOverflowMenu] =
+    useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
       setShowStepOverflowMenu(false)
@@ -106,26 +107,34 @@ export function AddStepButton({
   const lastTimelineFrame =
     timeline.length > 0 ? last(timeline)?.robotState : initialTimeline
   const labwareAtLastState = lastTimelineFrame?.labware ?? {}
+  const moduleAtLastState = lastTimelineFrame?.modules ?? {}
   const isLabwarePresentForLiquidHandling = Object.entries(
     labwareAtLastState
   ).some(([labwareId, { stack }]) => {
     const labwareDef = labwareEntities[labwareId]?.def
     const slot = getSlotInLocationStack(stack)
-    const isLidOnSlot = Object.values(labwareEntities).some(({ def }) =>
-      getIsLid(def)
+    const isInaccessible = slot === SYSTEM_LOCATION
+    const isLidOnSlot = labwareDef != null ? getIsLid(labwareDef) : false
+    const isStackerInSlot = Object.values(modules).some(
+      module =>
+        module.type === FLEX_STACKER_MODULE_TYPE &&
+        moduleAtLastState[module.id]?.slot === slot
     )
     return (
+      !isInaccessible &&
       labwareDef != null &&
       slot !== OFFDECK &&
       !getIsTiprack(labwareDef) &&
       !getIsAdapterFromDef(labwareDef) &&
-      !isLidOnSlot
+      !isLidOnSlot &&
+      !isStackerInSlot
     )
   })
   const getSupportedSteps = (): Array<
     Exclude<StepType, 'manualIntervention'>
   > => [
     'absorbanceReader',
+    'camera',
     'comment',
     'moveLabware',
     'moveLiquid',
@@ -135,11 +144,13 @@ export function AddStepButton({
     'magnet',
     'temperature',
     'thermocycler',
+    'flexStacker',
   ]
   const isStepTypeEnabled: Record<
     Exclude<StepType, 'manualIntervention'>,
     boolean
   > = {
+    camera: true,
     comment: enableComment,
     moveLabware: true,
     moveLiquid: isLabwarePresentForLiquidHandling,
@@ -150,6 +161,7 @@ export function AddStepButton({
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     heaterShaker: getIsModuleOnDeck(modules, HEATERSHAKER_MODULE_TYPE),
     absorbanceReader: getIsModuleOnDeck(modules, ABSORBANCE_READER_TYPE),
+    flexStacker: getIsModuleOnDeck(modules, FLEX_STACKER_MODULE_TYPE),
   }
 
   const addStep = (stepType: StepType): ReturnType<any> =>

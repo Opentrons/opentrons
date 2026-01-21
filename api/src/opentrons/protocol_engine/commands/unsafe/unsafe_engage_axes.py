@@ -1,15 +1,16 @@
 """Update position estimators payload, result, and implementaiton."""
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Optional, Type
+
 from pydantic import BaseModel, Field
-from typing import TYPE_CHECKING, Optional, List, Type
 from typing_extensions import Literal
 
-from ...types import MotorAxis
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
 from ...resources import ensure_ot3_hardware
-
+from ...types import MotorAxis
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from opentrons.hardware_control import HardwareControlAPI
 
 if TYPE_CHECKING:
@@ -68,9 +69,9 @@ class UnsafeEngageAxes(
     params: UnsafeEngageAxesParams
     result: Optional[UnsafeEngageAxesResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[UnsafeEngageAxesImplementation] = (
         UnsafeEngageAxesImplementation
-    ] = UnsafeEngageAxesImplementation
+    )
 
 
 class UnsafeEngageAxesCreate(BaseCommandCreate[UnsafeEngageAxesParams]):

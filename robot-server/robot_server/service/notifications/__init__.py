@@ -1,4 +1,5 @@
 """Notification service creation and management."""
+
 from .notification_client import (
     NotificationClient,
     get_notification_client,
@@ -10,12 +11,12 @@ from .publisher_notifier import (
     initialize_pe_publisher_notifier,
 )
 from .publishers import (
+    DeckConfigurationPublisher,
     MaintenanceRunsPublisher,
     RunsPublisher,
-    DeckConfigurationPublisher,
+    get_deck_configuration_publisher,
     get_maintenance_runs_publisher,
     get_runs_publisher,
-    get_deck_configuration_publisher,
 )
 
 __all__ = [

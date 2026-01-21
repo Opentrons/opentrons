@@ -3,15 +3,9 @@ import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
-  BORDERS,
   Box,
-  COLORS,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
-  DIRECTION_COLUMN,
-  Divider,
-  Flex,
-  SPACING,
   useConditionalConfirm,
 } from '@opentrons/components'
 
@@ -22,6 +16,11 @@ import {
   DELETE_STEP_FORM,
   getMainPagePortalEl,
 } from '/protocol-designer/components/organisms'
+import { deleteContainer } from '/protocol-designer/labware-ingred/actions'
+import {
+  getInitialDeckSetup,
+  getSavedStepForms,
+} from '/protocol-designer/step-forms/selectors'
 import { actions as steplistActions } from '/protocol-designer/steplist'
 import {
   deselectAllSteps,
@@ -30,7 +29,10 @@ import {
 import { getMultiSelectItemIds } from '/protocol-designer/ui/steps/selectors'
 
 import { StepOverflowMenu } from './StepOverflowMenu'
-import { capitalizeFirstLetterAfterNumber } from './utils'
+import {
+  capitalizeFirstLetterAfterNumber,
+  getFillLabwareToDeleteData,
+} from './utils'
 
 import type { ThunkDispatch } from 'redux-thunk'
 import type {
@@ -39,7 +41,6 @@ import type {
   SetStateAction,
 } from 'react'
 import type { IconName } from '@opentrons/components'
-import type { StepIdType } from '/protocol-designer/form-types'
 import type { BaseState } from '/protocol-designer/types'
 
 const STARTING_DECK_STATE = 'Starting deck'
@@ -64,9 +65,10 @@ export interface ConnectedStepContainerProps {
   hovered?: boolean
   hasError?: boolean
   isStepAfterError?: boolean
-  dragHovered?: boolean
 }
 
+// todo(mm, 2025-11-14): I've made a mess of ConnectedStepInfo and ConnectedStepContainer.
+// We should try to either merge them, or clarify each one's responsibilities.
 export function ConnectedStepContainer(
   props: ConnectedStepContainerProps
 ): JSX.Element {
@@ -84,7 +86,6 @@ export function ConnectedStepContainer(
     subtext,
     hasError = false,
     isStepAfterError = false,
-    dragHovered = false,
     setOpenedOverflowMenuId,
     openedOverflowMenuId,
     sidebarWidth,
@@ -95,7 +96,8 @@ export function ConnectedStepContainer(
     text === STARTING_DECK_STATE || text === FINAL_DECK_STATE
   const dispatch = useDispatch<ThunkDispatch<BaseState, any, any>>()
   const multiSelectItemIds = useSelector(getMultiSelectItemIds)
-
+  const savedStepForms = useSelector(getSavedStepForms)
+  const { modules: deckSetupModules } = useSelector(getInitialDeckSetup)
   const hasText = sidebarWidth > PX_SIDEBAR_MIN_WIDTH_FOR_ICON
 
   const handleClick = (event: MouseEvent): void => {
@@ -137,9 +139,25 @@ export function ConnectedStepContainer(
     setOpenedOverflowMenuId?.(null)
   }
 
+  const handleDeleteFillLabware = (stepIds: string[]): void => {
+    const fillLabwareToDeleteData = getFillLabwareToDeleteData(
+      stepIds,
+      savedStepForms,
+      deckSetupModules
+    )
+    for (const { labwareIds, module } of fillLabwareToDeleteData) {
+      labwareIds.forEach(id => {
+        dispatch(deleteContainer({ labwareId: id, stacker: module }))
+      })
+    }
+  }
+
   const onDeleteClickAction = (): void => {
     if (multiSelectItemIds) {
+      handleDeleteFillLabware(multiSelectItemIds)
       dispatch(steplistActions.deleteMultipleSteps(multiSelectItemIds))
+      // todo(mm, 2025-10-31): Why are we doing deselectAllSteps here?
+      // deleteMultipleSteps already adjusts the selection when any of them are deleted.
       dispatch(deselectAllSteps('EXIT_BATCH_EDIT_MODE_BUTTON_PRESS'))
     } else {
       console.warn(
@@ -154,13 +172,10 @@ export function ConnectedStepContainer(
     cancel: cancelMultiDelete,
   } = useConditionalConfirm(onDeleteClickAction, true)
 
-  const deleteStep = (stepId: StepIdType): void => {
-    dispatch(steplistActions.deleteStep(stepId))
-  }
-
   const handleDelete = (): void => {
     if (stepId != null) {
-      deleteStep(stepId)
+      handleDeleteFillLabware([stepId])
+      dispatch(steplistActions.deleteMultipleSteps([stepId]))
     } else {
       console.warn(
         'something went wrong, cannot delete a step without a step id'
@@ -180,6 +195,7 @@ export function ConnectedStepContainer(
       onDoubleClick?.(e)
     }
   }
+
   return (
     <>
       {showDeleteConfirmation === true && (
@@ -196,7 +212,7 @@ export function ConnectedStepContainer(
           onCancelClick={cancelMultiDelete}
         />
       )}
-      <Flex
+      <Box
         id={stepId}
         {...(!isStepAfterError
           ? {
@@ -204,21 +220,7 @@ export function ConnectedStepContainer(
               onMouseLeave,
             }
           : {})}
-        flexDirection={DIRECTION_COLUMN}
       >
-        {dragHovered && (
-          <Box paddingY={SPACING.spacing2}>
-            <Divider
-              // eslint-disable-next-line opentrons/no-margins-inline
-              marginY="0"
-              height="0.25rem"
-              width="100%"
-              backgroundColor={COLORS.blue50}
-              borderRadius={BORDERS.borderRadius2}
-            />
-          </Box>
-        )}
-
         <StepContainer
           stepNumber={stepNumber}
           // todo(mm, 2025-09-05): This can be simplified now that stepNumber has been
@@ -252,7 +254,7 @@ export function ConnectedStepContainer(
           }}
           dataTestId={`StepContainer_${stepId}`}
         />
-      </Flex>
+      </Box>
       {stepId != null &&
       openedOverflowMenuId === stepId &&
       setOpenedOverflowMenuId != null

@@ -1,4 +1,5 @@
 import {
+  AlertPrimaryButton,
   ALIGN_CENTER,
   COLORS,
   DIRECTION_COLUMN,
@@ -7,7 +8,7 @@ import {
   JUSTIFY_CENTER,
   JUSTIFY_SPACE_BETWEEN,
   Overlay,
-  PrimaryButton,
+  POSITION_ABSOLUTE,
   SecondaryButton,
   SPACING,
   StyledText,
@@ -32,6 +33,7 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
     <Overlay
       width="100%"
       height="100%"
+      position={POSITION_ABSOLUTE}
       backgroundColor={COLORS.transparentBlack90}
       alignItems={ALIGN_CENTER}
       justifyContent={JUSTIFY_CENTER}
@@ -77,12 +79,9 @@ export function OverlayModal(props: OverlayModalProps): JSX.Element {
             </SecondaryButton>
           )}
           {primaryButtonProps && (
-            <PrimaryButton
-              backgroundColor={COLORS.red50}
-              onClick={primaryButtonProps?.onClick}
-            >
+            <AlertPrimaryButton onClick={primaryButtonProps?.onClick}>
               {primaryButtonProps?.text}
-            </PrimaryButton>
+            </AlertPrimaryButton>
           )}
         </Flex>
       </Flex>

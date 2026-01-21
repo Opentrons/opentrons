@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Flex, InputField, SPACING } from '@opentrons/components'
 
 import type { Dispatch, SetStateAction } from 'react'
-import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/types'
+import type { FieldProps } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/types'
 
 interface InputStepFormFieldProps extends FieldProps {
   title: string
@@ -15,6 +15,9 @@ interface InputStepFormFieldProps extends FieldProps {
   caption?: string
   formLevelError?: string | null
   placeholder?: string
+  // special-casing for the fill Quantity field for stacker :(
+  setFillQuantityState?: Dispatch<SetStateAction<string | null>>
+  fillQuantityLocalState?: string | null
 }
 
 export function InputStepFormField(
@@ -37,16 +40,24 @@ export function InputStepFormField(
     setIsPristine,
     type,
     placeholder,
+    setFillQuantityState,
+    fillQuantityLocalState,
     ...otherProps
   } = props
+  const verifiedValue: string | number | null =
+    fillQuantityLocalState ??
+    (Array.isArray(value)
+      ? value.length
+      : typeof value === 'string' || typeof value === 'number'
+        ? value
+        : null)
   const { t } = useTranslation('tooltip')
-
   return (
     <Flex padding={padding} width="100%">
       <InputField
         {...otherProps}
         tooltipText={
-          showTooltip ? t(`${tooltipContent}`) ?? undefined : undefined
+          showTooltip ? (t(`${tooltipContent}`) ?? undefined) : undefined
         }
         type={type}
         title={title}
@@ -59,12 +70,16 @@ export function InputStepFormField(
         }}
         onFocus={onFieldFocus}
         onChange={e => {
-          updateValue(e.currentTarget.value)
+          if (setFillQuantityState != null) {
+            setFillQuantityState(e.currentTarget.value)
+          } else {
+            updateValue(e.currentTarget.value)
+          }
           if (setIsPristine != null) {
             setIsPristine(false)
           }
         }}
-        value={value?.toString()}
+        value={verifiedValue}
         units={units}
         placeholder={placeholder}
       />

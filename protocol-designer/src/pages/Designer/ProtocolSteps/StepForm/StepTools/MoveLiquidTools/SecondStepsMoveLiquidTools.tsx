@@ -34,6 +34,7 @@ import {
 import { ResetSettingsModal } from '/protocol-designer/components/organisms/ResetSettingsModal'
 import { getEnableByVolumeBuilder } from '/protocol-designer/feature-flags/selectors'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
+import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 
 import {
   getAdditionalEquipmentEntities,
@@ -65,8 +66,10 @@ import type { FormData, StepFieldName } from '/protocol-designer/form-types'
 import type { FieldPropsByName, LiquidHandlingTab } from '../../types'
 import type { StepInputFieldProps } from './MultiInputField'
 
-const addPrefix = (prefix: string) => (fieldName: string): StepFieldName =>
-  `${prefix}_${fieldName}`
+const addPrefix =
+  (prefix: string) =>
+  (fieldName: string): StepFieldName =>
+    `${prefix}_${fieldName}`
 
 interface SecondStepsMoveLiquidToolsProps {
   propsForFields: FieldPropsByName
@@ -90,9 +93,9 @@ export const SecondStepsMoveLiquidTools = ({
   const additionalEquipmentEntities = useSelector(
     getAdditionalEquipmentEntities
   )
-  const { trashBinEntities, wasteChuteEntities } = useSelector(
-    getInvariantContext
-  )
+  const allLabwareDefs = useSelector(getLabwareDefsByURI)
+  const { trashBinEntities, wasteChuteEntities } =
+    useSelector(getInvariantContext)
   const enableByVolumeBuilder = useSelector(getEnableByVolumeBuilder)
   const { spec: pipetteSpecs } = pipetteEntities[String(formData.pipette)]
   const invariantContext = useSelector(getInvariantContext)
@@ -102,16 +105,20 @@ export const SecondStepsMoveLiquidTools = ({
     formData.tipRack as string
   )
   // TODO: replace this with the actual individual byVolume values, separated by aspirate/dispense etc.
-  const stubbedByTipValues = getAllLiquidClassDefs()
-    [
+  const liquidClassDef =
+    getAllLiquidClassDefs()[
       formData.liquidClass !== NONE_LIQUID_CLASS_NAME
         ? formData.liquidClass
         : WATER_LIQUID_CLASS_NAME
-    ].byPipette.find(
+    ]
+  if (!liquidClassDef)
+    throw new Error(`Liquid class '${formData.liquidClass}' does not exist`)
+  const stubbedByTipValues = liquidClassDef.byPipette
+    .find(
       ({ pipetteModel }) => pipetteModel === getFlexNameConversion(pipetteSpecs)
     )
-    ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)?.aspirate
-    .flowRateByVolume
+    ?.byTipType.find(({ tiprack }) => tiprack === formData.tipRack)
+    ?.aspirate.flowRateByVolume
   const highestY = Math.max(
     ...(stubbedByTipValues?.map(point => point[1]) ?? [])
   )
@@ -119,6 +126,7 @@ export const SecondStepsMoveLiquidTools = ({
 
   const robotType = useSelector(getRobotType)
   const pipetteSpec = useSelector(getPipetteEntities)[formData.pipette]?.spec
+  const tiprackDef = useSelector(getLabwareDefsByURI)[formData.tipRack]
   const [showResetModal, setShowResetModal] = useState<boolean>(false)
   const [showChart, setShowChart] = useState<boolean>(false)
 
@@ -205,8 +213,7 @@ export const SecondStepsMoveLiquidTools = ({
             ? Number(formData.disposalVolume_volume)
             : 0,
         pipetteSpecs: pipetteSpec,
-        labwareEntities: labwareEntities,
-        tiprackDefUri: formData.tipRack,
+        tiprackDef: tiprackDef,
       }),
     [
       formData.transferVolume,
@@ -216,8 +223,9 @@ export const SecondStepsMoveLiquidTools = ({
     ]
   )
   const labwareId = formData[`${tab}_labware`]
+  const shouldCheckLabwareDef = tab === 'aspirate' || !isDestinationTrash
   // The getMinXYDimension() call below is crashing quite often, but I'm not sure why
-  if (!labwareEntities[labwareId]?.def) {
+  if (shouldCheckLabwareDef && !labwareEntities[labwareId]?.def) {
     throw new Error(
       `missing ${tab}_labware def for ${labwareId}, ` +
         `in labwareEntities: ${!!labwareEntities[labwareId]}`
@@ -309,8 +317,8 @@ export const SecondStepsMoveLiquidTools = ({
               propsForFields,
               rawForm: formData,
               pipetteEntities,
-              labwareEntities,
               additionalEquipmentEntities,
+              allLabwareDefs,
               liquidHandlingAction: tab,
               robotType,
             })

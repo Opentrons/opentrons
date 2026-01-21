@@ -10,19 +10,11 @@ import pytest
 
 from opentrons_shared_data.pipette import pipette_definition
 from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
     LiquidClasses as VolumeModes,
 )
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
-from opentrons.protocol_engine import actions, commands
-from opentrons.protocol_engine.resources.pipette_data_provider import (
-    LoadedStaticPipetteData,
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
 )
-from opentrons.protocol_engine.state import update_types
-from opentrons.protocol_engine.state.pipettes import PipetteStore, PipetteView
-from opentrons.protocol_engine.types import FlowRates, TipGeometry, LabwareWellId
-from opentrons.types import Point, MountType
 
 from ..pipette_fixtures import (
     EIGHT_CHANNEL_COLS,
@@ -32,6 +24,15 @@ from ..pipette_fixtures import (
     NINETY_SIX_MAP,
     NINETY_SIX_ROWS,
 )
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine import actions, commands
+from opentrons.protocol_engine.resources.pipette_data_provider import (
+    LoadedStaticPipetteData,
+)
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.pipettes import PipetteStore, PipetteView
+from opentrons.protocol_engine.types import FlowRates, LabwareWellId, TipGeometry
+from opentrons.types import MountType, Point
 
 
 def _dummy_command() -> commands.Command:
@@ -88,6 +89,7 @@ def test_handle_pipette_config_action(
                 sensors=["pressure", "capacitive", "environment"]
             ),
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         ),
     )
     subject.handle_action(
@@ -204,6 +206,7 @@ def test_active_channels(
                 sensors=["pressure", "capacitive", "environment"]
             ),
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         ),
     )
     subject.handle_action(

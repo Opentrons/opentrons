@@ -1,3 +1,5 @@
+import { AUTOMATIC } from '@opentrons/step-generation'
+
 import {
   ABSORBANCE_READER_COLOR_BY_WAVELENGTH,
   DEFAULT_CHANGE_TIP_OPTION,
@@ -53,6 +55,9 @@ export function getDefaultsForStepType(
         pushOut_volume: null,
         times: null,
         tipRack: null,
+        tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: undefined,
         wells: [],
       }
@@ -145,9 +150,22 @@ export function getDefaultsForStepType(
         pushOut_checkbox: null,
         pushOut_volume: null,
         tipRack: null,
+        tip_tracking: AUTOMATIC,
+        tiprack_selected: null,
+        tips_selected: [],
         volume: null,
       }
 
+    case 'camera':
+      return {
+        home_before: false,
+        filename: null,
+        resolution: null,
+        zoom: null,
+        contrast: null,
+        brightness: null,
+        saturation: null,
+      }
     case 'comment':
       return {
         message: null,
@@ -173,6 +191,7 @@ export function getDefaultsForStepType(
         labwareLocationUpdate: {},
         moduleLocationUpdate: {},
         pipetteLocationUpdate: {},
+        moduleStateUpdate: {},
         trashBinLocationUpdate: {},
         wasteChuteLocationUpdate: {},
         stagingAreaLocationUpdate: {},
@@ -206,15 +225,10 @@ export function getDefaultsForStepType(
     case 'thermocycler':
       return {
         blockIsActive: false,
-        blockIsActiveHold: false,
         blockTargetTemp: null,
-        blockTargetTempHold: null,
         lidIsActive: false,
-        lidIsActiveHold: false,
         lidOpen: false,
-        lidOpenHold: null,
         lidTargetTemp: null,
-        lidTargetTempHold: null,
         moduleId: null,
         orderedProfileItems: [],
         profileItemsById: {},
@@ -232,6 +246,14 @@ export function getDefaultsForStepType(
         referenceWavelength: null,
         referenceWavelengthActive: false,
         wavelengths: [Object.keys(ABSORBANCE_READER_COLOR_BY_WAVELENGTH)[0]], // default to first known wavelength
+      }
+    case 'flexStacker':
+      return {
+        fillLabwareUri: null,
+        fillLabwareIds: null,
+        flexStackerFormType: null,
+        interventionMessage: null,
+        moduleId: null,
       }
     default:
       return {}

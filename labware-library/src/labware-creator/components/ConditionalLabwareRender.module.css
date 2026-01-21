@@ -1,4 +1,4 @@
-@import '@opentrons/components/styles';
+@import url('@opentrons/components/styles');
 
 .error_text_wrapper {
   display: flex;

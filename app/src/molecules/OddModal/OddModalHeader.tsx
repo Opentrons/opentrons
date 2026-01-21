@@ -37,7 +37,13 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
       borderRadius={`${BORDERS.borderRadius12} ${BORDERS.borderRadius12} 0px 0px`}
       {...styleProps}
     >
-      <Flex flexDirection={DIRECTION_ROW} gridGap={SPACING.spacing16}>
+      <Flex
+        flexDirection={DIRECTION_ROW}
+        gridGap={SPACING.spacing16}
+        alignItems={ALIGN_CENTER}
+        overflow="hidden"
+        flex="1 1 auto"
+      >
         {iconName != null && iconColor != null ? (
           <Icon
             aria-label={`icon_${iconName}`}
@@ -52,6 +58,13 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
           fontWeight={TYPOGRAPHY.fontWeightBold}
           fontSize={TYPOGRAPHY.fontSize28}
           lineHeight={TYPOGRAPHY.lineHeight36}
+          css={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            flex: '1 1 auto',
+            minWidth: '0',
+          }}
         >
           {title}
         </LegacyStyledText>
@@ -61,6 +74,7 @@ export function OddModalHeader(props: OddModalHeaderBaseProps): JSX.Element {
           onClick={onClick}
           aria-label="closeIcon"
           alignItems={ALIGN_CENTER}
+          flexShrink="0"
         >
           <Icon size="3.5rem" name="ot-close" />
         </Flex>

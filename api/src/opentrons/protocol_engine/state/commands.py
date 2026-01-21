@@ -5,21 +5,49 @@ from __future__ import annotations
 import enum
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional, Union, Tuple
+from typing import Dict, List, Optional, Tuple, Union
+
 from typing_extensions import assert_never
 
 from opentrons_shared_data.errors import EnumeratedError, ErrorCodes, PythonException
 
-from opentrons.ordered_set import OrderedSet
-
+from ..actions import (
+    Action,
+    DoorChangeAction,
+    FailCommandAction,
+    FinishAction,
+    HardwareStoppedAction,
+    PauseAction,
+    PlayAction,
+    QueueCommandAction,
+    StopAction,
+    SucceedCommandAction,
+)
+from ..commands import Command, CommandCreate, CommandIntent, CommandStatus
+from ..errors import (
+    ErrorOccurrence,
+    FixitCommandNotAllowedError,
+    PauseNotAllowedError,
+    ProtocolCommandFailedError,
+    ResumeFromRecoveryNotAllowedError,
+    RobotDoorOpenError,
+    RunStoppedError,
+    SetupCommandNotAllowedError,
+    UnexpectedProtocolError,
+)
+from ..types import EngineStatus
+from ._abstract_store import HandlesActions, HasState
+from .command_history import (
+    CommandEntry,
+    CommandHistory,
+)
+from .config import Config
 from opentrons.hardware_control.types import DoorState
+from opentrons.ordered_set import OrderedSet
 from opentrons.protocol_engine.actions.actions import (
     ResumeFromRecoveryAction,
     RunCommandAction,
     SetErrorRecoveryPolicyAction,
-)
-from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
-    UnsafeUngripLabwareCommandType,
 )
 from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_close_latch import (
     UnsafeFlexStackerCloseLatchCommandType,
@@ -27,45 +55,15 @@ from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_close_latch import
 from opentrons.protocol_engine.commands.unsafe.unsafe_stacker_open_latch import (
     UnsafeFlexStackerOpenLatchCommandType,
 )
+from opentrons.protocol_engine.commands.unsafe.unsafe_ungrip_labware import (
+    UnsafeUngripLabwareCommandType,
+)
 from opentrons.protocol_engine.error_recovery_policy import (
     ErrorRecoveryPolicy,
     ErrorRecoveryType,
 )
 from opentrons.protocol_engine.notes.notes import CommandNote
 from opentrons.protocol_engine.state import update_types
-
-from ..actions import (
-    Action,
-    QueueCommandAction,
-    SucceedCommandAction,
-    FailCommandAction,
-    PlayAction,
-    PauseAction,
-    StopAction,
-    FinishAction,
-    HardwareStoppedAction,
-    DoorChangeAction,
-)
-
-from ..commands import Command, CommandStatus, CommandIntent, CommandCreate
-from ..errors import (
-    RunStoppedError,
-    ErrorOccurrence,
-    RobotDoorOpenError,
-    SetupCommandNotAllowedError,
-    FixitCommandNotAllowedError,
-    ResumeFromRecoveryNotAllowedError,
-    PauseNotAllowedError,
-    UnexpectedProtocolError,
-    ProtocolCommandFailedError,
-)
-from ..types import EngineStatus
-from ._abstract_store import HasState, HandlesActions
-from .command_history import (
-    CommandEntry,
-    CommandHistory,
-)
-from .config import Config
 
 
 class QueueStatus(enum.Enum):
@@ -239,7 +237,10 @@ class CommandState:
     """Whether the run has entered error recovery."""
 
     stopped_by_async_error: bool
-    """If this is set to True, the engine was stopped by an estop event."""
+    """If this is set to True, the engine was stopped by an async event."""
+
+    is_stopping_because_of_async_error: bool
+    """If this is set to True, the engine was stopped by an asynch event and hasn't finished stopping."""
 
     error_recovery_policy: ErrorRecoveryPolicy
     """See `CommandView.get_error_recovery_policy()`."""
@@ -273,11 +274,12 @@ class CommandStore(HasState[CommandState], HandlesActions):
             run_started_at=None,
             latest_protocol_command_hash=None,
             stopped_by_async_error=False,
+            is_stopping_because_of_async_error=False,
             error_recovery_policy=error_recovery_policy,
             has_entered_error_recovery=False,
         )
 
-    def handle_action(self, action: Action) -> None:
+    def handle_action(self, action: Action) -> None:  # noqa: C901
         """Modify state in reaction to an action."""
         match action:
             case QueueCommandAction():
@@ -474,6 +476,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
 
             if action.from_asynchronous_error:
                 self._state.stopped_by_async_error = True
+                self._state.is_stopping_because_of_async_error = True
                 self._state.run_result = RunResult.FAILED
             else:
                 self._state.run_result = RunResult.STOPPED
@@ -499,14 +502,29 @@ class CommandStore(HasState[CommandState], HandlesActions):
                     action.error_details.error,
                 )
         else:
-            # HACK(sf): There needs to be a better way to set
-            # an estop error than this else clause
-            if self._state.stopped_by_async_error and action.error_details:
+            # HACK(sf): There needs to be a better way to handle async errors than this logic
+            # which is way too nonlocal. The idea here is that
+            # (1) there's an async error that calls one of the engine async error handlers,
+            # which emits a stop action and then tells the orchestrator to call finish
+            # (2) calling stop normally would lock out the run error field (since the idea is that
+            # stop happens in the handler of the error that stops the run, and thus the failed
+            # command has already set the run error), but here either the command didn't fail or
+            # the command failed with an error that isn't relevant or is duplicative, so we want
+            # to override that
+            # (3) but we don't want to override it twice, because some other error handler might
+            # tell us to finish with the cancelled error that happens because a command was cancelled
+            # in reaction to (2)
+            # So we set and clear this stopped_by_async_error and it's awful. Let's figure out a better
+            # way.
+
+            if self._state.is_stopping_because_of_async_error and action.error_details:
                 self._state.run_error = self._map_run_exception_to_error_occurrence(
                     action.error_details.error_id,
                     action.error_details.created_at,
                     action.error_details.error,
                 )
+                self._state.is_stopping_because_of_async_error = False
+                self._state.stopped_by_async_error = True
 
     def _handle_hardware_stopped_action(self, action: HardwareStoppedAction) -> None:
         self._state.queue_status = QueueStatus.PAUSED
@@ -516,10 +534,13 @@ class CommandStore(HasState[CommandState], HandlesActions):
         )
 
         if action.finish_error_details:
-            self._state.finish_error = self._map_finish_exception_to_error_occurrence(
-                action.finish_error_details.error_id,
-                action.finish_error_details.created_at,
-                action.finish_error_details.error,
+            self._state.finish_error = (
+                self._state.finish_error
+                or self._map_finish_exception_to_error_occurrence(
+                    action.finish_error_details.error_id,
+                    action.finish_error_details.created_at,
+                    action.finish_error_details.error,
+                )
             )
 
     def _handle_door_change_action(self, action: DoorChangeAction) -> None:

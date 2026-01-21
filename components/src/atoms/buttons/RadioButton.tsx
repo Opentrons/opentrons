@@ -234,13 +234,13 @@ const SUBBUTTON_LABEL_STYLE = (
   color: ${disabled
     ? COLORS.grey50
     : isSelected
-    ? COLORS.white
-    : COLORS.grey60};
+      ? COLORS.white
+      : COLORS.grey60};
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: ${buttonSubLabel?.align === 'vertical' ? 2 : 1};
   overflow: hidden;
-  word-break: break-all;
+  word-break: break-word;
   text-overflow: ellipsis;
 `
 

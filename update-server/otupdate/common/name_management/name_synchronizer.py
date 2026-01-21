@@ -6,10 +6,9 @@ from typing import AsyncGenerator, Optional
 
 from aiohttp import web
 
-from otupdate.common.constants import APP_VARIABLE_PREFIX
 from .avahi import AvahiClient, alternative_service_name
 from .pretty_hostname import get_pretty_hostname, persist_pretty_hostname
-
+from otupdate.common.constants import APP_VARIABLE_PREFIX
 
 _NAME_SYNCHRONIZER_VARNAME = APP_VARIABLE_PREFIX + "name_synchronizer"
 _log = getLogger(__name__)
@@ -154,7 +153,7 @@ def get_name_synchronizer(request: web.Request) -> NameSynchronizer:
     aiohttp.Application already via install_name_synchronizer().
     """
     name_synchronizer = request.app.get(_NAME_SYNCHRONIZER_VARNAME, None)
-    assert isinstance(
-        name_synchronizer, NameSynchronizer
-    ), f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
+    assert isinstance(name_synchronizer, NameSynchronizer), (
+        f"Unexpected type {type(name_synchronizer)}. Incorrect Application setup?"
+    )
     return name_synchronizer

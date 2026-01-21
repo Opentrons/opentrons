@@ -1,7 +1,9 @@
 """HTTP API versioning logic, utilities, and dependencies."""
-from fastapi import Header, Request, Response, status
+
 from typing import Union
-from typing_extensions import Literal, Final
+
+from fastapi import Header, Request, Response, status
+from typing_extensions import Final, Literal
 
 from robot_server.errors.error_responses import ErrorDetails
 
@@ -106,8 +108,8 @@ async def get_requested_version(request: Request) -> int:
 
     The route must depend on the ``check_version_header`` dependency.
     """
-    assert isinstance(
-        request.state.api_version, int
-    ), "No api_version in request state; is endpoint properly configured?"
+    assert isinstance(request.state.api_version, int), (
+        "No api_version in request state; is endpoint properly configured?"
+    )
 
     return request.state.api_version

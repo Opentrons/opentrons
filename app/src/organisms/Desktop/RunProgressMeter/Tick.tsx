@@ -41,14 +41,8 @@ const ICON_NAME_BY_COMMAND_TYPE: {
   moveLabware: 'move-xy',
 }
 export function Tick(props: TickProps): JSX.Element {
-  const {
-    index,
-    count,
-    range,
-    firstCommandType,
-    makeHandleJumpToStep,
-    total,
-  } = props
+  const { index, count, range, firstCommandType, makeHandleJumpToStep, total } =
+    props
   const { t } = useTranslation('run_details')
 
   const [targetProps, tooltipProps] = useHoverTooltip()
@@ -58,12 +52,12 @@ export function Tick(props: TickProps): JSX.Element {
   const commandTKey =
     firstCommandType in TRANSLATION_KEY_BY_COMMAND_TYPE &&
     TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] != null
-      ? TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] ?? null
+      ? (TRANSLATION_KEY_BY_COMMAND_TYPE[firstCommandType] ?? null)
       : null
   const iconName =
     firstCommandType in ICON_NAME_BY_COMMAND_TYPE &&
     ICON_NAME_BY_COMMAND_TYPE[firstCommandType] != null
-      ? ICON_NAME_BY_COMMAND_TYPE[firstCommandType] ?? null
+      ? (ICON_NAME_BY_COMMAND_TYPE[firstCommandType] ?? null)
       : null
   return (
     <Flex
@@ -83,7 +77,7 @@ export function Tick(props: TickProps): JSX.Element {
       left={`${percent}%`}
       transform={`translateX(-${percent}%)`}
     >
-      <LegacyStyledText as="h6">
+      <LegacyStyledText forwardedAs="h6">
         {isAggregatedTick ? count : null}
       </LegacyStyledText>
       {createPortal(
@@ -97,14 +91,14 @@ export function Tick(props: TickProps): JSX.Element {
               <Icon name={iconName} size={SPACING.spacing20} />
             ) : null}
             <Flex flexDirection={DIRECTION_COLUMN}>
-              <LegacyStyledText as="label">
+              <LegacyStyledText forwardedAs="label">
                 {t('step_number', {
                   step_number: isAggregatedTick
                     ? `${stepNumber} - ${stepNumber + range}`
                     : stepNumber,
                 })}
               </LegacyStyledText>
-              <LegacyStyledText as="label">
+              <LegacyStyledText forwardedAs="label">
                 {commandTKey != null ? t(commandTKey) : null}
               </LegacyStyledText>
               {isAggregatedTick ? (

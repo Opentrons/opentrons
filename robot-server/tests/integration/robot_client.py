@@ -9,7 +9,6 @@ from typing import Any, AsyncGenerator, BinaryIO, Dict, List, Optional, Tuple, U
 import httpx
 from httpx import Response
 
-
 _STARTUP_WAIT = 40
 _SHUTDOWN_WAIT = 20
 
@@ -127,9 +126,7 @@ class RobotClient:
         multipart_upload_name = "files"
 
         with contextlib.ExitStack() as file_exit_stack:
-            opened_files: List[
-                Union[BinaryIO, Tuple[str, bytes]],
-            ] = []
+            opened_files: List[Union[BinaryIO, Tuple[str, bytes]],] = []
 
             for file in files:
                 if isinstance(file, Path):

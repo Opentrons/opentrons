@@ -64,6 +64,7 @@ import { SubStepsToolbox } from './Timeline'
 import { TimelineEditHardware } from './TimelineEditHardware'
 
 import type { Dispatch, SetStateAction } from 'react'
+import type { FormData } from '/protocol-designer/form-types'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 
 const CONTENT_MAX_WIDTH = '46.9375rem'
@@ -74,12 +75,14 @@ const DETAILS_HOVER_SPACE = 60
 interface ProtocolStepsProps {
   zoomedInSlot: string | null
   showLiquidOverflowMenu: Dispatch<SetStateAction<boolean>>
+  showDefineLiquidModal: boolean
   targetWidth: number
   setTargetWidth: (width: number) => void
 }
 export function ProtocolSteps({
   zoomedInSlot,
   showLiquidOverflowMenu,
+  showDefineLiquidModal,
   targetWidth,
   setTargetWidth,
 }: ProtocolStepsProps): JSX.Element {
@@ -130,25 +133,23 @@ export function ProtocolSteps({
   const isOffDeck = deckView === rightString
   const isZoomedIn = zoomedInSlot != null
 
-  const {
-    handleExportClick,
-    exportWarningModalElement,
-  } = useProtocolExportHandler({
-    hasCommands,
-    onConfirmExport: () => {
-      dispatch(saveProtocolFile())
-    },
-  })
-
-  let currentStep
-  if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
+  const { handleExportClick, exportWarningModalElement } =
+    useProtocolExportHandler({
+      hasCommands,
+      onConfirmExport: () => {
+        dispatch(saveProtocolFile())
+      },
+    })
+  let currentStep: FormData | null
+  if (formData?.stepType === 'flexStacker') {
+    currentStep = formData
+  } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId != null) {
     currentStep = savedStepForms[selectedStepId]
   } else if (hoveredTerminalItem === HARDWARE_ID && selectedStepId == null) {
     currentStep = null
   } else {
     currentStep = activeItem?.id != null ? savedStepForms[activeItem.id] : null
   }
-
   const hasTimelineErrors =
     timelineErrors != null ? timelineErrors.length > 0 : false
   const showTimelineAlerts =
@@ -199,7 +200,10 @@ export function ProtocolSteps({
         })
         setViewBox(zoomedInViewBox)
       }
-    } else if (zoomedInOnOffDeck) {
+    } else if (
+      zoomedInOnOffDeck &&
+      selectedTerminalItemId! === START_TERMINAL_ITEM_ID
+    ) {
       setDeckView(rightString)
     }
   }, [zoomedInSlot, labware, zoomedInOnOffDeck])
@@ -259,7 +263,7 @@ export function ProtocolSteps({
                 justifyContent={JUSTIFY_END}
                 position={POSITION_ABSOLUTE}
                 right={SPACING.spacing24}
-                zIndex={1000}
+                zIndex={showDefineLiquidModal ? 1 : 1000}
               >
                 <ExportButton onClick={handleExportClick} />
               </Flex>
@@ -273,8 +277,8 @@ export function ProtocolSteps({
                   robotType === OT2_ROBOT_TYPE)
                   ? '90%'
                   : isZoomedIn && isOffDeck
-                  ? '100%'
-                  : CONTENT_MAX_WIDTH
+                    ? '100%'
+                    : CONTENT_MAX_WIDTH
               }
               justifyContent={JUSTIFY_CENTER}
               paddingTop={
@@ -333,6 +337,7 @@ export function ProtocolSteps({
                     hoverSlot={hoverSlot}
                     setHoverSlot={setHoverSlot}
                     robotType={robotType}
+                    currentStep={currentStep}
                   />
                 ) : (
                   <OffDeck setOverflowMenu={showLiquidOverflowMenu} />

@@ -1,15 +1,15 @@
 """Router for /system/register endpoint."""
-from fastapi import APIRouter, Depends, status, Response
+
 from uuid import UUID
+
 import sqlalchemy
+from fastapi import APIRouter, Depends, Response, status
 
-from system_server.persistence import get_sql_engine, get_persistent_uuid
-from system_server.jwt import Registrant
-
-from .storage import get_or_create_registration_token
-from .models import PostRegisterResponse
 from .dependencies import create_registrant
-
+from .models import PostRegisterResponse
+from .storage import get_or_create_registration_token
+from system_server.jwt import Registrant
+from system_server.persistence import get_persistent_uuid, get_sql_engine
 
 register_router = APIRouter()
 

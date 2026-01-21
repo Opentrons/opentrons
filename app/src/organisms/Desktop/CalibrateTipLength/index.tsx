@@ -91,9 +91,9 @@ export function CalibrateTipLength({
   }, [instrument])
 
   const tipRack: CalibrationLabware | null =
-    labware != null ? labware.find(l => l.isTiprack) ?? null : null
+    labware != null ? (labware.find(l => l.isTiprack) ?? null) : null
   const calBlock: CalibrationLabware | null =
-    labware != null ? labware.find(l => !l.isTiprack) ?? null : null
+    labware != null ? (labware.find(l => !l.isTiprack) ?? null) : null
 
   const errorInfo = useCalibrationError(requestIds, session?.id)
 

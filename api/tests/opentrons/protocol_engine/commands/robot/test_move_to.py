@@ -1,16 +1,16 @@
 """Test robot.move-to commands."""
-from decoy import Decoy
 
-from opentrons.protocol_engine.execution import MovementHandler
-from opentrons.protocol_engine.types import DeckPoint
-from opentrons.types import Point, MountType
+from decoy import Decoy
 
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.robot.move_to import (
+    MoveToImplementation,
     MoveToParams,
     MoveToResult,
-    MoveToImplementation,
 )
+from opentrons.protocol_engine.execution import MovementHandler
+from opentrons.protocol_engine.types import DeckPoint
+from opentrons.types import MountType, Point
 
 
 async def test_move_to_implementation(

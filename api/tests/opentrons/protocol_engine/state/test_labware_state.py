@@ -13,7 +13,6 @@ from opentrons_shared_data.labware.labware_definition import (
     RectangularWellDefinition3,
 )
 
-
 from opentrons.protocol_engine import actions, commands, errors
 from opentrons.protocol_engine.state import update_types
 from opentrons.protocol_engine.state.labware import (

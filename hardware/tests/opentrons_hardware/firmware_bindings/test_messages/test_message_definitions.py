@@ -1,7 +1,9 @@
 """Test for message definitions."""
+
+from dataclasses import fields
+
 import pytest
 from typing_extensions import get_args
-from dataclasses import fields
 
 from opentrons_hardware.firmware_bindings.messages.messages import MessageDefinition
 

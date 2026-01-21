@@ -1,8 +1,9 @@
-from enum import Enum
+from opentrons_shared_data.util import StrEnum
+
 from robot_server.robot.calibration.constants import STATE_WILDCARD
 
 
-class TipCalibrationState(str, Enum):
+class TipCalibrationState(StrEnum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     measuringNozzleOffset = "measuringNozzleOffset"

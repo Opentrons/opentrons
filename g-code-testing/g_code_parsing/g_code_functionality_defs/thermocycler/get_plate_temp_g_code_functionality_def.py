@@ -1,15 +1,14 @@
 from enum import Enum
-from typing import Dict
 from string import Template
-from distutils.util import strtobool
-from opentrons.drivers.utils import parse_key_values
+from typing import Dict
+
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     GCodeFunctionalityDefBase,
 )
+from opentrons.drivers.utils import parse_key_values
 
 
 class GetPlateTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):
-
     VALID_KEYS = ["T", "C", "H", "TOTAL_H", "AT_TARGET"]
 
     class ResponseMessages(Enum):
@@ -39,9 +38,11 @@ class GetPlateTempGCodeFunctionalityDef(GCodeFunctionalityDefBase):
         # true or false. Using strtobool as a blanket statement to catch
         # anything that might actually mean True or False.
         # If not, lets still print it so we can see what it is
-        try:
-            at_target_temp = strtobool(value)
-        except ValueError:
+        if value.lower() in ["true", "1"]:
+            at_target_temp = True
+        elif value.lower() in ["false", "0"]:
+            at_target_temp = False
+        else:
             return cls.ResponseMessages.AT_TARGET_UNPARSABLE.value + value
 
         if at_target_temp:

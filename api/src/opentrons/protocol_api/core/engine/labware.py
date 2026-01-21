@@ -1,38 +1,37 @@
 """ProtocolEngine-based Labware core implementations."""
 
-from typing import List, Optional, cast, Dict
-
-from opentrons_shared_data.labware.types import (
-    LabwareParameters2 as LabwareParameters2Dict,
-    LabwareParameters3 as LabwareParameters3Dict,
-    LabwareDefinition as LabwareDefinitionDict,
-)
+from typing import Dict, List, Optional, cast
 
 from opentrons_shared_data.labware.labware_definition import (
-    LabwareRole,
     LabwareDefinition,
+    LabwareRole,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareDefinition as LabwareDefinitionDict,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareParameters2 as LabwareParameters2Dict,
+)
+from opentrons_shared_data.labware.types import (
+    LabwareParameters3 as LabwareParameters3Dict,
 )
 
+from ..._liquid import Liquid
+from ..labware import AbstractLabware, LabwareLoadParams
+from .well import WellCore
 from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.errors import (
     LabwareNotOnDeckError,
-    ModuleNotOnDeckError,
     LocationIsStagingSlotError,
+    ModuleNotOnDeckError,
 )
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
 from opentrons.protocol_engine.types import (
     LabwareOffsetCreate,
     LabwareOffsetVector,
     TipRackWellState,
 )
 from opentrons.types import DeckSlotName, NozzleMapInterface, Point, StagingSlotName
-
-
-from ..._liquid import Liquid
-from ..labware import AbstractLabware, LabwareLoadParams
-
-from .well import WellCore
-
 
 _LabwareParametersDict = LabwareParameters2Dict | LabwareParameters3Dict
 
@@ -171,6 +170,18 @@ class LabwareCore(AbstractLabware[WellCore]):
                     labwareId=self._labware_id,
                     wellNames=list(self._definition.wells),
                     tipWellState=TipRackWellState.CLEAN,
+                )
+            )
+        else:
+            raise TypeError(f"{self.get_display_name()} is not a tip rack.")
+
+    def set_empty(self) -> None:
+        if self.is_tip_rack():
+            self._engine_client.execute_command(
+                cmd.SetTipStateParams(
+                    labwareId=self._labware_id,
+                    wellNames=list(self._definition.wells),
+                    tipWellState=TipRackWellState.EMPTY,
                 )
             )
         else:

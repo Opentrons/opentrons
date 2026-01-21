@@ -14,9 +14,9 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  TextAreaField,
 } from '@opentrons/components'
 
-import { TextAreaField } from '/protocol-designer/components/molecules'
 import {
   actions,
   selectors as fileSelectors,

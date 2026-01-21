@@ -8,7 +8,6 @@ import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { renderWithProviders } from '/protocol-designer/__testing-utils__'
 import { i18n } from '/protocol-designer/assets/localization'
-import { getAllowAllTipracks } from '/protocol-designer/feature-flags/selectors'
 import { createCustomTiprackDef } from '/protocol-designer/labware-defs/actions'
 import { getLabwareDefsByURI } from '/protocol-designer/labware-defs/selectors'
 import { getTiprackOptions } from '/protocol-designer/pages/Onboarding/utils'
@@ -25,7 +24,6 @@ vi.mock('/protocol-designer/labware-defs/actions')
 vi.mock('/protocol-designer/pages/Onboarding/utils')
 vi.mock('../../IncompatibleTipsModal')
 vi.mock('/protocol-designer/labware-defs/selectors')
-vi.mock('/protocol-designer/feature-flags/selectors')
 const mockLocation = vi.fn()
 window.HTMLElement.prototype.scrollIntoView = vi.fn()
 
@@ -89,7 +87,6 @@ describe('SelectPipetteModal', () => {
       <div>mock incompatible tips modal</div>
     )
     vi.mocked(getLabwareDefsByURI).mockReturnValue({})
-    vi.mocked(getAllowAllTipracks).mockReturnValue(false)
     vi.mocked(getTiprackOptions).mockReturnValue({
       'opentrons/opentrons_flex_96_tiprack_200ul/1': '200µL Flex tipracks',
       'opentrons/opentrons_flex_96_tiprack_1000ul/1': '1000µL Flex tipracks',

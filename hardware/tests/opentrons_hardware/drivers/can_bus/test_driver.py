@@ -1,12 +1,12 @@
 """Can Driver tests."""
+
 from typing import AsyncGenerator, Iterator, cast
 
 import pytest
 from can import Bus, Message
-
 from opentrons_shared_data.errors.exceptions import CANBusBusError
-from opentrons_hardware.drivers.can_bus import CanDriver, ArbitrationId, CanMessage
 
+from opentrons_hardware.drivers.can_bus import ArbitrationId, CanDriver, CanMessage
 
 pytestmark = pytest.mark.slow
 
@@ -36,7 +36,7 @@ async def subject(bus_channel: str) -> AsyncGenerator[CanDriver, None]:
 async def test_send(subject: CanDriver, can_bus: Bus) -> None:
     """It should send a message."""
     message = CanMessage(
-        arbitration_id=ArbitrationId(id=0x1FFFFFFF), data=bytearray([1, 2, 3, 4])
+        arbitration_id=ArbitrationId(id=0x1FFFFFFF), data=bytes([1, 2, 3, 4])
     )
     await subject.send(message)
 

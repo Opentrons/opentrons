@@ -50,7 +50,6 @@ def test_disengage_axes(api_client, hardware):
 
 
 def test_disengage_axes_case_insensitive(api_client, hardware):
-
     postres = api_client.post("/motors/disengage", json={"axes": ["Y", "a"]})
 
     hardware.disengage_axes.assert_called_once_with([Axis.Y, Axis.Z_R])

@@ -20,7 +20,7 @@ interface NeedHelpLinkProps extends ComponentProps<typeof Flex> {
 }
 
 export function NeedHelpLink(props: NeedHelpLinkProps): JSX.Element {
-  const { href = SUPPORT_PAGE_URL, flexProps } = props
+  const { href = SUPPORT_PAGE_URL, ...flexProps } = props
   const { t } = useTranslation('robot_calibration')
   return (
     <Flex alignItems={ALIGN_CENTER} {...flexProps}>

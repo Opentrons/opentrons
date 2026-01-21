@@ -53,13 +53,11 @@ type GetLatestRequestIdType = (moduleId: string) => string | null
 
 export function useModuleApiRequests(): [
   GetLatestRequestIdType,
-  HandleModuleApiRequestsType
+  HandleModuleApiRequestsType,
 ] {
   const [dispatchApiRequest] = useDispatchApiRequest()
-  const [
-    requestIdsBySerial,
-    setRequestIdsBySerial,
-  ] = useState<RequestIdsBySerialNumber>({})
+  const [requestIdsBySerial, setRequestIdsBySerial] =
+    useState<RequestIdsBySerialNumber>({})
 
   const handleModuleApiRequests = (
     robotName: string,

@@ -134,6 +134,7 @@ export function EditInstrumentsModal(
         mount,
         selectedPipette as PipetteName,
         selectedTips,
+        labware,
         leftPipette,
         rightPipette
       )

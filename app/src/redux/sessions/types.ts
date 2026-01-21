@@ -112,23 +112,19 @@ export type SessionResponseAttributes =
   | DeckCalibrationSessionResponseAttributes
   | PipetteOffsetCalibrationSessionResponseAttributes
 
-export interface CalibrationCheckSession
-  extends CalibrationCheckSessionResponseAttributes {
+export interface CalibrationCheckSession extends CalibrationCheckSessionResponseAttributes {
   id: string
 }
 
-export interface TipLengthCalibrationSession
-  extends TipLengthCalibrationSessionResponseAttributes {
+export interface TipLengthCalibrationSession extends TipLengthCalibrationSessionResponseAttributes {
   id: string
 }
 
-export interface DeckCalibrationSession
-  extends DeckCalibrationSessionResponseAttributes {
+export interface DeckCalibrationSession extends DeckCalibrationSessionResponseAttributes {
   id: string
 }
 
-export interface PipetteOffsetCalibrationSession
-  extends PipetteOffsetCalibrationSessionResponseAttributes {
+export interface PipetteOffsetCalibrationSession extends PipetteOffsetCalibrationSessionResponseAttributes {
   id: string
 }
 
@@ -156,7 +152,8 @@ export type MultiSessionResponse = RobotApiV2ResponseBody<
   SessionResponseModel[]
 >
 
-export type SessionCommandResponse = RobotApiV2ResponseBody<SessionCommandResponseModel>
+export type SessionCommandResponse =
+  RobotApiV2ResponseBody<SessionCommandResponseModel>
 
 export interface CreateSessionAction {
   type: typeof CREATE_SESSION

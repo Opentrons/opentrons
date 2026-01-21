@@ -51,10 +51,8 @@ export function WifiConnectionDetails({
   const subnetMask = wifi?.subnetMask != null ? wifi.subnetMask : noData
   const macAddress = wifi?.macAddress != null ? wifi.macAddress : noData
 
-  const [
-    showNetworkDetailsModal,
-    setShowNetworkDetailsModal,
-  ] = useState<boolean>(false)
+  const [showNetworkDetailsModal, setShowNetworkDetailsModal] =
+    useState<boolean>(false)
 
   useEffect(() => {
     dispatch(fetchStatus(robotName))
@@ -125,7 +123,10 @@ const DisplayConnectionStatus = ({
       justifyContent={JUSTIFY_CENTER}
     >
       <Icon size="3rem" name="ot-check" color={COLORS.green50} />
-      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="h3"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {t('successfully_connected_to_network', { ssid })}
       </LegacyStyledText>
     </Flex>

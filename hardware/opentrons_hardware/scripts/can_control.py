@@ -5,20 +5,19 @@ Uses the styled output of can_mon while allowing message prompts as can_comm.
 
 Enter ? to get the can_comm prompts.
 """
+
+import argparse
 import asyncio
 import logging
-import argparse
 from logging.config import dictConfig
-from typing import TextIO, Optional
+from typing import Optional, TextIO
 
-from opentrons_hardware.drivers.can_bus import build, CanMessenger
+from .can_comm import InvalidInput, prompt_message
+from .can_mon import task as monitor_task
+from opentrons_hardware.drivers.can_bus import CanMessenger, build
 from opentrons_hardware.drivers.can_bus.abstract_driver import AbstractCanDriver
-
 from opentrons_hardware.firmware_bindings.message import CanMessage
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-
-from .can_mon import task as monitor_task
-from .can_comm import prompt_message, InvalidInput
 
 
 async def get_input(
@@ -73,9 +72,10 @@ async def input_task(
 
 async def run(args: argparse.Namespace) -> None:
     """Entry point for script."""
-    async with build.driver(build_settings(args)) as driver, CanMessenger(
-        driver
-    ) as messenger:
+    async with (
+        build.driver(build_settings(args)) as driver,
+        CanMessenger(driver) as messenger,
+    ):
         try:
             all_fut = asyncio.gather(
                 monitor_task(messenger, args.output),

@@ -1,7 +1,8 @@
 """Protocol engine types to deal with locating things on the deck."""
 
 from __future__ import annotations
-from typing import Literal, Union, TypeGuard
+
+from typing import Literal, TypeGuard, Union
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
@@ -85,8 +86,10 @@ class InStackerHopperLocation(BaseModel):
 
 _OffDeckLocationType = Literal["offDeck"]
 _SystemLocationType = Literal["systemLocation"]
+_WasteChuteLocationType = Literal["wasteChuteLocation"]
 OFF_DECK_LOCATION: _OffDeckLocationType = "offDeck"
 SYSTEM_LOCATION: _SystemLocationType = "systemLocation"
+WASTE_CHUTE_LOCATION: _WasteChuteLocationType = "wasteChuteLocation"
 
 
 def labware_location_is_off_deck(
@@ -101,6 +104,13 @@ def labware_location_is_system(
 ) -> TypeGuard[_SystemLocationType]:
     """Check if a location is the system location."""
     return isinstance(location, str) and location == SYSTEM_LOCATION
+
+
+def labware_location_is_in_waste_chute(
+    location: LabwareLocation,
+) -> TypeGuard[_WasteChuteLocationType]:
+    """Check if a location is the waste chute."""
+    return isinstance(location, str) and location == WASTE_CHUTE_LOCATION
 
 
 class OnLabwareLocationSequenceComponent(BaseModel):
@@ -137,7 +147,9 @@ class NotOnDeckLocationSequenceComponent(BaseModel):
     """Labware on a system location."""
 
     kind: Literal["notOnDeck"] = "notOnDeck"
-    logicalLocationName: _OffDeckLocationType | _SystemLocationType
+    logicalLocationName: (
+        _OffDeckLocationType | _SystemLocationType | _WasteChuteLocationType
+    )
 
 
 LabwareLocationSequence = list[
@@ -158,6 +170,7 @@ LabwareLocation = Union[
     _SystemLocationType,
     AddressableAreaLocation,
     InStackerHopperLocation,
+    _WasteChuteLocationType,
 ]
 """Union of all locations where it's legal to keep a labware."""
 
@@ -168,11 +181,15 @@ LoadableLabwareLocation = Union[
     _OffDeckLocationType,
     _SystemLocationType,
     AddressableAreaLocation,
+    _WasteChuteLocationType,
 ]
 """Union of all locations where it's legal to load a labware."""
 
 OnDeckLabwareLocation = Union[
-    DeckSlotLocation, ModuleLocation, OnLabwareLocation, AddressableAreaLocation
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    AddressableAreaLocation,
 ]
 
 NonStackedLocation = Union[
@@ -181,8 +198,18 @@ NonStackedLocation = Union[
     ModuleLocation,
     _OffDeckLocationType,
     _SystemLocationType,
+    _WasteChuteLocationType,
 ]
 """Union of all locations where it's legal to keep a labware that can't be stacked on another labware"""
+
+AccessibleByGripperLocation = Union[
+    DeckSlotLocation,
+    ModuleLocation,
+    OnLabwareLocation,
+    AddressableAreaLocation,
+    _WasteChuteLocationType,
+]
+"""Union of all locations that a gripper can move things to."""
 
 
 # TODO(mm, 2022-11-07): Deduplicate with Vec3f.
