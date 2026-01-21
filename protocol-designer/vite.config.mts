@@ -70,6 +70,25 @@ export default defineConfig(async (): Promise<UserConfig> => {
         },
       },
     },
+    worker: {
+      // Vite builds web workers in a separate bundle context with its own plugin pipeline.
+      // Add a Sentry plugin instance here so worker chunks get debug IDs injected.
+      // The main Sentry plugin instance (below) will then upload all debug-ID-enabled
+      // chunks (including workers) in a single upload.
+      //
+      // IMPORTANT: Prevent this worker plugin from uploading on its own by overriding
+      // auth/org/project with empty strings (so it does not fall back to process.env).
+      plugins: () => [
+        sentryVitePlugin({
+          silent: true,
+          telemetry: false,
+          authToken: '',
+          org: '',
+          project: '',
+          release: { inject: false },
+        }),
+      ],
+    },
     plugins: [
       react({
         include: '**/*.tsx',
