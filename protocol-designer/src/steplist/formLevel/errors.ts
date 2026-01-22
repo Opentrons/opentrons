@@ -633,6 +633,12 @@ const TIPS_SELECTED_REQUIRED: FormError = {
   location: ['form', 'field'],
   page: 3,
 }
+const FLEX_STACKER_FORM_TYPE_REQUIRED: FormError = {
+  title: 'Flex stacker step type required',
+  dependentFields: ['flexStackerFormType'],
+  location: ['form', 'field'],
+  showOnReopen: true,
+}
 export type FormErrorChecker = (
   arg: HydratedFormData,
   moduleEntities?: ModuleEntities
@@ -1586,6 +1592,13 @@ export const tipSelectionRequired = (
     (tips_selected == null || tips_selected?.length === 0)
     ? TIPS_SELECTED_REQUIRED
     : null
+}
+
+export const flexStackerFormTypeRequired = (
+  fields: HydratedFlexStackerFormData
+): FormError | null => {
+  const { flexStackerFormType } = fields
+  return flexStackerFormType == null ? FLEX_STACKER_FORM_TYPE_REQUIRED : null
 }
 
 /*******************

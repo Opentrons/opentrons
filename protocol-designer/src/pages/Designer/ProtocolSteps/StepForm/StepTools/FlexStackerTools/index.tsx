@@ -32,6 +32,7 @@ import styles from './flexstackertools.module.css'
 import { RefillSettings } from './RefillSettings'
 import { StackerContentItem } from './StackerContentItem'
 import { StackerControls } from './StackerControls'
+import { getIsStackerFillEnabled } from './utils.ts/getIsStackerFillEnabled'
 import { getIsStackerRetrieveEnabled } from './utils.ts/getIsStackerRetrieveEnabled'
 import { getIsStackerStoreEnabled } from './utils.ts/getIsStackerStoreEnabled'
 import { getStoredLabwareDefinitions } from './utils.ts/getStoredLabwareDefinitions'
@@ -41,7 +42,7 @@ import type { FlexStackerFormType } from '/protocol-designer/form-types'
 import type { StepFormProps } from '../../types'
 
 export function FlexStackerTools(props: StepFormProps): JSX.Element {
-  const { formData, propsForFields } = props
+  const { formData, propsForFields, showFormErrors } = props
   const { t } = useTranslation('form')
   const dispatch = useDispatch()
   const isFormPresaved = useSelector(getCurrentFormIsPresaved)
@@ -61,31 +62,36 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
     robotState != null ? flexStackerStateGetter(robotState, moduleId) : null
   const { labwareInHopper, labwareOnShuttle, storedLabwareDetails } =
     moduleState ?? {}
+  const numLabwareInHopper =
+    labwareInHopper != null ? labwareInHopper.length : 0
 
   const isStackerStoreEnabled =
     moduleState != null &&
     getIsStackerStoreEnabled(moduleState, labwareEntities)
   const isStackerRetrieveEnabled =
-    moduleState != null ? getIsStackerRetrieveEnabled(moduleState) : false
-  const firstFormTypeOption = ((): FlexStackerFormType => {
+    moduleState != null && getIsStackerRetrieveEnabled(moduleState)
+  const isStackerFillEnabled =
+    moduleState != null && getIsStackerFillEnabled(moduleState)
+  const isStackerEmptyEnabled = numLabwareInHopper > 0
+  const firstFormTypeOption = ((): FlexStackerFormType | null => {
     if (isStackerStoreEnabled) {
       return FLEX_STACKER_STORE
     } else if (isStackerRetrieveEnabled) {
       return FLEX_STACKER_RETRIEVE
-    } else {
-      return FLEX_STACKER_FILL
+    } else if (isStackerEmptyEnabled) {
+      return FLEX_STACKER_EMPTY
     }
+    // design specifies to never hide the refill option, even if the stacker does not have stored labware details
+    return FLEX_STACKER_FILL
   })()
 
   // preselect the first form option on mount if the form is presaved
   useEffect(() => {
-    if (isFormPresaved) {
+    if (isFormPresaved && moduleId != null && firstFormTypeOption != null) {
       propsForFields.flexStackerFormType.updateValue(firstFormTypeOption)
     }
-  }, [])
+  }, [moduleId])
 
-  const numLabwareInHopper =
-    labwareInHopper != null ? labwareInHopper.length : 0
   const storedLabwareDefinitions = getStoredLabwareDefinitions(
     storedLabwareDetails ?? null,
     labwareEntities
@@ -191,7 +197,7 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
           propsForFields={propsForFields}
           isStackerStoreEnabled={isStackerStoreEnabled}
           isStackerRetrieveEnabled={isStackerRetrieveEnabled}
-          isStackerEmptyEnabled={numLabwareInHopper > 0}
+          isStackerEmptyEnabled={isStackerEmptyEnabled}
         />
       ) : null}
       {formData.flexStackerFormType !== FLEX_STACKER_STORE &&
@@ -204,6 +210,8 @@ export function FlexStackerTools(props: StepFormProps): JSX.Element {
           propsForFields={propsForFields}
           moduleState={moduleState}
           maxPoolCount={maxPoolCount}
+          isStackerFillEnabled={isStackerFillEnabled}
+          showFormErrors={showFormErrors}
         />
       ) : null}
       {formData.flexStackerFormType === FLEX_STACKER_EMPTY ? (
