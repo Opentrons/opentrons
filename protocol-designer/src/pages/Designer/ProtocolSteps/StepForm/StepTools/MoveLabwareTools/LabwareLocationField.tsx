@@ -133,7 +133,7 @@ export function LabwareLocationField(
             labwareEntities[value].def.parameters.loadName
           )
         }
-        return name !== 'Trash bin' && isCompatible
+        return isCompatible
       })
   } else {
     unoccupiedLabwareLocationsOptions =
