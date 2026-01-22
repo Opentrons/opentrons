@@ -105,8 +105,7 @@ export const SlotDetailModal = (
   const isAdapter = getIsAdapterFromDef(labwareOnDeck.def)
   const slotName = getSlotInLocationStack(labwareOnDeck.stack)
   const isHopper = Object.values(modules).some(
-    module =>
-      module.slot === slotName && module.model === FLEX_STACKER_MODULE_V1
+    ({ slot, model }) => slot === slotName && model === FLEX_STACKER_MODULE_V1
   )
 
   const modalTitle = (

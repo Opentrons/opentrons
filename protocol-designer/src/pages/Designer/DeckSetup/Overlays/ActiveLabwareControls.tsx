@@ -70,14 +70,14 @@ export function ActiveLabwareControls(
       : null
   const stackerHopperLabware: string[] =
     stackerModuleState?.labwareInHopper?.reduceRight<string[]>(
-      (acc, hopper) => {
-        if (hopper.lidLabwareId) {
-          acc.push(hopper.lidLabwareId)
+      (acc, { lidLabwareId, primaryLabwareId, adapterLabwareId }) => {
+        if (lidLabwareId) {
+          acc.push(lidLabwareId)
         }
-        if (hopper.adapterLabwareId) {
-          acc.push(hopper.adapterLabwareId)
+        acc.push(primaryLabwareId)
+        if (adapterLabwareId) {
+          acc.push(adapterLabwareId)
         }
-        acc.push(hopper.primaryLabwareId)
         return acc
       },
       []
