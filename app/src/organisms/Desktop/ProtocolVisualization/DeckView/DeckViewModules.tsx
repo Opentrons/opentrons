@@ -14,7 +14,6 @@ import { getModuleInnerProps } from '../utils/getModuleInnerProps'
 import { getTopmostLabwareOnModuleFromStack } from '../utils/getTopmostLabwareOnModuleFromStack'
 import { DeckViewOverlay } from './DeckViewOverlay'
 import { DeckViewStacker } from './DeckViewStacker'
-import { ModuleCommandSummary } from './ModuleCommandSummary'
 
 import type { Dispatch, SetStateAction } from 'react'
 import type { ThermocyclerVizProps } from '@opentrons/components'
@@ -70,14 +69,11 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
         )
         const { isActiveLayerVisible } = getActiveLayer(
           labwareLoadedOnModuleId,
-          selectedRunTimeCommand
+          selectedRunTimeCommand,
+          id
         )
         const moduleDef = getModuleDef(moduleEntities[id].model)
         const moduleType = moduleEntities[id].type
-        const isStepAssociatedWithModule =
-          selectedRunTimeCommand != null &&
-          'moduleId' in selectedRunTimeCommand.params &&
-          selectedRunTimeCommand.params.moduleId === id
         const tempInnerProps = getModuleInnerProps(moduleState)
         const innerTCProps = {
           ...tempInnerProps,
@@ -86,89 +82,83 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
               ? 'closed'
               : 'open',
         }
+        const isSelectedCommandForThisModule =
+          selectedRunTimeCommand != null &&
+          'moduleId' in selectedRunTimeCommand.params &&
+          selectedRunTimeCommand.params.moduleId === id
+
+        const showLabwareCommandSummary =
+          isSelectedCommandForThisModule && labwareLoadedOnModuleId != null
+
         const showModuleCommandSummary =
-          (isActiveLayerVisible || isStepAssociatedWithModule) &&
-          selectedRunTimeCommand != null
+          (isActiveLayerVisible || isSelectedCommandForThisModule) &&
+          selectedRunTimeCommand != null &&
+          !showLabwareCommandSummary
         return (
           <Fragment key={id}>
-            <>
-              <Module
-                key={id}
-                x={slotPosition[0]}
-                y={slotPosition[1]}
-                def={moduleDef}
-                orientation={inferModuleOrientationFromXCoordinate(
-                  slotPosition[0]
-                )}
-                innerProps={
-                  moduleType === THERMOCYCLER_MODULE_TYPE
-                    ? innerTCProps
-                    : tempInnerProps
-                }
-                targetSlotId={
+            <Module
+              key={id}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
+              def={moduleDef}
+              orientation={inferModuleOrientationFromXCoordinate(
+                slotPosition[0]
+              )}
+              innerProps={
+                moduleType === THERMOCYCLER_MODULE_TYPE
+                  ? innerTCProps
+                  : tempInnerProps
+              }
+              targetSlotId={
+                moduleType === FLEX_STACKER_MODULE_TYPE ? `hopper${slot}` : slot
+              }
+              targetDeckId={deckDef.otId}
+              childrenPositioningMode="passThrough"
+              setSelectedSlot={setSelectedSlot}
+              setHoveredSlot={setHoveredSlot}
+            >
+              {labwareLoadedOnModuleId != null ? (
+                <DeckViewStacker
+                  robotState={robotState}
+                  invariantContext={invariantContext}
+                  liquids={liquids}
+                  deckDef={deckDef}
+                  robotType={robotType}
+                  setHoveredSlot={setHoveredSlot}
+                  setSelectedSlot={setSelectedSlot}
+                  slot={slot}
+                  slotPosition={slotPosition}
+                  moduleType={moduleType}
+                  moduleDef={moduleDef}
+                  showLabwareCommandSummary={showLabwareCommandSummary}
+                  labwareLoadedOnModuleId={labwareLoadedOnModuleId}
+                  showModuleCommandSummary={showModuleCommandSummary}
+                  hoveredSlot={hoveredSlot}
+                  labwareEntitiesExtended={labwareEntitiesExtended}
+                  selectedRunTimeCommand={selectedRunTimeCommand}
+                />
+              ) : null}
+              <DeckViewOverlay
+                key={slot}
+                slotId={
                   moduleType === FLEX_STACKER_MODULE_TYPE
                     ? `hopper${slot}`
                     : slot
                 }
-                targetDeckId={deckDef.otId}
-                childrenPositioningMode="passThrough"
+                slotPosition={[
+                  moduleType === FLEX_STACKER_MODULE_TYPE ? 178 : 0,
+                  0,
+                  0,
+                ]}
+                slotFillColor={COLORS.purple50}
+                robotType={robotType}
+                invariantContext={invariantContext}
+                robotState={robotState}
                 setSelectedSlot={setSelectedSlot}
                 setHoveredSlot={setHoveredSlot}
-              >
-                {labwareLoadedOnModuleId != null ? (
-                  <DeckViewStacker
-                    robotState={robotState}
-                    invariantContext={invariantContext}
-                    liquids={liquids}
-                    deckDef={deckDef}
-                    robotType={robotType}
-                    setHoveredSlot={setHoveredSlot}
-                    setSelectedSlot={setSelectedSlot}
-                    slot={slot}
-                    moduleType={moduleType}
-                    moduleDef={moduleDef}
-                    labwareLoadedOnModuleId={labwareLoadedOnModuleId}
-                    showModuleCommandSummary={showModuleCommandSummary}
-                    hoveredSlot={hoveredSlot}
-                    labwareEntitiesExtended={labwareEntitiesExtended}
-                    selectedRunTimeCommand={selectedRunTimeCommand}
-                  />
-                ) : null}
-                <DeckViewOverlay
-                  key={slot}
-                  slotId={
-                    moduleType === FLEX_STACKER_MODULE_TYPE
-                      ? `hopper${slot}`
-                      : slot
-                  }
-                  slotPosition={[
-                    moduleType === FLEX_STACKER_MODULE_TYPE ? 178 : 0,
-                    0,
-                    0,
-                  ]}
-                  slotFillColor={COLORS.purple50}
-                  robotType={robotType}
-                  invariantContext={invariantContext}
-                  robotState={robotState}
-                  setSelectedSlot={setSelectedSlot}
-                  setHoveredSlot={setHoveredSlot}
-                  hover={hoveredSlot}
-                />
-              </Module>
-              {showModuleCommandSummary ? (
-                <ModuleCommandSummary
-                  robotType={robotType}
-                  moduleModel={moduleDef.model}
-                  commandType={selectedRunTimeCommand.commandType}
-                  position={slotPosition}
-                  showModuleIcon={false}
-                  slot={slot}
-                  orientation={inferModuleOrientationFromXCoordinate(
-                    slotPosition[0]
-                  )}
-                />
-              ) : null}
-            </>
+                hover={hoveredSlot}
+              />
+            </Module>
           </Fragment>
         )
       })}
