@@ -6,11 +6,9 @@ import reduce from 'lodash/reduce'
 import { handleActions } from 'redux-actions'
 
 import {
-  FLEX_ROBOT_TYPE,
+  FLEX_SIMPLEST_DECK_CONFIG,
   FLEX_STACKER_MODULE_TYPE,
   getAllDefinitions,
-  getDeckDefFromRobotType,
-  getEmptyDeckConfiguration,
   getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
@@ -1643,9 +1641,7 @@ export const orderedStepIds = (
 }
 
 const initialDeckConfiguration: DeckConfigurationState = {
-  deckConfig: getEmptyDeckConfiguration(
-    getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
-  ),
+  deckConfig: FLEX_SIMPLEST_DECK_CONFIG,
 }
 const deckConfigurationProperties: Reducer<DeckConfigurationState, any> =
   handleActions<DeckConfigurationState, any>(

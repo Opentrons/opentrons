@@ -27,6 +27,28 @@ export interface CutoutConfigProtocolSpec extends CutoutConfig {
 export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
   compatibleCutoutFixtureIds: CutoutFixtureId[]
 }
+
+export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
+  { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutC1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutD1', cutoutFixtureId: 'singleLeftSlot' },
+  { cutoutId: 'cutoutA2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutB2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutC2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutD2', cutoutFixtureId: 'singleCenterSlot' },
+  { cutoutId: 'cutoutA3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutB3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutC3', cutoutFixtureId: 'singleRightSlot' },
+  { cutoutId: 'cutoutD3', cutoutFixtureId: 'singleRightSlot' },
+]
+
+export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] =
+  FLEX_SIMPLEST_DECK_CONFIG.map(config => ({
+    ...config,
+    requiredAddressableAreas: [],
+  }))
+
 export const getEmptyDeckConfiguration = (
   deckDef: DeckDefinition
 ): DeckConfiguration => {
@@ -46,14 +68,6 @@ export const getEmptyDeckConfiguration = (
   )
   return emptyDeckConfiguration
 }
-
-export const FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC: CutoutConfigProtocolSpec[] =
-  getEmptyDeckConfiguration(getDeckDefFromRobotType(FLEX_ROBOT_TYPE)).map(
-    config => ({
-      ...config,
-      requiredAddressableAreas: [],
-    })
-  )
 
 export function getSimplestDeckConfigForProtocol(
   protocolAnalysis: CompletedProtocolAnalysis | ProtocolAnalysisOutput | null

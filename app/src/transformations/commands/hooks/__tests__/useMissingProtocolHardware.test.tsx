@@ -10,9 +10,7 @@ import {
 } from '@opentrons/react-api-client'
 import {
   fixtureTiprack300ul,
-  FLEX_ROBOT_TYPE,
-  getDeckDefFromRobotType,
-  getEmptyDeckConfiguration,
+  FLEX_SIMPLEST_DECK_CONFIG,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -277,7 +275,7 @@ describe.only('useMissingProtocolHardware', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         omitBy(
-          getEmptyDeckConfiguration(getDeckDefFromRobotType(FLEX_ROBOT_TYPE)),
+          FLEX_SIMPLEST_DECK_CONFIG,
           ({ cutoutId }) => cutoutId === 'cutoutD3'
         ),
         {
@@ -322,7 +320,7 @@ describe.only('useMissingProtocolHardware', () => {
     vi.mocked(useNotifyDeckConfigurationQuery).mockReturnValue({
       data: [
         omitBy(
-          getEmptyDeckConfiguration(getDeckDefFromRobotType(FLEX_ROBOT_TYPE)),
+          FLEX_SIMPLEST_DECK_CONFIG,
           ({ cutoutId }) => cutoutId === 'cutoutD3'
         ),
         {
