@@ -1089,7 +1089,7 @@ def run(protocol: ProtocolContext) -> None:
                     )
                     profile_PCR_2: List[ThermocyclerStep] = [
                         {"temperature": 98, "hold_time_seconds": 15},
-                        {"temperature": 60, "hold_time_seconds": 3, "ramp_rate": 2},
+                        {"temperature": 60, "hold_time_seconds": 30, "ramp_rate": 2},
                         {"temperature": 72, "hold_time_seconds": 30, "ramp_rate": 4},
                     ]
                     thermocycler.execute_profile(
