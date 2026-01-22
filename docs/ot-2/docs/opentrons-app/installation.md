@@ -4,7 +4,7 @@ title: "Opentrons OT-2: App Installation and Management"
 
 Start here for step-by-step instructions for downloading, installing, and maintaining the Opentrons App on a computer.
 
-## App installation
+## App installation { #app-installation-ot2 }
 
 Download the Opentrons App from <https://opentrons.com/ot-app/>. The latest version of the app requires Windows 10, macOS 10.16, or Ubuntu 20.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
 

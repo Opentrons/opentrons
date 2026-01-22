@@ -4,7 +4,7 @@ title: "Opentrons OT-2: Transferring Protocols"
 
 Every protocol will begin as a file on your computer, regardless of what method of protocol development you use. You need to import the protocol into the Opentrons App and then transfer it to your OT-2. When transferring a protocol, you can choose to begin run setup immediately or later.
 
-## Import a protocol
+## Import a protocol { #protocol-import-ot2 }
 
 When you first launch the Opentrons App, you will see the Protocols screen. (Click Protocols in the left sidebar to access it at any other time.) Click **Import** in the top right corner to reveal the Import a Protocol pane. Then click **Choose File** and find your protocol in the system file picker, or drag and drop your protocol file into the well.
 
