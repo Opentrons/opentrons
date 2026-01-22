@@ -118,7 +118,7 @@ def eyes_check(
         enabled = (api_key or get_applitools_api_key(required=False)) is not None
 
     if not enabled:
-        print
+        print("Applitools visual check skipped (no APPLITOOLS_API_KEY).")
         return
 
     with eyes_session(page, test_name, app_name=app_name, api_key=api_key, enabled=True) as eyes:
