@@ -57,7 +57,7 @@ import type { LabwareOnDeck } from '/protocol-designer/step-forms'
 const CONTAINER_WIDTH = '49.8125rem'
 
 interface AssignLiquidsModalData {
-  selectedLabwareIds: string[]
+  selectedLabwareIds: string[] | null
   nickNames: Record<string, string>
   labwareId: string | null
   selectedWells: WellGroup
@@ -144,7 +144,7 @@ export function AssignLiquidsModal(
         {labwareIsOnHopper && labwareStack.length > 1 ? (
           <LabwareStackToolboxContainer
             setShowLiquidLayoutOverlay={setShowLiquidLayoutOverlay}
-            selectedLabwareIds={selectedLabwareIds}
+            selectedLabwareIds={selectedLabwareIds ?? null}
             showBadFormState={showBadFormState}
             setShowBadFormState={setShowBadFormState}
             setDefineLiquidModal={setDefineLiquidModal}
@@ -286,9 +286,7 @@ export function AssignLiquidsModalContainer(
   const selectedWells = useSelector(getSelectedWells)
   const { labware } = useSelector(getInitialDeckSetup)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
-  const selectedLabwareIds =
-    useSelector(selectors.getSelectedLabwareIds) ??
-    ([selectedLabwareId] as string[])
+  const selectedLabwareIds = useSelector(selectors.getSelectedLabwareIds)
   // TODO(tz, 2026-01-12): change this to use liquid locations instead of this method and remove getWellContentsForLabwareStack method
   const allWellContents = useSelector(
     wellContentsSelectors.getWellContentsForLabwareStack
@@ -305,7 +303,7 @@ export function AssignLiquidsModalContainer(
     allWellContents,
     liquidNamesById,
     liquidDisplayColors,
-    selectedLabwareIds: selectedLabwareIds ?? [],
+    selectedLabwareIds: selectedLabwareIds ?? null,
   }
 
   return (
