@@ -49,3 +49,5 @@ opentrons-ai-server/api/storage/
 
 # CSS files should not be linted by ESLint (CSS files are linted by stylelint)
 **/*.css
+
+e2e-testing/fixtures/protocol/for_snapshots/
