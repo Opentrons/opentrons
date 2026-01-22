@@ -2034,7 +2034,7 @@ def run(protocol: ProtocolContext) -> None:
                 if DRYRUN is False:
                     profile_TAGSTOP: List[ThermocyclerStep] = [
                         {"temperature": 98, "hold_time_minutes": 5, "ramp_rate": 4},
-                        {"temperature": 97, "hold_time_minutes": 10, "ramp_rate": 2},
+                        {"temperature": 97, "hold_time_minutes": 1, "ramp_rate": 2},
                         {"temperature": 95, "hold_time_minutes": 1, "ramp_rate": 2},
                         {"temperature": 93, "hold_time_minutes": 1, "ramp_rate": 2},
                         {"temperature": 91, "hold_time_minutes": 1, "ramp_rate": 2},
