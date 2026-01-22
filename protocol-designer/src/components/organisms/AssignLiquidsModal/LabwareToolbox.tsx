@@ -188,7 +188,6 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    dispatch(openIngredientSelector(newItem))
     if (
       labwareId &&
       (event.metaKey || event.ctrlKey) &&
