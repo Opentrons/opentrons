@@ -1865,12 +1865,6 @@ def test_retract_after_dispense_in_trash_with_blowout_in_disposal_location(
         "expected_blowout_point",
     ],
     argvalues=[
-        # (
-        #         "trash",
-        #         {"position_reference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}},
-        #         Point(1, 2, 3),     # Well-top point
-        #         Point(2, 4, 6),
-        # ),
         (
             "destination",
             {
@@ -1905,9 +1899,7 @@ def test_retract_after_dispense_with_blowout_position_set_for_destination(
     source_well = decoy.mock(cls=Well)
     source_location = Location(Point(1, 2, 3), labware=source_well)
 
-    trash_well_core = decoy.mock(cls=WellCore)
-    trash_well = decoy.mock(cls=Well)
-    trash_location = Location(Point(4, 5, 6), labware=trash_well)
+    trash_location = Location(Point(4, 5, 6), labware=None)
 
     dest_well_core = decoy.mock(cls=WellCore)
     dest_well = decoy.mock(cls=Well)
@@ -1927,13 +1919,11 @@ def test_retract_after_dispense_with_blowout_position_set_for_destination(
     decoy.when(mock_instrument_core.get_current_volume()).then_return(0)
     decoy.when(dest_well_core.get_top(0)).then_return(well_top_point)
     decoy.when(source_well_core.get_top(0)).then_return(well_top_point)
-    decoy.when(trash_well._core).then_return(trash_well_core)
 
-    for well_core in [trash_well_core, source_well_core, dest_well_core]:
+    for well_core in [source_well_core, dest_well_core]:
         decoy.when(well_core.get_top(AIR_GAP_LOC_Z_OFFSET_FROM_WELL_TOP)).then_return(
             Point(10, 20, 29)
         )
-    decoy.when(trash_well_core.get_top(0)).then_return(blowout_position_reference_point)
     decoy.when(dest_well_core.get_center()).then_return(
         blowout_position_reference_point
     )

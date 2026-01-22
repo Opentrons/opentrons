@@ -53,7 +53,7 @@ def test_load_definition_with_blowout_position() -> None:
     liquid_class_model = LiquidClassSchemaV1.model_validate_json(fixture_data)
     liquid_class_model.byPipette[0].byTipType[
         0
-    ].singleDispense.retract.blowout.params.blowoutPosition = TipPosition(
-        position_reference=PositionReference.WELL_TOP,
+    ].singleDispense.retract.blowout.params.blowoutPosition = TipPosition(  # type:ignore[union-attr]
+        positionReference=PositionReference.WELL_TOP,
         offset=Coordinate(x=1, y=2, z=3),
     )

@@ -316,8 +316,14 @@ def reshape_glob(
             data["enable"] = data["enabled"]
             data.pop("enabled")
 
-        params_list = [meta.alias for field, meta in params_model.model_fields.items()]  # List of all params in the *model*, including optional ones
-        required_params = [meta.alias for field, meta in params_model.model_fields.items() if meta.is_required()]   # List of strictly required params
+        params_list = [
+            meta.alias for field, meta in params_model.model_fields.items()
+        ]  # List of all params in the *model*, including optional ones
+        required_params = [
+            meta.alias
+            for field, meta in params_model.model_fields.items()
+            if meta.is_required()
+        ]  # List of strictly required params
 
         # List of booleans specifying if each required param is present in the data
         required_params_in_data = [param in data.keys() for param in required_params]
@@ -337,8 +343,10 @@ def reshape_glob(
             # This list purposely skips any extra, non-param keys present in the data so that the model validator
             # can raise a validation error upon encountering the unexpected keys.
             all_params_in_data = [
-                param for param in params_list
-                if param in required_params or (param not in required_params and data.get(param) is not None)
+                param
+                for param in params_list
+                if param in required_params
+                or (param not in required_params and data.get(param) is not None)
             ]
             data["params"] = params_model.model_validate(
                 {param: data[param] for param in all_params_in_data}
