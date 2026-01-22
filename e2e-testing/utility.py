@@ -5,6 +5,8 @@ from playwright.sync_api import Page, TimeoutError, expect
 
 from automation.pd_pages import LandingPage, ProtocolEditorPage
 
+# Todo add from eyes import eyes_check
+
 
 def _find_page_in_args(*args, **kwargs) -> Page | None:
     """Helper function to find the Playwright Page object in function arguments."""
@@ -76,10 +78,19 @@ def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: 
     return ProtocolEditorPage(page)
 
 
+def edit_step_form_for_snapshot(page, test_name: str, checkpoint_name: str) -> None:
+    """Edit the step form for a specific snapshot."""
+    # Todo add eyes_check(page, test_name, checkpoint_name)
+
+
 def _dismiss_migration_modal(page: Page) -> None:
     """Dismiss the migration modal if it appears during import."""
 
     overlay = page.locator('[aria-label="BackgroundOverlay_ModalShell"]')
+    overlay.wait_for(state="visible", timeout=5000)
     if overlay.is_visible():
         page.get_by_role("button", name="Import", exact=True).click()
         expect(overlay).not_to_be_visible()
+    else:
+        print("Migration modal did not appear, proceeding with test.")
+        pass

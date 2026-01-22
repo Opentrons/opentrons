@@ -22,17 +22,14 @@ import {
   THERMOCYCLER_MODULE_V1,
   THERMOCYCLER_MODULE_V2,
 } from '@opentrons/shared-data'
-import {
-  FAKE_HOPPER_LOCATION_MAP,
-  getIsSlotAHopper,
-} from '@opentrons/step-generation'
+import { getIsSlotAHopper } from '@opentrons/step-generation'
 
 import { useDeckSetupWindowBreakPoint } from '/protocol-designer/pages/Designer/DeckSetup/utils'
+import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
 import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import type { FC } from 'react'
 import type { RobotType } from '@opentrons/shared-data'
-import type { HopperLocationMapKey } from '@opentrons/step-generation'
 
 interface SlotInformationProps {
   location: string
@@ -66,7 +63,7 @@ export const SlotInformation: FC<SlotInformationProps> = ({
     modifiedLocation = tcDisplayLocation
   } else if (getIsSlotAHopper(location)) {
     modifiedLocation = t('stacker', {
-      slot: FAKE_HOPPER_LOCATION_MAP[location as HopperLocationMapKey],
+      slot: getColumnFromWellName(location),
     })
   }
 

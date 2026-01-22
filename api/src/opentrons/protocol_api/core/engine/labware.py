@@ -175,6 +175,18 @@ class LabwareCore(AbstractLabware[WellCore]):
         else:
             raise TypeError(f"{self.get_display_name()} is not a tip rack.")
 
+    def set_empty(self) -> None:
+        if self.is_tip_rack():
+            self._engine_client.execute_command(
+                cmd.SetTipStateParams(
+                    labwareId=self._labware_id,
+                    wellNames=list(self._definition.wells),
+                    tipWellState=TipRackWellState.EMPTY,
+                )
+            )
+        else:
+            raise TypeError(f"{self.get_display_name()} is not a tip rack.")
+
     def get_next_tip(
         self,
         num_tips: int,

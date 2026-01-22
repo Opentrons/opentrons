@@ -6,6 +6,8 @@
 OT_PYTHON := python3
 include $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python.mk
 
+OT_PYTHON := python3
+
 define OTUPDATESERVER_CALL_PBU
 	$(shell python3 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server $(or $(OPENTRONS_PROJECT),robot-stack) $(1))
 endef
@@ -24,7 +26,7 @@ PYTHON_OPENTRONS_UPDATE_SERVER_ENV = \
   HATCH_VCS_TUNABLE_RAW_OPTIONS="$(call hatch_raw_options_for_project,$(PROJECT));root=$(shell realpath --relative-to=$(PYTHON_OPENTRONS_UPDATE_SERVER_BUILDDIR) $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH))"
 
 define OTUS_DUMP_BR_VERSION
-  $(shell python $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server robot-stack dump_br_version)
+  $(shell python3 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/scripts/python_build_utils.py update-server robot-stack dump_br_version)
 endef
 
 define PYTHON_OPENTRONS_UPDATE_SERVER_INSTALL_VERSION

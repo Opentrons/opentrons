@@ -49,7 +49,7 @@ import type {
   WasteChuteEntities,
 } from '../types'
 
-export const PAPI_VERSION = '2.28' // latest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
+export const PAPI_VERSION = '2.27' // oldest version that we need from api/src/opentrons/protocols/api_support/definitions.py, might not be the actual latest version
 export const PD_APPLICATION_VERSION = '8.8.0' // latest PD version to insert into DESIGNER_APPLICATION blob
 
 export function pythonImports(): string {
@@ -703,9 +703,12 @@ export const getSetStoredLabware = (
 
         return `${pythonName}.set_stored_labware(\n${indentPyLines(pythonArgs)}\n)`
       } else {
-        const labwarePythonNames = Object.values(labwaresOnHopper).map(
-          labware => labwareEntities[labware[0]].pythonName
-        )
+        const labwarePythonNames = Object.values(labwaresOnHopper)
+          .filter(labware => {
+            const allowedRoles = labwareEntities[labware[0]]?.def.allowedRoles
+            return !allowedRoles?.includes('lid')
+          })
+          .map(labware => labwareEntities[labware[0]].pythonName)
         const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
 
         const indentedLabwarePythonNames = labwareChunks

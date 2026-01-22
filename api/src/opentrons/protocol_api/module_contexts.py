@@ -18,6 +18,7 @@ from .core.common import (
     ProtocolCore,
     TemperatureModuleCore,
     ThermocyclerCore,
+    VacuumModuleCore,
 )
 from .core.core_map import LoadedCoreMap
 from .core.engine import ENGINE_CORE_API_VERSION
@@ -1823,3 +1824,20 @@ class FlexStackerContext(ModuleContext):
         [`retrieve()`][opentrons.protocol_api.FlexStackerContext.retrieve].
         """
         return self._cores_to_labware(self._core.get_stored_labware())
+
+
+class VacuumModuleContext(ModuleContext):
+    """An object representing a connected Vacuum Module.
+
+    It should not be instantiated directly; instead, it should be
+    created through :py:meth:`.ProtocolContext.load_module`.
+
+    """
+
+    _core: VacuumModuleCore
+
+    @property
+    @requires_version(2, 28)
+    def serial_number(self) -> str:
+        """Get the module's unique hardware serial number."""
+        return self._core.get_serial_number()

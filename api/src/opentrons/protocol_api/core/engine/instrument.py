@@ -264,6 +264,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 labware_id=labware_id,
                 well_name=well_name,
                 well_location=well_location,
+                version=self._protocol_core.api_version,
             )
             assert isinstance(well_location, LiquidHandlingWellLocation)
             # the dynamic liquid tracking flag is for the prototype dynamic tracking method
@@ -401,6 +402,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 labware_id=labware_id,
                 well_name=well_name,
                 well_location=well_location,
+                version=self._protocol_core.api_version,
             )
             # the dynamic liquid tracking flag is for the prototype dynamic tracking method
             if dynamic_liquid_tracking or end_location is not None:
@@ -511,6 +513,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                 labware_id=labware_id,
                 well_name=well_name,
                 well_location=well_location,
+                version=self._protocol_core.api_version,
             )
             assert isinstance(well_location, WellLocation)
             self._engine_client.execute_command(
@@ -560,6 +563,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            version=self._protocol_core.api_version,
         )
         self._engine_client.execute_command(
             cmd.TouchTipParams(
@@ -620,6 +624,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            version=self._protocol_core.api_version,
         )
         assert isinstance(well_location, PickUpTipWellLocation)
         self._engine_client.execute_command(
@@ -689,6 +694,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            version=self._protocol_core.api_version,
         )
         self._engine_client.execute_command(
             cmd.DropTipParams(
@@ -832,6 +838,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
                     labware_id=labware_id,
                     well_name=well_name,
                     well_location=well_location,
+                    version=self._protocol_core.api_version,
                 )
             self._engine_client.execute_command(
                 cmd.MoveToWellParams(
@@ -916,6 +923,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            version=self._protocol_core.api_version,
         )
         self._engine_client.execute_command(
             cmd.UnsealPipetteFromTipParams(
@@ -966,6 +974,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            version=self._protocol_core.api_version,
         )
         assert isinstance(well_location, LiquidHandlingWellLocation)
         self._engine_client.execute_command(
@@ -2551,6 +2560,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            version=self._protocol_core.api_version,
         )
         self._engine_client.execute_command(
             cmd.LiquidProbeParams(
@@ -2578,6 +2588,7 @@ class InstrumentCore(AbstractInstrument[WellCore, LabwareCore]):
             labware_id=labware_id,
             well_name=well_name,
             well_location=well_location,
+            version=self._protocol_core.api_version,
         )
         result = self._engine_client.execute_command_without_recovery(
             cmd.LiquidProbeParams(

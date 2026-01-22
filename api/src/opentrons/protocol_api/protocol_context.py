@@ -11,7 +11,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
 )
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
@@ -41,6 +40,7 @@ from .core.module import (
     AbstractMagneticModuleCore,
     AbstractTemperatureModuleCore,
     AbstractThermocyclerCore,
+    AbstractVacuumModuleCore,
 )
 from .deck import Deck
 from .disposal_locations import TrashBin, WasteChute
@@ -55,6 +55,7 @@ from .module_contexts import (
     ModuleContext,
     TemperatureModuleContext,
     ThermocyclerContext,
+    VacuumModuleContext,
 )
 from .robot_context import HardwareManager, RobotContext
 from .tasks import Task
@@ -103,6 +104,7 @@ ModuleTypes = Union[
     MagneticBlockContext,
     AbsorbanceReaderContext,
     FlexStackerContext,
+    VacuumModuleContext,
 ]
 
 
@@ -1918,6 +1920,8 @@ def _create_module_context(
         module_cls = AbsorbanceReaderContext
     elif isinstance(module_core, AbstractFlexStackerCore):
         module_cls = FlexStackerContext
+    elif isinstance(module_core, AbstractVacuumModuleCore):
+        module_cls = VacuumModuleContext
     else:
         assert False, "Unsupported module type"
 

@@ -213,7 +213,6 @@ describe('thermocyclerFormToArgs', () => {
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
-        concurrent: true,
         moduleId: tcModuleId,
         description: 'mock details',
         profileElements: [
@@ -322,7 +321,6 @@ describe('thermocyclerFormToArgs', () => {
       },
       expected: {
         commandCreatorFnName: THERMOCYCLER_PROFILE,
-        concurrent: true,
         moduleId: tcModuleId,
         description: 'mock details',
         profileElements: [

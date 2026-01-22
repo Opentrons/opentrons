@@ -85,3 +85,15 @@ def flex_stacker_tof_sensors_disabled() -> bool:
     return advs.get_setting_with_env_overload(
         "disableFlexStackerLabwareDetection", RobotTypeEnum.FLEX
     )
+
+
+def protocol_subprocess_enabled() -> bool:
+    return advs.get_setting_with_env_overload(
+        "enableProtocolSubprocess", RobotTypeEnum.FLEX
+    )
+
+
+def hardware_subprocess_enabled() -> bool:
+    return advs.get_setting_with_env_overload(
+        "enableHardwareSubprocess", RobotTypeEnum.FLEX
+    )

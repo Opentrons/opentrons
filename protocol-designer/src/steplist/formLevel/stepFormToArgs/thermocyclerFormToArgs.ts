@@ -91,8 +91,6 @@ export const thermocyclerFormToArgs = (
         profileTargetLidTemp: Number(castFormData.profileTargetLidTemp),
         profileVolume: Number(castFormData.profileVolume),
         description: stepDetails,
-
-        concurrent: true as const,
       }
 
       return args
