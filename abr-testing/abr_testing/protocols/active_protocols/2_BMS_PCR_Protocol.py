@@ -253,7 +253,7 @@ def run(protocol: ProtocolContext) -> None:
 
             # block_task =
             tc_mod.set_block_temperature(
-                temperature=4, ramp_rate=1
+                temperature=4, ramp_rate=1.5
             )  # try ramping temperature by 1.5°C/Second
             # protocol.wait_for_tasks([block_task])
             tc_mod.open_lid()
