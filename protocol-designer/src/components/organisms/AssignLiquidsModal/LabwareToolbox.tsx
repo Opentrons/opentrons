@@ -188,27 +188,23 @@ export function LabwareStackToolbox({
     newItem: string,
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
-    if (
-      labwareId &&
-      (event.metaKey || event.ctrlKey) &&
-      JSON.stringify(liquidLocations[newItem]) !==
-        JSON.stringify(liquidLocations[labwareId])
-    ) {
-      // selected labware have different liquid layouts
-      setShowLiquidLayoutOverlay(true)
-      dispatch(
-        multipleIngredientsSelector([
-          ...(selectedLabwareIds ?? [topDownStackIds[0]]),
-          newItem,
-        ])
-      )
-    } else if (event.metaKey || event.ctrlKey) {
-      dispatch(
-        multipleIngredientsSelector([
-          ...(selectedLabwareIds ?? [topDownStackIds[0]]),
-          newItem,
-        ])
-      )
+    const isMultiSelect = event.metaKey || event.ctrlKey
+
+    if (isMultiSelect) {
+      const newSelection = [
+        ...(selectedLabwareIds ?? [topDownStackIds[0]]),
+        newItem,
+      ]
+      dispatch(multipleIngredientsSelector(newSelection))
+
+      // Show overlay if selected labware have different liquid layouts
+      const hasDifferentLiquids =
+        labwareId != null &&
+        JSON.stringify(liquidLocations[newItem]) !==
+          JSON.stringify(liquidLocations[labwareId])
+      if (hasDifferentLiquids) {
+        setShowLiquidLayoutOverlay(true)
+      }
     } else {
       dispatch(multipleIngredientsSelector([newItem]))
     }
