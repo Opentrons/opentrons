@@ -15,10 +15,10 @@ from opentrons_shared_data.liquid_classes.types import TipPositionDict
 from opentrons.protocol_api._liquid_properties import (
     LiquidHandlingPropertyByVolume,
     TipPosition,
+    _ensure_validated_tip_position,
     build_aspirate_properties,
     build_multi_dispense_properties,
     build_single_dispense_properties,
-    ensure_validated_tip_position,
 )
 
 
@@ -534,13 +534,13 @@ def test_ensure_validated_tip_position(
     tip_position: Union[TipPosition, TipPositionDict], expected_position: TipPosition
 ) -> None:
     """It should set tip position properties correctly."""
-    validated_position = ensure_validated_tip_position(tip_position)
+    validated_position = _ensure_validated_tip_position(tip_position)
     assert validated_position == expected_position
 
     with pytest.raises(TypeError):
-        ensure_validated_tip_position("invalid_tip_position")  # type: ignore[arg-type]
+        _ensure_validated_tip_position("invalid_tip_position")  # type: ignore[arg-type]
 
     with pytest.raises(ValueError):
-        ensure_validated_tip_position(
+        _ensure_validated_tip_position(
             {"position_reference": "invalid", "offset": {"x": 10, "y": 20, "z": 30}}  # type: ignore[arg-type]
         )

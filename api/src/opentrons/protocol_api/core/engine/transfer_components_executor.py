@@ -23,6 +23,7 @@ from opentrons.protocol_api._liquid_properties import (
     TouchTipProperties,
     TransferProperties,
 )
+from opentrons.protocol_api.disposal_locations import TrashBin, WasteChute
 from opentrons.protocols.advanced_control.transfers import (
     transfer_liquid_utils as tx_utils,
 )
@@ -34,7 +35,6 @@ from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import
 from opentrons.types import Location, Mount, Point
 
 if TYPE_CHECKING:
-    from ... import TrashBin, WasteChute
     from .instrument import InstrumentCore
     from .well import WellCore
 
@@ -611,7 +611,8 @@ class TransferComponentsExecutor:
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
                 if (
-                    "touchTipDisabled"
+                    blowout_touch_tip_props.enabled
+                    and "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
                 ):
                     blowout_touch_tip_props = replace(blowout_touch_tip_props)
@@ -852,7 +853,8 @@ class TransferComponentsExecutor:
                 touch_tip_and_air_gap_well = source_well
                 # Skip touch tip if blowing out at the SOURCE and it's untouchable:
                 if (
-                    "touchTipDisabled"
+                    blowout_touch_tip_props.enabled
+                    and "touchTipDisabled"
                     in source_location.labware.quirks_from_any_parent()
                 ):
                     blowout_touch_tip_props = replace(blowout_touch_tip_props)
