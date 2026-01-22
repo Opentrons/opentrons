@@ -67,14 +67,16 @@ Protocol Designer includes Absorbance Plate Reader step details to help you keep
 
 ## Flex Stacker Module steps
 
-Click in the bottom left to add a Stacker step to your Protocol Designer protocol. The step menu shows the labware currently in the Stacker Module and any labware on the attached shuttle. 
+Click **Add Step** in the bottom left to add a Stacker step to your Protocol Designer protocol. The step menu on the right shows the labware currently in the Stacker Module and any labware on the attached shuttle. 
 
 <figure class="screenshot" markdown>
-  ![Add a Stacker step](../images/stacker-steps.png)
+  ![Add a Stacker step](../images/stacker_steps.png)
   <figcaption>Add a Stacker step to store or retrieve labware, or refill or empty your Stacker Module.</figcaption>
 </figure>
 
-Choose from the available module controls to: 
+In the image above, labware on the shuttle and the top piece of labware in the Stacker are visible. Labware at the bottom of the stack can be moved to the shuttle, but you won't be able to see this labware on the Flex deck. Click the Stacker on the right side of the deck to view the labware stack. 
+
+In the step menu, choose from the available module controls to: 
 
 - **Retrieve** a single piece of labware loaded in the Stacker. The labware at the bottom of the stack will be moved onto the shuttle. Add a move step to transfer the labware elsewhere on the Flex deck, either manually or with the Flex Gripper. The shuttle must be empty to retrieve labware.
 - **Store** a single piece of labware on the shuttle in the Stacker. The labware will be stored at the bottom of the stack.
