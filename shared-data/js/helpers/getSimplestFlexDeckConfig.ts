@@ -28,6 +28,7 @@ export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
   compatibleCutoutFixtureIds: CutoutFixtureId[]
 }
 
+// this is removed in commit 1260c953b02cf0204e259c3bef992cefd100c10c
 export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
   { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
