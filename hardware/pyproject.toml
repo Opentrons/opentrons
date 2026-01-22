@@ -55,7 +55,7 @@ requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3', 'hatch-dependency
 build-backend = 'hatchling.build'
 
 [tool.ruff.lint]
-select = ["E", "ANN", "D", "C90", "I", "T201"]
+select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D105", "D107", "D400", "D401", "D402", "D403", "D404", "D415", "D418"]
 [tool.ruff.lint.pydocstyle]
 convention = "google"

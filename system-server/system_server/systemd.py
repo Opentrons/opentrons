@@ -5,7 +5,7 @@ from typing import Dict, Union
 
 try:
     # systemd journal is available, we can use its handler
-    import systemd.journal
+    import systemd.journal  # noqa: F401
 
     def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
         """Initialize log handler."""

@@ -41,7 +41,7 @@ dev = [
 
 [tool.ruff.lint]
 # TODO(sfoster, 12/24/25) probably check annotations and docstrings here
-select = ["E", "C90", "I", "T201"]
+select = ["E", "F", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741"]
 
 [tool.ruff.lint.pydocstyle]

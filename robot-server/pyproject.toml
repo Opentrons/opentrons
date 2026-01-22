@@ -87,7 +87,7 @@ dev = [
 
 [tool.ruff.lint]
 exclude = ["tests/integration/persistence_snapshots/**/*"]
-select = ["E", "ANN", "D", "C90", "I", "T201"]
+select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "robot_server/settings.py" = ["ANN","D"]
