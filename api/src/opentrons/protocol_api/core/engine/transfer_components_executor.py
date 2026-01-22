@@ -481,11 +481,11 @@ class TransferComponentsExecutor:
         6. If blowout is “source” or “trash”
             - Move to position specified by BlowoutPosition. If BlowoutPosition is not specified, move to the top of Well or TrashBin/WasteChute.
             - Do blow-out
-            - Do touch-tip AGAIN at the source well (if blowout in a non-trash blowout_location)
+            - Do touch-tip AGAIN at the source well (if blowout in a non-trash location)
             - Prepare-to-aspirate (top of well)
             - Do air-gap (top of well)
 
-        If target blowout_location is a trash bin or waste chute, the retract movement step is skipped along with touch tip,
+        If target location is a trash bin or waste chute, the retract movement step is skipped along with touch tip,
         even if it is enabled.
         """
         retract_props = self._transfer_properties.dispense.retract
@@ -563,7 +563,7 @@ class TransferComponentsExecutor:
             air_gap_volume = 0.0
         else:
             air_gap_volume = retract_props.air_gap_by_volume.get_for_volume(0)
-        # Regardless of the blowout blowout_location, do touch tip and air gap
+        # Regardless of the blowout location, do touch tip and air gap
         # when leaving the dispense well. If this will be the final air gap, i.e,
         # we won't be moving to a Trash or a Source for Blowout after this air gap,
         # then skip the final air gap if we have been told to do so.
@@ -584,7 +584,7 @@ class TransferComponentsExecutor:
             if blowout_props.location == BlowoutLocation.SOURCE:
                 if source_location is None or source_well is None:
                     raise RuntimeError(
-                        "Blowout blowout_location is 'source' but source blowout_location &/or well is not provided."
+                        "Blowout location is 'source' but source location &/or well is not provided."
                     )
                 src_blowout_location: Location
                 if blowout_props.blowout_position is not None:
@@ -623,7 +623,7 @@ class TransferComponentsExecutor:
                     trash_blowout_location = self._calculate_blowout_position_from_position_info(
                         blowout_position=blowout_props.blowout_position,
                         blowout_location=trash_location,
-                        # We have already established that trash blowout_location of `Location` type
+                        # We have already established that trash location of `Location` type
                         # has its `labware` as `Well` type.
                         blowout_well=trash_location.labware.as_well()._core  # type: ignore[arg-type]
                         if isinstance(trash_location, Location)
@@ -639,7 +639,7 @@ class TransferComponentsExecutor:
                 )
                 touch_tip_and_air_gap_location = trash_location
                 touch_tip_and_air_gap_well = (
-                    # We have already established that trash blowout_location of `Location` type
+                    # We have already established that trash location of `Location` type
                     # has its `labware` as `Well` type.
                     trash_location.labware.as_well()._core  # type: ignore[assignment]
                     if isinstance(trash_location, Location)

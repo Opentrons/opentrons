@@ -376,7 +376,6 @@ class BlowoutProperties:
         validated_flow_rate = validation.ensure_greater_than_zero_float(new_flow_rate)
         self._flow_rate = validated_flow_rate
 
-    # TODO: add a blowout_position setter
     @property
     def blowout_position(self) -> Optional[TipPosition]:
         return self._blowout_position
