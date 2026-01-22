@@ -7,7 +7,7 @@ import reduce from 'lodash/reduce'
 import { LiquidIcon, StyledText } from '@opentrons/components'
 import { swatchColors } from '@opentrons/step-generation'
 
-import { getModalPortalEl } from '/app/App/portal'
+import { getTopPortalEl } from '/app/App/portal'
 
 import { formatPercentage } from '../utils/formatPercentage'
 import { formatVolume } from '../utils/formatVolume'
@@ -59,12 +59,12 @@ export function WellTooltip({
   const makeHandleMouseEnterWell =
     (wellName: string, wellIngreds: LocationLiquidState) =>
     (e: MouseEvent): void => {
-      const target = e.target as HTMLElement
+      const target = e.currentTarget as HTMLElement
       const { left, top, height, width } = target.getBoundingClientRect()
-      if (Object.keys(wellIngreds).length > 0 && left && top) {
+      if (Object.keys(wellIngreds).length > 0) {
         setTooltipState({
           tooltipX: left + width / 2,
-          tooltipY: top + height / 2,
+          tooltipY: top + height / 3,
           tooltipWellName: wellName,
           tooltipWellIngreds: wellIngreds,
           tooltipOffset: height / 2,
@@ -162,7 +162,7 @@ export function WellTooltip({
                 </>
               ) : null}
             </div>,
-            getModalPortalEl()
+            getTopPortalEl()
           )
         : null}
     </>
