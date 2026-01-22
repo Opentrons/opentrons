@@ -109,9 +109,17 @@ jobs:
           OT_PD_MIXPANEL_DEV_ID: ${{ secrets.OT_PD_MIXPANEL_DEV_ID }}
           OT_PD_SENTRY_DSN: ${{ secrets.OT_PD_SENTRY_DSN }}
           OT_PD_SENTRY_DEV_DSN: ${{ secrets.OT_PD_SENTRY_DEV_DSN }}
+          # Used by @sentry/vite-plugin (sourcemap upload is gated by OT_PD_SENTRY_PLUGIN_UPLOAD).
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+          # Only meaningful for tagged releases; empty string is treated as absent.
+          SENTRY_RELEASE: ${{ github.ref_type == 'tag' && steps.version.outputs.number || '' }}
+          # Opt-in CI sourcemap upload via the Vite plugin (staging/prod tagged releases only).
+          OT_PD_SENTRY_PLUGIN_UPLOAD: ${{ github.ref_type == 'tag' && (startsWith(github.ref, 'refs/tags/protocol-designer') || startsWith(github.ref, 'refs/tags/staging-protocol-designer')) && (needs.determine-deploy-config.outputs.environment == 'production' || needs.determine-deploy-config.outputs.environment == 'staging') && 'true' || '' }}
         run: |
-          make -C protocol-designer NODE_ENV=${{ needs.determine-deploy-config.outputs.environment == 'production' && 'production' || 'development' }} OT_PD_PRERELEASE_MODE=${{ needs.determine-deploy-config.outputs.environment == 'sandbox' && '1' || '0' }}
-      - name: 'upload sourcemaps to Sentry'
+          make -C protocol-designer NODE_ENV=${{ (needs.determine-deploy-config.outputs.environment == 'production' || needs.determine-deploy-config.outputs.environment == 'staging') && 'production' || 'development' }} OT_PD_PRERELEASE_MODE=${{ needs.determine-deploy-config.outputs.environment == 'sandbox' && '1' || '0' }}
+      - name: 'update the release in Sentry with build metadata'
         # Only on production or staging releases (protocol-designer* or staging-protocol-designer*)
         if: github.ref_type == 'tag' && (startsWith(github.ref, 'refs/tags/protocol-designer') || startsWith(github.ref, 'refs/tags/staging-protocol-designer')) && (needs.determine-deploy-config.outputs.environment == 'production' || needs.determine-deploy-config.outputs.environment == 'staging')
         uses: getsentry/action-release@v3
@@ -121,7 +129,6 @@ jobs:
           SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         with:
           release: ${{ steps.version.outputs.number }}
-          sourcemaps: protocol-designer/dist
           set_commits: auto
           ignore_missing: true
           finalize: false

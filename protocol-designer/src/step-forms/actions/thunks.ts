@@ -250,8 +250,8 @@ export const createLabwareAndQueueForHopper =
       })
 
       // wait for all containers to finish
-      await Promise.all(containerPromises)
+      await Promise.all(containerPromises).then(() => {
+        dispatch(stackerLabwareCreationFinish())
+      })
     }
-
-    dispatch(stackerLabwareCreationFinish())
   }
