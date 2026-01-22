@@ -36,6 +36,56 @@ If there are already protocols stored on your OT-2, click **Import** in the top 
 
 The Opentrons App will analyze your protocol as soon as you import it. _Protocol analysis_ is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, the app shows a warning on the protocol's card. Correct the errors and re-import the protocol. The OT-2 can use your protocol when after importing it without any error warnings.
 
-## Managing existing protocols
+## Protocol management features
 
-Summary here. TBD
+The screen shows a summary of each protocol stored in your robot.
+
+<figure class="screenshot" markdown>
+![Protocol summary tile](../images/app-protocol-tile-summary.png)
+<figcaption>Click the summary to show more information about each protocol.</figcaption>
+</figure>
+
+Other screen elements and actions let you sort protocols, assign a protocol to a robot, and expand the protocol summary to see more information about each protocol.
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sort by</td>
+      <td>Opens a drop-down menu that offers protocol sorting options which include:
+        <ul>
+            <li>Alphabetical</li>
+            <li>Reverse alphabetical</li>
+            <li>Most recent updates</li>
+            <li>Oldest updates</li>
+            <li>Flex protocols first</li>
+            <li>OT-2 protocols first</li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Import</strong> button</td>
+      <td>Opens a file picker that lets you browse to and upload other saved protocols.</td>
+    </tr>
+    <tr>
+        <td>Three-dot (⋮) menu</td>
+        <td>Opens a pop-up menu that includes these options:
+            <ul>
+                <li>Start setup: choose a networked Opentrons robot to run a protocol.</li>
+                <li>Reanalyze: runs protocol analysis on a saved or revised protocol.</li>
+                <li>Show in folder: opens the file location for stored protocols.</li>
+                <li>Delete: deletes a protocol. Tip: Use the "Show in folder" option to delete protocols in bulk.</li>
+            </ul>
+        </td>
+    </tr>
+    <tr>
+        <td>Create or download a new protocol</td>
+        <td>Provides links to the <a href="https://library.opentrons.com/">Protocol Library</a>, <a href="https://designer.opentrons.com/">Protocol Designer</a>, and the <a href="https://docs.opentrons.com/python-api/">Python API</a>.</td>
+    </tr>
+  </tbody>
+</table>
