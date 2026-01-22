@@ -3,9 +3,11 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   FLEX_ROBOT_TYPE,
+  getCutoutFixtureIdsForModuleModel,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
   getEmptyDeckConfiguration,
+  replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
@@ -46,6 +48,8 @@ export function HardwareConfigurator(
   const { deckConfig } = useSelector(getDeckConfiguration)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const emptyDeckConfiguration = getEmptyDeckConfiguration(deckDef)
+  
+  const deckConifWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(emptyDeckConfiguration)
   const simpleDeckConfig: DeckConfiguration = emptyDeckConfiguration.filter(
     ({ cutoutId }) => {
       const hasModule = Object.values(modules).some(
@@ -67,24 +71,22 @@ export function HardwareConfigurator(
   console.log('emptyDeckConfiguration: ', emptyDeckConfiguration)
 
   console.log('simpleDeckConfig in HardwareConfigurator', simpleDeckConfig)
+  console.log('modules: ', modules)
   const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
     (module: FormModule | ModuleExtended): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
       const defaultModuleConfig: CutoutConfig = {
         cutoutId: getCutoutIdFromAddressableArea(module.slot, deckDef)!,
-        cutoutFixtureId: hasThermocycler
-          ? THERMOCYCLER_V2_FRONT_FIXTURE
-          : 'cutoutFixtureId' in module
-            ? (module.cutoutFixtureId ?? 'singleStandardSlot')
-            : 'singleStandardSlot',
+        cutoutFixtureId: getCutoutFixtureIdsForModuleModel(module.model)[0],
       }
-      const thermocyclerA1Config: CutoutConfig = {
-        cutoutId: 'cutoutA1',
-        cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
-      }
+      // const thermocyclerA1Config: CutoutConfig = {
+      //   cutoutId: 'cutoutA1',
+      //   cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
+      // }
+      console.log('defaultModuleConfig: ', defaultModuleConfig)
       return [
         defaultModuleConfig,
-        ...(hasThermocycler ? [thermocyclerA1Config] : []),
+        // ...(hasThermocycler ? [thermocyclerA1Config] : []),
       ]
     }
   )

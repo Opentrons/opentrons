@@ -85,11 +85,13 @@ export const updateInitialDeckState = (
     modules: moduleOnDeck,
     labware: labwareOnDeck,
   } = initialDeckSetup
+  console.log('updating initial deck state')
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   values.forEach(value => {
     if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
       return
     }
+    console.log('value: ', value)
     const fixtureName = getFixtureNameFromAddresableArea(
       value.addressableAreaId as AddressableAreaName
     )
