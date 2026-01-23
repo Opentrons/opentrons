@@ -14,6 +14,8 @@ import { LEFT, RIGHT } from '@opentrons/shared-data'
 import { usePipetteSpecsV2 } from '/app/local-resources/instruments'
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { ACTIONS } from './constants'
+
 import type { ComponentProps, Dispatch } from 'react'
 import type { Mount, PipetteData } from '@opentrons/api-client'
 import type { SmallButton } from '/app/atoms/buttons'
@@ -57,7 +59,7 @@ export function SelectPipette(props: SelectPipetteProps): JSX.Element {
     // the button will be disabled if these values are null
     if (selectedPipette != null && selectedPipetteSpecs != null) {
       dispatch({
-        type: 'SELECT_PIPETTE',
+        type: ACTIONS.SELECT_PIPETTE,
         pipette: selectedPipetteSpecs,
         mount: selectedPipette,
       })
