@@ -71,13 +71,8 @@ export function HardwareConfigurator(
     }
   )
 
-  console.log('emptyDeckConfiguration: ', emptyDeckConfiguration)
-
-  console.log('simpleDeckConfig in HardwareConfigurator', simpleDeckConfig)
-  console.log('modules: ', modules)
   const moduleConfig: CutoutConfigMap[] = Object.values(modules).flatMap(
     (module: FormModule | ModuleExtended): CutoutConfigMap[] => {
-      const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
       const fixtureModule = getCutoutFixtureIdsForModuleModel(module.model)[0]
       const cutoutId = getCutoutIdFromAddressableArea(module.slot, deckDef)!
       const matchingDeckConfigEntry = deckConfigWithAA.find(
@@ -92,19 +87,10 @@ export function HardwareConfigurator(
           matchingDeckConfigEntry?.addressableAreaId ??
           (module.slot as AddressableAreaNamesWithFakes),
       }
-      let missingThermocyclerFixtures: CutoutConfigMap[] = []
-      if (hasThermocycler) {
-        missingThermocyclerFixtures = getAddedMissingThermocyclerFixtures(
-          [defaultModuleConfig],
-          deckDef
-        )
-        console.log('missingThermocyclerFixtures:', missingThermocyclerFixtures)
-      }
-      // const thermocyclerA1Config: CutoutConfig = {
-      //   cutoutId: 'cutoutB1',
-      //   cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
-      // }
-      console.log('defaultModuleConfig: ', defaultModuleConfig)
+      const missingThermocyclerFixtures = getAddedMissingThermocyclerFixtures(
+        [defaultModuleConfig],
+        deckDef
+      )
       return [defaultModuleConfig, ...missingThermocyclerFixtures]
     }
   )

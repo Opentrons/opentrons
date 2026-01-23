@@ -1200,7 +1200,7 @@ export const getAddedMissingThermocyclerFixtures = (
           addressableAreaId: fixtureFromDeckDef.mayMountTo[0].replace(
             'cutout',
             ''
-          ) as AddressableAreaNamesWithFakes,
+          ) as AddressableAreaNamesWithFakes, // get addressable area name from cutout id and fixture id
         },
       ]
     },
