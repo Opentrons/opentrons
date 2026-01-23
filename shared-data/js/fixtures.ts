@@ -1163,3 +1163,42 @@ export const getCutoutConfigReplacmentForModule = (
     replacmentFixture[0].cutoutFixtureId
   )
 }
+
+// Check if thermocycler fixtures need the missing pair added
+export const getAddedMissingThermocyclerFixtures = (
+  values: CutoutConfigMap[],
+  deckDef: DeckDefinition
+): CutoutConfigMap[] => {
+  const hasThermocyclerFixture = values.some(v =>
+    MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]?.includes(
+      v.cutoutFixtureId
+    )
+  )
+  if (hasThermocyclerFixture) {
+    MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]?.forEach(fixtureId => {
+      const alreadyExists = values.some(v => v.cutoutFixtureId === fixtureId)
+      console.log('alreadyExists: ', alreadyExists)
+      console.log('fixtureId: ', fixtureId)
+      if (!alreadyExists) {
+        const fixtureFromDeckDef = deckDef.cutoutFixtures.find(
+          fixture => fixture.id === fixtureId
+        )
+        console.log(
+          'fixtureFromDeckDef?.fixtureGroup: ',
+          fixtureFromDeckDef?.fixtureGroup
+        )
+        if (fixtureFromDeckDef?.mayMountTo[0] != null) {
+          values.push({
+            cutoutId: fixtureFromDeckDef.mayMountTo[0],
+            cutoutFixtureId: fixtureId as CutoutFixtureId,
+            addressableAreaId: fixtureFromDeckDef.mayMountTo[0].replace(
+              'cutout',
+              ''
+            ) as AddressableAreaName,
+          })
+        }
+      }
+    })
+  }
+  return values
+}

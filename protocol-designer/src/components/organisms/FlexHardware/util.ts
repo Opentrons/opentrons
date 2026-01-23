@@ -1,10 +1,11 @@
 import {
   FLEX_ROBOT_TYPE,
+  getAddedMissingThermocyclerFixtures,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
-  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -29,7 +30,9 @@ import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CutoutConfigMap,
+  CutoutFixtureId,
   DeckConfiguration,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
@@ -44,6 +47,11 @@ const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
   cutoutC3: 'C4',
   cutoutD3: 'D4',
 }
+
+const THERMOCYCLER_FIXTURES: string[] = [
+  THERMOCYCLER_V2_REAR_FIXTURE,
+  THERMOCYCLER_V2_FRONT_FIXTURE,
+]
 
 interface UpdateInitialDeckSetupProps {
   values: CutoutConfigMap[]
@@ -88,10 +96,14 @@ export const updateInitialDeckState = (
   } = initialDeckSetup
   console.log('updating initial deck state')
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
+
+  const addedMissingFixtures = getAddedMissingThermocyclerFixtures(
+    values,
+    deckDef
+  )
+  console.log('addedMissingFixtures: ', addedMissingFixtures)
+
   values.forEach(value => {
-    if (value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE) {
-      return
-    }
     console.log('value: ', value)
     const fixtureName = getFixtureNameFromAddresableArea(
       value.addressableAreaId as AddressableAreaName
@@ -194,12 +206,12 @@ export const updateInitialDeckState = (
                 value.cutoutId
               )
             : null
-            let slot: string
-            if (type === THERMOCYCLER_MODULE_TYPE) {
-              slot = 'A1'
-            } else {
-              slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
-            }
+        let slot: string
+        // if (type === THERMOCYCLER_MODULE_TYPE) {
+        //   slot = 'A1'
+        // } else {
+        slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+        // }
         //   creating module
         if (labwareNotCompatible == null && model != null && type != null) {
           dispatch(
