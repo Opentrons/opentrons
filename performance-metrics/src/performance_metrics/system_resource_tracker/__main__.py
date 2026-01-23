@@ -22,7 +22,12 @@ def main() -> None:
 
     logger.info("Starting system resource tracker...")
 
-    systemd.daemon.notify("READY=1")
+    # `unset_environment=True` prevents a problem with shelling out to systemd commands
+    # like `hostnamectl`. For some reason, they send `EXIT_STATUS=` notifications to
+    # systemd. systemd associates those notifications with our service, but ignores
+    # them because they didn't come from our main PID. systemd logs warnings about this,
+    # which flood our logs.
+    systemd.daemon.notify("READY=1", unset_environment=True)
 
     try:
         while True:

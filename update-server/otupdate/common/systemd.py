@@ -23,9 +23,15 @@ try:
     # and type=notify in the unit file, we can prevent systemd from starting
     # dependent services until we actually say we're ready. By calling this
     # after we change the hostname, we make anything with an After= on us
-    # be guaranteed to see the correct hostname
+    # be guaranteed to see the correct hostname.
+    #
+    # `unset_environment=True` prevents a problem with shelling out to systemd commands
+    # like `hostnamectl`. For some reason, they send `EXIT_STATUS=` notifications to
+    # systemd. systemd associates those notifications with our service, but ignores
+    # them because they didn't come from our main PID. systemd logs warnings about this,
+    # which flood our logs.
     def notify_up() -> None:
-        systemd.daemon.notify("READY=1")
+        systemd.daemon.notify("READY=1", unset_environment=True)
 
     SOURCE: str = "systemd"
 
