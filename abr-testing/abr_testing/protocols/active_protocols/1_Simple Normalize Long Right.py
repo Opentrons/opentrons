@@ -33,13 +33,16 @@ def run(protocol: ProtocolContext) -> None:
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     data = all_data[1:]
-    helpers.comment_protocol_version(protocol, "06")
+    helpers.comment_protocol_version(protocol, "07")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # DECK SETUP AND LABWARE
-    protocol.capture_image(filename="start_of_run")
+    protocol.capture_image(
+        filename="start_of_run",
+        resolution=(1280, 720),
+        zoom=1)
     protocol.comment("THIS IS A NO MODULE RUN")
     tiprack_x_1 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D1")
     tiprack_x_2 = protocol.load_labware("opentrons_flex_96_tiprack_200ul", "D2")
@@ -166,6 +169,11 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.touch_tip()
                 current += 1
             p1000.return_tip()
+            protocol.capture_image(
+                home_before=True, 
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
 
             protocol.comment("Changing pipette configuration to 8ch.")
 
@@ -306,7 +314,10 @@ def run(protocol: ProtocolContext) -> None:
         helpers.find_liquid_height_of_all_wells(
             protocol, p1000_single, [waste_reservoir["A1"]]
         )
-        protocol.capture_image(filename="end_of_run")
+        protocol.capture_image(
+            filename="end_of_run",
+            resolution=(1280, 720),
+            zoom=1)
         if not protocol.is_simulating():
             helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
     except Exception as e:

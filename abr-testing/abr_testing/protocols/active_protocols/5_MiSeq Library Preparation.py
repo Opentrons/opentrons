@@ -52,7 +52,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
-    helpers.comment_protocol_version(protocol, "05")
+    helpers.comment_protocol_version(protocol, "06")
 
     def transfer(
         pipette: InstrumentContext,
@@ -199,6 +199,11 @@ def run(protocol: ProtocolContext) -> None:
             for col in range(12):
                 transfer(p96, 7.5, pcr_mm1, pcr1_plate.rows()[0][col])
             p96.return_tip()
+            protocol.capture_image(
+                home_before=True, 
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
 
         # Step 4: Transfer DNA samples
         all()
@@ -263,6 +268,11 @@ def run(protocol: ProtocolContext) -> None:
             for col in range(12):
                 transfer(p96, 6, pcr_mm2, pcr2_plate.rows()[0][col])
             p96.return_tip()
+            protocol.capture_image(
+                home_before=True, 
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
 
         protocol.comment("Rearranging Deck for Dilutions")
         heater_shaker.open_labware_latch()
