@@ -41,7 +41,7 @@ def run(protocol: ProtocolContext) -> None:
     deactivate_modules_bool = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "06")
+    helpers.comment_protocol_version(protocol, "08")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -141,7 +141,7 @@ def run(protocol: ProtocolContext) -> None:
             )
             p50.configure_for_volume(50)
             p50.blow_out()
-        p50.drop_tip()
+        p50.return_tip()
 
         # adding Mastermix
         protocol.comment("\n\n----------ADDING MASTERMIX----------\n")
@@ -168,6 +168,7 @@ def run(protocol: ProtocolContext) -> None:
 
             if mmx_vol == 0:
                 break
+
             p50.configure_for_volume(mmx_vol)
             p50.aspirate(
                 mmx_vol,
@@ -187,7 +188,7 @@ def run(protocol: ProtocolContext) -> None:
             p50.configure_for_volume(50)
             p50.drop_tip()
         if p50.has_tip:
-            p50.drop_tip()
+            p50.return_tip()
 
         # adding DNA
         protocol.comment("\n\n----------ADDING DNA----------\n")

@@ -33,7 +33,7 @@ def run(protocol: ProtocolContext) -> None:
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     data = all_data[1:]
-    helpers.comment_protocol_version(protocol, "05")
+    helpers.comment_protocol_version(protocol, "06")
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
@@ -165,7 +165,7 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.blow_out(location=waste_reservoir["A1"])
                 p1000.touch_tip()
                 current += 1
-            p1000.drop_tip()
+            p1000.return_tip()
 
             protocol.comment("Changing pipette configuration to 8ch.")
 

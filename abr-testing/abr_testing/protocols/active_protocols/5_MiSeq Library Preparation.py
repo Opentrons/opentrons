@@ -52,7 +52,7 @@ def run(protocol: ProtocolContext) -> None:
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
-    helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "04")
 
     def transfer(
         pipette: InstrumentContext,
