@@ -420,7 +420,11 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # NOQA: C901
                      Only {rounded} uL detected. Refill and try again."
                 )
                 retrying = True
+        # pip._retract()
+        pip.return_tip()
         pip._retract()
+        ctx.pause("Replace tip rack.")
+        pip.pick_up_tip(tips["A1"])
         # if ctx.params.lld:  # type: ignore [attr-defined]
         #    pip.return_tip()
         #    pip._retract()
@@ -430,7 +434,7 @@ def run(ctx: protocol_api.ProtocolContext) -> None:  # NOQA: C901
     target_volume = ctx.params.target_volume  # type: ignore [attr-defined]
 
     def _get_transfer_settings(tiprack: Labware, first_trial: bool) -> LiquidClass:
-        liquid_class = ctx.get_liquid_class("water", version=2)
+        liquid_class = ctx.get_liquid_class("water", version=3)
         transfer_properties = liquid_class.get_for(pip, tiprack)
 
         asp_offset = Coordinate(x=0, y=0, z=-1 * ctx.params.asp_sub_depth)  # type: ignore [attr-defined]
