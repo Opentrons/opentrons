@@ -566,7 +566,7 @@ export const forFlexStackerRetrieve = (
           ]
         if (labwareId != null) {
           runningStack.unshift(labwareId)
-          robotState.labware[labwareId].stack = runningStack
+          robotState.labware[labwareId].stack = [...runningStack]
         }
       }
     }

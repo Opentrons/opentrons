@@ -286,7 +286,7 @@ const stepFormHelperMap: {
     getErrors: composeErrors(),
   },
   flexStacker: {
-    getErrors: composeErrors(fillQuantityOutOfRange),
+    getErrors: composeErrors(fillQuantityOutOfRange, moduleIdRequired),
   },
 }
 

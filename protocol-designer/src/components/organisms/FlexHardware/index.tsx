@@ -242,6 +242,7 @@ export function FlexHardware(): JSX.Element {
             makeSnackbar,
             t,
             deckConfig,
+            handleDeleteStackerLabware,
           })
         }}
       />
