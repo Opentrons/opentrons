@@ -74,7 +74,7 @@ def run(protocol: ProtocolContext) -> None:
     protocol.capture_image(filename="start_of_run")
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
 
-    helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "04")
 
     # ======================== DOWNLOADED PARAMETERS ========================
     global REUSE_ANY_50_TIPS  # T/F Whether or not Reusing any p50
