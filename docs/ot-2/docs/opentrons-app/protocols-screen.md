@@ -18,14 +18,14 @@ The Protocols screen provides software features for importing and managing saved
 
 ## Importing protocols
 
-If your OT-2 is new, or you've deleted all its protocols, the Protocols screen provides controls that let you import a protocol. To upload a protocol, click **Choose file** to browse your computer file system to find the protocols you want to import. You can also drag and drop a protocol onto this screen to import it.
+If your OT-2 is new, or you've deleted your saved protocols, the Protocols screen provides controls that let you import a protocol. To upload a protocol, click **Choose file** to browse your computer file system to find the protocols you want to import. You can also drag and drop a protocol onto this screen to import it.
 
 <figure class="screenshot" markdown>
-![Protocols screen, import-upload details](../images/protocols-page-import.png)
-<figcaption>Protocol import controls.</figcaption>
+![Protocol upload features in the app](../images/app-protocol-upload.png){ width="60%" }
+<figcaption>Protocol upload features.</figcaption>
 </figure>
 
-If there are already protocols stored on your OT-2, click **Import** in the top right corner of the screen. This opens a file picker that lets you navigate to a protocol and add it to the others saved on your robot.
+If there are already protocols stored on your OT-2 (or other networked robots), click **Import** in the top right corner of the screen. This opens a file picker that lets you navigate to a protocol and add it to the others saved on your robot.
 
 <figure class="screenshot" markdown>
 ![Protocols screen, importing with existing protocols](../images/app-import-btn.png){ width="80%" }
@@ -36,14 +36,11 @@ If there are already protocols stored on your OT-2, click **Import** in the top 
 
 The Opentrons App will analyze your protocol as soon as you import it. _Protocol analysis_ is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, the app shows a warning on the protocol's card. Correct the errors and re-import the protocol. The OT-2 can use your protocol when after importing it without any error warnings.
 
-## Protocol management features
+## Protocol screen features
 
-The screen shows a summary of each protocol stored in your robot.
+The basic protocol screen shows a summary of each protocol stored in your robot.
 
-<figure class="screenshot" markdown>
 ![Protocol summary tile](../images/app-protocol-tile-summary.png)
-<figcaption>Click the summary to show more information about each protocol.</figcaption>
-</figure>
 
 Other screen elements and actions let you sort protocols, assign a protocol to a robot, and expand the protocol summary to see more information about each protocol.
 
@@ -89,3 +86,15 @@ Other screen elements and actions let you sort protocols, assign a protocol to a
     </tr>
   </tbody>
 </table>
+
+## Protocol tile
+
+You can click on each protocol tile to expand it.
+
+![Protocol summary tile](../images/app-protocol-tile-summary.png)
+
+ An expanded tile shows you more information about the protocol.
+
+![Protocol details tile](../images/app-protocol-details.png)
+
+Click the **Protocols** tab to return to the default summary list view.
