@@ -230,9 +230,9 @@ export const updateInitialDeckState = (
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
   // Add missing thermocycler fixtures if needed
-  getAddedMissingThermocyclerFixtures(values, deckDef)
+  const allValues = getAddedMissingThermocyclerFixtures(values, deckDef)
 
-  values.forEach(value => {
+  allValues.forEach(value => {
     const fixtureName = getFixtureNameFromAddresableArea(
       value.addressableAreaId as AddressableAreaName
     )

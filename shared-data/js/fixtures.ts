@@ -1169,37 +1169,43 @@ export const getAddedMissingThermocyclerFixtures = (
   values: CutoutConfigMap[],
   deckDef: DeckDefinition
 ): CutoutConfigMap[] => {
-  console.log('values: ', values)
+  const thermocyclerFixtures = MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]
   const hasThermocyclerFixture = values.some(v =>
-    MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]?.includes(
-      v.cutoutFixtureId
-    )
+    thermocyclerFixtures?.includes(v.cutoutFixtureId as CutoutFixtureId)
   )
-  if (hasThermocyclerFixture) {
-    MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]?.forEach(fixtureId => {
-      const alreadyExists = values.some(v => v.cutoutFixtureId === fixtureId)
-      console.log('alreadyExists: ', alreadyExists)
-      console.log('fixtureId: ', fixtureId)
-      if (!alreadyExists) {
-        const fixtureFromDeckDef = deckDef.cutoutFixtures.find(
-          fixture => fixture.id === fixtureId
-        )
-        console.log(
-          'fixtureFromDeckDef?.fixtureGroup: ',
-          fixtureFromDeckDef?.fixtureGroup
-        )
-        if (fixtureFromDeckDef?.mayMountTo[0] != null) {
-          values.push({
-            cutoutId: fixtureFromDeckDef.mayMountTo[0],
-            cutoutFixtureId: fixtureId as CutoutFixtureId,
-            addressableAreaId: fixtureFromDeckDef.mayMountTo[0].replace(
-              'cutout',
-              ''
-            ) as AddressableAreaName, // find  way to not do this
-          })
-        }
-      }
-    })
+
+  if (!hasThermocyclerFixture || thermocyclerFixtures == null) {
+    return values
   }
-  return values
+
+  const missingFixtures = thermocyclerFixtures.reduce<CutoutConfigMap[]>(
+    (acc, fixtureId) => {
+      const alreadyExists = values.some(v => v.cutoutFixtureId === fixtureId)
+      if (alreadyExists) {
+        return acc
+      }
+
+      const fixtureFromDeckDef = deckDef.cutoutFixtures.find(
+        fixture => fixture.id === fixtureId
+      )
+      if (fixtureFromDeckDef?.mayMountTo[0] == null) {
+        return acc
+      }
+
+      return [
+        ...acc,
+        {
+          cutoutId: fixtureFromDeckDef.mayMountTo[0],
+          cutoutFixtureId: fixtureId as CutoutFixtureId,
+          addressableAreaId: fixtureFromDeckDef.mayMountTo[0].replace(
+            'cutout',
+            ''
+          ) as AddressableAreaName,
+        },
+      ]
+    },
+    []
+  )
+
+  return [...values, ...missingFixtures]
 }
