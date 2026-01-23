@@ -22,6 +22,7 @@ This release adds support for the Flex Stacker Module in Protocol Designer, and 
 
 - Add tip rack lids to tip racks placed inside Flex 96-channel adapters.
 - Protocol Designer properly displays tip racks and their lids on the deck.
+- Mix step locations are accurate between the form and the generated python.
 
 ### Known Issues
 
