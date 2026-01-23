@@ -434,6 +434,8 @@ export interface HydratedMixFormData extends AnnotationFields {
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
   dropTip_wellNames?: string[] | null
+  // TODO: mix_mmFromBottom is now the position above the mix_position_reference, not the bottom.
+  // Renaming it will probably require a migration.
   mix_mmFromBottom?: number | null
   mix_touchTip_mmFromTop?: number | null
   mix_x_position?: number | null
