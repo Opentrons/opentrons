@@ -1,14 +1,15 @@
 import pytest
 from playwright.sync_api import Page
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
+from utility import create_new_protocol
 
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
 def test_flex_stacker(page: Page, base_url: str) -> None:
-    create_protocol = CreateProtocolWizard(page)
-
+    
+    create_new_protocol(page)
 #before each maybe? test.beforeEach(async ({ page }) => {}
     ##Creating a new protocol
     ##Test adding 4 Stackers, with a waste chute
