@@ -1188,19 +1188,22 @@ export const getAddedMissingThermocyclerFixtures = (
       const fixtureFromDeckDef = deckDef.cutoutFixtures.find(
         fixture => fixture.id === fixtureId
       )
-      if (fixtureFromDeckDef?.mayMountTo[0] == null) {
+      const cutoutId = fixtureFromDeckDef?.mayMountTo[0]
+      if (cutoutId == null || fixtureFromDeckDef == null) {
         return acc
       }
+
+      // Get addressable area from providesAddressableAreas using the cutoutId
+      const addressableArea =
+        fixtureFromDeckDef.providesAddressableAreas[cutoutId]?.[0]
 
       return [
         ...acc,
         {
-          cutoutId: fixtureFromDeckDef.mayMountTo[0],
+          cutoutId,
           cutoutFixtureId: fixtureId as CutoutFixtureId,
-          addressableAreaId: fixtureFromDeckDef.mayMountTo[0].replace(
-            'cutout',
-            ''
-          ) as AddressableAreaNamesWithFakes, // get addressable area name from cutout id and fixture id
+          addressableAreaId: (addressableArea ??
+            cutoutId.replace('cutout', '')) as AddressableAreaNamesWithFakes,
         },
       ]
     },
