@@ -22,7 +22,7 @@ metadata = {
 }
 
 
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 
 def add_parameters(parameters: ParameterContext) -> None:
