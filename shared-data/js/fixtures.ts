@@ -1169,6 +1169,7 @@ export const getAddedMissingThermocyclerFixtures = (
   values: CutoutConfigMap[],
   deckDef: DeckDefinition
 ): CutoutConfigMap[] => {
+  console.log('values: ', values)
   const hasThermocyclerFixture = values.some(v =>
     MODULE_FIXTURES_BY_MODEL[THERMOCYCLER_MODULE_V2]?.includes(
       v.cutoutFixtureId
@@ -1194,7 +1195,7 @@ export const getAddedMissingThermocyclerFixtures = (
             addressableAreaId: fixtureFromDeckDef.mayMountTo[0].replace(
               'cutout',
               ''
-            ) as AddressableAreaName,
+            ) as AddressableAreaName, // find  way to not do this
           })
         }
       }

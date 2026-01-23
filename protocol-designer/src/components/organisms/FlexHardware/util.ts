@@ -101,7 +101,10 @@ export const updateInitialDeckState = (
     values,
     deckDef
   )
-  console.log('addedMissingFixtures: ', addedMissingFixtures)
+  console.log(
+    'addedMissingFixtures in updateInitialDeckState: ',
+    addedMissingFixtures
+  )
 
   values.forEach(value => {
     console.log('value: ', value)
@@ -206,12 +209,8 @@ export const updateInitialDeckState = (
                 value.cutoutId
               )
             : null
-        let slot: string
-        // if (type === THERMOCYCLER_MODULE_TYPE) {
-        //   slot = 'A1'
-        // } else {
-        slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
-        // }
+        const slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+        console.log('slot: ', slot)
         //   creating module
         if (labwareNotCompatible == null && model != null && type != null) {
           dispatch(

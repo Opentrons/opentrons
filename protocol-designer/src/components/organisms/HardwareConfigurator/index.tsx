@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   FLEX_ROBOT_TYPE,
+  getAddedMissingThermocyclerFixtures,
   getCutoutFixtureIdsForModuleModel,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
@@ -78,19 +79,25 @@ export function HardwareConfigurator(
   const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
     (module: FormModule | ModuleExtended): DeckConfiguration => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
-      const defaultModuleConfig: CutoutConfig = {
+      const defaultModuleConfig: CutoutConfigMap = {
         cutoutId: getCutoutIdFromAddressableArea(module.slot, deckDef)!,
         cutoutFixtureId: getCutoutFixtureIdsForModuleModel(module.model)[0],
+        addressableAreaId: module.slot, //translate from vs
+      }
+      let missingThermocyclerFixtures: CutoutConfigMap[] = []
+      if (hasThermocycler) {
+        missingThermocyclerFixtures = getAddedMissingThermocyclerFixtures(
+          [defaultModuleConfig],
+          deckDef
+        )
+        console.log('missingThermocyclerFixtures:', missingThermocyclerFixtures)
       }
       // const thermocyclerA1Config: CutoutConfig = {
       //   cutoutId: 'cutoutB1',
       //   cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
       // }
       console.log('defaultModuleConfig: ', defaultModuleConfig)
-      return [
-        defaultModuleConfig,
-        // ...(hasThermocycler ? [thermocyclerA1Config] : []),
-      ]
+      return [defaultModuleConfig, ...missingThermocyclerFixtures]
     }
   )
   console.log('moduleConfig: ', moduleConfig)
