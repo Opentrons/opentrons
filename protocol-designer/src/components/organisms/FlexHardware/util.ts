@@ -3,6 +3,7 @@ import {
   getAddedMissingThermocyclerFixtures,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
+  getMainFixtureIdForAA,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
   THERMOCYCLER_MODULE_TYPE,
@@ -240,6 +241,11 @@ export const updateInitialDeckState = (
     const fixtureName = getFixtureNameFromAddresableArea(
       value.addressableAreaId as AddressableAreaName
     )
+
+    console.log('fixtureName: ', fixtureName)
+
+    const fixtureNameNew = getMainFixtureIdForAA([value.cutoutFixtureId], [value.addressableAreaId as AddressableAreaName], value.cutoutId)
+    console.log('fixtureNameNew: ', fixtureNameNew)
 
     const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
       ae => ae.name === fixtureName && ae.location === value.cutoutId
