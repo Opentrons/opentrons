@@ -5,8 +5,6 @@ import {
   getDeckDefFromRobotType,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { deleteModule } from '/protocol-designer/modules'
@@ -30,28 +28,25 @@ import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CutoutConfigMap,
-  CutoutFixtureId,
   DeckConfiguration,
-  DeckDefinition,
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
+  LabwareOnDeck,
+  ModuleOnDeck,
   SavedStepFormState,
 } from '/protocol-designer/step-forms'
+import type { DeckFixture } from '/protocol-designer/step-forms/actions/additionalItems'
+import type { AdditionalEquipmentOnDeck } from '/protocol-designer/step-forms/types'
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type { MakeSnackbar } from '../Kitchen/KitchenContext'
 
-const map3rdColumnCutoutTo4thColumnSlot: Record<string, string> = {
+const MAP_3RD_COLUMN_CUTOUT_TO_4TH_COLUMN_SLOT: Record<string, string> = {
   cutoutA3: 'A4',
   cutoutB3: 'B4',
   cutoutC3: 'C4',
   cutoutD3: 'D4',
 }
-
-const THERMOCYCLER_FIXTURES: string[] = [
-  THERMOCYCLER_V2_REAR_FIXTURE,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-]
 
 interface UpdateInitialDeckSetupProps {
   values: CutoutConfigMap[]
@@ -75,6 +70,143 @@ interface UpdateInitialDeckSetupProps {
   deckConfig?: DeckConfiguration
 }
 
+interface FixtureContext {
+  value: CutoutConfigMap
+  fixtureName: DeckFixture
+  matchingFixture: AdditionalEquipmentOnDeck | undefined
+  matching4thColumnLabware: LabwareOnDeck | null
+  hasLabwareOnSlot: boolean
+  fixtureIds: string[] | null
+  fourthColumnSlotLabwareId: string | null
+  deckConfig?: DeckConfiguration
+  dispatch: ThunkDispatch<any>
+  setShowDeleteEntityModal: UpdateInitialDeckSetupProps['setShowDeleteEntityModal']
+  setShowDeleteStagingAreaModal: UpdateInitialDeckSetupProps['setShowDeleteStagingAreaModal']
+  makeSnackbar: MakeSnackbar
+  t: any
+}
+
+interface ModuleContext {
+  value: CutoutConfigMap
+  matchingModule: ModuleOnDeck | undefined
+  moduleId: string | null
+  labwareOnDeck: AllTemporalPropertiesForTimelineFrame['labware']
+  deckConfig?: DeckConfiguration
+  dispatch: ThunkDispatch<any>
+  setShowDeleteEntityModal: UpdateInitialDeckSetupProps['setShowDeleteEntityModal']
+  makeSnackbar: MakeSnackbar
+  t: any
+}
+
+const handleDeleteFixture = (ctx: FixtureContext): void => {
+  const {
+    matchingFixture,
+    matching4thColumnLabware,
+    fixtureIds,
+    fourthColumnSlotLabwareId,
+    deckConfig,
+    dispatch,
+    setShowDeleteEntityModal,
+    setShowDeleteStagingAreaModal,
+  } = ctx
+
+  if (matchingFixture == null) return
+
+  // Deleting staging area with labware in 4th column slot
+  if (
+    matchingFixture.name === 'stagingArea' &&
+    fixtureIds == null &&
+    matching4thColumnLabware != null &&
+    deckConfig != null
+  ) {
+    setShowDeleteStagingAreaModal({
+      ids: [matching4thColumnLabware.id, matchingFixture.id],
+      deckConfig,
+    })
+    return
+  }
+
+  // Deleting fixture that is in use
+  if (fixtureIds != null && deckConfig != null) {
+    const ids =
+      fourthColumnSlotLabwareId != null
+        ? [...fixtureIds, fourthColumnSlotLabwareId]
+        : fixtureIds
+    setShowDeleteEntityModal({ ids, deckConfig })
+    return
+  }
+
+  // Deleting fixture that is not in use
+  dispatch(deleteDeckFixture(matchingFixture.id))
+  if (deckConfig != null) {
+    dispatch(editDeckConfiguration({ deckConfig }))
+  }
+}
+
+const handleCreateFixture = (ctx: FixtureContext): void => {
+  const { value, fixtureName, hasLabwareOnSlot, dispatch, makeSnackbar, t } =
+    ctx
+
+  // Block creating trashBin or wasteChute if there is labware on the slot
+  if (
+    hasLabwareOnSlot &&
+    (fixtureName === 'trashBin' || fixtureName === 'wasteChute')
+  ) {
+    makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
+    return
+  }
+
+  dispatch(createDeckFixture(fixtureName, value.cutoutId))
+}
+
+const handleDeleteModule = (ctx: ModuleContext): void => {
+  const {
+    matchingModule,
+    moduleId,
+    deckConfig,
+    dispatch,
+    setShowDeleteEntityModal,
+  } = ctx
+
+  if (matchingModule == null) return
+
+  // Module is in use
+  if (moduleId != null && deckConfig != null) {
+    setShowDeleteEntityModal({ ids: [moduleId], deckConfig })
+    return
+  }
+
+  // Delete module not in use
+  dispatch(deleteModule({ moduleId: matchingModule.id }))
+  if (deckConfig != null) {
+    dispatch(editDeckConfiguration({ deckConfig }))
+  }
+}
+
+const handleCreateModule = (ctx: ModuleContext): void => {
+  const { value, labwareOnDeck, dispatch, makeSnackbar, t } = ctx
+
+  const model = getModuleModel(value.addressableAreaId as AddressableAreaName)
+  if (model == null) return
+
+  const type = getModuleType(model)
+  const labwareNotCompatible = getLabwareNotCompatibleWithModule(
+    type,
+    labwareOnDeck,
+    value.cutoutId
+  )
+
+  if (labwareNotCompatible != null) {
+    makeSnackbar(
+      t('module_incompatible', { slot: labwareNotCompatible }) as string
+    )
+    return
+  }
+
+  const slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+  dispatch(createModule({ slot, model, type }))
+}
+
 export const updateInitialDeckState = (
   props: UpdateInitialDeckSetupProps
 ): void => {
@@ -89,36 +221,29 @@ export const updateInitialDeckState = (
     t,
     deckConfig,
   } = props
+
   const {
     additionalEquipmentOnDeck,
     modules: moduleOnDeck,
     labware: labwareOnDeck,
   } = initialDeckSetup
-  console.log('updating initial deck state')
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  const addedMissingFixtures = getAddedMissingThermocyclerFixtures(
-    values,
-    deckDef
-  )
-  console.log(
-    'addedMissingFixtures in updateInitialDeckState: ',
-    addedMissingFixtures
-  )
+  // Add missing thermocycler fixtures if needed
+  getAddedMissingThermocyclerFixtures(values, deckDef)
 
   values.forEach(value => {
-    console.log('value: ', value)
     const fixtureName = getFixtureNameFromAddresableArea(
       value.addressableAreaId as AddressableAreaName
     )
 
-    const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
     const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
       ae => ae.name === fixtureName && ae.location === value.cutoutId
     )
+
     const fourthColumnSlot =
       matchingFixture != null
-        ? map3rdColumnCutoutTo4thColumnSlot[matchingFixture.location]
+        ? MAP_3RD_COLUMN_CUTOUT_TO_4TH_COLUMN_SLOT[matchingFixture.location]
         : null
 
     const matchingModule = Object.values(moduleOnDeck).find(
@@ -126,14 +251,14 @@ export const updateInitialDeckState = (
         module.model === getModuleModel(value.addressableAreaId) &&
         getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
+
     const matching4thColumnLabware =
-      matchingFixture != null &&
-      matchingFixture.name === 'stagingArea' &&
-      fourthColumnSlot != null
-        ? (Object.values(labwareOnDeck).find(labware =>
-            labware.stack.includes(fourthColumnSlot)
+      matchingFixture?.name === 'stagingArea' && fourthColumnSlot != null
+        ? (Object.values(labwareOnDeck).find(lw =>
+            lw.stack.includes(fourthColumnSlot)
           ) ?? null)
         : null
+
     const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
       getHardwareInSlotInUse(
         savedSteps,
@@ -142,93 +267,51 @@ export const updateInitialDeckState = (
         matchingFixture != null ? [matchingFixture] : undefined
       )
 
-    //  updating fixtures only
+    const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
+
+    // Handle fixtures
     if (fixtureName != null) {
+      const fixtureCtx: FixtureContext = {
+        value,
+        fixtureName: fixtureName as DeckFixture,
+        matchingFixture,
+        matching4thColumnLabware,
+        hasLabwareOnSlot,
+        fixtureIds,
+        fourthColumnSlotLabwareId,
+        deckConfig,
+        dispatch,
+        setShowDeleteEntityModal,
+        setShowDeleteStagingAreaModal,
+        makeSnackbar,
+        t,
+      }
+
       if (matchingFixture != null) {
-        //  if deleting staging area with labware in 4th column slot
-        if (
-          matchingFixture.name === 'stagingArea' &&
-          fixtureIds == null &&
-          matching4thColumnLabware != null &&
-          deckConfig != null
-        ) {
-          setShowDeleteStagingAreaModal({
-            ids: [matching4thColumnLabware.id, matchingFixture.id],
-            deckConfig,
-          })
-          //  if deleting fixture that is in use
-        } else if (fixtureIds != null && deckConfig != null) {
-          setShowDeleteEntityModal({
-            ids:
-              fourthColumnSlotLabwareId != null
-                ? [...fixtureIds, ...fourthColumnSlotLabwareId]
-                : fixtureIds,
-            deckConfig,
-          })
-          //  if deleting fixture that is not in use
-        } else {
-          dispatch(deleteDeckFixture(matchingFixture.id))
-          if (deckConfig != null) {
-            dispatch(editDeckConfiguration({ deckConfig }))
-          }
-        }
-        //  creating fixture
+        handleDeleteFixture(fixtureCtx)
       } else {
-        //  if creating a trashBin or wasteChute and there is a labware on the slot
-        if (
-          hasLabwareOnSlot &&
-          (fixtureName === 'trashBin' || fixtureName === 'wasteChute')
-        ) {
-          makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
-        } else {
-          dispatch(createDeckFixture(fixtureName, value.cutoutId))
-        }
+        handleCreateFixture(fixtureCtx)
       }
+      return
+    }
+
+    // Handle modules
+    const moduleCtx: ModuleContext = {
+      value,
+      matchingModule,
+      moduleId,
+      labwareOnDeck,
+      deckConfig,
+      dispatch,
+      setShowDeleteEntityModal,
+      makeSnackbar,
+      t,
+    }
+
+    if (matchingModule != null) {
+      handleDeleteModule(moduleCtx)
     } else {
-      //  if deleting module in use
-      if (matchingModule != null) {
-        if (moduleId != null && deckConfig != null) {
-          setShowDeleteEntityModal({ ids: [moduleId], deckConfig })
-          //   if deleting module
-        } else {
-          dispatch(deleteModule({ moduleId: matchingModule.id }))
-          if (deckConfig != null) {
-            dispatch(editDeckConfiguration({ deckConfig }))
-          }
-        }
-      } else {
-        const model = getModuleModel(
-          value.addressableAreaId as AddressableAreaName
-        )
-        const type = model != null ? getModuleType(model) : null
-        const labwareNotCompatible =
-          type != null
-            ? getLabwareNotCompatibleWithModule(
-                type,
-                labwareOnDeck,
-                value.cutoutId
-              )
-            : null
-        const slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
-        console.log('slot: ', slot)
-        //   creating module
-        if (labwareNotCompatible == null && model != null && type != null) {
-          dispatch(
-            createModule({
-              slot,
-              model,
-              type,
-            })
-          )
-          //   if adding module to slot with incompatible labware
-        } else {
-          makeSnackbar(
-            t('module_incompatible', {
-              slot: labwareNotCompatible,
-            }) as string
-          )
-        }
-      }
+      handleCreateModule(moduleCtx)
     }
   })
 }
