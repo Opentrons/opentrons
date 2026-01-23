@@ -80,20 +80,20 @@ Protocol Designer only shows recommended labware in the list of available option
 
 The Absorbance Plate Reader Module needs to be initialized before adding labware. First, add a [step](steps/module.md#absorbance-plate-reader-module-steps) to initialize the module while empty. Then, use a move step to add any labware to the Absorbance Plate Reader Module later in your protocol. 
 
-You can add up to 4 Flex Stacker Modules to your protocol starting deck by clicking column 4, on the right side of your Flex. Each attached Stacker Module can store additional well plates, tip racks, or reservoirs. During a protocol, the module's attached shuttle moves stored labware from the bottom of the stack to the Flex deck.
+You can add up to 4 Flex Stacker Modules to your protocol starting deck by clicking column 4, on the right side of your Flex. Each attached Stacker can store additional well plates, tip racks, or reservoirs. During a protocol, the module's attached shuttle moves stored labware from the bottom of the stack to the Flex deck.
 
-In your protocol starting deck, click the Stacker Module on the right side of the Flex deck to add labware. Choose a labware type and quantity: 
+In your protocol starting deck, click the Stacker on the right side of the Flex deck to add labware. Choose a labware type and quantity: 
 
 - When adding tip racks, enter a quantity and choose whether to add a lid to each tip rack in the stack. 
 - For well plates or reservoirs, enter a quantity. Then, click **Edit liquid and quantity** in the labware menu on the right. 
 
-    Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. Use command + click to edit multiple labware and their liquids. 
+    Protocol Designer lets you add additional well plates or reservoirs until the Stacker is full. You can also define and add liquids to any labware in the stack. Use Command/^ + click to edit multiple labware and their liquids. 
 
 <figure class="screenshot" markdown>
   ![Edit Stacker labware](images/stacker_edit_labware.png)
   <figcaption>View, edit, and add liquids to labware in the Flex Stacker.</figcaption>
 </figure>
 
-Each Stacker can only store a single type of labware in a protocol. If you need to store more than one kind of labware, you'll need to use multiple Stacker Modules. 
+Each Stacker can only store a single type of labware in a protocol. If you need to store more than one kind of labware, you'll need to use multiple Flex Stackers. 
 
 

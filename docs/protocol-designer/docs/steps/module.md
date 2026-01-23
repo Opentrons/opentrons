@@ -67,11 +67,11 @@ Protocol Designer includes Absorbance Plate Reader step details to help you keep
 
 ## Flex Stacker Module steps
 
-Click **Add Step** in the bottom left to add a Stacker step to your Protocol Designer protocol. The step menu on the right shows the labware currently in the Stacker Module and any labware on the attached shuttle. 
+Click **Add Step** in the bottom left to add a Stacker step to your Protocol Designer protocol. The step menu on the right shows the labware currently in the Flex Stacker and any labware on the attached shuttle. 
 
 <figure class="screenshot" markdown>
   ![Add a Stacker step](../images/stacker_steps.png)
-  <figcaption>Add a Stacker step to store or retrieve labware, or refill or empty your Stacker Module.</figcaption>
+  <figcaption>Add a Stacker step to store or retrieve labware, or refill or empty your Flex Stacker.</figcaption>
 </figure>
 
 In the image above, labware on the shuttle and the top piece of labware in the Stacker are visible. Labware at the bottom of the stack can be moved to the shuttle, but you won't be able to see this labware on the Flex deck. Click the Stacker on the right side of the deck to view the labware stack. 
@@ -117,15 +117,9 @@ move your labware.
 
 ## Temperature Module steps
 
-Adding a Temperature Module step to your protocol displays any labware and adapters currently on the module. Aluminum blocks or
-a deep well adapter can be used to add labware to the module.
-Click to set the module state and enter a temperature between
-4 and 95 °C. 
+Adding a Temperature Module step to your protocol displays any labware and adapters currently on the module. Aluminum blocks or a deep well adapter can be used to add labware to the module. Click to set the module state and enter a temperature between 4 and 95 °C. 
 
-After your Temperature module step, add a second step to
-deactivate the module. Just like in a Heater-Shaker step, you
-can choose to pause your protocol until the Temperature module
-reaches the set temperature. 
+After your Temperature module step, add a second step to deactivate the module. Just like in a Heater-Shaker step, you can choose to pause your protocol until the Temperature module reaches the set temperature. 
 
 ## Thermocycler Module steps 
 
