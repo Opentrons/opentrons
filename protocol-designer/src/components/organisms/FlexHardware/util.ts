@@ -5,6 +5,8 @@ import {
   getDeckDefFromRobotType,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { deleteModule } from '/protocol-designer/modules'
@@ -190,6 +192,15 @@ const handleCreateModule = (ctx: ModuleContext): void => {
   if (model == null) return
 
   const type = getModuleType(model)
+
+  // Skip creating module for thermocycler rear fixture - only create once via front fixture
+  if (
+    type === THERMOCYCLER_MODULE_TYPE &&
+    value.cutoutFixtureId === THERMOCYCLER_V2_REAR_FIXTURE
+  ) {
+    return
+  }
+
   const labwareNotCompatible = getLabwareNotCompatibleWithModule(
     type,
     labwareOnDeck,
