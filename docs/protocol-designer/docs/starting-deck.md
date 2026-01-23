@@ -78,7 +78,7 @@ To add labware to a module, click any open module and choose **Edit labware**.
 
 Protocol Designer only shows recommended labware in the list of available options. You can choose to view more labware, including labware that may be incompatible with the module. Add compatible adapters for modules on the deck from the "adapter" labware category. 
 
-The Absorbance Plate Reader Module needs to be initialized before adding labware. First, add a [step](steps/module.md#absorbance-plate-reader-module-steps) to intialize the module while empty. Then, use a move step to add any labware to the Absorbance Plate Reader Module later in your protocol. 
+The Absorbance Plate Reader Module needs to be initialized before adding labware. First, add a [step](steps/module.md#absorbance-plate-reader-module-steps) to initialize the module while empty. Then, use a move step to add any labware to the Absorbance Plate Reader Module later in your protocol. 
 
 You can add up to 4 Flex Stacker Modules to your protocol starting deck by clicking column 4, on the right side of your Flex. Each attached Stacker Module can store additional well plates, tip racks, or reservoirs. During a protocol, the module's attached shuttle moves stored labware from the bottom of the stack to the Flex deck.
 

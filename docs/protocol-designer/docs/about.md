@@ -26,7 +26,7 @@ Click the :material-cog: in the upper right to access Protocol Designer settings
 
 Protocol Designer shows hints, tips, and timeline editing suggestions to help you fix protocol warnings and errors. You can restore all hints and tips shown during protocol editing and toggle timeline editing guidance on and off. 
 
-You can choose to share analytics with Opentrons to improve Protocol Designer and other services. To report a Protocol Designer bug, contact [Opentrons Support]( mailto:support@opentrons.com). 
+You can choose to share analytics with Opentrons to improve Protocol Designer and other services. To report a Protocol Designer bug, contact [Opentrons Support](mailto:support@opentrons.com).
 
 
 

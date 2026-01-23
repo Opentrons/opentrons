@@ -98,7 +98,7 @@ In this example, a Corning 96-well flat plate is placed on top of an Opentrons U
 
 Before moving labware to or from the Heater-Shaker, make sure that the labware latch is open. Add a Heater-Shaker step that opens the labware latch before any step that moves labware to the Heater-Shaker. Without this step, a [timeline error](../warnings-errors.md#errors) could occur. 
 
-In the Heater-Shaker step form, set the heater or shaker functions to **On** and enter a custom value for temperature or shake speed. The Heater-Shaker module can heat samples between 20° C,and 95° C, and shake samples between 200 and 3000 rpm. 
+In the Heater-Shaker step form, set the heater or shaker functions to **On** and enter a custom value for temperature or shake speed. The Heater-Shaker module can heat samples between 20 °C,and 95 °C, and shake samples between 200 and 3000 rpm. 
 
 Set a custom time for your Heater-Shaker step by enabling the timer. The timer will begin after the Heater-Shaker reaches the target temperature or shaking speed. 
 
@@ -117,8 +117,7 @@ move your labware.
 
 ## Temperature Module steps
 
-Adding a Temperature Module step to your protocol displays any
-labware and adapters currently on the module. Aluminum blocks or
+Adding a Temperature Module step to your protocol displays any labware and adapters currently on the module. Aluminum blocks or
 a deep well adapter can be used to add labware to the module.
 Click to set the module state and enter a temperature between
 4 and 95 °C. 
