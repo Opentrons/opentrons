@@ -4,6 +4,7 @@ import {
   getDeckDefFromRobotType,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
+  THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -193,7 +194,12 @@ export const updateInitialDeckState = (
                 value.cutoutId
               )
             : null
-        const slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+            let slot: string
+            if (type === THERMOCYCLER_MODULE_TYPE) {
+              slot = 'A1'
+            } else {
+              slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+            }
         //   creating module
         if (labwareNotCompatible == null && model != null && type != null) {
           dispatch(

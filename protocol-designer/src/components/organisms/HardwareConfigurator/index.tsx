@@ -79,14 +79,14 @@ export function HardwareConfigurator(
         cutoutId: getCutoutIdFromAddressableArea(module.slot, deckDef)!,
         cutoutFixtureId: getCutoutFixtureIdsForModuleModel(module.model)[0],
       }
-      // const thermocyclerA1Config: CutoutConfig = {
-      //   cutoutId: 'cutoutA1',
-      //   cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
-      // }
+      const thermocyclerA1Config: CutoutConfig = {
+        cutoutId: 'cutoutB1',
+        cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
+      }
       console.log('defaultModuleConfig: ', defaultModuleConfig)
       return [
         defaultModuleConfig,
-        // ...(hasThermocycler ? [thermocyclerA1Config] : []),
+        ...(hasThermocycler ? [thermocyclerA1Config] : []),
       ]
     }
   )
