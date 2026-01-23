@@ -1036,6 +1036,7 @@ dev = [
     { name = "pytest-xdist", specifier = "~=2.5.0" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "ruff", specifier = "==0.14.10" },
+    { name = "setuptools", specifier = "==80.9.0" },
     { name = "sqlalchemy2-stubs", specifier = "==0.0.2a21" },
     { name = "types-mock", specifier = "~=5.1.0" },
     { name = "types-requests", specifier = "~=2.31.0" },
