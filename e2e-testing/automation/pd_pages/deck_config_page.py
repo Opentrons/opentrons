@@ -1,5 +1,6 @@
 """Deck configuration page object."""
 
+from typing import Literal
 from playwright.sync_api import Page, TimeoutError
 
 from .base_page import BasePage
@@ -85,3 +86,11 @@ class DeckConfigPage(BasePage):
 
         self.click_button("Edit protocol")
         expect(self.page.get_by_role("button", name="Back to overview")).to_be_visible(timeout=5000)
+
+    def remove_fixture(self, fixture_name: Literal["Trash bin", "Waste", "Stage"]) -> None:
+        """Remove a fixture from the deck.
+
+        Args:
+            fixture_name: Name of the fixture to remove
+        """
+        self.page.get_by_role("button", name=fixture_name).click()
