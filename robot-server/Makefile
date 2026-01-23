@@ -81,6 +81,10 @@ setup-ot2:
 	@$(UV) pip uninstall python-can
 	@$(UV) pip list
 
+.PHONY: lock
+lock:
+	$(UV) lock
+
 .PHONY: clean
 clean:
 	$(clean_all_cmd)
