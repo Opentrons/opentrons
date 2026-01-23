@@ -317,7 +317,7 @@ def run(protocol: ProtocolContext) -> None:
                     pip.touch_tip()
                     pip.move_to(well.top())
                 protocol.delay(seconds=delay_time)
-            pip.drop_tip()
+            pip.return_tip()
 
         else:
             length = (
@@ -349,7 +349,7 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.delay(seconds=delay_time)
                 pip.move_to(destination[i].top())
 
-            pip.drop_tip()
+            pip.return_tip()
 
     def transfer_ep(src: Well, destination: Well, volume: float) -> None:
         """Transfer Extension Product to Sample Plate."""
@@ -400,7 +400,7 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
             pip.move_to(destination.top(-2))
-            pip.drop_tip()
+            pip.return_tip()
 
     def transfer_ifp(
         src: List[Well],
