@@ -17,7 +17,6 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
-    cast,
 )
 
 from opentrons_shared_data.errors.exceptions import (
@@ -28,7 +27,6 @@ from opentrons_shared_data.pipette import (
     pipette_load_name_conversions as pipette_load_name,
 )
 from opentrons_shared_data.pipette.types import PipetteName
-from opentrons_shared_data.robot.types import RobotType
 
 from . import modules
 from .backends import Controller, Simulator

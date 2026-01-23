@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from contextlib import ExitStack
-from typing import Any, List, Optional, Sequence, Tuple, Union, cast
+from typing import Any, List, Optional, Sequence, Tuple, Union
 
 from typing_extensions import Unpack
 

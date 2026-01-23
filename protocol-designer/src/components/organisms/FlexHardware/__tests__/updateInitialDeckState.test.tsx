@@ -97,6 +97,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(
@@ -137,6 +138,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockMakeSnackbar).toHaveBeenCalledWith('module_incompatible')
   })
@@ -156,6 +158,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(
@@ -182,6 +185,7 @@ describe('updateInitialDeckState', () => {
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
       deckConfig: mockDeckConfig,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockSetShowDeleteEntityModal).toHaveBeenCalled()
   })
@@ -201,6 +205,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(createDeckFixture('trashBin', 'cutoutA3'))
@@ -233,6 +238,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockMakeSnackbar).toHaveBeenCalledWith(
       'conflict_on_slot_labware_fixture'
@@ -254,6 +260,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenCalledWith(
       vi.mocked(deleteDeckFixture('trash'))
@@ -275,6 +282,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
@@ -305,6 +313,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
@@ -346,6 +355,7 @@ describe('updateInitialDeckState', () => {
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
       deckConfig: mockDeckConfig,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
@@ -366,6 +376,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
@@ -393,6 +404,7 @@ describe('updateInitialDeckState', () => {
       savedSteps: mockSavedSteps,
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockDispatch).toHaveBeenNthCalledWith(
       1,
@@ -431,6 +443,7 @@ describe('updateInitialDeckState', () => {
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
       deckConfig: mockDeckConfig,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
@@ -453,6 +466,7 @@ describe('updateInitialDeckState', () => {
       makeSnackbar: mockMakeSnackbar,
       t: mockT,
       deckConfig: mockDeckConfig,
+      handleDeleteStackerLabware: vi.fn(),
     })
     expect(mockSetShowDeleteEntityModal).toHaveBeenCalled()
   })
