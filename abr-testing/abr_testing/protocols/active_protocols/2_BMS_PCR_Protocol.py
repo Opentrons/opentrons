@@ -257,7 +257,7 @@ def run(protocol: ProtocolContext) -> None:
             tc_mod.open_lid()
             if disposable_lid:
                 protocol.move_lid(dest_plate_1, "C2", use_gripper=True)
-            p50.drop_tip()
+            p50.return_tip()
             p50.configure_nozzle_layout(style=SINGLE, start="A1", tip_racks=tiprack_50)
             mmx_pic.append(water)
         # Empty plates into liquid waste
