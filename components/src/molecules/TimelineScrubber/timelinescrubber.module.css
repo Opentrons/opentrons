@@ -1,11 +1,11 @@
 .scrubber_container {
   display: flex;
+  overflow: visible;
   width: 100%;
   box-sizing: border-box;
   flex-direction: column;
-  padding-bottom: 8px;
-  margin-bottom: -8px;
-  overflow: visible;
+  padding-bottom: var(--spacing-8);
+  margin-bottom: calc(-1 * var(--spacing-8));
 }
 
 .track_container {
