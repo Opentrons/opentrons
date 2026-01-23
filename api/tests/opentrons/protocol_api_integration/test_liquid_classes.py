@@ -4,14 +4,10 @@ from typing import Any, Dict
 
 import pytest
 
-from opentrons_shared_data.liquid_classes.liquid_class_definition import (
-    Coordinate,
-    PositionReference,
-)
+from opentrons_shared_data.liquid_classes.liquid_class_definition import Coordinate
 from opentrons_shared_data.liquid_classes.types import TransferPropertiesDict
 
 from opentrons.protocol_api import ProtocolContext
-from opentrons.protocol_api._liquid_properties import TipPosition
 
 
 @pytest.mark.ot3_only

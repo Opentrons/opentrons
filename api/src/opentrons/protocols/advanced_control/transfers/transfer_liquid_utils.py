@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, List, Literal, Optional, Sequence, TypeVar, Union
+from typing import TYPE_CHECKING, List, Literal, Optional, Sequence, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     PositionReference,

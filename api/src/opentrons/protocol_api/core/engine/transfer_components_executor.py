@@ -6,7 +6,7 @@ import logging
 from copy import deepcopy
 from dataclasses import dataclass, field, replace
 from enum import Enum
-from typing import TYPE_CHECKING, Literal, Optional, TypeVar, Union
+from typing import TYPE_CHECKING, Literal, Optional, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     BlowoutLocation,
@@ -533,8 +533,8 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
+            well_core = self._target_well if self._target_well is not None else None
             if blowout_props.blowout_position is not None:
-                well_core = self._target_well if self._target_well is not None else None
                 in_place = False
                 dest_blowout_location = (
                     self._calculate_blowout_position_from_position_info(
@@ -544,7 +544,6 @@ class TransferComponentsExecutor:
                     )
                 )
             else:
-                well_core = None
                 dest_blowout_location = retract_location
                 in_place = True
             self._instrument.blow_out(
@@ -619,21 +618,24 @@ class TransferComponentsExecutor:
                     blowout_touch_tip_props.enabled = False
             else:
                 trash_blowout_location: Union[Location, TrashBin, WasteChute]
+                blowout_well = (
+                    trash_location.labware.as_well()._core
+                    if isinstance(trash_location, Location)
+                    else None
+                )
                 if blowout_props.blowout_position is not None:
                     trash_blowout_location = self._calculate_blowout_position_from_position_info(
                         blowout_position=blowout_props.blowout_position,
                         blowout_location=trash_location,
                         # We have already established that trash location of `Location` type
                         # has its `labware` as `Well` type.
-                        blowout_well=trash_location.labware.as_well()._core  # type: ignore[arg-type]
-                        if isinstance(trash_location, Location)
-                        else None,
+                        blowout_well=blowout_well,  # type: ignore[arg-type]
                     )
                 else:
                     trash_blowout_location = trash_location
                 self._instrument.blow_out(
                     location=trash_blowout_location,
-                    well_core=None,
+                    well_core=blowout_well,  # type: ignore[arg-type]
                     in_place=False,
                     flow_rate=blowout_props.flow_rate,
                 )
@@ -734,21 +736,20 @@ class TransferComponentsExecutor:
             and blowout_props.location == BlowoutLocation.DESTINATION
         ):
             assert blowout_props.flow_rate is not None
-            dest_blowout_location: Union[Location, TrashBin, WasteChute]
+            dest_blowout_location: Location
+            # Destination for multi-dispense is never a disposal location, so we will always have a target well
+            assert self._target_well is not None
+            well_core = self._target_well
             if blowout_props.blowout_position is not None:
-                # Destination for multi-dispense is never a disposal location, so we will always have a target well
-                assert self._target_well is not None
-                well_core = self._target_well
                 in_place = False
                 dest_blowout_location = (
-                    self._calculate_blowout_position_from_position_info(
+                    self._calculate_blowout_position_from_position_info(  # type: ignore[assignment]
                         blowout_position=blowout_props.blowout_position,
                         blowout_location=self._target_location,
                         blowout_well=well_core,
                     )
                 )
             else:
-                well_core = None
                 dest_blowout_location = retract_location
                 in_place = True
             self._instrument.blow_out(
@@ -861,12 +862,12 @@ class TransferComponentsExecutor:
                     blowout_touch_tip_props.enabled = False
             else:
                 trash_blowout_location: Union[Location, TrashBin, WasteChute]
+                blowout_well = (
+                    trash_location._labware.as_well()._core
+                    if isinstance(trash_location, Location)
+                    else None
+                )
                 if blowout_props.blowout_position is not None:
-                    blowout_well = (
-                        trash_location._labware.as_well()._core
-                        if isinstance(trash_location, Location)
-                        else None
-                    )
                     trash_blowout_location = (
                         self._calculate_blowout_position_from_position_info(
                             blowout_position=blowout_props.blowout_position,
@@ -878,7 +879,7 @@ class TransferComponentsExecutor:
                     trash_blowout_location = trash_location
                 self._instrument.blow_out(
                     location=trash_blowout_location,
-                    well_core=None,
+                    well_core=blowout_well,  # type: ignore[arg-type]
                     in_place=False,
                     flow_rate=blowout_props.flow_rate,
                 )

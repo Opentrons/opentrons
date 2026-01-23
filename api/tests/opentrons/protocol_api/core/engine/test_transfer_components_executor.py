@@ -1318,7 +1318,7 @@ def test_retract_after_dispense_with_blowout_in_destination(
         mock_instrument_core.delay(10),
         mock_instrument_core.blow_out(
             location=Location(Point(12, 24, 36), labware=None),
-            well_core=None,
+            well_core=dest_well,
             in_place=True,
             flow_rate=100,
         ),
@@ -1448,7 +1448,7 @@ def test_retract_after_dispense_with_blowout_in_trash_well(
         mock_instrument_core.delay(0.2),
         mock_instrument_core.blow_out(
             location=trash_location,
-            well_core=None,
+            well_core=trash_well_core,
             in_place=False,
             flow_rate=100,
         ),
@@ -2429,7 +2429,7 @@ def test_multi_dispense_retract_after_dispense_with_blowout_without_conditioning
             and [
                 mock_instrument_core.blow_out(  # type: ignore[func-returns-value]
                     location=Location(Point(3, 5, 4), labware=None),
-                    well_core=None,
+                    well_core=dest_well,
                     in_place=True,
                     flow_rate=10,
                 )
@@ -2580,6 +2580,3 @@ def test_absolute_point_from_position_reference_and_offset_raises_errors(
             offset=Coordinate(x=0, y=0, z=0),
             mount=Mount.RIGHT,
         )
-
-
-# retract with blowout position set on src, trash, dest

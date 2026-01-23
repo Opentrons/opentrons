@@ -2,7 +2,6 @@
 
 import mock
 import pytest
-from more_itertools.more import side_effect
 
 from opentrons.protocol_api import ProtocolContext
 from opentrons.protocol_api.core.engine import InstrumentCore
@@ -3007,6 +3006,7 @@ def test_water_transfer_with_selected_tips(
         assert mock_manager.mock_calls == expected_calls
 
 
+# Fix this test
 @pytest.mark.ot3_only
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
