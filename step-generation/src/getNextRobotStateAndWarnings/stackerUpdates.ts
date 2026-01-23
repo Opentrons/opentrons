@@ -1,3 +1,5 @@
+import { current } from 'immer'
+
 import { SYSTEM_LOCATION } from '@opentrons/shared-data'
 
 import {
@@ -566,7 +568,7 @@ export const forFlexStackerRetrieve = (
           ]
         if (labwareId != null) {
           runningStack.unshift(labwareId)
-          robotState.labware[labwareId].stack = runningStack
+          robotState.labware[labwareId].stack = [...runningStack]
         }
       }
     }
