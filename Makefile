@@ -119,6 +119,18 @@ clean-py: $(PYTHON_CLEAN_TARGETS)
 $(SHARED_DATA_DIR)-py-clean:
 	$(MAKE) -C $(SHARED_DATA_DIR) clean-py
 
+PYTHON_LOCK_TARGETS := $(addsuffix -py-lock, $(PYTHON_DIRS))
+
+.PHONY: lock-py
+lock-py: $(PYTHON_LOCK_TARGETS)
+
+%-py-lock:
+	$(MAKE) -C $* lock
+
+# Specialize the %-py-lock pattern rule above to account for the Makefile duopoly in shared-data.
+$(SHARED_DATA_DIR)-py-lock:
+	$(MAKE) -C $(SHARED_DATA_DIR) lock-py
+
 .PHONY: deploy-py
 deploy-py: export twine_repository_url = $(twine_repository_url)
 deploy-py: export pypi_username = $(pypi_username)
