@@ -143,6 +143,14 @@ export const modulePipetteCollisionDanger = (): CommandCreatorError => {
   }
 }
 
+export const thermocyclerBusyWithProfile = (): CommandCreatorError => {
+  return {
+    type: 'THERMOCYCLER_BUSY_WITH_PROFILE',
+    message:
+      'This step cannot run while the Thermocycler is running a profile. Move the step outside the profile.',
+  }
+}
+
 export const thermocyclerLidClosed = (): CommandCreatorError => {
   return {
     type: 'THERMOCYCLER_LID_CLOSED',

@@ -5,16 +5,8 @@ requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Opentrons", email = "engineering@opentrons.com" }]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Environment :: Console",
-    "Operating System :: OS Independent",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
-    "Topic :: Scientific/Engineering",
+    "Private :: Do Not Upload"  # Prevent uploading to PyPI.
 ]
-keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "A server providing access to the Opentrons API"
 
 dependencies = [
@@ -93,7 +85,7 @@ dev = [
 
 [tool.ruff.lint]
 exclude = ["tests/integration/persistence_snapshots/**/*"]
-select = ["E", "ANN", "D", "C90", "I", "T201"]
+select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
 "robot_server/settings.py" = ["ANN","D"]
@@ -184,6 +176,7 @@ markers = [
     "ot2_only: Test only functions using the OT2 hardware",
     "ot3_only: Test only functions using the OT3 hardware",
     "slow: Marks tests that are especially slow. Commonly, this means the test starts and stops its own dev server process, which takes several seconds, instead of reusing a session-scoped one. Exclude this mark to run only the tests that are fast.",
+    "integration: Marks tests that are integration tests with a server in a separate process",
 ]
 filterwarnings = [
     "error::sqlalchemy.exc.RemovedIn20Warning",

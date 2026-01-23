@@ -34,10 +34,19 @@ interface RefillSettingsProps {
   propsForFields: FieldPropsByName
   moduleState: FlexStackerModuleState | null
   maxPoolCount: number
+  isStackerFillEnabled: boolean
+  showFormErrors: boolean
 }
 
 export function RefillSettings(props: RefillSettingsProps): JSX.Element {
-  const { formData, propsForFields, moduleState, maxPoolCount } = props
+  const {
+    formData,
+    propsForFields,
+    moduleState,
+    maxPoolCount,
+    isStackerFillEnabled,
+    showFormErrors,
+  } = props
   const { t } = useTranslation('form')
   const { storedLabwareDetails, labwareInHopper } = moduleState ?? {}
   const labwareEntities = useSelector(getLabwareEntities)
@@ -108,29 +117,31 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
 
   return (
     <div className={styles.refill_settings_container}>
-      <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
-        {t('step_edit_form.flex_stacker.selected_labware')}
-      </StyledText>
-      {storedLabwareDetails != null ? (
-        <div className={styles.selected_labware_container}>
-          {storedEntityName != null ? (
-            <StackerContentItem
-              primaryLabwareName={storedEntityName}
-              hasLid={storedLabwareDetails.lidLabwareURI != null}
-              isTiprack={isPrimaryTiprack}
-            />
-          ) : null}
-        </div>
-      ) : (
-        <ListItem type="default" className={styles.list_item}>
-          <StyledText desktopStyle="bodyDefaultRegular">
-            {t('step_edit_form.flex_stacker.no_labware_selected')}
-          </StyledText>
-        </ListItem>
-      )}
+      <div className={styles.selected_labware_container}>
+        <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>
+          {t('step_edit_form.flex_stacker.selected_labware')}
+        </StyledText>
+        {storedLabwareDetails != null ? (
+          <div className={styles.selected_labware_container}>
+            {storedEntityName != null ? (
+              <StackerContentItem
+                primaryLabwareName={storedEntityName}
+                hasLid={storedLabwareDetails.lidLabwareURI != null}
+                isTiprack={isPrimaryTiprack}
+              />
+            ) : null}
+          </div>
+        ) : (
+          <ListItem type="default" className={styles.list_item}>
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {t('step_edit_form.flex_stacker.no_labware_selected')}
+            </StyledText>
+          </ListItem>
+        )}
+      </div>
 
       {storedEntityName != null && (
-        <div>
+        <div className={styles.refill_settings_input_container}>
           <InputStepFormField
             title={t('step_edit_form.flex_stacker.fields.fillLabwareIds.title')}
             {...propsForFields.fillLabwareIds}
@@ -148,7 +159,7 @@ export function RefillSettings(props: RefillSettingsProps): JSX.Element {
         </div>
       )}
 
-      {storedLabwareDetails == null ? (
+      {showFormErrors && !isStackerFillEnabled ? (
         <InlineNotification
           type="error"
           heading={t('step_edit_form.flex_stacker.stacker_labware_not_defined')}

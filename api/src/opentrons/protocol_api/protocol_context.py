@@ -11,7 +11,6 @@ from typing import (
     Tuple,
     Type,
     Union,
-    cast,
 )
 
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
@@ -41,6 +40,7 @@ from .core.module import (
     AbstractMagneticModuleCore,
     AbstractTemperatureModuleCore,
     AbstractThermocyclerCore,
+    AbstractVacuumModuleCore,
 )
 from .deck import Deck
 from .disposal_locations import TrashBin, WasteChute
@@ -55,6 +55,7 @@ from .module_contexts import (
     ModuleContext,
     TemperatureModuleContext,
     ThermocyclerContext,
+    VacuumModuleContext,
 )
 from .robot_context import HardwareManager, RobotContext
 from .tasks import Task
@@ -103,6 +104,7 @@ ModuleTypes = Union[
     MagneticBlockContext,
     AbsorbanceReaderContext,
     FlexStackerContext,
+    VacuumModuleContext,
 ]
 
 
@@ -1859,8 +1861,8 @@ class ProtocolContext(CommandPublisher):
         Args:
             home_before (bool): If `True`, homes the pipette before capturing an image.
             filename (str): Custom name to use when saving the captured image as a file. The custom name
-                is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run, 
-                the step number, and a timestamp for the command running when the image was captured. 
+                is added as the beginning of the filename, followed by the robot and protocol name, a timestamp for the protocol run,
+                the step number, and a timestamp for the command running when the image was captured.
             resolution (Tuple[int, int]): Accepts a width and height (as a tuple) to determine the camera's resolution
                 when capturing an image.
             zoom (float): Zoom level the camera will use. Defaults to a minimum of 1x zoom (`1.0`) and
@@ -1918,6 +1920,8 @@ def _create_module_context(
         module_cls = AbsorbanceReaderContext
     elif isinstance(module_core, AbstractFlexStackerCore):
         module_cls = FlexStackerContext
+    elif isinstance(module_core, AbstractVacuumModuleCore):
+        module_cls = VacuumModuleContext
     else:
         assert False, "Unsupported module type"
 

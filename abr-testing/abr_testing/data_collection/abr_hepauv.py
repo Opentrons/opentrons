@@ -5,10 +5,12 @@ from typing import List, Any
 from abr_testing.automation import google_sheets_tool
 import os
 import sys
+from pathlib import Path
 import json
+import gspread  # type: ignore[import]
 
 
-def get_hepa_serials(storage_directory: str) -> List[List[Any]]:
+def get_hepa_serials(storage_directory: Path) -> List[List[Any]]:
     """Get HEPA / UV Serial Number."""
     try:
         ips_path = os.path.join(storage_directory, "IPs.json")
@@ -17,7 +19,13 @@ def get_hepa_serials(storage_directory: str) -> List[List[Any]]:
     except FileNotFoundError:
         print(f"Add IPs.json file to: {storage_directory}.")
         sys.exit()
-    robot_name_and_hepa_serial = list(map(list, (zip(*robot_dict.values()))))
+    filtered_values = [
+        value
+        for value in robot_dict.values()
+        if len(value) > 1 and isinstance(value[1], str) and value[1].strip() != ""
+    ]
+    robot_name_and_hepa_serial = list(map(list, zip(*filtered_values)))
+
     return robot_name_and_hepa_serial
 
 
@@ -139,13 +147,18 @@ def turning_hepa_off_and_uv_on(
     row_indices = [i - 1 for i in row_nums]  # API needs 0-based
     google_sheet.batch_delete_rows(row_indices, "1790601450")
     google_sheet.update_row_index()
-    google_sheet.batch_update_cells(nested_list, "A", starting_row_index, "1790601450")
+    try:
+        google_sheet.batch_update_cells(
+            nested_list, "A", starting_row_index, "1790601450"
+        )
+    except gspread.exceptions.APIError:
+        print("⚠️Warning: Did NOT time stamp turning off hepa/uv.")
 
 
 def run(
     turning_hepa_fan: str,
     google_sheet_name: str,
-    storage_directory: str,
+    storage_directory: Path,
 ) -> None:
     """Main control function."""
     try:
@@ -157,32 +170,13 @@ def run(
         credentials_path, google_sheet_name, 5
     )
     robot_names_and_hepa_serials = get_hepa_serials(storage_directory)
+
     if turning_hepa_fan == "on":
         print("𖣘 TIME STAMPING START OF HEPA FANS & UV LIGHT.")
     elif turning_hepa_fan == "off":
         print("𖣘 TIME STAMPING END OF HEPA FANS & UV LIGHT.")
     else:
         return
-
-    answer = input("Do you want to exclude any robots (y/n)?")
-    if answer.lower == "y":
-        robots_to_exclude = input(
-            "Enter robots you want to exclude in a comma separated list: "
-        )
-        exclude_list = [r.strip() for r in robots_to_exclude.split(",")]
-        robots = robot_names_and_hepa_serials[0]
-        serials = robot_names_and_hepa_serials[1]
-        # Zip robots and serials into pairs, filter, then unzip back
-        filtered_pairs = [
-            (r, s) for r, s in zip(robots, serials) if r not in exclude_list
-        ]
-        # Unzip into separate lists again
-        filtered_robots, filtered_serials = (
-            zip(*filtered_pairs) if filtered_pairs else ([], [])
-        )
-        robot_names_and_hepa_serials = [list(filtered_robots), list(filtered_serials)]
-    else:
-        robot_names_and_hepa_serials = robot_names_and_hepa_serials
     if turning_hepa_fan == "on":
         turning_uv_and_hepa_on(hepa_uv_sheet, robot_names_and_hepa_serials)
     else:

@@ -58,6 +58,7 @@ export interface ItemData {
   setSelectedCommand?: Dispatch<SetStateAction<string | null>>
   handlePause?: () => void
   scrollTargetId: string | null
+  listElement: HTMLElement | null
   onShowErrorDetails: () => void
   t: (key: string) => string
 }
@@ -79,6 +80,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
   const [showErrorDetailsModal, setShowErrorDetailsModal] =
     useState<boolean>(false)
   const [scrollTargetId, setScrollTargetId] = useState<string | null>(null)
+  const [listElement, setListElement] = useState<HTMLElement | null>(null)
   const isValidRobotSideAnalysis = analysis != null
   const allRunDefs = useMemo(
     () =>
@@ -123,8 +125,18 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       }),
     [groupedCommands, currentCommandIndex, commandIndexById]
   )
+  const filteredCommands = useMemo(
+    () =>
+      analysis.commands.filter(
+        command =>
+          !command.commandType.includes('load') &&
+          command.commandType !== 'home'
+      ),
+    [analysis.commands]
+  )
 
   useEffect(() => {
+    if (currentCommandIndex == null) return
     if (groupedCommands != null) {
       const flatCommands = groupedCommands.flatMap(node =>
         'subCommands' in node ? node.subCommands : [node]
@@ -137,18 +149,20 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       if (targetNode?.command.id && scrollTargetId !== targetNode.command.id) {
         setScrollTargetId(targetNode.command.id)
       }
+      return
     }
-  }, [groupedCommands, currentCommandIndex, scrollTargetId, commandIndexById])
 
-  const filteredCommands = useMemo(
-    () =>
-      analysis.commands.filter(
-        command =>
-          !command.commandType.includes('load') &&
-          command.commandType !== 'home'
-      ),
-    [analysis.commands]
-  )
+    const targetCommand = filteredCommands[currentCommandIndex]
+    if (targetCommand?.id && scrollTargetId !== targetCommand.id) {
+      setScrollTargetId(targetCommand.id)
+    }
+  }, [
+    groupedCommands,
+    currentCommandIndex,
+    scrollTargetId,
+    commandIndexById,
+    filteredCommands,
+  ])
 
   const { rows, rowIndexByCommandId } = useMemo(() => {
     const nextRows: AnnotatedStepsRow[] = []
@@ -238,8 +252,12 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     if (scrollTargetId == null) return
     const rowIndex = rowIndexByCommandId.get(scrollTargetId)
     if (rowIndex == null) return
-    listRef?.scrollToRow({ index: rowIndex, align: 'smart' })
+    listRef?.scrollToRow({ index: rowIndex, align: 'auto' })
   }, [scrollTargetId, rowIndexByCommandId, listRef])
+
+  useEffect(() => {
+    setListElement(listRef?.element ?? null)
+  }, [listRef])
 
   const handleRowsRendered = useCallback(
     ({ stopIndex }: { startIndex: number; stopIndex: number }) => {
@@ -251,7 +269,6 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
     },
     [rows.length, setIsAtBottom]
   )
-
   const itemData = useMemo<ItemData>(
     () => ({
       rows,
@@ -260,6 +277,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       setSelectedCommand,
       handlePause,
       scrollTargetId,
+      listElement,
       onShowErrorDetails: () => {
         setShowErrorDetailsModal(true)
       },
@@ -272,6 +290,7 @@ export function AnnotatedSteps(props: AnnotatedStepsProps): JSX.Element {
       setSelectedCommand,
       handlePause,
       scrollTargetId,
+      listElement,
       t,
     ]
   )
