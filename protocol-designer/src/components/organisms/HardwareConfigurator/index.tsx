@@ -10,8 +10,6 @@ import {
   getEmptyDeckConfiguration,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   THERMOCYCLER_MODULE_TYPE,
-  THERMOCYCLER_V2_FRONT_FIXTURE,
-  THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
@@ -21,6 +19,7 @@ import { HardwareConfiguratorContainer } from './HardwareConfiguratorContainer'
 
 import type { UseFormSetValue } from 'react-hook-form'
 import type {
+  AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
   CutoutId,
@@ -82,7 +81,7 @@ export function HardwareConfigurator(
       const defaultModuleConfig: CutoutConfigMap = {
         cutoutId: getCutoutIdFromAddressableArea(module.slot, deckDef)!,
         cutoutFixtureId: getCutoutFixtureIdsForModuleModel(module.model)[0],
-        addressableAreaId: module.slot, //translate from vs
+        addressableAreaId: module.slot as AddressableAreaNamesWithFakes, //translate from vs
       }
       let missingThermocyclerFixtures: CutoutConfigMap[] = []
       if (hasThermocycler) {

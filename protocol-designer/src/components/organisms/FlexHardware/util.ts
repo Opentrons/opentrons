@@ -43,13 +43,6 @@ import type { AdditionalEquipmentOnDeck } from '/protocol-designer/step-forms/ty
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type { MakeSnackbar } from '../Kitchen/KitchenContext'
 
-const MAP_3RD_COLUMN_CUTOUT_TO_4TH_COLUMN_SLOT: Record<string, string> = {
-  cutoutA3: 'A4',
-  cutoutB3: 'B4',
-  cutoutC3: 'C4',
-  cutoutD3: 'D4',
-}
-
 interface UpdateInitialDeckSetupProps {
   values: CutoutConfigMap[]
   initialDeckSetup: AllTemporalPropertiesForTimelineFrame
@@ -252,10 +245,7 @@ export const updateInitialDeckState = (
       ae => ae.name === fixtureName && ae.location === value.cutoutId
     )
 
-    const fourthColumnSlot =
-      matchingFixture != null
-        ? MAP_3RD_COLUMN_CUTOUT_TO_4TH_COLUMN_SLOT[matchingFixture.location]
-        : null
+    const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
 
     const matchingModule = Object.values(moduleOnDeck).find(
       module =>
@@ -264,9 +254,9 @@ export const updateInitialDeckState = (
     )
 
     const matching4thColumnLabware =
-      matchingFixture?.name === 'stagingArea' && fourthColumnSlot != null
+      matchingFixture?.name === 'stagingArea' && slotName != null
         ? (Object.values(labwareOnDeck).find(lw =>
-            lw.stack.includes(fourthColumnSlot)
+            lw.stack.includes(slotName)
           ) ?? null)
         : null
 

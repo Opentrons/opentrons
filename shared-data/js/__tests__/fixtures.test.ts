@@ -33,7 +33,7 @@ import {
 import { getDeckDefFromRobotType } from '../helpers'
 
 import type { Mock } from 'vitest'
-import type { CutoutConfig, DeckConfiguration } from '..'
+import type { CutoutConfig, CutoutConfigMap, DeckConfiguration } from '..'
 
 vi.mock('react-i18next', () => ({
   useTranslation: vi.fn(),
@@ -553,7 +553,7 @@ describe('getAddedMissingThermocyclerFixtures', () => {
         cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
         addressableAreaId: 'temperatureModuleV2D1',
       },
-    ]
+    ] as CutoutConfigMap[]
     const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
     expect(result).toEqual(values)
   })
@@ -565,7 +565,7 @@ describe('getAddedMissingThermocyclerFixtures', () => {
         cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
         addressableAreaId: 'B1',
       },
-    ]
+    ] as CutoutConfigMap[]
     const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
     expect(result).toHaveLength(2)
     expect(result).toContainEqual({
@@ -587,7 +587,7 @@ describe('getAddedMissingThermocyclerFixtures', () => {
         cutoutFixtureId: THERMOCYCLER_V2_REAR_FIXTURE,
         addressableAreaId: 'A1',
       },
-    ]
+    ] as CutoutConfigMap[]
     const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
     expect(result).toHaveLength(2)
     expect(result).toContainEqual({
@@ -614,7 +614,7 @@ describe('getAddedMissingThermocyclerFixtures', () => {
         cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
         addressableAreaId: 'B1',
       },
-    ]
+    ] as CutoutConfigMap[]
     const result = getAddedMissingThermocyclerFixtures([...values], deckDef)
     expect(result).toHaveLength(2)
   })
