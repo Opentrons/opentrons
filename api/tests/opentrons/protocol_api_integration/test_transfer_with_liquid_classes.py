@@ -3011,10 +3011,10 @@ def test_water_transfer_with_selected_tips(
 @pytest.mark.parametrize(
     "simulated_protocol_context", [("2.24", "Flex")], indirect=True
 )
-def test_order_of_water_transfer_steps_with_blowout_in_trash_custom_position(
+def test_order_of_water_transfer_steps_with_blowout_in_source_custom_position(
     simulated_protocol_context: ProtocolContext,
 ) -> None:
-    """It should run the transfer steps without any errors.
+    """It should run the transfer steps with blowout at specified position in source labware.
 
     This test only checks that various supported configurations for a transfer
     analyze successfully. It doesn't check whether the steps are as expected.
@@ -3037,7 +3037,7 @@ def test_order_of_water_transfer_steps_with_blowout_in_trash_custom_position(
     water = simulated_protocol_context.get_liquid_class("water")
     water_blowout_props = water.get_for(pipette_50, tiprack).dispense.retract.blowout
     water_blowout_props.enabled = True
-    water_blowout_props.location = "trash"
+    water_blowout_props.location = "source"
     water_blowout_props.blowout_position = {
         "position_reference": "well-top",
         "offset": {"x": 1, "y": 2, "z": 3},
@@ -3132,7 +3132,10 @@ def test_order_of_water_transfer_steps_with_blowout_in_trash_custom_position(
             ),
             mock.call.blow_out(
                 mock.ANY,
-                location=trash.top(1, 2, 3),
+                location=Location(
+                    nest_plate.rows()[0][0].top(0).point + Point(1, 2, 3),
+                    labware=nest_plate.rows()[0][0],
+                ),
                 well_core=mock.ANY,
                 in_place=False,
                 flow_rate=50,
@@ -3172,7 +3175,10 @@ def test_order_of_water_transfer_steps_with_blowout_in_trash_custom_position(
             ),
             mock.call.blow_out(
                 mock.ANY,
-                location=trash.top(1, 2, 3),
+                location=Location(
+                    nest_plate.rows()[0][1].top(0).point + Point(1, 2, 3),
+                    labware=nest_plate.rows()[0][1],
+                ),
                 well_core=mock.ANY,
                 in_place=False,
                 flow_rate=50,

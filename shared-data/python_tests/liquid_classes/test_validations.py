@@ -9,7 +9,6 @@ from opentrons_shared_data.liquid_classes import load_definition
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     AspirateProperties,
     BlowoutLocation,
-    BlowoutParams,
     BlowoutProperties,
     DelayProperties,
     MixProperties,

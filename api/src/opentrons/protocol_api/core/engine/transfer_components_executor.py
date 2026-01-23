@@ -30,7 +30,6 @@ from opentrons.protocols.advanced_control.transfers import (
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
     check_current_volume_before_dispensing,
-    get_blowout_location_for_trash,
 )
 from opentrons.types import Location, Mount, Point
 
@@ -619,17 +618,19 @@ class TransferComponentsExecutor:
             else:
                 trash_blowout_location: Union[Location, TrashBin, WasteChute]
                 blowout_well = (
+                    # We have already established that trash location of `Location` type
+                    # has its `labware` as `Well` type.
                     trash_location.labware.as_well()._core
                     if isinstance(trash_location, Location)
                     else None
                 )
                 if blowout_props.blowout_position is not None:
-                    trash_blowout_location = self._calculate_blowout_position_from_position_info(
-                        blowout_position=blowout_props.blowout_position,
-                        blowout_location=trash_location,
-                        # We have already established that trash location of `Location` type
-                        # has its `labware` as `Well` type.
-                        blowout_well=blowout_well,  # type: ignore[arg-type]
+                    trash_blowout_location = (
+                        self._calculate_blowout_position_from_position_info(
+                            blowout_position=blowout_props.blowout_position,
+                            blowout_location=trash_location,
+                            blowout_well=blowout_well,  # type: ignore[arg-type]
+                        )
                     )
                 else:
                     trash_blowout_location = trash_location
@@ -920,7 +921,7 @@ class TransferComponentsExecutor:
     ) -> Union[Location, TrashBin, WasteChute]:
         """Returns blowout position calculated from blowout position reference & offset."""
         if isinstance(blowout_location, (TrashBin, WasteChute)):
-            return get_blowout_location_for_trash(
+            return tx_utils.get_blowout_location_for_trash(
                 blowout_location,
                 blowout_position,
             )
