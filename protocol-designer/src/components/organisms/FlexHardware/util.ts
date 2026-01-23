@@ -31,6 +31,7 @@ import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
   CutoutConfigMap,
+  CutoutFixtureId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
 import type {
@@ -244,7 +245,11 @@ export const updateInitialDeckState = (
 
     console.log('fixtureName: ', fixtureName)
 
-    const fixtureNameNew = getMainFixtureIdForAA([value.cutoutFixtureId], [value.addressableAreaId as AddressableAreaName], value.cutoutId)
+    const fixtureNameNew = getMainFixtureIdForAA(
+      [value.cutoutFixtureId as CutoutFixtureId],
+      [value.addressableAreaId as AddressableAreaName],
+      value.cutoutId
+    )
     console.log('fixtureNameNew: ', fixtureNameNew)
 
     const matchingFixture = Object.values(additionalEquipmentOnDeck).find(

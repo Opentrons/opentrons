@@ -49,7 +49,7 @@ export function HardwareConfigurator(
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const emptyDeckConfiguration = getEmptyDeckConfiguration(deckDef)
 
-  const deckConifWithAA =
+  const deckConfigWithAA =
     replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
       emptyDeckConfiguration
     )
@@ -75,13 +75,22 @@ export function HardwareConfigurator(
 
   console.log('simpleDeckConfig in HardwareConfigurator', simpleDeckConfig)
   console.log('modules: ', modules)
-  const moduleConfig: DeckConfiguration = Object.values(modules).flatMap(
-    (module: FormModule | ModuleExtended): DeckConfiguration => {
+  const moduleConfig: CutoutConfigMap[] = Object.values(modules).flatMap(
+    (module: FormModule | ModuleExtended): CutoutConfigMap[] => {
       const hasThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
+      const fixtureModule = getCutoutFixtureIdsForModuleModel(module.model)[0]
+      const cutoutId = getCutoutIdFromAddressableArea(module.slot, deckDef)!
+      const matchingDeckConfigEntry = deckConfigWithAA.find(
+        config =>
+          config.cutoutId === cutoutId &&
+          config.cutoutFixtureId === fixtureModule
+      )
       const defaultModuleConfig: CutoutConfigMap = {
-        cutoutId: getCutoutIdFromAddressableArea(module.slot, deckDef)!,
-        cutoutFixtureId: getCutoutFixtureIdsForModuleModel(module.model)[0],
-        addressableAreaId: module.slot as AddressableAreaNamesWithFakes, //translate from vs
+        cutoutId,
+        cutoutFixtureId: fixtureModule,
+        addressableAreaId:
+          matchingDeckConfigEntry?.addressableAreaId ??
+          (module.slot as AddressableAreaNamesWithFakes),
       }
       let missingThermocyclerFixtures: CutoutConfigMap[] = []
       if (hasThermocycler) {
@@ -124,7 +133,7 @@ export function HardwareConfigurator(
           ...simpleDeckConfig,
           ...moduleConfig,
           ...additionalEquipmentConfig,
-        ],
+        ] as DeckConfiguration,
       })
     )
   }, [])
