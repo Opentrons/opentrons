@@ -32,7 +32,7 @@ You can click to edit multiple transfer steps of the same type:
 | --------------------- | ------------------ |
 |     Double Click      | Select an individual step |
 |       <ul><li>Control + Click</li><li>Shift + Click</li></ul>  | Select a range of steps   |
-|  Command + Click | Select multiple steps | 
+|  Command/^ + Click | Select multiple steps | 
 
 Selecting multiple transfer steps allows you to batch edit aspirate and dispense flow rate, well order, tip position, and other advanced settings.
 
