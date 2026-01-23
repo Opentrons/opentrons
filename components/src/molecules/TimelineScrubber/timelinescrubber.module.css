@@ -3,6 +3,9 @@
   width: 100%;
   box-sizing: border-box;
   flex-direction: column;
+  padding-bottom: 8px;
+  margin-bottom: -8px;
+  overflow: visible;
 }
 
 .track_container {
