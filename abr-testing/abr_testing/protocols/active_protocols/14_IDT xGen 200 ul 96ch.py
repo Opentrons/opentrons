@@ -70,7 +70,7 @@ def run(protocol: ProtocolContext) -> None:
     PCRCYCLES = protocol.params.PCRCYCLES  # type: ignore[attr-defined]
     DEACTIVATE_TEMP = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
-    helpers.comment_protocol_version(protocol, "02")
+    helpers.comment_protocol_version(protocol, "03")
 
     if not protocol.is_simulating():
         slack_bot = helpers.set_up_slack()
