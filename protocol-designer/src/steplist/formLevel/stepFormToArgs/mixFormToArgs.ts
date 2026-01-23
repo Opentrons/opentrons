@@ -65,8 +65,6 @@ export const mixFormToArgs = (
     castFormData.dispense_flowRate ||
     matchingTipLiquidSpecs?.defaultDispenseFlowRate.default
 
-  const offsetFromBottomMm =
-    castFormData.mix_mmFromBottom || DEFAULT_MM_OFFSET_FROM_BOTTOM
   // It's radiobutton, so one should always be selected.
   // One changeTip option should always be selected.
   console.assert(
@@ -112,7 +110,6 @@ export const mixFormToArgs = (
     aspirateFlowRateUlSec: aspirateFlowRateUlSec ?? 0,
     dispenseFlowRateUlSec: dispenseFlowRateUlSec ?? 0,
     blowoutFlowRateUlSec: blowoutFlowRateUlSec ?? 0,
-    offsetFromBottomMm,
     blowoutOffsetFromTopMm,
     aspirateDelaySeconds,
     tipRack: castFormData.tipRack?.tiprackDefURI,
@@ -120,10 +117,10 @@ export const mixFormToArgs = (
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation: dropTip_location,
     nozzles,
+    positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     xOffset: mix_x_position ?? 0,
     yOffset: mix_y_position ?? 0,
     zOffset: mix_mmFromBottom ?? DEFAULT_MM_OFFSET_FROM_BOTTOM,
-    positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     finalPushOut:
       pushOut_checkbox && pushOut_volume != null ? pushOut_volume : 0,
     tipTracking: tip_tracking ?? AUTOMATIC,
