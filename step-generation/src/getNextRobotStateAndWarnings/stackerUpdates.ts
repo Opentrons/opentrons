@@ -1,5 +1,3 @@
-import { current } from 'immer'
-
 import { SYSTEM_LOCATION } from '@opentrons/shared-data'
 
 import {
