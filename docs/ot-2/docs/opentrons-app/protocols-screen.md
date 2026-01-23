@@ -8,7 +8,7 @@ This section provides an overview of the Protocols screen in the [Opentrons App]
 
 ## Function summary
 
-The Protocols screen provides software features for importing and managing saved protocols. When working in other parts of the app, you can click the **Protocols** tab on the left side of the screen to return to this section anytime.
+The Protocols screen allows you to import new protocol files and review saved files. When working in other parts of the app, you can click the **Protocols** tab on the left side of the screen to return to this section anytime.
 
 <figure class="side-by-side" markdown>
 ![Protocols page showing upload features](../images/protocols-page-empty.png)
