@@ -465,7 +465,10 @@ class TransferComponentsExecutor:
         """Execute post-dispense retraction steps.
         1. Position ref+offset is the ending position. Move to this position using specified speed
         2. If blowout is enabled and “destination”
-            - Do blow-out at the position specified by BlowoutPosition. If BlowoutPosition is not specified, blow out at the retract position.
+            - Do blow-out at the position specified by BlowoutPosition.
+            - If BlowoutPosition is not specified, blow out at the retract position.
+              If destination is a DisposalLocation (TrashBin/ WasteChute), retract position is same as target position,
+              so, we blowout at the target position.
             - Leave plunger down
         3. Touch-tip in the destination well.
         4. If not ready-to-aspirate
@@ -478,7 +481,10 @@ class TransferComponentsExecutor:
                 If this is the last step of the transfer, and we aren't dropping the tip off,
                 then the air gap will be left as is(?).
         6. If blowout is “source” or “trash”
-            - Move to position specified by BlowoutPosition. If BlowoutPosition is not specified, move to the top of Well or TrashBin/WasteChute.
+            - Move to position specified by BlowoutPosition.
+            - If BlowoutPosition is not specified:
+                - if blowing out at source, move to the top of Well
+                - if blowing out at trash, move to the location specified by trash_location
             - Do blow-out
             - Do touch-tip AGAIN at the source well (if blowout in a non-trash location)
             - Prepare-to-aspirate (top of well)

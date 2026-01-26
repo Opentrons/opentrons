@@ -142,16 +142,25 @@ def test_adding_blowout_position_to_liquid_classes(
         properties=custom_pip_n_tip_transfer_properties_dict_v2,
         display_name="Custom Aqueous",
     )
+    custom_water_props = custom_water.get_for(pip_type, tiprack)
+    assert custom_water_props.dispense.retract.blowout.blowout_position is not None
     assert (
-        custom_water.get_for(
-            pip_type, tiprack
-        ).dispense.retract.blowout.blowout_position.position_reference.value  # type: ignore[union-attr]
+        custom_water_props.dispense.retract.blowout.blowout_position.position_reference.value
         == "well-top"
     )
-    assert custom_water.get_for(
-        pip_type, tiprack
-    ).dispense.retract.blowout.blowout_position.offset == Coordinate(x=11, y=22, z=33)  # type: ignore[union-attr]
+    assert (
+        custom_water_props.dispense.retract.blowout.blowout_position.offset
+        == Coordinate(x=11, y=22, z=33)
+    )
 
-    # This fails right now cuz of no setter. Fix that
-    # custom_water.get_for(pip_type, tiprack).dispense.retract.blowout.blowout_position = None
-    # assert custom_water.get_for(pip_type, tiprack).dispense.retract.blowout.blowout_position is None
+    custom_water_props.dispense.retract.blowout.blowout_position = None
+    assert custom_water_props.dispense.retract.blowout.blowout_position is None
+
+    custom_water_props.dispense.retract.blowout.blowout_position = {  # type:ignore[assignment]
+        "position_reference": "well-top",
+        "offset": {"x": 11, "y": 22, "z": 33, "w": 123},
+    }
+    assert (
+        custom_water_props.dispense.retract.blowout.blowout_position.offset  # type:ignore[union-attr]
+        == Coordinate(x=11, y=22, z=33)
+    )
