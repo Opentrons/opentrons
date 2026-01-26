@@ -221,6 +221,19 @@ const _getLidStacks = (
     {}
   )
 
+export const _getLidStackLocationArg = (
+  location: string,
+  isLidSlotOnAdapter: boolean
+): string => {
+  if (isLidSlotOnAdapter) {
+    return `location=${location}`
+  }
+  if (location === 'offDeck') {
+    return `location=${OFF_DECK}`
+  }
+  return `location=${formatPyStr(location)}`
+}
+
 export const getLoadLidStacks = (
   allLabwareEntities: LabwareEntities,
   labwareRobotState: TimelineFrame['labware']
@@ -242,9 +255,7 @@ export const getLoadLidStacks = (
         ({ pythonName }) => pythonName === location
       )
       const loadNameArg = `load_name=${formatPyStr(loadName)}`
-      const locationArg = `location=${
-        isLidSlotOnAdapter ? location : formatPyStr(location)
-      }`
+      const locationArg = _getLidStackLocationArg(location, isLidSlotOnAdapter)
       const quantityArg = `quantity=${quantity}`
       const allArgs = [loadNameArg, locationArg, quantityArg].join(',\n')
       const allArgsIndented = indentPyLines(allArgs)
