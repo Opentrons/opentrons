@@ -160,6 +160,8 @@
     "untilTemperature": "Until {{temperature}} °C reached"
   },
   "pipette": "Pipette",
+  "pipette_nozzles_and_wells": "Pipette nozzles and wells",
+
   "pipette_path": "Pipette path",
   "place_hardware": "Place the modules and fixtures that you are using for this protocol onto the deck.",
   "place_modules": "Place the modules that you are using for this protocol onto the deck.",
@@ -187,7 +189,6 @@
   "select_dispense_wells": "Select destination wells using a {{displayName}}",
   "select_labware": "Select labware",
   "select_mix_labware": "Select a mix labware",
-  "select_nozzles": "Nozzles",
   "select_pipette": "Select a pipette",
   "select_tip_location": "Select pick up tip location",
   "select_tiprack": "Select a tiprack",

@@ -82,7 +82,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
         error={errorToShow}
         dropdownType="neutral"
         filterOptions={options}
-        title={t('select_nozzles')}
+        title={t('pipette_nozzles_and_wells')}
         currentOption={
           options.find(option => option.value === selectedValue) ?? options[0]
         }
