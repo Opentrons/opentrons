@@ -28,9 +28,9 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = fillLabwareIds.map(
-    lwId => labwareEntities[lwId]?.pythonName
-  )
+  const labwarePythonNames = fillLabwareIds
+    .filter(id => !labwareEntities[id].def.allowedRoles?.includes('lid'))
+    .map(lwId => labwareEntities[lwId]?.pythonName)
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
   const indentedLabwarePythonNames = labwareChunks
     .map(chunk => INDENT + chunk.join(', '))
@@ -64,8 +64,11 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     }
   }
 
+  const filteredFillLabwareIds = fillLabwareIds.filter(
+    id => !labwareEntities[id].def.allowedRoles?.includes('lid')
+  )
   const pythonArgs = [
-    ...(fillLabwareIds.length > 0
+    ...(filteredFillLabwareIds.length > 0
       ? `labware=[${formattedPythonLabwareNames}],\n`
       : []),
     ...(interventionMessage != null
