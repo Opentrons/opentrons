@@ -10,15 +10,22 @@ The Devices tab lists all the Opentrons OT-2 and Flex robots on a network. Robot
 
 <font color="red">IMAGE PLACEHOLDER</font>
 
-You can click on any listed robot summary to expand it.
+## Device settings
+
+You can click on any robot summary tile to expand it.
 
 <font color="red">IMAGE PLACEHOLDER</font>
 
-An expanded tile shows you more information about the robot such as attached instruments, deck modules, peripheral components, and protocol run logs. In each section, different three-dot () menus provide additional controls for robot, device, and protocol management.
+An expanded tile shows you more information about the robot, any attached hardware, and protocol run logs. In each section, different three-dot (⋮) menus provide additional controls for the robot, attached devices, and protocol management.
 
-<font color="red">IMAGE PLACEHOLDER</font>
+### Hardware settings
+
+<figure class="screenshot" markdown>
+![Device 3-dot menus for robot hardware controls](../images/app-device-details-hardware.png)
+</figure>
 
 
+### Protocol settings
 
 ## Robot settings
 
