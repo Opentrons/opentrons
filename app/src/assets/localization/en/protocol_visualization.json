@@ -61,5 +61,5 @@
   "well_dimension": "{{number}} mm",
   "well_name": "Well {{wellName}}",
   "well_view": "Well view",
-  "well_volume": "{{volume}} µl"
+  "well_volume": "{{volume}} µL"
 }
