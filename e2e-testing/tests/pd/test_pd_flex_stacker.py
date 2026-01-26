@@ -17,15 +17,17 @@ def test_flex_stacker(page: Page) -> None:
     plate_reader_page = PlateReaderPage(page)
 
 
+
     ## Create new Flex protocol from Landing Page, 4 stackers and waste chute and magnetic block
     create_new_protocol_from_landing_page(True, True, True, page)
     flex_stacker_page.configure_stacker("A4")
+    deck_config_page.select_slot("A3")
+    deck_config_page.select_module("Magnetic Block GEN1")
     flex_stacker_page.configure_stacker("B4")
     flex_stacker_page.configure_stacker("C4")
     flex_stacker_page.configure_stacker("D4")
     #applitools eyes?
-    #need to add magnetic block
-    print("Configured 4 Flex Stackers with waste chute and magnetic block")
+    print("\n✓ Configured 4 Flex Stackers with waste chute and magnetic block")
 
     ## Create new Flex protocol from Create New button
     flex_stacker_page.start_new_create_protocol()
@@ -35,7 +37,7 @@ def test_flex_stacker(page: Page) -> None:
     flex_stacker_page.configure_stacker("B4")
     flex_stacker_page.configure_stacker("C4")
     flex_stacker_page.configure_stacker("D4")
-    print("Configured 4 Flex Stackers without waste chute")
+    print("✓ Configured 4 Flex Stackers without waste chute")
 
     ##Creating a new protocol and adding 3 stackers and a trashbin
     flex_stacker_page.start_new_create_protocol()
@@ -43,7 +45,7 @@ def test_flex_stacker(page: Page) -> None:
     flex_stacker_page.configure_stacker("B4")
     flex_stacker_page.configure_stacker("C4")
     flex_stacker_page.configure_stacker("D4")
-    print("Configured 3 Flex Stackers with a trashbin")
+    print("✓ Configured 3 Flex Stackers with a trashbin")
 
     ##Creating a new protocol
     ##Test adding 3 stackers and an absorbance reader
@@ -53,15 +55,39 @@ def test_flex_stacker(page: Page) -> None:
     plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
     flex_stacker_page.configure_stacker("C4")
     flex_stacker_page.configure_stacker("D4")
-    print("Configured 3 Flex Stackers with waste chute a plate reader")
+    print("✓ Configured 3 Flex Stackers with waste chute a plate reader")
 
 
-#before each maybe? test.beforeEach(async ({ page }) => {}
-    ##Creating a new protocol
     ##Test adding 2 stackers and an absorbnace reader and a expansion slot
+    flex_stacker_page.start_new_create_protocol()
+    create_new_protocol(True, True, True, page)
+    deck_config_page.select_slot("A3")
+    deck_config_page.select_fixture("Trash bin")
+    deck_config_page.select_slot("B3")
+    deck_config_page.select_module("Absorbance Plate Reader Module GEN1")
+    flex_stacker_page.configure_stacker("C4")
+    flex_stacker_page.configure_stacker("D4")
+    print("✓ Configured 2 Flex Stackers with Trash bin and a plate reader")
+
+    ##Test adding 2 stackers and an absorbnace reader and a expansion slot
+    flex_stacker_page.start_new_create_protocol()
+    create_new_protocol(True, True, True, page)
+    deck_config_page.select_slot("A4")
+    deck_config_page.select_fixture("Staging Area Slot")
+    deck_config_page.select_slot("A3")
+    deck_config_page.select_module("Magnetic Block GEN1")
+    deck_config_page.select_slot("B3")
+    deck_config_page.select_module("Absorbance Plate Reader Module GEN1")
+    flex_stacker_page.configure_stacker("C4")
+    flex_stacker_page.configure_stacker("D4")
+    print("✓ Configured 2 Flex Stackers with Waste bin, mag block, expansion slot, and a plate reader")
+
+
     ##Add labware to stacker
         ##select labware, check off tip rack lid, quantity
         ##replace labware is visible (app eyes)
     ##Add step for stacker
         ##Select Stacker by location
     ##check to make surethat the stacker is highlighted
+
+    print("\n✅ Flex Stacker Configuration and Form Test completed successfully!")
