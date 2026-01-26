@@ -89,7 +89,7 @@ class DeckConfigPage(BasePage):
         self.click_button("Edit protocol")
         expect(self.page.get_by_role("button", name="Back to overview")).to_be_visible(timeout=5000)
 
-    def remove_fixture(self, fixture_name: Literal["Trash bin", "Waste", "Stage"]) -> None:
+    def remove_fixture(self, fixture_name: str) -> None:
         """Remove a fixture from the deck.
 
         Args:
