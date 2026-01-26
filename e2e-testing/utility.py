@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import functools
+from typing import Callable, ParamSpec, TypeVar
 
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import Page, TimeoutError, expect
@@ -7,8 +10,11 @@ from automation.pd_pages import LandingPage, ProtocolEditorPage
 
 # Todo add from eyes import eyes_check
 
+P = ParamSpec("P")
+R = TypeVar("R")
 
-def _find_page_in_args(*args, **kwargs) -> Page | None:
+
+def _find_page_in_args(*args: object, **kwargs: object) -> Page | None:
     """Helper function to find the Playwright Page object in function arguments."""
     # Check positional arguments
     for arg in args:
@@ -21,7 +27,7 @@ def _find_page_in_args(*args, **kwargs) -> Page | None:
     return None
 
 
-def troubleshoot_and_pause(func):
+def troubleshoot_and_pause(func: Callable[P, R]) -> Callable[P, R]:
     """
     A decorator that wraps a function in a try...except block.
 
@@ -31,7 +37,7 @@ def troubleshoot_and_pause(func):
     """
 
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
         try:
             # Execute the decorated function
             return func(*args, **kwargs)
@@ -55,7 +61,7 @@ def troubleshoot_and_pause(func):
     return wrapper
 
 
-def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> None:
+def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: bool) -> ProtocolEditorPage:
     """This test takes two inputs:
     1. page: The Playwright Page object.
     2. PROTOCOL_PATH: The file path of the protocol to import
@@ -78,7 +84,7 @@ def _import_protocol_and_open_editor(page: Page, PROTOCOL_PATH: str, migration: 
     return ProtocolEditorPage(page)
 
 
-def edit_step_form_for_snapshot(page, test_name: str, checkpoint_name: str) -> None:
+def edit_step_form_for_snapshot(page: Page, test_name: str, checkpoint_name: str) -> None:
     """Edit the step form for a specific snapshot."""
     # Todo add eyes_check(page, test_name, checkpoint_name)
 

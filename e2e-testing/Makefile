@@ -13,17 +13,17 @@ test-setup:
 
 .PHONY: format
 format:
-	uv run ruff format .
-	uv run ruff check --fix .
+	uv run ruff format . *.py
+	uv run ruff check --fix . *.py
 
 .PHONY: lint
 lint:
-	uv run ruff check .
-	uv run ruff format --check .
+	uv run ruff check . *.py
+	uv run ruff format --check . *.py
 
 .PHONY: typecheck
 typecheck:
-	uv run mypy automation tests conftest.py
+	uv run mypy automation tests conftest.py migration_report.py protocols.py run_many_tests.py utility.py
 
 .PHONY: check
 check: lint typecheck
@@ -87,6 +87,46 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
+.PHONY: migration-report
+migration-report:
+	@echo "Generating migration export report (prod baseline -> staging diff)"
+	uv run python -m tests.migration_report
+
+.PHONY: migration-export-prod
+migration-export-prod:
+	@echo "Exporting protocol fixtures from production"
+	MIGRATION_REPORT_BASE_URL=$(or $(MIGRATION_REPORT_BASE_URL),https://designer.opentrons.com) \
+	MIGRATION_REPORT_HEADLESS=$(or $(MIGRATION_REPORT_HEADLESS),true) \
+	MIGRATION_REPORT_UI_TIMEOUT_MS=$(or $(MIGRATION_REPORT_UI_TIMEOUT_MS),3000) \
+	MIGRATION_REPORT_DOWNLOAD_TIMEOUT_MS=$(or $(MIGRATION_REPORT_DOWNLOAD_TIMEOUT_MS),15000) \
+	MIGRATION_REPORT_CLEAN=$(or $(MIGRATION_REPORT_CLEAN),false) \
+	MIGRATION_REPORT_KEYS=$(MIGRATION_REPORT_KEYS) \
+	MIGRATION_REPORT_SINGLE_KEY=$(MIGRATION_REPORT_SINGLE_KEY) \
+	MIGRATION_REPORT_LOG_MIGRATION_MODAL=$(MIGRATION_REPORT_LOG_MIGRATION_MODAL) \
+	MIGRATION_REPORT_LOG_DOWNLOAD=$(MIGRATION_REPORT_LOG_DOWNLOAD) \
+	uv run python -m tests.migration_report
+
+.PHONY: migration-export-staging
+migration-export-staging:
+	@echo "Exporting protocol fixtures from staging"
+	MIGRATION_REPORT_BASE_URL=$(or $(MIGRATION_REPORT_BASE_URL),https://staging.designer.opentrons.com) \
+	MIGRATION_REPORT_HEADLESS=$(or $(MIGRATION_REPORT_HEADLESS),false) \
+	MIGRATION_REPORT_UI_TIMEOUT_MS=$(or $(MIGRATION_REPORT_UI_TIMEOUT_MS),3000) \
+	MIGRATION_REPORT_DOWNLOAD_TIMEOUT_MS=$(or $(MIGRATION_REPORT_DOWNLOAD_TIMEOUT_MS),15000) \
+	MIGRATION_REPORT_CLEAN=$(or $(MIGRATION_REPORT_CLEAN),false) \
+	MIGRATION_REPORT_KEYS=$(MIGRATION_REPORT_KEYS) \
+	MIGRATION_REPORT_SINGLE_KEY=$(MIGRATION_REPORT_SINGLE_KEY) \
+	MIGRATION_REPORT_LOG_MIGRATION_MODAL=$(MIGRATION_REPORT_LOG_MIGRATION_MODAL) \
+	MIGRATION_REPORT_LOG_DOWNLOAD=$(MIGRATION_REPORT_LOG_DOWNLOAD) \
+	uv run python -m tests.migration_report
+
+.PHONY: migration-report-debug
+migration-report-debug:
+	@echo "Running migration report in DEBUG mode (headed, single fixture)"
+	@echo "Set MIGRATION_REPORT_SINGLE_KEY=<fixtureKey> to choose a fixture"
+	@echo "Optional: set MIGRATION_REPORT_PAUSE=true to open Playwright inspector"
+	MIGRATION_REPORT_MODE=debug MIGRATION_REPORT_HEADLESS=false uv run python -m tests.migration_report
 
 .PHONY: prep
 prep: format check test-unit test-pd-local

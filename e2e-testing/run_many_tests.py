@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import argparse
 import re
 import subprocess
 import sys
+from typing import TypedDict
 
 # ANSI Terminal Colors
 GREEN = "\033[92m"
@@ -15,7 +18,21 @@ RESET = "\033[0m"
 # --- CONFIGURATION ---
 # check: The command to verify state (should return non-zero on failure)
 # fix:   The command to automatically resolve issues (optional)
-STATIC_TASKS = {
+
+
+class TaskConfig(TypedDict):
+    check: str
+    fix: str | None
+
+
+class TaskResult(TypedDict):
+    name: str
+    success: bool
+    fails: list[str]
+    fix_cmd: str | None
+
+
+STATIC_TASKS: dict[str, TaskConfig] = {
     "Format": {
         "check": "uv run ruff format --check .",
         "fix": "make format",
@@ -31,10 +48,10 @@ STATIC_TASKS = {
 }
 
 
-def parse_failures(name, stdout, stderr):
+def parse_failures(name: str, stdout: str, stderr: str) -> list[str]:
     """Extracts specific lint error codes or type errors."""
     full_text = stdout + stderr
-    failures = []
+    failures: list[str] = []
     if name == "Lint":
         # Matches ruff error codes
         matches = re.findall(r": ([A-Z][0-9]+ .*)", full_text)
@@ -46,7 +63,7 @@ def parse_failures(name, stdout, stderr):
     return list(dict.fromkeys(failures))  # Unique items
 
 
-def run_task(name, config):
+def run_task(name: str, config: TaskConfig) -> TaskResult:
     """Runs a shell command and captures output/status."""
     result = subprocess.run(config["check"], shell=True, capture_output=True, text=True)
     success = result.returncode == 0
@@ -56,15 +73,15 @@ def run_task(name, config):
         "name": name,
         "success": success,
         "fails": fails,
-        "fix_cmd": config.get("fix"),
+        "fix_cmd": config["fix"],
     }
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(description="Opentrons Local Static Analysis Runner")
     parser.parse_args()
 
-    static_results = []
+    static_results: list[TaskResult] = []
 
     # --- PHASE 1: STATIC ANALYSIS ---
     print(f"\n{BOLD}🛡️  PHASE 1: Static Analysis{RESET}")
@@ -100,9 +117,12 @@ def main():
     if failed_with_fixes:
         print(f"\n{BOLD}{CYAN}🔧 AUTO-HEALING: Running fixes for Static Analysis...{RESET}")
         for res in failed_with_fixes:
-            print(f"  🚀 Running {BOLD}{res['fix_cmd']}{RESET}...")
+            fix_cmd = res["fix_cmd"]
+            if fix_cmd is None:
+                continue
+            print(f"  🚀 Running {BOLD}{fix_cmd}{RESET}...")
             # Run the fix (e.g., make format)
-            subprocess.run(res["fix_cmd"], shell=True)
+            subprocess.run(fix_cmd, shell=True)
         print(f"\n{GREEN}✅ Auto-fixes complete. Please re-run to verify clean state.{RESET}")
 
     elif not all_passed:

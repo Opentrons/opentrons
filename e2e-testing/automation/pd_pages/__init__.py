@@ -4,6 +4,7 @@ from .base_page import BasePage
 from .create_protocol_wizard import CreateProtocolWizard
 from .deck_config_page import DeckConfigPage
 from .heater_shaker_step_form_page import HeaterShakerStepPage
+from .info_page import InfoPage
 from .landing_page import LandingPage
 from .mix_step_form import MixStepForm
 from .module_config_page import ModuleConfigPage
@@ -27,5 +28,6 @@ __all__ = [
     "ThermocyclerStepPage",
     "TemperatureStepPage",
     "HeaterShakerStepPage",
+    "InfoPage",
     "TransferPage",
 ]
