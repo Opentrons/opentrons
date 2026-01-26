@@ -165,15 +165,6 @@ wheels = [
 ]
 
 [[package]]
-name = "atomicwrites"
-version = "1.4.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/55/8d/74a75635f2c3c914ab5b3850112fd4b0c8039975ecb320e4449aa363ba54/atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a", size = 11790, upload-time = "2022-07-09T04:09:52.757Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/a0/da5f49008ec6e9a658dbf5d7310a4debd397bce0b4db03cf8a410066bb87/atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197", size = 6790, upload-time = "2022-07-09T04:09:09.073Z" },
-]
-
-[[package]]
 name = "attrs"
 version = "25.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1043,9 +1034,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "anyio", specifier = "==4.9.0" },
-    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "build", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "coverage", specifier = "==7.4.1" },
     { name = "decoy", specifier = ">=2.2.0,<3" },
     { name = "hypothesis", specifier = ">=6.96.1,<7" },
@@ -1160,9 +1149,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "build", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "jsonschema", specifier = "==4.17.3" },
     { name = "mypy", specifier = "==1.19.1" },
     { name = "numpy", specifier = "==1.26.4" },
@@ -1840,10 +1827,8 @@ dependencies = [
 [package.dev-dependencies]
 dev = [
     { name = "aiohttp", marker = "python_full_version >= '3.11'" },
-    { name = "atomicwrites", marker = "python_full_version >= '3.11' and sys_platform == 'win32'" },
     { name = "build", marker = "python_full_version >= '3.11'" },
     { name = "click", marker = "python_full_version >= '3.11'" },
-    { name = "colorama", marker = "python_full_version >= '3.11' and sys_platform == 'win32'" },
     { name = "decoy", marker = "python_full_version >= '3.11'" },
     { name = "httpx", marker = "python_full_version >= '3.11'" },
     { name = "hypothesis", marker = "python_full_version >= '3.11'" },
@@ -1914,10 +1899,8 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "aiohttp", marker = "python_full_version >= '3.11'", specifier = "==3.12.14" },
-    { name = "atomicwrites", marker = "python_full_version >= '3.11' and sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "build", marker = "python_full_version >= '3.11'", specifier = "~=1.2.0" },
     { name = "click", marker = "python_full_version >= '3.11'", specifier = "==8.1.2" },
-    { name = "colorama", marker = "python_full_version >= '3.11' and sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "decoy", marker = "python_full_version >= '3.11'", specifier = ">=2.2.0,<3" },
     { name = "httpx", marker = "python_full_version >= '3.11'", specifier = "==0.26.0" },
     { name = "hypothesis", marker = "python_full_version >= '3.11'", specifier = ">=6.128,<7" },
@@ -2156,9 +2139,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "build", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "decoy", specifier = ">=2.2.0,<3" },
     { name = "httpx", specifier = "==0.26.0" },
     { name = "mock", specifier = "==5.1.0" },
