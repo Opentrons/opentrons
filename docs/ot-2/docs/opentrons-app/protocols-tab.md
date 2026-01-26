@@ -12,7 +12,7 @@ The Protocols tab includes controls that let you import protocol files and manag
 ![Protocols tab showing uploaded protocols](../images/app-protocol-list.png){ width="80%" }
 </figure>
 
-You can click on any listed protocol to expand it. An expanded tile shows you more information about the protocol.
+You can click on any listed protocol summary to expand it. An expanded tile shows you more information about the protocol.
 
 <figure class="screenshot" markdown>
 ![Protocol details tile](../images/app-protocol-details.png){ width="80%" }
@@ -40,7 +40,7 @@ If you have a new robot and are launching the Opentrons App for the first time, 
 
 The Opentrons App will analyze your protocol as soon as you import it. _Protocol analysis_ is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, the app shows a warning. Correct the errors and re-import the protocol. If protocol analysis imports the file without errors, it is ready to run on your OT-2.
 
-## Protocol screen features
+## Other features and settings
 
 The basic protocol screen displays a summary list of all the protocols stored on your computer. Other screen elements and actions let you sort protocols, assign a protocol to a robot, and expand the protocol summary to see more information about each protocol.
 
