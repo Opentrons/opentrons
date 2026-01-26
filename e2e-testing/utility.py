@@ -102,10 +102,10 @@ def create_new_protocol_from_landing_page(gripper: bool, tc: bool, waste_chute: 
     landing.confirm_welcome_modal()
 
     landing.click_create_protocol()
-    create_new_protocol(gripper, tc, waste_chute, page)
+    create_new_protocol_flow(gripper, tc, waste_chute, page)
 
 
-def create_new_protocol(gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+def create_new_protocol_flow(gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
     page.get_by_text("Add a pipette").click()
     page.get_by_text("1-Channel").click()
     page.get_by_text("50 µL").click()
@@ -126,4 +126,12 @@ def create_new_protocol(gripper: bool, tc: bool, waste_chute: bool, page: Page) 
         page.get_by_test_id("BasicsButtons_wasteChute_no").get_by_text("No").click()
     confirm_button = page.get_by_role("button", name="Confirm")
     confirm_button.click()
+
+def start_new_create_protocol(page: Page) -> None:
+    """
+    Create a a new protocol from banner bar.
+    This will open a browser dialog box to verify you'll lose your current progress.
+    """
+    page.on("dialog", lambda dialog: dialog.accept())
+    page.get_by_test_id("basic_button_Create new").click()
 
