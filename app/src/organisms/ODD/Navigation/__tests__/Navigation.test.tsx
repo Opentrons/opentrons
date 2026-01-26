@@ -53,9 +53,6 @@ describe('Navigation', () => {
     const allProtocols = screen.getByRole('link', { name: 'Protocols' })
     expect(allProtocols).toHaveAttribute('href', '/protocols')
 
-    const quickTransfer = screen.getByRole('link', { name: 'Quick Transfer' })
-    expect(quickTransfer).toHaveAttribute('href', '/quick-transfer')
-
     const instruments = screen.getByRole('link', { name: 'Instruments' })
     expect(instruments).toHaveAttribute('href', '/instruments')
 

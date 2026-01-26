@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 
 import {
   ALIGN_CENTER,
@@ -14,10 +15,15 @@ import {
   POSITION_STICKY,
   SPACING,
 } from '@opentrons/components'
-import { useAllProtocolsQuery } from '@opentrons/react-api-client'
+import {
+  useAllProtocolsQuery,
+  useInstrumentsQuery,
+} from '@opentrons/react-api-client'
 
-import { SmallButton } from '/app/atoms/buttons'
+import { FloatingActionButton, SmallButton } from '/app/atoms/buttons'
 import { Navigation } from '/app/organisms/ODD/Navigation'
+import { useTrackEventWithRobotSerial } from '/app/redux-resources/analytics'
+import { ANALYTICS_QUICK_TRANSFER_FLOW_STARTED } from '/app/redux/analytics'
 import {
   getPinnedProtocolIds,
   getProtocolsOnDeviceSortKey,
@@ -28,9 +34,11 @@ import { useNotifyAllRunsQuery } from '/app/resources/runs'
 import { DeleteProtocolConfirmationModal } from './DeleteProtocolConfirmationModal'
 import { NoProtocols } from './NoProtocols'
 import { PinnedProtocolCarousel } from './PinnedProtocolCarousel'
+import { PipetteNotAttachedErrorModal } from './PipetteNotAttachedErrorModal'
 import { ProtocolCard } from './ProtocolCard'
 import { sortProtocols } from './utils'
 
+import type { PipetteData } from '@opentrons/api-client'
 import type { ProtocolResource } from '@opentrons/shared-data'
 import type { ProtocolsOnDeviceSortKey } from '/app/redux/config/types'
 import type { Dispatch } from '/app/redux/types'
@@ -40,6 +48,10 @@ export function ProtocolDashboard(): JSX.Element {
   const runs = useNotifyAllRunsQuery()
   const { t } = useTranslation('protocol_info')
   const dispatch = useDispatch<Dispatch>()
+  const navigate = useNavigate()
+  const { data: attachedInstruments } = useInstrumentsQuery()
+  const { trackEventWithRobotSerial } = useTrackEventWithRobotSerial()
+
   const [navMenuIsOpened, setNavMenuIsOpened] = useState<boolean>(false)
   const [longPressModalIsOpened, setLongPressModalOpened] =
     useState<boolean>(false)
@@ -47,11 +59,11 @@ export function ProtocolDashboard(): JSX.Element {
     useState<boolean>(false)
   const [targetProtocolId, setTargetProtocolId] = useState<string>('')
   const [isRequiredCSV, setIsRequiredCSV] = useState<boolean>(false)
+  const [showPipetteNotAttachedModal, setShowPipetteNotAttachedModal] =
+    useState<boolean>(false)
+
   const sortBy = useSelector(getProtocolsOnDeviceSortKey) ?? 'alphabetical'
-  const protocolsData =
-    protocols.data?.data.filter(
-      protocol => protocol.protocolKind !== 'quick-transfer'
-    ) ?? []
+  const protocolsData = protocols.data?.data ?? []
   let unpinnedProtocols: ProtocolResource[] = protocolsData
 
   // The pinned protocols are stored as an array of IDs in config
@@ -99,6 +111,9 @@ export function ProtocolDashboard(): JSX.Element {
   const allRunsNewestFirst = runData.toSorted(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
+  const pipetteIsAttached = attachedInstruments?.data.some(
+    (i): i is PipetteData => i.ok && i.instrumentType === 'pipette'
+  )
   const sortedProtocols = sortProtocols(
     sortBy,
     unpinnedProtocols,
@@ -134,12 +149,34 @@ export function ProtocolDashboard(): JSX.Element {
     }
   }
 
+  const handleCreateNewQuickTransfer = (): void => {
+    if (!pipetteIsAttached) {
+      setShowPipetteNotAttachedModal(true)
+    } else {
+      trackEventWithRobotSerial({
+        name: ANALYTICS_QUICK_TRANSFER_FLOW_STARTED,
+        properties: {},
+      })
+      navigate('/quick-transfer/new')
+    }
+  }
+
   return (
     <>
       {showDeleteConfirmationModal ? (
         <DeleteProtocolConfirmationModal
           protocolId={targetProtocolId}
           setShowDeleteConfirmationModal={setShowDeleteConfirmationModal}
+        />
+      ) : null}
+      {showPipetteNotAttachedModal ? (
+        <PipetteNotAttachedErrorModal
+          onExit={() => {
+            setShowPipetteNotAttachedModal(false)
+          }}
+          onAttach={() => {
+            navigate('/instruments')
+          }}
         />
       ) : null}
       <Flex
@@ -274,6 +311,11 @@ export function ProtocolDashboard(): JSX.Element {
           ) : pinnedProtocols.length === 0 ? (
             <NoProtocols />
           ) : null}
+          <FloatingActionButton
+            buttonText={t('quick_transfer')}
+            iconName="plus"
+            onClick={handleCreateNewQuickTransfer}
+          />
         </Box>
       </Flex>
     </>

@@ -73,11 +73,11 @@ export function DeleteTransferConfirmationModal({
         .then(() => {
           setShowIcon(false)
           setShowDeleteConfirmationModal(false)
-          navigate('/quick-transfer')
+          navigate('/protocols')
           makeSnackbar(t('deleted_transfer') as string)
         })
         .catch((e: Error) => {
-          navigate('/quick-transfer')
+          navigate('/protocols')
           console.error(`error deleting resources: ${e.message}`)
         })
     } else {
