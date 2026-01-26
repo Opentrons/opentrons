@@ -132,7 +132,7 @@ export function WellTooltip({
                       {hasMultipleIngreds ? (
                         <td>
                           <StyledText desktopStyle="captionRegular">
-                            {`($formatPercentage(ingred.volume, totalLiquidVolume))`}
+                            {`(${formatPercentage(ingred.volume, totalLiquidVolume)})`}
                           </StyledText>
                         </td>
                       ) : null}
