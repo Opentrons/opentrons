@@ -59,6 +59,7 @@ from opentrons_shared_data.liquid_classes.liquid_class_definition import (
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     TransferProperties as SharedDataTransferProperties,
 )
+from opentrons_shared_data.liquid_classes.types import TipPositionDict
 
 from . import validation
 
@@ -343,6 +344,7 @@ class BlowoutProperties:
     _enabled: bool
     _location: Optional[BlowoutLocation]
     _flow_rate: Optional[float]
+    _blowout_position: Optional[TipPosition]
 
     @property
     def enabled(self) -> bool:
@@ -374,12 +376,28 @@ class BlowoutProperties:
         validated_flow_rate = validation.ensure_greater_than_zero_float(new_flow_rate)
         self._flow_rate = validated_flow_rate
 
+    @property
+    def blowout_position(self) -> Optional[TipPosition]:
+        return self._blowout_position
+
+    @blowout_position.setter
+    def blowout_position(
+        self, new_position: Union[TipPosition, TipPositionDict, None]
+    ) -> None:
+        if new_position is None:
+            self._blowout_position = None
+        else:
+            self._blowout_position = _ensure_validated_tip_position(new_position)
+
     def _get_shared_data_params(self) -> Optional[SharedDataBlowoutParams]:
         """Get the mix params in schema v1 shape."""
         if self._location is not None and self._flow_rate is not None:
             return SharedDataBlowoutParams(
                 location=self._location,
                 flowRate=self._flow_rate,
+                blowoutPosition=self._blowout_position.as_shared_data_model()
+                if self._blowout_position is not None
+                else None,
             )
         else:
             return None
@@ -418,6 +436,10 @@ class Submerge(_SubmergeRetractCommon):
     def start_position(self) -> TipPosition:
         return self._start_position
 
+    @start_position.setter
+    def start_position(self, new_position: TipPosition) -> None:
+        self._start_position = _ensure_validated_tip_position(new_position)
+
     def as_shared_data_model(self) -> SharedDataSubmerge:
         return SharedDataSubmerge(
             startPosition=self._start_position.as_shared_data_model(),
@@ -435,6 +457,10 @@ class RetractAspirate(_SubmergeRetractCommon):
     @property
     def end_position(self) -> TipPosition:
         return self._end_position
+
+    @end_position.setter
+    def end_position(self, new_position: TipPosition) -> None:
+        self._end_position = _ensure_validated_tip_position(new_position)
 
     @property
     def air_gap_by_volume(self) -> LiquidHandlingPropertyByVolume:
@@ -464,6 +490,10 @@ class RetractDispense(_SubmergeRetractCommon):
     @property
     def end_position(self) -> TipPosition:
         return self._end_position
+
+    @end_position.setter
+    def end_position(self, new_position: TipPosition) -> None:
+        self._end_position = _ensure_validated_tip_position(new_position)
 
     @property
     def air_gap_by_volume(self) -> LiquidHandlingPropertyByVolume:
@@ -523,6 +553,10 @@ class AspirateProperties(_BaseLiquidHandlingProperties):
     def aspirate_position(self) -> TipPosition:
         return self._aspirate_position
 
+    @aspirate_position.setter
+    def aspirate_position(self, new_position: TipPosition) -> None:
+        self._aspirate_position = _ensure_validated_tip_position(new_position)
+
     @property
     def pre_wet(self) -> bool:
         return self._pre_wet
@@ -564,6 +598,10 @@ class SingleDispenseProperties(_BaseLiquidHandlingProperties):
     def dispense_position(self) -> TipPosition:
         return self._dispense_position
 
+    @dispense_position.setter
+    def dispense_position(self, new_position: TipPosition) -> None:
+        self._dispense_position = _ensure_validated_tip_position(new_position)
+
     @property
     def push_out_by_volume(self) -> LiquidHandlingPropertyByVolume:
         return self._push_out_by_volume
@@ -599,6 +637,10 @@ class MultiDispenseProperties(_BaseLiquidHandlingProperties):
     @property
     def dispense_position(self) -> TipPosition:
         return self._dispense_position
+
+    @dispense_position.setter
+    def dispense_position(self, new_position: TipPosition) -> None:
+        self._dispense_position = _ensure_validated_tip_position(new_position)
 
     @property
     def retract(self) -> RetractDispense:
@@ -645,6 +687,28 @@ class TransferProperties:
     def multi_dispense(self) -> Optional[MultiDispenseProperties]:
         """Multi dispense properties."""
         return self._multi_dispense
+
+
+def _ensure_validated_tip_position(
+    tip_position: Union[TipPosition, TipPositionDict],
+) -> TipPosition:
+    """Given tip position in valid shapes, return an object of TipPosition type."""
+    if isinstance(tip_position, TipPosition):
+        return tip_position
+    elif isinstance(tip_position, dict):
+        # Use setters of TipPosition so we can get the validators for free
+        _pos = TipPosition(
+            _position_reference=PositionReference.WELL_TOP,
+            _offset=Coordinate(x=0, y=0, z=0),
+        )
+        _pos.position_reference = tip_position.get("position_reference")
+        offset = tip_position.get("offset")
+        _pos.offset = Coordinate(x=offset["x"], y=offset["y"], z=offset["z"])
+        return _pos
+    else:
+        raise TypeError(
+            f"Tip position should be an instance of `TipPosition` or of type `TipPositionDict`, but got {tip_position}"
+        )
 
 
 def _build_tip_position(tip_position: SharedDataTipPosition) -> TipPosition:
@@ -702,11 +766,18 @@ def _build_blowout_properties(
     if blowout_properties.params is not None:
         location = blowout_properties.params.location
         flow_rate = blowout_properties.params.flowRate
+        blowout_position = blowout_properties.params.blowoutPosition
     else:
         location = None
         flow_rate = None
+        blowout_position = None
     return BlowoutProperties(
-        _enabled=blowout_properties.enable, _location=location, _flow_rate=flow_rate
+        _enabled=blowout_properties.enable,
+        _location=location,
+        _flow_rate=flow_rate,
+        _blowout_position=_build_tip_position(blowout_position)
+        if blowout_position is not None
+        else None,
     )
 
 
