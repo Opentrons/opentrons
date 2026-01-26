@@ -3,17 +3,17 @@ import { useTranslation } from 'react-i18next'
 import { COLORS, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
 import { EMPTY } from '@opentrons/step-generation'
 
-import styles from './tipdisposalcontainer.module.css'
+import styles from './tipdisposalslot.module.css'
 
 import type { RobotState } from '@opentrons/step-generation'
 
-interface TipDisposalContainerProps {
+interface TipDisposalSlotProps {
   robotState: RobotState
 }
 
-export function TipDisposalContainer({
+export function TipDisposalSlot({
   robotState,
-}: TipDisposalContainerProps): JSX.Element {
+}: TipDisposalSlotProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const { tipState } = robotState
   const totalEmptyTips = Object.values(tipState.tipracks).reduce(
@@ -28,7 +28,6 @@ export function TipDisposalContainer({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <Tag text={t('disposal')} type="default" shrinkToContent />
         <RobotInfoLabel deckLabel={t('trash')} />
       </div>
       <div className={styles.main_content}>
@@ -40,12 +39,11 @@ export function TipDisposalContainer({
             {t('remaining_tips', { remaining: totalEmptyTips })}
           </StyledText>
         </div>
-        {/* TODO: count number of lids in trash when we support lids in PV
-        <div className={styles.text_container}>
-          <StyledText desktopStyle="captionSemiBold" color={COLORS.grey60}>
+        {/* <div className={styles.text_container}>
+          <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {t('lids_in_trash')}
           </StyledText>
-          <StyledText desktopStyle="captionSemiBold">{'lids num'}</StyledText>
+          <StyledText desktopStyle="captionRegular">{'lids num'}</StyledText>
         </div> */}
       </div>
     </div>
