@@ -52,7 +52,9 @@ class ExportResult:
 
 
 def _e2e_root() -> Path:
-    return Path(__file__).resolve().parents[1]
+    # Resolve relative to this file so output does not depend on CWD.
+    # This script lives at e2e-testing/migration_report.py.
+    return Path(__file__).resolve().parent
 
 
 def _report_root() -> Path:

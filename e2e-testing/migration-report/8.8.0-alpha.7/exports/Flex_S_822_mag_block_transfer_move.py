@@ -1,16 +1,16 @@
-from opentrons import protocol_api
+import json
+from opentrons import protocol_api, types
 
 metadata = {
     "protocolName": "Bead clean fixed?",
     "created": "2024-12-23T13:37:47.322Z",
     "internalAppBuildDate": "Fri, 23 Jan 2026 20:05:49 GMT",
-    "lastModified": "2026-01-26T18:51:51.182Z",
+    "lastModified": "2026-01-26T19:57:25.328Z",
     "protocolDesigner": "8.8.0-alpha.7",
     "source": "Protocol Designer",
 }
 
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
-
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     # Load Modules:
@@ -90,22 +90,30 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
 
     # Load Liquids:
     well_plate_2.load_liquid(
-        wells=["A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"],
+        wells=[
+            "A2", "B2", "C2", "D2", "E2", "F2", "G2", "H2"
+        ],
         liquid=liquid_4,
         volume=150,
     )
     well_plate_2.load_liquid(
-        wells=["A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"],
+        wells=[
+            "A4", "B4", "C4", "D4", "E4", "F4", "G4", "H4"
+        ],
         liquid=liquid_2,
         volume=200,
     )
     well_plate_2.load_liquid(
-        wells=["A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"],
+        wells=[
+            "A6", "B6", "C6", "D6", "E6", "F6", "G6", "H6"
+        ],
         liquid=liquid_3,
         volume=150,
     )
     well_plate_1.load_liquid(
-        wells=["A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"],
+        wells=[
+            "A1", "B1", "C1", "D1", "E1", "F1", "G1", "H1"
+        ],
         liquid=liquid_1,
         volume=100,
     )
@@ -128,76 +136,72 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_1",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {
-                                    "enabled": True,
-                                    "z_offset": -5,
-                                    "mm_from_edge": 0,
-                                    "speed": 300,
-                                },
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {
+                            "enabled": True,
+                            "z_offset": -5,
+                            "mm_from_edge": 0,
+                            "speed": 300,
+                        },
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -245,71 +249,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_6",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0.1, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0.1, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 53)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 53)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -330,76 +330,72 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_7",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {
-                                    "enabled": True,
-                                    "z_offset": -5,
-                                    "mm_from_edge": 0,
-                                    "speed": 300,
-                                },
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {
+                            "enabled": True,
+                            "z_offset": -5,
+                            "mm_from_edge": 0,
+                            "speed": 300,
+                        },
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -423,71 +419,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_9",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0.1, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 2},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0.1, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 2},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -508,71 +500,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_10",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -596,71 +584,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_12",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0.1, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 2},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0.1, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 2},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -687,71 +671,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_15",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 35)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": False},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 35)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": False},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 53)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 53)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -800,71 +780,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_20",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0.1, "y": 0, "z": 0.5},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0.1, "y": 0, "z": 0.5},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 53)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 53)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -888,76 +864,72 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_22",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {
-                                    "enabled": True,
-                                    "z_offset": -5,
-                                    "mm_from_edge": 0,
-                                    "speed": 300,
-                                },
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {
+                            "enabled": True,
+                            "z_offset": -5,
+                            "mm_from_edge": 0,
+                            "speed": 300,
+                        },
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -1006,71 +978,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_27",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0.1, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 2},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0.1, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 2},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 53)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 53)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -1091,71 +1059,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_28",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 35)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 35)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -1179,71 +1143,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_30",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0.1, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0.1, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -1264,71 +1224,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_31",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -1352,71 +1308,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_33",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0.1, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 2},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0.1, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 2},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 52)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 52)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -1443,71 +1395,67 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_36",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 35)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 35)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 51)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 51)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
@@ -1555,74 +1503,69 @@ def run(protocol: protocol_api.ProtocolContext) -> None:
         tip_racks=[tip_rack_1, tip_rack_2, tip_rack_3, tip_rack_4],
         liquid_class=protocol.define_liquid_class(
             name="transfer_step_41",
-            properties={
-                "flex_8channel_50": {
-                    "opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
-                        "aspirate": {
-                            "aspirate_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 20)],
-                            "pre_wet": False,
-                            "correction_by_volume": [(0, 0)],
-                            "delay": {"enabled": True, "duration": 1},
-                            "mix": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                            },
+            properties={"flex_8channel_50": {"opentrons/opentrons_flex_96_filtertiprack_50ul/1": {
+                "aspirate": {
+                    "aspirate_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 20)],
+                    "pre_wet": False,
+                    "correction_by_volume": [(0, 0)],
+                    "delay": {"enabled": True, "duration": 1},
+                    "mix": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                        "dispense": {
-                            "dispense_position": {
-                                "offset": {"x": 0, "y": 0, "z": 1},
-                                "position_reference": "well-bottom",
-                            },
-                            "flow_rate_by_volume": [(0, 51)],
-                            "delay": {"enabled": False},
-                            "submerge": {
-                                "delay": {"enabled": False},
-                                "speed": 100,
-                                "start_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                            },
-                            "retract": {
-                                "air_gap_by_volume": [(0, 0)],
-                                "delay": {"enabled": False},
-                                "end_position": {
-                                    "offset": {"x": 0, "y": 0, "z": 2},
-                                    "position_reference": "well-top",
-                                },
-                                "speed": 100,
-                                "touch_tip": {"enabled": False},
-                                "blowout": {"enabled": False},
-                            },
-                            "correction_by_volume": [(0, 0)],
-                            "push_out_by_volume": [(0, 2)],
-                            "mix": {"enabled": False},
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
                         },
-                    }
-                }
-            },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                    },
+                },
+                "dispense": {
+                    "dispense_position": {
+                        "offset": {"x": 0, "y": 0, "z": 1},
+                        "position_reference": "well-bottom",
+                    },
+                    "flow_rate_by_volume": [(0, 51)],
+                    "delay": {"enabled": False},
+                    "submerge": {
+                        "delay": {"enabled": False},
+                        "speed": 100,
+                        "start_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                    },
+                    "retract": {
+                        "air_gap_by_volume": [(0, 0)],
+                        "delay": {"enabled": False},
+                        "end_position": {
+                            "offset": {"x": 0, "y": 0, "z": 2},
+                            "position_reference": "well-top",
+                        },
+                        "speed": 100,
+                        "touch_tip": {"enabled": False},
+                        "blowout": {"enabled": False},
+                    },
+                    "correction_by_volume": [(0, 0)],
+                    "push_out_by_volume": [(0, 2)],
+                    "mix": {"enabled": False},
+                },
+            }}},
         ),
     )
     pipette_left.drop_tip(waste_chute)
 
-
-DESIGNER_APPLICATION = """{"robot":{"model":"OT-3 Standard"},"designerApplication":{"name":"opentrons/protocol-designer","version":"8.8.0","data":{"pipetteTiprackAssignments":{"b9c258b6-6837-4f86-a8ab-2fd29190ff88":["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]},"dismissedWarnings":{"form":[],"timeline":["ASPIRATE_MORE_THAN_WELL_CONTENTS"]},"ingredients":{"0":{"displayName":"Sample","description":"","liquidGroupId":"0","displayColor":"#ff80f5ff","liquidClass":null},"1":{"displayName":"Ethanol","description":"","liquidGroupId":"1","displayColor":"#9dffd8ff","liquidClass":null},"2":{"displayName":"RSB","description":"","liquidGroupId":"2","displayColor":"#ff9900ff","liquidClass":null},"3":{"displayName":"Beads","description":"","liquidGroupId":"3","displayColor":"#7eff42ff","liquidClass":null}},"ingredLocations":{"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"A2":{"3":{"volume":150}},"B2":{"3":{"volume":150}},"C2":{"3":{"volume":150}},"D2":{"3":{"volume":150}},"E2":{"3":{"volume":150}},"F2":{"3":{"volume":150}},"G2":{"3":{"volume":150}},"H2":{"3":{"volume":150}},"A4":{"1":{"volume":200}},"B4":{"1":{"volume":200}},"C4":{"1":{"volume":200}},"D4":{"1":{"volume":200}},"E4":{"1":{"volume":200}},"F4":{"1":{"volume":200}},"G4":{"1":{"volume":200}},"H4":{"1":{"volume":200}},"A6":{"2":{"volume":150}},"B6":{"2":{"volume":150}},"C6":{"2":{"volume":150}},"D6":{"2":{"volume":150}},"E6":{"2":{"volume":150}},"F6":{"2":{"volume":150}},"G6":{"2":{"volume":150}},"H6":{"2":{"volume":150}}},"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"A1":{"0":{"volume":100}},"B1":{"0":{"volume":100}},"C1":{"0":{"volume":100}},"D1":{"0":{"volume":100}},"E1":{"0":{"volume":100}},"F1":{"0":{"volume":100}},"G1":{"0":{"volume":100}},"H1":{"0":{"volume":100}}}},"savedStepForms":{"__INITIAL_DECK_SETUP_STEP__":{"labwareLocationUpdate":{"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":"C1","598aba21-436e-4166-94d7-12c8d2e95f1f:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"B2","885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":"C2","d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4":"C3","05a9ab32-1784-4f2e-9928-3c666e15778e:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"B3","3f94d791-760f-424a-9646-4c7067dec531:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"A2","198a6dec-2e9c-4c85-a951-6e2844d3ad54:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"A3"},"moduleLocationUpdate":{"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType":"D2"},"pipetteLocationUpdate":{"b9c258b6-6837-4f86-a8ab-2fd29190ff88":"left"},"stepType":"manualIntervention","id":"__INITIAL_DECK_SETUP_STEP__","stagingAreaLocationUpdate":{},"gripperLocationUpdate":{"c9b57953-316a-4bce-a939-7d6b7f96dbc3:gripper":"mounted"},"wasteChuteLocationUpdate":{"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute":"cutoutD3"},"trashBinLocationUpdate":{},"moduleStateUpdate":{}},"aa319c60-6aad-40fa-986c-419efe22f65e":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":true,"aspirate_touchTip_mmFromTop":-5,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"aa319c60-6aad-40fa-986c-419efe22f65e","dispense_touchTip_mmfromTop":null},"18fb4544-809f-4af7-bac5-7a76ce234428":{"aspirate_delay_checkbox":false,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"40","wells":["A1"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"18fb4544-809f-4af7-bac5-7a76ce234428"},"dafaeb17-c0b7-4e77-aac2-07e68765cb77":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Moving DNA onto beads. Next step: magnet separation. ","pauseTemperature":null,"pauseTime":"00:05:00","id":"dafaeb17-c0b7-4e77-aac2-07e68765cb77","stepType":"pause","stepName":"pause","stepDetails":""},"bfdcc84d-4874-4d4d-a093-392917e72888":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bfdcc84d-4874-4d4d-a093-392917e72888","stepType":"moveLabware","stepName":"move","stepDetails":""},"ce6bc9fc-b95d-442f-8082-e1e986259ff9":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Magnet separation 1","pauseTemperature":null,"pauseTime":"00:05:00","id":"ce6bc9fc-b95d-442f-8082-e1e986259ff9","stepType":"pause","stepName":"pause","stepDetails":""},"b7f5eb0a-6401-4a05-9e47-060ea4bd2e7f":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"once","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"150","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"b7f5eb0a-6401-4a05-9e47-060ea4bd2e7f","dispense_touchTip_mmfromTop":null},"a9d20ecc-5d52-4de1-af46-b763816eb302":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"a9d20ecc-5d52-4de1-af46-b763816eb302","stepType":"pause","stepName":"pause","stepDetails":""},"001b3cff-bce6-43a2-834b-483ea89bd741":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"001b3cff-bce6-43a2-834b-483ea89bd741","dispense_touchTip_mmfromTop":null},"eb64f4de-0a8d-4874-b4a2-776f88adaf0a":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":true,"aspirate_touchTip_mmFromTop":-5,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"eb64f4de-0a8d-4874-b4a2-776f88adaf0a","dispense_touchTip_mmfromTop":null},"d07454aa-7f75-49ff-8a7f-e294222d2409":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"d07454aa-7f75-49ff-8a7f-e294222d2409","dispense_touchTip_mmfromTop":null},"59f15b8f-2cc8-4e4a-981b-c1860eaf9c63":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"59f15b8f-2cc8-4e4a-981b-c1860eaf9c63","stepType":"pause","stepName":"pause","stepDetails":""},"6252e4f4-46a6-4d9b-8e7a-2bc9c7768336":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"6252e4f4-46a6-4d9b-8e7a-2bc9c7768336","dispense_touchTip_mmfromTop":null},"f6b23ae9-978d-42bf-85e6-8383f04b2c75":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Bead drying","pauseTemperature":null,"pauseTime":"00:05:00","id":"f6b23ae9-978d-42bf-85e6-8383f04b2c75","stepType":"pause","stepName":"pause","stepDetails":""},"97b617d5-1c22-43b6-b375-33a7af5d4cdf":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"C1","useGripper":true,"id":"97b617d5-1c22-43b6-b375-33a7af5d4cdf","stepType":"moveLabware","stepName":"move","stepDetails":""},"235d0876-46b9-4784-bf62-27266978f0ee":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":false,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A6"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"102","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"235d0876-46b9-4784-bf62-27266978f0ee","dispense_touchTip_mmfromTop":null},"c2ced21d-b449-49f8-acbf-34140ad8d7b9":{"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":50,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","wells":["A1"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"c2ced21d-b449-49f8-acbf-34140ad8d7b9"},"bd633425-885e-4346-a0d8-789304ff62a2":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Eluting DNA from beads","pauseTemperature":null,"pauseTime":"00:02:00","id":"bd633425-885e-4346-a0d8-789304ff62a2","stepType":"pause","stepName":"pause","stepDetails":""},"bd7f2f49-5c2a-4b63-aaa6-c8e4a7cd1746":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bd7f2f49-5c2a-4b63-aaa6-c8e4a7cd1746","stepType":"moveLabware","stepName":"move","stepDetails":""},"0d5da67b-3fdb-4e03-af05-f1381513c107":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:05:00","id":"0d5da67b-3fdb-4e03-af05-f1381513c107","stepType":"pause","stepName":"pause","stepDetails":""},"0b5021e1-09f0-4f82-99b7-2a5ab1f26f12":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":0.5,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"once","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"100","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"0b5021e1-09f0-4f82-99b7-2a5ab1f26f12","dispense_touchTip_mmfromTop":null},"c23ecf87-c157-4fd3-b9dd-c64aa37b22bd":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"C1","useGripper":true,"id":"c23ecf87-c157-4fd3-b9dd-c64aa37b22bd","stepType":"moveLabware","stepName":"move","stepDetails":""},"f7c18f6f-a059-4bc2-a4f3-4333b651338c":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":true,"aspirate_touchTip_mmFromTop":-5,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"58","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"f7c18f6f-a059-4bc2-a4f3-4333b651338c","dispense_touchTip_mmfromTop":null},"2b5286b1-bf2e-4ef2-a532-da1399867ba3":{"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":50,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","wells":["A2"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"2b5286b1-bf2e-4ef2-a532-da1399867ba3"},"d3b69e34-140c-4259-9a47-b0e8366639b2":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Pushing DNA onto beads. Next step: magnet separation. ","pauseTemperature":null,"pauseTime":"00:05:00","id":"d3b69e34-140c-4259-9a47-b0e8366639b2","stepType":"pause","stepName":"pause","stepDetails":""},"bec1bef7-52d2-4a2e-8fee-05d37fd40c10":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bec1bef7-52d2-4a2e-8fee-05d37fd40c10","stepType":"moveLabware","stepName":"move","stepDetails":""},"8d263c58-71b6-41cd-a038-209adb9d5ab4":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Magnet separation","pauseTemperature":null,"pauseTime":"00:05:00","id":"8d263c58-71b6-41cd-a038-209adb9d5ab4","stepType":"pause","stepName":"pause","stepDetails":""},"3f847251-6911-41e9-800f-9f574decf1a6":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"158","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"3f847251-6911-41e9-800f-9f574decf1a6","dispense_touchTip_mmfromTop":null},"4f51f882-e801-4abd-9bc3-69b6e5076ac6":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"4f51f882-e801-4abd-9bc3-69b6e5076ac6","dispense_touchTip_mmfromTop":null},"858e2a74-3b3a-4f01-b2d7-af79b1c14e2a":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"858e2a74-3b3a-4f01-b2d7-af79b1c14e2a","stepType":"pause","stepName":"pause","stepDetails":""},"197b2d9e-f68f-45aa-ab7d-eb20e310ae72":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"197b2d9e-f68f-45aa-ab7d-eb20e310ae72","dispense_touchTip_mmfromTop":null},"44831af6-ec68-475a-be7d-3e77db870f74":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"44831af6-ec68-475a-be7d-3e77db870f74","dispense_touchTip_mmfromTop":null},"bba709d0-4dd6-4c72-81f9-bad715207d5f":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"bba709d0-4dd6-4c72-81f9-bad715207d5f","stepType":"pause","stepName":"pause","stepDetails":""},"8cd7aae5-fd6a-4316-96f9-719c54975358":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"8cd7aae5-fd6a-4316-96f9-719c54975358","dispense_touchTip_mmfromTop":null},"f431ffee-da80-4f0e-92ab-17f9d3b86381":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Bead drying","pauseTemperature":null,"pauseTime":"00:05:00","id":"f431ffee-da80-4f0e-92ab-17f9d3b86381","stepType":"pause","stepName":"pause","stepDetails":""},"f83563fe-5657-4fd0-9fdb-793b08e5bf7b":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A6"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":51,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"22","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"f83563fe-5657-4fd0-9fdb-793b08e5bf7b","dispense_touchTip_mmfromTop":null},"4398ca59-b2de-4737-a8a1-89ef9ddcf5de":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"C1","useGripper":true,"id":"4398ca59-b2de-4737-a8a1-89ef9ddcf5de","stepType":"moveLabware","stepName":"move","stepDetails":""},"29816f24-d6ae-486a-929a-00b4599f3491":{"aspirate_delay_checkbox":false,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":51,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"20","wells":["A2"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"29816f24-d6ae-486a-929a-00b4599f3491"},"04c78246-f95a-4193-8eb5-6495a79e117c":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Eluting DNA","pauseTemperature":null,"pauseTime":"00:02:00","id":"04c78246-f95a-4193-8eb5-6495a79e117c","stepType":"pause","stepName":"pause","stepDetails":""},"bda82a20-0d96-4c26-af4c-5bc6d4fa8b44":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bda82a20-0d96-4c26-af4c-5bc6d4fa8b44","stepType":"moveLabware","stepName":"move","stepDetails":""},"09bc9f66-2e41-4bd8-8a12-2af18adf29e1":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Removing beads","pauseTemperature":null,"pauseTime":"00:05:00","id":"09bc9f66-2e41-4bd8-8a12-2af18adf29e1","stepType":"pause","stepName":"pause","stepDetails":""},"50125fc5-cd43-47d9-b473-40551decdd79":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":51,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A3"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"20","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"50125fc5-cd43-47d9-b473-40551decdd79","dispense_touchTip_mmfromTop":null}},"orderedStepIds":["aa319c60-6aad-40fa-986c-419efe22f65e","18fb4544-809f-4af7-bac5-7a76ce234428","dafaeb17-c0b7-4e77-aac2-07e68765cb77","bfdcc84d-4874-4d4d-a093-392917e72888","ce6bc9fc-b95d-442f-8082-e1e986259ff9","b7f5eb0a-6401-4a05-9e47-060ea4bd2e7f","eb64f4de-0a8d-4874-b4a2-776f88adaf0a","a9d20ecc-5d52-4de1-af46-b763816eb302","001b3cff-bce6-43a2-834b-483ea89bd741","d07454aa-7f75-49ff-8a7f-e294222d2409","59f15b8f-2cc8-4e4a-981b-c1860eaf9c63","6252e4f4-46a6-4d9b-8e7a-2bc9c7768336","f6b23ae9-978d-42bf-85e6-8383f04b2c75","97b617d5-1c22-43b6-b375-33a7af5d4cdf","235d0876-46b9-4784-bf62-27266978f0ee","c2ced21d-b449-49f8-acbf-34140ad8d7b9","bd633425-885e-4346-a0d8-789304ff62a2","bd7f2f49-5c2a-4b63-aaa6-c8e4a7cd1746","0d5da67b-3fdb-4e03-af05-f1381513c107","0b5021e1-09f0-4f82-99b7-2a5ab1f26f12","c23ecf87-c157-4fd3-b9dd-c64aa37b22bd","f7c18f6f-a059-4bc2-a4f3-4333b651338c","2b5286b1-bf2e-4ef2-a532-da1399867ba3","d3b69e34-140c-4259-9a47-b0e8366639b2","bec1bef7-52d2-4a2e-8fee-05d37fd40c10","8d263c58-71b6-41cd-a038-209adb9d5ab4","3f847251-6911-41e9-800f-9f574decf1a6","4f51f882-e801-4abd-9bc3-69b6e5076ac6","858e2a74-3b3a-4f01-b2d7-af79b1c14e2a","197b2d9e-f68f-45aa-ab7d-eb20e310ae72","44831af6-ec68-475a-be7d-3e77db870f74","bba709d0-4dd6-4c72-81f9-bad715207d5f","8cd7aae5-fd6a-4316-96f9-719c54975358","f431ffee-da80-4f0e-92ab-17f9d3b86381","4398ca59-b2de-4737-a8a1-89ef9ddcf5de","f83563fe-5657-4fd0-9fdb-793b08e5bf7b","29816f24-d6ae-486a-929a-00b4599f3491","04c78246-f95a-4193-8eb5-6495a79e117c","bda82a20-0d96-4c26-af4c-5bc6d4fa8b44","09bc9f66-2e41-4bd8-8a12-2af18adf29e1","50125fc5-cd43-47d9-b473-40551decdd79"],"pipettes":{"b9c258b6-6837-4f86-a8ab-2fd29190ff88":{"pipetteName":"p50_multi_flex"}},"modules":{"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType":{"model":"magneticBlockV1"}},"labware":{"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"displayName":"Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt","labwareDefURI":"opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4"},"598aba21-436e-4166-94d7-12c8d2e95f1f:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (1)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"},"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"displayName":"Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt","labwareDefURI":"opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4"},"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4":{"displayName":"NEST 1 Well Reservoir 290 mL","labwareDefURI":"opentrons/nest_1_reservoir_290ml/4"},"05a9ab32-1784-4f2e-9928-3c666e15778e:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (2)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"},"3f94d791-760f-424a-9646-4c7067dec531:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (3)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"},"198a6dec-2e9c-4c85-a951-6e2844d3ad54:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (4)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"}}}},"metadata":{"protocolName":"Bead clean fixed?","author":"","description":"","created":1734961067322,"lastModified":1769453511182,"category":null,"subcategory":null,"tags":[],"source":"Protocol Designer"}}"""
+DESIGNER_APPLICATION = """{"robot":{"model":"OT-3 Standard"},"designerApplication":{"name":"opentrons/protocol-designer","version":"8.8.0","data":{"pipetteTiprackAssignments":{"b9c258b6-6837-4f86-a8ab-2fd29190ff88":["opentrons/opentrons_flex_96_filtertiprack_50ul/1"]},"dismissedWarnings":{"form":[],"timeline":["ASPIRATE_MORE_THAN_WELL_CONTENTS"]},"ingredients":{"0":{"displayName":"Sample","description":"","liquidGroupId":"0","displayColor":"#ff80f5ff","liquidClass":null},"1":{"displayName":"Ethanol","description":"","liquidGroupId":"1","displayColor":"#9dffd8ff","liquidClass":null},"2":{"displayName":"RSB","description":"","liquidGroupId":"2","displayColor":"#ff9900ff","liquidClass":null},"3":{"displayName":"Beads","description":"","liquidGroupId":"3","displayColor":"#7eff42ff","liquidClass":null}},"ingredLocations":{"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"A2":{"3":{"volume":150}},"B2":{"3":{"volume":150}},"C2":{"3":{"volume":150}},"D2":{"3":{"volume":150}},"E2":{"3":{"volume":150}},"F2":{"3":{"volume":150}},"G2":{"3":{"volume":150}},"H2":{"3":{"volume":150}},"A4":{"1":{"volume":200}},"B4":{"1":{"volume":200}},"C4":{"1":{"volume":200}},"D4":{"1":{"volume":200}},"E4":{"1":{"volume":200}},"F4":{"1":{"volume":200}},"G4":{"1":{"volume":200}},"H4":{"1":{"volume":200}},"A6":{"2":{"volume":150}},"B6":{"2":{"volume":150}},"C6":{"2":{"volume":150}},"D6":{"2":{"volume":150}},"E6":{"2":{"volume":150}},"F6":{"2":{"volume":150}},"G6":{"2":{"volume":150}},"H6":{"2":{"volume":150}}},"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"A1":{"0":{"volume":100}},"B1":{"0":{"volume":100}},"C1":{"0":{"volume":100}},"D1":{"0":{"volume":100}},"E1":{"0":{"volume":100}},"F1":{"0":{"volume":100}},"G1":{"0":{"volume":100}},"H1":{"0":{"volume":100}}}},"savedStepForms":{"__INITIAL_DECK_SETUP_STEP__":{"labwareLocationUpdate":{"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":"C1","598aba21-436e-4166-94d7-12c8d2e95f1f:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"B2","885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":"C2","d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4":"C3","05a9ab32-1784-4f2e-9928-3c666e15778e:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"B3","3f94d791-760f-424a-9646-4c7067dec531:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"A2","198a6dec-2e9c-4c85-a951-6e2844d3ad54:opentrons/opentrons_flex_96_filtertiprack_50ul/1":"A3"},"moduleLocationUpdate":{"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType":"D2"},"pipetteLocationUpdate":{"b9c258b6-6837-4f86-a8ab-2fd29190ff88":"left"},"stepType":"manualIntervention","id":"__INITIAL_DECK_SETUP_STEP__","stagingAreaLocationUpdate":{},"gripperLocationUpdate":{"958e99d0-b27d-4ee6-9a84-f2c80632d05a:gripper":"mounted"},"wasteChuteLocationUpdate":{"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute":"cutoutD3"},"trashBinLocationUpdate":{},"moduleStateUpdate":{}},"aa319c60-6aad-40fa-986c-419efe22f65e":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":true,"aspirate_touchTip_mmFromTop":-5,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"aa319c60-6aad-40fa-986c-419efe22f65e","dispense_touchTip_mmfromTop":null},"18fb4544-809f-4af7-bac5-7a76ce234428":{"aspirate_delay_checkbox":false,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"40","wells":["A1"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"18fb4544-809f-4af7-bac5-7a76ce234428"},"dafaeb17-c0b7-4e77-aac2-07e68765cb77":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Moving DNA onto beads. Next step: magnet separation. ","pauseTemperature":null,"pauseTime":"00:05:00","id":"dafaeb17-c0b7-4e77-aac2-07e68765cb77","stepType":"pause","stepName":"pause","stepDetails":""},"bfdcc84d-4874-4d4d-a093-392917e72888":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bfdcc84d-4874-4d4d-a093-392917e72888","stepType":"moveLabware","stepName":"move","stepDetails":""},"ce6bc9fc-b95d-442f-8082-e1e986259ff9":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Magnet separation 1","pauseTemperature":null,"pauseTime":"00:05:00","id":"ce6bc9fc-b95d-442f-8082-e1e986259ff9","stepType":"pause","stepName":"pause","stepDetails":""},"b7f5eb0a-6401-4a05-9e47-060ea4bd2e7f":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"once","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"150","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"b7f5eb0a-6401-4a05-9e47-060ea4bd2e7f","dispense_touchTip_mmfromTop":null},"a9d20ecc-5d52-4de1-af46-b763816eb302":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"a9d20ecc-5d52-4de1-af46-b763816eb302","stepType":"pause","stepName":"pause","stepDetails":""},"001b3cff-bce6-43a2-834b-483ea89bd741":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"001b3cff-bce6-43a2-834b-483ea89bd741","dispense_touchTip_mmfromTop":null},"eb64f4de-0a8d-4874-b4a2-776f88adaf0a":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":true,"aspirate_touchTip_mmFromTop":-5,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"eb64f4de-0a8d-4874-b4a2-776f88adaf0a","dispense_touchTip_mmfromTop":null},"d07454aa-7f75-49ff-8a7f-e294222d2409":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"d07454aa-7f75-49ff-8a7f-e294222d2409","dispense_touchTip_mmfromTop":null},"59f15b8f-2cc8-4e4a-981b-c1860eaf9c63":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"59f15b8f-2cc8-4e4a-981b-c1860eaf9c63","stepType":"pause","stepName":"pause","stepDetails":""},"6252e4f4-46a6-4d9b-8e7a-2bc9c7768336":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"6252e4f4-46a6-4d9b-8e7a-2bc9c7768336","dispense_touchTip_mmfromTop":null},"f6b23ae9-978d-42bf-85e6-8383f04b2c75":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Bead drying","pauseTemperature":null,"pauseTime":"00:05:00","id":"f6b23ae9-978d-42bf-85e6-8383f04b2c75","stepType":"pause","stepName":"pause","stepDetails":""},"97b617d5-1c22-43b6-b375-33a7af5d4cdf":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"C1","useGripper":true,"id":"97b617d5-1c22-43b6-b375-33a7af5d4cdf","stepType":"moveLabware","stepName":"move","stepDetails":""},"235d0876-46b9-4784-bf62-27266978f0ee":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":false,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A6"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"102","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"235d0876-46b9-4784-bf62-27266978f0ee","dispense_touchTip_mmfromTop":null},"c2ced21d-b449-49f8-acbf-34140ad8d7b9":{"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":50,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","wells":["A1"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"c2ced21d-b449-49f8-acbf-34140ad8d7b9"},"bd633425-885e-4346-a0d8-789304ff62a2":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Eluting DNA from beads","pauseTemperature":null,"pauseTime":"00:02:00","id":"bd633425-885e-4346-a0d8-789304ff62a2","stepType":"pause","stepName":"pause","stepDetails":""},"bd7f2f49-5c2a-4b63-aaa6-c8e4a7cd1746":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bd7f2f49-5c2a-4b63-aaa6-c8e4a7cd1746","stepType":"moveLabware","stepName":"move","stepDetails":""},"0d5da67b-3fdb-4e03-af05-f1381513c107":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:05:00","id":"0d5da67b-3fdb-4e03-af05-f1381513c107","stepType":"pause","stepName":"pause","stepDetails":""},"0b5021e1-09f0-4f82-99b7-2a5ab1f26f12":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":0.5,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A1"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"once","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"100","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"0b5021e1-09f0-4f82-99b7-2a5ab1f26f12","dispense_touchTip_mmfromTop":null},"c23ecf87-c157-4fd3-b9dd-c64aa37b22bd":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"C1","useGripper":true,"id":"c23ecf87-c157-4fd3-b9dd-c64aa37b22bd","stepType":"moveLabware","stepName":"move","stepDetails":""},"f7c18f6f-a059-4bc2-a4f3-4333b651338c":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":true,"aspirate_touchTip_mmFromTop":-5,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"58","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"f7c18f6f-a059-4bc2-a4f3-4333b651338c","dispense_touchTip_mmfromTop":null},"2b5286b1-bf2e-4ef2-a532-da1399867ba3":{"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":50,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","wells":["A2"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"2b5286b1-bf2e-4ef2-a532-da1399867ba3"},"d3b69e34-140c-4259-9a47-b0e8366639b2":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Pushing DNA onto beads. Next step: magnet separation. ","pauseTemperature":null,"pauseTime":"00:05:00","id":"d3b69e34-140c-4259-9a47-b0e8366639b2","stepType":"pause","stepName":"pause","stepDetails":""},"bec1bef7-52d2-4a2e-8fee-05d37fd40c10":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bec1bef7-52d2-4a2e-8fee-05d37fd40c10","stepType":"moveLabware","stepName":"move","stepDetails":""},"8d263c58-71b6-41cd-a038-209adb9d5ab4":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Magnet separation","pauseTemperature":null,"pauseTime":"00:05:00","id":"8d263c58-71b6-41cd-a038-209adb9d5ab4","stepType":"pause","stepName":"pause","stepDetails":""},"3f847251-6911-41e9-800f-9f574decf1a6":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":53,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"158","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"3f847251-6911-41e9-800f-9f574decf1a6","dispense_touchTip_mmfromTop":null},"4f51f882-e801-4abd-9bc3-69b6e5076ac6":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"4f51f882-e801-4abd-9bc3-69b6e5076ac6","dispense_touchTip_mmfromTop":null},"858e2a74-3b3a-4f01-b2d7-af79b1c14e2a":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"858e2a74-3b3a-4f01-b2d7-af79b1c14e2a","stepType":"pause","stepName":"pause","stepDetails":""},"197b2d9e-f68f-45aa-ab7d-eb20e310ae72":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"197b2d9e-f68f-45aa-ab7d-eb20e310ae72","dispense_touchTip_mmfromTop":null},"44831af6-ec68-475a-be7d-3e77db870f74":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A4"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"44831af6-ec68-475a-be7d-3e77db870f74","dispense_touchTip_mmfromTop":null},"bba709d0-4dd6-4c72-81f9-bad715207d5f":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"","pauseTemperature":null,"pauseTime":"00:00:30","id":"bba709d0-4dd6-4c72-81f9-bad715207d5f","stepType":"pause","stepName":"pause","stepDetails":""},"8cd7aae5-fd6a-4316-96f9-719c54975358":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"2","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0.1,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":52,"dispense_labware":"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A1"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"50","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"8cd7aae5-fd6a-4316-96f9-719c54975358","dispense_touchTip_mmfromTop":null},"f431ffee-da80-4f0e-92ab-17f9d3b86381":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Bead drying","pauseTemperature":null,"pauseTime":"00:05:00","id":"f431ffee-da80-4f0e-92ab-17f9d3b86381","stepType":"pause","stepName":"pause","stepDetails":""},"f83563fe-5657-4fd0-9fdb-793b08e5bf7b":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"aspirate_labware":"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A6"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":51,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A2"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"22","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"f83563fe-5657-4fd0-9fdb-793b08e5bf7b","dispense_touchTip_mmfromTop":null},"4398ca59-b2de-4737-a8a1-89ef9ddcf5de":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"C1","useGripper":true,"id":"4398ca59-b2de-4737-a8a1-89ef9ddcf5de","stepType":"moveLabware","stepName":"move","stepDetails":""},"29816f24-d6ae-486a-929a-00b4599f3491":{"aspirate_delay_checkbox":false,"aspirate_delay_seconds":"1","aspirate_flowRate":35,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":null,"blowout_z_offset":0,"changeTip":"once","dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":51,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","liquidClassesSupported":false,"liquidClass":"none","mix_mmFromBottom":1,"mix_touchTip_checkbox":false,"mix_touchTip_mmFromTop":null,"mix_wellOrder_first":"t2b","mix_wellOrder_second":"l2r","mix_position_reference":"well-bottom","mix_x_position":0,"mix_y_position":0,"nozzles":"ALL","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","pushOut_checkbox":true,"pushOut_volume":2,"times":"10","tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"20","wells":["A2"],"stepType":"mix","stepName":"mix","stepDetails":"","id":"29816f24-d6ae-486a-929a-00b4599f3491"},"04c78246-f95a-4193-8eb5-6495a79e117c":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Eluting DNA","pauseTemperature":null,"pauseTime":"00:02:00","id":"04c78246-f95a-4193-8eb5-6495a79e117c","stepType":"pause","stepName":"pause","stepDetails":""},"bda82a20-0d96-4c26-af4c-5bc6d4fa8b44":{"labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","newLocation":"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType","useGripper":true,"id":"bda82a20-0d96-4c26-af4c-5bc6d4fa8b44","stepType":"moveLabware","stepName":"move","stepDetails":""},"09bc9f66-2e41-4bd8-8a12-2af18adf29e1":{"moduleId":null,"pauseAction":"untilTime","pauseMessage":"Removing beads","pauseTemperature":null,"pauseTime":"00:05:00","id":"09bc9f66-2e41-4bd8-8a12-2af18adf29e1","stepType":"pause","stepName":"pause","stepDetails":""},"50125fc5-cd43-47d9-b473-40551decdd79":{"aspirate_airGap_checkbox":false,"aspirate_airGap_volume":null,"aspirate_delay_checkbox":true,"aspirate_delay_seconds":"1","aspirate_flowRate":20,"aspirate_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","aspirate_mix_checkbox":false,"aspirate_mix_times":null,"aspirate_mix_volume":null,"aspirate_mmFromBottom":1,"aspirate_position_reference":"well-bottom","aspirate_retract_delay_seconds":0,"aspirate_retract_mmFromBottom":2,"aspirate_retract_speed":100,"aspirate_retract_x_position":null,"aspirate_retract_y_position":null,"aspirate_retract_position_reference":"well-top","aspirate_submerge_delay_seconds":0,"aspirate_submerge_speed":100,"aspirate_submerge_mmFromBottom":2,"aspirate_submerge_x_position":null,"aspirate_submerge_y_position":null,"aspirate_submerge_position_reference":"well-top","aspirate_touchTip_checkbox":false,"aspirate_touchTip_mmFromTop":null,"aspirate_touchTip_speed":300,"aspirate_touchTip_mmFromEdge":0,"aspirate_wellOrder_first":"t2b","aspirate_wellOrder_second":"l2r","aspirate_wells_grouped":false,"aspirate_wells":["A2"],"aspirate_x_position":0,"aspirate_y_position":0,"blowout_checkbox":false,"blowout_flowRate":55,"blowout_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","changeTip":"always","conditioning_checkbox":false,"conditioning_volume":null,"dispense_airGap_checkbox":false,"dispense_airGap_volume":null,"dispense_delay_checkbox":false,"dispense_delay_seconds":"1","dispense_flowRate":51,"dispense_labware":"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4","dispense_mix_checkbox":false,"dispense_mix_times":null,"dispense_mix_volume":null,"dispense_mmFromBottom":1,"dispense_position_reference":"well-bottom","dispense_retract_delay_seconds":0,"dispense_retract_mmFromBottom":2,"dispense_retract_speed":100,"dispense_retract_x_position":null,"dispense_retract_y_position":null,"dispense_retract_position_reference":"well-top","dispense_submerge_delay_seconds":0,"dispense_submerge_speed":100,"dispense_submerge_mmFromBottom":2,"dispense_submerge_x_position":null,"dispense_submerge_y_position":null,"dispense_submerge_position_reference":"well-top","dispense_touchTip_checkbox":false,"dispense_touchTip_mmFromTop":null,"dispense_touchTip_speed":300,"dispense_touchTip_mmFromEdge":0,"dispense_wellOrder_first":"t2b","dispense_wellOrder_second":"l2r","dispense_wells":["A3"],"dispense_x_position":0,"dispense_y_position":0,"disposalVolume_checkbox":true,"disposalVolume_volume":null,"dropTip_location":"e21e5889-3fe9-463b-a488-a25776bb2f8c:wasteChute","liquidClassesSupported":false,"liquidClass":"none","nozzles":"ALL","path":"single","pipette":"b9c258b6-6837-4f86-a8ab-2fd29190ff88","preWetTip":false,"pushOut_checkbox":true,"pushOut_volume":2,"tipRack":"opentrons/opentrons_flex_96_filtertiprack_50ul/1","tip_tracking":"automatic","tiprack_selected":null,"tips_selected":[],"volume":"20","stepType":"moveLiquid","stepName":"transfer","stepDetails":"","id":"50125fc5-cd43-47d9-b473-40551decdd79","dispense_touchTip_mmfromTop":null}},"orderedStepIds":["aa319c60-6aad-40fa-986c-419efe22f65e","18fb4544-809f-4af7-bac5-7a76ce234428","dafaeb17-c0b7-4e77-aac2-07e68765cb77","bfdcc84d-4874-4d4d-a093-392917e72888","ce6bc9fc-b95d-442f-8082-e1e986259ff9","b7f5eb0a-6401-4a05-9e47-060ea4bd2e7f","eb64f4de-0a8d-4874-b4a2-776f88adaf0a","a9d20ecc-5d52-4de1-af46-b763816eb302","001b3cff-bce6-43a2-834b-483ea89bd741","d07454aa-7f75-49ff-8a7f-e294222d2409","59f15b8f-2cc8-4e4a-981b-c1860eaf9c63","6252e4f4-46a6-4d9b-8e7a-2bc9c7768336","f6b23ae9-978d-42bf-85e6-8383f04b2c75","97b617d5-1c22-43b6-b375-33a7af5d4cdf","235d0876-46b9-4784-bf62-27266978f0ee","c2ced21d-b449-49f8-acbf-34140ad8d7b9","bd633425-885e-4346-a0d8-789304ff62a2","bd7f2f49-5c2a-4b63-aaa6-c8e4a7cd1746","0d5da67b-3fdb-4e03-af05-f1381513c107","0b5021e1-09f0-4f82-99b7-2a5ab1f26f12","c23ecf87-c157-4fd3-b9dd-c64aa37b22bd","f7c18f6f-a059-4bc2-a4f3-4333b651338c","2b5286b1-bf2e-4ef2-a532-da1399867ba3","d3b69e34-140c-4259-9a47-b0e8366639b2","bec1bef7-52d2-4a2e-8fee-05d37fd40c10","8d263c58-71b6-41cd-a038-209adb9d5ab4","3f847251-6911-41e9-800f-9f574decf1a6","4f51f882-e801-4abd-9bc3-69b6e5076ac6","858e2a74-3b3a-4f01-b2d7-af79b1c14e2a","197b2d9e-f68f-45aa-ab7d-eb20e310ae72","44831af6-ec68-475a-be7d-3e77db870f74","bba709d0-4dd6-4c72-81f9-bad715207d5f","8cd7aae5-fd6a-4316-96f9-719c54975358","f431ffee-da80-4f0e-92ab-17f9d3b86381","4398ca59-b2de-4737-a8a1-89ef9ddcf5de","f83563fe-5657-4fd0-9fdb-793b08e5bf7b","29816f24-d6ae-486a-929a-00b4599f3491","04c78246-f95a-4193-8eb5-6495a79e117c","bda82a20-0d96-4c26-af4c-5bc6d4fa8b44","09bc9f66-2e41-4bd8-8a12-2af18adf29e1","50125fc5-cd43-47d9-b473-40551decdd79"],"pipettes":{"b9c258b6-6837-4f86-a8ab-2fd29190ff88":{"pipetteName":"p50_multi_flex"}},"modules":{"033fe7d4-8681-4824-b0f1-3196b48103f5:magneticBlockType":{"model":"magneticBlockV1"}},"labware":{"fb3418cc-0069-48cb-a994-1d7d97416563:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"displayName":"Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt","labwareDefURI":"opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4"},"598aba21-436e-4166-94d7-12c8d2e95f1f:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (1)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"},"885a4eb2-cc92-47a3-a8dd-c2af155dba56:opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4":{"displayName":"Opentrons Tough 96 Well Plate 200 µL PCR Full Skirt","labwareDefURI":"opentrons/opentrons_96_wellplate_200ul_pcr_full_skirt/4"},"d6de1c8a-52a4-4989-b248-a82a74a19f73:opentrons/nest_1_reservoir_290ml/4":{"displayName":"NEST 1 Well Reservoir 290 mL","labwareDefURI":"opentrons/nest_1_reservoir_290ml/4"},"05a9ab32-1784-4f2e-9928-3c666e15778e:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (2)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"},"3f94d791-760f-424a-9646-4c7067dec531:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (3)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"},"198a6dec-2e9c-4c85-a951-6e2844d3ad54:opentrons/opentrons_flex_96_filtertiprack_50ul/1":{"displayName":"Opentrons Flex 96 Filter Tip Rack 50 µL (4)","labwareDefURI":"opentrons/opentrons_flex_96_filtertiprack_50ul/1"}}}},"metadata":{"protocolName":"Bead clean fixed?","author":"","description":"","created":1734961067322,"lastModified":1769457445328,"category":null,"subcategory":null,"tags":[],"source":"Protocol Designer"}}"""

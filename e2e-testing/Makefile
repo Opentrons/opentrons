@@ -105,13 +105,13 @@ migration-export-prod:
 	MIGRATION_REPORT_SINGLE_KEY=$(MIGRATION_REPORT_SINGLE_KEY) \
 	MIGRATION_REPORT_LOG_MIGRATION_MODAL=$(MIGRATION_REPORT_LOG_MIGRATION_MODAL) \
 	MIGRATION_REPORT_LOG_DOWNLOAD=$(MIGRATION_REPORT_LOG_DOWNLOAD) \
-	uv run python -m tests.migration_report
+	uv run python migration_report.py
 
 .PHONY: migration-export-staging
 migration-export-staging:
 	@echo "Exporting protocol fixtures from staging"
 	MIGRATION_REPORT_BASE_URL=$(or $(MIGRATION_REPORT_BASE_URL),https://staging.designer.opentrons.com) \
-	MIGRATION_REPORT_HEADLESS=$(or $(MIGRATION_REPORT_HEADLESS),false) \
+	MIGRATION_REPORT_HEADLESS=$(or $(MIGRATION_REPORT_HEADLESS),true) \
 	MIGRATION_REPORT_UI_TIMEOUT_MS=$(or $(MIGRATION_REPORT_UI_TIMEOUT_MS),3000) \
 	MIGRATION_REPORT_DOWNLOAD_TIMEOUT_MS=$(or $(MIGRATION_REPORT_DOWNLOAD_TIMEOUT_MS),15000) \
 	MIGRATION_REPORT_CLEAN=$(or $(MIGRATION_REPORT_CLEAN),false) \
@@ -119,7 +119,7 @@ migration-export-staging:
 	MIGRATION_REPORT_SINGLE_KEY=$(MIGRATION_REPORT_SINGLE_KEY) \
 	MIGRATION_REPORT_LOG_MIGRATION_MODAL=$(MIGRATION_REPORT_LOG_MIGRATION_MODAL) \
 	MIGRATION_REPORT_LOG_DOWNLOAD=$(MIGRATION_REPORT_LOG_DOWNLOAD) \
-	uv run python -m tests.migration_report
+	uv run python migration_report.py
 
 .PHONY: migration-report-debug
 migration-report-debug:
