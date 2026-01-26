@@ -42,8 +42,6 @@ export function FirstStepMixTools({
     formData.labware != null &&
     formData.tipRack != null &&
     formData.pipette != null
-  console.log('🚀 ~ FirstStepMixTools ~ completedSteps:', completedSteps)
-  console.log(formData)
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
