@@ -32,3 +32,5 @@ venv/
 # OS
 .DS_Store
 Thumbs.db
+
+e2e-testing/migration-report/**/exports_manifest.json

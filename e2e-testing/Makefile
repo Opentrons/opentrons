@@ -128,5 +128,15 @@ migration-report-debug:
 	@echo "Optional: set MIGRATION_REPORT_PAUSE=true to open Playwright inspector"
 	MIGRATION_REPORT_MODE=debug MIGRATION_REPORT_HEADLESS=false uv run python -m tests.migration_report
 
+.PHONY: migration-promote-baseline
+migration-promote-baseline:
+	@echo "Promoting migration exports into a baseline folder"
+	@echo "- Source folder: $(or $(MIGRATION_BASELINE_SOURCE_FOLDER),8.7.1)"
+	@echo "- Dest folder:   $(or $(MIGRATION_BASELINE_DEST_FOLDER),baseline)"
+	uv run python migration_baseline.py \
+		--source-folder $(or $(MIGRATION_BASELINE_SOURCE_FOLDER),8.7.1) \
+		--dest-folder $(or $(MIGRATION_BASELINE_DEST_FOLDER),baseline) \
+		$(if $(filter true,$(MIGRATION_BASELINE_OVERWRITE)),--overwrite,)
+
 .PHONY: prep
 prep: format check test-unit test-pd-local
