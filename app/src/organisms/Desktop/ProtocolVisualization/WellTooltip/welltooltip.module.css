@@ -1,5 +1,5 @@
 .popper_content {
-  position: absolute;
+  position: fixed;
   z-index: 2;
   width: max-content;
   padding: var(--spacing-8);
