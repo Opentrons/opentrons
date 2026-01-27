@@ -4,6 +4,7 @@
   background-color: var(--blue-30);
   color: var(--black-90);
   cursor: pointer;
+  text-align: left;
 }
 
 .button:hover {

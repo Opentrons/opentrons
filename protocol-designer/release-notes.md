@@ -22,6 +22,11 @@ This release adds support for the Flex Stacker Module in Protocol Designer, and 
 
 - Add tip rack lids to tip racks placed inside Flex 96-channel adapters.
 - Protocol Designer properly displays tip racks and their lids on the deck.
+- When you choose to mix liquids from the center of a well, Protocol Designer properly exports this location in your finished protocol.
+
+### Known Issues
+
+- Removing a Stacker Module from the deck can also remove other attached hardware. Click **Deck hardware** in the upper left to edit or re-add hardware to the Flex deck.
 
 Running a protocol created in Protocol Designer requires Opentrons App version 8.8.0 or newer.
 

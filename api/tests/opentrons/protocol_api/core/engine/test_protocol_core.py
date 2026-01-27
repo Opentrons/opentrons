@@ -209,7 +209,7 @@ def subject(
 
     return ProtocolCore(
         engine_client=mock_engine_client,
-        api_version=api_version,
+        api_version=selected_api_version,
         sync_hardware=mock_sync_hardware_api,
     )
 

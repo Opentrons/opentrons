@@ -21,7 +21,7 @@ from opentrons.protocol_engine.types import (
     CommandAnnotation,
     CommandPreconditions,
     RunTimeParameter,
-    SecondOrderCommandAnnotation,
+    SecondOrderCommandAnnotationLegacy,
 )
 from opentrons.protocol_runner import RunResult
 
@@ -105,7 +105,7 @@ def run_time_parameters() -> List[RunTimeParameter]:
 def command_annotations() -> List[CommandAnnotation]:
     """Get a CommandAnnotation list."""
     return [
-        SecondOrderCommandAnnotation(
+        SecondOrderCommandAnnotationLegacy(
             commandKeys=["abc"],
             params={"abc": "123"},
             machineReadableName="hello world",

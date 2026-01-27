@@ -14,6 +14,8 @@ import {
 
 import { ChildNavigation } from '/app/organisms/ODD/ChildNavigation'
 
+import { ACTIONS } from './constants'
+
 import type { ComponentProps, Dispatch } from 'react'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { SmallButton } from '/app/atoms/buttons'
@@ -53,7 +55,7 @@ export function SelectTipRack(props: SelectTipRackProps): JSX.Element {
     // the button will be disabled if this values is null
     if (selectedTipRack != null) {
       dispatch({
-        type: 'SELECT_TIP_RACK',
+        type: ACTIONS.SELECT_TIP_RACK,
         tipRack: selectedTipRack,
       })
       onNext()
