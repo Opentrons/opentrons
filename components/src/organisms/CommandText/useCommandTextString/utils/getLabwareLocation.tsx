@@ -6,7 +6,7 @@ import {
   getLabwareDisplayName,
   getModuleModelFromAddressableArea,
   getModuleType,
-  getSlotDisplayNameFromAAWithFakes,
+  getSlotFromAddressableAreaName,
   locationIsOffDeck,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
   WASTE_CHUTE_ADDRESSABLE_AREAS,
@@ -106,7 +106,7 @@ export function getLabwareLocationFromSequence(
           slotName: sequenceItem.addressableAreaName,
         }
       } else if (sequenceItem.kind === 'onAddressableArea') {
-        const slotName = getSlotDisplayNameFromAAWithFakes(
+        const slotName = getSlotFromAddressableAreaName(
           sequenceItem.addressableAreaName as AddressableAreaName
         )
         const moduleModel = getModuleModelFromAddressableArea(
@@ -200,7 +200,7 @@ export function getLabwareLocation(
     return { slotName: location.slotName }
   } else if ('addressableAreaName' in location) {
     return {
-      slotName: getSlotDisplayNameFromAAWithFakes(location.addressableAreaName),
+      slotName: getSlotFromAddressableAreaName(location.addressableAreaName),
     }
   } else if ('moduleId' in location) {
     const moduleModel = getModuleModel(loadedModules, location.moduleId)
