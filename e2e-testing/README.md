@@ -215,3 +215,12 @@ def test_visual_checkpoint(page: Page) -> None:
 Notes:
 
 - If `APPLITOOLS_API_KEY` is not set, `eyes_check()` will automatically no-op.
+- Applitools batch name is set in conftest.py and is dynamic
+
+### Adding a new visual checkpoint
+
+When you want to add a new visual checkpoint, use the `eyes_check` helper function in your test. Provide a `test_name` and `checkpoint_name` to identify the snapshot
+
+If you have multiple checkpoints in the same test, the test name stays the same. Make sure each `checkpoint_name` is unique to avoid overwriting previous snapshots.
+
+Run the test with the new visual checkpoint locally so you may resolve the new image in the applitools dashboard. Then your CI test run for the PR will pass.

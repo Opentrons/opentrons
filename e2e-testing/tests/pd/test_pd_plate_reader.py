@@ -90,7 +90,7 @@ def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
     # now take a visual snapshot of the timeline element with stitching
     eyes_check_element(
         page,
-        test_name="test_flex_absorbance_reader_timeline",
-        checkpoint_name="Stitched Timeline",
+        test_name="test_flex_absorbance_reader_setup",
+        checkpoint_name="Stitched Final Timeline",
         element=page.get_by_test_id(timeline.timeline_box_testid),
     )
