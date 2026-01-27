@@ -598,7 +598,7 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
-    getSetStoredLabware(moduleEntities, labwareEntities, labware, modules),
+    getSetStoredLabware(moduleEntities, labwareEntities, labware, modules, robotStateTimeline),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -649,35 +649,42 @@ export const getSetStoredLabware = (
   moduleEntities: ModuleEntities,
   labwareEntities: LabwareEntities,
   labware: { [labwareId: string]: LabwareTemporalProperties },
-  modules: { [moduleId: string]: ModuleTemporalProperties }
+  modules: { [moduleId: string]: ModuleTemporalProperties },
+  robotStateTimeline: Timeline
 ): string => {
   const pythonSetStoredLabware = Object.values(moduleEntities).map(module => {
     const { id, type, pythonName } = module
 
     if (type === FLEX_STACKER_MODULE_TYPE) {
       const moduleSlot = modules[id].slot
+      const allLabwareState = robotStateTimeline.timeline.map(timeline => timeline.robotState.labware)
       const labwaresOnHopper = Object.entries(labware).filter(
         ([_, labware]) =>
           labware.stack.includes(id) &&
           labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
-      const labwaresOnShuttle = Object.entries(labware).filter(
+      // include initialDeckState and all future states in the protocol
+      const allLabwaresThatAppearOnShuttle = [
+        ...Object.entries(labware),
+        ...allLabwareState.flatMap(labwareMap => Object.entries(labwareMap)),
+      ].filter(
         ([_, labware]) =>
           getSlotInLocationStack(labware.stack) === moduleSlot &&
           !labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
+      
       // TODO: this doesn't address adapters in the shuttle yet since we dont allow that
       // as of 1/9/26
       if (labwaresOnHopper.length === 0) {
-        if (labwaresOnShuttle.length === 0) {
+        if (allLabwaresThatAppearOnShuttle.length === 0) {
           return ''
         }
 
-        const lid = labwaresOnShuttle.find(([id]) =>
+        const lid = allLabwaresThatAppearOnShuttle.find(([id]) =>
           labwareEntities[id].def.allowedRoles?.includes('lid')
         )
 
-        const nonLid = labwaresOnShuttle.find(
+        const nonLid = allLabwaresThatAppearOnShuttle.find(
           ([id]) => !labwareEntities[id].def.allowedRoles?.includes('lid')
         )
 
