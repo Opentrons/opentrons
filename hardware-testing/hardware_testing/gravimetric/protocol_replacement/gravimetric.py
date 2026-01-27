@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass
 import os
 import sys
@@ -1136,7 +1136,7 @@ def run_one_test(
     volume: float,
     trial: int,
     channel: int,
-    last_measurement: MeasurementData,
+    last_measurement: Optional[MeasurementData],
 ) -> List[MeasurementData]:
     """Run one trial of one test."""
     print_info(f"Running trial {trial} volume {volume} channel {channel} tip {tip}")
@@ -1211,7 +1211,7 @@ def run_one_test(
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     if fixture_settings.lld_every_tip:
         fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
-    else:
+    elif last_measurement:
         volume_lost_since_last_trial = calculate_change_in_volume(
             last_measurement, pre_aspirate, liq
         )
@@ -1343,7 +1343,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     remove_tip(fixture_settings)
 
     measurements: Dict[float, List[List[MeasurementData]]] = {}
-    last_measurement = blank_measurments[-1][-1]
+    last_measurement: Optional[MeasurementData] = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
         if tip != last_probed_tip_size:
@@ -1374,14 +1374,15 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
                 print_info(str(tips))
-                """
-                Leaving this here as a comment in case we other solutions don'twork.
                 if channel == 7:
                     # we're doing an 8 channel test and just swapped over to the front channel.
+                    print_info("Switching to channel 7, running LLD again and skipping evap loss application.")
                     pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
-                    fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+                    fixture_settings.pipette.require_liquid_presence(
+                        fixture_settings.liquid_source
+                    )
                     remove_tip(fixture_settings)
-                """
+                    last_measurement = None
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
 
