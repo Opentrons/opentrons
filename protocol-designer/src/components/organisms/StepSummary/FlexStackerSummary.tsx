@@ -43,12 +43,12 @@ export function FlexStackerSummary(
 
   let stepSummaryContent: JSX.Element | null = null
 
-  // CHANGE: Get URIs from the module's robot state (the timeline state)
   const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
     stackerModuleState.storedLabwareDetails ?? {}
 
-  // CHANGE: If the robot state is empty (Step creation hasn't propagated to timeline),
-  // we attempt to fall back to the form data (fillLabwareIds) to find the primary name.
+  // URIs are pulled from the module's robot state (the timeline state).
+  // If robot state is empty (Step creation hasn't propagated yet),
+  // fall back to form data (fillLabwareIds) for the primary name.
   let primaryName = primaryLabwareURI
     ? labwareDefByURI[primaryLabwareURI]?.metadata?.displayName
     : null
