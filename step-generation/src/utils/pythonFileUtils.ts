@@ -598,7 +598,13 @@ export function pythonDefRun(
     getDefineLiquids(liquidEntities),
     getLoadLiquids(liquidsByLabwareId, liquidEntities, labwareEntities),
     getLoadLiquidClasses(allUniqueLiquidClassesFromForms),
-    getSetStoredLabware(moduleEntities, labwareEntities, labware, modules, robotStateTimeline),
+    getSetStoredLabware(
+      moduleEntities,
+      labwareEntities,
+      labware,
+      modules,
+      robotStateTimeline
+    ),
     stepCommands(robotStateTimeline),
   ]
   const functionBody =
@@ -657,7 +663,9 @@ export const getSetStoredLabware = (
 
     if (type === FLEX_STACKER_MODULE_TYPE) {
       const moduleSlot = modules[id].slot
-      const allLabwareState = robotStateTimeline.timeline.map(timeline => timeline.robotState.labware)
+      const allLabwareState = robotStateTimeline.timeline.map(
+        timeline => timeline.robotState.labware
+      )
       const labwaresOnHopper = Object.entries(labware).filter(
         ([_, labware]) =>
           labware.stack.includes(id) &&
@@ -672,7 +680,7 @@ export const getSetStoredLabware = (
           getSlotInLocationStack(labware.stack) === moduleSlot &&
           !labware.stack.includes(HOPPER_STACKER_LOCATION)
       )
-      
+
       // TODO: this doesn't address adapters in the shuttle yet since we dont allow that
       // as of 1/9/26
       if (labwaresOnHopper.length === 0) {
