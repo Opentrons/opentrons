@@ -263,7 +263,6 @@ export function ProtocolSteps({
                 justifyContent={JUSTIFY_END}
                 position={POSITION_ABSOLUTE}
                 right={SPACING.spacing24}
-                zIndex={0}
               >
                 <ExportButton onClick={handleExportClick} />
               </Flex>
