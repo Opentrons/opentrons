@@ -219,8 +219,8 @@ Notes:
 
 ### Adding a new visual checkpoint
 
-When you want to add a new visual checkpoint, use the `eyes_check` helper function in your test. Provide a `test_name` and `checkpoint_name` to identify the snapshot
+When you want to add a new visual checkpoint, use the `eyes_check` helper function in your test. Provide a `test_name` (the exact name of the test function) and `checkpoint_name` to identify the snapshot
 
-If you have multiple checkpoints in the same test, the test name stays the same. Make sure each `checkpoint_name` is unique to avoid overwriting previous snapshots.
+If you have multiple checkpoints in the same test, the `test_name` stays the same. Make sure each `checkpoint_name` is unique.
 
-Run the test with the new visual checkpoint locally so you may resolve the new image in the applitools dashboard. Then your CI test run for the PR will pass.
+You can run the test locally and approve the baseline but this will not be the approval for the test in CI. CI runs have a baseline with the OS set to Linux, and so is considered a separate baseline from local (macOS) runs.
