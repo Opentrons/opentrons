@@ -603,7 +603,6 @@ export const forFlexStackerStore = (
             labwareId,
             HOPPER_STACKER_LOCATION,
             moduleId,
-            moduleSlot,
           ]
         }
       }
