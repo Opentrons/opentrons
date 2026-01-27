@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { COLORS, RobotInfoLabel, StyledText, Tag } from '@opentrons/components'
+import { COLORS, RobotInfoLabel, StyledText } from '@opentrons/components'
 import { EMPTY } from '@opentrons/step-generation'
 
 import styles from './tipdisposalslot.module.css'
@@ -39,7 +39,8 @@ export function TipDisposalSlot({
             {t('remaining_tips', { remaining: totalEmptyTips })}
           </StyledText>
         </div>
-        {/* <div className={styles.text_container}>
+        {/* Note this is for phase-2
+          <div className={styles.text_container}>
           <StyledText desktopStyle="captionRegular" color={COLORS.grey60}>
             {t('lids_in_trash')}
           </StyledText>

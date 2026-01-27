@@ -11,7 +11,6 @@ import { ModuleContainer } from '../ModuleContainer'
 import { LabwareSlot } from '../SecondWindow/LabwareSlot'
 import { TipDisposalSlot } from '../SecondWindow/TipDisposalSlot'
 import { TipPickupSlot } from '../SecondWindow/TipPickupSlot'
-// import { TipDisposalContainer } from '../TipDisposalContainer'
 import styles from './slotdetails.module.css'
 
 import type {
