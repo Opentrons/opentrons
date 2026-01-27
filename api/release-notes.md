@@ -1,4 +1,4 @@
-jFor more details about this release, please see the full [technical change
+For more details about this release, please see the full [technical change
 log][]. For a list of currently known issues, please see the [Opentrons issue tracker][].
 
 [technical change log]: https://github.com/Opentrons/opentrons/releases
@@ -12,11 +12,11 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 
 ### Feature Improvements
 
-- Use the `ramp_rate` parameter of the `set_block_temperature()` or `start_set_block_temperature()` methods to control how quickly the Thermocycler Module heats or cools. 
+- Use the `ramp_rate` parameter of the `set_block_temperature()` and `start_set_block_temperature()` methods to control how quickly the Thermocycler Module heats or cools.
 - Return tips to their original position in the tip rack when using partial tip pickup with a Flex or OT-2 pipette.
 - Choose a blowout flow rate and location for your source or destination well during a transfer that uses liquid class settings.
-- Change the position to dispose of tips in any trash bin, including a non-default trash bin, with the `drop_tip()` method. 
-- Liquid class transfers are optimized to prevent unnecessary movements to the top of a well before proceeding. 
+- Change the position to dispose of tips in any trash bin, including a non-default trash bin, with the `drop_tip()` method.
+- Liquid class transfers are optimized to prevent unnecessary movements to the top of a well before proceeding.
 
 ---
 
@@ -24,17 +24,17 @@ Welcome to the v9.0.0 release of the Opentrons robot software! This release incl
 
 The 8.8.1 hotfix release includes a small fix to allow all robots to properly boot after a recent upgrade.
 
-If error recovery was enabled in v8.8.0, installing v8.8.1 allows the robot to properly boot. 
+If error recovery was enabled in v8.8.0, installing v8.8.1 allows the robot to properly boot.
 
 ## Opentrons Robot Software Changes in 8.8.0
 
-Welcome to the v8.8.0 release of the Opentrons robot software! This release includes concurrent module actions, dynamic liquid tracking at the meniscus, and other new features.  
+Welcome to the v8.8.0 release of the Opentrons robot software! This release includes concurrent module actions, dynamic liquid tracking at the meniscus, and other new features.
 
 ### New Features
 
-- Use new concurrent commands for the Heater-Shaker, Temperature, and Thermocycler Modules. These commands can control multiple modules and complete pipetting actions simultaneously. 
--  Dynamic liquid tracking lets you aspirate, dispense, or mix at the liquid meniscus. Flex pipettes can track the liquid meniscus as its position changes during a pipetting action. 
-- Capture images of the Flex or OT-2 deck during a protocol. 
+- Use new concurrent commands for the Heater-Shaker, Temperature, and Thermocycler Modules. These commands can control multiple modules and complete pipetting actions simultaneously.
+- Dynamic liquid tracking lets you aspirate, dispense, or mix at the liquid meniscus. Flex pipettes can track the liquid meniscus as its position changes during a pipetting action.
+- Capture images of the Flex or OT-2 deck during a protocol.
 - Choose where your Flex pipette will select a new tip when performing a transfer with a liquid class.
 
 ---

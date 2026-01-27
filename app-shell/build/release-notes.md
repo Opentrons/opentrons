@@ -8,25 +8,25 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons App Changes in 9.0.0
 
-Welcome to the v9.0.0 release of the Opentrons App! This release includes protocol visualization and other feature improvements and bug fixes. 
+Welcome to the v9.0.0 release of the Opentrons App! This release includes protocol visualization and other feature improvements and bug fixes.
 
 ### New Features
 
-- Visualize Opentrons Flex protocols to see protocol steps like tip pickup and disposal, labware and liquid moves, module steps, and more alongside a view of the robot deck. Click **Visualize** on the details page of any Flex protocol to get started. 
+- Visualize Opentrons Flex protocols to see protocol steps like tip pickup and disposal, labware and liquid moves, module steps, and more alongside a view of the robot deck. Click **Visualize** on the details page of any Flex protocol to get started.
 
 ### Improvements
 
-- Enable the Flex or OT-2's built-in camera for additional settings: 
+- Enable the Flex or OT-2's built-in camera for additional settings:
   - Adjust image and video settings like zoom, brightness, contrast, and saturation.
-  - Preview an image of the Flex or OT-2's deck when customizing camera controls. 
+  - Preview an image of the Flex or OT-2's deck when customizing camera controls.
   - Updated image filenames make it easier to find images from your protocol runs.
-- Use Quick Transfer to create Python protocols. 
+- Use Quick Transfer to create Python protocols.
 
 ### Bug Fixes
 
-- Drop tip locations are properly exported in Quick Transfer protocols. 
+- Drop tip locations are properly exported in Quick Transfer protocols.
 - Adding a CSV file to an imported protocol no longer causes analysis errors.
-- Protocol run logs include correct descriptions for tip pickup with the Flex 96-channel pipette. 
+- Protocol run logs include correct descriptions for tip pickup with the Flex 96-channel pipette.
 
 ---
 
