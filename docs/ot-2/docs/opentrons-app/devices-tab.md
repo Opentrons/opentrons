@@ -8,7 +8,9 @@ This section provides an overview of the Devices tab in the [Opentrons App](http
 
 The Devices tab lists all the Opentrons OT-2 and Flex robots on a network. The list displays robots alphabetically by name. If you're using a WiFi connection and don't see the OT-2 you want to use, check your WiFi settings. Your OT-2 may be on a different wireless network.
 
-<font color="red">IMAGE PLACEHOLDER</font>
+<figure class="screenshot" markdown>
+![Devices tab showing list of robots](../images/app-devices-tab.png){ width="80%" }
+</figure>
 
 ## Device settings
 
