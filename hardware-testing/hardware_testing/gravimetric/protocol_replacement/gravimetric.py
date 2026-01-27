@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, asdict
 import os
 import sys
@@ -129,6 +129,118 @@ fast_simulate_measurement = MeasurementData(
     celsius_liquid=25,
 )
 
+QC_TEST_MIN_REQUIREMENTS: Dict[
+    int, Dict[int, Dict[int, Dict[float, Tuple[float, float]]]]
+] = {
+    # channels: [Pipette: [tip: [Volume: (%d, Cv)]]]
+    1: {
+        50: {  # P50
+            20: {
+                1.0: (5.0, 4.0),
+                10.0: (1.0, 0.5),
+                20.0: (1, 0.4),
+            },
+            50: {
+                1.0: (5.0, 4.0),
+                10.0: (1.0, 0.5),
+                50.0: (1, 0.4),
+            },
+        },  # T50
+        1000: {  # P1000
+            50: {  # T50
+                5.0: (5.0, 5.0),
+                10.0: (2.0, 2.0),
+                50.0: (1.0, 1.0),
+            },
+            200: {  # T200
+                5.0: (7.0, 4.00),
+                50.0: (2.0, 1.0),
+                200.0: (0.5, 0.2),
+            },
+            1000: {  # T1000
+                10.0: (7.5, 3.5),
+                100.0: (2.0, 0.75),
+                1000.0: (0.7, 0.15),
+            },
+        },
+    },
+    8: {
+        50: {  # P50
+            50: {  # T50
+                1.0: (20.0, 5.0),
+                10.0: (3.0, 2.0),
+                50.0: (1.25, 0.4),
+            },
+        },
+        1000: {  # P1000
+            50: {  # T50
+                5.0: (5.0, 5.0),
+                10.0: (1.5, 1.5),
+                50.0: (1.0, 1.0),
+            },
+            200: {  # T200
+                5.0: (5.0, 5.0),
+                50.0: (1.5, 1.5),
+                200.0: (1.0, 0.4),
+            },
+            1000: {  # T1000
+                10.0: (10.0, 5.0),
+                100.0: (2.5, 1.0),
+                1000.0: (0.7, 0.15),
+            },
+        },
+    },
+    96: {
+        200: {
+            20: {  # T20
+                0.5: (2.5, 2.0),
+                1.0: (2.5, 2.0),
+                2.0: (2.5, 2.0),
+                3.0: (2.5, 2.0),
+                5.0: (2.5, 2.0),
+                10.0: (3.1, 1.7),
+            },
+            50: {  # T50
+                1.0: (2.5, 2.0),
+                50.0: (1.5, 0.75),
+            },
+            200: {  # T200
+                5.0: (2.5, 4.0),
+                50.0: (1.5, 2.0),
+                200.0: (1.4, 0.9),
+            },
+        },
+        1000: {  # P1000
+            20: {  # T20
+                1.0: (2.5, 2.0),
+                2.0: (2.5, 2.0),
+                3.0: (2.5, 2.0),
+                5.0: (2.5, 2.0),
+                10.0: (3.1, 1.7),
+                20.0: (3.1, 1.7),
+            },
+            50: {  # T50
+                1.0: (2.5, 2.0),
+                2.0: (2.5, 2.0),
+                3.0: (2.5, 2.0),
+                5.0: (2.5, 2.0),
+                10.0: (3.1, 1.7),
+                50.0: (1.5, 0.75),
+            },
+            200: {  # T200
+                5.0: (2.5, 4.0),
+                50.0: (1.5, 2.0),
+                200.0: (1.4, 0.9),
+            },
+            1000: {  # T1000
+                10.0: (5.0, 5.0),
+                100.0: (2.5, 1.5),
+                1000.0: (1.0, 0.75),
+            },
+        },
+    },
+}
+
 
 @dataclass(kw_only=True)
 class CSVSettings:
@@ -168,6 +280,7 @@ class CSVSettings:
     retracted_offset: float
     gantry_speed: float
     liquid_class_test: bool
+    fail_early: bool
 
     @classmethod
     def parse_csv(cls, csv_params: List[List[str]], simulating: bool) -> "CSVSettings":
@@ -256,6 +369,7 @@ class CSVSettings:
         liquid_class_test = bool(
             lookup_key("liquid_class_test", csv_params)[0] == "TRUE"
         )
+        fail_early = bool(lookup_key("fail_early", csv_params)[0] == "TRUE")
 
         volumes = {
             20: volumes_to_test_20ul,
@@ -320,6 +434,7 @@ class CSVSettings:
             retracted_offset=retracted_offset,
             gantry_speed=gantry_speed,
             liquid_class_test=liquid_class_test,
+            fail_early=fail_early,
         )
 
 
@@ -1358,6 +1473,21 @@ def calculate_evaporation(
     return blank_measurments, avg_asp_evap, avg_disp_evap
 
 
+def _get_passing_requirements(
+    fixture_settings: FixtureSettings, tip: int, volume: float
+) -> Optional[Tuple[float, float]]:
+    if fixture_settings.fail_early:
+        try:
+            return QC_TEST_MIN_REQUIREMENTS[fixture_settings.pipette_channels][
+                fixture_settings.pipette_volume
+            ][tip][volume]
+        except KeyError:
+            print_error(
+                f"No minimum requirements for the P{fixture_settings.pipette_volume} {fixture_settings.pipette_channels}channel with tip {tip} at {volume}"
+            )
+    return None
+
+
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
     first_tip = _get_tips_for_test(
@@ -1539,6 +1669,20 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
 
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
+                requirements: Optional[Tuple[float, float]] = _get_passing_requirements(
+                    fixture_settings, tip, volume
+                )
+                if requirements:
+                    if (
+                        abs(dispense_d) > requirements[0]
+                        or abs(dispense_cv) > requirements[1]
+                    ):
+                        print_error(
+                            f"Pipette failed QC on channel {channel} tip {tip} volume {volume}"
+                        )
+                        raise RuntimeError(
+                            f"Pipette failed on QC channel {channel} tip {tip} volume {volume}"
+                        )
             for trial in range(fixture_settings.trials):
                 aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
                     trial_asp_dict[trial], volume
