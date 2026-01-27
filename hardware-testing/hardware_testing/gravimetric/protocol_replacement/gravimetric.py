@@ -136,7 +136,7 @@ QC_TEST_MIN_REQUIREMENTS: Dict[
     # channels: [Pipette: [tip: [Volume: (%d, Cv)]]]
     1: {
         50: {  # P50
-            50: { # T50
+            50: {  # T50
                 1.0: (6.4, 5.6),
                 10.0: (1.2, 0.4),
                 50.0: (1.0, 0.32),
