@@ -54,7 +54,7 @@ describe('UpdateRobotModal', () => {
 
   it('renders an update available header if the type is not Balena when upgrading', () => {
     render(props)
-    screen.getByText('test robot Update Available')
+    screen.getByText('Robot Operating System Update Available')
   })
 
   it('renders a special update  header if the type is Balena', () => {
@@ -71,7 +71,7 @@ describe('UpdateRobotModal', () => {
     screen.getByText('test notes')
 
     const exitIcon = screen.getByTestId(
-      'ModalHeader_icon_close_test robot Update Available'
+      'ModalHeader_icon_close_Robot Operating System Update Available'
     )
     fireEvent.click(exitIcon)
     expect(props.closeModal).toHaveBeenCalled()
@@ -115,7 +115,7 @@ describe('UpdateRobotModal', () => {
     }
 
     render(props)
-    screen.getByText('test robot Update Available')
+    screen.getByText('Robot Operating System Update Available')
     screen.getByText('Not now')
     screen.getByText('Update robot now')
   })
