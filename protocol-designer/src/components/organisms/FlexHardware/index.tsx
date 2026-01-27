@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   MAGNETIC_BLOCK_TYPE,
@@ -38,6 +39,7 @@ import type {
   DeckConfiguration,
   FlexModuleCutoutFixtureId,
 } from '@opentrons/shared-data'
+import type { ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type { FixtureName, Fixtures } from '..'
 import type { InitialDeckStateModules } from '../HardwareConfigurator/AddFixtureModal'
@@ -141,12 +143,38 @@ export function FlexHardware(): JSX.Element {
     },
     {}
   )
+  const handleDeleteStackerLabware = (module: ModuleOnDeck): void => {
+    if (module.moduleState.type === FLEX_STACKER_MODULE_TYPE) {
+      // delete hopper labware
+      for (const labwareGroup of module.moduleState.labwareInHopper ?? []) {
+        for (const labwareId of Object.values(labwareGroup)) {
+          if (labwareId != null) {
+            dispatch(deleteContainer({ labwareId, stacker: module }))
+          }
+        }
+      }
+      // delete shuttle labware
+      if (module.moduleState.labwareOnShuttle != null) {
+        for (const labwareId of Object.values(
+          module.moduleState.labwareOnShuttle
+        )) {
+          if (labwareId != null) {
+            dispatch(deleteContainer({ labwareId, stacker: module }))
+          }
+        }
+      }
+    }
+  }
+
   const handleConfirmDeleteEntity = (modalInfo: {
     ids: string[]
     deckConfig: DeckConfiguration
   }): void => {
     modalInfo.ids.forEach(item => {
       if (moduleOnDeck[item] != null) {
+        if (moduleOnDeck[item].type === FLEX_STACKER_MODULE_TYPE) {
+          handleDeleteStackerLabware(moduleOnDeck[item])
+        }
         dispatch(deleteModule({ moduleId: item }))
       } else if (labwareOnDeck[item] != null) {
         dispatch(deleteContainer({ labwareId: item }))
@@ -214,6 +242,7 @@ export function FlexHardware(): JSX.Element {
             makeSnackbar,
             t,
             deckConfig,
+            handleDeleteStackerLabware,
           })
         }}
       />

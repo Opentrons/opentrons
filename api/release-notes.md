@@ -8,6 +8,12 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ---
 
+## Opentrons Robot Software Changes in 8.8.1
+
+The 8.8.1 hotfix release includes a small fix to allow all robots to properly boot after a recent upgrade.
+
+If error recovery was enabled in v8.8.0, installing v8.8.1 allows the robot to properly boot. 
+
 ## Opentrons Robot Software Changes in 8.8.0
 
 Welcome to the v8.8.0 release of the Opentrons robot software! This release includes concurrent module actions, dynamic liquid tracking at the meniscus, and other new features.  

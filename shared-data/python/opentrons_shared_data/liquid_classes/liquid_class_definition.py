@@ -251,6 +251,12 @@ class BlowoutParams(BaseLiquidClassModel):
         alias="flow_rate",
         description="Flow rate for blow out, in microliters per second.",
     )
+    blowoutPosition: Optional[TipPosition] | SkipJsonSchema[None] = Field(
+        None,
+        alias="blowout_position",
+        description="Position of the tip during blowout.",
+        json_schema_extra=_remove_default,
+    )
 
 
 class BlowoutProperties(BaseLiquidClassModel):
@@ -310,23 +316,43 @@ def reshape_glob(
             data["enable"] = data["enabled"]
             data.pop("enabled")
 
-        params_list = [meta.alias for field, meta in params_model.model_fields.items()]
-        list_of_presence_of_params = [param in data.keys() for param in params_list]
-        if any(list_of_presence_of_params):
-            if not all(list_of_presence_of_params):
+        params_list = [
+            meta.alias for field, meta in params_model.model_fields.items()
+        ]  # List of all params in the *model*, including optional ones
+        required_params = [
+            meta.alias
+            for field, meta in params_model.model_fields.items()
+            if meta.is_required()
+        ]  # List of strictly required params
+
+        # List of booleans specifying if each required param is present in the data
+        required_params_in_data = [param in data.keys() for param in required_params]
+        if any(required_params_in_data):
+            if not all(required_params_in_data):
                 raise ValueError(
                     f"{property_name} should specify either all of the params-"
-                    f"{params_list} - or none of them."
+                    f"{required_params} - or none of them."
                 )
             if data.get("params"):
                 raise ValueError(
                     f"{property_name} should specify either all of"
-                    f" {params_list} or 'params', not both."
+                    f" {required_params} or 'params', not both."
                 )
+            # Get a list of the required params + the optional params in the data.
+            # Then move them all under a new "params" key.
+            # This list purposely skips any extra, non-param keys present in the data so that the model validator
+            # can raise a validation error upon encountering the unexpected keys.
+            all_params_in_data = [
+                param
+                for param in params_list
+                if param in required_params
+                or (param not in required_params and data.get(param) is not None)
+            ]
             data["params"] = params_model.model_validate(
-                {param: data[param] for param in params_list}
+                {param: data[param] for param in all_params_in_data}
             )
-            for param in params_list:
+            # Remove the params from the data dict
+            for param in all_params_in_data:
                 data.pop(param)
     return data
 

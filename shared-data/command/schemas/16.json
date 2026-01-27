@@ -572,6 +572,18 @@
       "additionalProperties": false,
       "description": "Parameters for blowout.",
       "properties": {
+        "blowoutPosition": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TipPosition"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "description": "Position of the tip during blowout.",
+          "title": "Blowoutposition"
+        },
         "flowRate": {
           "anyOf": [
             {

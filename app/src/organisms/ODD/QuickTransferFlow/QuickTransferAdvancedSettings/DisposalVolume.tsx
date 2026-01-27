@@ -34,7 +34,7 @@ import { ACTIONS } from '../constants'
 import { getPipetteName } from '../utils'
 
 import type { Dispatch } from 'react'
-import type { SupportedTip } from '@opentrons/shared-data'
+import type { CutoutConfig, SupportedTip } from '@opentrons/shared-data'
 import type {
   BlowOutLocation,
   FlowRateKind,
@@ -84,44 +84,37 @@ export function DisposalVolume(props: DisposalVolumeProps): JSX.Element {
   const [flowRate, setFlowRate] = useState<number | null>(null)
   const deckConfig = useNotifyDeckConfigurationQuery().data ?? []
 
-  const trashBinCutoutConfig = deckConfig.find(
-    cutoutConfig => cutoutConfig.cutoutFixtureId === TRASH_BIN_ADAPTER_FIXTURE
-  )
-  const trashBinOption: BlowOutLocation | undefined =
-    trashBinCutoutConfig != null
+  // If state.dropTipLocation is dropping tips into a trash fixture, then that is the
+  // only trash fixture allowed for the disposal blowout location. Otherwise (if we're
+  // returning tips), let the user choose to blow out to any trash fixture on the deck.
+  const selectableCutoutConfigs: CutoutConfig[] =
+    typeof state.dropTipLocation === 'object'
+      ? [state.dropTipLocation]
+      : deckConfig.filter(
+          cutoutConfig =>
+            TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId ||
+            WASTE_CHUTE_FIXTURES.includes(cutoutConfig.cutoutFixtureId)
+        )
+  const fixtureOptions = selectableCutoutConfigs.map(cutoutConfig =>
+    TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
       ? {
-          cutoutId: trashBinCutoutConfig.cutoutId,
-          cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+          option: cutoutConfig,
+          value: `trashBin:${cutoutConfig.cutoutId}`,
+          description: t('trashBin_location', {
+            slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId],
+          }),
         }
-      : undefined
-
-  const wasteChuteOptions = deckConfig
-    .filter(
-      option =>
-        typeof option.cutoutFixtureId === 'string' &&
-        WASTE_CHUTE_FIXTURES.includes(option.cutoutFixtureId)
-    )
-    .map(option => ({
-      option,
-      value: `wasteChute:${option.cutoutId}`,
-      description: t('wasteChute_location', {
-        slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[option.cutoutId],
-      }),
-    }))
+      : {
+          option: cutoutConfig,
+          value: `wasteChute:${cutoutConfig.cutoutId}`,
+          description: t('wasteChute_location', {
+            slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[cutoutConfig.cutoutId],
+          }),
+        }
+  )
 
   const blowoutLocationOptions = [
-    ...(trashBinOption != null
-      ? [
-          {
-            option: trashBinOption,
-            value: `trashBin:${trashBinOption.cutoutId}`,
-            description: t('trashBin_location', {
-              slotName: FLEX_SINGLE_SLOT_BY_CUTOUT_ID[trashBinOption.cutoutId],
-            }),
-          },
-        ]
-      : []),
-    ...wasteChuteOptions,
+    ...fixtureOptions,
     {
       option: SOURCE_WELL_BLOWOUT_DESTINATION,
       value: SOURCE_WELL_BLOWOUT_DESTINATION,

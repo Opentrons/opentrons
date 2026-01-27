@@ -1,3 +1,5 @@
+import { getIsLid } from '@opentrons/shared-data'
+
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
@@ -19,15 +21,18 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
 ) => {
   const { moduleId, interventionMessage, fillLabwareIds } = args
   const { labwareEntities, moduleEntities } = invariantContext
+  if (moduleId == null || moduleEntities[moduleId] == null) {
+    return { errors: [errorCreators.missingModuleError()] }
+  }
   const flexStackerState = flexStackerStateGetter(robotState, moduleId)
   const isSpace = getIsSpaceInHopper(
     flexStackerState,
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = fillLabwareIds.map(
-    lwId => labwareEntities[lwId]?.pythonName
-  )
+  const labwarePythonNames = fillLabwareIds
+    .filter(id => !getIsLid(labwareEntities[id].def))
+    .map(lwId => labwareEntities[lwId]?.pythonName)
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
   const indentedLabwarePythonNames = labwareChunks
     .map(chunk => INDENT + chunk.join(', '))
@@ -36,7 +41,12 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     labwarePythonNames.length < 4
       ? labwarePythonNames.join(', ')
       : `\n${indentedLabwarePythonNames}\n`
-  if (flexStackerState?.storedLabwareDetails === null) {
+
+  if (
+    flexStackerState != null &&
+    flexStackerState.storedLabwareDetails === null &&
+    flexStackerState.labwareInHopper == null
+  ) {
     return {
       errors: [errorCreators.flexStackerLabwareTypeMissing()],
     }
@@ -56,8 +66,11 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     }
   }
 
+  const filteredFillLabwareIds = fillLabwareIds.filter(
+    id => !getIsLid(labwareEntities[id].def)
+  )
   const pythonArgs = [
-    ...(fillLabwareIds.length > 0
+    ...(filteredFillLabwareIds.length > 0
       ? `labware=[${formattedPythonLabwareNames}],\n`
       : []),
     ...(interventionMessage != null

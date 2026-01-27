@@ -132,6 +132,37 @@ def test_validate_blowout_properties_dict() -> None:
             }
         )
 
+    with pytest.raises(ValueError):
+        BlowoutProperties.model_validate(
+            {
+                "enable": True,
+                "location": "source",
+                "flow_rate": 3,
+                "foo": "bar",  # It should not allow unknown parameters
+            }
+        )
+
+    # Test Blowout position validation
+    obj2 = BlowoutProperties.model_validate(
+        {
+            "enable": True,
+            "location": "source",
+            "flow_rate": 3,
+            "blowout_position": {
+                "position_reference": "well-bottom",
+                "offset": {"x": 10, "y": 20, "z": 30},
+            },
+        }
+    )
+    assert isinstance(obj2, BlowoutProperties)
+    assert obj2.enable is True
+    assert obj2.params is not None
+    assert obj2.params.location == BlowoutLocation.SOURCE
+    assert (
+        obj2.params.blowoutPosition.positionReference == PositionReference.WELL_BOTTOM  # type: ignore[union-attr]
+    )
+    assert obj2.params.blowoutPosition.offset.y == 20  # type: ignore[union-attr]
+
 
 def test_validate_aspirate_properties_dict(
     sample_transfer_properties_dict: Dict[str, Dict[str, Any]],
