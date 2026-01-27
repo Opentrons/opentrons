@@ -22,6 +22,7 @@ import {
   getAADisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getModuleModelFromFixtureId,
   getModuleType,
   getSlotFromAddressableAreaName,
   getWasteChuteOptions,
@@ -46,7 +47,6 @@ import {
   getAllFixtureOptions,
   getAvailableOptions,
   getFixtureNameFromAddresableArea,
-  getModuleModel,
   getModuleOptions,
 } from './utils'
 
@@ -276,7 +276,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
       const moduleModel =
         newModule != null
-          ? getModuleModel(newModule.addressableAreaId as AddressableAreaName)
+          ? getModuleModelFromFixtureId(
+              newModule.cutoutFixtureId as CutoutFixtureId
+            )
           : null
 
       if (newModule != null && moduleModel != null) {

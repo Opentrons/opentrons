@@ -1,3 +1,4 @@
+
 import type {
   ABSORBANCE_READER_TYPE,
   CreateCommand,
@@ -231,6 +232,7 @@ export type AdditionalEquipmentName =
   | 'wasteChute'
   | 'stagingArea'
   | 'trashBin'
+
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName

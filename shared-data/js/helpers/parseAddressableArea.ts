@@ -47,6 +47,7 @@ export function getSlotFromAddressableAreaName(
   return addressableArea
 }
 
+// TODO: (tz, 1/27/26): remove this function and use getModuleModelFromFixtureId instead
 export function getModuleModelFromAddressableArea(
   addressableArea: AddressableAreaName
 ): ModuleModel | null {

@@ -246,6 +246,19 @@ export function getCutoutFixtureIdsForModuleModel(
   return moduleFixtures ?? []
 }
 
+export function getModuleModelFromFixtureId(
+  fixtureId: CutoutFixtureId
+): ModuleModel | null {
+  for (const [moduleModel, fixtureIds] of Object.entries(
+    MODULE_FIXTURES_BY_MODEL
+  )) {
+    if (fixtureIds?.includes(fixtureId)) {
+      return moduleModel as ModuleModel
+    }
+  }
+  return null
+}
+
 export function getCutoutFixturesForModuleModel(
   moduleModel: ModuleModel,
   deckDef: DeckDefinition

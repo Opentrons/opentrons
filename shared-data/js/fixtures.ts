@@ -1164,7 +1164,7 @@ export const getCutoutConfigReplacmentForModule = (
   )
 }
 
-// Check if thermocycler fixtures need the missing pair added
+// Check if thermocycler fixtures need the missing fixture added
 export const getAddedMissingThermocyclerFixtures = (
   values: CutoutConfigMap[],
   deckDef: DeckDefinition

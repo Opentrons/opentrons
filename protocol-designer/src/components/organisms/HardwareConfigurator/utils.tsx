@@ -7,7 +7,7 @@ import {
   getAAsToFixtureIdFromDeckDefWithFakes,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
-  getModuleModelFromAddressableArea,
+  getModuleModelFromFixtureId,
   getNewConfigForDeckConfig,
   getReplacementFixtureForFixtureRemoval,
   getWasteChuteOptions,
@@ -445,14 +445,14 @@ export const getFixtureNameFromAddresableArea = (
   return fixtureName
 }
 
-export const getModuleModel = (
-  addressableAreaId: AddressableAreaNamesWithFakes
-): ModuleModel | null => {
-  if (addressableAreaId === 'thermocyclerModuleV2') {
-    return THERMOCYCLER_MODULE_V2
-  } else {
-    return getModuleModelFromAddressableArea(
-      addressableAreaId as AddressableAreaName
-    )
-  }
-}
+// export const getModuleModel = (
+//   addressableAreaId: AddressableAreaNamesWithFakes
+// ): ModuleModel | null => {
+//   if (addressableAreaId === 'thermocyclerModuleV2') {
+//     return THERMOCYCLER_MODULE_V2
+//   } else {
+//     return getModuleModelFromAddressableArea(
+//       addressableAreaId as AddressableAreaName
+//     )
+//   }
+// }

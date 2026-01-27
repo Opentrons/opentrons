@@ -471,6 +471,7 @@ export const exactMatchOnlyLoadNames = new Set([
   'opentrons_universal_flat_adapter_type_b',
 ])
 
+// TODO: (tz, 1/27/26): removed all these groupted aa
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,
   MAGNETIC_BLOCK_B1_ADDRESSABLE_AREA,

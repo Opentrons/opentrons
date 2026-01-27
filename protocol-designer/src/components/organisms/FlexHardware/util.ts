@@ -4,11 +4,19 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getMainFixtureIdForAA,
+  getModuleModelFromFixtureId,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
+  STAGING_AREA_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_REAR_FIXTURE,
+  TRASH_BIN_ADAPTER_FIXTURE,
+  TRASH_BIN_FIXTURE,
+  WASTE_CHUTE_FIXTURES,
+  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
+import { AdditionalEquipmentName } from '@opentrons/step-generation'
 
 import { deleteModule } from '/protocol-designer/modules'
 import {
@@ -20,10 +28,7 @@ import {
   deleteDeckFixture,
 } from '/protocol-designer/step-forms/actions/additionalItems'
 
-import {
-  getFixtureNameFromAddresableArea,
-  getModuleModel,
-} from '../HardwareConfigurator/utils'
+import { getFixtureNameFromAddresableArea } from '../HardwareConfigurator/utils'
 import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
 
@@ -69,7 +74,7 @@ interface UpdateInitialDeckSetupProps {
 
 interface FixtureContext {
   value: CutoutConfigMap
-  fixtureName: DeckFixture
+  fixtureName: CutoutFixtureId
   matchingFixture: AdditionalEquipmentOnDeck | undefined
   matching4thColumnLabware: LabwareOnDeck | null
   hasLabwareOnSlot: boolean
@@ -147,13 +152,19 @@ const handleCreateFixture = (ctx: FixtureContext): void => {
   // Block creating trashBin or wasteChute if there is labware on the slot
   if (
     hasLabwareOnSlot &&
-    (fixtureName === 'trashBin' || fixtureName === 'wasteChute')
+    (fixtureName === TRASH_BIN_ADAPTER_FIXTURE ||
+      fixtureName in WASTE_CHUTE_FIXTURES)
   ) {
     makeSnackbar(t('conflict_on_slot_labware_fixture') as string)
     return
   }
 
-  dispatch(createDeckFixture(fixtureName, value.cutoutId))
+  dispatch(
+    createDeckFixture(
+      mapFixtureIdToFixtureName(fixtureName) as DeckFixture,
+      value.cutoutId
+    )
+  )
 }
 
 const handleDeleteModule = (ctx: ModuleContext): void => {
@@ -183,7 +194,9 @@ const handleDeleteModule = (ctx: ModuleContext): void => {
 const handleCreateModule = (ctx: ModuleContext): void => {
   const { value, labwareOnDeck, dispatch, makeSnackbar, t } = ctx
 
-  const model = getModuleModel(value.addressableAreaId as AddressableAreaName)
+  const model = getModuleModelFromFixtureId(
+    value.cutoutFixtureId as CutoutFixtureId
+  )
   if (model == null) return
 
   const type = getModuleType(model)
@@ -239,33 +252,29 @@ export const updateInitialDeckState = (
   const allValues = getAddedMissingThermocyclerFixtures(values, deckDef)
 
   allValues.forEach(value => {
-    const fixtureName = getFixtureNameFromAddresableArea(
-      value.addressableAreaId as AddressableAreaName
-    )
-
-    console.log('fixtureName: ', fixtureName)
-
-    const fixtureNameNew = getMainFixtureIdForAA(
+    const fixtureName = getMainFixtureIdForAA(
       [value.cutoutFixtureId as CutoutFixtureId],
       [value.addressableAreaId as AddressableAreaName],
       value.cutoutId
     )
-    console.log('fixtureNameNew: ', fixtureNameNew)
 
-    const matchingFixture = Object.values(additionalEquipmentOnDeck).find(
-      ae => ae.name === fixtureName && ae.location === value.cutoutId
+    const matchingFixtureOnDeck = Object.values(additionalEquipmentOnDeck).find(
+      ae =>
+        ae.name === mapFixtureIdToFixtureName(fixtureName) &&
+        ae.location === value.cutoutId
     )
 
     const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
 
-    const matchingModule = Object.values(moduleOnDeck).find(
+    const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module =>
-        module.model === getModuleModel(value.addressableAreaId) &&
+        fixtureName != null &&
+        module.model === getModuleModelFromFixtureId(fixtureName) &&
         getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
 
     const matching4thColumnLabware =
-      matchingFixture?.name === 'stagingArea' && slotName != null
+      matchingFixtureOnDeck?.name === 'stagingArea' && slotName != null
         ? (Object.values(labwareOnDeck).find(lw =>
             lw.stack.includes(slotName)
           ) ?? null)
@@ -275,8 +284,8 @@ export const updateInitialDeckState = (
       getHardwareInSlotInUse(
         savedSteps,
         matching4thColumnLabware,
-        matchingModule,
-        matchingFixture != null ? [matchingFixture] : undefined
+        matchingModuleOnDeck,
+        matchingFixtureOnDeck != null ? [matchingFixtureOnDeck] : undefined
       )
 
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
@@ -285,8 +294,8 @@ export const updateInitialDeckState = (
     if (fixtureName != null) {
       const fixtureCtx: FixtureContext = {
         value,
-        fixtureName: fixtureName as DeckFixture,
-        matchingFixture,
+        fixtureName,
+        matchingFixture: matchingFixtureOnDeck,
         matching4thColumnLabware,
         hasLabwareOnSlot,
         fixtureIds,
@@ -299,7 +308,7 @@ export const updateInitialDeckState = (
         t,
       }
 
-      if (matchingFixture != null) {
+      if (matchingFixtureOnDeck != null) {
         handleDeleteFixture(fixtureCtx)
       } else {
         handleCreateFixture(fixtureCtx)
@@ -310,7 +319,7 @@ export const updateInitialDeckState = (
     // Handle modules
     const moduleCtx: ModuleContext = {
       value,
-      matchingModule,
+      matchingModule: matchingModuleOnDeck,
       moduleId,
       labwareOnDeck,
       deckConfig,
@@ -320,10 +329,23 @@ export const updateInitialDeckState = (
       t,
     }
 
-    if (matchingModule != null) {
+    if (matchingModuleOnDeck != null) {
       handleDeleteModule(moduleCtx)
     } else {
       handleCreateModule(moduleCtx)
     }
   })
+}
+function mapFixtureIdToFixtureName(
+  fixtureId: CutoutFixtureId | null
+): string | null {
+  if (fixtureId == null) return null
+  if (fixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
+    return 'trashBin'
+  } else if (fixtureId in WASTE_CHUTE_FIXTURES) {
+    return 'wasteChute'
+  } else if (fixtureId in STAGING_AREA_FIXTURES) {
+    return 'stagingArea'
+  }
+  return null
 }
