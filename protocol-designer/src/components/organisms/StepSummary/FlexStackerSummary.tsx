@@ -30,6 +30,7 @@ export function FlexStackerSummary(
   const { fillLabwareIds, flexStackerFormType, moduleId } = currentStep
   const { moduleState: stackerModuleState } = moduleRobotState[moduleId] ?? {}
   const nicknamesById = useSelector(getLabwareNicknamesById)
+
   if (
     stackerModuleState == null ||
     stackerModuleState.type !== FLEX_STACKER_MODULE_TYPE
@@ -41,21 +42,33 @@ export function FlexStackerSummary(
   }
 
   let stepSummaryContent: JSX.Element | null = null
+
+  // CHANGE: Get URIs from the module's robot state (the timeline state)
   const { primaryLabwareURI, adapterLabwareURI, lidLabwareURI } =
     stackerModuleState.storedLabwareDetails ?? {}
 
+  // CHANGE: If the robot state is empty (Step creation hasn't propagated to timeline),
+  // we attempt to fall back to the form data (fillLabwareIds) to find the primary name.
+  let primaryName = primaryLabwareURI
+    ? labwareDefByURI[primaryLabwareURI]?.metadata?.displayName
+    : null
+
+  if (
+    !primaryName &&
+    flexStackerFormType === FLEX_STACKER_FILL &&
+    fillLabwareIds?.[0]
+  ) {
+    const firstLabwareId = fillLabwareIds[0]
+    primaryName = nicknamesById[firstLabwareId] ?? 'Selected Labware'
+  }
+
   const labwareNameString = [
-    adapterLabwareURI,
-    primaryLabwareURI,
-    lidLabwareURI,
+    adapterLabwareURI &&
+      labwareDefByURI[adapterLabwareURI]?.metadata?.displayName,
+    primaryName,
+    lidLabwareURI && labwareDefByURI[lidLabwareURI]?.metadata?.displayName,
   ]
-    .reduce<string[]>((names, uri) => {
-      const name = uri && labwareDefByURI[uri]?.metadata?.displayName
-      if (name != null) {
-        names.push(name)
-      }
-      return names
-    }, [])
+    .filter(Boolean)
     .join(', ')
 
   switch (flexStackerFormType) {
