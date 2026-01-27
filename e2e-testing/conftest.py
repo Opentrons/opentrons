@@ -128,6 +128,10 @@ def browser_type_launch_args(pytestconfig: pytest.Config) -> dict[str, Any]:
     else:
         headless = True
 
+    # Expose the effective headless/headed mode to helpers that don't have
+    # access to pytestconfig (e.g. Applitools Eyes helper).
+    os.environ["PW_E2E_HEADLESS"] = "true" if headless else "false"
+
     return {
         "headless": headless,
         "slow_mo": 0 if headless else 250,
