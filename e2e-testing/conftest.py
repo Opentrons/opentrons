@@ -6,6 +6,7 @@ import select
 import subprocess
 import time
 import urllib.request
+import uuid
 from collections.abc import Generator
 from pathlib import Path
 from typing import Any, List
@@ -85,6 +86,43 @@ def _save_video_with_test_name(video: Video, nodeid: str) -> None:
 def pytest_configure(config: Any) -> None:
     """Create test-results directory if it doesn't exist."""
     _ensure_test_results_dir()
+    _ensure_applitools_batch_env()
+
+
+def _ensure_applitools_batch_env() -> None:
+    """Ensure the Applitools batch name/id are stable for a single pytest run.
+
+    Applitools defaults `APPLITOOLS_BATCH_ID` to a unique per-process UUID.
+    For pytest runs, we want one batch shared across all tests in the same run.
+    """
+
+    # Respect explicit user/CI configuration.
+    if os.getenv("APPLITOOLS_BATCH_ID") and os.getenv("APPLITOOLS_BATCH_NAME"):
+        return
+
+    # Create a stable ID for the run if one isn't already set.
+    os.environ.setdefault("APPLITOOLS_BATCH_ID", str(uuid.uuid4()))
+
+    if os.getenv("APPLITOOLS_BATCH_NAME") is not None:
+        return
+
+    test_env = os.getenv("TEST_ENV", "local")
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+
+    # Add CI context when available for easier triage.
+    workflow = os.getenv("GITHUB_WORKFLOW")
+    run_id = os.getenv("GITHUB_RUN_ID")
+    run_attempt = os.getenv("GITHUB_RUN_ATTEMPT")
+
+    parts = ["pd-e2e", test_env, timestamp]
+    if workflow:
+        parts.append(workflow)
+    if run_id:
+        parts.append(f"run:{run_id}")
+    if run_attempt:
+        parts.append(f"attempt:{run_attempt}")
+
+    os.environ["APPLITOOLS_BATCH_NAME"] = " | ".join(parts)
 
 
 def pytest_sessionstart(session: pytest.Session) -> None:
