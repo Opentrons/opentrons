@@ -86,6 +86,7 @@ async def test_runner_with_modules_in_legacy_python(
         params=commands.HomeParams(axes=None),
         notes=[],
         result=commands.HomeResult(),
+        commandAnnotations=[],
     )
     assert commands_result[1] == commands.LoadLabware.model_construct(
         id=matchers.IsA(str),
@@ -97,6 +98,7 @@ async def test_runner_with_modules_in_legacy_python(
         params=matchers.Anything(),
         notes=[],
         result=matchers.Anything(),
+        commandAnnotations=None,
     )
 
     assert commands_result[2] == commands.LoadModule.model_construct(
@@ -109,6 +111,7 @@ async def test_runner_with_modules_in_legacy_python(
         params=matchers.Anything(),
         notes=[],
         result=temp_module_result_captor,
+        commandAnnotations=None,
     )
 
     assert commands_result[3] == commands.LoadModule.model_construct(
@@ -121,6 +124,7 @@ async def test_runner_with_modules_in_legacy_python(
         params=matchers.Anything(),
         notes=[],
         result=mag_module_result_captor,
+        commandAnnotations=None,
     )
 
     assert commands_result[4] == commands.LoadModule.model_construct(
@@ -145,6 +149,7 @@ async def test_runner_with_modules_in_legacy_python(
         params=matchers.Anything(),
         notes=[],
         result=heater_shaker_result_captor,
+        commandAnnotations=None,
     )
 
     assert temp_module_result_captor.value.model == ModuleModel.TEMPERATURE_MODULE_V1

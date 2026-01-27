@@ -337,6 +337,7 @@ class CommandStore(HasState[CommandState], HandlesActions):
             params=action.request.params,  # type: ignore[arg-type]
             intent=action.request.intent,
             status=CommandStatus.QUEUED,
+            commandAnnotations=action.request.commandAnnotations,
             failedCommandId=action.failed_command_id,
         )
 

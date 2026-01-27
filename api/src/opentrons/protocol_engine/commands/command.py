@@ -110,6 +110,7 @@ class BaseCommandCreate(
         ),
         json_schema_extra=_pop_default,
     )
+    commandAnnotations: List[str] = Field(default_factory=list, description="...")
 
 
 @dataclasses.dataclass(frozen=True)
