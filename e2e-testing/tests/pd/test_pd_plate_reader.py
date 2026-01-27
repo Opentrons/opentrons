@@ -6,12 +6,12 @@ from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
 from automation.pd_pages.timeline import Timeline
-from eyes import eyes_check, eyes_check_element
+from eyes import Eyes
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
+def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes) -> None:
     plate_reader_page = PlateReaderPage(page)
     protocol_editor = ProtocolEditorPage(page)
     create_protocol = CreateProtocolWizard(page)
@@ -86,11 +86,9 @@ def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
     plate_reader_page.wait_for_save_banner_gone()
     timeline = Timeline(page)
     timeline.scroll_timeline_to_bottom()
-    eyes_check(page, test_name="test_flex_absorbance_reader_setup", checkpoint_name="Fully Configured Plate Reader")
+    eyes.check(checkpoint_name="Fully Configured Plate Reader")
     # now take a visual snapshot of the timeline element with stitching
-    eyes_check_element(
-        page,
-        test_name="test_flex_absorbance_reader_setup",
+    eyes.check_element(
         checkpoint_name="Stitched Final Timeline",
         element=page.get_by_test_id(timeline.timeline_box_testid),
     )

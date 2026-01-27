@@ -1,7 +1,10 @@
 """Applitools Eyes helpers for PD E2E tests.
 
-This module intentionally provides plain functions/context managers (not pytest fixtures)
-so tests can opt-in to visual checks when desired.
+Primary entrypoint is the `eyes` pytest fixture (provided via `conftest.py` plugin
+registration). When enabled, tests can call:
+
+- `eyes.check("Checkpoint")` for a window snapshot.
+- `eyes.check_element("Checkpoint", locator)` for a stitched element snapshot.
 
 Environment:
 - Set `APPLITOOLS_API_KEY` (optionally via a `.env` file) to enable visual checks.
@@ -10,13 +13,39 @@ Environment:
 from __future__ import annotations
 
 import os
-from contextlib import contextmanager
 from functools import lru_cache
 from typing import Iterator
 
-from applitools.playwright import Eyes, Target
+import pytest
+from _pytest.fixtures import FixtureRequest
+from applitools.playwright import Eyes as ApplitoolsEyes
+from applitools.playwright import Target
 from dotenv import find_dotenv, load_dotenv
 from playwright.sync_api import Locator, Page
+
+
+class Eyes(ApplitoolsEyes):
+    """Applitools Eyes with PD E2E convenience methods.
+
+    Provides a lightweight wrapper around Applitools' `Eyes` so tests can call:
+    - `eyes.check("Checkpoint")` to snapshot the current window
+    - `eyes.check_element("Checkpoint", locator)` to snapshot a stitched element
+
+    The original Applitools signature is still supported via the optional `target`.
+    """
+
+    def check(self, checkpoint_name: str, target: object | None = None) -> None:  # type: ignore[override]
+        """Run a window check by default, or a raw Applitools check when `target` is provided."""
+
+        if target is None:
+            return super().check(checkpoint_name, Target.window())
+        return super().check(checkpoint_name, target)
+
+    def check_element(self, checkpoint_name: str, element: Locator) -> None:
+        """Run a stitched element check for a scrollable region."""
+
+        element.wait_for(state="visible")
+        super().check(checkpoint_name, Target.region(element).fully())
 
 
 @lru_cache(maxsize=1)
@@ -78,118 +107,59 @@ def _is_headed_run() -> bool:
     return False
 
 
-@contextmanager
-def eyes_session(
-    page: Page,
-    test_name: str,
-    *,
-    app_name: str = "Protocol Designer",
-    api_key: str | None = None,
-    enabled: bool | None = None,
-) -> Iterator[Eyes]:
-    """Open an Applitools Eyes session and ensure it is closed/aborted safely.
+def _print_once(message: str, *, guard_env_var: str) -> None:
+    """Print a message only once per process to avoid noisy logs."""
 
-    Args:
-        page: Playwright page from pytest-playwright.
-        test_name: The name of the test (usually the pytest test name).
-        app_name: The Applitools app name.
-        api_key: Explicit API key override.
-        enabled: If None, enabled when an API key is present. If False, raises.
+    if os.environ.get(guard_env_var) == "true":
+        return
+    print(message)
+    os.environ[guard_env_var] = "true"
 
-    Yields:
-        An opened Eyes instance.
+
+@pytest.fixture(scope="session")
+def eyes_singleton() -> Eyes | None:
+    """Session-scoped Applitools Eyes singleton.
+
+    This creates a single Eyes instance per pytest worker process.
+    It does *not* open a test; use the function-scoped `eyes` fixture for that.
     """
 
-    if enabled is None:
-        api_key_found = api_key or get_applitools_api_key(required=False)
-        enabled = api_key_found is not None
-        api_key = api_key_found
+    # If we're headed, never do Applitools checks.
+    if _is_headed_run():
+        _print_once("Applitools disabled for this run (headed mode).", guard_env_var="_APPLITOOLS_DISABLED_HEADED")
+        return None
 
-    if not enabled:
-        raise RuntimeError(
-            "Applitools is disabled (no APPLITOOLS_API_KEY). "
-            "Use eyes_check_window(..., enabled=None) to auto-skip when missing."
+    api_key = get_applitools_api_key(required=False)
+    if api_key is None:
+        _print_once(
+            "Applitools disabled for this run (no APPLITOOLS_API_KEY).",
+            guard_env_var="_APPLITOOLS_DISABLED_NO_KEY",
         )
+        return None
 
-    eyes = create_eyes(api_key=api_key)
-    eyes.open(page, app_name=app_name, test_name=test_name)
+    return create_eyes(api_key=api_key)
+
+
+@pytest.fixture(scope="function")
+def eyes(page: Page, request: FixtureRequest, eyes_singleton: Eyes | None) -> Iterator[Eyes | None]:
+    """Opened Applitools Eyes session for the current pytest test.
+
+    Use this fixture when you want multiple `eyes.check(...)` calls in the same
+    pytest test function to be grouped under one Applitools test.
+
+    If Applitools is disabled (headed mode or missing key), yields None.
+    """
+
+    if eyes_singleton is None:
+        yield None
+        return
+
+    # Use the pytest test function name as the Applitools test name.
+    test_name = request.node.name
+
+    eyes_singleton.open(page, app_name="Protocol Designer", test_name=test_name)
     try:
-        yield eyes
-        eyes.close()
+        yield eyes_singleton
+        eyes_singleton.close()
     finally:
-        eyes.abort_if_not_closed()
-
-
-def eyes_check(
-    page: Page,
-    test_name: str,
-    checkpoint_name: str,
-    *,
-    app_name: str = "Protocol Designer",
-    api_key: str | None = None,
-    enabled: bool | None = None,
-) -> None:
-    """Take a visual snapshot of the current page with Applitools.
-
-    This is the one-call helper to use in tests when you want a visual verification.
-
-    If `enabled` is None (default), the check is automatically skipped when
-    no `APPLITOOLS_API_KEY` is available.
-    """
-
-    if _is_headed_run():
-        print("Applitools visual check skipped (headed mode).")
-        return
-
-    if enabled is None:
-        enabled = (api_key or get_applitools_api_key(required=False)) is not None
-
-    if not enabled:
-        print("Applitools visual check skipped (no APPLITOOLS_API_KEY).")
-        return
-
-    with eyes_session(page, test_name, app_name=app_name, api_key=api_key, enabled=True) as eyes:
-        eyes.check(checkpoint_name, Target.window())  # TODO Applitools should we use .fully()?
-
-
-def eyes_check_element(
-    page: Page,
-    test_name: str,
-    checkpoint_name: str,
-    element: Locator,
-    *,
-    app_name: str = "Protocol Designer",
-    api_key: str | None = None,
-    enabled: bool | None = None,
-) -> None:
-    """Take a stitched visual snapshot of a specific element with Applitools.
-
-    Use this when you have a scrollable container (e.g. the timeline toolbox)
-    and want Applitools to stitch the full element contents.
-
-    Args:
-        page: Playwright page from pytest-playwright.
-        test_name: The name of the test (usually the pytest test name).
-        checkpoint_name: The Applitools checkpoint name.
-        element: A Playwright Locator pointing at the element to capture.
-        app_name: The Applitools app name.
-        api_key: Explicit API key override.
-        enabled: If None (default), auto-skip when no API key is available.
-    """
-
-    if _is_headed_run():
-        print("Applitools visual check skipped (headed mode).")
-        return
-
-    if enabled is None:
-        enabled = (api_key or get_applitools_api_key(required=False)) is not None
-
-    if not enabled:
-        print("Applitools visual check skipped (no APPLITOOLS_API_KEY).")
-        return
-
-    # Ensure the element is present/visible before snapshotting.
-    element.wait_for(state="visible")
-
-    with eyes_session(page, test_name, app_name=app_name, api_key=api_key, enabled=True) as eyes:
-        eyes.check(checkpoint_name, Target.region(element).fully())
+        eyes_singleton.abort_if_not_closed()

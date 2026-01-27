@@ -21,6 +21,9 @@ from playwright.sync_api import Error as PlaywrightError
 
 from utility import troubleshoot_and_pause
 
+# Expose fixtures defined in e2e-testing/eyes.py (e.g. the `eyes` fixture).
+pytest_plugins = ["eyes"]
+
 
 def pytest_collection_modifyitems(config: Config, items: List[Item]) -> None:
     is_headed = bool(config.getoption("--headed", False)) or os.getenv("HEADLESS") == "false"
@@ -86,7 +89,6 @@ def _save_video_with_test_name(video: Video, nodeid: str) -> None:
 def pytest_configure(config: Any) -> None:
     """Create test-results directory if it doesn't exist."""
     _ensure_test_results_dir()
-    _ensure_applitools_batch_env()
 
 
 def _ensure_applitools_batch_env() -> None:
@@ -119,12 +121,11 @@ def _ensure_applitools_batch_env() -> None:
 
     # Create a stable ID for the run if one isn't already set.
     _log(f"CI={os.environ.get('CI')}")
-    _log(f"GITHUB_ACTIONS={os.environ.get('GITHUB_ACTIONS')}")
+    _log(f"APPLITOOLS_DEBUG={os.environ.get('APPLITOOLS_DEBUG')}")
     _log(f"TEST_ENV={os.environ.get('TEST_ENV')}")
-    _log(f"GITHUB_WORKFLOW={os.environ.get('GITHUB_WORKFLOW')}")
-    _log(f"GITHUB_RUN_ID={os.environ.get('GITHUB_RUN_ID')}")
-    _log(f"GITHUB_RUN_ATTEMPT={os.environ.get('GITHUB_RUN_ATTEMPT')}")
-    _log(f"APPLITOOLS_API_KEY_set={os.getenv('APPLITOOLS_API_KEY') is not None}")
+    _log(f"GITHUB_HEAD_REF={os.environ.get('GITHUB_HEAD_REF')}")
+    _log(f"GITHUB_REF_NAME={os.environ.get('GITHUB_REF_NAME')}")
+    _log(f"GITHUB_REF={os.environ.get('GITHUB_REF')}")
     _log(f"APPLITOOLS_BATCH_NAME_pre={os.getenv('APPLITOOLS_BATCH_NAME')}")
     _log(f"APPLITOOLS_BATCH_ID_pre={os.getenv('APPLITOOLS_BATCH_ID')}")
 
@@ -139,22 +140,16 @@ def _ensure_applitools_batch_env() -> None:
         return
 
     test_env = os.getenv("TEST_ENV", "local")
-    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
 
-    # Add CI context when available for easier triage.
-    workflow = os.getenv("GITHUB_WORKFLOW")
-    run_id = os.getenv("GITHUB_RUN_ID")
-    run_attempt = os.getenv("GITHUB_RUN_ATTEMPT")
-
-    parts = ["pd-e2e", test_env, timestamp]
-    if workflow:
-        parts.append(workflow)
-    if run_id:
-        parts.append(f"run:{run_id}")
-    if run_attempt:
-        parts.append(f"attempt:{run_attempt}")
-
-    os.environ["APPLITOOLS_BATCH_NAME"] = " | ".join(parts)
+    if is_ci:
+        # For pull_request events, this is the source branch name.
+        # Fallbacks cover non-PR workflows.
+        pr_branch = (
+            os.getenv("GITHUB_HEAD_REF") or os.getenv("GITHUB_REF_NAME") or os.getenv("GITHUB_REF") or "unknown-branch"
+        )
+        os.environ["APPLITOOLS_BATCH_NAME"] = f"CI | {pr_branch}"
+    else:
+        os.environ["APPLITOOLS_BATCH_NAME"] = f"dev run | {test_env}"
 
     _log("Batch env configured.")
     _log(f"APPLITOOLS_BATCH_NAME={os.getenv('APPLITOOLS_BATCH_NAME')}")

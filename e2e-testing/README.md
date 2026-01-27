@@ -179,7 +179,7 @@ All tests automatically generate comprehensive reports and recordings:
 
 ## Visual Snapshots (Applitools Eyes)
 
-This project includes an opt-in helper to take Applitools visual snapshots from any test.
+This project includes an opt-in Applitools Eyes integration for visual snapshots.
 
 ### Setup
 
@@ -199,28 +199,39 @@ This project includes an opt-in helper to take Applitools visual snapshots from 
 
 ### Usage
 
-Use the one-call helper when you want to capture a visual checkpoint:
+Use the `eyes` pytest fixture when you want to capture visual checkpoints.
 
 ```python
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
-from eyes import eyes_check
+from eyes import Eyes
 
 
-def test_visual_checkpoint(page: Page) -> None:
+def test_visual_checkpoint(page: Page, eyes: Eyes | None) -> None:
    # ... navigate using page objects ...
-   eyes_check(page, test_name="test_visual_checkpoint", checkpoint_name="Main Page")
+
+   if eyes is None:
+      # Eyes is disabled in headed mode or when APPLITOOLS_API_KEY is missing.
+      return
+
+   eyes.check("Main Page")
+
+   timeline: Locator = page.get_by_test_id("TimelineToolbox_scrollContainer")
+   eyes.check_element("Timeline Toolbox (stitched)", timeline)
 ```
 
 Notes:
 
-- If `APPLITOOLS_API_KEY` is not set, `eyes_check()` will automatically no-op.
-- Applitools batch name is set in conftest.py and is dynamic
+- If `APPLITOOLS_API_KEY` is not set, the `eyes` fixture yields `None`.
+- In headed mode, the `eyes` fixture yields `None` (no visual snapshots).
+- Applitools batch name is set in `conftest.py`:
+  - Local/dev: `dev run | <TEST_ENV>`
+  - CI: `CI | <PR branch>`
 
 ### Adding a new visual checkpoint
 
-When you want to add a new visual checkpoint, use the `eyes_check` helper function in your test. Provide a `test_name` (the exact name of the test function) and `checkpoint_name` to identify the snapshot
+When you want to add a new visual checkpoint, add a new `eyes.check("<checkpoint>")` call.
 
-If you have multiple checkpoints in the same test, the `test_name` stays the same. Make sure each `checkpoint_name` is unique.
+If you have multiple checkpoints in the same test, they will be grouped under a single Applitools test. Make sure each checkpoint name is unique.
 
 You can run the test locally and approve the baseline but this will not be the approval for the test in CI. CI runs have a baseline with the OS set to Linux, and so is considered a separate baseline from local (macOS) runs.

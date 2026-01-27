@@ -9,7 +9,7 @@ description = "E2E tests for Opentrons Protocol Designer"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "eyes-playwright>=6.4.18",
+    "eyes-playwright>=6.4.20",
     "mypy>=1.13.0",
     "playwright>=1.55.0",
     "pytest>=8.0.0",
@@ -39,7 +39,7 @@ ignore = []
 'fixtures/protocol/9/*' = ["ALL"]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.12"
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
