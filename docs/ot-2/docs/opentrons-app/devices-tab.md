@@ -13,7 +13,7 @@ The Devices tab lists all the Opentrons OT-2 and Flex robots on a network. The l
 </figure>
 
 !!! tip
-    If you're using a WiFi connection and don't see the OT-2 you want to use, check your WiFi settings. Your OT-2 may be on a different wireless network.
+    If you're using a WiFi connection and the OT-2 you want to use is unavailable, check your WiFi settings. Your OT-2 may be on a different wireless network.
 
 ## Device details
 
