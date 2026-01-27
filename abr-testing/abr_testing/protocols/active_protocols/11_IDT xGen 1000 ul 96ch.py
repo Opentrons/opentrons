@@ -97,7 +97,7 @@ def run(protocol: ProtocolContext) -> None:
     TIP_MIX = True  # Default False   | Use Tip Mixing instead of Heatershaker
     ONDECK_THERMO = True  # Default True    | On Deck Thermocycler
     ONDECK_TEMP = True
-    helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "04")
 
     # =============================== PIPETTE ===============================
     p1000 = protocol.load_instrument("flex_96channel_1000", "left")

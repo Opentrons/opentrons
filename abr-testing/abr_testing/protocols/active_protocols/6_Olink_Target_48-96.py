@@ -16,7 +16,7 @@ metadata = {
     "author": "Zachary Galluzzo <zachary.galluzzo@opentrons.com>",
 }
 
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 open_location: Any = "A4"
 
@@ -105,7 +105,7 @@ def run(protocol: ProtocolContext) -> None:
         open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
-    helpers.comment_protocol_version(protocol, "03")
+    helpers.comment_protocol_version(protocol, "05")
 
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
@@ -317,7 +317,12 @@ def run(protocol: ProtocolContext) -> None:
                     pip.touch_tip()
                     pip.move_to(well.top())
                 protocol.delay(seconds=delay_time)
-            pip.drop_tip()
+            pip.return_tip()
+            protocol.capture_image(
+                home_before=True, 
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
 
         else:
             length = (
@@ -349,7 +354,12 @@ def run(protocol: ProtocolContext) -> None:
                 protocol.delay(seconds=delay_time)
                 pip.move_to(destination[i].top())
 
-            pip.drop_tip()
+            pip.return_tip()
+            protocol.capture_image(
+                home_before=True, 
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
 
     def transfer_ep(src: Well, destination: Well, volume: float) -> None:
         """Transfer Extension Product to Sample Plate."""
@@ -400,7 +410,12 @@ def run(protocol: ProtocolContext) -> None:
             protocol.delay(seconds=delay_time)
             mixing(destination, 6, reps=2)  # rinse sample off tips
             pip.move_to(destination.top(-2))
-            pip.drop_tip()
+            pip.return_tip()
+            protocol.capture_image(
+                home_before=True, 
+                filename="successful_partial_tip_return",
+                resolution=(1280, 720),
+                zoom=1)
 
     def transfer_ifp(
         src: List[Well],
