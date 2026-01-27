@@ -92,21 +92,17 @@ export function GalleryItemCard(props: GalleryItemCardProps): JSX.Element {
     if (isLoading) {
       return
     }
-    const img = new Image()
-    const imagePathUrl = img.src
-    img.onload = () => {
-      if (robotName) {
-        dispatch(
-          cameraPhotoOpenAction({
-            robotName: robotName,
-            photoUrl: imagePathUrl,
-            windowTitle: t('branded:image_capture_window_title', {
-              step: stepCommandText,
-              timestamp,
-            }),
-          })
-        )
-      }
+    if (robotName && imagePath != null) {
+      dispatch(
+        cameraPhotoOpenAction({
+          robotName: robotName,
+          photoUrl: imagePath,
+          windowTitle: t('branded:image_capture_window_title', {
+            step: stepCommandText,
+            timestamp,
+          }),
+        })
+      )
     }
   }
   const [showErrorModal, setShowErrorModal] = useState(false)
