@@ -29,7 +29,6 @@ nav:
       - Labware Tab: opentrons-app/labware-tab.md
       - Devices Tab: opentrons-app/devices-tab.md
       - Transferring Protocols: opentrons-app/transfer-protocols.md
-      - Controlling Modules: opentrons-app/control-modules.md
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
