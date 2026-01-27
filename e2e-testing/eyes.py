@@ -16,7 +16,7 @@ from typing import Iterator
 
 from applitools.playwright import Eyes, Target
 from dotenv import find_dotenv, load_dotenv
-from playwright.sync_api import Page
+from playwright.sync_api import Locator, Page
 
 
 @lru_cache(maxsize=1)
@@ -150,3 +150,46 @@ def eyes_check(
 
     with eyes_session(page, test_name, app_name=app_name, api_key=api_key, enabled=True) as eyes:
         eyes.check(checkpoint_name, Target.window())  # TODO Applitools should we use .fully()?
+
+
+def eyes_check_element(
+    page: Page,
+    test_name: str,
+    checkpoint_name: str,
+    element: Locator,
+    *,
+    app_name: str = "Protocol Designer",
+    api_key: str | None = None,
+    enabled: bool | None = None,
+) -> None:
+    """Take a stitched visual snapshot of a specific element with Applitools.
+
+    Use this when you have a scrollable container (e.g. the timeline toolbox)
+    and want Applitools to stitch the full element contents.
+
+    Args:
+        page: Playwright page from pytest-playwright.
+        test_name: The name of the test (usually the pytest test name).
+        checkpoint_name: The Applitools checkpoint name.
+        element: A Playwright Locator pointing at the element to capture.
+        app_name: The Applitools app name.
+        api_key: Explicit API key override.
+        enabled: If None (default), auto-skip when no API key is available.
+    """
+
+    if _is_headed_run():
+        print("Applitools visual check skipped (headed mode).")
+        return
+
+    if enabled is None:
+        enabled = (api_key or get_applitools_api_key(required=False)) is not None
+
+    if not enabled:
+        print("Applitools visual check skipped (no APPLITOOLS_API_KEY).")
+        return
+
+    # Ensure the element is present/visible before snapshotting.
+    element.wait_for(state="visible")
+
+    with eyes_session(page, test_name, app_name=app_name, api_key=api_key, enabled=True) as eyes:
+        eyes.check(checkpoint_name, Target.region(element).fully())

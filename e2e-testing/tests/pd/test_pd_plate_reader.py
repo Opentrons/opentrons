@@ -5,7 +5,8 @@ from test_pd_create_new_flex import test_flex_onboarding_workflow
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
-from eyes import eyes_check
+from automation.pd_pages.timeline import Timeline
+from eyes import eyes_check, eyes_check_element
 
 
 @pytest.mark.pdE2E
@@ -79,4 +80,17 @@ def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
     protocol_editor.add_step("Absorbance Plate Reader")
     plate_reader_page.read_labware("test 2")
     plate_reader_page.save_pr_step()
+    # Make a deterministic visual snapshot of the whole page
+    # - wait for the step save snackbar to disappear
+    # - scroll to the bottom of the timeline
+    plate_reader_page.wait_for_save_banner_gone()
+    timeline = Timeline(page)
+    timeline.scroll_timeline_to_bottom()
     eyes_check(page, test_name="test_flex_absorbance_reader_setup", checkpoint_name="Fully Configured Plate Reader")
+    # now take a visual snapshot of the timeline element with stitching
+    eyes_check_element(
+        page,
+        test_name="test_flex_absorbance_reader_timeline",
+        checkpoint_name="Stitched Timeline",
+        element=page.get_by_test_id(timeline.timeline_box_testid),
+    )
