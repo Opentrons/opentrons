@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { DropdownMenu, Flex, SPACING } from '@opentrons/components'
-import { ALL, COLUMN, SINGLE } from '@opentrons/shared-data'
+import { ALL, COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -37,7 +37,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
 
   const options: DropdownOption[] = [
     {
-      name: t('all'),
+      name: t('all_nozzles'),
       value: ALL,
     },
   ]
@@ -45,16 +45,24 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
     options.push(
       ...[
         {
-          name: t('column'),
-          value: COLUMN,
+          name: t('single_nozzle'),
+          value: SINGLE,
           disabled: areAllTipracksOnAdapter,
           tooltipText: areAllTipracksOnAdapter
             ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
             : null,
         },
         {
-          name: t('single_nozzle'),
-          value: SINGLE,
+          name: t('single_row_of_nozzles'),
+          value: ROW,
+          disabled: areAllTipracksOnAdapter,
+          tooltipText: areAllTipracksOnAdapter
+            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
+            : null,
+        },
+        {
+          name: t('single_column_of_nozzles'),
+          value: COLUMN,
           disabled: areAllTipracksOnAdapter,
           tooltipText: areAllTipracksOnAdapter
             ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
