@@ -84,14 +84,14 @@ export function useRecoveryToastText({
   const currentStepReturnVal =
     stepNumber != null
       ? t('retrying_step_succeeded', {
-          step: stepNumber,
-        })
+        step: stepNumber,
+      })
       : t('retrying_step_succeeded_na')
   const nextStepReturnVal =
     stepNumber != null
       ? t('skipping_to_step_succeeded', {
-          step: stepNumber,
-        })
+        step: stepNumber,
+      })
       : t('skipping_to_step_succeeded_na')
 
   const toastText = handleRecoveryOptionAction(
@@ -193,6 +193,8 @@ export function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE:
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE:
       return currentStepReturnVal
+    case null:
+      return null
     default: {
       console.error('Unhandled recovery toast case. Handle explicitly.')
       return null
