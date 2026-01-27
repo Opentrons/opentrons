@@ -227,18 +227,11 @@ describe('form casting', () => {
       profileTargetLidTemp: null,
       orderedProfileItems: [],
       profileItemsById: {},
-      blockIsActiveHold: false,
-      blockTargetTempHold: null,
-      lidIsActiveHold: false,
-      lidTargetTempHold: null,
-      lidOpenHold: false,
     }
     expect(_castForm(input)).toEqual({
       ...input,
       blockTargetTemp: 24,
       lidTargetTemp: 44,
-      blockTargetTempHold: 0,
-      lidTargetTempHold: 0,
     })
   })
 })

@@ -6,6 +6,7 @@ import {
   getIsTiprack,
   GRIPPER_WASTE_CHUTE_ADDRESSABLE_AREA,
   LOW_VOLUME_PIPETTES,
+  POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN,
   WELL_ORIGIN_BOTTOM,
 } from '@opentrons/shared-data'
 
@@ -36,7 +37,11 @@ import {
 } from '../atomic'
 import { replaceTip } from './replaceTip'
 
-import type { MoveToWellParams, WellLocation } from '@opentrons/shared-data'
+import type {
+  MoveToWellParams,
+  WellLocation,
+  WellOrigin,
+} from '@opentrons/shared-data'
 import type {
   CommandCreator,
   CurriedCommandCreator,
@@ -66,9 +71,10 @@ const makePythonCommandCreator: (args: {
   positionArgs?: {
     labware: string
     well: string
+    wellOrigin: WellOrigin
     xOffset: number
     yOffset: number
-    offsetFromBottomMm: number
+    zOffset: number
   }
 }) => CurriedCommandCreator = args => () => {
   const {
@@ -88,11 +94,12 @@ const makePythonCommandCreator: (args: {
   const pipettePythonName = pipetteEntities[pipette].pythonName
   let locationPythonArg: string | null = null
   if (positionArgs != null) {
-    const { labware, well, xOffset, yOffset, offsetFromBottomMm } = positionArgs
+    const { labware, well, wellOrigin, xOffset, yOffset, zOffset } =
+      positionArgs
     const labwarePythonName = labwareEntities[labware].pythonName
     const pythonWellLocation: WellLocation = {
-      origin: 'bottom',
-      offset: { x: xOffset, y: yOffset, z: offsetFromBottomMm },
+      origin: wellOrigin,
+      offset: { x: xOffset, y: yOffset, z: zOffset },
     }
     locationPythonArg = `location=${labwarePythonName}[${formatPyStr(
       well
@@ -136,6 +143,7 @@ export const mixInPlaceUtil = (args: {
   liquidClass: string | null
   tiprack: string
   generatePython: boolean
+  // TODO: This function shouldn't be called "mixInPlaceUtil()" if we support moveToWellParams:
   moveToWellParams?: MoveToWellParams
 }): CurriedCommandCreator[] => {
   const {
@@ -169,9 +177,11 @@ export const mixInPlaceUtil = (args: {
         ? {
             labware: moveToWellParams.labwareId,
             well: moveToWellParams.wellName,
+            wellOrigin:
+              moveToWellParams.wellLocation?.origin ?? WELL_ORIGIN_BOTTOM,
             xOffset: moveToWellParams.wellLocation?.offset?.x ?? 0,
             yOffset: moveToWellParams.wellLocation?.offset?.y ?? 0,
-            offsetFromBottomMm: moveToWellParams.wellLocation?.offset?.z ?? 0,
+            zOffset: moveToWellParams.wellLocation?.offset?.z ?? 0,
           }
         : undefined,
   })
@@ -267,15 +277,16 @@ export const mix: CommandCreator<MixArgs> = (
     volume,
     times,
     changeTip,
-    offsetFromBottomMm,
     aspirateFlowRateUlSec,
     dispenseFlowRateUlSec,
     blowoutFlowRateUlSec,
     blowoutOffsetFromTopMm,
     dropTipLocation,
     tipRack,
+    positionReference,
     xOffset,
     yOffset,
+    zOffset,
     finalPushOut,
     nozzles,
     tipsSelected,
@@ -520,11 +531,11 @@ export const mix: CommandCreator<MixArgs> = (
           labwareId: labware,
           wellName: well,
           wellLocation: {
-            origin: WELL_ORIGIN_BOTTOM,
+            origin: POSITION_REFERENCE_MAPPED_TO_WELL_ORIGIN[positionReference],
             offset: {
-              z: offsetFromBottomMm,
               x: xOffset,
               y: yOffset,
+              z: zOffset,
             },
           },
         },

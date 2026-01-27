@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { pickBy } from 'lodash'
+import pickBy from 'lodash/pickBy'
 
 import { uuid } from '/protocol-designer/utils'
 
@@ -87,14 +87,6 @@ function migrateThermocyclerProfileForm(
     profileItemsById: originalForm.profileItemsById,
     profileTargetLidTemp: originalForm.profileTargetLidTemp,
     profileVolume: originalForm.profileVolume,
-
-    // These should be ignored now that profile steps are non-blocking and "end hold"
-    // options are no longer supported on them (because of backend limitations).
-    blockIsActiveHold: false,
-    blockTargetTempHold: null,
-    lidIsActiveHold: false,
-    lidTargetTempHold: null,
-    lidOpenHold: false,
   }
 
   const newPauseForm: PauseUntilProfileCompleteFormData = {
@@ -129,13 +121,6 @@ function migrateThermocyclerProfileForm(
     profileItemsById: {},
     profileTargetLidTemp: null,
     profileVolume: null,
-
-    // These should be ignored because this is a state step, not a profile step.
-    blockIsActiveHold: false,
-    blockTargetTempHold: null,
-    lidIsActiveHold: false,
-    lidTargetTempHold: null,
-    lidOpenHold: false,
   }
 
   return [newProfileForm, newPauseForm, newStateForm]

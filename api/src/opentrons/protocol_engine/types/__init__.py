@@ -7,8 +7,8 @@ from opentrons_shared_data.pipette.types import LabwareUri
 from .automatic_tip_selection import NextTipInfo, NoTipAvailable, NoTipReason
 from .command_annotations import (
     CommandAnnotation,
-    CustomCommandAnnotation,
-    SecondOrderCommandAnnotation,
+    CustomCommandAnnotationLegacy,
+    SecondOrderCommandAnnotationLegacy,
 )
 from .command_preconditions import (
     CommandPreconditions,
@@ -167,8 +167,8 @@ __all__ = [
     "FileInfo",
     "RunTimeParameter",
     # Command annotations
-    "SecondOrderCommandAnnotation",
-    "CustomCommandAnnotation",
+    "SecondOrderCommandAnnotationLegacy",
+    "CustomCommandAnnotationLegacy",
     "CommandAnnotation",
     # Command preconditions
     "PreconditionTypes",

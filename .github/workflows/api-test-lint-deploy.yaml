@@ -57,7 +57,7 @@ jobs:
           fetch-depth: 0
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.21.1'
+          node-version: '22.22.0'
       - uses: './.github/actions/python/setup-uv'
         with:
           project: 'api'
@@ -91,7 +91,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.21.1'
+          node-version: '22.22.0'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:
@@ -190,7 +190,7 @@ jobs:
           git checkout ${{ github.ref }}
       - uses: 'actions/setup-node@v6'
         with:
-          node-version: '22.21.1'
+          node-version: '22.22.0'
       - name: 'set complex environment variables'
         uses: actions/github-script@v6
         with:

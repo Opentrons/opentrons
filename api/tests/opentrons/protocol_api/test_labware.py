@@ -247,6 +247,14 @@ def test_reset_tips(
     decoy.verify(mock_labware_core.reset_tips(), times=1)
 
 
+def test_set_empty(
+    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
+) -> None:
+    """It should empty the tip state."""
+    subject.set_empty()
+    decoy.verify(mock_labware_core.set_empty(), times=1)
+
+
 def test_parent_slot(
     decoy: Decoy,
     subject: Labware,

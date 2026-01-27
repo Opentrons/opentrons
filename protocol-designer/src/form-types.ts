@@ -118,19 +118,14 @@ export type StepFieldName = string
 
 /* MODULE FIELDS */
 // | 'blockIsActive'
-// | 'blockIsActiveHold'
-// | 'blockTargetTempHold'
 // | 'engageHeight'
 // | 'heaterShakerSetTimer'
 // | 'heaterShakerTimerMinutes'
 // | 'heaterShakerTimerSeconds'
 // | 'latchOpen'
 // | 'lidIsActive'
-// | 'lidIsActiveHold'
 // | 'lidOpen'
-// | 'lidOpenHold'
 // | 'lidTargetTemp'
-// | 'lidTargetTempHold'
 // | 'magnetAction'
 // | 'moduleId'
 // | 'orderedProfileItems'
@@ -434,6 +429,8 @@ export interface HydratedMixFormData extends AnnotationFields {
   dispense_delay_seconds?: number | null
   dispense_flowRate?: number | null
   dropTip_wellNames?: string[] | null
+  // TODO: mix_mmFromBottom is now the position above the mix_position_reference, not the bottom.
+  // Renaming it will probably require a migration.
   mix_mmFromBottom?: number | null
   mix_touchTip_mmFromTop?: number | null
   mix_x_position?: number | null
@@ -498,18 +495,6 @@ export interface HydratedThermocyclerFormData extends AnnotationFields {
   profileItemsById: Record<string, ProfileItem>
   profileTargetLidTemp: string | null
   profileVolume: string | null
-
-  // https://opentrons.atlassian.net/browse/EXEC-2141
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  blockIsActiveHold: boolean
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  blockTargetTempHold: string | null
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  lidIsActiveHold: boolean
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  lidTargetTempHold: string | null
-  /** @deprecated Ignored with enableConcurrentModuleActions. Use a separate Thermocycler step instead. */
-  lidOpenHold: boolean
 }
 
 export type AbsorbanceReaderFormType =

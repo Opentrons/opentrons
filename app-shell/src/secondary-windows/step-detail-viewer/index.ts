@@ -9,6 +9,7 @@ import {
 
 import type { Logger } from 'winston'
 import type {
+  CompletedProtocolAnalysis,
   Liquid,
   ProtocolAnalysisOutput,
   RunTimeCommand,
@@ -30,7 +31,7 @@ interface OpenStepDetailViewerParams {
   command: RunTimeCommand
   robotState: RobotState
   invariantContext: InvariantContext
-  analysis: ProtocolAnalysisOutput
+  analysis: ProtocolAnalysisOutput | CompletedProtocolAnalysis
   liquids: Liquid[]
   log: Logger
 }

@@ -368,3 +368,25 @@ class ProtocolEditorPage(BasePage):
 
         mouse.up()
         self.page.wait_for_timeout(150)
+
+    def select_step(self, step_count: int, step_type: str) -> None:
+        """click to view step
+        NOTE: This function has 1 not 0 based indexing
+        Args:
+            step_count: ALWAYS the index of the source step
+            step_type: The type of step being selected (e.g., "Absorbance Plate Reader").
+        """
+        steps = self.page.locator('div[draggable="true"]')
+
+        source = steps.nth(step_count)
+        source.scroll_into_view_if_needed()
+
+        source_box = source.bounding_box()
+
+        assert source_box is not None
+
+        start_x = source_box["x"] + source_box["width"] / 2
+        start_y = source_box["y"] + source_box["height"] / 2
+        mouse = self.page.mouse
+        ## Ask mouse to double click
+        mouse.click(start_x, start_y, click_count=2)

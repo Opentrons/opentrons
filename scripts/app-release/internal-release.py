@@ -151,25 +151,36 @@ def get_last_tag_from_list(tags: List[str], tag_type: str, internal_version: str
     if not tags:
         return None
     
-    # Sort tags by version
-    tags_sorted = sorted(tags, key=lambda t: t, reverse=True)
-    
-    # For internal_numeric (ot3-firmware), just return the latest
+    # For internal_numeric (ot3-firmware), sort by numeric version
     if tag_type == "internal_numeric":
+        def numeric_key(tag: str) -> int:
+            m = re.match(r"^internal@v(\d+)$", tag)
+            return int(m.group(1)) if m else -1
+        tags_sorted = sorted(tags, key=numeric_key, reverse=True)
         return tags_sorted[0] if tags_sorted else None
     
-    # For alpha tags, find the latest tag matching this specific version
-    for tag in tags_sorted:
-        if tag_type == "internal_alpha":
-            # internal@2.8.0-alpha.X
-            if tag.startswith(f"internal@{internal_version}-alpha."):
-                return tag
-        elif tag_type == "ot3_alpha":
-            # ot3@2.8.0-alpha.X
-            if tag.startswith(f"ot3@{internal_version}-alpha."):
-                return tag
+    # For alpha tags, filter to matching version and sort by alpha number
+    if tag_type == "internal_alpha":
+        prefix = f"internal@{internal_version}-alpha."
+    elif tag_type == "ot3_alpha":
+        prefix = f"ot3@{internal_version}-alpha."
+    else:
+        return None
     
-    return None
+    matching_tags = [t for t in tags if t.startswith(prefix)]
+    if not matching_tags:
+        return None
+    
+    def alpha_key(tag: str) -> int:
+        # Extract the number after "alpha."
+        suffix = tag[len(prefix):]
+        try:
+            return int(suffix)
+        except ValueError:
+            return -1
+    
+    matching_sorted = sorted(matching_tags, key=alpha_key, reverse=True)
+    return matching_sorted[0] if matching_sorted else None
 
 
 def get_last_tag_for_version(repo_path: Path, tag_pattern: str, tag_type: str, internal_version: str) -> Optional[str]:

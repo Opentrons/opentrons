@@ -1,0 +1,70 @@
+{
+  "$otSharedSchema": "module/schemas/3",
+  "moduleType": "vacuumModuleType",
+  "model": "vacuumModuleMilliporeV1",
+  "labwareOffset": {
+    "x": 999999,
+    "y": 999999,
+    "z": 999999
+  },
+  "features": {},
+  "dimensions": {
+    "bareOverallHeight": 999999,
+    "overLabwareHeight": 999999,
+    "xDimension": 999999,
+    "yDimension": 999999,
+    "footprintXDimension": 128,
+    "footprintYDimension": 86,
+    "labwareInterfaceXDimension": 128,
+    "labwareInterfaceYDimension": 86
+  },
+  "extents": {
+    "total": {
+      "backLeftBottom": {
+        "x": 999999,
+        "y": 999999,
+        "z": 999999
+      },
+      "frontRightTop": {
+        "x": 999999,
+        "y": 999999,
+        "z": 999999
+      }
+    }
+  },
+  "cornerOffsetFromSlot": {
+    "x": 999999,
+    "y": 999999,
+    "z": 999999
+  },
+  "calibrationPoint": {
+    "x": 999999,
+    "y": 999999,
+    "z": 999999
+  },
+  "gripperOffsets": {
+    "default": {
+      "pickUpOffset": {
+        "x": 999999,
+        "y": 999999,
+        "z": 999999
+      },
+      "dropOffset": {
+        "x": 999999,
+        "y": 999999,
+        "z": 999999
+      }
+    }
+  },
+  "displayName": "Vacuum Module Millipore GEN1",
+  "quirks": [],
+  "slotTransforms": {},
+  "orientation": {
+    "A3": "right",
+    "A4": "right",
+    "D3": "right",
+    "D4": "right"
+  },
+  "compatibleWith": [],
+  "incompatibleWithDecks": ["ot2_standard", "ot2_short_trash"]
+}
