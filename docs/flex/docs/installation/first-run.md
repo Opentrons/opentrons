@@ -17,17 +17,28 @@ When you power on Flex, the Opentrons logo will appear on the touchscreen. After
 
 Follow the prompts on the touchscreen to get your robot connected so it can check for software updates and receive protocol files. There are three connection methods: Wi-Fi, Ethernet, and USB.
 
+!!! note
+    Opentrons strongly recommends using an Ethernet connection for the initial setup.
+
 <figure class="screenshot" markdown>
 ![Network connection options.](../images/choose-network-type.png "Network connection options")
 <figcaption>Network connection options. You need to have internet connectivity to set up Flex.</figcaption>
 </figure>
 
+### Ethernet (recommended on first run)
+
+Connect your Flex to a network switch, hub, or router with an Ethernet cable *before* connecting it to a Wi-Fi network. Making this initial connection via Ethernet cable ensures the robot has a stable internet connection to download any required software or firmware updates. Weak wireless signals can interrupt these downloads, causing the robot to get stuck in an endless restart cycle (or "boot loop). After the flex has updated and restarted, you can then switch to a wireless network if desired.
+
+<!--- do we still need this? --->
+Also, after first starting with an ethernet connection, you can then connect the robot directly to the Ethernet port on your computer, starting in robot system version 7.1.0.
+
 ### Wi-Fi
 
 Use the touchscreen to connect to Wi-Fi networks that are secured with WPA2 Personal authentication (most networks that only require a password to join fall under this category).
 
-!!! note 
-    Flex does not support captive portals (networks that don't have a password but load a webpage to authenticate users after connecting).
+!!! tip "Avoiding first-run setup errors"
+    - **Use Ethernet first**: As noted above, using Ethernet for the first connection prevents potential update errors caused by weak Wi-Fi signals. After updating, you can then connect the robot to a wireless network.
+    - **No captive portals**: Flex does not support captive portals (networks that don't have a password but load a webpage to authenticate users after connecting). Captive portals are commonly found in hotels, airports, or other public guest network locations.
 
 You can also connect to an open Wi-Fi network, but this is not recommended.
 
@@ -55,10 +66,6 @@ Select your network from the dropdown menu or choose "Join other network..." and
 - EAP-TLS
 
 Each of these methods requires a username and password, and depending on your exact network configuration may require certificate files or other options. Consult your facility's IT documentation or contact your IT manager for details of your network setup.
-
-### Ethernet
-
-Connect your robot to a network switch or hub with an Ethernet cable. You can also connect directly to the Ethernet port on your computer, starting in robot system version 7.1.0.
 
 ### USB 
 
