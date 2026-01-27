@@ -284,8 +284,8 @@ class BaseCommand(
             " the command's execution or the command's generation."
         ),
     )
-    commandAnnotations: Optional[List[str]] = Field(
-        None,
+    commandAnnotations: List[str] = Field(
+        default_factory=list,
         description="An optional list of command annotation IDs that apply to this command.",
     )
     failedCommandId: Optional[str] = Field(
