@@ -84,14 +84,14 @@ export function useRecoveryToastText({
   const currentStepReturnVal =
     stepNumber != null
       ? t('retrying_step_succeeded', {
-        step: stepNumber,
-      })
+          step: stepNumber,
+        })
       : t('retrying_step_succeeded_na')
   const nextStepReturnVal =
     stepNumber != null
       ? t('skipping_to_step_succeeded', {
-        step: stepNumber,
-      })
+          step: stepNumber,
+        })
       : t('skipping_to_step_succeeded_na')
 
   const toastText = handleRecoveryOptionAction(
