@@ -8,6 +8,7 @@ import {
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
   getEmptyDeckConfiguration,
+  replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -103,23 +104,22 @@ export function HardwareConfigurator(
       cutoutFixtureId: ae.cutoutFixtureId,
     })
   )
+
+  // merge additional equipment config with module config by finding combo fixture with replaceCutoutFixtureWithComboFixture
+
   console.log('additionalEquipmentConfig: ', additionalEquipmentConfig)
   const updatedDeckConfig = [
     ...simpleDeckConfig,
     ...moduleConfig,
     ...additionalEquipmentConfig,
   ]
-  console.log('updatedDeckConfig: ', updatedDeckConfig)
+  console.log('updatedDeckConfig in initial deck config: ', updatedDeckConfig)
 
   //  initiate deck config
   useEffect(() => {
     dispatch(
       editDeckConfiguration({
-        deckConfig: [
-          ...simpleDeckConfig,
-          ...moduleConfig,
-          ...additionalEquipmentConfig,
-        ] as DeckConfiguration,
+        deckConfig: updatedDeckConfig as DeckConfiguration,
       })
     )
   }, [])
