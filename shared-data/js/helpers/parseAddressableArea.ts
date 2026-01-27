@@ -18,34 +18,34 @@ import {
 import type { AddressableAreaName } from '../../deck'
 import type { ModuleModel } from '../types'
 
-export function getSlotFromAddressableAreaName(
-  addressableArea: AddressableAreaName
-): string {
-  if (
-    [
-      ...FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
-      ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-      ...OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
-    ].includes(addressableArea as AddressableAreaName)
-  ) {
-    return addressableArea
-  } else if (addressableArea === THERMOCYCLER_ADDRESSABLE_AREA) {
-    return 'A1+B1'
-  } else {
-    const slotName = addressableArea.slice(-2)
+// export function getSlotFromAddressableAreaName(
+//   addressableArea: AddressableAreaName
+// ): string {
+//   if (
+//     [
+//       ...FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+//       ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+//       ...OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
+//     ].includes(addressableArea as AddressableAreaName)
+//   ) {
+//     return addressableArea
+//   } else if (addressableArea === THERMOCYCLER_ADDRESSABLE_AREA) {
+//     return 'A1+B1'
+//   } else {
+//     const slotName = addressableArea.slice(-2)
 
-    if (
-      [
-        ...FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
-        ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-        ...OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
-      ].includes(slotName as AddressableAreaName)
-    ) {
-      return slotName
-    }
-  }
-  return addressableArea
-}
+//     if (
+//       [
+//         ...FLEX_SINGLE_SLOT_ADDRESSABLE_AREAS,
+//         ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+//         ...OT2_SINGLE_SLOT_ADDRESSABLE_AREAS,
+//       ].includes(slotName as AddressableAreaName)
+//     ) {
+//       return slotName
+//     }
+//   }
+//   return addressableArea
+// }
 
 // TODO: (tz, 1/27/26): remove this function and use getModuleModelFromFixtureId instead
 export function getModuleModelFromAddressableArea(

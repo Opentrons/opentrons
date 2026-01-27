@@ -24,7 +24,7 @@ import {
   getFixtureDisplayName,
   getModuleModelFromFixtureId,
   getModuleType,
-  getSlotFromAddressableAreaName,
+  getSlotDisplayNameFromAAWithFakes,
   getWasteChuteOptions,
   MODULE_MODELS,
   MOVABLE_TRASH_ADDRESSABLE_AREAS,
@@ -295,7 +295,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
             slot:
               newModule.addressableAreaId === THERMOCYCLER_ADDRESSABLE_AREA
                 ? 'B1'
-                : getSlotFromAddressableAreaName(
+                : getSlotDisplayNameFromAAWithFakes(
                     newModule.addressableAreaId as AddressableAreaName
                   ),
             cutoutFixtureId:

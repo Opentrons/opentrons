@@ -7,10 +7,10 @@ import {
   THERMOCYCLER_MODULE_V2,
 } from '../../constants'
 import { getCutoutDisplayName } from '../../fixtures'
+import { getSlotDisplayNameFromAAWithFakes } from '../deckConfiguration/getVisualSlotFrom'
 import { getLabwareDefinitionsByURIForProtocol } from '../getLabwareDefinitionsByURIForProtocol'
 import { getLabwareDefURI } from '../getLabwareDefURI'
 import { getStackedItemsOnStartingDeck } from '../getStackedItemsOnStartingDeck'
-import { getSlotFromAddressableAreaName } from '../parseAddressableArea'
 
 import type {
   LoadLabwareRunTimeCommand,
@@ -382,7 +382,7 @@ describe('getStackedItemsOnStartingDeck', () => {
     })
 
     vi.mocked(getCutoutDisplayName).mockReturnValue('A1')
-    vi.mocked(getSlotFromAddressableAreaName).mockReturnValue('A1')
+    vi.mocked(getSlotDisplayNameFromAAWithFakes).mockReturnValue('A1')
   })
 
   it('returns empty object when no load commands are present', () => {
