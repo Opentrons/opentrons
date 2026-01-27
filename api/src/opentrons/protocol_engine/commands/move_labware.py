@@ -271,14 +271,18 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 addressable_area_name=params.newLocation.slotName.id
             )
 
+        # TODO: Make sure we dont move contained labware
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
-            location=params.newLocation
+            params.newLocation,
+            None,
+            current_labware_definition
         )
 
-        # Check that labware and destination do not have labware on top
-        self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
-            labware_id=params.labwareId
-        )
+        # Check that labware and destination do not have labware on top if not contained
+        if current_labware_definition.containedSpace is None:
+            self._state_view.labware.raise_if_labware_has_non_lid_labware_on_top(
+                labware_id=params.labwareId
+            )
 
         if isinstance(available_new_location, DeckSlotLocation):
             self._state_view.labware.raise_if_labware_cannot_be_ondeck(
@@ -333,9 +337,10 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     f" If trying to move a labware on an adapter, load the adapter separately to allow"
                     f" gripper movement."
                 )
+
             if labware_validation.validate_definition_is_adapter(
                 current_labware_definition
-            ):
+            ) and not current_labware_definition.parameters.isMovableAdapter:
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move adapter '{current_labware_definition.parameters.loadName}' with gripper."
                 )

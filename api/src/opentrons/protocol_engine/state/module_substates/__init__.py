@@ -15,6 +15,7 @@ from .thermocycler_module_substate import (
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
 )
+from .vacuum_module_substate import VacuumModuleId, VacuumModuleSubState
 
 ModuleSubStateType = Union[
     HeaterShakerModuleSubState,
@@ -24,6 +25,7 @@ ModuleSubStateType = Union[
     MagneticBlockSubState,
     AbsorbanceReaderSubState,
     FlexStackerSubState,
+    VacuumModuleSubState,
 ]
 
 __all__ = [
@@ -41,6 +43,8 @@ __all__ = [
     "AbsorbanceReaderId",
     "FlexStackerSubState",
     "FlexStackerId",
+    "VacuumModuleSubState",
+    "VacuumModuleId",
     # Union of all module substates
     "ModuleSubStateType",
 ]

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import logging
-from typing import Dict, Iterator, List, Optional, Sequence, Union, cast
+from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Union, cast
 
+from opentrons.protocol_engine.types.location import AddressableAreaLocation
+from opentrons.types import StagingSlotName
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
@@ -1841,3 +1843,64 @@ class VacuumModuleContext(ModuleContext):
     def serial_number(self) -> str:
         """Get the module's unique hardware serial number."""
         return self._core.get_serial_number()
+
+    @requires_version(2, 28)
+    def load_adapter_to_dock(
+        self,
+        name: str,
+        namespace: Optional[str] = None,
+        version: Optional[int] = None,
+    ) -> Labware:
+        """Load a collar adapter to the vacuum module dock."""
+
+        base_slot = self._core.get_deck_slot().id
+        area_name = f"{self.model}Dock{base_slot[0]}4"
+        location = AddressableAreaLocation(addressableAreaName=area_name)
+        # location = StagingSlotName.from_primitive(f"{self._core.get_deck_slot().id[0]}4")
+        labware_core = self._protocol_core.load_adapter(
+            load_name=name,
+            namespace=namespace,
+            version=version,
+            location=location,
+        )
+
+        if isinstance(self._core, LegacyModuleCore) and isinstance(
+            labware_core, LegacyLabwareCore
+        ):
+            adapter = self._core.add_labware_core(labware_core)
+        else:
+            adapter = Labware(
+                core=labware_core,
+                api_version=self._api_version,
+                protocol_core=self._protocol_core,
+                core_map=self._core_map,
+            )
+
+        self._core_map.add(labware_core, adapter)
+
+        return adapter
+
+    @requires_version(2, 28)
+    def move_to_dock(
+        self,
+        labware: Labware,
+        use_gripper: bool = False,
+        pick_up_offset: Optional[Mapping[str, float]] = None,
+        drop_offset: Optional[Mapping[str, float]] = None,
+    ) -> None:
+        pass
+
+    @requires_version(2, 28)
+    def start_set_vacuum(
+        self,
+        pressure: float,
+        duration: int,
+        vent_after: bool = False
+    ) -> None:
+        """The user commands the mbar of vacuum desired and the time. The user
+        has control, via an argument, to automatically vent the vacuum line to
+        bring the return to atmospheric pressure and allow for the manifold to
+        be unstacked. This is an asynchronous command that returns right away;
+        the command will continue to execute until the target gauge pressure
+        is reached."""
+        pass

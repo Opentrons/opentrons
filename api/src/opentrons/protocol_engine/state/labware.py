@@ -518,18 +518,20 @@ class LabwareView:
     def get_by_addressable_area(
         self,
         addressable_area: str,
-    ) -> Optional[LoadedLabware]:
-        """Get the labware located in a given addressable area, if any."""
+    ) -> List[LoadedLabware]:
+        """Get the list of labware located in a given addressable area, if any."""
+        labwares = []
         loaded_labware = list(self._state.labware_by_id.values())
 
         for labware in loaded_labware:
+            print("LOADED", labware)
             if (
                 isinstance(labware.location, AddressableAreaLocation)
                 and labware.location.addressableAreaName == addressable_area
             ):
-                return labware
+                labwares.append(labware)
 
-        return None
+        return labwares
 
     def get_definition(self, labware_id: str) -> LabwareDefinition:
         """Get labware definition by the labware's unique identifier."""

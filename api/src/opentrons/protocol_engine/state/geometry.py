@@ -17,6 +17,7 @@ from opentrons_shared_data.errors.exceptions import (
 )
 from opentrons_shared_data.labware.constants import WELL_NAME_PATTERN
 from opentrons_shared_data.labware.labware_definition import (
+    ContainedSpace,
     InnerWellGeometry,
     LabwareDefinition,
     LabwareDefinition2,
@@ -870,19 +871,32 @@ class GeometryView:
         """Get the name of the addressable area the labware is eventually on."""
         labware = self._labware.get(labware_id)
         original_display_name = self._labware.get_display_name(labware_id)
-        seen: Set[str] = set((labware_id,))
+
+        # Track visited IDs to truly detect cycles (A nested on B nested on A)
+        seen: Set[str] = {labware_id}
+
+        # Resolve 'OnLabware' nesting first
         while isinstance(labware.location, OnLabwareLocation):
-            labware = self._labware.get(labware.location.labwareId)
-            if labware.id in seen:
+            parent_id = labware.location.labwareId
+            if parent_id in seen:
                 raise InvalidLabwarePositionError(
-                    f"Cycle detected in labware positioning for {original_display_name}"
+                    f"Cycle detected in labware positioning for {original_display_name}. "
+                    f"Lineage: {' -> '.join(seen)} -> {parent_id}"
                 )
-            seen.add(labware.id)
+
+            seen.add(parent_id)
+            labware = self._labware.get(parent_id)
+
+        # Once we've reached the 'Base' labware of a stack, find the deck anchor
         if isinstance(labware.location, DeckSlotLocation):
             return labware.location.slotName.id
+
         elif isinstance(labware.location, AddressableAreaLocation):
             return labware.location.addressableAreaName
+
         elif isinstance(labware.location, ModuleLocation):
+            # This is where your Vacuum Module lives.
+            # It returns the Slot name (e.g., 'A3') that the module occupies.
             return self._modules.get_provided_addressable_area(
                 labware.location.moduleId
             )
@@ -893,33 +907,84 @@ class GeometryView:
             )
 
     def get_parent_from_location(self, location: _LabwareLocation) -> str:
+        """
+        Resolves a LabwareLocation (OnLabware, Module, or Slot)
+        down to its root Addressable Area Name.
+        """
+        current_loc = location
         seen: Set[str] = set()
-        while isinstance(location, OnLabwareLocation):
-            labware = self._labware.get(location.labwareId)
-            if labware.id in seen:
+
+        # 1. Resolve recursive nesting (Labware on Labware)
+        while isinstance(current_loc, OnLabwareLocation):
+            parent_id = current_loc.labwareId
+
+            if parent_id in seen:
                 raise InvalidLabwarePositionError(
-                    f"Cycle detected in labware positioning for {location}"
+                    f"Cycle detected in labware positioning at location: {location}"
                 )
-            seen.add(labware.id)
-        if isinstance(location, DeckSlotLocation):
-            return location.slotName.id
-        elif isinstance(location, AddressableAreaLocation):
-            return location.addressableAreaName
-        elif isinstance(location, ModuleLocation):
+
+            seen.add(parent_id)
+            # Fetch the next parent in the chain
+            parent_labware = self._labware.get(parent_id)
+            current_loc = parent_labware.location
+
+        # 2. Extract the Addressable Area from the terminal (root) location
+        if isinstance(current_loc, DeckSlotLocation):
+            return current_loc.slotName.id
+
+        elif isinstance(current_loc, AddressableAreaLocation):
+            return current_loc.addressableAreaName
+
+        elif isinstance(current_loc, ModuleLocation):
+            # The vacuum module provides exactly one addressable area
+            # (e.g. 'vacuumModuleV1_area' or simply the slot id like 'A3')
             return self._modules.get_provided_addressable_area(
-                location.moduleId
-            )
-        else:
-            raise LabwareNotOnDeckError(
-                f"Labware `SOMETHING` is not loaded on deck",
-                details={"eventual-location": repr(location)},
+                current_loc.moduleId
             )
 
+        else:
+            raise LabwareNotOnDeckError(
+                "Provided location is not linked to an addressable area on the deck.",
+                details={"terminal-location": repr(current_loc)},
+            )
+
+    # TODO: Only works for LabwareSchemaV2 rightnow
+    def _is_fully_contained(
+            self,
+            resident_def: LabwareDefinition,
+            boundary_space: ContainedSpace
+        ) -> bool:
+            """
+            Validates that the resident fits entirely within the boundary_space box.
+            All coordinates are relative to the parent's (0,0,0).
+            """
+            # Resident Extents (Standard labware starts at 0,0,0 relative to parent)
+            res_min_x, res_max_x = 0.0, resident_def.dimensions.xDimension
+            res_min_y, res_max_y = 0.0, resident_def.dimensions.yDimension
+            res_min_z, res_max_z = 0.0, resident_def.dimensions.zDimension
+
+            # Boundary Extents (The 'hole' defined in the JSON)
+            bound_min_x = boundary_space.origin.x
+            bound_max_x = bound_min_x + boundary_space.dimensions.xDimension
+
+            bound_min_y = boundary_space.origin.y
+            bound_max_y = bound_min_y + boundary_space.dimensions.yDimension
+
+            bound_min_z = boundary_space.origin.z
+            bound_max_z = bound_min_z + boundary_space.dimensions.zDimension
+
+            # Logical Check: Resident must be bounded by the boundary planes
+            return (
+                res_min_x >= bound_min_x and res_max_x <= bound_max_x and
+                res_min_y >= bound_min_y and res_max_y <= bound_max_y and
+                res_min_z >= bound_min_z and res_max_z <= bound_max_z
+            )
 
     def ensure_location_not_occupied(
         self,
         location: _LabwareLocation,
         desired_addressable_area: Optional[str] = None,
+        labware_definition: Optional[LabwareDefinition] = None,
     ) -> _LabwareLocation:
         """Ensure that the location does not already have either Labware or a Module in it."""
         # Collect set of existing fixtures, if any
@@ -934,10 +999,9 @@ class GeometryView:
             else None
         )
 
-        print("LOCATION", location)
-        print("DESIRED", desired_addressable_area)
-        print("EXISTS", existing_fixtures)
-        print("POTENTIAL", potential_fixtures)
+        print("EXISTING: ", existing_fixtures)
+        print("POTENTIAL: ", potential_fixtures)
+        print("DESIRED_AA: ", desired_addressable_area)
 
         # Handle the checking conflict on an incoming fixture
         if potential_fixtures is not None and isinstance(location, DeckSlotLocation):
@@ -967,13 +1031,6 @@ class GeometryView:
         # Otherwise handle standard conflict checking
         else:
 
-            # Check if the parent (Module or Labware) has a 'containedSpace'
-            parent = self.get_parent_from_location(location)
-            labware_stack = self._labware.get_labware_stack_from_parent(parent)
-            print("PARENT", location, parent)
-            print("STACK", labware_stack)
-            # parent_space = parent.definition.get("containedSpace") if parent else None
-
             if isinstance(
                 location,
                 (
@@ -983,7 +1040,61 @@ class GeometryView:
                     AddressableAreaLocation,
                 ),
             ):
-                self._labware.raise_if_labware_in_location(location)
+
+                # Check if the parent (Module or Labware) has a 'containedSpace'
+                print("\n\n---------------ELSE--------------------")
+
+                children = []
+                parent = self.get_parent_from_location(location)
+                for labware in self._labware.get_all():
+                    if (
+                        isinstance(labware.location, ModuleLocation) and labware.location == location
+                    ):
+                        children.append(labware)
+                    elif (
+                        isinstance(labware.location, AddressableAreaLocation)
+                        and labware.location.addressableAreaName == parent
+                    ):
+                        children.append(labware)
+
+                # if we have children check if either siblings have `containedSpace`
+                if children and labware_definition is not None:
+                    # new_labware_def corresponds to what is currently being loaded
+                    new_labware_def = labware_definition
+                    new_contained = new_labware_def.containedSpace
+
+                    for child in children:
+                        child_def = self._labware.get_definition(child.id)
+                        existing_contained = child_def.containedSpace
+
+                        # 1. Standard Nesting: Loading a resident into an existing container
+                        if existing_contained is not None:
+                            if not self._is_fully_contained(resident_def=new_labware_def, boundary_space=existing_contained):
+                                raise errors.LabwareIsNotAllowedInLocationError(
+                                    f"Labware {new_labware_def.parameters.loadName} does not fit within the "
+                                    f"containedSpace of existing {child.loadName}."
+                                )
+                            print(f"Nesting Success: {new_labware_def.parameters.loadName} is inside {child.loadName}")
+
+                        # 2. Enveloping Logic: Loading a container over an existing resident
+                        elif new_contained is not None:
+                            # Note: existing_contained is None here (the child is 'solid')
+                            if not self._is_fully_contained(resident_def=child_def, boundary_space=new_contained):
+                                raise errors.LocationIsOccupiedError(
+                                    f"Cannot envelop {child.loadName}; it is too large for the "
+                                    f"internal volume of {new_labware_def.parameters.loadName}."
+                                )
+                            print(f"Enveloping Success: {new_labware_def.parameters.loadName} dropped over {child.loadName}")
+
+                        # 3. Strict Occupancy: Neither has a volume
+                        else:
+                            raise errors.LocationIsOccupiedError(
+                                f"Labware {child.loadName} is already present at {location} "
+                                f"and neither labware supports nested containment."
+                            )
+
+                print("---------------ELSE--------------------\n\n")
+                # self._labware.raise_if_labware_in_location(location)
 
             area = (
                 location.slotName.id
@@ -994,6 +1105,9 @@ class GeometryView:
                     else None
                 )
             )
+
+            print("AREA: ", area)
+            print("PROVIDED: ", existing_fixtures)
             if area is not None and (
                 existing_fixtures is None
                 or not any(
@@ -1001,17 +1115,43 @@ class GeometryView:
                     for fixture in existing_fixtures[1]
                 )
             ):
+                print("HERE???", location)
                 if isinstance(location, DeckSlotLocation):
                     self._modules.raise_if_module_in_location(location)
                 elif isinstance(location, AddressableAreaLocation):
-                    self._modules.raise_if_module_in_location(
-                        DeckSlotLocation(
-                            slotName=self._addressable_areas.get_addressable_area_base_slot(
-                                location.addressableAreaName
-                            )
-                        )
-                    )
 
+                    base_slot = self._addressable_areas.get_addressable_area_base_slot(
+                        location.addressableAreaName
+                    )
+                    
+                    # 2. Check if there's a module at that base slot
+                    module_at_location = self._modules.get_by_slot(base_slot)
+
+                    print("MODULE: ", module_at_location)
+                    if module_at_location is not None and labware_definition is not None:
+                        # 3. EXCEPTION: If the module is a Vacuum Module and we are loading 
+                        # into its designated staging dock, do NOT raise.
+                        is_vacuum_module = "vacuumModule" in module_at_location.model
+                        is_staging_area = any(char in location.addressableAreaName for char in "4")
+                        quirks = labware_definition.parameters.quirks
+                        if is_vacuum_module and quirks is not None:
+                            name = f"{module_at_location.model}Dock{location.addressableAreaName}"
+                            print("MOD_NAME: ", module_at_location.model)
+                            is_dock = f"{module_at_location.model}" in list(quirks)
+                            print("NAME: ", name)
+
+                        if not (is_vacuum_module and is_staging_area):
+                            # Otherwise, proceed with standard standard collision check
+                            self._modules.raise_if_module_in_location(
+                                DeckSlotLocation(slotName=base_slot)
+                            )
+                        # else:
+                            # return AddressableAreaLocation(
+                            #     addressableAreaName="vaccu"
+                            #         )
+
+
+        print("ALl GOOD")
         return location
 
     def _get_potential_fixtures_for_location_occupation(
@@ -1610,9 +1750,13 @@ class GeometryView:
         labware_pending_load: dict[str, LoadedLabware] | None = None,
     ) -> LabwareLocationSequence:
         """Get the location sequence for this location. Useful for a labware that hasn't been loaded."""
-        return self._recurse_labware_location(
+        labware_sequence = self._recurse_labware_location(
             labware_location, [], labware_pending_load or {}
         )
+        print("REQ_LABWARE_SEQ: ", labware_sequence)
+        for seq in labware_sequence:
+            print(seq)
+        return labware_sequence
 
     def _cutout_fixture_location_sequence_from_addressable_area(
         self, addressable_area_name: str

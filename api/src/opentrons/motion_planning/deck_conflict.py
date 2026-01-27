@@ -236,6 +236,8 @@ def check(
     Returns:
         True if this item can be added (it will raise rather than return False)
     """
+
+    print("DECK: ", existing_items, new_item, new_location, robot_type)
     restrictions: List[_DeckRestriction] = []
     # build restrictions driven by existing items
     for location, item in existing_items.items():

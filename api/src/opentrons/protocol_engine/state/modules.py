@@ -68,6 +68,8 @@ from .module_substates import (
     TemperatureModuleSubState,
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
+    VacuumModuleId,
+    VacuumModuleSubState,
 )
 from .update_types import (
     AbsorbanceReaderStateUpdate,
@@ -386,6 +388,10 @@ class ModuleStore(HasState[ModuleState], HandlesActions):
                 max_pool_count=0,
                 pool_overlap=0,
                 pool_height=0,
+            )
+        elif ModuleModel.is_vacuum_module(actual_model):
+            self._state.substate_by_module_id[module_id] = VacuumModuleSubState(
+                module_id=VacuumModuleId(module_id),
             )
 
     def _update_additional_slots_occupied_by_thermocycler(
@@ -842,6 +848,21 @@ class ModuleView:
             module_id=module_id,
             expected_type=FlexStackerSubState,
             expected_name="Flex Stacker",
+        )
+
+
+    def get_vacuum_module_substate(self, module_id: str) -> VacuumModuleSubState:
+        """Return a `VacuumModuleSubState` for the given Vacuum Module.
+
+        Raises:
+           ModuleNotLoadedError: If module_id has not been loaded.
+           WrongModuleTypeError: If module_id has been loaded,
+               but it's not a Vacuum Module.
+        """
+        return self._get_module_substate(
+            module_id=module_id,
+            expected_type=VacuumModuleSubState,
+            expected_name="Vacuum Module",
         )
 
     def get_location(self, module_id: str) -> DeckSlotLocation:
@@ -1325,6 +1346,8 @@ class ModuleView:
 
         Return True if it does not raise.
         """
+
+        print("RAISE", location)
         for module in self.get_all():
             if module.model in _COLUMN_4_MODULES and module.location == location:
                 raise errors.LocationIsOccupiedError(
@@ -1459,6 +1482,21 @@ class ModuleView:
         assert lid_doc_slot is not None
         lid_dock_area = AddressableAreaLocation(
             addressableAreaName="absorbanceReaderV1LidDock" + lid_doc_slot.value
+        )
+        return lid_dock_area
+
+
+    def vacuum_module_dock_location(
+        self, module_id: str
+    ) -> AddressableAreaLocation:
+        """Get the addressable area for the vacuum module dock."""
+        reader_slot = self.get_location(module_id)
+        lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)
+        addressable_area = self.get_provided_addressable_area(module_id)
+        print("MOD_AA: ", addressable_area)
+        assert lid_doc_slot is not None
+        lid_dock_area = AddressableAreaLocation(
+            addressableAreaName="VacuumModuleV1LidDock" + lid_doc_slot.value
         )
         return lid_dock_area
 

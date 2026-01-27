@@ -293,13 +293,18 @@ class ProtocolCore(
             StagingSlotName,
             ModuleCore,
             NonConnectedModuleCore,
+            AddressableAreaLocation,
             OffDeckType,
         ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCore:
         """Load an adapter using its identifying parameters"""
-        load_location = self._get_non_stacked_location(location=location)
+        load_location = location
+        if not isinstance(location, AddressableAreaLocation):
+            load_location = self._get_non_stacked_location(location=location)
+
+        print("LOAD_LOC: ", location)
 
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
@@ -315,6 +320,7 @@ class ProtocolCore(
                 version=version,
             )
         )
+
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_adapter(load_result.definition)
 

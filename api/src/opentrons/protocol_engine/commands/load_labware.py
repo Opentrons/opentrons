@@ -109,6 +109,8 @@ class LoadLabwareImplementation(
         """Load definition and calibration data necessary for a labware."""
         state_update = StateUpdate()
 
+        print("HUH", params.location)
+
         # TODO (tz, 8-15-2023): extend column validation to column 1 when working
         # on https://opentrons.atlassian.net/browse/RSS-258 and completing
         # https://opentrons.atlassian.net/browse/RSS-255
@@ -126,6 +128,7 @@ class LoadLabwareImplementation(
             if not (
                 fixture_validation.is_deck_slot(params.location.addressableAreaName)
                 or fixture_validation.is_abs_reader(params.location.addressableAreaName)
+                or fixture_validation.is_vac_dock(params.location.addressableAreaName)
             ):
                 raise LabwareIsNotAllowedInLocationError(
                     f"Cannot load {params.loadName} onto addressable area {area_name}"
@@ -140,17 +143,19 @@ class LoadLabwareImplementation(
             )
             state_update.set_addressable_area_used(params.location.slotName.id)
 
-        print("LABWARE", params.loadName)
-        verified_location = self._state_view.geometry.ensure_location_not_occupied(
-            params.location
-        )
-
-        loaded_labware = await self._equipment.load_labware(
+        definition, definition_uri = await self._equipment.load_definition_for_details(
             load_name=params.loadName,
             namespace=params.namespace,
             version=params.version,
-            location=verified_location,
-            labware_id=params.labwareId,
+        )
+
+        verified_location = self._state_view.geometry.ensure_location_not_occupied(
+            params.location,
+            None,
+            definition
+        )
+        loaded_labware = await self._equipment._load_labware_from_def_and_uri(
+            definition, definition_uri, verified_location, params.labwareId, None
         )
 
         state_update.set_loaded_labware(

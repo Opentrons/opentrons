@@ -10,6 +10,8 @@ from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
+from opentrons.protocol_engine.types.location import AddressableAreaLocation
+
 from .._liquid import Liquid, LiquidClass
 from .._types import OffDeckType
 from ..disposal_locations import TrashBin, WasteChute
@@ -89,7 +91,7 @@ class AbstractProtocol(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, StagingSlotName, ModuleCoreType, OffDeckType],
+        location: Union[DeckSlotName, StagingSlotName, ModuleCoreType, OffDeckType, AddressableAreaLocation],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:

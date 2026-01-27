@@ -58,6 +58,11 @@ def is_abs_reader(addressable_area_name: str) -> bool:
     return "absorbanceReaderV1" in addressable_area_name
 
 
+def is_vac_dock(addressable_area_name: str) -> bool:
+    """Check if an addressable area is an vacuum module area."""
+    return "vacuumModule" in addressable_area_name
+
+
 def is_stacker_shuttle(addressable_area_name: str) -> bool:
     """Check if an addressable area is a flex stacker shuttle area."""
     return addressable_area_name in [

@@ -390,6 +390,13 @@ class FlexStackerStateUpdate:
 
 
 @dataclasses.dataclass
+class VacuumModuleStateUpdate:
+    """An update to the vacuum module state."""
+
+    module_id: str
+
+
+@dataclasses.dataclass
 class LiquidClassLoadedUpdate:
     """The state update from loading a liquid class."""
 
