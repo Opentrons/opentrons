@@ -5,6 +5,7 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAAsToFixtureIdFromDeckDefWithFakes,
+  getComboFixtureFromFixtureIds,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
   getModuleModelFromFixtureId,
@@ -456,3 +457,68 @@ export const getFixtureNameFromAddresableArea = (
 //     )
 //   }
 // }
+
+interface MergeResult {
+  comboFixtures: CutoutConfigMap[]
+  remainingModuleConfig: CutoutConfigMap[]
+  remainingAdditionalEquipmentConfig: DeckConfiguration
+}
+
+/**
+ * Merges module configs and additional equipment configs into combo fixtures
+ * where applicable. Returns combo fixtures and the remaining unmerged configs.
+ */
+export function mergeToComboFixtures(
+  moduleConfig: CutoutConfigMap[],
+  additionalEquipmentConfig: DeckConfiguration
+): MergeResult {
+  const comboFixtures: CutoutConfigMap[] = []
+  const mergedCutoutIds: CutoutId[] = []
+  const processedCutoutIds: CutoutId[] = []
+
+  moduleConfig.forEach(mc => {
+    // Skip if we've already processed this cutoutId
+    if (processedCutoutIds.includes(mc.cutoutId)) return
+    processedCutoutIds.push(mc.cutoutId)
+
+    // Find all modules at this cutoutId
+    const moduleMatches = moduleConfig.filter(m => m.cutoutId === mc.cutoutId)
+    // Find all fixtures at this cutoutId
+    const fixtureMatches = additionalEquipmentConfig.filter(
+      ae => mc.cutoutId === ae.cutoutId
+    )
+
+    // Combine all fixture IDs at this cutoutId
+    const allFixtureIds = [
+      ...moduleMatches.map(m => m.cutoutFixtureId),
+      ...fixtureMatches.map(f => f.cutoutFixtureId),
+    ]
+
+    // Only try to find combo if there are multiple items at this cutoutId
+    if (allFixtureIds.length > 1) {
+      const comboFixture = getComboFixtureFromFixtureIds(allFixtureIds)
+      if (comboFixture != null) {
+        comboFixtures.push({
+          cutoutId: mc.cutoutId,
+          cutoutFixtureId: comboFixture,
+          addressableAreaId: mc.addressableAreaId,
+        })
+        mergedCutoutIds.push(mc.cutoutId)
+      }
+    }
+  })
+
+  // Filter out items that were merged into combo fixtures
+  const remainingModuleConfig = moduleConfig.filter(
+    mc => !mergedCutoutIds.includes(mc.cutoutId)
+  )
+  const remainingAdditionalEquipmentConfig = additionalEquipmentConfig.filter(
+    ae => !mergedCutoutIds.includes(ae.cutoutId)
+  )
+
+  return {
+    comboFixtures,
+    remainingModuleConfig,
+    remainingAdditionalEquipmentConfig,
+  }
+}
