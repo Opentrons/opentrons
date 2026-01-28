@@ -146,6 +146,23 @@ describe('mergeToComboFixtures', () => {
     )
   })
 
+  it('should not merge if there is no additional equipment at the same cutoutId', () => {
+    const moduleConfig: CutoutConfigMap[] = [
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        addressableAreaId: 'flexStackerModuleV1D4',
+      },
+    ]
+    const additionalEquipmentConfig: DeckConfiguration = []
+
+    const result = mergeToComboFixtures(moduleConfig, additionalEquipmentConfig)
+
+    expect(result.comboFixtures).toEqual([])
+    expect(result.remainingModuleConfig).toEqual(moduleConfig)
+    expect(result.remainingAdditionalEquipmentConfig).toEqual([])
+  })
+
   it('should not merge when no combo fixture exists for the combination', () => {
     const moduleConfig: CutoutConfigMap[] = [
       {
@@ -165,6 +182,37 @@ describe('mergeToComboFixtures', () => {
 
     // No combo exists for temp module + staging area
     expect(result.comboFixtures).toEqual([])
+    expect(result.remainingModuleConfig).toEqual(moduleConfig)
+    expect(result.remainingAdditionalEquipmentConfig).toEqual(
+      additionalEquipmentConfig
+    )
+  })
+
+  it('should not create combo when duplicate modules with same fixtureId exist at same cutoutId', () => {
+    const moduleConfig: CutoutConfigMap[] = [
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        addressableAreaId: 'D4',
+      },
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
+        addressableAreaId: 'D4',
+      },
+    ]
+    const additionalEquipmentConfig: DeckConfiguration = [
+      {
+        cutoutId: 'cutoutA3',
+        cutoutFixtureId: TRASH_BIN_ADAPTER_FIXTURE,
+      },
+    ]
+
+    const result = mergeToComboFixtures(moduleConfig, additionalEquipmentConfig)
+
+    // No combo exists for two of the same fixtures
+    expect(result.comboFixtures).toEqual([])
+    // Both duplicate modules should remain (they weren't merged)
     expect(result.remainingModuleConfig).toEqual(moduleConfig)
     expect(result.remainingAdditionalEquipmentConfig).toEqual(
       additionalEquipmentConfig

@@ -268,15 +268,18 @@ export function getModuleModelFromFixtureId(
 export function getComboFixtureFromFixtureIds(
   fixtureIds: CutoutFixtureIdsWithFakes[]
 ): CutoutFixtureId | null {
+  // Remove duplicates from input
+  const uniqueFixtureIds = [...new Set(fixtureIds)]
+
   for (const [comboFixtureId, componentFixtures] of Object.entries(
     COMBO_FIXTURE_TO_FIXTURE_MAP
   )) {
     if (componentFixtures == null) continue
-    // Check if all provided fixtureIds are in the combo's component fixtures
-    const allMatch = fixtureIds.every(fixtureId =>
-      componentFixtures.includes(fixtureId)
-    )
-    if (allMatch && fixtureIds.length === componentFixtures.length) {
+    // Check if arrays have same length and all fixtures match
+    const allMatch =
+      uniqueFixtureIds.length === componentFixtures.length &&
+      uniqueFixtureIds.every(fixtureId => componentFixtures.includes(fixtureId))
+    if (allMatch) {
       return comboFixtureId as CutoutFixtureId
     }
   }
