@@ -180,6 +180,22 @@ describe('CameraCard', () => {
     screen.getByText('MOCK_CAMERA_CONTROLS')
   })
 
+  it('edit settings menu item is disabled when camera is disabled', async () => {
+    const user = userEvent.setup()
+    vi.mocked(useCameraUsageSettings).mockReturnValue({
+      isCameraEnabled: false,
+      toggleCameraEnabled: mockToggleEnabled,
+    } as any)
+
+    render(mockProps)
+
+    const overflowButton = screen.getByLabelText('overflow')
+    await user.click(overflowButton)
+
+    const editSettingsOption = screen.getByText('Edit settings')
+    expect(editSettingsOption).toBeDisabled()
+  })
+
   it('navigates to camera settings when usage settings is clicked', async () => {
     const user = userEvent.setup()
     render(mockProps)
