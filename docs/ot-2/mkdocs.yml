@@ -23,6 +23,7 @@ nav:
       - Labware Types: labware/types.md
       - Labware Definitions: labware/definitions.md
   - Opentrons App:
+      - Features Summary: opentrons-app/features.md
       - Opentrons App Protocol Tab: opentrons-app/index.md
       - App Installation and Management: opentrons-app/installation.md
       - Protocols Tab: opentrons-app/protocols-tab.md
