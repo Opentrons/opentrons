@@ -8,13 +8,17 @@ By installing and using Opentrons software, you agree to the Opentrons End-User 
 
 ## Opentrons Robot Software Changes in 9.0.0
 
-Welcome to the v9.0.0 release of the Opentrons robot software! This release includes several feature improvements.
+Welcome to the v9.0.0 release of the Opentrons robot software! This release includes several new and improved features.
+
+### New Features
+
+- Use the `set_empty()` method to load an empty tip rack on the deck.
 
 ### Feature Improvements
 
-- Use the `ramp_rate` parameter of the `set_block_temperature()` and `start_set_block_temperature()` methods to control how quickly the Thermocycler Module heats or cools.
-- Return tips to their original position in the tip rack when using partial tip pickup with a Flex or OT-2 pipette.
-- Choose a blowout flow rate and location for your source or destination well during a transfer that uses liquid class settings.
+- Use the `ramp_rate` parameter of the `set_block_temperature()` and `start_set_block_temperature()` methods to control how quickly the Thermocycler Module moves between set temperatures.
+- Return tips to a tip rack when using partial tip pickup with a Flex or OT-2 pipette.
+- Choose a blowout flow rate and location for custom liquid class transfer settings.
 - Change the position to dispose of tips in any trash bin, including a non-default trash bin, with the `drop_tip()` method.
 - Liquid class transfers are optimized to prevent unnecessary movements to the top of a well before proceeding.
 

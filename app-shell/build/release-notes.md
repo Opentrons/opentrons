@@ -12,7 +12,12 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 
 ### New Features
 
-- Visualize Opentrons Flex protocols to see protocol steps like tip pickup and disposal, labware and liquid moves, module steps, and more alongside a view of the robot deck. Click **Visualize** on the details page of any Flex protocol to get started.
+- Bring your protocols to life in the Opentrons App! Protocol visualization lets you:
+  - View Python protocol steps like tip pickup and disposal, labware and liquid moves, module steps, and more alongside a view of the robot deck.
+  - Check new Python protocol steps and errors in a visual, playable format.
+  - Assess the results of an OpentronsAI protocol before running on the Flex.
+
+  Click **Visualize** on the details page of any Flex protocol to get started.
 
 ### Improvements
 
@@ -26,7 +31,7 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
 
 - Drop tip locations are properly exported in Quick Transfer protocols.
 - Adding a CSV file to an imported protocol no longer causes analysis errors.
-- Protocol run logs include correct descriptions for tip pickup with the Flex 96-channel pipette.
+- Protocol run logs include correct descriptions for partial tip pickup with the Flex 96-channel pipette.
 
 ---
 
