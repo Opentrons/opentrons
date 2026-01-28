@@ -21,7 +21,7 @@ class ProtocolEditorPage(BasePage):
             slot: Slot identifier like "D2"
         """
 
-        slot_region = self.page.locator(f"[data-testid='{slot}']").first
+        slot_region = self.page.get_by_test_id(slot)
         if slot_region.count() == 0:
             test_ids = self.page.locator("[data-testid]").evaluate_all(
                 "elements => elements.map(el => el.getAttribute('data-testid'))"
@@ -36,17 +36,19 @@ class ProtocolEditorPage(BasePage):
             if add_button.count() == 0:
                 text_trigger = slot_region.get_by_text("Add labware", exact=False)
                 if text_trigger.count() > 0:
-                    self.wait_for_visible(text_trigger.first)
-                    text_trigger.first.click()
+                    self.wait_for_visible(text_trigger)
+                    text_trigger.click()
                 else:
                     self.wait_for_visible(slot_region)
                     slot_region.click()
             else:
-                self.wait_for_visible(add_button.first)
-                add_button.first.click()
+                self.wait_for_visible(add_button)
+                add_button.click()
+                self.page.get_by_test_id("SlotOverflowMenu_openTools").click()
+
         else:
-            self.wait_for_visible(add_button.first)
-            add_button.first.click()
+            self.wait_for_visible(add_button)
+            add_button.click()
 
         self._ensure_labware_tab_active()
         self._open_select_labware_modal()
@@ -107,7 +109,7 @@ class ProtocolEditorPage(BasePage):
         self.wait_for_visible(category.first)
         category.first.click()
 
-    def select_labware_by_name(self, labware_name: str) -> None:
+    def select_labware_by_name(self, labware_name: str, stacker= False, fill_num=6, lid= False) -> None:
         """Select a specific labware by its name.
 
         Args:
@@ -154,7 +156,13 @@ class ProtocolEditorPage(BasePage):
                 ) from error
 
         target.click()
+        if stacker == True:
+            self.page.get_by_test_id("CustomizeExpandButton_inputField").click()
+            self.page.get_by_test_id("CustomizeExpandButton_inputField").fill(str(fill_num))
+        if lid == True:
+            self._add_lid("Opentrons Flex 96 Tip Rack 50", "CheckboxField_icon")
         self.click_test_id("SelectLabwareModal_confirm")
+
 
         modal = self.page.get_by_role("dialog", name="Add labware", exact=False)
         if modal.count() > 0:
@@ -308,6 +316,9 @@ class ProtocolEditorPage(BasePage):
         """Toggle a checkbox-like control by its field name."""
 
         self.page.get_by_role("checkbox", name=field_name, exact=True).click()
+
+    def _add_lid(self, labware: str, test_id) -> None:
+        self.page.locator("label").filter(has_text=labware).get_by_test_id(test_id).click()
 
     def move_labware(self, labware: str, new_location: str) -> None:
         """Select labware and new location to move the labware."""
