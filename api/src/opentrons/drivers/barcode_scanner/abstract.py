@@ -29,6 +29,11 @@ class AbstractBarcodeScannerDriver(ABC):
         ...
 
     @abstractmethod
+    async def set_scan_timeout(self, timeout: float) -> None:
+        """Set how long to run the decoder before timing out."""
+        ...
+
+    @abstractmethod
     async def scan_barcode(self) -> Optional[str]:
         """Scan and return a barcode."""
         ...
