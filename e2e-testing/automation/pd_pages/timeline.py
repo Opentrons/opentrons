@@ -6,7 +6,7 @@ from .base_page import BasePage
 
 
 class Timeline(BasePage):
-    """Main transfer page for configuring transfer steps."""
+    """Scrollable element on the left side of protocol editing containing the protocol steps/timeline."""
 
     timeline_box_testid: str = "TimelineToolbox_scrollContainer"
 
