@@ -117,10 +117,10 @@ def run(protocol: ProtocolContext) -> None:
         "Diluent": [{"well": [Diluent_1, Diluent_2, Diluent_3], "volume": 675.0}],
     }
     water = protocol.get_liquid_class("water")
-    water_blowout = water.get_for(p1000, tiprack_x_1).dispense.retract.blowout
-    water_blowout.enabled = True
-    water_blowout.location = blowout_selection
-    water_blowout.blowout_position = BLOWOUT_OPTIONS[blowout_selection]
+    water_blowout_properties = water.get_for(p1000, tiprack_x_1).dispense.retract.blowout
+    water_blowout_properties.enabled = True
+    water_blowout_properties.location = blowout_selection
+    water_blowout_properties.blowout_position = BLOWOUT_OPTIONS[blowout_selection]
 
     lm = "liquid-meniscus"
     tip_racks = [tiprack_x_2, tiprack_x_3]
