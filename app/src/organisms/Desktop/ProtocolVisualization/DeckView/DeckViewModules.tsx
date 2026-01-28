@@ -26,6 +26,8 @@ import type {
 import type { InvariantContext, RobotState } from '@opentrons/step-generation'
 import type { LabwareEntityExtended } from '../../../../organisms/Desktop/ProtocolVisualization/DeckView'
 
+const FLEX_STACKER_SLOT_POSITION = 178
+
 interface DeckViewModulesProps {
   robotState: RobotState
   invariantContext: InvariantContext
@@ -146,7 +148,9 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
                     : slot
                 }
                 slotPosition={[
-                  moduleType === FLEX_STACKER_MODULE_TYPE ? 178 : 0,
+                  moduleType === FLEX_STACKER_MODULE_TYPE
+                    ? FLEX_STACKER_SLOT_POSITION
+                    : 0,
                   0,
                   0,
                 ]}
