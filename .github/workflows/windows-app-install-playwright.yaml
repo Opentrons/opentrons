@@ -170,8 +170,8 @@ jobs:
           $ErrorActionPreference = 'Stop'
           Write-Host "::group::Resolve installed app executable"
           $candidates = @(
-            Join-Path $env:LOCALAPPDATA 'Programs\Opentrons\Opentrons.exe',
-            Join-Path $env:LOCALAPPDATA 'Programs\Opentrons-OT3\Opentrons-OT3.exe'
+            Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Programs\Opentrons\Opentrons.exe'
+            Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Programs\Opentrons-OT3\Opentrons-OT3.exe'
           )
 
           Write-Host "Candidate paths:"
