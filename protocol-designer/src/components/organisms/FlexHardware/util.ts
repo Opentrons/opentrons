@@ -8,15 +8,11 @@ import {
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
   STAGING_AREA_FIXTURES,
-  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  TRASH_BIN_FIXTURE,
   WASTE_CHUTE_FIXTURES,
-  WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
-import { AdditionalEquipmentName } from '@opentrons/step-generation'
 
 import { deleteModule } from '/protocol-designer/modules'
 import {
@@ -28,7 +24,6 @@ import {
   deleteDeckFixture,
 } from '/protocol-designer/step-forms/actions/additionalItems'
 
-import { getFixtureNameFromAddresableArea } from '../HardwareConfigurator/utils'
 import { getLabwareNotCompatibleWithModule, getSlotHasLabware } from '../utils'
 import { getHardwareInSlotInUse } from './getHardwareInSlotInUse'
 
@@ -336,16 +331,18 @@ export const updateInitialDeckState = (
     }
   })
 }
-function mapFixtureIdToFixtureName(
+
+export function mapFixtureIdToFixtureName(
   fixtureId: CutoutFixtureId | null
 ): string | null {
   if (fixtureId == null) return null
   if (fixtureId === TRASH_BIN_ADAPTER_FIXTURE) {
     return 'trashBin'
-  } else if (fixtureId in WASTE_CHUTE_FIXTURES) {
+  } else if (WASTE_CHUTE_FIXTURES.includes(fixtureId)) {
     return 'wasteChute'
-  } else if (fixtureId in STAGING_AREA_FIXTURES) {
+  } else if (STAGING_AREA_FIXTURES.includes(fixtureId)) {
     return 'stagingArea'
+  } else {
+    return null
   }
-  return null
 }

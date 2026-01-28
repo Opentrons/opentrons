@@ -22,6 +22,7 @@ import {
   getAADisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
+  getMainFixtureIdForAA,
   getModuleModelFromFixtureId,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
@@ -40,13 +41,13 @@ import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
+import { mapFixtureIdToFixtureName } from '../FlexHardware/util'
 import { useKitchen } from '../Kitchen/useKitchen'
 import { getMainPagePortalEl } from '../Portal'
 import { getLabwareCompatibleForEditHardware } from '../utils'
 import {
   getAllFixtureOptions,
   getAvailableOptions,
-  getFixtureNameFromAddresableArea,
   getModuleOptions,
 } from './utils'
 
@@ -65,7 +66,7 @@ import type {
   ModuleModel,
 } from '@opentrons/shared-data'
 import type { FormModules, ModuleOnDeck } from '/protocol-designer/step-forms'
-import type { Fixtures, WizardFormState } from '../types'
+import type { FixtureName, Fixtures, WizardFormState } from '../types'
 
 const ADDRESSABLE_AREA_D3 = 'D3'
 export interface ModuleExtended extends ModuleOnDeck {
@@ -295,17 +296,26 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
       )
     )
-    const name = getFixtureNameFromAddresableArea(
-      newFixture.addressableAreaId as AddressableAreaName
+    console.log('newFixture: ', newFixture)
+    const fixtureName = getMainFixtureIdForAA(
+      [newFixture.cutoutFixtureId as CutoutFixtureId],
+      [newFixture.addressableAreaId as AddressableAreaName],
+      newFixture.cutoutId
     )
+
+    console.log('fixtureName: ', fixtureName)
+
     const updatedFixtures: Fixtures = {
       ...filteredFixtures,
       [uuid()]: {
-        name: name ?? 'stagingArea',
+        name:
+          (mapFixtureIdToFixtureName(fixtureName) as FixtureName) ??
+          'stagingArea',
         cutoutFixtureId: newFixture.cutoutFixtureId as CutoutFixtureId,
         cutoutId: newFixture.cutoutId,
       },
     }
+    console.log('updatedFixtures: ', updatedFixtures)
     setValue?.('fixtures', updatedFixtures)
   }
 
@@ -329,10 +339,14 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       )
     })
 
+    console.log('newDeckConfig: ', newDeckConfig)
+    console.log('addedCutoutConfigs: ', addedCutoutConfigs)
+
     // Find and handle new module
     const newModule = addedCutoutConfigs.find(cutoutConfig =>
       MODULE_MODELS.includes(cutoutConfig.cutoutFixtureId as ModuleModel)
     )
+    console.log('newModule: ', newModule)
     if (newModule != null) {
       handleAddModule(newModule)
     }
@@ -343,6 +357,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         cutoutConfig.addressableAreaId as AddressableAreaName
       )
     )
+    console.log('newFixture: ', newFixture)
     if (newFixture != null) {
       handleAddNewFixture(newFixture)
     }
@@ -356,6 +371,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     if (labwareCompatible) {
       dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
     }
+    console.log('addedCutoutConfigs: ', addedCutoutConfigs)
     updateInitialDeckState?.(addedCutoutConfigs)
     closeModal()
   }
