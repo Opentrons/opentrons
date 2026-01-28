@@ -334,12 +334,4 @@ describe('getComboFixtureFromFixtureIds', () => {
     const result = getComboFixtureFromFixtureIds([])
     expect(result).toBeNull()
   })
-
-  it('should return null for duplicate fixtures with same fixtureId', () => {
-    const result = getComboFixtureFromFixtureIds([
-      FLEX_STACKER_V1_FIXTURE,
-      FLEX_STACKER_V1_FIXTURE,
-    ])
-    expect(result).toBeNull()
-  })
 })

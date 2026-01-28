@@ -73,6 +73,7 @@ export function HardwareConfigurator(
     }
   )
 
+  console.log('modules: ', modules)
   const moduleConfig: CutoutConfigMap[] = Object.values(modules).flatMap(
     (module: FormModule | ModuleExtended): CutoutConfigMap[] => {
       const fixtureModule = getCutoutFixtureIdsForModuleModel(module.model)[0]
@@ -89,11 +90,8 @@ export function HardwareConfigurator(
           matchingDeckConfigEntry?.addressableAreaId ??
           (module.slot as AddressableAreaNamesWithFakes),
       }
-      const missingThermocyclerFixtures = getAddedMissingThermocyclerFixtures(
-        [defaultModuleConfig],
-        deckDef
-      )
-      return [defaultModuleConfig, ...missingThermocyclerFixtures]
+      // getAddedMissingThermocyclerFixtures returns input array + any missing TC fixtures
+      return getAddedMissingThermocyclerFixtures([defaultModuleConfig], deckDef)
     }
   )
   console.log('moduleConfig: ', moduleConfig)
@@ -119,7 +117,6 @@ export function HardwareConfigurator(
     ...remainingAdditionalEquipmentConfig,
     ...comboFixtures,
   ]
-  console.log('updatedDeckConfig in initial deck config: ', updatedDeckConfig)
 
   //  initiate deck config
   useEffect(() => {

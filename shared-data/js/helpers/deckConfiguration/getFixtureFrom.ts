@@ -268,18 +268,14 @@ export function getModuleModelFromFixtureId(
 export function getComboFixtureFromFixtureIds(
   fixtureIds: CutoutFixtureIdsWithFakes[]
 ): CutoutFixtureId | null {
-  // TODO: (tz, 2026-01-28) - figure out why in the initial deck config we have duplicate stackers.
-  // Remove duplicates from input
-  const uniqueFixtureIds = [...new Set(fixtureIds)]
-
   for (const [comboFixtureId, componentFixtures] of Object.entries(
     COMBO_FIXTURE_TO_FIXTURE_MAP
   )) {
     if (componentFixtures == null) continue
     // Check if arrays have same length and all fixtures match
     const allMatch =
-      uniqueFixtureIds.length === componentFixtures.length &&
-      uniqueFixtureIds.every(fixtureId => componentFixtures.includes(fixtureId))
+      fixtureIds.length === componentFixtures.length &&
+      fixtureIds.every(fixtureId => componentFixtures.includes(fixtureId))
     if (allMatch) {
       return comboFixtureId as CutoutFixtureId
     }
