@@ -48,6 +48,7 @@ export function trackEvent(
 
   log.debug('Trackable event', { event, optedIn })
   if (MIXPANEL_ID != null && optedIn) {
+    initMixpanelInstanceOnce(config)
     try {
       if (event.superProperties != null) {
         mixpanel.register(event.superProperties)
