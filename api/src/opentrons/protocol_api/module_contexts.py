@@ -700,11 +700,16 @@ class ThermocyclerContext(ModuleContext):
             block_max_volume: The greatest volume of liquid contained in any
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
+            ramp_rate: The rate to heat or cool the Thermocycler Module's block,
+                in °C/second. The acceptable range is between 0.01 and 2 °C/second
+                to cool the block, and 0.01 and 4.25 °C/second to heat the block. 
 
-                *Changed in version 2.27:* After API
-                version 2.27 it will attempt to use the liquid tracking of the
-                labware first and then fall back to the 25 if there is no
-                probed or loaded liquid.
+                *Changed in version 2.27:* In API version
+                2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
+                liquid information.
+
+                *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly 
+                the block heats or cools. 
 
         !!! note
             If `hold_time_minutes` and `hold_time_seconds` are not specified,
@@ -744,10 +749,16 @@ class ThermocyclerContext(ModuleContext):
             block_max_volume: The greatest volume of liquid contained in any
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
+            ramp_rate: The rate to heat or cool the Thermocycler Module's block,
+                in °C/second. The acceptable range is between 0.01 and 2 °C/second
+                to cool the block, and 0.01 and 4.25 °C/second to heat the block. 
 
         *Changed in version 2.27:* In API version
         2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
         liquid information.
+
+        *Changed in version 2.28:* Use the optional `ramp_rate` parameter to control how quickly 
+        the block heats or cools. 
         """
 
         if block_max_volume is None:
