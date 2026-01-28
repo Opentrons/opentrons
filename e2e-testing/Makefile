@@ -87,3 +87,27 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
+.PHONY: test-ll-local
+test-ll-local:
+	TEST_ENV=local uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll
+test-ll:
+	TEST_ENV=$(TEST_ENV) uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-local-headed
+test-ll-local-headed:
+	TEST_ENV=local HEADLESS=false uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-staging
+test-ll-staging:
+	TEST_ENV=staging uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-staging-headed
+test-ll-staging-headed:
+	TEST_ENV=staging HEADLESS=false uv run pytest -m llE2E $(PYTEST_ARGS)
+
+.PHONY: test-ll-prod
+test-ll-prod:
+	TEST_ENV=prod uv run pytest -m llE2E $(PYTEST_ARGS)
