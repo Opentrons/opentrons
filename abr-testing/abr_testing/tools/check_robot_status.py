@@ -84,7 +84,8 @@ if __name__ == "__main__":
     # GET IP ADDRESSES OF INTEREST
     robot_ips = [input("Enter IP of robot (type 'all' to run on all robots): ")]
     if robot_ips[0].lower() == "all":
-        ip_file = configurations["DEFAULT"]["ips"]
+        storage_directory = configurations["DEFAULT"]["storage_directory"]
+        ip_file = os.path.join(storage_directory, "IPs.json")
         with open(ip_file) as file:
             file_dict = json.load(file)
             robot_dict = file_dict.get("ip_address_list")
