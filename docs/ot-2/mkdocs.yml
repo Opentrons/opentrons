@@ -30,7 +30,6 @@ nav:
       - Running Protocols: opentrons-app/protocol-run.md
       - Protocols Tab: opentrons-app/protocols-tab.md
       - Devices Tab: opentrons-app/devices-tab.md
-      - Transferring Protocols: opentrons-app/transfer-protocols.md
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md

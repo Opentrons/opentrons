@@ -9,13 +9,13 @@ You will operate and interact with the OT-2 from a computer running the Opentron
 The Devices tab lists all the Opentrons OT-2 and Flex robots on a network. The list displays robots alphabetically by name. Each device summary also shows you how a robot is connected to a network (eithernet, USB, or WiFi), what hardware components are attached, if a software update is available, and other information. You can use this section for an at-a-glance overview of the state of your OT-2 and other networked robots.
 
 <figure class="screenshot" markdown>
-![Devices tab showing list of robots](../images/app-devices-tab.png){ width="80%" }
+![Devices tab showing list of robots](../images/app-devices-tab.png)
 </figure>
 
 !!! tip
     If you're using a WiFi connection and the OT-2 you want to use is unavailable, check your WiFi settings. Your OT-2 may be on a different wireless network.
 
-### Device details
+### Robot details
 
 You can click on any robot summary tile to expand it for more information about a particular robot. In each section, three-dot (⋮) menus provide context-specific controls for the robot, any attached instruments and modules.
 
@@ -23,43 +23,51 @@ You can click on any robot summary tile to expand it for more information about 
 ![Device 3-dot menus for robot hardware controls](../images/app-device-details-hardware.png)
 </figure>
 
+### Recent protocol runs
+
+The robot details page also keeps records of up to 20 recent protocol runs.
+
+<figure class="screenshot" markdown>
+![Recent protocol runs section](../images/recent-protocol-runs.png)
+</figure>
+
+Each entry in the recent protocol runs list includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
+
+- **View protocol run record**: Show the protocol run screen as it appeared when the protocol ended (succeeded, failed, or was canceled), including all performed steps.
+
+- **Rerun protocol now**: The same as choosing Start setup on the corresponding protocol.
+
+- **Download run log**: Save to your computer a JSON file containing information about the protocol run, including all performed steps.
+
+- **Delete protocol run record**: Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
+
+!!! note
+    If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
+
+- **Download image files**: Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.## Recent protocol runs
+
+The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
+
+Each entry in the recent protocol runs list includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
+
+- **View protocol run record**: Show the protocol run screen as it appeared when the protocol ended (succeeded, failed, or was canceled), including all performed steps.
+
+- **Rerun protocol now**: The same as choosing Start setup on the corresponding protocol.
+
+- **Download run log**: Save to your computer a JSON file containing information about the protocol run, including all performed steps.
+
+- **Delete protocol run record**: Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
+
+!!! tip
+    If you need to maintain a comprehensive record of all runs performed on your OT-2, you must use the **Download run log** feature to save this information to your computer.
+
+- **Download image files**: Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.
+
 ## Labware tab
 
 ## Protocols tab
 
 This section provides an overview of the Protocols tab. The Protocols tab is selected by default when you first launch the app. It includes controls that let you import protocol files and manage saved files.
-
-<figure class="screenshot" markdown>
-![Protocols tab showing uploaded protocols](../images/app-protocol-list.png){ width="80%" }
-</figure>
-
-You can click on any listed protocol summary to expand it. An expanded tile shows you more information about the protocol.
-
-<figure class="screenshot" markdown>
-![Protocol details tile](../images/app-protocol-details.png){ width="80%" }
-</figure>
-
-Click the **Protocols** tab to return to the default summary list view.
-
-## Importing protocols
-
-If you have a new robot and are launching the Opentrons App for the first time, or you've deleted your saved protocols, the app shows you the protocol upload screen.
-
-<figure class="screenshot" markdown>
-![Protocol upload features in the app](../images/app-protocol-upload.png){ width="80%" }
-</figure>
-
- To upload a protocol, you can either:
-
-- Click **Choose file** and browse through your computer files to find the protocols you want to upload.
-- Drag and drop a protocol onto this screen to upload it.
-
-!!! tip
-    If your list already contains protocols, and you need to add another, click **Import** in the top right corner of the screen. This opens a file picker that lets you navigate to a new protocol file and bring it into the app.
-
-### Protocol analysis
-
-The Opentrons App will analyze your protocol as soon as you import it. _Protocol analysis_ is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, the app shows a warning. Correct the errors and re-import the protocol. If protocol analysis imports the file without errors, it is ready to run on your OT-2.
 
 ### Protocol features and settings
 
@@ -107,3 +115,17 @@ The basic protocol screen displays a summary list of all the protocols stored on
     </tr>
   </tbody>
 </table>
+
+
+
+<figure class="screenshot" markdown>
+![Protocols tab showing uploaded protocols](../images/app-protocol-list.png){ width="80%" }
+</figure>
+
+You can click on any listed protocol summary to expand it. An expanded tile shows you more information about the protocol.
+
+<figure class="screenshot" markdown>
+![Protocol details tile](../images/app-protocol-details.png){ width="80%" }
+</figure>
+
+Click the **Protocols** tab to return to the default summary list view.
