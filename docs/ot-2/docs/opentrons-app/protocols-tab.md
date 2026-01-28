@@ -36,7 +36,7 @@ If you have a new robot and are launching the Opentrons App for the first time, 
 !!! tip
     If your list already contains protocols, and you need to add another, click **Import** in the top right corner of the screen. This opens a file picker that lets you navigate to a new protocol file and bring it into the app.
 
-## Analyzing protocols
+## Protocol Analysis
 
 The Opentrons App will analyze your protocol as soon as you import it. _Protocol analysis_ is the process of taking the JSON object or Python code contained in the protocol file and turning it into a series of commands that the robot can execute in order. If there are any errors in your protocol file, or if you're missing custom labware definitions, the app shows a warning. Correct the errors and re-import the protocol. If protocol analysis imports the file without errors, it is ready to run on your OT-2.
 

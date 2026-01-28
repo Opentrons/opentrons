@@ -26,8 +26,9 @@ nav:
       - Features Summary: opentrons-app/features.md
       - Opentrons App Protocol Tab: opentrons-app/index.md
       - App Installation and Management: opentrons-app/installation.md
+      - Importing Protocols: opentrons-app/protocol-import.md
+      - Running Protocols: opentrons-app/protocol-run.md
       - Protocols Tab: opentrons-app/protocols-tab.md
-      - Labware Tab: opentrons-app/labware-tab.md
       - Devices Tab: opentrons-app/devices-tab.md
       - Transferring Protocols: opentrons-app/transfer-protocols.md
   - Maintenance:
