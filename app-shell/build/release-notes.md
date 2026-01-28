@@ -25,7 +25,6 @@ Welcome to the v9.0.0 release of the Opentrons App! This release includes protoc
   - Adjust image and video settings like zoom, brightness, contrast, and saturation.
   - Preview an image of the Flex or OT-2's deck when customizing camera controls.
   - Updated image filenames make it easier to find images from your protocol runs.
-- Use Quick Transfer to create Python protocols.
 
 ### Bug Fixes
 
@@ -55,6 +54,7 @@ Welcome to the v8.8.0 release of the Opentrons App! This release includes concur
   - Turn on a live view of the deck during your protocol run (Flex only).
   - View, download, or delete images after a protocol run.
 - Choose to return tips to the tip rack in a quick transfer. The pipette will return tips to their original position in the tip rack, and you won't be able to pick up these tips again in the same protocol.
+- Protocols you create in Quick Transfer are exported as .py files, not .json. 
 
 ### Bug Fixes
 
