@@ -22,6 +22,7 @@ import {
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '../../../constants'
 import {
+  getComboFixtureFromFixtureIds,
   getCutoutFixtureReplacementIfNeeded,
   getMainNonComboFixtureId,
   getMainUsbModuleFixtureIdForComboFixture,
@@ -268,5 +269,69 @@ describe('getMainNonComboFixtureId', () => {
       'cutoutD3'
     )
     expect(result).toEqual(MAGNETIC_BLOCK_V1_FIXTURE)
+  })
+})
+
+describe('getComboFixtureFromFixtureIds', () => {
+  it('should return flex stacker with waste chute covered combo fixture', () => {
+    const result = getComboFixtureFromFixtureIds([
+      FLEX_STACKER_V1_FIXTURE,
+      WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+    ])
+    expect(result).toEqual(
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE
+    )
+  })
+
+  it('should return flex stacker with waste chute no cover combo fixture', () => {
+    const result = getComboFixtureFromFixtureIds([
+      FLEX_STACKER_V1_FIXTURE,
+      WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+    ])
+    expect(result).toEqual(
+      FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE
+    )
+  })
+
+  it('should return flex stacker with mag block combo fixture', () => {
+    const result = getComboFixtureFromFixtureIds([
+      FLEX_STACKER_V1_FIXTURE,
+      MAGNETIC_BLOCK_V1_FIXTURE,
+    ])
+    expect(result).toEqual(FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE)
+  })
+
+  it('should return staging area with mag block combo fixture', () => {
+    const result = getComboFixtureFromFixtureIds([
+      STAGING_AREA_RIGHT_SLOT_FIXTURE,
+      MAGNETIC_BLOCK_V1_FIXTURE,
+    ])
+    expect(result).toEqual(STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE)
+  })
+
+  it('should return combo fixture regardless of fixture order', () => {
+    const result = getComboFixtureFromFixtureIds([
+      MAGNETIC_BLOCK_V1_FIXTURE,
+      FLEX_STACKER_V1_FIXTURE,
+    ])
+    expect(result).toEqual(FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE)
+  })
+
+  it('should return null when no combo fixture matches', () => {
+    const result = getComboFixtureFromFixtureIds([
+      FLEX_STACKER_V1_FIXTURE,
+      STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    ])
+    expect(result).toBeNull()
+  })
+
+  it('should return null for single fixture that is not a combo', () => {
+    const result = getComboFixtureFromFixtureIds([FLEX_STACKER_V1_FIXTURE])
+    expect(result).toBeNull()
+  })
+
+  it('should return null for empty array', () => {
+    const result = getComboFixtureFromFixtureIds([])
+    expect(result).toBeNull()
   })
 })

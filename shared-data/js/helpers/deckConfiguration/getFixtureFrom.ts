@@ -3,6 +3,7 @@ import isEqual from 'lodash/isEqual'
 import { getCutoutIdForSlotName, getDeckDefFromRobotType } from '..'
 import {
   ABSORBANCE_READER_V1_FIXTURE,
+  COMBO_FIXTURE_TO_FIXTURE_MAP,
   DEFAULT_AA_FOR_WASTE_CHUTE,
   FAKE_STAGING_AREA_RIGHT_SLOT,
   FAKE_STAGING_SLOT_WITH_MAG_BLOCK_FIXTURE,
@@ -254,6 +255,29 @@ export function getModuleModelFromFixtureId(
   )) {
     if (fixtureIds?.includes(fixtureId)) {
       return moduleModel as ModuleModel
+    }
+  }
+  return null
+}
+
+/**
+ * Given a list of fixture IDs, find the combo fixture that contains all of them.
+ * @param fixtureIds - Array of fixture IDs to find a combo for
+ * @returns The combo fixture ID if found, null otherwise
+ */
+export function getComboFixtureFromFixtureIds(
+  fixtureIds: CutoutFixtureIdsWithFakes[]
+): CutoutFixtureId | null {
+  for (const [comboFixtureId, componentFixtures] of Object.entries(
+    COMBO_FIXTURE_TO_FIXTURE_MAP
+  )) {
+    if (componentFixtures == null) continue
+    // Check if all provided fixtureIds are in the combo's component fixtures
+    const allMatch = fixtureIds.every(fixtureId =>
+      componentFixtures.includes(fixtureId)
+    )
+    if (allMatch && fixtureIds.length === componentFixtures.length) {
+      return comboFixtureId as CutoutFixtureId
     }
   }
   return null
