@@ -64,13 +64,12 @@ export function forMoveLabware(
         ).filter((id): id is string => id != null)
       : []
 
-  const movedStackUpToTarget =
-    movedStackFromShuttle.indexOf(labwareId) !== -1
-      ? movedStackFromShuttle.slice(
-          0,
-          movedStackFromShuttle.indexOf(labwareId) + 1
-        )
-      : []
+  const movedStackUpToTarget = movedStackFromShuttle.includes(labwareId)
+    ? movedStackFromShuttle.slice(
+        0,
+        movedStackFromShuttle.indexOf(labwareId) + 1
+      )
+    : []
 
   if (
     initialShuttleParentStackerState != null &&
