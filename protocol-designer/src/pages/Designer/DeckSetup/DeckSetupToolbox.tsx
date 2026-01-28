@@ -30,6 +30,7 @@ import {
 } from '@opentrons/step-generation'
 
 import { getColumnFromWellName } from '/protocol-designer/pages/Designer/ProtocolSteps/StepForm/PipetteFields/TipSelectionWizard/utils'
+import { updateStackerModuleState } from '/protocol-designer/step-forms/actions'
 
 import {
   LINK_BUTTON_STYLE,
@@ -54,7 +55,10 @@ import { getDeckSetupForActiveItem } from '../../../top-selectors/labware-locati
 import { getSlotInformation } from '../utils'
 import { getIsLabwareOnSlotInUse } from './utils'
 
-import type { HopperLocationMapKey } from '@opentrons/step-generation'
+import type {
+  FlexStackerModuleState,
+  HopperLocationMapKey,
+} from '@opentrons/step-generation'
 import type { CreateContainerAboveModuleArgs } from '../../../step-forms/actions/thunks'
 import type { ThunkDispatch } from '../../../types'
 
@@ -183,6 +187,18 @@ export function DeckSetupToolbox(
               stackerPosition: 'hopper',
               amount: selectedTopLabware.amount,
             }
+        // clear previous hopper labware before creating new hopper labware
+        if (createdModuleForSlot?.id != null) {
+          dispatch(
+            updateStackerModuleState({
+              moduleId: createdModuleForSlot.id,
+              moduleState: {
+                ...(createdModuleForSlot.moduleState as FlexStackerModuleState),
+                labwareInHopper: null,
+              },
+            })
+          )
+        }
       }
       dispatch(
         createContainerAboveModule({
