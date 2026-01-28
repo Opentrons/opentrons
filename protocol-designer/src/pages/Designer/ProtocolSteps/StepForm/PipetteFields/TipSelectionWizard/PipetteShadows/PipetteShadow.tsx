@@ -139,6 +139,7 @@ export function PipetteShadow(props: {
           fill: `${COLORS.black90}${COLORS.opacity20HexCode}`,
           stroke: COLORS.blue50,
         }),
+    rotate: true,
   }
 
   const labelPlacement = getPlacementByViewboxAndPipetteSpec({

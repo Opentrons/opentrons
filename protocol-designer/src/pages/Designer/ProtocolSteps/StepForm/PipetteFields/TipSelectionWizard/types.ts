@@ -33,6 +33,7 @@ export interface PipetteShadowProps {
   height: number
   fill: string
   stroke: string
+  rotate?: boolean
 }
 
 export type LabelPlacement =

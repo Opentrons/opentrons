@@ -53,6 +53,8 @@ export function FirstStepMixTools({
         <PartialTipField
           {...propsForFields.nozzles}
           pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+          propsForFields={propsForFields}
+          stepType="mix"
         />
       ) : null}
       <Divider marginY="0" />
@@ -69,6 +71,8 @@ export function FirstStepMixTools({
           <PartialTipField
             {...propsForFields.nozzles}
             pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+            propsForFields={propsForFields}
+            stepType="mix"
           />
         </>
       ) : null}

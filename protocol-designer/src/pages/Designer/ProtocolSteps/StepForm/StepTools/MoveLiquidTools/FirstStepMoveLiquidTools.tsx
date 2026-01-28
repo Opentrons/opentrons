@@ -68,6 +68,8 @@ export function FirstStepMoveLiquidTools({
           <PartialTipField
             {...propsForFields.nozzles}
             pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+            propsForFields={propsForFields}
+            stepType="transfer"
           />
         </>
       ) : null}
@@ -125,6 +127,8 @@ export function FirstStepMoveLiquidTools({
               pipetteSpecs={
                 pipettes[String(propsForFields.pipette.value)]?.spec
               }
+              propsForFields={propsForFields}
+              stepType="transfer"
             />
             <WellSelectionField
               {...propsForFields.aspirate_wells}

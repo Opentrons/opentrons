@@ -19,6 +19,7 @@ export function getConfigureNozzleLayoutCommandText({
     ROW: t('row_layout'),
     QUADRANT: t('partial_layout'),
     ALL: t('all_nozzles'),
+    PARTIAL: t('partial_nozzles'),
   }
 
   return t('configure_nozzle_layout', {
