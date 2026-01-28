@@ -187,5 +187,4 @@ describe('mergeToComboFixtures', () => {
       additionalEquipmentConfig
     )
   })
-
 })

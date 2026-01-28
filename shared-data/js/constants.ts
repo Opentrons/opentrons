@@ -863,6 +863,14 @@ export const FAKE_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
 ]
 
+// TODO: (tz, 2026-01-28) - find better name for this
+export const FIXTURES_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
+  ...([TRASH_BIN_ADAPTER_FIXTURE] as CutoutFixtureId[]),
+  ...WASTE_CHUTE_FIXTURES,
+  ...FAKE_FIXTURE_IDS,
+  ...STAGING_AREA_FIXTURES,
+]
+
 export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FLEX_STACKER_FIXTURES,
   ...MAGNETIC_BLOCK_FIXTURES,

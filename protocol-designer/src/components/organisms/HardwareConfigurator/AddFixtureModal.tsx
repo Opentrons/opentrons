@@ -17,8 +17,8 @@ import {
 } from '@opentrons/components'
 import {
   ABSORBANCE_READER_ADDRESSABLE_AREAS,
+  FIXTURES_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
-  FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAADisplayName,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
@@ -33,7 +33,6 @@ import {
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
   THERMOCYCLER_ADDRESSABLE_AREA,
-  WASTE_CHUTE_ADDRESSABLE_AREAS,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
@@ -97,11 +96,11 @@ export type OptionStage =
   | 'moduleOptions'
   | 'wasteChuteOptions'
 
-const FIXTURE_ADDRESSABLE_AREAS = [
-  ...WASTE_CHUTE_ADDRESSABLE_AREAS,
-  ...MOVABLE_TRASH_ADDRESSABLE_AREAS,
-  ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-]
+// const FIXTURE_ADDRESSABLE_AREAS = [
+//   ...WASTE_CHUTE_ADDRESSABLE_AREAS,
+//   ...MOVABLE_TRASH_ADDRESSABLE_AREAS,
+//   ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
+// ]
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
@@ -235,6 +234,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     if (
       !hasGripper &&
       addedCutoutConfigs.some(cutoutConfig =>
+        // TODO: (tz, 2026-01-28) - get absorbance reader fixtures instead of addressable areas
         ABSORBANCE_READER_ADDRESSABLE_AREAS.includes(
           cutoutConfig.addressableAreaId as AddressableAreaName
         )
@@ -244,6 +244,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     }
     //  block thermocycler from being added if there is something in slot A1
     if (
+      // TODO: (tz, 2026-01-28) - get thermocycler fixtures instead of addressable areas
       addedCutoutConfigs.some(
         cutoutConfig =>
           THERMOCYCLER_ADDRESSABLE_AREA === cutoutConfig.addressableAreaId
@@ -343,6 +344,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     console.log('addedCutoutConfigs: ', addedCutoutConfigs)
 
     // Find and handle new module
+    // TODO: (tz, 2026-01-28) - get module fixtures
     const newModule = addedCutoutConfigs.find(cutoutConfig =>
       MODULE_MODELS.includes(cutoutConfig.cutoutFixtureId as ModuleModel)
     )
@@ -353,8 +355,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
 
     // Find and handle new fixture
     const newFixture = addedCutoutConfigs.find(cutoutConfig =>
-      FIXTURE_ADDRESSABLE_AREAS.includes(
-        cutoutConfig.addressableAreaId as AddressableAreaName
+      FIXTURES_FIXTURE_IDS.includes(
+        cutoutConfig.cutoutFixtureId as CutoutFixtureId
       )
     )
     console.log('newFixture: ', newFixture)
