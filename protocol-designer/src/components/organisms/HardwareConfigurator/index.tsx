@@ -23,6 +23,7 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
+  CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -105,8 +106,18 @@ export function HardwareConfigurator(
     })
   )
 
-  // merge additional equipment config with module config by finding combo fixture with replaceCutoutFixtureWithComboFixture
+  let comboFixtures: CutoutConfig[] = []
+  moduleConfig.forEach(mc => {
+    const fixtureMatches = additionalEquipmentConfig.filter(
+      ae => mc.cutoutId === ae.cutoutId
+    )
+    console.log('fixtureMatches: ', fixtureMatches)
+    if (fixtureMatches.length > 0) {
+      comboFixtures.push(...fixtureMatches)
+    }
+  })
 
+  console.log('comboFixtures: ', comboFixtures)
   console.log('additionalEquipmentConfig: ', additionalEquipmentConfig)
   const updatedDeckConfig = [
     ...simpleDeckConfig,

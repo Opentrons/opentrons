@@ -871,6 +871,27 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...STAGING_AREA_FIXTURES,
 ]
 
+export const COMBO_FIXTURE_TO_FIXTURE_MAP: Partial<
+  Record<CutoutFixtureId, CutoutFixtureIdsWithFakes[]>
+> = {
+  [FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  ],
+  [FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  ],
+  [FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    MAGNETIC_BLOCK_V1_FIXTURE,
+  ],
+  [STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE]: [
+    STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    MAGNETIC_BLOCK_V1_FIXTURE,
+  ],
+}
+
 // a labware location when something has been used already on the deck
 // and moves to a new location that isn't accessible on or off the deck
 export const SYSTEM_LOCATION = 'systemLocation'
