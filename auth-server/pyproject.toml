@@ -16,6 +16,7 @@ dependencies = [
     "typing-extensions>=4.0.0,<5",
     "uvicorn==0.27.0.post1",
     "sqlalchemy==1.4.51",
+    "oauthlib>=3.3.1,<4",
 ]
 
 [tool.uv.dependency-groups]
@@ -30,6 +31,7 @@ robot = [
     "pydantic-settings==2.4.0",
     "uvicorn==0.27.0.post1",
     "sqlalchemy==1.4.51",
+    "oauthlib==3.3.1",
 ]
 dev = [
     "ruff==0.14.10",
@@ -46,6 +48,7 @@ dev = [
     "requests==2.27.1",
     "sqlalchemy2-stubs==0.0.2a21",
     "tavern>=3.0.2",
+    "types-oauthlib==3.3.0.20250822",
 ]
 
 [tool.ruff.lint]
