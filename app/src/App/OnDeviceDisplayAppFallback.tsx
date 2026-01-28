@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import {
   ALIGN_CENTER,
@@ -15,8 +15,6 @@ import {
 import { useSentryReport } from '/app/App/hooks'
 import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
-import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
-import { getLocalRobot, getRobotSerialNumber } from '/app/redux/discovery'
 import { appRestart, sendLog } from '/app/redux/shell'
 
 import type { FallbackProps } from 'react-error-boundary'
@@ -27,16 +25,8 @@ export function OnDeviceDisplayAppFallback({
   error,
 }: FallbackProps): JSX.Element {
   const { t } = useTranslation(['app_settings', 'branded'])
-  const trackEvent = useTrackEvent()
   const dispatch = useDispatch<Dispatch>()
-  const localRobot = useSelector(getLocalRobot)
-  const robotSerialNumber =
-    localRobot?.status != null ? getRobotSerialNumber(localRobot) : null
   const handleRestartClick = (): void => {
-    trackEvent({
-      name: ANALYTICS_ODD_APP_ERROR,
-      properties: { errorMessage: error.message, robotSerialNumber },
-    })
     dispatch(appRestart(error.message as string))
   }
   const modalHeader: OddModalHeaderBaseProps = {
