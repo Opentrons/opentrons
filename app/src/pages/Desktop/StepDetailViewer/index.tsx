@@ -81,13 +81,11 @@ export function StepDetailViewer(): JSX.Element {
   if (!data) {
     return <div>no data found</div>
   }
-  const { slot, command, robotState, invariantContext, analysis, liquids } =
-    data
+  const { slot, robotState, invariantContext, analysis, liquids } = data
 
   return (
     <SlotDetails
       slotId={slot}
-      command={command}
       robotState={robotState}
       invariantContext={invariantContext}
       analysis={analysis}
