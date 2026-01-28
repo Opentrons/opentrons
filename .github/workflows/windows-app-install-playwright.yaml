@@ -1,0 +1,269 @@
+# Build and install the Windows Electron app, then smoke test it via Playwright (Python)
+
+name: 'Windows app install + Playwright smoke'
+
+on:
+  pull_request:
+    paths:
+      - 'Makefile'
+      - 'app/**'
+      - 'app-shell/**'
+      - 'components/**'
+      - 'e2e-testing/**'
+      - 'shared-data/**'
+      - 'discovery-client/**'
+      - 'scripts/**'
+      - '*.js'
+      - '*.json'
+      - 'yarn.lock'
+      - '.github/actions/js/setup/**'
+      - '.github/workflows/windows-app-install-playwright.yaml'
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'Makefile'
+      - 'app/**'
+      - 'app-shell/**'
+      - 'components/**'
+      - 'e2e-testing/**'
+      - 'shared-data/**'
+      - 'discovery-client/**'
+      - 'scripts/**'
+      - '*.js'
+      - '*.json'
+      - 'yarn.lock'
+      - '.github/actions/js/setup/**'
+      - '.github/workflows/windows-app-install-playwright.yaml'
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: 'true'
+
+jobs:
+  windows-app-install-playwright:
+    runs-on: windows-2022
+    timeout-minutes: 90
+    name: 'Build, install, and Playwright-smoke Windows app'
+
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/js/setup
+
+      - name: "Setup UV for E2E tests"
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: '3.12'
+          cache-dependency-glob: |
+            e2e-testing/uv.lock
+            e2e-testing/pyproject.toml
+
+      - name: 'Check tooling versions'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Tooling versions"
+          node --version
+          yarn --version
+          python --version
+          uv --version
+          make --version
+          Write-Host "::endgroup::"
+
+      - name: 'Bundle frontend (app/dist)'
+        shell: pwsh
+        env:
+          OPENTRONS_PROJECT: robot-stack
+          OT_BUILD_TARGET: desktop
+          # These are usually provided in release CI; keep them non-empty to avoid build-time surprises.
+          OT_APP_MIXPANEL_ID: 'ci'
+          OT_APP_INTERCOM_ID: 'ci'
+          OT_SENTRY_DSN: ''
+          OT_SENTRY_AUTH_TOKEN: ''
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Bundle frontend (app/dist)"
+          Write-Host "OPENTRONS_PROJECT=$env:OPENTRONS_PROJECT"
+          Write-Host "OT_BUILD_TARGET=$env:OT_BUILD_TARGET"
+          make -C app dist
+          Write-Host "Listing app/dist (top-level)"
+          if (Test-Path "app/dist") {
+            Get-ChildItem -Path "app/dist" -Force | Select-Object -First 50 | Format-Table -AutoSize
+          } else {
+            Write-Error "app/dist not found after bundling"
+          }
+          Write-Host "::endgroup::"
+
+      - name: 'Build Windows installer (app-shell)'
+        shell: pwsh
+        env:
+          OPENTRONS_PROJECT: robot-stack
+          WINDOWS_SIGN: 'false'
+          USE_HARD_LINKS: 'false'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Build Windows installer (app-shell)"
+          Write-Host "OPENTRONS_PROJECT=$env:OPENTRONS_PROJECT"
+          Write-Host "WINDOWS_SIGN=$env:WINDOWS_SIGN"
+          make -C app-shell dist-windows-2022 USE_HARD_LINKS=false
+          Write-Host "Listing app-shell/dist/publish"
+          if (Test-Path "app-shell/dist/publish") {
+            Get-ChildItem -Path "app-shell/dist/publish" -Force | Format-Table -AutoSize
+          } else {
+            Write-Error "app-shell/dist/publish not found after build"
+          }
+          Write-Host "::endgroup::"
+
+      - name: 'Locate installer'
+        id: installer
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Locate installer"
+          Write-Host "Searching app-shell/dist/publish for Opentrons-*.exe"
+          Get-ChildItem -Path "app-shell/dist/publish" -Force | Format-Table -AutoSize
+          $installer = Get-ChildItem -Path "app-shell/dist/publish" -Filter "Opentrons-*.exe" |
+            Sort-Object LastWriteTime -Descending |
+            Select-Object -First 1
+
+          if (-not $installer) {
+            Write-Error "Could not find installer in app-shell/dist/publish"
+            Get-ChildItem -Path "app-shell/dist/publish" -Force | Format-List
+            exit 1
+          }
+
+          Write-Host "Found installer: $($installer.FullName)"
+          Write-Host "Installer size: $([Math]::Round($installer.Length/1MB,2)) MB"
+          try { Get-FileHash -Path $installer.FullName -Algorithm SHA256 | Format-List } catch { Write-Host "Get-FileHash unavailable" }
+          "path=$($installer.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "::endgroup::"
+
+      - name: 'Install app (silent)'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Install app (silent)"
+          $installerPath = "${{ steps.installer.outputs.path }}"
+          Write-Host "Installing: $installerPath"
+
+          # NSIS silent install switch
+          $p = Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait -PassThru
+          Write-Host "Installer exit code: $($p.ExitCode)"
+          if ($p.ExitCode -ne 0) {
+            throw "Installer failed with exit code $($p.ExitCode)"
+          }
+          Write-Host "Installed programs under LOCALAPPDATA\\Programs (top-level)"
+          Get-ChildItem -Path (Join-Path $env:LOCALAPPDATA 'Programs') -Force | Select-Object -First 50 | Format-Table -AutoSize
+          Write-Host "::endgroup::"
+
+      - name: 'Resolve installed app executable'
+        id: installed
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Resolve installed app executable"
+          $candidates = @(
+            Join-Path $env:LOCALAPPDATA 'Programs\Opentrons\Opentrons.exe',
+            Join-Path $env:LOCALAPPDATA 'Programs\Opentrons-OT3\Opentrons-OT3.exe'
+          )
+
+          Write-Host "Candidate paths:"
+          $candidates | ForEach-Object { Write-Host " - $_" }
+
+          $exe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+
+          if (-not $exe) {
+            Write-Host "Default paths not found; searching under LOCALAPPDATA\\Programs..."
+            $exe = Get-ChildItem -Path (Join-Path $env:LOCALAPPDATA 'Programs') -Recurse -ErrorAction SilentlyContinue |
+              Where-Object { $_.Name -in @('Opentrons.exe', 'Opentrons-OT3.exe') } |
+              Select-Object -First 1 |
+              ForEach-Object { $_.FullName }
+          }
+
+          if (-not $exe) {
+            Write-Error "Could not find installed Opentrons executable"
+            exit 1
+          }
+
+          Write-Host "Installed app executable: $exe"
+          "exe=$exe" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "::endgroup::"
+
+      - name: 'Launch app with remote debugging'
+        id: launch
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Launch app with remote debugging"
+          $exe = "${{ steps.installed.outputs.exe }}"
+          $port = 9222
+
+          Write-Host "Launching: $exe"
+          Write-Host "Using remote debugging port: $port"
+
+          # Start Electron with a Chrome remote debugging port.
+          $proc = Start-Process -FilePath $exe -ArgumentList "--remote-debugging-port=$port" -PassThru
+          Write-Host "Launched PID: $($proc.Id)"
+          "pid=$($proc.Id)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+          # Wait for the port to open
+          $deadline = (Get-Date).AddSeconds(60)
+          while ((Get-Date) -lt $deadline) {
+            try {
+              $ok = Test-NetConnection -ComputerName 127.0.0.1 -Port $port -WarningAction SilentlyContinue
+              if ($ok.TcpTestSucceeded) { break }
+            } catch { }
+            Start-Sleep -Seconds 2
+          }
+
+          $final = Test-NetConnection -ComputerName 127.0.0.1 -Port $port -WarningAction SilentlyContinue
+          if (-not $final.TcpTestSucceeded) {
+            Write-Host "Netstat excerpt (if available):"
+            try { netstat -ano | Select-String ":$port" | Out-Host } catch { }
+            Write-Error "Remote debugging port $port did not open in time"
+            exit 1
+          }
+
+          Write-Host "CDP port is open. Fetching /json/version for quick sanity:"
+          try {
+            $version = Invoke-RestMethod -Uri "http://127.0.0.1:$port/json/version" -TimeoutSec 5
+            $version | ConvertTo-Json -Depth 5 | Out-Host
+          } catch {
+            Write-Host "Failed to fetch /json/version: $($_.Exception.Message)"
+          }
+          Write-Host "::endgroup::"
+
+      - name: 'Run Playwright smoke (Python, CDP connect)'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Write-Host "::group::Run Playwright smoke (Python)"
+          Write-Host "Installing E2E test dependencies via make setup"
+          make -C e2e-testing setup
+          Write-Host "Installing Playwright Chromium via make test-setup"
+          make -C e2e-testing test-setup
+          Write-Host "Running smoke script"
+          make -C e2e-testing smoke-windows-app BASIC_WINDOWS_APP_ARGS="--cdp-url http://127.0.0.1:9222 --timeout-seconds 60"
+          Write-Host "::endgroup::"
+
+      - name: 'Shutdown app'
+        if: always()
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Continue'
+          Write-Host "::group::Shutdown app"
+          $pid = "${{ steps.launch.outputs.pid }}"
+          if ($pid) {
+            Write-Host "Stopping PID $pid (tree)"
+            taskkill /PID $pid /T /F | Out-Host
+          } else {
+            Write-Host "No PID captured; nothing to stop."
+          }
+          Write-Host "::endgroup::"

@@ -3,13 +3,20 @@
 # Environment selection (local, sandbox, staging, prod)
 TEST_ENV ?= local
 
+# Playwright's `--with-deps` is only supported on Linux.
+ifeq ($(OS),Windows_NT)
+PLAYWRIGHT_WITH_DEPS :=
+else
+PLAYWRIGHT_WITH_DEPS := --with-deps
+endif
+
 .PHONY: setup
 setup:
 	uv sync --frozen
 
 .PHONY: test-setup
 test-setup:
-	uv run playwright install chromium --with-deps
+	uv run playwright install chromium $(PLAYWRIGHT_WITH_DEPS)
 
 .PHONY: format
 format:
@@ -87,3 +94,7 @@ codegen:
 .PHONY: test-unit
 test-unit:
 	TEST_ENV=$(TEST_ENV) uv run pytest -m unit $(PYTEST_ARGS)
+
+.PHONY: smoke-windows-app
+smoke-windows-app:
+	uv run python basic_windows_app.py $(BASIC_WINDOWS_APP_ARGS)
