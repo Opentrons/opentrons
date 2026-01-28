@@ -69,18 +69,18 @@ class BlowoutLocation(Enum):
     TRASH = "trash"
 
 
-class Coordinate(BaseModel):
+class BaseLiquidClassModel(BaseModel):
+    """Base class for liquid class definitions."""
+
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+
+class Coordinate(BaseLiquidClassModel):
     """Three-dimensional coordinates."""
 
     x: _Number
     y: _Number
     z: _Number
-
-
-class BaseLiquidClassModel(BaseModel):
-    """Base class for liquid class definitions."""
-
-    model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
 
 class TipPosition(BaseLiquidClassModel):
