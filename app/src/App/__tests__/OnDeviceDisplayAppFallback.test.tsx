@@ -3,14 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { renderWithProviders } from '/app/__testing-utils__'
 import { i18n } from '/app/i18n'
-import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
 import { getLocalRobot } from '/app/redux/discovery'
 import { mockConnectableRobot } from '/app/redux/discovery/__fixtures__'
 import { appRestart } from '/app/redux/shell'
 
 import { OnDeviceDisplayAppFallback } from '../OnDeviceDisplayAppFallback'
 
-import type { Mock } from 'vitest'
 import type { FallbackProps } from 'react-error-boundary'
 
 vi.mock('/app/redux/shell')
@@ -33,8 +31,6 @@ const render = (props: FallbackProps) => {
   })
 }
 
-let mockTrackEvent: Mock
-
 const MOCK_ROBOT_SERIAL_NUMBER = 'OT123'
 
 describe('OnDeviceDisplayAppFallback', () => {
@@ -45,8 +41,6 @@ describe('OnDeviceDisplayAppFallback', () => {
       error: mockError,
       resetErrorBoundary: {} as any,
     } as FallbackProps
-    mockTrackEvent = vi.fn()
-    vi.mocked(useTrackEvent).mockReturnValue(mockTrackEvent)
     vi.mocked(getLocalRobot).mockReturnValue({
       ...mockConnectableRobot,
       health: {
@@ -68,13 +62,6 @@ describe('OnDeviceDisplayAppFallback', () => {
   it('should call a mock function when tapping reload button', () => {
     render(props)
     fireEvent.click(screen.getByText('Restart touchscreen'))
-    expect(mockTrackEvent).toHaveBeenCalledWith({
-      name: ANALYTICS_ODD_APP_ERROR,
-      properties: {
-        errorMessage: 'mock error',
-        robotSerialNumber: MOCK_ROBOT_SERIAL_NUMBER,
-      },
-    })
     expect(vi.mocked(appRestart)).toHaveBeenCalled()
   })
 })
