@@ -216,7 +216,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     )
   }
 
-  const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[]): void => {
+  const validateAddedConfigs = (
+    addedCutoutConfigs: CutoutConfigMap[]
+  ): string | null => {
     //  only allow 1 trashBin
     if (
       addedCutoutConfigs.some(cutoutConfig =>
@@ -226,9 +228,10 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ) &&
       Object.values(fixtures).some(fixture => fixture.name === 'trashBin')
     ) {
-      makeSnackbar(t('only_one_trash') as string)
-      //  only allow absorbance reader if gripper is attached
-    } else if (
+      return t('only_one_trash') as string
+    }
+    //  only allow absorbance reader if gripper is attached
+    if (
       !hasGripper &&
       addedCutoutConfigs.some(cutoutConfig =>
         ABSORBANCE_READER_ADDRESSABLE_AREAS.includes(
@@ -236,9 +239,10 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         )
       )
     ) {
-      makeSnackbar(t('add_gripper_for_plate') as string)
-      //  block thermocycler from being added if there is something in slot A1
-    } else if (
+      return t('add_gripper_for_plate') as string
+    }
+    //  block thermocycler from being added if there is something in slot A1
+    if (
       addedCutoutConfigs.some(
         cutoutConfig =>
           THERMOCYCLER_ADDRESSABLE_AREA === cutoutConfig.addressableAreaId
@@ -251,95 +255,109 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           lw => getSlotInLocationStack(lw.stack) === 'A1'
         ))
     ) {
-      makeSnackbar(t('thermocycler_blocked') as string)
-    } else {
-      const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
-        addedCutoutConfigs,
-        deckConfigWithAA,
-        cutoutId
-      )
-      const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
-        return (
-          addedCutoutConfigsWithCombo.find(
-            c => c.cutoutId === fixture.cutoutId
-          ) ?? fixture
-        )
-      })
-      const newModule = addedCutoutConfigs.find(cutoutConfig =>
-        MODULE_MODELS.includes(cutoutConfig.cutoutFixtureId as ModuleModel)
-      )
-      const newFixture = addedCutoutConfigs.find(cutoutConfig =>
-        FIXTURE_ADDRESSABLE_AREAS.includes(
-          cutoutConfig.addressableAreaId as AddressableAreaName
-        )
-      )
-
-      const moduleModel =
-        newModule != null
-          ? getModuleModelFromFixtureId(
-              newModule.cutoutFixtureId as CutoutFixtureId
-            )
-          : null
-
-      if (newModule != null && moduleModel != null) {
-        const filteredModules = Object.fromEntries(
-          Object.entries(modules).filter(
-            ([, module]) => module.cutoutId !== newModule.cutoutId
-          )
-        )
-        const updatedModules: FormModules = {
-          ...filteredModules,
-          [uuid()]: {
-            model: moduleModel,
-            type: getModuleType(moduleModel as ModuleModel),
-            slot:
-              newModule.addressableAreaId === THERMOCYCLER_ADDRESSABLE_AREA
-                ? 'B1'
-                : getSlotDisplayNameFromAAWithFakes(
-                    newModule.addressableAreaId as AddressableAreaName
-                  ),
-            cutoutFixtureId:
-              newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
-            cutoutId: newModule.cutoutId,
-          },
-        }
-        setValue?.('modules', updatedModules)
-      }
-      if (newFixture != null) {
-        const filteredFixtures = Object.fromEntries(
-          Object.entries(fixtures).filter(
-            ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
-          )
-        )
-
-        let additionalFixture: Fixtures | undefined
-        const name = getFixtureNameFromAddresableArea(
-          newFixture.addressableAreaId as AddressableAreaName
-        )
-
-        const updatedFixtures: Fixtures = {
-          ...filteredFixtures,
-          [uuid()]: {
-            name: name ?? 'stagingArea',
-            cutoutFixtureId: newFixture.cutoutFixtureId as CutoutFixtureId,
-            cutoutId: newFixture.cutoutId,
-          },
-          ...additionalFixture,
-        }
-        setValue?.('fixtures', updatedFixtures)
-      }
-      const labwareCompatible = getLabwareCompatibleForEditHardware(
-        labware,
-        cutoutId,
-        newModule,
-        newFixture
-      )
-      if (labwareCompatible) {
-        dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
-      }
-      updateInitialDeckState?.(addedCutoutConfigs)
-      closeModal()
+      return t('thermocycler_blocked') as string
     }
+    return null
+  }
+
+  const handleAddModule = (newModule: CutoutConfigMap): void => {
+    const moduleModel = getModuleModelFromFixtureId(
+      newModule.cutoutFixtureId as CutoutFixtureId
+    )
+    if (moduleModel == null) return
+
+    const filteredModules = Object.fromEntries(
+      Object.entries(modules).filter(
+        ([, module]) => module.cutoutId !== newModule.cutoutId
+      )
+    )
+    const updatedModules: FormModules = {
+      ...filteredModules,
+      [uuid()]: {
+        model: moduleModel,
+        type: getModuleType(moduleModel as ModuleModel),
+        slot:
+          newModule.addressableAreaId === THERMOCYCLER_ADDRESSABLE_AREA
+            ? 'B1'
+            : getSlotDisplayNameFromAAWithFakes(
+                newModule.addressableAreaId as AddressableAreaName
+              ),
+        cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
+        cutoutId: newModule.cutoutId,
+      },
+    }
+    setValue?.('modules', updatedModules)
+  }
+
+  const handleAddNewFixture = (newFixture: CutoutConfigMap): void => {
+    const filteredFixtures = Object.fromEntries(
+      Object.entries(fixtures).filter(
+        ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
+      )
+    )
+    const name = getFixtureNameFromAddresableArea(
+      newFixture.addressableAreaId as AddressableAreaName
+    )
+    const updatedFixtures: Fixtures = {
+      ...filteredFixtures,
+      [uuid()]: {
+        name: name ?? 'stagingArea',
+        cutoutFixtureId: newFixture.cutoutFixtureId as CutoutFixtureId,
+        cutoutId: newFixture.cutoutId,
+      },
+    }
+    setValue?.('fixtures', updatedFixtures)
+  }
+
+  const handleAddFixture = (addedCutoutConfigs: CutoutConfigMap[]): void => {
+    const validationError = validateAddedConfigs(addedCutoutConfigs)
+    if (validationError != null) {
+      makeSnackbar(validationError)
+      return
+    }
+
+    const addedCutoutConfigsWithCombo = replaceCutoutFixtureWithComboFixture(
+      addedCutoutConfigs,
+      deckConfigWithAA,
+      cutoutId
+    )
+    const newDeckConfig: CutoutConfig[] = deckConfig.map(fixture => {
+      return (
+        addedCutoutConfigsWithCombo.find(
+          c => c.cutoutId === fixture.cutoutId
+        ) ?? fixture
+      )
+    })
+
+    // Find and handle new module
+    const newModule = addedCutoutConfigs.find(cutoutConfig =>
+      MODULE_MODELS.includes(cutoutConfig.cutoutFixtureId as ModuleModel)
+    )
+    if (newModule != null) {
+      handleAddModule(newModule)
+    }
+
+    // Find and handle new fixture
+    const newFixture = addedCutoutConfigs.find(cutoutConfig =>
+      FIXTURE_ADDRESSABLE_AREAS.includes(
+        cutoutConfig.addressableAreaId as AddressableAreaName
+      )
+    )
+    if (newFixture != null) {
+      handleAddNewFixture(newFixture)
+    }
+
+    const labwareCompatible = getLabwareCompatibleForEditHardware(
+      labware,
+      cutoutId,
+      newModule,
+      newFixture
+    )
+    if (labwareCompatible) {
+      dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
+    }
+    updateInitialDeckState?.(addedCutoutConfigs)
+    closeModal()
   }
   const fixtureOptions = availableOptions.map(cutoutConfigs => {
     return (
