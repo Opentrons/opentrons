@@ -265,7 +265,8 @@ async def test_run_commands_persist(client_and_server: ClientServerFixture) -> N
     assert get_all_persisted_commands_response.json()["data"] == [
         # NOTE: GET /run/:id/commands returns command summaries,
         # which are commands without the `result` key
-        {k: v for k, v in expected_command.items() if k != "result"}
+        # TODO(jbl, 2026-01-27) undo this with robot server work, this should start failing when we persist this
+        {k: v for k, v in expected_command.items() if k != "result" and k != "commandAnnotations"}
     ]
     assert get_persisted_command_response.json()["data"] == expected_command
 
