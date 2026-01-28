@@ -23,6 +23,18 @@ You can click on any robot summary tile to expand it for more information about 
 ![Device 3-dot menus for robot hardware controls](../images/app-device-details-hardware.png)
 </figure>
 
+### Controlling modules
+
+### Using the camera
+
+OT-2 includes a built-in camera. You can use it to take pictures during protocols when:
+
+- That command is included in a protocol created in the API (not PD)
+https://docs.opentrons.com/python-api/reference/protocols/#opentrons.protocol_api.ProtocolContext.capture_image
+- OT-2 encounters an error
+
+There is no live stream for OT-2.
+
 ### Recent protocol runs
 
 The robot details page also keeps records of up to 20 recent protocol runs.
@@ -47,21 +59,6 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 - **Download image files**: Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.## Recent protocol runs
 
 The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
-
-Each entry in the recent protocol runs list includes the protocol name, its timestamp, whether the run was canceled or completed, and the duration of the run. Click the disclosure triangle next to any run to show its associated labware offset data. Click the three-dot menu (⋮) for related actions:
-
-- **View protocol run record**: Show the protocol run screen as it appeared when the protocol ended (succeeded, failed, or was canceled), including all performed steps.
-
-- **Rerun protocol now**: The same as choosing Start setup on the corresponding protocol.
-
-- **Download run log**: Save to your computer a JSON file containing information about the protocol run, including all performed steps.
-
-- **Delete protocol run record**: Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
-
-!!! tip
-    If you need to maintain a comprehensive record of all runs performed on your OT-2, you must use the **Download run log** feature to save this information to your computer.
-
-- **Download image files**: Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.
 
 ## Labware tab
 
@@ -115,8 +112,6 @@ The basic protocol screen displays a summary list of all the protocols stored on
     </tr>
   </tbody>
 </table>
-
-
 
 <figure class="screenshot" markdown>
 ![Protocols tab showing uploaded protocols](../images/app-protocol-list.png){ width="80%" }

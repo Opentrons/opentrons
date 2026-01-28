@@ -28,8 +28,6 @@ nav:
       - App Installation and Management: opentrons-app/installation.md
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
-      - Protocols Tab: opentrons-app/protocols-tab.md
-      - Devices Tab: opentrons-app/devices-tab.md
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
