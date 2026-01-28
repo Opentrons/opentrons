@@ -107,6 +107,9 @@ def run_smoke(config: SmokeConfig) -> None:
         try:
             page = _get_any_page(browser, timeout_seconds=config.timeout_seconds)
             _ = page.evaluate("() => ({ readyState: document.readyState, href: location.href })")
+            screenshot_path = "smoke_test.png"
+            page.screenshot(path=screenshot_path)
+            print(f"Saved smoke test screenshot to {screenshot_path}")
         finally:
             browser.close()
 

@@ -253,17 +253,27 @@ jobs:
           make -C e2e-testing smoke-windows-app BASIC_WINDOWS_APP_ARGS="--cdp-url http://127.0.0.1:9222 --timeout-seconds 60"
           Write-Host "::endgroup::"
 
-      - name: 'Shutdown app'
+      - name: 'Upload smoke screenshot artifact'
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: smoke-test-screenshot
+          path: |
+            e2e-testing/smoke_test.png
+          retention-days: 7
+          if-no-files-found: warn
+
+      - name: 'Add job summary links'
         if: always()
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Continue'
-          Write-Host "::group::Shutdown app"
-          $pid = "${{ steps.launch.outputs.pid }}"
-          if ($pid) {
-            Write-Host "Stopping PID $pid (tree)"
-            taskkill /PID $pid /T /F | Out-Host
-          } else {
-            Write-Host "No PID captured; nothing to stop."
-          }
-          Write-Host "::endgroup::"
+
+          $artifactUrl = "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}#artifacts"
+
+          "## Windows app smoke test outputs" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "- Smoke screenshot artifact: **smoke-test-screenshot**" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "- Artifacts page: $artifactUrl" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "" | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
+          "Note: GitHub Actions job summaries can't reliably render private artifact images inline, so the screenshot is uploaded as an artifact instead." | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Append
