@@ -24,7 +24,7 @@ class AbstractBarcodeScannerDriver(ABC):
         ...
 
     @abstractmethod
-    async def set_sufix(self, suffix: str) -> None:
+    async def set_suffix(self, suffix: str) -> None:
         """Set the automatic suffix for the barcode data."""
         ...
 
