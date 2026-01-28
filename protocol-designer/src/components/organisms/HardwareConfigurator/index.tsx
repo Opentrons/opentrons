@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   FLEX_ROBOT_TYPE,
   getAddedMissingThermocyclerFixtures,
+  getComboFixtureFromFixtureIds,
   getCutoutFixtureIdsForModuleModel,
   getCutoutIdFromAddressableArea,
   getDeckDefFromRobotType,
   getEmptyDeckConfiguration,
-  replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
@@ -23,7 +23,6 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
-  CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
@@ -106,23 +105,59 @@ export function HardwareConfigurator(
     })
   )
 
-  let comboFixtures: CutoutConfig[] = []
+  // Find combo fixtures and track which cutoutIds are merged
+  const comboFixtures: CutoutConfig[] = []
+  const mergedCutoutIds: CutoutId[] = []
+
+  // Get unique cutoutIds from moduleConfig
+  const processedCutoutIds: CutoutId[] = []
+
   moduleConfig.forEach(mc => {
+    // Skip if we've already processed this cutoutId
+    if (processedCutoutIds.includes(mc.cutoutId)) return
+    processedCutoutIds.push(mc.cutoutId)
+
+    // Find all modules at this cutoutId
+    const moduleMatches = moduleConfig.filter(m => m.cutoutId === mc.cutoutId)
+    // Find all fixtures at this cutoutId
     const fixtureMatches = additionalEquipmentConfig.filter(
       ae => mc.cutoutId === ae.cutoutId
     )
-    console.log('fixtureMatches: ', fixtureMatches)
-    if (fixtureMatches.length > 0) {
-      comboFixtures.push(...fixtureMatches)
+
+    // Combine all fixture IDs at this cutoutId
+    const allFixtureIds = [
+      ...moduleMatches.map(m => m.cutoutFixtureId),
+      ...fixtureMatches.map(f => f.cutoutFixtureId),
+    ]
+
+    console.log('allFixtureIds: ', allFixtureIds)
+
+    // Only try to find combo if there are multiple items at this cutoutId
+    if (allFixtureIds.length > 1) {
+      const comboFixture = getComboFixtureFromFixtureIds(allFixtureIds)
+      if (comboFixture != null) {
+        comboFixtures.push({
+          cutoutId: mc.cutoutId,
+          cutoutFixtureId: comboFixture,
+        })
+        mergedCutoutIds.push(mc.cutoutId)
+      }
     }
   })
 
-  console.log('comboFixtures: ', comboFixtures)
-  console.log('additionalEquipmentConfig: ', additionalEquipmentConfig)
+  // Filter out items that were merged into combo fixtures
+  const remainingModuleConfig = moduleConfig.filter(
+    mc => !mergedCutoutIds.includes(mc.cutoutId)
+  )
+  const remainingAdditionalEquipmentConfig = additionalEquipmentConfig.filter(
+    ae => !mergedCutoutIds.includes(ae.cutoutId)
+  )
+
   const updatedDeckConfig = [
     ...simpleDeckConfig,
-    ...moduleConfig,
-    ...additionalEquipmentConfig,
+    ...remainingModuleConfig,
+    ...remainingAdditionalEquipmentConfig,
+    ...comboFixtures,
   ]
   console.log('updatedDeckConfig in initial deck config: ', updatedDeckConfig)
 
