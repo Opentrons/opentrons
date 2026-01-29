@@ -5,6 +5,7 @@ import {
   FLEX_ROBOT_TYPE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAAsToFixtureIdFromDeckDefWithFakes,
+  getAAWithFakesFromCutoutFixtureId,
   getComboFixtureFromFixtureIds,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
@@ -146,11 +147,23 @@ export function useDeckConfigurationEditing(
     cutoutFixtureId: CutoutFixtureIdsWithFakes,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
+    console.log(
+      'removeFixtureFromCutoutForEditing: ',
+      cutoutId,
+      cutoutFixtureId,
+      addressableAreaId
+    )
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
       cutoutId,
       addressableAreaId
     )
+    const aa = getAAWithFakesFromCutoutFixtureId(
+      cutoutId,
+      replacementFixtureId,
+      deckDef
+    )
+
     const newDeckConfig = getNewConfigForDeckConfig(
       cutoutId,
       cutoutFixtureId,
@@ -159,12 +172,13 @@ export function useDeckConfigurationEditing(
       deckDef,
       false
     )
+    console.log('newDeckConfig: ', newDeckConfig)
     updateInitialDeckState?.(
       [
         {
           cutoutId,
           cutoutFixtureId: replacementFixtureId,
-          addressableAreaId,
+          addressableAreaId: aa?.[0] ?? addressableAreaId,
         },
       ],
       newDeckConfig

@@ -248,6 +248,7 @@ export const updateInitialDeckState = (
   // Add missing thermocycler fixtures if needed
   const allValues = getAddedMissingThermocyclerFixtures(values, deckDef)
 
+  console.log('additionalEquipmentOnDeck: ', additionalEquipmentOnDeck)
   allValues.forEach(value => {
     const fixtureName = getMainFixtureIdForAA(
       [value.cutoutFixtureId as CutoutFixtureId],
@@ -255,20 +256,22 @@ export const updateInitialDeckState = (
       value.cutoutId
     )
 
+    console.log('fixtureName: ', fixtureName)
     const matchingFixtureOnDeck = Object.values(additionalEquipmentOnDeck).find(
-      ae =>
-        ae.name === mapFixtureIdToFixtureName(fixtureName) &&
-        ae.location === value.cutoutId
+      ae => ae.location === value.cutoutId
     )
 
     const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
 
+    console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module =>
         fixtureName != null &&
         module.model === getModuleModelFromFixtureId(fixtureName) &&
         getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
+
+    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
 
     const matching4thColumnLabware =
       matchingFixtureOnDeck?.name === 'stagingArea' && slotName != null
