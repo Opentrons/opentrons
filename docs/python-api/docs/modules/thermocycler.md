@@ -82,7 +82,7 @@ To set the block temperature inside the Thermocycler, you can use either a block
 === "Concurrent"
 
     ```python
-    tc_mod.start_set_block_temperature(temperature=50)
+    tc_mod.start_set_block_temperature(temperature=4)
     ```
 
     Use the concurrent [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] method to perform other protocol steps while the block reaches its target temperature.
@@ -132,6 +132,36 @@ You can optionally instruct the Thermocycler to hold its block temperature for a
     The concurrent [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] method doesn't accept hold time arguments. Instead, use [`create_timer()`][opentrons.protocol_api.ProtocolContext.create_timer] to proceed to the next steps in the protocol. Here, the robot will perform the pipetting actions while the block reaches its target temperature. Once the protocol reaches the [`wait_for_tasks()`][opentrons.protocol_api.ProtocolContext.wait_for_tasks] commands, the robot pauses and waits for the block to finish cooling or holds for the remainder of the timer.
 
     *New in version 2.27*
+
+### Ramp rate
+
+In some protocols, your samples might require a slower ramp speed. Use the optional `ramp_rate` parameter of the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature] and [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] methods to control how quickly the block reaches its set temperature. 
+
+=== "Blocking"
+
+    ```python
+    tc_mod.set_block_temperature(
+        temperature=4,
+        ramp_rate=1
+    )
+    ```
+
+    Here, the Thermocycler Module will cool the block to 4 °C at a rate of 1 °C/second. 
+
+    *New in version 2.28*
+
+=== "Concurrent"
+
+    ```python
+    tc_mod.start_set_block_temperature(
+        temperature=4,
+        ramp_rate=1
+    )
+    ```
+
+    Here, the Thermocycler Module will cool the block to 4 °C at a rate of 1 °C/second. 
+
+    *New in version 2.28*
 
 ### Block max volume
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the `block_max_volume` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.

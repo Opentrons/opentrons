@@ -701,8 +701,9 @@ class ThermocyclerContext(ModuleContext):
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
             ramp_rate: The rate to heat or cool the Thermocycler Module's block,
-                in °C/second. The acceptable range is between 0.01 and 2 °C/second
-                to cool the block, and 0.01 and 4.25 °C/second to heat the block. 
+                in °C/second. The acceptable range is between 0.01–2 °C/second
+                to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
+                the block will heat or cool as quickly as possible to reach the set temperature.
 
                 *Changed in version 2.27:* In API version
                 2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
@@ -750,8 +751,9 @@ class ThermocyclerContext(ModuleContext):
                 individual well of the loaded labware, in µL. If not specified,
                 the default is 25 µL.
             ramp_rate: The rate to heat or cool the Thermocycler Module's block,
-                in °C/second. The acceptable range is between 0.01 and 2 °C/second
-                to cool the block, and 0.01 and 4.25 °C/second to heat the block. 
+                in °C/second. The acceptable range is between 0.01–2 °C/second
+                to cool the block, and 0.01–4.25 °C/second to heat the block. If not specified,
+                the block will heat or cool as quickly as possible to reach the set temperature.
 
         *Changed in version 2.27:* In API version
         2.27 and newer, the API will first attempt to use the liquid tracking in labware, then default to 25 µL if the protocol lacks probed or loaded
