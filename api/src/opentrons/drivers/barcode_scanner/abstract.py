@@ -11,7 +11,7 @@ class AbstractBarcodeScannerDriver(ABC):
 
     @abstractmethod
     async def disconnect(self) -> None:
-        """Disonnect from the barcode scanner."""
+        """Disconnect from the barcode scanner."""
 
     @abstractmethod
     async def is_connected(self) -> bool:
