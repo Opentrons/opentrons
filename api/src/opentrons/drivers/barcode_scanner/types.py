@@ -1,4 +1,6 @@
+from dataclasses import dataclass
 from enum import Enum
+from typing import Dict
 
 
 class SoundProfile(Enum):
@@ -13,5 +15,10 @@ class LEDProfile(Enum):
     OFF = 3
 
 
+@dataclass
 class BarcodeModuleInfo:
     serial: str
+
+    def to_dict(self) -> Dict[str, str]:
+        """Build command."""
+        return {"serial": self.serial}
