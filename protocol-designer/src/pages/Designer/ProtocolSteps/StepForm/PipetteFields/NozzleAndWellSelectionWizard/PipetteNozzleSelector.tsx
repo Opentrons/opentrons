@@ -70,6 +70,7 @@ export function PipetteNozzleSelector(props: {
     value: nozzleMode,
     setSelectedValue,
   } = props
+    console.log("🚀 ~ PipetteNozzleSelector ~ pipetteSpecs:", pipetteSpecs)
   const { channels, pipetteBoundingBoxOffsets, displayName } = pipetteSpecs
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
   const { t } = useTranslation('protocol_steps')
@@ -82,10 +83,10 @@ export function PipetteNozzleSelector(props: {
   const outlineProps = {
     fill: COLORS.white,
     stroke: COLORS.grey50,
-    x: 0,
-    y: 0,
-    width: width * 3,
-    height: height * 3,
+    x: -16,
+    y: -41.5,
+    width: width,
+    height: height,
     rotate: false,
   }
 
@@ -144,8 +145,8 @@ export function PipetteNozzleSelector(props: {
             padding={SPACING.spacing20}
             gridGap={SPACING.spacing10}
           >
-             <Flex maxHeight={"10px"}>
-            {!is96Channel && <EightChannelFlexShadow{...outlineProps}/>}
+             <Flex height={"100%"}>
+            {!is96Channel && <OutlineComponent {...outlineProps}/>}
 </Flex>
 
             <Flex flexDirection={DIRECTION_COLUMN}>
