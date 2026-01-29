@@ -126,10 +126,11 @@ class AttachedModulesControl:
         simulated_usb_port: types.USBPort,
         type: modules.ModuleType,
         sim_model: str,
+        sim_serial: Optional[str] = None,
     ) -> modules.AbstractModule:
         """Register a simulated module."""
         module = await self.build_module(
-            "", simulated_usb_port, type, sim_model, sim_serial_number=None
+            "", simulated_usb_port, type, sim_model, sim_serial_number=sim_serial
         )
         self._available_modules.append(module)
         self._available_modules = sorted(
@@ -149,7 +150,7 @@ class AttachedModulesControl:
             port=port,
             usb_port=usb_port,
             type=type,
-            simulating=self._api.is_simulator,
+            simulating=self._api.is_simulator or sim_model is not None,
             hw_control_loop=self._api.loop,
             execution_manager=self._api._execution_manager,
             sim_model=sim_model,
