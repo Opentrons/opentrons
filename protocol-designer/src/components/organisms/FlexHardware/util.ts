@@ -187,6 +187,7 @@ const handleDeleteModule = (ctx: ModuleContext): void => {
 }
 
 const handleCreateModule = (ctx: ModuleContext): void => {
+  console.log('handleCreateModule: ', ctx)
   const { value, labwareOnDeck, dispatch, makeSnackbar, t } = ctx
 
   const model = getModuleModelFromFixtureId(
@@ -236,6 +237,7 @@ export const updateInitialDeckState = (
     deckConfig,
   } = props
 
+  console.log('values: ', values)
   const {
     additionalEquipmentOnDeck,
     modules: moduleOnDeck,
@@ -285,8 +287,10 @@ export const updateInitialDeckState = (
 
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
 
+    const isModuleFixture =
+      getModuleModelFromFixtureId(fixtureName as CutoutFixtureId) !== null
     // Handle fixtures
-    if (fixtureName != null) {
+    if (fixtureName != null && !isModuleFixture) {
       const fixtureCtx: FixtureContext = {
         value,
         fixtureName,
@@ -324,10 +328,12 @@ export const updateInitialDeckState = (
       t,
     }
 
-    if (matchingModuleOnDeck != null) {
-      handleDeleteModule(moduleCtx)
-    } else {
-      handleCreateModule(moduleCtx)
+    if (isModuleFixture) {
+      if (matchingModuleOnDeck != null) {
+        handleDeleteModule(moduleCtx)
+      } else {
+        handleCreateModule(moduleCtx)
+      }
     }
   })
 }

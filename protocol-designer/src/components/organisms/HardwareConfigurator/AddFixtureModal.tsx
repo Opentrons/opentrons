@@ -16,10 +16,11 @@ import {
   TYPOGRAPHY,
 } from '@opentrons/components'
 import {
-  ABSORBANCE_READER_ADDRESSABLE_AREAS,
+  ABSORBANCE_READER_V1,
   FIXTURES_FIXTURE_IDS,
   FLEX_ROBOT_TYPE,
   getAADisplayName,
+  getCutoutFixturesForModuleModel,
   getDeckDefFromRobotType,
   getFixtureDisplayName,
   getMainFixtureIdForAA,
@@ -28,11 +29,12 @@ import {
   getSlotDisplayNameFromAAWithFakes,
   getWasteChuteOptions,
   MODULE_MODELS,
-  MOVABLE_TRASH_ADDRESSABLE_AREAS,
   replaceCutoutFixtureWithComboFixture,
   replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA,
   SINGLE_CENTER_CUTOUTS,
-  THERMOCYCLER_ADDRESSABLE_AREA,
+  THERMOCYCLER_MODULE_CUTOUTS,
+  THERMOCYCLER_MODULE_V2,
+  TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_CUTOUT,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
@@ -58,6 +60,7 @@ import type {
   AddressableAreaNamesWithFakes,
   CutoutConfig,
   CutoutConfigMap,
+  CutoutFixture,
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
@@ -95,12 +98,6 @@ export type OptionStage =
   | 'fixtureOptions'
   | 'moduleOptions'
   | 'wasteChuteOptions'
-
-// const FIXTURE_ADDRESSABLE_AREAS = [
-//   ...WASTE_CHUTE_ADDRESSABLE_AREAS,
-//   ...MOVABLE_TRASH_ADDRESSABLE_AREAS,
-//   ...FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
-// ]
 
 //  TODO: this is similar to the AddFixtureModal in the app but logic varies
 //  quite a bit. Would be ideal to merge them together but not sure how to do
@@ -221,10 +218,9 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   ): string | null => {
     //  only allow 1 trashBin
     if (
-      addedCutoutConfigs.some(cutoutConfig =>
-        MOVABLE_TRASH_ADDRESSABLE_AREAS.includes(
-          cutoutConfig.addressableAreaId as AddressableAreaName
-        )
+      addedCutoutConfigs.some(
+        cutoutConfig =>
+          TRASH_BIN_ADAPTER_FIXTURE === cutoutConfig.cutoutFixtureId
       ) &&
       Object.values(fixtures).some(fixture => fixture.name === 'trashBin')
     ) {
@@ -234,27 +230,31 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     if (
       !hasGripper &&
       addedCutoutConfigs.some(cutoutConfig =>
-        // TODO: (tz, 2026-01-28) - get absorbance reader fixtures instead of addressable areas
-        ABSORBANCE_READER_ADDRESSABLE_AREAS.includes(
-          cutoutConfig.addressableAreaId as AddressableAreaName
-        )
+        getCutoutFixturesForModuleModel(ABSORBANCE_READER_V1, deckDef)
+          .map(cf => cf.id)
+          .includes(cutoutConfig.cutoutFixtureId as CutoutFixtureId)
       )
     ) {
       return t('add_gripper_for_plate') as string
     }
     //  block thermocycler from being added if there is something in slot A1
     if (
-      // TODO: (tz, 2026-01-28) - get thermocycler fixtures instead of addressable areas
-      addedCutoutConfigs.some(
-        cutoutConfig =>
-          THERMOCYCLER_ADDRESSABLE_AREA === cutoutConfig.addressableAreaId
+      addedCutoutConfigs.some(cutoutConfig =>
+        getCutoutFixturesForModuleModel(THERMOCYCLER_MODULE_V2, deckDef)
+          .map(cf => cf.id)
+          .includes(cutoutConfig.cutoutFixtureId as CutoutFixtureId)
       ) &&
-      (Object.values(modules).some(module => module.cutoutId === 'cutoutA1') ||
-        Object.values(fixtures).some(
-          fixture => fixture.cutoutId === 'cutoutA1'
-        ) ||
-        Object.values(labware).some(
-          lw => getSlotInLocationStack(lw.stack) === 'A1'
+      (Object.values(modules).some(
+        module =>
+          THERMOCYCLER_MODULE_CUTOUTS.includes(module.cutoutId) ||
+          Object.values(fixtures).some(fixture =>
+            THERMOCYCLER_MODULE_CUTOUTS.includes(fixture.cutoutId as CutoutId)
+          )
+      ) ||
+        Object.values(labware).some(lw =>
+          THERMOCYCLER_MODULE_CUTOUTS.includes(
+            getSlotInLocationStack(lw.stack) as CutoutId
+          )
         ))
     ) {
       return t('thermocycler_blocked') as string
@@ -273,21 +273,30 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         ([, module]) => module.cutoutId !== newModule.cutoutId
       )
     )
+    console.log('moduleModel: ', moduleModel)
+    console.log('newModule: ', newModule)
+    const isThermocyclerModule = getCutoutFixturesForModuleModel(
+      THERMOCYCLER_MODULE_V2,
+      deckDef
+    )
+      .map(cf => cf.id)
+      .includes(newModule.cutoutFixtureId as CutoutFixtureId)
+
     const updatedModules: FormModules = {
       ...filteredModules,
       [uuid()]: {
         model: moduleModel,
         type: getModuleType(moduleModel as ModuleModel),
-        slot:
-          newModule.addressableAreaId === THERMOCYCLER_ADDRESSABLE_AREA
-            ? 'B1'
-            : getSlotDisplayNameFromAAWithFakes(
-                newModule.addressableAreaId as AddressableAreaName
-              ),
+        slot: isThermocyclerModule
+          ? 'B1'
+          : getSlotDisplayNameFromAAWithFakes(
+              newModule.addressableAreaId as AddressableAreaName
+            ),
         cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
-        cutoutId: newModule.cutoutId,
+        cutoutId: isThermocyclerModule ? 'cutoutB1' : newModule.cutoutId,
       },
     }
+    console.log('updatedModules: ', updatedModules)
     setValue?.('modules', updatedModules)
   }
 
@@ -344,9 +353,11 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     console.log('addedCutoutConfigs: ', addedCutoutConfigs)
 
     // Find and handle new module
-    // TODO: (tz, 2026-01-28) - get module fixtures
-    const newModule = addedCutoutConfigs.find(cutoutConfig =>
-      MODULE_MODELS.includes(cutoutConfig.cutoutFixtureId as ModuleModel)
+    const newModule = addedCutoutConfigs.find(
+      cutoutConfig =>
+        getModuleModelFromFixtureId(
+          cutoutConfig.cutoutFixtureId as CutoutFixtureId
+        ) !== null
     )
     console.log('newModule: ', newModule)
     if (newModule != null) {
