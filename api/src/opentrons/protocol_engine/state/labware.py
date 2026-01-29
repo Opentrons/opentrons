@@ -1277,6 +1277,7 @@ class LabwareView:
             if labware_validation.is_tiprack_lid(
                 top_labware_definition.parameters.loadName
             ) and labware_validation.is_tiprack_lid(below_labware.loadName):
+                # Validate that when attempting to stack a tiprack lid on another tiprack lid we still adhere to the maximum limit
                 if len(stack_without_adapters) >= self.get_labware_stacking_maximum(
                     top_labware_definition
                 ):
