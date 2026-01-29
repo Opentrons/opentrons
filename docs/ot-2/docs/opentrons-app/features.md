@@ -11,7 +11,7 @@ The Devices tab provides a summary list all the discoverable Opentrons robots on
 - **Connectivity**: Icons indicate the network connection type used by your OT-2. These are Ethernet <img src="../../images/ethernet.svg" width="20" style="vertical-align:middle;"/>, Wi-Fi <img src="../../images/wifi.svg" width="20" style="vertical-align:middle;"/>, or USB <img src="../../images/usb.svg" width="20" style="vertical-align:middle;">.
 - **Instruments**: Gray labels show the type of pipette attached to the gantry. 
 - **Modules**: Icons indicate which powered modules are attached to your OT-2. These include the Temperature Module <img src="../../images/temperature-module.svg" width="20" style="vertical-align:middle;">, Magnetic Module <img src="../../images/magnetic-module.svg" width="20" style="vertical-align:middle;">, Heater-Shaker <img src="../../images/heater-shaker.svg" width="20" style="vertical-align:middle;">, and Thermocycler <img src="../../images/thermocycler.svg" width="20" style="vertical-align:middle;">.
-- **Perpherals**: Other attached and powered components (e.g., built-in camera <img src="../../images/camera.svg" width="20" style="vertical-align:middle;">)
+- **Perpherals**: Other attached and powered components (e.g., built-in camera <img src="../../images/camera.svg" width="20" style="vertical-align:middle;">).
 
 <figure class="screenshot" markdown>
 ![Devices tab showing list of robots](../images/app-devices-tab.png)
