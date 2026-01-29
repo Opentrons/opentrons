@@ -264,6 +264,7 @@ export const updateInitialDeckState = (
     const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
 
     console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
+    // look if there is a module on deck that matches cutout id
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module =>
         fixtureName != null &&
