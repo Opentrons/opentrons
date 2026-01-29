@@ -34,6 +34,7 @@ export interface PipetteShadowProps {
   fill: string
   stroke: string
   rotate?: boolean
+  nozzles?: boolean
 }
 
 export type LabelPlacement =

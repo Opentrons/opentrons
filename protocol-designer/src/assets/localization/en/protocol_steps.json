@@ -203,6 +203,8 @@
   "select_wells": "Select wells using a {{displayName}}",
   "select_wells_to_aspirate_liquid_from": "Select wells to aspirate liquid from {{labware}}",
   "select_wells_to_dispense_liquid_into": "Select wells to dispense liquid into in {{labware}}",
+  "select_wells_to_mix_liquid_in": "Select wells to mix liquid in {{labware}}",
+
   "shake": "Shake",
   "shake_speed": "Shake speed",
   "single": "Single transfer",

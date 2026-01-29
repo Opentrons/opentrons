@@ -20,15 +20,20 @@ import {
   PARTIAL,
 } from '@opentrons/shared-data'
 
-import { EightChannelFlexShadow } from './EightChannelFlexShadow'
-import { EightChannelOT2Shadow } from './EightChannelOT2Shadow'
-import { NinetySixChannelFlexShadow } from './NinetySixChannelFlexShadow'
-import { SingleChannelOT2Shadow } from './SingleChannelOT2Shadow'
-import { SingleChannelFlexShadow } from './SingleChannelShadow'
+import { EightChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/EightChannelFlexShadow'
+import { EightChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/EightChannelOT2Shadow'
+import { NinetySixChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/NinetySixChannelFlexShadow'
+import { SingleChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelOT2Shadow'
+import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelShadow'
 
 import type { Channels, DropdownOption } from '@opentrons/components'
-import type { PipetteV2Specs, RobotType } from '@opentrons/shared-data'
-import type { PipetteShadowProps } from '../types'
+import type {
+  NozzleConfigurationStyle,
+  PipetteV2Specs,
+  RobotType,
+} from '@opentrons/shared-data'
+import type { PipetteShadowProps } from '../TipSelectionWizard/types'
+import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 
 const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   RobotType,
@@ -54,14 +59,22 @@ export function PipetteNozzleSelector(props: {
   robotType: RobotType
   options: DropdownOption[]
   updateValue: (arg: unknown) => void
+  value: NozzleConfigurationStyle
+  setSelectedValue: any
 }): JSX.Element {
-  const { pipetteSpecs, robotType, options, updateValue } = props
-  console.log('🚀 ~ PipetteNozzleSelector ~ options:', options)
+  const {
+    pipetteSpecs,
+    robotType,
+    options,
+    updateValue,
+    value: nozzleMode,
+    setSelectedValue,
+  } = props
   const { channels, pipetteBoundingBoxOffsets, displayName } = pipetteSpecs
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
   const { t } = useTranslation('protocol_steps')
 
-  const [selectedValue, setSelectedValue] = useState<string | null>(null)
+  const [partialNozzleCount, setPartialNozzleCount] = useState<string>('2')
 
   const width = frontRightCorner[0] - backLeftCorner[0]
   const height = backLeftCorner[1] - frontRightCorner[1]
@@ -69,8 +82,8 @@ export function PipetteNozzleSelector(props: {
   const outlineProps = {
     fill: COLORS.white,
     stroke: COLORS.grey50,
-    x: -80,
-    y: -55,
+    x: 0,
+    y: 0,
     width: width * 3,
     height: height * 3,
     rotate: false,
@@ -84,40 +97,43 @@ export function PipetteNozzleSelector(props: {
     name: t('num_nozzles', { num }),
     value: num,
   }))
-  console.log('options', options)
+
   const OutlineComponent =
     SHADOW_BY_ROBOT_TYPE_AND_CHANNELS[robotType][channels]
-  const isPartialNozzle = false
+  const isPartialNozzle = nozzleMode === PARTIAL
   return (
     <>
-      <StyledText desktopStyle="headingMediumBold">
-        {t('select_pipette_nozzles_to_use')}
-      </StyledText>
+      <Flex padding={SPACING.spacing20}>
+        <StyledText desktopStyle="headingMediumBold">
+          {t('select_pipette_nozzles_to_use')}
+        </StyledText>
+      </Flex>
 
-      <Flex flexDirection={DIRECTION_ROW} padding={SPACING.spacing12}>
+      <Flex flexDirection={DIRECTION_ROW}>
         <Flex
           gridGap={SPACING.spacing4}
           flexDirection={DIRECTION_COLUMN}
           padding={SPACING.spacing12}
         >
-          {options.map(({ value, name }) => (
-            <RadioButton
-              key={`${name}_${value}`}
-              buttonLabel={name}
-              buttonValue={value}
-              isSelected={selectedValue === value}
-              onChange={() => {
-                setSelectedValue(value)
-                updateValue(value)
-              }}
-              largeDesktopBorderRadius
-            />
-          ))}
+          {options.map(({ value, name }) => {
+            return (
+              <RadioButton
+                key={`${name}_${value}`}
+                buttonLabel={name}
+                buttonValue={value}
+                isSelected={nozzleMode === value}
+                onChange={() => {
+                  updateValue(value)
+                  setSelectedValue(value)
+                }}
+                largeDesktopBorderRadius
+              />
+            )
+          })}
         </Flex>
 
         <Box
           backgroundColor={COLORS.grey20}
-          padding={SPACING.spacing20}
           borderRadius={BORDERS.borderRadius12}
           width="558px"
           height="497px"
@@ -128,15 +144,17 @@ export function PipetteNozzleSelector(props: {
             padding={SPACING.spacing20}
             gridGap={SPACING.spacing10}
           >
-            {!is96Channel && <OutlineComponent {...outlineProps} />}
+             <Flex maxHeight={"10px"}>
+            {!is96Channel && <EightChannelFlexShadow{...outlineProps}/>}
+</Flex>
 
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText desktopStyle="bodyDefaultSemiBold">
                 {displayName}
               </StyledText>
-
+             
+                
               {is96Channel && <OutlineComponent {...outlineProps} />}
-
               <StyledText
                 desktopStyle="bodyDefaultRegular"
                 color={isPartialNozzle ? COLORS.grey60 : COLORS.black90}
@@ -150,13 +168,12 @@ export function PipetteNozzleSelector(props: {
                 <DropdownMenu
                   dropdownType="neutral"
                   filterOptions={partialOptions}
-                  onClick={option => {
-                    setSelectedValue(option.valueOf)
-                    updateValue(option.valueOf)
+                  onClick={value => {
+                    setPartialNozzleCount(value)
                   }}
                   currentOption={
                     partialOptions.find(
-                      option => option.value === selectedValue
+                      option => option.value === partialNozzleCount
                     ) ?? partialOptions[0]
                   }
                 />

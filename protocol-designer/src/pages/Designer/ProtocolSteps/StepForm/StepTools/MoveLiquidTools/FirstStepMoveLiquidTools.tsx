@@ -11,13 +11,13 @@ import {
 
 import {
   LabwareField,
-  PartialTipField,
   PathField,
   PipetteField,
   TiprackField,
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
+import { PartialTipField } from '../../PipetteFields/NozzleAndWellSelectionWizard/PartialTipField'
 
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'

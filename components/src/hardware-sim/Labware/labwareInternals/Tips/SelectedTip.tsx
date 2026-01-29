@@ -3,18 +3,27 @@ import { DEFAULT_TIP_SIZE } from './constants'
 import styles from './tips.module.css'
 
 export function SelectedTip(props: {
+  selected?: boolean
   size?: string
   textInsideTip?: string
   isUsed?: boolean
   isError?: boolean
 }): JSX.Element {
-  const { size, textInsideTip, isUsed = false, isError = false } = props
+  const {
+    size,
+    textInsideTip,
+    isUsed = false,
+    isError = false,
+    selected = true,
+  } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
-  const fill = isError ? COLORS.red50 : isUsed ? COLORS.yellow50 : COLORS.blue50
+  const defaultColor = selected ? COLORS.blue50 : COLORS.blue35
+  const fill = isError ? COLORS.red50 : isUsed ? COLORS.yellow50 : defaultColor
 
   // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
   const showStroke = textInsideTip == null
+
   return (
     <svg
       width={width}

@@ -8,12 +8,12 @@ import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/featu
 
 import {
   LabwareField,
-  PartialTipField,
   PipetteField,
   TiprackField,
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
+import { PartialTipField } from '../../PipetteFields/NozzleAndWellSelectionWizard/PartialTipField'
 
 import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'

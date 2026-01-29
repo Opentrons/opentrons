@@ -14,11 +14,14 @@ import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
 import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
-import { NozzleAndWellSelectionModal } from './TipSelectionWizard/NozzleAndWellSelectionModal'
+import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 
 import type { DropdownOption } from '@opentrons/components'
-import type { PipetteV2Specs } from '@opentrons/shared-data'
-import type { FieldProps, FieldPropsByName } from '../types'
+import type {
+  NozzleConfigurationStyle,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
+import type { FieldProps, FieldPropsByName } from '../../types'
 
 interface PartialTipFieldProps extends FieldProps {
   pipetteSpecs: PipetteV2Specs
@@ -27,7 +30,6 @@ interface PartialTipFieldProps extends FieldProps {
 }
 export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
   const {
-    value: dropdownItem,
     updateValue,
     errorToShow,
     padding = `0 ${SPACING.spacing16}`,
@@ -85,7 +87,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
       ]
     )
   }
-  if (enableAdditionalPartialTip) {
+  if (enableAdditionalPartialTip && channels !== 8) {
     options.push({
       name: t('single_row_of_nozzles'),
       value: ROW,
@@ -106,12 +108,33 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
       value: PARTIAL,
     })
   }
+  let aspWellsLength: number
+  let dspWellsLength: number
+  switch (stepType) {
+    case 'mix':
+      aspWellsLength =
+        deckSetup.labware[
+          propsForFields.labware.value as string
+        ].def.ordering.flat().length
+      dspWellsLength = 0
+      break
+    case 'transfer':
+      aspWellsLength =
+        deckSetup.labware[
+          propsForFields.aspirate_labware.value as string
+        ]?.def.ordering.flat().length ?? 0 
+      dspWellsLength =
+        deckSetup.labware[
+          propsForFields.dispense_labware.value as string
+        ]?.def.ordering.flat().length ?? 0
+      break
+    default:
+      aspWellsLength = 0
+      dspWellsLength = 0
+  }
 
-  const aspWells = propsForFields.aspirate_wells.value as string[]
-  const dspWells = propsForFields.dispense_wells.value as string[]
-  const numAspWells = aspWells.length
-  const numDspWells = dspWells.length
-  const [selectedValue, setSelectedValue] = useState(dropdownItem)
+  const [selectedValue, setSelectedValue] =
+    useState<NozzleConfigurationStyle>(ALL)
   const nozzle = 'A1'
   const getNozzleWellText = (): string => {
     switch (selectedValue) {
@@ -120,29 +143,29 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
         const selectedValueText = selectedValue.toLowerCase() + 's'
         return t('nozzles_selected', {
           nozzleSelection: 'Left' + selectedValueText + ' nozzles',
-          aspWells: numAspWells,
-          dispWells: numDspWells,
+          aspWells: aspWellsLength,
+          dispWells: dspWellsLength,
           positionType: selectedValueText,
         })
       case ALL:
         return t('nozzles_selected', {
           nozzleSelection: 'All nozzles',
-          aspWells: numAspWells,
-          dispWells: numDspWells,
+          aspWells: aspWellsLength,
+          dispWells: dspWellsLength,
           positionType: 'wells',
         })
       case SINGLE:
         return t('nozzles_selected', {
           nozzleSelection: nozzle + ' nozzle',
-          aspWells: numAspWells,
-          dispWells: numDspWells,
+          aspWells: aspWellsLength,
+          dispWells: dspWellsLength,
           positionType: 'wells',
         })
       case PARTIAL:
         return t('nozzles_selected', {
           nozzleSelection: nozzle.length + ' nozzles',
-          aspWells: numAspWells,
-          dispWells: numDspWells,
+          aspWells: aspWellsLength,
+          dispWells: dspWellsLength,
           positionType: 'wells',
         })
       default:
@@ -165,7 +188,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
             }
             onClick={value => {
               updateValue(value)
-              setSelectedValue(value)
+              setSelectedValue(value as NozzleConfigurationStyle)
             }}
             tooltipText={tooltipContent}
           />
@@ -191,10 +214,12 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
             totalSteps={3}
             pipetteSpecs={pipetteSpecs}
             updateValue={updateValue}
+            setSelectedValue={setSelectedValue}
             options={options}
             deckSetup={deckSetup}
             propsForFields={propsForFields}
             stepType={stepType}
+            value={selectedValue as NozzleConfigurationStyle}
           ></NozzleAndWellSelectionModal>
         </>
       ) : null}

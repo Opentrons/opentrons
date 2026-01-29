@@ -8,6 +8,7 @@ import type {
   SELECTED_USED,
   USED,
 } from './Tips/constants'
+import type { UNSELECTED } from './Wells/constants'
 
 export interface WellMouseEvent {
   wellName: string
@@ -34,3 +35,10 @@ export type TipType =
   | typeof INACCESSIBLE
   | typeof SELECTED_USED
   | typeof SELECTED_ERROR
+
+export type WellType = typeof SELECTED | typeof INACCESSIBLE | typeof UNSELECTED
+
+export const WELL: 'well' = 'well'
+export const TIP: 'tip' = 'tip'
+
+export type SelectionType = typeof WELL | typeof TIP

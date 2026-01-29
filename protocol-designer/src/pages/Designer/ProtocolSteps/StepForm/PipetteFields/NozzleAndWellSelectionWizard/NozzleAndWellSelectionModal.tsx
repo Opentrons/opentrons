@@ -7,20 +7,22 @@ import {
   Box,
   ModalShell,
   PrimaryButton,
-  SPACING,
   WizardHeader,
 } from '@opentrons/components'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 
-import { PipetteNozzleSelector } from './PipetteShadows/PipetteNozzleSelector'
-import { WellSelection } from './PipetteShadows/WellSelector'
-import styles from './tipselectionwizard.module.css'
+import styles from './nozzleandwellwizard.module.css'
+import { PipetteNozzleSelector } from './PipetteNozzleSelector'
+import { WellSelection } from './WellSelector'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
 import type { DropdownOption } from '@opentrons/components'
-import type { PipetteV2Specs } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  PipetteV2Specs,
+} from '@opentrons/shared-data'
 import type { FieldPropsByName } from '../../types'
 
 interface NozzleAndWellSelectionModalProps {
@@ -33,6 +35,8 @@ interface NozzleAndWellSelectionModalProps {
   deckSetup: any
   propsForFields: FieldPropsByName
   stepType: string
+  value: NozzleConfigurationStyle
+  setSelectedValue: any
 }
 
 export function NozzleAndWellSelectionModal(
@@ -43,11 +47,13 @@ export function NozzleAndWellSelectionModal(
     totalSteps,
     pipetteSpecs,
     options,
-    updateValue,
     deckSetup,
     showModal,
     propsForFields,
     stepType,
+    updateValue,
+    setSelectedValue,
+    value,
   } = props
   const { t } = useTranslation('protocol_steps')
   const robotType = useSelector(getRobotType)
@@ -66,8 +72,10 @@ export function NozzleAndWellSelectionModal(
         <PipetteNozzleSelector
           pipetteSpecs={pipetteSpecs}
           options={options}
-          updateValue={updateValue}
           robotType={robotType}
+          updateValue={updateValue}
+          value={value}
+          setSelectedValue={setSelectedValue}
         />
       )
       break
@@ -106,16 +114,23 @@ export function NozzleAndWellSelectionModal(
       onExit={handleClose}
     />
   )
-
+  const isLastStep = currentStepIndex + 1 === totalSteps
+  const isLastStepOfMix = isMixStep
+    ? currentStepIndex + 1 === totalSteps - 1
+    : false
   const footerElement = (
     <div className={styles.modal_footer}>
-      <PrimaryButton onClick={handleContinue}>{'Continue'}</PrimaryButton>
+      <PrimaryButton
+        onClick={isLastStep || isLastStepOfMix ? handleClose : handleContinue}
+      >
+        {'Continue'}
+      </PrimaryButton>
     </div>
   )
 
   return createPortal(
     <ModalShell header={header} width="56.25rem" footer={footerElement}>
-      <Box padding={SPACING.spacing24}>{children}</Box>
+      <Box>{children}</Box>
       {currentComponent}
     </ModalShell>,
     getMainPagePortalEl()
