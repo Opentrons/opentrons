@@ -24,7 +24,7 @@ nav:
       - Labware Definitions: labware/definitions.md
   - Opentrons App:
       - Features Summary: opentrons-app/features.md
-      - Opentrons App Protocol Tab: opentrons-app/index.md
+      - Opentrons App: opentrons-app/index.md
       - App Installation and Management: opentrons-app/installation.md
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
