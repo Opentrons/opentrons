@@ -1,7 +1,7 @@
 """IDT xGEn 1000ul 96x with Flex Stacker."""
 
 from opentrons.protocol_api import ProtocolContext, ParameterContext
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers
 from typing import List
 from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
@@ -24,10 +24,10 @@ requirements = {
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Runtime parameters."""
-    helpers.create_deactivate_modules_parameter(parameters)
-    helpers.create_dry_run_parameter(parameters)
-    helpers.create_dot_bottom_parameter(parameters)
-    helpers.create_error_capture_duration_duration(parameters)
+    run_helpers.create_deactivate_modules_parameter(parameters)
+    run_helpers.create_dry_run_parameter(parameters)
+    run_helpers.create_dot_bottom_parameter(parameters)
+    run_helpers.create_error_capture_duration_duration(parameters)
     parameters.add_str(
         display_name="Frag Mode",
         variable_name="FRAG_MODE",
@@ -71,7 +71,7 @@ def run(protocol: ProtocolContext) -> None:
     DEACTIVATE_TEMP = protocol.params.deactivate_modules  # type: ignore[attr-defined]
     dot_bottom = protocol.params.dot_bottom  # type: ignore[attr-defined]
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     #  ADVANCED PARAMETERS ======================================
@@ -97,7 +97,7 @@ def run(protocol: ProtocolContext) -> None:
     TIP_MIX = True  # Default False   | Use Tip Mixing instead of Heatershaker
     ONDECK_THERMO = True  # Default True    | On Deck Thermocycler
     ONDECK_TEMP = True
-    helpers.comment_protocol_version(protocol, "03")
+    run_helpers.comment_protocol_version(protocol, "03")
 
     # =============================== PIPETTE ===============================
     p1000 = protocol.load_instrument("flex_96channel_1000", "left")
@@ -129,7 +129,7 @@ def run(protocol: ProtocolContext) -> None:
 
     # ========== FIRST ROW ===========
     thermocycler: ThermocyclerContext = protocol.load_module(
-        helpers.tc_str
+        run_helpers.tc_str
     )  # type: ignore[assignment]
     sample_plate_1 = thermocycler.load_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", "Sample Plate 1"
@@ -156,7 +156,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     # ========== THIRD ROW ===========
     temp_block: TemperatureModuleContext = protocol.load_module(
-        helpers.temp_str, "C1"
+        run_helpers.temp_str, "C1"
     )  # type: ignore[assignment]
     reagent_plate_1 = temp_block.load_labware(
         "greiner_384_wellplate_240ul", "Reagent Plate 1"
@@ -166,7 +166,7 @@ def run(protocol: ProtocolContext) -> None:
     )
     lids = protocol.load_lid_stack("opentrons_tough_pcr_auto_sealing_lid", "C3", 4)
     mag_block: MagneticBlockContext = protocol.load_module(
-        helpers.mag_str, "D2"
+        run_helpers.mag_str, "D2"
     )  # type: ignore[assignment]
     CleanupPlate_1 = mag_block.load_labware(
         "nest_96_wellplate_2ml_deep", "Cleanup Plate 1"
@@ -1480,10 +1480,12 @@ def run(protocol: ProtocolContext) -> None:
         protocol.capture_image(filename="end_of_run")
 
         if not protocol.is_simulating():
-            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)
