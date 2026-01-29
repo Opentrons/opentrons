@@ -2,11 +2,16 @@
 title: "Opentrons OT-2: Opentrons App Feature Summary"
 ---
 
-You will operate and interact with the OT-2 from a computer running the Opentrons App. This section provides an high-level overview of the features provided by the Protocols, Labware, and Devices sections of the app.
+You will operate and interact with the OT-2 from a computer running the Opentrons App. This section provides an high-level overview of some salient features provided by the Protocols, Labware, and Devices sections of the app.
 
 ## Devices tab summary
 
-The Devices tab lists all the Opentrons OT-2 and Flex robots on a network. The list displays robots alphabetically by name. Each device summary also shows you how a robot is connected to a network (eithernet, USB, or WiFi), what hardware components are attached, if a software update is available, and other information. You can use this section for an at-a-glance overview of the state of your OT-2 and other networked robots.
+The Devices tab provides a summary list all the discoverable Opentrons robots on a network. This means it will show you OT-2 _and_ Flex robots, if you have different models in your lab. The app lists robots alphabetically, by name. This basic view is the device summary which includes information about:
+
+- **Connectivity**: Icons indicate the network connection type used by your OT-2. These are Ethernet <img src="../../images/ethernet.svg" width="20" style="vertical-align:middle;"/>, Wi-Fi <img src="../../images/wifi.svg" width="20" style="vertical-align:middle;"/>, or USB <img src="../../images/usb.svg" width="20" style="vertical-align:middle;">.
+- **Instruments**: Gray labels show the type of pipette attached to the gantry. 
+- **Modules**: Icons indicate which powered modules are attached to your OT-2. These include the Temperature Module <img src="../../images/temperature-module.svg" width="20" style="vertical-align:middle;">, Magnetic Module <img src="../../images/magnetic-module.svg" width="20" style="vertical-align:middle;">, Heater-Shaker <img src="../../images/heater-shaker.svg" width="20" style="vertical-align:middle;">, and Thermocycler <img src="../../images/thermocycler.svg" width="20" style="vertical-align:middle;">.
+- **Perpherals**: Other attached and powered components (e.g., built-in camera <img src="../../images/camera.svg" width="20" style="vertical-align:middle;">)
 
 <figure class="screenshot" markdown>
 ![Devices tab showing list of robots](../images/app-devices-tab.png)
