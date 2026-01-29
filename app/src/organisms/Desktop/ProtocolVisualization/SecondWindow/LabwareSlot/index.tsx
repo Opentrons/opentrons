@@ -246,7 +246,10 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
           {/* header text part */}
         </div>
         <div className={styles.body_container}>
-          <WellTooltip ingredNames={ingredNames}>
+          <WellTooltip
+            ingredNames={ingredNames}
+            liquidDisplayColors={liquidDisplayColors}
+          >
             {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
               <div className={styles.labware_render_container}>
                 <RobotWorkSpace
@@ -269,7 +272,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
                             if (wellContents != null) {
                               makeHandleMouseEnterWell(
                                 wellName,
-                                wellContents[wellName]?.ingreds
+                                wellContents[wellName]?.ingreds ?? {}
                               )(event)
                             }
                           }}
