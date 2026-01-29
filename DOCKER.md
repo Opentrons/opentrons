@@ -6,7 +6,7 @@ This includes the `robot-server` connected to the hardware emulation application
 
 ## Requirements
 
-- A clone of [this](https://github.com/Opentrons/opentrons) repo.
+- A clone of [this](https://github.com/Opentrons/opentrons-ot2) repo.
 - An installation of [docker](https://docs.docker.com/get-docker/)
 - An installation of [docker-compose](https://docs.docker.com/compose/install/)
 

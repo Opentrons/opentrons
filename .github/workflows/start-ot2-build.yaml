@@ -41,7 +41,7 @@ jobs:
 
   handle-pr:
     runs-on: 'ubuntu-latest'
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons' && contains(github.event.pull_request.labels.*.name, 'ot2-build')
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'Opentrons/opentrons-ot2' && contains(github.event.pull_request.labels.*.name, 'ot2-build')
     name: "Start an OT-2 build for a requested PR"
     steps:
       - name: 'start build'

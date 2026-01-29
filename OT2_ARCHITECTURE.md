@@ -45,13 +45,13 @@ The buildroot [configuration](https://github.com/Opentrons/buildroot/blob/opentr
 
 ### API
 
-The [Opentrons API](https://github.com/Opentrons/opentrons/tree/edge/api) is a Python package that provides an interface to control the OT-2. Protocols are written in the protocol API, which is a part of the API package.
+The [Opentrons API](https://github.com/Opentrons/opentrons-ot2/tree/edge/api) is a Python package that provides an interface to control the OT-2. Protocols are written in the protocol API, which is a part of the API package.
 
 With the API alone, a Python script or Jupyter notebook running on the OT2 is able to control the robot to perform liquid-handling operations.
 
 ### Robot server
 
-The main such Python programme is the [robot server](https://github.com/Opentrons/opentrons/tree/edge/robot-server), which provides the interface to the robot that the Opentrons app on a user's computer can access to do routine robot work. It provides endpoints that allow performing calibration and running protocols uploaded from the app.
+The main such Python programme is the [robot server](https://github.com/Opentrons/opentrons-ot2/tree/edge/robot-server), which provides the interface to the robot that the Opentrons app on a user's computer can access to do routine robot work. It provides endpoints that allow performing calibration and running protocols uploaded from the app.
 
 Note that only one process can have access to the robot's GPIO ports at a time. By default the robot server connects to these ports on start-up, which prevents a copy of the API running in Jupyter or imported from a Python script from using GPIO functionality. To gain access to the GPIOs in these custom scripts, one can disable the robot server with `systemctl stop opentrons-robot-server`, before importing the Opentrons API into the other Python script. However this will prevent the Opentrons app from connecting to the robot until the robot server is restarted with `systemctl start opentrons-robot-server`, or the robot is rebooted.
 
@@ -59,8 +59,8 @@ Note that only one process can have access to the robot's GPIO ports at a time. 
 
 Some data needs to be shared between different parts of the Opentrons codebase. For example, the descriptions of how labware is shaped are needed by both Protocol Designer and the robot itself.
 
-We keep data like this in the special [shared-data](https://github.com/Opentrons/opentrons/tree/edge/shared-data) directory, so all those different parts can easily include it.
+We keep data like this in the special [shared-data](https://github.com/Opentrons/opentrons-ot2/tree/edge/shared-data) directory, so all those different parts can easily include it.
 
 ## Update server
 
-The [update server](https://github.com/Opentrons/opentrons/tree/edge/update-server) is a separate server designed primarily to allow updating the robot's software with a new system image built using buildroot. The update server also controls some system-specific tasks such as handling SSH keys and setting the robot's name.
+The [update server](https://github.com/Opentrons/opentrons-ot2/tree/edge/update-server) is a separate server designed primarily to allow updating the robot's software with a new system image built using buildroot. The update server also controls some system-specific tasks such as handling SSH keys and setting the robot's name.

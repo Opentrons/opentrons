@@ -14,22 +14,15 @@ The robot release process has 3 main outputs:
 
 The robot software stack is composed of the following repositories:
 
-- [opentrons]("https://github.com/Opentrons/opentrons") (this repository)
+- [opentrons]("https://github.com/Opentrons/opentrons-ot2") (this repository)
 - [opentrons_modules]("https://github.com/Opentrons/opentrons-modules") (module firmware)
-- [oe_core]("https://github.com/Opentrons/oe-core") (Flex OS)
-- [ot3_firmware]("https://github.com/Opentrons/ot3-firmware") (Flex firmware)
 - [buildroot]("https://github.com/Opentrons/buildroot") (OT-2 OS)
 
 ```mermaid
 flowchart LR
     subgraph Shared ["Shared Repositories"]
-    opentrons["Opentrons/opentrons" ]
+    opentrons["Opentrons/opentrons-ot2" ]
     opentrons_modules["Opentrons/opentrons-modules" ]
-    end
-
-    subgraph Flex ["Flex Only"]
-    oe_core["Opentrons/oe-core"]
-    ot3_firmware["Opentrons/ot3-firmware" ]
     end
 
     subgraph OT2 ["OT-2 Only"]
@@ -42,13 +35,7 @@ flowchart LR
 
    App["Opentrons App"]
     opentrons --> App
-
-    FlexBuild["Flex System Package"]
-    opentrons --> FlexBuild
-    oe_core --> FlexBuild
-    ot3_firmware --> FlexBuild
     opentrons_modules --> OT2Build
-    opentrons_modules --> FlexBuild
 ```
 
 These are all versioned and released together. These assets are produced in 2 possible channels:

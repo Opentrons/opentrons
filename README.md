@@ -48,7 +48,7 @@ Easily create a protocol to run on your robot with this graphical tool.
 
 We love contributors! Here is the best way to work with us:
 
-1.  Filing a [bug report](https://github.com/Opentrons/opentrons/issues). We will fix these as quickly as we can, and appreciate your help uncovering bugs in our code.
+1.  Filing a [bug report](https://github.com/Opentrons/opentrons-ot2/issues). We will fix these as quickly as we can, and appreciate your help uncovering bugs in our code.
 
 2.  Submit a pull request with any new features you've added to a branch of the API or App. We will reach out to talk with you about integration testing and launching it into our product!
 
@@ -56,6 +56,6 @@ For more information and development setup instructions, please read [the contri
 
 Enjoy!
 
-[codecov]: https://codecov.io/gh/Opentrons/opentrons/branches
-[codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons/edge.svg?style=flat-square&maxAge=3600
+[codecov]: https://codecov.io/gh/Opentrons/opentrons-ot2/branches
+[codecov-badge]: https://img.shields.io/codecov/c/github/Opentrons/opentrons-ot2/edge.svg?style=flat-square&maxAge=3600
 [contributing]: ./CONTRIBUTING.md

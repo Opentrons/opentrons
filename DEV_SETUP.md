@@ -1,6 +1,6 @@
 # Development Environment Setup
 
-This guide provides a set of opinionated instructions for setting up your computer to work on the software in Opentrons/opentrons. You can choose to set up your machine in a different way with different tools if you desire, but this setup is tested and recommended.
+This guide provides a set of opinionated instructions for setting up your computer to work on the software in Opentrons/opentrons-ot2. You can choose to set up your machine in a different way with different tools if you desire, but this setup is tested and recommended.
 
 If you notice a discrepancy between these instructions and any instructions in the documentation of tools we reference below, please [file an issue][] or [open a pull request][]!
 
@@ -248,7 +248,7 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 Once your system is set up, you're ready to clone the repository and get the development environment set up.
 
 ```shell
-git clone https://github.com/Opentrons/opentrons.git
+git clone https://github.com/Opentrons/opentrons-ot2.git
 cd ./opentrons
 ```
 
@@ -283,8 +283,8 @@ make setup
 
 Once `make setup` completes, you're ready to start developing! Check out our general [contributing guide][] for more information. If you ever need to remove (or recreate) the steps run in `make setup`, you can use `make teardown` to remove the installed dependencies.
 
-[file an issue]: https://github.com/Opentrons/opentrons/issues
-[open a pull request]: https://github.com/Opentrons/opentrons/pulls
+[file an issue]: https://github.com/Opentrons/opentrons-ot2/issues
+[open a pull request]: https://github.com/Opentrons/opentrons-ot2/pulls
 [first-time git setup]: https://git-scm.com/book/en/v2/Getting-Started-First-Time-Git-Setup
 [brew]: https://brew.sh
 [xcode command line tools]: https://developer.apple.com/xcode/resources/

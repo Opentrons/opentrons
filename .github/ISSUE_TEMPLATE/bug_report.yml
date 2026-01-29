@@ -9,7 +9,7 @@ body:
       value: |
         ## Thanks for taking the time to file a bug!
 
-        > Please make sure you've read the "Opening Issues" section of our [Contributing Guide.](https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#opening-issues)
+        > Please make sure you've read the "Opening Issues" section of our [Contributing Guide.](https://github.com/Opentrons/opentrons-ot2/blob/edge/CONTRIBUTING.md#opening-issues)
   - type: textarea
     attributes:
       label: Overview
