@@ -322,7 +322,7 @@ custom_liquid_class_properties = {
                 "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
                 "retract": {
                     "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
-                    "blowout": {"enabled": False},
+                    "blowout": {"enabled": },
                     "delay": {"enabled": False},
                     "end_position": {
                         "offset": {"x": 1, "y": 2, "z": 3},
@@ -331,6 +331,7 @@ custom_liquid_class_properties = {
                     "speed": 40,
                     "touch_tip": {"enabled": False},
                 },
+                "blowout": {"enabled": False},
                 "submerge": {
                     "delay": {"enabled": False},
                     "speed": 100,
@@ -358,7 +359,7 @@ custom_viscous = protocol.define_liquid_class(
 
 *New in version 2.24*
 
-*Changed in version 2.28*: Add a `blowout_position`
+*Changed in version 2.28*: When defining an optional blowout, add a `blowout_position`.
 
 You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified [liquid class properties](https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1) for examples.
 
