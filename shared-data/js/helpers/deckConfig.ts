@@ -40,7 +40,6 @@ export const getNewConfigForDeckConfig = (
   if (cutoutId in fixtureGroup) {
     // Get the first group which contains all cutoutIds that need to be updated
     const groupMap = fixtureGroup[cutoutId]?.[0] ?? {}
-    console.log('groupMap: ', groupMap)
     const groupCutoutIds = Object.keys(groupMap) as CutoutId[]
 
     // First, update existing entries and filter out duplicates

@@ -6,7 +6,6 @@ import {
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
-  STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -14,11 +13,7 @@ import {
 
 import { mergeToComboFixtures } from '../utils'
 
-import type {
-  CutoutConfigMap,
-  CutoutFixtureId,
-  DeckConfiguration,
-} from '@opentrons/shared-data'
+import type { CutoutConfigMap, DeckConfiguration } from '@opentrons/shared-data'
 
 describe('mergeToComboFixtures', () => {
   it('should return empty arrays when no configs provided', () => {

@@ -9,7 +9,6 @@ import {
   getComboFixtureFromFixtureIds,
   getDeckDefFromRobotType,
   getMainAAForAFixture,
-  getModuleModelFromFixtureId,
   getNewConfigForDeckConfig,
   getReplacementFixtureForFixtureRemoval,
   getWasteChuteOptions,
@@ -147,18 +146,11 @@ export function useDeckConfigurationEditing(
     cutoutFixtureId: CutoutFixtureIdsWithFakes,
     addressableAreaId: AddressableAreaNamesWithFakes
   ): void => {
-    console.log(
-      'removeFixtureFromCutoutForEditing: ',
-      cutoutId,
-      cutoutFixtureId,
-      addressableAreaId
-    )
     const replacementFixtureId = getReplacementFixtureForFixtureRemoval(
       cutoutFixtureId,
       cutoutId,
       addressableAreaId
     )
-    console.log('replacementFixtureId: ', replacementFixtureId)
     const aa = getAAWithFakesFromCutoutFixtureId(
       cutoutId,
       replacementFixtureId,
@@ -174,7 +166,6 @@ export function useDeckConfigurationEditing(
       deckDef,
       false
     )
-    console.log('newDeckConfig: ', newDeckConfig)
     updateInitialDeckState?.(
       [
         {
