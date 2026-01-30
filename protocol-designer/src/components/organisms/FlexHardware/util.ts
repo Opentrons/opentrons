@@ -12,6 +12,8 @@ import {
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
+  getCutoutFixturesForModuleModel,
+  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { deleteModule } from '/protocol-designer/modules'
@@ -173,6 +175,7 @@ const handleDeleteModule = (ctx: ModuleContext): void => {
 
   if (matchingModule == null) return
 
+  
   // Module is in use
   if (moduleId != null && deckConfig != null) {
     setShowDeleteEntityModal({ ids: [moduleId], deckConfig })
@@ -250,12 +253,17 @@ export const updateInitialDeckState = (
 
   console.log('additionalEquipmentOnDeck: ', additionalEquipmentOnDeck)
   allValues.forEach(value => {
+
     const fixtureName = getMainFixtureIdForAA(
       [value.cutoutFixtureId as CutoutFixtureId],
       [value.addressableAreaId as AddressableAreaName],
       value.cutoutId
     )
 
+    const removing = SINGLE_SLOT_FIXTURES.includes(fixtureName as CutoutFixtureId)
+    const currentDeckConfigItem = deckConfig?.find(config => config.cutoutId === value.cutoutId)
+    console.log('currentDeckConfigItem: ', currentDeckConfigItem)
+    console.log('removing: ', removing)
     console.log('fixtureName: ', fixtureName)
     const matchingFixtureOnDeck = Object.values(additionalEquipmentOnDeck).find(
       ae => ae.location === value.cutoutId
@@ -264,12 +272,11 @@ export const updateInitialDeckState = (
     const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
 
     console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
-    // look if there is a module on deck that matches cutout id
+    console.log('deckConfig: ', deckConfig)
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module =>
-        fixtureName != null &&
-        module.model === getModuleModelFromFixtureId(fixtureName) &&
         getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
+      && getCutoutFixturesForModuleModel(module.model, deckDef).map(cf => cf.id).includes(deckConfig?.find(config => config.cutoutId === value.cutoutId)?.cutoutFixtureId as CutoutFixtureId)
     )
 
     console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
