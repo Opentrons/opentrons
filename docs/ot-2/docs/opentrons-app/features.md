@@ -8,6 +8,8 @@ You will operate and interact with the OT-2 from a computer running the Opentron
 
 This section provides an overview of the Protocols tab. The Protocols tab is selected by default when you first launch the app. It includes controls that let you import protocol files and manage saved files.
 
+### Protocols summary
+
 <figure class="screenshot" markdown>
 ![Protocols tab showing uploaded protocols](../images/app-protocol-list.png){ width="80%" }
 </figure>
@@ -57,6 +59,8 @@ The basic protocol screen displays a summary list of all the protocols stored on
   </tbody>
 </table>
 
+### Protocol details
+
 You can click on any listed protocol summary to expand it. An expanded tile shows you more information about the protocol.
 
 <figure class="screenshot" markdown>
@@ -73,16 +77,59 @@ This tab stores information about labware found in Labware Library. You can also
 
 ## Devices tab
 
-The Devices tab provides a summary list all the discoverable Opentrons robots on a network. This means it will show you OT-2 _and_ Flex robots, if you have different models in your lab. The app lists robots alphabetically, by name. This basic view is the device summary which includes information about:
-
-- **Connectivity**: Icons indicate the network connection type used by your OT-2. These are Ethernet <img src="../../images/ethernet.svg" width="20" style="vertical-align:middle;"/>, Wi-Fi <img src="../../images/wifi.svg" width="20" style="vertical-align:middle;"/>, or USB <img src="../../images/usb.svg" width="20" style="vertical-align:middle;">.
-- **Instruments**: Gray labels show the type of pipette attached to the gantry. 
-- **Modules**: Icons indicate which powered modules are attached to your OT-2. These include the Temperature Module <img src="../../images/temperature-module.svg" width="20" style="vertical-align:middle;">, Magnetic Module <img src="../../images/magnetic-module.svg" width="20" style="vertical-align:middle;">, Heater-Shaker <img src="../../images/heater-shaker.svg" width="20" style="vertical-align:middle;">, and Thermocycler <img src="../../images/thermocycler.svg" width="20" style="vertical-align:middle;">.
-- **Perpherals**: Other attached and powered components (e.g., built-in camera <img src="../../images/camera.svg" width="20" style="vertical-align:middle;">).
+The Devices tab provides a summary list all the discoverable Opentrons robots on a network. This means it will show you OT-2 _and_ Flex robots, if you have different models in your lab. The app lists robots alphabetically, by name.
 
 <figure class="screenshot" markdown>
 ![Devices tab showing list of robots](../images/app-devices-tab.png)
 </figure>
+
+This basic view shows summary information about 
+
+<table>
+  <thead>
+    <tr>
+      <th>Feature</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Connectivity</strong></td>
+      <td>
+        Icons indicate the network connection type used by your OT-2. These are:
+        <ul>
+          <li>Ethernet <img src="../../images/ethernet.svg" width="20" style="vertical-align:middle;"></li>
+          <li>Wi-Fi <img src="../../images/wifi.svg" width="20" style="vertical-align:middle;"></li>
+          <li>USB <img src="../../images/usb.svg" width="20" style="vertical-align:middle;"></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Instruments</strong></td>
+      <td>
+        Gray labels show the type of pipette attached to the gantry.
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Modules</strong></td>
+      <td>
+        Icons indicate which powered modules are attached to your OT-2. These include:
+        <ul>
+          <li>Temperature Module <img src="../../images/temperature-module.svg" width="20" style="vertical-align:middle;"></li>
+          <li>Magnetic Module <img src="../../images/magnetic-module.svg" width="20" style="vertical-align:middle;"></li>
+          <li>Heater-Shaker <img src="../../images/heater-shaker.svg" width="20" style="vertical-align:middle;"></li>
+          <li>Thermocycler <img src="../../images/thermocycler.svg" width="20" style="vertical-align:middle;"></li>
+        </ul>
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Peripherals</strong></td>
+      <td>
+        Other attached and powered components (e.g., built-in camera <img src="../../images/camera.svg" width="20" style="vertical-align:middle;">).
+      </td>
+    </tr>
+  </tbody>
+</table>
 
 !!! tip
     If you're using a WiFi connection and the OT-2 you want to use is unavailable, check your WiFi settings. Your OT-2 may be on a different wireless network.
