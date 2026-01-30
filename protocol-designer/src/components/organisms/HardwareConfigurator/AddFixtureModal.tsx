@@ -244,7 +244,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       ) &&
       (Object.values(modules).some(
         module =>
-          THERMOCYCLER_MODULE_CUTOUTS.includes(module.cutoutId) ||
+          THERMOCYCLER_MODULE_CUTOUTS.includes(module.cutoutId as CutoutId) ||
           Object.values(fixtures).some(fixture =>
             THERMOCYCLER_MODULE_CUTOUTS.includes(fixture.cutoutId as CutoutId)
           )

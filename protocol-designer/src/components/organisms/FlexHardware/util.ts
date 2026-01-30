@@ -1,7 +1,6 @@
 import {
   FLEX_ROBOT_TYPE,
   getAddedMissingThermocyclerFixtures,
-  getCutoutFixturesForModuleModel,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getMainFixtureIdForAA,
@@ -258,12 +257,10 @@ export const updateInitialDeckState = (
       value.cutoutId
     )
     // Determine if we're removing (applying single slot fixture) or adding
-    const removing = SINGLE_SLOT_FIXTURES.includes(
-      newFixtureName as CutoutFixtureId
-    )
+    const removing = SINGLE_SLOT_FIXTURES.includes(newFixtureName!)
     // Determine if the new fixture is a module
     const isModuleFixture =
-      getModuleModelFromFixtureId(newFixtureName as CutoutFixtureId) !== null
+      getModuleModelFromFixtureId(newFixtureName!) !== null
 
     // Find matching fixtures on deck by cutoutId
     const matchingFixtureOnDeck = Object.values(additionalEquipmentOnDeck).find(
@@ -309,7 +306,7 @@ export const updateInitialDeckState = (
       } else if (matchingFixtureOnDeck != null) {
         const fixtureCtx: FixtureContext = {
           value,
-          fixtureName: newFixtureName as CutoutFixtureId,
+          fixtureName: newFixtureName!,
           matchingFixture: matchingFixtureOnDeck,
           matching4thColumnLabware,
           hasLabwareOnSlot,
@@ -340,7 +337,7 @@ export const updateInitialDeckState = (
     }
     const fixtureCtx: FixtureContext = {
       value,
-      fixtureName: newFixtureName as CutoutFixtureId,
+      fixtureName: newFixtureName!,
       matchingFixture: matchingFixtureOnDeck,
       matching4thColumnLabware,
       hasLabwareOnSlot,

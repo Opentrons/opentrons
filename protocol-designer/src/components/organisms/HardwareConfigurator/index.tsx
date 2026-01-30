@@ -58,7 +58,8 @@ export function HardwareConfigurator(
     ({ cutoutId }) => {
       const hasModule = Object.values(modules).some(
         module =>
-          getCutoutIdFromAddressableArea(module.slot, deckDef) === cutoutId
+          getCutoutIdFromAddressableArea(module.slot as string, deckDef) ===
+          cutoutId
       )
       //  since we are adding cutoutA1 in moduleConfig if
       //  there is a TC
