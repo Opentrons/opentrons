@@ -38,6 +38,7 @@
     "volume": "Recommended between 0.1 and {{max}}"
   },
   "change_tips": "Change tips",
+  "click_on_highlighted_nozzles": "Click on highlighted nozzles to select them for use",
   "comfirm_reset_settings": {
     "liquid_class_selected": "Continuing will undo any changes and restore the settings to the values associated with the {{liquidClassName}} liquid class.",
     "no_liquid_class": "Continuing will undo any changes and restore the settings to the default values."
@@ -148,8 +149,12 @@
   "multiDispense": "Distribute",
   "new_location": "New location",
   "no_tiprack": "No tiprack available",
+  "nozzles_selected": "{{nozzleSelection}} selected, {{aspWells}} aspirate {{positionType}} selected, and {{dispWells}} dispense {{positionType}} selected",
+  "num_nozzles": "{{num}} nozzles",
+  "number_of_nozzles_used": "Number of nozzles used",
   "of": "of",
   "off_deck": "Off-Deck",
+
   "pause": {
     "forDuration": "For {{duration}}",
     "pausingForDuration": "<text>Pausing for</text><tag/>",
@@ -158,6 +163,7 @@
     "untilResume": "Until told to resume",
     "untilTemperature": "Until {{temperature}} °C reached"
   },
+  "partial_nozzles": "Partial nozzles",
   "pipette": "Pipette",
   "pipette_nozzles_and_wells": "Pipette nozzles and wells",
 
@@ -188,11 +194,16 @@
   "select_dispense_wells": "Select destination wells using a {{displayName}}",
   "select_labware": "Select labware",
   "select_mix_labware": "Select a mix labware",
+  "select_nozzles_and_wells": "Select nozzles and wells",
   "select_pipette": "Select a pipette",
+  "select_pipette_nozzles_to_use": "Select pipette nozzles to use",
   "select_tip_location": "Select pick up tip location",
   "select_tiprack": "Select a tiprack",
   "select_volume": "Select a volume",
   "select_wells": "Select wells using a {{displayName}}",
+  "select_wells_to_aspirate_liquid_from": "Select wells to aspirate liquid from {{labware}}",
+  "select_wells_to_dispense_liquid_into": "Select wells to dispense liquid into in {{labware}}",
+  "select_wells_to_mix_liquid_in": "Select wells to mix liquid in {{labware}}",
   "shake": "Shake",
   "shake_speed": "Shake speed",
   "single": "Single transfer",
