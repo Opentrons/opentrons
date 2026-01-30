@@ -263,26 +263,16 @@ export const updateInitialDeckState = (
       newFixtureName as CutoutFixtureId
     )
 
-    // Get current state at this cutout
-    const currentDeckConfigItem = deckConfig?.find(
-      config => config.cutoutId === value.cutoutId
-    )
-    const currentModuleModel = getModuleModelFromFixtureId(
-      currentDeckConfigItem?.cutoutFixtureId as CutoutFixtureId
-    )
-
     // Determine if the new fixture is a module
     const isModuleFixture =
       getModuleModelFromFixtureId(newFixtureName as CutoutFixtureId) !== null
 
-    // Find matching fixture on deck
+    // Find matching items on deck by cutoutId
     const matchingFixtureOnDeck = Object.values(additionalEquipmentOnDeck).find(
       ae => ae.location === value.cutoutId
     )
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
-      module =>
-        getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId &&
-        currentModuleModel === module.model
+      module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
 
     const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
@@ -306,7 +296,7 @@ export const updateInitialDeckState = (
     // Decision logic based on removing flag and fixture type
     if (removing) {
       // Removing: delete existing module or fixture
-      if (currentModuleModel != null && matchingModuleOnDeck != null) {
+      if (matchingModuleOnDeck != null) {
         // Delete module
         const moduleCtx: ModuleContext = {
           value,
@@ -377,6 +367,8 @@ export const updateInitialDeckState = (
       t,
     }
 
+    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
+    console.log('moduleCtx: ', moduleCtx)
     if (matchingModuleOnDeck != null) {
       // Replace existing module - delete first
       handleDeleteModule(moduleCtx)
