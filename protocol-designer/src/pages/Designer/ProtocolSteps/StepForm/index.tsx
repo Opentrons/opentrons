@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { connect, useSelector } from 'react-redux'
 
 import { useConditionalConfirm } from '@opentrons/components'
+import { flexStackerStateGetter } from '@opentrons/step-generation'
 
 import {
   CLOSE_STEP_FORM_WITH_CHANGES,
@@ -22,6 +23,7 @@ import {
   getSavedStepForms,
 } from '/protocol-designer/step-forms/selectors'
 import { actions } from '/protocol-designer/steplist'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 import { actions as stepsActions } from '/protocol-designer/ui/steps'
 
 import { StepFormToolbox } from './StepFormToolbox'
@@ -45,7 +47,11 @@ interface StateProps {
 interface DispatchProps {
   cancelStepForm: () => void
   saveStepForm: (options?: { userWantsBonusStep?: boolean }) => void
-  createdLabwareForQueue: (moduleId: string, fillLabwareIds: string[]) => void
+  createdLabwareForQueue: (
+    moduleId: string,
+    fillLabwareIds: string[],
+    isLidConfigured: boolean
+  ) => void
   deleteLabwares: (labwareIds: string[]) => void
 }
 type StepFormManagerProps = StateProps & DispatchProps
@@ -68,6 +74,7 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
     getDirtyFields(isNewStep, formData)
   )
   const savedStepForms = useSelector(getSavedStepForms)
+  const robotState = useSelector(getRobotStateAtActiveItem)
   const savedStepForm = formData != null ? savedStepForms[formData.id] : null
 
   const handleBlur = (fieldName: StepFieldName): void => {
@@ -105,11 +112,19 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
   }
 
   const handleSave = (): void => {
+    // No dialog to show. Just save the step directly.
     saveStepForm()
     if (
       hydratedForm.stepType === 'flexStacker' &&
       hydratedForm.flexStackerFormType === FLEX_STACKER_FILL
     ) {
+      const moduleState =
+        robotState != null
+          ? flexStackerStateGetter(robotState, hydratedForm.moduleId)
+          : null
+      const isLidConfigured =
+        moduleState?.storedLabwareDetails?.lidLabwareURI != null
+
       // logic for editing a fill step form
       if (savedStepForm != null) {
         const initialLabwareIds =
@@ -130,15 +145,29 @@ function StepFormManager(props: StepFormManagerProps): JSX.Element | null {
             oldFillQuantity,
             hydratedForm.fillLabwareIds.length
           )
-          createdLabwareForQueue(hydratedForm.moduleId, newLabwareIds)
+          createdLabwareForQueue(
+            hydratedForm.moduleId,
+            newLabwareIds,
+            isLidConfigured
+          )
         }
       } else {
         // if no saved step form exists, create all the new labware
         createdLabwareForQueue(
           hydratedForm.moduleId,
-          hydratedForm.fillLabwareIds
+          hydratedForm.fillLabwareIds,
+          isLidConfigured
         )
       }
+    } else if (
+      hydratedForm.stepType === 'flexStacker' &&
+      savedStepForm?.flexStackerFormType === FLEX_STACKER_FILL &&
+      hydratedForm.flexStackerFormType !== FLEX_STACKER_FILL
+    ) {
+      // logic for deleting fill labware if the stacker form type changes from fill to something else
+      const fillLabwareIds =
+        (savedStepForm.fillLabwareIds as string[] | null) ?? []
+      deleteLabwares(fillLabwareIds)
     }
   }
 
@@ -193,12 +222,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any>): DispatchProps => {
 
   const createdLabwareForQueue = (
     moduleId: string,
-    fillLabwareIds: string[]
+    fillLabwareIds: string[],
+    isLidConfigured: boolean
   ): void => {
     dispatch(
       createLabwareAndQueueForHopper({
         moduleId,
         fillLabwareIds,
+        isLidConfigured,
       })
     )
   }

@@ -1,6 +1,6 @@
 """Gravimetric QC protocol."""
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Optional
 from dataclasses import dataclass, asdict
 import os
 import sys
@@ -129,6 +129,79 @@ fast_simulate_measurement = MeasurementData(
     celsius_liquid=25,
 )
 
+QC_TEST_MIN_REQUIREMENTS: Dict[
+    int, Dict[int, Dict[int, Dict[float, Tuple[float, float]]]]
+] = {
+    # Published specs with 0.8 safety factor
+    # channels: [Pipette: [tip: [Volume: (%d, Cv)]]]
+    1: {
+        50: {  # P50
+            50: {  # T50
+                1.0: (6.4, 5.6),
+                10.0: (1.2, 0.4),
+                50.0: (1.0, 0.32),
+            },
+        },
+        1000: {  # P1000
+            50: {  # T50
+                5.0: (4.0, 2.0),
+                50.0: (0.4, 0.24),
+            },
+            200: {  # T200
+                200.0: (0.4, 0.12),
+            },
+            1000: {  # T1000
+                1000.0: (0.4, 0.12),
+            },
+        },
+    },
+    8: {
+        50: {  # P50
+            50: {  # T50
+                1.0: (8.0, 6.4),
+                10.0: (2.0, 0.8),
+                50.0: (1.0, 0.48),
+            },
+        },
+        1000: {  # P1000
+            50: {  # T50
+                5.0: (6.4, 3.2),
+                50.0: (2.0, 0.48),
+            },
+            200: {  # T200
+                200.0: (0.8, 0.2),
+            },
+            1000: {  # T1000
+                1000.0: (0.56, 0.12),
+            },
+        },
+    },
+    96: {
+        200: {
+            50: {  # T50
+                1.0: (8.0, 4.8),
+                5.0: (3.2, 1.6),
+                50.0: (1.2, 0.8),
+            },
+            200: {  # T200
+                200.0: (0.8, 0.8),
+            },
+        },
+        1000: {  # P1000
+            50: {  # T50
+                5.0: (8.0, 4.0),
+                50.0: (2.0, 1.0),
+            },
+            200: {  # T200
+                200.0: (1.2, 1.0),
+            },
+            1000: {  # T1000
+                1000.0: (1.2, 1.2),
+            },
+        },
+    },
+}
+
 
 @dataclass(kw_only=True)
 class CSVSettings:
@@ -167,6 +240,8 @@ class CSVSettings:
     touch_blank: bool
     retracted_offset: float
     gantry_speed: float
+    liquid_class_test: bool
+    fail_early: bool
 
     @classmethod
     def parse_csv(cls, csv_params: List[List[str]], simulating: bool) -> "CSVSettings":
@@ -252,6 +327,10 @@ class CSVSettings:
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
         cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
         touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
+        liquid_class_test = bool(
+            lookup_key("liquid_class_test", csv_params)[0] == "TRUE"
+        )
+        fail_early = bool(lookup_key("fail_early", csv_params)[0] == "TRUE")
 
         volumes = {
             20: volumes_to_test_20ul,
@@ -315,6 +394,8 @@ class CSVSettings:
             touch_blank=touch_blank,
             retracted_offset=retracted_offset,
             gantry_speed=gantry_speed,
+            liquid_class_test=liquid_class_test,
+            fail_early=fail_early,
         )
 
 
@@ -667,12 +748,8 @@ def _get_tips_for_test(
             return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         else:
             return _get_tips_for_test_96(fixture_settings, tip, blank)
-    if (
-        fixture_settings.pipette_channels == 8
-        and len(fixture_settings.channels) == 1
-        and fixture_settings.channels[0] == 0
-        and not fixture_settings.cavity_test
-    ):
+    if fixture_settings.pipette_channels == 8 and fixture_settings.liquid_class_test:
+        # Liquid class testing uses the whole tip rack with one channel so dont use the special pattern
         return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
@@ -1357,6 +1434,21 @@ def calculate_evaporation(
     return blank_measurments, avg_asp_evap, avg_disp_evap
 
 
+def _get_passing_requirements(
+    fixture_settings: FixtureSettings, tip: int, volume: float
+) -> Optional[Tuple[float, float]]:
+    if fixture_settings.fail_early:
+        try:
+            return QC_TEST_MIN_REQUIREMENTS[fixture_settings.pipette_channels][
+                fixture_settings.pipette_volume
+            ][tip][volume]
+        except KeyError:
+            print_error(
+                f"No minimum requirements for the P{fixture_settings.pipette_volume} {fixture_settings.pipette_channels}channel with tip {tip} at {volume}"
+            )
+    return None
+
+
 def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
     """Run."""
     first_tip = _get_tips_for_test(
@@ -1538,6 +1630,20 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
 
                 actual_asp_list_all.extend(actual_asp_list_channel)
                 actual_disp_list_all.extend(actual_disp_list_channel)
+                requirements: Optional[Tuple[float, float]] = _get_passing_requirements(
+                    fixture_settings, tip, volume
+                )
+                if requirements:
+                    if (
+                        abs(dispense_d) > requirements[0]
+                        or abs(dispense_cv) > requirements[1]
+                    ):
+                        print_error(
+                            f"Pipette failed QC on channel {channel} tip {tip} volume {volume}"
+                        )
+                        raise RuntimeError(
+                            f"Pipette failed on QC channel {channel} tip {tip} volume {volume}"
+                        )
             for trial in range(fixture_settings.trials):
                 aspirate_average, aspirate_cv, aspirate_d = helpers._calculate_stats(
                     trial_asp_dict[trial], volume

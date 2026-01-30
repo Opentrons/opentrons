@@ -7,6 +7,10 @@ from typing import Any, ContextManager
 import pytest
 from decoy import Decoy
 
+from opentrons_shared_data.liquid_classes.liquid_class_definition import (
+    Coordinate,
+    PositionReference,
+)
 from opentrons_shared_data.pipette.pipette_definition import ValidNozzleMaps
 from tests.opentrons.protocol_engine.pipette_fixtures import (
     EIGHT_CHANNEL_COLS,
@@ -19,9 +23,16 @@ from tests.opentrons.protocol_engine.pipette_fixtures import (
 
 from .labware_well_fixtures import WELLS_BY_COLUMN_96, WELLS_BY_COLUMN_384
 from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_api._liquid_properties import TipPosition
 from opentrons.protocol_api.core.engine import WellCore
+from opentrons.protocol_api.disposal_locations import (
+    _TRASH_BIN_CUTOUT_FIXTURE,
+    DisposalOffset,
+    TrashBin,
+)
 from opentrons.protocol_api.labware import Labware, Well
 from opentrons.protocol_engine import ProtocolEngineError
+from opentrons.protocol_engine.clients.sync_client import SyncClient as EngineClient
 from opentrons.protocol_engine.errors import (
     IncompleteLabwareDefinitionError,
     LiquidHeightUnknownError,
@@ -31,10 +42,12 @@ from opentrons.protocol_engine.types.liquid_level_detection import (
 )
 from opentrons.protocols.advanced_control.transfers.transfer_liquid_utils import (
     LocationCheckDescriptors,
+    get_blowout_location_for_trash,
     group_wells_for_multi_channel_transfer,
     raise_if_location_inside_liquid,
 )
-from opentrons.types import Location, Point
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.types import DeckSlotName, Location, Point
 
 _96_FULL_MAP = NozzleMap.build(
     physical_nozzles=NINETY_SIX_MAP,
@@ -571,3 +584,67 @@ def test_grouping_well_returns_all_wells_for_non_96_or_384_plate(
 
     result = group_wells_for_multi_channel_transfer(mock_wells, nozzle_map, "source")
     assert result == mock_wells
+
+
+@pytest.mark.parametrize(
+    argnames="target_tip_position, expected_offset_from_top",
+    argvalues=[
+        (
+            TipPosition(
+                _position_reference=PositionReference.WELL_TOP,
+                _offset=Coordinate(x=0, y=0, z=0),
+            ),
+            DisposalOffset(x=0, y=0, z=0),
+        ),
+        (
+            TipPosition(
+                _position_reference=PositionReference.WELL_BOTTOM,
+                _offset=Coordinate(x=0, y=0, z=0),
+            ),
+            DisposalOffset(x=0, y=0, z=-10),
+        ),
+        (
+            TipPosition(
+                _position_reference=PositionReference.WELL_CENTER,
+                _offset=Coordinate(x=1, y=2, z=3),
+            ),
+            DisposalOffset(x=1, y=2, z=-2),
+        ),
+    ],
+)
+def test_blowout_location_for_trash(
+    decoy: Decoy,
+    target_tip_position: TipPosition,
+    expected_offset_from_top: DisposalOffset,
+) -> None:
+    """Should return the expected blowout location for all given disposal locations."""
+    engine_client = decoy.mock(cls=EngineClient)
+    trash = TrashBin(
+        location=DeckSlotName.SLOT_A1,
+        addressable_area_name="moveableTrashD3",
+        api_version=APIVersion(2, 28),
+        engine_client=engine_client,
+    )
+    decoy.when(
+        engine_client.state.addressable_areas.get_fixture_height(
+            _TRASH_BIN_CUTOUT_FIXTURE
+        )
+    ).then_return(10)
+    assert (
+        get_blowout_location_for_trash(trash, target_tip_position).offset
+        == expected_offset_from_top
+    )
+
+
+def test_blowout_location_for_trash_raises_when_position_reference_is_liquid_meniscus(
+    decoy: Decoy,
+) -> None:
+    """Should raise ValueError when position reference is PositionReference.LIQUID_MENISCUS."""
+    with pytest.raises(ValueError):
+        get_blowout_location_for_trash(
+            decoy.mock(cls=TrashBin),
+            TipPosition(
+                _position_reference=PositionReference.LIQUID_MENISCUS,
+                _offset=Coordinate(x=0, y=0, z=0),
+            ),
+        )

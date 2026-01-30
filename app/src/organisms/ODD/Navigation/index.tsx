@@ -39,7 +39,6 @@ import type { ON_DEVICE_DISPLAY_PATHS } from '/app/App/OnDeviceDisplayApp'
 
 const NAV_LINKS: Array<(typeof ON_DEVICE_DISPLAY_PATHS)[number]> = [
   '/protocols',
-  '/quick-transfer',
   '/instruments',
   '/robot-settings',
 ]
@@ -114,8 +113,6 @@ export function Navigation(props: NavigationProps): JSX.Element {
         return t('protocols')
       case '/robot-settings':
         return t('settings')
-      case '/quick-transfer':
-        return t('quick_transfer')
       default:
         return ''
     }

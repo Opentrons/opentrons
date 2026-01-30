@@ -35,6 +35,7 @@ from opentrons.protocol_engine.state.commands import (
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.update_types import StateUpdate
 from opentrons.protocol_engine.types import DeckType, EngineStatus
+from opentrons.protocol_engine.types.command_annotations import UserCommandAnnotation
 
 
 def _make_config() -> Config:
@@ -1369,4 +1370,32 @@ def test_get_errors_slice() -> None:
         ],
         cursor=0,
         total_length=1,
+    )
+
+
+def test_create_and_close_command_annotations() -> None:
+    """It should create an enabled command annotation."""
+    subject = CommandStore(
+        config=_make_config(),
+        error_recovery_policy=_placeholder_error_recovery_policy,
+        is_door_open=False,
+    )
+
+    subject_view = CommandView(subject.state)
+
+    subject.handle_action(
+        actions.CreateUserCommandAnnotation(
+            annotation_id="abc123",
+            user_defined_name="bar",
+            user_description="foo",
+            params={"a": 1},
+        )
+    )
+
+    annotation = subject_view.get_command_annotation("abc123")
+    assert annotation == UserCommandAnnotation(
+        annotationId="abc123",
+        userSpecifiedName="bar",
+        userSpecifiedDescription="foo",
+        params={"a": 1},
     )

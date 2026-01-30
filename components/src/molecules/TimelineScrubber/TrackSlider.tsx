@@ -21,17 +21,22 @@ export function TrackSlider({
 }: TrackSliderProps): JSX.Element {
   const trackRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState<boolean>(false)
+  const THUMB_RADIUS_PX = 6
 
-  const calculateValue = useCallback((clientX: number) => {
-    if (trackRef.current == null) return 0
+  const calculateValue = useCallback(
+    (clientX: number) => {
+      if (trackRef.current == null) return 0
 
-    const rect = trackRef.current.getBoundingClientRect()
-    const x = clientX - rect.x
-    const width = rect.width
-    const value = Math.min(100, Math.max(0, (x / width) * 100))
+      const rect = trackRef.current.getBoundingClientRect()
+      const x = clientX - rect.x - THUMB_RADIUS_PX
+      const width = rect.width - THUMB_RADIUS_PX * 2
+      const clampedX = Math.min(width, Math.max(0, x))
+      const value = width > 0 ? (clampedX / width) * 100 : 0
 
-    return value
-  }, [])
+      return value
+    },
+    [THUMB_RADIUS_PX]
+  )
 
   const handleMouseMove = useCallback(
     (e: globalThis.MouseEvent) => {
@@ -69,7 +74,14 @@ export function TrackSlider({
         className={styles.track_progress}
         style={{ width: `${track.value}%` }}
       />
-      <div className={styles.track_thumb} style={{ left: `${track.value}%` }} />
+      <div
+        className={styles.track_thumb}
+        style={{
+          left: `calc(${THUMB_RADIUS_PX}px + (${track.value} / 100) * (100% - ${
+            THUMB_RADIUS_PX * 2
+          }px))`,
+        }}
+      />
     </div>
   )
 }

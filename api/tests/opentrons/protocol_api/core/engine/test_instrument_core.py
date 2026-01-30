@@ -500,6 +500,7 @@ def test_pick_up_tip(
             well_location=PickUpTipWellLocation(
                 origin=PickUpTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.PickUpTipParams(
@@ -529,7 +530,10 @@ def test_get_return_height(
 
 
 def test_drop_tip_no_location(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should drop a tip given a well core."""
     well_core = WellCore(
@@ -551,6 +555,7 @@ def test_drop_tip_no_location(
                 origin=DropTipWellOrigin.DEFAULT,
                 offset=WellOffset(x=0, y=0, z=0),
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.DropTipParams(
@@ -569,7 +574,10 @@ def test_drop_tip_no_location(
 
 
 def test_drop_tip_with_location(
-    decoy: Decoy, mock_engine_client: EngineClient, subject: InstrumentCore
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
+    subject: InstrumentCore,
 ) -> None:
     """It should drop a tip given a well core."""
     location = Location(point=Point(1, 2, 3), labware=None)
@@ -610,6 +618,7 @@ def test_drop_tip_with_location(
             well_location=DropTipWellLocation(
                 origin=DropTipWellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.DropTipParams(
@@ -745,6 +754,7 @@ def test_aspirate_from_well(
             well_location=LiquidHandlingWellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.AspirateParams(
@@ -856,6 +866,7 @@ def test_aspirate_from_meniscus(
                 offset=WellOffset(x=3, y=2, z=1),
                 volumeOffset="operationVolume",
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.AspirateParams(
@@ -944,6 +955,7 @@ def test_blow_out_to_well(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.BlowOutParams(
@@ -1112,6 +1124,7 @@ def test_dispense_to_well(
             well_location=LiquidHandlingWellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=3, y=2, z=1)
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.DispenseParams(
@@ -1604,6 +1617,7 @@ def test_touch_tip(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=4.56)
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.TouchTipParams(
@@ -1652,6 +1666,7 @@ def test_touch_tip_with_mm_from_edge(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=4.56)
             ),
+            version=mock_protocol_core.api_version,
         ),
         mock_engine_client.execute_command(
             cmd.TouchTipParams(
@@ -1941,6 +1956,7 @@ def test_liquid_probe_without_recovery(
 def test_liquid_probe_without_recovery_unsafe(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
@@ -1956,6 +1972,7 @@ def test_liquid_probe_without_recovery_unsafe(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
             ),
+            version=mock_protocol_core.api_version,
         )
     ).then_raise(
         pipette_movement_conflict.PartialTipMovementNotAllowedError(
@@ -2013,6 +2030,7 @@ def test_liquid_probe_with_recovery(
 def test_liquid_probe_with_recovery_unsafe(
     decoy: Decoy,
     mock_engine_client: EngineClient,
+    mock_protocol_core: ProtocolCore,
     subject: InstrumentCore,
 ) -> None:
     """It should raise an exception on when attempting to liquid probe out of bounds when the pipette is in partial tip."""
@@ -2028,6 +2046,7 @@ def test_liquid_probe_with_recovery_unsafe(
             well_location=WellLocation(
                 origin=WellOrigin.TOP, offset=WellOffset(x=0, y=0, z=2)
             ),
+            version=mock_protocol_core.api_version,
         )
     ).then_raise(
         pipette_movement_conflict.PartialTipMovementNotAllowedError(

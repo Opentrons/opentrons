@@ -2,7 +2,6 @@ import asyncio
 import contextlib
 import json
 import time
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Generator
 
@@ -100,10 +99,10 @@ def _requests_session() -> Generator[requests.Session, None, None]:
 
 def _wait_until_ready(base_url: str) -> None:
     with _requests_session() as requests_session:
-        started = datetime.now()
+        started = time.monotonic()
         while True:
-            now = datetime.now()
-            if (now - started).total_seconds() > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
+            now = time.monotonic()
+            if now - started > _INTEGRATION_SERVER_STARTUP_TIMEOUT_S:
                 raise RuntimeError("Could not start dev server")
             try:
                 health_response = requests_session.get(f"{base_url}/health")

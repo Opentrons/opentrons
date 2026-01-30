@@ -65,6 +65,7 @@ interface UpdateInitialDeckSetupProps {
   savedSteps: SavedStepFormState
   makeSnackbar: MakeSnackbar
   t: any
+  handleDeleteStackerLabware: (module: ModuleOnDeck) => void
   deckConfig?: DeckConfiguration
 }
 
@@ -236,6 +237,7 @@ export const updateInitialDeckState = (
     makeSnackbar,
     t,
     deckConfig,
+    handleDeleteStackerLabware,
   } = props
 
   console.log('values: ', values)
