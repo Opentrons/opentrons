@@ -22,6 +22,7 @@ import type {
   WellGroup,
   WellMouseEvent,
   WellStroke,
+  WellType,
 } from './labwareInternals/types'
 
 export const WELL_LABEL_OPTIONS = {
@@ -110,7 +111,7 @@ export interface LabwareRenderProps {
   onLabwareClick?: () => void
   showBorder?: boolean
   strokeColor?: string
-  tipStatusByWellName?: Record<string, TipType>
+  statusByWellName?: Record<string, TipType | WellType>
   handleClickWell?: (wellName: string) => void
   selectedTipsByIndex?: Record<string, number>
   fill?: CSSProperties['fill']
@@ -135,7 +136,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
     highlightedWellLabels,
     selectedWells,
     missingTips,
-    tipStatusByWellName,
+    statusByWellName,
     handleClickWell,
     selectedTipsByIndex,
     disabledWells,
@@ -204,7 +205,7 @@ export const LabwareRender = (props: LabwareRenderProps): JSX.Element => {
         highlight={highlight}
         highlightShadow={highlightShadow}
         wellStroke={wellStroke}
-        tipStatusByWellName={tipStatusByWellName}
+        statusByWellName={statusByWellName}
         handleClickWell={handleClickWell}
         selectedTipsByIndex={selectedTipsByIndex}
         fill={fill}

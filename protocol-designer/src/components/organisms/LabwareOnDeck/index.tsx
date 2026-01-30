@@ -10,7 +10,7 @@ import * as tipContentsSelectors from '../../../top-selectors/tip-contents'
 import { getAllWellContentsForActiveItem } from '../../../top-selectors/well-contents'
 
 import type { CSSProperties } from 'react'
-import type { TipType, WellMouseEvent } from '@opentrons/components'
+import type { TipType, WellMouseEvent, WellType } from '@opentrons/components'
 import type { LabwareOnDeck as LabwareOnDeckType } from '/protocol-designer/step-forms'
 
 interface LabwareOnDeckProps {
@@ -20,7 +20,7 @@ interface LabwareOnDeckProps {
   highlight?: boolean
   showHighlightedWells?: boolean
   handleClickWell?: (wellName: string) => void
-  tipStatusByWellName?: Record<string, TipType>
+  statusByWellName?: Record<string, TipType | WellType>
   onMouseEnterWell?: (e: WellMouseEvent) => void
   onMouseLeaveWell?: (e: WellMouseEvent) => void
   selectedTipsByIndex?: Record<string, number>
@@ -36,7 +36,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     y,
     highlight = false,
     showHighlightedWells = true,
-    tipStatusByWellName,
+    statusByWellName,
     handleClickWell,
     onMouseEnterWell,
     onMouseLeaveWell,
@@ -77,7 +77,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
       {...(showHighlightedWells ? { highlightedWells } : {})}
       {...(ignoreMissingTips ? {} : { missingTips })}
       highlight={highlight}
-      tipStatusByWellName={tipStatusByWellName}
+      statusByWellName={statusByWellName}
       onMouseEnterWell={onMouseEnterWell}
       onMouseLeaveWell={onMouseLeaveWell}
       selectedTipsByIndex={selectedTipsByIndex}

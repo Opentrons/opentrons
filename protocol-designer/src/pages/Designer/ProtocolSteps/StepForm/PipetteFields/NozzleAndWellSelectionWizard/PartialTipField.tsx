@@ -122,7 +122,7 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
       aspWellsLength =
         deckSetup.labware[
           propsForFields.aspirate_labware.value as string
-        ]?.def.ordering.flat().length ?? 0 
+        ]?.def.ordering.flat().length ?? 0
       dspWellsLength =
         deckSetup.labware[
           propsForFields.dispense_labware.value as string

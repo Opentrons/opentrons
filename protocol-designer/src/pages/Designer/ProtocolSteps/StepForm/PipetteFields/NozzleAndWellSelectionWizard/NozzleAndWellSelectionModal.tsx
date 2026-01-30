@@ -87,6 +87,7 @@ export function NozzleAndWellSelectionModal(
           deckSetup={deckSetup}
           stepType={isMixStep ? stepType : 'aspirate'}
           robotType={robotType}
+          nozzleConfiguration={value}
         />
       )
       break
@@ -98,6 +99,7 @@ export function NozzleAndWellSelectionModal(
           deckSetup={deckSetup}
           stepType={'dispense'}
           robotType={robotType}
+          nozzleConfiguration={value}
         />
       )
       break

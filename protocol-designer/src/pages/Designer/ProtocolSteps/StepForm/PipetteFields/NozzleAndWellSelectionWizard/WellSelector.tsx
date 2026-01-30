@@ -1,26 +1,47 @@
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 
 import {
   ALIGN_CENTER,
   Box,
+  COLORS,
   DIRECTION_COLUMN,
   DIRECTION_ROW,
   Flex,
+  INACCESSIBLE,
   SPACING,
   StyledText,
+  UNSELECTED,
   WELL,
 } from '@opentrons/components'
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
+import {
+  getDeckDefFromRobotType,
+  getPositionFromSlotId,
+} from '@opentrons/shared-data'
+import {
+  getIsSafePipetteMovement,
+  getSlotInLocationStack,
+} from '@opentrons/step-generation'
+
+import { LabwareOnDeck } from '/protocol-designer/components/organisms'
+import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
+import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
+import { DeckOverlay } from '../TipSelectionWizard/DeckOverlay'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
 
-import type { RobotType } from '@opentrons/shared-data'
+import type { WellType } from '@opentrons/components'
+import type {
+  NozzleConfigurationStyle,
+  RobotType,
+} from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectionProps {
+  nozzleConfiguration: NozzleConfigurationStyle
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
@@ -28,11 +49,24 @@ interface WellSelectionProps {
 }
 export function WellSelection(props: WellSelectionProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
-  const { deckSetup, propsForFields, stepType, robotType } = props
+  const {
+    deckSetup,
+    propsForFields,
+    stepType,
+    robotType,
+    nozzleConfiguration,
+  } = props
+  const pipetteId = propsForFields.pipette.value as string
   const isAspirate = stepType === 'aspirate'
   const isDispense = stepType === 'dispense'
   const isMix = stepType === 'mix'
+  const robotState = useSelector(getRobotStateAtActiveItem)
+  const invariantContext = useSelector(getInvariantContext)
   let labwareId: string
+  const handleClickWell = (wellName: string): void => {
+    console.log(`clicked well ${wellName}`)
+  }
+
   switch (stepType) {
     case 'aspirate':
       labwareId = propsForFields.aspirate_labware.value as string
@@ -46,11 +80,76 @@ export function WellSelection(props: WellSelectionProps): JSX.Element {
     default:
       labwareId = ''
   }
+
+  let controls: JSX.Element = <></>
   const labware = deckSetup.labware[labwareId]
+
+  const allWells = labware.def.ordering.flat()
+
   const displayName = labware.def.metadata.displayName
+  const slot = getSlotInLocationStack(labware.stack)
   const deckDef = getDeckDefFromRobotType(robotType)
+  const slotPosition = getPositionFromSlotId(slot, deckDef)
+
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
-  const controls: JSX.Element = <></>
+
+  if (slotPosition == null || labware == null) {
+    console.warn(`no slot position for selected labware ${labwareId}`)
+    controls = <></>
+  } else if (robotState === null) {
+    console.warn(`no robot state so unable to determine well accessibility`)
+  } else {
+    const allWellsWithStatus = allWells.reduce<Record<string, number>>(
+      (acc, key) => {
+        acc[key] = getIsSafePipetteMovement({
+          robotState,
+          invariantContext,
+          pipetteId,
+          labwareId,
+          wellTargetName: key,
+          primaryNozzle: 'A1',
+          nozzleConfiguration,
+        })
+          ? 0
+          : 1
+        return acc
+      },
+      {}
+    )
+    const allWellsWithState = allWells.reduce<Record<string, WellType>>(
+      (acc, key) => {
+        acc[key] = getIsSafePipetteMovement({
+          robotState,
+          invariantContext,
+          pipetteId,
+          labwareId,
+          wellTargetName: key,
+          primaryNozzle: 'A1',
+          nozzleConfiguration,
+        })
+          ? UNSELECTED
+          : INACCESSIBLE
+        return acc
+      },
+      {}
+    )
+    controls = (
+      <>
+        <DeckOverlay deckDef={deckDef} />
+        <LabwareOnDeck
+          labwareOnDeck={labware}
+          x={slotPosition[0]}
+          y={slotPosition[1]}
+          showHighlightedWells={false}
+          handleClickWell={handleClickWell}
+          selectedTipsByIndex={allWellsWithStatus}
+          {...{ allWellsWithState }}
+          fill={COLORS.white}
+          ignoreMissingTips
+        />
+      </>
+    )
+  }
 
   return (
     <Flex flexDirection={DIRECTION_COLUMN}>

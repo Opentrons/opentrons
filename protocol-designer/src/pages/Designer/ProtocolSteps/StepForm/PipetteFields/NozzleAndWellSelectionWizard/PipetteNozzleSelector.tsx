@@ -33,7 +33,6 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { PipetteShadowProps } from '../TipSelectionWizard/types'
-import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 
 const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   RobotType,
@@ -70,7 +69,6 @@ export function PipetteNozzleSelector(props: {
     value: nozzleMode,
     setSelectedValue,
   } = props
-    console.log("🚀 ~ PipetteNozzleSelector ~ pipetteSpecs:", pipetteSpecs)
   const { channels, pipetteBoundingBoxOffsets, displayName } = pipetteSpecs
   const { backLeftCorner, frontRightCorner } = pipetteBoundingBoxOffsets
   const { t } = useTranslation('protocol_steps')
@@ -145,16 +143,15 @@ export function PipetteNozzleSelector(props: {
             padding={SPACING.spacing20}
             gridGap={SPACING.spacing10}
           >
-             <Flex height={"100%"}>
-            {!is96Channel && <OutlineComponent {...outlineProps}/>}
-</Flex>
+            <Flex height={'100%'}>
+              {!is96Channel && <OutlineComponent {...outlineProps} />}
+            </Flex>
 
             <Flex flexDirection={DIRECTION_COLUMN}>
               <StyledText desktopStyle="bodyDefaultSemiBold">
                 {displayName}
               </StyledText>
-             
-                
+
               {is96Channel && <OutlineComponent {...outlineProps} />}
               <StyledText
                 desktopStyle="bodyDefaultRegular"

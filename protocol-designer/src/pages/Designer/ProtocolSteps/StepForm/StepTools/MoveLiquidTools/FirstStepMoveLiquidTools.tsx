@@ -54,7 +54,6 @@ export function FirstStepMoveLiquidTools({
       ?.name === 'wasteChute' ||
     additionalEquipmentEntities[String(propsForFields.dispense_labware.value)]
       ?.name === 'trashBin'
-
   return (
     <Flex
       flexDirection={DIRECTION_COLUMN}
