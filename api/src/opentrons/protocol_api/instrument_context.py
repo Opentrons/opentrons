@@ -1075,7 +1075,6 @@ class InstrumentContext(publisher.CommandPublisher):
                 position.
 
                 *Changed in version 2.16*: Accepts `TrashBin` and `WasteChute` values.
-        <!-- TODO: uncomment when 2.28 is released
             flow_rate: The absolute flow rate in µL/s.
 
                 *New in version 2.28*

@@ -310,10 +310,12 @@ To blow an extra amount of air through the pipette's tip, call the [`InstrumentC
 pipette.blow_out()
 ```
 
-You can also specify a particular well as the blowout location:
+You can also specify a particular well as the blowout location and an absolute flow rate:
 
 ```python
-pipette.blow_out(plate["B1"])
+pipette.blow_out(
+    location=plate["B1"],
+    flow_rate=50)
 ```
 
 Many protocols use a trash container for blowing out the pipette. You can specify the pipette's current trash container as the blowout location by using the [`InstrumentContext.trash_container`][opentrons.protocol_api.InstrumentContext.trash_container] property:
@@ -325,6 +327,8 @@ pipette.blow_out(pipette.trash_container)
 *New in version 2.0*
 
 *Changed in version 2.16:* Added support for `TrashBin` and `WasteChute` locations.
+
+*Changed in version 2.28:* Add the blowout `flow_rate` parameter.
 
 ## Touch tip { #touch-tip-building-block }
 

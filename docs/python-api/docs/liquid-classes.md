@@ -252,6 +252,7 @@ custom_water_properties = custom_water.get_for(pipette, tiprack)
 Here, you can also use the optional `version` parameter to specify which version of the liquid class definition you’d like to customize. If unspecified, the API loads the latest version.
 
 *New in version 2.24*
+
 *Changed in version 2.26:* The `version` parameter lets you apply a previous liquid class definition version.
 
 Next, edit individual liquid class properties based on your Flex pipette and tip combination.
@@ -356,6 +357,8 @@ custom_viscous = protocol.define_liquid_class(
 ```
 
 *New in version 2.24*
+
+*Changed in version 2.28*: Add a `blowout_position`
 
 You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified [liquid class properties](https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1) for examples.
 
