@@ -15,19 +15,15 @@ import {
 import type { CSSProperties, RefObject } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { LabwareAdapterLoadName } from './LabwareAdapter'
+import type { TipType } from './labwareInternals/types'
 import type {
   HighlightedWellLabels,
-  TipType,
+  WELL_LABEL_OPTIONS,
   WellFill,
   WellGroup,
   WellMouseEvent,
   WellStroke,
-} from './labwareInternals/types'
-
-export const WELL_LABEL_OPTIONS = {
-  SHOW_LABEL_INSIDE: 'SHOW_LABEL_INSIDE',
-  SHOW_LABEL_OUTSIDE: 'SHOW_LABEL_OUTSIDE',
-} as const
+} from './labwareInternals/Wells'
 
 export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
 

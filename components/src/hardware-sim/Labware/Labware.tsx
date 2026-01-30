@@ -24,7 +24,7 @@ import type {
   WellFill,
   WellMouseEvent,
   WellStroke,
-} from './labwareInternals/types'
+} from './labwareInternals/Wells'
 
 export interface LabwareProps {
   /** Labware definition to render */

@@ -1,7 +1,7 @@
 import { memo } from 'react'
 import map from 'lodash/map'
 
-import { COLORS } from '../../../helix-design-system'
+import { COLORS } from '../../../../helix-design-system'
 import { Well } from './Well'
 
 import type { CSSProperties, MemoExoticComponent, ReactNode } from 'react'

@@ -7,11 +7,19 @@ export function SelectedTip(props: {
   textInsideTip?: string
   isUsed?: boolean
   isError?: boolean
+  isSelected?: boolean
 }): JSX.Element {
-  const { size, textInsideTip, isUsed = false, isError = false } = props
+  const {
+    size,
+    textInsideTip,
+    isUsed = false,
+    isError = false,
+    isSelected = true,
+  } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
-  const fill = isError ? COLORS.red50 : isUsed ? COLORS.yellow50 : COLORS.blue50
+  const defaultColor = isSelected ? COLORS.blue50 : COLORS.blue35
+  const fill = isError ? COLORS.red50 : isUsed ? COLORS.yellow50 : defaultColor
 
   // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
   const showStroke = textInsideTip == null
