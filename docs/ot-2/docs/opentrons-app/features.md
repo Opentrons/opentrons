@@ -2,11 +2,11 @@
 title: "Opentrons OT-2: App Features Reference"
 ---
 
-You will operate and interact with the OT-2 from a computer running the Opentrons App. This section provides an high-level overview of some salient features provided by the Protocols, Labware, and Devices sections of the app.
+You control the OT-2 using the Opentrons App on your computer. This section highlights key features found in the Protocols, Labware, and Devices tabs of the app.
 
 ## Protocols tab
 
-This section provides an overview of the Protocols tab. The Protocols tab is selected by default when you first launch the app. It includes controls that let you import protocol files and manage saved files.
+The Protocols tab is selected by default when you first launch the app. It includes controls that let you import protocol files and manage saved files.
 
 ### Protocols summary
 
@@ -26,7 +26,7 @@ The basic protocol screen displays a summary list of all the protocols stored on
   <tbody>
     <tr>
       <td>Sort by</td>
-      <td>Opens a drop-down menu that offers protocol sorting options which include:
+      <td>Opens a drop-down menu that let you sort protocols. Options include:
         <ul>
             <li><strong>Alphabetical</strong></li>
             <li><strong>Reverse alphabetical</strong></li>
@@ -69,26 +69,24 @@ You can click on any listed protocol summary to expand it. An expanded tile show
 
 Click the **Protocols** tab to return to the default summary list view.
 
-
-
 ## Labware tab
 
-This tab stores information about labware found in Labware Library. You can also upload custom labware you create and store it in the app here.
+This tab stores information about labware found in Labware Library and is reserved for future development. You can also upload custom labware you create and store it in the app here.
 
 ## Devices tab
 
-The Devices tab provides a summary list all the discoverable Opentrons robots on a network. This means it will show you OT-2 _and_ Flex robots, if you have different models in your lab. The app lists robots alphabetically, by name.
+The Devices tab lists all the discoverable Opentrons robots on a network. This means it will show you OT-2 _and_ Flex robots, if you have different models in your lab. The app lists robots alphabetically, by name.
 
 <figure class="screenshot" markdown>
 ![Devices tab showing list of robots](../images/app-devices-tab.png)
 </figure>
 
-This basic view shows summary information about 
+Each summary tile provides robot information as shown in the following table.
 
 <table>
   <thead>
     <tr>
-      <th>Feature</th>
+      <th>Category</th>
       <th>Description</th>
     </tr>
   </thead>
@@ -151,7 +149,7 @@ Use the Opentrons App to view the status of modules connected to your OT-2 and c
 <figcaption>Module card for the Temperature Module.</figcaption>
 </figure>
 
-Click the three-dot menu (⋮) on the module card to choose from a menu of commands. You can always choose **About module** to see the moudule's firmware version and serial number. (This information is very useful when contacting Opentrons Support!) The other commands depend on the type of the module and its current status:
+Click the three-dot menu (⋮) on the module card to choose from a menu of commands. You can always choose **About module** to see the module's firmware version and serial number. (This information is very useful when contacting Opentrons Support!) The other commands depend on the type of the module and its current status:
 
 <table>
   <thead>
@@ -179,6 +177,14 @@ Click the three-dot menu (⋮) on the module card to choose from a menu of comma
         </ul>
       </td>
     </tr>
+     <tr>
+      <td><strong>Temperature Module</strong></td>
+      <td>
+        <ul>
+          <li>Set module temperature / Deactivate module</li>
+        </ul>
+      </td>
+    </tr>
     <tr>
       <td><strong>Thermocycler</strong></td>
       <td>
@@ -196,7 +202,7 @@ Click the three-dot menu (⋮) on the module card to choose from a menu of comma
 
 Every OT-2 comes equipped with a built-in 2-megapixel camera that can capture full HD still images of the deck and working area. When enabled, the camera can take pictures:
 
-- During a protocol that was created using the [`capture_image`] method(https://docs.opentrons.com/python-api/reference/protocols/#opentrons.protocol_api.ProtocolContext.capture_image) in Opentrons Python API. You cannot add an image step from Protocol Designer. <!--- yes, that's a full url, I know, I know --->
+- During a protocol that was created using the [`capture_image`](https://docs.opentrons.com/python-api/reference/protocols/#opentrons.protocol_api.ProtocolContext.capture_image) method in the Python API. You cannot add an image step from Protocol Designer. <!--- yes, that's a full url, I know, I know --->
 
 - When the OT-2 encounters an error
 
@@ -218,12 +224,9 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 - **Download run log**: Save to your computer a JSON file containing information about the protocol run, including all performed steps.
 
-- **Delete protocol run record**: Delete all information about this protocol run from Flex, including labware offset data. When you choose this option, it's as though the protocol run never happened.
+- **Delete protocol run record**: Delete all information about this protocol run from the robot, including labware offset data. When you choose this option, it's as though the protocol run never happened.
 
 !!! note
-    If you need to maintain a comprehensive record of all runs performed on your Flex, you must use the **Download run log** feature to save this information to your computer.
+    If you need to maintain a comprehensive record of all runs performed on your robot, you must use the **Download run log** feature to save this information to your computer.
 
-- **Download image files**: Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.## Recent protocol runs
-
-The robot details page lists up to 20 recent protocol runs. This provides additional information compared to the touchscreen, which only shows the most recent run for each unique protocol.
-
+- **Download image files**: Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.
