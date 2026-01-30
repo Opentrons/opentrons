@@ -1,19 +1,19 @@
 import {
   FLEX_ROBOT_TYPE,
   getAddedMissingThermocyclerFixtures,
+  getCutoutFixturesForModuleModel,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getMainFixtureIdForAA,
   getModuleModelFromFixtureId,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
+  SINGLE_SLOT_FIXTURES,
   STAGING_AREA_FIXTURES,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_FIXTURES,
-  getCutoutFixturesForModuleModel,
-  SINGLE_SLOT_FIXTURES,
 } from '@opentrons/shared-data'
 
 import { deleteModule } from '/protocol-designer/modules'
@@ -175,7 +175,6 @@ const handleDeleteModule = (ctx: ModuleContext): void => {
 
   if (matchingModule == null) return
 
-  
   // Module is in use
   if (moduleId != null && deckConfig != null) {
     setShowDeleteEntityModal({ ids: [moduleId], deckConfig })
@@ -253,34 +252,40 @@ export const updateInitialDeckState = (
 
   console.log('additionalEquipmentOnDeck: ', additionalEquipmentOnDeck)
   allValues.forEach(value => {
-
-    const fixtureName = getMainFixtureIdForAA(
+    const newFixtureName = getMainFixtureIdForAA(
       [value.cutoutFixtureId as CutoutFixtureId],
       [value.addressableAreaId as AddressableAreaName],
       value.cutoutId
     )
 
-    const removing = SINGLE_SLOT_FIXTURES.includes(fixtureName as CutoutFixtureId)
-    const currentDeckConfigItem = deckConfig?.find(config => config.cutoutId === value.cutoutId)
-    console.log('currentDeckConfigItem: ', currentDeckConfigItem)
-    console.log('removing: ', removing)
-    console.log('fixtureName: ', fixtureName)
+    // Determine if we're removing (applying single slot fixture) or adding
+    const removing = SINGLE_SLOT_FIXTURES.includes(
+      newFixtureName as CutoutFixtureId
+    )
+
+    // Get current state at this cutout
+    const currentDeckConfigItem = deckConfig?.find(
+      config => config.cutoutId === value.cutoutId
+    )
+    const currentModuleModel = getModuleModelFromFixtureId(
+      currentDeckConfigItem?.cutoutFixtureId as CutoutFixtureId
+    )
+
+    // Determine if the new fixture is a module
+    const isModuleFixture =
+      getModuleModelFromFixtureId(newFixtureName as CutoutFixtureId) !== null
+
+    // Find matching fixture on deck
     const matchingFixtureOnDeck = Object.values(additionalEquipmentOnDeck).find(
       ae => ae.location === value.cutoutId
     )
-
-    const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
-
-    console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
-    console.log('deckConfig: ', deckConfig)
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module =>
-        getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
-      && getCutoutFixturesForModuleModel(module.model, deckDef).map(cf => cf.id).includes(deckConfig?.find(config => config.cutoutId === value.cutoutId)?.cutoutFixtureId as CutoutFixtureId)
+        getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId &&
+        currentModuleModel === module.model
     )
 
-    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
-
+    const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
     const matching4thColumnLabware =
       matchingFixtureOnDeck?.name === 'stagingArea' && slotName != null
         ? (Object.values(labwareOnDeck).find(lw =>
@@ -298,13 +303,51 @@ export const updateInitialDeckState = (
 
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
 
-    const isModuleFixture =
-      getModuleModelFromFixtureId(fixtureName as CutoutFixtureId) !== null
-    // Handle fixtures
-    if (fixtureName != null && !isModuleFixture) {
+    // Decision logic based on removing flag and fixture type
+    if (removing) {
+      // Removing: delete existing module or fixture
+      if (currentModuleModel != null && matchingModuleOnDeck != null) {
+        // Delete module
+        const moduleCtx: ModuleContext = {
+          value,
+          matchingModule: matchingModuleOnDeck,
+          moduleId,
+          labwareOnDeck,
+          deckConfig,
+          dispatch,
+          setShowDeleteEntityModal,
+          makeSnackbar,
+          t,
+        }
+        handleDeleteModule(moduleCtx)
+      } else if (matchingFixtureOnDeck != null) {
+        // Delete fixture
+        const fixtureCtx: FixtureContext = {
+          value,
+          fixtureName: newFixtureName as CutoutFixtureId,
+          matchingFixture: matchingFixtureOnDeck,
+          matching4thColumnLabware,
+          hasLabwareOnSlot,
+          fixtureIds,
+          fourthColumnSlotLabwareId,
+          deckConfig,
+          dispatch,
+          setShowDeleteEntityModal,
+          setShowDeleteStagingAreaModal,
+          makeSnackbar,
+          t,
+        }
+        handleDeleteFixture(fixtureCtx)
+      }
+      return
+    }
+
+    // Adding: create new module or fixture
+    if (!isModuleFixture && newFixtureName != null) {
+      // Create fixture
       const fixtureCtx: FixtureContext = {
         value,
-        fixtureName,
+        fixtureName: newFixtureName,
         matchingFixture: matchingFixtureOnDeck,
         matching4thColumnLabware,
         hasLabwareOnSlot,
@@ -317,16 +360,11 @@ export const updateInitialDeckState = (
         makeSnackbar,
         t,
       }
-
-      if (matchingFixtureOnDeck != null) {
-        handleDeleteFixture(fixtureCtx)
-      } else {
-        handleCreateFixture(fixtureCtx)
-      }
+      handleCreateFixture(fixtureCtx)
       return
     }
 
-    // Handle modules
+    // Handle modules (isModuleFixture is true at this point)
     const moduleCtx: ModuleContext = {
       value,
       matchingModule: matchingModuleOnDeck,
@@ -339,12 +377,12 @@ export const updateInitialDeckState = (
       t,
     }
 
-    if (isModuleFixture) {
-      if (matchingModuleOnDeck != null) {
-        handleDeleteModule(moduleCtx)
-      } else {
-        handleCreateModule(moduleCtx)
-      }
+    if (matchingModuleOnDeck != null) {
+      // Replace existing module - delete first
+      handleDeleteModule(moduleCtx)
+    } else {
+      // Create new module
+      handleCreateModule(moduleCtx)
     }
   })
 }
