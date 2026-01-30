@@ -52,7 +52,7 @@ Set the language used by the touchscreen to Chinese or English.
 View the status of or set up a Wi-Fi, Ethernet, or USB connection. Multiple connections can be active simultaneously.
 
 !!! Note
-    When first setting up your Flex, connect it to a network switch, hub, or router with an Ethernet cable *before* connecting it to a Wi-Fi network. Making this initial connection via Ethernet cable ensures the robot has a stable internet connection to download any required software or firmware updates. See the [First Run section](../installation/first-run.md#ethernet-recommended-on-first-run) for more information.
+    When first setting up your Flex, connect it to a network switch, hub, or router with an Ethernet cable *before* connecting it to a Wi-Fi network. See the [First Run section](../installation/first-run.md#ethernet-recommended) for more information.
 
 ### Privacy
 
