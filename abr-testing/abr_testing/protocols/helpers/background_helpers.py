@@ -35,4 +35,5 @@ def detect_robot_status(ip: str) -> None:
             slack_bot=slack_bot,
             running_robots=running_robots,
             completed_robots=completed_robots,
+            on_robot=True
         )
