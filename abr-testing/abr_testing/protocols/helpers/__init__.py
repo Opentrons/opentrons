@@ -3,7 +3,7 @@ import os
 import subprocess
 
 """
-Checks if it is inside a "worker" process. Prevents that code block from accidentally getting run 
+Checks if it is inside a "worker" process. Prevents that code block from accidentally getting run
 from inside its sub process
 """
 if not os.environ.get("I'M THE WORKER"):
