@@ -42,7 +42,7 @@ Grant the app security or firewall permissions, if prompted, to make sure it can
 
 ### Ubuntu
 
-The Unbutu version of the Opentrons App is packaged as an AppImage. To use it:
+The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 
 <div class="instruction-list" markdown>
 
