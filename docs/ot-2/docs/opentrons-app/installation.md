@@ -1,12 +1,12 @@
 ---
-title: "Opentrons OT-2: App Installation and Management"
+title: "Opentrons OT-2: Installing the App"
 ---
 
-Start here for step-by-step instructions for downloading, installing, and maintaining the Opentrons App on a computer.
+Start here for step-by-step instructions for downloading, installing, and updating the Opentrons App.
 
 ## App installation { #app-installation-ot2 }
 
-Download the Opentrons App from <https://opentrons.com/ot-app/>. The latest version of the app requires Windows 10, macOS 10.16, or Ubuntu 20.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
+Download the Opentrons App from [opentrons.com/ot-app](https://opentrons.com/ot-app/). The latest version of the app requires Windows 10, macOS 11, or Ubuntu 20.04 or later. The app may run on other Linux distributions, but Opentrons does not officially support them.
 
 ### Windows
 
@@ -16,7 +16,7 @@ The Windows version of the Opentrons App is packaged as an installer. To use it:
 
 1. Open the `.exe` file you downloaded from opentrons.com.
 
-2. Follow the instructions in the installer. You can install the App for a single user or all users of the computer.
+2. Follow the instructions in the installer. You can install the app for a single user or all users of the computer.
 
 </div>
 
@@ -38,11 +38,11 @@ The macOS version of the Opentrons App is packaged as a disk image. To use it:
 
 </div>
 
-Grant the App security or firewall permissions, if prompted, to make sure it can launch and communicate with the OT-2 over your network.
+Grant the app security or firewall permissions, if prompted, to make sure it can launch and communicate with the OT-2 over your network.
 
-Unbuntu
+### Ubuntu
 
-The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
+The Unbutu version of the Opentrons App is packaged as an AppImage. To use it:
 
 <div class="instruction-list" markdown>
 
@@ -57,8 +57,8 @@ The Ubuntu version of the Opentrons App is packaged as an AppImage. To use it:
 </div>
 
 !!! note
-    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with App updates. Opentrons does not support using third-party launchers to control Opentrons robots.
+    Do not use third-party AppImage launchers with the Opentrons App. They may interfere with app updates. Opentrons does not support using third-party launchers to control Opentrons robots.
 
 ## App software updates
 
-The App displays a notification when Opentrons releases new software versions. To update the App, simply click the link to view the update and automatically install the latest version.
+The app displays a notification when Opentrons releases new software versions. To update the app, click the link to view the update and automatically install the latest version.

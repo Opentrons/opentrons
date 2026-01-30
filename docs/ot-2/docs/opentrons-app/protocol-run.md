@@ -17,7 +17,7 @@ After creating and uploading a protocol, it's time to run it on your OT-2. Follo
 
     ![Protocol details showing instruments, offsets, labware, and camera settings](../images/protocol-first-run.png)
 
-6. Click **Start run**. The OT-2 changes its status to "Running" and the app opens the Run Preview. The preview shows each step in your protocol and which step the robot is currently executing. You can also cancel or pause a protocol during a run.
+6. Click **Start run**. The OT-2 changes its status to "Running" and the app opens the **Run Preview** tab. This feature shows each step in your protocol and which step the robot is currently executing. You can also cancel or pause a protocol during a run.
 
     ![Running protocol showing each step](../images/protocol-run-preview.png)
 

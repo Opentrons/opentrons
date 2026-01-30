@@ -26,7 +26,7 @@ The basic protocol screen displays a summary list of all the protocols stored on
   <tbody>
     <tr>
       <td>Sort by</td>
-      <td>Opens a drop-down menu that let's you sort protocols. Options include:
+      <td>Opens a drop-down menu that sorts protocol files. Options include:
         <ul>
             <li><strong>Alphabetical</strong></li>
             <li><strong>Reverse alphabetical</strong></li>
