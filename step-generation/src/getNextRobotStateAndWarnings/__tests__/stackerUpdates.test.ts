@@ -257,7 +257,6 @@ describe('flex stacker state updates forFlexStackerStore', () => {
       'tiprack4Id',
       HOPPER_STACKER_LOCATION,
       FLEX_STACKER_ID,
-      '1',
     ])
   })
 })
