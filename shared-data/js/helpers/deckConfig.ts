@@ -35,7 +35,6 @@ export const getNewConfigForDeckConfig = (
     deckDef.cutoutFixtures.find(cf => cf.id === cutoutFixtureId)
       ?.fixtureGroup ?? {}
 
-  console.log('fixtureGroup: ', fixtureGroup)
   let newDeckConfig = deckConfig
   if (cutoutId in fixtureGroup) {
     // Get the first group which contains all cutoutIds that need to be updated
@@ -87,7 +86,6 @@ export const getNewConfigForDeckConfig = (
         : cutoutConfig
     })
   }
-  console.log('newDeckConfig: ', newDeckConfig)
   return newDeckConfig
 }
 
