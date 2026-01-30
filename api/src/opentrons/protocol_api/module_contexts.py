@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 from typing import Dict, Iterator, List, Mapping, Optional, Sequence, Union, cast
 
-from opentrons.protocol_engine.types.location import AddressableAreaLocation
-from opentrons.types import StagingSlotName
 from opentrons_shared_data.errors.exceptions import CommandPreconditionViolated
 from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.module.types import ModuleModel, ModuleType
@@ -37,12 +35,14 @@ from opentrons.legacy_broker import LegacyBroker
 from opentrons.legacy_commands import module_commands as cmds
 from opentrons.legacy_commands.publisher import CommandPublisher, publish
 from opentrons.protocol_engine.types import ABSMeasureMode
+from opentrons.protocol_engine.types.location import AddressableAreaLocation
 from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
 from opentrons.protocols.api_support.util import (
     APIVersionError,
     UnsupportedAPIError,
     requires_version,
 )
+from opentrons.types import StagingSlotName
 
 from . import validation  # isort: skip  # Imported after other protocol_api imports to avoid circular import
 from .tasks import Task  # isort: skip
@@ -1888,14 +1888,29 @@ class VacuumModuleContext(ModuleContext):
         pick_up_offset: Optional[Mapping[str, float]] = None,
         drop_offset: Optional[Mapping[str, float]] = None,
     ) -> None:
-        pass
+        _pick_up_offset = (
+            validation.ensure_valid_labware_offset_vector(pick_up_offset)
+            if pick_up_offset
+            else None
+        )
+        _drop_offset = (
+            validation.ensure_valid_labware_offset_vector(drop_offset)
+            if drop_offset
+            else None
+        )
+        location = AddressableAreaLocation(addressableAreaName=f"{self.model}DockA4")
+        self._protocol_core.move_labware(
+            labware._core,
+            new_location=location,
+            use_gripper=use_gripper,
+            pause_for_manual_move=True,
+            pick_up_offset=_pick_up_offset,
+            drop_offset=_drop_offset,
+        )
 
     @requires_version(2, 28)
     def start_set_vacuum(
-        self,
-        pressure: float,
-        duration: int,
-        vent_after: bool = False
+        self, pressure: float, duration: int, vent_after: bool = False
     ) -> None:
         """The user commands the mbar of vacuum desired and the time. The user
         has control, via an argument, to automatically vent the vacuum line to

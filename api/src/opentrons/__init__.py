@@ -4,6 +4,8 @@ import re
 from pathlib import Path
 from typing import Any, List, Tuple
 
+from opentrons.hardware_control.modules.types import VacuumModuleModel
+
 from ._version import version
 from opentrons.config import (
     IS_ROBOT,
@@ -137,6 +139,9 @@ async def _create_thread_manager() -> ThreadManagedHardware:
         log.exception("Could not build hardware controller, forcing virtual")
         thread_manager = ThreadManager(HardwareAPI.build_hardware_simulator)
 
+
+    # For SLAS DEMO:
+    await thread_manager.create_simulating_module(VacuumModuleModel.VACUUM_MODULE_V1, "VMA1020250119002")
     return thread_manager
 
 

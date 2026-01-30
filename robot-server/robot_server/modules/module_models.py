@@ -405,6 +405,12 @@ class VacuumModuleData(BaseModel):
         ...,
         description="Overall status of the module.",
     )
+    vacuumState: Optional[str] = Field(
+        ...,
+        description=(
+            "The state of the vacuum and pressure sensors"
+            ),
+        )
     errorDetails: Optional[str] = Field(
         ...,
         description=(

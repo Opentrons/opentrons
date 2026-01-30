@@ -54,7 +54,15 @@ def get_waypoints(
 
     print("ORIGIN: ", origin)
     print("DEST: ", dest)
-    print("OPTS: ", max_travel_z, min_travel_z, move_type, xy_waypoints, origin_cp, dest_cp)
+    print(
+        "OPTS: ",
+        max_travel_z,
+        min_travel_z,
+        move_type,
+        xy_waypoints,
+        origin_cp,
+        dest_cp,
+    )
 
     # a direct move can ignore all arc and waypoint planning
     if move_type == MoveType.DIRECT:

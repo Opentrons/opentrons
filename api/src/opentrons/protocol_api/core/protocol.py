@@ -10,8 +10,6 @@ from opentrons_shared_data.labware.types import LabwareDefinition
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocol_engine.types.location import AddressableAreaLocation
-
 from .._liquid import Liquid, LiquidClass
 from .._types import OffDeckType
 from ..disposal_locations import TrashBin, WasteChute
@@ -22,6 +20,7 @@ from .robot import AbstractRobot
 from .tasks import TaskCoreType
 from opentrons.hardware_control import SyncHardwareAPI
 from opentrons.hardware_control.modules.types import ModuleModel
+from opentrons.protocol_engine.types.location import AddressableAreaLocation
 from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
@@ -91,7 +90,13 @@ class AbstractProtocol(
     def load_adapter(
         self,
         load_name: str,
-        location: Union[DeckSlotName, StagingSlotName, ModuleCoreType, OffDeckType, AddressableAreaLocation],
+        location: Union[
+            DeckSlotName,
+            StagingSlotName,
+            ModuleCoreType,
+            OffDeckType,
+            AddressableAreaLocation,
+        ],
         namespace: Optional[str],
         version: Optional[int],
     ) -> LabwareCoreType:
@@ -116,6 +121,7 @@ class AbstractProtocol(
         new_location: Union[
             DeckSlotName,
             StagingSlotName,
+            AddressableAreaLocation,
             LabwareCoreType,
             ModuleCoreType,
             OffDeckType,

@@ -5,12 +5,12 @@
   "labwareOffset": {
     "x": 0,
     "y": 0,
-    "z": 0
+    "z": 14
   },
   "features": {},
   "dimensions": {
     "bareOverallHeight": 40,
-    "overLabwareHeight": 45,
+    "overLabwareHeight": 0,
     "xDimension": 143,
     "yDimension": 101.5,
     "footprintXDimension": 143,
@@ -27,8 +27,8 @@
       },
       "frontRightTop": {
         "x": 143,
-        "y": 101.5,
-        "z": 38
+        "y": -101.5,
+        "z": 37
       }
     }
   },

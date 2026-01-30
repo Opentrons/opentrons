@@ -204,6 +204,7 @@ class LabwareMovementHandler:
             labware_grip_force = self._state_store.labware.get_grip_force(
                 labware_definition
             )
+            print("GRIP: ", labware_grip_force)
             holding_labware = False
             for waypoint_data in movement_waypoints:
                 if waypoint_data.jaw_open:

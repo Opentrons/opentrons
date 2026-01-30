@@ -850,7 +850,6 @@ class ModuleView:
             expected_name="Flex Stacker",
         )
 
-
     def get_vacuum_module_substate(self, module_id: str) -> VacuumModuleSubState:
         """Return a `VacuumModuleSubState` for the given Vacuum Module.
 
@@ -1485,10 +1484,7 @@ class ModuleView:
         )
         return lid_dock_area
 
-
-    def vacuum_module_dock_location(
-        self, module_id: str
-    ) -> AddressableAreaLocation:
+    def vacuum_module_dock_location(self, module_id: str) -> AddressableAreaLocation:
         """Get the addressable area for the vacuum module dock."""
         reader_slot = self.get_location(module_id)
         lid_doc_slot = get_adjacent_staging_slot(reader_slot.slotName)

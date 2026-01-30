@@ -207,6 +207,7 @@ class ModuleDataMapper:
             module_data = VacuumModuleData(
                 status=VacuumModuleStatus(live_data["status"]),
                 errorDetails=cast(str, live_data["data"].get("errorDetails")),
+                vacuumState=cast(str, live_data["data"].get("vacuumState")),
             )
         else:
             assert False, f"Invalid module type {module_type}"

@@ -120,6 +120,7 @@ class FlexStackerData(TypedDict):
 
 
 class VacuumModuleData(TypedDict):
+    vacuumState: None
     errorDetails: str | None
 
 
@@ -176,8 +177,7 @@ class ModuleDataValidator:
     def is_vacuum_module_data(
         cls, data: ModuleData | None
     ) -> TypeGuard[VacuumModuleData]:
-        # TODO: Change platformState to specific key
-        return data is not None and "platformState" in data.keys()
+        return data is not None and "vacuumState" in data.keys()
 
 
 class LiveData(TypedDict):

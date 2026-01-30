@@ -197,6 +197,8 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         origin_location_sequence = self._state_view.geometry.get_location_sequence(
             params.labwareId
         )
+
+        print("OG_LOC_SEQ: ", origin_location_sequence)
         eventual_destination_location_sequence: LabwareLocationSequence | None = None
 
         if isinstance(params.newLocation, AddressableAreaLocation):
@@ -205,6 +207,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 not fixture_validation.is_gripper_waste_chute(area_name)
                 and not fixture_validation.is_deck_slot(area_name)
                 and not fixture_validation.is_trash(area_name)
+                and not fixture_validation.is_vac_dock(area_name)
             ):
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move {current_labware.loadName} to addressable area {area_name}"
@@ -273,9 +276,7 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
 
         # TODO: Make sure we dont move contained labware
         available_new_location = self._state_view.geometry.ensure_location_not_occupied(
-            params.newLocation,
-            None,
-            current_labware_definition
+            params.newLocation, None, current_labware_definition
         )
 
         # Check that labware and destination do not have labware on top if not contained
@@ -338,9 +339,12 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                     f" gripper movement."
                 )
 
-            if labware_validation.validate_definition_is_adapter(
-                current_labware_definition
-            ) and not current_labware_definition.parameters.isMovableAdapter:
+            if (
+                labware_validation.validate_definition_is_adapter(
+                    current_labware_definition
+                )
+                and not current_labware_definition.parameters.isMovableAdapter
+            ):
                 raise LabwareMovementNotAllowedError(
                     f"Cannot move adapter '{current_labware_definition.parameters.loadName}' with gripper."
                 )
@@ -382,6 +386,11 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 eventual_destination_location_sequence = (
                     immediate_destination_location_sequence
                 )
+
+            print("EV_LOC_SEQ: ", eventual_destination_location_sequence)
+
+            print("CUR_LOC: ", validated_current_loc)
+            print("NEW_LOC: ", validated_new_loc)
 
             try:
                 # Skips gripper moves when using virtual gripper

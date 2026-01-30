@@ -1107,7 +1107,7 @@
     "dimensions": {
         "xDimension": 127.5,
         "yDimension": 85,
-        "zDimension": 38
+        "zDimension": 14.25
     },
     "parameters": {
         "format": "irregular",
@@ -1127,8 +1127,8 @@
         "millipore_vacuum_manifold_collar_tall": {
             "x": 0,
             "y": 0,
-            "z": 37
+            "z": 14.30
         }
     },
-    "gripHeightFromLabwareBottom": 33
+    "gripHeightFromLabwareBottom": 10
 }

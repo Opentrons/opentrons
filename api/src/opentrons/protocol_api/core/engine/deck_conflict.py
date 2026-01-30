@@ -250,7 +250,7 @@ def _map_labware(
         area_name = location_from_engine.addressableAreaName
         # --- NEW LOGIC START ---
         # If this is our custom module dock, it's not a standard deck slot.
-        # We skip standard conflict mapping because the geometry engine 
+        # We skip standard conflict mapping because the geometry engine
         # (which we updated earlier) handles this 1:n space.
         if "VACUUMMODULE" in area_name.upper() and "DOCK" in area_name.upper():
             return None

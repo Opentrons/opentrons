@@ -1,7 +1,7 @@
 """Command side-effect execution logic container."""
 
-import traceback
 import asyncio
+import traceback
 from logging import getLogger
 from typing import List, Optional, Protocol
 

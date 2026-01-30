@@ -398,6 +398,7 @@ class ProtocolCore(
         new_location: Union[
             DeckSlotName,
             StagingSlotName,
+            AddressableAreaLocation,
             LabwareCore,
             ModuleCore,
             NonConnectedModuleCore,
@@ -1245,6 +1246,7 @@ class ProtocolCore(
         location: Union[
             DeckSlotName,
             StagingSlotName,
+            AddressableAreaLocation,
             ModuleCore,
             NonConnectedModuleCore,
             OffDeckType,
@@ -1267,3 +1269,5 @@ class ProtocolCore(
             return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, TrashBin):
             return AddressableAreaLocation(addressableAreaName=location.area_name)
+        elif isinstance(location, AddressableAreaLocation):
+            return location

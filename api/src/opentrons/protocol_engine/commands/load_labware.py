@@ -150,9 +150,7 @@ class LoadLabwareImplementation(
         )
 
         verified_location = self._state_view.geometry.ensure_location_not_occupied(
-            params.location,
-            None,
-            definition
+            params.location, None, definition
         )
         loaded_labware = await self._equipment._load_labware_from_def_and_uri(
             definition, definition_uri, verified_location, params.labwareId, None

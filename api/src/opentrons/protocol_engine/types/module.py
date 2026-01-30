@@ -122,7 +122,7 @@ class ModuleModel(StrEnum):
     @classmethod
     def is_vacuum_module(cls, model: ModuleModel) -> TypeGuard[VacuumModuleModel]:
         """Whether a given model is a Vacuum Module."""
-        return model == cls.VACUUM_MODULE_V1
+        return model in [cls.VACUUM_MODULE_V1]
 
 
 TemperatureModuleModel = Literal[

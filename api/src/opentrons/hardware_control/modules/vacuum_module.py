@@ -167,7 +167,8 @@ class VacuumModule(mod_abc.AbstractModule):
     @staticmethod
     def _model_from_revision(revision: Optional[str]) -> str:
         """Defines the revision -> model mapping"""
-        return "vacuumModuleV1"
+        # TODO: This needs to be addressed
+        return "vacuumModuleMilliporeV1"
 
     def model(self) -> str:
         return self._model_from_revision(self._device_info.get("model"))
@@ -193,6 +194,7 @@ class VacuumModule(mod_abc.AbstractModule):
     @property
     def live_data(self) -> LiveData:
         data: VacuumModuleData = {
+            "vacuumState": None,
             "errorDetails": self._reader.error,
         }
         return {"status": self.status.value, "data": data}
