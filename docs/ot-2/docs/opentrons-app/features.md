@@ -26,7 +26,7 @@ The basic protocol screen displays a summary list of all the protocols stored on
   <tbody>
     <tr>
       <td>Sort by</td>
-      <td>Opens a drop-down menu that let you sort protocols. Options include:
+      <td>Opens a drop-down menu that let's you sort protocols. Options include:
         <ul>
             <li><strong>Alphabetical</strong></li>
             <li><strong>Reverse alphabetical</strong></li>
@@ -71,11 +71,11 @@ Click the **Protocols** tab to return to the default summary list view.
 
 ## Labware tab
 
-This tab stores information about labware found in Labware Library and is reserved for future development. You can also upload custom labware you create and store it in the app here.
+This tab stores information about labware found in the Labware Library and is reserved for future development. You can also upload custom labware you create and store it in the app here.
 
 ## Devices tab
 
-The Devices tab lists all the discoverable Opentrons robots on a network. This means it will show you OT-2 _and_ Flex robots, if you have different models in your lab. The app lists robots alphabetically, by name.
+The Devices tab lists all the discoverable Opentrons robots on a network. This means it will show you OT-2 _and_ Flex robots, if you have different models in your lab. The app lists robots alphabetically by name.
 
 <figure class="screenshot" markdown>
 ![Devices tab showing list of robots](../images/app-devices-tab.png)
@@ -149,7 +149,7 @@ Use the Opentrons App to view the status of modules connected to your OT-2 and c
 <figcaption>Module card for the Temperature Module.</figcaption>
 </figure>
 
-Click the three-dot menu (⋮) on the module card to choose from a menu of commands. You can always choose **About module** to see the module's firmware version and serial number. (This information is very useful when contacting Opentrons Support!) The other commands depend on the type of the module and its current status:
+Click the three-dot menu (⋮) on the module card to choose from a menu of commands. You can always choose **About module** to see the module's firmware version and serial number. (This information is very useful when contacting Opentrons Support!) The other commands depend on the type of module and its current status:
 
 <table>
   <thead>
@@ -202,9 +202,9 @@ Click the three-dot menu (⋮) on the module card to choose from a menu of comma
 
 Every OT-2 comes equipped with a built-in 2-megapixel camera that can capture full HD still images of the deck and working area. When enabled, the camera can take pictures:
 
-- During a protocol that was created using the [`capture_image`](https://docs.opentrons.com/python-api/reference/protocols/#opentrons.protocol_api.ProtocolContext.capture_image) method in the Python API. You cannot add an image step from Protocol Designer. <!--- yes, that's a full url, I know, I know --->
+- During a protocol that was created using the Python API and includes the [`capture_image`](https://docs.opentrons.com/python-api/reference/protocols/#opentrons.protocol_api.ProtocolContext.capture_image) method. You cannot add an image step from Protocol Designer. <!--- yes, that's a full url, I know, I know --->
 
-- When the OT-2 encounters an error
+- When the OT-2 encounters an error.
 
 Due to limits on processing power and memory, the OT-2 cannot live-stream a protocol run.
 
@@ -220,7 +220,7 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 
 - **View protocol run record**: Show the protocol run screen as it appeared when the protocol ended (succeeded, failed, or was canceled), including all performed steps.
 
-- **Rerun protocol now**: The same as choosing Start setup on the corresponding protocol.
+- **Rerun protocol now**: The same as choosing **Start setup** on the corresponding protocol.
 
 - **Download run log**: Save to your computer a JSON file containing information about the protocol run, including all performed steps.
 

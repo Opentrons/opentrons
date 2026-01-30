@@ -27,7 +27,6 @@ nav:
       - App Installation and Management: opentrons-app/installation.md
       - Importing Protocols: opentrons-app/protocol-import.md
       - Running Protocols: opentrons-app/protocol-run.md
-      - Deleting Protocols: opentrons-app/protocol-delete.md
       - App Features Reference: opentrons-app/features.md
   - Maintenance:
       - Maintenance: maintenance/index.md
