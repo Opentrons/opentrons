@@ -257,8 +257,6 @@ export const updateInitialDeckState = (
       [value.addressableAreaId as AddressableAreaName],
       value.cutoutId
     )
-    console.log('newFixtureName', newFixtureName)
-
     // Determine if we're removing (applying single slot fixture) or adding
     const removing = SINGLE_SLOT_FIXTURES.includes(
       newFixtureName as CutoutFixtureId

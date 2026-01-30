@@ -158,11 +158,13 @@ export function useDeckConfigurationEditing(
       cutoutId,
       addressableAreaId
     )
+    console.log('replacementFixtureId: ', replacementFixtureId)
     const aa = getAAWithFakesFromCutoutFixtureId(
       cutoutId,
       replacementFixtureId,
       deckDef
     )
+    console.log('aa: ', aa)
 
     const newDeckConfig = getNewConfigForDeckConfig(
       cutoutId,
