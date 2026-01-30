@@ -30,7 +30,7 @@ Enable additional tools and features designed for developers. Not recommended fo
 
 Batch delete certain types of information from the robot, such as calibrations, run history, or protocols.
 
-### Disable Stacker sensors for labware detection in z- and x-axis
+### Disable Stacker Sensors for Labware Detection
 
 Controls the _Time of Flight_ (ToF) sensor in the Flex Stacker. By default, the ToF sensor detects if labware is loaded in the Stacker before attempting to dispense or store it.
 
