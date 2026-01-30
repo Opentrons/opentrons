@@ -322,7 +322,7 @@ custom_liquid_class_properties = {
                 "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
                 "retract": {
                     "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
-                    "blowout": {"enabled": },
+                    "blowout": {"enabled": False },
                     "delay": {"enabled": False},
                     "end_position": {
                         "offset": {"x": 1, "y": 2, "z": 3},
