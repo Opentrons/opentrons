@@ -240,7 +240,6 @@ export const updateInitialDeckState = (
     handleDeleteStackerLabware,
   } = props
 
-  console.log('values: ', values)
   const {
     additionalEquipmentOnDeck,
     modules: moduleOnDeck,
@@ -251,7 +250,6 @@ export const updateInitialDeckState = (
   // Add missing thermocycler fixtures if needed
   const allValues = getAddedMissingThermocyclerFixtures(values, deckDef)
 
-  console.log('additionalEquipmentOnDeck: ', additionalEquipmentOnDeck)
   allValues.forEach(value => {
     const newFixtureName = getMainFixtureIdForAA(
       [value.cutoutFixtureId as CutoutFixtureId],

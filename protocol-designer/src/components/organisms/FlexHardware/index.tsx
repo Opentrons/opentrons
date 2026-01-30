@@ -70,6 +70,10 @@ export function FlexHardware(): JSX.Element {
     additionalEquipmentOnDeck,
     labware: labwareOnDeck,
   } = initialDeckSetup
+
+  console.log('ae.location === WASTE_CHUTE_CUTOUT: ',     Object.values(additionalEquipmentOnDeck).filter(
+    ae => ae.location === WASTE_CHUTE_CUTOUT
+  ))
   // TODO(tZ, 2026-01-30): refactor this to use cutoutFixtureId
   const hasStagingAreaAndWasteChute =
     Object.values(additionalEquipmentOnDeck).filter(
@@ -94,7 +98,7 @@ export function FlexHardware(): JSX.Element {
       }
       //  the stagingArea + wasteChute combo is added only once through wasteChute
       //  and filtered out the 2nd time for stagingArea here
-      // TODO(tZ, 2026-01-30): refactor this to use cutoutID// TODO(tz, 2026-01-30): fix this as well!// TODO(tZ, 2026-01-30): refactor this to use cutoutFixtureId
+      // TODO(tz, 2026-01-30): fix this as well!// TODO(tZ, 2026-01-30): refactor this to use cutoutFixtureId
       if (
         hasStagingAreaAndWasteChute &&
         fixture.name === 'stagingArea' &&
