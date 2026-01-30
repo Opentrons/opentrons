@@ -145,7 +145,8 @@ def test_flex_stacker(page: Page) -> None:
     protocol_editor.move_labware("D4 Opentrons Flex 96 Tip Rack", "A2")
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("A2 Opentrons Flex 96 Tip Rack", "D4")
-    print("✓ Move labware too and from stacker")
+    print("✓ Move labware to and from stacker")
+
     protocol_editor.add_step("Flex Stacker")
     flex_stacker_page.store_stacker('D4 Flex Stacker')
     plate_reader_page.button_selection("Save")
@@ -159,10 +160,8 @@ def test_flex_stacker(page: Page) -> None:
     plate_reader_page.button_selection("Confirm")
     print("✓ Move lid from tip rack on shuttle to waste chute")
 
-
-    protocol_editor.add_step("Flex Stacker")
-    flex_stacker_page.retrieve_stacker('D4 Flex Stacker')
-    plate_reader_page.button_selection('Save')
+    protocol_editor.add_step("Move")
+    protocol_editor.move_labware("D4 Opentrons Flex 96 Tip Rack", "A2")
     protocol_editor.add_step("Flex Stacker")
     flex_stacker_page.refill_stacker("D4 Flex Stacker", 1, 'Refill message test')
     plate_reader_page.button_selection('Save')
