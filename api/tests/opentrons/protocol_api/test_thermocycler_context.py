@@ -792,7 +792,7 @@ def test_ramp_rate_(
     this_api_version: APIVersion,
     ramp_rate: Optional[float],
 ) -> None:
-    """It should delete the ramp rate argument on pre 2.18 versions."""
+    """It should delete the ramp rate argument on pre 2.28 versions."""
     subject._api_version = this_api_version
     decoy.when(
         mock_validation.ensure_hold_time_seconds(seconds=None, minutes=None)
