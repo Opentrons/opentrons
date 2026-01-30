@@ -74,7 +74,6 @@ export function HardwareConfigurator(
     }
   )
 
-  console.log('modules: ', modules)
   const moduleConfig: CutoutConfigMap[] = Object.values(modules).flatMap(
     (module: FormModule | ModuleExtended): CutoutConfigMap[] => {
       const fixtureModule = getCutoutFixtureIdsForModuleModel(module.model)[0]
@@ -95,7 +94,6 @@ export function HardwareConfigurator(
       return getAddedMissingThermocyclerFixtures([defaultModuleConfig], deckDef)
     }
   )
-  console.log('moduleConfig: ', moduleConfig)
   const additionalEquipmentConfig: DeckConfiguration = Object.values(
     fixtures
   ).map(

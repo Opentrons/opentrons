@@ -271,8 +271,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         ([, module]) => module.cutoutId !== newModule.cutoutId
       )
     )
-    console.log('moduleModel: ', moduleModel)
-    console.log('newModule: ', newModule)
     const isThermocyclerModule = getCutoutFixturesForModuleModel(
       THERMOCYCLER_MODULE_V2,
       deckDef
@@ -294,7 +292,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         cutoutId: isThermocyclerModule ? 'cutoutB1' : newModule.cutoutId,
       },
     }
-    console.log('updatedModules: ', updatedModules)
     setValue?.('modules', updatedModules)
   }
 
@@ -304,14 +301,11 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         ([, fixture]) => fixture.cutoutId !== newFixture.cutoutId
       )
     )
-    console.log('newFixture: ', newFixture)
     const fixtureName = getMainFixtureIdForAA(
       [newFixture.cutoutFixtureId as CutoutFixtureId],
       [newFixture.addressableAreaId as AddressableAreaName],
       newFixture.cutoutId
     )
-
-    console.log('fixtureName: ', fixtureName)
 
     const updatedFixtures: Fixtures = {
       ...filteredFixtures,
@@ -323,7 +317,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         cutoutId: newFixture.cutoutId,
       },
     }
-    console.log('updatedFixtures: ', updatedFixtures)
     setValue?.('fixtures', updatedFixtures)
   }
 
@@ -347,9 +340,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
       )
     })
 
-    console.log('newDeckConfig: ', newDeckConfig)
-    console.log('addedCutoutConfigs: ', addedCutoutConfigs)
-
     // Find and handle new module
     const newModule = addedCutoutConfigs.find(
       cutoutConfig =>
@@ -357,7 +347,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
           cutoutConfig.cutoutFixtureId as CutoutFixtureId
         ) !== null
     )
-    console.log('newModule: ', newModule)
     if (newModule != null) {
       handleAddModule(newModule)
     }
@@ -368,7 +357,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
         cutoutConfig.cutoutFixtureId as CutoutFixtureId
       )
     )
-    console.log('newFixture: ', newFixture)
     if (newFixture != null) {
       handleAddNewFixture(newFixture)
     }
@@ -382,7 +370,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     if (labwareCompatible) {
       dispatch(editDeckConfiguration({ deckConfig: newDeckConfig }))
     }
-    console.log('addedCutoutConfigs: ', addedCutoutConfigs)
     updateInitialDeckState?.(addedCutoutConfigs)
     closeModal()
   }

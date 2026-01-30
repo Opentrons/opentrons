@@ -156,7 +156,6 @@ export function useDeckConfigurationEditing(
       replacementFixtureId,
       deckDef
     )
-    console.log('aa: ', aa)
 
     const newDeckConfig = getNewConfigForDeckConfig(
       cutoutId,
