@@ -22,7 +22,7 @@ def detect_robot_status(ip: str) -> None:
 
     # Process will be constantly running
     while True:
-        time.sleep(320)
+        time.sleep(300)
 
         # Reset running_robot and completed_robot information to prevent possible data corruption
         running_robots: List[str] = []

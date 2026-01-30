@@ -14,7 +14,13 @@ Pattern used:
         ii) True: break out to prevent recursive explosion
 """
 if not os.environ.get("I'M THE WORKER"):
-    env = os.environ.copy()
-    env["I_AM_THE_WORKER"] = "true"
+    # gets this package's directory
+    package_dir = os.path.dirname(os.path.abspath(__file__))
 
-    subprocess.Popen(["bash", "run_background.sh"], env=env)
+    # adds script name to the end
+    script_full_path = os.path.join(package_dir, "run_background.sh")
+
+    env = os.environ.copy()
+    env["I'M THE WORKER"] = "true"
+
+    subprocess.Popen(["bash", script_full_path], env=env)
