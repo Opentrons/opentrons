@@ -40,7 +40,6 @@ def get_current_run_details_from_robot(
     else:
         print_terminal = True
 
-
     robot_name, run_list = get_robot_run_info(ip)
     if len(run_list) > 0:
         most_recent_run = run_list[-1]
@@ -52,36 +51,32 @@ def get_current_run_details_from_robot(
                     and robot_name not in running_robots
                 ):
                     _enable_print_to_terminal(
-                        print_terminal,
-                        f"Run Status of {robot_name}: {run_status}")
+                        print_terminal, f"Run Status of {robot_name}: {run_status}"
+                    )
                     message = f"⚠️ {robot_name} is in error recovery mode ⚠️"
                     slack_bot.send_slack_message(message)
                     completed_robots.append(robot_name)
             elif run_status == "running":
                 _enable_print_to_terminal(
-                    print_terminal,
-                    f"Run Status of {robot_name}: {run_status}")
+                    print_terminal, f"Run Status of {robot_name}: {run_status}"
+                )
                 running_robots.append(robot_name)
             else:
                 _enable_print_to_terminal(
-                    print_terminal,
-                    f"Run Status of {robot_name}: {run_status}")
+                    print_terminal, f"Run Status of {robot_name}: {run_status}"
+                )
                 completed_robots.append(robot_name)
         else:
-            _enable_print_to_terminal(
-                print_terminal,
-                f"No run active on {robot_name}")
+            _enable_print_to_terminal(print_terminal, f"No run active on {robot_name}")
             completed_at = most_recent_run["completedAt"]
             completed_robots.append(robot_name)
             _enable_print_to_terminal(
-                print_terminal,
-                f"Last run completed at {completed_at}")
+                print_terminal, f"Last run completed at {completed_at}"
+            )
     return completed_robots, running_robots
 
-def _enable_print_to_terminal(
-        bool: bool,
-        string: str | None = None
-) -> None:
+
+def _enable_print_to_terminal(bool: bool, string: str | None = None) -> None:
     """Print to terminal if true; Nothing if false."""
     if bool:
         print(string)
