@@ -1,5 +1,6 @@
 import {
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_MODULE_TYPE,
   getAddedMissingThermocyclerFixtures,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
@@ -111,6 +112,10 @@ const handleDeleteFixture = (ctx: FixtureContext): void => {
 
   if (matchingFixture == null) return
 
+  console.log('matchingFixture: ', matchingFixture)
+  console.log('fixtureIds: ', fixtureIds)
+  console.log('matching4thColumnLabware: ', matching4thColumnLabware)
+  console.log('deckConfig: ', deckConfig)
   // Deleting staging area with labware in 4th column slot
   if (
     matchingFixture.name === 'stagingArea' &&
@@ -164,7 +169,10 @@ const handleCreateFixture = (ctx: FixtureContext): void => {
   )
 }
 
-const handleDeleteModule = (ctx: ModuleContext): void => {
+const handleDeleteModule = (
+  ctx: ModuleContext,
+  handleDeleteStackerLabware: (module: ModuleOnDeck) => void
+): void => {
   const {
     matchingModule,
     moduleId,
@@ -183,6 +191,9 @@ const handleDeleteModule = (ctx: ModuleContext): void => {
 
   // Delete module not in use
   dispatch(deleteModule({ moduleId: matchingModule.id }))
+  if (matchingModule.type === FLEX_STACKER_MODULE_TYPE) {
+    handleDeleteStackerLabware(matchingModule)
+  }
   if (deckConfig != null) {
     dispatch(editDeckConfiguration({ deckConfig }))
   }
@@ -279,6 +290,8 @@ export const updateInitialDeckState = (
           ) ?? null)
         : null
 
+        console.log('matching4thColumnLabware: ', matching4thColumnLabware)
+
     const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
       getHardwareInSlotInUse(
         savedSteps,
@@ -302,7 +315,7 @@ export const updateInitialDeckState = (
           makeSnackbar,
           t,
         }
-        handleDeleteModule(moduleCtx)
+        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
       } else if (matchingFixtureOnDeck != null) {
         const fixtureCtx: FixtureContext = {
           value,
@@ -354,7 +367,7 @@ export const updateInitialDeckState = (
     if (!isModuleFixture && newFixtureName != null) {
       // Adding fixture
       if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
-        handleDeleteModule(moduleCtx)
+        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
       } else if (matchingFixtureOnDeck != null) {
         handleDeleteFixture(fixtureCtx)
       } else {
@@ -365,7 +378,7 @@ export const updateInitialDeckState = (
       if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
         handleDeleteFixture(fixtureCtx)
       } else if (matchingModuleOnDeck != null) {
-        handleDeleteModule(moduleCtx)
+        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
       } else {
         handleCreateModule(moduleCtx)
       }

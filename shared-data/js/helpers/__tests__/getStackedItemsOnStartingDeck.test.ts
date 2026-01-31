@@ -54,6 +54,7 @@ vi.mock('../getLabwareDefinitionsByURIForProtocol')
 vi.mock('../getLabwareDefURI')
 vi.mock('../../fixtures')
 vi.mock('../parseAddressableArea')
+vi.mock('../deckConfiguration/getVisualSlotFrom')
 
 const MOCK_LABWARE_DEF = mockDefinition
 const MOCK_ADAPTER_DEF: LabwareDefinition2 = {
