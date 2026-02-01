@@ -6,6 +6,7 @@ import {
   HEATERSHAKER_MODULE_V1,
   MAGNETIC_BLOCK_TYPE,
   MAGNETIC_BLOCK_V1,
+  MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -332,7 +333,7 @@ describe('updateInitialDeckState', () => {
       values: [
         {
           cutoutId: 'cutoutB3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
+          cutoutFixtureId: MAGNETIC_BLOCK_V1_FIXTURE,
           addressableAreaId: 'B4',
         },
       ],
