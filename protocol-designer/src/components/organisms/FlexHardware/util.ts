@@ -273,31 +273,35 @@ export const updateInitialDeckState = (
     const isModuleFixture =
       getModuleModelFromFixtureId(newFixtureName!) !== null
 
-    // Find matching fixtures on deck by cutoutId
-    const matchingFixtureOnDeck = Object.values(additionalEquipmentOnDeck).find(
-      ae => ae.location === value.cutoutId
-    )
+    // Find matching fixtures on deck by cutoutId (could be multiple, e.g., waste chute + staging area)
+    const matchingFixturesOnDeck = Object.values(
+      additionalEquipmentOnDeck
+    ).filter(ae => ae.location === value.cutoutId)
+    // Check if this is a waste chute + staging area combo (multiple fixtures at same cutout)
+    const isWasteChuteStagingAreaCombo = matchingFixturesOnDeck.length > 1
+    const matchingFixtureOnDeck = matchingFixturesOnDeck[0] ?? null
 
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
 
     const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
+    const matchingStagingArea = matchingFixturesOnDeck.find(
+      f => f.name === 'stagingArea'
+    )
     const matching4thColumnLabware =
-      matchingFixtureOnDeck?.name === 'stagingArea' && slotName != null
+      matchingStagingArea != null && slotName != null
         ? (Object.values(labwareOnDeck).find(lw =>
             lw.stack.includes(slotName)
           ) ?? null)
         : null
-
-        console.log('matching4thColumnLabware: ', matching4thColumnLabware)
 
     const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
       getHardwareInSlotInUse(
         savedSteps,
         matching4thColumnLabware,
         matchingModuleOnDeck,
-        matchingFixtureOnDeck != null ? [matchingFixtureOnDeck] : undefined
+        matchingFixturesOnDeck.length > 0 ? matchingFixturesOnDeck : undefined
       )
 
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
@@ -316,23 +320,46 @@ export const updateInitialDeckState = (
           t,
         }
         handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
-      } else if (matchingFixtureOnDeck != null) {
-        const fixtureCtx: FixtureContext = {
-          value,
-          fixtureName: newFixtureName!,
-          matchingFixture: matchingFixtureOnDeck,
-          matching4thColumnLabware,
-          hasLabwareOnSlot,
-          fixtureIds,
-          fourthColumnSlotLabwareId,
-          deckConfig,
-          dispatch,
-          setShowDeleteEntityModal,
-          setShowDeleteStagingAreaModal,
-          makeSnackbar,
-          t,
+      } else if (isWasteChuteStagingAreaCombo) {
+        // If multiple fixtures (waste chute + staging area combo), find the one to delete based on newFixtureName
+        let fixtureToDelete = matchingFixtureOnDeck
+        if (isWasteChuteStagingAreaCombo) {
+          const targetFixtureName = WASTE_CHUTE_FIXTURES.includes(
+            newFixtureName!
+          )
+            ? 'wasteChute'
+            : STAGING_AREA_FIXTURES.includes(newFixtureName!)
+              ? 'stagingArea'
+              : null
+          fixtureToDelete =
+            targetFixtureName != null
+              ? (matchingFixturesOnDeck.find(
+                  f => f.name === targetFixtureName
+                ) ?? matchingFixtureOnDeck)
+              : matchingFixtureOnDeck
         }
-        handleDeleteFixture(fixtureCtx)
+
+        if (fixtureToDelete != null) {
+          const fixtureCtx: FixtureContext = {
+            value,
+            fixtureName: newFixtureName!,
+            matchingFixture: fixtureToDelete,
+            matching4thColumnLabware:
+              fixtureToDelete.name === 'stagingArea'
+                ? matching4thColumnLabware
+                : null,
+            hasLabwareOnSlot,
+            fixtureIds,
+            fourthColumnSlotLabwareId,
+            deckConfig,
+            dispatch,
+            setShowDeleteEntityModal,
+            setShowDeleteStagingAreaModal,
+            makeSnackbar,
+            t,
+          }
+          handleDeleteFixture(fixtureCtx)
+        }
       }
       return
     }
@@ -364,12 +391,35 @@ export const updateInitialDeckState = (
       t,
     }
 
+    console.log('isModuleFixture: ', isModuleFixture)
+    console.log('newFixtureName: ', newFixtureName)
+    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
+    console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
+
     if (!isModuleFixture && newFixtureName != null) {
       // Adding fixture
       if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
         handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
       } else if (matchingFixtureOnDeck != null) {
-        handleDeleteFixture(fixtureCtx)
+        // Check if this is a waste chute + staging area combo case
+        // If adding waste chute to staging area OR adding staging area to waste chute, keep both for combo
+        const isAddingWasteChuteToStagingArea =
+          WASTE_CHUTE_FIXTURES.includes(newFixtureName!) &&
+          matchingFixtureOnDeck.name === 'stagingArea'
+        const isAddingStagingAreaToWasteChute =
+          STAGING_AREA_FIXTURES.includes(newFixtureName!) &&
+          matchingFixtureOnDeck.name === 'wasteChute'
+
+        if (
+          isAddingWasteChuteToStagingArea ||
+          isAddingStagingAreaToWasteChute
+        ) {
+          // Keep existing fixture and create the new one for combo
+          handleCreateFixture(fixtureCtx)
+        } else {
+          // Replace existing fixture
+          handleDeleteFixture(fixtureCtx)
+        }
       } else {
         handleCreateFixture(fixtureCtx)
       }
