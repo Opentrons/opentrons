@@ -470,6 +470,7 @@ export function mergeToComboFixtures(
   const mergedCutoutIds: CutoutId[] = []
   const processedCutoutIds: CutoutId[] = []
 
+  // Process module configs first
   moduleConfig.forEach(mc => {
     // Skip if we've already processed this cutoutId
     if (processedCutoutIds.includes(mc.cutoutId)) return
@@ -498,6 +499,37 @@ export function mergeToComboFixtures(
           addressableAreaId: mc.addressableAreaId,
         })
         mergedCutoutIds.push(mc.cutoutId)
+      }
+    }
+  })
+
+  // Process additional equipment configs to handle fixture-only combos (e.g., waste chute + staging area)
+  additionalEquipmentConfig.forEach(ae => {
+    // Skip if we've already processed this cutoutId
+    if (processedCutoutIds.includes(ae.cutoutId)) return
+    processedCutoutIds.push(ae.cutoutId)
+
+    // Find all fixtures at this cutoutId
+    const fixtureMatches = additionalEquipmentConfig.filter(
+      f => f.cutoutId === ae.cutoutId
+    )
+
+    // Combine all fixture IDs at this cutoutId
+    const allFixtureIds = fixtureMatches.map(f => f.cutoutFixtureId)
+
+    // Only try to find combo if there are multiple fixtures at this cutoutId
+    if (allFixtureIds.length > 1) {
+      const comboFixture = getComboFixtureFromFixtureIds(allFixtureIds)
+      if (comboFixture != null) {
+        comboFixtures.push({
+          cutoutId: ae.cutoutId,
+          cutoutFixtureId: comboFixture,
+          addressableAreaId: ae.cutoutId.replace(
+            'cutout',
+            ''
+          ) as AddressableAreaNamesWithFakes,
+        })
+        mergedCutoutIds.push(ae.cutoutId)
       }
     }
   })

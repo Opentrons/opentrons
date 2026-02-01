@@ -10,9 +10,7 @@ import {
   MAGNETIC_BLOCK_TYPE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
   STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
-  WASTE_CHUTE_CUTOUT,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -77,33 +75,10 @@ export function FlexHardware(): JSX.Element {
 
       if (fixture.name === 'stagingArea') {
         cutoutFixtureId = STAGING_AREA_RIGHT_SLOT_FIXTURE
-        if (
-          Object.values(additionalEquipmentOnDeck).some(
-            ae =>
-              ae.location === WASTE_CHUTE_CUTOUT &&
-              getCutoutIdForSlotName(ae.location, deckDef) ===
-                WASTE_CHUTE_CUTOUT &&
-              ae.name === 'wasteChute'
-          )
-        ) {
-          cutoutFixtureId =
-            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-        }
       } else if (fixture.name === 'wasteChute') {
-        if (
-          Object.values(additionalEquipmentOnDeck).some(
-            ae =>
-              getCutoutIdForSlotName(ae.location, deckDef) ===
-                WASTE_CHUTE_CUTOUT && ae.name === 'stagingArea'
-          )
-        ) {
-          cutoutFixtureId =
-            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-        }
         cutoutFixtureId = WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
       }
 
-      console.log('cutoutFixtureId: ', cutoutFixtureId)
       acc[fixture.id] = {
         cutoutId: fixture.location as CutoutId,
         name: fixture.name as FixtureName,

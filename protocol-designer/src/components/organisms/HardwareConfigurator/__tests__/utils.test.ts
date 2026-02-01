@@ -6,6 +6,7 @@ import {
   FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE,
   MAGNETIC_BLOCK_V1_FIXTURE,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
+  STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
   TEMPERATURE_MODULE_V2_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
@@ -141,21 +142,52 @@ describe('mergeToComboFixtures', () => {
     )
   })
 
-  it('should not merge if there is no additional equipment at the same cutoutId', () => {
+  it('should merge equipment for staging area and waste chute at the same cutoutId', () => {
+    const moduleConfig: CutoutConfigMap[] = []
+    const additionalEquipmentConfig: DeckConfiguration = [
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+      },
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+      },
+    ]
+    const result = mergeToComboFixtures(moduleConfig, additionalEquipmentConfig)
+
+    expect(result.comboFixtures).toHaveLength(1)
+    expect(result.comboFixtures[0].cutoutFixtureId).toEqual(
+      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+    )
+    expect(result.comboFixtures[0].cutoutId).toEqual('cutoutD3')
+    expect(result.remainingModuleConfig).toEqual(moduleConfig)
+    expect(result.remainingAdditionalEquipmentConfig).toEqual([])
+  })
+
+  it('should not merge when no combo fixture exists for the combination', () => {
     const moduleConfig: CutoutConfigMap[] = [
       {
         cutoutId: 'cutoutD3',
-        cutoutFixtureId: FLEX_STACKER_V1_FIXTURE,
-        addressableAreaId: 'flexStackerModuleV1D4',
+        cutoutFixtureId: TEMPERATURE_MODULE_V2_FIXTURE,
+        addressableAreaId: 'temperatureModuleV2D3',
       },
     ]
-    const additionalEquipmentConfig: DeckConfiguration = []
+    const additionalEquipmentConfig: DeckConfiguration = [
+      {
+        cutoutId: 'cutoutD3',
+        cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+      },
+    ]
 
     const result = mergeToComboFixtures(moduleConfig, additionalEquipmentConfig)
 
+    // No combo exists for temp module + staging area
     expect(result.comboFixtures).toEqual([])
     expect(result.remainingModuleConfig).toEqual(moduleConfig)
-    expect(result.remainingAdditionalEquipmentConfig).toEqual([])
+    expect(result.remainingAdditionalEquipmentConfig).toEqual(
+      additionalEquipmentConfig
+    )
   })
 
   it('should not merge when no combo fixture exists for the combination', () => {
