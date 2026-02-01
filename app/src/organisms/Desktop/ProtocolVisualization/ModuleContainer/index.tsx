@@ -47,8 +47,17 @@ export function ModuleContainer({
           })
           break
         case 'profile':
-          // todo(mm, 2025-12-12): As a placeholder, this is showing the block as 'deactivated' when there's a profile ongoing.
-          blockTemperatureText = t('deactivated')
+          const profileElements = currentBlockActivity.profileElements
+          const lastElement = profileElements[profileElements.length - 1]
+
+          const endingTemp =
+            'celsius' in lastElement
+              ? lastElement.celsius
+              : lastElement.steps[lastElement.steps.length - 1]?.celsius
+
+          blockTemperatureText = t('temperature', {
+            temp: endingTemp,
+          })
           break
         case 'blockDeactivated':
           blockTemperatureText = t('idle')
