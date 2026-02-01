@@ -71,49 +71,39 @@ export function FlexHardware(): JSX.Element {
     labware: labwareOnDeck,
   } = initialDeckSetup
 
-  console.log('ae.location === WASTE_CHUTE_CUTOUT: ',     Object.values(additionalEquipmentOnDeck).filter(
-    ae => ae.location === WASTE_CHUTE_CUTOUT
-  ))
-  // TODO(tZ, 2026-01-30): refactor this to use cutoutFixtureId
-  const hasStagingAreaAndWasteChute =
-    Object.values(additionalEquipmentOnDeck).filter(
-      ae => ae.location === WASTE_CHUTE_CUTOUT
-    )?.length === 2
-
   const fixtures: Fixtures = Object.values(additionalEquipmentOnDeck).reduce(
     (acc: Fixtures, fixture) => {
       let cutoutFixtureId: CutoutFixtureId = TRASH_BIN_ADAPTER_FIXTURE
 
-      //  the stagingArea + magneticBlock combo is added to the modules and
-      //  filtered out here
-      if (
-        fixture.name === 'stagingArea' &&
-        Object.values(moduleOnDeck).some(
-          module =>
-            module.type === MAGNETIC_BLOCK_TYPE &&
-            fixture.location.includes(module.slot)
-        )
-      ) {
-        return acc
-      }
-      //  the stagingArea + wasteChute combo is added only once through wasteChute
-      //  and filtered out the 2nd time for stagingArea here
-      // TODO(tz, 2026-01-30): fix this as well!// TODO(tZ, 2026-01-30): refactor this to use cutoutFixtureId
-      if (
-        hasStagingAreaAndWasteChute &&
-        fixture.name === 'stagingArea' &&
-        fixture.location === WASTE_CHUTE_CUTOUT
-      ) {
-        return acc
-      }
-      if (hasStagingAreaAndWasteChute && fixture.name === 'wasteChute') {
-        cutoutFixtureId =
-          STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
-      } else if (fixture.name === 'stagingArea') {
+      if (fixture.name === 'stagingArea') {
         cutoutFixtureId = STAGING_AREA_RIGHT_SLOT_FIXTURE
+        if (
+          Object.values(additionalEquipmentOnDeck).some(
+            ae =>
+              ae.location === WASTE_CHUTE_CUTOUT &&
+              getCutoutIdForSlotName(ae.location, deckDef) ===
+                WASTE_CHUTE_CUTOUT &&
+              ae.name === 'wasteChute'
+          )
+        ) {
+          cutoutFixtureId =
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+        }
       } else if (fixture.name === 'wasteChute') {
+        if (
+          Object.values(additionalEquipmentOnDeck).some(
+            ae =>
+              getCutoutIdForSlotName(ae.location, deckDef) ===
+                WASTE_CHUTE_CUTOUT && ae.name === 'stagingArea'
+          )
+        ) {
+          cutoutFixtureId =
+            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
+        }
         cutoutFixtureId = WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
       }
+
+      console.log('cutoutFixtureId: ', cutoutFixtureId)
       acc[fixture.id] = {
         cutoutId: fixture.location as CutoutId,
         name: fixture.name as FixtureName,
