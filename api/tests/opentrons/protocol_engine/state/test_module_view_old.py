@@ -1695,6 +1695,31 @@ def test_thermocycler_validate_target_lid_temperature(
     assert result == input_temperature
 
 
+def test_thermocycler_validate_ramp_rate(
+    module_view_with_thermocycler: ModuleView,
+) -> None:
+    """It should return a valid target block temperature."""
+    subject = module_view_with_thermocycler.get_thermocycler_module_substate(
+        "module-id"
+    )
+    # Make sure we pass before any block temp is set.
+
+    result = subject.validate_ramp_rate(ramp_rate=1.0, target_temp=100)
+    assert result == 1.0
+
+    # exceeding the max while heating.
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=5.0, target_temp=100)
+
+    # exceeding the max while cooling.
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=3.6, target_temp=0)
+
+    # must be positive.
+    with pytest.raises(errors.InvalidRampRateError):
+        subject.validate_ramp_rate(ramp_rate=-0.1, target_temp=0)
+
+
 @pytest.mark.parametrize("input_temperature", [36.999, 110.001])
 def test_thermocycler_validate_target_lid_temperature_raises(
     module_view_with_thermocycler: ModuleView,

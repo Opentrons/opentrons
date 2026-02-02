@@ -509,7 +509,8 @@ well_plate_3 = protocol.load_labware_from_definition(
       mockModuleEntitiesWithFlexStackerModule,
       mockLabwareEntitiesWithFlexStackerLabware,
       mockLabwareRobotStateWithFlexStackerLabware,
-      mockModuleState
+      mockModuleState,
+      { timeline: [] }
     )
 
     expect(setStoredLabware).toBe(
@@ -557,7 +558,8 @@ flex_stacker_1.set_stored_labware_items(
       mockModuleEntitiesWithFlexStackerModule,
       mockLabwareEntitiesWithFlexStackerLabware,
       mockLabwareRobotStateWithFlexStackerLabware,
-      mockModuleState
+      mockModuleState,
+      { timeline: [] }
     )
 
     expect(setStoredLabware).toBe(
