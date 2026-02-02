@@ -56,6 +56,7 @@ select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D100", "D107", "D402", "D418"]
 
 [tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
 "auth_server/_version.py" = ["I"]
 
 [tool.ruff.lint.isort]
