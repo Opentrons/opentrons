@@ -18,15 +18,8 @@ This manual is organized to help you get started and operate your OT-2 efficient
 
 - **Work with Instruments and modules**: Attaching pipettes and modules to the OT-2 gives it the ability, and flexibility, to handle a range liquid handling tasks. See [OT-2 Pipettes section](./pipettes-ot2.md) and the [OT-2 Modules section](./modules/index.md) for technical specifications and instructions on how to attach these components to your robot.
 
-- **Use labware**: The [Labware section](./labware/index.md) works with labware, both in software and on the robot deck itself.
+- **Use labware**: The [Labware section](./labware/index.md) describes what it is, what's compatible with the OT-2, and how to use it, in the Opentrons App and on the deck.
 
+- **Keep OT-2 running**: Following the procedures in the [Maintenance section](./maintenance/index.md) help ensure that your robot has a long and trouble-free life.
 
-
-
-
-
-- **Pipettes and Modules:** Find out how to attach, calibrate, and use pipettes and on-deck modules.
-- **[Labware](labware/index.md):** Understand labware compatibility and how to use different types in your protocols.
-- **[Software](software.md):** Get acquainted with the Opentrons App and how to control your robot.
-- **[Maintenance](./maintenance/index.md):** Learn how to keep your OT-2 in good working order with routine cleaning and maintenance procedures.
-- **[Safety and Regulatory Information](regulatory.md):** Review important safety guidelines and compliance standards.
+- **And more!**: For other topics, try the [Appendicies section](./support.md).
