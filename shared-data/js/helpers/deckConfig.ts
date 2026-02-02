@@ -37,8 +37,16 @@ export const getNewConfigForDeckConfig = (
 
   let newDeckConfig = deckConfig
   if (cutoutId in fixtureGroup) {
-    // Get the first group which contains all cutoutIds that need to be updated
-    const groupMap = fixtureGroup[cutoutId]?.[0] ?? {}
+    const groupMap =
+      fixtureGroup[cutoutId]?.find(group => {
+        const match = Object.entries(group).some(([cId, cfId]) => {
+          const found = deckConfig.find(
+            config => config.cutoutId === cId && config.cutoutFixtureId === cfId
+          )
+          return !!found
+        })
+        return match
+      }) ?? {}
     const groupCutoutIds = Object.keys(groupMap) as CutoutId[]
 
     // First, update existing entries and filter out duplicates
