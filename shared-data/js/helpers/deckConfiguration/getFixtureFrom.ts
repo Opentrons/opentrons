@@ -89,7 +89,6 @@ export const getReplacementFixtureForFixtureRemoval = (
       cutoutId,
       addressableAreaId
     )
-    console.log('cutoutFixtureReplacment: ', cutoutFixtureReplacment)
     return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
   } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_RIGHT_SLOT_FIXTURE
