@@ -24,7 +24,7 @@ categories.
   - helpers to comment about protocol events
 
 ## background_helpers.py
-Any helper that is called during a protocol and does not block the protocols's execution is housed here. This includes 
+Any helper that is called during a protocol and does not block the protocol's execution is housed here. This includes 
 all features that run in perpetuity (e.g. error recovery detection). `launch_background_tasks()` launches all background 
 tasks by running the `run_background.sh` bash script. This script, in turn, runs all other functions in 
 `background_helpers.py` as background tasks.
