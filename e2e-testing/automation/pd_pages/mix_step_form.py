@@ -59,7 +59,6 @@ class MixStepForm(BasePage):
         if dropdown.count() == 0:
             dropdown = self.page.get_by_test_id("dropdownMenu").first
         self.wait_for_visible(dropdown, timeout=10000)
-        self.highlight_element(dropdown)
         dropdown.click()
         listbox = self.page.locator("div[role='listbox']").last
         self.wait_for_visible(listbox)
@@ -68,7 +67,6 @@ class MixStepForm(BasePage):
             button = buttons.nth(index)
             normalized = " ".join(button.inner_text().split())
             if option_text in normalized:
-                self.highlight_element(button)
                 button.click()
                 return
 
