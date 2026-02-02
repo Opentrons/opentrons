@@ -134,12 +134,25 @@ export function getNextNickname(
     : proposedNickname
 }
 
+// Additional equipment types that are not stored in the labware object
+// and should not be migrated
+const ADDITIONAL_EQUIPMENT_TYPES = ['wasteChute', 'trashBin']
+
 export const getMigratedLabwareId = (
   oldLabwareId: string,
   labware: Labware,
   allLabwareDefs: Record<string, LabwareDefinition2>,
   latestDefs: LabwareDefByDefURI
 ): string => {
+  // Check if this is an additional equipment ID (e.g., waste chute, trash bin)
+  // These are stored in additionalEquipmentOnDeck, not in labware, so return unchanged
+  const isAdditionalEquipment = ADDITIONAL_EQUIPMENT_TYPES.some(type =>
+    oldLabwareId.includes(type)
+  )
+  if (isAdditionalEquipment) {
+    return oldLabwareId
+  }
+
   const defURI = labware[oldLabwareId]?.labwareDefURI
   const loadName = allLabwareDefs[defURI]?.parameters.loadName
   const latestURI = Object.entries(latestDefs).find(
