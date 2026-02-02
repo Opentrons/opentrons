@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { DropdownMenu, Flex, SPACING } from '@opentrons/components'
-import { ALL, COLUMN, ROW, SINGLE } from '@opentrons/shared-data'
+import { ALL, COLUMN, getIsTiprack, ROW, SINGLE } from '@opentrons/shared-data'
 
 import { getEnableAdditionalPartialTipSelection } from '/protocol-designer/feature-flags/selectors'
-import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
+import { getDeckSetupForActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import type { DropdownOption } from '@opentrons/components'
 import type { PipetteV2Specs } from '@opentrons/shared-data'
@@ -25,14 +25,13 @@ export function PartialTipField(props: PartialTipFieldProps): JSX.Element {
     pipetteSpecs,
   } = props
   const { t } = useTranslation('protocol_steps')
-  const deckSetup = useSelector(getInitialDeckSetup)
+  const { labware } = useSelector(getDeckSetupForActiveItem)
   const { channels } = pipetteSpecs
   const enableAdditionalPartialTip = useSelector(
     getEnableAdditionalPartialTipSelection
   )
-  const tipracks = Object.values(deckSetup.labware).filter(
-    labware => labware.def.parameters.isTiprack
-  )
+
+  const tipracks = Object.values(labware).filter(({ def }) => getIsTiprack(def))
   const tipracksNotOnAdapter = tipracks.filter(
     tiprack => tiprack.stack.length === 2
   )
