@@ -146,10 +146,6 @@ In some protocols, your samples might require a slower ramp speed. Use the optio
     )
     ```
 
-    Here, the Thermocycler Module will cool the block to 4 °C at a rate of 1 °C/second. 
-
-    *New in version 2.28*
-
 === "Concurrent"
 
     ```python
@@ -159,9 +155,9 @@ In some protocols, your samples might require a slower ramp speed. Use the optio
     )
     ```
 
-    Here, the Thermocycler Module will cool the block to 4 °C at a rate of 1 °C/second. 
+Here, the Thermocycler Module will cool the block to 4 °C at a rate of 1 °C/second. 
 
-    *New in version 2.28*
+*New in version 2.28*
 
 ### Block max volume
 The Thermocycler's block temperature controller varies its behavior based on the amount of liquid in the wells of its labware. Accurately specifying the liquid volume allows the Thermocycler to more precisely control the temperature of the samples. You should set the `block_max_volume` parameter to the amount of liquid in the *fullest* well, measured in µL. If not specified, the Thermocycler will assume samples of 25 µL.
