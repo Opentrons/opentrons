@@ -25,9 +25,11 @@ def test_96_channel_workflow(page: Page) -> None:
     transfer_page = TransferPage(page)
     # transfer_page.tip_rack_page_1_transfer_select()
     transfer_page.source_labware_select(SOURCE_LABWARE)
+    transfer_page.wells_select("Source", "A1")
     transfer_page.destination_labware_select("Greiner 384 Well Plate 240 µL")
     transfer_page.wells_select("Destination", "A1")
     transfer_page.pipette_path_select("Single transfer")
+
     transfer_page.input_volume("30")
     transfer_page.transfer_continue_to_next_step()
     """

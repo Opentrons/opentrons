@@ -117,19 +117,7 @@ export function FirstStepMoveLiquidTools({
               propsForFields={propsForFields}
               stepType="transfer"
             />
-          </>
-        ) : null}
-        {channels != null && channels !== 1 && completedSteps ? (
-          <>
             <Divider marginY="0" />
-            {!enableAdditionalPartialTip ? (
-              <PartialTipField
-                {...propsForFields.nozzles}
-                pipetteSpecs={
-                  pipettes[String(propsForFields.pipette.value)]?.spec
-                }
-              />
-            ) : null}
 
             <WellSelectionField
               {...propsForFields.aspirate_wells}
@@ -146,6 +134,8 @@ export function FirstStepMoveLiquidTools({
               }
               hasFormError={propsForFields.aspirate_wells.errorToShow != null}
             />
+            <Divider marginY="0" />
+
             <WellSelectionField
               {...propsForFields.dispense_wells}
               labwareId={
@@ -161,6 +151,19 @@ export function FirstStepMoveLiquidTools({
               }
               hasFormError={propsForFields.dispense_wells.errorToShow != null}
             />
+          </>
+        ) : null}
+        {channels != null && channels !== 1 && completedSteps ? (
+          <>
+            <Divider marginY="0" />
+            {!enableAdditionalPartialTip ? (
+              <PartialTipField
+                {...propsForFields.nozzles}
+                pipetteSpecs={
+                  pipettes[String(propsForFields.pipette.value)]?.spec
+                }
+              />
+            ) : null}
           </>
         ) : null}
       </Flex>

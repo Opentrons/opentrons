@@ -114,7 +114,7 @@ class TransferPage(BasePage):
         Args:
             liquid_class: The liquid class to select like "Aqueous", "Viscous", "Volatile", etc.
         """
-        liquid_class_option = self.page.get_by_text(liquid_class)
+        liquid_class_option = self.page.get_by_text(liquid_class, exact=False)
         liquid_class_option.click()
 
     ### Step 3 transfer form Aspiration and Dispense
