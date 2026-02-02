@@ -20,7 +20,10 @@ async def _lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     yield
 
 
-app = FastAPI(title="Opentrons Auth Server", lifespan=_lifespan,)
+app = FastAPI(
+    title="Opentrons Auth Server",
+    lifespan=_lifespan,
+)
 
 app.include_router(oauth2_router)
 app.include_router(users_router)
