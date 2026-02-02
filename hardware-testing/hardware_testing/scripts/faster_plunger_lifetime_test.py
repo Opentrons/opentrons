@@ -352,7 +352,7 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                         await api._backend.set_active_current({Axis.P_L: default_current})
             T11 = time.time()
             T22 = time.time()
-            while T22-T11<=600:
+            for i in range(100):
                 print(f"RUN BLOWOUT time {T22-T11}")
                 for current in sorted(currents, reverse=True):
                     speed = CURRENTS_SPEEDS[current]
@@ -469,6 +469,8 @@ async def main(args: argparse.Namespace, cfg: TestConfig) -> None:
                     )
                     await api._backend.set_active_current({Axis.P_L: default_current})
                     T22 =time.time()
+                    if T22 - T11 >=600:
+                        break
         except Exception as e:
             test_data["error"] = str(e)
             writer.writerow(test_data)
