@@ -31,6 +31,7 @@ interface WellTooltipParams {
 interface WellTooltipProps {
   children: (wellTooltipParams: WellTooltipParams) => ReactNode
   ingredNames: Record<string, string | null>
+  liquidDisplayColors: Record<string, string>
 }
 
 interface TooltipState {
@@ -51,6 +52,7 @@ const initialTooltipState: TooltipState = {
 export function WellTooltip({
   children,
   ingredNames,
+  liquidDisplayColors,
 }: WellTooltipProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const [tooltipState, setTooltipState] =
@@ -61,7 +63,7 @@ export function WellTooltip({
     (e: MouseEvent): void => {
       const target = e.currentTarget as HTMLElement
       const { left, top, height, width } = target.getBoundingClientRect()
-      if (Object.keys(wellIngreds).length > 0) {
+      if (wellIngreds != null && Object.keys(wellIngreds).length > 0) {
         setTooltipState({
           tooltipX: left + width / 2,
           tooltipY: top + height / 3,
@@ -90,7 +92,6 @@ export function WellTooltip({
     0
   )
   const hasMultipleIngreds = Object.keys(tooltipWellIngreds ?? {}).length > 1
-  const liquidDisplayColors: Record<string, string> = {}
 
   return (
     <>
