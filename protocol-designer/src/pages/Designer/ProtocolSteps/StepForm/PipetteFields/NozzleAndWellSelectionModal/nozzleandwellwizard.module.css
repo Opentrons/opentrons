@@ -15,7 +15,7 @@
 
 .header_text_wrapper{
   display: flex;
-  padding: var(--spacing-16) var(--spacing-16) var(--spacing-16)
+  padding: var(--spacing-16) var(--spacing-16) var(--spacing-16);
 }
 
 .row_wrapper{
@@ -30,18 +30,18 @@
 
 .nozzle_selection_text {
   display: flex;
-  gap: var(--spacing-4);
-  padding: 0 var(--spacing-12) 0;
   flex-direction: column;
+  padding: 0 var(--spacing-12) 0;
+  gap: var(--spacing-4);
 }
 
 .nozzle_background_square {
-  background-color: var(--grey-20);
   width: 558px;
   height: 497px;
-  border-radius: var(--border-radius-12);
-  gap: var(--spacing-16);
   padding:  var(--spacing-16) var(--spacing-16)  var(--spacing-16);
+  border-radius: var(--border-radius-12);
+  background-color: var(--grey-20);
+  gap: var(--spacing-16);
 }
 
 .select_well_alignment {
