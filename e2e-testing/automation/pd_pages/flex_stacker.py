@@ -29,16 +29,16 @@ class FlexStackerPage(BasePage):
         """
         self._stacker_select(stacker)
 
-        refill_option = self.page.locator("label").filter(has_text="RefillManually fill the")
+        refill_label = self.page.locator("label").filter(has_text="RefillManually fill the")
+        refill_radio = self.page.locator("input#Refill")
 
-        # Check if Refill is preselected / highlighted - 
-        refill_highlighted = refill_option.to_have_attribute("aria-selected", "true")
-        expect(refill_highlighted)
-        if refill_highlighted == refill_option.to_have_attribute("aria-selected", "false"):
-            refill_option.click()
+        try:
+            expect(refill_radio).to_be_checked()
+        except TimeoutError:
+            refill_label.click()
+            expect(refill_radio).to_be_checked()
 
         spinbutton = self.page.get_by_role("spinbutton")
-        spinbutton.click()
         spinbutton.fill(str(refill_num))
 
         self._message_box(message)
