@@ -24,8 +24,3 @@ app = FastAPI(title="Opentrons Auth Server", lifespan=_lifespan,)
 
 app.include_router(oauth2_router)
 app.include_router(users_router)
-
-# todo(mm, 2026-01-15): Remove this placeholder when this server has any real endpoint.
-@app.get("/auth/hello")
-def get_hello() -> str:  # noqa: D103
-    return "Hello, world."
