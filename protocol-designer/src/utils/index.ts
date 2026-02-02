@@ -436,13 +436,15 @@ export const getFullStackFromLabwaresOnDeck = (
   const slotInStack = onHopper
     ? FAKE_HOPPER_LOCATION_MAP[slot as HopperLocationMapKey]
     : slot
-  return labwareOnDeck
-    .filter(
-      ({ stack }) =>
-        stack.includes(slotInStack as string) &&
-        onHopper === stack.includes(HOPPER_STACKER_LOCATION)
-    )
-    .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack
+  return (
+    labwareOnDeck
+      .filter(
+        ({ stack }) =>
+          stack.includes(slotInStack as string) &&
+          onHopper === stack.includes(HOPPER_STACKER_LOCATION)
+      )
+      .sort((a, b) => b.stack.length - a.stack.length)[0]?.stack ?? []
+  )
 }
 
 export const getModuleIdFromStack = (

@@ -22,6 +22,11 @@ def is_lid_stack(load_name: str) -> bool:
     return load_name == "protocol_engine_lid_stack_object"
 
 
+def is_tiprack_lid(load_name: str) -> bool:
+    """Check if a labware object is a tip rack lid."""
+    return load_name == "opentrons_flex_tiprack_lid"
+
+
 def validate_definition_is_labware(definition: LabwareDefinition) -> bool:
     """Validate that one of the definition's allowed roles is `labware`.
 

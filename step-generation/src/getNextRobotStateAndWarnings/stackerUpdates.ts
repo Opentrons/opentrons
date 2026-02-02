@@ -580,7 +580,6 @@ export const forFlexStackerStore = (
 ): void => {
   const { robotState } = robotStateAndWarnings
   const { moduleId } = params
-  const moduleSlot = robotState.modules[moduleId].slot
   const moduleState = flexStackerStateGetter(robotState, moduleId)
   if (moduleState != null) {
     const { labwareOnShuttle } = moduleState
@@ -603,7 +602,6 @@ export const forFlexStackerStore = (
             labwareId,
             HOPPER_STACKER_LOCATION,
             moduleId,
-            moduleSlot,
           ]
         }
       }

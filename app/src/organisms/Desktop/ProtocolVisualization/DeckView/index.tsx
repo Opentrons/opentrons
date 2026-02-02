@@ -67,6 +67,8 @@ interface DeckViewProps {
   robotType: RobotType
   setSelectedSlot: Dispatch<SetStateAction<string | null>>
   liquids: Liquid[]
+  // filtered commands means we are filtering out the load commands
+  filteredCommands: RunTimeCommand[]
   selectedRunTimeCommand?: RunTimeCommand
 }
 
@@ -83,6 +85,7 @@ export function DeckView(props: DeckViewProps): JSX.Element {
     selectedRunTimeCommand,
     liquids,
     commands,
+    filteredCommands,
   } = props
   const { t } = useTranslation('protocol_visualization')
   const [hoveredSlot, setHoveredSlot] = useState<string | null>(null)
@@ -141,7 +144,9 @@ export function DeckView(props: DeckViewProps): JSX.Element {
 
   const selectedCommandIndex =
     selectedRunTimeCommand != null
-      ? commands.findIndex(command => command.id === selectedRunTimeCommand.id)
+      ? filteredCommands.findIndex(
+          command => command.id === selectedRunTimeCommand.id
+        )
       : 0
 
   return (

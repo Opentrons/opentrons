@@ -179,7 +179,10 @@ export function LabwareSlotContainer(
           </StyledText>
         </div>
         <div className={styles.main_content}>
-          <WellTooltip ingredNames={ingredNames}>
+          <WellTooltip
+            ingredNames={ingredNames}
+            liquidDisplayColors={liquidDisplayColors}
+          >
             {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
               <div className={styles.labware_render_container}>
                 <RobotWorkSpace
@@ -201,7 +204,7 @@ export function LabwareSlotContainer(
                           if (wellContents != null) {
                             makeHandleMouseEnterWell(
                               wellName,
-                              wellContents[wellName]?.ingreds
+                              wellContents[wellName]?.ingreds ?? {}
                             )(event)
                           }
                         }}
