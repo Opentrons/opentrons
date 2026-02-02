@@ -119,10 +119,8 @@ pipette.return_tip()
 
 *New in version 2.0*
 
-!!! note
-    You can't return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). This restriction ensures that the pipette has clear access to unused tips. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is empty.
+Beginning with API version 2.28, you can return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). If you return these tips to their original position in the tip rack, you'll need to consider which tips you plan to pick up and use again. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is completely empty. 
 
-    If you call `return_tip()` while using partial tip pickup, the API will raise an error. Use `drop_tip()` to dispose the tips instead.
 
 ## Working with used tips
 
