@@ -112,10 +112,6 @@ const handleDeleteFixture = (ctx: FixtureContext): void => {
 
   if (matchingFixture == null) return
 
-  console.log('matchingFixture: ', matchingFixture)
-  console.log('fixtureIds: ', fixtureIds)
-  console.log('matching4thColumnLabware: ', matching4thColumnLabware)
-  console.log('deckConfig: ', deckConfig)
   // Deleting staging area with labware in 4th column slot
   if (
     matchingFixture.name === 'stagingArea' &&
@@ -200,7 +196,6 @@ const handleDeleteModule = (
 }
 
 const handleCreateModule = (ctx: ModuleContext): void => {
-  console.log('handleCreateModule: ', ctx)
   const { value, labwareOnDeck, dispatch, makeSnackbar, t } = ctx
 
   const model = getModuleModelFromFixtureId(
@@ -390,11 +385,6 @@ export const updateInitialDeckState = (
       makeSnackbar,
       t,
     }
-
-    console.log('isModuleFixture: ', isModuleFixture)
-    console.log('newFixtureName: ', newFixtureName)
-    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
-    console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
 
     if (!isModuleFixture && newFixtureName != null) {
       // Adding fixture
