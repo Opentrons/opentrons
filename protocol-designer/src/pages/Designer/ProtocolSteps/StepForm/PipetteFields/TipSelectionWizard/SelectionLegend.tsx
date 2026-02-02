@@ -11,6 +11,7 @@ import {
 import styles from './tipselectionwizard.module.css'
 
 import type { SelectionType, TipType, WellType } from '@opentrons/components'
+import type { LabwareDefinition } from '@opentrons/shared-data'
 
 function useLegendItems(
   selectionType: SelectionType
@@ -38,10 +39,12 @@ function useLegendItems(
 
 interface SelectionLegendProps {
   selectionType: SelectionType
+  labwareDefinition: LabwareDefinition
 }
 
 export function SelectionLegend({
   selectionType,
+  labwareDefinition,
 }: SelectionLegendProps): JSX.Element {
   const isTipSelection = selectionType === TIP
   const legendItems = useLegendItems(selectionType)
@@ -51,9 +54,15 @@ export function SelectionLegend({
       {legendItems.map(({ type, label }) => (
         <div key={label} className={styles.tip_select_legend_item}>
           {isTipSelection ? (
-            <TipStatus type={type as TipType} />
+            <TipStatus
+              type={type as TipType}
+              labwareDefinition={labwareDefinition}
+            />
           ) : (
-            <WellStatus type={type as WellType} />
+            <WellStatus
+              type={type as WellType}
+              labwareDefinition={labwareDefinition}
+            />
           )}
 
           <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.grey60}>

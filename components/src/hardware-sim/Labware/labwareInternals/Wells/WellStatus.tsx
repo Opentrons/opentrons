@@ -1,21 +1,35 @@
+import { SelectedItem } from '../SelectedItem'
 import { INACCESSIBLE, SELECTED } from '../Tips/constants'
 import { NoTip } from '../Tips/NoTip'
-import { SelectedTip } from '../Tips/SelectedTip'
 import { UNSELECTED } from './constants'
 
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { WellType } from '../types'
 
 export function WellStatus(props: {
   type: WellType
-  size?: string
+  labwareDefinition: LabwareDefinition
 }): JSX.Element {
-  const { type, size } = props
+  const { type, labwareDefinition } = props
+
   switch (type) {
     case SELECTED:
-      return <SelectedTip size={size} isSelected={true} textInsideTip={''} />
+      return (
+        <SelectedItem
+          labwareDefinition={labwareDefinition}
+          isSelected={true}
+          textInsideTip={''}
+        />
+      )
     case INACCESSIBLE:
-      return <NoTip size={size} />
+      return <NoTip labwareDefinition={labwareDefinition} />
     case UNSELECTED:
-      return <SelectedTip size={size} isSelected={false} textInsideTip={''} />
+      return (
+        <SelectedItem
+          labwareDefinition={labwareDefinition}
+          isSelected={false}
+          textInsideTip={''}
+        />
+      )
   }
 }

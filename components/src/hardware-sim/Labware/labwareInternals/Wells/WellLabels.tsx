@@ -92,7 +92,6 @@ export function WellLabelsComponent(props: WellLabelsProps): JSX.Element {
     props
   const letterColumn = definition.ordering[0] ?? []
   const numberRow = definition.ordering.map(wellCol => wellCol[0])
-
   return (
     <g>
       <Labels

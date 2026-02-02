@@ -313,7 +313,7 @@ export function SelectTips(
           selectedTipsByIndex={selectedWellsByIndex}
           {...(tipState != null
             ? {
-                tipStatusByWellName,
+                statusByWellName: tipStatusByWellName,
               }
             : {})}
           fill={COLORS.white}
@@ -368,7 +368,7 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <SelectionLegend selectionType={TIP} />
+        <SelectionLegend selectionType={TIP} labwareDefinition={labwareDef} />
       </div>
     </div>
   )

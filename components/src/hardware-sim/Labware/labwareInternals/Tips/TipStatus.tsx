@@ -1,3 +1,4 @@
+import { SelectedItem } from '../SelectedItem'
 import {
   INACCESSIBLE,
   NEW,
@@ -10,31 +11,49 @@ import {
 import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
 import { NoTip } from './NoTip'
-import { SelectedTip } from './SelectedTip'
 import { UsedTip } from './UsedTip'
 
+import type { LabwareDefinition } from '@opentrons/shared-data'
 import type { TipType } from '../types'
 
 export function TipStatus(props: {
   type: TipType
+  labwareDefinition: LabwareDefinition
   size?: string
   text?: string
 }): JSX.Element {
-  const { type, size, text } = props
+  const { type, size, text, labwareDefinition } = props
   switch (type) {
     case NEW:
       return <NewTip size={size} />
     case USED:
       return <UsedTip size={size} />
     case SELECTED:
-      return <SelectedTip size={size} textInsideTip={text} />
+      return (
+        <SelectedItem
+          labwareDefinition={labwareDefinition}
+          textInsideTip={text}
+        />
+      )
     case NO:
-      return <NoTip size={size} />
+      return <NoTip labwareDefinition={labwareDefinition} />
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:
-      return <SelectedTip size={size} textInsideTip={text} isUsed />
+      return (
+        <SelectedItem
+          labwareDefinition={labwareDefinition}
+          textInsideTip={text}
+          isUsed
+        />
+      )
     case SELECTED_ERROR:
-      return <SelectedTip size={size} textInsideTip={text} isError />
+      return (
+        <SelectedItem
+          labwareDefinition={labwareDefinition}
+          textInsideTip={text}
+          isError
+        />
+      )
   }
 }

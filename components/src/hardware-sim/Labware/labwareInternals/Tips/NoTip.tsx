@@ -1,13 +1,33 @@
 import { DEFAULT_TIP_SIZE } from './constants'
 
-export function NoTip(props: { size?: string }): JSX.Element {
-  const { size } = props
-  const width = size ?? DEFAULT_TIP_SIZE
-  const height = size ?? DEFAULT_TIP_SIZE
+import type { LabwareDefinition } from '@opentrons/shared-data'
+
+export function NoTip(props: {
+  labwareDefinition: LabwareDefinition
+}): JSX.Element {
+  const { labwareDefinition } = props
+
+  const firstWell = labwareDefinition?.wells
+    ? labwareDefinition.wells.A1
+    : undefined
+
+  const wellWidth =
+    firstWell == null
+      ? DEFAULT_TIP_SIZE
+      : firstWell.shape === 'circular'
+        ? firstWell.diameter
+        : firstWell.xDimension
+
+  const wellHeight =
+    firstWell == null
+      ? DEFAULT_TIP_SIZE
+      : firstWell.shape === 'circular'
+        ? firstWell.diameter
+        : firstWell.yDimension
   return (
     <svg
-      width={width}
-      height={height}
+      width={wellWidth}
+      height={wellHeight}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 20 20"
