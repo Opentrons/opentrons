@@ -36,7 +36,7 @@ from opentrons.types import Point, DeckSlotName, Location
 from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
-metadata = {"protocolName": "Gravimetric QC V2"}
+metadata = {"protocolName": "Gravimetric QC V2 weiye"}
 requirements = {"robotType": "Flex", "apiLevel": "2.27"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
@@ -106,6 +106,7 @@ from hardware_testing.gravimetric.measurement.record import (  # noqa: E402
     GravimetricRecorderConfig,
 )
 from hardware_testing.drivers import asair_sensor as AsairDriver  # noqa: E402
+from hardware_testing.drivers.ImpactProtection import ImpactProtectionSerial
 from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: E402
 from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
     clear_pipette_ul_per_mm,
@@ -177,6 +178,7 @@ class FixtureSettings:
     single_tip_96: bool
     cavity_test: bool
     touch_blank: bool
+    ImpactSerial:ImpactProtectionSerial
 
     @classmethod
     def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
@@ -354,8 +356,15 @@ class FixtureSettings:
             start_graph=False,
         )
         scale_serial = scale.read_serial_number()
+        ImpactSerial = None
         if simulating:
             recorder.set_simulation_mass(10)
+
+
+            ImpactSerial = ImpactProtectionSerial()
+            ImpactSerial.auto_connect()
+
+            
         recorder.record(in_thread=True)
         env_sensor = AsairDriver.BuildAsairSensor(simulating)
         env_serial = env_sensor.get_serial()
@@ -451,6 +460,8 @@ class FixtureSettings:
             single_tip_96=single_tip_96,
             cavity_test=cavity_test,
             touch_blank=touch_blank,
+            ImpactSerial = ImpactSerial
+
         )
 
     def validate_settings(self) -> bool:
@@ -460,6 +471,37 @@ class FixtureSettings:
         # - Tips fit on the given pipette
 
         return True
+
+
+def sync_pipette_by_tip(fixture_settings: FixtureSettings,side, vol):
+    """
+    根据测试的针管规格设置防撞工装
+    """
+    
+    if side == "left":
+        if vol == 1000:
+            fixture_settings.ImpactSerial.set_left_t1000()
+        # elif vol == 200:
+        #     ctx._pipette_serial.set_left_t200()
+        elif vol == 50 or vol == 200 or vol == 20:
+            fixture_settings.ImpactSerial.set_left_t50()
+        # elif vol == 20:
+        #     ctx._pipette_serial.set_left_t20()
+        else:
+            raise ValueError(f"Unsupported volume: {vol}")
+
+    elif side == "right":
+        if vol == 1000:
+            fixture_settings.ImpactSerial.set_right_t1000()
+        # elif vol == 200:
+        #     ctx._pipette_serial.set_right_t200()
+        elif vol == 50 or vol == 200 or vol == 20:
+            fixture_settings.ImpactSerial.set_right_t50()
+        # elif vol == 20:
+        #     ctx._pipette_serial.set_right_t20()
+        else:
+            raise ValueError(f"Unsupported volume: {vol}")
+    print_info("set  pipette_serial_ImpactProtection {vol} ok")
 
 
 def _store_config_as_old_style(fixture_settings: FixtureSettings) -> None:
@@ -1333,19 +1375,25 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         fixture_settings, fixture_settings.tip_sizes[0], True
     )[0]
     print_info("Picking up first tip.")
+    side = fixture_settings.mount.lower()
+    
     _configure_tip_count(fixture_settings, 0)
     pick_up_tip_for_channel(fixture_settings, first_tip, 0)
+    
     last_probed_tip_size = fixture_settings.tip_sizes[0]
+    #开启针管防撞
+    sync_pipette_by_tip(fixture_settings, side, last_probed_tip_size)
     liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
         ctx, fixture_settings, liq, first_tip
     )
     remove_tip(fixture_settings)
-
     measurements: Dict[float, List[List[MeasurementData]]] = {}
     last_measurement = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
+        sync_pipette_by_tip(ctx, side, tip)
+
         if tip != last_probed_tip_size:
             _configure_tip_count(fixture_settings, 0)
             probe_tip = _get_tips_for_test(fixture_settings, tip, False)[0]
@@ -1562,6 +1610,7 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 flag="",
             )
         tip_sizes_done.append(tip)
+        fixture_settings.ImpactSerial.close_all_gratings()
 
 
 def _override_check(
