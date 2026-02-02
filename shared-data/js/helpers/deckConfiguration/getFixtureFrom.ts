@@ -24,6 +24,7 @@ import {
   WASTE_CHUTE_FIXTURES,
   WASTE_CHUTE_FLEX_STACKER_FIXTURES,
   WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  WASTE_CHUTE_STAGING_AREA_FIXTURES,
   WASTE_CHUTE_WITH_FAKE_FIXTURES,
 } from '../../constants'
 import { getAAByAAId, getVisualSlotIdForAA } from '../../fixtures'
@@ -88,6 +89,7 @@ export const getReplacementFixtureForFixtureRemoval = (
       cutoutId,
       addressableAreaId
     )
+    console.log('cutoutFixtureReplacment: ', cutoutFixtureReplacment)
     return getReplacementFixtureForFakeFixture(cutoutFixtureReplacment)
   } else if (SINGLE_RIGHT_CUTOUTS.includes(cutoutId)) {
     return SINGLE_RIGHT_SLOT_FIXTURE
@@ -201,9 +203,16 @@ export const replaceCutoutFixtureForFixtureRemoval = (
   )
   if (WASTE_CHUTE_WITH_FAKE_FIXTURES.includes(cutoutFixtureRemoved)) {
     if (addressableAreaId === DEFAULT_AA_FOR_WASTE_CHUTE) {
-      return WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)
-        ? FLEX_STACKER_V1_FIXTURE
-        : SINGLE_RIGHT_SLOT_FIXTURE
+      if (WASTE_CHUTE_FLEX_STACKER_FIXTURES.includes(cutoutFixtureRemoved)) {
+        return FLEX_STACKER_V1_FIXTURE
+      } else if (
+        WASTE_CHUTE_STAGING_AREA_FIXTURES.includes(
+          cutoutFixtureRemoved as CutoutFixtureId
+        )
+      ) {
+        return STAGING_AREA_RIGHT_SLOT_FIXTURE
+      }
+      return SINGLE_RIGHT_SLOT_FIXTURE
     } else {
       return WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE
     }

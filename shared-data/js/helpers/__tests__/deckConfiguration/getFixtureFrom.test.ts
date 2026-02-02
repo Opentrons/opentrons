@@ -115,6 +115,16 @@ describe('getReplacementFixtureForFixtureRemoval', () => {
 
     expect(result).toEqual(FLEX_STACKER_V1_FIXTURE)
   })
+
+  it('Should return staging area fixture when removing waste chute from staging area + waste chute combo', () => {
+    const result = getReplacementFixtureForFixtureRemoval(
+      STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+      'cutoutD3',
+      '1ChannelWasteChute'
+    )
+
+    expect(result).toEqual(STAGING_AREA_RIGHT_SLOT_FIXTURE)
+  })
 })
 
 describe('getReplacementFixtureForFakeFixture', () => {
