@@ -190,10 +190,21 @@ export function VisualizerContainer(
     srcFileNames,
     analysisOutput
   )
-  const percentComplete =
-    filteredSelectedCommandIndex != null
-      ? (filteredSelectedCommandIndex / filteredCommands.length) * 100
-      : 0
+  const clamp = (n: number, min: number, max: number): number =>
+    Math.min(max, Math.max(min, n))
+  let percentComplete = 0
+
+  if (filteredSelectedCommandIndex == null) {
+    percentComplete = 0
+  } else if (filteredCommands.length <= 1) {
+    percentComplete = 100
+  } else {
+    percentComplete = clamp(
+      (filteredSelectedCommandIndex / (filteredCommands.length - 1)) * 100,
+      0,
+      100
+    )
+  }
 
   const thermocyclerSlots = ['A1', '8', '10', '11']
 
