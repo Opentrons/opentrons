@@ -67,7 +67,7 @@ describe('FileUploadMessagesModal', () => {
     screen.getByText('Error message:')
     screen.getByText('mock error message')
   })
-  it('renders modal for python file missing the DESGINER_APPLICATION blob', () => {
+  it('renders modal for python file missing the DESIGNER_APPLICATION blob', () => {
     vi.mocked(getFileUploadMessages).mockReturnValue({
       isError: true,
       errorType: 'INVALID_PYTHON_FILE',
@@ -91,5 +91,20 @@ describe('FileUploadMessagesModal', () => {
     )
     screen.getByText('Error message:')
     screen.getByText('mock error message')
+  })
+
+  it('renders modal for URL import failure', () => {
+    vi.mocked(getFileUploadMessages).mockReturnValue({
+      isError: true,
+      errorType: 'FAILED_TO_IMPORT_FROM_URL',
+      errorMessage: 'mock url import error',
+    })
+    render()
+    screen.getByText('Unable to import from link')
+    screen.getByText(
+      'Protocol Designer could not download the file from the provided link. Please verify the link is valid, not expired, and allows cross-origin downloads (CORS).'
+    )
+    screen.getByText('Error message:')
+    screen.getByText('mock url import error')
   })
 })

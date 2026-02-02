@@ -37,31 +37,33 @@ export const loadFileAction = (
   type: 'LOAD_FILE',
   payload: migration(payload),
 })
-// load file thunk, handles file loading errors
-export const loadProtocolFile =
-  (event: SyntheticEvent<HTMLInputElement>): ThunkAction<any> =>
-  (dispatch: ThunkDispatch<any>, getState: GetState) => {
-    const fileError = (
-      errorType: FileUploadErrorType,
-      errorMessage?: string
-    ): void =>
-      dispatch(
-        fileUploadMessage({
-          isError: true,
-          errorType,
-          errorMessage,
-        })
-      )
 
-    // @ts-expect-error need null checking
-    const file = event.currentTarget.files[0]
+const dispatchFileError = (
+  dispatch: ThunkDispatch<any>,
+  errorType: FileUploadErrorType,
+  errorMessage?: string
+): void => {
+  dispatch(
+    fileUploadMessage({
+      isError: true,
+      errorType,
+      errorMessage,
+    })
+  )
+}
+
+// Load protocol file thunk from a File object.
+// This is shared between the file-input workflow and URL-based import.
+export const loadProtocolFileFromFile = (file: File): ThunkAction<any> =>
+  (dispatch: ThunkDispatch<any>) => {
     const reader = new FileReader()
-    // reset the state of the input to allow file re-uploads
-    event.currentTarget.value = ''
 
     if (!file.name.endsWith('.json') && !file.name.endsWith('.py')) {
-      fileError('INVALID_FILE_TYPE')
-    } else if (file.name.endsWith('.json')) {
+      dispatchFileError(dispatch, 'INVALID_FILE_TYPE')
+      return
+    }
+
+    if (file.name.endsWith('.json')) {
       reader.onload = readEvent => {
         const result = (readEvent.currentTarget as any as FileReader).result
         let parsedProtocol: PDProtocolFile | null | undefined
@@ -73,62 +75,74 @@ export const loadProtocolFile =
         } catch (error) {
           console.error(error)
           if (error instanceof Error) {
-            fileError('INVALID_JSON_FILE', error.message)
+            dispatchFileError(dispatch, 'INVALID_JSON_FILE', error.message)
           }
         }
       }
 
       reader.readAsText(file)
-    } else {
-      reader.onload = readEvent => {
-        const result = (readEvent.currentTarget as FileReader).result as string
+      return
+    }
 
-        try {
-          // Extract designer application blob
-          const designerApplication = result.match(
-            /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/m
+    reader.onload = readEvent => {
+      const result = (readEvent.currentTarget as FileReader).result as string
+
+      try {
+        // Extract designer application blob
+        const designerApplication = result.match(
+          /^DESIGNER_APPLICATION\s?=\s?"""(.*)"""/m
+        )
+        if (designerApplication != null && designerApplication[1]) {
+          const designerApplicationString = designerApplication[1]
+          const designerApplicationJson = JSON.parse(designerApplicationString) // Convert to JSON
+
+          const customLabwareRegex = new RegExp(
+            `^${CUSTOM_LABWARE_DICT_NAME}\\s*=\\s*json.loads\\("""(.*)"""\\)` ,
+            'm'
           )
-          if (designerApplication != null && designerApplication[1]) {
-            const designerApplicationString = designerApplication[1]
-            const designerApplicationJson = JSON.parse(
-              designerApplicationString
-            ) // Convert to JSON
-
-            const customLabwareRegex = new RegExp(
-              `^${CUSTOM_LABWARE_DICT_NAME}\\s*=\\s*json.loads\\("""(.*)"""\\)`,
-              'm'
-            )
-            const customLabware = result.match(customLabwareRegex)
-            let customLabwareJson
-            if (customLabware != null && customLabware[1]) {
-              const customLabwareString = customLabware[1]
-              customLabwareJson = JSON.parse(customLabwareString)
-            }
-            dispatch(
-              loadFileAction(
-                (customLabwareJson != null
-                  ? {
-                      ...designerApplicationJson,
-                      //  NOTE: labwareDefinitions contain custom labware only
-                      //  other labwareDefinitions are populated via mapping through
-                      //  the labware key in the labwareInvariantProperties reducer
-                      labwareDefinitions: customLabwareJson,
-                    }
-                  : designerApplicationJson) as PythonDesignerApplication
-              )
-            )
-          } else {
-            fileError('INVALID_PYTHON_FILE')
+          const customLabware = result.match(customLabwareRegex)
+          let customLabwareJson
+          if (customLabware != null && customLabware[1]) {
+            const customLabwareString = customLabware[1]
+            customLabwareJson = JSON.parse(customLabwareString)
           }
-        } catch (error) {
-          console.error('Error extracting blob:', error)
-          if (error instanceof Error) {
-            fileError('INVALID_PYTHON_FILE', error.message)
-          }
+          dispatch(
+            loadFileAction(
+              (customLabwareJson != null
+                ? {
+                    ...designerApplicationJson,
+                    //  NOTE: labwareDefinitions contain custom labware only
+                    //  other labwareDefinitions are populated via mapping through
+                    //  the labware key in the labwareInvariantProperties reducer
+                    labwareDefinitions: customLabwareJson,
+                  }
+                : designerApplicationJson) as PythonDesignerApplication
+            )
+          )
+        } else {
+          dispatchFileError(dispatch, 'INVALID_PYTHON_FILE')
+        }
+      } catch (error) {
+        console.error('Error extracting blob:', error)
+        if (error instanceof Error) {
+          dispatchFileError(dispatch, 'INVALID_PYTHON_FILE', error.message)
         }
       }
+    }
 
-      reader.readAsText(file)
+    reader.readAsText(file)
+  }
+// load file thunk, handles file loading errors
+export const loadProtocolFile =
+  (event: SyntheticEvent<HTMLInputElement>): ThunkAction<any> =>
+  (dispatch: ThunkDispatch<any>, getState: GetState) => {
+    // @ts-expect-error need null checking
+    const file = event.currentTarget.files[0]
+    // reset the state of the input to allow file re-uploads
+    event.currentTarget.value = ''
+
+    if (file != null) {
+      dispatch(loadProtocolFileFromFile(file))
     }
   }
 export interface UndoLoadFile {

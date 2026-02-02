@@ -56,7 +56,7 @@ const invalidJsonModal = (props: InvalidModalProps): ModalContents => {
         <Flex
           flexDirection={DIRECTION_COLUMN}
           gridGap={SPACING.spacing4}
-          marginTop={SPACING.spacing8}
+          paddingTop={SPACING.spacing8}
         >
           <StyledText desktopStyle="bodyDefaultSemiBold">
             {t('invalid_file_error')}
@@ -65,6 +65,37 @@ const invalidJsonModal = (props: InvalidModalProps): ModalContents => {
             {errorMessage}
           </StyledText>
         </Flex>
+      </Flex>
+    ),
+  }
+}
+
+const importFromUrlErrorModal = (props: {
+  t: any
+  errorMessage?: string | null
+}): ModalContents => {
+  const { t, errorMessage } = props
+  return {
+    title: t('import_url_error_header'),
+    body: (
+      <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing4}>
+        <StyledText desktopStyle="bodyDefaultRegular">
+          {t('import_url_error_body')}
+        </StyledText>
+        {errorMessage != null ? (
+          <Flex
+            flexDirection={DIRECTION_COLUMN}
+            gridGap={SPACING.spacing4}
+            paddingTop={SPACING.spacing8}
+          >
+            <StyledText desktopStyle="bodyDefaultSemiBold">
+              {t('invalid_file_error')}
+            </StyledText>
+            <StyledText desktopStyle="bodyDefaultRegular" color={COLORS.red50}>
+              {errorMessage}
+            </StyledText>
+          </Flex>
+        ) : null}
       </Flex>
     ),
   }
@@ -107,6 +138,11 @@ export function useFileUploadModalContents(
           type: 'general',
           t,
         })
+      case 'FAILED_TO_IMPORT_FROM_URL':
+        return importFromUrlErrorModal({
+          errorMessage: uploadResponse.errorMessage,
+          t,
+        })
       case 'INVALID_PYTHON_FILE':
         if (uploadResponse.errorMessage != null) {
           return invalidJsonModal({
@@ -129,10 +165,8 @@ export function useFileUploadModalContents(
         t,
       })
     default: {
-      console.assert(
-        false,
-        `invalid messageKey ${uploadResponse.messageKey} specified for modal`
-      )
+      const messageKey = String((uploadResponse as any).messageKey)
+      console.assert(false, `invalid messageKey ${messageKey} specified for modal`)
       return { title: '', body: uploadResponse.messageKey }
     }
   }

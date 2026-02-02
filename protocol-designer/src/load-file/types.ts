@@ -5,6 +5,7 @@ export type FileUploadErrorType =
   | 'INVALID_FILE_TYPE'
   | 'INVALID_JSON_FILE'
   | 'INVALID_PYTHON_FILE'
+  | 'FAILED_TO_IMPORT_FROM_URL'
 export type FileUploadMessageKey = 'DID_MIGRATE'
 export type FileUploadMessage =
   | {

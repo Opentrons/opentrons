@@ -44,6 +44,8 @@
   "hints": "Hints",
   "import_existing_protocol": "Import existing protocol",
   "import": "Import",
+  "import_url_error_header": "Unable to import from link",
+  "import_url_error_body": "Protocol Designer could not download the file from the provided link. Please verify the link is valid, not expired, and allows cross-origin downloads (CORS).",
   "incorrect_file_header": "Invalid file type",
   "incorrect_file_type_body": "Protocol Designer only accepts JSON and Python protocol files created with Protocol Designer. Upload a valid file to continue.",
   "incorrect_python_file_header": "Unable to import",

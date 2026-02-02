@@ -11,6 +11,7 @@ import {
   LabwareUploadModal,
   Navigation,
 } from './components/organisms'
+import { useImportProtocolFromUrl } from './load-file/useImportProtocolFromUrl'
 import {
   Designer,
   Hardware,
@@ -64,6 +65,8 @@ const pdRoutes: RouteProps[] = [
 ]
 
 export function ProtocolRoutes(): JSX.Element {
+  useImportProtocolFromUrl()
+
   const landingPage: RouteProps = {
     Component: Landing,
     name: 'Landing',
