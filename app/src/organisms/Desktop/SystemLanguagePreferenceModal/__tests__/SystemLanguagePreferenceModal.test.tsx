@@ -63,7 +63,7 @@ describe('SystemLanguagePreferenceModal', () => {
 
     screen.getByText('Language preference')
     screen.getByText(
-      'The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.'
+      'The Opentrons OT-2 App matches your system language unless you select another language below. You can change the language later in the app settings.'
     )
     const primaryButton = screen.getByRole('button', {
       name: 'Continue',
@@ -96,7 +96,7 @@ describe('SystemLanguagePreferenceModal', () => {
 
     screen.getByText('Language preference')
     screen.getByText(
-      'The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.'
+      'The Opentrons OT-2 App matches your system language unless you select another language below. You can change the language later in the app settings.'
     )
     const primaryButton = screen.getByRole('button', {
       name: 'Continue',
@@ -126,7 +126,7 @@ describe('SystemLanguagePreferenceModal', () => {
 
     screen.getByText('Language preference')
     screen.getByText(
-      'The Opentrons App matches your system language unless you select another language below. You can change the language later in the app settings.'
+      'The Opentrons OT-2 App matches your system language unless you select another language below. You can change the language later in the app settings.'
     )
     const primaryButton = screen.getByRole('button', {
       name: 'Continue',
@@ -155,7 +155,7 @@ describe('SystemLanguagePreferenceModal', () => {
 
     screen.getByText('Update to your system language preferences')
     screen.getByText(
-      'Your system’s language was recently updated. Would you like to use the updated language as the default for the Opentrons App?'
+      'Your system’s language was recently updated. Would you like to use the updated language as the default for the Opentrons OT-2 App?'
     )
     const secondaryButton = screen.getByRole('button', { name: 'Don’t change' })
     const primaryButton = screen.getByRole('button', {

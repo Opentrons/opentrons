@@ -288,8 +288,8 @@ jobs:
       # Do the frontend dist bundle
       - name: 'bundle ${{matrix.variant}} frontend'
         env:
-          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
-          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          OT_OT2_APP_MIXPANEL_ID: ${{ secrets.OT_OT2_APP_MIXPANEL_ID }}
+          OT_OT2_APP_INTERCOM_ID: ${{ secrets.OT_OT2_APP_INTERCOM_ID }}
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
           OT_BUILD_TARGET: ${{ matrix.target }}
           OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
@@ -302,8 +302,8 @@ jobs:
         if: matrix.target == 'desktop'
         timeout-minutes: 60
         env:
-          OT_APP_MIXPANEL_ID: ${{ secrets.OT_APP_MIXPANEL_ID }}
-          OT_APP_INTERCOM_ID: ${{ secrets.OT_APP_INTERCOM_ID }}
+          OT_OT2_APP_MIXPANEL_ID: ${{ secrets.OT_OT2_APP_MIXPANEL_ID }}
+          OT_OT2_APP_INTERCOM_ID: ${{ secrets.OT_OT2_APP_INTERCOM_ID }}
           WINDOWS_SIGN: ${{ format('{0}', contains(needs.determine-build-type.outputs.type, 'release')) }}
           SM_CODE_SIGNING_CERT_SHA1_HASH: ${{secrets.SM_CODE_SIGNING_CERT_SHA1_HASH_V3}}
           SM_KEYPAIR_ALIAS: ${{secrets.SM_KEYPAIR_ALIAS_V3}}
@@ -312,15 +312,15 @@ jobs:
           SM_CLIENT_CERT_PASSWORD: ${{secrets.SM_CLIENT_CERT_PASSWORD_V2}}
           SM_API_KEY: ${{secrets.SM_API_KEY_V2}}
           WINDOWS_CSC_FILEPATH: "D:\\opentrons_labworks_inc.crt"
-          CSC_LINK: ${{ secrets.OT_APP_CSC_MACOS_V2 }}
-          CSC_KEY_PASSWORD: ${{ secrets.OT_APP_CSC_KEY_MACOS_V2 }}
-          APPLE_ID: ${{ secrets.OT_APP_APPLE_ID_V2 }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_APP_APPLE_ID_PASSWORD_V2 }}
-          APPLE_TEAM_ID: ${{ secrets.OT_APP_APPLE_TEAM_ID_V2 }}
+          CSC_LINK: ${{ secrets.OT_OT2_APP_CSC_MACOS_V2 }}
+          CSC_KEY_PASSWORD: ${{ secrets.OT_OT2_APP_CSC_KEY_MACOS_V2 }}
+          APPLE_ID: ${{ secrets.OT_OT2_APP_APPLE_ID_V2 }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.OT_OT2_APP_APPLE_ID_PASSWORD_V2 }}
+          APPLE_TEAM_ID: ${{ secrets.OT_OT2_APP_APPLE_TEAM_ID_V2 }}
           HOST_PYTHON: python
           OPENTRONS_PROJECT: ${{ steps.project.outputs.project }}
-          OT_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
-          OT_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
+          OT_OT2_APP_DEPLOY_BUCKET: ${{ steps.project.outputs.bucket }}
+          OT_OT2_APP_DEPLOY_FOLDER: ${{ steps.project.outputs.folder }}
           OT_BUILD_TARGET: ${{ matrix.target }}
           OT_SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           OT_SENTRY_DSN: ${{ secrets.OT_DESKTOP_SENTRY_DSN }}
@@ -374,7 +374,7 @@ jobs:
           aws configure set region us-east-2 --profile identity
           aws configure set output json --profile identity
           aws configure set region us-east-2 --profile deploy
-          aws configure set role_arn ${{ secrets.OT_APP_OT3_DEPLOY_ROLE }} --profile deploy
+          aws configure set role_arn ${{ secrets.OT_OT2_APP_OT3_DEPLOY_ROLE }} --profile deploy
           aws configure set source_profile identity --profile deploy
         shell: bash
       - name: 'deploy release builds to s3'
@@ -439,7 +439,7 @@ jobs:
         with:
           payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons-ot2/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-internal-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-internal-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-internal-release}}"}'
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.OT_OT2_APP_OT3_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_OT3}}/${{env._APP_DEPLOY_FOLDER_OT3}}
       - name: 'slack notify release'
         uses: slackapi/slack-github-action@v1.14.0
@@ -448,7 +448,7 @@ jobs:
         with:
           payload: '{"branch_or_tag":"${{ github.ref_name }}","build_type":"${{ needs.determine-build-type.outputs.type }}", "gh_linkback":"https://github.com/Opentrons/opentrons-ot2/tree/${{ github.ref_name }}", "windows_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.windows-release}}", "mac_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.mac-release}}", "linux_build":"${{ env._ACCESS_URL }}/${{steps.names.outputs.linux-release}}"}'
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.OT_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.OT_OT2_APP_ROBOTSTACK_SLACK_NOTIFICATION_WEBHOOK_URL }}
           _ACCESS_URL: https://${{env._APP_DEPLOY_BUCKET_ROBOTSTACK}}/${{env._APP_DEPLOY_FOLDER_ROBOTSTACK}}
 
       - name: 'backup upload folders before checkout'
@@ -504,7 +504,7 @@ jobs:
         with:
           status: 'success'
           workflow_name: 'App test, build, and deploy'
-          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          webhook_url: ${{ secrets.OT_OT2_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-failure:
     name: 'Notify Build Failure'
@@ -549,7 +549,7 @@ jobs:
           status: 'failure'
           workflow_name: 'App test, build, and deploy'
           failed_jobs: ${{ steps.failed-jobs.outputs.failed_jobs }}
-          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          webhook_url: ${{ secrets.OT_OT2_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
 
   notify-cancelled:
     name: 'Notify Build Cancelled'
@@ -572,4 +572,4 @@ jobs:
         with:
           status: 'cancelled'
           workflow_name: 'App test, build, and deploy'
-          webhook_url: ${{ secrets.OT_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}
+          webhook_url: ${{ secrets.OT_OT2_APP_RELEASE_SLACK_NOTIFICATION_WEBHOOK_URL }}

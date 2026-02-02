@@ -74,7 +74,7 @@ describe('UpdateAppModal', () => {
   it('renders update available title and release notes when update is available', () => {
     render(props)
     expect(
-      screen.getByText('Opentrons App Update Available')
+      screen.getByText('Opentrons OT-2 App Update Available')
     ).toBeInTheDocument()
     expect(screen.getByText('this is a release')).toBeInTheDocument()
   })

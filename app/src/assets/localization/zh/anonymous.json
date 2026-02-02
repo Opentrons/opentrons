@@ -91,7 +91,7 @@
   "store_labware_from_slot_to_stacker": "将 {{primaryDefinitionDisplayName}} 从 {{slotName}} 存入设备的外置堆栈",
   "system_language_preferences_update_description": "您系统的语言最近已更新。您想使用更新后的语言作为应用的默认语言吗？",
   "these_are_advanced_settings": "<block>这些是高级设置。请勿在没有支持团队帮助的情况下尝试调整这些设置。更改这些设置可能会影响您的移液器寿命。</block><block>这些设置不会覆盖协议中定义的任何移液器设置。</block>",
-  "u2e_driver_description": "OT-2 通过此适配器，使用 USB 连接 Opentrons APP。",
+  "u2e_driver_description": "OT-2 通过此适配器，使用 USB 连接 Opentrons OT-2 APP。",
   "unexpected_error": "发生意外错误。",
   "update_requires_restarting_app": "更新需要重新启动应用程序。",
   "update_robot_software_description": "绕过自动更新过程并手动更新工作站软件",

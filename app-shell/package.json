@@ -1,9 +1,9 @@
 {
   "name": "@opentrons/app-shell",
   "private": true,
-  "productName": "Opentrons",
+  "productName": "Opentrons OT-2",
   "version": "0.0.0-dev",
-  "description": "Opentrons desktop application",
+  "description": "Opentrons OT-2 desktop application",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
   "scripts": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Opentrons/opentrons.git"
+    "url": "https://github.com/Opentrons/opentrons-ot2.git"
   },
   "author": {
     "name": "Opentrons Labworks",
@@ -20,9 +20,9 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Opentrons/opentrons/issues"
+    "url": "https://github.com/Opentrons/opentrons-ot2/issues"
   },
-  "homepage": "https://github.com/Opentrons/opentrons",
+  "homepage": "https://github.com/Opentrons/opentrons-ot2",
   "workspaces": {
     "nohoist": ["**"]
   },

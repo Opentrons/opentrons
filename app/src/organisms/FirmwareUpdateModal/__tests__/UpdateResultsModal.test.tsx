@@ -52,7 +52,7 @@ describe('UpdateResultsModal', () => {
     render(props)
     screen.getByText('Update failed')
     screen.getByText(
-      'Download the robot logs from the Opentrons App and send them to support@opentrons.com for assistance.'
+      'Download the robot logs from the Opentrons OT-2 App and send them to support@opentrons.com for assistance.'
     )
   })
 })

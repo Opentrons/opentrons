@@ -76,7 +76,9 @@ export default defineConfig(async (): Promise<UserConfig> => {
       _OPENTRONS_PROJECT_: JSON.stringify(project),
       _OT_SENTRY_DSN_: JSON.stringify(process.env.OT_SENTRY_DSN),
       _NODE_ENV_: JSON.stringify(process.env.NODE_ENV),
-      _OT_APP_MIXPANEL_ID_: JSON.stringify(process.env.OT_APP_MIXPANEL_ID),
+      _OT_OT2_APP_MIXPANEL_ID_: JSON.stringify(
+        process.env.OT_OT2_APP_MIXPANEL_ID
+      ),
       // _OT_LL_ variables because app/ imports files directly from labware-library/,
       // causing them to be processed in the context of this Vite config instead of
       // labware-library's Vite config.

@@ -52,7 +52,7 @@ describe('ConnectViaUSB', () => {
     getByLabelText('Connect_via_usb_back_button')
     getByText('1. Connect the USB A-to-B cable to the robot’s USB-B port.')
     getByText('2. Connect the cable to an open USB port on your computer.')
-    getByText('3. Launch the Opentrons App on the computer to continue.')
+    getByText('3. Launch the Opentrons OT-2 App on the computer to continue.')
   })
 
   it('should call a mock function when tapping back button', () => {
@@ -69,7 +69,7 @@ describe('ConnectViaUSB', () => {
     getByText('USB')
     getByText('Successfully connected!')
     getByText(
-      'Find your robot in the Opentrons App to install software updates.'
+      'Find your robot in the Opentrons OT-2 App to install software updates.'
     )
     getByText('Continue')
   })

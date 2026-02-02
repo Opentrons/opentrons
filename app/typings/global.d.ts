@@ -12,5 +12,5 @@ declare const global: typeof globalThis & {
 declare const _PKG_VERSION_: string
 declare const _OPENTRONS_PROJECT_: string
 declare const _NODE_ENV_: string | undefined
-declare const _OT_APP_MIXPANEL_ID_: string | undefined
+declare const _OT_OT2_APP_MIXPANEL_ID_: string | undefined
 declare const _OT_SENTRY_DSN_: string

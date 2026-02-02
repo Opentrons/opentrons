@@ -30,21 +30,21 @@ async function readOrDefaultReleases(releasesPath) {
 }
 
 const FILES_IN_RELEASE_JSON = [
-  /Opentrons.*\.exe$/,
-  /Opentrons.*\.dmg$/,
-  /Opentrons.*\.AppImage$/,
+  /Opentrons-OT2.*\.exe$/,
+  /Opentrons-OT2.*\.dmg$/,
+  /Opentrons-OT2.*\.AppImage$/,
   /latest.*yml$/,
   /alpha.*yml$/,
   /beta.*yml$/,
 ]
 
 function artifactNameToObj(artifactName, urlBase) {
-  if (artifactName.search(/Opentrons.*\.exe$/) !== -1) {
-    return { 'Opentrons.exe': urlBase + artifactName }
-  } else if (artifactName.search(/Opentrons.*\.dmg$/) !== -1) {
-    return { 'Opentrons.dmg': urlBase + artifactName }
-  } else if (artifactName.search(/Opentrons.*\.AppImage$/) !== -1) {
-    return { 'Opentrons.AppImage': urlBase + artifactName }
+  if (artifactName.search(/Opentrons-OT2.*\.exe$/) !== -1) {
+    return { 'Opentrons-OT2.exe': urlBase + artifactName }
+  } else if (artifactName.search(/Opentrons-OT2.*\.dmg$/) !== -1) {
+    return { 'Opentrons-OT2.dmg': urlBase + artifactName }
+  } else if (artifactName.search(/Opentrons-OT2.*\.AppImage$/) !== -1) {
+    return { 'Opentrons-OT2.AppImage': urlBase + artifactName }
   } else if (artifactName.search(/(latest|alpha|beta).*yml$/) !== -1) {
     return { [artifactName]: urlBase + artifactName }
   } else {

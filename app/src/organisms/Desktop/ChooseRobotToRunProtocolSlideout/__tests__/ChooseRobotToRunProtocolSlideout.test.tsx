@@ -234,7 +234,7 @@ describe('ChooseRobotToRunProtocolSlideout', () => {
     })
     expect(proceedButton).toBeDisabled()
     screen.getByText(
-      'A robot software update is required to run protocols with this version of the Opentrons App.'
+      'A robot software update is required to run protocols with this version of the Opentrons OT-2 App.'
     )
     const linkToRobotDetails = screen.getByText('Go to Robot')
     fireEvent.click(linkToRobotDetails)

@@ -60,15 +60,6 @@ dev:
 		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \
 		"$(MAKE) dev-shell OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)"
 
-.PHONY: dev-odd
-dev-odd: export NODE_ENV := development
-dev-odd: export PORT := $(PORT)
-dev-odd: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
-dev-odd:
-	concurrently --no-color --kill-others --names "server,shell" \
-		"$(MAKE) dev-server OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)" \
-		"$(MAKE) dev-shell-odd OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)"
-
 .PHONY: dev-server
 dev-server: export OPENTRONS_PROJECT := $(OPENTRONS_PROJECT)
 dev-server:
@@ -82,16 +73,6 @@ dev-dist:
 .PHONY: dev-shell
 dev-shell:
 	$(MAKE) -C $(shell_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
-
-
-.PHONY: dev-shell-odd
-dev-shell-odd: export OT_APP_IS_ON_DEVICE := 1
-dev-shell-odd: export OT_APP_ON_DEVICE_DISPLAY_SETTINGS__UNFINISHED_UNBOXING_FLOW_ROUTE := 0
-dev-shell-odd: export OT_APP_UI__WIDTH := 1024
-dev-shell-odd: export OT_APP_UI__HEIGHT := 600
-dev-shell-odd:
-	wait-on http-get://localhost:$(PORT)
-	$(MAKE) -C $(shell_odd_dir) dev OPENTRONS_PROJECT=$(OPENTRONS_PROJECT)
 
 .PHONY: test
 test:

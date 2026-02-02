@@ -2,7 +2,7 @@
 
 [![JavaScript Style Guide][style-guide-badge]][style-guide]
 
-> Desktop application wrapper for the [Opentrons App](../app) using Electron
+> Desktop application wrapper for the [Opentrons OT-2 App](../app) using Electron
 
 ## overview
 
@@ -12,9 +12,9 @@ This directory contains the code for the [Electron main process][electron-main] 
 
 The app uses [`electron-store`][electron-store] to store its configuration in a JSON file located at:
 
-- `%APPDATA%\Opentrons\config.json` on Windows
-- `~/.config/Opentrons/config.json` on Linux
-- `~/Library/Application Support/Opentrons/config.json` on macOS
+- `%APPDATA%\Opentrons-OT2\config.json` on Windows
+- `~/.config/Opentrons-OT2/config.json` on Linux
+- `~/Library/Application Support/Opentrons-OT2/config.json` on macOS
 
 Configuration values will be determined by:
 
@@ -29,13 +29,13 @@ Configuration values will be determined by:
 Configuration values may be specified via:
 
 - A CLI argument of the format `--configName.nestedValue`
-- An environment variable of the format `OT_APP_CONFIG_NAME__NESTED_VALUE`
+- An environment variable of the format `OT_OT2_APP_CONFIG_NAME__NESTED_VALUE`
 - The configuration JSON file with the path `configName.nestedValue`
 
 **If overriding boolean values**:
 
 - For CLI arguments, use `--value` for true, and `--disable_value` for false
-- For environment variables, use `OT_APP_VALUE=1` for true, and `OT_APP_VALUE=0` for false
+- For environment variables, use `OT_OT2_APP_VALUE=1` for true, and `OT_OT2_APP_VALUE=0` for false
 
 #### feature flags
 
@@ -44,7 +44,7 @@ During development, we develop new features behind "feature flags", so that we c
 The feature flags are part of the configuration under the path `devInternal`. To enable a feature flag, set the configuration value to true:
 
 - CLI: `--devInternal.nameOfFlag`
-- Environment variable: `OT_APP_DEV_INTERNAL__NAME_OF_FLAG`
+- Environment variable: `OT_OT2_APP_DEV_INTERNAL__NAME_OF_FLAG`
 - Configuration JSON: `devInternal.nameOfFlag`
 
 The app also presents UI for enabling these flags when the [`devtools`](#devtools) setting is enabled.
@@ -90,7 +90,7 @@ The easiest way to override config on Windows is to modify the Opentrons desktop
 ##### devtools
 
 - CLI argument: `--devtools`
-- Environment variable: `OT_APP_DEVTOOLS`
+- Environment variable: `OT_OT2_APP_DEVTOOLS`
 - JSON path: `devtools`
 - Default: `false`
 
@@ -99,7 +99,7 @@ Enables and opens the Chrome devtools with the React and Redux devtools extensio
 ##### reinstallDevtools
 
 - CLI argument: `--reinstallDevtools`
-- Environment variable: `OT_APP_REINSTALL_DEVTOOLS`
+- Environment variable: `OT_OT2_APP_REINSTALL_DEVTOOLS`
 - JSON path: `reinstallDevtools`
 - Default: `false`
 
@@ -108,7 +108,7 @@ Forces the devtools extensions to be re-installed. Make sure you enable **both**
 ##### update.channel
 
 - CLI argument: `--update.channel`
-- Environment variable: `OT_APP_UPDATE__CHANNEL`
+- Environment variable: `OT_OT2_APP_UPDATE__CHANNEL`
 - JSON path: `update.channel`
 - Default: `"latest"`
 
@@ -117,7 +117,7 @@ Sets the app's self-update channel. Options are `alpha`, `beta`, or `latest`. `a
 ##### log.level.file
 
 - CLI argument: `--log.level.file`
-- Environment variable: `OT_APP_LOG__LEVEL__FILE`
+- Environment variable: `OT_OT2_APP_LOG__LEVEL__FILE`
 - JSON path: `log.level.file`
 - Default: `"debug"`
 
@@ -126,7 +126,7 @@ Default log level of the `combined.log` log file. See logging section below.
 ##### log.level.console
 
 - CLI argument: `--log.level.console`
-- Environment variable: `OT_APP_LOG__LEVEL__CONSOLE`
+- Environment variable: `OT_OT2_APP_LOG__LEVEL__CONSOLE`
 - JSON path: `log.level.console`
 - Default: `"info"`
 
@@ -135,7 +135,7 @@ Default log level of the console log. See logging section below.
 ##### ui.webPreferences.webSecurity
 
 - CLI argument: `--ui.webPreferences.webSecurity` or `--disable_ui.webPreferences.webSecurity`
-- Environment variable: `OT_APP_UI__WEB_PREFERENCES__WEB_SECURITY`
+- Environment variable: `OT_OT2_APP_UI__WEB_PREFERENCES__WEB_SECURITY`
 - JSON path: `ui.webPreferences.webSecurity`
 - Default: `true`
 
@@ -144,7 +144,7 @@ Sets the `webPreferences.webSecurity` option of the Electron [BrowserWindow][ele
 ##### ui.width
 
 - CLI argument: `--ui.width`
-- Environment variable: `OT_APP_UI__WIDTH`
+- Environment variable: `OT_OT2_APP_UI__WIDTH`
 - JSON path: `ui.width`
 - Default: `800`
 
@@ -153,7 +153,7 @@ Sets the `webPreferences.webSecurity` option of the Electron [BrowserWindow][ele
 ##### ui.minWidth
 
 - CLI argument: `--ui.minWidth`
-- Environment variable: `OT_APP_UI__MIN_WIDTH`
+- Environment variable: `OT_OT2_APP_UI__MIN_WIDTH`
 - JSON path: `ui.minWidth`
 - Default: `600`
 
@@ -162,7 +162,7 @@ Sets the `webPreferences.webSecurity` option of the Electron [BrowserWindow][ele
 ##### ui.height
 
 - CLI argument: `--ui.height`
-- Environment variable: `OT_APP_UI__HEIGHT`
+- Environment variable: `OT_OT2_APP_UI__HEIGHT`
 - JSON path: `ui.height`
 - Default: `760`
 
@@ -171,7 +171,7 @@ Sets the `webPreferences.webSecurity` option of the Electron [BrowserWindow][ele
 ##### ui.url.protocol
 
 - CLI argument: `--ui.url.protocol`
-- Environment variable: `OT_APP_UI__URL__PROTOCOL`
+- Environment variable: `OT_OT2_APP_UI__URL__PROTOCOL`
 - JSON path: `ui.url.protocol`
 - Default: `"file:"`
 
@@ -180,7 +180,7 @@ Protocol used to fetch the UI's `index.html`. If you want to fetch the UI from t
 ##### ui.url.path
 
 - CLI argument: `--ui.url.path`
-- Environment variable: `OT_APP_UI__URL__PATH`
+- Environment variable: `OT_OT2_APP_UI__URL__PATH`
 - JSON path: `ui.url.path`
 - Default: `"ui/index.html"`
 
@@ -189,7 +189,7 @@ Path to `index.html`. If `ui.url.protocol` is `file:`, this path is relative to 
 ##### analytics.appId
 
 - CLI argument: `--analytics.appId`
-- Environment variable: `OT_APP_ANALYTICS__APP_ID`
+- Environment variable: `OT_OT2_APP_ANALYTICS__APP_ID`
 - JSON path: `analytics.appId`
 - Default: Random UUID generated at first launch
 
@@ -198,7 +198,7 @@ Random, persistent ID to use for anonymous analytics tracking if opted in.
 ##### analytics.optedIn
 
 - CLI argument: `--analytics.optedIn`
-- Environment variable: `OT_APP_ANALYTICS__OPTED_IN`
+- Environment variable: `OT_OT2_APP_ANALYTICS__OPTED_IN`
 - JSON path: `analytics.optedIn`
 - Default: `false`
 
@@ -207,7 +207,7 @@ Whether or not the user has opted into anonymous analytics tracking.
 ##### analytics.seenOptIn
 
 - CLI argument: `--analytics.seenOptIn`
-- Environment variable: `OT_APP_ANALYTICS__SEEN_OPT_IN`
+- Environment variable: `OT_OT2_APP_ANALYTICS__SEEN_OPT_IN`
 - JSON path: `analytics.seenOptIn`
 - Default: `false`
 
@@ -216,7 +216,7 @@ Whether or not the user has seen the initial analytics description pop-up.
 ##### support.userId
 
 - CLI argument: `--support.userId`
-- Environment variable: `OT_APP_SUPPORT__USER_ID`
+- Environment variable: `OT_OT2_APP_SUPPORT__USER_ID`
 - JSON path: `support.userId`
 - Default: Random UUID generated at first launch
 
@@ -225,7 +225,7 @@ Random, persistent ID to use for support tracking. Different than `analytics.app
 ##### support.createdAt
 
 - CLI argument: `--support.createdAt`
-- Environment variable: `OT_APP_SUPPORT__CREATED_AT`
+- Environment variable: `OT_OT2_APP_SUPPORT__CREATED_AT`
 - JSON path: `support.createdAt`
 - Default: Current Unix time at first launch
 
@@ -234,7 +234,7 @@ Timestamp of first app launch.
 ##### support.name
 
 - CLI argument: `--support.name`
-- Environment variable: `OT_APP_SUPPORT__NAME`
+- Environment variable: `OT_OT2_APP_SUPPORT__NAME`
 - JSON path: `support.name`
 - Default: `"App User"`
 
@@ -243,7 +243,7 @@ Full name of app user to populate "Name" in support conversations.
 ##### support.email
 
 - CLI argument: `--support.email`
-- Environment variable: `OT_APP_SUPPORT__EMAIL`
+- Environment variable: `OT_OT2_APP_SUPPORT__EMAIL`
 - JSON path: `support.email`
 - Default: `null`
 
@@ -252,7 +252,7 @@ Email of app user to populate "Email" in support conversations.
 ##### discovery.candidates
 
 - CLI argument: `--discovery.candidates`
-- Environment variable: `OT_APP_DISCOVERY__CANDIDATES`
+- Environment variable: `OT_OT2_APP_DISCOVERY__CANDIDATES`
 - JSON path: `discovery.candidates`
 - Default: `[]`
 
@@ -262,7 +262,7 @@ Currently this config only allows one hostname/IP address as the value.
 ##### labware.directory
 
 - CLI argument: `--labware.directory`
-- Environment variable: `OT_APP_LABWARE__DIRECTORY`
+- Environment variable: `OT_OT2_APP_LABWARE__DIRECTORY`
 - JSON path: `labware.directory`
 - Default:
   - `%APPDATA%\Opentrons\labware` on Windows
@@ -365,29 +365,29 @@ There are a series of tasks designed to be run in CI to create distributable ver
 
 ```shell
 # Create a macOS distributable of the app
-make dist-osx OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
+make dist-osx OT_OT2_APP_DEPLOY_BUCKET=opentrons-app OT_OT2_APP_DEPLOY_FOLDER=builds
 
 # Create a Linux distributable of the app
-make dist-linux OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
+make dist-linux OT_OT2_APP_DEPLOY_BUCKET=opentrons-app OT_OT2_APP_DEPLOY_FOLDER=builds
 
 # Create macOS and Linux apps simultaneously
-make dist-posix OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
+make dist-posix OT_OT2_APP_DEPLOY_BUCKET=opentrons-app OT_OT2_APP_DEPLOY_FOLDER=builds
 
 # Create a Windows distributable of the app
-make dist-win OT_APP_DEPLOY_BUCKET=opentrons-app OT_APP_DEPLOY_FOLDER=builds
+make dist-win OT_OT2_APP_DEPLOY_BUCKET=opentrons-app OT_OT2_APP_DEPLOY_FOLDER=builds
 ```
 
 These tasks use the following environment variables defined:
 
 <!-- TODO(mc, 2018-05-16): update bucket / folder vars to use config prefix -->
 
-| name                 | description   | required | description                            |
-| -------------------- | ------------- | -------- | -------------------------------------- |
-| OT_APP_DEPLOY_BUCKET | AWS S3 bucket | yes      | Artifact deploy bucket                 |
-| OT_APP_DEPLOY_FOLDER | AWS S3 folder | yes      | Artifact deploy folder in bucket       |
-| OT_BRANCH            | Branch name   | no       | Sometimes added to the artifact name   |
-| OT_BUILD             | Build number  | no       | Appended to the artifact name          |
-| OT_TAG               | Tag name      | no       | Flags autoupdate files to be published |
+| name                     | description   | required | description                            |
+| ------------------------ | ------------- | -------- | -------------------------------------- |
+| OT_OT2_APP_DEPLOY_BUCKET | AWS S3 bucket | yes      | Artifact deploy bucket                 |
+| OT_OT2_APP_DEPLOY_FOLDER | AWS S3 folder | yes      | Artifact deploy folder in bucket       |
+| OT_BRANCH                | Branch name   | no       | Sometimes added to the artifact name   |
+| OT_BUILD                 | Build number  | no       | Appended to the artifact name          |
+| OT_TAG                   | Tag name      | no       | Flags autoupdate files to be published |
 
 The release channel is set according to the version string:
 

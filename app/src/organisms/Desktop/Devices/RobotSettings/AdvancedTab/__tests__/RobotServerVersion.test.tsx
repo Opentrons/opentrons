@@ -63,7 +63,7 @@ describe('RobotSettings RobotServerVersion', () => {
     })
     render()
     screen.getByText(
-      'A robot software update is required to run protocols with this version of the Opentrons App.'
+      'A robot software update is required to run protocols with this version of the Opentrons OT-2 App.'
     )
     const btn = screen.getByText('View update')
     fireEvent.click(btn)
@@ -78,7 +78,7 @@ describe('RobotSettings RobotServerVersion', () => {
     })
     render()
     screen.getByText(
-      'A robot software update is required to run protocols with this version of the Opentrons App.'
+      'A robot software update is required to run protocols with this version of the Opentrons OT-2 App.'
     )
     const btn = screen.getByText('View update')
     fireEvent.click(btn)

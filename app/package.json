@@ -7,7 +7,7 @@
   "types": "lib/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Opentrons/opentrons.git"
+    "url": "https://github.com/Opentrons/opentrons-ot2.git"
   },
   "author": {
     "name": "Opentrons Labworks",
@@ -15,9 +15,9 @@
   },
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Opentrons/opentrons/issues"
+    "url": "https://github.com/Opentrons/opentrons-ot2/issues"
   },
-  "homepage": "https://github.com/Opentrons/opentrons",
+  "homepage": "https://github.com/Opentrons/opentrons-ot2",
   "dependencies": {
     "@ebay/nice-modal-react": "1.2.13",
     "@fontsource/dejavu-sans": "5.0.3",

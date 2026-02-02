@@ -30,7 +30,7 @@ import type { ChangeEventHandler, MouseEventHandler } from 'react'
 import type { Run } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
-const OT_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
+const OT_OT2_APP_UPDATE_PAGE_LINK = 'https://opentrons.com/ot-app/'
 const HIDDEN_CSS = css`
   position: fixed;
   clip: rect(1px 1px 1px 1px);
@@ -94,7 +94,7 @@ export function UpdateRobotSoftware({
           <LegacyStyledText forwardedAs="p" marginBottom={SPACING.spacing8}>
             {t('branded:update_robot_software_description')}
           </LegacyStyledText>
-          <ExternalLink href={OT_APP_UPDATE_PAGE_LINK}>
+          <ExternalLink href={OT_OT2_APP_UPDATE_PAGE_LINK}>
             {t('branded:update_robot_software_link')}
           </ExternalLink>
         </Box>

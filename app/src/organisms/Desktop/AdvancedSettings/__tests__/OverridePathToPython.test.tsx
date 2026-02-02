@@ -36,7 +36,7 @@ describe('OverridePathToPython', () => {
     render()
     screen.getByText('Override Path to Python')
     screen.getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
+      'If specified, the Opentrons OT-2 App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
     )
     screen.getByText('override path')
     screen.getByText('No path specified')
@@ -53,7 +53,7 @@ describe('OverridePathToPython', () => {
     render()
     screen.getByText('Override Path to Python')
     screen.getByText(
-      'If specified, the Opentrons App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
+      'If specified, the Opentrons OT-2 App will use the Python interpreter at this path instead of the default bundled Python interpreter.'
     )
     screen.getByText('override path')
     const specifiedPath = screen.getByText('otherPath')

@@ -38,7 +38,7 @@ describe('AlternativeSecurityTypeModal', () => {
     render(props)
     screen.getByText('Alternative security types')
     screen.getByText(
-      'The Opentrons App supports connecting Flex to various enterprise access points. Connect via USB and finish setup in the app.'
+      'The Opentrons OT-2 App supports connecting Flex to various enterprise access points. Connect via USB and finish setup in the app.'
     )
     screen.getByText('Connect via USB')
   })

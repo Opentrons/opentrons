@@ -32,7 +32,7 @@ describe('TakeoverModal', () => {
     render(props)
     screen.getByText('Robot is busy')
     screen.getByText(
-      'A computer with the Opentrons App is currently controlling this robot.'
+      'A computer with the Opentrons OT-2 App is currently controlling this robot.'
     )
     fireEvent.click(screen.getByText('Terminate remote activity'))
     expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()
@@ -46,7 +46,7 @@ describe('TakeoverModal', () => {
     render(props)
     screen.getByText('Terminate remote activity?')
     screen.getByText(
-      'This will immediately stop the activity begun on a computer. You, or another user, may lose progress or see an error in the Opentrons App.'
+      'This will immediately stop the activity begun on a computer. You, or another user, may lose progress or see an error in the Opentrons OT-2 App.'
     )
     fireEvent.click(screen.getByText('Continue activity'))
     expect(props.setShowConfirmTerminateModal).toHaveBeenCalled()

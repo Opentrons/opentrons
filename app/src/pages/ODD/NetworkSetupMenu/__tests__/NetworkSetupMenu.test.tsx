@@ -44,7 +44,7 @@ describe('NetworkSetupMenu', () => {
     screen.getByText("Connect to your lab's wired network.")
     screen.getByText('USB')
     screen.getByText(
-      'Connect directly to a computer (running the Opentrons App).'
+      'Connect directly to a computer (running the Opentrons OT-2 App).'
     )
   })
 

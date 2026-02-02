@@ -240,7 +240,7 @@ describe('SendProtocolToFlexSlideout', () => {
     expect(proceedButton).toBeDisabled()
     expect(
       screen.getByText(
-        'A robot software update is required to run protocols with this version of the Opentrons App.'
+        'A robot software update is required to run protocols with this version of the Opentrons OT-2 App.'
       )
     ).toBeInTheDocument()
     const linkToRobotDetails = screen.getByText('Go to Robot')

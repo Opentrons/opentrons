@@ -45,7 +45,7 @@ describe('UsagePreferencesSettings', () => {
 
     screen.getByText('Live video')
     screen.getByText(
-      'View real-time video of the deck in the Opentrons App while running a protocol.'
+      'View real-time video of the deck in the Opentrons OT-2 App while running a protocol.'
     )
   })
 

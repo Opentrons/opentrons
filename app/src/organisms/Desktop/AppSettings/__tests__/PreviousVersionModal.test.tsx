@@ -34,7 +34,7 @@ describe('PreviousVersionModal', () => {
   it('renders correct support links', () => {
     render(props)
     const uninstallLink = screen.getByRole('link', {
-      name: 'Learn more about uninstalling the Opentrons App',
+      name: 'Learn more about uninstalling the Opentrons OT-2 App',
     })
     expect(uninstallLink.getAttribute('href')).toBe(UNINSTALL_APP_URL)
     const previousReleasesLink = screen.getByRole('link', {

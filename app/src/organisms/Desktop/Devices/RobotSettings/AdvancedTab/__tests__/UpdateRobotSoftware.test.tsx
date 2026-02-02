@@ -50,7 +50,7 @@ describe('RobotSettings UpdateRobotSoftware', () => {
     render()
     screen.getByText('Update robot software manually with a local file (.zip)')
     screen.getByText(
-      'Bypass the Opentrons App auto-update process and update the robot software manually.'
+      'Bypass the Opentrons OT-2 App auto-update process and update the robot software manually.'
     )
     screen.getByText('Browse file system')
     screen.getByText('Launch Opentrons software update page')

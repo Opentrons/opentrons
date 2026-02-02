@@ -76,7 +76,7 @@ describe('RecoveryTakeover', () => {
     render({ ...props, isOnDevice: true })
     screen.getByText('Robot is in recovery mode')
     screen.getByText(
-      'A computer with the Opentrons App is currently controlling this robot.'
+      'A computer with the Opentrons OT-2 App is currently controlling this robot.'
     )
     screen.getByText('Terminate remote activity')
   })
@@ -85,7 +85,7 @@ describe('RecoveryTakeover', () => {
     render({ ...props, isOnDevice: true, intent: 'canceling' })
     screen.getByText('Robot is canceling the run')
     screen.getByText(
-      'A computer with the Opentrons App is currently controlling this robot.'
+      'A computer with the Opentrons OT-2 App is currently controlling this robot.'
     )
     screen.getByText('Terminate remote activity')
   })

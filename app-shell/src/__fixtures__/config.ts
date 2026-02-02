@@ -80,7 +80,7 @@ export const MOCK_CONFIG_V0: ConfigV0 = {
     candidates: [],
   },
   labware: {
-    directory: '/Users/ot/Library/Application Support/Opentrons/labware',
+    directory: '/Users/ot/Library/Application Support/Opentrons-OT2/labware',
   },
   alerts: {
     ignored: [],

@@ -33,7 +33,7 @@ const argv = process.argv0.endsWith('defaultApp')
   : process.argv.slice(1)
 
 const PARSE_ARGS_OPTS = {
-  envPrefix: 'OT_APP',
+  envPrefix: 'OT_OT2_APP',
   configuration: {
     'negation-prefix': 'disable_',
   },
