@@ -134,12 +134,14 @@ User clicks slot
 
 When a module and fixture share a cutoutId, they merge into a combo fixture:
 
-| Module       | Fixture                 | Combo                                     |
-| ------------ | ----------------------- | ----------------------------------------- |
-| Flex Stacker | Waste Chute (covered)   | `flexStackerWithWasteChuteAdapterCovered` |
-| Flex Stacker | Waste Chute (uncovered) | `flexStackerWithWasteChuteAdapterNoCover` |
-| Flex Stacker | Magnetic Block          | `flexStackerWithMagBlock`                 |
-| Staging Area | Magnetic Block          | `stagingAreaSlotWithMagneticBlockV1`      |
+| Module       | Fixture                 | Combo                                              |
+| ------------ | ----------------------- | -------------------------------------------------- |
+| Flex Stacker | Waste Chute (covered)   | `flexStackerWithWasteChuteAdapterCovered`          |
+| Flex Stacker | Waste Chute (uncovered) | `flexStackerWithWasteChuteAdapterNoCover`          |
+| Flex Stacker | Magnetic Block          | `flexStackerWithMagBlock`                          |
+| Staging Area | Magnetic Block          | `stagingAreaSlotWithMagneticBlockV1`               |
+| Staging Area | Waste Chute (covered)   | `stagingAreaSlotWithWasteChuteRightAdapterCovered` |
+| Staging Area | Waste Chute (uncovered) | `stagingAreaSlotWithWasteChuteRightAdapterNoCover` |
 
 ---
 
