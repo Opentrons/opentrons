@@ -59,8 +59,8 @@ class MixStepForm(BasePage):
         if dropdown.count() == 0:
             dropdown = self.page.get_by_test_id("dropdownMenu").first
         self.wait_for_visible(dropdown, timeout=10000)
+        self.highlight_element(dropdown)
         dropdown.click()
-
         listbox = self.page.locator("div[role='listbox']").last
         self.wait_for_visible(listbox)
         buttons = listbox.locator("button")
@@ -68,6 +68,7 @@ class MixStepForm(BasePage):
             button = buttons.nth(index)
             normalized = " ".join(button.inner_text().split())
             if option_text in normalized:
+                self.highlight_element(button)
                 button.click()
                 return
 
@@ -223,11 +224,12 @@ class MixStepForm(BasePage):
             checkbox_input.click()
             return
 
+        checkbox_test_id_count = self.page.locator("[data-testid*='checkbox']").count()
         raise AssertionError(
             f"Could not find checkbox or switch at index {index}. "
             f"Found {self.page.get_by_role('switch').count()} switches, "
             f"{self.page.get_by_role('checkbox').count()} checkboxes, "
-            f"{self.page.locator('[data-testid*="checkbox"]').count()} checkbox test IDs."
+            f"{checkbox_test_id_count} checkbox test IDs."
         )
 
     def fill_delay_seconds(self, value: str) -> None:

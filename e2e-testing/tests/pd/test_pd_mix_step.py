@@ -39,15 +39,19 @@ def test_mix_step_configuration_workflow(page: Page, base_url: str) -> None:
         "Pipette",
         "Tiprack",
         "Labware",
-        "Select wells",
-        "Volume per well",
-        "Mix repetitions",
+        # JTM 20260202 -- These labels are now not present until after labware/well selection
+        # "Select wells",
+        # "Volume per well",
+        # "Mix repetitions",
     ]:
+        print(f"Expecting text: {label}")
         mix_form.expect_text(label)
 
+    print("Selecting pipette...")
     mix_form.select_pipette(PIPETTE_OPTION)
+    print("Selecting tiprack...")
     mix_form.select_tiprack(TIPRACK_OPTION)
-
+    print("Selecting labware...")
     mix_form.select_labware(LABWARE_OPTION)
     mix_form.open_well_selector()
     mix_form.expect_well_selector_modal()
