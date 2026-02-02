@@ -190,7 +190,7 @@ export function VisualizerContainer(
     srcFileNames,
     analysisOutput
   )
-  const clamp = (n: number, min: number, max: number) =>
+  const clamp = (n: number, min: number, max: number): number =>
     Math.min(max, Math.max(min, n))
   let percentComplete = 0
 
