@@ -76,6 +76,13 @@ class PlateReaderPage(BasePage):
         """Click save transfer step button in transfer step."""
         self.page.get_by_text("Save", exact=True).click()
 
+    def wait_for_save_banner_gone(self) -> None:
+        """Wait for the save banner to disappear."""
+        banner_message = "Absorbance Plate Reader has been saved"
+        banner = self.page.get_by_test_id("Snackbar").get_by_text(banner_message, exact=True).first
+        banner.wait_for(state="visible")
+        banner.wait_for(state="detached")
+
     def button_selection(self, button_name: str) -> None:
         self.page.get_by_role("button", name=button_name).click()
 

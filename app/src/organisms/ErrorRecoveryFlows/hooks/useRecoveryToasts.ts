@@ -193,6 +193,8 @@ export function handleRecoveryOptionAction<T>(
     case RECOVERY_MAP.SHUTTLE_FULL_RETRY.ROUTE:
     case RECOVERY_MAP.STACKER_SHUTTLE_EMPTY_STORE_RETRY.ROUTE:
       return currentStepReturnVal
+    case null:
+      return null
     default: {
       console.error('Unhandled recovery toast case. Handle explicitly.')
       return null

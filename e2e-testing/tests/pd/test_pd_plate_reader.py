@@ -5,11 +5,13 @@ from test_pd_create_new_flex import test_flex_onboarding_workflow
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
+from automation.pd_pages.timeline import Timeline
+from eyes import Eyes
 
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
+def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes) -> None:
     plate_reader_page = PlateReaderPage(page)
     protocol_editor = ProtocolEditorPage(page)
     create_protocol = CreateProtocolWizard(page)
@@ -78,3 +80,15 @@ def test_flex_absorbance_reader_setup(page: Page, base_url: str) -> None:
     protocol_editor.add_step("Absorbance Plate Reader")
     plate_reader_page.read_labware("test 2")
     plate_reader_page.save_pr_step()
+    # Make a deterministic visual snapshot of the whole page
+    # - wait for the step save snackbar to disappear
+    # - scroll to the bottom of the timeline
+    plate_reader_page.wait_for_save_banner_gone()
+    timeline = Timeline(page)
+    timeline.scroll_timeline_to_bottom()
+    eyes.check(checkpoint_name="Fully Configured Plate Reader")
+    # now take a visual snapshot of the timeline element with stitching
+    eyes.check_element(
+        checkpoint_name="Stitched Final Timeline",
+        element=page.get_by_test_id(timeline.timeline_box_testid),
+    )
