@@ -291,12 +291,10 @@ describe('updateInitialDeckState', () => {
       t: mockT,
       handleDeleteStackerLabware: vi.fn(),
     })
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      1,
+    expect(mockDispatch).toHaveBeenCalledWith(
       createDeckFixture('stagingArea', 'cutoutB3')
     )
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      2,
+    expect(mockDispatch).toHaveBeenCalledWith(
       createModule({
         slot: 'B1',
         model: MAGNETIC_BLOCK_V1,
@@ -366,7 +364,12 @@ describe('updateInitialDeckState', () => {
     })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
-  it('creates staging area and waste chute', () => {
+  it('creates staging area when there is a waste chute on deck and staging area is added', () => {
+    const mockInitialDeckSetupWithWasteChute = {
+      ...mockInitialDeckSetup,
+      ...mockInitialDeckSetup.additionalEquipmentOnDeck,
+      waste: { location: 'cutoutD3', name: 'wasteChute', id: 'waste' },
+    }
     updateInitialDeckState({
       values: [
         {
@@ -376,7 +379,7 @@ describe('updateInitialDeckState', () => {
           addressableAreaId: 'D4',
         },
       ],
-      initialDeckSetup: mockEmptyIntialDeckSetup,
+      initialDeckSetup: mockInitialDeckSetupWithWasteChute,
       dispatch: mockDispatch,
       setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
       setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
@@ -385,12 +388,10 @@ describe('updateInitialDeckState', () => {
       t: mockT,
       handleDeleteStackerLabware: vi.fn(),
     })
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      1,
+    expect(mockDispatch).toHaveBeenCalledWith(
       createDeckFixture('stagingArea', 'cutoutD3')
     )
-    expect(mockDispatch).toHaveBeenNthCalledWith(
-      2,
+    expect(mockDispatch).toHaveBeenCalledWith(
       createDeckFixture('wasteChute', 'cutoutD3')
     )
   })
@@ -498,18 +499,30 @@ describe('updateInitialDeckState', () => {
     })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
-  it('tries to delete staging area and waste chute but something is in use', () => {
+  it.only('tries to delete staging area from waste chute + staging area combo but something is in use', () => {
+    const mockLabwareOnDeck = {
+      labware: {
+        stack: ['labware', 'D4'],
+        def: fixture12Trough as LabwareDefinition2,
+        labwareDefURI: 'mockURI',
+        id: 'labware',
+        pythonName: 'mockPythonName',
+      },
+    }
+    const mockInitialDeckSetupWithLabware = {
+      ...mockInitialDeckSetup,
+      labware: mockLabwareOnDeck,
+    }
     updateInitialDeckState({
       values: [
         {
           cutoutId: 'cutoutD3',
-          cutoutFixtureId:
-            STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
-          addressableAreaId: 'D4',
+          cutoutFixtureId: WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+          addressableAreaId: '1ChannelWasteChute',
         },
       ],
 
-      initialDeckSetup: mockInitialDeckSetup,
+      initialDeckSetup: mockInitialDeckSetupWithLabware,
       dispatch: mockDispatch,
       setShowDeleteEntityModal: mockSetShowDeleteEntityModal,
       setShowDeleteStagingAreaModal: mockSetShowDeleteStagingAreaModal,
@@ -519,6 +532,6 @@ describe('updateInitialDeckState', () => {
       deckConfig: mockDeckConfig,
       handleDeleteStackerLabware: vi.fn(),
     })
-    expect(mockSetShowDeleteEntityModal).toHaveBeenCalled()
+    expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
 })

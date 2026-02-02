@@ -1,6 +1,7 @@
 import {
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  getAAWithFakesFromCutoutFixtureId,
   getAddedMissingThermocyclerFixtures,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
@@ -10,6 +11,7 @@ import {
   getSlotDisplayNameFromAAWithFakes,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_FIXTURES,
+  STAGING_AREA_RIGHT_SLOT_FIXTURE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER_V2_REAR_FIXTURE,
   TRASH_BIN_ADAPTER_FIXTURE,
@@ -34,6 +36,7 @@ import type {
   AddressableAreaName,
   CutoutConfigMap,
   CutoutFixtureId,
+  CutoutId,
   DeckConfiguration,
 } from '@opentrons/shared-data'
 import type {
@@ -281,14 +284,25 @@ export const updateInitialDeckState = (
       module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
 
-    const slotName = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
     const matchingStagingArea = matchingFixturesOnDeck.find(
       f => f.name === 'stagingArea'
     )
+
+    // Get the addressable area IDs for the staging area slot (e.g., ['D4', 'fakeD4'] for cutoutD3)
+    const stagingAreaSlots =
+      matchingStagingArea != null && matchingStagingArea.location != null
+        ? getAAWithFakesFromCutoutFixtureId(
+            matchingStagingArea.location as CutoutId,
+            STAGING_AREA_RIGHT_SLOT_FIXTURE as CutoutFixtureId,
+            deckDef
+          )
+        : null
+
+    // Check if there's labware on any of the staging area slots
     const matching4thColumnLabware =
-      matchingStagingArea != null && slotName != null
+      stagingAreaSlots != null && stagingAreaSlots.length > 0
         ? (Object.values(labwareOnDeck).find(lw =>
-            lw.stack.includes(slotName)
+            stagingAreaSlots.some(slot => lw.stack.includes(slot))
           ) ?? null)
         : null
 
