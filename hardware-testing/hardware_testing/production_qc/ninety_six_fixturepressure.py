@@ -746,8 +746,12 @@ async def _main(
     except Exception as err:
         print("run fail:",err)
         await api.move_rel(OT3Mount.LEFT,Point(z=20))
-        await api.drop_tip(OT3Mount.LEFT)
-    await api.home([Axis.Z_L, Axis.Z_R])
+        try:
+            await api.drop_tip(OT3Mount.LEFT)
+        except Exception:
+            pass
+    finally:
+        await api.home()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
