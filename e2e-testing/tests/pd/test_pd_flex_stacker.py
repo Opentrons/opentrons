@@ -6,6 +6,7 @@ from automation.pd_pages.protocol_editor_page import ProtocolEditorPage
 from automation.pd_pages.deck_config_page import DeckConfigPage
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
+from automation.pd_pages.tc_step_form_page import ThermocyclerStepPage
 
 
 
@@ -17,7 +18,7 @@ def test_flex_stacker(page: Page) -> None:
     deck_config_page = DeckConfigPage(page)
     plate_reader_page = PlateReaderPage(page)
     create_protocol = CreateProtocolWizard(page)
-
+    thermocycler_page = ThermocyclerStepPage(page)  # Placeholder if ThermocyclerPage is needed later
 
 
     ## Create new Flex protocol from Landing Page, 4 stackers and waste chute and magnetic block
@@ -90,7 +91,7 @@ def test_flex_stacker(page: Page) -> None:
     # deck_config_page.select_module("Flex Stacker Module GEN1")
     # print("✓ Configured 2 Flex Stackers with Trash bin and a plate reader")
 
-    # ##Test adding 2 stackers and an absorbnace reader and a expansion slot
+    # ##Test adding 2 stackers and an absorbance reader and a expansion slot
     # start_new_create_protocol(page)
     # create_new_protocol_flow(True, True, True, page)
     # deck_config_page.select_slot("A4")
@@ -127,7 +128,13 @@ def test_flex_stacker(page: Page) -> None:
     protocol_editor.select_labware_category_by_name("Well plates")
     protocol_editor.select_labware_by_name("Opentrons Tough 96 Well Plate", True, 40)
     plate_reader_page.button_selection("Done")
+
+    protocol_editor.add_labware_to_slot("B2")
+    protocol_editor.select_labware_category_by_name("Reservoirs")  
+    protocol_editor.select_labware_by_name("NEST 1 Well Reservoir 195 mL")
+    plate_reader_page.button_selection("Done")
     print("✓ Add labware to stacker")
+
 
     ## DO NOT COMMENT BACK IN UNTIL FIX IS DONE
     # protocol_editor.add_labware_to_slot("hopperD4")
@@ -160,24 +167,38 @@ def test_flex_stacker(page: Page) -> None:
     plate_reader_page.button_selection("Confirm")
     print("✓ Move lid from tip rack on shuttle to waste chute")
 
+    protocol_editor.add_step("Thermocycler")
+    thermocycler_page.select_state_mode()
+    thermocycler_page.set_lid_position("open")
+    plate_reader_page.button_selection("Save")
+
+
+    protocol_editor.add_step("Flex Stacker")
+    flex_stacker_page.retrieve_stacker('C4 Flex Stacker')
+    plate_reader_page.button_selection('Save')
+    protocol_editor.add_step("Move")
+    protocol_editor.move_labware("C4 Opentrons Tough 96 Well Plate", "Thermocycler Module GEN2") 
+    # protocol_editor.add_step("Transfer")
+
+
+    protocol_editor.add_step("Flex Stacker")
+    flex_stacker_page.empty_stacker("C4 Flex Stacker", "Empty message test")
+    plate_reader_page.button_selection("Save")
+    print("✓ Empty command successful")
+
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("D4 Opentrons Flex 96 Tip Rack", "A2")
     protocol_editor.add_step("Flex Stacker")
     flex_stacker_page.refill_stacker("D4 Flex Stacker", 1, 'Refill message test')
     plate_reader_page.button_selection('Save')
+    print("✓ Refill command successful")
+
 
     page.wait_for_timeout(10000)
 
 
-    ##Add step for stacker
-
         ##Empty stacker
             ##message
-        ##reterive
-        ##store
-        ##refill
-            ##number of labwawre to refill
-            ##message to display
     ##check to make surethat the stacker is highlighted
 
     print("\n✅ Flex Stacker Configuration and Form Test completed successfully!")
