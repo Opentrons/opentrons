@@ -2,16 +2,9 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
-  ALIGN_CENTER,
-  BORDERS,
-  Box,
   COLORS,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
   DropdownMenu,
-  Flex,
   RadioButton,
-  SPACING,
   StyledText,
 } from '@opentrons/components'
 import {
@@ -25,6 +18,7 @@ import { EightChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/Eigh
 import { NinetySixChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/NinetySixChannelFlexShadow'
 import { SingleChannelOT2Shadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelOT2Shadow'
 import { SingleChannelFlexShadow } from '../TipSelectionWizard/PipetteShadows/SingleChannelShadow'
+import styles from './nozzleandwellwizard.module.css'
 
 import type { Channels, DropdownOption } from '@opentrons/components'
 import type {
@@ -53,14 +47,18 @@ const SHADOW_BY_ROBOT_TYPE_AND_CHANNELS: Record<
   },
 }
 
-export function PipetteNozzleSelector(props: {
+interface PipetteNozzleSelectorProps {
   pipetteSpecs: PipetteV2Specs
   robotType: RobotType
   options: DropdownOption[]
   updateValue: (arg: unknown) => void
   value: NozzleConfigurationStyle
   setSelectedValue: any
-}): JSX.Element {
+}
+
+export function PipetteNozzleSelector(
+  props: PipetteNozzleSelectorProps
+): JSX.Element {
   const {
     pipetteSpecs,
     robotType,
@@ -89,7 +87,6 @@ export function PipetteNozzleSelector(props: {
   }
 
   const is96Channel = channels === 96
-
   const nozzles = Array.from({ length: 6 }, (_, i) => String(i + 2))
 
   const partialOptions: DropdownOption[] = nozzles.map(num => ({
@@ -102,18 +99,14 @@ export function PipetteNozzleSelector(props: {
   const isPartialNozzle = nozzleMode === PARTIAL
   return (
     <>
-      <Flex padding={SPACING.spacing20}>
+      <div className={styles.header_text_wrapper}>
         <StyledText desktopStyle="headingMediumBold">
           {t('select_pipette_nozzles_to_use')}
         </StyledText>
-      </Flex>
+      </div>
 
-      <Flex flexDirection={DIRECTION_ROW}>
-        <Flex
-          gridGap={SPACING.spacing4}
-          flexDirection={DIRECTION_COLUMN}
-          padding={SPACING.spacing12}
-        >
+      <div className={styles.row_wrapper}>
+        <div className={styles.nozzle_selection_text}>
           {options.map(({ value, name }) => {
             return (
               <RadioButton
@@ -129,26 +122,18 @@ export function PipetteNozzleSelector(props: {
               />
             )
           })}
-        </Flex>
+        </div>
 
-        <Box
-          backgroundColor={COLORS.grey20}
-          borderRadius={BORDERS.borderRadius12}
-          width="558px"
-          height="497px"
-        >
-          <Flex
-            flexDirection={is96Channel ? DIRECTION_COLUMN : DIRECTION_ROW}
-            alignItems={ALIGN_CENTER}
-            padding={SPACING.spacing20}
-            gridGap={SPACING.spacing10}
+        <div className={styles.nozzle_background_square}>
+          <div
+            className={is96Channel ? styles.column_wrapper : styles.row_wrapper}
           >
-            <Flex height={'100%'}>
+            <div style={{ height: '100%' }}>
               {!is96Channel && <OutlineComponent {...outlineProps} />}
-            </Flex>
+            </div>
 
-            <Flex flexDirection={DIRECTION_COLUMN}>
-              <StyledText desktopStyle="bodyDefaultSemiBold">
+            <div className={styles.column_wrapper}>
+              <StyledText desktopStyle="bodyLargeSemiBold">
                 {displayName}
               </StyledText>
 
@@ -176,10 +161,10 @@ export function PipetteNozzleSelector(props: {
                   }
                 />
               )}
-            </Flex>
-          </Flex>
-        </Box>
-      </Flex>
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   )
 }

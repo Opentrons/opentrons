@@ -18,7 +18,7 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
-import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal.tsx/ExtendedPartialTipField'
+import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
@@ -115,7 +115,7 @@ export function FirstStepMoveLiquidTools({
                 pipettes[String(propsForFields.pipette.value)]?.spec
               }
               propsForFields={propsForFields}
-              stepType={'transfer'}
+              stepType="transfer"
             />
           </>
         ) : null}

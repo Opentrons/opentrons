@@ -14,7 +14,7 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
-import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal.tsx/ExtendedPartialTipField'
+import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
 import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'

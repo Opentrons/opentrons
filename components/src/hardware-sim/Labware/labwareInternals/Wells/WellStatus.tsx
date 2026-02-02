@@ -5,17 +5,19 @@ import { UNSELECTED } from './constants'
 
 import type { WellType } from '../types'
 
-export function WellStatus(props: {
+interface WellStatusProps {
   type: WellType
   size?: string
-}): JSX.Element {
+}
+
+export function WellStatus(props: WellStatusProps): JSX.Element {
   const { type, size } = props
   switch (type) {
     case SELECTED:
-      return <SelectedTip size={size} isSelected={true} textInsideTip={''} />
+      return <SelectedTip size={size} isSelected={true} showStroke={false} />
     case INACCESSIBLE:
       return <NoTip size={size} />
     case UNSELECTED:
-      return <SelectedTip size={size} isSelected={false} textInsideTip={''} />
+      return <SelectedTip size={size} isSelected={false} showStroke={false} />
   }
 }

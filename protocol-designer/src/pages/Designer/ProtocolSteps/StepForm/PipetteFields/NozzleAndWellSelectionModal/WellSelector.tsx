@@ -1,20 +1,12 @@
 import { useTranslation } from 'react-i18next'
 
-import {
-  ALIGN_CENTER,
-  Box,
-  DIRECTION_COLUMN,
-  DIRECTION_ROW,
-  Flex,
-  SPACING,
-  StyledText,
-  WELL,
-} from '@opentrons/components'
+import { StyledText, WELL } from '@opentrons/components'
 import { getDeckDefFromRobotType } from '@opentrons/shared-data'
 
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
+import styles from './nozzleandwellwizard.module.css'
 
 import type {
   NozzleConfigurationStyle,
@@ -36,22 +28,21 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const isAspirate = stepType === 'aspirate'
   const isDispense = stepType === 'dispense'
   const isMix = stepType === 'mix'
-  let labwareId: string
 
-  switch (stepType) {
-    case 'aspirate':
-      labwareId = propsForFields.aspirate_labware.value as string
-      break
-    case 'dispense':
-      labwareId = propsForFields.dispense_labware.value as string
-      break
-    case 'mix':
-      labwareId = propsForFields.labware.value as string
-      break
-    default:
-      labwareId = ''
+  function getLabwareId(): string {
+    switch (stepType) {
+      case 'aspirate':
+        return propsForFields.aspirate_labware.value as string
+      case 'dispense':
+        return propsForFields.dispense_labware.value as string
+      case 'mix':
+        return propsForFields.labware.value as string
+      default:
+        return ''
+    }
   }
 
+  const labwareId = getLabwareId()
   const controls: JSX.Element = <></>
   const labware = deckSetup.labware[labwareId]
 
@@ -61,8 +52,8 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
 
   return (
-    <Flex flexDirection={DIRECTION_COLUMN}>
-      <Flex padding={SPACING.spacing20}>
+    <div className={styles.column_wrapper}>
+      <div className={styles.header_text_wrapper}>
         {isMix ? (
           <StyledText desktopStyle={'headingMediumBold'}>
             {t('select_wells_to_mix_liquid_in', {
@@ -85,18 +76,14 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
             })}
           </StyledText>
         ) : null}
-      </Flex>
+      </div>
 
-      <Flex
-        flexDirection={DIRECTION_ROW}
-        alignItems={ALIGN_CENTER}
-        padding={SPACING.spacing20}
-      >
+      <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
-        <Box width={'160px'}>
+        <div className={styles.well_legend_box}>
           <SelectionLegend selectionType={WELL} />
-        </Box>
-      </Flex>
-    </Flex>
+        </div>
+      </div>
+    </div>
   )
 }

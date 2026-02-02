@@ -3,12 +3,7 @@ import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import {
-  Box,
-  ModalShell,
-  PrimaryButton,
-  WizardHeader,
-} from '@opentrons/components'
+import { ModalShell, PrimaryButton, WizardHeader } from '@opentrons/components'
 
 import { getMainPagePortalEl } from '/protocol-designer/components/organisms'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -23,6 +18,7 @@ import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
 } from '@opentrons/shared-data'
+import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 import type { FieldPropsByName } from '../../types'
 
 interface NozzleAndWellSelectionModalProps {
@@ -32,7 +28,7 @@ interface NozzleAndWellSelectionModalProps {
   pipetteSpecs: PipetteV2Specs
   options: DropdownOption[]
   updateValue: (arg: unknown) => void
-  deckSetup: any
+  deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
   value: NozzleConfigurationStyle
@@ -65,49 +61,48 @@ export function NozzleAndWellSelectionModal(
   const handleClose = (): void => {
     showModal(false)
   }
-  let currentComponent: JSX.Element
-  switch (currentStepIndex) {
-    case 0:
-      currentComponent = (
-        <PipetteNozzleSelector
-          pipetteSpecs={pipetteSpecs}
-          options={options}
-          robotType={robotType}
-          updateValue={updateValue}
-          value={value}
-          setSelectedValue={setSelectedValue}
-        />
-      )
-      break
+  function getStepComponent(): JSX.Element {
+    switch (currentStepIndex) {
+      case 0:
+        return (
+          <PipetteNozzleSelector
+            pipetteSpecs={pipetteSpecs}
+            options={options}
+            robotType={robotType}
+            updateValue={updateValue}
+            value={value}
+            setSelectedValue={setSelectedValue}
+          />
+        )
 
-    case 1:
-      currentComponent = (
-        <WellSelector
-          propsForFields={propsForFields}
-          deckSetup={deckSetup}
-          stepType={isMixStep ? stepType : 'aspirate'}
-          robotType={robotType}
-          nozzleConfiguration={value}
-        />
-      )
-      break
+      case 1:
+        return (
+          <WellSelector
+            propsForFields={propsForFields}
+            deckSetup={deckSetup}
+            stepType={isMixStep ? stepType : 'aspirate'}
+            robotType={robotType}
+            nozzleConfiguration={value}
+          />
+        )
 
-    case 2:
-      currentComponent = (
-        <WellSelector
-          propsForFields={propsForFields}
-          deckSetup={deckSetup}
-          stepType={'dispense'}
-          robotType={robotType}
-          nozzleConfiguration={value}
-        />
-      )
-      break
-    default:
-      console.warn(`no current component for step index ${currentStepIndex}`)
-      currentComponent = <></>
+      case 2:
+        return (
+          <WellSelector
+            propsForFields={propsForFields}
+            deckSetup={deckSetup}
+            stepType={'dispense'}
+            robotType={robotType}
+            nozzleConfiguration={value}
+          />
+        )
+
+      default:
+        console.warn(`no current component for step index ${currentStepIndex}`)
+        return <></>
+    }
   }
-
+  const currentComponent = getStepComponent()
   const header = (
     <WizardHeader
       title={t('select_nozzles_and_wells')}
@@ -132,7 +127,7 @@ export function NozzleAndWellSelectionModal(
 
   return createPortal(
     <ModalShell header={header} width="56.25rem" footer={footerElement}>
-      <Box>{children}</Box>
+      <div>{children}</div>
       {currentComponent}
     </ModalShell>,
     getMainPagePortalEl()

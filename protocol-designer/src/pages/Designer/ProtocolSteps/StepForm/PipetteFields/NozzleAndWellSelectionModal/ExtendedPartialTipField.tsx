@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { Flex, ListButton, SPACING, StyledText } from '@opentrons/components'
+import { ListButton, StyledText } from '@opentrons/components'
 import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
+import styles from './nozzleandwellwizard.module.css'
 
 import type { DropdownOption } from '@opentrons/components'
 import type {
@@ -24,13 +25,7 @@ interface ExtendedPartialTipFieldProps extends FieldProps {
 export function ExtendedPartialTipField(
   props: ExtendedPartialTipFieldProps
 ): JSX.Element {
-  const {
-    updateValue,
-    padding = `0 ${SPACING.spacing16}`,
-    pipetteSpecs,
-    propsForFields,
-    stepType,
-  } = props
+  const { updateValue, pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
 
@@ -164,35 +159,26 @@ export function ExtendedPartialTipField(
   }
   return (
     <>
-      <Flex padding={padding}>
-        <ListButton
-          type="noActive"
-          width="100%"
-          padding={SPACING.spacing12}
-          onClick={() => {
-            handleOpen()
-          }}
-        >
+      <div className={styles.nozzle_selection_text}>
+        <ListButton type="noActive" onClick={handleOpen}>
           <StyledText desktopStyle="bodyDefaultRegular">
             {getNozzleWellText()}
           </StyledText>
         </ListButton>
-      </Flex>
+      </div>
       {isNozzleAndWellModalOpen ? (
-        <>
-          <NozzleAndWellSelectionModal
-            showModal={setIsNozzleAndWellModalOpen}
-            totalSteps={3}
-            pipetteSpecs={pipetteSpecs}
-            updateValue={updateValue}
-            setSelectedValue={setSelectedValue}
-            options={options}
-            deckSetup={deckSetup}
-            propsForFields={propsForFields}
-            stepType={stepType}
-            value={selectedValue as NozzleConfigurationStyle}
-          ></NozzleAndWellSelectionModal>
-        </>
+        <NozzleAndWellSelectionModal
+          showModal={setIsNozzleAndWellModalOpen}
+          totalSteps={3}
+          pipetteSpecs={pipetteSpecs}
+          updateValue={updateValue}
+          setSelectedValue={setSelectedValue}
+          options={options}
+          deckSetup={deckSetup}
+          propsForFields={propsForFields}
+          stepType={stepType}
+          value={selectedValue as NozzleConfigurationStyle}
+        />
       ) : null}
     </>
   )
