@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any, TypedDict, TypeGuard, cast, override
@@ -12,11 +13,11 @@ import pydantic
 from auth_server.users.scopes import Scope
 from auth_server.users.store import TEST_USERS, User
 
+_log = logging.getLogger(__name__)
+
 router = fastapi.APIRouter(prefix="/auth")
 
-
 _CLIENT_ID = "unregistered-client"
-
 
 # todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
 _TOKEN_LIFETIME = timedelta(minutes=3)
@@ -179,16 +180,34 @@ class RequestValidator(oauthlib.oauth2.RequestValidator):
     @override
     @pydantic.validate_call(config=_validate_call_config)
     def validate_bearer_token(
-        self, token: str, scopes: list[str], request: oauthlib.common.Request
-    ):
+        self,
+        # Despite the docs, token can apparently be None if this is called
+        # through verify_request().
+        token: str | None,
+        scopes: list[str],
+        request: oauthlib.common.Request,
+    ) -> bool:
+        if token is None:
+            _log.info("The request provided no bearer token.")
+            return False
+
         issuance = self.__token_store.find_active_access_token(token, now=_now())
         if issuance is not None:
             # find_active_access_token() already checked the expiration for us,
             # so we just need to check scope membership.
             requested_scopes = set(scopes)
             issued_scopes = issuance.scopes
-            return requested_scopes.issubset(issued_scopes)
+            if requested_scopes.issubset(issued_scopes):
+                return True
+            else:
+                _log.info(
+                    f"The request provided a bearer token with insufficient scopes."
+                    f" Required: {requested_scopes}."
+                    f" Provided: {issued_scopes}."
+                )
+                return False
         else:
+            _log.info("The request provided an expired or nonexistent bearer token.")
             return False
 
     @override

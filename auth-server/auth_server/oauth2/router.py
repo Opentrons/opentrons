@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+"""HTTP routes to implement OAuth 2 flows."""
 
 import fastapi
 
@@ -7,20 +7,17 @@ from .backend import server
 router = fastapi.APIRouter(prefix="/auth")
 
 
-def _now() -> datetime:
-    return datetime.now(tz=UTC)
-
-
 @router.post("/oauth2/token")
 async def token_endpoint(request: fastapi.Request) -> fastapi.Response:
     """The OAuth 2 token endpoint, as specified in RFC 6749."""
     form_data = await _get_form_data(request)
-    headers, body, status_code = server.create_token_response(
+    token_response: tuple[dict[str, str], str, int] = server.create_token_response(
         uri=str(request.url),
         http_method=request.method,  # type: ignore[arg-type]
         body=form_data,
         headers=dict(request.headers),
     )
+    headers, body, status_code = token_response
     return fastapi.Response(
         headers=headers,
         content=body,
@@ -35,7 +32,8 @@ async def introspection_endpoint(request: fastapi.Request) -> fastapi.Response:
     headers, body, status_code = server.create_introspect_response(
         uri=str(request.url),
         http_method=request.method,  # type: ignore[arg-type]
-        body=form_data,
+        # The type stubs are wrong; `body` can in fact be a `list[tuple[str, str]]`.
+        body=form_data,  # type: ignore[arg-type]
         headers=dict(request.headers),
     )
     return fastapi.Response(
