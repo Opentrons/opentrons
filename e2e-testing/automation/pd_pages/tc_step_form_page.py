@@ -88,9 +88,9 @@ class ThermocyclerStepPage(BasePage):
             position: "open" or "closed".
         """
         if position == "open":
-            self.page.get_by_text("Lid positionClosed").click()
+            self.page.get_by_test_id("ToggleButton_Closed").click()
         else:
-            self.page.get_by_text("Lid positionOpen").click()
+            self.page.get_by_test_id("ToggleButton_Open").click()
 
     # ========== Profile Mode: Well Volume & Temperatures ==========
 
