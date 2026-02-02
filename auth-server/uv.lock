@@ -72,6 +72,7 @@ dev = [
     { name = "sqlalchemy2-stubs" },
     { name = "tavern" },
     { name = "types-oauthlib" },
+    { name = "types-requests" },
 ]
 robot = [
     { name = "fastapi" },
@@ -112,6 +113,7 @@ dev = [
     { name = "sqlalchemy2-stubs", marker = "python_full_version >= '3.11'", specifier = "==0.0.2a21" },
     { name = "tavern", marker = "python_full_version >= '3.11'", specifier = ">=3.0.2" },
     { name = "types-oauthlib", marker = "python_full_version >= '3.11'", specifier = "==3.3.0.20250822" },
+    { name = "types-requests", marker = "python_full_version >= '3.11'", specifier = "==2.27.1" },
 ]
 robot = [
     { name = "fastapi", specifier = "==0.100.0" },
@@ -1186,6 +1188,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/6a/6e/d08033f562053c459322333c46baa8cf8d2d8c18f30d46dd898c8fd8df77/types_oauthlib-3.3.0.20250822.tar.gz", hash = "sha256:2cd41587dd80c199e4230e3f086777e9ae525e89579c64afe5e0039ab09be9de", size = 25700, upload-time = "2025-08-22T03:02:41.378Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/18/4b/00593b8b5d055550e1fcb9af2c42fa11b0a90bf16a94759a77bc1c3c0c72/types_oauthlib-3.3.0.20250822-py3-none-any.whl", hash = "sha256:b7f4c9b9eed0e020f454e0af800b10e93dd2efd196da65744b76910cce7e70d6", size = 48800, upload-time = "2025-08-22T03:02:40.427Z" },
+]
+
+[[package]]
+name = "types-requests"
+version = "2.27.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/3a/12/f17ed7841bbc299cc4f6b9e2b0c23b93fa006716f9a3b2021dea9094a43f/types-requests-2.27.1.tar.gz", hash = "sha256:59ae7a60ed4b61ece7ff6f0ccff394e4d65a6df9b2970cfeb7a0015cb0c91b7e", size = 14395, upload-time = "2022-01-07T11:32:15.382Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/69/9d/2119ebfc8c3cc849b61712c2b2fba5ac6e42c7406acb9423d1452400253f/types_requests-2.27.1-py3-none-any.whl", hash = "sha256:d03823054e34cb683ffcc4a05035482224c264096b20e1e14adb99f2b1775f09", size = 22722, upload-time = "2022-01-07T11:32:14.481Z" },
 ]
 
 [[package]]
