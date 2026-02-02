@@ -1,26 +1,32 @@
 """Pipette config data providers."""
+
+import re
 from dataclasses import dataclass
 from typing import Dict, Optional, Sequence
-import re
 
-from opentrons_shared_data.pipette.types import PipetteName, PipetteModel
+from opentrons_shared_data.errors.exceptions import MissingConfigurationData
 from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
     load_data as load_pipette_data,
-    types as pip_types,
+)
+from opentrons_shared_data.pipette import (
     pipette_definition,
 )
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
+)
+from opentrons_shared_data.pipette import (
+    types as pip_types,
+)
+from opentrons_shared_data.pipette.types import PipetteModel, PipetteName
 
+from ...types import Point
+from ..errors.exceptions import InvalidLoadPipetteSpecsError
+from ..types import FlowRates
 from opentrons.hardware_control.dev_types import PipetteDict
 from opentrons.hardware_control.nozzle_manager import (
     NozzleConfigurationManager,
     NozzleMap,
 )
-from opentrons_shared_data.errors.exceptions import MissingConfigurationData
-
-from ..errors.exceptions import InvalidLoadPipetteSpecsError
-from ..types import FlowRates
-from ...types import Point
 
 _TIP_OVERLAP_VERSION_RE = re.compile(r"^v\d+$")
 
@@ -70,7 +76,10 @@ class LoadedStaticPipetteData:
     plunger_positions: Dict[str, float]
     shaft_ul_per_mm: float
     available_sensors: pipette_definition.AvailableSensorDefinition
-    volume_mode: pip_types.LiquidClasses  # pip_types Liquid Classes refers to volume modes
+    volume_mode: (
+        pip_types.LiquidClasses
+    )  # pip_types Liquid Classes refers to volume modes
+    available_volume_modes_min_vol: Dict[pip_types.LiquidClasses, float]  # Ditto
 
 
 class VirtualPipetteDataProvider:
@@ -300,6 +309,10 @@ class VirtualPipetteDataProvider:
             available_sensors=config.available_sensors
             or pipette_definition.AvailableSensorDefinition(sensors=[]),
             volume_mode=liquid_class,
+            available_volume_modes_min_vol={
+                volume_mode: props.min_volume
+                for volume_mode, props in config.liquid_properties.items()
+            },
         )
 
     def get_virtual_pipette_static_config(
@@ -356,6 +369,10 @@ def get_pipette_static_config(
         shaft_ul_per_mm=pipette_dict["shaft_ul_per_mm"],
         available_sensors=available_sensors,
         volume_mode=pipette_dict["volume_mode"],
+        available_volume_modes_min_vol={
+            volume_mode: props.min_volume
+            for volume_mode, props in pipette_dict["available_volume_modes"].items()
+        },
     )
 
 
@@ -363,6 +380,7 @@ def get_latest_tip_overlap_before_version(
     overlap: Dict[str, Dict[str, float]], version: str
 ) -> Dict[str, float]:
     """Get the latest tip overlap definitions that are equal or older than the version."""
+
     # TODO: make this less awful
     def _numeric(versionstr: str) -> int:
         return int(versionstr[1:])

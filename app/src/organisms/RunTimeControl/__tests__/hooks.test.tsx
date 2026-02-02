@@ -4,13 +4,13 @@ import { when } from 'vitest-when'
 
 import '@testing-library/jest-dom/vitest'
 
+import { RUN_STATUS_RUNNING } from '@opentrons/api-client'
 import { useRunActionMutations } from '@opentrons/react-api-client'
 
 import {
   useCloneRun,
   useCurrentRunId,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 import {
   mockPausedRun,
@@ -49,7 +49,8 @@ describe('useRunControls hook', () => {
       pauseRun: mockPauseRun,
       stopRun: mockStopRun,
       resumeRunFromRecovery: mockResumeRunFromRecovery,
-      resumeRunFromRecoveryAssumingFalsePositive: mockResumeRunFromRecoveryAssumingFalsePositive,
+      resumeRunFromRecoveryAssumingFalsePositive:
+        mockResumeRunFromRecoveryAssumingFalsePositive,
       isPlayRunActionLoading: false,
       isPauseRunActionLoading: false,
       isStopRunActionLoading: false,
@@ -81,9 +82,17 @@ describe('useCurrentRunStatus hook', () => {
   })
 
   it('returns the run status of the current run', async () => {
-    when(useRunStatus).calledWith(RUN_ID_2).thenReturn('running')
-    const { result } = renderHook(useCurrentRunStatus)
-    expect(result.current).toBe('running')
+    when(useNotifyRunQuery)
+      .calledWith(RUN_ID_2, expect.any(Object))
+      .thenReturn({
+        data: {
+          data: {
+            ...mockRunningRun,
+          },
+        },
+      } as unknown as UseQueryResult<Run>)
+    const { result } = renderHook(() => useCurrentRunStatus({}))
+    expect(result.current).toBe(RUN_STATUS_RUNNING)
   })
 })
 
@@ -107,14 +116,14 @@ describe('useRunErrors hook', () => {
     ]
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: {
           data: {
             ...mockRunningRun,
             errors: fixtureErrors,
           },
         },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunErrors(RUN_ID_2))
     expect(result.current).toBe(fixtureErrors)
@@ -123,12 +132,12 @@ describe('useRunErrors hook', () => {
   it('returns no errors if no errors present', async () => {
     when(useNotifyRunQuery)
       .calledWith(RUN_ID_2, expect.any(Object))
-      .thenReturn(({
+      .thenReturn({
         data: {
           data: mockRunningRun,
           errors: undefined,
         },
-      } as unknown) as UseQueryResult<Run>)
+      } as unknown as UseQueryResult<Run>)
 
     const { result } = renderHook(() => useRunErrors(RUN_ID_2))
     expect(result.current).toEqual([])

@@ -1,18 +1,17 @@
 """Test robot.move-axes-to commands."""
+
 from decoy import Decoy
 
 from opentrons.hardware_control import HardwareControlAPI
-
-from opentrons.protocol_engine.execution import GantryMover
-from opentrons.protocol_engine.types import MotorAxis
 from opentrons.hardware_control.protocols.types import FlexRobotType
-
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.robot.move_axes_to import (
+    MoveAxesToImplementation,
     MoveAxesToParams,
     MoveAxesToResult,
-    MoveAxesToImplementation,
 )
+from opentrons.protocol_engine.execution import GantryMover
+from opentrons.protocol_engine.types import MotorAxis
 
 
 async def test_move_axes_to_implementation(

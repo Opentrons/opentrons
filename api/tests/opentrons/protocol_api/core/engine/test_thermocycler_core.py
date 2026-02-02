@@ -1,25 +1,26 @@
 """Tests for the engine based Protocol API module core implementations."""
 
 from typing import cast
+
 import pytest
 from _pytest.fixtures import SubRequest
 from decoy import Decoy
 
+from ... import versions_at_or_above, versions_below
 from opentrons.drivers.types import ThermocyclerLidStatus
 from opentrons.hardware_control import SynchronousAdapter
 from opentrons.hardware_control.modules import (
-    Thermocycler,
-    TemperatureStatus,
     ModuleType,
+    TemperatureStatus,
+    Thermocycler,
 )
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.clients import SyncClient as EngineClient
-from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
+from opentrons.protocol_api import MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.core.engine.module_core import ThermocyclerModuleCore
 from opentrons.protocol_api.core.engine.protocol import ProtocolCore
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.core.engine.tasks import EngineTaskCore
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as EngineClient
 from opentrons.protocols.api_support.types import APIVersion
-from ... import versions_below, versions_at_or_above
 
 SyncThermocyclerHardware = SynchronousAdapter[Thermocycler]
 
@@ -144,7 +145,32 @@ def test_close_lid(
 def test_set_target_block_temperature(
     decoy: Decoy, mock_engine_client: EngineClient, subject: ThermocyclerModuleCore
 ) -> None:
-    """It should set the block temperature with the engine client and return an EngineTaskCore."""
+    """It should set the block temperature with the engine client."""
+    subject.set_target_block_temperature(
+        celsius=42.0,
+        hold_time_seconds=1.2,
+        block_max_volume=3.4,
+        ramp_rate=None,
+    )
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.thermocycler.SetTargetBlockTemperatureParams(
+                moduleId="1234",
+                celsius=42.0,
+                blockMaxVolumeUl=3.4,
+                holdTimeSeconds=1.2,
+                ramp_rate=None,
+            )
+        ),
+        times=1,
+    )
+
+
+def test_start_set_target_block_temperature(
+    decoy: Decoy, mock_engine_client: EngineClient, subject: ThermocyclerModuleCore
+) -> None:
+    """It should start to set the block temperature with the engine client and return an EngineTaskCore."""
     task_mock = decoy.mock(cls=EngineTaskCore)
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
@@ -152,7 +178,6 @@ def test_set_target_block_temperature(
                 moduleId="1234",
                 celsius=42.0,
                 blockMaxVolumeUl=3.4,
-                holdTimeSeconds=1.2,
                 ramp_rate=None,
             )
         )
@@ -162,9 +187,8 @@ def test_set_target_block_temperature(
         )
     )
     task_mock._id = "taskId"
-    result = subject.set_target_block_temperature(
+    result = subject.start_set_target_block_temperature(
         celsius=42.0,
-        hold_time_seconds=1.2,
         block_max_volume=3.4,
         ramp_rate=None,
     )
@@ -191,6 +215,24 @@ def test_set_target_lid_temperature(
     mock_engine_client: EngineClient,
     subject: ThermocyclerModuleCore,
 ) -> None:
+    """It should set the lid temperature with the engine client."""
+    subject.set_target_lid_temperature(celsius=42.0)
+
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.thermocycler.SetTargetLidTemperatureParams(
+                moduleId="1234", celsius=42.0
+            )
+        ),
+        times=1,
+    )
+
+
+def test_start_set_target_lid_temperature(
+    decoy: Decoy,
+    mock_engine_client: EngineClient,
+    subject: ThermocyclerModuleCore,
+) -> None:
     """It should set the lid temperature with the engine client and return an EngineTaskCore."""
     task_mock = decoy.mock(cls=EngineTaskCore)
     decoy.when(
@@ -205,7 +247,7 @@ def test_set_target_lid_temperature(
         )
     )
     task_mock._id = "taskId"
-    result = subject.set_target_lid_temperature(42.0)
+    result = subject.start_set_target_lid_temperature(42.0)
     assert isinstance(result, EngineTaskCore)
     assert result._id == "taskId"
 

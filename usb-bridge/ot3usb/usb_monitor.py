@@ -23,9 +23,11 @@ In that case, it is important to check for an OSError on the port while
 reading new data.
 
 """
-import pyudev  # type: ignore[import-untyped]
+
 import logging
 import os
+
+import pyudev  # type: ignore[import-untyped]
 
 LOG = logging.getLogger(__name__)
 

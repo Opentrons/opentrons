@@ -18,24 +18,26 @@ import {
 } from '../../constants'
 import { createPresavedStepForm } from '../utils/createPresavedStepForm'
 
+import type { LabwareEntity, PipetteEntity } from '@opentrons/step-generation'
 import type { CreatePresavedStepFormArgs } from '../utils/createPresavedStepForm'
 
 const stepId = 'stepId123'
 const EXAMPLE_ENGAGE_HEIGHT = '18'
-let defaultArgs: any
+let defaultArgs: CreatePresavedStepFormArgs
 beforeEach(() => {
   const { robotState } = getStateAndContextTempTCModules({
     temperatureModuleId: 'someTemperatureModuleId',
     thermocyclerId: 'someThermocyclerModuleId',
   })
-  const leftPipette = {
+  const leftPipette: PipetteEntity = {
     name: 'p10_single',
     id: 'leftPipetteId',
     spec: fixtureP10SingleV2Specs,
-    tiprackLabwareDef: [fixture_tiprack_10_ul],
+    tiprackLabwareDef: [fixture_tiprack_10_ul as any],
     tiprackDefURI: ['defaultTipRack'],
+    pythonName: 'left_pipette',
   }
-  const labwareOnMagModule = {
+  const labwareOnMagModule: LabwareEntity = {
     id: 'labwareOnMagModule',
     def: {
       parameters: {
@@ -43,7 +45,7 @@ beforeEach(() => {
         isTiprack: false,
       },
     },
-  }
+  } as any
   const tipRack = {
     id: 'tipRack',
     def: fixture_tiprack_10_ul,
@@ -55,8 +57,10 @@ beforeEach(() => {
     },
     labwareEntities: {
       labwareOnMagModule: {
+        // todo(mm, 2025-12-15): Was this supposed to be a `...labwareOnMagModule` spread?
+        // Currently, this does not conform to the LabwareEntity type.
         labwareOnMagModule,
-      },
+      } as any,
     },
     additionalEquipmentEntities: {
       mockTrash: { name: 'trashBin', id: 'mockTrash', location: 'A3' },
@@ -70,6 +74,8 @@ beforeEach(() => {
           stack: ['labwareOnMagModule', 'someMagneticModuleId', '1'],
         },
       },
+      // @ts-expect-error: Unrecognized property, inherited from prior code with less type safety.
+      // Remove this if it's safe.
       tipRack: {
         ...tipRack,
         stack: ['tipRack', '6'],
@@ -80,19 +86,19 @@ beforeEach(() => {
           type: MAGNETIC_MODULE_TYPE,
           model: MAGNETIC_MODULE_V2,
           slot: '1',
-        },
+        } as any,
         someTemperatureModuleId: {
           id: 'someTemperatureModuleId',
           type: TEMPERATURE_MODULE_TYPE,
           model: TEMPERATURE_MODULE_V2,
           slot: '3',
-        },
+        } as any,
         someThermocyclerModuleId: {
           id: 'someTemperatureModuleId',
           type: THERMOCYCLER_MODULE_TYPE,
           model: THERMOCYCLER_MODULE_V1,
           slot: '3',
-        },
+        } as any,
       },
       pipettes: {
         leftPipetteId: { ...leftPipette, mount: 'left' },
@@ -138,7 +144,10 @@ describe('createPresavedStepForm', () => {
     })
   })
   it(`should call handleFormChange with a default pipette and drop tip location for "moveLiquid" step`, () => {
-    const args = { ...defaultArgs, stepType: 'moveLiquid' }
+    const args: CreatePresavedStepFormArgs = {
+      ...defaultArgs,
+      stepType: 'moveLiquid',
+    }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       pipette: 'leftPipetteId',
@@ -234,11 +243,17 @@ describe('createPresavedStepForm', () => {
       liquidClassesSupported: true,
       liquidClass: 'none',
       stepNumber: 0,
+      tip_tracking: 'automatic',
+      tiprack_selected: null,
+      tips_selected: [],
     })
   })
   describe('mix step', () => {
     it('should call handleFormChange with a default pipette and drop tip location for mix step', () => {
-      const args = { ...defaultArgs, stepType: 'mix' }
+      const args: CreatePresavedStepFormArgs = {
+        ...defaultArgs,
+        stepType: 'mix',
+      }
       expect(createPresavedStepForm(args)).toEqual({
         id: stepId,
         pipette: 'leftPipetteId',
@@ -280,11 +295,17 @@ describe('createPresavedStepForm', () => {
         pushOut_checkbox: null,
         pushOut_volume: null,
         mix_position_reference: 'well-bottom',
+        tip_tracking: 'automatic',
+        tiprack_selected: null,
+        tips_selected: [],
       })
     })
   })
   it('should set a default magnetic module for magnet step, and set engage height and magnetAction=engage, when it is the first magnet step in the timeline', () => {
-    const args = { ...defaultArgs, stepType: 'magnet' }
+    const args: CreatePresavedStepFormArgs = {
+      ...defaultArgs,
+      stepType: 'magnet',
+    }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       stepType: 'magnet',
@@ -298,7 +319,7 @@ describe('createPresavedStepForm', () => {
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=disengage, when the previous magnet step is an engage', () => {
-    const args = {
+    const args: CreatePresavedStepFormArgs = {
       ...defaultArgs,
       savedStepForms: {
         prevStepId: {
@@ -327,7 +348,7 @@ describe('createPresavedStepForm', () => {
     })
   })
   it('should set a default magnetic module for magnet step, and set magnetAction=engage, when the previous magnet step is a disengage', () => {
-    const args = {
+    const args: CreatePresavedStepFormArgs = {
       ...defaultArgs,
       savedStepForms: {
         prevStepId: {
@@ -355,7 +376,10 @@ describe('createPresavedStepForm', () => {
     })
   })
   it('should set a default temperature module when a Temperature step is added', () => {
-    const args = { ...defaultArgs, stepType: 'temperature' }
+    const args: CreatePresavedStepFormArgs = {
+      ...defaultArgs,
+      stepType: 'temperature',
+    }
     expect(createPresavedStepForm(args)).toEqual({
       id: stepId,
       stepType: 'temperature',
@@ -379,26 +403,36 @@ describe('createPresavedStepForm', () => {
         // mutate robot state in defaultArgs
         if (timelineHasErrors) {
           defaultArgs.robotStateTimeline = {
-            errors: ['OH NO!'],
+            errors: [{ message: 'OH NO!', type: 'GRIPPER_REQUIRED' }],
             timeline: [],
           }
         } else {
           const thermocyclerModuleState =
-            defaultArgs.robotStateTimeline.timeline[0].robotState.modules
+            defaultArgs.robotStateTimeline!.timeline[0].robotState.modules
               .someThermocyclerModuleId
           thermocyclerModuleState.moduleState = {
             ...thermocyclerModuleState.moduleState,
-            blockTargetTemp: 42,
+            // Need to specify module type here to help TypeScript recognize the following module-specific fields.
+            type: 'thermocyclerModuleType',
+            currentBlockActivity: {
+              type: 'blockTargetTemp',
+              blockTargetTemp: 42,
+            },
             lidTargetTemp: 43,
             lidOpen: true,
+            numProfilesStarted: 0,
           }
         }
 
-        const args = { ...defaultArgs, stepType: 'thermocycler' }
+        const args: CreatePresavedStepFormArgs = {
+          ...defaultArgs,
+          stepType: 'thermocycler',
+        }
 
         if (isFirstThermocyclerStep) {
           args.savedStepForms = {
             prevStepId: {
+              id: 'prevStepId',
               stepType: 'thermocycler',
               // TC Default fields (should all be ignored, robotState is used to populate the form)
               stepName: 'thermocycler',
@@ -414,11 +448,6 @@ describe('createPresavedStepForm', () => {
               profileTargetLidTemp: null,
               orderedProfileItems: [],
               profileItemsById: {},
-              blockIsActiveHold: false,
-              blockTargetTempHold: null,
-              lidIsActiveHold: false,
-              lidTargetTempHold: null,
-              lidOpenHold: null,
             },
           }
           args.orderedStepIds = ['prevStepId']
@@ -426,16 +455,11 @@ describe('createPresavedStepForm', () => {
 
         expect(createPresavedStepForm(args)).toEqual({
           blockIsActive: !timelineHasErrors,
-          blockIsActiveHold: false,
           blockTargetTemp: timelineHasErrors ? null : 42,
-          blockTargetTempHold: null,
           id: stepId,
           lidIsActive: !timelineHasErrors,
-          lidIsActiveHold: false,
           lidOpen: !timelineHasErrors,
-          lidOpenHold: null,
           lidTargetTemp: timelineHasErrors ? null : 43,
-          lidTargetTempHold: null,
           moduleId: 'someThermocyclerModuleId',
           orderedProfileItems: [],
           profileItemsById: {},
@@ -450,11 +474,17 @@ describe('createPresavedStepForm', () => {
       })
     })
   })
-  it('should default movdLabware form useGripper value to `true` if gripper is added', () => {
-    const args = {
+  it('should default moveLabware form useGripper value to `true` if gripper is added', () => {
+    const args: CreatePresavedStepFormArgs = {
       ...defaultArgs,
       additionalEquipmentEntities: {
-        gripperId: { name: 'gripper', id: 'gripperId' },
+        gripperId: {
+          name: 'gripper',
+          id: 'gripperId',
+          // todo(mm, 2025-12-15): `location: undefined` inherited from prior code with less type safety.
+          // Should this be GRIPPER_LOCATION?
+          location: undefined as any,
+        },
       },
       stepType: 'moveLabware',
     }

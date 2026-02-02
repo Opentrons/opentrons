@@ -1,4 +1,4 @@
-""" opentrons.simulate: functions and entrypoints for simulating protocols
+"""opentrons.simulate: functions and entrypoints for simulating protocols
 
 This module has functions that provide a console entrypoint for simulating
 a protocol from the command line.
@@ -7,82 +7,85 @@ a protocol from the command line.
 import argparse
 import asyncio
 import atexit
-from contextlib import ExitStack, contextmanager
-import sys
 import logging
 import os
 import pathlib
 import queue
+import sys
+from contextlib import ExitStack, contextmanager
 from typing import (
     TYPE_CHECKING,
-    Generator,
     Any,
+    BinaryIO,
     Dict,
+    Generator,
+    Iterator,
     List,
     Mapping,
+    Optional,
     TextIO,
     Tuple,
-    BinaryIO,
-    Optional,
     Union,
-    Iterator,
 )
+
 from typing_extensions import Literal
 
+from opentrons_shared_data.labware.labware_definition import (
+    labware_definition_type_adapter,
+)
 from opentrons_shared_data.robot.types import RobotType
 
 import opentrons
-from opentrons import should_use_ot3
+from .util import entrypoint_util
+from opentrons import protocol_api, should_use_ot3
+from opentrons.config import IS_ROBOT
 from opentrons.hardware_control import (
     API as OT2API,
-    ThreadManager,
-    ThreadManagedHardware,
 )
-from opentrons.hardware_control.types import HardwareFeatureFlags
-
+from opentrons.hardware_control import (
+    ThreadManagedHardware,
+    ThreadManager,
+)
 from opentrons.hardware_control.simulator_setup import load_simulator
+from opentrons.hardware_control.types import HardwareFeatureFlags
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import types as command_types
 from opentrons.protocol_api.core.engine import ENGINE_CORE_API_VERSION
 from opentrons.protocol_api.protocol_context import ProtocolContext
-from opentrons.protocol_engine.create_protocol_engine import (
-    create_protocol_engine_in_thread,
-    create_protocol_engine,
-)
 from opentrons.protocol_engine import error_recovery_policy
+from opentrons.protocol_engine.create_protocol_engine import (
+    create_protocol_engine,
+    create_protocol_engine_in_thread,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
 from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.types import DeckType, EngineStatus, PostRunHardwareState
 from opentrons.protocol_reader.protocol_source import ProtocolSource
-from opentrons.protocol_runner.protocol_runner import create_protocol_runner, LiveRunner
 from opentrons.protocol_runner import RunOrchestrator
-from opentrons.protocols.duration import DurationEstimator
-from opentrons.protocols.execution import execute
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.config import IS_ROBOT
-from opentrons import protocol_api
-from opentrons.legacy_commands import types as command_types
-
-from opentrons.protocols import parse, bundle
-from opentrons.protocols.types import (
-    ApiDeprecationError,
-    Protocol,
-    PythonProtocol,
-    BundleContents,
-)
+from opentrons.protocol_runner.protocol_runner import LiveRunner, create_protocol_runner
+from opentrons.protocols import bundle, parse
 from opentrons.protocols.api_support.deck_type import (
     for_simulation as deck_type_for_simulation,
+)
+from opentrons.protocols.api_support.deck_type import (
     should_load_fixed_trash,
     should_load_fixed_trash_labware_for_python_protocol,
 )
 from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.labware.labware_definition import (
-    labware_definition_type_adapter,
+from opentrons.protocols.duration import DurationEstimator
+from opentrons.protocols.execution import execute
+from opentrons.protocols.types import (
+    ApiDeprecationError,
+    BundleContents,
+    Protocol,
+    PythonProtocol,
 )
-
-from .util import entrypoint_util
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.types import (
         LabwareDefinition as LabwareDefinitionDict,
     )
+
     from opentrons.protocol_engine import ProtocolEngine
 
 
@@ -233,45 +236,48 @@ def get_protocol_api(
     use_virtual_hardware: bool = True,
 ) -> protocol_api.ProtocolContext:
     """
-    Build and return a ``protocol_api.ProtocolContext`` that simulates robot control.
+    Build and return a `protocol_api.ProtocolContext` that simulates robot control.
 
     This can be used to simulate protocols from interactive Python sessions
     such as Jupyter or an interpreter on the command line:
 
-    .. code-block:: python
+    ```python
+    from opentrons.simulate import get_protocol_api
+    protocol = get_protocol_api('2.0')
+    instr = protocol.load_instrument('p300_single', 'right')
+    instr.home()
+    ```
 
-        >>> from opentrons.simulate import get_protocol_api
-        >>> protocol = get_protocol_api('2.0')
-        >>> instr = protocol.load_instrument('p300_single', 'right')
-        >>> instr.home()
+    Args:
+        version: The API version to use. This must be lower than
+            `opentrons.protocol_api.MAX_SUPPORTED_VERSION`.
+            It may be specified either as a string (`'2.0'`) or
+            as a [`APIVersion`][opentrons.protocols.api_support.types.APIVersion]
+            (`APIVersion(2, 0)`).
+        bundled_labware: If specified, a mapping from labware names to
+            labware definitions for labware to consider in the
+            protocol. Note that if you specify this, *only*
+            labware in this argument will be allowed in the
+            protocol. This is preparation for a beta feature
+            and is best not used.
+        bundled_data: If specified, a mapping from filenames to contents
+            for data to be available in the protocol from
+            [`bundled_data`][opentrons.protocol_api.ProtocolContext.bundled_data].
+        extra_labware: A mapping from labware load names to custom labware definitions.
+            If this is `None` (the default), and this function is called on a robot,
+            it will look for labware in the `labware` subdirectory of the Jupyter
+            data directory.
+        hardware_simulator: This is only for internal use by Opentrons. If specified,
+            it's a hardware simulator instance to reuse instead of creating a fresh one.
+        robot_type: The type of robot to simulate: either `"Flex"` or `"OT-2"`.
+            If you're running this function on a robot, the default is the type of that
+            robot. Otherwise, the default is `"OT-2"`, for backwards compatibility.
+        use_virtual_hardware: This is only for internal use by Opentrons.
+            If `True`, use the Protocol Engine's virtual hardware. If `False`, use the
+            lower level hardware simulator.
 
-    :param version: The API version to use. This must be lower than
-        ``opentrons.protocol_api.MAX_SUPPORTED_VERSION``.
-        It may be specified either as a string (``'2.0'``) or
-        as a ``protocols.types.APIVersion``
-        (``APIVersion(2, 0)``).
-    :param bundled_labware: If specified, a mapping from labware names to
-        labware definitions for labware to consider in the
-        protocol. Note that if you specify this, *only*
-        labware in this argument will be allowed in the
-        protocol. This is preparation for a beta feature
-        and is best not used.
-    :param bundled_data: If specified, a mapping from filenames to contents
-        for data to be available in the protocol from
-        :py:obj:`opentrons.protocol_api.ProtocolContext.bundled_data`.
-    :param extra_labware: A mapping from labware load names to custom labware definitions.
-        If this is ``None`` (the default), and this function is called on a robot,
-        it will look for labware in the ``labware`` subdirectory of the Jupyter
-        data directory.
-    :param hardware_simulator: This is only for internal use by Opentrons. If specified,
-        it's a hardware simulator instance to reuse instead of creating a fresh one.
-    :param robot_type: The type of robot to simulate: either ``"Flex"`` or ``"OT-2"``.
-        If you're running this function on a robot, the default is the type of that
-        robot. Otherwise, the default is ``"OT-2"``, for backwards compatibility.
-    :param use_virtual_hardware: This is only for internal use by Opentrons.
-        If ``True``, use the Protocol Engine's virtual hardware. If ``False``, use the
-        lower level hardware simulator.
-    :return: The protocol context.
+    Returns:
+        The protocol context.
     """
     if isinstance(version, str):
         checked_version = parse.version_from_string(version)
@@ -455,71 +461,75 @@ def simulate(
     internal server infrastructure) sources.
 
     To simulate an opentrons protocol from other places, pass in a file-like
-    object as ``protocol_file``; this function either returns (if the simulation
+    object as `protocol_file`; this function either returns (if the simulation
     has no problems) or raises an exception.
 
     To call from the command line, use either the autogenerated entrypoint
-    ``opentrons_simulate`` (``opentrons_simulate.exe``, on windows) or
-    ``python -m opentrons.simulate``.
+    `opentrons_simulate` (`opentrons_simulate.exe`, on Windows) or
+    `python -m opentrons.simulate`.
 
     The return value is the run log, a list of dicts that represent the
     commands executed by the robot; and either the contents of the protocol
-    that would be required to bundle, or ``None``.
+    that would be required to bundle, or `None`.
 
     Each dict element in the run log has the following keys:
 
-        - ``level``: The depth at which this command is nested. If this an
-          aspirate inside a mix inside a transfer, for instance, it would be 3.
+    - `level`: The depth at which this command is nested. If this is an
+        aspirate inside a mix inside a transfer, for instance, it would be 3.
 
-        - ``payload``: The command. The human-readable run log text is available at
-          ``payload["text"]``. The other keys of ``payload`` are command-dependent;
-          see ``opentrons.legacy_commands``.
+    - `payload`: The command. The human-readable run log text is available at
+        `payload["text"]`. The other keys of `payload` are command-dependent;
+        see `opentrons.legacy_commands`.
 
-          .. note::
-            In older software versions, ``payload["text"]`` was a
-            `format string <https://docs.python.org/3/library/string.html#formatstrings>`_.
-            To get human-readable text, you had to do ``payload["text"].format(**payload)``.
-            Don't do that anymore. If ``payload["text"]`` happens to contain any
-            ``{`` or ``}`` characters, it can confuse ``.format()`` and cause it to raise a
-            ``KeyError``.
+        !!! note
+            In older software versions, `payload["text"]` was a
+            [format string](https://docs.python.org/3/library/string.html#formatstrings).
+            To get human-readable text, you had to do
+            `payload["text"].format(**payload)`. Don't do that anymore. If
+            `payload["text"]` happens to contain any `{` or `}` characters, it
+            can confuse `.format()` and cause it to raise a `KeyError`.
 
-        - ``logs``: Any log messages that occurred during execution of this
-          command, as a standard Python :py:obj:`~logging.LogRecord`.
+    - `logs`: Any log messages that occurred during execution of this
+        command, as a standard Python
+        [`LogRecord`](https://docs.python.org/3/library/logging.html#logging.LogRecord).
 
-    :param protocol_file: The protocol file to simulate.
-    :param file_name: The name of the file
-    :param custom_labware_paths: A list of directories to search for custom labware.
-        Loads valid labware from these paths and makes them available
-        to the protocol context. If this is ``None`` (the default), and
-        this function is called on a robot, it will look in the ``labware``
-        subdirectory of the Jupyter data directory.
-    :param custom_data_paths: A list of directories or files to load custom
-        data files from. Ignored if the apiv2 feature
-        flag if not set. Entries may be either files or
-        directories. Specified files and the
-        non-recursive contents of specified directories
-        are presented by the protocol context in
-        ``protocol_api.ProtocolContext.bundled_data``.
-    :param hardware_simulator_file_path: A path to a JSON file defining the simulated
-        hardware. This is mainly for internal use by Opentrons, and is not necessary
-        to simulate protocols.
-    :param duration_estimator: For internal use only.
-        Optional duration estimator object.
-    :param propagate_logs: Whether this function should allow logs from the
-        Opentrons stack to propagate up to the root handler.
-        This can be useful if you're integrating this
-        function in a larger application, but most logs that
-        occur during protocol simulation are best associated
-        with the actions in the protocol that cause them.
-        Default: ``False``
-    :param log_level: The level of logs to capture in the run log:
-        ``"debug"``, ``"info"``, ``"warning"``, or ``"error"``.
-        Defaults to ``"warning"``.
-    :returns: A tuple of a run log for user output, and possibly the required
-        data to write to a bundle to bundle this protocol. The bundle is
-        only emitted if bundling is allowed
-        and this is an unbundled Protocol API
-        v2 python protocol. In other cases it is None.
+    Args:
+        protocol_file: The protocol file to simulate.
+        file_name: The name of the file.
+        custom_labware_paths: A list of directories to search for custom labware.
+            Loads valid labware from these paths and makes them available
+            to the protocol context. If this is `None` (the default), and
+            this function is called on a robot, it will look in the `labware`
+            subdirectory of the Jupyter data directory.
+        custom_data_paths: A list of directories or files to load custom
+            data files from. Ignored if the apiv2 feature
+            flag is not set. Entries may be either files or
+            directories. Specified files and the
+            non-recursive contents of specified directories
+            are presented by the protocol context in
+            [`bundled_data`][opentrons.protocol_api.ProtocolContext.bundled_data].
+        hardware_simulator_file_path: A path to a JSON file defining the simulated
+            hardware. This is mainly for internal use by Opentrons, and is not necessary
+            to simulate protocols.
+        duration_estimator: For internal use only.
+            Optional duration estimator object.
+        propagate_logs: Whether this function should allow logs from the
+            Opentrons stack to propagate up to the root handler.
+            This can be useful if you're integrating this
+            function in a larger application, but most logs that
+            occur during protocol simulation are best associated
+            with the actions in the protocol that cause them.
+            Default: `False`.
+        log_level: The level of logs to capture in the run log:
+            `"debug"`, `"info"`, `"warning"`, or `"error"`.
+            Defaults to `"warning"`.
+
+    Returns:
+        A tuple of a run log for user output, and possibly the required
+            data to write to a bundle to bundle this protocol. The bundle is
+            only emitted if bundling is allowed
+            and this is an unbundled Protocol API
+            v2 Python protocol. In other cases it is `None`.
     """
     stack_logger = logging.getLogger("opentrons")
     stack_logger.propagate = propagate_logs
@@ -595,10 +605,11 @@ def simulate(
 
 def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
     """
-    Format a run log (return value of :py:obj:`simulate`) into a
-    human-readable string
+    Format a run log (return value of [`simulate()`][opentrons.simulate.simulate])
+    into a human-readable string.
 
-    :param runlog: The output of a call to :py:obj:`simulate`
+    Args:
+        runlog: The output of a call to [`simulate()`][opentrons.simulate.simulate].
     """
     to_ret = []
     for command in runlog:
@@ -647,13 +658,18 @@ def allow_bundle() -> bool:
 
 
 def get_arguments(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
-    """Get the argument parser for this module
+    """
+    Get the argument parser for this module.
 
     Useful if you want to use this module as a component of another CLI program
     and want to add its arguments.
 
-    :param parser: A parser to add arguments to. If not specified, one will be created.
-    :returns argparse.ArgumentParser: The parser with arguments added.
+    Args:
+        parser: A parser to add arguments to. If not specified, one will be
+            created.
+
+    Returns:
+        argparse.ArgumentParser: The parser with arguments added.
     """
     parser.add_argument(
         "-l",
@@ -831,10 +847,9 @@ def _create_live_context_pe(
     global _LIVE_PROTOCOL_ENGINE_CONTEXTS
 
     @contextmanager
-    def _cleanup_hardware_with_engine() -> (
-        Iterator[tuple["ProtocolEngine", asyncio.AbstractEventLoop]]
-    ):
-
+    def _cleanup_hardware_with_engine() -> Iterator[
+        tuple["ProtocolEngine", asyncio.AbstractEventLoop]
+    ]:
         try:
             with create_protocol_engine_in_thread(
                 hardware_api=hardware_api_wrapped,
@@ -849,6 +864,7 @@ def _create_live_context_pe(
                 load_fixed_trash=should_load_fixed_trash_labware_for_python_protocol(
                     api_version
                 ),
+                camera_provider=CameraProvider(),
             ) as (engine, loop):
                 yield engine, loop
         finally:
@@ -982,6 +998,7 @@ def _run_file_pe(
             protocol_live_runner=LiveRunner(
                 protocol_engine=protocol_engine, hardware_api=hardware_api_wrapped
             ),
+            camera_provider=CameraProvider(),
         )
 
         # TODO(mm, 2024-08-06): This home is theoretically redundant with Protocol

@@ -1,4 +1,4 @@
-""" opentrons.system.nmcli: Functions and data for interacting with nmcli
+"""opentrons.system.nmcli: Functions and data for interacting with nmcli
 
 The functions contained here are for bridging Python calls with nmcli command
 line invocations. They are in general not safe to call anywhere except an
@@ -11,19 +11,17 @@ is relevant in particular because they mostly do not handle exceptions coming
 from subprocess itself, only parsing nmcli output.
 """
 
-import csv
-import logging
-import re
 import copy
-from typing import Optional, List, Tuple, Dict, Callable, Any, NamedTuple
+import csv
 import enum
+import logging
 import os
-
-from shlex import quote
+import re
 from asyncio import subprocess as as_subprocess
+from shlex import quote
+from typing import Any, Callable, Dict, List, NamedTuple, Optional, Tuple
 
 from opentrons import config
-
 
 log = logging.getLogger(__name__)
 
@@ -302,7 +300,10 @@ class NETWORK_IFACES(enum.Enum):
         config.SystemArchitecture.BUILDROOT: "wlan0",
         config.SystemArchitecture.YOCTO: "mlan0",
     }.get(config.ARCHITECTURE, "wlan0")
-    ETH_LL = "eth0"
+    ETH_LL = {
+        config.SystemArchitecture.BUILDROOT: "eth0",
+        config.SystemArchitecture.YOCTO: "end0",
+    }.get(config.ARCHITECTURE, "eth0")
 
 
 def _add_security_type_to_scan(scan_out: Dict[str, Any]) -> Dict[str, Any]:

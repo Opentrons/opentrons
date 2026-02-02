@@ -108,9 +108,8 @@ export function useAssignLiquidClass(
   const aspirateLabwareLiquids =
     allWellContentsForActiveItem?.[formData[labwareField]]
 
-  const [orderedLiquidClassOptions, setOrderedLiquidClassOptions] = useState<
-    LiquidClassOption[]
-  >(liquidClassOptions)
+  const [orderedLiquidClassOptions, setOrderedLiquidClassOptions] =
+    useState<LiquidClassOption[]>(liquidClassOptions)
 
   useEffect(() => {
     if (aspirateLabwareLiquids != null) {

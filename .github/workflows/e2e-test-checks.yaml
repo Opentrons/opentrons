@@ -1,0 +1,50 @@
+# E2E Testing Checks Workflow
+
+name: "E2E Test Checks"
+
+on:
+  pull_request:
+    paths:
+      - "e2e-testing/**"
+      - ".github/workflows/e2e-test-checks.yaml"
+  workflow_dispatch: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  CI: "true"
+
+jobs:
+  checks:
+    name: "E2E test checks (lint + typecheck)"
+    runs-on: "ubuntu-24.04"
+    timeout-minutes: 5
+    steps:
+      - name: "Checkout Repository"
+        uses: actions/checkout@v5
+
+      - name: "Setup UV"
+        uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+          cache-dependency-glob: |
+              e2e-testing/uv.lock
+              e2e-testing/pyproject.toml
+
+      - name: "Install E2E test dependencies"
+        working-directory: e2e-testing
+        run: make setup
+
+      - name: "Run lint, format check, and type check"
+        working-directory: e2e-testing
+        run: make check
+
+      - name: "Run unit tests"
+        working-directory: e2e-testing
+        run: make test-unit

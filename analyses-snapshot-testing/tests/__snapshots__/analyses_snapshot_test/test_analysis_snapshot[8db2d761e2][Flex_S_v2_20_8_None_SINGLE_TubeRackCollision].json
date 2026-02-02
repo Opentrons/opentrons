@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -1492,7 +1495,7 @@
           "z": 99.0
         },
         "tipDiameter": 5.58,
-        "tipLength": 48.62,
+        "tipLength": 48.379999999999995,
         "tipVolume": 50.0
       },
       "startedAt": "TIMESTAMP",

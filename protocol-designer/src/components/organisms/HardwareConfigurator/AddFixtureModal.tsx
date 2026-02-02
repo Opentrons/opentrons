@@ -36,7 +36,6 @@ import {
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack, uuid } from '@opentrons/step-generation'
 
-import { getEnableStacking } from '/protocol-designer/feature-flags/selectors'
 import { editDeckConfiguration } from '/protocol-designer/step-forms/actions'
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
@@ -121,7 +120,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
   } = props
   const { t, i18n } = useTranslation('shared')
   const initialDeckSetup = useSelector(getInitialDeckSetup)
-  const enableStackerFF = useSelector(getEnableStacking)
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
   const { labware } = initialDeckSetup
   const dispatch = useDispatch()
@@ -130,9 +128,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     ? 'moduleOptions'
     : 'modulesOrFixtures'
   const [optionStage, setOptionStage] = useState<OptionStage>(initialStage)
-  const deckConfigWithAA = replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(
-    deckConfig
-  )
+  const deckConfigWithAA =
+    replaceFixtureToFakeFixtureAndTransformCutoutFixturesToAA(deckConfig)
   // Bind allFixtureOptions with useEffect
   const [allFixtureOptions, setAllFixtureOptions] = useState<
     CutoutConfigMap[][]
@@ -152,13 +149,7 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     ]
     setAllFixtureOptions(options)
     const moduleOptions = [
-      ...getModuleOptions(
-        cutoutId,
-        addressableAreaId,
-        deckDef,
-        enableStackerFF,
-        fixtures
-      ),
+      ...getModuleOptions(cutoutId, addressableAreaId, deckDef, fixtures),
     ]
     setAllModuleOptions(moduleOptions)
   }, [cutoutId, addressableAreaId, existingCutoutFixtureId])
@@ -178,7 +169,6 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
     cutoutId,
     deckDefinition: deckDef,
     addressableAreaId,
-    enableStackerFF,
     fixtures,
   })
 
@@ -306,7 +296,8 @@ export function AddFixtureModal(props: AddFixtureModalProps): JSX.Element {
                 : getSlotFromAddressableAreaName(
                     newModule.addressableAreaId as AddressableAreaName
                   ),
-            cutoutFixtureId: newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
+            cutoutFixtureId:
+              newModule.cutoutFixtureId as FlexModuleCutoutFixtureId,
             cutoutId: newModule.cutoutId,
           },
         }

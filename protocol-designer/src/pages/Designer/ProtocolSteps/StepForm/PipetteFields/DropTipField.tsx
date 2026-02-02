@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { ALL } from '@opentrons/shared-data'
+import { ALL, SINGLE } from '@opentrons/shared-data'
 
 import { DropdownStepFormField } from '/protocol-designer/components/molecules'
 import {
@@ -11,16 +11,26 @@ import {
 } from '/protocol-designer/step-forms/selectors'
 
 import type { DropdownOption } from '@opentrons/components'
-import type { NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  NozzleConfigurationStyle,
+  PipetteChannels,
+} from '@opentrons/shared-data'
 import type { FieldProps } from '../types'
 
 interface DropTipFieldProps extends FieldProps {
   nozzles: NozzleConfigurationStyle | null
+  channels: PipetteChannels
   tiprackDefUri: string
 }
 
 export function DropTipField(props: DropTipFieldProps): JSX.Element {
-  const { value: dropdownItem, updateValue, nozzles, tiprackDefUri } = props
+  const {
+    value: dropdownItem,
+    updateValue,
+    nozzles,
+    tiprackDefUri,
+    channels,
+  } = props
   const { t, i18n } = useTranslation(['form', 'shared'])
   const additionalEquipment = useSelector(getAdditionalEquipmentEntities)
   const labwareEntities = useSelector(getLabwareEntities)
@@ -49,7 +59,8 @@ export function DropTipField(props: DropTipFieldProps): JSX.Element {
     value: tiprackDefUri,
   }
 
-  const isReturnTipValid = nozzles === ALL || nozzles == null
+  const isReturnTipValid =
+    nozzles === ALL || nozzles == null || (channels === 1 && nozzles === SINGLE)
 
   const isTipDropLocationReturnTip = Object.values(labwareEntities).some(
     ({ labwareDefURI }) => labwareDefURI === tiprackDefUri

@@ -1,29 +1,28 @@
 """Test serial number setting."""
+
 import asyncio
 
 import pytest
 
+from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
+from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId
+from opentrons_hardware.firmware_bindings.constants import PipetteName
 from opentrons_hardware.firmware_bindings.messages.fields import SerialField
-from opentrons_hardware.instruments.pipettes.serials import (
-    serial_val_from_parts,
+from opentrons_hardware.firmware_bindings.messages.message_definitions import (
+    GripperInfoResponse,
+    InstrumentInfoRequest,
+    PipetteInfoResponse,
+    SetSerialNumber,
+)
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    SerialNumberPayload,
 )
 from opentrons_hardware.instruments.gripper.serials import (  # noqa: F401
     gripper_serial_val_from_parts,
 )
-
-from opentrons_hardware.firmware_bindings.messages.message_definitions import (
-    GripperInfoResponse,
-    PipetteInfoResponse,
-    SetSerialNumber,
-    InstrumentInfoRequest,
+from opentrons_hardware.instruments.pipettes.serials import (
+    serial_val_from_parts,
 )
-
-from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
-from opentrons_hardware.firmware_bindings.constants import PipetteName
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    SerialNumberPayload,
-)
-from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
 
 
 def filter_func(arb: ArbitrationId) -> bool:

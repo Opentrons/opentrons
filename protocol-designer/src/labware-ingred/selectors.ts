@@ -16,6 +16,7 @@ import type {
   RootState,
   SelectedContainerId,
   SelectedLiquidGroupState,
+  SelectedMultipleContainerIds,
 } from './reducers'
 import type {
   AllIngredGroupFields,
@@ -58,48 +59,63 @@ const getLiquidNamesById: Selector<
       (ingred: Ingredient) => ingred.displayName
     ) as Record<string, string>
 )
-const getLiquidSelectionOptions: Selector<
-  RootSlice,
-  DropdownOption[]
-> = createSelector(getLiquidGroupsById, liquidGroupsById => {
-  return Object.keys(liquidGroupsById).map(id => ({
-    // NOTE: if these fallbacks are used, it's a bug
-    name: liquidGroupsById[id]
-      ? liquidGroupsById[id].displayName || `(Unnamed Liquid: ${String(id)})`
-      : 'Missing Liquid',
-    value: id,
-  }))
-})
+const getLiquidSelectionOptions: Selector<RootSlice, DropdownOption[]> =
+  createSelector(getLiquidGroupsById, liquidGroupsById => {
+    return Object.keys(liquidGroupsById).map(id => ({
+      // NOTE: if these fallbacks are used, it's a bug
+      name: liquidGroupsById[id]
+        ? liquidGroupsById[id].displayName || `(Unnamed Liquid: ${String(id)})`
+        : 'Missing Liquid',
+      value: id,
+    }))
+  })
 
 // false or selected slot to add labware to, eg 'A2'
 const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
   rootSelector(state).modeLabwareSelection
 
-const getSelectedLabwareId: Selector<
+const getSelectedLabwareId: Selector<RootSlice, SelectedContainerId> =
+  createSelector(rootSelector, rootState => rootState.selectedContainerId)
+
+// TODO: (tz, 2026-01-16): remove this selector when we find a way to only use multiple selected
+const getMultiSelectSelectedLabwareId: Selector<
   RootSlice,
   SelectedContainerId
-> = createSelector(rootSelector, rootState => rootState.selectedContainerId)
+> = createSelector(
+  rootSelector,
+  rootState =>
+    rootState.selectedMultipleContainerIds?.[0] ?? rootState.selectedContainerId
+)
+
+const getMultipleSelectedLabwareIds: Selector<
+  RootSlice,
+  SelectedMultipleContainerIds
+> = createSelector(
+  rootSelector,
+  rootState => rootState.selectedMultipleContainerIds
+)
+
 const getSelectedLiquidGroupState: Selector<
   RootSlice,
   SelectedLiquidGroupState
 > = createSelector(rootSelector, rootState => rootState.selectedLiquidGroup)
-const getDrillDownLabwareId: Selector<
-  RootSlice,
-  DrillDownLabwareId
-> = createSelector(rootSelector, rootState => rootState.drillDownLabwareId)
-const allIngredientGroupFields: Selector<
-  RootSlice,
-  AllIngredGroupFields
-> = createSelector(getLiquidGroupsById, ingreds =>
-  reduce<IngredientsState, AllIngredGroupFields>(
-    ingreds,
-    (acc, ingredGroup: IngredInputs, ingredGroupId): AllIngredGroupFields => ({
-      ...acc,
-      [ingredGroupId]: ingredGroup,
-    }),
-    {}
+const getDrillDownLabwareId: Selector<RootSlice, DrillDownLabwareId> =
+  createSelector(rootSelector, rootState => rootState.drillDownLabwareId)
+const allIngredientGroupFields: Selector<RootSlice, AllIngredGroupFields> =
+  createSelector(getLiquidGroupsById, ingreds =>
+    reduce<IngredientsState, AllIngredGroupFields>(
+      ingreds,
+      (
+        acc,
+        ingredGroup: IngredInputs,
+        ingredGroupId
+      ): AllIngredGroupFields => ({
+        ...acc,
+        [ingredGroupId]: ingredGroup,
+      }),
+      {}
+    )
   )
-)
 
 const getLabwareSelectionMode: Selector<RootSlice, boolean> = createSelector(
   rootSelector,
@@ -114,21 +130,24 @@ const getLiquidGroupsOnDeck: Selector<RootSlice, string[]> = createSelector(
     forEach(
       ingredLocationsByLabware,
       (
-        byWell: typeof ingredLocationsByLabware[keyof typeof ingredLocationsByLabware]
+        byWell: (typeof ingredLocationsByLabware)[keyof typeof ingredLocationsByLabware]
       ) =>
-        forEach(byWell, (groupContents: typeof byWell[keyof typeof byWell]) => {
-          forEach(
-            groupContents,
-            (
-              contents: typeof groupContents[keyof typeof groupContents],
-              groupId: keyof typeof groupContents
-            ) => {
-              if (contents.volume > 0) {
-                liquidGroups.add(groupId as string)
+        forEach(
+          byWell,
+          (groupContents: (typeof byWell)[keyof typeof byWell]) => {
+            forEach(
+              groupContents,
+              (
+                contents: (typeof groupContents)[keyof typeof groupContents],
+                groupId: keyof typeof groupContents
+              ) => {
+                if (contents.volume > 0) {
+                  liquidGroups.add(groupId as string)
+                }
               }
-            }
-          )
-        })
+            )
+          }
+        )
     )
     return [...liquidGroups]
   }
@@ -152,10 +171,8 @@ const getLiquidDisplayColors: Selector<
     )
 )
 
-const getZoomedInSlotInfo: Selector<
-  RootSlice,
-  ZoomedIntoSlotInfoState
-> = createSelector(rootSelector, rootState => rootState.zoomedInSlotInfo)
+const getZoomedInSlotInfo: Selector<RootSlice, ZoomedIntoSlotInfoState> =
+  createSelector(rootSelector, rootState => rootState.zoomedInSlotInfo)
 
 const getZoomedInSlot: Selector<
   RootSlice,
@@ -181,6 +198,8 @@ export const selectors = {
   getLiquidGroupsOnDeck,
   getNextLiquidGroupId,
   getSelectedLabwareId,
+  getSelectedLabwareIds: getMultipleSelectedLabwareIds,
+  getMultiSelectSelectedLabwareId,
   getSelectedLiquidGroupState,
   getDrillDownLabwareId,
   allIngredientGroupFields,

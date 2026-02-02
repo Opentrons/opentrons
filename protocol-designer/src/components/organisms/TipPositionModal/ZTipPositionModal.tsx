@@ -200,8 +200,8 @@ export function ZTipPositionModal(props: ZTipPositionModalProps): JSX.Element {
               isPositionFromTop
                 ? undefined
                 : value !== null
-                ? Number(value)
-                : defaultMm
+                  ? Number(value)
+                  : defaultMm
             }
             mmFromTop={
               isPositionFromTop

@@ -26,8 +26,9 @@ import { useNotifyDeckConfigurationQuery } from '/app/resources/deck_configurati
 import { useDeckConfigurationCompatibility } from '/app/resources/deck_configuration/hooks'
 import { useAttachedModules } from '/app/resources/modules'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
-  useRunStatus,
+  useNotifyRunQuery,
 } from '/app/resources/runs'
 import {
   getAttachedProtocolModuleMatches,
@@ -60,21 +61,20 @@ export function ProtocolSetupModulesAndDeck({
 }: ProtocolSetupModulesAndDeckProps): JSX.Element {
   const { i18n, t } = useTranslation('protocol_setup')
   const navigate = useNavigate()
-  const runStatus = useRunStatus(runId)
+  const { data: runRecord } = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  })
+  const runStatus = runRecord?.data.status ?? null
   useEffect(() => {
     if (runStatus === RUN_STATUS_STOPPED) {
       navigate('/protocols')
     }
   }, [runStatus, navigate])
-  const [
-    showSetupInstructionsModal,
-    setShowSetupInstructionsModal,
-  ] = useState<boolean>(false)
+  const [showSetupInstructionsModal, setShowSetupInstructionsModal] =
+    useState<boolean>(false)
   const [showMapView, setShowMapView] = useState<boolean>(false)
-  const [
-    clearModuleMismatchBanner,
-    setClearModuleMismatchBanner,
-  ] = useState<boolean>(false)
+  const [clearModuleMismatchBanner, setClearModuleMismatchBanner] =
+    useState<boolean>(false)
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
   const deckConfigCompatibility = useDeckConfigurationCompatibility(
     FLEX_ROBOT_TYPE,
@@ -102,10 +102,8 @@ export function ProtocolSetupModulesAndDeck({
 
   const hasModules = attachedProtocolModuleMatches.length > 0
 
-  const {
-    missingModuleIds,
-    remainingAttachedModules,
-  } = getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
+  const { missingModuleIds, remainingAttachedModules } =
+    getUnmatchedModulesForProtocol(attachedModules, protocolModulesInfo)
 
   const isModuleMismatch =
     remainingAttachedModules.length > 0 && missingModuleIds.length > 0

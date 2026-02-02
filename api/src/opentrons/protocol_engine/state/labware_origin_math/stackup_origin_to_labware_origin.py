@@ -1,55 +1,60 @@
 """Utilities for calculating the labware origin offset position."""
+
 import dataclasses
 import enum
-from typing import Union, overload, Optional
+from typing import Optional, Union, overload
 
 from typing_extensions import assert_type
 
-from opentrons.types import Point, DeckSlotName
+from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
+    AxisAlignedBoundingBox3D,
+    Extents,
     LabwareDefinition,
     LabwareDefinition2,
     LabwareDefinition3,
-    Extents,
-    AxisAlignedBoundingBox3D,
     Vector3D,
 )
 from opentrons_shared_data.labware.types import (
-    SlotFootprintAsChildFeature,
     LocatingFeatures,
-    SpringDirectionalForce,
+    SlotFootprintAsChildFeature,
     SlotFootprintAsParentFeature,
+    SpringDirectionalForce,
+)
+from opentrons_shared_data.labware.types import (
     Vector3D as LabwareVector3D,
 )
 from opentrons_shared_data.module.types import ModuleOrientation
-from opentrons.protocol_engine.resources.labware_validation import (
-    validate_definition_is_lid,
-    is_absorbance_reader_lid,
-)
-from opentrons.protocol_engine.errors import (
-    LabwareNotOnDeckError,
-    LabwareOffsetDoesNotExistError,
-    InvalidModuleOrientation,
-)
+
 from .errors import (
-    MissingLocatingFeatureError,
     IncompatibleLocatingFeatureError,
     InvalidLabwarePlacementError,
+    MissingLocatingFeatureError,
 )
-from opentrons.protocol_engine.types import AddressableArea
-from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
+from opentrons.protocol_engine.errors import (
+    InvalidModuleOrientation,
+    LabwareNotOnDeckError,
+    LabwareOffsetDoesNotExistError,
+)
+from opentrons.protocol_engine.resources.labware_validation import (
+    is_absorbance_reader_lid,
+    validate_definition_is_lid,
+)
 from opentrons.protocol_engine.types import (
-    ModuleDefinition,
-    ModuleModel,
-    DeckLocationDefinition,
-    LabwareLocation,
-    ModuleLocation,
-    DeckSlotLocation,
+    WASTE_CHUTE_LOCATION,
+    AddressableArea,
     AddressableAreaLocation,
-    OnLabwareLocation,
+    DeckLocationDefinition,
+    DeckSlotLocation,
+    LabwareLocation,
     LabwareMovementOffsetData,
     LabwareOffsetVector,
+    ModuleDefinition,
+    ModuleLocation,
+    ModuleModel,
+    OnLabwareLocation,
 )
+from opentrons.types import DeckSlotName, Point
 
 _OFFSET_ON_TC_OT2 = Point(x=0, y=0, z=10.7)
 
@@ -174,9 +179,13 @@ def _get_stackup_origin_to_lw_origin(
             slot_name=slot_name,
             is_topmost_labware=False,
         )
+    elif location == WASTE_CHUTE_LOCATION:
+        raise LabwareNotOnDeckError(
+            f"Cannot access {definition.metadata.displayName} because it is in the waste chute."
+        )
     else:
         raise LabwareNotOnDeckError(
-            "Cannot access labware since it is not on the deck. "
+            f"Cannot access {definition.metadata.displayName} since it is not on the deck. "
             "Either it has been loaded off-deck or its been moved off-deck."
         )
 
@@ -262,8 +271,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: ModuleLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 @overload
@@ -275,8 +283,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: Union[DeckSlotLocation, AddressableAreaLocation],
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 @overload
@@ -288,8 +295,7 @@ def _get_parent_placement_origin_to_lw_origin(
     is_topmost_labware: bool,
     labware_location: OnLabwareLocation,
     underlying_ancestor_orientation: ModuleOrientation,
-) -> Point:
-    ...
+) -> Point: ...
 
 
 def _get_parent_placement_origin_to_lw_origin(

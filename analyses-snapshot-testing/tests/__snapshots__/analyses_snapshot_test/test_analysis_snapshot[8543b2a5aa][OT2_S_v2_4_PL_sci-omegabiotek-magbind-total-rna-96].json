@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -32406,7 +32409,24 @@
     "author": "Opentrons <protocols@opentrons.com>",
     "protocolName": "Mag-BindÂ® Total RNA 96 Kit"
   },
-  "modules": [],
+  "modules": [
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "6"
+      },
+      "model": "magneticModuleV1",
+      "serialNumber": "UUID"
+    },
+    {
+      "id": "UUID",
+      "location": {
+        "slotName": "1"
+      },
+      "model": "temperatureModuleV2",
+      "serialNumber": "UUID"
+    }
+  ],
   "pipettes": [
     {
       "id": "UUID",

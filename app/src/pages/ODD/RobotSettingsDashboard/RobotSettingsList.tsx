@@ -168,6 +168,15 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="brightness"
         />
         <RobotSettingButton
+          settingName={t('camera_preferences')}
+          settingInfo={t('camera_preferences_description')}
+          dataTestId="RobotSettingButton_camera_preferences"
+          onClick={() => {
+            setCurrentOption('CameraPreferences')
+          }}
+          iconName="camera"
+        />
+        <RobotSettingButton
           settingName={t('app_settings:privacy')}
           dataTestId="RobotSettingButton_privacy"
           settingInfo={t('branded:choose_what_data_to_share')}
@@ -177,7 +186,10 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           iconName="privacy"
         />
         <RobotSettingButton
-          settingName={t('app_settings:error_recovery_mode')}
+          settingName={i18n.format(
+            t('app_settings:error_recovery_mode'),
+            'titleCase'
+          )}
           dataTestId="RobotSettingButton_error_recovery_mode"
           settingInfo={t('app_settings:error_recovery_mode_description')}
           iconName="recovery-alt"
@@ -208,7 +220,7 @@ export function RobotSettingsList(props: RobotSettingsListProps): JSX.Element {
           settingName={t('disable_stacker_sensors')}
           dataTestId="RobotSettingButton_disable_stacker_sensors"
           settingInfo={t('disable_stacker_sensors_description')}
-          iconName="stacker-sensors"
+          iconName="ot-flex-stacker"
           rightElement={<OnOffToggle isOn={sensorsDisabled} />}
           onClick={toggleSensors}
         />
@@ -250,12 +262,15 @@ function FeatureFlags(): JSX.Element {
         >
           <div className={styles.feature_flag_content}>
             <Icon
-              name="alert-circle"
+              name="ot-alert"
               className={styles.icon_large}
               color="#171717"
             />
             <div className={styles.feature_flag_text_content}>
-              <LegacyStyledText as="h4" className={styles.feature_flag_title}>
+              <LegacyStyledText
+                forwardedAs="h4"
+                className={styles.feature_flag_title}
+              >
                 {t(`__dev_internal__${flag}`)}
               </LegacyStyledText>
             </div>

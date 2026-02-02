@@ -1,10 +1,10 @@
-from typing import Optional, Dict
+from typing import Dict, Optional
 
-from opentrons.util.async_helpers import ensure_yield
-from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
-from opentrons.drivers.types import Temperature, PlateTemperature, ThermocyclerLidStatus
-from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
 from opentrons.drivers.asyncio.communication.errors import ErrorResponse
+from opentrons.drivers.thermocycler.abstract import AbstractThermocyclerDriver
+from opentrons.drivers.types import PlateTemperature, Temperature, ThermocyclerLidStatus
+from opentrons.hardware_control.modules.types import ThermocyclerModuleModel
+from opentrons.util.async_helpers import ensure_yield
 
 
 class SimulatingDriver(AbstractThermocyclerDriver):
@@ -126,3 +126,7 @@ class SimulatingDriver(AbstractThermocyclerDriver):
             if angle < 0
             else ThermocyclerLidStatus.OPEN
         )
+
+    @ensure_yield
+    async def get_error_state(self) -> None:
+        return

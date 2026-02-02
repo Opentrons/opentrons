@@ -1,18 +1,15 @@
 import { useEffect } from 'react'
 
-import {
-  RUN_STATUS_IDLE,
-  RUN_STATUS_STOP_REQUESTED,
-} from '@opentrons/api-client'
+import { RUN_STATUS_IDLE } from '@opentrons/api-client'
 import { useErrorRecoverySettings } from '@opentrons/react-api-client'
 import { FLEX_ROBOT_TYPE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 
 import { lastRunCommandPromptedErrorRecovery } from '/app/local-resources/commands'
+import { isTerminatingOrTerminal } from '/app/local-resources/runs/utils'
 import { useDropTipWizardFlows } from '/app/organisms/DropTipWizardFlows'
 import { useTipAttachmentStatus } from '/app/resources/instruments'
 import { useCurrentRunCommands, useIsRunCurrent } from '/app/resources/runs'
 
-import { isTerminalRunStatus } from '../../utils'
 import { useProtocolDropTipModal } from '../modals'
 
 import type { Run, RunStatus } from '@opentrons/api-client'
@@ -105,11 +102,9 @@ export function useRunHeaderDropTip({
         }
       : { showDTWiz: false, dtWizProps: null }
   }
-
+  const isRunTerminatingOrTerminal = isTerminatingOrTerminal(runStatus)
   const { data } = useErrorRecoverySettings()
   const isEREnabled = data?.data.enabled ?? true
-  const isRunTerminatingOrTerminal =
-    isTerminalRunStatus(runStatus) || runStatus === RUN_STATUS_STOP_REQUESTED
   const runSummaryNoFixit = useCurrentRunCommands(
     {
       includeFixitCommands: false,

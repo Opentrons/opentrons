@@ -112,10 +112,10 @@ describe('robotsByName reducer', () => {
     const initialState: RobotsByNameMap = {
       'opentrons-dev': {
         name: 'opentrons-dev',
-        health: ({ mockHealth: true } as unknown) as HealthResponse,
-        serverHealth: ({
+        health: { mockHealth: true } as unknown as HealthResponse,
+        serverHealth: {
           mockServerHealth: true,
-        } as unknown) as ServerHealthResponse,
+        } as unknown as ServerHealthResponse,
       },
     }
     const nextState = robotsByNameReducer(initialState, action)

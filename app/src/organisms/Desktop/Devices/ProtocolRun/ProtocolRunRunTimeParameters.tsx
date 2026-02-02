@@ -33,9 +33,9 @@ import {
 
 import { Divider } from '/app/atoms/structure'
 import {
+  DEFAULT_STATUS_REFETCH_INTERVAL,
   useMostRecentCompletedAnalysis,
   useNotifyRunQuery,
-  useRunStatus,
 } from '/app/resources/runs'
 
 import type { RunStatus } from '@opentrons/api-client'
@@ -49,7 +49,11 @@ export function ProtocolRunRuntimeParameters({
 }: ProtocolRunRuntimeParametersProps): JSX.Element {
   const { t } = useTranslation('protocol_setup')
   const mostRecentAnalysis = useMostRecentCompletedAnalysis(runId)
-  const runStatus = useRunStatus(runId)
+  const run = useNotifyRunQuery(runId, {
+    refetchInterval: DEFAULT_STATUS_REFETCH_INTERVAL,
+  }).data
+  const runStatus = run?.data.status ?? null
+
   const isRunTerminal =
     runStatus == null
       ? false
@@ -57,7 +61,6 @@ export function ProtocolRunRuntimeParameters({
   // we access runTimeParameters from the run record rather than the most recent analysis
   // because the most recent analysis may not reflect the selected run (e.g. cloning a run
   // from a historical protocol run from the device details page)
-  const run = useNotifyRunQuery(runId).data
   const runTimeParametersFromRun =
     run?.data != null && 'runTimeParameters' in run?.data
       ? run?.data?.runTimeParameters
@@ -95,14 +98,14 @@ export function ProtocolRunRuntimeParameters({
         >
           {hasRunTimeParameters ? (
             <LegacyStyledText
-              as="h3"
+              forwardedAs="h3"
               fontWeight={TYPOGRAPHY.fontWeightSemiBold}
             >
               {t('parameters')}
             </LegacyStyledText>
           ) : null}
           {hasRunTimeParameters ? (
-            <LegacyStyledText as="label" color={COLORS.grey60}>
+            <LegacyStyledText forwardedAs="label" color={COLORS.grey60}>
               {hasCustomRunTimeParameterValues
                 ? t('custom_values')
                 : t('default_values')}
@@ -170,10 +173,13 @@ function RunTimeParametersBanner({
   return (
     <Banner type="informing" width="100%" iconMarginLeft={SPACING.spacing4}>
       <Flex flexDirection={DIRECTION_COLUMN}>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+        >
           {isRunTerminal ? t('download_files') : t('values_are_view_only')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {isRunTerminal
             ? t('all_files_associated')
             : t('cancel_and_restart_to_edit')}
@@ -199,7 +205,7 @@ const StyledTableRowComponent = (
     <StyledTableRow isLast={isLast} key={`runTimeParameter-${index}`}>
       <StyledTableCell display="span">
         <LegacyStyledText
-          as="p"
+          forwardedAs="p"
           css={css`
             display: inline;
             padding-right: 8px;
@@ -235,9 +241,9 @@ const StyledTableRowComponent = (
           gridGap={SPACING.spacing16}
           alignItems={ALIGN_CENTER}
         >
-          <LegacyStyledText as="p" css={PARAMETER_VALUE_TEXT_STYLE}>
+          <LegacyStyledText forwardedAs="p" css={PARAMETER_VALUE_TEXT_STYLE}>
             {parameter.type === 'csv_file'
-              ? parameter.file?.name ?? ''
+              ? (parameter.file?.name ?? '')
               : formatRunTimeParameterValue(parameter, t)}
           </LegacyStyledText>
           {parameter.type === 'csv_file' ||

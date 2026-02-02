@@ -4,7 +4,7 @@ import type { BrowserWindow } from 'electron'
 import type mqtt from 'mqtt'
 import type { NotifyTopic } from '@opentrons/app/src/redux/shell/types'
 
-type FailedConnStatus = typeof FAILURE_STATUSES[keyof typeof FAILURE_STATUSES]
+type FailedConnStatus = (typeof FAILURE_STATUSES)[keyof typeof FAILURE_STATUSES]
 
 interface HostData {
   client: mqtt.MqttClient | null
@@ -22,12 +22,20 @@ class ConnectionStore {
 
   private robotNamesByIP: Record<string, string> = {}
 
-  private browserWindow: BrowserWindow | null = null
+  private readonly browserWindows = new Set<BrowserWindow>()
 
   private readonly knownPortBlockedIPs = new Set<string>()
 
-  public getBrowserWindow(): BrowserWindow | null {
-    return this.browserWindow
+  public getBrowserWindows(): Set<BrowserWindow> {
+    return this.browserWindows
+  }
+
+  public addBrowserWindow(window: BrowserWindow): void {
+    this.browserWindows.add(window)
+
+    window.once('closed', () => {
+      this.browserWindows.delete(window)
+    })
   }
 
   public getAllBrokersInStore(): string[] {
@@ -63,10 +71,6 @@ class ConnectionStore {
 
   public getRobotNameByIP(ip: string): string | null {
     return this.robotNamesByIP[ip] ?? null
-  }
-
-  public setBrowserWindow(window: BrowserWindow): void {
-    this.browserWindow = window
   }
 
   public setPendingConnection(robotName: string): Promise<void> {
@@ -164,9 +168,8 @@ class ConnectionStore {
     return new Promise((resolve, reject) => {
       const robotName = this.getRobotNameByIP(ip)
       if (robotName != null && robotName in this.hostsByRobotName) {
-        const { pendingUnsubs, subscriptions } = this.hostsByRobotName[
-          robotName
-        ]
+        const { pendingUnsubs, subscriptions } =
+          this.hostsByRobotName[robotName]
         if (subscriptions.has(topic)) {
           if (status === 'pending') {
             pendingUnsubs.add(topic)
@@ -195,12 +198,12 @@ class ConnectionStore {
   public clearStore(): void {
     this.hostsByRobotName = {}
     this.robotNamesByIP = {}
-    this.browserWindow = null
+    this.browserWindows.clear()
   }
 
   public isConnectedToBroker(robotName: string): boolean {
     return robotName != null
-      ? this.hostsByRobotName[robotName]?.client?.connected ?? false
+      ? (this.hostsByRobotName[robotName]?.client?.connected ?? false)
       : false
   }
 

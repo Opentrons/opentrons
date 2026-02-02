@@ -12,12 +12,13 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Dict, Optional
-from enum import Enum
 
-from opentrons.drivers import utils
-from opentrons.drivers.command_builder import CommandBuilder
-from opentrons.drivers.asyncio.communication import SerialConnection
+from opentrons_shared_data.util import StrEnum
+
 from .abstract import AbstractMagDeckDriver
+from opentrons.drivers import utils
+from opentrons.drivers.asyncio.communication import SerialConnection
+from opentrons.drivers.command_builder import CommandBuilder
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ DEFAULT_MAG_DECK_TIMEOUT = 10  # Quite large to account for probe time
 DEFAULT_COMMAND_RETRIES = 3
 
 
-class GCODE(str, Enum):
+class GCODE(StrEnum):
     HOME = "G28.2"
     PROBE_PLATE = "G38.2"
     GET_PLATE_HEIGHT = "M836"

@@ -2,66 +2,68 @@
 
 from contextlib import AsyncExitStack
 from logging import getLogger
-from typing import Dict, Optional, Union, AsyncGenerator, Callable
+from typing import AsyncGenerator, Callable, Dict, Optional, Tuple, Union
 
 from opentrons_shared_data.errors import (
-    ErrorCodes,
     EnumeratedError,
+    ErrorCodes,
 )
 from opentrons_shared_data.labware.labware_definition import LabwareDefinition
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
-from opentrons.hardware_control.types import PauseType as HardwarePauseType
-
+from . import commands, labware_offset_standardization, slot_standardization
+from .actions import (
+    ActionDispatcher,
+    AddAddressableAreaAction,
+    AddCameraCaptureImageSettingsAction,
+    AddCameraSettingsAction,
+    AddLabwareDefinitionAction,
+    AddLabwareOffsetAction,
+    AddLiquidAction,
+    AddModuleAction,
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    SetDeckConfigurationAction,
+    SetPipetteMovementSpeedAction,
+    StopAction,
+)
 from .actions.actions import (
     ResumeFromRecoveryAction,
     SetErrorRecoveryPolicyAction,
 )
-from .errors import ProtocolCommandFailedError, ErrorOccurrence, CommandNotAllowedError
-from .errors.exceptions import EStopActivatedError
 from .error_recovery_policy import ErrorRecoveryPolicy
-from . import commands, slot_standardization, labware_offset_standardization
-from .resources import ModelUtils, ModuleDataProvider, FileProvider
-from .types import (
-    LabwareOffset,
-    LabwareOffsetCreate,
-    LegacyLabwareOffsetCreate,
-    LabwareUri,
-    ModuleModel,
-    Liquid,
-    HexColor,
-    PostRunHardwareState,
-    DeckConfigurationType,
-)
+from .errors import CommandNotAllowedError, ErrorOccurrence, ProtocolCommandFailedError
+from .errors.exceptions import EStopActivatedError
 from .execution import (
-    QueueWorker,
-    create_queue_worker,
     DoorWatcher,
     HardwareStopper,
+    QueueWorker,
+    create_queue_worker,
 )
+from .plugins import AbstractPlugin, PluginStarter
+from .resources import CameraProvider, FileProvider, ModelUtils, ModuleDataProvider
+from .resources.camera_provider import CameraSettings
 from .state.state import StateStore, StateView
 from .state.update_types import StateUpdate
-from .plugins import AbstractPlugin, PluginStarter
-from .actions import (
-    ActionDispatcher,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    StopAction,
-    FinishAction,
-    FinishErrorDetails,
-    QueueCommandAction,
-    AddLabwareOffsetAction,
-    AddLabwareDefinitionAction,
-    AddLiquidAction,
-    SetDeckConfigurationAction,
-    AddAddressableAreaAction,
-    AddModuleAction,
-    HardwareStoppedAction,
-    SetPipetteMovementSpeedAction,
+from .types import (
+    DeckConfigurationType,
+    HexColor,
+    LabwareOffset,
+    LabwareOffsetCreate,
+    LabwareUri,
+    LegacyLabwareOffsetCreate,
+    Liquid,
+    ModuleModel,
+    PostRunHardwareState,
 )
-
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.modules import AbstractModule as HardwareModuleAPI
+from opentrons.hardware_control.types import PauseType as HardwarePauseType
+from opentrons.system import camera
 
 _log = getLogger(__name__)
 
@@ -96,6 +98,7 @@ class ProtocolEngine:
         door_watcher: DoorWatcher,
         module_data_provider: ModuleDataProvider,
         file_provider: FileProvider,
+        camera_provider: CameraProvider,
         queue_worker: Optional[QueueWorker] = None,
     ) -> None:
         """Initialize a ProtocolEngine instance.
@@ -107,6 +110,7 @@ class ProtocolEngine:
         """
         self._hardware_api = hardware_api
         self._file_provider = file_provider
+        self._camera_provider = camera_provider
         self._state_store = state_store
         self._model_utils = model_utils
         self._action_dispatcher = action_dispatcher
@@ -214,6 +218,7 @@ class ProtocolEngine:
         Arguments:
             request: The command type and payload data used to construct
                 the command in state.
+            failed_command_id: If this is a FIXIT command, the ID this is fixing.
 
         Returns:
             The full, newly queued command.
@@ -391,6 +396,46 @@ class ProtocolEngine:
             module_model, serial
         ):
             return False
+
+        if self._state_store.commands.get_is_terminal():
+            # Do not stop multiple times; it will be common for this action to fire
+            # many times when a module enters an error state, and we don't want to do
+            # the stop behavior over and over
+            return False
+
+        self._stop_from_asynchronous_error()
+        # like self.request_stop, and unlike self.estop(), we must explicitly request that the
+        # hardware stops execution, since not all asynchronous errors will cause the hardware
+        # to know that it should stop.
+        await self._do_hardware_stop()
+        return True
+
+    async def module_disconnected(
+        self, module_model: ModuleModel, serial: str | None
+    ) -> bool:
+        """Signal to the engine that a module has disconnected.
+
+        The return value of this function signals whether the module was relevant to this
+        protocol or not. If the function returns True, the module was relevant. The engine
+        will stop, and the caller should call `finish()` with an appropriate error to indicate
+        the missing module. If the function returns False, the error is not relevant. The engine
+        will not stop, and the caller should not call `finish()`.
+
+        Module disconnects are signaled when a hardware module's status poller indicates that the
+        module is no logner connected - for instance, someone unplugs the module, or it crashes.
+        These errors are not related to a particular command, even a currently-happening module
+        control command for the module in the error state.
+
+        Similar to an estop error, the error can occur at any time relative to the lifecycle
+        of the engine run or of any particular command.
+
+        Unlike an estop, the motion control hardware will not be raising an error and will not
+        stop on its own; the stop action derived from this call will do that.
+        """
+        if not self._state_store.modules.get_has_module_probably_matching_hardware_details(
+            module_model, serial
+        ):
+            return False
         self._stop_from_asynchronous_error()
         # like self.request_stop, and unlike self.estop(), we must explicitly request that the
         # hardware stops execution, since not all asynchronous errors will cause the hardware
@@ -438,7 +483,7 @@ class ProtocolEngine:
         )
         self._state_store.commands.raise_fatal_command_error()
 
-    async def finish(
+    async def finish(  # noqa: C901
         self,
         error: Optional[Exception] = None,
         drop_tips_after_run: bool = True,
@@ -475,7 +520,7 @@ class ProtocolEngine:
             # we were paused between two commands, or imagine we were executing a waitForDuration.
             drop_tips_after_run = False
             post_run_hardware_state = PostRunHardwareState.DISENGAGE_IN_PLACE
-            if error is None:
+            if error is None and self._state_store.commands.get_error() is None:
                 error = EStopActivatedError()
 
         if error:
@@ -552,6 +597,16 @@ class ProtocolEngine:
         else:
             finish_error_details = None
 
+        try:
+            await camera.update_live_stream_status(
+                self.state_view.config.robot_type,
+                False,
+                self._camera_provider,
+                self.state_view.camera.get_enablement_settings(),
+            )
+        except Exception as e:
+            _log.exception(f"Exception during live stream post-run cleanup: {e}")
+
         self._action_dispatcher.dispatch(
             HardwareStoppedAction(
                 completed_at=self._model_utils.get_timestamp(),
@@ -587,6 +642,34 @@ class ProtocolEngine:
         )
         return self.state_view.labware.get_labware_offset(
             labware_offset_id=labware_offset_id
+        )
+
+    def add_camera_enablement_settings(
+        self, enablement_settings: CameraSettings
+    ) -> CameraSettings:
+        """Add new camera enablement settings."""
+        self._action_dispatcher.dispatch(
+            AddCameraSettingsAction(enablement_settings=enablement_settings)
+        )
+        camera_settings = self.state_view.camera.get_enablement_settings()
+        assert camera_settings is not None
+        return camera_settings
+
+    def add_camera_capture_image_settings_to_state(
+        self,
+        camera_id: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        pan: Optional[Tuple[int, int]] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Add new camera capture image settings to the engine state."""
+        self._action_dispatcher.dispatch(
+            AddCameraCaptureImageSettingsAction(
+                camera_id, resolution, zoom, pan, contrast, brightness, saturation
+            )
         )
 
     def add_labware_definition(self, definition: LabwareDefinition) -> LabwareUri:
@@ -669,6 +752,7 @@ class ProtocolEngine:
         self._queue_worker = create_queue_worker(
             hardware_api=self._hardware_api,
             file_provider=self._file_provider,
+            camera_provider=self._camera_provider,
             state_store=self._state_store,
             action_dispatcher=self._action_dispatcher,
             command_generator=command_generator,

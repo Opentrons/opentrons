@@ -1,63 +1,63 @@
-import logging
 import functools
-
+import logging
 from typing import Any, Dict, Optional, Set, Tuple, Union, cast
 
-from opentrons.types import Point
-
-from opentrons_shared_data.pipette.pipette_definition import (
-    PipetteConfigurations,
-    PlungerPositions,
-    MotorConfigurations,
-    SupportedTipsDefinition,
-    PickUpTipConfigurations,
-    PressFitPickUpTipConfiguration,
-    CamActionPickUpTipConfiguration,
-    DropTipConfigurations,
-    PlungerHomingConfigurations,
-    PipetteNameType,
-    PipetteModelVersionType,
-    PipetteLiquidPropertiesDefinition,
-    default_tip_for_liquid_class,
-)
 from opentrons_shared_data.errors.exceptions import (
-    InvalidLiquidClassName,
     CommandPreconditionViolated,
-    PythonException,
     InvalidInstrumentData,
-)
-from opentrons_shared_data.pipette.ul_per_mm import (
-    calculate_ul_per_mm,
-    PIPETTING_FUNCTION_FALLBACK_VERSION,
-    PIPETTING_FUNCTION_LATEST_VERSION,
-)
-from ..instrument_abc import AbstractInstrument
-from .instrument_calibration import (
-    save_pipette_offset_calibration,
-    load_pipette_offset,
-    PipetteOffsetByPipetteMount,
-)
-from opentrons_shared_data.pipette.types import (
-    UlPerMmAction,
-    PipetteName,
-    PipetteModel,
-    Quirks,
-    PipetteOEMType,
+    InvalidLiquidClassName,
+    PythonException,
 )
 from opentrons_shared_data.pipette import (
     load_data as load_pipette_data,
+)
+from opentrons_shared_data.pipette import (
     types as pip_types,
 )
-from opentrons.hardware_control.types import CriticalPoint, OT3Mount
-from opentrons.hardware_control.errors import InvalidCriticalPoint
-from opentrons.hardware_control import nozzle_manager
-
-from opentrons.hardware_control.util import (
-    pick_up_speed_by_configuration,
-    pick_up_distance_by_configuration,
-    pick_up_current_by_configuration,
-    nominal_tip_overlap_dictionary_by_configuration,
+from opentrons_shared_data.pipette.pipette_definition import (
+    CamActionPickUpTipConfiguration,
+    DropTipConfigurations,
+    MotorConfigurations,
+    PickUpTipConfigurations,
+    PipetteConfigurations,
+    PipetteLiquidPropertiesDefinition,
+    PipetteModelVersionType,
+    PipetteNameType,
+    PlungerHomingConfigurations,
+    PlungerPositions,
+    PressFitPickUpTipConfiguration,
+    SupportedTipsDefinition,
+    default_tip_for_liquid_class,
 )
+from opentrons_shared_data.pipette.types import (
+    PipetteModel,
+    PipetteName,
+    PipetteOEMType,
+    Quirks,
+    UlPerMmAction,
+)
+from opentrons_shared_data.pipette.ul_per_mm import (
+    PIPETTING_FUNCTION_FALLBACK_VERSION,
+    PIPETTING_FUNCTION_LATEST_VERSION,
+    calculate_ul_per_mm,
+)
+
+from ..instrument_abc import AbstractInstrument
+from .instrument_calibration import (
+    PipetteOffsetByPipetteMount,
+    load_pipette_offset,
+    save_pipette_offset_calibration,
+)
+from opentrons.hardware_control import nozzle_manager
+from opentrons.hardware_control.errors import InvalidCriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, OT3Mount
+from opentrons.hardware_control.util import (
+    nominal_tip_overlap_dictionary_by_configuration,
+    pick_up_current_by_configuration,
+    pick_up_distance_by_configuration,
+    pick_up_speed_by_configuration,
+)
+from opentrons.types import Point
 
 mod_log = logging.getLogger(__name__)
 
@@ -488,6 +488,9 @@ class Pipette(AbstractInstrument[PipetteConfigurations]):
         """
         self._nozzle_manager.update_nozzle_configuration(
             back_left_nozzle, front_right_nozzle, starting_nozzle
+        )
+        self._versioned_tip_overlap_dictionary = (
+            self.get_nominal_tip_overlap_dictionary_by_configuration()
         )
 
     def reset_nozzle_configuration(self) -> None:

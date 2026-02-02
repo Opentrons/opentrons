@@ -7,8 +7,8 @@ from typing import Dict, Union
 
 try:
     # systemd journal is available, we can use its handler
-    import systemd.journal
     import systemd.daemon
+    import systemd.journal
 
     def log_handler(topic_name: str, log_level: int) -> Dict[str, Union[int, str]]:
         return {

@@ -2,37 +2,33 @@
 
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING, overload
+from typing import TYPE_CHECKING, Optional, overload
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition
-
-from opentrons.types import Point
-
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount, Axis
-from opentrons.motion_planning import get_gripper_labware_movement_waypoints
-
-from opentrons.protocol_engine.state.state import StateStore
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-
-from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
-from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
-from .thermocycler_plate_lifter import ThermocyclerPlateLifter
+from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Quirks
 
 from ..errors import (
+    CannotPerformGripperAction,
     GripperNotAttachedError,
+    HeaterShakerLabwareLatchNotOpenError,
     LabwareMovementNotAllowedError,
     ThermocyclerNotOpenError,
-    HeaterShakerLabwareLatchNotOpenError,
-    CannotPerformGripperAction,
 )
-
 from ..types import (
-    OnLabwareLocation,
+    AccessibleByGripperLocation,
+    GripperMoveType,
     LabwareLocation,
     OnDeckLabwareLocation,
-    GripperMoveType,
+    OnLabwareLocation,
 )
+from .heater_shaker_movement_flagger import HeaterShakerMovementFlagger
+from .thermocycler_movement_flagger import ThermocyclerMovementFlagger
+from .thermocycler_plate_lifter import ThermocyclerPlateLifter
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.hardware_control.types import Axis, OT3Mount
+from opentrons.motion_planning import get_gripper_labware_movement_waypoints
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+from opentrons.protocol_engine.state.state import StateStore
+from opentrons.types import Point
 
 if TYPE_CHECKING:
     from opentrons.protocol_engine.execution import EquipmentHandler, MovementHandler
@@ -95,12 +91,11 @@ class LabwareMovementHandler:
         *,
         labware_id: str,
         current_location: OnDeckLabwareLocation,
-        new_location: OnDeckLabwareLocation,
+        new_location: AccessibleByGripperLocation,
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
-    ) -> None:
-        ...
+    ) -> None: ...
 
     @overload
     async def move_labware_with_gripper(
@@ -108,13 +103,12 @@ class LabwareMovementHandler:
         *,
         labware_definition: LabwareDefinition,
         current_location: OnDeckLabwareLocation,
-        new_location: OnDeckLabwareLocation,
+        new_location: AccessibleByGripperLocation,
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
         gripper_z_offset: Optional[float],
-    ) -> None:
-        ...
+    ) -> None: ...
 
     async def move_labware_with_gripper(  # noqa: C901
         self,
@@ -122,7 +116,7 @@ class LabwareMovementHandler:
         labware_id: str | None = None,
         labware_definition: LabwareDefinition | None = None,
         current_location: OnDeckLabwareLocation,
-        new_location: OnDeckLabwareLocation,
+        new_location: AccessibleByGripperLocation,
         user_pick_up_offset: Point,
         user_drop_offset: Point,
         post_drop_slide_offset: Optional[Point],
@@ -235,6 +229,13 @@ class LabwareMovementHandler:
                             labware_definition=labware_definition
                         )
 
+                        disable_geometry_grip_check = False
+                        if labware_definition.parameters.quirks is not None:
+                            disable_geometry_grip_check = (
+                                Quirks.disableGeometryBasedGripCheck.value
+                                in labware_definition.parameters.quirks
+                            )
+
                         # todo(mm, 2024-09-26): This currently raises a lower-level 2015 FailedGripperPickupError.
                         # Convert this to a higher-level 3001 LabwareDroppedError or 3002 LabwareNotPickedUpError,
                         # depending on what waypoint we're at, to propagate a more specific error code to users.
@@ -242,6 +243,7 @@ class LabwareMovementHandler:
                             expected_grip_width=grip_specs.targetY,
                             grip_width_uncertainty_wider=grip_specs.uncertaintyWider,
                             grip_width_uncertainty_narrower=grip_specs.uncertaintyNarrower,
+                            disable_geometry_grip_check=disable_geometry_grip_check,
                         )
                 await ot3api.move_to(
                     mount=gripper_mount, abs_position=waypoint_data.position

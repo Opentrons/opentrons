@@ -112,8 +112,7 @@ function robotBusyStatusByNameReducer(
 }
 
 interface ChooseRobotSlideoutProps
-  extends Omit<SlideoutProps, 'children'>,
-    Partial<UseCreateRun> {
+  extends Omit<SlideoutProps, 'children'>, Partial<UseCreateRun> {
   isSelectedRobotOnDifferentSoftwareVersion: boolean
   robotType: RobotType | null
   selectedRobot: Robot | null
@@ -160,10 +159,8 @@ export function ChooseRobotSlideout(
   const dispatch = useDispatch<Dispatch>()
   const isScanning = useSelector((state: State) => getScanning(state))
   const [targetProps, tooltipProps] = useTooltip()
-  const [
-    showRestoreValuesTooltip,
-    setShowRestoreValuesTooltip,
-  ] = useState<boolean>(false)
+  const [showRestoreValuesTooltip, setShowRestoreValuesTooltip] =
+    useState<boolean>(false)
   const [isInputFocused, setIsInputFocused] = useState<boolean>(false)
   const multiSlideoutRef = useRef<HTMLDivElement>(null)
 
@@ -251,7 +248,7 @@ export function ChooseRobotSlideout(
         {isScanning ? (
           <Flex flexDirection={DIRECTION_ROW} alignItems={ALIGN_CENTER}>
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               color={COLORS.grey60}
               marginRight={SPACING.spacing12}
             >
@@ -284,8 +281,11 @@ export function ChooseRobotSlideout(
           height={SIZE_4}
           gridGap={SPACING.spacing8}
         >
-          <Icon name="alert-circle" size={SIZE_1} />
-          <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+          <Icon name="ot-alert" size={SIZE_1} />
+          <LegacyStyledText
+            forwardedAs="p"
+            fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+          >
             {t('no_available_robots_found')}
           </LegacyStyledText>
         </Flex>
@@ -313,7 +313,7 @@ export function ChooseRobotSlideout(
               />
               {runCreationError != null && isSelected && (
                 <LegacyStyledText
-                  as="label"
+                  forwardedAs="label"
                   color={COLORS.red60}
                   overflowWrap={OVERFLOW_WRAP_ANYWHERE}
                   display={DISPLAY_INLINE_BLOCK}
@@ -352,7 +352,7 @@ export function ChooseRobotSlideout(
           textAlign={TYPOGRAPHY.textAlignCenter}
           marginTop={SPACING.spacing24}
         >
-          <LegacyStyledText as="p" color={COLORS.grey50}>
+          <LegacyStyledText forwardedAs="p" color={COLORS.grey50}>
             {showIdleOnly
               ? t('unavailable_or_busy_robot_not_listed', {
                   count: unavailableCount + reducerBusyCount,
@@ -486,7 +486,7 @@ export function ChooseRobotSlideout(
                   key={runtimeParam.variableName}
                 >
                   <LegacyStyledText
-                    as="label"
+                    forwardedAs="label"
                     fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     paddingBottom={SPACING.spacing8}
                   >
@@ -521,11 +521,14 @@ export function ChooseRobotSlideout(
                       label={Boolean(runtimeParam.value) ? t('on') : t('off')}
                       paddingTop={SPACING.spacing2} // manual alignment of SVG with value label
                     />
-                    <LegacyStyledText as="p">
+                    <LegacyStyledText forwardedAs="p">
                       {Boolean(runtimeParam.value) ? t('on') : t('off')}
                     </LegacyStyledText>
                   </Flex>
-                  <LegacyStyledText as="label" paddingTop={SPACING.spacing8}>
+                  <LegacyStyledText
+                    forwardedAs="label"
+                    paddingTop={SPACING.spacing8}
+                  >
                     {runtimeParam.description}
                   </LegacyStyledText>
                 </Flex>
@@ -546,7 +549,7 @@ export function ChooseRobotSlideout(
                   key={runtimeParam.variableName}
                   flexDirection={DIRECTION_COLUMN}
                   alignItems={ALIGN_CENTER}
-                  gridgap={SPACING.spacing8}
+                  gridGap={SPACING.spacing8}
                 >
                   <Flex
                     flexDirection={DIRECTION_COLUMN}
@@ -555,7 +558,7 @@ export function ChooseRobotSlideout(
                     marginBottom={SPACING.spacing16}
                   >
                     <LegacyStyledText
-                      as="h3"
+                      forwardedAs="h3"
                       fontWeight={TYPOGRAPHY.fontWeightSemiBold}
                     >
                       {t('csv_file')}
@@ -582,7 +585,7 @@ export function ChooseRobotSlideout(
                         setRunTimeParametersOverrides?.(clone)
                       }}
                       dragAndDropText={
-                        <LegacyStyledText as="p">
+                        <LegacyStyledText forwardedAs="p">
                           <Trans
                             t={t}
                             i18nKey="shared:drag_and_drop"

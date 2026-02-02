@@ -3,9 +3,9 @@
 from .system_jwt import (
     Registrant,
     create_jwt,
+    expiration_from_jwt,
     jwt_is_valid,
     registrant_from_jwt,
-    expiration_from_jwt,
 )
 
 __all__ = [

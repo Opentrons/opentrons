@@ -8,25 +8,26 @@ from decoy import Decoy
 
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
 
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons.protocols.api_support.util import APIVersionError, UnsupportedAPIError
-from opentrons.protocol_api import MAX_SUPPORTED_VERSION, Labware, Well
+from . import versions_at_or_above, versions_at_or_below, versions_between
+from opentrons.protocol_api import (
+    MAX_SUPPORTED_VERSION,
+    Labware,
+    TemperatureModuleContext,
+    Well,
+)
+from opentrons.protocol_api._liquid import Liquid
 from opentrons.protocol_api.core import well_grid
 from opentrons.protocol_api.core.common import (
     LabwareCore,
-    WellCore,
-    ProtocolCore,
     ModuleCore,
+    ProtocolCore,
+    WellCore,
 )
-
-from opentrons.protocol_api.core.labware import LabwareLoadParams
 from opentrons.protocol_api.core.core_map import LoadedCoreMap
-from opentrons.protocol_api import TemperatureModuleContext
-from opentrons.protocol_api._liquid import Liquid
-
+from opentrons.protocol_api.core.labware import LabwareLoadParams
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import APIVersionError, UnsupportedAPIError
 from opentrons.types import Point
-
-from . import versions_at_or_below, versions_at_or_above, versions_between
 
 
 @pytest.fixture(autouse=True)
@@ -244,6 +245,14 @@ def test_reset_tips(
     """It should reset and tip state."""
     subject.reset()
     decoy.verify(mock_labware_core.reset_tips(), times=1)
+
+
+def test_set_empty(
+    decoy: Decoy, mock_labware_core: LabwareCore, subject: Labware
+) -> None:
+    """It should empty the tip state."""
+    subject.set_empty()
+    decoy.verify(mock_labware_core.set_empty(), times=1)
 
 
 def test_parent_slot(

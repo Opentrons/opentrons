@@ -12,6 +12,7 @@ import {
   SPACING,
 } from '@opentrons/components'
 
+import { useSentryReport } from '/app/App/hooks'
 import { MediumButton } from '/app/atoms/buttons'
 import { OddModal } from '/app/molecules/OddModal'
 import { ANALYTICS_ODD_APP_ERROR, useTrackEvent } from '/app/redux/analytics'
@@ -44,6 +45,8 @@ export function OnDeviceDisplayAppFallback({
     iconColor: COLORS.red50,
   }
 
+  useSentryReport(error)
+
   // immediately report to robot logs that something fatal happened
   useEffect(() => {
     dispatch(sendLog(`ODD app encountered a fatal error: ${error.message}`))
@@ -57,7 +60,7 @@ export function OnDeviceDisplayAppFallback({
         alignItems={ALIGN_CENTER}
         justifyContent={JUSTIFY_CENTER}
       >
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('branded:error_boundary_description')}
         </LegacyStyledText>
         <MediumButton

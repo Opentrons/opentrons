@@ -63,10 +63,8 @@ export function GeneralSettings(): JSX.Element {
   const { t } = useTranslation(['app_settings', 'shared', 'branded'])
   const dispatch = useDispatch<Dispatch>()
   const trackEvent = useTrackEvent()
-  const [
-    showPreviousVersionModal,
-    setShowPreviousVersionModal,
-  ] = useState<boolean>(false)
+  const [showPreviousVersionModal, setShowPreviousVersionModal] =
+    useState<boolean>(false)
   const updateAvailable = Boolean(useSelector(getAvailableShellUpdate))
 
   const appLanguage = useSelector(getAppLanguage)
@@ -86,12 +84,10 @@ export function GeneralSettings(): JSX.Element {
     })
   }
 
-  const [showUpdateBanner, setShowUpdateBanner] = useState<boolean>(
-    updateAvailable
-  )
-  const [showConnectRobotSlideout, setShowConnectRobotSlideout] = useState(
-    false
-  )
+  const [showUpdateBanner, setShowUpdateBanner] =
+    useState<boolean>(updateAvailable)
+  const [showConnectRobotSlideout, setShowConnectRobotSlideout] =
+    useState(false)
 
   // may be enabled, disabled, or unknown (because config is loading)
   const updateAlertEnabled = useSelector((s: State) => {
@@ -175,13 +171,13 @@ export function GeneralSettings(): JSX.Element {
                 {t('software_version')}
               </LegacyStyledText>
               <LegacyStyledText
-                as="p"
+                forwardedAs="p"
                 paddingBottom={SPACING.spacing8}
                 id="GeneralSettings_currentVersion"
               >
                 {CURRENT_VERSION}
               </LegacyStyledText>
-              <LegacyStyledText as="p">
+              <LegacyStyledText forwardedAs="p">
                 {t('shared:view_latest_release_notes')}
                 <Link
                   external
@@ -214,7 +210,7 @@ export function GeneralSettings(): JSX.Element {
             )}
           </Flex>
           <Box width="70%">
-            <LegacyStyledText as="p" paddingY={SPACING.spacing8}>
+            <LegacyStyledText forwardedAs="p" paddingY={SPACING.spacing8}>
               {t('manage_versions')}
             </LegacyStyledText>
           </Box>
@@ -251,7 +247,7 @@ export function GeneralSettings(): JSX.Element {
           alignItems={ALIGN_CENTER}
           justifyContent={JUSTIFY_SPACE_BETWEEN}
         >
-          <LegacyStyledText as="p">
+          <LegacyStyledText forwardedAs="p">
             {t('branded:receive_alert')}
           </LegacyStyledText>
           <ToggleButton
@@ -299,7 +295,7 @@ export function GeneralSettings(): JSX.Element {
                 >
                   {t('app_language_preferences')}
                 </LegacyStyledText>
-                <LegacyStyledText as="p">
+                <LegacyStyledText forwardedAs="p">
                   {t('app_language_description')}
                 </LegacyStyledText>
               </Flex>

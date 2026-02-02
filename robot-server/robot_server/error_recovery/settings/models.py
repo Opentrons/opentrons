@@ -1,8 +1,8 @@
 """HTTP request/response models for error recovery settings."""
 
-
 import textwrap
 from typing import Annotated
+
 import pydantic
 
 

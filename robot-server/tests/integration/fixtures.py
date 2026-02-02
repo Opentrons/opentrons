@@ -1,14 +1,14 @@
 """Fixtures to be used by Tavern tests."""
 
-
 from box import Box
 from requests import Response
+
+from opentrons import __version__, config
 from opentrons.protocol_api import (
     MAX_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION,
     MIN_SUPPORTED_VERSION_FOR_FLEX,
 )
-from opentrons import __version__, config
 from opentrons_shared_data.module.types import ModuleModel
 
 
@@ -38,6 +38,12 @@ def check_health_response(response: Response) -> None:
         "robot_serial": "simulator",
     }
     got = response.json()
+
+    # We avoid checking the disk details in `expected` due to testing environment variance.
+    assert "disk_details" in got
+    assert "systemAvailableMb" in got["disk_details"]
+    assert "imagesDirectorySizeMb" in got["disk_details"]
+    got.pop("disk_details", None)
 
     assert got == expected, f"health response failed:\n {got}"
 
@@ -71,6 +77,12 @@ def check_ot3_health_response(response: Response) -> None:
         "robot_serial": "simulator",
     }
     got = response.json()
+
+    # We avoid checking the disk details in `expected` due to testing environment variance.
+    assert "disk_details" in got
+    assert "systemAvailableMb" in got["disk_details"]
+    assert "imagesDirectorySizeMb" in got["disk_details"]
+    got.pop("disk_details", None)
 
     assert got == expected, f"health response failed:\n {got}"
 

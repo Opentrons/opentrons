@@ -51,17 +51,15 @@ const {
   failureMeta,
   success,
   failure,
-}: ResponseFixtures<
-  FetchEapOptionsResponse,
-  { message: string }
-> = makeResponseFixtures({
-  method: GET,
-  path: EAP_OPTIONS_PATH,
-  successStatus: 200,
-  successBody: { options: [mockEapOption] },
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+}: ResponseFixtures<FetchEapOptionsResponse, { message: string }> =
+  makeResponseFixtures({
+    method: GET,
+    path: EAP_OPTIONS_PATH,
+    successStatus: 200,
+    successBody: { options: [mockEapOption] },
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  })
 
 export {
   successMeta as mockFetchEapOptionsSuccessMeta,

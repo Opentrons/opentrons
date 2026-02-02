@@ -143,7 +143,7 @@ export const SetupModuleAndDeck = ({
           padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
           {...targetProps}
         >
-          {t('proceed_to_labware_position_check')}
+          {t('proceed_to_labware_offsets_setup_step')}
         </PrimaryButton>
       </Flex>
       {missingModuleIds.length > 0 ||
@@ -153,8 +153,8 @@ export const SetupModuleAndDeck = ({
           {runHasStarted
             ? t('protocol_run_started')
             : missingModuleIds.length > 0
-            ? t('plug_in_required_module', { count: missingModuleIds.length })
-            : t('calibrate_module_failure_reason')}
+              ? t('plug_in_required_module', { count: missingModuleIds.length })
+              : t('calibrate_module_failure_reason')}
         </Tooltip>
       ) : null}
     </>

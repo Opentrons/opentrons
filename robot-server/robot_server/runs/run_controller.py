@@ -1,20 +1,20 @@
 """Control an active run with Actions."""
+
 import logging
 from datetime import datetime
 from typing import Optional
+
 from typing_extensions import assert_never
+
 from opentrons.protocol_engine import ProtocolEngineError
+from opentrons.protocol_engine.types import DeckConfigurationType
 from opentrons_shared_data.errors.exceptions import RoboticsInteractionError
 
-from robot_server.service.task_runner import TaskRunner
-
+from .action_models import RunAction, RunActionType
 from .run_orchestrator_store import RunOrchestratorStore
 from .run_store import RunStore
-from .action_models import RunAction, RunActionType
-
-from opentrons.protocol_engine.types import DeckConfigurationType
-
-from robot_server.service.notifications import RunsPublisher, MaintenanceRunsPublisher
+from robot_server.service.notifications import MaintenanceRunsPublisher, RunsPublisher
+from robot_server.service.task_runner import TaskRunner
 
 log = logging.getLogger(__name__)
 
@@ -62,9 +62,9 @@ class RunController:
             RunNotFoundError: The given run identifier was not found in the database.
             RunActionNotAllowed: The following operation is not allowed
         """
-        assert (
-            self._run_id == self._run_orchestrator_store.current_run_id
-        ), "Expected RunController to be bound to current run"
+        assert self._run_id == self._run_orchestrator_store.current_run_id, (
+            "Expected RunController to be bound to current run"
+        )
 
         action = RunAction(id=action_id, actionType=action_type, createdAt=created_at)
 

@@ -64,13 +64,8 @@ export interface UploadInputProps {
 }
 
 export function UploadInput(props: UploadInputProps): JSX.Element | null {
-  const {
-    dragAndDropText,
-    onClick,
-    onUpload,
-    uploadButtonText,
-    uploadText,
-  } = props
+  const { dragAndDropText, onClick, onUpload, uploadButtonText, uploadText } =
+    props
   const { t } = useTranslation('protocol_info')
 
   const fileInput = useRef<HTMLInputElement>(null)
@@ -120,7 +115,7 @@ export function UploadInput(props: UploadInputProps): JSX.Element | null {
         <>
           {typeof uploadText === 'string' ? (
             <LegacyStyledText
-              as="p"
+              forwardedAs="p"
               textAlign={TYPOGRAPHY.textAlignCenter}
               marginTop={SPACING.spacing16}
             >

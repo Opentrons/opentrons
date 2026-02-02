@@ -58,7 +58,7 @@ export function ConfirmDeleteCalibrationModal({
         flexDirection={DIRECTION_COLUMN}
         justifyContent={JUSTIFY_SPACE_BETWEEN}
       >
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('delete_calibration_modal_description')}
         </LegacyStyledText>
         <Flex gridGap={SPACING.spacing24} justifyContent={JUSTIFY_END}>

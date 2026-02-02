@@ -9,7 +9,7 @@ import type {
   UseMutationOptions,
   UseMutationResult,
 } from 'react-query'
-import type { HostConfig, RunAction } from '@opentrons/api-client'
+import type { RunAction } from '@opentrons/api-client'
 
 export type UseStopRunMutationResult = UseMutationResult<
   RunAction,
@@ -32,7 +32,7 @@ export const useStopRunMutation = (
   const mutation = useMutation<RunAction, unknown, string>(
     [host, 'runs', RUN_ACTION_TYPE_STOP],
     (runId: string) =>
-      createRunAction(host as HostConfig, runId, {
+      createRunAction(host!, runId, {
         actionType: RUN_ACTION_TYPE_STOP,
       }).then(response => response.data),
     options

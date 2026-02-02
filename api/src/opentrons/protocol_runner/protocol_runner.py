@@ -1,54 +1,55 @@
 """Protocol run control and management."""
-import asyncio
-from typing import List, NamedTuple, Optional, Union
 
+import asyncio
 from abc import ABC, abstractmethod
+from typing import List, NamedTuple, Optional, Union
 
 import anyio
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons import protocol_reader
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.protocol_api import ParameterContext
-from opentrons.protocol_api.core.legacy.load_info import LoadInfo
-from opentrons.protocol_engine.commands.command import CommandStatus
-from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
-from opentrons.protocol_reader import (
-    ProtocolSource,
-    JsonProtocolConfig,
-    PythonProtocolConfig,
+from ..protocol_engine.errors import ProtocolCommandFailedError
+from ..protocol_engine.types import (
+    CSVRuntimeParamPaths,
+    DeckConfigurationType,
+    PostRunHardwareState,
+    PrimitiveRunTimeParamValuesType,
+    RunTimeParameter,
 )
-from opentrons.protocol_engine import (
-    ProtocolEngine,
-    StateSummary,
-    Command,
-    commands as pe_commands,
-)
-from opentrons.protocol_engine.types import CommandAnnotation
-from opentrons.protocols.parse import PythonParseMode
-from opentrons.util.async_helpers import asyncio_yield
-from opentrons.util.broker import Broker
-
-from .task_queue import TaskQueue
+from ..protocols.types import PythonProtocol
 from .json_file_reader import JsonFileReader
 from .json_translator import JsonTranslator
 from .legacy_context_plugin import LegacyContextPlugin
 from .python_protocol_wrappers import (
-    LEGACY_PYTHON_API_VERSION_CUTOFF,
     LEGACY_JSON_SCHEMA_VERSION_CUTOFF,
-    PythonAndLegacyFileReader,
+    LEGACY_PYTHON_API_VERSION_CUTOFF,
     ProtocolContextCreator,
+    PythonAndLegacyFileReader,
     PythonProtocolExecutor,
 )
-from ..protocol_engine.errors import ProtocolCommandFailedError
-from ..protocol_engine.types import (
-    PostRunHardwareState,
-    DeckConfigurationType,
-    RunTimeParameter,
-    PrimitiveRunTimeParamValuesType,
-    CSVRuntimeParamPaths,
+from .task_queue import TaskQueue
+from opentrons import protocol_reader
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.protocol_api import ParameterContext
+from opentrons.protocol_api.core.legacy.load_info import LoadInfo
+from opentrons.protocol_engine import (
+    Command,
+    ProtocolEngine,
+    StateSummary,
 )
-from ..protocols.types import PythonProtocol
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+)
+from opentrons.protocol_engine.commands.command import CommandStatus
+from opentrons.protocol_engine.error_recovery_policy import ErrorRecoveryType
+from opentrons.protocol_engine.types import CommandAnnotation, CommandPreconditions
+from opentrons.protocol_reader import (
+    JsonProtocolConfig,
+    ProtocolSource,
+    PythonProtocolConfig,
+)
+from opentrons.protocols.parse import PythonParseMode
+from opentrons.util.async_helpers import asyncio_yield
+from opentrons.util.broker import Broker
 
 
 class RunResult(NamedTuple):
@@ -58,6 +59,7 @@ class RunResult(NamedTuple):
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
     command_annotations: List[CommandAnnotation]
+    command_preconditions: Optional[CommandPreconditions]
 
 
 class AbstractRunner(ABC):
@@ -284,11 +286,15 @@ class PythonAndLegacyRunner(AbstractRunner):
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
         parameters = self.run_time_parameters
+        preconditions = (
+            self._protocol_engine.state_view.preconditions.get_precondition()
+        )
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=parameters,
             command_annotations=[],
+            command_preconditions=preconditions,
         )
 
 
@@ -403,11 +409,15 @@ class JsonRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
+        preconditions = (
+            self._protocol_engine.state_view.preconditions.get_precondition()
+        )
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=[],
             command_annotations=self._command_annotations,
+            command_preconditions=preconditions,
         )
 
     async def _add_and_execute_commands(self) -> None:
@@ -479,11 +489,15 @@ class LiveRunner(AbstractRunner):
 
         run_data = self._protocol_engine.state_view.get_summary()
         commands = self._protocol_engine.state_view.commands.get_all()
+        preconditions = (
+            self._protocol_engine.state_view.preconditions.get_precondition()
+        )
         return RunResult(
             commands=commands,
             state_summary=run_data,
             parameters=[],
             command_annotations=[],
+            command_preconditions=preconditions,
         )
 
 

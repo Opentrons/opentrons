@@ -1,10 +1,11 @@
-from datetime import datetime
 from dataclasses import dataclass, field
-from typing import Any, Optional, Generic, TypeVar
+from datetime import datetime
+from typing import Any, Generic, Optional, TypeVar
+
+from opentrons.util.helpers import utc_now
 
 from robot_server.service.session.models.command import CommandStatus, RequestTypes
 from robot_server.service.session.models.common import IdentifierType, create_identifier
-from opentrons.util.helpers import utc_now
 
 
 @dataclass(frozen=True)

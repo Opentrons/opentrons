@@ -1,18 +1,19 @@
-"""Command models to start heating a Thermocycler's lid."""
+"""Command models for heating a Thermocycler's lid."""
+
 from __future__ import annotations
-from typing import Optional, TYPE_CHECKING, Any
-from typing_extensions import Literal, Type
+
+from typing import TYPE_CHECKING, Any, Optional
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal, Type
 
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
-
+    from opentrons.protocol_engine.state.state import StateView
 
 SetTargetLidTemperatureCommandType = Literal["thermocycler/setTargetLidTemperature"]
 
@@ -22,7 +23,7 @@ def _remove_default(s: dict[str, Any]) -> None:
 
 
 class SetTargetLidTemperatureParams(BaseModel):
-    """Input parameters to set a Thermocycler's target lid temperature."""
+    """Input parameters to  to set a Thermocycler's target lid temperature."""
 
     moduleId: str = Field(..., description="Unique ID of the Thermocycler Module.")
     celsius: float = Field(..., description="Target temperature in °C.")
@@ -49,10 +50,11 @@ class SetTargetLidTemperatureResult(BaseModel):
 
 class SetTargetLidTemperatureImpl(
     AbstractCommandImpl[
-        SetTargetLidTemperatureParams, SuccessData[SetTargetLidTemperatureResult]
+        SetTargetLidTemperatureParams,
+        SuccessData[SetTargetLidTemperatureResult],
     ]
 ):
-    """Execution implementation of a Thermocycler's set lid temperature command."""
+    """Execution implementation of a Thermocycler's  to set lid temperature command."""
 
     def __init__(
         self,
@@ -69,7 +71,7 @@ class SetTargetLidTemperatureImpl(
         self,
         params: SetTargetLidTemperatureParams,
     ) -> SuccessData[SetTargetLidTemperatureResult]:
-        """Set a Thermocycler's target lid temperature."""
+        """To set a Thermocycler's target lid temperature."""
         thermocycler_state = self._state_view.modules.get_thermocycler_module_substate(
             params.moduleId
         )
@@ -82,10 +84,13 @@ class SetTargetLidTemperatureImpl(
 
         async def set_target_lid_temperature(task_handler: TaskHandler) -> None:
             if thermocycler_hardware is not None:
-                await thermocycler_hardware.set_target_lid_temperature(
-                    target_temperature
-                )
-                await thermocycler_hardware.wait_for_lid_target()
+                async with task_handler.synchronize_cancel_latest(
+                    thermocycler_state.module_id + "-lid"
+                ):
+                    await thermocycler_hardware.set_target_lid_temperature(
+                        target_temperature
+                    )
+                    await thermocycler_hardware.wait_for_lid_target()
 
         task = await self._task_handler.create_task(
             task_function=set_target_lid_temperature, id=params.taskId
@@ -99,10 +104,12 @@ class SetTargetLidTemperatureImpl(
 
 class SetTargetLidTemperature(
     BaseCommand[
-        SetTargetLidTemperatureParams, SetTargetLidTemperatureResult, ErrorOccurrence
+        SetTargetLidTemperatureParams,
+        SetTargetLidTemperatureResult,
+        ErrorOccurrence,
     ]
 ):
-    """A command to set a Thermocycler's target lid temperature."""
+    """A command to  to set a Thermocycler's target lid temperature."""
 
     commandType: SetTargetLidTemperatureCommandType = (
         "thermocycler/setTargetLidTemperature"

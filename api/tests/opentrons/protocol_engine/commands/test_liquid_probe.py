@@ -3,15 +3,9 @@
 from datetime import datetime
 from typing import Type, Union
 
-from decoy import matchers, Decoy
 import pytest
+from decoy import Decoy, matchers
 
-from opentrons.protocol_engine.errors.exceptions import (
-    MustHomeError,
-    PipetteNotReadyToAspirateError,
-    TipNotAttachedError,
-    TipNotEmptyError,
-)
 from opentrons_shared_data.errors.exceptions import (
     PipetteLiquidNotFoundError,
     StallOrCollisionDetectedError,
@@ -20,46 +14,49 @@ from opentrons_shared_data.pipette.pipette_definition import (
     AvailableSensorDefinition,
     SupportedTipsDefinition,
 )
-
 from opentrons_shared_data.pipette.types import (
-    PipetteNameType,
     LiquidClasses as VolumeModes,
 )
-
-from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.pipettes import (
-    StaticPipetteConfig,
-    BoundingNozzlesOffsets,
-    PipetteBoundingBoxOffsets,
+from opentrons_shared_data.pipette.types import (
+    PipetteNameType,
 )
-from opentrons.protocol_engine.state import update_types
-from opentrons.types import MountType, Point
-from opentrons.protocol_engine import WellLocation, WellOrigin, WellOffset, DeckPoint
-from opentrons.protocol_engine.types import LabwareWellId
-from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
 
+from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine import DeckPoint, WellLocation, WellOffset, WellOrigin
+from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.liquid_probe import (
+    LiquidProbeImplementation,
     LiquidProbeParams,
     LiquidProbeResult,
-    LiquidProbeImplementation,
+    TryLiquidProbeImplementation,
     TryLiquidProbeParams,
     TryLiquidProbeResult,
-    TryLiquidProbeImplementation,
 )
-from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.movement_common import StallOrCollisionError
-
-
+from opentrons.protocol_engine.commands.pipetting_common import LiquidNotFoundError
+from opentrons.protocol_engine.errors.exceptions import (
+    MustHomeError,
+    PipetteNotReadyToAspirateError,
+    TipNotAttachedError,
+    TipNotEmptyError,
+)
 from opentrons.protocol_engine.execution import (
+    GantryMover,
     MovementHandler,
     PipettingHandler,
-    GantryMover,
 )
 from opentrons.protocol_engine.execution.pipetting import VirtualPipettingHandler
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
-
-from ..pipette_fixtures import get_default_nozzle_map
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.pipettes import (
+    BoundingNozzlesOffsets,
+    PipetteBoundingBoxOffsets,
+    StaticPipetteConfig,
+)
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import LabwareWellId
+from opentrons.protocol_engine.types.liquid_level_detection import SimulatedProbeResult
+from opentrons.types import MountType, Point
 
 EitherImplementationType = Union[
     Type[LiquidProbeImplementation], Type[TryLiquidProbeImplementation]
@@ -239,6 +236,7 @@ async def test_liquid_probe_implementation(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
 
@@ -335,6 +333,7 @@ async def test_liquid_not_found_error(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
     decoy.when(
@@ -464,6 +463,7 @@ async def test_liquid_probe_tip_checking(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
     with pytest.raises(TipNotAttachedError):
@@ -528,6 +528,7 @@ async def test_liquid_probe_plunger_preparedness_checking(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
     decoy.when(state_view.pipettes.get_aspirated_volume(pipette_id)).then_return(None)
@@ -594,6 +595,7 @@ async def test_liquid_probe_volume_checking(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
     decoy.when(
@@ -668,6 +670,7 @@ async def test_liquid_probe_location_checking(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
     decoy.when(
@@ -739,6 +742,7 @@ async def test_liquid_probe_stall(
             shaft_ul_per_mm=5.0,
             available_sensors=available_sensors,
             volume_mode=VolumeModes.default,
+            available_volume_modes_min_vol={},
         )
     )
     decoy.when(

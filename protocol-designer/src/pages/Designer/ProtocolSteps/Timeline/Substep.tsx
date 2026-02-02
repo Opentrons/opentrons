@@ -4,11 +4,11 @@ import noop from 'lodash/noop'
 
 import {
   ALIGN_CENTER,
-  DeckInfoLabel,
   DIRECTION_COLUMN,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   ListItem,
+  RobotInfoLabel,
   SPACING,
   StyledText,
   Tag,
@@ -111,7 +111,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
               <StyledText desktopStyle="bodyDefaultRegular">
                 {t('protocol_steps:in')}
               </StyledText>
-              <DeckInfoLabel
+              <RobotInfoLabel
                 deckLabel={i18n.format(
                   t('protocol_steps:well_name', {
                     wellName: source?.well ?? '',
@@ -141,7 +141,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
                   <StyledText desktopStyle="bodyDefaultRegular">
                     {t('protocol_steps:from')}
                   </StyledText>
-                  <DeckInfoLabel
+                  <RobotInfoLabel
                     deckLabel={i18n.format(
                       t('protocol_steps:well_name', {
                         wellName: source.well,
@@ -172,7 +172,7 @@ function SubstepComponent(props: SubstepProps): JSX.Element {
                       {t('protocol_steps:into')}
                     </StyledText>
 
-                    <DeckInfoLabel
+                    <RobotInfoLabel
                       deckLabel={i18n.format(
                         dest?.well != null
                           ? t('protocol_steps:well_name', {

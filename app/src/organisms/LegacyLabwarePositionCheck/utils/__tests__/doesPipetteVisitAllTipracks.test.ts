@@ -11,9 +11,11 @@ import type {
 } from '@opentrons/shared-data'
 
 // TODO: update these fixtures to be v6 protocols
-const protocolMultipleTipracks = (multiple_tipracks as unknown) as ProtocolAnalysisOutput
-const labwareDefinitionsMultipleTipracks = multiple_tipracks.labwareDefinitions as {}
-const protocolOneTiprack = (one_tiprack as unknown) as ProtocolAnalysisOutput
+const protocolMultipleTipracks =
+  multiple_tipracks as unknown as ProtocolAnalysisOutput
+const labwareDefinitionsMultipleTipracks =
+  multiple_tipracks.labwareDefinitions as {}
+const protocolOneTiprack = one_tiprack as unknown as ProtocolAnalysisOutput
 const labwareDefinitionsOneTiprack = one_tiprack.labwareDefinitions as {}
 const labwareWithDefinitionUri = [
   {
@@ -23,15 +25,13 @@ const labwareWithDefinitionUri = [
     loadName: 'opentrons_1_trash_1100ml_fixed',
   },
   {
-    id:
-      '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
+    id: '50d3ebb0-0042-11ec-8258-f7ffdf5ad45a:opentrons/opentrons_96_tiprack_300ul/1',
     displayName: 'Opentrons 96 Tip Rack 300 µL',
     definitionUri: 'opentrons/opentrons_96_tiprack_300ul/1',
     loadName: 'opentrons_96_tiprack_300ul',
   },
   {
-    id:
-      '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
+    id: '9fbc1db0-0042-11ec-8258-f7ffdf5ad45a:opentrons/nest_12_reservoir_15ml/1',
     displayName: 'NEST 12 Well Reservoir 15 mL',
     definitionUri: 'opentrons/nest_12_reservoir_15ml/1',
     loadName: 'nest_12_reservoir_15ml',

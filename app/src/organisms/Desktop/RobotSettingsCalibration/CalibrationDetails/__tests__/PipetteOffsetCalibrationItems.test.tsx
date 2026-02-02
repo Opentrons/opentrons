@@ -72,7 +72,6 @@ const mockAttachedPipettes: AttachedPipettesByMount = {
   left: mockAttachedPipette,
   right: mockAttachedPipette,
 } as any
-const mockUpdateRobotStatus = vi.fn()
 
 describe('PipetteOffsetCalibrationItems', () => {
   let props: ComponentProps<typeof PipetteOffsetCalibrationItems>
@@ -88,7 +87,7 @@ describe('PipetteOffsetCalibrationItems', () => {
     props = {
       robotName: ROBOT_NAME,
       formattedPipetteOffsetCalibrations: mockPipetteOffsetCalibrations,
-      updateRobotStatus: mockUpdateRobotStatus,
+      isRobotBusy: false,
     }
   })
 

@@ -2,13 +2,14 @@ import { css } from 'styled-components'
 
 import { BORDERS, COLORS } from '../../helix-design-system'
 import { Icon } from '../../icons'
-import { Flex } from '../../primitives'
+import { Btn, Flex } from '../../primitives'
 import {
   ALIGN_CENTER,
   CURSOR_AUTO,
   CURSOR_DEFAULT,
   CURSOR_POINTER,
   DIRECTION_ROW,
+  DISPLAY_FLEX,
   FLEX_MAX_CONTENT,
   JUSTIFY_SPACE_BETWEEN,
 } from '../../styles'
@@ -88,8 +89,9 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
   `
 
   return (
-    <Flex
-      as="button"
+    <Btn
+      display={DISPLAY_FLEX}
+      alignItems={ALIGN_CENTER}
       role="checkbox"
       onClick={onClick}
       tabIndex={tabIndex}
@@ -100,7 +102,7 @@ export function Checkbox(props: CheckboxProps): JSX.Element {
         {labelText}
       </StyledText>
       <Check isChecked={isChecked} disabled={disabled} />
-    </Flex>
+    </Btn>
   )
 }
 
@@ -111,6 +113,8 @@ interface CheckProps {
 }
 export function Check(props: CheckProps): JSX.Element {
   const { isChecked, color = COLORS.white, disabled = false } = props
+  // todo(mm, 2025-09-30): For accessibility, keyboard usability, etc., can this be
+  // a real <input type="checkbox"> instead of a div?
   return isChecked ? (
     <Flex css={CHECK_STYLE}>
       <Icon name="ot-checkbox" color={color} />

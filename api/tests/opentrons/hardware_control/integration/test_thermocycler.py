@@ -5,12 +5,11 @@ from typing import AsyncGenerator, List
 import anyio
 import pytest
 
+from .build_module import build_module
 from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.emulation.settings import Settings
 from opentrons.hardware_control.modules import Thermocycler
 from opentrons.hardware_control.modules.types import TemperatureStatus, ThermocyclerStep
-
-from .build_module import build_module
 
 
 @pytest.fixture
@@ -36,7 +35,7 @@ async def thermocycler(
 def test_device_info(thermocycler: Thermocycler) -> None:
     """It should have device info."""
     assert {
-        "model": "v02",
+        "model": "thermocyclerModuleV2",
         "serial": "thermocycler_emulator",
         "version": "v1.1.0",
     } == thermocycler.device_info

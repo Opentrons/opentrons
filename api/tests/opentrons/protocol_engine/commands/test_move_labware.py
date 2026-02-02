@@ -1,17 +1,12 @@
 """Test the ``moveLabware`` command."""
 
-from datetime import datetime
 import inspect
+from datetime import datetime
 from unittest.mock import sentinel
 
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.labware.labware_definition import (
-    LabwareDefinition2,
-    Parameters2,
-    Dimensions,
-)
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
     FailedGripperPickupError,
@@ -19,41 +14,46 @@ from opentrons_shared_data.errors.exceptions import (
     StallOrCollisionDetectedError,
 )
 from opentrons_shared_data.gripper.constants import GRIPPER_PADDLE_WIDTH
-
-from opentrons.protocol_engine.state import update_types
-from opentrons.types import DeckSlotName, Point
-from opentrons.protocol_engine import errors, Config
-from opentrons.protocol_engine.resources import labware_validation
-from opentrons.protocol_engine.resources.model_utils import ModelUtils
-from opentrons.protocol_engine.types import (
-    CurrentWell,
-    DeckSlotLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    LoadedLabware,
-    LabwareMovementStrategy,
-    LabwareOffsetVector,
-    DeckType,
-    AddressableAreaLocation,
-    OnAddressableAreaLocationSequenceComponent,
-    OnLabwareLocationSequenceComponent,
-    NotOnDeckLocationSequenceComponent,
-    OFF_DECK_LOCATION,
-    LabwareLocationSequence,
+from opentrons_shared_data.labware.labware_definition import (
+    Dimensions,
+    LabwareDefinition2,
+    Parameters2,
 )
-from opentrons.protocol_engine.state.state import StateView
+
+from opentrons.protocol_engine import Config, errors
 from opentrons.protocol_engine.commands.command import DefinedErrorData, SuccessData
 from opentrons.protocol_engine.commands.move_labware import (
     GripperMovementError,
+    MoveLabwareImplementation,
     MoveLabwareParams,
     MoveLabwareResult,
-    MoveLabwareImplementation,
 )
 from opentrons.protocol_engine.execution import (
     EquipmentHandler,
-    RunControlHandler,
     LabwareMovementHandler,
+    RunControlHandler,
 )
+from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.resources.model_utils import ModelUtils
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
+from opentrons.protocol_engine.types import (
+    WASTE_CHUTE_LOCATION,
+    AddressableAreaLocation,
+    CurrentWell,
+    DeckSlotLocation,
+    DeckType,
+    LabwareLocationSequence,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadedLabware,
+    ModuleLocation,
+    NotOnDeckLocationSequenceComponent,
+    OnAddressableAreaLocationSequenceComponent,
+    OnLabwareLocation,
+    OnLabwareLocationSequenceComponent,
+)
+from opentrons.types import DeckSlotName, Point
 
 
 @pytest.fixture(autouse=True)
@@ -437,7 +437,7 @@ async def test_gripper_error(
 
     # Actual setup for this test:
     decoy.when(
-        await labware_movement.move_labware_with_gripper(
+        await labware_movement.move_labware_with_gripper(  # type: ignore[func-returns-value]
             labware_id=labware_id,
             current_location=origin_location,
             new_location=new_location,
@@ -561,13 +561,9 @@ async def test_gripper_move_to_waste_chute_implementation(
         OnAddressableAreaLocationSequenceComponent(addressableAreaName="1")
     ]
     immediate_dest_loc_sequence: LabwareLocationSequence = [
-        OnAddressableAreaLocationSequenceComponent(
-            addressableAreaName="gripperWasteChute"
-        )
+        NotOnDeckLocationSequenceComponent(logicalLocationName=WASTE_CHUTE_LOCATION)
     ]
-    eventual_dest_loc_sequence: LabwareLocationSequence = [
-        NotOnDeckLocationSequenceComponent(logicalLocationName=OFF_DECK_LOCATION)
-    ]
+    eventual_dest_loc_sequence = immediate_dest_loc_sequence
 
     data = MoveLabwareParams(
         labwareId="my-cool-labware-id",
@@ -741,7 +737,7 @@ async def test_move_labware_raises_if_movement_obstructed(
     ).then_return("wowzers-a-new-offset-id")
 
     decoy.when(
-        await labware_movement.ensure_movement_not_obstructed_by_module(
+        await labware_movement.ensure_movement_not_obstructed_by_module(  # type: ignore[func-returns-value]
             labware_id="my-cool-labware-id",
             new_location=DeckSlotLocation(slotName=DeckSlotName.SLOT_6),
         )

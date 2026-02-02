@@ -2,24 +2,25 @@ from __future__ import annotations
 
 import re
 from typing import List
+
 from g_code_parsing.errors import UnparsableGCodeError
-from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CODE
-from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
-from opentrons.drivers.temp_deck.driver import GCODE as TEMPDECK_G_CODE
-from opentrons.drivers.thermocycler.driver import GCODE as THERMOCYCLER_G_CODE
-from opentrons.drivers.heater_shaker.driver import GCODE as HEATER_SHAKER_G_CODE
-from g_code_parsing.utils import reverse_enum
-from opentrons.hardware_control.emulation.parser import Parser
+from g_code_parsing.g_code_functionality_defs import (
+    heater_shaker,
+    magdeck,
+    smoothie,
+    tempdeck,
+    thermocycler,
+)
 from g_code_parsing.g_code_functionality_defs.g_code_functionality_def_base import (
     Explanation,
 )
-from g_code_parsing.g_code_functionality_defs import (
-    smoothie,
-    magdeck,
-    tempdeck,
-    thermocycler,
-    heater_shaker,
-)
+from g_code_parsing.utils import reverse_enum
+from opentrons.drivers.heater_shaker.driver import GCODE as HEATER_SHAKER_G_CODE
+from opentrons.drivers.mag_deck.driver import GCODE as MAGDECK_G_CODE
+from opentrons.drivers.smoothie_drivers.driver_3_0 import GCODE as SMOOTHIE_G_CODE
+from opentrons.drivers.temp_deck.driver import GCODE as TEMPDECK_G_CODE
+from opentrons.drivers.thermocycler.driver import GCODE as THERMOCYCLER_G_CODE
+from opentrons.hardware_control.emulation.parser import Parser
 
 
 class GCode:
@@ -94,6 +95,7 @@ class GCode:
         THERMOCYCLER_G_CODE.DEACTIVATE_BLOCK.name: thermocycler.DeactivateBlockGCodeFunctionalityDef,
         THERMOCYCLER_G_CODE.DEACTIVATE_ALL.name: thermocycler.DeactivateAllGCodeFunctionalityDef,
         THERMOCYCLER_G_CODE.EDIT_PID_PARAMS.name: thermocycler.EditPIDParamsGCodeFunctionalityDef,
+        THERMOCYCLER_G_CODE.GET_ERROR_STATE.name: thermocycler.GetErrorStatusFunctionalityDef,
     }
 
     HEATER_SHAKER_G_CODE_EXPLANATION_MAPPING = {
@@ -106,6 +108,7 @@ class GCode:
         HEATER_SHAKER_G_CODE.OPEN_LABWARE_LATCH.name: heater_shaker.OpenLabwareLatchGCodeFunctionalityDef,
         HEATER_SHAKER_G_CODE.CLOSE_LABWARE_LATCH.name: heater_shaker.CloseLabwareLatchGCodeFunctionalityDef,
         HEATER_SHAKER_G_CODE.GET_LABWARE_LATCH_STATE.name: heater_shaker.GetLabwareLatchStateGCodeFunctionalityDef,
+        HEATER_SHAKER_G_CODE.GET_ERROR_STATE.name: heater_shaker.GetErrorStatusFunctionalityDef,
     }
 
     # Smoothie G-Code Parsing Characters
@@ -158,6 +161,8 @@ class GCode:
         THERMOCYCLER_G_CODE.GET_LID_TEMP.value,
         THERMOCYCLER_G_CODE.GET_PLATE_TEMP.value,
         THERMOCYCLER_G_CODE.GET_LID_STATUS.value,
+        THERMOCYCLER_G_CODE.GET_ERROR_STATE.value,
+        HEATER_SHAKER_G_CODE.GET_ERROR_STATE.value,
     ]
 
     @classmethod

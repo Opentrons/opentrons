@@ -5,44 +5,47 @@ import {
   fixture_96_plate,
   fixture_trash,
 } from '@opentrons/shared-data/labware/fixtures/2'
+import { CLEAN } from '@opentrons/step-generation'
 
-import { getWellContentsAllLabware } from '../getWellContentsAllLabware'
+import {
+  getWellContentsAllLabware,
+  getWellContentsForLabwareStack,
+} from '../getWellContentsAllLabware'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
-  LabwareEntities,
   LabwareLiquidState,
+  TimelineFrame,
 } from '@opentrons/step-generation'
 
 vi.mock('../../../labware-defs/utils')
 
+const baseIngredFields = {
+  groupId: '0',
+  name: 'Some Ingred',
+  description: null,
+  serialize: false,
+}
+
+const labwareEntities = {
+  FIXED_TRASH_ID: { def: fixture_trash as LabwareDefinition2 },
+  container1Id: { def: fixture_96_plate as LabwareDefinition2 },
+  container2Id: { def: fixture_96_plate as LabwareDefinition2 },
+  container3Id: { def: fixture_24_tuberack as LabwareDefinition2 },
+  mockDestLabware: { def: fixture_96_plate as LabwareDefinition2 },
+}
+
+const defaultWellContents = {
+  highlighted: false,
+  selected: false,
+}
+const container1MaxVolume = fixture_96_plate.wells.A1.totalLiquidVolume
+
 describe('getWellContentsAllLabware', () => {
-  const container1MaxVolume = fixture_96_plate.wells.A1.totalLiquidVolume
-  let baseIngredFields
-  let labwareEntities: LabwareEntities
   let ingredsByLabwareXXSingleIngred: LabwareLiquidState
-  let defaultWellContents: { highlighted: boolean; selected: boolean }
   let singleIngredResult: Record<string, any>
 
   beforeEach(() => {
-    baseIngredFields = {
-      groupId: '0',
-      name: 'Some Ingred',
-      description: null,
-      serialize: false,
-    }
-
-    labwareEntities = {
-      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
-      FIXED_TRASH_ID: { def: fixture_trash as LabwareDefinition2 },
-      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
-      container1Id: { def: fixture_96_plate as LabwareDefinition2 },
-      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
-      container2Id: { def: fixture_96_plate as LabwareDefinition2 },
-      // @ts-expect-error(sa, 2021-6-22): missing id and labwareDefURI
-      container3Id: { def: fixture_24_tuberack as LabwareDefinition2 },
-    }
-
     ingredsByLabwareXXSingleIngred = {
       container1Id: {
         0: {
@@ -58,18 +61,12 @@ describe('getWellContentsAllLabware', () => {
       container3Id: {},
       FIXED_TRASH_ID: {},
     }
-
-    defaultWellContents = {
-      highlighted: false,
-      selected: false,
-    }
-    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
     singleIngredResult = getWellContentsAllLabware.resultFunc(
-      labwareEntities,
+      labwareEntities as any,
       ingredsByLabwareXXSingleIngred,
       'container1Id', // selected labware id
-      { A1: 'A1', B1: 'B1' }, // selected
-      { A3: 'A3' } // highlighted
+      { A1: null, B1: null }, // selected
+      { A3: null } // highlighted
     )
   })
 
@@ -114,14 +111,141 @@ describe('getWellContentsAllLabware', () => {
   })
 
   it('no selected wells when labwareId is not selected', () => {
-    // @ts-expect-error(sa, 2021-6-22): resultFunc not part of Selector type
     const result = getWellContentsAllLabware.resultFunc(
-      labwareEntities,
+      labwareEntities as any,
       ingredsByLabwareXXSingleIngred,
       null, // selected labware id
-      { A1: 'A1', B1: 'B1' }, // selected
-      { A3: 'A3' } // highlighted
+      { A1: null, B1: null }, // selected
+      { A3: null } // highlighted
     )
-    expect(result.container1Id.A1.selected).toBe(false)
+    expect(result.container1Id?.A1.selected).toStrictEqual(false)
+  })
+})
+
+describe('getWellContentsForLabwareStack', () => {
+  const mockRobotState: TimelineFrame = {
+    pipettes: {
+      mockPipette: {
+        mount: 'left',
+      },
+    },
+    labware: {
+      mockDestLabware: {
+        stack: ['mockDestLabware', 'C2'],
+      },
+      mockTiprack: {
+        stack: ['mockTiprack', 'B1'],
+      },
+      container1Id: {
+        stack: ['container1Id', 'mockDestLabware'],
+      },
+    },
+    modules: {},
+    tipState: {
+      tipracks: {
+        mockTiprack: {
+          A1: CLEAN,
+          B1: CLEAN,
+        },
+      },
+      pipettes: {
+        mockPipette: {
+          hasTip: false,
+          tiprackURI: null,
+        },
+      },
+    },
+    liquidState: {
+      pipettes: {
+        mockPipette: {
+          0: {},
+        },
+      },
+      labware: {
+        mockSourceLabware: {
+          A1: {},
+        },
+        mockDestLabware: {
+          A1: {},
+        },
+      },
+      trashBins: {
+        mockTrashBin: {},
+      },
+      wasteChute: {},
+    },
+  }
+
+  const ingredsByLabwareXXSingleIngredStack = {
+    container1Id: {
+      0: {
+        ...baseIngredFields,
+        wells: {
+          A1: { volume: 100 },
+          B1: { volume: 150 },
+        },
+      },
+    },
+    mockDestLabware: {
+      0: {
+        ...baseIngredFields,
+        wells: {
+          A1: { volume: 100 },
+          B1: { volume: 150 },
+        },
+      },
+    },
+    container2Id: {
+      0: {
+        ...baseIngredFields,
+        wells: {
+          A1: { volume: 100 },
+          B1: { volume: 150 },
+        },
+      },
+    },
+    container3Id: {},
+    FIXED_TRASH_ID: {},
+  }
+
+  it('selects well contents of all labware in stack (for Plate props)', () => {
+    const singleIngredResultStack = getWellContentsForLabwareStack.resultFunc(
+      labwareEntities as any,
+      mockRobotState,
+      ingredsByLabwareXXSingleIngredStack as any,
+      'container1Id', // selected labware id
+      { A1: null, B1: null }, // selected
+      { A3: null } // highlighted
+    )
+
+    expect(singleIngredResultStack).toMatchObject({
+      container1Id: {
+        A1: {
+          ...defaultWellContents,
+          selected: true,
+          maxVolume: container1MaxVolume,
+        },
+        A2: {
+          ...defaultWellContents,
+          maxVolume: container1MaxVolume,
+        },
+        B1: {
+          ...defaultWellContents,
+          selected: true,
+          maxVolume: container1MaxVolume,
+        },
+        B2: {
+          ...defaultWellContents,
+          maxVolume: container1MaxVolume,
+        },
+      },
+      mockDestLabware: {
+        A1: {
+          ...defaultWellContents,
+          selected: true,
+          maxVolume: container1MaxVolume,
+        },
+      },
+    })
   })
 })

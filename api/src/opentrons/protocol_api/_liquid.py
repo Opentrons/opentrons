@@ -1,19 +1,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Dict, Union, TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Dict, Optional, Tuple, Union
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
 
-from opentrons.protocols.advanced_control.transfers.common import (
-    NoLiquidClassPropertyError,
-)
-
 from ._liquid_properties import (
     TransferProperties,
     build_transfer_properties,
+)
+from opentrons.protocols.advanced_control.transfers.common import (
+    NoLiquidClassPropertyError,
 )
 
 if TYPE_CHECKING:
@@ -29,7 +28,7 @@ class Liquid:
         description: An optional description.
         display_color: An optional display color for the liquid.
 
-    .. versionadded:: 2.14
+    *New in version 2.14*
     """
 
     _id: str

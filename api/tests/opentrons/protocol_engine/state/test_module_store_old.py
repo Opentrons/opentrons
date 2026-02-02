@@ -4,61 +4,62 @@ DEPRECATED: Testing ModuleStore independently of ModuleView is no longer helpful
 Try to add new tests to test_module_state.py, where they can be tested together,
 treating ModuleState as a private implementation detail.
 """
-from typing import List, Set, cast, Dict, Optional
+
+from typing import Dict, List, Optional, Set, cast
 
 import pytest
-
-from opentrons.protocol_engine.state import update_types
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.deck.types import DeckDefinitionV5
 from pytest_lazy_fixtures import lf as lazy_fixture
 
-from opentrons.types import DeckSlotName
-from opentrons.protocol_engine import commands, actions
+from opentrons_shared_data.deck.types import DeckDefinitionV5
+from opentrons_shared_data.robot.types import RobotType
+
+from opentrons.hardware_control.modules.types import LiveData
+from opentrons.protocol_engine import actions, commands
 from opentrons.protocol_engine.commands import (
     heater_shaker as hs_commands,
+)
+from opentrons.protocol_engine.commands import (
     temperature_module as temp_commands,
+)
+from opentrons.protocol_engine.commands import (
     thermocycler as tc_commands,
 )
-from opentrons.protocol_engine.types import (
-    DeckSlotLocation,
-    ModuleDefinition,
-    ModuleModel,
-    HeaterShakerLatchStatus,
-    DeckType,
-    AddressableArea,
-    DeckConfigurationType,
-    PotentialCutoutFixture,
+from opentrons.protocol_engine.resources import deck_configuration_provider
+from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.addressable_areas import (
+    AddressableAreaState,
+    AddressableAreaView,
 )
-
-from opentrons.protocol_engine.state.modules import (
-    ModuleStore,
-    ModuleState,
-    HardwareModule,
-)
-
+from opentrons.protocol_engine.state.config import Config
 from opentrons.protocol_engine.state.module_substates import (
-    MagneticModuleId,
-    MagneticModuleSubState,
+    AbsorbanceReaderId,
+    AbsorbanceReaderSubState,
     HeaterShakerModuleId,
     HeaterShakerModuleSubState,
+    MagneticModuleId,
+    MagneticModuleSubState,
+    ModuleSubStateType,
     TemperatureModuleId,
     TemperatureModuleSubState,
     ThermocyclerModuleId,
     ThermocyclerModuleSubState,
-    AbsorbanceReaderSubState,
-    AbsorbanceReaderId,
-    ModuleSubStateType,
 )
-
-from opentrons.protocol_engine.state.addressable_areas import (
-    AddressableAreaView,
-    AddressableAreaState,
+from opentrons.protocol_engine.state.modules import (
+    HardwareModule,
+    ModuleState,
+    ModuleStore,
 )
-from opentrons.protocol_engine.state.config import Config
-from opentrons.hardware_control.modules.types import LiveData
-from opentrons.protocol_engine.resources import deck_configuration_provider
-
+from opentrons.protocol_engine.types import (
+    AddressableArea,
+    DeckConfigurationType,
+    DeckSlotLocation,
+    DeckType,
+    HeaterShakerLatchStatus,
+    ModuleDefinition,
+    ModuleModel,
+    PotentialCutoutFixture,
+)
+from opentrons.types import DeckSlotName
 
 _OT2_STANDARD_CONFIG = Config(
     use_simulated_deck_config=False,
@@ -486,10 +487,15 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         params=hs_commands.SetAndWaitForShakeSpeedParams(moduleId="module-id", rpm=111),
         result=hs_commands.SetAndWaitForShakeSpeedResult(pipetteRetracted=False),
     )
+    start_set_shake_cmd = hs_commands.SetShakeSpeed.model_construct(  # type: ignore[call-arg]
+        params=hs_commands.SetShakeSpeedParams(moduleId="module-id", rpm=111),
+        result=hs_commands.SetShakeSpeedResult(pipetteRetracted=False, taskId="taskId"),
+    )
     deactivate_cmd = hs_commands.DeactivateShaker.model_construct(  # type: ignore[call-arg]
         params=hs_commands.DeactivateShakerParams(moduleId="module-id"),
         result=hs_commands.DeactivateShakerResult(),
     )
+
     subject = ModuleStore(
         config=_OT2_STANDARD_CONFIG,
         deck_fixed_labware=[],
@@ -508,6 +514,15 @@ def test_handle_hs_shake_commands(heater_shaker_v1_def: ModuleDefinition) -> Non
         )
     )
     subject.handle_action(actions.SucceedCommandAction(command=set_shake_cmd))
+    assert subject.state.substate_by_module_id == {
+        "module-id": HeaterShakerModuleSubState(
+            module_id=HeaterShakerModuleId("module-id"),
+            labware_latch_status=HeaterShakerLatchStatus.UNKNOWN,
+            is_plate_shaking=True,
+            plate_target_temperature=None,
+        )
+    }
+    subject.handle_action(actions.SucceedCommandAction(command=start_set_shake_cmd))
     assert subject.state.substate_by_module_id == {
         "module-id": HeaterShakerModuleSubState(
             module_id=HeaterShakerModuleId("module-id"),
@@ -673,9 +688,7 @@ def test_handle_thermocycler_temperature_commands(
         params=tc_commands.SetTargetBlockTemperatureParams(
             moduleId="module-id", celsius=42.4
         ),
-        result=tc_commands.SetTargetBlockTemperatureResult(
-            targetBlockTemperature=42.4, taskId="taskId"
-        ),
+        result=tc_commands.SetTargetBlockTemperatureResult(targetBlockTemperature=42.4),
     )
     deactivate_block_cmd = tc_commands.DeactivateBlock.model_construct(  # type: ignore[call-arg]
         params=tc_commands.DeactivateBlockParams(moduleId="module-id"),
@@ -685,9 +698,7 @@ def test_handle_thermocycler_temperature_commands(
         params=tc_commands.SetTargetLidTemperatureParams(
             moduleId="module-id", celsius=35.3
         ),
-        result=tc_commands.SetTargetLidTemperatureResult(
-            targetLidTemperature=35.3, taskId="taskId"
-        ),
+        result=tc_commands.SetTargetLidTemperatureResult(targetLidTemperature=35.3),
     )
     deactivate_lid_cmd = tc_commands.DeactivateLid.model_construct(  # type: ignore[call-arg]
         params=tc_commands.DeactivateLidParams(moduleId="module-id"),

@@ -28,9 +28,14 @@ export interface CloseLabwareSelectorAction {
   type: 'CLOSE_LABWARE_SELECTOR'
 }
 // @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
-export const closeLabwareSelector: () => CloseLabwareSelectorAction = createAction(
-  'CLOSE_LABWARE_SELECTOR'
-)
+export const closeLabwareSelector: () => CloseLabwareSelectorAction =
+  createAction('CLOSE_LABWARE_SELECTOR')
+// ===== Open and close multiple Ingredient Selector modal ====
+export interface MultipleIngredientsSelectorAction {
+  type: 'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'
+  payload: string[]
+}
+
 // ===== Open and close Ingredient Selector modal ====
 export interface OpenIngredientSelectorAction {
   type: 'OPEN_INGREDIENT_SELECTOR'
@@ -43,19 +48,24 @@ export const openIngredientSelector: (
 export interface CloseIngredientSelectorAction {
   type: 'CLOSE_INGREDIENT_SELECTOR'
 }
-// @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
-export const closeIngredientSelector: () => CloseIngredientSelectorAction = createAction(
-  'CLOSE_INGREDIENT_SELECTOR'
+// @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
+export const multipleIngredientsSelector: (
+  payload: string[]
+) => MultipleIngredientsSelectorAction = createAction(
+  'OPEN_MULTIPLE_INGREDIENTS_SELECTOR'
 )
+
+// @ts-expect-error(mc, 2020-06-04): creatActions doesn't return exact actions
+export const closeIngredientSelector: () => CloseIngredientSelectorAction =
+  createAction('CLOSE_INGREDIENT_SELECTOR')
 // ===== Drill Down on Labware ====
 export interface DrillDownOnLabwareAction {
   type: 'DRILL_DOWN_ON_LABWARE'
   payload: string
 }
 // @ts-expect-error(sa, 2021-6-20): creatActions doesn't return exact actions
-export const drillDownOnLabware: (
-  payload: string
-) => DrillDownOnLabwareAction = createAction('DRILL_DOWN_ON_LABWARE')
+export const drillDownOnLabware: (payload: string) => DrillDownOnLabwareAction =
+  createAction('DRILL_DOWN_ON_LABWARE')
 export interface DrillUpFromLabwareAction {
   type: 'DRILL_UP_FROM_LABWARE'
 }
@@ -68,7 +78,10 @@ export interface CreateContainerArgs {
   labwareDefURIStack: string[]
   // NOTE: if slot is omitted, next available slot will be used.
   slot?: DeckSlot
+  updateSelectedLabwareId?: boolean
+  uuids?: string[]
 }
+
 export interface CreateContainerAction {
   type: 'CREATE_CONTAINER'
   payload: {
@@ -118,7 +131,7 @@ export interface DuplicateLabwareAction {
 export interface RemoveWellsContentsAction {
   type: 'REMOVE_WELLS_CONTENTS'
   payload: {
-    labwareId: string
+    labwareId: string | string[]
     liquidGroupId?: string
     wells: string[]
   }
@@ -141,48 +154,47 @@ export interface DeleteLiquidGroupAction {
 }
 export const deleteLiquidGroup: (
   liquidGroupId: string
-) => ThunkAction<
-  DeleteLiquidGroupAction | EditMultipleLiquidGroupsAction
-> = liquidGroupId => (dispatch, getState) => {
-  const allLiquidGroups = selectors.getLiquidGroupsOnDeck(getState())
-  const liquidEntities = getLiquidEntities(getState())
-  const liquidIsOnDeck = allLiquidGroups.includes(liquidGroupId)
+) => ThunkAction<DeleteLiquidGroupAction | EditMultipleLiquidGroupsAction> =
+  liquidGroupId => (dispatch, getState) => {
+    const allLiquidGroups = selectors.getLiquidGroupsOnDeck(getState())
+    const liquidEntities = getLiquidEntities(getState())
+    const liquidIsOnDeck = allLiquidGroups.includes(liquidGroupId)
 
-  const okToDelete = liquidIsOnDeck
-    ? global.confirm(
-        'This liquid has been placed on the deck, are you sure you want to delete it?'
-      )
-    : true
-  if (!okToDelete) {
-    console.error(`problem with deleting liquid id ${liquidGroupId}`)
-    return
+    const okToDelete = liquidIsOnDeck
+      ? global.confirm(
+          'This liquid has been placed on the deck, are you sure you want to delete it?'
+        )
+      : true
+    if (!okToDelete) {
+      console.error(`problem with deleting liquid id ${liquidGroupId}`)
+      return
+    }
+
+    // filter out the deleted group and create an updated liquid entities object
+    const { [liquidGroupId]: _, ...remainingLiquidEntities } = liquidEntities
+
+    const updatedLiquidGroupPythonName = Object.keys(remainingLiquidEntities)
+      .sort() //  sort to ensure correct order
+      .reduce<Record<string, LiquidEntity>>((acc, oldId, index) => {
+        acc[oldId] = {
+          ...remainingLiquidEntities[oldId],
+          pythonName: `liquid_${index + 1}`,
+        }
+        return acc
+      }, {})
+
+    //  delete user selected group, then update pythonName for rest of liquids
+    dispatch({ type: 'DELETE_LIQUID_GROUP', payload: liquidGroupId })
+    dispatch({
+      type: 'EDIT_MULTIPLE_LIQUID_GROUPS_PYTHON_NAME',
+      payload: updatedLiquidGroupPythonName,
+    })
   }
-
-  // filter out the deleted group and create an updated liquid entities object
-  const { [liquidGroupId]: _, ...remainingLiquidEntities } = liquidEntities
-
-  const updatedLiquidGroupPythonName = Object.keys(remainingLiquidEntities)
-    .sort() //  sort to ensure correct order
-    .reduce<Record<string, LiquidEntity>>((acc, oldId, index) => {
-      acc[oldId] = {
-        ...remainingLiquidEntities[oldId],
-        pythonName: `liquid_${index + 1}`,
-      }
-      return acc
-    }, {})
-
-  //  delete user selected group, then update pythonName for rest of liquids
-  dispatch({ type: 'DELETE_LIQUID_GROUP', payload: liquidGroupId })
-  dispatch({
-    type: 'EDIT_MULTIPLE_LIQUID_GROUPS_PYTHON_NAME',
-    payload: updatedLiquidGroupPythonName,
-  })
-}
 
 // NOTE: assumes you want to set a uniform volume of the same liquid in one labware
 export interface SetWellContentsPayload {
   liquidGroupId: string
-  labwareId: string
+  labwareId: string | string[]
   wells: string[]
   // NOTE: order should not be meaningful
   volume: number

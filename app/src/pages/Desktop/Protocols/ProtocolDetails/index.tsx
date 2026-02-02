@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Navigate, useParams } from 'react-router-dom'
 
-import { ProtocolDetails as ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
+import { ProtocolDetailsContents } from '/app/organisms/Desktop/ProtocolDetails'
 import {
   fetchProtocols,
   getStoredProtocol,

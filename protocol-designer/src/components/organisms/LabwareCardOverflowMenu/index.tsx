@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 import { css } from 'styled-components'
 
 import {
@@ -27,6 +28,8 @@ import {
 import {
   deleteContainer,
   editSlotInfo,
+  multipleIngredientsSelector,
+  openIngredientSelector,
 } from '/protocol-designer/labware-ingred/actions'
 import { getIsLabwareOnSlotInUse } from '/protocol-designer/pages/Designer/DeckSetup/utils'
 import { getSavedStepForms } from '/protocol-designer/step-forms/selectors'
@@ -49,17 +52,15 @@ export function LabwareCardOverflowMenu(
 ): JSX.Element | null {
   const { labwareIds, setShowOverflowMenu, lidId } = props
   const { t } = useTranslation('starting_deck_state')
+  const navigate = useNavigate()
   const savedSteps = useSelector(getSavedStepForms)
   const deckSetup = useSelector(getDeckSetupForActiveItem)
-  const [showNotCompatibleModal, setShowNotCompatibleModal] = useState<boolean>(
-    false
-  )
+  const [showNotCompatibleModal, setShowNotCompatibleModal] =
+    useState<boolean>(false)
   const { labware: deckSetupLabware, modules: deckSetupModules } = deckSetup
   const dispatch = useDispatch<ThunkDispatch<any>>()
-  const [
-    showDeleteEntityInUseModal,
-    setShowDeleteEntityInUseModal,
-  ] = useState<boolean>(false)
+  const [showDeleteEntityInUseModal, setShowDeleteEntityInUseModal] =
+    useState<boolean>(false)
   const [showNickNameModal, setShowNickNameModal] = useState<boolean>(false)
   const overflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -73,9 +74,8 @@ export function LabwareCardOverflowMenu(
     },
   })
   const topLabwareId = labwareIds[0]
-  const isAdapter = deckSetupLabware[topLabwareId].def.allowedRoles?.includes(
-    'adapter'
-  )
+  const isAdapter =
+    deckSetupLabware[topLabwareId].def.allowedRoles?.includes('adapter')
   const slotName = getSlotInLocationStack(deckSetupLabware[topLabwareId].stack)
   const fullStack = getFullStackFromLabwares(
     deckSetupLabware,
@@ -123,7 +123,19 @@ export function LabwareCardOverflowMenu(
         : { labwareDefURI: null, lidDefURI: null, amount: 1 }),
     }
     dispatch(editSlotInfo(newSlotInfo))
+    const availableLabware = Object.values(deckSetupLabware).filter(
+      lw => lw.id !== topLabwareId && lw.stack.includes(slotName)
+    )
+    const newLabwareId =
+      availableLabware.length > 0 ? availableLabware[0].id : ''
+    if (newLabwareId === '') {
+      console.log('No more labware in stacker')
+      navigate('/designer')
+    }
+    dispatch(openIngredientSelector(newLabwareId))
+    dispatch(multipleIngredientsSelector([newLabwareId]))
   }
+
   const handleConfirmDeleteEntityInUseModal = (): void => {
     labwareIds.forEach(labwareId => {
       dispatch(deleteContainer({ labwareId }))

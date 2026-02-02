@@ -51,6 +51,11 @@
       "body1": "Introducing the {{pd}} 7.0 with {{flex}} support!",
       "body2": "All protocols now require {{app}} version <strong> 7.0+ </strong> to run."
     },
+    "genericStartingFrom861": {
+      "heading": "{{version}} Announcements",
+      "body1": "All protocols created in Protocol Designer v{{version}} generate Python protocols using API version {{apiVersion}} and now require Opentrons App version {{appVersion}} or newer to run.",
+      "footer": "For more information, see the <link1>Protocol Designer Instruction Manual</link1>."
+    },
     "header": "We've updated the {{pd}}",
     "heaterShakerSupport": {
       "body1": "The {{opd}} now supports our Heater-Shaker Module!",
@@ -90,21 +95,6 @@
       "body1": "{{pd}} Beta now includes support for the Thermocycler!",
       "body2": "Note: Protocols with modules <strong>may require an app and robot update to run</strong>. You will need to have the {{app}} and robot on the latest versions (<strong>3.18 or higher</strong>)."
     }
-  },
-  "auto_add_pause_until_temp_step": {
-    "body1": "Pause protocol now to wait until module reaches {{temperature}}°C before continuing on to the next step.",
-    "body2": "Build a pause later if you want your protocol to proceed to the next steps while the temperature module ramps up to {{temperature}}°C.",
-    "heater_shaker_pause_later": "Build a pause later if you want your protocol to proceed to the next steps while the Heater-Shaker module goes to {{temperature}}°C",
-    "heater_shaker_title": "Pause protocol until Heater-Shaker module reaches {{temperature}}°C",
-    "later_button": "I will build a pause later",
-    "now_button": "Pause protocol now",
-    "redesign": {
-      "body": "Add a pause step to wait until the {{module}} reaches {{temperature}}°C. Click Skip to continue to the next protocol step without pausing.",
-      "skip_pause_step": "Skip pause step",
-      "add_pause_step": "Add pause step",
-      "title": "Pause protocol until {{module}} reaches {{temp}}°C?"
-    },
-    "title": "Pause protocol until temperature module is at {{temperature}}°C?"
   },
   "browse_labware": {
     "instructions": "Hover on a well to see contents"

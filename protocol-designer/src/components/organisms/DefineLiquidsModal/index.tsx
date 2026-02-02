@@ -3,6 +3,7 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { clsx } from 'clsx'
 import * as Yup from 'yup'
 
 import {
@@ -20,6 +21,7 @@ import {
   SecondaryButton,
   SPACING,
   StyledText,
+  TextAreaField,
   TYPOGRAPHY,
   useOnClickOutside,
 } from '@opentrons/components'
@@ -31,18 +33,18 @@ import { swatchColors } from '@opentrons/step-generation'
 
 import {
   HandleEnter,
-  LINE_CLAMP_TEXT_STYLE,
   LINK_BUTTON_STYLE,
 } from '/protocol-designer/components/atoms'
-import { TextAreaField } from '/protocol-designer/components/molecules'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
 import * as labwareIngredActions from '/protocol-designer/labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '/protocol-designer/labware-ingred/selectors'
+import lineClampStyles from '/protocol-designer/styles/lineclamp.module.css'
 
 import { LiquidClassDropdown } from './LiquidClassDropdown'
 import { LiquidColorPicker } from './LiquidColorPicker'
 
 import type { ThunkDispatch } from 'redux-thunk'
+import type { MouseEvent } from 'react'
 import type { Ingredient } from '@opentrons/step-generation'
 import type { BaseState } from '/protocol-designer/types'
 
@@ -85,12 +87,11 @@ export function DefineLiquidsModal(
   const sortedLiquidClassDefs = getSortedLiquidClassDefs()
 
   const liquidGroupId = selectedLiquidGroupState.liquidGroupId
-  const volumePerWell = Object.values(
-    allLabwareWellContents
-  ).flatMap(labwareWithIngred =>
-    Object.values(labwareWithIngred).map(ingred =>
-      liquidGroupId != null ? ingred[liquidGroupId]?.volume : 0
-    )
+  const volumePerWell = Object.values(allLabwareWellContents).flatMap(
+    labwareWithIngred =>
+      Object.values(labwareWithIngred).map(ingred =>
+        liquidGroupId != null ? ingred[liquidGroupId]?.volume : 0
+      )
   )
   const liquidHasAssignedWell = volumePerWell.some(volume => volume > 0)
 
@@ -127,18 +128,12 @@ export function DefineLiquidsModal(
     liquidGroupId: liquidGroupId ?? nextGroupId,
   }
 
-  const {
-    handleSubmit,
-    formState,
-    control,
-    watch,
-    setValue,
-    register,
-  } = useForm<Ingredient>({
-    defaultValues: initialValues,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-    resolver: yupResolver(liquidEditFormSchema),
-  })
+  const { handleSubmit, formState, control, watch, setValue, register } =
+    useForm<Ingredient>({
+      defaultValues: initialValues,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      resolver: yupResolver(liquidEditFormSchema),
+    })
   const name = watch('displayName')
   const color = watch('displayColor')
   const liquidClass = watch('liquidClass')
@@ -149,7 +144,9 @@ export function DefineLiquidsModal(
       displayName: values.displayName,
       displayColor: values.displayColor,
       liquidClass:
-        values.liquidClass !== '' ? values.liquidClass ?? undefined : undefined,
+        values.liquidClass !== ''
+          ? (values.liquidClass ?? undefined)
+          : undefined,
       description: values.description !== '' ? values.description : null,
       liquidGroupId: values.liquidGroupId,
     })
@@ -170,6 +167,13 @@ export function DefineLiquidsModal(
     ),
   ]
 
+  const handleClickLiquidIcon = (
+    e: MouseEvent<HTMLButtonElement | HTMLDivElement>
+  ): void => {
+    e.preventDefault()
+    setShowColorPicker(prev => !prev)
+  }
+
   return (
     <HandleEnter
       onEnter={() => {
@@ -186,7 +190,11 @@ export function DefineLiquidsModal(
               <LiquidIcon color={initialValues.displayColor} />
               <StyledText
                 desktopStyle="bodyLargeSemiBold"
-                css={LINE_CLAMP_TEXT_STYLE(1)}
+                className={clsx(
+                  lineClampStyles.line_clamp,
+                  lineClampStyles.word_break_all
+                )}
+                style={{ WebkitLineClamp: 1 }}
               >
                 {initialValues.displayName}
               </StyledText>
@@ -199,7 +207,8 @@ export function DefineLiquidsModal(
         onClose={onClose}
       >
         <form
-          onSubmit={() => {
+          onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault()
             void handleSubmit(handleLiquidEdits)()
           }}
         >
@@ -275,9 +284,7 @@ export function DefineLiquidsModal(
                   </StyledText>
 
                   <LiquidIcon
-                    onClick={() => {
-                      setShowColorPicker(prev => !prev)
-                    }}
+                    onClick={handleClickLiquidIcon}
                     color={color}
                     size="medium"
                   />

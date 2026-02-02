@@ -1,37 +1,42 @@
 """Tests for OT3 calibration."""
+
 import copy
-from dataclasses import replace
-import pytest
 import json
+from dataclasses import replace
 from math import isclose
-from typing import AsyncIterator, Iterator, Tuple, Any, Literal
-from mock import patch, AsyncMock, Mock, call as mock_call
-from opentrons.hardware_control import ThreadManager
-from opentrons.hardware_control.ot3api import OT3API
-from opentrons.hardware_control.types import OT3Mount, Axis, InstrumentProbeType
+from typing import Any, AsyncIterator, Iterator, Literal, Tuple
+
+import pytest
+from mock import AsyncMock, Mock, patch
+from mock import call as mock_call
+
+from opentrons_shared_data.deck import get_calibration_square_position_in_slot
+from opentrons_shared_data.errors.exceptions import (
+    CalibrationStructureNotFoundError,
+    EarlyCapacitiveSenseTrigger,
+    EdgeNotFoundError,
+    InaccurateNonContactSweepError,
+)
+
 from opentrons.config.types import OT3CalibrationSettings
+from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.ot3_calibration import (
-    find_edge_binary,
-    find_axis_center,
-    find_calibration_structure_height,
-    find_slot_center_binary,
-    find_slot_center_noncontact,
-    calibrate_pipette,
+    EDGES,
+    PREP_OFFSET_DEPTH,
     CalibrationMethod,
     _edges_from_data,
     _probe_deck_at,
     _verify_edge_pos,
-    PREP_OFFSET_DEPTH,
-    EDGES,
+    calibrate_pipette,
+    find_axis_center,
+    find_calibration_structure_height,
+    find_edge_binary,
+    find_slot_center_binary,
+    find_slot_center_noncontact,
 )
+from opentrons.hardware_control.ot3api import OT3API
+from opentrons.hardware_control.types import Axis, InstrumentProbeType, OT3Mount
 from opentrons.types import Point
-from opentrons_shared_data.deck import get_calibration_square_position_in_slot
-from opentrons_shared_data.errors.exceptions import (
-    CalibrationStructureNotFoundError,
-    EdgeNotFoundError,
-    EarlyCapacitiveSenseTrigger,
-    InaccurateNonContactSweepError,
-)
 
 
 @pytest.fixture(autouse=True)
@@ -341,23 +346,30 @@ async def test_method_enum(
 ) -> None:
     managed = ot3_hardware.managed_obj
     assert managed
-    with patch(
-        "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
-        AsyncMock(spec=find_slot_center_binary),
-    ) as binary, patch(
-        "opentrons.hardware_control.ot3_calibration.get_calibration_square_position_in_slot",
-        Mock(),
-    ) as calibration_target, patch(
-        "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
-        AsyncMock(spec=find_slot_center_noncontact),
-    ) as noncontact, patch(
-        "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
-        AsyncMock(spec=find_calibration_structure_height),
-    ) as find_deck, patch.object(
-        managed, "reset_instrument_offset", AsyncMock()
-    ) as reset_instrument_offset, patch.object(
-        managed, "save_instrument_offset", AsyncMock()
-    ) as save_instrument_offset:
+    with (
+        patch(
+            "opentrons.hardware_control.ot3_calibration.find_slot_center_binary",
+            AsyncMock(spec=find_slot_center_binary),
+        ) as binary,
+        patch(
+            "opentrons.hardware_control.ot3_calibration.get_calibration_square_position_in_slot",
+            Mock(),
+        ) as calibration_target,
+        patch(
+            "opentrons.hardware_control.ot3_calibration.find_slot_center_noncontact",
+            AsyncMock(spec=find_slot_center_noncontact),
+        ) as noncontact,
+        patch(
+            "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
+            AsyncMock(spec=find_calibration_structure_height),
+        ) as find_deck,
+        patch.object(
+            managed, "reset_instrument_offset", AsyncMock()
+        ) as reset_instrument_offset,
+        patch.object(
+            managed, "save_instrument_offset", AsyncMock()
+        ) as save_instrument_offset,
+    ):
         find_deck.return_value = 10
         calibration_target.return_value = Point(0.0, 0.0, 0.0)
         binary.return_value = Point(1.0, 2.0, 3.0)
@@ -396,14 +408,18 @@ async def test_calibrate_mount_errors(
 ) -> None:
     managed = ot3_hardware.managed_obj
     assert managed
-    with patch.object(
-        managed, "reset_instrument_offset", AsyncMock()
-    ) as reset_instrument_offset, patch.object(
-        managed, "save_instrument_offset", AsyncMock()
-    ) as save_instrument_offset, patch(
-        "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
-        AsyncMock(spec=find_calibration_structure_height),
-    ) as find_deck:
+    with (
+        patch.object(
+            managed, "reset_instrument_offset", AsyncMock()
+        ) as reset_instrument_offset,
+        patch.object(
+            managed, "save_instrument_offset", AsyncMock()
+        ) as save_instrument_offset,
+        patch(
+            "opentrons.hardware_control.ot3_calibration.find_calibration_structure_height",
+            AsyncMock(spec=find_calibration_structure_height),
+        ) as find_deck,
+    ):
         find_deck.return_value = 10
         mock_data_analysis.return_value = (-1000, 1000)
 

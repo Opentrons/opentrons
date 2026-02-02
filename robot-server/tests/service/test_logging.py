@@ -1,8 +1,11 @@
-from mock import patch, MagicMock
 import logging
+
 import pytest
-from robot_server.service import logging as rs_logging
+from mock import MagicMock, patch
+
 from opentrons.config.types import RobotConfig
+
+from robot_server.service import logging as rs_logging
 
 
 @pytest.fixture

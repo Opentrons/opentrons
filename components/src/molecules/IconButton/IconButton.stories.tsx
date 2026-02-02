@@ -2,7 +2,8 @@ import { COLORS } from '../../helix-design-system'
 import { ICON_DATA_BY_NAME } from '../../icons'
 import { Flex } from '../../primitives'
 import { SPACING } from '../../ui-style-constants'
-import { IconButton as IconButtonComponent } from './index'
+// Note: this will be renamed to IconButton when remove IconButton from components
+import { NewIconButton as IconButtonComponent } from './index'
 
 import type { Meta, StoryObj } from '@storybook/react'
 

@@ -18,5 +18,6 @@ export type SettingOption =
   | 'RobotSettingsWifi'
   | 'RobotSettingsWifiConnect'
   | 'LanguageSetting'
+  | 'CameraPreferences'
 
 export type SetSettingOption = (option: SettingOption | null) => void

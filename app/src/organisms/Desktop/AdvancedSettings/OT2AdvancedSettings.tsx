@@ -72,8 +72,8 @@ export function OT2AdvancedSettings(): JSX.Element {
             useTrashSurfaceForTipCal === true
               ? ALWAYS_TRASH
               : useTrashSurfaceForTipCal === false
-              ? ALWAYS_BLOCK
-              : ALWAYS_PROMPT
+                ? ALWAYS_BLOCK
+                : ALWAYS_PROMPT
           }
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
             // you know this is a limited-selection field whose values are only

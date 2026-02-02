@@ -15,7 +15,11 @@ import {
   TYPOGRAPHY,
   WHITE_SPACE_PRE_WRAP,
 } from '@opentrons/components'
-import { getTopLocationInStack } from '@opentrons/step-generation'
+import { FLEX_STACKER_MODULE_TYPE } from '@opentrons/shared-data'
+import {
+  getIsSlotAHopper,
+  getTopLocationInStack,
+} from '@opentrons/step-generation'
 
 import { DND_TYPES } from '/protocol-designer/constants'
 import { moveDeckItem } from '/protocol-designer/labware-ingred/actions'
@@ -26,7 +30,7 @@ import { BlockedSlot } from './BlockedSlot'
 import { SlotOverlay } from './SlotOverlay'
 
 import type { DropTargetMonitor } from 'react-dnd'
-import type { LabwareOnDeck } from '/protocol-designer/step-forms'
+import type { LabwareOnDeck, ModuleOnDeck } from '/protocol-designer/step-forms'
 import type { ThunkDispatch } from '/protocol-designer/types'
 import type { DroppedItem, SharedControlsType } from '../types'
 
@@ -35,6 +39,7 @@ interface LabwareControlsProps extends SharedControlsType {
   setHoveredLabware: (labware?: LabwareOnDeck | null) => void
   setDraggedLabware: (labware?: LabwareOnDeck | null) => void
   swapBlocked: boolean
+  allModules: ModuleOnDeck[]
 }
 
 export const LabwareControls = (
@@ -52,27 +57,38 @@ export const LabwareControls = (
     isSelected,
     terminalItemId,
     itemId,
+    allModules,
   } = props
   const dispatch = useDispatch<ThunkDispatch<any>>()
   const ref = useRef(null)
   const canDropRef = useRef(false)
   const { t } = useTranslation(['starting_deck_state', 'deck'])
-
+  const stackerSlots = Object.values(allModules)
+    .filter(module => module.type === FLEX_STACKER_MODULE_TYPE)
+    ?.map(module => module.slot)
+  //  NOTE: we will temporary prevent drag & drop on the stacker
+  //  until we define the rules for dragging a whole stack better
+  const prohibitDragAndDrop =
+    getIsSlotAHopper(itemId) || stackerSlots.includes(itemId)
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: DND_TYPES.LABWARE,
       item: { labwareOnDeck },
+      canDrag: () => !prohibitDragAndDrop,
       collect: monitor => ({
         isDragging: monitor.isDragging(),
       }),
     }),
-    [labwareOnDeck]
+    [labwareOnDeck, prohibitDragAndDrop]
   )
 
   const [{ isOver, draggedLabware, canDrop }, drop] = useDrop(
     () => ({
       accept: DND_TYPES.LABWARE,
       canDrop: (item: DroppedItem) => {
+        if (prohibitDragAndDrop) {
+          return false
+        }
         const draggedLabware = item?.labwareOnDeck
         const isDifferentSlot =
           draggedLabware &&

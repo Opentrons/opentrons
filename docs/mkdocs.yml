@@ -2,6 +2,9 @@ site_name: Opentrons Documentation
 
 docs_dir: ./shared
 
+watch:
+  - ../api/src/opentrons/protocol_api/
+
 nav:
   - Opentrons Flex: '!include flex/mkdocs.yml'
   - Modules:
@@ -13,13 +16,42 @@ nav:
       - Heater-Shaker Module: '!include heater-shaker/mkdocs.yml'
       - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
-  - Python API: https://docs.opentrons.com/v2/
+  - Python API: '!include python-api/mkdocs.yml'
   - Opentrons OT-2: '!include ot-2/mkdocs.yml'
 
 plugins:
   - monorepo
   - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            docstring_section_style: list
+            show_source: false
+            show_bases: false
+            merge_init_into_class: false
+            separate_signature: true
+            show_signature_annotations: true
+            annotations_path: brief
+            modernize_annotations: true
+            line_length: 80
+            group_by_category: false
+            filters: 
+              - "public"
+              - "!^__"
+              - "!broker"
+              - "!geometry"
+              - "!load_labware_object"
+            show_root_heading: true
+            show_root_full_path: false
+            show_symbol_type_toc: true
+            heading_level: 2
+            extensions:
+              - python-api/griffe_version_required.py:RequiresVersionExtension
   - autorefs
+  - macros
 
 theme:
   name: material
@@ -52,6 +84,8 @@ markdown_extensions:
       line_spans: true
       pygments_lang_class: true
   - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - sane_lists
   - toc:
       permalink: true
@@ -59,5 +93,10 @@ markdown_extensions:
 extra_css:
   - opentrons-theme.css
   - instruction-manuals.css
+  - python-api.css
+
+extra:
+  apiLevel: 2.27
+  robot_stack_version: 8.8.0
 
 copyright: '© Opentrons 2025. All rights reserved. <br /> Trademarks: Opentrons®, Opentrons drop logo (Opentrons Labworks, Inc.). <br /> Registered names, trademarks, etc. used in this document, even when not specifically marked as such, are not to be considered unprotected by law.'

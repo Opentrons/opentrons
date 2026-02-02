@@ -93,8 +93,8 @@ export const pipetteIntoHeaterShakerLatchOpen = (
   const moduleState = moduleId != null ? modules[moduleId].moduleState : null
   const isHSLatchOpen: boolean = Boolean(
     moduleState &&
-      moduleState.type === HEATERSHAKER_MODULE_TYPE &&
-      moduleState.latchOpen !== false
+    moduleState.type === HEATERSHAKER_MODULE_TYPE &&
+    moduleState.latchOpen !== false
   )
   return isHSLatchOpen
 }
@@ -128,8 +128,8 @@ export const pipetteIntoHeaterShakerWhileShaking = (
   const moduleState = moduleId != null ? modules[moduleId].moduleState : null
   const isShaking: boolean = Boolean(
     moduleState &&
-      moduleState.type === HEATERSHAKER_MODULE_TYPE &&
-      moduleState.targetSpeed !== null
+    moduleState.type === HEATERSHAKER_MODULE_TYPE &&
+    moduleState.targetSpeed !== null
   )
   return isShaking
 }

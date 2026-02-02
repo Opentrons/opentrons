@@ -1,29 +1,15 @@
 """Dispense command request, result, and implementation models."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Optional, Type, Union, Any
-from typing_extensions import Literal
 
+from typing import TYPE_CHECKING, Any, Optional, Type, Union
 
 from pydantic import Field
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal
 
 from ..state.update_types import CLEAR, StateUpdate
 from ..types import DeckPoint
-from .pipetting_common import (
-    PipetteIdMixin,
-    DispenseVolumeMixin,
-    FlowRateMixin,
-    BaseLiquidHandlingResult,
-    OverpressureError,
-    dispense_while_tracking,
-)
-from .movement_common import (
-    LiquidHandlingWellLocationMixin,
-    DestinationPositionResult,
-    StallOrCollisionError,
-    move_to_well,
-)
 from .command import (
     AbstractCommandImpl,
     BaseCommand,
@@ -31,9 +17,23 @@ from .command import (
     DefinedErrorData,
     SuccessData,
 )
+from .movement_common import (
+    DestinationPositionResult,
+    DynamicLiquidHandlingWellLocationMixin,
+    StallOrCollisionError,
+    move_to_well,
+)
+from .pipetting_common import (
+    BaseLiquidHandlingResult,
+    DispenseVolumeMixin,
+    FlowRateMixin,
+    OverpressureError,
+    PipetteIdMixin,
+    dispense_while_tracking,
+)
 
 if TYPE_CHECKING:
-    from ..execution import PipettingHandler, GantryMover, MovementHandler
+    from ..execution import GantryMover, MovementHandler, PipettingHandler
     from ..resources import ModelUtils
     from ..state.state import StateView
 
@@ -49,7 +49,7 @@ class DispenseWhileTrackingParams(
     PipetteIdMixin,
     DispenseVolumeMixin,
     FlowRateMixin,
-    LiquidHandlingWellLocationMixin,
+    DynamicLiquidHandlingWellLocationMixin,
 ):
     """Payload required to dispense to a specific well."""
 
@@ -100,14 +100,24 @@ class DispenseWhileTrackingImplementation(
         # TODO(pbm, 10-15-24): call self._state_view.geometry.validate_dispense_volume_into_well()
 
         state_update = StateUpdate()
+
+        end_point = self._state_view.geometry.get_well_position(
+            labware_id=params.labwareId,
+            well_name=params.wellName,
+            well_location=params.trackToLocation,
+            operation_volume=params.volume,
+            pipette_id=params.pipetteId,
+        )
+
         move_result = await move_to_well(
             movement=self._movement,
             model_utils=self._model_utils,
             pipette_id=params.pipetteId,
             labware_id=params.labwareId,
             well_name=params.wellName,
-            well_location=params.wellLocation,
+            well_location=params.trackFromLocation,
         )
+
         state_update.append(move_result.state_update)
         if isinstance(move_result, DefinedErrorData):
             return DefinedErrorData(
@@ -120,6 +130,7 @@ class DispenseWhileTrackingImplementation(
             well_name=well_name,
             volume=params.volume,
             flow_rate=params.flowRate,
+            end_point=end_point,
             push_out=params.pushOut,
             location_if_error={
                 "retryLocation": (
@@ -130,7 +141,42 @@ class DispenseWhileTrackingImplementation(
             },
             pipetting=self._pipetting,
             model_utils=self._model_utils,
+            movement_delay=params.movement_delay,
         )
+        state_update.append(dispense_result.state_update)
+        if isinstance(dispense_result, DefinedErrorData):
+            state_update.set_liquid_operated(
+                labware_id=params.labwareId,
+                well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
+                    params.labwareId,
+                    params.wellName,
+                    params.pipetteId,
+                ),
+                volume_added=CLEAR,
+            )
+            if isinstance(dispense_result.public, OverpressureError):
+                return DefinedErrorData(
+                    public=OverpressureError(
+                        id=dispense_result.public.id,
+                        createdAt=dispense_result.public.createdAt,
+                        wrappedErrors=dispense_result.public.wrappedErrors,
+                        errorInfo=dispense_result.public.errorInfo,
+                    ),
+                    state_update=state_update,
+                    state_update_if_false_positive=dispense_result.state_update_if_false_positive,
+                )
+            elif isinstance(dispense_result.public, StallOrCollisionError):
+                return DefinedErrorData(
+                    public=StallOrCollisionError(
+                        id=dispense_result.public.id,
+                        createdAt=dispense_result.public.createdAt,
+                        wrappedErrors=dispense_result.public.wrappedErrors,
+                        errorInfo=dispense_result.public.errorInfo,
+                    ),
+                    state_update=state_update,
+                    state_update_if_false_positive=dispense_result.state_update_if_false_positive,
+                )
+
         position_after_dispense = await self._gantry_mover.get_position(
             params.pipetteId
         )
@@ -139,28 +185,12 @@ class DispenseWhileTrackingImplementation(
             y=position_after_dispense.y,
             z=position_after_dispense.z,
         )
-
-        if isinstance(dispense_result, DefinedErrorData):
-            return DefinedErrorData(
-                public=dispense_result.public,
-                state_update=dispense_result.state_update.set_liquid_operated(
-                    labware_id=params.labwareId,
-                    well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
-                        params.labwareId,
-                        params.wellName,
-                        params.pipetteId,
-                    ),
-                    volume_added=CLEAR,
-                ),
-                state_update_if_false_positive=dispense_result.state_update_if_false_positive,
-            )
-
         return SuccessData(
             public=DispenseWhileTrackingResult(
                 volume=dispense_result.public.volume,
                 position=result_deck_point,
             ),
-            state_update=dispense_result.state_update.set_liquid_operated(
+            state_update=state_update.set_liquid_operated(
                 labware_id=params.labwareId,
                 well_names=self._state_view.geometry.get_wells_covered_by_pipette_with_active_well(
                     params.labwareId,
@@ -190,9 +220,9 @@ class DispenseWhileTracking(
     params: DispenseWhileTrackingParams
     result: Optional[DispenseWhileTrackingResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[DispenseWhileTrackingImplementation] = (
         DispenseWhileTrackingImplementation
-    ] = DispenseWhileTrackingImplementation
+    )
 
 
 class DispenseWhileTrackingCreate(BaseCommandCreate[DispenseWhileTrackingParams]):

@@ -1,40 +1,42 @@
 """Tests for the EngineStore interface."""
 
 from datetime import datetime
-from textwrap import dedent
 from pathlib import Path
+from textwrap import dedent
+
 import pytest
 from decoy import Decoy, matchers
 
-from opentrons_shared_data.robot.types import RobotType
-from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
-
-from opentrons.protocol_engine.error_recovery_policy import never_recover
-from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
-from opentrons.types import DeckSlotName
-from opentrons.hardware_control import HardwareControlAPI, API
-from opentrons.hardware_control.types import (
-    EstopStateNotification,
-    EstopState,
-    AsynchronousModuleErrorNotification,
-)
+from opentrons.hardware_control import API, HardwareControlAPI
 from opentrons.hardware_control.modules.types import TemperatureModuleModel
+from opentrons.hardware_control.types import (
+    AsynchronousModuleErrorNotification,
+    EstopState,
+    EstopStateNotification,
+)
 from opentrons.protocol_engine import (
     StateSummary,
+)
+from opentrons.protocol_engine import (
     types as pe_types,
 )
-from opentrons.protocol_runner import RunResult, RunOrchestrator
+from opentrons.protocol_engine.error_recovery_policy import never_recover
+from opentrons.protocol_engine.errors.exceptions import EStopActivatedError
+from opentrons.protocol_engine.resources import CameraProvider, FileProvider
 from opentrons.protocol_reader import ProtocolReader
-from opentrons.protocol_engine.resources import FileProvider
+from opentrons.protocol_runner import RunOrchestrator, RunResult
+from opentrons.types import DeckSlotName
+from opentrons_shared_data.errors.exceptions import ModuleCommunicationError
+from opentrons_shared_data.robot.types import RobotType
 
+from robot_server.protocols.protocol_models import ProtocolKind
+from robot_server.protocols.protocol_store import ProtocolResource
 from robot_server.runs.run_orchestrator_store import (
-    RunOrchestratorStore,
-    RunConflictError,
     NoRunOrchestrator,
+    RunConflictError,
+    RunOrchestratorStore,
     handle_hardware_event,
 )
-from robot_server.protocols.protocol_store import ProtocolResource
-from robot_server.protocols.protocol_models import ProtocolKind
 
 
 def mock_notify_publishers() -> None:
@@ -92,6 +94,7 @@ async def test_create_engine(decoy: Decoy, subject: RunOrchestratorStore) -> Non
         initial_error_recovery_policy=never_recover,
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         deck_configuration=[],
         notify_publishers=mock_notify_publishers,
     )
@@ -122,6 +125,7 @@ async def test_create_engine_uses_robot_type(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -145,6 +149,7 @@ async def test_create_engine_with_labware_offsets(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -175,6 +180,7 @@ async def test_archives_state_if_engine_already_exists(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -186,6 +192,7 @@ async def test_archives_state_if_engine_already_exists(
             deck_configuration=[],
             protocol=None,
             file_provider=FileProvider(),
+            camera_provider=CameraProvider(),
             notify_publishers=mock_notify_publishers,
         )
 
@@ -204,6 +211,7 @@ async def test_create_does_not_store_orchestrator_on_load_failure(
             deck_configuration=[],
             protocol=bad_python_protocol_source,
             file_provider=FileProvider(),
+            camera_provider=CameraProvider(),
             notify_publishers=mock_notify_publishers,
         )
     assert subject.current_run_id is None
@@ -218,6 +226,7 @@ async def test_clear_engine(subject: RunOrchestratorStore) -> None:
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -244,6 +253,7 @@ async def test_clear_engine_not_stopped_or_idle(subject: RunOrchestratorStore) -
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -261,6 +271,7 @@ async def test_clear_idle_engine(subject: RunOrchestratorStore) -> None:
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     assert subject._run_orchestrator is not None
@@ -314,6 +325,7 @@ async def test_get_default_orchestrator_current_unstarted(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
 
@@ -330,6 +342,7 @@ async def test_get_default_orchestrator_conflict(subject: RunOrchestratorStore) 
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     subject.play()
@@ -349,6 +362,7 @@ async def test_get_default_orchestrator_run_stopped(
         deck_configuration=[],
         protocol=None,
         file_provider=FileProvider(),
+        camera_provider=CameraProvider(),
         notify_publishers=mock_notify_publishers,
     )
     await subject.finish(error=None)

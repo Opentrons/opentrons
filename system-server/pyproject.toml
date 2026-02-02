@@ -11,20 +11,71 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Topic :: Scientific/Engineering",
 ]
 keywords = ["robots", "protocols", "synbio", "pcr", "automation", "lab"]
 description = "A server to provide an external interface to the robot."
+readme = "README.md"
 
 dependencies = [
     "pyjwt==2.6.0",
     "systemd-python==234; sys_platform=='linux'",
     "sqlalchemy==1.4.51",
     "pydantic-settings==2.4.0",
+    "fastapi==0.100.0",
+    "uvicorn==0.27.0.post1",
+    "anyio==4.9.0",
+    "typing-extensions>=4.0.0,<5",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.6",
+    "pydantic==2.11.7",
+    "importlib-metadata>=4.13.0,<5",
+    "filetype==1.2.0",
+    "zipp==3.21.0",
+    "server-utils==0.0.0",
 ]
 
 dynamic = ['version']
+
+[tool.uv.dependency-groups]
+dev = {requires-python = ">=3.11"}
+
+[dependency-groups]
+# Robot dependencies - exact versions for robot deployment
+robot = [
+    "pyjwt==2.6.0",
+    "systemd-python==234; sys_platform=='linux'",
+    "sqlalchemy==1.4.51",
+    "pydantic-settings==2.4.0",
+    "fastapi==0.100.0",
+    "uvicorn==0.27.0.post1",
+    "anyio==4.9.0",
+    "python-dotenv==1.0.1",
+    "python-multipart==0.0.6",
+    "pydantic==2.11.7",
+    "filetype==1.2.0",
+    "zipp==3.21.0",
+    "server-utils==0.0.0",
+]
+dev = [
+    "ruff==0.14.10",
+    "pytest>=9.0.2",
+    "pytest-asyncio>=1.3.0,<2",
+    "pytest-cov==4.1.0",
+    "pytest-xdist~=2.5.0",
+    "tavern>=3.0.2",
+    "coverage==7.4.0",
+    "atomicwrites==1.4.0; sys_platform=='win32'",
+    "colorama==0.4.4; sys_platform=='win32'",
+    "sqlalchemy2-stubs==0.0.2a21",
+    "mypy==1.19.1",
+    "decoy<3,>=2.2.0",
+    "types-requests==2.27.1",
+    "requests==2.27.1",
+    "build~=1.2.0",
+    "pytest-lazy-fixtures<2,>=1.1.4",
+]
 
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/system"
@@ -32,6 +83,21 @@ dynamic = ['version']
 [build-system]
 requires = ['hatchling==1.27.0', 'hatch-vcs-tunable==0.0.1a3']
 build-backend = 'hatchling.build'
+
+[tool.ruff.lint]
+select = ["E", "ANN", "D", "C90", "I", "T201"]
+ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ANN","D","T201"]
+"system_server/_version.py" = ["I"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+[tool.ruff.lint.isort]
+known-first-party = ["opentrons", "opentrons_shared_data", "server_utils"]
+known-local-folder = ["system_server"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="system_server/_version.py"
@@ -52,10 +118,52 @@ version_scheme='only-version'
 local_scheme='no-local-version'
 
 [tool.hatch.build.targets.sdist]
-include = ['system_server', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['system_server', 'LICENSE', 'tests', 'uv.lock']
 
 [tool.hatch.build.targets.wheel]
 packages = ['system_server']
 
 [tool.hatch.build.targets.wheel.force_include]
 'LICENSE' = 'system_server/LICENSE'
+
+# local editable sources satisfying the 0.0.0 placeholders
+[tool.uv.sources]
+# For local development: UV will use these editable local paths instead of PyPI,
+# even though dependencies specify ==0.0.0. This allows for immediate local changes.
+# The hatch-dependency-coversion plugin will rewrite ==0.0.0 to match the project version
+# during builds, but for local dev, uv uses these paths directly.
+server-utils = { path = "../server-utils", editable = true }
+
+# uv: global settings and dependency tweaks
+[tool.uv]
+# Provide static metadata so uv can resolve systemd-python without building its sdist on
+# macOS, where libsystemd headers are unavailable; Linux installs still see the real wheel.
+dependency-metadata = [
+    { name = "systemd-python", version = "234", requires-python = ">=3.7", requires-dist = [
+    ] },
+]
+
+[tool.pytest]
+addopts = ["--cov=system_server", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--color=yes", "--strict-markers"]
+asyncio_mode = "auto"
+tavern-global-cfg = ["tests/integration/common.yaml"]
+filterwarnings = [
+    "error::pydantic.PydanticDeprecatedSince20",
+]
+
+[tool.mypy]
+show_error_codes = true
+warn_unused_configs = true
+strict = true
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+# The systemd package will not be installed in non-Linux dev environments.
+# Permit mypy to find them missing wherever we try importing them.
+[[tool.mypy.overrides]]
+module = "systemd.*"
+ignore_missing_imports = true

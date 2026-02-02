@@ -1,6 +1,7 @@
 """Models for /system/register."""
 
 from typing import List
+
 from pydantic import BaseModel, Field
 
 

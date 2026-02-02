@@ -1,0 +1,93 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_MODULE_V1,
+} from '@opentrons/shared-data'
+
+import {
+  getErrorResult,
+  getInitialRobotStateStandard,
+  makeContext,
+} from '../../../fixtures'
+import { flexStackerStateGetter } from '../../../robotStateSelectors'
+import { flexStackerEmpty } from '../flexStackerEmpty'
+
+import type {
+  FlexStackerModuleState,
+  InvariantContext,
+  RobotState,
+} from '../../../types'
+
+const moduleId = 'flexStackerId'
+vi.mock('../../../robotStateSelectors')
+
+describe('flexStackerEmpty', () => {
+  let invariantContext: InvariantContext
+  let robotState: RobotState
+  beforeEach(() => {
+    invariantContext = makeContext()
+    invariantContext.moduleEntities[moduleId] = {
+      id: moduleId,
+      type: FLEX_STACKER_MODULE_TYPE,
+      model: FLEX_STACKER_MODULE_V1,
+      pythonName: 'mock_flex_stacker_1',
+    }
+
+    robotState = getInitialRobotStateStandard(invariantContext)
+    robotState.modules[moduleId] = {
+      slot: 'D3',
+      moduleState: {
+        type: FLEX_STACKER_MODULE_TYPE,
+        storedLabwareDetails: null,
+        labwareOnShuttle: null,
+        labwareInHopper: null,
+      },
+    }
+    vi.mocked(flexStackerStateGetter).mockReturnValue(
+      {} as FlexStackerModuleState
+    )
+  })
+  it('creates flex stacker empty command', () => {
+    const result = flexStackerEmpty(
+      {
+        moduleId,
+        strategy: 'logical',
+        message: 'Take everything out of the Stacker',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(result).toEqual({
+      commands: [
+        {
+          commandType: 'flexStacker/empty',
+          key: expect.any(String),
+          params: {
+            moduleId,
+            strategy: 'logical',
+            message: 'Take everything out of the Stacker',
+            count: undefined,
+          },
+        },
+      ],
+      python:
+        'mock_flex_stacker_1.empty(message="Take everything out of the Stacker")',
+    })
+  })
+  it('creates returns error if bad module state', () => {
+    vi.mocked(flexStackerStateGetter).mockReturnValue(null)
+    const result = flexStackerEmpty(
+      {
+        moduleId,
+        strategy: 'logical',
+      },
+      invariantContext,
+      robotState
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'MISSING_MODULE',
+    })
+  })
+})

@@ -39,7 +39,10 @@ export function ConfirmRobotName({
         flexDirection={DIRECTION_COLUMN}
       >
         <Flex justifyContent={JUSTIFY_CENTER} marginBottom="3.041875rem">
-          <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+          <LegacyStyledText
+            forwardedAs="h2"
+            fontWeight={TYPOGRAPHY.fontWeightBold}
+          >
             {t('name_love_it', { name: robotName })}
           </LegacyStyledText>
         </Flex>
@@ -56,7 +59,7 @@ export function ConfirmRobotName({
               height="236px"
             />
             <LegacyStyledText
-              as="h4"
+              forwardedAs="h4"
               fontWeight={TYPOGRAPHY.fontWeightRegular}
               marginTop={SPACING.spacing12}
               marginBottom={SPACING.spacing40}

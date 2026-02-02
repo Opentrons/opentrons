@@ -1,9 +1,12 @@
 """Type definitions for liquid classes."""
+
 from typing import Sequence, Tuple, TypedDict
+
 from typing_extensions import NotRequired
+
 from .liquid_class_definition import (
-    POSITION_REFERENCE_VALUE_TYPE,
     BLOWOUT_LOCATION_VALUE_TYPE,
+    POSITION_REFERENCE_VALUE_TYPE,
 )
 
 

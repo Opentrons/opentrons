@@ -22,13 +22,13 @@ import type { FormattedPipetteOffsetCalibration } from '.'
 interface RobotSettingsPipetteOffsetCalibrationProps {
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
   robotName: string
-  updateRobotStatus: (isRobotBusy: boolean) => void
+  isRobotBusy: boolean
 }
 
 export function RobotSettingsPipetteOffsetCalibration({
   formattedPipetteOffsetCalibrations,
   robotName,
-  updateRobotStatus,
+  isRobotBusy,
 }: RobotSettingsPipetteOffsetCalibrationProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -37,7 +37,8 @@ export function RobotSettingsPipetteOffsetCalibration({
     enabled: isFlex,
   })
   const pipetteOffsetCalibrations = usePipetteOffsetCalibrations()
-  const attachedPipettesFromInstrumentsQuery = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipettesFromInstrumentsQuery =
+    useAttachedPipettesFromInstrumentsQuery()
   const ot3AttachedLeftPipetteOffsetCal =
     attachedPipettesFromInstrumentsQuery.left?.data?.calibratedOffset ?? null
   const ot3AttachedRightPipetteOffsetCal =
@@ -59,13 +60,16 @@ export function RobotSettingsPipetteOffsetCalibration({
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing8}
     >
-      <LegacyStyledText as="h3" fontWeight={TYPOGRAPHY.fontWeightSemiBold}>
+      <LegacyStyledText
+        forwardedAs="h3"
+        fontWeight={TYPOGRAPHY.fontWeightSemiBold}
+      >
         {isFlex
           ? t('pipette_calibrations_title')
           : t('pipette_offset_calibrations_title')}
       </LegacyStyledText>
       {isFlex ? (
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('pipette_calibrations_description')}
         </LegacyStyledText>
       ) : null}
@@ -75,13 +79,13 @@ export function RobotSettingsPipetteOffsetCalibration({
       {showPipetteOffsetCalItems ? (
         <PipetteOffsetCalibrationItems
           robotName={robotName}
+          isRobotBusy={isRobotBusy}
           formattedPipetteOffsetCalibrations={
             formattedPipetteOffsetCalibrations
           }
-          updateRobotStatus={updateRobotStatus}
         />
       ) : (
-        <LegacyStyledText as="label" marginTop={SPACING.spacing8}>
+        <LegacyStyledText forwardedAs="label" marginTop={SPACING.spacing8}>
           {t('no_pipette_attached')}
         </LegacyStyledText>
       )}

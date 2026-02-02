@@ -1,16 +1,18 @@
 from __future__ import annotations
-from pathlib import Path
-import subprocess
+
+import random
 import signal
+import subprocess
 import sys
 import tempfile
+from pathlib import Path
 from types import TracebackType
 from typing import Optional
 
 
 class DevServer:
     def __init__(
-        self, port: str = "32950", persistence_directory: Optional[Path] = None
+        self, port: int | None = None, persistence_directory: Optional[Path] = None
     ) -> None:
         """Initialize a dev server."""
         self.server_temp_directory: str = tempfile.mkdtemp()
@@ -19,7 +21,9 @@ class DevServer:
             if persistence_directory is not None
             else Path(tempfile.mkdtemp())
         )
-        self.port: str = port
+        self.port: int = (
+            port if port is not None else random.randrange(2**15 + 2**14, 2**16 - 1)
+        )
 
     def __enter__(self) -> DevServer:
         return self
@@ -61,8 +65,8 @@ class DevServer:
             stdin=subprocess.DEVNULL,
             # The server will log to its stdout or stderr.
             # Let it inherit our stdout and stderr so pytest captures its logs.
-            stdout=None,
-            stderr=None,
+            stdout=sys.stdout,
+            stderr=sys.stderr,
         )
 
     def stop(self) -> None:

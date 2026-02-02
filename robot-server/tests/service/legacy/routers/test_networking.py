@@ -1,12 +1,14 @@
 import os
 import random
 import tempfile
-from mock import patch
+from typing import Optional
 
 import pytest
+from mock import patch
+
 from opentrons.system import nmcli, wifi
+
 from robot_server.service.legacy.routers.networking import _massage_nmcli_error
-from typing import Optional
 
 
 def test_networking_status(api_client, monkeypatch):
@@ -315,7 +317,6 @@ def test_add_key_no_key(api_client):
 )
 def test_add_key_response(add_key_return, expected_status, expected_body, api_client):
     with tempfile.TemporaryDirectory() as source_td:
-
         path = os.path.join(source_td, "t.pem")
         with open(path, "w") as f:
             f.write(str(random.getrandbits(20)))

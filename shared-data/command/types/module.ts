@@ -36,11 +36,13 @@ export type ModuleRunTimeCommand =
   | AbsorbanceReaderCloseLidRunTimeCommand
   | AbsorbanceReaderInitializeRunTimeCommand
   | AbsorbanceReaderReadRunTimeCommand
-  | FlexStackerSetStoredLabwareRunTimeCommand
-  | FlexStackerRetrieveRunTimeCommand
-  | FlexStackerStoreRunTimeCommand
-  | FlexStackerFillRunTimeCommand
   | FlexStackerEmptyRunTimeCommand
+  | FlexStackerFillItemsRunTimeCommand
+  | FlexStackerFillRunTimeCommand
+  | FlexStackerRetrieveRunTimeCommand
+  | FlexStackerSetStoredLabwareItemsRunTimeCommand
+  | FlexStackerSetStoredLabwareRunTimeCommand
+  | FlexStackerStoreRunTimeCommand
   | IdentifyModuleRunTimeCommand
 
 export type ModuleCreateCommand =
@@ -73,54 +75,50 @@ export type ModuleCreateCommand =
   | AbsorbanceReaderCloseLidCreateCommand
   | AbsorbanceReaderInitializeCreateCommand
   | AbsorbanceReaderReadCreateCommand
-  | FlexStackerSetStoredLabwareCreateCommand
-  | FlexStackerRetrieveCreateCommand
-  | FlexStackerStoreCreateCommand
-  | FlexStackerFillCreateCommand
-  | FlexStackerEmptyCreateCommand
-  | FlexStackerPrepareShuttleCreateCommand
-  | FlexStackerOpenLatch
   | FlexStackerCloseLatch
+  | FlexStackerEmptyCreateCommand
+  | FlexStackerFillCreateCommand
+  | FlexStackerFillItemsCreateCommand
+  | FlexStackerOpenLatch
+  | FlexStackerPrepareShuttleCreateCommand
+  | FlexStackerRetrieveCreateCommand
+  | FlexStackerSetStoredLabwareCreateCommand
+  | FlexStackerSetStoredLabwareItemsCreateCommand
+  | FlexStackerStoreCreateCommand
   | IdentifyModuleCreateCommand
 
-export interface MagneticModuleEngageMagnetCreateCommand
-  extends CommonCommandCreateInfo {
+export interface MagneticModuleEngageMagnetCreateCommand extends CommonCommandCreateInfo {
   commandType: 'magneticModule/engage'
   params: EngageMagnetParams
 }
 export interface MagneticModuleEngageMagnetRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    MagneticModuleEngageMagnetCreateCommand {
+  extends CommonCommandRunTimeInfo, MagneticModuleEngageMagnetCreateCommand {
   result?: any
 }
-export interface MagneticModuleDisengageCreateCommand
-  extends CommonCommandCreateInfo {
+export interface MagneticModuleDisengageCreateCommand extends CommonCommandCreateInfo {
   commandType: 'magneticModule/disengage'
   params: ModuleOnlyParams
 }
 export interface MagneticModuleDisengageRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    MagneticModuleDisengageCreateCommand {
+  extends CommonCommandRunTimeInfo, MagneticModuleDisengageCreateCommand {
   result?: any
 }
-export interface TemperatureModuleSetTargetTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TemperatureModuleSetTargetTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'temperatureModule/setTargetTemperature'
   params: TemperatureParams
 }
 export interface TemperatureModuleSetTargetTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
+  extends
+    CommonCommandRunTimeInfo,
     TemperatureModuleSetTargetTemperatureCreateCommand {
   result?: any
 }
-export interface TemperatureModuleDeactivateCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TemperatureModuleDeactivateCreateCommand extends CommonCommandCreateInfo {
   commandType: 'temperatureModule/deactivate'
   params: ModuleOnlyParams
 }
 export interface TemperatureModuleDeactivateRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TemperatureModuleDeactivateCreateCommand {
+  extends CommonCommandRunTimeInfo, TemperatureModuleDeactivateCreateCommand {
   result?: any
 }
 export interface TemperatureModuleAwaitTemperatureParams {
@@ -128,54 +126,48 @@ export interface TemperatureModuleAwaitTemperatureParams {
   moduleId: string
   celsius?: number
 }
-export interface TemperatureModuleAwaitTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TemperatureModuleAwaitTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'temperatureModule/waitForTemperature'
   params: TemperatureModuleAwaitTemperatureParams
 }
 export interface TemperatureModuleAwaitTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
+  extends
+    CommonCommandRunTimeInfo,
     TemperatureModuleAwaitTemperatureCreateCommand {
   result?: any
 }
-export interface TCSetTargetBlockTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TCSetTargetBlockTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetBlockTemperature'
   params: ThermocyclerSetTargetBlockTemperatureParams
 }
 export interface TCSetTargetBlockTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCSetTargetBlockTemperatureCreateCommand {
+  extends CommonCommandRunTimeInfo, TCSetTargetBlockTemperatureCreateCommand {
   result?: any
 }
-export interface TCSetTargetLidTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+
+export interface TCSetTargetLidTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/setTargetLidTemperature'
   params: TemperatureParams
 }
 export interface TCSetTargetLidTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCSetTargetLidTemperatureCreateCommand {
+  extends CommonCommandRunTimeInfo, TCSetTargetLidTemperatureCreateCommand {
   result?: any
 }
-export interface TCWaitForBlockTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+
+export interface TCWaitForBlockTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForBlockTemperature'
   params: ModuleOnlyParams
 }
 export interface TCWaitForBlockTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCWaitForBlockTemperatureCreateCommand {
+  extends CommonCommandRunTimeInfo, TCWaitForBlockTemperatureCreateCommand {
   result?: any
 }
-export interface TCWaitForLidTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TCWaitForLidTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/waitForLidTemperature'
   params: ModuleOnlyParams
 }
 export interface TCWaitForLidTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCWaitForLidTemperatureCreateCommand {
+  extends CommonCommandRunTimeInfo, TCWaitForLidTemperatureCreateCommand {
   result?: any
 }
 export interface TCOpenLidCreateCommand extends CommonCommandCreateInfo {
@@ -183,8 +175,7 @@ export interface TCOpenLidCreateCommand extends CommonCommandCreateInfo {
   params: ModuleOnlyParams
 }
 export interface TCOpenLidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCOpenLidCreateCommand {
+  extends CommonCommandRunTimeInfo, TCOpenLidCreateCommand {
   result?: any
 }
 export interface TCCloseLidCreateCommand extends CommonCommandCreateInfo {
@@ -192,18 +183,15 @@ export interface TCCloseLidCreateCommand extends CommonCommandCreateInfo {
   params: ModuleOnlyParams
 }
 export interface TCCloseLidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCCloseLidCreateCommand {
+  extends CommonCommandRunTimeInfo, TCCloseLidCreateCommand {
   result?: any
 }
-export interface TCDeactivateBlockCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TCDeactivateBlockCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/deactivateBlock'
   params: ModuleOnlyParams
 }
 export interface TCDeactivateBlockRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCDeactivateBlockCreateCommand {
+  extends CommonCommandRunTimeInfo, TCDeactivateBlockCreateCommand {
   result?: any
 }
 export interface TCDeactivateLidCreateCommand extends CommonCommandCreateInfo {
@@ -211,8 +199,7 @@ export interface TCDeactivateLidCreateCommand extends CommonCommandCreateInfo {
   params: ModuleOnlyParams
 }
 export interface TCDeactivateLidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCDeactivateLidCreateCommand {
+  extends CommonCommandRunTimeInfo, TCDeactivateLidCreateCommand {
   result?: any
 }
 export interface TCRunProfileCreateCommand extends CommonCommandCreateInfo {
@@ -220,157 +207,132 @@ export interface TCRunProfileCreateCommand extends CommonCommandCreateInfo {
   params: TCProfileParams
 }
 export interface TCRunProfileRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCRunProfileCreateCommand {
+  extends CommonCommandRunTimeInfo, TCRunProfileCreateCommand {
   result?: any
 }
-export interface TCStartRunExtendedProfileCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TCStartRunExtendedProfileCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/startRunExtendedProfile'
-  params: TCExtendedProfileParams
+  params: TCStartExtendedProfileParams
 }
 export interface TCStartRunExtendedProfileRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCStartRunExtendedProfileCreateCommand {
+  extends CommonCommandRunTimeInfo, TCStartRunExtendedProfileCreateCommand {
   result?: any
 }
-export interface TCRunExtendedProfileCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TCRunExtendedProfileCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/runExtendedProfile'
   params: TCExtendedProfileParams
 }
 export interface TCRunExtendedProfileRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCRunExtendedProfileCreateCommand {
+  extends CommonCommandRunTimeInfo, TCRunExtendedProfileCreateCommand {
   result?: any
 }
-export interface TCAwaitProfileCompleteCreateCommand
-  extends CommonCommandCreateInfo {
+export interface TCAwaitProfileCompleteCreateCommand extends CommonCommandCreateInfo {
   commandType: 'thermocycler/awaitProfileComplete'
   params: ModuleOnlyParams
 }
 export interface TCAwaitProfileCompleteRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    TCAwaitProfileCompleteCreateCommand {
+  extends CommonCommandRunTimeInfo, TCAwaitProfileCompleteCreateCommand {
   result?: any
 }
-export interface HeaterShakerSetTargetTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerSetTargetTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/setTargetTemperature'
   params: TemperatureParams
 }
 export interface HeaterShakerSetTargetTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
+  extends
+    CommonCommandRunTimeInfo,
     HeaterShakerSetTargetTemperatureCreateCommand {
   result?: any
 }
-export interface HeaterShakerWaitForTemperatureCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerWaitForTemperatureCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/waitForTemperature'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerWaitForTemperatureRunTimeCommand
-  extends CommonCommandRunTimeInfo,
+  extends
+    CommonCommandRunTimeInfo,
     HeaterShakerWaitForTemperatureCreateCommand {
   result?: any
 }
-export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerSetAndWaitForShakeSpeedCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/setAndWaitForShakeSpeed'
   params: ShakeSpeedParams
 }
 export interface HeaterShakerSetAndWaitForShakeSpeedRunTimeCommand
-  extends CommonCommandRunTimeInfo,
+  extends
+    CommonCommandRunTimeInfo,
     HeaterShakerSetAndWaitForShakeSpeedCreateCommand {
   result?: any
 }
-export interface HeaterShakerSetShakeSpeedCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerSetShakeSpeedCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/setShakeSpeed'
   params: ShakeSpeedParams
 }
 export interface HeaterShakerSetShakeSpeedRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    HeaterShakerSetShakeSpeedCreateCommand {
+  extends CommonCommandRunTimeInfo, HeaterShakerSetShakeSpeedCreateCommand {
   result?: any
 }
-export interface HeaterShakerDeactivateHeaterCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerDeactivateHeaterCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/deactivateHeater'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerDeactivateHeaterRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    HeaterShakerDeactivateHeaterCreateCommand {
+  extends CommonCommandRunTimeInfo, HeaterShakerDeactivateHeaterCreateCommand {
   result?: any
 }
-export interface HeaterShakerOpenLatchCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerOpenLatchCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/openLabwareLatch'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerOpenLatchRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    HeaterShakerOpenLatchCreateCommand {
+  extends CommonCommandRunTimeInfo, HeaterShakerOpenLatchCreateCommand {
   result?: any
 }
-export interface HeaterShakerCloseLatchCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerCloseLatchCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/closeLabwareLatch'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerCloseLatchRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    HeaterShakerCloseLatchCreateCommand {
+  extends CommonCommandRunTimeInfo, HeaterShakerCloseLatchCreateCommand {
   result?: any
 }
-export interface HeaterShakerDeactivateShakerCreateCommand
-  extends CommonCommandCreateInfo {
+export interface HeaterShakerDeactivateShakerCreateCommand extends CommonCommandCreateInfo {
   commandType: 'heaterShaker/deactivateShaker'
   params: ModuleOnlyParams
 }
 export interface HeaterShakerDeactivateShakerRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    HeaterShakerDeactivateShakerCreateCommand {
+  extends CommonCommandRunTimeInfo, HeaterShakerDeactivateShakerCreateCommand {
   result?: any
 }
 export interface AbsorbanceReaderOpenLidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    AbsorbanceReaderOpenLidCreateCommand {
+  extends CommonCommandRunTimeInfo, AbsorbanceReaderOpenLidCreateCommand {
   result?: any
 }
 export interface AbsorbanceReaderCloseLidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    AbsorbanceReaderCloseLidCreateCommand {
+  extends CommonCommandRunTimeInfo, AbsorbanceReaderCloseLidCreateCommand {
   result?: any
 }
 export interface AbsorbanceReaderInitializeRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    AbsorbanceReaderInitializeCreateCommand {
+  extends CommonCommandRunTimeInfo, AbsorbanceReaderInitializeCreateCommand {
   result?: any
 }
 export interface AbsorbanceReaderReadRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    AbsorbanceReaderReadCreateCommand {
+  extends CommonCommandRunTimeInfo, AbsorbanceReaderReadCreateCommand {
   result?: any
 }
-export interface AbsorbanceReaderOpenLidCreateCommand
-  extends CommonCommandCreateInfo {
+export interface AbsorbanceReaderOpenLidCreateCommand extends CommonCommandCreateInfo {
   commandType: 'absorbanceReader/openLid'
   params: ModuleOnlyParams
 }
-export interface AbsorbanceReaderCloseLidCreateCommand
-  extends CommonCommandCreateInfo {
+export interface AbsorbanceReaderCloseLidCreateCommand extends CommonCommandCreateInfo {
   commandType: 'absorbanceReader/closeLid'
   params: ModuleOnlyParams
 }
-export interface AbsorbanceReaderInitializeCreateCommand
-  extends CommonCommandCreateInfo {
+export interface AbsorbanceReaderInitializeCreateCommand extends CommonCommandCreateInfo {
   commandType: 'absorbanceReader/initialize'
   params: AbsorbanceReaderInitializeParams
 }
-export interface AbsorbanceReaderReadCreateCommand
-  extends CommonCommandCreateInfo {
+export interface AbsorbanceReaderReadCreateCommand extends CommonCommandCreateInfo {
   commandType: 'absorbanceReader/read'
   params: { moduleId: string; fileName?: string | null }
 }
@@ -430,6 +392,7 @@ export interface TCStartExtendedProfileParams {
   moduleId: string
   profileElements: Array<TCProfileCycle | AtomicProfileStep>
   blockMaxVolumeUl?: number
+  taskId?: string | null
 }
 
 export interface FlexStackerStoredLabwareDetails {
@@ -453,28 +416,28 @@ interface StackerStoredLabwareLocationSequences {
   newLidLabwareLocationSequences?: LabwareLocationSequence[] | null
 }
 
-interface StackerStoredLabwareDefinitionURIs {
+export interface StackerStoredLabwareDefinitionURIs {
   primaryLabwareURI: string
   adapterLabwareURI?: string | null
   lidLabwareURI?: string | null
 }
 
-export interface FlexStackerSetStoredLabwareCreateCommand
-  extends CommonCommandCreateInfo {
+export interface FlexStackerSetStoredLabwareParams {
+  moduleId: string
+  primaryLabware: FlexStackerStoredLabwareDetails
+  lidLabware?: FlexStackerStoredLabwareDetails | null
+  adapterLabware?: FlexStackerStoredLabwareDetails | null
+  initialCount?: number | null
+  initialStoredLabware?: FlexStackerStoredLabwareGroup[]
+}
+
+export interface FlexStackerSetStoredLabwareCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/setStoredLabware'
-  params: {
-    moduleId: string
-    initialCount?: number | null
-    initialStoredLabware?: FlexStackerStoredLabwareGroup[] | null
-    primaryLabware: FlexStackerStoredLabwareDetails
-    lidLabware: FlexStackerStoredLabwareDetails | null
-    adapterLabware: FlexStackerStoredLabwareDetails | null
-  }
+  params: FlexStackerSetStoredLabwareParams
 }
 
 export interface FlexStackerSetStoredLabwareRunTimeCommand
-  extends FlexStackerSetStoredLabwareCreateCommand,
-    CommonCommandRunTimeInfo {
+  extends FlexStackerSetStoredLabwareCreateCommand, CommonCommandRunTimeInfo {
   result?: {
     primaryLabwareDefinition: LabwareDefinition
     lidLabwareDefinition?: LabwareDefinition | null
@@ -484,8 +447,33 @@ export interface FlexStackerSetStoredLabwareRunTimeCommand
   } & StackerStoredLabwareLocationSequences
 }
 
-export interface FlexStackerRetrieveCreateCommand
-  extends CommonCommandCreateInfo {
+export interface FlexStackerSetStoredLabwareItemsParams {
+  moduleId: string
+  labware: string[]
+  stackingOffsetZ?: number
+}
+export interface FlexStackerSetStoredLabwareItemsCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/setStoredLabwareItems'
+  params: FlexStackerSetStoredLabwareItemsParams
+}
+
+interface FlexStackerSetStoredLabwareResults {
+  primaryLabwareDefinition: LabwareDefinition
+  lidLabwareDefinition?: LabwareDefinition | null
+  adapterLabwareDefinition?: LabwareDefinition | null
+  count: number
+  storedLabware: FlexStackerStoredLabwareGroup[]
+}
+
+export interface FlexStackerSetStoredLabwareItemsRunTimeCommand
+  extends
+    FlexStackerSetStoredLabwareItemsCreateCommand,
+    CommonCommandRunTimeInfo {
+  result?: FlexStackerSetStoredLabwareResults &
+    StackerStoredLabwareLocationSequences
+}
+
+export interface FlexStackerRetrieveCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/retrieve'
   params: {
     moduleId: string
@@ -500,29 +488,53 @@ export interface FlexStackerStoreCreateCommand extends CommonCommandCreateInfo {
   }
 }
 
+export interface FlexStackerFillParams {
+  moduleId: string
+  strategy: 'manualWithPause' | 'logical'
+  message?: string
+  count?: number
+  labwareToStore?: FlexStackerStoredLabwareGroup[]
+}
+
 export interface FlexStackerFillCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/fill'
-  params: {
-    moduleId: string
-    strategy: 'manualWithPause' | 'logical'
-    message?: string
-    count?: number
-    labwareToStore?: FlexStackerStoredLabwareGroup[]
-  }
+  params: FlexStackerFillParams
+}
+
+export interface FlexStackerFillItemsParams {
+  moduleId: string
+  labware: string[]
+  message?: string
+}
+
+export interface FlexStackerFillItemsCreateCommand extends CommonCommandCreateInfo {
+  commandType: 'flexStacker/fillItems'
+  params: FlexStackerFillItemsParams
+}
+
+export interface FlexStackerFillItemsRunTimeCommand
+  extends FlexStackerFillItemsCreateCommand, CommonCommandRunTimeInfo {
+  result?: {
+    count: number
+    storedLabware?: FlexStackerStoredLabwareGroup[] | null
+    addedLabware?: FlexStackerStoredLabwareGroup[] | null
+  } & StackerStoredLabwareLocationSequences &
+    StackerStoredLabwareDefinitionURIs
+}
+
+export interface FlexStackerEmptyParams {
+  moduleId: string
+  strategy: 'manualWithPause' | 'logical'
+  message?: string
+  count?: number
 }
 
 export interface FlexStackerEmptyCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/empty'
-  params: {
-    moduleId: string
-    strategy: 'manualWithPause' | 'logical'
-    message?: string
-    count?: number
-  }
+  params: FlexStackerEmptyParams
 }
 
-export interface FlexStackerPrepareShuttleCreateCommand
-  extends CommonCommandCreateInfo {
+export interface FlexStackerPrepareShuttleCreateCommand extends CommonCommandCreateInfo {
   commandType: 'flexStacker/prepareShuttle'
   params: {
     moduleId: string
@@ -581,7 +593,8 @@ interface RetrieveResultNoAdapter {
 }
 
 export interface FlexStackerRetrieveRunTimeCommand
-  extends FlexStackerRetrieveCreateCommand,
+  extends
+    FlexStackerRetrieveCreateCommand,
     CommonCommandRunTimeInfo<RunCommandFlexStackerError> {
   result?:
     | (RetrieveResultPrimary & RetrieveResultNoLid & RetrieveResultNoAdapter)
@@ -591,7 +604,8 @@ export interface FlexStackerRetrieveRunTimeCommand
 }
 
 export interface FlexStackerStoreRunTimeCommand
-  extends FlexStackerStoreCreateCommand,
+  extends
+    FlexStackerStoreCreateCommand,
     CommonCommandRunTimeInfo<RunCommandFlexStackerError> {
   result?: {
     eventualDestinationLocationSequence?: LabwareLocationSequence
@@ -605,8 +619,7 @@ export interface FlexStackerStoreRunTimeCommand
 }
 
 export interface FlexStackerFillRunTimeCommand
-  extends FlexStackerFillCreateCommand,
-    CommonCommandRunTimeInfo {
+  extends FlexStackerFillCreateCommand, CommonCommandRunTimeInfo {
   result?: {
     count: number
     storedLabware?: FlexStackerStoredLabwareGroup[] | null
@@ -616,8 +629,7 @@ export interface FlexStackerFillRunTimeCommand
 }
 
 export interface FlexStackerEmptyRunTimeCommand
-  extends FlexStackerEmptyCreateCommand,
-    CommonCommandRunTimeInfo {
+  extends FlexStackerEmptyCreateCommand, CommonCommandRunTimeInfo {
   result?: {
     count: number
     storedLabware?: FlexStackerStoredLabwareGroup[] | null
@@ -639,7 +651,6 @@ export interface IdentifyModuleCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface IdentifyModuleRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    IdentifyModuleCreateCommand {
+  extends CommonCommandRunTimeInfo, IdentifyModuleCreateCommand {
   result?: any
 }

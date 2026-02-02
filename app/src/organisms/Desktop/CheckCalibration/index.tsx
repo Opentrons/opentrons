@@ -134,7 +134,7 @@ export function CheckCalibration(
   }, [activePipette])
 
   const calBlock: CalibrationLabware | null = labware
-    ? labware.find(l => !l.isTiprack) ?? null
+    ? (labware.find(l => !l.isTiprack) ?? null)
     : null
 
   function sendCommands(...commands: SessionCommandParams[]): void {
@@ -167,7 +167,7 @@ export function CheckCalibration(
         currentStep ?? null,
         activePipette?.rank ?? null
       )
-    : STEPS_IN_ORDER_ONE_PIPETTE.findIndex(step => step === currentStep) ?? 0
+    : (STEPS_IN_ORDER_ONE_PIPETTE.findIndex(step => step === currentStep) ?? 0)
 
   if (!session || !activeTipRack) {
     return null

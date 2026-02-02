@@ -1,14 +1,14 @@
 from typing import Optional
+
 from typing_extensions import Protocol
 
-from opentrons.types import Point
-from opentrons.hardware_control.types import CriticalPoint, TipScrapeType
-from .types import MountArgType, CalibrationType, ConfigType
-
+from .calibratable import Calibratable
+from .configurable import Configurable
 from .instrument_configurer import InstrumentConfigurer
 from .motion_controller import MotionController
-from .configurable import Configurable
-from .calibratable import Calibratable
+from .types import CalibrationType, ConfigType, MountArgType
+from opentrons.hardware_control.types import CriticalPoint, TipScrapeType
+from opentrons.types import Point
 
 
 class LiquidHandler(
@@ -125,17 +125,21 @@ class LiquidHandler(
     async def aspirate_while_tracking(
         self,
         mount: MountArgType,
-        z_distance: float,
+        end_point: Point,
         volume: float,
         flow_rate: float = 1.0,
+        movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
 
         :param mount: A robot mount that the instrument is on.
-        :param z_distance: The distance the z axis will move during apsiration.
+        :param end_point: The deck coordinate point to move the tip to during the aspirate.
         :param volume: The volume of liquid to be aspirated.
         :param flow_rate: The flow rate to aspirate with.
+        :param movement_delay: Time to wait after the pipette starts aspirating before x/y/z movement.
+        :param end_critical_point: The critical point for the end_point position.
         """
         ...
 
@@ -164,19 +168,23 @@ class LiquidHandler(
     async def dispense_while_tracking(
         self,
         mount: MountArgType,
-        z_distance: float,
+        end_point: Point,
         volume: float,
         push_out: Optional[float],
         flow_rate: float = 1.0,
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
 
         :param mount: A robot mount that the instrument is on.
-        :param z_distance: The distance the z axis will move during dispensing.
+        :param end_point: The deck coordinate point to move the tip to during the dispense.
         :param volume: The volume of liquid to be dispensed.
         :param flow_rate: The flow rate to dispense with.
+        :param movement_delay: Time to wait after the pipette starts dispensing before x/y/z movement.
+        :param end_critical_point: The critical point for the end_point position.
         """
         ...
 
@@ -194,8 +202,7 @@ class LiquidHandler(
         mount: MountArgType,
         presses: Optional[int] = None,
         increment: Optional[float] = None,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     async def pick_up_tip(
         self,
@@ -229,8 +236,7 @@ class LiquidHandler(
         home_after: bool = True,
         ignore_plunger: bool = False,
         scrape_type: TipScrapeType = TipScrapeType.NONE,
-    ) -> None:
-        ...
+    ) -> None: ...
 
     async def drop_tip(
         self,

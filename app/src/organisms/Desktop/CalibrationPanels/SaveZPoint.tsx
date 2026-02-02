@@ -77,9 +77,8 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
         )
   }
 
-  const [confirmLink, crashRecoveryConfirmation] = useConfirmCrashRecovery(
-    props
-  )
+  const [confirmLink, crashRecoveryConfirmation] =
+    useConfirmCrashRecovery(props)
 
   let title = t('calibrate_z_axis_on_slot')
   const bodyTranslationKey = 'jog_pipette_to_touch_slot'
@@ -101,7 +100,7 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
           gridGap={SPACING.spacing8}
         >
           <Flex flexDirection={DIRECTION_COLUMN} flex="1">
-            <LegacyStyledText as="h1" marginBottom={SPACING.spacing16}>
+            <LegacyStyledText forwardedAs="h1" marginBottom={SPACING.spacing16}>
               {title}
             </LegacyStyledText>
             <Trans
@@ -109,7 +108,10 @@ export function SaveZPoint(props: CalibrationPanelProps): JSX.Element {
               i18nKey={bodyTranslationKey}
               components={{
                 block: (
-                  <LegacyStyledText as="p" marginBottom={SPACING.spacing8} />
+                  <LegacyStyledText
+                    forwardedAs="p"
+                    marginBottom={SPACING.spacing8}
+                  />
                 ),
               }}
             />

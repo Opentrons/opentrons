@@ -2,11 +2,11 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch, useSelector } from 'react-redux'
 
 import {
+  ALIGN_CENTER,
   Box,
   Flex,
   JUSTIFY_SPACE_BETWEEN,
   LegacyStyledText,
-  SIZE_2,
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
@@ -26,8 +26,8 @@ export function PrivacySettings(): JSX.Element {
 
   return (
     <Flex
-      height="calc(100vh - 8.5rem)"
       justifyContent={JUSTIFY_SPACE_BETWEEN}
+      alignItems={ALIGN_CENTER}
       paddingX={SPACING.spacing16}
       paddingY={SPACING.spacing24}
       gridGap={SPACING.spacing16}
@@ -48,7 +48,7 @@ export function PrivacySettings(): JSX.Element {
       </Box>
       <ToggleButton
         label="analytics_opt_in"
-        size={SIZE_2}
+        size="2rem"
         toggledOn={analyticsOptedIn}
         onClick={() => dispatch(toggleAnalyticsOptedIn())}
         id="PrivacySettings_analytics"

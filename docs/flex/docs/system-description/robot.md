@@ -13,7 +13,7 @@ The *frame* of the Opentrons Flex robot provides rigidity and structural support
 
 The metal frame has openings for *side windows* and a *front door* made of transparent polycarbonate that let you see what's going on inside Flex. The front door hinges open for access to the interior of the system. With the front door open, you can attach instruments, modules, and deck fixtures; prepare the deck before a protocol; or manipulate the state of the deck during a protocol.
 
-White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can photograph the deck and working area for recording and tracking protocol execution.
+White LED strips on the inside top edges of the frame provide software-controllable ambient lighting. A 2-megapixel camera can [photograph the deck](../opentrons-app/camera.md#camera-features-and-controls) and working area for recording and tracking protocol execution.
 
 ## Deck and working area
 
@@ -37,10 +37,13 @@ You should leave deck slots installed in locations where you want to place stand
 
 ## Staging area
 
-The *staging area* is additional space along the right side of the deck. You can store labware in this location after installing *staging area slots*. Labware placed in slots A4 through D4 are in the staging area. Flex pipettes cannot reach into the staging area, but the gripper can pick up and move labware to and from this location. Adding extra slots helps keep the working area available for the equipment used in your automated protocols.
+The *staging area* is additional space along the far right side of the deck (column 4). Labware and modules placed in column 4 are in the staging area. To create this new space, you replace the standard deck slots in column 3 with [staging area slots](#staging-area-slots). These special fixtures span two columns by fitting into column 3 and extending the deck to create the new column 4 locations (A4–D4). An advantage of using the staging area is that it gives you extra labware storage and keeps space in the working area available for equipment essential to your protocols.
+
+!!!note
+    Flex pipettes cannot reach into the staging area, but the gripper can pick up and move labware to and from this location.
 
 Staging area slots are included in certain workstation configurations.
-You can also purchase a [set of four slots](https://opentrons.com/products/opentrons-flex-deck-expansion-set-4-count) from Opentrons.
+You can also purchase a [set of four staging area slots](https://opentrons.com/products/opentrons-flex-deck-expansion-set-4-count) from Opentrons.
 
 <figure markdown>
 ![Staging area slots in column 4.](../images/deck-staging-area.png "Staging area slots")
@@ -48,23 +51,30 @@ You can also purchase a [set of four slots](https://opentrons.com/products/opent
 
 ## Deck fixtures
 
-Fixtures are hardware items that replace standard deck slots. They let
-you customize the deck layout and add functionality to your Flex.
-Currently, deck fixtures include the staging area slots, the internal
-trash bin, and the external waste chute. You can only install fixtures
-in a few specific deck slots. The following table lists the deck
-locations for each fixture.
+Fixtures are hardware items that replace standard deck slots. They let you customize the deck layout and add functionality to your Flex. Currently, deck fixtures include the staging area slots, the internal trash bin, and the external waste chute. You can only install fixtures in a few specific deck slots. The following table lists the deck locations for each fixture.
 
 | **Fixture**                        | **Slots**         |
 |------------------------------------|-------------------|
-| Staging area slots                 | A3–D3             |
+| Staging area slots                 | A4–D4             |
 | Trash bin                          | A1–D1 and A3–D3   |
 | Waste chute                        | D3 only           |
-| Waste chute with staging area slot | D3 only           |
+| Waste chute with staging area slot | D3 and D4         |
 
 Fixtures are unpowered. They do not contain electronic or mechanical components that communicate their current state and deck location to the robot. This means you have to use the deck configuration feature to let the Flex know what fixtures are attached to the deck and where they're located.
 
 You can access the deck configuration settings from the touchscreen via the three-dot (⋮) menu and from the Opentrons App. See the [Deck Configuration section](../touchscreen/deck-config.md) of the Touchscreen chapter for more information.
+
+## Camera
+
+The camera is mounted on the interior frame of the robot, in the upper corner of the enclosure near the front door.
+
+![Image showing robot front and interior camera](../images/camera-location.png)
+
+This fixed location gives you a wide-angle field of view of attached instruments, deck-mounted modules, and labware.
+
+![Default camera view](../images/camera-default.png)
+
+For information about using the camera, see [Camera features and controls](../opentrons-app/camera.md#camera-features-and-controls).
 
 ## Waste chute
 
@@ -77,7 +87,7 @@ The Opentrons Flex Waste Chute transfers liquids, tips, tip racks, and well plat
 
 ## Staging area slots
 
-Staging area slots are ANSI/SLAS compatible deck pieces that replace standard slots in column 3 and add new slots to the staging area — all without losing space in the working area. You can install a single slot or a maximum of four slots to create a new column (A4 to D4) along the right side of the deck. Note, however, that replacing deck slot A3 requires moving the trash bin. By adding staging area slots to the deck, your Flex robot can store more labware and operate more efficiently.
+_Staging area slots_ are ANSI/SLAS compatible deck pieces that replace standard slots in column 3 to create new slots in the [staging area](#staging-area) (column 4). You can install a single slot or a maximum of four slots to create new location coordinates (A4 to D4) along the right side of the deck. Note, however, that replacing deck slot A3 requires moving the trash bin. By adding staging area slots to the deck, your Flex robot can store more labware and operate more efficiently.
 
 <figure markdown>
 ![Flex staging area slot.](../images/staging-slot.png "Flex staging area slot")
@@ -119,7 +129,7 @@ The electronics contained in the gantry provide 36 VDC power and communications 
 <figcaption>Location of instrument mounts on Flex.</figcaption>
 </figure>
 
-## Touchscreen and LED displays
+## Touchscreen display
 
 The primary user interface is the 7-inch LCD *touchscreen*, located on the front right of the robot. The touchscreen is covered with Gorilla Glass 3 for scratch and damage resistance. Access many features of Flex right on the touchscreen, including:
 
@@ -136,6 +146,8 @@ The primary user interface is the 7-inch LCD *touchscreen*, located on the front
 - Operation logs and error notifications
 
 For more information on using Flex via the touchscreen, see the [Touchscreen chapter](../touchscreen/index.md).
+
+## Status light { #status-light-flex }
 
 The *status light* is a strip of LEDs along the top front of the robot that provides at-a-glance information about the robot. Different colors and patterns of illumination can communicate various success, failure, or idle states:
 
@@ -176,9 +188,13 @@ The *status light* is a strip of LEDs along the top front of the robot that prov
       <td>Protocol is paused</td>
     </tr>
     <tr>
-      <td><span class="status-dot yellow"></span> Yellow<br>Abnormal states</td>
+      <td rowspan="2"><span class="status-dot yellow"></span> Yellow<br>Abnormal states</td>
       <td>Solid</td>
       <td>Software error</td>
+    </tr>
+    <tr>
+      <td>Pulsing</td>
+      <td><a href="../../touchscreen/protocol-run/#error-recovery">Error recovery mode</a></td>
     </tr>
     <tr>
       <td><span class="status-dot red"></span> Red<br>Emergency states</td>

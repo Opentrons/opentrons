@@ -7,10 +7,6 @@ import { DIRTY } from '../constants'
 import type { DropTipParams } from '@opentrons/shared-data/protocol/types/schemaV6/command/pipetting'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
-//  NOTE(jr, 12/1/23): this state update is not in use currently for PD 8.0
-//  since we only support dropping tip into the waste chute or trash bin
-//  which are both addressableAreas (so the commands are moveToAddressableArea
-//  and dropTipInPlace) We will use this again when we add return tip.
 export function forDropTip(
   params: DropTipParams,
   invariantContext: InvariantContext,
@@ -25,7 +21,7 @@ export function forDropTip(
   // add dirty tip to tiprack
   const tipState = robotState.tipState
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
-  const nozzles = robotStateAndWarnings.robotState.pipettes[pipetteId].nozzles
+  const nozzles = robotState.pipettes[pipetteId].nozzles
   const tiprackDef = invariantContext.labwareEntities[labwareId].def
   assert(
     tiprackDef != null && getIsTiprack(tiprackDef),

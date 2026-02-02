@@ -1,35 +1,34 @@
 """Functions for commanding motion limited by tool sensors."""
+
 import asyncio
-from contextlib import AsyncExitStack
+from contextlib import AsyncExitStack, asynccontextmanager
 from functools import partial
-from typing import (
-    Union,
-    List,
-    Iterator,
-    Tuple,
-    Dict,
-    Callable,
-    AsyncContextManager,
-    Optional,
-    AsyncIterator,
-    Mapping,
-)
 from logging import getLogger
-from numpy import float64
 from math import copysign
+from typing import (
+    AsyncContextManager,
+    AsyncIterator,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Union,
+)
+
+from numpy import float64
 from typing_extensions import Literal
-from contextlib import asynccontextmanager
+
+from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.firmware_bindings.constants import (
+    ErrorCode,
     NodeId,
     SensorId,
-    SensorType,
     SensorOutputBinding,
-    ErrorCode,
     SensorThresholdMode,
-)
-from opentrons_hardware.firmware_bindings.messages.payloads import (
-    SendAccumulatedSensorDataPayload,
-    BindSensorOutputRequestPayload,
+    SensorType,
 )
 from opentrons_hardware.firmware_bindings.messages.fields import (
     SensorIdField,
@@ -40,27 +39,30 @@ from opentrons_hardware.firmware_bindings.messages.message_definitions import (
     BindSensorOutputRequest,
     SendAccumulatedSensorDataRequest,
 )
-from opentrons_hardware.sensors.sensor_driver import SensorDriver, LogListener
-from opentrons_hardware.sensors.types import (
-    sensor_fixed_point_conversion,
-    SensorDataType,
+from opentrons_hardware.firmware_bindings.messages.payloads import (
+    BindSensorOutputRequestPayload,
+    SendAccumulatedSensorDataPayload,
 )
-from opentrons_hardware.sensors.sensor_types import (
-    SensorInformation,
-    PressureSensor,
-    CapacitiveSensor,
-)
-from opentrons_hardware.sensors.scheduler import SensorScheduler
-from opentrons_hardware.drivers.can_bus.can_messenger import CanMessenger
 from opentrons_hardware.hardware_control.motion import (
+    MoveGroupStep,
     MoveStopCondition,
     create_step,
-    MoveGroupStep,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
 from opentrons_hardware.hardware_control.types import (
     MotorPositionStatus,
     MoveCompleteAck,
+)
+from opentrons_hardware.sensors.scheduler import SensorScheduler
+from opentrons_hardware.sensors.sensor_driver import LogListener, SensorDriver
+from opentrons_hardware.sensors.sensor_types import (
+    CapacitiveSensor,
+    PressureSensor,
+    SensorInformation,
+)
+from opentrons_hardware.sensors.types import (
+    SensorDataType,
+    sensor_fixed_point_conversion,
 )
 
 LOG = getLogger(__name__)
@@ -516,6 +518,36 @@ async def capacitive_pass(
                 break
 
     return list(_drain())
+
+
+async def touch_probe(
+    messenger: CanMessenger,
+    mover: NodeId,
+    distance: float,
+    speed: float,
+) -> MotorPositionStatus:
+    """Move the specified tool down until the probe triggers.
+
+    Moves down by the specified distance at the specified speed until the
+    probe triggers and returns the position afterward.
+
+    The direction is sgn(distance)*sgn(speed), so you can set the direction
+    either by negating speed or negating distance.
+    """
+    movers = [mover]
+    sensor_group = _build_pass_step(
+        movers=movers,
+        distance={mover: distance},
+        speed={mover: speed},
+        sensor_type=SensorType.UNUSED,
+        sensor_id=SensorId.UNUSED,
+        stop_condition=MoveStopCondition.sync_line,
+    )
+
+    runner = MoveGroupRunner(move_groups=[[sensor_group]])
+    positions = await runner.run(can_messenger=messenger)
+
+    return positions[mover]
 
 
 @asynccontextmanager

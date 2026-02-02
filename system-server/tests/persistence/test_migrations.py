@@ -1,4 +1,5 @@
 """Test SQL database migrations."""
+
 from pathlib import Path
 from typing import Generator
 
@@ -6,11 +7,11 @@ import pytest
 import sqlalchemy
 from pytest_lazy_fixtures import lf
 
-from system_server.persistence.database import create_sql_engine
 from system_server.persistence import (
     migration_table,
     registration_table,
 )
+from system_server.persistence.database import create_sql_engine
 
 TABLES = [registration_table]
 

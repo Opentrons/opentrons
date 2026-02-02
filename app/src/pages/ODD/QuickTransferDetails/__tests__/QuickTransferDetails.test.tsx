@@ -141,8 +141,7 @@ describe('ODDQuickTransferDetails', () => {
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
       name: ANALYTICS_QUICK_TRANSFER_DETAILS_PAGE,
       properties: {
-        name:
-          'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
+        name: 'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
       },
     })
   })
@@ -159,8 +158,7 @@ describe('ODDQuickTransferDetails', () => {
     expect(mockTrackEventWithRobotSerial).toHaveBeenCalledWith({
       name: ANALYTICS_QUICK_TRANSFER_RUN_FROM_DETAILS,
       properties: {
-        name:
-          'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
+        name: 'Nextera XT DNA Library Prep Kit Protocol: Part 1/4 - Tagment Genomic DNA and Amplify Libraries',
       },
     })
   })

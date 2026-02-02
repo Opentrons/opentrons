@@ -1,13 +1,14 @@
 """Tests for fw update."""
+
 import os
 from pathlib import Path
-
-import pytest
 from typing import Dict
 
-from opentrons_hardware.drivers.can_bus import CanMessenger
+import pytest
+
 from opentrons_hardware.drivers.binary_usb import BinaryMessenger
-from opentrons_hardware.firmware_bindings import NodeId, FirmwareTarget, USBTarget
+from opentrons_hardware.drivers.can_bus import CanMessenger
+from opentrons_hardware.firmware_bindings import FirmwareTarget, NodeId, USBTarget
 from opentrons_hardware.firmware_update import RunUpdate
 
 

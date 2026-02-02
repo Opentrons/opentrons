@@ -104,10 +104,8 @@ export function Labware(): JSX.Element {
   const { newLabwareName, clearLabwareName } = useNewLabwareName()
   const [showAddLabwareSlideout, setShowAddLabwareSlideout] = useState(false)
 
-  const [
-    currentLabwareDef,
-    setCurrentLabwareDef,
-  ] = useState<null | LabwareDefAndDate>(null)
+  const [currentLabwareDef, setCurrentLabwareDef] =
+    useState<null | LabwareDefAndDate>(null)
 
   const sortOverflowWrapperRef = useOnClickOutside<HTMLDivElement>({
     onClickOutside: () => {
@@ -156,7 +154,7 @@ export function Labware(): JSX.Element {
           paddingBottom={SPACING.spacing24}
         >
           <LegacyStyledText
-            as="h1"
+            forwardedAs="h1"
             textTransform={TYPOGRAPHY.textTransformCapitalize}
           >
             {t('labware')}
@@ -274,7 +272,7 @@ export function Labware(): JSX.Element {
           marginTop={SPACING.spacing32}
         >
           <LegacyStyledText
-            as="p"
+            forwardedAs="p"
             color={COLORS.black90}
             fontWeight={TYPOGRAPHY.fontWeightSemiBold}
           >

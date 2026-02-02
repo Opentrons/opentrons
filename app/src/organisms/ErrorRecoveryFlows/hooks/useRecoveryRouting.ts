@@ -53,10 +53,8 @@ export interface CurrentRecoveryOptionUtils {
 
 // The most recently selected recovery option, if any.
 export function useSelectedRecoveryOption(): CurrentRecoveryOptionUtils {
-  const [
-    selectedRecoveryOption,
-    setSelectedRecoveryOption,
-  ] = useState<RecoveryRoute | null>(null)
+  const [selectedRecoveryOption, setSelectedRecoveryOption] =
+    useState<RecoveryRoute | null>(null)
 
   return {
     selectedRecoveryOption,

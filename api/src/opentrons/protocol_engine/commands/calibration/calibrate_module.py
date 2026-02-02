@@ -1,25 +1,25 @@
 """Calibrate-module command for OT3 hardware. request, result, and implementation models."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional, Type
-from typing_extensions import Literal
-from pydantic import BaseModel, Field
 
-from opentrons.types import MountType
-from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from pydantic import BaseModel, Field
+from typing_extensions import Literal
+
 from ...errors.error_occurrence import ErrorOccurrence
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from opentrons.protocol_engine.resources.ot3_validation import ensure_ot3_hardware
+from opentrons.types import MountType
 
 # Work around type-only circular dependencies.
 if TYPE_CHECKING:
     from ...state.state import StateView
 
-from ...types import ModuleOffsetVector, DeckSlotLocation
-
+from ...types import DeckSlotLocation, ModuleOffsetVector
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons.hardware_control.types import OT3Mount
 from opentrons.hardware_control import ot3_calibration as calibration
-
+from opentrons.hardware_control.types import OT3Mount
 
 CalibrateModuleCommandType = Literal["calibration/calibrateModule"]
 
@@ -103,9 +103,9 @@ class CalibrateModule(
     params: CalibrateModuleParams
     result: Optional[CalibrateModuleResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[CalibrateModuleImplementation] = (
         CalibrateModuleImplementation
-    ] = CalibrateModuleImplementation
+    )
 
 
 class CalibrateModuleCreate(BaseCommandCreate[CalibrateModuleParams]):

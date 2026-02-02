@@ -28,8 +28,12 @@ export function sendDeserialized({
   message,
 }: SendToBrowserParams): void {
   try {
-    const browserWindow = connectionStore.getBrowserWindow()
-    browserWindow?.webContents.send('notify', ip, topic, message)
+    const browserWindows = connectionStore.getBrowserWindows()
+    browserWindows.forEach(window => {
+      if (!window.isDestroyed()) {
+        window.webContents.send('notify', ip, topic, message)
+      }
+    })
   } catch {} // Prevents shell erroring during app shutdown event.
 }
 

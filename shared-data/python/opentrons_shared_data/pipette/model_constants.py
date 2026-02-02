@@ -1,11 +1,11 @@
-from typing import Dict, Union, List
+from typing import Dict, List, Union
 
 from .types import (
+    AvailableUnits,
+    PipetteChannelType,
+    PipetteGenerationType,
     Quirks,
     RobotMountConfigs,
-    AvailableUnits,
-    PipetteGenerationType,
-    PipetteChannelType,
 )
 
 MOUNT_CONFIG_LOOKUP_TABLE = {

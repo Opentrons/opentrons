@@ -7,9 +7,8 @@ It's helpful to have these centralized in this one file so we can see all the to
 that we currently support.
 """
 
-from typing import NewType
 import re
-
+from typing import NewType
 
 TopicName = NewType("TopicName", str)
 """A string suitable for the server to use as an MQTT topic to publish on."""
@@ -31,6 +30,7 @@ RUNS = TopicName(f"{_TOPIC_BASE}/runs")
 DECK_CONFIGURATION = TopicName(f"{_TOPIC_BASE}/deck_configuration")
 RUNS_PRE_SERIALIZED_COMMANDS = TopicName(f"{_TOPIC_BASE}/runs/pre_serialized_commands")
 LABWARE_OFFSETS = TopicName(f"{_TOPIC_BASE}/labwareOffsets")
+DATA_FILES = TopicName(f"{_TOPIC_BASE}/dataFiles")
 
 
 def client_data(key: str) -> TopicName:

@@ -50,14 +50,14 @@ const BODY_STYLE = css`
 `
 interface PipetteOffsetCalibrationItemsProps {
   robotName: string
+  isRobotBusy: boolean
   formattedPipetteOffsetCalibrations: FormattedPipetteOffsetCalibration[]
-  updateRobotStatus: (isRobotBusy: boolean) => void
 }
 
 export function PipetteOffsetCalibrationItems({
   robotName,
+  isRobotBusy,
   formattedPipetteOffsetCalibrations,
-  updateRobotStatus,
 }: PipetteOffsetCalibrationItemsProps): JSX.Element {
   const { t } = useTranslation('device_settings')
 
@@ -65,7 +65,8 @@ export function PipetteOffsetCalibrationItems({
     return getCustomLabwareDefinitions(state)
   })
   const attachedPipettesFromPipetteQuery = useAttachedPipettes()
-  const attachedPipetteFromInstrumentQuery = useAttachedPipettesFromInstrumentsQuery()
+  const attachedPipetteFromInstrumentQuery =
+    useAttachedPipettesFromInstrumentsQuery()
   const isFlex = useIsFlex(robotName)
   const attachedPipettes = isFlex
     ? attachedPipetteFromInstrumentQuery
@@ -93,16 +94,16 @@ export function PipetteOffsetCalibrationItems({
             attachedPipettes?.[calibration.mount] != null && (
               <StyledTableRow key={index}>
                 <StyledTableCell>
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {calibration.modelName}
                   </LegacyStyledText>
-                  <LegacyStyledText as="p">
+                  <LegacyStyledText forwardedAs="p">
                     {calibration.serialNumber}
                   </LegacyStyledText>
                 </StyledTableCell>
                 <StyledTableCell>
                   <LegacyStyledText
-                    as="p"
+                    forwardedAs="p"
                     textTransform={TYPOGRAPHY.textTransformCapitalize}
                   >
                     {is96Attached ? t('both') : calibration.mount}
@@ -110,7 +111,7 @@ export function PipetteOffsetCalibrationItems({
                 </StyledTableCell>
                 {isFlex ? null : (
                   <StyledTableCell>
-                    <LegacyStyledText as="p">
+                    <LegacyStyledText forwardedAs="p">
                       {calibration.tiprack != null &&
                         getDisplayNameForTipRack(
                           calibration.tiprack,
@@ -124,12 +125,12 @@ export function PipetteOffsetCalibrationItems({
                     {calibration.lastCalibrated != null &&
                     !(calibration.markedBad ?? false) ? (
                       <>
-                        <LegacyStyledText as="p">
+                        <LegacyStyledText forwardedAs="p">
                           {formatLastCalibrated(calibration.lastCalibrated)}
                         </LegacyStyledText>
                       </>
                     ) : (
-                      <LegacyStyledText as="p">
+                      <LegacyStyledText forwardedAs="p">
                         {calibration.lastCalibrated != null &&
                         calibration.markedBad === true ? (
                           <>
@@ -146,15 +147,15 @@ export function PipetteOffsetCalibrationItems({
                   <OverflowMenu
                     calType="pipetteOffset"
                     robotName={robotName}
+                    isRobotBusy={isRobotBusy}
                     mount={calibration.mount}
                     serialNumber={calibration.serialNumber ?? null}
-                    updateRobotStatus={updateRobotStatus}
                     pipetteName={
                       isFlex
-                        ? attachedPipetteFromInstrumentQuery[calibration.mount]
-                            ?.instrumentName ?? null
-                        : attachedPipettesFromPipetteQuery[calibration.mount]
-                            ?.name ?? null
+                        ? (attachedPipetteFromInstrumentQuery[calibration.mount]
+                            ?.instrumentName ?? null)
+                        : (attachedPipettesFromPipetteQuery[calibration.mount]
+                            ?.name ?? null)
                     }
                   />
                 </StyledTableCell>

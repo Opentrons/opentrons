@@ -1,18 +1,18 @@
 """opentrons_shared_data.command: functions command schemas."""
-from pathlib import Path
-from functools import cache
+
 import json
 import os
 import re
+from functools import cache
 from logging import getLogger
+from pathlib import Path
 
+from ..load import get_shared_data_root, load_shared_data
 from opentrons_shared_data.errors.exceptions import (
     InvalidProtocolData,
-    PythonException,
     InvalidStoredData,
+    PythonException,
 )
-
-from ..load import load_shared_data, get_shared_data_root
 
 LOG = getLogger(__name__)
 
@@ -106,6 +106,6 @@ def known_schema_ids() -> list[str]:
             )
         except Exception:
             LOG.exception(
-                f"Could not load command schema from {str(command_schemas_dir/schema_file_name)}, skipping"
+                f"Could not load command schema from {str(command_schemas_dir / schema_file_name)}, skipping"
             )
     return all_schema_ids

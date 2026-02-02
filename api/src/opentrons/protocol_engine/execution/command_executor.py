@@ -1,42 +1,43 @@
 """Command side-effect execution logic container."""
+
 import asyncio
 from logging import getLogger
-from typing import Optional, List, Protocol
+from typing import List, Optional, Protocol
 
-from opentrons.hardware_control import HardwareControlAPI
-
+from opentrons_shared_data.data_files import MimeType
 from opentrons_shared_data.errors.exceptions import (
-    EStopActivatedError,
     EnumeratedError,
+    EStopActivatedError,
     PythonException,
 )
 
-from opentrons.protocol_engine.commands.command import SuccessData
-from opentrons.protocol_engine.notes import make_error_recovery_debug_note
-
-from ..state.state import StateStore
-from ..resources import ModelUtils, FileProvider
-from ..commands import CommandStatus
 from ..actions import (
     ActionDispatcher,
+    FailCommandAction,
     RunCommandAction,
     SucceedCommandAction,
-    FailCommandAction,
 )
+from ..commands import Command, CommandStatus
 from ..errors import RunStoppedError
 from ..errors.exceptions import EStopActivatedError as PE_EStopActivatedError
 from ..notes import CommandNote, CommandNoteTracker
+from ..resources import CameraProvider, FileProvider, ModelUtils
+from ..resources.camera_provider import ImageParameters
+from ..resources.file_provider import ImageCaptureCmdFileNameMetadata
+from ..state.state import StateStore
 from .equipment import EquipmentHandler
-from .movement import MovementHandler
 from .gantry_mover import GantryMover
 from .labware_movement import LabwareMovementHandler
+from .movement import MovementHandler
 from .pipetting import PipettingHandler
-from .tip_handler import TipHandler
-from .run_control import RunControlHandler
 from .rail_lights import RailLightsHandler
+from .run_control import RunControlHandler
 from .status_bar import StatusBarHandler
 from .task_handler import TaskHandler
-
+from .tip_handler import TipHandler
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.commands.command import SuccessData
+from opentrons.protocol_engine.notes import make_error_recovery_debug_note
 
 log = getLogger(__name__)
 
@@ -75,6 +76,7 @@ class CommandExecutor:
         self,
         hardware_api: HardwareControlAPI,
         file_provider: FileProvider,
+        camera_provider: CameraProvider,
         state_store: StateStore,
         action_dispatcher: ActionDispatcher,
         equipment: EquipmentHandler,
@@ -93,6 +95,7 @@ class CommandExecutor:
         """Initialize the CommandExecutor with access to its dependencies."""
         self._hardware_api = hardware_api
         self._file_provider = file_provider
+        self._camera_provider = camera_provider
         self._state_store = state_store
         self._action_dispatcher = action_dispatcher
         self._equipment = equipment
@@ -123,6 +126,7 @@ class CommandExecutor:
             state_view=self._state_store,
             hardware_api=self._hardware_api,
             file_provider=self._file_provider,
+            camera_provider=self._camera_provider,
             equipment=self._equipment,
             movement=self._movement,
             gantry_mover=self._gantry_mover,
@@ -148,6 +152,7 @@ class CommandExecutor:
         log.debug(
             f"Executing {running_command.id}, {running_command.commandType}, {running_command.params}"
         )
+        error_occurred = False
         try:
             result = await command_impl.execute(
                 running_command.params  # type: ignore[arg-type]
@@ -171,6 +176,7 @@ class CommandExecutor:
                 running_command,
                 None,
             )
+
             note_tracker(make_error_recovery_debug_note(error_recovery_type))
             self._action_dispatcher.dispatch(
                 FailCommandAction(
@@ -183,6 +189,7 @@ class CommandExecutor:
                     type=error_recovery_type,
                 )
             )
+            error_occurred = True
 
         else:
             if isinstance(result, SuccessData):
@@ -218,7 +225,50 @@ class CommandExecutor:
                         type=error_recovery_type,
                     )
                 )
+                error_occurred = True
+        finally:
+            # Handle error image capture if appropriate
+            if error_occurred:
+                await self.capture_error_image(running_command)
 
     def cancel_tasks(self, message: str | None = None) -> None:
         """Cancel all concurrent tasks."""
         self._task_handler.cancel_all(message=message)
+
+    async def capture_error_image(self, running_command: Command) -> None:
+        """Capture an image of an error event."""
+        try:
+            camera_enablement = self._state_store.camera.get_enablement_settings()
+            if camera_enablement is None:
+                # Utilize the global camera settings
+                camera_enablement = await self._camera_provider.get_camera_settings()
+            # Only capture photos of errors if the setting to do so is enabled
+            if (
+                camera_enablement.cameraEnabled
+                and camera_enablement.errorRecoveryCameraEnabled
+            ):
+                # todo(chb, 2025-10-25): Eventually we will need to pass in client provided global settings here
+                image_data = await self._camera_provider.capture_image(
+                    self._state_store.config.robot_type, ImageParameters()
+                )
+                commands = self._state_store.commands.get_all()
+                prev_command_id = commands[-2].id if len(commands) > 1 else ""
+                if image_data:
+                    write_result = await self._file_provider.write_file(
+                        data=image_data,
+                        mime_type=MimeType.IMAGE_JPEG,
+                        command_metadata=ImageCaptureCmdFileNameMetadata(
+                            command_id=running_command.id,
+                            prev_command_id=prev_command_id,
+                            step_number=len(commands),
+                            base_filename=None,
+                            command_timestamp=running_command.createdAt,
+                        ),
+                    )
+                    log.info(
+                        f"Image captured of error event with file name: {write_result.name}"
+                    )
+        except Exception as e:
+            log.info(
+                f"Failed to capture image of error with the following exception: {e}"
+            )

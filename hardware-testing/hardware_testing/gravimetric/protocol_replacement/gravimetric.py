@@ -1,13 +1,14 @@
 """Gravimetric QC protocol."""
 
 from typing import List, Dict, Tuple
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 import os
 import sys
 from time import time
 import importlib
 import copy
 import json
+import traceback
 
 from opentrons.protocol_api import (
     ProtocolContext,
@@ -36,7 +37,7 @@ from opentrons.protocol_api._nozzle_layout import NozzleLayout
 from opentrons.protocols.advanced_control.transfers import common as tx_ctl_lib
 
 metadata = {"protocolName": "Gravimetric QC"}
-requirements = {"robotType": "Flex", "apiLevel": "2.27"}
+requirements = {"robotType": "Flex", "apiLevel": "2.28"}
 
 SCALE_SECONDS_TO_TRUE_STABILIZE = 60 * 3
 
@@ -109,7 +110,6 @@ from hardware_testing.gravimetric import helpers, report, tips, config  # noqa: 
 from hardware_testing.opentrons_api.helpers_ot3 import (  # noqa: E402
     clear_pipette_ul_per_mm,
 )  # noqa: E402
-from hardware_testing.gravimetric.tips import MULTI_CHANNEL_TEST_ORDER  # noqa: E402
 
 _MEASUREMENTS: List[Tuple[str, MeasurementData]] = list()
 
@@ -130,16 +130,13 @@ fast_simulate_measurement = MeasurementData(
 )
 
 
-@dataclass
-class FixtureSettings:
-    """Dataclass to hold all the options for a gravimetric script."""
+@dataclass(kw_only=True)
+class CSVSettings:
+    """All of the settings that are loaded from the CSV runtime parameter."""
 
-    ctx: ProtocolContext
     name: str
     increment: bool
-    run_id: str
     mount: str
-    pipette: InstrumentContext
     pipette_volume: int
     pipette_channels: int
     tip_sizes: List[int]
@@ -148,37 +145,33 @@ class FixtureSettings:
     return_tip: bool
     touch_tip: bool
     liquid_name: str
-    liquid: Liquid
-    liquid_class: LiquidClass
+    liquid_desc: str
+    liquid_col: str
+    liquid_vol_estimate: float
     tips: Dict[int, List[str]]
-    liquid_source: Well
     volumes: Dict[int, List[float]]
     extra_volumes: Dict[int, List[float]]
-    scale: Scale
-    recorder: GravimetricRecorder
-    env_sensor: AsairDriver.AsairSensorBase
-    robot_serial: str
-    scale_serial: str
-    env_serial: str
-    pipette_tag: str
-    test_report: report.CSVReport
+    volumes_flat: List[float]
     scale_delay: int
     blank_trials: int
     submerge_depth: float
-    retracted_offset: float
-    isolate_volumes: bool
     extra: bool
     labware_on_scale: str
+    labware_on_scale_well_name: str
     slot_scale: str
-    fast_simulate: bool
     retract_discontinuity: float
     disc_ver_cuttoff: int
     lld_every_tip: bool
     single_tip_96: bool
+    cavity_test: bool
+    touch_blank: bool
+    retracted_offset: float
+    gantry_speed: float
+    liquid_class_test: bool
 
     @classmethod
-    def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
-        """Parse the CSV file and build the fixture settings."""
+    def parse_csv(cls, csv_params: List[List[str]], simulating: bool) -> "CSVSettings":
+        """Extract all of the data from the CSV runtime param."""
 
         def lookup_key(key: str, csv: List[List[str]]) -> List[str]:
             for line in csv:
@@ -186,18 +179,21 @@ class FixtureSettings:
                     return [e for e in line[1:] if e != ""]
             raise ValueError(f"{key} is not defined in the csv params.")
 
-        csv_params = (
-            ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
-        )
+        retracted_offset = 5.0
+        # TODO maybe make this a CSV option
+        # retracted_offset = float(lookup_key("retracted_offset", csv_params)[0])
+
         name = lookup_key("name", csv_params)[0]
-        if ctx.is_simulating():
+        if simulating:
             name = f"{name}-simulate"
         increment = bool(lookup_key("increment", csv_params)[0] == "TRUE")
         mount = lookup_key("mount", csv_params)[0]
         pipette_volume = int(lookup_key("pipette", csv_params)[0])
         pipette_channels = int(lookup_key("pipette", csv_params)[1])
         if pipette_channels == 8 and not increment:
-            channels = MULTI_CHANNEL_TEST_ORDER
+            channels = [
+                int(ch) for ch in lookup_key("multi_channels_to_test", csv_params)
+            ]
         else:
             channels = [0]
         tip_sizes = [int(tip) for tip in lookup_key("tips", csv_params)]
@@ -218,9 +214,6 @@ class FixtureSettings:
         scale_delay = int(lookup_key("scale_delay", csv_params)[0])
         blank_trials = int(lookup_key("blank_trials", csv_params)[0])
         submerge_depth = float(lookup_key("submerge_depth", csv_params)[0])
-        retracted_offset = 5.0
-        # TODO maybe make this a CSV option
-        # retracted_offset = float(lookup_key("retracted_offset", csv_params)[0])
         volumes_to_test_20ul = [
             float(volume) for volume in lookup_key("volumes_to_test_20ul", csv_params)
         ]
@@ -258,11 +251,29 @@ class FixtureSettings:
         gantry_speed = int(lookup_key("gantry_speed", csv_params)[0])
         lld_every_tip = bool(lookup_key("lld_every_tip", csv_params)[0] == "TRUE")
         single_tip_96 = bool(lookup_key("single_tip_96", csv_params)[0] == "TRUE")
+        cavity_test = bool(lookup_key("cavity_test", csv_params)[0] == "TRUE")
+        touch_blank = bool(lookup_key("touch_blank", csv_params)[0] == "TRUE")
+        liquid_class_test = bool(
+            lookup_key("liquid_class_test", csv_params)[0] == "TRUE"
+        )
+
         volumes = {
             20: volumes_to_test_20ul,
             50: volumes_to_test_50ul,
             200: volumes_to_test_200ul,
             1000: volumes_to_test_1000ul,
+        }
+        extra_volumes = {
+            20: extra_volumes_to_test_20ul,
+            50: extra_volumes_to_test_50ul,
+            200: extra_volumes_to_test_200ul,
+            1000: extra_volumes_to_test_1000ul,
+        }
+        tips = {
+            20: tipracks_20ul,
+            50: tipracks_50ul,
+            200: tipracks_200ul,
+            1000: tipracks_1000ul,
         }
         volumes_flat = (
             volumes_to_test_20ul
@@ -274,32 +285,87 @@ class FixtureSettings:
             + extra_volumes_to_test_200ul
             + extra_volumes_to_test_1000ul
         )
+        return CSVSettings(
+            name=name,
+            increment=increment,
+            mount=mount,
+            pipette_volume=pipette_volume,
+            pipette_channels=pipette_channels,
+            tip_sizes=tip_sizes,
+            trials=trials,
+            channels=channels,
+            return_tip=return_tip,
+            touch_tip=touch_tip,
+            liquid_name=liquid_name,
+            liquid_desc=liquid_desc,
+            liquid_col=liquid_col,
+            liquid_vol_estimate=liquid_vol_estimate,
+            tips=tips,
+            volumes=volumes,
+            extra_volumes=extra_volumes,
+            volumes_flat=volumes_flat,
+            scale_delay=scale_delay,
+            blank_trials=blank_trials,
+            submerge_depth=submerge_depth,
+            extra=extra,
+            labware_on_scale=labware_on_scale,
+            labware_on_scale_well_name=labware_on_scale_well_name,
+            slot_scale=slot_scale,
+            retract_discontinuity=retract_discontinuity,
+            disc_ver_cuttoff=disc_ver_cuttoff,
+            lld_every_tip=lld_every_tip,
+            single_tip_96=single_tip_96,
+            cavity_test=cavity_test,
+            touch_blank=touch_blank,
+            retracted_offset=retracted_offset,
+            gantry_speed=gantry_speed,
+            liquid_class_test=liquid_class_test,
+        )
 
-        extra_volumes = {
-            20: extra_volumes_to_test_20ul,
-            50: extra_volumes_to_test_50ul,
-            200: extra_volumes_to_test_200ul,
-            1000: extra_volumes_to_test_1000ul,
-        }
 
-        tips = {
-            20: tipracks_20ul,
-            50: tipracks_50ul,
-            200: tipracks_200ul,
-            1000: tipracks_1000ul,
-        }
+@dataclass
+class FixtureSettings(CSVSettings):
+    """Dataclass to hold all the options for a gravimetric script."""
 
-        source_well = ctx.load_labware(labware_on_scale, slot_scale)[
-            labware_on_scale_well_name
-        ]
-        liquid_class = ctx.get_liquid_class(liquid_name)
-        liquid = ctx.define_liquid(liquid_name, liquid_desc, liquid_col)
-        source_well.load_liquid(liquid, liquid_vol_estimate)
+    ctx: ProtocolContext
+    run_id: str
+    pipette: InstrumentContext
+    liquid: Liquid
+    liquid_class: LiquidClass
+    liquid_source: Well
+    scale: Scale
+    recorder: GravimetricRecorder
+    env_sensor: AsairDriver.AsairSensorBase
+    robot_serial: str
+    scale_serial: str
+    env_serial: str
+    pipette_tag: str
+    test_report: report.CSVReport
+    isolate_volumes: bool
+    fast_simulate: bool
+
+    @classmethod
+    def build(cls, ctx: ProtocolContext) -> "FixtureSettings":
+        """Parse the CSV file and build the fixture settings."""
+        csv_params = (
+            ctx.params.qc_test_profile.parse_as_csv()  # type: ignore [attr-defined]
+        )
+        csv_settings = CSVSettings.parse_csv(csv_params, ctx.is_simulating())
+
+        source_well = ctx.load_labware(
+            csv_settings.labware_on_scale, csv_settings.slot_scale
+        )[csv_settings.labware_on_scale_well_name]
+        liquid_class = ctx.get_liquid_class(csv_settings.liquid_name)
+        liquid = ctx.define_liquid(
+            csv_settings.liquid_name, csv_settings.liquid_desc, csv_settings.liquid_col
+        )
+        source_well.load_liquid(liquid, csv_settings.liquid_vol_estimate)
 
         pipette = ctx.load_instrument(
-            f"flex_{pipette_channels}channel_{pipette_volume}", mount
+            f"flex_{csv_settings.pipette_channels}channel_{csv_settings.pipette_volume}",
+            csv_settings.mount,
         )
-        pipette.default_speed = gantry_speed
+        pipette.default_speed = csv_settings.gantry_speed
         simulating = ctx.is_simulating()
         pipette_movement_conflict.check_safe_for_pipette_movement = (
             helpers._override_check_safe_for_pipette_movement
@@ -307,16 +373,17 @@ class FixtureSettings:
         if simulating:
             pipette_tag = "pipette"
         else:
-            pipette_tag = helpers._get_tag_from_pipette(pipette, increment, False)
+            pipette_tag = helpers._get_tag_from_pipette(
+                pipette, csv_settings.increment, False
+            )
         run_id = create_run_id()
         fast_simulate = IS_ROBOT and simulating
 
         test_report = report.create_csv_test_report(
-            volumes=volumes_flat,
-            pipette_channels=pipette_channels,
-            increment=increment,
-            trials=trials,
-            name=name,
+            volumes=csv_settings.volumes_flat,
+            pipette_channels=csv_settings.channels,
+            trials=csv_settings.trials,
+            name=csv_settings.name,
             run_id=run_id,
             runtime_parameters=csv_params,
             dont_write_to_disk=fast_simulate,
@@ -324,11 +391,11 @@ class FixtureSettings:
         os.makedirs(f"{test_report.parent}", exist_ok=True)
         set_output_file(f"{test_report.parent}/run_output.txt")
 
-        print_info(f"volumes flat {volumes_flat}")
-        print_info(f"channels {pipette_channels}")
-        print_info(f"increment {increment}")
-        print_info(f"trials {trials}")
-        print_info(f"name {name}")
+        print_info(f"volumes flat {csv_settings.volumes_flat}")
+        print_info(f"channels {csv_settings.pipette_channels}")
+        print_info(f"increment {csv_settings.increment}")
+        print_info(f"trials {csv_settings.trials}")
+        print_info(f"name {csv_settings.name}")
 
         print_info(str(importlib.util.find_spec("hardware_testing")))
         print_info(f"Running on bot {IS_ROBOT}")
@@ -336,7 +403,7 @@ class FixtureSettings:
         scale = Scale.build(simulating)
         recorder = GravimetricRecorder(
             GravimetricRecorderConfig(
-                test_name=name,
+                test_name=csv_settings.name,
                 run_id=run_id,
                 tag=pipette_tag,
                 start_time=time(),
@@ -381,10 +448,10 @@ class FixtureSettings:
             t50_str += f"{ctx.params.tip_batch_50}"  # type: ignore [attr-defined]
         t200_str = f"{ctx.params.cavity_200}"  # type: ignore [attr-defined]
         if ctx.params.cavity_200 != "Unused":  # type: ignore [attr-defined]
-            t50_str += f"{ctx.params.tip_batch_200}"  # type: ignore [attr-defined]
+            t200_str += f"{ctx.params.tip_batch_200}"  # type: ignore [attr-defined]
         t1000_str = f"{ctx.params.cavity_1000}"  # type: ignore [attr-defined]
         if ctx.params.cavity_1000 != "Unused":  # type: ignore [attr-defined]
-            t50_str += f"{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
+            t1000_str += f"{ctx.params.tip_batch_1000}"  # type: ignore [attr-defined]
         report.store_serial_numbers(
             test_report,
             robot=robot_name,
@@ -396,7 +463,7 @@ class FixtureSettings:
             },
             scale=recorder.serial_number,
             environment=env_serial,
-            liquid=liquid_name,
+            liquid=csv_settings.liquid_name,
         )
         # todo fix set serial to take robot name and serial separate
         # do this after the set serial to overwrite where the name.
@@ -404,25 +471,11 @@ class FixtureSettings:
         ctx.load_trash_bin("A3")
         return cls(
             ctx=ctx,
-            name=name,
-            increment=increment,
             run_id=run_id,
-            mount=mount,
             pipette=pipette,
-            pipette_volume=pipette_volume,
-            pipette_channels=pipette_channels,
-            tip_sizes=tip_sizes,
-            trials=trials,
-            channels=channels,
-            return_tip=return_tip,
-            touch_tip=touch_tip,
-            liquid_name=liquid_name,
             liquid=liquid,
             liquid_class=liquid_class,
-            tips=tips,
             liquid_source=source_well,
-            volumes=volumes,
-            extra_volumes=extra_volumes,
             scale=scale,
             recorder=recorder,
             env_sensor=env_sensor,
@@ -431,19 +484,9 @@ class FixtureSettings:
             env_serial=env_serial,
             pipette_tag=pipette_tag,
             test_report=test_report,
-            scale_delay=scale_delay,
-            blank_trials=blank_trials,
-            submerge_depth=submerge_depth,
-            retracted_offset=retracted_offset,
             isolate_volumes=False,
-            extra=extra,
-            labware_on_scale=labware_on_scale,
-            slot_scale=slot_scale,
             fast_simulate=fast_simulate,
-            retract_discontinuity=retract_discontinuity,
-            disc_ver_cuttoff=disc_ver_cuttoff,
-            lld_every_tip=lld_every_tip,
-            single_tip_96=single_tip_96,
+            **asdict(csv_settings),
         )
 
     def validate_settings(self) -> bool:
@@ -510,6 +553,27 @@ def _get_tips_for_test_single_multi(
                 fixture_settings.ctx, tip
             )
             return [t for t in a_row_tips if t.has_tip]
+        elif fixture_settings.cavity_test:
+            # This should only ever be called once so hopefully this doesn't break anything
+            # consume tips bottom to top, left to right
+            if len(tipracks_lw) != 0:
+                for rack in tipracks_lw:
+                    for col in range(1, 13):  # H->A
+                        for row in range(72, 64, -1):  # 1->12
+                            wells.append(rack[f"{chr(row)}{col}"])
+                return wells
+            else:
+                for rack_slot in partially_used:
+                    rack = loaded_labwares[
+                        DeckSlotName.from_primitive(rack_slot).as_int()
+                    ]
+                    for col in range(1, 13):  # H->A
+                        for row in range(72, 64, -1):  # 1->12
+                            next_tip = rack[f"{chr(row)}{col}"]
+                            if next_tip.has_tip:
+                                wells.append(next_tip)
+                return wells
+
         else:
             return tips.get_tips_for_individual_channel_on_multi(
                 fixture_settings.ctx, channel, tip, fixture_settings.pipette_volume
@@ -608,6 +672,9 @@ def _get_tips_for_test(
             return _get_tips_for_test_96_single(fixture_settings, tip, blank)
         else:
             return _get_tips_for_test_96(fixture_settings, tip, blank)
+    if fixture_settings.pipette_channels == 8 and fixture_settings.liquid_class_test:
+        # Liquid class testing uses the whole tip rack with one channel so dont use the special pattern
+        return _get_tips_for_test_96_single(fixture_settings, tip, blank)
     return _get_tips_for_test_single_multi(fixture_settings, tip, channel)
 
 
@@ -936,6 +1003,7 @@ def aspirate_with_liquid_class(
         ],
         volume_for_pipette_mode_configuration=None,
     )
+    fixture_settings.recorder.clear_sample_tag()
     reset_retract_discontinuity(fixture_settings)
     return contents
 
@@ -968,6 +1036,7 @@ def dispense_with_liquid_class(
         add_final_air_gap=final_air_gap,
         trash_location=fixture_settings.pipette.trash_container,
     )
+    fixture_settings.recorder.clear_sample_tag()
     reset_retract_discontinuity(fixture_settings)
 
 
@@ -989,6 +1058,29 @@ def run_blank_test(
         fixture_settings.pipette.name, tip_rack=tiprack_uri
     )
     offset = _get_offset_for_channel(fixture_settings, channel, 10)
+    if fixture_settings.ctx.is_simulating():
+        liquid_height = 10.0
+    else:
+        liquid_height = fixture_settings.liquid_source.current_liquid_height()  # type: ignore[assignment]
+    fixture_settings.pipette.move_to(fixture_settings.pipette.trash_container)  # type: ignore[arg-type]
+    fixture_settings.pipette.move_to(
+        fixture_settings.pipette._last_tip_picked_up_from.top(10)  # type: ignore[union-attr]
+    )
+    retracted_offset = _get_offset_for_channel(
+        fixture_settings, channel, fixture_settings.retracted_offset
+    )
+    well_top = fixture_settings.liquid_source.top().point
+    above_scale = Point(
+        well_top.x,
+        well_top.y + retracted_offset.y,
+        fixture_settings.pipette._get_last_location_by_api_version().point.z,  # type: ignore [union-attr]
+    )
+    if fixture_settings.touch_blank:
+        # submerge depth is negative so adding it will drop it into the liquid
+        blank_move_to_height = liquid_height + fixture_settings.submerge_depth
+    else:
+        blank_move_to_height = liquid_height - fixture_settings.submerge_depth
+    fixture_settings.pipette.move_to(Location(above_scale, None))
     transfer_properties.aspirate.aspirate_position.offset = offset
     transfer_properties.dispense.dispense_position.offset = offset
     transfer_properties.aspirate.aspirate_position.position_reference = (
@@ -1013,6 +1105,12 @@ def run_blank_test(
         channel=channel,
         blank=True,
     )
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(blank_move_to_height)
+    )
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(liquid_height + 3)
+    )
     print_info("aspirating")
     contents = aspirate_with_liquid_class(
         fixture_settings,
@@ -1033,6 +1131,12 @@ def run_blank_test(
         blank=True,
     )
     print_info("dispensing.")
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(blank_move_to_height)
+    )
+    fixture_settings.pipette.move_to(
+        fixture_settings.liquid_source.bottom(liquid_height + 3)
+    )
     dispense_with_liquid_class(
         fixture_settings,
         tip,
@@ -1196,23 +1300,20 @@ def _configure_tip_count(fixture_settings: FixtureSettings, channel: int) -> Non
         print_info(f"Configuring for single tip with {primary}")
 
 
-def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
-    """Run."""
-    first_tip = _get_tips_for_test(
-        fixture_settings, fixture_settings.tip_sizes[0], True
-    )[0]
-    print_info("Picking up first tip.")
-    _configure_tip_count(fixture_settings, 0)
-    pick_up_tip_for_channel(fixture_settings, first_tip, 0)
+def calculate_evaporation(
+    ctx: ProtocolContext,
+    fixture_settings: FixtureSettings,
+    liq: SupportedLiquid,
+    tip: Well,
+) -> Tuple[List[List[MeasurementData]], float, float]:
+    """This is done at the begining of the test and during the cavity test it happens again for each cavity."""
     print_info("Detecting liquid height.")
     fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
-    last_probed_tip_size = fixture_settings.tip_sizes[0]
     print_info(
         f"Test source has {fixture_settings.liquid_source.current_liquid_volume()}"
     )
     fixture_settings.pipette._retract()
     blank_measurments: List[List[MeasurementData]] = []
-    measurements: Dict[float, List[List[MeasurementData]]] = {}
     ctx.delay(
         seconds=SCALE_SECONDS_TO_TRUE_STABILIZE,
         msg=f"Waiting {SCALE_SECONDS_TO_TRUE_STABILIZE} for scale to stabalize",
@@ -1225,10 +1326,9 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
                 fixture_settings.tip_sizes[0],
                 fixture_settings.volumes[fixture_settings.tip_sizes[0]][0],
                 i,
-                first_tip,
+                tip,
             )
         )
-    liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
     asp_evaps = [
         calculate_change_in_volume(blank[0], blank[1], liq)
         for blank in blank_measurments
@@ -1237,6 +1337,8 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
         calculate_change_in_volume(blank[1], blank[2], liq)
         for blank in blank_measurments
     ]
+    for i in range(len(asp_evaps)):
+        print(f"Trial {i+1} evap: aspirate {asp_evaps[i]} dispense {disp_evaps[i]}")
     avg_asp_evap = sum(asp_evaps) / len(asp_evaps)
     avg_disp_evap = sum(disp_evaps) / len(disp_evaps)
     report.store_average_evaporation(
@@ -1253,8 +1355,25 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             fixture_settings.liquid_source.current_liquid_volume()  # type: ignore[arg-type]
             - volume_lost_during_blank,
         )
+    return blank_measurments, avg_asp_evap, avg_disp_evap
+
+
+def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
+    """Run."""
+    first_tip = _get_tips_for_test(
+        fixture_settings, fixture_settings.tip_sizes[0], True
+    )[0]
+    print_info("Picking up first tip.")
+    _configure_tip_count(fixture_settings, 0)
+    pick_up_tip_for_channel(fixture_settings, first_tip, 0)
+    last_probed_tip_size = fixture_settings.tip_sizes[0]
+    liq = SupportedLiquid.from_string(fixture_settings.liquid_name)
+    blank_measurments, avg_asp_evap, avg_disp_evap = calculate_evaporation(
+        ctx, fixture_settings, liq, first_tip
+    )
     remove_tip(fixture_settings)
 
+    measurements: Dict[float, List[List[MeasurementData]]] = {}
     last_measurement = blank_measurments[-1][-1]
     tip_sizes_done = []
     for tip in fixture_settings.tip_sizes:
@@ -1284,11 +1403,31 @@ def _run(ctx: ProtocolContext, fixture_settings: FixtureSettings) -> None:
             for channel in fixture_settings.channels:
                 _configure_tip_count(fixture_settings, channel)
                 # override pipette movement conflict checking 'cause we specially lay out our tipracks
-                channel_aspriate_dict: Dict[int, List[float]]
                 tips = _get_tips_for_test(fixture_settings, tip, False, channel)
+                print_info(str(tips))
+                """
+                Leaving this here as a comment in case we other solutions don'twork.
+                if channel == 7:
+                    # we're doing an 8 channel test and just swapped over to the front channel.
+                    pick_up_tip_for_channel(fixture_settings, tips.pop(0), channel)
+                    fixture_settings.pipette.require_liquid_presence(fixture_settings.liquid_source)
+                    remove_tip(fixture_settings)
+                """
                 actual_asp_list_channel: List[float] = []
                 actual_disp_list_channel: List[float] = []
+
                 for trial in range(fixture_settings.trials):
+                    if fixture_settings.cavity_test and trial != 0 and trial % 15 == 0:
+                        pick_up_tip_for_channel(fixture_settings, tips[0], 0)
+                        print_info("calculating evap.")
+                        (
+                            blank_measurments,
+                            avg_asp_evap,
+                            avg_disp_evap,
+                        ) = calculate_evaporation(
+                            ctx, fixture_settings, liq, tips.pop(0)
+                        )
+                        remove_tip(fixture_settings)
                     print_header(
                         f"Running trial {trial} for channel {channel} {volume}ul with T{tip}"
                     )
@@ -1479,7 +1618,8 @@ def run(ctx: ProtocolContext) -> None:
             _adjust_settings_for_increment(fixture_settings)
         _run(ctx, fixture_settings)
     except Exception as e:
-        print_error(f"error during run {e}")
+        print_error(f"Captured traceback:\n{traceback.format_exc()}")
+        raise e
     finally:
         if fixture_settings.recorder is not None:
             print_info("ending recording")

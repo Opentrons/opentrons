@@ -4,6 +4,7 @@ import some from 'lodash/some'
 import {
   ABSORBANCE_READER_V1,
   FLEX_ROBOT_TYPE,
+  FLEX_STACKER_V1_FIXTURE,
   FLEX_STAGING_AREA_SLOT_ADDRESSABLE_AREAS,
   getAreSlotsAdjacent,
   getModuleType,
@@ -34,7 +35,6 @@ import {
 import type { Dispatch, SetStateAction } from 'react'
 import type {
   AddressableAreaName,
-  CoordinateTuple,
   CutoutFixture,
   CutoutId,
   DeckDefinition,
@@ -66,10 +66,8 @@ export function getCutoutIdForAddressableArea(
 ): CutoutId | null {
   return cutoutFixtures.reduce<CutoutId | null>((acc, cutoutFixture) => {
     const [cutoutId] =
-      Object.entries(
-        cutoutFixture.providesAddressableAreas
-      ).find(([_cutoutId, providedAAs]) =>
-        providedAAs.includes(addressableArea)
+      Object.entries(cutoutFixture.providesAddressableAreas).find(
+        ([_cutoutId, providedAAs]) => providedAAs.includes(addressableArea)
       ) ?? []
     return (cutoutId as CutoutId) ?? acc
   }, null)
@@ -105,7 +103,8 @@ export function getModuleModelsBySlot(
               return FLEX_RIGHT_SLOTS.has(slot)
             } else if (
               model === TEMPERATURE_MODULE_V2 ||
-              model === HEATERSHAKER_MODULE_V1
+              model === HEATERSHAKER_MODULE_V1 ||
+              model === FLEX_STACKER_V1_FIXTURE
             ) {
               return !FLEX_MIDDLE_SLOTS.has(slot)
             } else if (
@@ -421,12 +420,8 @@ export interface SwapBlockedModuleArgs {
 }
 
 export const getSwapBlockedModule = (args: SwapBlockedModuleArgs): boolean => {
-  const {
-    hoveredLabware,
-    draggedLabware,
-    modulesById,
-    customLabwareDefs,
-  } = args
+  const { hoveredLabware, draggedLabware, modulesById, customLabwareDefs } =
+    args
 
   if (!hoveredLabware || !draggedLabware) {
     return false
@@ -496,73 +491,6 @@ export const getSwapBlockedAdapter = (
       : false
 
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
-}
-
-interface HoverDimensions {
-  width: number
-  height: number
-  x: number
-  y: number
-}
-
-const FOURTH_COLUMN_SLOTS = ['A4', 'B4', 'C4', 'D4']
-
-export const getFlexHoverDimensions = (
-  stagingAreaLocations: string[],
-  cutoutId: CutoutId,
-  slotId: string,
-  hasTCOnSlot: boolean,
-  slotPosition: CoordinateTuple
-): HoverDimensions => {
-  const hasStagingArea = stagingAreaLocations.includes(cutoutId)
-
-  const X_ADJUSTMENT_LEFT_SIDE = -101.5
-  const X_ADJUSTMENT = -17
-  const X_DIMENSION_MIDDLE_SLOTS = 160.3
-  const X_DIMENSION_OUTER_SLOTS = hasStagingArea ? 160.0 : 246.5
-  const X_DIMENSION_4TH_COLUMN_SLOTS = 175.0
-  const Y_DIMENSION = hasTCOnSlot ? 294.0 : 106.0
-
-  const slotFromCutout = slotId
-  const isLeftSideofDeck =
-    slotFromCutout === 'A1' ||
-    slotFromCutout === 'B1' ||
-    slotFromCutout === 'C1' ||
-    slotFromCutout === 'D1'
-  const xAdjustment = isLeftSideofDeck ? X_ADJUSTMENT_LEFT_SIDE : X_ADJUSTMENT
-  const xSlotPosition = slotPosition[0] + xAdjustment
-
-  const yAdjustment = -10
-  const ySlotPosition = slotPosition[1] + yAdjustment
-
-  const isMiddleOfDeck =
-    slotId === 'A2' || slotId === 'B2' || slotId === 'C2' || slotId === 'D2'
-
-  let xDimension = X_DIMENSION_OUTER_SLOTS
-  if (isMiddleOfDeck) {
-    xDimension = X_DIMENSION_MIDDLE_SLOTS
-  } else if (FOURTH_COLUMN_SLOTS.includes(slotId)) {
-    xDimension = X_DIMENSION_4TH_COLUMN_SLOTS
-  }
-  const x = hasTCOnSlot ? xSlotPosition + 20 : xSlotPosition
-  const y = hasTCOnSlot ? ySlotPosition - 70 : ySlotPosition
-
-  return { width: xDimension, height: Y_DIMENSION, x, y }
-}
-
-export const getOT2HoverDimensions = (
-  hasTCOnSlot: boolean,
-  slotPosition: CoordinateTuple
-): HoverDimensions => {
-  const y = slotPosition[1]
-  const x = slotPosition[0]
-
-  return {
-    width: hasTCOnSlot ? 260 : 128,
-    height: hasTCOnSlot ? 178 : 85,
-    x,
-    y: hasTCOnSlot ? y - 72 : y,
-  }
 }
 
 export const getSVGContainerWidth = (

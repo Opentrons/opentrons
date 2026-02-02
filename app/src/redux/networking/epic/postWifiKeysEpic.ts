@@ -14,7 +14,9 @@ import type { RobotApiErrorResponse } from '../../robot-api/types'
 import type { Action, Epic } from '../../types'
 import type { PostWifiKeysAction, WifiKey } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<PostWifiKeysAction> = action => {
+const mapActionToRequest: ActionToRequestMapper<
+  PostWifiKeysAction
+> = action => {
   const { keyFile } = action.payload
   const form = new FormData()
   form.append('key', keyFile, keyFile.name)

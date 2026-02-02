@@ -36,9 +36,8 @@ export const ProtocolLabwareDetails = (props: {
   const { commands } = props
   const { t } = useTranslation('protocol_details')
 
-  const labwareAndLidDetails = getRequiredLabwareDetailsFromLoadCommands(
-    commands
-  )
+  const labwareAndLidDetails =
+    getRequiredLabwareDetailsFromLoadCommands(commands)
 
   return (
     <>
@@ -160,10 +159,8 @@ export const LabwareDetailOverflowMenu = (
     showOverflowMenu,
     setShowOverflowMenu,
   } = useMenuHandleClickOutside()
-  const [
-    showLabwareDetailSlideout,
-    setShowLabwareDetailSlideout,
-  ] = useState<boolean>(false)
+  const [showLabwareDetailSlideout, setShowLabwareDetailSlideout] =
+    useState<boolean>(false)
 
   const handleClickMenuItem: MouseEventHandler<HTMLButtonElement> = e => {
     e.preventDefault()

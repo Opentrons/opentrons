@@ -1,27 +1,25 @@
-from typing import NamedTuple, Union, Optional
-
-from opentrons.types import (
-    Mount,
-    DeckLocation,
-    Location,
-    Point,
-    AxisMapType,
-    AxisType,
-    StringAxisMap,
-)
-from opentrons.legacy_broker import LegacyBroker
-from opentrons.legacy_commands import robot_commands as cmds
-from opentrons.legacy_commands import publisher
-from opentrons.hardware_control import SyncHardwareAPI
-from opentrons.protocols.api_support.util import requires_version
-from opentrons.protocols.api_support.types import APIVersion
-from opentrons_shared_data.pipette.types import PipetteNameType
+from typing import NamedTuple, Optional, Union
 
 from . import validation
-from .core.common import ProtocolCore, RobotCore
-from .module_contexts import ModuleContext
-from .labware import Labware
 from ._types import PipetteActionTypes, PlungerPositionTypes
+from .core.common import ProtocolCore, RobotCore
+from .labware import Labware
+from .module_contexts import ModuleContext
+from opentrons.hardware_control import SyncHardwareAPI
+from opentrons.legacy_broker import LegacyBroker
+from opentrons.legacy_commands import publisher
+from opentrons.legacy_commands import robot_commands as cmds
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import requires_version
+from opentrons.types import (
+    AxisMapType,
+    AxisType,
+    DeckLocation,
+    Location,
+    Mount,
+    Point,
+    StringAxisMap,
+)
 
 
 class HardwareManager(NamedTuple):
@@ -40,14 +38,13 @@ class RobotContext(publisher.CommandPublisher):
     The RobotContext class provides the objects, attributes, and methods that allow
     you to control robot motor axes individually.
 
-    Its methods can command the robot to perform an action, like moving to an absolute position,
-    controlling the gripper jaw, or moving individual pipette motors.
+    Its methods can command the robot to perform an action, like moving to an absolute
+    position, controlling the gripper jaw, or moving individual pipette motors.
 
     Objects in this class should not be instantiated directly. Instead, instances are
-    returned by :py:meth:`ProtocolContext.robot`.
+    returned by [`ProtocolContext.robot()`][opentrons.protocol_api.ProtocolContext.robot].
 
-    .. versionadded:: 2.22
-
+    *New in version 2.22*
     """
 
     def __init__(
@@ -85,17 +82,18 @@ class RobotContext(publisher.CommandPublisher):
         """
         Move a specified mount to a location on the deck.
 
-        :param mount: The mount of the instrument you wish to move.
-                      This can either be an instance of :py:class:`.types.Mount` or one
-                      of the strings ``"left"``, ``"right"``, ``"extension"``, ``"gripper"``. Note
-                      that the gripper mount can be referred to either as ``"extension"`` or ``"gripper"``.
-        :type mount: types.Mount or str
-        :param destination: Any location on the deck, specified as:
+        Args:
+            mount: The mount of the instrument you wish to move. This can either be
+                an instance of [`Mount`][opentrons.types.Mount] or one of the strings
+                `"left"`, `"right"`, `"extension"`, `"gripper"`. Note that the gripper
+                mount can be referred to either as `"extension"` or `"gripper"`.
+            destination: Any location on the deck, specified as:
 
-              -  a slot, like ``"A1"``
-              -  a defined location, like labware in a deck slot
-              -  an absolute location, like a point {x=10 , y=10, z=10} or a deck location and point ("A1" + point {x=10 , y=10, z=10})
-        :param speed: The absolute speed in mm/s.
+                - A slot, like `"A1"`.
+                - A defined location, like labware in a deck slot.
+                - An absolute location, like a point `{x=10, y=10, z=10}` or a deck
+                location and point (`"A1"` + point `{x=10, y=10, z=10}`).
+            speed: The absolute speed in mm/s.
         """
         mount = validation.ensure_instrument_mount(mount)
         with publisher.publish_context(
@@ -119,13 +117,20 @@ class RobotContext(publisher.CommandPublisher):
         """
         Move a set of axes to an absolute position on the deck.
 
-        :param axis_map: A dictionary mapping axes to an absolute position on the deck in mm.
-        :param critical_point: The critical point, or specific point on the object being moved, to move the axes with. It should only specify the gantry axes (i.e. `x`, `y`, `z`). When you specify a critical point, you're specifying the object on the gantry to be moved. If not specified, the critical point defaults to the center of the carriage attached to the gantry.
-        :param float speed: The maximum speed with which to move all axes in mm/s.
+        Args:
+            axis_map (dict): A dictionary mapping axes to an absolute position on the
+                deck in mm.
+            critical_point (Optional[dict]): The critical point, or specific point on
+                the object being moved, to move the axes with. It should only specify
+                the gantry axes (i.e. `x`, `y`, `z`). When you specify a critical
+                point, you're specifying the object on the gantry to be moved. If not
+                specified, the critical point defaults to the center of the carriage
+                attached to the gantry.
+            speed (Optional[float]): The maximum speed with which to move all axes in mm/s.
 
         """
         instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
-        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+        is_96_channel = validation.is_pipette_96_channel(instrument_on_left)
         axis_map = validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
         )
@@ -157,12 +162,14 @@ class RobotContext(publisher.CommandPublisher):
         """
         Move a set of axes to a relative position on the deck.
 
-        :param axis_map: A dictionary mapping axes to relative movements from the current position in mm.
-
-        :param float speed: The maximum speed with which to move all axes in mm/s.
+        Args:
+            axis_map (dict): A dictionary mapping axes to relative movements
+                from the current position in mm.
+            speed (float, optional): The maximum speed with which to move all
+                axes in mm/s.
         """
         instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
-        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+        is_96_channel = validation.is_pipette_96_channel(instrument_on_left)
 
         axis_map = validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel
@@ -180,7 +187,8 @@ class RobotContext(publisher.CommandPublisher):
     def close_gripper_jaw(self, force: Optional[float] = None) -> None:
         """Closes the Flex Gripper jaws with a specified force.
 
-        :param force: Force with which to close the gripper jaws in newtons.
+        Args:
+            force: Force with which to close the gripper jaws in newtons.
         """
         with publisher.publish_context(
             broker=self.broker,
@@ -191,10 +199,7 @@ class RobotContext(publisher.CommandPublisher):
             self._core.close_gripper(force)
 
     def open_gripper_jaw(self) -> None:
-        """Opens the Flex Gripper jaws with a specified force.
-
-        :param force: Force with which to open the gripper jaws in newtons.
-        """
+        """Fully opens the Flex Gripper jaws."""
         with publisher.publish_context(
             broker=self.broker,
             command=cmds.open_gripper(),
@@ -208,20 +213,22 @@ class RobotContext(publisher.CommandPublisher):
     ) -> AxisMapType:
         """
         Build an axis map from a location to provide to
-        either :py:meth:`.RobotContext.move_axes_to` or :py:meth:`.RobotContext.move_axes_relative`.
-        You must provide only one of either a `location`, `slot`, or `module` to build
+        either [`RobotContext.move_axes_to()`][opentrons.protocol_api.RobotContext.move_axes_to] or
+        [`RobotContext.move_axes_relative()`][opentrons.protocol_api.RobotContext.move_axes_relative].
+        You must provide only one of either a location, slot, or module to build
         the axis map.
 
-        :param mount: The mount of the instrument you wish create an axis map for.
-                      This can either be an instance of :py:class:`.types.Mount` or one
-                      of the strings ``"left"``, ``"right"``, ``"extension"``, ``"gripper"``. Note
-                      that the gripper mount can be referred to either as ``"extension"`` or ``"gripper"``.
-        :type mount: types.Mount or str
-        :param location: Any location on the deck, specified as:
+        Args:
+            mount (Union[types.Mount, str]): The mount of the instrument you wish to
+                create an axis map for. This can either be an instance of
+                [`Mount`][opentrons.types.Mount] or one of the strings `"left"`,
+                `"right"`, `"extension"`, `"gripper"`. Note that the gripper mount can
+                be referred to either as `"extension"` or `"gripper"`.
+            location (Union[Well, ModuleContext, DeckLocation, OffDeckType]): Any
+                location on the deck, specified as:
 
-              -  a deck location, like slot ``"A1"``.
-              -  a defined location, like a module on the deck.
-        :type location: `Well`, `ModuleContext`, `DeckLocation` or `OffDeckType`
+                - A deck location, like slot `"A1"`.
+                - A defined location, like a module on the deck.
         """
         mount = validation.ensure_instrument_mount(mount)
 
@@ -235,7 +242,9 @@ class RobotContext(publisher.CommandPublisher):
                 top_of_labware = loc.wells()[0].top()
                 loc = top_of_labware.point
                 return {mount_axis: loc.z, AxisType.X: loc.x, AxisType.Y: loc.y}
-            elif location is DeckLocation and not isinstance(location, Location):
+            elif isinstance(location, (int, str)) and not isinstance(
+                location, Location
+            ):
                 slot_name = validation.ensure_and_convert_deck_slot(
                     location,
                     api_version=self._api_version,
@@ -258,12 +267,13 @@ class RobotContext(publisher.CommandPublisher):
         self, mount: Union[Mount, str], volume: float, action: PipetteActionTypes
     ) -> AxisMapType:
         """
-        Build an axis map to move a pipette plunger motor to complete liquid handling actions.
+        Build an axis map to move a pipette plunger motor to complete liquid handling
+        actions.
 
-        :mount: The left or right instrument mount the pipette is attached to.
-        :param volume: A volume to convert to an axis map for linear plunger displacement.
-        :param action: Choose to ``aspirate`` or ``dispense``.
-
+        Args:
+            mount: The left or right instrument mount the pipette is attached to.
+            volume: A volume to convert to an axis map for linear plunger displacement.
+            action: Choose to `aspirate` or `dispense`.
         """
         pipette_name = self._core.get_pipette_type_from_engine(mount)
         if not pipette_name:
@@ -284,7 +294,9 @@ class RobotContext(publisher.CommandPublisher):
         """
         Build an axis map to move a pipette plunger motor to a named position.
 
-        :param position_name: A named position to move the pipette plunger to. Choose from ``top``, ``bottom``, ``blowout``, or ``drop`` plunger positions.
+        Args:
+            position_name: A named position to move the pipette plunger to. Choose from
+                `top`, `bottom`, `blowout`, or `drop` plunger positions.
 
         """
         pipette_name = self._core.get_pipette_type_from_engine(mount)
@@ -300,20 +312,21 @@ class RobotContext(publisher.CommandPublisher):
         return {pipette_axis: pipette_position}
 
     def build_axis_map(self, axis_map: StringAxisMap) -> AxisMapType:
-        """Take in a :py:class:`.types.StringAxisMap` and output an axis map.
+        """
+        Take in a [`StringAxisMap`][opentrons.types.StringAxisMap] and
+        output an axis map.
 
-        The :py:class:`.types.StringAxisMap` is allowed to contain any of the following strings:
-        ``"x"``, ``"y"``, "``z_l"``, "``z_r"``, "``z_g"``, ``"q"``.
+        The `StringAxisMap` is allowed to contain any of the following strings:
+        `"x"`, `"y"`, `"z_l"`, `"z_r"`, `"z_g"`, `"q"`.
 
         An example of a valid axis map could be:
 
-        {"x": 1, "y": 2} or {"Z_L": 100}
+            {"x": 1, "y": 2} or {"Z_L": 100}
 
         Note that capitalization does not matter.
-
         """
         instrument_on_left = self._core.get_pipette_type_from_engine(Mount.LEFT)
-        is_96_channel = instrument_on_left == PipetteNameType.P1000_96
+        is_96_channel = validation.is_pipette_96_channel(instrument_on_left)
 
         return validation.ensure_axis_map_type(
             axis_map, self._protocol_core.robot_type, is_96_channel

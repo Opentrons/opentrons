@@ -1,21 +1,88 @@
 """ProtocolEngine-based Protocol API core implementation."""
 
 from __future__ import annotations
-from typing import Dict, Optional, Type, Union, List, Tuple, TYPE_CHECKING, Sequence
 
-from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
+from typing import TYPE_CHECKING, Dict, List, Optional, Sequence, Tuple, Type, Union
+
+from opentrons_shared_data import liquid_classes
 from opentrons_shared_data.deck.types import DeckDefinitionV5, SlotDefV3
 from opentrons_shared_data.labware.labware_definition import (
     labware_definition_type_adapter,
 )
 from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
-from opentrons_shared_data import liquid_classes
+from opentrons_shared_data.liquid_classes import LiquidClassDefinitionDoesNotExist
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     LiquidClassSchemaV1,
 )
 from opentrons_shared_data.pipette.types import PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
+from ... import validation
+from ..._liquid import Liquid, LiquidClass
+from ..._types import OffDeckType
+from ...disposal_locations import TrashBin, WasteChute
+from ..labware import LabwareLoadParams
+from ..protocol import AbstractProtocol
+from . import (
+    _default_liquid_class_versions,
+    deck_conflict,
+    load_labware_params,
+    overlap_versions,
+)
+from .exceptions import InvalidModuleLocationError
+from .instrument import InstrumentCore
+from .labware import LabwareCore
+from .module_core import (
+    AbsorbanceReaderCore,
+    FlexStackerCore,
+    HeaterShakerModuleCore,
+    MagneticBlockCore,
+    MagneticModuleCore,
+    ModuleCore,
+    NonConnectedModuleCore,
+    TemperatureModuleCore,
+    ThermocyclerModuleCore,
+    VacuumModuleCore,
+)
+from .robot import RobotCore
+from .tasks import EngineTaskCore
+from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
+from opentrons.hardware_control.modules import AbstractModule
+from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
+from opentrons.hardware_control.types import DoorState
+from opentrons.protocol_engine import (
+    AddressableAreaLocation,
+    DeckSlotLocation,
+    LabwareMovementStrategy,
+    LabwareOffsetVector,
+    LoadedLabware,
+    LoadedModule,
+    ModuleLocation,
+    OnLabwareLocation,
+)
+from opentrons.protocol_engine import (
+    ModuleModel as EngineModuleModel,
+)
+from opentrons.protocol_engine import commands as cmd
+from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
+from opentrons.protocol_engine.commands import LoadModuleResult
+from opentrons.protocol_engine.errors import (
+    LabwareNotLoadedOnLabwareError,
+    LabwareNotLoadedOnModuleError,
+)
+from opentrons.protocol_engine.resources import labware_validation
+from opentrons.protocol_engine.types import (
+    OFF_DECK_LOCATION,
+    SYSTEM_LOCATION,
+    WASTE_CHUTE_LOCATION,
+    LoadableLabwareLocation,
+    NonStackedLocation,
+)
+from opentrons.protocol_engine.types import (
+    ModuleModel as ProtocolEngineModuleModel,
+)
+from opentrons.protocols.api_support.types import APIVersion
+from opentrons.protocols.api_support.util import AxisMaxSpeeds
 from opentrons.types import (
     DeckSlotName,
     Location,
@@ -24,68 +91,6 @@ from opentrons.types import (
     Point,
     StagingSlotName,
 )
-from opentrons.hardware_control import SyncHardwareAPI, SynchronousAdapter
-from opentrons.hardware_control.modules import AbstractModule
-from opentrons.hardware_control.modules.types import ModuleModel, ModuleType
-from opentrons.hardware_control.types import DoorState
-from opentrons.protocols.api_support.util import AxisMaxSpeeds
-from opentrons.protocols.api_support.types import APIVersion
-
-from opentrons.protocol_engine import commands as cmd
-from opentrons.protocol_engine.commands import LoadModuleResult
-from opentrons.protocol_engine import (
-    DeckSlotLocation,
-    AddressableAreaLocation,
-    ModuleLocation,
-    OnLabwareLocation,
-    ModuleModel as EngineModuleModel,
-    LabwareMovementStrategy,
-    LabwareOffsetVector,
-    LoadedLabware,
-    LoadedModule,
-)
-from opentrons.protocol_engine.types import (
-    ModuleModel as ProtocolEngineModuleModel,
-    OFF_DECK_LOCATION,
-    SYSTEM_LOCATION,
-    LoadableLabwareLocation,
-    NonStackedLocation,
-)
-from opentrons.protocol_engine.clients import SyncClient as ProtocolEngineClient
-from opentrons.protocol_engine.errors import (
-    LabwareNotLoadedOnModuleError,
-    LabwareNotLoadedOnLabwareError,
-)
-
-from ... import validation
-from ..._types import OffDeckType
-from ..._liquid import Liquid, LiquidClass
-from ...disposal_locations import TrashBin, WasteChute
-from ..protocol import AbstractProtocol
-from ..labware import LabwareLoadParams
-from .labware import LabwareCore
-from .tasks import EngineTaskCore
-from .instrument import InstrumentCore
-from .robot import RobotCore
-from .module_core import (
-    ModuleCore,
-    TemperatureModuleCore,
-    MagneticModuleCore,
-    ThermocyclerModuleCore,
-    HeaterShakerModuleCore,
-    NonConnectedModuleCore,
-    MagneticBlockCore,
-    AbsorbanceReaderCore,
-    FlexStackerCore,
-)
-from .exceptions import InvalidModuleLocationError
-from . import (
-    load_labware_params,
-    deck_conflict,
-    overlap_versions,
-    _default_liquid_class_versions,
-)
-from opentrons.protocol_engine.resources import labware_validation
 
 if TYPE_CHECKING:
     from ...labware import Labware
@@ -773,15 +778,16 @@ class ProtocolCore(
             ModuleType.HEATER_SHAKER: HeaterShakerModuleCore,
             ModuleType.ABSORBANCE_READER: AbsorbanceReaderCore,
             ModuleType.FLEX_STACKER: FlexStackerCore,
+            ModuleType.VACUUM_MODULE: VacuumModuleCore,
         }
 
         module_type = load_module_result.model.as_type()
 
         module_core_cls = type_lookup[module_type]
 
-        assert (
-            load_module_result.serialNumber is not None
-        ), "Expected a connected module but did not get a serial number."
+        assert load_module_result.serialNumber is not None, (
+            "Expected a connected module but did not get a serial number."
+        )
         selected_hardware = self._resolve_module_hardware(
             load_module_result.serialNumber, model
         )
@@ -1168,8 +1174,47 @@ class ProtocolCore(
             return self._module_cores_by_id[labware_location.moduleId]
         elif isinstance(labware_location, OnLabwareLocation):
             return self._labware_cores_by_id[labware_location.labwareId]
-
+        elif labware_location == WASTE_CHUTE_LOCATION:
+            return OffDeckType.WASTE_CHUTE
         return OffDeckType.OFF_DECK
+
+    def capture_image(
+        self,
+        filename: Optional[str] = None,
+        resolution: Optional[Tuple[int, int]] = None,
+        zoom: Optional[float] = None,
+        contrast: Optional[float] = None,
+        brightness: Optional[float] = None,
+        saturation: Optional[float] = None,
+    ) -> None:
+        """Capture an image using a camera.
+        Args:
+            resolution: Width by height resolution in pixels for the image to be captured with.
+            zoom: Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.
+            contrast: The contrast to use when processing an image. Scale is 0% to 100%
+            brightness: The brightness to use when processing an image. Scale is 0% to 100%.
+            saturation: The saturation to use when processing an image. Scale is 0% to 100%.
+        """
+        self._engine_client.execute_command(
+            cmd.CaptureImageParams(
+                fileName=filename,
+                resolution=resolution
+                if resolution is not None
+                else self._engine_client.state.camera.get_resolution(),
+                zoom=zoom
+                if zoom is not None
+                else self._engine_client.state.camera.get_zoom(),
+                contrast=contrast
+                if contrast is not None
+                else self._engine_client.state.camera.get_contrast(),
+                brightness=brightness
+                if brightness is not None
+                else self._engine_client.state.camera.get_brightness(),
+                saturation=saturation
+                if saturation is not None
+                else self._engine_client.state.camera.get_saturation(),
+            )
+        )
 
     def _convert_labware_location(
         self,
@@ -1205,6 +1250,8 @@ class ProtocolCore(
             return ModuleLocation(moduleId=location.module_id)
         elif location is OffDeckType.OFF_DECK:
             return OFF_DECK_LOCATION
+        elif location is OffDeckType.WASTE_CHUTE:
+            return AddressableAreaLocation(addressableAreaName="gripperWasteChute")
         elif isinstance(location, DeckSlotName):
             return DeckSlotLocation(slotName=location)
         elif isinstance(location, StagingSlotName):

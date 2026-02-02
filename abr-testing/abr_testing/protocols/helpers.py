@@ -24,6 +24,8 @@ from typing import List, Union, Dict, Tuple
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from datetime import datetime
 import subprocess
+import requests
+import os
 
 # FUNCTIONS FOR LOADING COMMON CONFIGURATIONS
 
@@ -130,6 +132,19 @@ def create_meniscus_z_parameter(parameters: ParameterContext) -> None:
         minimum=-10.0,
         maximum=10.0,
         description="Z offset for meniscus height. Default is -1.5mm.",
+    )
+
+
+def create_error_capture_duration_duration(parameters: ParameterContext) -> None:
+    """Create error capture duration parameter."""
+    parameters.add_int(
+        variable_name="error_capture_duration",
+        display_name="Error Capture Duration",
+        description="Length of video clip to capture on error (in seconds).",
+        default=30,
+        minimum=5,
+        maximum=6000,
+        unit="seconds",
     )
 
 
@@ -606,9 +621,8 @@ def set_up_slack() -> slack.Slack:
     )
 
 
-def create_robot_log_zip() -> str:
-    """Create a zip file of logs saved locally on robot."""
-    storage_directory = "/data/testing_data"
+def get_current_run_id() -> str:
+    """Get current run id."""
     result = subprocess.run(
         "ip route get 1.1.1.1 | awk '{print $7}'",
         shell=True,
@@ -616,15 +630,75 @@ def create_robot_log_zip() -> str:
         text=True,
     )
     ip = result.stdout.strip()
-    return get_logs(storage_directory, ip)
+    try:
+        response = requests.get(
+            f"http://{ip}:31950/runs", headers={"opentrons-version": "3"}
+        )
+        run_data = response.json()
+        run_list = run_data.get("data", "")
+        for run in run_list:
+            run_id = run["id"]
+            if run["current"]:
+                return run_id
+        else:
+            return ""
+    except requests.exceptions.RequestException:
+        print(f"Could not connect to robot with IP {ip}")
+        return ""
 
 
-def send_slack_error_message_with_log(
-    slack_bot: slack.Slack, protocol_name: str, error_str: str
+def get_last_image_capture() -> str:
+    """Get final photo of run."""
+    run_id = get_current_run_id()
+    image_storage = f"/data/images/{run_id}"
+    all_images = os.listdir(image_storage)
+    image_path = os.path.join(image_storage, all_images[-1])
+    return image_path
+
+
+def convert_m3u8_to_mp4(m3u8_pth: str, mp4_pth: str, dur: int = 30) -> None:
+    """Convert m3u8 video to mp4 format."""
+    subprocess.run(
+        f'ffmpeg -i "{m3u8_pth}" -t {dur} -c:v mpeg4 -c:a aac -movflags +faststart "{mp4_pth}" -y',
+        shell=True,
+        check=True,
+    )
+
+
+def get_livestream_video(length: int) -> str:
+    """Get latest livestream video."""
+    video_path = "/var/www/localhost/html/stream/hls/stream.m3u8"
+    new_video_path = "/data/testing_data/livestream_video.mp4"
+    convert_m3u8_to_mp4(video_path, new_video_path, length)
+    return new_video_path
+
+
+def create_robot_log_zip() -> Tuple[str, str]:
+    """Create a zip file of logs saved locally on robot."""
+    storage_directory = Path("/data/testing_data")
+    result = subprocess.run(
+        "ip route get 1.1.1.1 | awk '{print $7}'",
+        shell=True,
+        capture_output=True,
+        text=True,
+    )
+    ip = result.stdout.strip()
+    return get_logs(storage_directory, ip), ip
+
+
+def send_slack_error_message_with_attachments(
+    slack_bot: slack.Slack, protocol_name: str, error_str: str, length: int = 30
 ) -> None:
-    """Send error slack message with log files attached."""
-    log_path = create_robot_log_zip()
-    slack_bot.send_error_message(protocol_name, error_str, log_path)
+    """Send error slack message with log files and video clip attached."""
+    log_path, ip = create_robot_log_zip()
+    video_path = get_livestream_video(length)
+    slack_bot.send_error_message(protocol_name, error_str, ip, [log_path, video_path])
+
+
+def send_slack_message_with_image(slack_bot: slack.Slack, protocol_name: str) -> None:
+    """Send run completed message with image."""
+    image_path = get_last_image_capture()
+    slack_bot.send_run_completed_message(protocol_name, [image_path])
 
 
 def comment_height_of_specific_labware(

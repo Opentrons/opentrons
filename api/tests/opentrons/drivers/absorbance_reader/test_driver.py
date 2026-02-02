@@ -1,13 +1,14 @@
-from typing import cast
-from mock import MagicMock
-import pytest
 import asyncio
-from enum import Enum
 from concurrent.futures.thread import ThreadPoolExecutor
+from enum import Enum
+from typing import cast
+
+import pytest
+from mock import MagicMock
 
 from opentrons.drivers.absorbance_reader import (
-    AbsorbanceReaderDriver,
     AbsorbanceHidInterface,
+    AbsorbanceReaderDriver,
 )
 from opentrons.drivers.absorbance_reader.async_byonoy import AsyncByonoy
 from opentrons.drivers.types import ABSMeasurementMode, AbsorbanceReaderLidStatus
@@ -77,7 +78,6 @@ async def test_driver_get_device_info(
     mock_interface: MagicMock,
     connected_driver: AbsorbanceReaderDriver,
 ) -> None:
-
     DEVICE_INFO = MagicMock(AbsorbanceHidInterface.DeviceInfo)
     DEVICE_INFO.ref_no = "DE MAA 001"
     DEVICE_INFO.sn = "BYOMAA00013"
@@ -165,7 +165,6 @@ async def test_driver_get_lid_status(
     parts_aligned: bool,
     module_status: AbsorbanceReaderLidStatus,
 ) -> None:
-
     mock_interface.get_device_parts_aligned.return_value = (
         MockErrorCode.NO_ERROR,
         parts_aligned,

@@ -32,10 +32,8 @@ export function MaintenanceRunTakeoverModal(
 ): JSX.Element {
   const { i18n, t } = useTranslation(['shared', 'branded'])
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [
-    showConfirmTerminateModal,
-    setShowConfirmTerminateModal,
-  ] = useState<boolean>(false)
+  const [showConfirmTerminateModal, setShowConfirmTerminateModal] =
+    useState<boolean>(false)
 
   const { oddRunId, currentRunId } = useMaintenanceRunTakeover().getRunIds()
   const isMaintenanceRunCurrent = currentRunId != null

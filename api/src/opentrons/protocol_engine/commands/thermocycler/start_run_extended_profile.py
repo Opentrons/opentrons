@@ -1,26 +1,27 @@
 """StartRunProfile command request, result, and implementation models."""
 
 from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any, List, Optional, Union, overload
+
 from pydantic import BaseModel, Field
-from typing import List, Optional, TYPE_CHECKING, overload, Union, Any
-from typing_extensions import Literal, Type
 from pydantic.json_schema import SkipJsonSchema
+from typing_extensions import Literal, Type
 
-from opentrons.hardware_control.modules.types import ThermocyclerStep, ThermocyclerCycle
-
-from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ...errors.error_occurrence import ErrorOccurrence
-from .run_extended_profile import ProfileStep, ProfileCycle
+from ..command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .run_extended_profile import ProfileCycle, ProfileStep
+from opentrons.hardware_control.modules.types import ThermocyclerCycle, ThermocyclerStep
 
 if TYPE_CHECKING:
-    from opentrons.protocol_engine.state.state import StateView
     from opentrons.protocol_engine.execution import (
-        TaskHandler,
         EquipmentHandler,
+        TaskHandler,
     )
     from opentrons.protocol_engine.state.module_substates.thermocycler_module_substate import (
         ThermocyclerModuleSubState,
     )
+    from opentrons.protocol_engine.state.state import StateView
 
 StartRunExtendedProfileCommandType = Literal["thermocycler/startRunExtendedProfile"]
 
@@ -79,15 +80,13 @@ def _transform_profile_step(
 @overload
 def _transform_profile_element(
     element: ProfileStep, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerStep:
-    ...
+) -> ThermocyclerStep: ...
 
 
 @overload
 def _transform_profile_element(
     element: ProfileCycle, thermocycler_state: ThermocyclerModuleSubState
-) -> ThermocyclerCycle:
-    ...
+) -> ThermocyclerCycle: ...
 
 
 def _transform_profile_element(
@@ -150,7 +149,7 @@ class StartRunExtendedProfileImpl(
         async def start_run_profile(task_handler: TaskHandler) -> None:
             if thermocycler_hardware is not None:
                 async with task_handler.synchronize_cancel_latest(
-                    thermocycler_state.module_id
+                    thermocycler_state.module_id + "-block"
                 ):
                     await thermocycler_hardware.execute_profile(
                         profile=profile, volume=target_volume

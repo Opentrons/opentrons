@@ -12,15 +12,16 @@ import type {
 import type { Action, Epic } from '../../types'
 import type { FetchResetConfigOptionsAction, ResetConfigOption } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchResetConfigOptionsAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<
+  FetchResetConfigOptionsAction
+> = action => ({
   method: GET,
   path: Constants.SETTINGS_RESET_OPTIONS_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction> = (
-  response,
-  originalAction
-) => {
+const mapResponseToAction: ResponseToActionMapper<
+  FetchResetConfigOptionsAction
+> = (response, originalAction) => {
   const { host, body, ...responseMeta } = response
   const options: ResetConfigOption[] = body.options
   const meta = { ...originalAction.meta, response: responseMeta }

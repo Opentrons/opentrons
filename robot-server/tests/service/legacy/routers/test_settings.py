@@ -1,30 +1,34 @@
 import logging
-from mock import patch, call, MagicMock
 from dataclasses import make_dataclass
-from typing import Generator, Optional
 from pathlib import Path
+from typing import Generator, Optional
 
 import pytest
-
 from decoy import Decoy
+from mock import MagicMock, call, patch
 
-from opentrons.config.reset import ResetOptionId
 from opentrons.config import advanced_settings
+from opentrons.config.reset import ResetOptionId
+from opentrons.types import Mount
 from opentrons_shared_data.pipette import (
-    types as pip_types,
     pipette_definition as pip_def,
 )
-from opentrons.types import Mount
+from opentrons_shared_data.pipette import (
+    types as pip_types,
+)
 from opentrons_shared_data.robot.types import RobotTypeEnum
-
 
 from robot_server.app import app
 from robot_server.deck_configuration.fastapi_dependencies import (
     get_deck_configuration_store_failsafe,
 )
 from robot_server.deck_configuration.store import DeckConfigurationStore
+from robot_server.persistence.fastapi_dependencies import (
+    get_images_resetter,
+    get_persistence_resetter,
+)
+from robot_server.persistence.images_directory import ImagesResetter
 from robot_server.persistence.persistence_directory import PersistenceResetter
-from robot_server.persistence.fastapi_dependencies import get_persistence_resetter
 
 
 def test_get_robot_settings(api_client, hardware):
@@ -493,7 +497,7 @@ def test_available_resets(api_client):
 
 @pytest.fixture
 def mock_reset():
-    with patch("robot_server.service.legacy.routers." "settings.reset_util.reset") as m:
+    with patch("robot_server.service.legacy.routers.settings.reset_util.reset") as m:
         yield m
 
 
@@ -512,6 +516,20 @@ def mock_persistence_resetter(
 
 
 @pytest.fixture
+def mock_images_resetter(
+    decoy: Decoy,
+) -> Generator[ImagesResetter, None, None]:
+    mock_images_resetter = decoy.mock(cls=ImagesResetter)
+
+    async def mock_get_images_resetter() -> ImagesResetter:
+        return mock_images_resetter
+
+    app.dependency_overrides[get_images_resetter] = mock_get_images_resetter
+    yield mock_images_resetter
+    del app.dependency_overrides[get_images_resetter]
+
+
+@pytest.fixture
 def mock_deck_configuration_store_failsafe(
     decoy: Decoy,
 ) -> Generator[Optional[DeckConfigurationStore], None, None]:
@@ -520,9 +538,9 @@ def mock_deck_configuration_store_failsafe(
     async def mock_get_deck_configuration_store_failsafe() -> DeckConfigurationStore:
         return mock_deck_configuration_store
 
-    app.dependency_overrides[
-        get_deck_configuration_store_failsafe
-    ] = mock_get_deck_configuration_store_failsafe
+    app.dependency_overrides[get_deck_configuration_store_failsafe] = (
+        mock_get_deck_configuration_store_failsafe
+    )
     yield mock_deck_configuration_store
     del app.dependency_overrides[get_deck_configuration_store_failsafe]
 
@@ -580,6 +598,7 @@ def test_reset_success(
     api_client,
     mock_reset,
     mock_persistence_resetter: PersistenceResetter,
+    mock_images_resetter: ImagesResetter,
     mock_deck_configuration_store_failsafe: Optional[DeckConfigurationStore],
     body,
     called_with,
@@ -593,6 +612,7 @@ def test_reset_invalid_option(
     api_client,
     mock_reset,
     mock_persistence_resetter,
+    mock_images_resetter,
     mock_deck_configuration_store_failsafe,
 ):
     resp = api_client.post("/settings/reset", json={"aksgjajhadjasl": False})
@@ -604,7 +624,7 @@ def test_reset_invalid_option(
 
 @pytest.fixture()
 def mock_robot_configs():
-    with patch("robot_server.service.legacy.routers." "settings.robot_configs") as m:
+    with patch("robot_server.service.legacy.routers.settings.robot_configs") as m:
         yield m
 
 

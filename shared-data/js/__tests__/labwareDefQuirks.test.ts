@@ -15,6 +15,8 @@ const EXPECTED_VALID_QUIRKS = [
   'tiprackAdapterFor96Channel',
   'stackingMaxFive',
   'stackingOnly',
+  'noLabwarePositionCheck',
+  'disableGeometryBasedGripCheck',
 ]
 
 describe('check quirks for all labware defs', () => {

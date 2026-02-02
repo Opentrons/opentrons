@@ -1,28 +1,29 @@
 """QueueWorker and dependency factory."""
+
 from typing import AsyncGenerator, Callable
 
-from opentrons.hardware_control import HardwareControlAPI
-from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
-
-from ..state.state import StateStore
 from ..actions import ActionDispatcher
-from ..resources import FileProvider
+from ..resources import CameraProvider, FileProvider
+from ..state.state import StateStore
+from .command_executor import CommandExecutor
 from .equipment import EquipmentHandler
-from .movement import MovementHandler
 from .gantry_mover import create_gantry_mover
 from .labware_movement import LabwareMovementHandler
+from .movement import MovementHandler
 from .pipetting import create_pipetting_handler
-from .tip_handler import create_tip_handler
-from .run_control import RunControlHandler
-from .command_executor import CommandExecutor
 from .queue_worker import QueueWorker
+from .run_control import RunControlHandler
 from .status_bar import StatusBarHandler
 from .task_handler import TaskHandler
+from .tip_handler import create_tip_handler
+from opentrons.hardware_control import HardwareControlAPI
+from opentrons.protocol_engine.execution.rail_lights import RailLightsHandler
 
 
 def create_queue_worker(
     hardware_api: HardwareControlAPI,
     file_provider: FileProvider,
+    camera_provider: CameraProvider,
     state_store: StateStore,
     action_dispatcher: ActionDispatcher,
     command_generator: Callable[[], AsyncGenerator[str, None]],
@@ -32,6 +33,7 @@ def create_queue_worker(
     Arguments:
         hardware_api: Hardware control API to pass down to dependencies.
         file_provider: Provides access to robot server file writing procedures for protocol output.
+        camera_provider: Provides access to camera interface with image capture and callbacks.
         state_store: StateStore to pass down to dependencies.
         action_dispatcher: ActionDispatcher to pass down to dependencies.
         error_recovery_policy: ErrorRecoveryPolicy to pass down to dependencies.
@@ -85,6 +87,7 @@ def create_queue_worker(
     command_executor = CommandExecutor(
         hardware_api=hardware_api,
         file_provider=file_provider,
+        camera_provider=camera_provider,
         state_store=state_store,
         action_dispatcher=action_dispatcher,
         equipment=equipment_handler,

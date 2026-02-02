@@ -111,32 +111,31 @@ describe('EditOffset', () => {
       ...mockLPCContentProps,
     }
 
-    vi.mocked(
-      selectStepInfo
-    ).mockImplementation((runId: string) => (state: any) => state[runId]?.steps)
-    vi.mocked(
-      selectActivePipette
-    ).mockImplementation((runId: string) => (state: any) =>
-      state[runId]?.activePipette
+    vi.mocked(selectStepInfo).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.steps
     )
-    vi.mocked(selectSelectedLwFlowType).mockImplementation(() => () =>
-      'default'
+    vi.mocked(selectActivePipette).mockImplementation(
+      (runId: string) => (state: any) => state[runId]?.activePipette
+    )
+    vi.mocked(selectSelectedLwFlowType).mockImplementation(
+      () => () => 'default'
     )
     vi.mocked(
       selectSelectedLwWithOffsetDetailsMostRecentVectorOffset
     ).mockImplementation(() => () => null)
-    vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-      HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+    vi.mocked(selectCurrentSubstep).mockImplementation(
+      () => () => HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
     )
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      ({
-        uri: 'test-labware-uri',
-        displayName: 'Test Labware',
-        offsetLocationDetails: {
-          location: 'test-location',
-          slot: '1',
-        },
-      } as any)
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () =>
+        ({
+          uri: 'test-labware-uri',
+          displayName: 'Test Labware',
+          offsetLocationDetails: {
+            location: 'test-location',
+            slot: '1',
+          },
+        }) as any
     )
     vi.mocked(goBackEditOffsetSubstep).mockReturnValue({
       type: 'GO_BACK_HANDLE_LW_SUBSTEP',
@@ -148,8 +147,8 @@ describe('EditOffset', () => {
 
   describe('content header selection', () => {
     it('shows "add default labware offset" when flow type is default and no offset exists', () => {
-      vi.mocked(selectSelectedLwFlowType).mockImplementation(() => () =>
-        'default'
+      vi.mocked(selectSelectedLwFlowType).mockImplementation(
+        () => () => 'default'
       )
       vi.mocked(
         selectSelectedLwWithOffsetDetailsMostRecentVectorOffset
@@ -164,8 +163,8 @@ describe('EditOffset', () => {
     })
 
     it('shows "adjust default labware offset" when flow type is default and an offset exists', () => {
-      vi.mocked(selectSelectedLwFlowType).mockImplementation(() => () =>
-        'default'
+      vi.mocked(selectSelectedLwFlowType).mockImplementation(
+        () => () => 'default'
       )
       vi.mocked(
         selectSelectedLwWithOffsetDetailsMostRecentVectorOffset
@@ -180,8 +179,8 @@ describe('EditOffset', () => {
     })
 
     it('shows "adjust applied location offset" when flow type is location-specific', () => {
-      vi.mocked(selectSelectedLwFlowType).mockImplementation(() => () =>
-        'location-specific'
+      vi.mocked(selectSelectedLwFlowType).mockImplementation(
+        () => () => 'location-specific'
       )
 
       render(props)
@@ -193,8 +192,8 @@ describe('EditOffset', () => {
     })
 
     it('defaults to "add default labware offset" for unknown flow types', () => {
-      vi.mocked(selectSelectedLwFlowType).mockImplementation(() => () =>
-        'unknown-type' as any
+      vi.mocked(selectSelectedLwFlowType).mockImplementation(
+        () => () => 'unknown-type' as any
       )
 
       render(props)
@@ -208,8 +207,8 @@ describe('EditOffset', () => {
 
   describe('substep rendering', () => {
     it('renders PrepareLabware when on prepare substep', () => {
-      vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-        HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
+      vi.mocked(selectCurrentSubstep).mockImplementation(
+        () => () => HANDLE_LW_SUBSTEP.EDIT_OFFSET_PREP_LW
       )
 
       render(props)
@@ -222,8 +221,8 @@ describe('EditOffset', () => {
     })
 
     it('renders CheckLabware when on check substep', () => {
-      vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-        HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
+      vi.mocked(selectCurrentSubstep).mockImplementation(
+        () => () => HANDLE_LW_SUBSTEP.EDIT_OFFSET_CHECK_LW
       )
 
       render(props)
@@ -238,8 +237,8 @@ describe('EditOffset', () => {
     })
 
     it('renders DesktopOffsetSuccess when on success substep', () => {
-      vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-        HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
+      vi.mocked(selectCurrentSubstep).mockImplementation(
+        () => () => HANDLE_LW_SUBSTEP.EDIT_OFFSET_SUCCESS
       )
 
       render(props)
@@ -252,8 +251,8 @@ describe('EditOffset', () => {
     })
 
     it('renders nothing for unknown substeps', () => {
-      vi.mocked(selectCurrentSubstep).mockImplementation(() => () =>
-        'unknown-substep' as any
+      vi.mocked(selectCurrentSubstep).mockImplementation(
+        () => () => 'unknown-substep' as any
       )
 
       const { container } = render(props)

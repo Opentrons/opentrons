@@ -55,11 +55,10 @@ export function EstopMissingModal({
   )
 }
 
-interface EstopMissingTouchscreenModalProps
-  extends Omit<
-    EstopMissingModalProps,
-    'isDismissedModal' | 'setIsDismissedModal'
-  > {}
+interface EstopMissingTouchscreenModalProps extends Omit<
+  EstopMissingModalProps,
+  'isDismissedModal' | 'setIsDismissedModal'
+> {}
 
 function TouchscreenModal({
   robotName,
@@ -77,10 +76,13 @@ function TouchscreenModal({
   return (
     <OddModal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing16}>
-        <LegacyStyledText as="p" fontWeight={TYPOGRAPHY.fontWeightBold}>
+        <LegacyStyledText
+          forwardedAs="p"
+          fontWeight={TYPOGRAPHY.fontWeightBold}
+        >
           {t('connect_the_estop_to_continue')}
         </LegacyStyledText>
-        <LegacyStyledText as="p">
+        <LegacyStyledText forwardedAs="p">
           {t('estop_missing_description', { robotName })}
         </LegacyStyledText>
       </Flex>
@@ -88,8 +90,10 @@ function TouchscreenModal({
   )
 }
 
-interface EstopMissingDesktopModalProps
-  extends Omit<EstopMissingModalProps, 'isDismissedModal'> {}
+interface EstopMissingDesktopModalProps extends Omit<
+  EstopMissingModalProps,
+  'isDismissedModal'
+> {}
 
 function DesktopModal({
   robotName,
@@ -117,7 +121,7 @@ function DesktopModal({
   return (
     <Modal {...modalProps}>
       <Flex flexDirection={DIRECTION_COLUMN} gridGap={SPACING.spacing24}>
-        <LegacyStyledText as="h1">
+        <LegacyStyledText forwardedAs="h1">
           {t('connect_the_estop_to_continue')}
         </LegacyStyledText>
         <LegacyStyledText>

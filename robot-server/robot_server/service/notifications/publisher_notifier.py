@@ -1,16 +1,17 @@
 """Provides an interface for alerting notification publishers to events and related lifecycle utilities."""
+
 import asyncio
 from logging import getLogger
-from fastapi import Depends
-from typing import Annotated, Optional, Callable, List, Awaitable, Union
+from typing import Annotated, Awaitable, Callable, List, Optional, Union
 
+from fastapi import Depends
+
+from opentrons.util.change_notifier import ChangeNotifier, ChangeNotifier_ts
 from server_utils.fastapi_utils.app_state import (
     AppState,
     AppStateAccessor,
     get_app_state,
 )
-
-from opentrons.util.change_notifier import ChangeNotifier, ChangeNotifier_ts
 
 LOG = getLogger(__name__)
 
@@ -51,7 +52,7 @@ class PublisherNotifier:
                         await callback()
                     except BaseException:
                         LOG.exception(
-                            f'PublisherNotifier: exception in callback {getattr(callback, "__name__", "<unknown>")}'
+                            f"PublisherNotifier: exception in callback {getattr(callback, '__name__', '<unknown>')}"
                         )
         except asyncio.exceptions.CancelledError:
             LOG.warning("PublisherNotifier task cancelled.")

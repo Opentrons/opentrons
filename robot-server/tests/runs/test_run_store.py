@@ -1,46 +1,50 @@
 """Tests for robot_server.runs.run_store."""
 
+import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional, Type
-import warnings
+from unittest import mock
 
 import pytest
 from decoy import Decoy
-from robot_server.data_files.data_files_store import (
-    DataFileInfo,
-    DataFilesStore,
-)
 from sqlalchemy.engine import Engine
-from unittest import mock
-
-from opentrons_shared_data.pipette.types import PipetteNameType
-from opentrons_shared_data.errors.codes import ErrorCodes
-
-from robot_server.data_files.models import DataFileSource
-from robot_server.protocols.protocol_store import ProtocolNotFoundError
-from robot_server.runs.run_store import (
-    CSVParameterRunResource,
-    RunStore,
-    RunResource,
-    CommandNotFoundError,
-    BadStateSummary,
-)
-from robot_server.runs.run_models import RunNotFoundError
-from robot_server.runs.action_models import RunAction, RunActionType
-from robot_server.service.notifications import RunsPublisher
 
 from opentrons.protocol_engine import (
-    commands as pe_commands,
-    errors as pe_errors,
-    types as pe_types,
-    StateSummary,
     CommandSlice,
-    Liquid,
     EngineStatus,
     ErrorOccurrence,
+    Liquid,
+    StateSummary,
 )
-from opentrons.types import MountType, DeckSlotName
+from opentrons.protocol_engine import (
+    commands as pe_commands,
+)
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
+from opentrons.types import DeckSlotName, MountType
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
+from opentrons_shared_data.errors.codes import ErrorCodes
+from opentrons_shared_data.pipette.types import PipetteNameType
+
+from robot_server.data_files.data_files_store import (
+    DataFilesStore,
+)
+from robot_server.protocols.protocol_store import ProtocolNotFoundError
+from robot_server.runs.action_models import RunAction, RunActionType
+from robot_server.runs.run_models import RunNotFoundError
+from robot_server.runs.run_store import (
+    BadStateSummary,
+    CommandNotFoundError,
+    CSVParameterRunResource,
+    RunResource,
+    RunStore,
+)
+from robot_server.service.notifications import RunsPublisher
 
 
 @pytest.fixture()
@@ -293,7 +297,13 @@ def data_files_store(sql_engine: Engine, tmp_path: Path) -> DataFilesStore:
     """
     data_files_dir = tmp_path / "data_files"
     data_files_dir.mkdir()
-    return DataFilesStore(sql_engine=sql_engine, data_files_directory=data_files_dir)
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    return DataFilesStore(
+        sql_engine=sql_engine,
+        data_files_directory=data_files_dir,
+        images_directory=images_dir,
+    )
 
 
 async def test_update_run_state(
@@ -402,8 +412,11 @@ async def test_insert_and_get_csv_rtp(
             id="file-id",
             name="my_csv_file.csv",
             file_hash="file-hash",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+            mime_type=MimeType.TEXT_CSV,
+            path="data_files/file-id/my_csv_file.csv",
+            generated=False,
+            stored=True,
         )
     )
 
@@ -631,8 +644,11 @@ async def test_remove_run(
             id="file-id",
             name="my_csv_file.csv",
             file_hash="file-hash",
-            source=DataFileSource.UPLOADED,
             created_at=datetime(year=2024, month=1, day=1, tzinfo=timezone.utc),
+            mime_type=MimeType.TEXT_CSV,
+            path="data_files/file-id/my_csv_file.csv",
+            generated=False,
+            stored=True,
         )
     )
     subject.insert_csv_rtp(run_id="run-id", run_time_parameters=run_time_parameters)

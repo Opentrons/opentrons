@@ -51,10 +51,8 @@ export function UpdateFirmware(props: UpdateFirmwareProps): JSX.Element {
   const sendIdentifyStacker = useSendIdentifyStacker()
   const [getLatestRequestId, handleModuleApiRequests] = useModuleApiRequests()
   const moduleSerialNumber = props.attachedModule.serialNumber
-  const [
-    moduleRequestTimeoutId,
-    setModuleRequestTimeoutId,
-  ] = useState<ReturnType<typeof setTimeout> | null>(null)
+  const [moduleRequestTimeoutId, setModuleRequestTimeoutId] =
+    useState<ReturnType<typeof setTimeout> | null>(null)
   const [checkingFirmware, setCheckingFirmware] = useState(false)
   const [inProgress, setInProgress] = useState(false)
   const [shouldProceed, setShouldProceed] = useState(false)

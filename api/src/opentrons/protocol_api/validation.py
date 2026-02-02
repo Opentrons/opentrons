@@ -1,53 +1,57 @@
 from __future__ import annotations
+
+from math import isinf, isnan
 from typing import (
+    TYPE_CHECKING,
     Any,
     Dict,
     List,
-    Optional,
-    Sequence,
-    Union,
-    Tuple,
     Mapping,
     NamedTuple,
-    TYPE_CHECKING,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
 )
-from math import isinf, isnan
+
 from typing_extensions import TypeGuard
 
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     LabwareRole,
 )
-from opentrons_shared_data.pipette.types import PipetteNameType, PIPETTE_API_NAMES_MAP
+from opentrons_shared_data.pipette.types import PIPETTE_API_NAMES_MAP, PipetteNameType
 from opentrons_shared_data.robot.types import RobotType
 
-from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
-from opentrons.protocols.api_support.util import APIVersionError
-from opentrons.protocols.advanced_control.transfers.common import TransferTipPolicyV2
-from opentrons.types import (
-    Mount,
-    DeckSlotName,
-    StagingSlotName,
-    Location,
-    AxisType,
-    AxisMapType,
-    StringAxisMap,
-)
+from .disposal_locations import TrashBin, WasteChute
 from opentrons.hardware_control.modules.types import (
-    ModuleModel,
-    MagneticModuleModel,
-    TemperatureModuleModel,
-    ThermocyclerModuleModel,
-    HeaterShakerModuleModel,
-    MagneticBlockModel,
     AbsorbanceReaderModel,
     FlexStackerModuleModel,
+    HeaterShakerModuleModel,
+    MagneticBlockModel,
+    MagneticModuleModel,
+    ModuleModel,
+    TemperatureModuleModel,
+    ThermocyclerModuleModel,
+    VacuumModuleModel,
 )
-
-from .disposal_locations import TrashBin, WasteChute
+from opentrons.protocols.api_support.types import APIVersion, ThermocyclerStep
+from opentrons.protocols.api_support.util import APIVersionError
+from opentrons.types import (
+    AxisMapType,
+    AxisType,
+    DeckSlotName,
+    Location,
+    Mount,
+    StagingSlotName,
+    StringAxisMap,
+)
 
 if TYPE_CHECKING:
     from .labware import Well
+    from opentrons.protocols.advanced_control.transfers.common import (
+        TransferTipPolicyV2,
+    )
 
 
 # The first APIVersion where Python protocols can specify deck labels like "D1" instead of "1".
@@ -99,11 +103,18 @@ class InvalidFixtureLocationError(ValueError):
     """An error raised when attempting to load a fixture in an invalid cutout."""
 
 
+def is_pipette_96_channel(pipette: Optional[PipetteNameType]) -> bool:
+    """Return if this pipette type is a 96 channel."""
+    if pipette is not None:
+        return pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]
+    return False
+
+
 def ensure_mount_for_pipette(
     mount: Union[str, Mount, None], pipette: PipetteNameType
 ) -> Mount:
     """Ensure that an input value represents a valid mount, and is valid for the given pipette."""
-    if pipette in [PipetteNameType.P1000_96, PipetteNameType.P200_96]:
+    if is_pipette_96_channel(pipette):
         # Always validate the raw mount input, even if the pipette is a 96-channel and we're not going
         # to use the mount value.
         if mount is not None:
@@ -194,7 +205,10 @@ def _check_ot2_axis_type(
                 f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
             )
     if robot_type == "OT-2 Standard" and isinstance(axis_map_keys[0], str):
-        if any(k.upper() not in [axis.value for axis in AxisType.ot2_axes()] for k in axis_map_keys):  # type: ignore [union-attr]
+        if any(
+            k.upper() not in [axis.value for axis in AxisType.ot2_axes()]  # type: ignore [union-attr]
+            for k in axis_map_keys
+        ):
             raise IncorrectAxisError(
                 f"An OT-2 Robot only accepts the following axes {AxisType.ot2_axes()}"
             )
@@ -370,7 +384,7 @@ def ensure_definition_is_not_lid_after_api_version(
         and api_version >= LID_STACK_VERSION_GATE
     ):
         raise APIVersionError(
-            f"Labware Lids cannot be loaded like standard labware in Protocols written with an API version greater than {LID_STACK_VERSION_GATE}."
+            f"Labware Lids cannot be loaded like standard labware in Protocols written with an API version of {LID_STACK_VERSION_GATE} or higher."
         )
 
 
@@ -398,6 +412,7 @@ _MODULE_MODELS: Dict[str, ModuleModel] = {
     "magneticBlockV1": MagneticBlockModel.MAGNETIC_BLOCK_V1,
     "absorbanceReaderV1": AbsorbanceReaderModel.ABSORBANCE_READER_V1,
     "flexStackerModuleV1": FlexStackerModuleModel.FLEX_STACKER_V1,
+    "vacuumModuleMilliporeV1": VacuumModuleModel.VACUUM_MODULE_V1,
 }
 
 
@@ -521,7 +536,7 @@ def is_all_strings(items: Sequence[Any]) -> TypeGuard[Sequence[str]]:
 
 
 def ensure_valid_labware_offset_vector(
-    offset: Mapping[str, float]
+    offset: Mapping[str, float],
 ) -> Tuple[float, float, float]:
     if not isinstance(offset, dict):
         raise TypeError("Labware offset must be a dictionary.")
@@ -568,6 +583,40 @@ class LocationTypeError(TypeError):
 
 
 ValidTarget = Union[WellTarget, PointTarget, DisposalTarget]
+
+
+def validate_dynamic_locations(
+    location: Optional[Union[Location, Well, TrashBin, WasteChute]],
+    end_location: Location,
+) -> None:
+    """Given that we have an end_location we check that they're a vaild dynamic pair."""
+    if location is None:
+        raise ValueError("Location must be supplied if using an End Location.")
+    if not isinstance(location, Location):
+        raise ValueError(
+            "Location must be a point within a well when dynamic pipetting."
+        )
+    # Shouldn't be true ever if using typing but a customer protocol may not check
+    if not isinstance(end_location, Location):
+        raise ValueError(
+            "End location must be a point within a well when dynamic pipetting."
+        )
+    if not location.labware.is_well:
+        raise ValueError("Start location must be within a well when dynamic pipetting")
+    if not end_location.labware.is_well:
+        raise ValueError("End location must be within a well when dynamic pipetting")
+    (
+        _,
+        start_well,
+    ) = location.labware.get_parent_labware_and_well()
+    (
+        _,
+        end_well,
+    ) = end_location.labware.get_parent_labware_and_well()
+    if start_well != end_well:
+        raise ValueError(
+            "Start and end locations must be within the same well when dynamic pipetting"
+        )
 
 
 def validate_location(
@@ -671,8 +720,12 @@ def validate_coordinates(value: Sequence[float]) -> Tuple[float, float, float]:
     return float(value[0]), float(value[1]), float(value[2])
 
 
-def ensure_new_tip_policy(value: str) -> TransferTipPolicyV2:
+def ensure_new_tip_policy(value: str) -> "TransferTipPolicyV2":
     """Ensure that new_tip value is a valid TransferTipPolicy value."""
+    from opentrons.protocols.advanced_control.transfers.common import (
+        TransferTipPolicyV2,
+    )
+
     try:
         return TransferTipPolicyV2(value.lower())
     except ValueError:
@@ -721,7 +774,7 @@ def ensure_valid_flat_wells_list_for_transfer_v2(
 
 
 def ensure_valid_trash_location_for_transfer_v2(
-    trash_location: Union[Location, Well, TrashBin, WasteChute]
+    trash_location: Union[Location, Well, TrashBin, WasteChute],
 ) -> Union[Location, TrashBin, WasteChute]:
     """Ensure that the trash location is valid for v2 transfer."""
     from .labware import Well

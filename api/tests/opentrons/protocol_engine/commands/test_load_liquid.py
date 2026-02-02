@@ -1,18 +1,20 @@
 """Test load-liquid command."""
-import pytest
-from decoy import Decoy
+
 from datetime import datetime
 
-from opentrons.protocol_engine.commands.command import SuccessData
+import pytest
+from decoy import Decoy
+
 from opentrons.protocol_engine.commands import (
-    LoadLiquidResult,
     LoadLiquidImplementation,
     LoadLiquidParams,
+    LoadLiquidResult,
 )
+from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.errors import InvalidLiquidError
-from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.resources.model_utils import ModelUtils
 from opentrons.protocol_engine.state import update_types
+from opentrons.protocol_engine.state.state import StateView
 
 
 @pytest.fixture

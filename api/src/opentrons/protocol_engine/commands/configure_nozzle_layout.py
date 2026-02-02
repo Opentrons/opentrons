@@ -1,22 +1,25 @@
 """Configure nozzle layout command request, result, and implementation models."""
+
 from __future__ import annotations
-from opentrons.protocol_engine.state.update_types import StateUpdate
-from pydantic import BaseModel
+
 from typing import TYPE_CHECKING, Optional, Type, Union
+
+from pydantic import BaseModel
 from typing_extensions import Literal
 
-from .pipetting_common import (
-    PipetteIdMixin,
-)
-from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
 from ..errors.error_occurrence import ErrorOccurrence
 from ..types import (
     AllNozzleLayoutConfiguration,
-    SingleNozzleLayoutConfiguration,
-    RowNozzleLayoutConfiguration,
     ColumnNozzleLayoutConfiguration,
     QuadrantNozzleLayoutConfiguration,
+    RowNozzleLayoutConfiguration,
+    SingleNozzleLayoutConfiguration,
 )
+from .command import AbstractCommandImpl, BaseCommand, BaseCommandCreate, SuccessData
+from .pipetting_common import (
+    PipetteIdMixin,
+)
+from opentrons.protocol_engine.state.update_types import StateUpdate
 
 if TYPE_CHECKING:
     from ..execution import EquipmentHandler, TipHandler
@@ -74,14 +77,19 @@ class ConfigureNozzleLayoutImplementation(
             back_left_nozzle=back_left_nozzle,
         )
 
-        nozzle_map = await self._equipment.configure_nozzle_layout(
+        pipette_result = await self._equipment.configure_nozzle_layout(
             pipette_id=params.pipetteId,
             **nozzle_params,
         )
 
         update_state = StateUpdate()
         update_state.update_pipette_nozzle(
-            pipette_id=params.pipetteId, nozzle_map=nozzle_map
+            pipette_id=params.pipetteId, nozzle_map=pipette_result.nozzle_map
+        )
+        update_state.update_pipette_config(
+            pipette_id=pipette_result.pipette_id,
+            config=pipette_result.static_config,
+            serial_number=pipette_result.serial_number,
         )
 
         return SuccessData(
@@ -101,9 +109,9 @@ class ConfigureNozzleLayout(
     params: ConfigureNozzleLayoutParams
     result: Optional[ConfigureNozzleLayoutResult] = None
 
-    _ImplementationCls: Type[
+    _ImplementationCls: Type[ConfigureNozzleLayoutImplementation] = (
         ConfigureNozzleLayoutImplementation
-    ] = ConfigureNozzleLayoutImplementation
+    )
 
 
 class ConfigureNozzleLayoutCreate(BaseCommandCreate[ConfigureNozzleLayoutParams]):

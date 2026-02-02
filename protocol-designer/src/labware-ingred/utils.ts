@@ -52,9 +52,8 @@ export function getNextAvailableDeckSlot(
     const cutoutIds = Object.values(initialDeckSetup.additionalEquipmentOnDeck)
       .filter(ae => ae.name === 'stagingArea')
       .map(ae => ae.location as CutoutId)
-    const stagingAreaAddressableAreaNames = getStagingAreaAddressableAreas(
-      cutoutIds
-    )
+    const stagingAreaAddressableAreaNames =
+      getStagingAreaAddressableAreas(cutoutIds)
     const addressableAreaName = stagingAreaAddressableAreaNames.find(
       aa => aa === slot.id
     )
@@ -146,9 +145,18 @@ export const getMigratedLabwareId = (
   const latestURI = Object.entries(latestDefs).find(
     ([_, def]) => def.parameters.loadName === loadName
   )?.[0]
+
+  if (defURI == null) {
+    console.error(
+      `expected to find a matching defURI with labwareId ${oldLabwareId} but could not`
+    )
+  }
+
   const labwareIdString = oldLabwareId.split(':')[0]
   const latestLabwareId =
-    latestURI != null ? `${labwareIdString}:${latestURI}` : oldLabwareId // fallback to original labwareId for custom labware
+    latestURI != null
+      ? `${labwareIdString}:${latestURI}`
+      : `${labwareIdString}:${defURI}` // fallback to original labwareId & defURI for custom labware
 
   return latestLabwareId
 }

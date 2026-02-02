@@ -28,61 +28,53 @@ const getPythonVersion = (platformName, arch) => {
 }
 
 const PYTHON_BASE_URL =
-  'https://github.com/astral-sh/python-build-standalone/releases/download/20250529/'
+  'https://github.com/astral-sh/python-build-standalone/releases/download/20251202/'
 // fallback options needed because electron builder does not provide a real arch as an argument in the beforePack script
 const PYTHON_BY_PLATFORM = {
   darwin: {
     fallback: {
-      file:
-        'cpython-3.10.17+20250529-x86_64-apple-darwin-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-x86_64-apple-darwin-install_only_stripped.tar.gz',
       sha256:
-        'cb45a45bcbdf00a4808f48fbf344f597a01e66c5ed83a7e388883c86844bd2f1',
+        '5713cad240056294d1c0307b501889d9eebd63ff4afde990ca88b05c276c1056',
     },
     arm64: {
-      file:
-        'cpython-3.10.17+20250529-aarch64-apple-darwin-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-aarch64-apple-darwin-install_only_stripped.tar.gz',
       sha256:
-        '366d037181b1cea0a7a8b1457874a0cdfbb795815d07ae25c55ef1461aa487ef',
+        '8a6b1f121f6a1d1f00f449eeed048a96a052d75c901737403026976c6561f60a',
     },
     x64: {
-      file:
-        'cpython-3.10.17+20250529-x86_64-apple-darwin-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-x86_64-apple-darwin-install_only_stripped.tar.gz',
       sha256:
-        'cb45a45bcbdf00a4808f48fbf344f597a01e66c5ed83a7e388883c86844bd2f1',
+        '5713cad240056294d1c0307b501889d9eebd63ff4afde990ca88b05c276c1056',
     },
   },
   linux: {
     fallback: {
-      file:
-        'cpython-3.10.17+20250529-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz',
       sha256:
-        'e3abc6e300ccdfe5e8faf220d0682dc8eae4d438b96b7d312b32d50a4e536d21',
+        '0c4fea94c5ab7d0c3cc34fced0449310c01cb063de6018413984bf7283afe479',
     },
     x64: {
-      file:
-        'cpython-3.10.17+20250529-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz',
       sha256:
-        'e3abc6e300ccdfe5e8faf220d0682dc8eae4d438b96b7d312b32d50a4e536d21',
+        '0c4fea94c5ab7d0c3cc34fced0449310c01cb063de6018413984bf7283afe479',
     },
     arm64: {
-      file:
-        'cpython-3.10.17+20250529-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz',
       sha256:
-        'aaf1fd370ab3ae31807c8d7d5aff0b8d2abb370c12d17a561178ceb842314f2a',
+        'b4a9e20da633166c48f44ce0215702aea33cb4f78b7246611a7ddd2191f06199',
     },
   },
   win32: {
     fallback: {
-      file:
-        'cpython-3.10.17+20250529-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
       sha256:
-        '775558a9ad71d42afb168ff76f6db6fa4bf512e933b888e55c8f0557860eac83',
+        'e9a580c6b351dc2dcd01637fbf5ea3a2a0822d3e640104ae09f62f132f744a32',
     },
     x64: {
-      file:
-        'cpython-3.10.17+20250529-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
+      file: 'cpython-3.12.12+20251202-x86_64-pc-windows-msvc-install_only_stripped.tar.gz',
       sha256:
-        '775558a9ad71d42afb168ff76f6db6fa4bf512e933b888e55c8f0557860eac83',
+        'e9a580c6b351dc2dcd01637fbf5ea3a2a0822d3e640104ae09f62f132f744a32',
     },
   },
 }
@@ -122,7 +114,7 @@ const PYTHON_BASE = path.join(__dirname, '..', 'python')
 const PYTHON_STAGING_BASE = path.join(PYTHON_BASE, 'staging')
 const pythonStaging = arch => path.join(PYTHON_STAGING_BASE, 'python', arch)
 const pythonSitePackagesStagingPosix = arch =>
-  path.join(pythonStaging(arch), 'lib', 'python3.10', 'site-packages')
+  path.join(pythonStaging(arch), 'lib', 'python3.12', 'site-packages')
 const pythonSitePackagesStagingWindows = arch =>
   path.join(pythonStaging(arch), 'Lib', 'site-packages')
 const pythonSitePackagesStaging = (platform, arch) =>
@@ -132,7 +124,7 @@ const pythonSitePackagesStaging = (platform, arch) =>
 const executablePython = (platform, arch) =>
   platform === 'win32'
     ? path.join(pythonStaging(arch), 'python.exe')
-    : path.join(pythonStaging(arch), 'bin', 'python3.10')
+    : path.join(pythonStaging(arch), 'bin', 'python3.12')
 
 const PYTHON_DOWNLOAD_BASE = path.join(PYTHON_BASE, 'download')
 const pythonDownloadDestination = (arch, platform) =>

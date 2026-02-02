@@ -4,9 +4,15 @@ import { setupReducer } from './setup'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../../types'
-import type { ProtocolRunState } from '../types'
+import type { CameraState, ProtocolRunState } from '../types'
 
 const INITIAL_STATE: ProtocolRunState = {}
+
+export const INITIAL_CAMERA_STATE: CameraState = {
+  enabled: false,
+  liveStreamEnabled: false,
+  recoveryEnabled: false,
+}
 
 export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
   state = INITIAL_STATE,
@@ -14,7 +20,8 @@ export const protocolRunReducer: Reducer<ProtocolRunState, Action> = (
 ) => {
   switch (action.type) {
     case Constants.UPDATE_RUN_SETUP_STEPS_COMPLETE:
-    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED: {
+    case Constants.UPDATE_RUN_SETUP_STEPS_REQUIRED:
+    case Constants.CAMERA_SETUP_STEP_KEY: {
       const runId = action.payload.runId
       const currentRunState = state[runId]
 

@@ -2,15 +2,14 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Optional
 
+from ..labware import LabwareLoadParams
 from opentrons.hardware_control.modules import ModuleModel as HardwareModuleModel
 from opentrons.protocol_engine import (
-    ProtocolEngine,
     LegacyLabwareOffsetLocation,
     ModuleModel,
+    ProtocolEngine,
 )
 from opentrons.types import DeckSlotName, Point
-
-from ..labware import LabwareLoadParams
 
 
 @dataclass

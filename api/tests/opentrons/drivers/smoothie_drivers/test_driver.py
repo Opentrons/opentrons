@@ -1,21 +1,21 @@
 from copy import deepcopy
 from typing import Dict, cast
 
+import pytest
+from mock import AsyncMock, patch
+
 from opentrons.drivers import utils
 from opentrons.drivers.asyncio.communication import AlarmResponse
-from mock import AsyncMock, patch
-import pytest
-from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
+from opentrons.drivers.command_builder import CommandBuilder
 from opentrons.drivers.rpi_drivers.dev_types import GPIODriverLike
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+from opentrons.drivers.smoothie_drivers import constants, driver_3_0
+from opentrons.drivers.smoothie_drivers.connection import SmoothieConnection
 from opentrons.drivers.smoothie_drivers.constants import (
     HOMED_POSITION,
     Y_BOUND_OVERRIDE,
 )
-from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
-
-from opentrons.drivers.smoothie_drivers import driver_3_0, constants
-from opentrons.drivers.smoothie_drivers.errors import SmoothieError, SmoothieAlarm
-from opentrons.drivers.command_builder import CommandBuilder
+from opentrons.drivers.smoothie_drivers.errors import SmoothieAlarm, SmoothieError
 
 
 @pytest.fixture
@@ -446,8 +446,9 @@ async def test_no_auto_recover_on_alarm(
     await smoothie.hard_halt()
     assert smoothie._is_hard_halting.is_set()
 
-    with patch.object(smoothie, "_send_command_unsynchronized"), patch.object(
-        smoothie, "_reset_from_error"
+    with (
+        patch.object(smoothie, "_send_command_unsynchronized"),
+        patch.object(smoothie, "_reset_from_error"),
     ):
         mocked_send = cast(AsyncMock, smoothie._send_command_unsynchronized)
         mocked_send.side_effect = [SmoothieAlarm("G0", "Alarm: Hard limit -X")]
@@ -460,9 +461,11 @@ async def test_auto_recover_on_error(
     smoothie: driver_3_0.SmoothieDriver, mock_connection: AsyncMock
 ) -> None:
     """Errors do incur recovery."""
-    with patch.object(smoothie, "_send_command_unsynchronized"), patch.object(
-        smoothie, "_reset_from_error"
-    ), patch.object(smoothie, "home"):
+    with (
+        patch.object(smoothie, "_send_command_unsynchronized"),
+        patch.object(smoothie, "_reset_from_error"),
+        patch.object(smoothie, "home"),
+    ):
         mocked_home = cast(AsyncMock, smoothie.home)
         mocked_send = cast(AsyncMock, smoothie._send_command_unsynchronized)
         mocked_send.side_effect = [SmoothieError("G0", "error: Uh oh")]

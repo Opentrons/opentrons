@@ -78,8 +78,8 @@ describe('PlaceItemInstruction', () => {
     vi.mocked(selectLwDisplayName).mockReturnValue(() => mockLwDisplayName)
 
     vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => false)
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      mockLabwareStackup as any
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => mockLabwareStackup as any
     )
     vi.mocked(selectActivePipetteChannelCount).mockImplementation(() => () => 8)
 
@@ -102,8 +102,8 @@ describe('PlaceItemInstruction', () => {
 
   it('should render prepare tip rack instruction in slot location', () => {
     vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => true)
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      mockTipRackStackup as any
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => mockTipRackStackup as any
     )
 
     render()
@@ -120,8 +120,8 @@ describe('PlaceItemInstruction', () => {
   })
 
   it('should show clear deck but modules instruction for non-default offset with a module', () => {
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      mockLabwareWithModuleStackup as any
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => mockLabwareWithModuleStackup as any
     )
 
     render()
@@ -147,8 +147,8 @@ describe('PlaceItemInstruction', () => {
 
   it('should show a place tip rack instruction', () => {
     vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => true)
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      mockTipRackStackup as any
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => mockTipRackStackup as any
     )
     vi.mocked(selectLwDisplayName).mockReturnValue(() => mockTipRackDisplayName)
 
@@ -167,11 +167,11 @@ describe('PlaceItemInstruction', () => {
 
   it('should show inline notification for 96-channel pipette when calibrating a default offset for a tiprack ', () => {
     vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => true)
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      mockTipRackStackup as any
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => mockTipRackStackup as any
     )
-    vi.mocked(selectActivePipetteChannelCount).mockImplementation(() => () =>
-      96
+    vi.mocked(selectActivePipetteChannelCount).mockImplementation(
+      () => () => 96
     )
 
     render()
@@ -183,11 +183,11 @@ describe('PlaceItemInstruction', () => {
 
   it('should show inline notification for 96-channel pipette when calibrating a default offset for a labware', () => {
     vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => false)
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      mockTipRackStackup as any
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => mockTipRackStackup as any
     )
-    vi.mocked(selectActivePipetteChannelCount).mockImplementation(() => () =>
-      96
+    vi.mocked(selectActivePipetteChannelCount).mockImplementation(
+      () => () => 96
     )
 
     render()
@@ -219,11 +219,11 @@ describe('PlaceItemInstruction', () => {
     } as any
 
     vi.mocked(selectIsSelectedLwTipRack).mockImplementation(() => () => true)
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      mockTipRackStackup as any
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => mockTipRackStackup as any
     )
-    vi.mocked(selectActivePipetteChannelCount).mockImplementation(() => () =>
-      96
+    vi.mocked(selectActivePipetteChannelCount).mockImplementation(
+      () => () => 96
     )
     vi.mocked(selectSelectedLwOverview).mockImplementation(() => () => stackUp)
 
@@ -248,8 +248,8 @@ describe('PlaceItemInstruction', () => {
       },
     } as any
 
-    vi.mocked(selectSelectedLwOverview).mockImplementation(() => () =>
-      multiItemStackup
+    vi.mocked(selectSelectedLwOverview).mockImplementation(
+      () => () => multiItemStackup
     )
     vi.mocked(selectLwDisplayName).mockImplementation((runId, uri) => {
       return () =>

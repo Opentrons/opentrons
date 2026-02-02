@@ -6,14 +6,8 @@ const installPython = require('./python-install')
 const path = require('path')
 
 module.exports = function afterPack(context) {
-  const {
-    platform,
-    arch,
-    electronPlatformName,
-    outDir,
-    appOutDir,
-    packager,
-  } = context
+  const { platform, arch, electronPlatformName, outDir, appOutDir, packager } =
+    context
   const archStr = eblib.Arch[arch]
   console.log('after-pack: context', context)
   console.log(

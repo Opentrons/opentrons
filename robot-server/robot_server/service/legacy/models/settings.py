@@ -1,12 +1,11 @@
-from enum import Enum
 import logging
+from typing import Any, Dict, List, Optional, Tuple, Union
 
-from typing import Optional, List, Dict, Any, Union
+from pydantic import BaseModel, Field, create_model, field_validator
 
-from pydantic import field_validator, BaseModel, Field, create_model
-
-from opentrons_shared_data.pipette import model_constants
 from opentrons.config.reset import ResetOptionId
+from opentrons_shared_data.pipette import model_constants
+from opentrons_shared_data.util import StrEnum
 
 
 class AdvancedSetting(BaseModel):
@@ -71,7 +70,7 @@ class AdvancedSettingRequest(BaseModel):
     )
 
 
-class LogLevels(str, Enum):
+class LogLevels(StrEnum):
     _level_id: int
 
     """Valid log levels"""
@@ -120,7 +119,7 @@ class FactoryResetOption(BaseModel):
     )
     name: str = Field(..., description="A short human-readable name for the setting")
     description: str = Field(
-        ..., description="A longer human-readable description of the " "setting"
+        ..., description="A longer human-readable description of the setting"
     )
 
 
@@ -133,7 +132,7 @@ class FactoryResetOptions(BaseModel):
 RobotConfigs = Dict[str, Any]
 
 
-class PipetteSettingsFieldType(str, Enum):
+class PipetteSettingsFieldType(StrEnum):
     """The type of the property"""
 
     float = "float"
@@ -158,7 +157,7 @@ class PipetteSettingsInfo(BaseModel):
 
     name: str = Field(..., description='A pipette name (e.g. "p300_single")')
     model: str = Field(
-        ..., description='The exact pipette model (e.g. "' 'p300_single_v1.5")'
+        ..., description='The exact pipette model (e.g. "p300_single_v1.5")'
     )
 
 
@@ -194,7 +193,6 @@ PipetteSettingsFields.__doc__ = "The fields of the pipette settings"
 
 
 class PipetteSettings(BaseModel):
-
     info: PipetteSettingsInfo
     setting_fields: PipetteSettingsFields = Field(..., alias="fields")  # type: ignore
 
@@ -239,3 +237,105 @@ class PipetteSettingsUpdate(BaseModel):
                 else:
                     raise ValueError(f"{key} is not a valid field or quirk name")
         return v
+
+
+class CameraEnable(BaseModel):
+    """Configuration value for Opentrons Camera and Live Stream enablement.
+    Disabling the Camera also disables the Live Stream and Error Recovery Camera useage.
+    Enabling the Camera retains the existing Live Stream and Error Recovery enablement settings.
+    """
+
+    cameraEnabled: Optional[bool] = Field(
+        ...,
+        description="Enable or disable the general use of the Opentrons Camera.",
+    )
+    liveStreamEnabled: Optional[bool] = Field(
+        ...,
+        description="Enable or disable the Opentrons Live Stream.",
+    )
+    errorRecoveryCameraEnabled: Optional[bool] = Field(
+        ...,
+        description="Enable or disable the Opentrons Camera to record error recovery.",
+    )
+
+
+class CameraCaptureImageSettings(BaseModel):
+    """Parameters for Capture Image to determine filters. These inputs are replacements for the defaults used by the `capture_image` engine command."""
+
+    cameraId: Optional[str] = Field(
+        None,
+        description="Id of the Camera to use in image capture. Defaults to the `ot_system_camera`.",
+    )
+    resolution: Optional[Tuple[int, int]] = Field(
+        None,
+        description="Width by height resolution in pixels for the image to be captured with.",
+    )
+    zoom: Optional[float] = Field(
+        None,
+        description="Multiplier to use when cropping and scaling a captured image. Scale is 1.0 to 2.0.",
+    )
+    pan: Optional[Tuple[int, int]] = Field(
+        None,
+        description="X/Y (pixels) position to pan to for a given zoom. Default is the center of the image.",
+    )
+    contrast: Optional[float] = Field(
+        None,
+        description="The contrast to use when processing an image. Scale is 0% to 100%.",
+    )
+    brightness: Optional[float] = Field(
+        None,
+        description="The brightness to use when processing an image. Scale is 0% to 100%.",
+    )
+    saturation: Optional[float] = Field(
+        None,
+        description="The saturation to use when processing an image. Scale is 0% to 100%.",
+    )
+
+
+class LiveStreamData(BaseModel):
+    """Opentrons Live Stream enablement and URL values."""
+
+    enabled: bool = Field(
+        ..., description="Enable status of the Opentrons Live Stream."
+    )
+    hls: str = Field(..., description="URL for the HLS browser-compatible stream.")
+    rtmp: str = Field(..., description="URL for the RTMP raw stream in FLV format.")
+
+
+class StreamStatusType(StrEnum):
+    """Status types of the Opentrons Live Stream Service.
+
+    * `"ON"`: Start the live stream.
+
+    * `"OFF"`: Stop (cancel) the live stream.
+    """
+
+    OFF = "OFF"
+    ON = "ON"
+
+
+class Resolution(BaseModel):
+    """Resolution width and height data for the Opentrons Live Stream service."""
+
+    width: int = Field(
+        ..., description="Resolution width in pixels of the live stream."
+    )
+    height: int = Field(
+        ..., description="Resolution height in pixels of the live stream."
+    )
+
+
+class LiveStreamSettings(BaseModel):
+    """Configuration values of Opentrons Live Stream service."""
+
+    source: str = Field(
+        ..., description="Source video device for the live stream feed."
+    )
+    resolution: Resolution = Field(
+        ..., description="Video resolution for the live stream."
+    )
+    framerate: int = Field(..., description="Framerate of the live stream.")
+    bitrate_k: int = Field(
+        ...,
+        description="Bitrate in Kbps to use when broadcasting the live stream video over the network.",
+    )

@@ -16,8 +16,7 @@ export interface LoadPipetteCreateCommand extends CommonCommandCreateInfo {
   params: LoadPipetteParams
 }
 export interface LoadPipetteRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    Omit<LoadPipetteCreateCommand, 'params'> {
+  extends CommonCommandRunTimeInfo, Omit<LoadPipetteCreateCommand, 'params'> {
   params: LoadPipetteParams & {
     pipetteName: PipetteName
   }
@@ -28,8 +27,7 @@ export interface LoadLabwareCreateCommand extends CommonCommandCreateInfo {
   params: LoadLabwareParams
 }
 export interface LoadLabwareRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLabwareCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLabwareCreateCommand {
   result?: LoadLabwareResult
 }
 export interface LoadLidCreateCommand extends CommonCommandCreateInfo {
@@ -37,8 +35,7 @@ export interface LoadLidCreateCommand extends CommonCommandCreateInfo {
   params: LoadLidParams
 }
 export interface LoadLidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLidCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLidCreateCommand {
   result?: LoadLidResult
 }
 export interface LoadLidStackCreateCommand extends CommonCommandCreateInfo {
@@ -46,8 +43,7 @@ export interface LoadLidStackCreateCommand extends CommonCommandCreateInfo {
   params: LoadLidStackParams
 }
 export interface LoadLidStackRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLidStackCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLidStackCreateCommand {
   result?: LoadLidStackResult
 }
 export interface ReloadLabwareCreateCommand extends CommonCommandCreateInfo {
@@ -55,8 +51,7 @@ export interface ReloadLabwareCreateCommand extends CommonCommandCreateInfo {
   params: { labwareId: string }
 }
 export interface ReloadLabwareRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    ReloadLabwareCreateCommand {
+  extends CommonCommandRunTimeInfo, ReloadLabwareCreateCommand {
   result?: ReloadLabwareResult
 }
 export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
@@ -64,8 +59,7 @@ export interface MoveLabwareCreateCommand extends CommonCommandCreateInfo {
   params: MoveLabwareParams
 }
 export interface MoveLabwareRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    MoveLabwareCreateCommand {
+  extends CommonCommandRunTimeInfo, MoveLabwareCreateCommand {
   result?: MoveLabwareResult
 }
 export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
@@ -73,8 +67,7 @@ export interface LoadModuleCreateCommand extends CommonCommandCreateInfo {
   params: LoadModuleParams
 }
 export interface LoadModuleRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    Omit<LoadModuleCreateCommand, 'params'> {
+  extends CommonCommandRunTimeInfo, Omit<LoadModuleCreateCommand, 'params'> {
   params: LoadModuleParams & {
     model: ModuleModel
   }
@@ -85,8 +78,7 @@ export interface LoadLiquidCreateCommand extends CommonCommandCreateInfo {
   params: LoadLiquidParams
 }
 export interface LoadLiquidRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLiquidCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLiquidCreateCommand {
   result?: LoadLiquidResult
 }
 
@@ -95,20 +87,17 @@ export interface LoadLiquidClassCreateCommand extends CommonCommandCreateInfo {
   params: LoadLiquidClassParams
 }
 export interface LoadLiquidClassRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    LoadLiquidClassCreateCommand {
+  extends CommonCommandRunTimeInfo, LoadLiquidClassCreateCommand {
   result?: LoadLiquidClassResult
 }
 
-export interface ConfigureNozzleLayoutCreateCommand
-  extends CommonCommandCreateInfo {
+export interface ConfigureNozzleLayoutCreateCommand extends CommonCommandCreateInfo {
   commandType: 'configureNozzleLayout'
   params: ConfigureNozzleLayoutParams
 }
 
 export interface ConfigureNozzleLayoutRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    ConfigureNozzleLayoutCreateCommand {
+  extends CommonCommandRunTimeInfo, ConfigureNozzleLayoutCreateCommand {
   result?: {}
 }
 
@@ -118,8 +107,7 @@ export interface SetTipStateCreateCommand extends CommonCommandCreateInfo {
 }
 
 export interface SetTipStateRunTimeCommand
-  extends CommonCommandRunTimeInfo,
-    SetTipStateCreateCommand {
+  extends CommonCommandRunTimeInfo, SetTipStateCreateCommand {
   result?: {}
 }
 
@@ -152,6 +140,7 @@ export type SetupCreateCommand =
 export type LabwareLocation =
   | 'offDeck'
   | 'systemLocation'
+  | 'wasteChuteLocation'
   | { slotName: string }
   | { moduleId: string }
   | { labwareId: string }
@@ -198,7 +187,7 @@ export interface OnAddressableAreaLocationSequenceComponent {
 
 export interface NotOnDeckLocationSequenceComponent {
   kind: 'notOnDeck'
-  logicalLocationName: 'offDeck' | 'systemLocation'
+  logicalLocationName: 'offDeck' | 'systemLocation' | 'wasteChuteLocation'
 }
 
 export interface OnCutoutFixtureLocationSequenceComponent {

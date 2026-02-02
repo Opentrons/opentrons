@@ -4,14 +4,17 @@ from contextlib import contextmanager
 from typing import Any, Callable, Iterator, Optional, TypeVar, cast
 from uuid import uuid4
 
-from opentrons.legacy_broker import LegacyBroker
-
 from .types import (
     COMMAND as COMMAND_TOPIC,
+)
+from .types import (
     Command as CommandPayload,
+)
+from .types import (
     CommandMessage,
     MessageSequenceId,
 )
+from opentrons.legacy_broker import LegacyBroker
 
 
 class CommandPublisher:
@@ -59,9 +62,9 @@ def publish(command: CommandPayloadCreator) -> Callable[[FuncT], FuncT]:
 
             broker = getattr(args[0], "broker", None)
 
-            assert isinstance(
-                broker, LegacyBroker
-            ), "Only methods of CommandPublisher classes should be decorated."
+            assert isinstance(broker, LegacyBroker), (
+                "Only methods of CommandPublisher classes should be decorated."
+            )
 
             func_sig = _inspect_signature(func)
             bound_func_args = func_sig.bind(*args, **kwargs)

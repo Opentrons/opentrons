@@ -1,5 +1,8 @@
 {
   "commandAnnotations": [],
+  "commandPreconditions": {
+    "isCameraUsed": false
+  },
   "commands": [
     {
       "commandType": "home",
@@ -36097,7 +36100,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -36154,7 +36157,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -36549,7 +36552,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -36876,7 +36879,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -39549,7 +39552,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -40052,7 +40055,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -40398,7 +40401,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -40808,7 +40811,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -41258,7 +41261,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -41697,7 +41700,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -42014,7 +42017,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -42545,7 +42548,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -42877,7 +42880,7 @@
         "eventualDestinationLocationSequence": [
           {
             "kind": "notOnDeck",
-            "logicalLocationName": "offDeck"
+            "logicalLocationName": "wasteChuteLocation"
           }
         ],
         "immediateDestinationLocationSequence": [
@@ -43311,14 +43314,14 @@
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (1)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (2)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/nest_96_wellplate_2ml_deep/2",
@@ -43350,14 +43353,14 @@
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (4)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (5)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
@@ -43373,63 +43376,63 @@
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (7)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (8)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (9)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (10)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (11)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (12)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (13)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (14)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",
       "displayName": "Opentrons Flex 96 Tip Rack 1000 µL (15)",
       "id": "UUID",
       "loadName": "opentrons_flex_96_tiprack_1000ul",
-      "location": "offDeck"
+      "location": "wasteChuteLocation"
     },
     {
       "definitionUri": "opentrons/opentrons_flex_96_tiprack_1000ul/1",

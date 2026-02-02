@@ -2,8 +2,10 @@ import { useSelector } from 'react-redux'
 
 import { Module } from '@opentrons/components'
 import {
-  getAllLabwareDefs,
+  FLEX_STACKER_MODULE_TYPE,
+  getAllDefinitions,
   getModuleDef,
+  getModuleType,
   inferModuleOrientationFromXCoordinate,
 } from '@opentrons/shared-data'
 import { getSlotInLocationStack } from '@opentrons/step-generation'
@@ -27,9 +29,10 @@ interface SelectedItemsProps {
   deckDef: DeckDefinition
   robotType: RobotType
   slotPosition: CoordinateTuple | null
+  isSlotAHopper: boolean
 }
 export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
-  const { deckDef, robotType, slotPosition } = props
+  const { deckDef, robotType, slotPosition, isSlotAHopper } = props
   const selectedSlotInfo = useSelector(selectors.getZoomedInSlotInfo)
   const {
     selectedSlot,
@@ -40,7 +43,7 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
     selectedLidLabware,
   } = selectedSlotInfo
   const customLabwareDefs = useSelector(getCustomLabwareDefsByURI)
-  const defs = getAllLabwareDefs()
+  const defs = getAllDefinitions()
   const deckSetup = useSelector(getInitialDeckSetup)
   const { labware } = deckSetup
   const matchingSelectedTopLabwareOnDeck = Object.values(labware).find(
@@ -52,7 +55,6 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
       )
     }
   )
-
   const matchingSelectedLidOnDeck = Object.values(labware).find(
     ({ stack, labwareDefURI }) => {
       const matchingSlot = getSlotInLocationStack(stack)
@@ -64,12 +66,13 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
   )
   const selectedAdapterDef =
     selectedAdapterDefURI != null
-      ? defs[selectedAdapterDefURI] ?? customLabwareDefs[selectedAdapterDefURI]
+      ? (defs[selectedAdapterDefURI] ??
+        customLabwareDefs[selectedAdapterDefURI])
       : null
   const selectedTopLabwareDef =
     selectedTopLabware.labwareDefURI != null
-      ? defs[selectedTopLabware.labwareDefURI] ??
-        customLabwareDefs[selectedTopLabware.labwareDefURI]
+      ? (defs[selectedTopLabware.labwareDefURI] ??
+        customLabwareDefs[selectedTopLabware.labwareDefURI])
       : null
 
   const orientation =
@@ -123,24 +126,34 @@ export const SelectedItems = (props: SelectedItemsProps): JSX.Element => {
           quite right, most obviously for the Thermocycler on a Flex. We aren't
           passing a targetSlotId and targetDeckId down to <Module>, which means
           it isn't applying slot-specific adjustments.
+
+          note: we need to special-case labware on the hopper since it is the 2nd slot
+          available for labware on the stacker. so we don't want to re-render the stacker
+          in the hopper slot
           */}
-          <Module
-            key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
-            x={slotPosition[0]}
-            y={slotPosition[1]}
-            def={getModuleDef(selectedModuleModel)}
-            orientation={orientation}
-            targetDeckId={null}
-            targetSlotId={null}
-            childrenPositioningMode="offsetToSlot"
-          >
-            <SelectedModuleLabwareRender
-              topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
-              adapterDef={selectedAdapterDef}
-              moduleModel={selectedModuleModel}
-              lidOnDeck={matchingSelectedLidOnDeck}
-            />
-          </Module>
+          {isSlotAHopper ? null : (
+            <Module
+              key={`${selectedModuleModel}_${selectedSlot.slot}_selected`}
+              x={slotPosition[0]}
+              y={slotPosition[1]}
+              def={getModuleDef(selectedModuleModel)}
+              orientation={orientation}
+              targetDeckId={null}
+              targetSlotId={null}
+              childrenPositioningMode={
+                getModuleType(selectedModuleModel) === FLEX_STACKER_MODULE_TYPE
+                  ? 'passThrough'
+                  : 'offsetToSlot'
+              }
+            >
+              <SelectedModuleLabwareRender
+                topLabwareOnDeck={matchingSelectedTopLabwareOnDeck}
+                adapterDef={selectedAdapterDef}
+                moduleModel={selectedModuleModel}
+                lidOnDeck={matchingSelectedLidOnDeck}
+              />
+            </Module>
+          )}
           {selectedModuleModel != null ? (
             <ModuleLabel
               isLast={selectedAdapterDefURI == null}

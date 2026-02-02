@@ -1,5 +1,6 @@
 import upperCase from 'lodash/upperCase'
 
+import { getIsTiprack } from '@opentrons/shared-data'
 import {
   consolidate,
   distribute,
@@ -39,6 +40,7 @@ export function quickTransferStepCommands(
     trashBinEntities,
     wasteChuteEntities,
     pipetteEntities,
+    labwareEntities,
   } = invariantContext
   const pipettePythonName = Object.values(pipetteEntities)[0].pythonName
   let nonLoadCommandCreator: CommandCreatorResult | null = null
@@ -64,16 +66,27 @@ export function quickTransferStepCommands(
 
   const nonLoadCommands =
     nonLoadCommandCreator != null && 'python' in nonLoadCommandCreator
-      ? nonLoadCommandCreator.python ?? []
+      ? (nonLoadCommandCreator.python ?? [])
       : []
 
   let finalDropTipCommand = ''
 
-  if (Object.values(trashBinEntities).length > 0) {
-    finalDropTipCommand = `${pipettePythonName}.drop_tip()`
-  } else if (Object.values(wasteChuteEntities).length > 0) {
-    const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
-    finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+  const dropTipLocation = stepArgs?.dropTipLocation
+  const matchingDropTipLabwareEntity = Object.values(labwareEntities).find(
+    ({ labwareDefURI }) => labwareDefURI === dropTipLocation
+  )
+  const isReturnTip =
+    matchingDropTipLabwareEntity != null &&
+    getIsTiprack(matchingDropTipLabwareEntity.def)
+
+  // if the drop tip location is not a tip rack, a protocol needs to add a drop tip command
+  if (!isReturnTip) {
+    if (Object.values(trashBinEntities).length > 0) {
+      finalDropTipCommand = `${pipettePythonName}.drop_tip()`
+    } else if (Object.values(wasteChuteEntities).length > 0) {
+      const wasteChuteEntity = Object.values(wasteChuteEntities)[0]
+      finalDropTipCommand = `${pipettePythonName}.drop_tip(${wasteChuteEntity.pythonName})`
+    }
   }
 
   return (
@@ -88,11 +101,8 @@ export function pythonDef(
   quickTransferState: QuickTransferSummaryState,
   deckConfig: DeckConfiguration
 ): string {
-  const {
-    stepArgs,
-    invariantContext,
-    initialRobotState,
-  } = generateQuickTransferArgs(quickTransferState, deckConfig)
+  const { stepArgs, invariantContext, initialRobotState } =
+    generateQuickTransferArgs(quickTransferState, deckConfig)
   const {
     moduleEntities,
     labwareEntities,
@@ -100,10 +110,10 @@ export function pythonDef(
     wasteChuteEntities,
     trashBinEntities,
   } = invariantContext
-  const { labware, pipettes } = initialRobotState
+  const { modules, labware, pipettes } = initialRobotState
   const sections: string[] = [
     getLoadAdapters(moduleEntities, labwareEntities, labware),
-    getLoadLabware(moduleEntities, labwareEntities, labware, {}),
+    getLoadLabware(modules, moduleEntities, labwareEntities, labware, {}),
     getLoadPipettes(pipetteEntities, pipettes),
     ...[
       getLoadTrashBins(trashBinEntities),

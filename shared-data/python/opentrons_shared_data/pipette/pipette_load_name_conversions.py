@@ -1,22 +1,23 @@
 import re
 from functools import lru_cache
-from typing import List, Optional, Union, cast, Literal, Tuple
-from opentrons_shared_data import get_shared_data_root
-from .types import PipetteModel, PipetteName
+from typing import List, Literal, Optional, Tuple, Union, cast
 
+from .pipette_definition import (
+    PipetteModelVersionType,
+    PipetteNameType,
+)
 from .types import (
     PipetteChannelType,
-    PipetteModelType,
-    PipetteVersionType,
     PipetteGenerationType,
+    PipetteModel,
     PipetteModelMajorVersionType,
     PipetteModelMinorVersionType,
+    PipetteModelType,
+    PipetteName,
     PipetteOEMType,
+    PipetteVersionType,
 )
-from .pipette_definition import (
-    PipetteNameType,
-    PipetteModelVersionType,
-)
+from opentrons_shared_data import get_shared_data_root
 
 DEFAULT_CALIBRATION_OFFSET = [0.0, 0.0, 0.0]
 DEFAULT_MODEL = PipetteModelType.p1000
@@ -211,7 +212,7 @@ def generation_from_string(pipette_name_list: List[str]) -> PipetteGenerationTyp
 
 
 def convert_to_pipette_name_type(
-    model_or_name: Union[PipetteName, PipetteModel]
+    model_or_name: Union[PipetteName, PipetteModel],
 ) -> PipetteNameType:
     """Convert the py:data:PipetteName to a py:obj:PipetteModelVersionType.
 

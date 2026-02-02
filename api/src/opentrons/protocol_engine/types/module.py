@@ -1,36 +1,39 @@
 """Protocol engine types to do with modules."""
 
 from __future__ import annotations
+
 from dataclasses import dataclass
 from enum import Enum
 from typing import (
-    TypeGuard,
-    Literal,
-    Optional,
-    List,
-    Dict,
     Any,
+    Dict,
+    List,
+    Literal,
     NamedTuple,
+    Optional,
+    TypeGuard,
 )
 
 from pydantic import BaseModel, Field
 from pydantic.json_schema import SkipJsonSchema
 
-from opentrons_shared_data.labware.labware_definition import LabwareDefinition, Extents
+from opentrons_shared_data.labware.labware_definition import Extents, LabwareDefinition
 from opentrons_shared_data.labware.types import LocatingFeatures
+from opentrons_shared_data.util import StrEnum
 
+from .labware_movement import LabwareMovementOffsetData
+from .labware_offset_vector import LabwareOffsetVector
+from .location import DeckSlotLocation
 from opentrons.hardware_control.modules import (
-    ModuleType as ModuleType,
     ModuleModel as HardwareModuleModel,
 )
-
-from .location import DeckSlotLocation
-from .labware_offset_vector import LabwareOffsetVector
-from .labware_movement import LabwareMovementOffsetData
+from opentrons.hardware_control.modules import (
+    ModuleType as ModuleType,
+)
 
 
 # TODO(mc, 2022-01-18): use opentrons_shared_data.module.types.ModuleModel
-class ModuleModel(str, Enum):
+class ModuleModel(StrEnum):
     """All available modules' models."""
 
     TEMPERATURE_MODULE_V1 = "temperatureModuleV1"
@@ -43,6 +46,7 @@ class ModuleModel(str, Enum):
     MAGNETIC_BLOCK_V1 = "magneticBlockV1"
     ABSORBANCE_READER_V1 = "absorbanceReaderV1"
     FLEX_STACKER_MODULE_V1 = "flexStackerModuleV1"
+    VACUUM_MODULE_V1 = "vacuumModuleMilliporeV1"
 
     @classmethod
     def from_hardware(cls, hardware_model: HardwareModuleModel) -> "ModuleModel":
@@ -65,6 +69,8 @@ class ModuleModel(str, Enum):
             return ModuleType.ABSORBANCE_READER
         elif ModuleModel.is_flex_stacker(self):
             return ModuleType.FLEX_STACKER
+        elif ModuleModel.is_vacuum_module(self):
+            return ModuleType.VACUUM_MODULE
 
         assert False, f"Invalid ModuleModel {self}"
 
@@ -113,6 +119,11 @@ class ModuleModel(str, Enum):
         """Whether a given model is a Flex Stacker.."""
         return model == cls.FLEX_STACKER_MODULE_V1
 
+    @classmethod
+    def is_vacuum_module(cls, model: ModuleModel) -> TypeGuard[VacuumModuleModel]:
+        """Whether a given model is a Vacuum Module."""
+        return model == cls.VACUUM_MODULE_V1
+
 
 TemperatureModuleModel = Literal[
     ModuleModel.TEMPERATURE_MODULE_V1, ModuleModel.TEMPERATURE_MODULE_V2
@@ -127,6 +138,7 @@ HeaterShakerModuleModel = Literal[ModuleModel.HEATER_SHAKER_MODULE_V1]
 MagneticBlockModel = Literal[ModuleModel.MAGNETIC_BLOCK_V1]
 AbsorbanceReaderModel = Literal[ModuleModel.ABSORBANCE_READER_V1]
 FlexStackerModuleModel = Literal[ModuleModel.FLEX_STACKER_MODULE_V1]
+VacuumModuleModel = Literal[ModuleModel.VACUUM_MODULE_V1]
 
 
 class ModuleDimensions(BaseModel):
@@ -279,14 +291,14 @@ class ModuleOffsetData:
     location: DeckSlotLocation
 
 
-class StackerFillEmptyStrategy(str, Enum):
+class StackerFillEmptyStrategy(StrEnum):
     """Strategy to use for filling or emptying a stacker."""
 
     MANUAL_WITH_PAUSE = "manualWithPause"
     LOGICAL = "logical"
 
 
-class StackerLabwareMovementStrategy(str, Enum):
+class StackerLabwareMovementStrategy(StrEnum):
     """Strategy to retrieve or store labware."""
 
     AUTOMATIC = "automatic"
@@ -303,14 +315,14 @@ class StackerStoredLabwareGroup(BaseModel):
 
 @dataclass
 class StackerPoolDefinition:
-    """Represents an internal configuraiton of stored labware."""
+    """Represents an internal configuration of stored labware."""
 
     primaryLabwareDefinition: LabwareDefinition
     adapterLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
     lidLabwareDefinition: LabwareDefinition | SkipJsonSchema[None] = None
 
 
-class IdentifyColor(str, Enum):
+class IdentifyColor(StrEnum):
     """Module identify color."""
 
     WHITE = "white"

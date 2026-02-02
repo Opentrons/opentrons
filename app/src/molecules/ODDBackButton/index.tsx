@@ -26,7 +26,7 @@ export function ODDBackButton(
           width="3rem"
         />
       </Btn>
-      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {label}
       </LegacyStyledText>
     </Flex>

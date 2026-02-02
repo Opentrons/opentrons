@@ -2,7 +2,9 @@ import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueryClient } from 'react-query'
 import { useDispatch } from 'react-redux'
+import { captureException } from '@sentry/electron/renderer'
 import difference from 'lodash/difference'
+import { v4 as uuidv4 } from 'uuid'
 
 import { getProtocol } from '@opentrons/api-client'
 import {
@@ -49,9 +51,10 @@ const SUBSYSTEM_UPDATE_POLL = 5000
 
 export function useSoftwareUpdatePoll(): void {
   const dispatch = useDispatch<Dispatch>()
-  const checkAppUpdate = useCallback(() => dispatch(checkShellUpdate()), [
-    dispatch,
-  ])
+  const checkAppUpdate = useCallback(
+    () => dispatch(checkShellUpdate()),
+    [dispatch]
+  )
   useInterval(checkAppUpdate, UPDATE_RECHECK_INTERVAL_MS)
 }
 
@@ -145,7 +148,8 @@ const MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP: ModuleType[] = [
   FLEX_STACKER_MODULE_TYPE,
 ]
 
-const MODULES_NOT_REQUIRING_CALIBRATION = MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP
+const MODULES_NOT_REQUIRING_CALIBRATION =
+  MODULES_NOT_REQUIRING_PIPETTE_FOR_SETUP
 
 export function useGetModulesNeedingSetup(): AttachedModule[] {
   const attachedModules =
@@ -185,14 +189,14 @@ export function useGetModulesNeedingSetupThatCanCurrentlyBeSetUp(): AttachedModu
 export function useModuleAttachedToast(
   launchModuleSetupCallback: (open: boolean) => void
 ): void {
-  const currentlySetuppableModules = useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
+  const currentlySetuppableModules =
+    useGetModulesNeedingSetupThatCanCurrentlyBeSetUp()
 
   const currentRunId = useCurrentRunId({ refetchInterval: CURRENT_RUN_POLL })
-  const {
-    data: currentSubsystemsUpdatesData,
-  } = useCurrentAllSubsystemUpdatesQuery({
-    refetchInterval: SUBSYSTEM_UPDATE_POLL,
-  })
+  const { data: currentSubsystemsUpdatesData } =
+    useCurrentAllSubsystemUpdatesQuery({
+      refetchInterval: SUBSYSTEM_UPDATE_POLL,
+    })
   const ongoingSubsystemUpdate = currentSubsystemsUpdatesData?.data.find(
     update =>
       update.updateStatus === 'queued' || update.updateStatus === 'updating'
@@ -305,4 +309,15 @@ export function useWindowType(): WindowType {
   }, [])
 
   return windowType
+}
+
+// Report an error to sentry if it falls to an error boundary.
+export function useSentryReport(error: any): void {
+  const errorId = uuidv4()
+
+  useEffect(() => {
+    if (error != null) {
+      captureException(error, { extra: { errorId }, level: 'error' })
+    }
+  }, [error, errorId])
 }

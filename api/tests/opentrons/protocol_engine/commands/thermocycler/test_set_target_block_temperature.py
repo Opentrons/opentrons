@@ -1,22 +1,22 @@
 """Test Thermocycler set block temperature command implementation."""
+
 from decoy import Decoy, matchers
 
 from opentrons.hardware_control.modules import Thermocycler
-
-from opentrons.protocol_engine.state.state import StateView
-from opentrons.protocol_engine.state.module_substates import (
-    ThermocyclerModuleSubState,
-    ThermocyclerModuleId,
-)
-from opentrons.protocol_engine.resources import ModelUtils
-from opentrons.protocol_engine.actions import ActionDispatcher, Action, StartTaskAction
-from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
+from opentrons.protocol_engine.actions import Action, ActionDispatcher, StartTaskAction
 from opentrons.protocol_engine.commands import thermocycler as tc_commands
 from opentrons.protocol_engine.commands.command import SuccessData
 from opentrons.protocol_engine.commands.thermocycler.set_target_block_temperature import (
     SetTargetBlockTemperatureImpl,
     SetTargetBlockTemperatureResult,
 )
+from opentrons.protocol_engine.execution import EquipmentHandler, TaskHandler
+from opentrons.protocol_engine.resources import ModelUtils
+from opentrons.protocol_engine.state.module_substates import (
+    ThermocyclerModuleId,
+    ThermocyclerModuleSubState,
+)
+from opentrons.protocol_engine.state.state import StateView
 from opentrons.protocol_engine.types.tasks import Task
 
 
@@ -50,10 +50,10 @@ async def test_set_target_block_temperature(
     decoy.when(
         state_view.modules.get_thermocycler_module_substate("input-thermocycler-id")
     ).then_return(tc_module_substate)
-    decoy.when(model_utils.ensure_id("taskId")).then_return("taskId")
     decoy.when(tc_module_substate.module_id).then_return(
         ThermocyclerModuleId("thermocycler-id")
     )
+    decoy.when(model_utils.ensure_id("taskId")).then_return("taskId")
 
     # Stub temperature validation from TC module view
     decoy.when(tc_module_substate.validate_target_block_temperature(12.3)).then_return(
@@ -78,7 +78,7 @@ async def test_set_target_block_temperature(
         task = action.task
 
     decoy.when(
-        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))
+        action_dispatcher.dispatch(StartTaskAction(task=matchers.Anything()))  # type: ignore[func-returns-value]
     ).then_do(_capture_task)
 
     result = await subject.execute(data)
@@ -88,8 +88,8 @@ async def test_set_target_block_temperature(
     decoy.verify(
         await tc_hardware.set_target_block_temperature(
             celsius=45.6,
-            volume=77.6,
             hold_time_seconds=654321,
+            volume=77.6,
             ramp_rate=None,
         ),
     )

@@ -1,16 +1,16 @@
 import asyncio
 from typing import AsyncGenerator
 
-from decoy import Decoy
 import pytest
+from decoy import Decoy
 
+from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.hardware_control import ExecutionManager, modules
+from opentrons.hardware_control.modules.tempdeck import TempDeck
 from opentrons.hardware_control.modules.types import (
     ModuleDisconnectedCallback,
     ModuleErrorCallback,
 )
-from opentrons.drivers.rpi_drivers.types import USBPort
-from opentrons.hardware_control import modules, ExecutionManager
-from opentrons.hardware_control.modules.tempdeck import TempDeck
 
 
 @pytest.fixture

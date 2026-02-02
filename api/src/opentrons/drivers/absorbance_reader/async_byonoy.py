@@ -3,24 +3,25 @@ import os
 import re
 from concurrent.futures.thread import ThreadPoolExecutor
 from functools import partial
-from typing import Any, Optional, List, Dict, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from .hid_protocol import (
     AbsorbanceHidInterface as AbsProtocol,
-    ErrorCodeNames,
-    DeviceStateNames,
-    SlotStateNames,
-    MeasurementConfig,
 )
-from opentrons.drivers.types import (
-    AbsorbanceReaderLidStatus,
-    AbsorbanceReaderPlatePresence,
-    AbsorbanceReaderDeviceState,
-    ABSMeasurementMode,
+from .hid_protocol import (
+    DeviceStateNames,
+    ErrorCodeNames,
+    MeasurementConfig,
+    SlotStateNames,
 )
 from opentrons.drivers.rpi_drivers.types import USBPort
+from opentrons.drivers.types import (
+    ABSMeasurementMode,
+    AbsorbanceReaderDeviceState,
+    AbsorbanceReaderLidStatus,
+    AbsorbanceReaderPlatePresence,
+)
 from opentrons.hardware_control.modules.errors import AbsorbanceReaderDisconnectedError
-
 
 SN_PARSER = re.compile(r'ATTRS{serial}=="(?P<serial>.+?)"')
 # match semver V0.0.0 (old format) or one integer (latest format)
@@ -227,9 +228,9 @@ class AsyncByonoy:
     async def get_measurement(self) -> List[List[float]]:
         """Gets one or more measurements based on the current configuration."""
         handle = self._verify_device_handle()
-        assert (
-            self._current_config is not None
-        ), "Cannot get measurement without initializing."
+        assert self._current_config is not None, (
+            "Cannot get measurement without initializing."
+        )
         measure_func: Any = self._interface.abs96_single_measure
         if isinstance(self._current_config, AbsProtocol.MultiMeasurementConfig):
             measure_func = self._interface.abs96_multiple_measure
@@ -242,7 +243,7 @@ class AsyncByonoy:
             ),
         )
         self._raise_if_error(err.name, f"Error getting measurement: {err}")
-        return measurements if isinstance(measurements[0], List) else [measurements]  # type: ignore
+        return measurements if isinstance(measurements[0], List) else [measurements]
 
     async def get_plate_presence(self) -> AbsorbanceReaderPlatePresence:
         """Get the state of the plate for the reader."""

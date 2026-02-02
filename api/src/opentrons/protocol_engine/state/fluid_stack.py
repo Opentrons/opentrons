@@ -6,8 +6,11 @@ you want air gaps in different places - physically-below liquid to prevent dripp
 extra room to push the plunger - we need to support some notion of at least phsyical ordinal position of air and liquid,
 and we do so as a logical stack because that's physically relevant.
 """
+
 from logging import getLogger
+
 from numpy import isclose
+
 from ..types import AspiratedFluid, FluidKind
 
 _LOG = getLogger(__name__)
@@ -131,7 +134,7 @@ class FluidStack:
         """String representation of a fluid stack."""
         if self._fluid_stack:
             stringified_stack = (
-                f'(top) {", ".join([str(item) for item in self._fluid_stack])} (bottom)'
+                f"(top) {', '.join([str(item) for item in self._fluid_stack])} (bottom)"
             )
         else:
             stringified_stack = "empty"

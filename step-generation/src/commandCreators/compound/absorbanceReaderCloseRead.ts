@@ -10,11 +10,9 @@ import type {
   CurriedCommandCreator,
 } from '../../types'
 
-export const absorbanceReaderCloseRead: CommandCreator<AbsorbanceReaderReadArgs> = (
-  args,
-  invariantContext,
-  prevRobotState
-) => {
+export const absorbanceReaderCloseRead: CommandCreator<
+  AbsorbanceReaderReadArgs
+> = (args, invariantContext, prevRobotState) => {
   const errors: CommandCreatorError[] = []
   const absorbanceReaderState = absorbanceReaderStateGetter(
     prevRobotState,

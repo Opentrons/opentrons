@@ -1,18 +1,19 @@
 # TODO(mc, 2021-05-10): delete this file; these models have been moved to
 # robot_server/errors/error_responses.py and robot_server/errors/global_errors.py
 # Note: (2024-07-18): this file does not actually seem to be safe to delete
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import Any, Dict, Optional, Sequence, Tuple
+from typing import Any, Dict, Optional, Sequence, Tuple, Type, TypeVar
+
 from starlette import status as status_codes
 
 from opentrons_shared_data.errors import ErrorCodes
 
 from robot_server.errors.error_responses import (
     ApiError,
-    ErrorSource,
-    ErrorDetails,
     ErrorBody,
+    ErrorDetails,
+    ErrorSource,
 )
 from robot_server.service.json_api import ResourceLinks
 
@@ -25,9 +26,16 @@ class ErrorCreateDef:
     error_code: str
 
 
+_ED = TypeVar("_ED", bound="ErrorDef")
+
+
 class ErrorDef(ErrorCreateDef, Enum):
-    """An enumeration of ErrorCreateDef Error definitions for use by
-    RobotServerError"""
+    """An enumeration of ErrorCreateDef Error definitions for use by RobotServerError."""
+
+    def __new__(cls: Type[_ED], dc_inst: ErrorCreateDef) -> _ED:
+        obj = object.__new__(cls)
+        obj._value_ = type(dc_inst)(**asdict(dc_inst))
+        return obj
 
     def __init__(self, e: Any) -> None:
         super().__init__(**(asdict(e)))
@@ -49,7 +57,7 @@ class RobotServerError(ApiError):
         meta: Optional[Dict[str, Any]] = None,
         wrapping: Optional[Sequence[BaseException]] = None,
         *fmt_args: object,
-        **fmt_kw_args: object
+        **fmt_kw_args: object,
     ) -> None:
         """
         Constructor.

@@ -3,6 +3,7 @@ import {
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getModuleType,
+  getSlotDisplayNameFromAAWithFakes,
   THERMOCYCLER_V2_REAR_FIXTURE,
 } from '@opentrons/shared-data'
 
@@ -111,20 +112,17 @@ export const updateInitialDeckState = (
       matchingFixture != null &&
       matchingFixture.name === 'stagingArea' &&
       fourthColumnSlot != null
-        ? Object.values(labwareOnDeck).find(labware =>
+        ? (Object.values(labwareOnDeck).find(labware =>
             labware.stack.includes(fourthColumnSlot)
-          ) ?? null
+          ) ?? null)
         : null
-    const {
-      moduleId,
-      fixtureIds,
-      fourthColumnSlotLabwareId,
-    } = getHardwareInSlotInUse(
-      savedSteps,
-      matching4thColumnLabware,
-      matchingModule,
-      matchingFixture != null ? [matchingFixture] : undefined
-    )
+    const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
+      getHardwareInSlotInUse(
+        savedSteps,
+        matching4thColumnLabware,
+        matchingModule,
+        matchingFixture != null ? [matchingFixture] : undefined
+      )
 
     //  updating fixtures only
     if (fixtureName != null) {
@@ -193,7 +191,7 @@ export const updateInitialDeckState = (
                 value.cutoutId
               )
             : null
-        const slot = value.cutoutId.split('cutout')[1]
+        const slot = getSlotDisplayNameFromAAWithFakes(value.addressableAreaId)
         //   creating module
         if (labwareNotCompatible == null && model != null && type != null) {
           dispatch(

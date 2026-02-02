@@ -1,38 +1,37 @@
 """A very simple script to run a move group and wait for it to complete."""
+
 import argparse
 import asyncio
 import logging
-from numpy import float64
 from logging.config import dictConfig
-from typing import Iterator, List, Any, Dict
+from typing import Any, Dict, Iterator, List
 
-from opentrons_hardware.drivers.can_bus import build, CanMessenger
-from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
+from numpy import float64
+
+import opentrons_hardware.sensors.types as sensor_types
+from opentrons_hardware.drivers.can_bus import CanMessenger, build
+from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
 from opentrons_hardware.firmware_bindings.constants import (
     NodeId,
-    SensorType,
     SensorId,
     SensorThresholdMode,
+    SensorType,
 )
-from opentrons_hardware.firmware_bindings.arbitration_id import ArbitrationId
-from opentrons_hardware.hardware_control.network import NetworkInfo
-import opentrons_hardware.sensors.types as sensor_types
-
 from opentrons_hardware.firmware_bindings.messages import (
-    message_definitions,
-    payloads,
     MessageDefinition,
     fields,
+    message_definitions,
+    payloads,
 )
-
+from opentrons_hardware.firmware_bindings.utils.binary_serializable import Int32Field
 from opentrons_hardware.hardware_control.motion import (
     MoveStopCondition,
     create_home_step,
     create_step,
 )
 from opentrons_hardware.hardware_control.move_group_runner import MoveGroupRunner
+from opentrons_hardware.hardware_control.network import NetworkInfo
 from opentrons_hardware.scripts.can_args import add_can_args, build_settings
-
 
 log = logging.getLogger(__name__)
 

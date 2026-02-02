@@ -93,7 +93,7 @@ export function MoveLabwareInterventionContent({
   )?.definitionUri
   const movedLabwareDef =
     movedLabwareDefUri != null
-      ? labwareDefsByUri?.[movedLabwareDefUri] ?? null
+      ? (labwareDefsByUri?.[movedLabwareDefUri] ?? null)
       : null
   if (oldLabwareLocation == null || movedLabwareDef == null) return null
   const oldDisplayLabwareLocation = getLabwareDisplayLocation({

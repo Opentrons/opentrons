@@ -5,42 +5,38 @@ Try to add new tests to test_command_state.py, where they can be tested together
 treating CommandState as a private implementation detail.
 """
 
-from decoy import matchers
-import pytest
 from datetime import datetime
 from typing import Any
 
+import pytest
+from decoy import matchers
+
 from opentrons_shared_data.errors import ErrorCodes
 
+from .command_fixtures import create_succeeded_command
 from opentrons.ordered_set import OrderedSet
-from opentrons.protocol_engine.actions.actions import RunCommandAction
-
 from opentrons.protocol_engine import commands, errors
-from opentrons.protocol_engine.types import DeckType
-from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.actions import (
+    FinishAction,
+    FinishErrorDetails,
+    HardwareStoppedAction,
+    PauseAction,
+    PauseSource,
+    PlayAction,
+    QueueCommandAction,
+    StopAction,
+    SucceedCommandAction,
+)
+from opentrons.protocol_engine.actions.actions import RunCommandAction
+from opentrons.protocol_engine.state.command_history import CommandEntry, CommandHistory
 from opentrons.protocol_engine.state.commands import (
     CommandState,
     CommandStore,
-    RunResult,
     QueueStatus,
+    RunResult,
 )
-from opentrons.protocol_engine.state.command_history import CommandEntry
-
-from opentrons.protocol_engine.actions import (
-    QueueCommandAction,
-    SucceedCommandAction,
-    PlayAction,
-    PauseAction,
-    PauseSource,
-    FinishAction,
-    FinishErrorDetails,
-    StopAction,
-    HardwareStoppedAction,
-)
-
-from opentrons.protocol_engine.state.command_history import CommandHistory
-
-from .command_fixtures import create_succeeded_command
+from opentrons.protocol_engine.state.config import Config
+from opentrons.protocol_engine.types import DeckType
 
 
 def _make_config(block_on_door_open: bool = False) -> Config:
@@ -333,6 +329,7 @@ def test_command_store_handles_pause_action(pause_source: PauseSource) -> None:
         recovery_target=None,
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -362,6 +359,7 @@ def test_command_store_handles_play_action(pause_source: PauseSource) -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -396,6 +394,7 @@ def test_command_store_handles_finish_action() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -450,6 +449,7 @@ def test_command_store_handles_stop_action(
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_async_error=from_asynchronous_error,
+        is_stopping_because_of_async_error=from_asynchronous_error,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -487,6 +487,7 @@ def test_command_store_handles_stop_action_when_awaiting_recovery() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -520,6 +521,7 @@ def test_command_store_cannot_restart_after_should_stop() -> None:
         run_started_at=None,
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -666,6 +668,7 @@ def test_command_store_wraps_unknown_errors() -> None:
         recovery_target=None,
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -735,6 +738,7 @@ def test_command_store_preserves_enumerated_errors() -> None:
         run_started_at=None,
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -770,6 +774,7 @@ def test_command_store_ignores_stop_after_graceful_finish() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -805,6 +810,7 @@ def test_command_store_ignores_finish_after_non_graceful_stop() -> None:
         run_started_at=datetime(year=2021, month=1, day=1),
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )
@@ -840,6 +846,7 @@ def test_handles_hardware_stopped() -> None:
         run_started_at=None,
         latest_protocol_command_hash=None,
         stopped_by_async_error=False,
+        is_stopping_because_of_async_error=False,
         error_recovery_policy=matchers.Anything(),
         has_entered_error_recovery=False,
     )

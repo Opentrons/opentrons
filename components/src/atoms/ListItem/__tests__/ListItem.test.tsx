@@ -28,7 +28,7 @@ describe('ListItem', () => {
     render(props)
     screen.getByText('mock listitem content')
     const listItem = screen.getByTestId('ListItem_error')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red35}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.red30}`)
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
 
@@ -46,7 +46,7 @@ describe('ListItem', () => {
     render(props)
     screen.getByText('mock listitem content')
     const listItem = screen.getByTestId('ListItem_success')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green35}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.green30}`)
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
 
@@ -55,7 +55,7 @@ describe('ListItem', () => {
     render(props)
     screen.getByText('mock listitem content')
     const listItem = screen.getByTestId('ListItem_warning')
-    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow35}`)
+    expect(listItem).toHaveStyle(`backgroundColor: ${COLORS.yellow30}`)
     expect(listItem).toHaveStyle(`borderRadius: ${BORDERS.borderRadius4}`)
   })
 

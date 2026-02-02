@@ -4,6 +4,7 @@ import textwrap
 from typing import Annotated, Literal
 
 import fastapi
+
 from server_utils.fastapi_utils.light_router import LightRouter
 
 from robot_server.client_data.store import (

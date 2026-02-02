@@ -1,92 +1,91 @@
 """Tests for base /runs routes."""
 
+from datetime import datetime
+from pathlib import Path
+
+import pytest
+from decoy import Decoy
+
 from opentrons.hardware_control import HardwareControlAPI
-from opentrons_shared_data.robot.types import RobotTypeEnum
-from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons.protocol_engine import (
+    CommandErrorSlice,
+    CommandPointer,
+)
+from opentrons.protocol_engine import (
+    errors as pe_errors,
+)
+from opentrons.protocol_engine import (
+    types as pe_types,
+)
+from opentrons.protocol_engine.resources.camera_provider import CameraProvider
+from opentrons.protocol_engine.resources.file_provider import (
+    FileProvider,
+)
+from opentrons.protocol_engine.state.module_substates import (
+    FlexStackerId,
+    FlexStackerSubState,
+)
+from opentrons.protocol_engine.types.module import StackerStoredLabwareGroup
+from opentrons.protocol_reader import JsonProtocolConfig, ProtocolSource
+from opentrons.types import DeckSlotName, NozzleConfigurationType, Point
+from opentrons_shared_data.data_files import DataFileInfo, MimeType
 from opentrons_shared_data.labware.labware_definition import (
     LabwareDefinition,
     labware_definition_type_adapter,
 )
-import pytest
-from datetime import datetime
-from decoy import Decoy
-from pathlib import Path
-
-from opentrons.types import DeckSlotName, Point, NozzleConfigurationType
-from opentrons.protocol_engine import (
-    types as pe_types,
-    errors as pe_errors,
-    CommandErrorSlice,
-    CommandPointer,
-)
-from opentrons.protocol_reader import ProtocolSource, JsonProtocolConfig
-
-from opentrons.hardware_control.nozzle_manager import NozzleMap
+from opentrons_shared_data.labware.types import LabwareDefinition as LabwareDefDict
+from opentrons_shared_data.robot.types import RobotTypeEnum
 
 from robot_server.data_files.data_files_store import (
     DataFilesStore,
-    DataFileInfo,
 )
-
-from robot_server.data_files.models import DataFileSource
+from robot_server.deck_configuration.store import DeckConfigurationStore
 from robot_server.errors.error_responses import ApiError
-from robot_server.service.json_api import (
-    RequestModel,
-    SimpleBody,
-    SimpleEmptyBody,
-    MultiBodyMeta,
-    ResourceLink,
-)
-
+from robot_server.file_provider.provider import FileProviderExecutor
 from robot_server.protocols.protocol_models import ProtocolKind
 from robot_server.protocols.protocol_store import (
     ProtocolNotFoundError,
     ProtocolResource,
     ProtocolStore,
 )
-
-from robot_server.runs.run_auto_deleter import RunAutoDeleter
-
-from robot_server.runs.run_models import (
-    Run,
-    RunCreate,
-    RunUpdate,
-    RunCurrentState,
-    ActiveNozzleLayout,
-    CommandLinkNoMeta,
-    NozzleLayoutConfig,
-    TipState,
-    FlexStackerState,
+from robot_server.runs.router.base_router import (
+    AllRunsLinks,
+    CurrentStateLinks,
+    create_run,
+    get_current_state,
+    get_run,
+    get_run_commands_error,
+    get_run_data_from_url,
+    get_runs,
+    remove_run,
+    update_run,
 )
-from robot_server.runs.run_orchestrator_store import RunConflictError
+from robot_server.runs.run_auto_deleter import RunAutoDeleter
 from robot_server.runs.run_data_manager import (
     RunDataManager,
     RunNotCurrentError,
 )
-from robot_server.runs.run_models import RunNotFoundError
-from robot_server.runs.router.base_router import (
-    AllRunsLinks,
-    create_run,
-    get_run_data_from_url,
-    get_run,
-    get_runs,
-    remove_run,
-    update_run,
-    get_run_commands_error,
-    get_current_state,
-    CurrentStateLinks,
+from robot_server.runs.run_models import (
+    ActiveNozzleLayout,
+    CommandLinkNoMeta,
+    FlexStackerState,
+    NozzleLayoutConfig,
+    Run,
+    RunCreate,
+    RunCurrentState,
+    RunNotFoundError,
+    RunUpdate,
+    TipState,
 )
-
-from robot_server.deck_configuration.store import DeckConfigurationStore
-from opentrons.protocol_engine.resources.file_provider import (
-    FileProvider,
+from robot_server.runs.run_orchestrator_store import RunConflictError
+from robot_server.service.json_api import (
+    MultiBodyMeta,
+    RequestModel,
+    ResourceLink,
+    SimpleBody,
+    SimpleEmptyBody,
 )
-from robot_server.file_provider.provider import FileProviderWrapper
-from opentrons.protocol_engine.state.module_substates import (
-    FlexStackerSubState,
-    FlexStackerId,
-)
-from opentrons.protocol_engine.types.module import StackerStoredLabwareGroup
 
 
 def mock_notify_publishers() -> None:
@@ -132,10 +131,11 @@ async def test_create_run(
     mock_run_auto_deleter: RunAutoDeleter,
     labware_offset_create: pe_types.LegacyLabwareOffsetCreate,
     mock_deck_configuration_store: DeckConfigurationStore,
-    mock_file_provider_wrapper: FileProviderWrapper,
+    mock_file_provider_wrapper: FileProviderExecutor,
     mock_protocol_store: ProtocolStore,
     mock_data_files_store: DataFilesStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should be able to create a basic run."""
     run_id = "run-id"
@@ -168,7 +168,7 @@ async def test_create_run(
             created_at=run_created_at,
             labware_offsets=[labware_offset_create],
             deck_configuration=[],
-            file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             protocol=None,
             run_time_param_values=None,
             run_time_param_paths=None,
@@ -186,9 +186,8 @@ async def test_create_run(
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
-        quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
-        file_provider=mock_file_provider,
+        camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         protocol_store=mock_protocol_store,
         check_estop=True,
@@ -208,6 +207,7 @@ async def test_create_protocol_run(
     mock_deck_configuration_store: DeckConfigurationStore,
     mock_data_files_store: DataFilesStore,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should be able to create a protocol run."""
     run_id = "run-id"
@@ -253,7 +253,10 @@ async def test_create_protocol_run(
             name="abc.xyz",
             file_hash="987",
             created_at=datetime(month=1, day=2, year=2024),
-            source=DataFileSource.UPLOADED,
+            mime_type=MimeType.TEXT_CSV,
+            generated=False,
+            stored=True,
+            path="/dev/null/123/abc.xyz",
         )
     )
     decoy.when(
@@ -269,7 +272,7 @@ async def test_create_protocol_run(
             created_at=run_created_at,
             labware_offsets=[],
             deck_configuration=[],
-            file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             protocol=protocol_resource,
             run_time_param_values={"foo": "bar"},
             run_time_param_paths={"my-csv-param": Path("/dev/null/file-id/abc.xyz")},
@@ -292,9 +295,8 @@ async def test_create_protocol_run(
         run_id=run_id,
         created_at=run_created_at,
         run_auto_deleter=mock_run_auto_deleter,
-        quick_transfer_run_auto_deleter=mock_run_auto_deleter,
         deck_configuration_store=mock_deck_configuration_store,
-        file_provider=mock_file_provider,
+        camera_provider=mock_camera_provider,
         notify_publishers=mock_notify_publishers,
         check_estop=True,
     )
@@ -314,6 +316,7 @@ async def test_create_protocol_run_bad_protocol_id(
     mock_data_files_store: DataFilesStore,
     mock_data_files_directory: Path,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should 404 if a protocol for a run does not exist."""
     error = ProtocolNotFoundError("protocol-id")
@@ -330,11 +333,10 @@ async def test_create_protocol_run_bad_protocol_id(
             run_data_manager=mock_run_data_manager,
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
-            file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             run_id="run-id",
             created_at=datetime.now(),
             run_auto_deleter=mock_run_auto_deleter,
-            quick_transfer_run_auto_deleter=mock_run_auto_deleter,
             check_estop=True,
             notify_publishers=mock_notify_publishers,
         )
@@ -352,6 +354,7 @@ async def test_create_run_conflict(
     mock_data_files_store: DataFilesStore,
     mock_data_files_directory: Path,
     mock_file_provider: FileProvider,
+    mock_camera_provider: CameraProvider,
 ) -> None:
     """It should respond with a conflict error if multiple engines are created."""
     created_at = datetime(year=2021, month=1, day=1)
@@ -365,7 +368,7 @@ async def test_create_run_conflict(
             created_at=created_at,
             labware_offsets=[],
             deck_configuration=[],
-            file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             protocol=None,
             run_time_param_values=None,
             run_time_param_paths=None,
@@ -381,11 +384,10 @@ async def test_create_run_conflict(
             protocol_store=mock_protocol_store,
             run_data_manager=mock_run_data_manager,
             run_auto_deleter=mock_run_auto_deleter,
-            quick_transfer_run_auto_deleter=mock_run_auto_deleter,
             deck_configuration_store=mock_deck_configuration_store,
             data_files_store=mock_data_files_store,
             data_files_directory=mock_data_files_directory,
-            file_provider=mock_file_provider,
+            camera_provider=mock_camera_provider,
             notify_publishers=mock_notify_publishers,
             check_estop=True,
         )
@@ -565,7 +567,7 @@ async def test_delete_run_with_bad_id(
     """It should 404 if the run ID does not exist."""
     key_error = RunNotFoundError(run_id="run-id")
 
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(key_error)  # type: ignore[func-returns-value]
 
     with pytest.raises(ApiError) as exc_info:
         await remove_run(runId="run-id", run_data_manager=mock_run_data_manager)
@@ -579,7 +581,7 @@ async def test_delete_active_run(
     mock_run_data_manager: RunDataManager,
 ) -> None:
     """It should 409 if the run is not finished."""
-    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(
+    decoy.when(await mock_run_data_manager.delete("run-id")).then_raise(  # type: ignore[func-returns-value]
         RunConflictError("oh no")
     )
 
@@ -793,7 +795,7 @@ async def test_get_run_commands_errors_raises_no_run(
 
 @pytest.mark.parametrize(
     "error_list, expected_cursor_result",
-    [([], 0), ([pe_errors.ErrorOccurrence.model_construct(id="error-id")], 1)],
+    [([], 0), ([pe_errors.ErrorOccurrence.model_construct(id="error-id")], 1)],  # type: ignore[call-arg]
 )
 async def test_get_run_commands_errors_defualt_cursor(
     decoy: Decoy,

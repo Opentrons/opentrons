@@ -1,21 +1,22 @@
+from typing import Any, Dict, NamedTuple, Optional
+
 import pytest
 from pydantic import BaseModel
-from typing import Any, Dict, NamedTuple, Optional
 
 from robot_server.service.json_api.resource_links import ResourceLink
 from robot_server.service.json_api.response import (
-    ResourceModel,
-    SimpleBody,
     Body,
-    SimpleEmptyBody,
+    DeprecatedMultiResponseModel,
+    DeprecatedResponseModel,
     EmptyBody,
-    SimpleMultiBody,
     MultiBody,
     MultiBodyMeta,
     NotifyRefetchBody,
     NotifyUnsubscribeBody,
-    DeprecatedResponseModel,
-    DeprecatedMultiResponseModel,
+    ResourceModel,
+    SimpleBody,
+    SimpleEmptyBody,
+    SimpleMultiBody,
 )
 
 

@@ -4,16 +4,20 @@ export const commandCreatorFromStepArgs = (
   args: StepGeneration.CommandCreatorArgs
 ): StepGeneration.CurriedCommandCreator | null => {
   switch (args.commandCreatorFnName) {
-    case 'consolidate': {
+    case 'consolidate':
       return StepGeneration.curryCommandCreator(
         StepGeneration.consolidate,
         args
       )
-    }
 
-    case 'delay': {
+    case 'delay':
       return StepGeneration.curryCommandCreator(StepGeneration.delay, args)
-    }
+
+    case 'waitForModuleTask':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.waitForModuleTask,
+        args
+      )
 
     case 'distribute':
       return StepGeneration.curryCommandCreator(StepGeneration.distribute, args)
@@ -24,12 +28,17 @@ export const commandCreatorFromStepArgs = (
     case 'mix':
       return StepGeneration.curryCommandCreator(StepGeneration.mix, args)
 
-    case 'moveLabware': {
+    case 'moveLabware':
       return StepGeneration.curryCommandCreator(
         StepGeneration.moveLabware,
         args
       )
-    }
+
+    case 'captureImage':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.captureImage,
+        args
+      )
 
     case 'engageMagnet':
       return StepGeneration.curryCommandCreator(
@@ -72,36 +81,64 @@ export const commandCreatorFromStepArgs = (
         StepGeneration.thermocyclerStateStep,
         args
       )
+
     case 'heaterShaker':
       return StepGeneration.curryCommandCreator(
         StepGeneration.heaterShaker,
         args
       )
+
     case 'comment':
       return StepGeneration.curryCommandCreator(StepGeneration.comment, args)
+
     case 'absorbanceReaderOpenLid':
       return StepGeneration.curryCommandCreator(
         StepGeneration.absorbanceReaderOpenLid,
         args
       )
+
     case 'absorbanceReaderCloseLid':
       return StepGeneration.curryCommandCreator(
         StepGeneration.absorbanceReaderCloseLid,
         args
       )
+
     case 'absorbanceReaderRead':
       return StepGeneration.curryCommandCreator(
         StepGeneration.absorbanceReaderCloseRead,
         args
       )
+
     case 'absorbanceReaderInitialize':
       return StepGeneration.curryCommandCreator(
         StepGeneration.absorbanceReaderCloseInitialize,
         args
       )
+
+    case 'flexStackerEmpty':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerEmpty,
+        { ...args, strategy: 'manualWithPause' }
+      )
+
+    case 'flexStackerFillItems':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerFillItems,
+        args
+      )
+
+    case 'flexStackerRetrieve':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerRetrieve,
+        args
+      )
+
+    case 'flexStackerStore':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.flexStackerStore,
+        { ...args, strategy: 'automatic' }
+      )
   }
-  // @ts-expect-error we've exhausted all command creators, but keeping this console warn
-  // for when we impelement the next command creator
-  console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
-  return null
+
+  args satisfies never // Make sure we handle every commandCreatorFnName.
 }

@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "otupdate"
 description = "A server to update software and firmware on Opentrons robots"
 readme = "README.md"
-requires-python = ">=3.6"
+requires-python = ">=3.10"
 license = "Apache-2.0"
 authors = [
     { name = "Opentrons", email = "engineering@opentrons.com" },
@@ -19,16 +19,52 @@ classifiers = [
     "Intended Audience :: Science/Research",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.10",
     "Topic :: Scientific/Engineering",
 ]
 dependencies = [
-    "aiohttp==3.9.3",
+    "typing-extensions>=4.0.0,<5",
+    "aiohttp==3.12.14",
 ]
 dynamic = ['version']
 
+[dependency-groups]
+# Robot dependencies - exact versions for robot deployment
+robot = [
+    "aiohttp==3.12.14",
+]
+dev = [
+    "ruff==0.14.10",
+    "pytest>=9.0.2",
+    "pytest-watch~=4.2.0",
+    "pytest-cov==4.1.0",
+    "pytest-aiohttp==1.0.5",
+    "coverage==7.4.1",
+    "atomicwrites==1.4.0; sys_platform=='win32'",
+    "colorama==0.4.4; sys_platform=='win32'",
+    "mypy==1.19.1",
+    "decoy<3,>=2.2.0",
+    "build~=1.2.0",
+    "setuptools==80.9.0",
+]
+
 [project.urls]
 "Source Code On Github" = "https://github.com/Opentrons/opentrons/tree/edge/update-server"
+
+[tool.ruff.lint]
+# TODO(sfoster, 2025-12-24) since 2012, we have ignored annotation and doc string lints.
+select = ["E", "C90", "I", "T201"]
+ignore = ["E203", "E501", "E741"]
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+[tool.ruff.lint.mccabe]
+max-complexity = 9
+[tool.ruff.lint.isort]
+known-local-folder = ["otupdate"]
+[tool.ruff.lint.per-file-ignores]
+"otupdate/_version.py" = ["I"]
+"buildroot_upload.py" = ["T201"]
+"oe_upload.py" = ["T201"]
 
 [tool.hatch.build.hooks.vcs-tunable]
 version-file="otupdate/_version.py"
@@ -59,5 +95,75 @@ exclude = [
 'LICENSE' = 'opentrons/LICENSE'
 
 [tool.hatch.build.target.sdist]
-include = ['otupdate', 'LICENSE', 'tests', 'mypy.ini', 'pytest.ini', '.flake8', 'Pipfile', 'Pipfile.lock']
+include = ['otupdate', 'LICENSE', 'tests', 'uv.lock']
+
+[tool.pytest]
+addopts = ["--cov=otupdate", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--strict-markers"]
+asyncio_mode = "auto"
+markers = [
+    "exclude_boot_vfat: tests that ensure success if there's no bootfs",
+    "exclude_boot_vfat_hash: tests that check if there's no boot hash",
+    "bad_boot_vfat_hash: tests that work if theres a bad boot hash",
+    "bad_sig: tests that work if theres a bad sig",
+    "bad_hash: tests that work if theres a bad hash",
+    "exclude_rootfs_ext4_hash: check if theres no rootfs hash",
+    "exclude_rootfs_ext4_hash_sig: check if theres no hash sig",
+    "exclude_rootfs_ext4: check if theres no rootfs",
+    "bad_cert_path: bad local cert for code signing",
+    "no_cert_path: no local cert for code signing",
+    "bad_rootfs_ext4_hash: bad rootfs hash",
+]
+
+[tool.mypy]
+strict = true
+show_error_codes = true
+plugins = ["decoy.mypy"]
+warn_unused_configs = true
+
+# The dbus and systemd packages will not be installed in non-Linux dev environments.
+# Permit mypy to find them missing wherever we try importing them.
+[[tool.mypy.overrides]]
+module = ["dbus.*", "systemd.*"]
+ignore_missing_imports = true
+
+# TODO(mm, 2022-05-25): Resolve the typing errors in these files
+# and remove these overrides when able.
+[[tool.mypy.overrides]]
+module = [
+    "otupdate.common.control",
+    "otupdate.common.session",
+    "otupdate.common.update",
+    "otupdate.buildroot",
+]
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+warn_return_any = false
+
+[[tool.mypy.overrides]]
+module = [
+    "otupdate.buildroot.update_actions",
+    "otupdate.openembedded",
+    "otupdate.openembedded.updater",
+]
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+module = [
+    "tests.conftest",
+    "tests.buildroot.conftest",
+    "tests.buildroot.test_control",
+    "tests.buildroot.test_ssh_key_management",
+    "tests.buildroot.test_update_actions",
+    "tests.common.conftest",
+    "tests.common.config",
+    "tests.common.test_config",
+    "tests.common.test_control",
+    "tests.common.test_file_actions",
+    "tests.common.test_update",
+    "tests.openembedded.conftest",
+    "tests.openembedded.test_control",
+    "tests.openembedded.test_updater",
+]
+ignore_errors = true
 

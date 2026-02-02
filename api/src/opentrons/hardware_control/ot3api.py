@@ -1,152 +1,147 @@
 import asyncio
-from concurrent.futures import Future
 import contextlib
-from copy import deepcopy
-from functools import partial, lru_cache, wraps
-from dataclasses import replace
 import logging
 from collections import OrderedDict
+from concurrent.futures import Future
+from copy import deepcopy
+from dataclasses import replace
+from functools import lru_cache, partial, wraps
 from typing import (
+    Any,
     AsyncIterator,
-    cast,
+    Awaitable,
     Callable,
     Dict,
-    Union,
     List,
+    Mapping,
     Optional,
     Sequence,
     Set,
-    Any,
-    TypeVar,
     Tuple,
-    Mapping,
-    Awaitable,
-)
-from opentrons.hardware_control.modules.module_calibration import (
-    ModuleCalibrationOffset,
+    TypeVar,
+    Union,
+    cast,
 )
 
-
-from opentrons_shared_data.pipette.types import PipetteName, PipetteModelType
-from opentrons_shared_data.pipette import (
-    pipette_load_name_conversions as pipette_load_name,
-    pipette_definition,
-)
-from opentrons_shared_data.robot.types import RobotType
-
-from opentrons import types as top_types
-from opentrons.config import robot_configs
-from opentrons.config.types import (
-    RobotConfig,
-    OT3Config,
-    GantryLoad,
-    CapacitivePassSettings,
-    LiquidProbeSettings,
-)
-from opentrons.drivers.rpi_drivers.types import USBPort, PortGroup
 from opentrons_shared_data.errors.exceptions import (
     EnumeratedError,
-    PythonException,
-    PositionUnknownError,
+    FirmwareUpdateFailedError,
     GripperNotPresentError,
     InvalidActuator,
-    FirmwareUpdateFailedError,
     PipetteLiquidNotFoundError,
+    PipetteOverpressureError,
+    PositionUnknownError,
+    PythonException,
 )
-
-from .util import use_or_initialize_loop, check_motion_bounds
-
-from .instruments.ot3.pipette import (
-    load_from_config_and_check_skip,
+from opentrons_shared_data.pipette import (
+    pipette_definition,
 )
-from .instruments.ot3.gripper import compare_gripper_config_and_check_skip, Gripper
-from .instruments.ot3.instrument_calibration import (
-    GripperCalibrationOffset,
-    PipetteOffsetSummary,
+from opentrons_shared_data.pipette import (
+    pipette_load_name_conversions as pipette_load_name,
 )
+from opentrons_shared_data.pipette.types import PipetteModelType, PipetteName
+from opentrons_shared_data.robot.types import RobotType
 
-from .execution_manager import ExecutionManagerProvider
-from .pause_manager import PauseManager
-from .module_control import AttachedModulesControl
-from .types import (
-    CriticalPoint,
-    DoorState,
-    DoorStateNotification,
-    ErrorMessageNotification,
-    HardwareEvent,
-    AsynchronousModuleErrorNotification,
-    HardwareEventHandler,
-    HardwareAction,
-    HepaFanState,
-    HepaUVState,
-    MotionChecks,
-    SubSystem,
-    PauseType,
-    Axis,
-    OT3AxisKind,
-    OT3Mount,
-    OT3AxisMap,
-    InstrumentProbeType,
-    GripperProbe,
-    UpdateStatus,
-    StatusBarState,
-    StatusBarUpdateListener,
-    StatusBarUpdateUnsubscriber,
-    SubSystemState,
-    TipStateType,
-    EstopOverallStatus,
-    EstopStateNotification,
-    EstopState,
-    HardwareFeatureFlags,
-    FailedTipStateCheck,
-    PipetteSensorResponseQueue,
-    TipScrapeType,
+from . import modules
+from .backends.errors import SubsystemUpdating
+from .backends.flex_protocol import FlexBackend
+from .backends.ot3simulator import OT3Simulator
+from .backends.types import HWStopCondition
+from .dev_types import (
+    AttachedGripper,
+    AttachedPipette,
+    GripperDict,
+    InstrumentDict,
+    PipetteDict,
+    PipetteStateDict,
 )
 from .errors import (
     UpdateOngoingError,
 )
-from . import modules
-from .ot3_calibration import OT3Transforms, OT3RobotCalibrationProvider
-
-from .protocols import FlexHardwareControlInterface
+from .execution_manager import ExecutionManagerProvider
+from .instruments.ot3.gripper import Gripper, compare_gripper_config_and_check_skip
+from .instruments.ot3.gripper_handler import GripperHandler
+from .instruments.ot3.instrument_calibration import (
+    GripperCalibrationOffset,
+    PipetteOffsetSummary,
+    load_gripper_calibration_offset,
+    load_pipette_offset,
+)
+from .instruments.ot3.pipette import (
+    load_from_config_and_check_skip,
+)
 
 # TODO (lc 09/15/2022) We should update our pipette handler to reflect OT-3 properties
 # in a follow-up PR.
 from .instruments.ot3.pipette_handler import (
-    OT3PipetteHandler,
     InstrumentsByMount,
-    TipActionSpec,
+    OT3PipetteHandler,
     TipActionMoveSpec,
+    TipActionSpec,
 )
-from .instruments.ot3.instrument_calibration import load_pipette_offset
-from .instruments.ot3.gripper_handler import GripperHandler
-from .instruments.ot3.instrument_calibration import (
-    load_gripper_calibration_offset,
-)
-
+from .module_control import AttachedModulesControl
 from .motion_utilities import (
-    target_position_from_absolute,
-    target_position_from_relative,
-    target_position_from_plunger,
-    target_positions_from_plunger_tracking,
-    offset_for_mount,
     deck_from_machine,
     machine_from_deck,
     machine_vector_from_deck_vector,
+    offset_for_mount,
+    target_position_from_absolute,
+    target_position_from_plunger,
+    target_position_from_relative,
+    target_positions_from_plunger_tracking,
 )
-
-from .dev_types import (
-    AttachedGripper,
-    AttachedPipette,
-    PipetteDict,
-    PipetteStateDict,
-    InstrumentDict,
-    GripperDict,
+from .ot3_calibration import OT3RobotCalibrationProvider, OT3Transforms
+from .pause_manager import PauseManager
+from .protocols import FlexHardwareControlInterface
+from .types import (
+    AsynchronousModuleErrorNotification,
+    Axis,
+    CriticalPoint,
+    DoorState,
+    DoorStateNotification,
+    ErrorMessageNotification,
+    EstopOverallStatus,
+    EstopState,
+    EstopStateNotification,
+    FailedTipStateCheck,
+    GripperProbe,
+    HardwareAction,
+    HardwareEvent,
+    HardwareEventHandler,
+    HardwareFeatureFlags,
+    HepaFanState,
+    HepaUVState,
+    InstrumentProbeType,
+    ModuleDisconnectedNotification,
+    MotionChecks,
+    OT3AxisKind,
+    OT3AxisMap,
+    OT3Mount,
+    PauseType,
+    PipetteSensorResponseQueue,
+    StatusBarState,
+    StatusBarUpdateListener,
+    StatusBarUpdateUnsubscriber,
+    SubSystem,
+    SubSystemState,
+    TipScrapeType,
+    TipStateType,
+    UpdateStatus,
 )
-from .backends.types import HWStopCondition
-from .backends.flex_protocol import FlexBackend
-from .backends.ot3simulator import OT3Simulator
-from .backends.errors import SubsystemUpdating
+from .util import check_motion_bounds, use_or_initialize_loop
+from opentrons import types as top_types
+from opentrons.config import robot_configs
+from opentrons.config.types import (
+    CapacitivePassSettings,
+    GantryLoad,
+    LiquidProbeSettings,
+    OT3Config,
+    RobotConfig,
+)
+from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
+from opentrons.hardware_control.modules.module_calibration import (
+    ModuleCalibrationOffset,
+)
 
 mod_log = logging.getLogger(__name__)
 
@@ -371,7 +366,10 @@ class OT3API(
     def _send_module_notification(self, event: HardwareEvent) -> None:
         if not isinstance(
             event,
-            AsynchronousModuleErrorNotification,
+            (
+                AsynchronousModuleErrorNotification,
+                ModuleDisconnectedNotification,
+            ),
         ):
             return
         mod_log.info(
@@ -393,7 +391,7 @@ class OT3API(
             machine_pos=machine_pos,
             attitude=self._robot_calibration.deck_calibration.attitude,
             offset=self._robot_calibration.carriage_offset,
-            robot_type=cast(RobotType, "OT-3 Standard"),
+            robot_type="OT-3 Standard",
         )
 
     @classmethod
@@ -643,9 +641,9 @@ class OT3API(
         model: modules.types.ModuleModel,
     ) -> modules.AbstractModule:
         """Create a simulating module hardware interface."""
-        assert (
-            self.is_simulator
-        ), "Cannot build simulating module from non-simulating hardware control API"
+        assert self.is_simulator, (
+            "Cannot build simulating module from non-simulating hardware control API"
+        )
 
         return await self._backend.module_controls.register_simulated_module(
             simulated_usb_port=USBPort(
@@ -1483,6 +1481,7 @@ class OT3API(
         expected_grip_width: float,
         grip_width_uncertainty_wider: float,
         grip_width_uncertainty_narrower: float,
+        disable_geometry_grip_check: bool = False,
     ) -> None:
         """Ensure that a gripper pickup succeeded.
 
@@ -1503,6 +1502,7 @@ class OT3API(
             gripper.max_allowed_grip_error,
             gripper.min_jaw_width,
             gripper.max_jaw_width,
+            disable_geometry_grip_check,
         )
 
     def gripper_jaw_can_home(self) -> bool:
@@ -1518,13 +1518,14 @@ class OT3API(
         acquire_lock: bool = True,
         check_bounds: MotionChecks = MotionChecks.NONE,
         expect_stalls: bool = False,
+        delay: Optional[Tuple[List[Axis], float]] = None,
     ) -> None:
         """Worker function to apply robot motion."""
         machine_pos = machine_from_deck(
             deck_pos=target_position,
             attitude=self._robot_calibration.deck_calibration.attitude,
             offset=self._robot_calibration.carriage_offset,
-            robot_type=cast(RobotType, "OT-3 Standard"),
+            robot_type="OT-3 Standard",
         )
         bounds = self._backend.axis_bounds
         to_check = {
@@ -1551,6 +1552,7 @@ class OT3API(
                     machine_pos,
                     speed or 400.0,
                     HWStopCondition.stall if expect_stalls else HWStopCondition.none,
+                    delay=delay,
                 )
             except Exception:
                 self._log.exception("Move failed")
@@ -3076,9 +3078,11 @@ class OT3API(
     async def aspirate_while_tracking(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        z_distance: float,
+        end_point: top_types.Point,
         volume: float,
-        flow_rate: float = 1.0,
+        rate: float = 1.0,
+        movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Aspirate a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -3086,19 +3090,35 @@ class OT3API(
         :param mount: A robot mount that the instrument is on.
         :param z_distance: The distance the z axis will move during apsiration.
         :param volume: The volume of liquid to be aspirated.
-        :param flow_rate: The flow rate to aspirate with.
+        :param rate: The rate multiplier to aspirate with.
+        :param movement_delay: Time to wait after the pipette starts aspirating before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         aspirate_spec = self._pipette_handler.plan_check_aspirate(
-            realmount, volume, flow_rate
+            realmount, volume, rate
         )
         if not aspirate_spec:
             return
+        end_position = target_position_from_absolute(
+            realmount,
+            end_point,
+            partial(self.critical_point_for, cp_override=end_critical_point),
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+
         target_pos = target_positions_from_plunger_tracking(
             realmount,
             aspirate_spec.plunger_distance,
-            z_distance,
-            self._current_position,
+            end_position,
+        )
+
+        delay: Optional[Tuple[List[Axis], float]] = None
+        if movement_delay is not None:
+            delay = ([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R], movement_delay)
+        self._log.info(
+            f"aspirate_while_tracking: end at {end_point} {end_critical_point}, machine pos {end_position}, with plunger {target_pos}, delay {delay}"
         )
         try:
             await self._backend.set_active_current(
@@ -3112,7 +3132,13 @@ class OT3API(
                     target_pos,
                     speed=aspirate_spec.speed,
                     home_flagged_axes=False,
+                    delay=delay,
                 )
+        except PipetteOverpressureError:
+            self._log.exception("Aspirate failed with overpressure")
+            # refresh positions during an over pressure here so we know where the gantry stopped.
+            await self.refresh_positions()
+            raise
         except Exception:
             self._log.exception("Aspirate failed")
             aspirate_spec.instr.set_current_volume(0)
@@ -3123,11 +3149,13 @@ class OT3API(
     async def dispense_while_tracking(
         self,
         mount: Union[top_types.Mount, OT3Mount],
-        z_distance: float,
+        end_point: top_types.Point,
         volume: float,
         push_out: Optional[float],
-        flow_rate: float = 1.0,
+        rate: float = 1.0,
         is_full_dispense: bool = False,
+        movement_delay: Optional[float] = None,
+        end_critical_point: Optional[CriticalPoint] = None,
     ) -> None:
         """
         Dispense a volume of liquid (in microliters/uL) while moving the z axis synchronously.
@@ -3135,21 +3163,36 @@ class OT3API(
         :param mount: A robot mount that the instrument is on.
         :param z_distance: The distance the z axis will move during dispensing.
         :param volume: The volume of liquid to be dispensed.
-        :param flow_rate: The flow rate to dispense with.
+        :param rate: The rate multiplier to dispense with.
+        :param movement_delay: Time to wait after the pipette starts dispensing before x/y/z movement.
         """
         realmount = OT3Mount.from_mount(mount)
         dispense_spec = self._pipette_handler.plan_check_dispense(
-            realmount, volume, flow_rate, push_out, is_full_dispense
+            realmount, volume, rate, push_out, is_full_dispense
         )
         if not dispense_spec:
             return
+        end_position = target_position_from_absolute(
+            realmount,
+            end_point,
+            partial(self.critical_point_for, cp_override=end_critical_point),
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+
         target_pos = target_positions_from_plunger_tracking(
             realmount,
             dispense_spec.plunger_distance,
-            z_distance,
-            self._current_position,
+            end_position,
         )
 
+        delay: Optional[Tuple[List[Axis], float]] = None
+        if movement_delay is not None:
+            delay = ([Axis.X, Axis.Y, Axis.Z_L, Axis.Z_R], movement_delay)
+        self._log.info(
+            f"dispense_while_tracking: end at {end_point} {end_critical_point}, machine pos {end_position}, with plunger {target_pos}, delay {delay}"
+        )
         try:
             await self._backend.set_active_current(
                 {dispense_spec.axis: dispense_spec.current}
@@ -3162,7 +3205,13 @@ class OT3API(
                     target_pos,
                     speed=dispense_spec.speed,
                     home_flagged_axes=False,
+                    delay=delay,
                 )
+        except PipetteOverpressureError:
+            self._log.exception("Aspirate failed with overpressure")
+            # refresh positions during an over pressure here so we know where the gantry stopped.
+            await self.refresh_positions()
+            raise
         except Exception:
             self._log.exception("dispense failed")
             dispense_spec.instr.set_current_volume(0)
@@ -3246,3 +3295,26 @@ class OT3API(
         realmount = OT3Mount.from_mount(mount)
         s_data = await self._backend.read_capacitive_sensor(realmount, primary)
         return s_data if s_data else 0.0
+
+    async def touch_probe(
+        self,
+        mount: Union[top_types.Mount, OT3Mount],
+        axis: Axis,
+        speed: float,
+        distance: float,
+    ) -> top_types.Point:
+        await self._backend.touch_probe(axis, speed, distance)  # type: ignore[attr-defined]
+        realmount = OT3Mount.from_mount(mount)
+        machine_pos = await self._backend.update_position()
+        end_pos = self.get_deck_from_machine(machine_pos)
+        end_point = top_types.Point(
+            end_pos[Axis.X], end_pos[Axis.Y], end_pos[Axis.by_mount(realmount)]
+        )
+        offset = offset_for_mount(
+            realmount,
+            top_types.Point(*self._config.left_mount_offset),
+            top_types.Point(*self._config.right_mount_offset),
+            top_types.Point(*self._config.gripper_mount_offset),
+        )
+        cp = self.critical_point_for(realmount, None)
+        return end_point + offset + cp

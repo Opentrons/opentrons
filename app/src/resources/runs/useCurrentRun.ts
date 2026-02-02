@@ -7,7 +7,7 @@ const REFETCH_INTERVAL = 5000
 
 // TODO: doesn't have to fetch after status is terminal
 export function useCurrentRun(): Run | null {
-  const currentRunId = useCurrentRunId()
+  const currentRunId = useCurrentRunId({ refetchInterval: REFETCH_INTERVAL })
   const { data: runRecord } = useNotifyRunQuery(currentRunId, {
     refetchInterval: REFETCH_INTERVAL,
   })

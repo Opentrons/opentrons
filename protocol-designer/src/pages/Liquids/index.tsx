@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useOnClickOutside } from '@opentrons/components'
 
 import {
-  AssignLiquidsModal,
+  AssignLiquidsModalContainer,
   DefineLiquidsModal,
 } from '../../components/organisms'
 import { LiquidsOverflowMenu } from '../../components/organisms/LiquidsOverflowMenu'
@@ -28,7 +28,7 @@ export function Liquids(): JSX.Element {
 
   useEffect(() => {
     if (selectedLabware == null) {
-      console.warn('selectedLabware was lost, navigate to deisgner page')
+      console.warn('selectedLabware was lost, navigate to designer page')
       navigate('/designer')
     }
   })
@@ -55,7 +55,7 @@ export function Liquids(): JSX.Element {
         />
       ) : null}
 
-      <AssignLiquidsModal
+      <AssignLiquidsModalContainer
         showLiquidOverflowMenu={showLiquidOverflowMenu}
         setDefineLiquidModal={setDefineLiquidModal}
       />

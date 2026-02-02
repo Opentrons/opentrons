@@ -47,12 +47,10 @@ export function LPCSetupFlexBtns({
   const [runLPCTargetProps, runLPCTooltipProps] = useHoverTooltip({
     placement: TOOLTIP_BOTTOM,
   })
-  const [
-    confirmOffsetsTargetProps,
-    confirmOffsetsTooltipProps,
-  ] = useHoverTooltip({
-    placement: TOOLTIP_BOTTOM,
-  })
+  const [confirmOffsetsTargetProps, confirmOffsetsTooltipProps] =
+    useHoverTooltip({
+      placement: TOOLTIP_BOTTOM,
+    })
 
   const anyOffsetsToLpc =
     useSelector(selectTotalCountNonHardCodedLSOffsets(runId)) === 0
@@ -113,6 +111,7 @@ export function LPCSetupFlexBtns({
         onClick={onApplyOffsets}
         id="LPC_setOffsetsConfirmed"
         padding={`${SPACING.spacing8} ${SPACING.spacing16}`}
+        disabled={isApplyOffsetsBtnDisabled}
         {...confirmOffsetsTargetProps}
       >
         {t('apply_offsets')}

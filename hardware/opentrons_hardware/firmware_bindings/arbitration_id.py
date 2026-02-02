@@ -4,15 +4,17 @@ This file is used as a source for code generation, which does not run in a venv 
 default. Please do not unconditionally import things outside the python standard
 library.
 """
+
 from __future__ import annotations
+
 import ctypes
 from enum import Enum
 from typing import TYPE_CHECKING, Type
 
 from opentrons_hardware.firmware_bindings.constants import (
     FunctionCode,
-    NodeId,
     MessageId,
+    NodeId,
 )
 
 if TYPE_CHECKING:
@@ -79,4 +81,4 @@ class ArbitrationId(ctypes.Union):
 
     def __repr__(self) -> str:
         """Return string representation of class."""
-        return f"id: 0x{self.id:x}, " f"parts: {self.parts}"
+        return f"id: 0x{self.id:x}, parts: {self.parts}"

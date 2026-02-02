@@ -1,9 +1,11 @@
 """Test for attached tool request."""
+
 import asyncio
+
 import pytest
 
 from opentrons_hardware.drivers.can_bus import CanMessenger, WaitableCallback
-from opentrons_hardware.firmware_bindings import NodeId, ArbitrationId
+from opentrons_hardware.firmware_bindings import ArbitrationId, NodeId
 from opentrons_hardware.firmware_bindings.constants import ToolType
 from opentrons_hardware.firmware_bindings.messages.fields import ToolField
 from opentrons_hardware.firmware_bindings.messages.message_definitions import (

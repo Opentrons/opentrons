@@ -1,26 +1,26 @@
 """Exception hierarchy for error codes."""
 
 from __future__ import annotations
-from typing import (
-    Dict,
-    Any,
-    Optional,
-    List,
-    Iterator,
-    Union,
-    Sequence,
-    overload,
-    Type,
-    TypeVar,
-)
-from logging import getLogger
-from traceback import format_exception_only, format_tb
+
 import inspect
 import sys
+from logging import getLogger
+from traceback import format_exception_only, format_tb
+from typing import (
+    Any,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
-from .codes import ErrorCodes
 from .categories import ErrorCategories
-
+from .codes import ErrorCodes
 
 log = getLogger(__name__)
 
@@ -60,7 +60,7 @@ class EnumeratedError(Exception):
     def __str__(self) -> str:
         """Get a human-readable string."""
         _node = self.detail.get("node")
-        return f'Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f": {self.message}" if self.message else ""}{f" ({_node})" if _node else ""}'
+        return f"Error {self.code.value.code} {self.code.name} ({self.__class__.__name__}){f': {self.message}' if self.message else ''}{f' ({_node})' if _node else ''}"
 
     def __eq__(self, other: object) -> bool:
         """Compare if two enumerated errors match."""
@@ -202,7 +202,7 @@ def _exc_harvest_predicate(v: Any) -> bool:
         return False
     # on python 3.11 and up we can check if things are method wrappers, which basic builtin
     # dunders like __add__ are, but until then we can't and also don't know this is real
-    if sys.version_info.minor >= 11 and inspect.ismethodwrapper(v):  # type: ignore[attr-defined]
+    if sys.version_info.minor >= 11 and inspect.ismethodwrapper(v):
         return False
     return True
 

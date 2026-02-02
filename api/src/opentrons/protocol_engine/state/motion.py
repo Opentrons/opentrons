@@ -1,33 +1,33 @@
 """Motion state store and getters."""
+
+import logging
 from dataclasses import dataclass
 from typing import List, Optional, Union
-import logging
 
-from opentrons.types import MountType, Point, StagingSlotName
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.motion_planning.adjacent_slots_getters import (
-    get_east_west_slots,
-    get_adjacent_slots,
-)
-from opentrons import motion_planning
-
-from . import _move_types
 from .. import errors
 from ..types import (
+    AddressableOffsetVector,
+    CurrentPipetteLocation,
+    CurrentWell,
+    LiquidHandlingWellLocation,
     MotorAxis,
     WellLocation,
-    LiquidHandlingWellLocation,
-    CurrentWell,
-    CurrentPipetteLocation,
-    AddressableOffsetVector,
 )
-from .config import Config
-from .labware import LabwareView
-from .pipettes import PipetteView
+from . import _move_types
 from .addressable_areas import AddressableAreaView
+from .config import Config
 from .geometry import GeometryView
-from .modules import ModuleView
+from .labware import LabwareView
 from .module_substates import HeaterShakerModuleId
+from .modules import ModuleView
+from .pipettes import PipetteView
+from opentrons import motion_planning
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.motion_planning.adjacent_slots_getters import (
+    get_adjacent_slots,
+    get_east_west_slots,
+)
+from opentrons.types import MountType, Point, StagingSlotName
 
 log = logging.getLogger(__name__)
 
@@ -78,14 +78,9 @@ class MotionView:
             isinstance(current_location, CurrentWell)
             and current_location.pipette_id == pipette_id
         ):
-            if self._labware.get_should_center_column_on_target_well(
+            critical_point = self.get_critical_point_for_wells_in_labware(
                 current_location.labware_id
-            ):
-                critical_point = CriticalPoint.Y_CENTER
-            elif self._labware.get_should_center_pipette_on_target_well(
-                current_location.labware_id
-            ):
-                critical_point = CriticalPoint.XY_CENTER
+            )
         return PipetteLocationData(mount=mount, critical_point=critical_point)
 
     def _get_pipette_offset_for_reservoirs(
@@ -124,6 +119,17 @@ class MotionView:
             x_offset = -1 * well_x_dim / 24
         return Point(x=x_offset, y=y_offset)
 
+    def get_critical_point_for_wells_in_labware(
+        self, labware_id: str
+    ) -> CriticalPoint | None:
+        """Get the appropriate critical point override for this labware."""
+        if self._labware.get_should_center_column_on_target_well(labware_id):
+            return CriticalPoint.Y_CENTER
+        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
+            return CriticalPoint.XY_CENTER
+        else:
+            return None
+
     def get_movement_waypoints_to_well(
         self,
         pipette_id: str,
@@ -142,11 +148,7 @@ class MotionView:
         """Calculate waypoints to a destination that's specified as a well."""
         location = current_well or self._pipettes.get_current_location()
 
-        destination_cp: Optional[CriticalPoint] = None
-        if self._labware.get_should_center_column_on_target_well(labware_id):
-            destination_cp = CriticalPoint.Y_CENTER
-        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
-            destination_cp = CriticalPoint.XY_CENTER
+        destination_cp = self.get_critical_point_for_wells_in_labware(labware_id)
 
         destination = self._geometry.get_well_position(
             labware_id=labware_id,
@@ -397,12 +399,7 @@ class MotionView:
             mm_from_edge=mm_from_edge,
             edge_path_type=edge_path_type,
         )
-        critical_point: Optional[CriticalPoint] = None
-
-        if self._labware.get_should_center_column_on_target_well(labware_id):
-            critical_point = CriticalPoint.Y_CENTER
-        elif self._labware.get_should_center_pipette_on_target_well(labware_id):
-            critical_point = CriticalPoint.XY_CENTER
+        critical_point = self.get_critical_point_for_wells_in_labware(labware_id)
 
         return [
             motion_planning.Waypoint(position=p, critical_point=critical_point)

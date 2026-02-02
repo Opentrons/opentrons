@@ -1,7 +1,7 @@
 import { StepContainer } from '../StepContainer'
 import { ConcurrentGroup } from './ConcurrentGroup'
 import { ConcurrentGroupCheckpoint } from './ConcurrentGroupCheckpoint'
-import { ConcurrentGroupStepContainer } from './ConcurrentGroupStepContainer'
+import { ConcurrentGroupChild } from './ConcurrentGroupChild'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
@@ -20,8 +20,12 @@ export const OnlyCheckpoints: Story = {
   render: args => (
     <div style={{ width: '300px' }}>
       <ConcurrentGroup {...args}>
-        <ConcurrentGroupCheckpoint text="Start profile" />
-        <ConcurrentGroupCheckpoint text="Wait for profile to complete" />
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="Start profile" />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="Wait for profile to complete" />
+        </ConcurrentGroupChild>
       </ConcurrentGroup>
     </div>
   ),
@@ -52,35 +56,49 @@ export const CheckpointsAndStepContainers: Story = {
         semiTransparent={false}
       />
       <ConcurrentGroup {...args}>
-        <ConcurrentGroupCheckpoint text="Start profile" />
-        <ConcurrentGroupStepContainer
-          stepNumber={2}
-          text="Transfer"
-          type="default"
-          size="iconAndText"
-          iconName="transfer"
-          cursor="default"
-          active={false}
-          hover={false}
-          error={false}
-          semiTransparent={false}
-        />
-        <ConcurrentGroupStepContainer
-          stepNumber={3}
-          text="Transfer"
-          type="default"
-          size="iconAndText"
-          iconName="transfer"
-          cursor="default"
-          active={false}
-          hover={false}
-          error={false}
-          semiTransparent={false}
-        />
-        <ConcurrentGroupCheckpoint text="Wait for profile to complete" />
-        <ConcurrentGroupCheckpoint text="I am..." />
-        <ConcurrentGroupCheckpoint text="...running out of ideas..." />
-        <ConcurrentGroupCheckpoint text="...for example text" />
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="Start profile" />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="step">
+          <StepContainer
+            stepNumber={2}
+            text="Transfer"
+            type="default"
+            size="iconAndText"
+            iconName="transfer"
+            cursor="default"
+            active={false}
+            hover={false}
+            error={false}
+            semiTransparent={false}
+          />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="step">
+          <StepContainer
+            stepNumber={3}
+            text="Transfer"
+            type="default"
+            size="iconAndText"
+            iconName="transfer"
+            cursor="default"
+            active={false}
+            hover={false}
+            error={false}
+            semiTransparent={false}
+          />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="Wait for profile to complete" />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="I am..." />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="...running out of ideas..." />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="...for example text" />
+        </ConcurrentGroupChild>
       </ConcurrentGroup>
       <StepContainer
         stepNumber={4}
@@ -105,8 +123,12 @@ export const LongTextWrapping: Story = {
   render: args => (
     <div style={{ width: '300px' }}>
       <ConcurrentGroup {...args}>
-        <ConcurrentGroupCheckpoint text="Start profile" />
-        <ConcurrentGroupCheckpoint text="Wait, perchance, for the profile to attain rest, splendid at last in its absolute completion" />
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="Start profile" />
+        </ConcurrentGroupChild>
+        <ConcurrentGroupChild type="checkpoint">
+          <ConcurrentGroupCheckpoint text="Wait, perchance, for the profile to attain rest, splendid at last in its absolute completion" />
+        </ConcurrentGroupChild>
       </ConcurrentGroup>
     </div>
   ),

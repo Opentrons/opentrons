@@ -1,30 +1,36 @@
 """Tests for RunController."""
+
+from datetime import datetime
 from typing import List
 
 import pytest
-from datetime import datetime
 from decoy import Decoy, matchers
 
 from opentrons.protocol_engine import (
     EngineStatus,
     StateSummary,
+)
+from opentrons.protocol_engine import (
     commands as pe_commands,
+)
+from opentrons.protocol_engine import (
     errors as pe_errors,
 )
 from opentrons.protocol_engine.types import (
-    RunTimeParameter,
     BooleanParameter,
     CommandAnnotation,
+    CommandPreconditions,
+    RunTimeParameter,
     SecondOrderCommandAnnotation,
 )
 from opentrons.protocol_runner import RunResult
 
-from robot_server.service.notifications import RunsPublisher, MaintenanceRunsPublisher
-from robot_server.service.task_runner import TaskRunner
 from robot_server.runs.action_models import RunAction, RunActionType
+from robot_server.runs.run_controller import RunActionNotAllowedError, RunController
 from robot_server.runs.run_orchestrator_store import RunOrchestratorStore
 from robot_server.runs.run_store import RunStore
-from robot_server.runs.run_controller import RunController, RunActionNotAllowedError
+from robot_server.service.notifications import MaintenanceRunsPublisher, RunsPublisher
+from robot_server.service.task_runner import TaskRunner
 
 
 @pytest.fixture
@@ -108,6 +114,12 @@ def command_annotations() -> List[CommandAnnotation]:
 
 
 @pytest.fixture
+def command_preconditions() -> CommandPreconditions:
+    """Get a CommandPreconditions result."""
+    return CommandPreconditions(isCameraUsed=False)
+
+
+@pytest.fixture
 def protocol_commands() -> List[pe_commands.Command]:
     """Get a StateSummary value object."""
     return [
@@ -175,6 +187,7 @@ async def test_create_play_action_to_start(
     engine_state_summary: StateSummary,
     run_time_parameters: List[RunTimeParameter],
     command_annotations: List[CommandAnnotation],
+    command_preconditions: CommandPreconditions,
     protocol_commands: List[pe_commands.Command],
     run_id: str,
     subject: RunController,
@@ -208,6 +221,7 @@ async def test_create_play_action_to_start(
             state_summary=engine_state_summary,
             parameters=run_time_parameters,
             command_annotations=command_annotations,
+            command_preconditions=command_preconditions,
         )
     )
 
@@ -348,8 +362,8 @@ async def test_action_not_allowed(
 ) -> None:
     """It should raise a RunActionNotAllowedError if a play/pause action is rejected."""
     decoy.when(mock_run_orchestrator_store.run_was_started()).then_return(True)
-    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)
-    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)
+    decoy.when(mock_run_orchestrator_store.play()).then_raise(exception)  # type: ignore[func-returns-value]
+    decoy.when(mock_run_orchestrator_store.pause()).then_raise(exception)  # type: ignore[func-returns-value]
 
     with pytest.raises(RunActionNotAllowedError, match="oh no"):
         subject.create_action(

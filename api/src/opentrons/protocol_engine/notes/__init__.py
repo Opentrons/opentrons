@@ -1,10 +1,10 @@
 """Protocol engine notes module."""
 
 from .notes import (
-    NoteKind,
     CommandNote,
     CommandNoteAdder,
     CommandNoteTracker,
+    NoteKind,
     make_error_recovery_debug_note,
 )
 

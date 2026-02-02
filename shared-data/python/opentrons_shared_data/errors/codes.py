@@ -1,10 +1,10 @@
 """Error codes."""
 
-from enum import Enum
-from dataclasses import dataclass
 import json
-from typing import Tuple, Dict
+from dataclasses import dataclass
+from enum import Enum
 from functools import lru_cache
+from typing import Dict, Tuple
 
 from ..load import load_shared_data
 from .categories import ErrorCategories
@@ -99,6 +99,7 @@ class ErrorCodes(Enum):
     RUNTIME_PARAMETER_VALUE_REQUIRED = _code_from_dict_entry("4010")
     INCORRECT_API_VERSION = _code_from_dict_entry("4011")
     LABWARE_LOCATING_FEATURE_ERROR = _code_from_dict_entry("4012")
+    CAMERA_ERROR = _code_from_dict_entry("4013")
 
     @classmethod
     @lru_cache(25)

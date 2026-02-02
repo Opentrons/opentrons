@@ -27,7 +27,7 @@ export function CheckUpdates(): JSX.Element {
       borderRadius={BORDERS.borderRadius12}
     >
       <Icon name="ot-spinner" size="5rem" spin color={COLORS.grey60} />
-      <LegacyStyledText as="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
+      <LegacyStyledText forwardedAs="h2" fontWeight={TYPOGRAPHY.fontWeightBold}>
         {t('checking_for_updates')}
       </LegacyStyledText>
     </Flex>
