@@ -5,14 +5,6 @@ import { remote } from '/app/redux/shell/remote'
 
 import type { FallbackProps } from 'react-error-boundary'
 
-declare global {
-  interface Window {
-    secondaryApi?: {
-      closeSelf?: () => void | Promise<void>
-    }
-  }
-}
-
 export function SecondaryWindowAppFallback({
   error,
 }: FallbackProps): JSX.Element | null {
