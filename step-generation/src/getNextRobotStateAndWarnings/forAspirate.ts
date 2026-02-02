@@ -31,7 +31,6 @@ export function forAspirate(
       ? params.labwareId
       : (robotState.pipettes[pipetteId].entityId ?? '')
 
-  console.log('labwareId', labwareId)
   const wellName =
     'wellName' in params
       ? params.wellName
