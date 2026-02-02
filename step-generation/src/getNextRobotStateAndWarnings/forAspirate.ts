@@ -30,6 +30,8 @@ export function forAspirate(
     'labwareId' in params
       ? params.labwareId
       : (robotState.pipettes[pipetteId].entityId ?? '')
+
+  console.log('labwareId', labwareId)
   const wellName =
     'wellName' in params
       ? params.wellName
@@ -178,4 +180,13 @@ export function forAspirate(
       labwareLiquidState[well]
     ).source
   })
+
+  // if entityId was not set by a previous "moveToWell" command
+  if ('labwareId' in params) {
+    robotState.pipettes[pipetteId] = {
+      ...robotState.pipettes[pipetteId],
+      entityId: params.labwareId,
+      wellName,
+    }
+  }
 }
