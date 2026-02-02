@@ -40,8 +40,9 @@ def detect_robot_status(ip: str) -> None:
             on_robot=True,
         )
 
+
 def launch_background_tasks() -> None:
-    """Launches background processes"""
+    """Launches background processes."""
     # gets this package's directory
     package_dir = os.path.dirname(os.path.abspath(__file__))
 

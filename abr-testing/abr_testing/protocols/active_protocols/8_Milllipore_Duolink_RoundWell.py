@@ -208,9 +208,9 @@ def discard(
 # Run protocol
 # ----------------------------
 def run(ctx: ProtocolContext) -> None:
+    """Run the protocol."""
     background_helpers.launch_background_tasks()
 
-    """Run the protocol."""
     num_sample = ctx.params.num_sample  # type: ignore[attr-defined]
     length = ctx.params.error_capture_duration  # type: ignore[attr-defined]
     heat_on_deck = ctx.params.heat_on_deck  # type: ignore[attr-defined]
