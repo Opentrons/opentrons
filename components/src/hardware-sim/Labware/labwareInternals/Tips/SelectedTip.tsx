@@ -37,7 +37,6 @@ export function SelectedTip(props: {
   }
 
   const shouldShowStroke = textInsideTip == null && showStroke
-  console.log('🚀 ~ SelectedTip ~ showStroke:', showStroke)
   // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
   return (
     <svg
