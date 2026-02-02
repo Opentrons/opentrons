@@ -262,11 +262,6 @@ export const updateInitialDeckState = (
       [value.addressableAreaId as AddressableAreaName],
       value.cutoutId
     )
-    // Determine if we're removing (applying single slot fixture) or adding
-    const removing = SINGLE_SLOT_FIXTURES.includes(newFixtureName!)
-    // Determine if the new fixture is a module
-    const isModuleFixture =
-      getModuleModelFromFixtureId(newFixtureName!) !== null
 
     // Find matching fixtures on deck by cutoutId (could be multiple, e.g., waste chute + staging area)
     const matchingFixturesOnDeck = Object.values(
@@ -275,6 +270,12 @@ export const updateInitialDeckState = (
     // Check if this is a waste chute + staging area combo (multiple fixtures at same cutout)
     const isWasteChuteStagingAreaCombo = matchingFixturesOnDeck.length > 1
     const matchingFixtureOnDeck = matchingFixturesOnDeck[0] ?? null
+
+    // Determine if we're removing (applying single slot fixture) or adding
+    const removing = SINGLE_SLOT_FIXTURES.includes(newFixtureName!)
+    // Determine if the new fixture is a module
+    const isModuleFixture =
+      getModuleModelFromFixtureId(newFixtureName!) !== null
 
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
@@ -301,6 +302,45 @@ export const updateInitialDeckState = (
 
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
 
+    // Handle waste chute + staging area combo - treat as remove
+    if (isWasteChuteStagingAreaCombo) {
+      // Determine which fixture to delete based on newFixtureName (delete the opposite)
+      // If newFixtureName is waste chute, delete staging area (keep waste chute)
+      // If newFixtureName is staging area, delete waste chute (keep staging area)
+      const targetFixtureName = WASTE_CHUTE_FIXTURES.includes(newFixtureName!)
+        ? 'stagingArea'
+        : STAGING_AREA_FIXTURES.includes(newFixtureName!)
+          ? 'wasteChute'
+          : null
+      const fixtureToDelete =
+        targetFixtureName != null
+          ? matchingFixturesOnDeck.find(f => f.name === targetFixtureName)
+          : matchingFixtureOnDeck
+
+      if (fixtureToDelete != null) {
+        const fixtureCtx: FixtureContext = {
+          value,
+          fixtureName: newFixtureName!,
+          matchingFixture: fixtureToDelete,
+          matching4thColumnLabware:
+            fixtureToDelete.name === 'stagingArea'
+              ? matching4thColumnLabware
+              : null,
+          hasLabwareOnSlot,
+          fixtureIds,
+          fourthColumnSlotLabwareId,
+          deckConfig,
+          dispatch,
+          setShowDeleteEntityModal,
+          setShowDeleteStagingAreaModal,
+          makeSnackbar,
+          t,
+        }
+        handleDeleteFixture(fixtureCtx)
+      }
+      return
+    }
+
     if (removing) {
       if (matchingModuleOnDeck != null) {
         const moduleCtx: ModuleContext = {
@@ -315,46 +355,23 @@ export const updateInitialDeckState = (
           t,
         }
         handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
-      } else if (isWasteChuteStagingAreaCombo) {
-        // If multiple fixtures (waste chute + staging area combo), find the one to delete based on newFixtureName
-        let fixtureToDelete = matchingFixtureOnDeck
-        if (isWasteChuteStagingAreaCombo) {
-          const targetFixtureName = WASTE_CHUTE_FIXTURES.includes(
-            newFixtureName!
-          )
-            ? 'wasteChute'
-            : STAGING_AREA_FIXTURES.includes(newFixtureName!)
-              ? 'stagingArea'
-              : null
-          fixtureToDelete =
-            targetFixtureName != null
-              ? (matchingFixturesOnDeck.find(
-                  f => f.name === targetFixtureName
-                ) ?? matchingFixtureOnDeck)
-              : matchingFixtureOnDeck
+      } else if (matchingFixturesOnDeck.length > 0) {
+        const fixtureCtx: FixtureContext = {
+          value,
+          fixtureName: newFixtureName!,
+          matchingFixture: matchingFixtureOnDeck,
+          matching4thColumnLabware,
+          hasLabwareOnSlot,
+          fixtureIds,
+          fourthColumnSlotLabwareId,
+          deckConfig,
+          dispatch,
+          setShowDeleteEntityModal,
+          setShowDeleteStagingAreaModal,
+          makeSnackbar,
+          t,
         }
-
-        if (fixtureToDelete != null) {
-          const fixtureCtx: FixtureContext = {
-            value,
-            fixtureName: newFixtureName!,
-            matchingFixture: fixtureToDelete,
-            matching4thColumnLabware:
-              fixtureToDelete.name === 'stagingArea'
-                ? matching4thColumnLabware
-                : null,
-            hasLabwareOnSlot,
-            fixtureIds,
-            fourthColumnSlotLabwareId,
-            deckConfig,
-            dispatch,
-            setShowDeleteEntityModal,
-            setShowDeleteStagingAreaModal,
-            makeSnackbar,
-            t,
-          }
-          handleDeleteFixture(fixtureCtx)
-        }
+        handleDeleteFixture(fixtureCtx)
       }
       return
     }
