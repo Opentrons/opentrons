@@ -17,6 +17,7 @@ dependencies = [
     "playwright>=1.55",
     "opentrons",
     "opentrons-shared-data",
+    "neoteroi-mkdocs>=1.2.0",
 ]
 
 [tool.uv.sources]

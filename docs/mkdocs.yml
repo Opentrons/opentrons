@@ -17,10 +17,13 @@ nav:
       - Temperature Module: '!include temperature-module/mkdocs.yml'
   - Protocol Designer: '!include protocol-designer/mkdocs.yml'
   - Python API: '!include python-api/mkdocs.yml'
+  - HTTP API: http-api.md
 
 plugins:
   - monorepo
   - search
+  - neoteroi.mkdocsoad:
+      use_pymdownx: true
   - mkdocstrings:
       default_handler: python
       handlers:
@@ -71,6 +74,7 @@ markdown_extensions:
   - admonition
   - attr_list
   - md_in_html
+  - pymdownx.details
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
