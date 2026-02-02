@@ -254,7 +254,11 @@ function _getNextRobotStateAndWarningsSingleCommand(
       break
 
     case 'configureNozzleLayout':
-      forConfigureNozzleLayout(command.params, robotStateAndWarnings)
+      forConfigureNozzleLayout(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     case 'temperatureModule/setTargetTemperature':
