@@ -9,7 +9,7 @@ from opentrons.protocol_api import (
     Labware,
 )
 from typing import List, Any
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 metadata = {
     "protocolName": "Olink Target 96/ 48 v3",
@@ -84,6 +84,8 @@ def add_parameters(p: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
+    background_helpers.launch_background_tasks()
+
     """Main function to run the protocol."""
     global open_location
     protocol.capture_image(filename="start_of_run")

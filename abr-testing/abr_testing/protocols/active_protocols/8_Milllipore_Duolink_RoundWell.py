@@ -12,7 +12,7 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
 )
 from typing import List, Union
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 metadata = {
     "protocolName": "Duolink PLA for Microscopy - Combined Day 1 & Day 2",
@@ -208,6 +208,8 @@ def discard(
 # Run protocol
 # ----------------------------
 def run(ctx: ProtocolContext) -> None:
+    background_helpers.launch_background_tasks()
+
     """Run the protocol."""
     num_sample = ctx.params.num_sample  # type: ignore[attr-defined]
     length = ctx.params.error_capture_duration  # type: ignore[attr-defined]

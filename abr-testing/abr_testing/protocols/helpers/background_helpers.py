@@ -4,6 +4,8 @@ These functions do not affect protocol execution.
 """
 from typing import List
 import time
+import os
+import subprocess
 
 from abr_testing.automation import slack
 from abr_testing.tools import check_robot_status as robot_status
@@ -37,3 +39,13 @@ def detect_robot_status(ip: str) -> None:
             completed_robots=completed_robots,
             on_robot=True,
         )
+
+def launch_background_tasks() -> None:
+    """Launches background processes"""
+    # gets this package's directory
+    package_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # adds script name to the end
+    script_full_path = os.path.join(package_dir, "run_background.sh")
+
+    subprocess.Popen(["bash", script_full_path])

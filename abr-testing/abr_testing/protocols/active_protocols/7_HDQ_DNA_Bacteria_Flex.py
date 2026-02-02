@@ -1,5 +1,5 @@
 """Omega HDQ DNA Extraction: Bacteria - Tissue Protocol."""
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 import math
 from opentrons import types
 from opentrons.protocol_api import (
@@ -63,6 +63,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
+    background_helpers.launch_background_tasks()
+
     """Protocol."""
     protocol.capture_image(filename="start_of_run")
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]

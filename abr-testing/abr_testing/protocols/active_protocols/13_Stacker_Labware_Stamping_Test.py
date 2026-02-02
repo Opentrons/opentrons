@@ -12,7 +12,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 
 from typing import List
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 metadata = {
     "protocolName": "Flex Stacker Stamping Protocol",
@@ -129,6 +129,8 @@ def unload_tipracks_from_stacker(
 
 
 def run(ctx: ProtocolContext) -> None:
+    background_helpers.launch_background_tasks()
+
     """Run the protocol."""
     ctx.capture_image(filename="start_of_run")
     length = ctx.params.error_capture_duration  # type: ignore[attr-defined]

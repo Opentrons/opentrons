@@ -7,7 +7,7 @@ from opentrons.protocol_api import (
 )
 from typing import Tuple, Optional
 from opentrons.protocol_api import COLUMN, ALL
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 from opentrons.protocol_api.module_contexts import (
     HeaterShakerContext,
     ThermocyclerContext,
@@ -40,6 +40,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
+    background_helpers.launch_background_tasks()
+
     """Protocol."""
     # Load Parameters
     protocol.capture_image(filename="start_of_run")

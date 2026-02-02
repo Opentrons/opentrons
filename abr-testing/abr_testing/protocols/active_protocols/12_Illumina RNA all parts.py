@@ -11,7 +11,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 
 metadata = {
@@ -70,6 +70,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
+    background_helpers.launch_background_tasks()
+
     """Protocol."""
     protocol.capture_image(filename="start_of_run")
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]

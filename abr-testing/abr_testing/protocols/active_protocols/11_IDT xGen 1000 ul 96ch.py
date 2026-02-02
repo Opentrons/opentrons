@@ -1,7 +1,7 @@
 """IDT xGEn 1000ul 96x with Flex Stacker."""
 
 from opentrons.protocol_api import ProtocolContext, ParameterContext
-from abr_testing.protocols.helpers import run_helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 from typing import List
 from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
@@ -57,6 +57,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 
 def run(protocol: ProtocolContext) -> None:
+    background_helpers.launch_background_tasks()
+
     """Protocol."""
     protocol.capture_image(filename="start_of_run")
 
