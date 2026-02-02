@@ -75,7 +75,7 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   const { params: labwareLoadCommandParams } = labwareLoadCommand ?? {}
   const labwareNickname: string | null =
     labwareLoadCommandParams != null &&
-      'displayName' in labwareLoadCommandParams
+    'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
       : null
   const isTopLabwareLid =
@@ -106,8 +106,8 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   const wellGroup: WellGroup | null =
     activeWellName != null
       ? {
-        [activeWellName]: null,
-      }
+          [activeWellName]: null,
+        }
       : null
 
   const labwareViewBox = getLabwareViewBox(labwareDef)
@@ -123,10 +123,10 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     hopperGroups != null
       ? hopperGroups.length
       : labware[topLabwareOnSlotId].stack.filter(
-        id =>
-          labware[id] != null &&
-          labwareEntities[id].labwareDefURI === topLabwareURI
-      )?.length
+          id =>
+            labware[id] != null &&
+            labwareEntities[id].labwareDefURI === topLabwareURI
+        )?.length
   const adapterId = labware[topLabwareOnSlotId].stack.find(
     id =>
       labwareEntities[id]?.def.allowedRoles?.includes('adapter') &&
