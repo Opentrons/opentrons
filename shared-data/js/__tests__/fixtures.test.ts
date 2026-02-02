@@ -598,7 +598,7 @@ describe('getAddedMissingThermocyclerFixtures', () => {
     expect(result).toContainEqual({
       cutoutId: 'cutoutB1',
       cutoutFixtureId: THERMOCYCLER_V2_FRONT_FIXTURE,
-      addressableAreaId: 'B1',
+      addressableAreaId: 'thermocyclerModuleV2',
     })
   })
 
