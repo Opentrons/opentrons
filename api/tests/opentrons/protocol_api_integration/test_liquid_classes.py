@@ -156,11 +156,8 @@ def test_adding_blowout_position_to_liquid_classes(
     custom_water_props.dispense.retract.blowout.blowout_position = None
     assert custom_water_props.dispense.retract.blowout.blowout_position is None
 
-    custom_water_props.dispense.retract.blowout.blowout_position = {  # type:ignore[assignment]
-        "position_reference": "well-top",
-        "offset": {"x": 11, "y": 22, "z": 33, "w": 123},
-    }
-    assert (
-        custom_water_props.dispense.retract.blowout.blowout_position.offset  # type:ignore[union-attr]
-        == Coordinate(x=11, y=22, z=33)
-    )
+    with pytest.raises(ValueError):
+        custom_water_props.dispense.retract.blowout.blowout_position = {  # type:ignore[assignment]
+            "position_reference": "well-top",
+            "offset": {"x": 11, "y": 22, "z": 33, "w": 123},
+        }

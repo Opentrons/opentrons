@@ -25,25 +25,29 @@ lint:
 typecheck:
 	uv run mypy automation tests conftest.py
 
+.PHONY: prep
+prep: 
+	echo "Format and typecheck the code"
+	$(MAKE) format
+	$(MAKE) typecheck
+
 .PHONY: check
 check: lint typecheck
 
-.PHONY: test-pd
-test-pd:
-	TEST_ENV=$(TEST_ENV) uv run pytest -m pdE2E
-
 .PHONY: test-pd-local
 test-pd-local:
-	# Running the command with '-' ignores the failure exit code so the echos run
-	-TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS)
-	@echo ""
-	@echo "---------------------------------------------------------"
-	@echo "🧪 Tests Finished!"
-	@echo "View /opentrons/e2e-testing/test-results/report.html for report"
-	@echo "Use /opentrons/e2e-testing/test-result to see videos"
-	@echo "Use 'make troubleshoot' to view and troubleshoot failed tests"
-	@echo "Run the python file run_many_tests in /e2e-testing to auto-format"
-	@echo "---------------------------------------------------------"
+	@# Always print the summary banner, but preserve pytest's exit code.
+	@status=0; \
+	TEST_ENV=local uv run pytest $(PYTEST_ARGS) || status=$$?; \
+	echo ""; \
+	echo "---------------------------------------------------------"; \
+	echo "🧪 Tests Finished!"; \
+	echo "View /opentrons/e2e-testing/test-results/report.html for report"; \
+	echo "Use /opentrons/e2e-testing/test-result to see videos"; \
+	echo "Use 'make troubleshoot' to view and troubleshoot failed tests"; \
+	echo "Run the python file run_many_tests in /e2e-testing to auto-format"; \
+	echo "---------------------------------------------------------"; \
+	exit $$status
 
 .PHONY: troubleshoot
 troubleshoot:

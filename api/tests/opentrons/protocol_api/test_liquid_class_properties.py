@@ -537,10 +537,24 @@ def test_ensure_validated_tip_position(
     validated_position = _ensure_validated_tip_position(tip_position)
     assert validated_position == expected_position
 
+
+def test_ensure_validated_tip_position_raises_error() -> None:
+    """It should raise an error if the tip position is invalid."""
     with pytest.raises(TypeError):
         _ensure_validated_tip_position("invalid_tip_position")  # type: ignore[arg-type]
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match="Input should be 'well-bottom', 'well-top', 'well-center' or 'liquid-meniscus'",
+    ):
         _ensure_validated_tip_position(
             {"position_reference": "invalid", "offset": {"x": 10, "y": 20, "z": 30}}  # type: ignore[arg-type]
+        )
+
+    with pytest.raises(ValueError, match="Extra inputs are not permitted"):
+        _ensure_validated_tip_position(
+            {  # type: ignore[arg-type]
+                "position_reference": "well-bottom",
+                "offset": {"x": 10, "y": 20, "z": 30, "w": 3},
+            }
         )

@@ -12,7 +12,7 @@
   "add_details": "Add step details",
   "advanced_settings": "Advanced pipetting settings",
   "air_gap_volume": "Air gap volume",
-  "all": "All",
+  "all_nozzles": "All nozzles (recommended)",
   "and": "and",
   "aspirate": "Aspirate",
   "aspirate_labware": "Source labware",
@@ -38,7 +38,6 @@
     "volume": "Recommended between 0.1 and {{max}}"
   },
   "change_tips": "Change tips",
-  "column": "Column",
   "comfirm_reset_settings": {
     "liquid_class_selected": "Continuing will undo any changes and restore the settings to the values associated with the {{liquidClassName}} liquid class.",
     "no_liquid_class": "Continuing will undo any changes and restore the settings to the default values."
@@ -160,6 +159,8 @@
     "untilTemperature": "Until {{temperature}} °C reached"
   },
   "pipette": "Pipette",
+  "pipette_nozzles_and_wells": "Pipette nozzles and wells",
+
   "pipette_path": "Pipette path",
   "place_hardware": "Place the modules and fixtures that you are using for this protocol onto the deck.",
   "place_modules": "Place the modules that you are using for this protocol onto the deck.",
@@ -187,7 +188,6 @@
   "select_dispense_wells": "Select destination wells using a {{displayName}}",
   "select_labware": "Select labware",
   "select_mix_labware": "Select a mix labware",
-  "select_nozzles": "Nozzles",
   "select_pipette": "Select a pipette",
   "select_tip_location": "Select pick up tip location",
   "select_tiprack": "Select a tiprack",
@@ -196,7 +196,9 @@
   "shake": "Shake",
   "shake_speed": "Shake speed",
   "single": "Single transfer",
-  "single_nozzle": "Single",
+  "single_column_of_nozzles": "Single column of nozzles",
+  "single_nozzle": "Single nozzle",
+  "single_row_of_nozzles": "Single row of nozzles",
   "speed": "Speed",
   "start_point": "{{prefix}} start point",
   "starting_deck": "Starting deck",
