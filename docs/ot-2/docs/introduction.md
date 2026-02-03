@@ -23,3 +23,5 @@ This manual is organized to help you get started quickly and operate your OT-2 e
 - **Keep OT-2 running**: Following the user-level procedures in the [Maintenance section](./maintenance/index.md) helps ensure that your robot has a long and trouble-free life.
 
 - **And more!**: For other topics, see the [Appendices section](./support.md).
+
+<!-- test, remove -->
