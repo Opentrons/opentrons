@@ -6,7 +6,7 @@ Regardless of how you create them, every protocol begins as a file on your compu
 
 ## The Protocols tab
 
-By default, the Opentrons App opens to the **Protocols** tab. If you have a new robot and are opening the app for the first time, or if you have deleted all saved protocols, the app displays the protocol upload screen. If you have already imported protocols, the app displays a summary list.
+By default, the Opentrons App opens to the **Protocols** tab. If you have a new robot and are opening the app for the first time, the app displays the protocol upload screen. If you have already imported protocols, the app displays a summary list.
 
 <figure class="side-by-side" markdown>
 ![Protocol tab screen with no protocols](../images/app-no-protocol.png)
