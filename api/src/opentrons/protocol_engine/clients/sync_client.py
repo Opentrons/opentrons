@@ -257,3 +257,17 @@ class SyncClient:
             pipette_id=pipette_id,
             speed=speed,
         )
+
+    def create_user_command_annotation(
+        self,
+        annotation_name: str,
+        description: Optional[str],
+        annotation_id: Optional[str] = None,
+    ) -> str:
+        """Creates a command annotation and returns the annotation ID."""
+        return self._transport.call_method(  # type: ignore[no-any-return]
+            "create_user_command_annotation",
+            annotation_name=annotation_name,
+            description=description,
+            annotation_id=annotation_id,
+        )

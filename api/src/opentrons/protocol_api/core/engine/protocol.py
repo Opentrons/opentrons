@@ -130,6 +130,7 @@ class ProtocolCore(
         self._disposal_locations: List[Union[Labware, TrashBin, WasteChute]] = []
         self._liquid_class_def_cache: Dict[Tuple[str, int], LiquidClassSchemaV1] = {}
         self._load_fixed_trash()
+        self._annotation_ids: List[str] = []
 
     @property
     def api_version(self) -> APIVersion:
@@ -147,6 +148,10 @@ class ProtocolCore(
         if trash_id is not None and self._api_version < APIVersion(2, 16):
             return self._labware_cores_by_id[trash_id]
         return None
+
+    @property
+    def annotation_ids(self) -> List[str]:
+        return self._annotation_ids
 
     def _load_fixed_trash(self) -> None:
         if self.robot_type == "OT-2 Standard" or self._api_version < APIVersion(2, 16):
@@ -1215,6 +1220,25 @@ class ProtocolCore(
                 else self._engine_client.state.camera.get_saturation(),
             )
         )
+
+    def create_user_command_annotation(
+        self, annotation_name: str, annotation_description: Optional[str]
+    ) -> None:
+        """Creates a command annotation and adds the ID to list of active command annotations."""
+        annotation_id = self._engine_client.create_user_command_annotation(
+            annotation_name=annotation_name,
+            description=annotation_description,
+        )
+        self.annotation_ids.append(annotation_id)
+
+    def close_command_annotation(self, annotation_id: str) -> None:
+        """Closes a command annotation by removing the annotation ID from the list of active command annotations."""
+        try:
+            self._annotation_ids.remove(annotation_id)
+        except ValueError:
+            raise ValueError(
+                f"Could not find command annotation with ID: '{annotation_id}'"
+            )
 
     def _convert_labware_location(
         self,

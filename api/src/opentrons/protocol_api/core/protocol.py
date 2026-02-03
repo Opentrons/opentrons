@@ -303,5 +303,17 @@ class AbstractProtocol(
         "Capture an image using a camera."
 
     @abstractmethod
+    def create_user_command_annotation(
+        self,
+        annotation_name: str,
+        annotation_description: Optional[str],
+    ) -> None:
+        """Creates a command annotation and adds the ID to list of active command annotations."""
+
+    @abstractmethod
+    def close_command_annotation(self, annotation_id: str) -> None:
+        """Closes a command annotation by removing the annotation ID from the list of active command annotations."""
+
+    @abstractmethod
     def load_robot(self) -> AbstractRobot:
         """Load a Robot Core context into a protocol"""
