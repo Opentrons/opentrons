@@ -12,3 +12,5 @@ You operate an OT-2 through the [Opentrons App](https://opentrons.com/ot-app). T
 
 !!! note
     While the Opentrons App lets you control the robot and run automated protocols, this software does not create protocols. To create a protocol, you'll use the [Opentrons Protocol Designer](https://designer.opentrons.com/). See the [Protocol Designer Instruction Manual](https://docs.opentrons.com/protocol-designer/) for help getting started or for more information.
+
+<!-- test, remove this -->
