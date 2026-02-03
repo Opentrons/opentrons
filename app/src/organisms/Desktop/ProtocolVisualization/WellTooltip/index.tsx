@@ -119,6 +119,7 @@ export function WellTooltip({
                     <tr key={groupId} className={styles.tooltip_row}>
                       <td>
                         <LiquidIcon
+                          size="xSmall"
                           color={
                             liquidDisplayColors[groupId] ??
                             swatchColors(groupId)
