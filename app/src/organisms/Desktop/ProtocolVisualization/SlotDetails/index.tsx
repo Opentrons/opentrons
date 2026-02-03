@@ -26,15 +26,21 @@ import type {
 
 interface SlotDetailsProps {
   slotId: string
-  command: RunTimeCommand
+  currentCommand: RunTimeCommand
   robotState: RobotState
   invariantContext: InvariantContext
   analysis: ProtocolAnalysisOutput
   liquids: Liquid[]
 }
 export function SlotDetails(props: SlotDetailsProps): JSX.Element {
-  const { slotId, command, robotState, invariantContext, analysis, liquids } =
-    props
+  const {
+    slotId,
+    currentCommand,
+    robotState,
+    invariantContext,
+    analysis,
+    liquids,
+  } = props
   const { labware, modules } = robotState
   const {
     labwareEntities,
@@ -98,7 +104,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
             topLabwareOnSlotId={topMostLabwareOnSlot}
             labwareEntities={labwareEntities}
             commands={commands}
-            currentCommand={command}
+            currentCommand={currentCommand}
             liquids={liquids}
             robotState={robotState}
             pipetteEntities={pipetteEntities}
