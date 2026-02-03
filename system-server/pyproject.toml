@@ -58,8 +58,6 @@ dev = [
     "pytest-xdist~=2.5.0",
     "tavern>=3.0.2",
     "coverage==7.4.0",
-    "atomicwrites==1.4.0; sys_platform=='win32'",
-    "colorama==0.4.4; sys_platform=='win32'",
     "sqlalchemy2-stubs==0.0.2a21",
     "mypy==1.19.1",
     "decoy<3,>=2.2.0",
@@ -80,7 +78,7 @@ build-backend = 'hatchling.build'
 select = ["E", "F", "ANN", "D", "C90", "I", "T201"]
 ignore = ["E203", "E501", "E741", "ANN401", "D107", "D402", "D418"]
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["ANN","D","T201"]
+"tests/*" = ["D", "T201"]
 "system_server/_version.py" = ["I"]
 
 [tool.ruff.lint.pydocstyle]
@@ -138,7 +136,6 @@ dependency-metadata = [
 [tool.pytest]
 addopts = ["--cov=system_server", "--cov-report", "term-missing:skip-covered", "--cov-report", "xml:coverage.xml", "--color=yes", "--strict-markers"]
 asyncio_mode = "auto"
-tavern-global-cfg = ["tests/integration/common.yaml"]
 filterwarnings = [
     "error::pydantic.PydanticDeprecatedSince20",
 ]

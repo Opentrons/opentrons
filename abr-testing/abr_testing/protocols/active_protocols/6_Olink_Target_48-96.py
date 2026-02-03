@@ -9,7 +9,7 @@ from opentrons.protocol_api import (
     Labware,
 )
 from typing import List, Any
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 metadata = {
     "protocolName": "Olink Target 96/ 48 v3",
@@ -80,17 +80,19 @@ def add_parameters(p: ParameterContext) -> None:
         default=False,
         description="ON - protocol will use the waste chute.",
     )
-    helpers.create_error_capture_duration_duration(p)
+    run_helpers.create_error_capture_duration_duration(p)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Main function to run the protocol."""
+    background_helpers.launch_background_tasks()
+
     global open_location
     protocol.capture_image(filename="start_of_run")
 
     # Import Parameters
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
     mmx_to_sample_plate = protocol.params.mmx_to_sample_plate  # type: ignore[attr-defined]
@@ -105,7 +107,7 @@ def run(protocol: ProtocolContext) -> None:
         open_location = "B2"
 
     ninety_six = True if num_samples == 96 else False
-    helpers.comment_protocol_version(protocol, "04")
+    run_helpers.comment_protocol_version(protocol, "04")
 
     protocol.comment(f"\n********\nStarting Target {num_samples} Protocol\n********\n")
 
@@ -527,10 +529,12 @@ def run(protocol: ProtocolContext) -> None:
         protocol.comment(str(liquid_heights))
         protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

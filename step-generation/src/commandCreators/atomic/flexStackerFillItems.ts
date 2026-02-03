@@ -1,3 +1,5 @@
+import { getIsLid } from '@opentrons/shared-data'
+
 import * as errorCreators from '../../errorCreators'
 import { flexStackerStateGetter } from '../../robotStateSelectors'
 import {
@@ -28,9 +30,9 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     invariantContext.labwareEntities
   )
   const modulePythonName = moduleEntities[moduleId].pythonName
-  const labwarePythonNames = fillLabwareIds.map(
-    lwId => labwareEntities[lwId]?.pythonName
-  )
+  const labwarePythonNames = fillLabwareIds
+    .filter(id => !getIsLid(labwareEntities[id].def))
+    .map(lwId => labwareEntities[lwId]?.pythonName)
   const labwareChunks = getChunkForIndentingLists(labwarePythonNames, 4)
   const indentedLabwarePythonNames = labwareChunks
     .map(chunk => INDENT + chunk.join(', '))
@@ -64,8 +66,11 @@ export const flexStackerFillItems: CommandCreator<FlexStackerFillItemsArgs> = (
     }
   }
 
+  const filteredFillLabwareIds = fillLabwareIds.filter(
+    id => !getIsLid(labwareEntities[id].def)
+  )
   const pythonArgs = [
-    ...(fillLabwareIds.length > 0
+    ...(filteredFillLabwareIds.length > 0
       ? `labware=[${formattedPythonLabwareNames}],\n`
       : []),
     ...(interventionMessage != null

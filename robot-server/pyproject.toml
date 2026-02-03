@@ -54,8 +54,6 @@ robot = [
     "Pyro5==5.16",
 ]
 dev = [
-    "atomicwrites==1.4.0; sys_platform=='win32'",
-    "colorama==0.4.4; sys_platform=='win32'",
     "aiohttp==3.12.14",
     "ruff==0.14.10",
     "build~=1.2.0",

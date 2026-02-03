@@ -11,7 +11,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 from opentrons.hardware_control.modules.types import ThermocyclerStep
 from typing import List
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 
 metadata = {
@@ -66,15 +66,17 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Use temperature module in protocol",
         default=True,
     )
-    helpers.create_error_capture_duration_duration(parameters)
+    run_helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    background_helpers.launch_background_tasks()
+
     protocol.capture_image(filename="start_of_run")
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
 
-    helpers.comment_protocol_version(protocol, "04")
+    run_helpers.comment_protocol_version(protocol, "04")
 
     # ======================== DOWNLOADED PARAMETERS ========================
     global REUSE_ANY_50_TIPS  # T/F Whether or not Reusing any p50
@@ -205,7 +207,7 @@ def run(protocol: ProtocolContext) -> None:
     p50_flow_rate_dispense_default = 50
     p50_flow_rate_blow_out_default = 100
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
     # ================================ LISTS ================================
@@ -2889,10 +2891,12 @@ def run(protocol: ProtocolContext) -> None:
                 stacker_50_2.store()
         protocol.capture_image(filename="end_of_run")
         if not protocol.is_simulating():
-            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)
