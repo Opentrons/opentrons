@@ -28,7 +28,7 @@ export interface CutoutConfigAndCompatibility extends CutoutConfigProtocolSpec {
   compatibleCutoutFixtureIds: CutoutFixtureId[]
 }
 
-// TODO: (tz, 2026-02-03) remove this and once FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC is using the getEmptyDeckConfiguration
+// TODO: (tz, 2026-02-03) remove this and once FLEX_SIMPLEST_DECK_CONFIG_PROTOCOL_SPEC is using the getEmptyDeckConfiguration https://opentrons.atlassian.net/browse/AUTH-2736
 export const FLEX_SIMPLEST_DECK_CONFIG: DeckConfiguration = [
   { cutoutId: 'cutoutA1', cutoutFixtureId: 'singleLeftSlot' },
   { cutoutId: 'cutoutB1', cutoutFixtureId: 'singleLeftSlot' },
