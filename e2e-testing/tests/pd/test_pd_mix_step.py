@@ -40,11 +40,11 @@ def test_mix_step_configuration_workflow(page: Page, base_url: str) -> None:
         "Tiprack",
         "Labware",
     ]:
+        print(f"Expecting text: {label}")
         mix_form.expect_text(label)
 
     mix_form.select_pipette(PIPETTE_OPTION)
     mix_form.select_tiprack(TIPRACK_OPTION)
-
     mix_form.select_labware(LABWARE_OPTION)
 
     for label in [

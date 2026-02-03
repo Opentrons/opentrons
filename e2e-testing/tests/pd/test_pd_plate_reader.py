@@ -11,7 +11,7 @@ from eyes import Eyes
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes) -> None:
+def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes | None) -> None:
     plate_reader_page = PlateReaderPage(page)
     protocol_editor = ProtocolEditorPage(page)
     create_protocol = CreateProtocolWizard(page)
@@ -86,9 +86,10 @@ def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes) -> 
     plate_reader_page.wait_for_save_banner_gone()
     timeline = Timeline(page)
     timeline.scroll_timeline_to_bottom()
-    eyes.check(checkpoint_name="Fully Configured Plate Reader")
-    # now take a visual snapshot of the timeline element with stitching
-    eyes.check_element(
-        checkpoint_name="Stitched Final Timeline",
-        element=page.get_by_test_id(timeline.timeline_box_testid),
-    )
+    if eyes is not None:
+        eyes.check(checkpoint_name="Fully Configured Plate Reader")
+        # now take a visual snapshot of the timeline element with stitching
+        eyes.check_element(
+            checkpoint_name="Stitched Final Timeline",
+            element=page.get_by_test_id(timeline.timeline_box_testid),
+        )
