@@ -439,6 +439,7 @@ export function generateQuickTransferArgs(
   if (pipetteEntity.spec.channels === 96) {
     nozzles = 'ALL' as NozzleConfigurationStyle
   }
+  const primary_nozzle = 'A1'
   const touchTipAfterDispenseOffsetMmFromTop =
     quickTransferState.touchTipDispense ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
@@ -493,6 +494,7 @@ export function generateQuickTransferArgs(
     name: null,
     description: null,
     nozzles,
+    primary_nozzle,
     pushOut: quickTransferState.pushOutDispense?.volume ?? 0,
     liquidClass:
       quickTransferState.liquidClassName !== 'none'

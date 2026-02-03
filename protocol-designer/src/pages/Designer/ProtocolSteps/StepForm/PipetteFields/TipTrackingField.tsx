@@ -11,10 +11,9 @@ import {
   SPACING,
   StyledText,
 } from '@opentrons/components'
-import { OT2_ROBOT_TYPE } from '@opentrons/shared-data'
+import { A1_NOZZLE, OT2_ROBOT_TYPE } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
-  getDefaultPrimaryNozzle,
   getTransferPlanAndReferenceVolumes,
   MANUAL,
 } from '@opentrons/step-generation'
@@ -124,10 +123,7 @@ export function TipTrackingField(props: TipTrackingFieldProps): JSX.Element {
     },
   ]
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles,
-    channels,
-  })
+  const primaryNozzle = A1_NOZZLE
 
   const tipAccessibilityStatus =
     useMemoizedTipAccessibilityByTiprackIdByWellName({

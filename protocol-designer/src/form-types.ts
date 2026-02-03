@@ -4,6 +4,7 @@ import type {
   LabwareLocation,
   NozzleConfigurationStyle,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -306,6 +307,7 @@ export interface HydratedMoveLiquidFormData extends AnnotationFields {
   dropTip_location: string
   liquidClassesSupported: boolean
   nozzles: NozzleConfigurationStyle | null
+  primary_nozzle: PrimaryNozzleConfigurationStyle
   path: PathOption
   // the existing code claims that pipette and tipRack are not nullable, but they are:
   pipette: PipetteEntity
@@ -416,6 +418,7 @@ export interface HydratedMixFormData extends AnnotationFields {
   mix_wellOrder_first: WellOrderOption
   mix_wellOrder_second: WellOrderOption
   nozzles: NozzleConfigurationStyle | null
+  primary_nozzle: PrimaryNozzleConfigurationStyle
   pipette: PipetteEntity // can be null if user deletes pipette
   stepType: 'mix'
   tipRack: TipRackWithDef

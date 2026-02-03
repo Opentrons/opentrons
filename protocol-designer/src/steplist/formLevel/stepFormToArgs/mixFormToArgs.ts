@@ -25,6 +25,7 @@ export const mixFormToArgs = (
     labware,
     pipette,
     dropTip_location,
+    primary_nozzle,
     nozzles,
     mix_x_position,
     mix_y_position,
@@ -117,6 +118,7 @@ export const mixFormToArgs = (
     //  TODO(jr, 7/26/24): wire up wellNames
     dropTipLocation: dropTip_location,
     nozzles,
+    primary_nozzle,
     positionReference: mix_position_reference ?? POSITION_REFERENCE_BOTTOM,
     xOffset: mix_x_position ?? 0,
     yOffset: mix_y_position ?? 0,

@@ -1,4 +1,5 @@
 import {
+  A1_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -303,7 +304,6 @@ export const getIsSafePipetteMovement = (args: {
     labwareId,
     wellLocationOffset = { x: 0, y: 0, z: 0 },
     wellTargetName,
-    primaryNozzle: primaryNozzleOverride,
     nozzleConfiguration: nozzleConfigurationOverride,
   } = args
   const {
@@ -375,12 +375,7 @@ export const getIsSafePipetteMovement = (args: {
 
   const { channels } = pipetteEntity.spec
   const primaryNozzle =
-    primaryNozzleOverride ??
-    getDefaultPrimaryNozzle({
-      nozzles: nozzleConfiguration,
-      channels,
-    })
-
+    robotState.pipettes[pipetteId]?.primaryNozzle ?? A1_NOZZLE
   const tipOverlapOnNozzle =
     tiprackEntity != null
       ? getTipOverlap({
@@ -553,23 +548,6 @@ export const getTipColumnName = (wellName: string): string => wellName.slice(1)
 
 export const getTipColumnIndex = (wellName: string): number =>
   parseInt(wellName.slice(1)) - 1
-
-export const getDefaultPrimaryNozzle = (args: {
-  nozzles: NozzleConfigurationStyle
-  channels: PipetteChannels
-}): string => {
-  const { nozzles, channels } = args
-  if (channels === 8 && nozzles === SINGLE) {
-    return 'H1'
-  } else if (channels === 96) {
-    if (nozzles === COLUMN) {
-      return 'A12'
-    } else if (nozzles === SINGLE) {
-      return 'H12'
-    }
-  }
-  return 'A1'
-}
 
 export const getTargetTipsFromWellSets = (args: {
   wellSets: string[][]

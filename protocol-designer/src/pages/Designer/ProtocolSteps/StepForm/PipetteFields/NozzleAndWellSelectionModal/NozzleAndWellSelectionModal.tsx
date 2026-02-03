@@ -13,11 +13,7 @@ import { PipetteNozzleSelector } from './PipetteNozzleSelector'
 import { WellSelector } from './WellSelector'
 
 import type { Dispatch, ReactNode, SetStateAction } from 'react'
-import type { DropdownOption } from '@opentrons/components'
-import type {
-  NozzleConfigurationStyle,
-  PipetteV2Specs,
-} from '@opentrons/shared-data'
+import type { PipetteV2Specs } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 import type { FieldPropsByName } from '../../types'
 
@@ -26,13 +22,9 @@ interface NozzleAndWellSelectionModalProps {
   children?: ReactNode
   totalSteps: number
   pipetteSpecs: PipetteV2Specs
-  options: DropdownOption[]
-  updateValue: (arg: unknown) => void
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
-  value: NozzleConfigurationStyle
-  setSelectedValue: any
 }
 
 export function NozzleAndWellSelectionModal(
@@ -42,15 +34,12 @@ export function NozzleAndWellSelectionModal(
     children,
     totalSteps,
     pipetteSpecs,
-    options,
     deckSetup,
     showModal,
     propsForFields,
     stepType,
-    updateValue,
-    setSelectedValue,
-    value,
   } = props
+
   const { t } = useTranslation('protocol_steps')
   const robotType = useSelector(getRobotType)
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0)
@@ -67,11 +56,8 @@ export function NozzleAndWellSelectionModal(
         return (
           <PipetteNozzleSelector
             pipetteSpecs={pipetteSpecs}
-            options={options}
             robotType={robotType}
-            updateValue={updateValue}
-            value={value}
-            setSelectedValue={setSelectedValue}
+            propsForFields={propsForFields}
           />
         )
 
@@ -82,7 +68,6 @@ export function NozzleAndWellSelectionModal(
             deckSetup={deckSetup}
             stepType={isMixStep ? stepType : 'aspirate'}
             robotType={robotType}
-            nozzleConfiguration={value}
           />
         )
 
@@ -93,7 +78,6 @@ export function NozzleAndWellSelectionModal(
             deckSetup={deckSetup}
             stepType={'dispense'}
             robotType={robotType}
-            nozzleConfiguration={value}
           />
         )
 

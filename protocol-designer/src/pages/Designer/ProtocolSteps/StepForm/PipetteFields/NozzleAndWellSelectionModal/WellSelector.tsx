@@ -8,15 +8,11 @@ import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
 import styles from './nozzleandwellwizard.module.css'
 
-import type {
-  NozzleConfigurationStyle,
-  RobotType,
-} from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectorProps {
-  nozzleConfiguration: NozzleConfigurationStyle
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string

@@ -1,6 +1,7 @@
 import flatMap from 'lodash/flatMap'
 
 import {
+  A1_NOZZLE,
   ALL,
   getByVolumeValue,
   getIsTiprack,
@@ -17,7 +18,6 @@ import {
   curryWithoutPython,
   formatPyStr,
   formatPyWellLocation,
-  getDefaultPrimaryNozzle,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
@@ -413,10 +413,8 @@ export const mix: CommandCreator<MixArgs> = (
     tiprackSelected != null &&
     tipsSelected != null &&
     tipsSelected.length > 0
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
+  const primaryNozzle =
+    prevRobotState.pipettes[pipette].primaryNozzle ?? A1_NOZZLE
   const targetTips = shouldSelectManualTips
     ? getTargetTipsFromWellSets({
         wellSets: tipsSelected,

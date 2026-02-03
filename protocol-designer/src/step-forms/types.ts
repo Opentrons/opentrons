@@ -5,6 +5,7 @@ import type {
   ModuleModel,
   ModuleType,
   NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AdditionalEquipmentEntity,
@@ -63,6 +64,7 @@ export interface PipetteTemporalProperties {
   mount: Mount
   nozzles?: NozzleConfigurationStyle
   prevNozzles?: NozzleConfigurationStyle
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
 }
 // =========== ON DECK ========
 // The "on deck" types are entities with added properties (slot / mount)

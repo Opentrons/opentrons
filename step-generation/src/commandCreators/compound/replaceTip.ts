@@ -1,4 +1,5 @@
 import {
+  A1_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -11,7 +12,6 @@ import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
-  getDefaultPrimaryNozzle,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getLabwareSlot,
@@ -202,10 +202,8 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels,
-  })
+  const primaryNozzle =
+    prevRobotState.pipettes[pipette].primaryNozzle ?? A1_NOZZLE
 
   const curryCommand = isFromMixCommand
     ? curryCommandCreator

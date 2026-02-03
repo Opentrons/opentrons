@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { ALL, COLUMN, fixtureP100096V2Specs } from '@opentrons/shared-data'
+import {
+  A1_NOZZLE,
+  ALL,
+  COLUMN,
+  fixtureP100096V2Specs,
+} from '@opentrons/shared-data'
 
 import { getSuccessResult } from '../../../fixtures'
 import { configureNozzleLayout } from '../configureNozzleLayout'
@@ -33,7 +38,7 @@ describe('configureNozzleLayout', () => {
     const result = configureNozzleLayout(
       {
         configurationParams: {
-          primaryNozzle: undefined,
+          primaryNozzle: A1_NOZZLE,
           style: ALL,
         },
         pipetteId: mockPipette,

@@ -228,6 +228,8 @@ describe('createPresavedStepForm', () => {
       disposalVolume_volume: '1',
       path: 'single',
       preWetTip: false,
+      primary_nozzle: 'A1',
+
       pushOut_checkbox: null,
       pushOut_volume: null,
       conditioning_checkbox: false,
@@ -262,6 +264,8 @@ describe('createPresavedStepForm', () => {
         // default fields
         labware: null,
         nozzles: null,
+        primary_nozzle: 'A1',
+
         dropTip_wellNames: undefined,
         dropTip_location: 'mockTrash',
         pickUpTip_location: undefined,

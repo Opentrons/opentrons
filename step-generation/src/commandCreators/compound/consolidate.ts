@@ -2,6 +2,7 @@ import chunk from 'lodash/chunk'
 import flatMap from 'lodash/flatMap'
 
 import {
+  A1_NOZZLE,
   ALL,
   getAllLiquidClassDefs,
   getByVolumeValue,
@@ -27,7 +28,6 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getIsSafePipetteMovement,
   getSlotInLocationStack,
@@ -418,10 +418,8 @@ export const consolidate: CommandCreator<ConsolidateArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
+  const primaryNozzle =
+    prevRobotState.pipettes[pipette].primaryNozzle ?? A1_NOZZLE
 
   const shouldSelectManualTips =
     tipTracking === MANUAL &&

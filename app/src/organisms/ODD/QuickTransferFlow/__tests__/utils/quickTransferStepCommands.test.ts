@@ -161,6 +161,8 @@ describe('quickTransferStepCommands', () => {
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
       nozzles: null,
+      primary_nozzle: 'A1',
+
       sourceLabware: 'mockSourceLabware',
       destLabware: 'mockDestLabware',
       volume: 10,
@@ -318,6 +320,8 @@ pipette.drop_tip()`.trimStart()
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
       nozzles: null,
+      primary_nozzle: 'A1',
+
       sourceLabware: 'mockSourceLabware',
       destLabware: 'mockDestLabware',
       volume: 10,
@@ -475,6 +479,8 @@ pipette.drop_tip()`.trimStart()
       tipRack: 'fixture/fixture_flex_96_tiprack_1000ul/1',
       pipette: 'mockPipette',
       nozzles: null,
+      primary_nozzle: 'A1',
+
       sourceLabware: 'mockSourceLabware',
       destLabware: 'mockDestLabware',
       volume: 10,

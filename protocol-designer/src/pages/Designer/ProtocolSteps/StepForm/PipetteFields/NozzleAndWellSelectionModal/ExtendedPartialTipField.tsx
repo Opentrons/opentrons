@@ -3,17 +3,27 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import { ListButton, StyledText } from '@opentrons/components'
-import { ALL, COLUMN, PARTIAL, ROW, SINGLE } from '@opentrons/shared-data'
+import {
+  A1_NOZZLE,
+  A12_NOZZLE,
+  ALL,
+  COLUMN,
+  PARTIAL,
+  ROW,
+  SINGLE,
+} from '@opentrons/shared-data'
 
 import { getInitialDeckSetup } from '/protocol-designer/step-forms/selectors'
 
 import { NozzleAndWellSelectionModal } from './NozzleAndWellSelectionModal'
 import styles from './nozzleandwellwizard.module.css'
+import { partialNozzleMap } from './utils'
 
-import type { DropdownOption } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
+  PartialPrimaryNozzles,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type { FieldProps, FieldPropsByName } from '../../types'
 
@@ -25,7 +35,7 @@ interface ExtendedPartialTipFieldProps extends FieldProps {
 export function ExtendedPartialTipField(
   props: ExtendedPartialTipFieldProps
 ): JSX.Element {
-  const { updateValue, pipetteSpecs, propsForFields, stepType } = props
+  const { pipetteSpecs, propsForFields, stepType } = props
   const { t } = useTranslation('protocol_steps')
   const deckSetup = useSelector(getInitialDeckSetup)
 
@@ -34,65 +44,14 @@ export function ExtendedPartialTipField(
   const handleOpen = (): void => {
     setIsNozzleAndWellModalOpen(true)
   }
+  const primaryNozzle = propsForFields.primary_nozzle
+    .value as PrimaryNozzleConfigurationStyle
+  const nozzleConfiguration = propsForFields.nozzles
+    .value as NozzleConfigurationStyle
 
-  const { channels } = pipetteSpecs
-  const tipracks = Object.values(deckSetup.labware).filter(
-    labware => labware.def.parameters.isTiprack
-  )
-  const tipracksNotOnAdapter = tipracks.filter(
-    tiprack => tiprack.stack.length === 2
-  )
-  const areAllTipracksOnAdapter = tipracksNotOnAdapter.length === 0
+  const partialNozzleCount =
+    partialNozzleMap[primaryNozzle as PartialPrimaryNozzles]
 
-  const options: DropdownOption[] = [
-    {
-      name: t('all_nozzles'),
-      value: ALL,
-    },
-  ]
-  if (channels === 96) {
-    options.push(
-      ...[
-        {
-          name: t('single_nozzle'),
-          value: SINGLE,
-          disabled: areAllTipracksOnAdapter,
-          tooltipText: areAllTipracksOnAdapter
-            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-            : null,
-        },
-        {
-          name: t('single_column_of_nozzles'),
-          value: COLUMN,
-          disabled: areAllTipracksOnAdapter,
-          tooltipText: areAllTipracksOnAdapter
-            ? t('form:step_edit_form.field.nozzles.option_tooltip.partial')
-            : null,
-        },
-      ]
-    )
-  }
-  if (channels !== 8) {
-    options.push({
-      name: t('single_row_of_nozzles'),
-      value: ROW,
-      disabled: areAllTipracksOnAdapter,
-      tooltipText: areAllTipracksOnAdapter
-        ? t('form:step_edit_form.field.alozzles.option_tooltip.partial')
-        : null,
-    })
-  }
-  if (channels === 8) {
-    // 8-channel
-    options.push({
-      name: t('single_nozzle'),
-      value: SINGLE,
-    })
-    options.push({
-      name: t('partial_nozzles'),
-      value: PARTIAL,
-    })
-  }
   let aspWellsLength: number
   let dspWellsLength: number
   switch (stepType) {
@@ -118,37 +77,58 @@ export function ExtendedPartialTipField(
       dspWellsLength = 0
   }
 
-  const [selectedValue, setSelectedValue] =
-    useState<NozzleConfigurationStyle>(ALL)
-  const nozzle = 'A1'
-  const getNozzleWellText = (): string => {
-    switch (selectedValue) {
+  function getNozzleText(
+    primaryNozzle: PrimaryNozzleConfigurationStyle,
+    nozzleConfiguration: NozzleConfigurationStyle
+  ): string | null {
+    if (nozzleConfiguration === ALL) {
+      return 'All'
+    }
+    if (nozzleConfiguration === PARTIAL) {
+      return String(partialNozzleCount) + ' nozzles'
+    }
+    if (nozzleConfiguration === SINGLE) {
+      return String(primaryNozzle) + ' nozzle'
+    }
+    if (primaryNozzle === A1_NOZZLE) {
+      if (nozzleConfiguration === ROW) {
+        return 'Top'
+      }
+      return 'Left'
+    }
+    if (primaryNozzle === A12_NOZZLE) {
+      if (nozzleConfiguration === ROW) {
+        return 'Bottom'
+      } else {
+        return 'Right'
+      }
+    }
+    return null
+  }
+
+  function getNozzleWellText(
+    primaryNozzle: PrimaryNozzleConfigurationStyle,
+    nozzleConfiguration: NozzleConfigurationStyle
+  ): string {
+    const nozzleText = getNozzleText(primaryNozzle, nozzleConfiguration)
+    if (nozzleText === null) {
+      return t('no_nozzles_and_wells_selected')
+    }
+    switch (nozzleConfiguration) {
       case ROW:
       case COLUMN:
-        const selectedValueText = selectedValue.toLowerCase() + 's'
+        const selectedValueText = nozzleConfiguration.toLowerCase() + 's'
         return t('nozzles_selected', {
-          nozzleSelection: 'Left' + selectedValueText + ' nozzles',
+          nozzleSelection: nozzleText + selectedValueText + ' nozzles',
           aspWells: aspWellsLength,
           dispWells: dspWellsLength,
           positionType: selectedValueText,
         })
       case ALL:
-        return t('nozzles_selected', {
-          nozzleSelection: 'All nozzles',
-          aspWells: aspWellsLength,
-          dispWells: dspWellsLength,
-          positionType: 'wells',
-        })
       case SINGLE:
-        return t('nozzles_selected', {
-          nozzleSelection: nozzle + ' nozzle',
-          aspWells: aspWellsLength,
-          dispWells: dspWellsLength,
-          positionType: 'wells',
-        })
       case PARTIAL:
         return t('nozzles_selected', {
-          nozzleSelection: nozzle.length + ' nozzles',
+          nozzleSelection: nozzleText,
           aspWells: aspWellsLength,
           dispWells: dspWellsLength,
           positionType: 'wells',
@@ -162,7 +142,7 @@ export function ExtendedPartialTipField(
       <div className={styles.nozzle_selection_text}>
         <ListButton type="noActive" onClick={handleOpen}>
           <StyledText desktopStyle="bodyDefaultRegular">
-            {getNozzleWellText()}
+            {getNozzleWellText(primaryNozzle, nozzleConfiguration)}
           </StyledText>
         </ListButton>
       </div>
@@ -171,13 +151,9 @@ export function ExtendedPartialTipField(
           showModal={setIsNozzleAndWellModalOpen}
           totalSteps={3}
           pipetteSpecs={pipetteSpecs}
-          updateValue={updateValue}
-          setSelectedValue={setSelectedValue}
-          options={options}
           deckSetup={deckSetup}
           propsForFields={propsForFields}
           stepType={stepType}
-          value={selectedValue as NozzleConfigurationStyle}
         />
       ) : null}
     </>

@@ -301,8 +301,35 @@ export type NozzleConfigurationStyle =
   | typeof ALL
   | typeof PARTIAL
 
+export const A1_NOZZLE = 'A1'
+export const A12_NOZZLE = 'A12'
+export const H1_NOZZLE = 'H1'
+export const H12_NOZZLE = 'H12'
+
+export const G1_NOZZLE = 'G1'
+export const E1_NOZZLE = 'E1'
+export const F1_NOZZLE = 'F1'
+export const D1_NOZZLE = 'D1'
+export const C1_NOZZLE = 'C1'
+export const B1_NOZZLE = 'B1'
+
+export type PartialPrimaryNozzles =
+  | typeof B1_NOZZLE
+  | typeof C1_NOZZLE
+  | typeof D1_NOZZLE
+  | typeof E1_NOZZLE
+  | typeof F1_NOZZLE
+  | typeof G1_NOZZLE
+
+export type PrimaryNozzleConfigurationStyle =
+  | typeof A1_NOZZLE
+  | PartialPrimaryNozzles
+  | typeof A12_NOZZLE
+  | typeof H1_NOZZLE
+  | typeof H12_NOZZLE
+
 interface NozzleConfigurationParams {
-  primaryNozzle?: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   style: NozzleConfigurationStyle
 }
 

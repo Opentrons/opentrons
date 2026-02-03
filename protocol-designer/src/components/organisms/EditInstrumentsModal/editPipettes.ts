@@ -28,7 +28,7 @@ const ADAPTER_96_CHANNEL_TIPRACK_LOADNAME = 'opentrons_flex_96_tiprack_adapter'
 
 type PipetteFieldsData = Omit<
   PipetteOnDeck,
-  'id' | 'spec' | 'tiprackLabwareDef' | 'pythonName'
+  'id' | 'spec' | 'tiprackLabwareDef' | 'pythonName' | 'primaryNozzle'
 >
 export const editPipettes = (
   pipettes: { [pipetteId: string]: PipetteOnDeck },

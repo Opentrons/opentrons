@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
-import { getDeckDefFromRobotType } from '@opentrons/shared-data'
-import { DIRTY, getDefaultPrimaryNozzle } from '@opentrons/step-generation'
+import { A1_NOZZLE, getDeckDefFromRobotType } from '@opentrons/shared-data'
+import { DIRTY } from '@opentrons/step-generation'
 
 import { useKitchen } from '/protocol-designer/components/organisms/Kitchen/useKitchen'
 import { getRobotType } from '/protocol-designer/file-data/selectors'
@@ -82,10 +82,7 @@ export function TipSelectionWizard(
   const robotType = useSelector(getRobotType)
   const { makeSnackbar } = useKitchen()
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles,
-    channels: pipetteSpecs.channels,
-  })
+  const primaryNozzle = A1_NOZZLE
 
   const deckDef = getDeckDefFromRobotType(robotType)
 

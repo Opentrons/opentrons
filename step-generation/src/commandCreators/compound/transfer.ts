@@ -2,6 +2,7 @@ import assert from 'assert'
 import zip from 'lodash/zip'
 
 import {
+  A1_NOZZLE,
   ALL,
   getAllLiquidClassDefs,
   getByVolumeValue,
@@ -30,7 +31,6 @@ import {
   DEST_WELL_BLOWOUT_DESTINATION,
   formatChangeTipArg,
   formatPyStr,
-  getDefaultPrimaryNozzle,
   getIsRetractSafeForAirGap,
   getSlotInLocationStack,
   getTargetTipsFromWellSets,
@@ -481,10 +481,8 @@ export const transfer: CommandCreator<TransferArgs> = (
     pythonLiquidClassArgs.join(',\n')
   )},\n)`
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels: pipetteSpecs.channels,
-  })
+  const primaryNozzle =
+    prevRobotState.pipettes[pipette].primaryNozzle ?? A1_NOZZLE
 
   const shouldSelectManualTips =
     tipTracking === MANUAL &&

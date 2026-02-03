@@ -99,6 +99,7 @@ const _patchDefaultPipette =
           pipette: defaultPipetteId,
           nozzles: hasPartialTipSupportedChannel ? ALL : null,
           tipRack: firstDefaultTiprackURIOnDeck ?? null,
+          primary_nozzle: 'A1',
         },
         formData,
         pipetteEntities,
