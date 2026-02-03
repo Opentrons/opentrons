@@ -1,6 +1,6 @@
 """Protocol to Stress Test Picking up Tips."""
 from opentrons.protocol_api import ProtocolContext, ParameterContext
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers
 
 metadata = {"protocolName": "Pick Up Tips Test"}
 requirements = {"robotType": "Flex", "apiLevel": "2.23"}
@@ -8,10 +8,10 @@ requirements = {"robotType": "Flex", "apiLevel": "2.23"}
 
 def add_parameters(parameters: ParameterContext) -> None:
     """Add parameters."""
-    helpers.create_pipette_parameters(parameters)
-    helpers.create_tip_size_parameter(parameters)
-    helpers.create_single_pipette_mount_parameter(parameters)
-    helpers.create_all_deck_slot_parameters(parameters)
+    run_helpers.create_pipette_parameters(parameters)
+    run_helpers.create_tip_size_parameter(parameters)
+    run_helpers.create_single_pipette_mount_parameter(parameters)
+    run_helpers.create_all_deck_slot_parameters(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -35,7 +35,7 @@ def run(protocol: ProtocolContext) -> None:
         "D3": protocol.params.D3,  # type: ignore[attr-defined]
     }
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     try:
         tip_rack_slots = [slot for slot, value in slot_mapping.items() if value]
@@ -60,7 +60,7 @@ def run(protocol: ProtocolContext) -> None:
                 pipette.reset_tipracks()
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e)
             )
         raise (e)
