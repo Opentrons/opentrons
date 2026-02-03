@@ -170,7 +170,7 @@ Click the three-dot menu (⋮) on the module card to choose from a menu of comma
       </td>
     </tr>
     <tr>
-      <td><strong>Magnetic Block</strong></td>
+      <td><strong>Magnetic Module</strong></td>
       <td>
         <ul>
           <li>Set the magnet engagement height.</li>
@@ -200,9 +200,11 @@ Click the three-dot menu (⋮) on the module card to choose from a menu of comma
 
 ### Built-in camera
 
-Every OT-2 comes equipped with a built-in 2-megapixel camera that can capture full HD still images of the deck and working area. When enabled, the camera can take pictures:
+Every OT-2 comes equipped with a built-in 2-megapixel camera that can capture full HD still images of the deck and working area. When enabled, the camera can take pictures when running a protocol :
 
-- During a protocol that was created using the Python API and includes the [`capture_image`](https://docs.opentrons.com/python-api/reference/protocols/#opentrons.protocol_api.ProtocolContext.capture_image) method. You cannot add an image step from Protocol Designer. <!--- yes, that's a full url, I know, I know --->
+- Created using the Python API and includes the [`capture_image`](https://docs.opentrons.com/python-api/reference/protocols/#opentrons.protocol_api.ProtocolContext.capture_image) method.
+
+- Created with Protocol Designer.
 
 - When the OT-2 encounters an error.
 
@@ -229,4 +231,4 @@ Each entry in the recent protocol runs list includes the protocol name, its time
 !!! note
     If you need to maintain a comprehensive record of all runs performed on your robot, you must use the **Download run log** feature to save this information to your computer.
 
-- **Download image files**: Save to your computer a `.zip` file containing all the still images taken during a protocol run, if the camera was enabled.
+- **Download image files**: Save to your computer a `.zip` file containing all the images taken during a protocol run, if the camera was enabled.

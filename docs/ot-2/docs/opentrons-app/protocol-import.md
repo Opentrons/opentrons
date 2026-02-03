@@ -30,7 +30,7 @@ To add another protocol to your existing list, click **Import** in the top right
 
 ## Protocol analysis
 
-The Opentrons App analyzes your protocol immediately upon import. _Protocol analysis_ is the process of translating the protocol file (JSON or Python) into a series of robot commands.
+The Opentrons App analyzes your protocol immediately upon import. _Protocol analysis_ transforms a protocol file (JSON or Python) into a series of robot commands.
 
 The app displays a warning if it detects errors in your protocol file. Correct the errors and re-import the protocol. If the analysis completes without errors, the protocol is ready to run on your OT-2.
 
