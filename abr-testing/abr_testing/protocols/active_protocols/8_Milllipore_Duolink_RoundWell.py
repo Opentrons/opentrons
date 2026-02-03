@@ -12,7 +12,7 @@ from opentrons.protocol_api.module_contexts import (
     TemperatureModuleContext,
 )
 from typing import List, Union
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 
 metadata = {
     "protocolName": "Duolink PLA for Microscopy - Combined Day 1 & Day 2",
@@ -82,7 +82,7 @@ def add_parameters(parameters: ParameterContext) -> None:
         description="Keep reagents cold?",
         default=True,
     )
-    helpers.create_error_capture_duration_duration(parameters)
+    run_helpers.create_error_capture_duration_duration(parameters)
 
 
 # ----------------------------
@@ -209,14 +209,16 @@ def discard(
 # ----------------------------
 def run(ctx: ProtocolContext) -> None:
     """Run the protocol."""
+    background_helpers.launch_background_tasks()
+
     num_sample = ctx.params.num_sample  # type: ignore[attr-defined]
     length = ctx.params.error_capture_duration  # type: ignore[attr-defined]
     heat_on_deck = ctx.params.heat_on_deck  # type: ignore[attr-defined]
     use_lid = ctx.params.use_lid  # type: ignore[attr-defined]
     use_temp = ctx.params.use_temp  # type: ignore[attr-defined]
     if not ctx.is_simulating():
-        helpers.comment_protocol_version(ctx, "01")
-        slack_bot = helpers.set_up_slack()
+        run_helpers.comment_protocol_version(ctx, "01")
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
     try:
         ctx.capture_image(filename="start_of_run")
@@ -373,7 +375,7 @@ def run(ctx: ProtocolContext) -> None:
             ctx.capture_image(filename="end_of_run")
     except Exception as e:
         if not ctx.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)
