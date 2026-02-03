@@ -27,7 +27,7 @@ You can use the Custom Labware Creator if your labware meets the following crite
 
 For other labware, consider the Custom Labware Service, outlined below. Or you can reference the complete JSON schema to create a labware definition from scratch, although this is not recommended.
 
-## Custom Labware Service 
+## Custom Labware Service { #custom-labware-service-ot2 }
 
 Get in touch with us if the labware you'd like to use isn't available in the library, if you can't create your own definitions, or if a custom item includes different shapes, sizes, or other irregularities described below. 
 
