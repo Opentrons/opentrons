@@ -9,7 +9,7 @@ Custom labware is labware that's not listed in the Opentrons Labware Library. Yo
 !!! note
     While you cannot create custom labware within the Python Protocol API, you can use custom labware with the available API methods. However, you need to define your custom labware first and import it into the Opentrons App. Then your custom labware is available to the Python API and the robot.
 
-## Custom Labware Creator 
+## Custom Labware Creator { #custom-labware-creator-ot2 }
 
 The [Custom Labware Creator](https://labware.opentrons.com/create/) is a no-code, web-based tool that uses a graphical interface to help you create a labware definition file. Labware Creator produces a JSON labware definition file that you import into the Opentrons App. After that, your custom labware is available to the OT-2 and the Python API. 
 
@@ -44,7 +44,7 @@ Get in touch with us if the labware you'd like to use isn't available in the lib
 
 If you need help creating custom labware definitions, contact Opentrons Support (<support@opentrons.com>). They will work to design custom labware definitions based on your requirements. This is a fee-based service.
 
-## JSON labware schema 
+## JSON labware schema { #json-schema-ot2 }
 
 A JSON file is the blueprint for Opentrons standard and custom labware. This file contains and organizes labware data according to the design specifications set by the default schema.
 
