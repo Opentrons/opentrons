@@ -452,7 +452,7 @@ export const getFixtureNameFromAddresableArea = (
   return fixtureName
 }
 
-interface MergeResult {
+interface ComboFixtureMergeResult {
   comboFixtures: CutoutConfigMap[]
   remainingModuleConfig: CutoutConfigMap[]
   remainingAdditionalEquipmentConfig: DeckConfiguration
@@ -465,7 +465,7 @@ interface MergeResult {
 export function mergeToComboFixtures(
   moduleConfig: CutoutConfigMap[],
   additionalEquipmentConfig: DeckConfiguration
-): MergeResult {
+): ComboFixtureMergeResult {
   const comboFixtures: CutoutConfigMap[] = []
   const mergedCutoutIds: CutoutId[] = []
   const processedCutoutIds: CutoutId[] = []
