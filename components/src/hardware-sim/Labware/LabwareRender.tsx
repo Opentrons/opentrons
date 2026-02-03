@@ -19,10 +19,10 @@ import type { TipType } from './labwareInternals/types'
 import type {
   HighlightedWellLabels,
   WELL_LABEL_OPTIONS,
-  WellFill,
+  WellFillByName,
   WellGroup,
   WellMouseEvent,
-  WellStroke,
+  WellStrokeByName,
 } from './labwareInternals/Wells'
 
 export type WellLabelOption = keyof typeof WELL_LABEL_OPTIONS
@@ -89,9 +89,9 @@ export interface LabwareRenderProps {
   highlightedWellLabels?: HighlightedWellLabels
   selectedWells?: WellGroup | null
   /** CSS color to fill specified wells */
-  wellFill?: WellFill
+  wellFill?: WellFillByName
   /** CSS color to stroke specified wells */
-  wellStroke?: WellStroke
+  wellStroke?: WellStrokeByName
   /** CSS color to stroke the labware outline */
   labwareStroke?: CSSProperties['stroke']
   /** adds thicker blue border with blur to labware */

@@ -7,10 +7,11 @@ import { Well } from './Well'
 import type { CSSProperties } from 'styled-components'
 import type { MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
+import type { WellStrokeByName } from './constants'
 
 export interface StrokedWellProps {
   definition: LabwareDefinition
-  strokeByWell: Record<string, CSSProperties['stroke']>
+  strokeByWell?: WellStrokeByName
 }
 
 export function StrokedWellsComponent(props: StrokedWellProps): JSX.Element {

@@ -154,7 +154,6 @@
   "number_of_nozzles_used": "Number of nozzles used",
   "of": "of",
   "off_deck": "Off-Deck",
-
   "pause": {
     "forDuration": "For {{duration}}",
     "pausingForDuration": "<text>Pausing for</text><tag/>",

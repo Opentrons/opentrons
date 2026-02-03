@@ -13,7 +13,7 @@ import type { CSSProperties } from 'styled-components'
 import type { MemoExoticComponent } from 'react'
 import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
 import type { TipType } from './types'
-import type { WellMouseEvent, WellStroke } from './Wells/constants'
+import type { WellMouseEvent, WellStrokeByName } from './Wells/constants'
 
 export interface StaticLabwareProps {
   /** Labware definition to render */
@@ -30,7 +30,7 @@ export interface StaticLabwareProps {
   onMouseLeaveWell?: (e: WellMouseEvent) => unknown
   fill?: CSSProperties['fill']
   showRadius?: boolean
-  wellStroke?: WellStroke
+  wellStroke?: WellStrokeByName
   /** optional show of labware border, defaulted to true */
   showBorder?: boolean
   borderStroke?: CSSProperties['stroke']

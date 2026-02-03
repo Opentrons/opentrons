@@ -1,8 +1,8 @@
 import { COLORS } from '../../../../helix-design-system'
-import { DEFAULT_TIP_SIZE } from './constants'
-import styles from './tips.module.css'
+import { DEFAULT_TIP_SIZE } from '../Tips/constants'
+import styles from './wells.module.css'
 
-export function SelectedTip(props: {
+export function SelectedWell(props: {
   size?: string
   textInsideTip?: string
   isUsed?: boolean
@@ -20,20 +20,21 @@ export function SelectedTip(props: {
   } = props
   const width = size ?? DEFAULT_TIP_SIZE
   const height = size ?? DEFAULT_TIP_SIZE
-  function fillColor(
+  const getFillColor = (
     isSelected: boolean,
     isError: boolean,
     isUsed: boolean
-  ): string {
+  ): string => {
     if (isError) {
       return COLORS.red50
-    } else if (isUsed) {
-      return COLORS.yellow50
-    } else if (isSelected) {
-      return COLORS.blue50
-    } else {
-      return COLORS.blue35
     }
+    if (isUsed) {
+      return COLORS.yellow50
+    }
+    if (isSelected) {
+      return COLORS.blue50
+    }
+    return COLORS.blue35
   }
 
   const shouldShowStroke = textInsideTip == null && showStroke
@@ -50,7 +51,7 @@ export function SelectedTip(props: {
         cx="10"
         cy="10"
         r={shouldShowStroke ? '9' : '10'}
-        fill={fillColor(isSelected, isError, isUsed)}
+        fill={getFillColor(isSelected, isError, isUsed)}
         stroke={shouldShowStroke ? COLORS.black90 : undefined}
         strokeWidth={shouldShowStroke ? '2' : undefined}
       />

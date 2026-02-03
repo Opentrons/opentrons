@@ -1,7 +1,7 @@
 import { INACCESSIBLE, SELECTED } from '../Tips/constants'
-import { NoTip } from '../Tips/NoTip'
-import { SelectedTip } from '../Tips/SelectedTip'
+import { SelectedWell } from '../Wells/SelectedWell'
 import { UNSELECTED } from './constants'
+import { EmptyWell } from './EmptyWell'
 
 import type { WellType } from '../types'
 
@@ -14,10 +14,10 @@ export function WellStatus(props: WellStatusProps): JSX.Element {
   const { type, size } = props
   switch (type) {
     case SELECTED:
-      return <SelectedTip size={size} isSelected={true} showStroke={false} />
+      return <SelectedWell size={size} isSelected={true} showStroke={false} />
     case INACCESSIBLE:
-      return <NoTip size={size} />
+      return <EmptyWell size={size} />
     case UNSELECTED:
-      return <SelectedTip size={size} isSelected={false} showStroke={false} />
+      return <SelectedWell size={size} isSelected={false} showStroke={false} />
   }
 }

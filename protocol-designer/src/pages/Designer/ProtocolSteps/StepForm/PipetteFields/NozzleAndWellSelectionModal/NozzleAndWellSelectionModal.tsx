@@ -61,7 +61,7 @@ export function NozzleAndWellSelectionModal(
   const handleClose = (): void => {
     showModal(false)
   }
-  function getStepComponent(): JSX.Element {
+  const getStepComponent = (): JSX.Element => {
     switch (currentStepIndex) {
       case 0:
         return (

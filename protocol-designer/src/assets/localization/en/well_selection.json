@@ -1,8 +1,8 @@
 {
   "select_instructions": "Click + Drag to select multiple.",
   "legend": {
-    "unselected_well": "Unselected well",
+    "inaccessible_tip": "Inaccessible well",
     "selected_well": "Selected well",
-    "inaccessible_tip": "Inaccessible well"
+    "unselected_well": "Unselected well"
   }
 }

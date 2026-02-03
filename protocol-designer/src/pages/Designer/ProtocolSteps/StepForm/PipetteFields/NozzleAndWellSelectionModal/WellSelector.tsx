@@ -25,11 +25,8 @@ interface WellSelectorProps {
 export function WellSelector(props: WellSelectorProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
   const { deckSetup, propsForFields, stepType, robotType } = props
-  const isAspirate = stepType === 'aspirate'
-  const isDispense = stepType === 'dispense'
-  const isMix = stepType === 'mix'
 
-  function getLabwareId(): string {
+  const getLabwareId = (): string => {
     switch (stepType) {
       case 'aspirate':
         return propsForFields.aspirate_labware.value as string
@@ -51,32 +48,47 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
 
-  return (
-    <div className={styles.column_wrapper}>
-      <div className={styles.header_text_wrapper}>
-        {isMix ? (
-          <StyledText desktopStyle={'headingMediumBold'}>
-            {t('select_wells_to_mix_liquid_in', {
-              labware: displayName,
-            })}
-          </StyledText>
-        ) : null}
-        {isAspirate ? (
+  const getWellSelectionText = (): JSX.Element => {
+    switch (stepType) {
+      case 'mix':
+        return (
+          <>
+            <StyledText desktopStyle={'headingMediumBold'}>
+              {t('select_wells_to_mix_liquid_in', {
+                labware: displayName,
+              })}
+            </StyledText>
+          </>
+        )
+
+      case 'aspirate':
+        return (
           <StyledText desktopStyle={'headingMediumBold'}>
             {t('select_wells_to_aspirate_liquid_from', {
               labware: displayName,
             })}
           </StyledText>
-        ) : null}
-
-        {isDispense ? (
+        )
+      case 'dispense':
+        return (
           <StyledText desktopStyle={'headingMediumBold'}>
             {t('select_wells_to_dispense_liquid_into', {
               labware: displayName,
             })}
           </StyledText>
-        ) : null}
-      </div>
+        )
+      default:
+        console.warn(`Unhandled step type ${stepType} for ${displayName}`)
+        return (
+          <StyledText desktopStyle={'headingMediumBold'}>
+            {displayName}
+          </StyledText>
+        )
+    }
+  }
+  return (
+    <div className={styles.column_wrapper}>
+      <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
 
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />

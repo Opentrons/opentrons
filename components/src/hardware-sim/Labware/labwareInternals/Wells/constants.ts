@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react'
+import type { CSSProperties, MouseEvent } from 'react'
 
 export const UNSELECTED: 'unselected' = 'unselected'
 
@@ -11,9 +11,11 @@ export interface WellMouseEvent {
   event: MouseEvent
 }
 
-// wellName to CSS color, eg {'A1': '#123456'}
-export type WellFill = Record<string, string>
-export type WellStroke = WellFill
+type WellName = string
+export type WellStroke = CSSProperties['stroke']
+export type WellFill = CSSProperties['fill']
+export type WellFillByName = Record<WellName, WellFill>
+export type WellStrokeByName = Record<WellName, WellStroke>
 
 // Use this like a Set!
 export type WellGroup = Record<string, null>
