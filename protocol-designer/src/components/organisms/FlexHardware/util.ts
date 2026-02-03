@@ -76,13 +76,12 @@ interface UpdateInitialDeckSetupProps {
   deckConfig?: DeckConfiguration
 }
 
-interface FixtureContext {
-  value: CutoutConfigMap
-  fixtureName: CutoutFixtureId
+interface fixtureEntry {
+  cutoutConfigMap: CutoutConfigMap
+  newFixtureName: CutoutFixtureId
   matchingFixture: AdditionalEquipmentOnDeck | undefined
-  matching4thColumnLabware: LabwareOnDeck | null
   hasLabwareOnSlot: boolean
-  fixtureIds: string[] | null
+  onDeckFixtureIds: string[] | null
   fourthColumnSlotLabwareId: string | null
   deckConfig?: DeckConfiguration
   dispatch: ThunkDispatch<any>
@@ -92,8 +91,8 @@ interface FixtureContext {
   t: any
 }
 
-interface ModuleContext {
-  value: CutoutConfigMap
+interface ModuleEntry {
+  cutoutConfigMap: CutoutConfigMap
   matchingModule: ModuleOnDeck | undefined
   moduleId: string | null
   labwareOnDeck: AllTemporalPropertiesForTimelineFrame['labware']
@@ -104,11 +103,10 @@ interface ModuleContext {
   t: any
 }
 
-const handleDeleteFixture = (ctx: FixtureContext): void => {
+const handleDeleteFixture = (ctx: fixtureEntry): void => {
   const {
     matchingFixture,
-    matching4thColumnLabware,
-    fixtureIds,
+    onDeckFixtureIds: fixtureIds,
     fourthColumnSlotLabwareId,
     deckConfig,
     dispatch,
@@ -122,11 +120,11 @@ const handleDeleteFixture = (ctx: FixtureContext): void => {
   if (
     matchingFixture.name === 'stagingArea' &&
     fixtureIds == null &&
-    matching4thColumnLabware != null &&
+    fourthColumnSlotLabwareId != null &&
     deckConfig != null
   ) {
     setShowDeleteStagingAreaModal({
-      ids: [matching4thColumnLabware.id, matchingFixture.id],
+      ids: [fourthColumnSlotLabwareId, matchingFixture.id],
       deckConfig,
     })
     return
@@ -149,9 +147,15 @@ const handleDeleteFixture = (ctx: FixtureContext): void => {
   }
 }
 
-const handleCreateFixture = (ctx: FixtureContext): void => {
-  const { value, fixtureName, hasLabwareOnSlot, dispatch, makeSnackbar, t } =
-    ctx
+const handleCreateFixture = (ctx: fixtureEntry): void => {
+  const {
+    cutoutConfigMap: value,
+    newFixtureName: fixtureName,
+    hasLabwareOnSlot,
+    dispatch,
+    makeSnackbar,
+    t,
+  } = ctx
 
   // Block creating trashBin or wasteChute if there is labware on the slot
   if (
@@ -172,7 +176,7 @@ const handleCreateFixture = (ctx: FixtureContext): void => {
 }
 
 const handleDeleteModule = (
-  ctx: ModuleContext,
+  ctx: ModuleEntry,
   handleDeleteStackerLabware: (module: ModuleOnDeck) => void
 ): void => {
   const {
@@ -201,8 +205,14 @@ const handleDeleteModule = (
   }
 }
 
-const handleCreateModule = (ctx: ModuleContext): void => {
-  const { value, labwareOnDeck, dispatch, makeSnackbar, t } = ctx
+const handleCreateModule = (ctx: ModuleEntry): void => {
+  const {
+    cutoutConfigMap: value,
+    labwareOnDeck,
+    dispatch,
+    makeSnackbar,
+    t,
+  } = ctx
 
   const model = getModuleModelFromFixtureId(
     value.cutoutFixtureId as CutoutFixtureId
@@ -334,16 +344,12 @@ export const updateInitialDeckState = (
           : matchingFixtureOnDeck
 
       if (fixtureToDelete != null) {
-        const fixtureCtx: FixtureContext = {
-          value,
-          fixtureName: newFixtureName!,
+        const fixtureCtx: fixtureEntry = {
+          cutoutConfigMap: value,
+          newFixtureName: newFixtureName!,
           matchingFixture: fixtureToDelete,
-          matching4thColumnLabware:
-            fixtureToDelete.name === 'stagingArea'
-              ? matching4thColumnLabware
-              : null,
           hasLabwareOnSlot,
-          fixtureIds,
+          onDeckFixtureIds: fixtureIds,
           fourthColumnSlotLabwareId,
           deckConfig,
           dispatch,
@@ -369,8 +375,8 @@ export const updateInitialDeckState = (
           moduleToDelete,
           undefined
         )
-        const moduleCtx: ModuleContext = {
-          value,
+        const moduleCtx: ModuleEntry = {
+          cutoutConfigMap: value,
           matchingModule: moduleToDelete,
           moduleId: moduleToDeleteId,
           labwareOnDeck,
@@ -387,8 +393,8 @@ export const updateInitialDeckState = (
 
     if (removing) {
       if (matchingModuleOnDeck != null) {
-        const moduleCtx: ModuleContext = {
-          value,
+        const moduleCtx: ModuleEntry = {
+          cutoutConfigMap: value,
           matchingModule: matchingModuleOnDeck,
           moduleId,
           labwareOnDeck,
@@ -400,13 +406,12 @@ export const updateInitialDeckState = (
         }
         handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
       } else if (matchingFixturesOnDeck.length > 0) {
-        const fixtureCtx: FixtureContext = {
-          value,
-          fixtureName: newFixtureName!,
+        const fixtureCtx: fixtureEntry = {
+          cutoutConfigMap: value,
+          newFixtureName: newFixtureName!,
           matchingFixture: matchingFixtureOnDeck,
-          matching4thColumnLabware,
           hasLabwareOnSlot,
-          fixtureIds,
+          onDeckFixtureIds: fixtureIds,
           fourthColumnSlotLabwareId,
           deckConfig,
           dispatch,
@@ -420,8 +425,8 @@ export const updateInitialDeckState = (
       return
     }
 
-    const moduleCtx: ModuleContext = {
-      value,
+    const moduleCtx: ModuleEntry = {
+      cutoutConfigMap: value,
       matchingModule: matchingModuleOnDeck,
       moduleId,
       labwareOnDeck,
@@ -431,13 +436,12 @@ export const updateInitialDeckState = (
       makeSnackbar,
       t,
     }
-    const fixtureCtx: FixtureContext = {
-      value,
-      fixtureName: newFixtureName!,
+    const fixtureCtx: fixtureEntry = {
+      cutoutConfigMap: value,
+      newFixtureName: newFixtureName!,
       matchingFixture: matchingFixtureOnDeck,
-      matching4thColumnLabware,
       hasLabwareOnSlot,
-      fixtureIds,
+      onDeckFixtureIds: fixtureIds,
       fourthColumnSlotLabwareId,
       deckConfig,
       dispatch,
@@ -448,7 +452,6 @@ export const updateInitialDeckState = (
     }
 
     if (!isModuleFixture && newFixtureName != null) {
-      console.log('adding fixture')
       // Adding fixture
       if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
         handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
@@ -491,7 +494,7 @@ export const updateInitialDeckState = (
         if (comboFixtureId != null) {
           handleCreateModule({
             ...moduleCtx,
-            value: {
+            cutoutConfigMap: {
               ...value,
               cutoutFixtureId: newFixtureName ?? value.cutoutFixtureId,
             },
