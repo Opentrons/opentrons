@@ -38,7 +38,7 @@ check: lint typecheck
 test-pd-local:
 	@# Always print the summary banner, but preserve pytest's exit code.
 	@status=0; \
-	TEST_ENV=local uv run pytest $(PYTEST_ARGS) || status=$$?; \
+	TEST_ENV=local uv run pytest -m pdE2E $(PYTEST_ARGS) || status=$$?; \
 	echo ""; \
 	echo "---------------------------------------------------------"; \
 	echo "🧪 Tests Finished!"; \

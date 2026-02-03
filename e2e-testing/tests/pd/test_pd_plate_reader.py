@@ -11,7 +11,7 @@ from eyes import Eyes
 
 @pytest.mark.pdE2E
 @pytest.mark.slow
-def test_flex_absorbance_reader_setup(page: Page, base_url: str, eyes: Eyes | None) -> None:
+def test_flex_absorbance_reader_setup(page: Page, pd_base_url: str, eyes: Eyes | None) -> None:
     plate_reader_page = PlateReaderPage(page)
     protocol_editor = ProtocolEditorPage(page)
     create_protocol = CreateProtocolWizard(page)
