@@ -19,7 +19,6 @@ import {
 } from '@opentrons/step-generation'
 
 import { getAllWellContentsAtFrame } from '../../utils/getAllWellContentsAtFrame'
-import { WellContainer } from '../../WellContainer'
 import { WellTooltip } from '../../WellTooltip'
 import styles from './labwareslot.module.css'
 
@@ -29,7 +28,6 @@ import type {
   FlexStackerModuleState,
   LabwareEntities,
   ModuleEntities,
-  PipetteEntities,
   RobotState,
 } from '@opentrons/step-generation'
 
@@ -38,20 +36,16 @@ interface LabwareSlotContainerProps {
   labwareEntities: LabwareEntities
   commands: RunTimeCommand[]
   liquids: Liquid[]
-  currentCommand: RunTimeCommand
   robotState: RobotState
-  pipetteEntities: PipetteEntities
   moduleEntities: ModuleEntities
 }
 export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
   const {
-    commands,
-    liquids,
     topLabwareOnSlotId,
     labwareEntities,
-    currentCommand,
+    commands,
+    liquids,
     robotState,
-    pipetteEntities,
     moduleEntities,
   } = props
   const { labware, pipettes, liquidState, modules } = robotState
@@ -84,7 +78,6 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     'displayName' in labwareLoadCommandParams
       ? labwareLoadCommandParams.displayName
       : null
-  const { params } = currentCommand
   const isTopLabwareLid =
     labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('lid')
   const adjustedTopLabwareId = isTopLabwareLid
@@ -116,22 +109,6 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
           [activeWellName]: null,
         }
       : null
-  const { wells } = labwareDef
-
-  const pipetteLocationLiquidState =
-    pipetteTemporalProperties != null
-      ? liquidState.pipettes[pipetteTemporalProperties[0]]?.[0]
-      : null
-  const labwareLocationLiquidState =
-    activeWellName != null
-      ? liquidState.labware[adjustedTopLabwareId]?.[activeWellName]
-      : null
-
-  const tipMaxVolume =
-    pipetteTemporalProperties != null
-      ? pipetteEntities[pipetteTemporalProperties[0]].spec.liquids.default
-          .maxVolume
-      : 0
 
   const labwareViewBox = getLabwareViewBox(labwareDef)
   const ingredNames = liquids.reduce(
@@ -156,165 +133,148 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       !labwareEntities[topLabwareOnSlotId].def.allowedRoles?.includes('adapter')
   )
   return (
-    <>
-      {activeWellName != null ? (
-        <WellContainer
-          wells={wells}
-          params={params}
-          activeWellName={activeWellName}
-          wellColor={wellFill[activeWellName]}
-          labwareLocationLiquidState={labwareLocationLiquidState}
-          pipetteLocationLiquidState={pipetteLocationLiquidState}
-          liquids={liquids}
-          tipMaxVolume={tipMaxVolume}
-        />
-      ) : null}
-      <div className={styles.container}>
-        <div className={styles.header}>
-          {/* header icon part */}
-          <div className={styles.header_icons}>
-            {labware[topLabwareOnSlotId]?.stack
-              .filter(item => item !== topLabwareOnSlotId)
-              .reverse()
-              .map((item, index) => {
-                if (moduleEntities[item] != null) {
+    <div className={styles.container}>
+      <div className={styles.header}>
+        {/* header icon part */}
+        <div className={styles.header_icons}>
+          {labware[topLabwareOnSlotId]?.stack
+            .filter(item => item !== topLabwareOnSlotId)
+            .reverse()
+            .map((item, index) => {
+              if (moduleEntities[item] != null) {
+                return (
+                  <RobotInfoLabel
+                    key={`${item}-${index}`}
+                    iconName={
+                      MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
+                    }
+                  />
+                )
+              } else if (labware[item] != null) {
+                return (
+                  <RobotInfoLabel key={`${item}-${index}`} iconName="stacked" />
+                )
+              } else {
+                if (item !== HOPPER_STACKER_LOCATION) {
+                  const stack = labware[topLabwareOnSlotId]?.stack
+                  const hasHopper = stack.includes(HOPPER_STACKER_LOCATION)
                   return (
                     <RobotInfoLabel
                       key={`${item}-${index}`}
-                      iconName={
-                        MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]
+                      deckLabel={
+                        hasHopper ? t('stacker_slot', { slot: slot }) : slot
                       }
                     />
                   )
-                } else if (labware[item] != null) {
-                  return (
-                    <RobotInfoLabel
-                      key={`${item}-${index}`}
-                      iconName="stacked"
-                    />
-                  )
-                } else {
-                  if (item !== HOPPER_STACKER_LOCATION) {
-                    const stack = labware[topLabwareOnSlotId]?.stack
-                    const hasHopper = stack.includes(HOPPER_STACKER_LOCATION)
-                    return (
-                      <RobotInfoLabel
-                        key={`${item}-${index}`}
-                        deckLabel={
-                          hasHopper ? t('stacker_slot', { slot: slot }) : slot
-                        }
-                      />
-                    )
-                  }
                 }
-              })}
-            {hopperGroups != null && hopperGroups.length > 1 ? (
-              <RobotInfoLabel key="hopperGroupStackedIcon" iconName="stacked" />
+              }
+            })}
+          {hopperGroups != null && hopperGroups.length > 1 ? (
+            <RobotInfoLabel key="hopperGroupStackedIcon" iconName="stacked" />
+          ) : null}
+        </div>
+        {/* header icon part */}
+
+        {/* header text part */}
+        <div className={styles.header_container}>
+          <div className={styles.header_text}>
+            {labwareNickname != null ? (
+              <StyledText desktopStyle="captionSemiBold">
+                {labwareNickname}
+              </StyledText>
+            ) : null}
+            <StyledText desktopStyle="bodyDefaultRegular">
+              {labwareDisplayName}
+            </StyledText>
+            {isTopLabwareLid ? (
+              <StyledText desktopStyle="captionSemiBold">
+                {`With ${labwareEntities[topLabwareOnSlotId].def.metadata.displayName}`}
+              </StyledText>
+            ) : null}
+            {adapterId != null ? (
+              <div>
+                <Divider />
+                <StyledText desktopStyle="captionSemiBold">
+                  {labwareEntities[adapterId].def.metadata.displayName}
+                </StyledText>
+              </div>
             ) : null}
           </div>
-          {/* header icon part */}
-
-          {/* header text part */}
-          <div className={styles.header_container}>
-            <div className={styles.header_text}>
-              {labwareNickname != null ? (
-                <StyledText desktopStyle="captionSemiBold">
-                  {labwareNickname}
-                </StyledText>
-              ) : null}
-              <StyledText desktopStyle="bodyDefaultRegular">
-                {labwareDisplayName}
-              </StyledText>
-              {isTopLabwareLid ? (
-                <StyledText desktopStyle="captionSemiBold">
-                  {`With ${labwareEntities[topLabwareOnSlotId].def.metadata.displayName}`}
-                </StyledText>
-              ) : null}
-              {adapterId != null ? (
-                <div>
-                  <Divider />
-                  <StyledText desktopStyle="captionSemiBold">
-                    {labwareEntities[adapterId].def.metadata.displayName}
+          {quantity > 1 ? (
+            <Tag text={t('quantity', { quantity })} type="default" />
+          ) : null}
+        </div>
+        {/* header text part */}
+      </div>
+      <div className={styles.body_container}>
+        <WellTooltip
+          ingredNames={ingredNames}
+          liquidDisplayColors={liquidDisplayColors}
+        >
+          {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
+            <div className={styles.labware_render_container}>
+              <RobotWorkSpace
+                key={topLabwareOnSlotId}
+                viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension + (quantity > 1 ? 10 : 0)} ${labwareViewBox.yDimension + (quantity > 1 ? 5 : 0)}`}
+              >
+                {() => (
+                  <>
+                    <g>
+                      <LabwareRender
+                        definition={labwareDef}
+                        positioningMode="passThrough"
+                        wellFill={wellFill}
+                        highlightedWells={wellGroup}
+                        onMouseLeaveWell={mouseEventArgs => {
+                          handleMouseLeaveWell(mouseEventArgs)
+                          handleMouseLeaveWell(mouseEventArgs.event)
+                        }}
+                        onMouseEnterWell={({ wellName, event }) => {
+                          if (wellContents != null) {
+                            makeHandleMouseEnterWell(
+                              wellName,
+                              wellContents[wellName]?.ingreds ?? {}
+                            )(event)
+                          }
+                        }}
+                      />
+                    </g>
+                    {quantity > 1 ? (
+                      <>
+                        <g transform="scale(0.5)">
+                          <RobotCoordsForeignObject
+                            width="1.5rem"
+                            height="1.25rem"
+                            x={235}
+                            y={155}
+                          >
+                            <RobotInfoLabel
+                              height="1rem"
+                              svgSize="0.875rem"
+                              highlight
+                              iconName="stacked"
+                            />
+                          </RobotCoordsForeignObject>
+                        </g>
+                      </>
+                    ) : null}
+                  </>
+                )}
+              </RobotWorkSpace>
+              {quantity > 1 ? (
+                <div className={styles.labware_text_align}>
+                  <StyledText
+                    desktopStyle="captionRegular"
+                    color={COLORS.grey60}
+                  >
+                    {t('top_labware_in_stack')}
                   </StyledText>
                 </div>
               ) : null}
             </div>
-            {quantity > 1 ? (
-              <Tag text={t('quantity', { quantity })} type="default" />
-            ) : null}
-          </div>
-          {/* header text part */}
-        </div>
-        <div className={styles.body_container}>
-          <WellTooltip
-            ingredNames={ingredNames}
-            liquidDisplayColors={liquidDisplayColors}
-          >
-            {({ makeHandleMouseEnterWell, handleMouseLeaveWell }) => (
-              <div className={styles.labware_render_container}>
-                <RobotWorkSpace
-                  key={topLabwareOnSlotId}
-                  viewBox={`${labwareViewBox.minX} ${labwareViewBox.minY} ${labwareViewBox.xDimension + (quantity > 1 ? 10 : 0)} ${labwareViewBox.yDimension + (quantity > 1 ? 5 : 0)}`}
-                >
-                  {() => (
-                    <>
-                      <g>
-                        <LabwareRender
-                          definition={labwareDef}
-                          positioningMode="passThrough"
-                          wellFill={wellFill}
-                          highlightedWells={wellGroup}
-                          onMouseLeaveWell={mouseEventArgs => {
-                            handleMouseLeaveWell(mouseEventArgs)
-                            handleMouseLeaveWell(mouseEventArgs.event)
-                          }}
-                          onMouseEnterWell={({ wellName, event }) => {
-                            if (wellContents != null) {
-                              makeHandleMouseEnterWell(
-                                wellName,
-                                wellContents[wellName]?.ingreds ?? {}
-                              )(event)
-                            }
-                          }}
-                        />
-                      </g>
-                      {quantity > 1 ? (
-                        <>
-                          <g transform="scale(0.5)">
-                            <RobotCoordsForeignObject
-                              width="1.5rem"
-                              height="1.25rem"
-                              x={235}
-                              y={155}
-                            >
-                              <RobotInfoLabel
-                                height="1rem"
-                                svgSize="0.875rem"
-                                highlight
-                                iconName="stacked"
-                              />
-                            </RobotCoordsForeignObject>
-                          </g>
-                        </>
-                      ) : null}
-                    </>
-                  )}
-                </RobotWorkSpace>
-                {quantity > 1 ? (
-                  <div className={styles.labware_text_align}>
-                    <StyledText
-                      desktopStyle="captionRegular"
-                      color={COLORS.grey60}
-                    >
-                      {t('top_labware_in_stack')}
-                    </StyledText>
-                  </div>
-                ) : null}
-              </div>
-            )}
-          </WellTooltip>
-        </div>
+          )}
+        </WellTooltip>
       </div>
-    </>
+    </div>
   )
 }
