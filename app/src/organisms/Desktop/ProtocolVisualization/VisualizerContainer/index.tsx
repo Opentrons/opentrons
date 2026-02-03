@@ -70,9 +70,7 @@ export function VisualizerContainer(
   )
   const [isDragging, setIsDragging] = useState<boolean>(false)
 
-  const [selectedCommandId, setSelectedCommand] = useState<string | null>(
-    null
-  )
+  const [selectedCommandId, setSelectedCommand] = useState<string | null>(null)
 
   // for resizable columns
   const [leftWidth, setLeftWidth] = useState<number>(INITIAL_WIDTH_PX)
@@ -142,7 +140,9 @@ export function VisualizerContainer(
 
     const intervalId = setInterval(() => {
       setSelectedCommand(prevId => {
-        const currentIndex = filteredCommands.findIndex(cmd => cmd.id === prevId)
+        const currentIndex = filteredCommands.findIndex(
+          cmd => cmd.id === prevId
+        )
         const nextIndex =
           currentIndex >= 0 && currentIndex < filteredCommands.length - 1
             ? currentIndex + 1
