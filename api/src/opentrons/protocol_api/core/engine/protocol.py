@@ -249,7 +249,8 @@ class ProtocolCore(
                 namespace=namespace,
                 version=version,
                 displayName=label,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_labware(load_result.definition)
@@ -318,7 +319,8 @@ class ProtocolCore(
                 location=load_location,
                 namespace=namespace,
                 version=version,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
         # FIXME(jbl, 2023-08-14) validating after loading the object issue
         validation.ensure_definition_is_adapter(load_result.definition)
@@ -366,7 +368,8 @@ class ProtocolCore(
                 location=load_location,
                 namespace=namespace,
                 version=version,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
         # FIXME(chb, 2024-12-06) validating after loading the object issue
         validation.ensure_definition_is_lid(load_result.definition)
@@ -439,7 +442,8 @@ class ProtocolCore(
                 strategy=strategy,
                 pickUpOffset=_pick_up_offset,
                 dropOffset=_drop_offset,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
@@ -602,7 +606,8 @@ class ProtocolCore(
                     version=1,
                     namespace="empty",
                     quantity=0,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
 
             # Move the lid stack object from the SYSTEM_LOCATION space to the desired deck location
@@ -613,7 +618,8 @@ class ProtocolCore(
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
                     dropOffset=None,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
 
             output_result = LabwareCore(
@@ -630,7 +636,8 @@ class ProtocolCore(
                 strategy=strategy,
                 pickUpOffset=_pick_up_offset,
                 dropOffset=_drop_offset,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         # Handle leftover empty lid stack if there is one
@@ -652,7 +659,8 @@ class ProtocolCore(
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
                     dropOffset=None,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
         elif (
             potential_lid_stack
@@ -671,7 +679,8 @@ class ProtocolCore(
                     strategy=LabwareMovementStrategy.MANUAL_MOVE_WITHOUT_PAUSE,
                     pickUpOffset=None,
                     dropOffset=None,
-                )
+                ),
+                command_annotations=self._annotation_ids,
             )
 
         if strategy == LabwareMovementStrategy.USING_GRIPPER:
@@ -737,7 +746,8 @@ class ProtocolCore(
             cmd.LoadModuleParams(
                 model=EngineModuleModel(model),
                 location=DeckSlotLocation(slotName=normalized_deck_slot),
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         module_core = self._get_module_core(load_module_result=result, model=model)
@@ -854,7 +864,8 @@ class ProtocolCore(
                     self._api_version
                 ),
                 liquidPresenceDetection=liquid_presence_detection,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         return InstrumentCore(
@@ -913,27 +924,38 @@ class ProtocolCore(
 
     def pause(self, msg: Optional[str]) -> None:
         """Pause the protocol."""
-        self._engine_client.execute_command(cmd.WaitForResumeParams(message=msg))
+        self._engine_client.execute_command(
+            cmd.WaitForResumeParams(message=msg),
+            command_annotations=self._annotation_ids,
+        )
 
     def comment(self, msg: str) -> None:
         """Create a comment in the protocol to be shown in the log."""
-        self._engine_client.execute_command(cmd.CommentParams(message=msg))
+        self._engine_client.execute_command(
+            cmd.CommentParams(message=msg), command_annotations=self._annotation_ids
+        )
 
     def delay(self, seconds: float, msg: Optional[str]) -> None:
         """Wait for a period of time before proceeding."""
         self._engine_client.execute_command(
-            cmd.WaitForDurationParams(seconds=seconds, message=msg)
+            cmd.WaitForDurationParams(seconds=seconds, message=msg),
+            command_annotations=self._annotation_ids,
         )
 
     def wait_for_tasks(self, task_cores: Sequence[EngineTaskCore]) -> None:
         """Wait for specified tasks to complete."""
         task_ids = task_ids = [task._id for task in task_cores if task._id is not None]
-        self._engine_client.execute_command(cmd.WaitForTasksParams(task_ids=task_ids))
+        self._engine_client.execute_command(
+            cmd.WaitForTasksParams(task_ids=task_ids), command_annotations=[]
+        )
 
     def create_timer(self, seconds: float) -> EngineTaskCore:
         """Create a timer task that runs in the background."""
         result = self._engine_client.execute_command_without_recovery(
-            cmd.CreateTimerParams(time=seconds)
+            cmd.CreateTimerParams(
+                time=seconds
+            ),  # TODO should this have command annotations?
+            command_annotations=[],
         )
         timer_task = EngineTaskCore(
             engine_client=self._engine_client, task_id=result.task_id
@@ -942,11 +964,16 @@ class ProtocolCore(
 
     def home(self) -> None:
         """Move all axes to their home positions."""
-        self._engine_client.execute_command(cmd.HomeParams(axes=None))
+        self._engine_client.execute_command(
+            cmd.HomeParams(axes=None), command_annotations=self._annotation_ids
+        )
 
     def set_rail_lights(self, on: bool) -> None:
         """Set the device's rail lights."""
-        self._engine_client.execute_command(cmd.SetRailLightsParams(on=on))
+        self._engine_client.execute_command(
+            cmd.SetRailLightsParams(on=on),
+            command_annotations=self._annotation_ids,
+        )
 
     def get_rail_lights_on(self) -> bool:
         """Get whether the device's rail lights are on."""
@@ -1012,7 +1039,8 @@ class ProtocolCore(
                 namespace=namespace,
                 version=version,
                 quantity=quantity,
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
         # FIXME(CHB, 2024-12-04) just like load labware and load adapter we have a validating after loading the object issue
@@ -1218,7 +1246,8 @@ class ProtocolCore(
                 saturation=saturation
                 if saturation is not None
                 else self._engine_client.state.camera.get_saturation(),
-            )
+            ),
+            command_annotations=self._annotation_ids,
         )
 
     def create_user_command_annotation(

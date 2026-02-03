@@ -292,7 +292,8 @@ def test_load_instrument_pre_219(
                 mount=MountType.LEFT,
                 tipOverlapNotAfterVersion="v0",
                 liquidPresenceDetection=False,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
@@ -329,7 +330,8 @@ def test_load_instrument_post_220(
                 mount=MountType.LEFT,
                 tipOverlapNotAfterVersion="v3",
                 liquidPresenceDetection=False,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(commands.LoadPipetteResult(pipetteId="cool-pipette"))
 
@@ -379,7 +381,8 @@ def test_load_labware(
                 displayName="some_display_name",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -454,7 +457,8 @@ def test_load_labware_on_staging_slot(
                 displayName="some_display_name",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -532,7 +536,8 @@ def test_load_labware_on_labware(
                 displayName="some_display_name",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -603,7 +608,8 @@ def test_load_labware_off_deck(
                 displayName="some_display_name",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -667,7 +673,8 @@ def test_load_adapter(
                 loadName="some_adapter",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -740,7 +747,8 @@ def test_load_adapter_on_staging_slot(
                 loadName="some_adapter",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -815,7 +823,8 @@ def test_load_lid(
                 loadName="some_labware",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLidResult.model_construct(
@@ -888,7 +897,8 @@ def test_load_lid_stack(
                 namespace="some_namespace",
                 version=9001,
                 quantity=5,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLidStackResult.model_construct(
@@ -1062,7 +1072,8 @@ def test_move_labware(
                     LabwareOffsetVector(x=4, y=5, z=6) if pick_up_offset else None
                 ),
                 dropOffset=LabwareOffsetVector(x=4, y=5, z=6) if drop_offset else None,
-            )
+            ),
+            command_annotations=[],
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -1103,7 +1114,8 @@ def test_move_labware_on_staging_slot(
                 strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
                 pickUpOffset=None,
                 dropOffset=None,
-            )
+            ),
+            command_annotations=[],
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -1150,7 +1162,8 @@ def test_move_labware_on_non_connected_module(
                 strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
                 pickUpOffset=None,
                 dropOffset=None,
-            )
+            ),
+            command_annotations=[],
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -1192,7 +1205,8 @@ def test_move_labware_off_deck(
                 strategy=LabwareMovementStrategy.MANUAL_MOVE_WITH_PAUSE,
                 pickUpOffset=None,
                 dropOffset=None,
-            )
+            ),
+            command_annotations=[],
         ),
         deck_conflict.check(
             engine_state=mock_engine_client.state,
@@ -1234,7 +1248,8 @@ def test_load_labware_on_module(
                 displayName="some_display_name",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -1313,7 +1328,8 @@ def test_load_labware_on_non_connected_module(
                 displayName="some_display_name",
                 namespace="some_namespace",
                 version=9001,
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadLabwareResult.model_construct(
@@ -1465,7 +1481,8 @@ def test_load_module(
             cmd.LoadModuleParams(
                 model=engine_model,
                 location=DeckSlotLocation(slotName=slot_name),
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -1525,7 +1542,8 @@ def test_load_mag_block(
             cmd.LoadModuleParams(
                 model=EngineModuleModel.MAGNETIC_BLOCK_V1,
                 location=DeckSlotLocation(slotName=DeckSlotName.SLOT_A2),
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -1605,7 +1623,8 @@ def test_load_module_thermocycler_with_no_location(
             cmd.LoadModuleParams(
                 model=engine_model,
                 location=DeckSlotLocation(slotName=expected_slot),
-            )
+            ),
+            command_annotations=[],
         )
     ).then_return(
         commands.LoadModuleResult(
@@ -1664,7 +1683,9 @@ def test_pause(
     """It should issue a waitForResume command."""
     subject.pause(msg=message)
     decoy.verify(
-        mock_engine_client.execute_command(cmd.WaitForResumeParams(message=message))
+        mock_engine_client.execute_command(
+            cmd.WaitForResumeParams(message=message), command_annotations=[]
+        )
     )
 
 
@@ -1681,8 +1702,9 @@ def test_delay(
     subject.delay(seconds=seconds, msg=message)
     decoy.verify(
         mock_engine_client.execute_command(
-            cmd.WaitForDurationParams(seconds=seconds, message=message)
-        )
+            cmd.WaitForDurationParams(seconds=seconds, message=message),
+            command_annotations=[],
+        ),
     )
 
 
@@ -1702,7 +1724,9 @@ def test_wait_for_tasks(
 
     subject.wait_for_tasks(task_cores=tasks)
     decoy.verify(
-        mock_engine_client.execute_command(cmd.WaitForTasksParams(task_ids=task_ids))
+        mock_engine_client.execute_command(
+            cmd.WaitForTasksParams(task_ids=task_ids), command_annotations=[]
+        ),
     )
 
 
@@ -1714,8 +1738,8 @@ def test_create_timer(
     """It should issue a createTimer command."""
     decoy.when(
         mock_engine_client.execute_command_without_recovery(
-            cmd.CreateTimerParams(time=0.1)
-        )
+            cmd.CreateTimerParams(time=0.1), command_annotations=[]
+        ),
     ).then_return(cmd.CreateTimerResult(task_id="taskid", time=0.1))
     result = subject.create_timer(seconds=0.1)
     assert result._id == "taskid"
@@ -1730,7 +1754,9 @@ def test_comment(
     """It should issue a comment command."""
     subject.comment("Hello, world!")
     decoy.verify(
-        mock_engine_client.execute_command(cmd.CommentParams(message="Hello, world!"))
+        mock_engine_client.execute_command(
+            cmd.CommentParams(message="Hello, world!"), command_annotations=[]
+        ),
     )
 
 
@@ -1741,7 +1767,12 @@ def test_home(
 ) -> None:
     """It should home all axes."""
     subject.home()
-    decoy.verify(mock_engine_client.execute_command(cmd.HomeParams(axes=None)), times=1)
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.HomeParams(axes=None), command_annotations=[]
+        ),
+        times=1,
+    )
 
 
 def test_is_simulating(
@@ -1759,10 +1790,18 @@ def test_set_rail_lights(
 ) -> None:
     """It should verify a call to sync client."""
     subject.set_rail_lights(on=True)
-    decoy.verify(mock_engine_client.execute_command(cmd.SetRailLightsParams(on=True)))
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.SetRailLightsParams(on=True), command_annotations=[]
+        )
+    )
 
     subject.set_rail_lights(on=False)
-    decoy.verify(mock_engine_client.execute_command(cmd.SetRailLightsParams(on=False)))
+    decoy.verify(
+        mock_engine_client.execute_command(
+            cmd.SetRailLightsParams(on=False), command_annotations=[]
+        )
+    )
 
 
 def test_get_rail_lights(
@@ -2075,6 +2114,7 @@ def test_capture_image_with_run_specific_defaults(
                 contrast=25,
                 brightness=75,
                 saturation=99,
-            )
+            ),
+            command_annotations=[],
         )
     )
