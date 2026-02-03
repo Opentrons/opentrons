@@ -1,6 +1,8 @@
 import {
+  COMBO_FIXTURE_TO_FIXTURE_MAP,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
+  FLEX_STACKER_V1_FIXTURE,
   getAAWithFakesFromCutoutFixtureId,
   getAddedMissingThermocyclerFixtures,
   getComboFixtureFromFixtureIds,
@@ -12,6 +14,8 @@ import {
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
   isModuleFixtureId,
+  MAGNETIC_BLOCK_TYPE,
+  MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -270,8 +274,6 @@ export const updateInitialDeckState = (
       [value.addressableAreaId as AddressableAreaName],
       value.cutoutId
     )
-
-    console.log('newFixtureName: ', newFixtureName)
     // Find matching fixtures on deck by cutoutId (could be multiple, e.g., waste chute + staging area)
     const matchingFixturesOnDeck = Object.values(
       additionalEquipmentOnDeck
@@ -289,13 +291,13 @@ export const updateInitialDeckState = (
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
-    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
+    const modulesAtCutout = Object.values(moduleOnDeck).filter(
+      module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
+    )
 
     const matchingStagingArea = matchingFixturesOnDeck.find(
       f => f.name === 'stagingArea'
     )
-    console.log('matchingStagingArea: ', matchingStagingArea)
-
     // Get the addressable area IDs for the staging area slot (e.g., ['D4', 'fakeD4'] for cutoutD3)
     const stagingAreaSlots =
       matchingStagingArea != null && matchingStagingArea.location != null
@@ -363,6 +365,34 @@ export const updateInitialDeckState = (
       return
     }
 
+    // Handle flex stacker + mag block combo (2 modules in same slot) - remove the module that is not newFixtureName
+    if (modulesAtCutout.length === 2) {
+      const moduleToDelete = modulesAtCutout.find(
+        m => m.model !== getModuleModelFromFixtureId(newFixtureName!)
+      )
+      if (moduleToDelete != null) {
+        const { moduleId: moduleToDeleteId } = getHardwareInSlotInUse(
+          savedSteps,
+          matching4thColumnLabware,
+          moduleToDelete,
+          undefined
+        )
+        const moduleCtx: ModuleContext = {
+          value,
+          matchingModule: moduleToDelete,
+          moduleId: moduleToDeleteId,
+          labwareOnDeck,
+          deckConfig,
+          dispatch,
+          setShowDeleteEntityModal,
+          makeSnackbar,
+          t,
+        }
+        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
+      }
+      return
+    }
+
     if (removing) {
       if (matchingModuleOnDeck != null) {
         const moduleCtx: ModuleContext = {
@@ -398,8 +428,6 @@ export const updateInitialDeckState = (
       return
     }
 
-    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
-    console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
     const moduleCtx: ModuleContext = {
       value,
       matchingModule: matchingModuleOnDeck,
@@ -427,8 +455,6 @@ export const updateInitialDeckState = (
       t,
     }
 
-    console.log('isModuleFixture: ', isModuleFixture)
-    console.log('newFixtureName: ', newFixtureName)
     if (!isModuleFixture && newFixtureName != null) {
       console.log('adding fixture')
       // Adding fixture
@@ -462,11 +488,12 @@ export const updateInitialDeckState = (
       if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
         handleDeleteFixture(fixtureCtx)
       } else if (matchingModuleOnDeck != null) {
+        const moduleOnDeckFixtureId = getCutoutFixturesForModuleModel(
+          matchingModuleOnDeck.model,
+          deckDef
+        )
         const comboFixtureId = getComboFixtureFromFixtureIds([
-          getCutoutFixturesForModuleModel(
-            matchingModuleOnDeck.model,
-            deckDef
-          )[0].id as CutoutFixtureId,
+          moduleOnDeckFixtureId[0].id as CutoutFixtureId,
           newFixtureName ?? value.cutoutFixtureId,
         ])
         if (comboFixtureId != null) {
