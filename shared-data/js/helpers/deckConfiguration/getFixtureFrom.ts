@@ -293,10 +293,11 @@ export function getComboFixtureFromFixtureIds(
     COMBO_FIXTURE_TO_FIXTURE_MAP
   )) {
     if (componentFixtures == null) continue
-    // Check if arrays have same length and all fixtures match
+    // Check same length and that both arrays contain exactly the same set (all components present)
     const allMatch =
       fixtureIds.length === componentFixtures.length &&
-      fixtureIds.every(fixtureId => componentFixtures.includes(fixtureId))
+      fixtureIds.every(fixtureId => componentFixtures.includes(fixtureId)) &&
+      componentFixtures.every(cf => fixtureIds.includes(cf))
     if (allMatch) {
       return comboFixtureId as CutoutFixtureId
     }
