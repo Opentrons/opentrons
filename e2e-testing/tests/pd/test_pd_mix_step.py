@@ -40,14 +40,20 @@ def test_mix_step_configuration_workflow(page: Page, base_url: str) -> None:
         "Tiprack",
         "Labware",
     ]:
+        print(f"Expecting text: {label}")
         mix_form.expect_text(label)
 
     mix_form.select_pipette(PIPETTE_OPTION)
     mix_form.select_tiprack(TIPRACK_OPTION)
-
     mix_form.select_labware(LABWARE_OPTION)
-    for other_labels in ["Select wells", "Volume per well", "Mix repetitions"]:
-        mix_form.expect_text(other_labels)
+
+    for label in [
+        "Select wells",
+        "Volume per well",
+        "Mix repetitions",
+    ]:
+        mix_form.expect_text(label)
+
     mix_form.open_well_selector()
     mix_form.expect_well_selector_modal()
     mix_form.select_wells(["A1", "A2"])

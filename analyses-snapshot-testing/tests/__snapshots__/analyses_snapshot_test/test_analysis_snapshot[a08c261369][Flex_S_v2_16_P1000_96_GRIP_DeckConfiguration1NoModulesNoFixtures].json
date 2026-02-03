@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1204,6 +1206,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2391,6 +2394,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2475,6 +2479,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3657,6 +3662,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -3739,6 +3745,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -4919,6 +4926,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -6086,6 +6094,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7253,6 +7262,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7272,6 +7282,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7290,6 +7301,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7308,6 +7320,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7326,6 +7339,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7344,6 +7358,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7362,6 +7377,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7380,6 +7396,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7398,6 +7415,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7416,6 +7434,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7434,6 +7453,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7452,6 +7472,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7470,6 +7491,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7488,6 +7510,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7506,6 +7529,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7524,6 +7548,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7542,6 +7567,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7560,6 +7586,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7578,6 +7605,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7596,6 +7624,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7614,6 +7643,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7632,6 +7662,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7650,6 +7681,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7668,6 +7700,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7686,6 +7719,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7704,6 +7738,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7722,6 +7757,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7740,6 +7776,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7758,6 +7795,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7776,6 +7814,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7794,6 +7833,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7812,6 +7852,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7830,6 +7871,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7848,6 +7890,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7866,6 +7909,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7884,6 +7928,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7902,6 +7947,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7920,6 +7966,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7938,6 +7985,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7956,6 +8004,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7974,6 +8023,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -7992,6 +8042,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8010,6 +8061,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8028,6 +8080,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8046,6 +8099,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8064,6 +8118,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8082,6 +8137,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8100,6 +8156,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8118,6 +8175,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8136,6 +8194,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8154,6 +8213,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8172,6 +8232,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8190,6 +8251,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8208,6 +8270,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8226,6 +8289,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8244,6 +8308,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8262,6 +8327,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8280,6 +8346,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8298,6 +8365,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8316,6 +8384,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8334,6 +8403,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8352,6 +8422,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8370,6 +8441,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8388,6 +8460,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8406,6 +8479,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8424,6 +8498,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8442,6 +8517,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8460,6 +8536,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8478,6 +8555,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8496,6 +8574,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8514,6 +8593,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8532,6 +8612,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8550,6 +8631,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8568,6 +8650,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8586,6 +8669,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8604,6 +8688,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8622,6 +8707,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8640,6 +8726,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8658,6 +8745,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8676,6 +8764,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8694,6 +8783,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8712,6 +8802,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8730,6 +8821,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8748,6 +8840,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8766,6 +8859,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8784,6 +8878,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8802,6 +8897,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8820,6 +8916,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8838,6 +8935,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8856,6 +8954,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8874,6 +8973,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8892,6 +8992,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8910,6 +9011,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8928,6 +9030,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8946,6 +9049,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8964,6 +9068,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -8982,6 +9087,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLiquid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9000,6 +9106,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9033,6 +9140,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9067,6 +9175,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9101,6 +9210,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9133,6 +9243,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9166,6 +9277,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9200,6 +9312,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9234,6 +9347,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9266,6 +9380,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9314,6 +9429,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9360,6 +9476,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9423,6 +9540,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9482,6 +9600,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9515,6 +9634,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9549,6 +9669,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9583,6 +9704,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9615,6 +9737,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "pickUpTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9648,6 +9771,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "aspirate",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9682,6 +9806,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dispense",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9716,6 +9841,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "dropTip",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9748,6 +9874,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -9790,6 +9917,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
