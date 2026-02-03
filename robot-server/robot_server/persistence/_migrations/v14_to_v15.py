@@ -24,6 +24,6 @@ class Migration14to15(Migration):  # noqa: D101
 
         with sql_engine_ctx(dest_db_file) as engine:
             with engine.begin() as connection:
-                # Create the new capture image settings table
+                # Create the new annotations tables
                 schema_15.command_annotation_table.create(connection)
                 schema_15.command_to_annotation_table.create(connection)
