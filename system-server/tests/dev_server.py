@@ -70,10 +70,6 @@ class DevServer:
         )
 
     def stop(self) -> None:
-        """Stop the server and wait for it to clean up."""
+        """Stop the robot server."""
         self.proc.send_signal(signal.SIGTERM)
         self.proc.wait()
-
-    @property
-    def base_url(self) -> str:
-        return f"http://localhost:{self.port}"
