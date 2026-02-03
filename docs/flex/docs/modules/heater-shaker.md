@@ -70,8 +70,8 @@ You can purchase adapters directly from Opentrons:
 - [96 Flat Bottom Adapter](https://opentrons.com/products/96-flat-bottom-adapter/)
 
 ### Software control
-<!-- This link caused build problems ../../python-api/modules/heater-shaker.md#non-blocking-commands -->
-The Heater-Shaker is fully programmable in Protocol Designer and the Python Protocol API. The Python API additionally allows for other protocol steps to be performed in parallel while the Heater-Shaker is active. See the [Heater-Shaker section](https://docs.opentrons.com/flex/modules/heater-shaker/) in the API documentation for details on adding parallel steps to your protocols. 
+
+The Heater-Shaker is fully programmable in Protocol Designer and the Python Protocol API. The Python API additionally allows for other protocol steps to be performed in parallel while the Heater-Shaker is active. See [Non-blocking commands](https://docs.opentrons.com/python-api/modules/heater-shaker/#non-blocking-commands) in the API documentation for details on adding parallel steps to your protocols.
 
 Outside of protocols, the Opentrons App can display the current status of the Heater-Shaker and can directly control the heater, shaker, and labware latch.
 
