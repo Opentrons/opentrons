@@ -1,8 +1,6 @@
 import {
-  COMBO_FIXTURE_TO_FIXTURE_MAP,
   FLEX_ROBOT_TYPE,
   FLEX_STACKER_MODULE_TYPE,
-  FLEX_STACKER_V1_FIXTURE,
   getAAWithFakesFromCutoutFixtureId,
   getAddedMissingThermocyclerFixtures,
   getComboFixtureFromFixtureIds,
@@ -14,8 +12,6 @@ import {
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
   isModuleFixtureId,
-  MAGNETIC_BLOCK_TYPE,
-  MAGNETIC_BLOCK_V1_FIXTURE,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
