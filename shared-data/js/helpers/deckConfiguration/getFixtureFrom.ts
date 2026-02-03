@@ -269,6 +269,19 @@ export function getModuleModelFromFixtureId(
 }
 
 /**
+ * Returns true if the fixture is a module fixture, including when the fixture
+ * is a combo fixture that contains a module (e.g. flex stacker + waste chute).
+ */
+export function isModuleFixtureId(fixtureId: CutoutFixtureId): boolean {
+  const componentFixtureIds = COMBO_FIXTURE_TO_FIXTURE_MAP[fixtureId] ?? [
+    fixtureId,
+  ]
+  return componentFixtureIds.some(
+    id => getModuleModelFromFixtureId(id as CutoutFixtureId) !== null
+  )
+}
+
+/**
  * Given a list of fixture IDs, find the combo fixture that contains all of them.
  * @param fixtureIds - Array of fixture IDs to find a combo for
  * @returns The combo fixture ID if found, null otherwise

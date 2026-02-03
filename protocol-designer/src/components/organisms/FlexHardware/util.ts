@@ -3,12 +3,15 @@ import {
   FLEX_STACKER_MODULE_TYPE,
   getAAWithFakesFromCutoutFixtureId,
   getAddedMissingThermocyclerFixtures,
+  getComboFixtureFromFixtureIds,
+  getCutoutFixturesForModuleModel,
   getCutoutIdForSlotName,
   getDeckDefFromRobotType,
   getMainFixtureIdForAA,
   getModuleModelFromFixtureId,
   getModuleType,
   getSlotDisplayNameFromAAWithFakes,
+  isModuleFixtureId,
   SINGLE_SLOT_FIXTURES,
   STAGING_AREA_FIXTURES,
   STAGING_AREA_RIGHT_SLOT_FIXTURE,
@@ -249,6 +252,8 @@ export const updateInitialDeckState = (
     handleDeleteStackerLabware,
   } = props
 
+  console.log('values: ', values)
+
   const {
     additionalEquipmentOnDeck,
     modules: moduleOnDeck,
@@ -266,6 +271,7 @@ export const updateInitialDeckState = (
       value.cutoutId
     )
 
+    console.log('newFixtureName: ', newFixtureName)
     // Find matching fixtures on deck by cutoutId (could be multiple, e.g., waste chute + staging area)
     const matchingFixturesOnDeck = Object.values(
       additionalEquipmentOnDeck
@@ -276,17 +282,19 @@ export const updateInitialDeckState = (
 
     // Determine if we're removing (applying single slot fixture) or adding
     const removing = SINGLE_SLOT_FIXTURES.includes(newFixtureName!)
-    // Determine if the new fixture is a module
-    const isModuleFixture =
-      getModuleModelFromFixtureId(newFixtureName!) !== null
+    // Determine if the new fixture is a module (including combo fixtures that contain a module)
+    const isModuleFixture = isModuleFixtureId(newFixtureName!)
 
+    console.log('isModuleFixture: ', isModuleFixture)
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
+    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
 
     const matchingStagingArea = matchingFixturesOnDeck.find(
       f => f.name === 'stagingArea'
     )
+    console.log('matchingStagingArea: ', matchingStagingArea)
 
     // Get the addressable area IDs for the staging area slot (e.g., ['D4', 'fakeD4'] for cutoutD3)
     const stagingAreaSlots =
@@ -390,6 +398,8 @@ export const updateInitialDeckState = (
       return
     }
 
+    console.log('matchingModuleOnDeck: ', matchingModuleOnDeck)
+    console.log('matchingFixtureOnDeck: ', matchingFixtureOnDeck)
     const moduleCtx: ModuleContext = {
       value,
       matchingModule: matchingModuleOnDeck,
@@ -417,7 +427,10 @@ export const updateInitialDeckState = (
       t,
     }
 
+    console.log('isModuleFixture: ', isModuleFixture)
+    console.log('newFixtureName: ', newFixtureName)
     if (!isModuleFixture && newFixtureName != null) {
+      console.log('adding fixture')
       // Adding fixture
       if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
         handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
@@ -449,7 +462,24 @@ export const updateInitialDeckState = (
       if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
         handleDeleteFixture(fixtureCtx)
       } else if (matchingModuleOnDeck != null) {
-        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
+        const comboFixtureId = getComboFixtureFromFixtureIds([
+          getCutoutFixturesForModuleModel(
+            matchingModuleOnDeck.model,
+            deckDef
+          )[0].id as CutoutFixtureId,
+          newFixtureName ?? value.cutoutFixtureId,
+        ])
+        if (comboFixtureId != null) {
+          handleCreateModule({
+            ...moduleCtx,
+            value: {
+              ...value,
+              cutoutFixtureId: newFixtureName ?? value.cutoutFixtureId,
+            },
+          })
+        } else {
+          handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
+        }
       } else {
         handleCreateModule(moduleCtx)
       }
