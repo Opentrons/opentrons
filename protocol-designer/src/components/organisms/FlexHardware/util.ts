@@ -256,8 +256,6 @@ export const updateInitialDeckState = (
     handleDeleteStackerLabware,
   } = props
 
-  console.log('values: ', values)
-
   const {
     additionalEquipmentOnDeck,
     modules: moduleOnDeck,
@@ -286,8 +284,6 @@ export const updateInitialDeckState = (
     const removing = SINGLE_SLOT_FIXTURES.includes(newFixtureName!)
     // Determine if the new fixture is a module (including combo fixtures that contain a module)
     const isModuleFixture = isModuleFixtureId(newFixtureName!)
-
-    console.log('isModuleFixture: ', isModuleFixture)
     const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
       module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
     )
