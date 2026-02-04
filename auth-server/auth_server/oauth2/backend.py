@@ -15,8 +15,6 @@ from auth_server.users.store import TEST_USERS, User
 
 _log = logging.getLogger(__name__)
 
-router = fastapi.APIRouter(prefix="/auth")
-
 # oauthlib seems to expect every request to carry a client_id, even though OAuth 2
 # doesn't require it for password grants. To work around this, we expect
 # our clients to always supply this hard-coded arbitrary client_id.
