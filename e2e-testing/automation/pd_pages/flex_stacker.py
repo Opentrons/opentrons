@@ -29,15 +29,7 @@ class FlexStackerPage(BasePage):
         """
         self._stacker_select(stacker)
 
-        refill_label = self.page.locator("label").filter(has_text="RefillManually fill the")
-        refill_radio = self.page.locator("input#Refill")
-
-        try:
-            expect(refill_radio).to_be_checked()
-        except TimeoutError:
-            refill_label.click()
-            expect(refill_radio).to_be_checked()
-
+        self.page.get_by_text("RefillManually fill the").click()
         spinbutton = self.page.get_by_role("spinbutton")
         spinbutton.fill(str(refill_num))
 
