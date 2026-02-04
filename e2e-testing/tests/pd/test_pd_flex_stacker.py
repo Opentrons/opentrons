@@ -7,6 +7,7 @@ from automation.pd_pages.deck_config_page import DeckConfigPage
 from automation.pd_pages.plate_reader_page import PlateReaderPage
 from automation.pd_pages.create_protocol_wizard import CreateProtocolWizard
 from automation.pd_pages.tc_step_form_page import ThermocyclerStepPage
+from automation.pd_pages.transfer_form import TransferPage
 
 
 
@@ -18,90 +19,91 @@ def test_flex_stacker(page: Page) -> None:
     deck_config_page = DeckConfigPage(page)
     plate_reader_page = PlateReaderPage(page)
     create_protocol = CreateProtocolWizard(page)
-    thermocycler_page = ThermocyclerStepPage(page)  # Placeholder if ThermocyclerPage is needed later
+    thermocycler_page = ThermocyclerStepPage(page)
+    transfer_page = TransferPage(page)
 
 
     ## Create new Flex protocol from Landing Page, 4 stackers and waste chute and magnetic block
     create_new_protocol_from_landing_page(True, True, True, page)
-    # deck_config_page.select_slot("A4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("A3")
-    # deck_config_page.select_module("Magnetic Block GEN1")
-    # deck_config_page.select_slot("B4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("C4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("D4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # #applitools eyes?
-    # print("\n✓ Configured 4 Flex Stackers with waste chute and magnetic block")
+    deck_config_page.select_slot("A4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("A3")
+    deck_config_page.select_module("Magnetic Block GEN1")
+    deck_config_page.select_slot("B4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("C4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("D4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    #applitools eyes?
+    print("\n✓ Configured 4 Flex Stackers with waste chute and magnetic block")
 
-    # ## Create new Flex protocol from Create New button
-    # start_new_create_protocol(page)
-    # create_new_protocol_flow(True, True, False, page)
-    # deck_config_page.remove_fixture("Trash bin")
-    # deck_config_page.select_slot("A4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.remove_fixture("Stacker")
-    # deck_config_page.select_slot("A4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("B4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("C4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("D4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # print("✓ Configured 4 Flex Stackers without waste chute")
+    ## Create new Flex protocol from Create New button
+    start_new_create_protocol(page)
+    create_new_protocol_flow(True, True, False, page)
+    deck_config_page.remove_fixture("Trash bin")
+    deck_config_page.select_slot("A4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.remove_fixture("Stacker")
+    deck_config_page.select_slot("A4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("B4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("C4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("D4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    print("✓ Configured 4 Flex Stackers without waste chute")
 
-    # ##Creating a new protocol and adding 3 stackers and a trashbin
-    # start_new_create_protocol(page)
-    # create_new_protocol_flow(True, True, False, page)
-    # deck_config_page.select_slot("B4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("C4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("D4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # print("✓ Configured 3 Flex Stackers with a trashbin")
+    ##Creating a new protocol and adding 3 stackers and a trashbin
+    start_new_create_protocol(page)
+    create_new_protocol_flow(True, True, False, page)
+    deck_config_page.select_slot("B4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("C4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("D4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    print("✓ Configured 3 Flex Stackers with a trashbin")
 
-    # ##Creating a new protocol
-    # ##Test adding 3 stackers and an absorbance reader
-    # start_new_create_protocol(page)
-    # create_new_protocol_flow(True, True, True, page)
-    # deck_config_page.select_slot("A4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
-    # deck_config_page.select_slot("C4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("D4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # print("✓ Configured 3 Flex Stackers with waste chute a plate reader")
+    ##Creating a new protocol
+    ##Test adding 3 stackers and an absorbance reader
+    start_new_create_protocol(page)
+    create_new_protocol_flow(True, True, True, page)
+    deck_config_page.select_slot("A4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    plate_reader_page.configure_module("B3", "Absorbance Plate Reader Module GEN1")
+    deck_config_page.select_slot("C4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("D4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    print("✓ Configured 3 Flex Stackers with waste chute a plate reader")
 
 
-    # ##Test adding 2 stackers and an absorbnace reader and a expansion slot
-    # start_new_create_protocol(page)
-    # create_new_protocol_flow(True, True, True, page)
-    # deck_config_page.select_slot("A3")
-    # deck_config_page.select_fixture("Trash bin")
-    # deck_config_page.select_slot("B3")
-    # deck_config_page.select_module("Absorbance Plate Reader Module GEN1")
-    # deck_config_page.select_slot("C4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # deck_config_page.select_slot("D4")
-    # deck_config_page.select_module("Flex Stacker Module GEN1")
-    # print("✓ Configured 2 Flex Stackers with Trash bin and a plate reader")
+    ##Test adding 2 stackers and an absorbnace reader and a expansion slot
+    start_new_create_protocol(page)
+    create_new_protocol_flow(True, True, True, page)
+    deck_config_page.select_slot("A3")
+    deck_config_page.select_fixture("Trash bin")
+    deck_config_page.select_slot("B3")
+    deck_config_page.select_module("Absorbance Plate Reader Module GEN1")
+    deck_config_page.select_slot("C4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    deck_config_page.select_slot("D4")
+    deck_config_page.select_module("Flex Stacker Module GEN1")
+    print("✓ Configured 2 Flex Stackers with Trash bin and a plate reader")
 
-    # ##Test adding 2 stackers and an absorbance reader and a expansion slot
-    # start_new_create_protocol(page)
-    # create_new_protocol_flow(True, True, True, page)
-    # deck_config_page.select_slot("A4")
-    # deck_config_page.select_fixture("Staging Area Slot")
-    # deck_config_page.select_slot("A3")
-    # deck_config_page.select_module("Magnetic Block GEN1")
-    # deck_config_page.select_slot("B3")
-    # deck_config_page.select_module("Absorbance Plate Reader Module GEN1")
-    # deck_config_page.select_slot("C1")
-    # deck_config_page.select_module("Heater-Shaker Module GEN1")
+    ##Test adding 2 stackers and an absorbance reader and a expansion slot
+    start_new_create_protocol(page)
+    create_new_protocol_flow(True, True, True, page)
+    deck_config_page.select_slot("A4")
+    deck_config_page.select_fixture("Staging Area Slot")
+    deck_config_page.select_slot("A3")
+    deck_config_page.select_module("Magnetic Block GEN1")
+    deck_config_page.select_slot("B3")
+    deck_config_page.select_module("Absorbance Plate Reader Module GEN1")
+    deck_config_page.select_slot("C1")
+    deck_config_page.select_module("Heater-Shaker Module GEN1")
     deck_config_page.select_slot("C4")
     deck_config_page.select_module("Flex Stacker Module GEN1")
     deck_config_page.select_slot("D4")
@@ -121,7 +123,7 @@ def test_flex_stacker(page: Page) -> None:
     # protocol_editor.select_labware_by_name("Opentrons Tough 96 Well Plate", True, 40)
     # plate_reader_page.button_selection("Done")
     protocol_editor.select_labware_category_by_name("Tip racks")
-    protocol_editor.select_labware_by_name("Opentrons Flex 96 Tip Rack 50 µL", stacker=True, lid=True)
+    protocol_editor.select_labware_by_name("Opentrons Flex 96 Tip Rack 50 µL", stacker=True, fill_num=4, lid=True)
     plate_reader_page.button_selection("Done")
 
     protocol_editor.add_labware_to_slot("hopperC4")
@@ -171,14 +173,22 @@ def test_flex_stacker(page: Page) -> None:
     thermocycler_page.select_state_mode()
     thermocycler_page.set_lid_position("open")
     plate_reader_page.button_selection("Save")
-
-
     protocol_editor.add_step("Flex Stacker")
     flex_stacker_page.retrieve_stacker('C4 Flex Stacker')
     plate_reader_page.button_selection('Save')
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("C4 Opentrons Tough 96 Well Plate", "Thermocycler Module GEN2") 
-    # protocol_editor.add_step("Transfer")
+    # protocol_editor.add_step()
+    # transfer_page.source_labware_select("NEST 1 Well Reservoir 195 mL")
+    # transfer_page.destination_labware_select("Opentrons Tough 96 Well Plate")
+    # transfer_page.wells_select("Destination", ["A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10", "A11", "A12"], rect=False)
+    # transfer_page.pipette_path_select("Single transfer")
+    # transfer_page.input_volume("150")
+    # transfer_page.transfer_continue_to_next_step()
+    # transfer_page.transfer_continue_to_next_step()
+    # transfer_page.transfer_continue_to_next_step()
+    # plate_reader_page.button_selection("Save")
+    print("✓ Transfer from Reservoir to plate in TC")
 
 
     protocol_editor.add_step("Flex Stacker")
@@ -189,16 +199,31 @@ def test_flex_stacker(page: Page) -> None:
     protocol_editor.add_step("Move")
     protocol_editor.move_labware("D4 Opentrons Flex 96 Tip Rack", "A2")
     protocol_editor.add_step("Flex Stacker")
-    flex_stacker_page.refill_stacker("D4 Flex Stacker", 1, 'Refill message test')
+    flex_stacker_page.retrieve_stacker('D4 Flex Stacker')
     plate_reader_page.button_selection('Save')
+    # protocol_editor.add_step("Flex Stacker")
+    # flex_stacker_page.refill_stacker("D4 Flex Stacker", 1, 'Refill message test')
+    # plate_reader_page.button_selection('Save')
     print("✓ Refill command successful")
 
+    protocol_editor.add_step("Move")
+    protocol_editor.move_labware("C2 Opentrons Flex 96 Tip Rack", "D4")
 
-    page.wait_for_timeout(10000)
+    protocol_editor.add_step("Move")
+    protocol_editor.move_labware("A1+B1 Opentrons Tough 96 Well Plate", "C4")
+    protocol_editor.add_step("Flex Stacker")
+    flex_stacker_page.store_stacker('C4 Flex Stacker')
+    plate_reader_page.button_selection("Save")
+    print("✓ Store well plate from TC into Stacker C")
+
+    protocol_editor.add_step("Flex Stacker")
+    flex_stacker_page.store_stacker('D4 Flex Stacker')
+    plate_reader_page.button_selection("Save")
+    print("✓ Store tip rack from deck into Stacker D")
+    ##protocol doesn't seem to throw an error if you try to store empty tip rack into hopper
 
 
-        ##Empty stacker
-            ##message
-    ##check to make surethat the stacker is highlighted
+    # page.wait_for_timeout(100000)
+
 
     print("\n✅ Flex Stacker Configuration and Form Test completed successfully!")
