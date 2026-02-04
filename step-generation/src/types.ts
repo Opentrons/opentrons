@@ -22,6 +22,7 @@ import type {
   TCExtendedProfileParams,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  VACUUM_MODULE_TYPE,
   Width,
 } from '@opentrons/shared-data'
 import type {
@@ -165,6 +166,11 @@ export interface FlexStackerModuleState {
   fillCount?: number
 }
 
+// TODO (nd: 02/04/2026): configure this type for vacuum module
+export interface VacuumModuleState {
+  type: typeof VACUUM_MODULE_TYPE
+}
+
 export type ModuleState =
   | MagneticModuleState
   | TemperatureModuleState
@@ -173,6 +179,7 @@ export type ModuleState =
   | MagneticBlockState
   | AbsorbanceReaderState
   | FlexStackerModuleState
+  | VacuumModuleState
 export interface ModuleTemporalProperties {
   slot: DeckSlot
   moduleState: ModuleState
