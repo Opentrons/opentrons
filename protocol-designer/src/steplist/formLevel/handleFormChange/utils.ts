@@ -1437,7 +1437,6 @@ export const getLiquidClassesValues = (args: {
     robotType,
   } = args
   const { liquidClass, pipette, tipRack, stepType } = rawForm
-  console.log('🚀 ~ getLiquidClassesValues ~ rawForm:', rawForm)
   if (stepType !== 'mix' && stepType !== 'moveLiquid') {
     console.warn(`invalid step type for liquid classes: ${stepType}`)
     return {}
@@ -1531,8 +1530,6 @@ export const updateFieldsForLiquidClass = (args: {
     liquidHandlingAction,
     robotType,
   })
-  console.log('inside update fields')
-  console.log('🚀 ~ updateFieldsForLiquidClass ~ fieldUpdates:', fieldUpdates)
 
   Object.entries(fieldUpdates).forEach(([field, value]) => {
     if (field in propsForFields) {
