@@ -231,6 +231,7 @@ export type AdditionalEquipmentName =
   | 'wasteChute'
   | 'stagingArea'
   | 'trashBin'
+
 export interface NormalizedAdditionalEquipmentById {
   [additionalEquipmentId: string]: {
     name: AdditionalEquipmentName
