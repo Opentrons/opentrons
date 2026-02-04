@@ -107,7 +107,7 @@ def create_new_protocol_from_landing_page(gripper: bool, tc: bool, waste_chute: 
 
 def create_new_protocol_flow(gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
     page.get_by_text("Add a pipette").click()
-    page.get_by_text("1-Channel").click()
+    page.get_by_text("8-Channel").click()
     page.get_by_text("50 µL").click()
     page.get_by_role("checkbox", name="Tip Rack 50 µL", exact=True).click()
     page.get_by_role("button", name="Save").click()
