@@ -266,8 +266,14 @@ custom_water_properties.aspirate.flow_rate_by_volume.set_for_volume = [(20.0, 30
 # edit to delay for 1 sec before retracting after an aspirate
 custom_water_properties.aspirate.retract.delay.enabled = True
 custom_water_properties.aspirate.retract.delay.duration = 1.0
+# edit aspirate tip position 
+custom_water_properties.aspirate.aspirate_position = {"position_reference": "well-top", "offset": {"x": 1, "y": 2, "z": 3}}
+# use aspirate tip position to set dispense tip position
+custom_water_properties.aspirate.aspirate_position = custom_water_properties.dispense.dispense_position
 ```
 *New in version 2.24*
+
+*Changed in version 2.28*: Edit tip position for an aspirate, dispense, or blowout in a single line, and use one tip position to set another.
 
 Then, complete your transfers with the modified `custom_water` liquid class.
 
