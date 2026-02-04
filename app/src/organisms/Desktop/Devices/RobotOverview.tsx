@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -18,7 +17,6 @@ import {
   SPACING,
   TYPOGRAPHY,
 } from '@opentrons/components'
-import { useAuthorization } from '@opentrons/react-api-client'
 
 import FLEX_PNG from '/app/assets/images/FLEX.png'
 import OT2_PNG from '/app/assets/images/OT2-R_HERO.png'
@@ -28,13 +26,7 @@ import {
   useIsRobotViewable,
   useRobot,
 } from '/app/redux-resources/robots'
-import { getConfig } from '/app/redux/config'
-import {
-  CONNECTABLE,
-  getRobotAddressesByName,
-  getRobotModelByName,
-  OPENTRONS_USB,
-} from '/app/redux/discovery'
+import { CONNECTABLE, getRobotModelByName } from '/app/redux/discovery'
 import { useLights } from '/app/resources/devices'
 
 import { UpdateRobotBanner } from '../UpdateRobotBanner'
@@ -43,11 +35,11 @@ import {
   ErrorRecoveryBanner,
   useErrorRecoveryBanner,
 } from './ErrorRecoveryBanner'
+import { useUSBRegistration } from './hooks'
 import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
-import type { CreateRegistrationParams } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
 interface RobotOverviewProps {
@@ -74,26 +66,8 @@ export function RobotOverview({
   const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
   const { lightsOn, toggleLights } = useLights()
 
-  const userId = useSelector(getConfig)?.userInfo?.userId ?? 'Opentrons-user'
-
-  const addresses = useSelector((state: State) =>
-    getRobotAddressesByName(state, robot?.name ?? '')
-  )
-  const isUsbConnected = addresses.some(address => address.ip === OPENTRONS_USB)
-
   // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
-  const createRegistrationParams: CreateRegistrationParams = useMemo(
-    () => ({
-      subject: 'Opentrons',
-      agent:
-        // define the registration agent as usb if any usb hostname address exists
-        // may change when ODD no longer needs to rely on this
-        isUsbConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
-      agentId: userId,
-    }),
-    [isUsbConnected, userId]
-  )
-  useAuthorization(createRegistrationParams)
+  useUSBRegistration(robot)
 
   return robot != null ? (
     <>
