@@ -1,7 +1,4 @@
-import re
-from typing import Literal
-
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 from .base_page import BasePage
 
@@ -11,7 +8,7 @@ class FlexStackerPage(BasePage):
 
     def __init__(self, page: Page) -> None:
         super().__init__(page)
-    
+
     def _stacker_select(self, stacker: str) -> None:
         self.page.get_by_test_id("moduleId_dropdownMenu").click()
         self.page.get_by_role("button", name=stacker).click()

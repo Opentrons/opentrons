@@ -95,6 +95,7 @@ def _dismiss_migration_modal(page: Page) -> None:
         print("Migration modal did not appear, proceeding with test.")
         pass
 
+
 def create_new_protocol_from_landing_page(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
     """Create a new protocol from the landing page."""
     landing = LandingPage(page)
@@ -116,16 +117,17 @@ def create_new_protocol_flow(pipette: str, gripper: bool, tc: bool, waste_chute:
         page.get_by_test_id("BasicsButtons_gripper_yes").get_by_text("Yes").click()
     else:
         page.get_by_test_id("BasicsButtons_gripper_no").get_by_text("No").click()
-    if tc:  
+    if tc:
         page.get_by_test_id("BasicsButtons_thermocycler_yes").get_by_text("Yes").click()
     else:
         page.get_by_test_id("BasicsButtons_thermocycler_no").get_by_text("No").click()
-    if waste_chute:    
+    if waste_chute:
         page.get_by_test_id("BasicsButtons_wasteChute_yes").get_by_text("Yes").click()
     else:
         page.get_by_test_id("BasicsButtons_wasteChute_no").get_by_text("No").click()
     confirm_button = page.get_by_role("button", name="Confirm")
     confirm_button.click()
+
 
 def start_new_create_protocol(page: Page) -> None:
     """
@@ -134,4 +136,3 @@ def start_new_create_protocol(page: Page) -> None:
     """
     page.on("dialog", lambda dialog: dialog.accept())
     page.get_by_test_id("basic_button_Create new").click()
-
