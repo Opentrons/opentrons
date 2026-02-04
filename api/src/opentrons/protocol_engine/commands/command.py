@@ -112,7 +112,7 @@ class BaseCommandCreate(
     )
     commandAnnotations: List[str] = Field(
         default_factory=list,
-        description="A list of command annotation IDs (if any) that apply to this command."
+        description="A list of command annotation IDs (if any) that apply to this command.",
     )
 
 
