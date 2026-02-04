@@ -58,11 +58,13 @@ def get_current_run_details_from_robot(
                     )
                     message = f"⚠️ {robot_name} is in error recovery mode ⚠️"
 
-                    # Check that the robot's most recent run status isn't the same as current before slack update
+                    # Check most recent run status isn't the same as current before slack update
                     if on_robot:
                         past_run_status_list: list = list(past_run_status)
 
-                        if (len(past_run_status_list) == 0) or not (past_run_status_list[-1] == run_status):
+                        if (len(past_run_status_list) == 0) or not (
+                            past_run_status_list[-1] == run_status
+                        ):
                             slack_bot.send_slack_message(message)
                     else:
                         slack_bot.send_slack_message(message)
