@@ -1386,7 +1386,7 @@ class Labware:
         [`reset()`][opentrons.protocol_api.InstrumentContext.reset] can be called to treat it as
         a fresh tip rack.
 
-        This will raise if the labware is not a tip rack.
+        The API will raise an error if the labware is not a tip rack.
         """
         self._core.set_empty()
 

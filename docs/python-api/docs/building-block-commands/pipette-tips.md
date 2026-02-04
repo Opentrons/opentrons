@@ -119,7 +119,17 @@ pipette.return_tip()
 
 *New in version 2.0*
 
-Beginning with API version 2.28, you can return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). If you return these tips to their original position in the tip rack, you'll need to consider which tips you plan to pick up and use again. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is completely empty. 
+Beginning with API version 2.28, you can return tips with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md). If you return these tips to their original position in the tip rack, you'll need to consider which tips you plan to pick up and use again. For example, a 96-channel pipette in column configuration can't reach column 2 unless column 1 is completely empty. When you call [`pick_up_tip()`][opentrons.protocol_api.InstrumentContext.pick_up_tip] again, the robot won't be able to access unused tips in column 2.
+
+To avoid these tip use conflicts, you can use [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] to return used tips to an empty tip rack on the deck.
+
+```python
+tiprack_1.set_empty()
+```
+
+*New in version 2.28*
+
+The example above sets `tiprack_1` to `empty`. Tips returned here are marked "used" and will be skipped in automatic tip tracking.
 
 
 ## Working with used tips
