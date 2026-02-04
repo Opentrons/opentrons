@@ -71,6 +71,7 @@ const STABLE_FIELDS_BY_FORM_TYPE: Record<'mix' | 'moveLiquid', string[]> = {
     'pipette',
     'tipRack',
     'nozzles',
+    'primaryNozzle',
     'labware',
     'wells',
     'volume',
@@ -87,6 +88,7 @@ const STABLE_FIELDS_BY_FORM_TYPE: Record<'mix' | 'moveLiquid', string[]> = {
     'pipette',
     'tipRack',
     'nozzles',
+    'primaryNozzle',
     'aspirate_labware',
     'aspirate_wells',
     'dispense_labware',
@@ -1435,6 +1437,7 @@ export const getLiquidClassesValues = (args: {
     robotType,
   } = args
   const { liquidClass, pipette, tipRack, stepType } = rawForm
+  console.log('🚀 ~ getLiquidClassesValues ~ rawForm:', rawForm)
   if (stepType !== 'mix' && stepType !== 'moveLiquid') {
     console.warn(`invalid step type for liquid classes: ${stepType}`)
     return {}
@@ -1528,6 +1531,9 @@ export const updateFieldsForLiquidClass = (args: {
     liquidHandlingAction,
     robotType,
   })
+  console.log('inside update fields')
+  console.log('🚀 ~ updateFieldsForLiquidClass ~ fieldUpdates:', fieldUpdates)
+
   Object.entries(fieldUpdates).forEach(([field, value]) => {
     if (field in propsForFields) {
       propsForFields[field].updateValue(value)
