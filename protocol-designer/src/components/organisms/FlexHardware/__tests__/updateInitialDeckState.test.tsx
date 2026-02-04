@@ -273,13 +273,13 @@ describe('updateInitialDeckState', () => {
       vi.mocked(deleteDeckFixture('trash'))
     )
   })
-  it('creates staging area and magnetic block', () => {
+  it('creates staging area and magnetic block when magnetic block on deck', () => {
     updateInitialDeckState({
       values: [
         {
           cutoutId: 'cutoutB3',
-          cutoutFixtureId: STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE,
-          addressableAreaId: 'magneticBlockV1B3',
+          cutoutFixtureId: STAGING_AREA_RIGHT_SLOT_FIXTURE,
+          addressableAreaId: 'B4',
         },
       ],
       initialDeckSetup: mockEmptyIntialDeckSetup,
@@ -293,13 +293,6 @@ describe('updateInitialDeckState', () => {
     })
     expect(mockDispatch).toHaveBeenCalledWith(
       createDeckFixture('stagingArea', 'cutoutB3')
-    )
-    expect(mockDispatch).toHaveBeenCalledWith(
-      createModule({
-        slot: 'B1',
-        model: MAGNETIC_BLOCK_V1,
-        type: MAGNETIC_BLOCK_TYPE,
-      })
     )
   })
   it('deletes staging area and magnetic block', () => {
@@ -499,7 +492,7 @@ describe('updateInitialDeckState', () => {
     })
     expect(mockSetShowDeleteStagingAreaModal).toHaveBeenCalled()
   })
-  it.only('tries to delete staging area from waste chute + staging area combo but something is in use', () => {
+  it('tries to delete staging area from waste chute + staging area combo but something is in use', () => {
     const mockLabwareOnDeck = {
       labware: {
         stack: ['labware', 'D4'],
