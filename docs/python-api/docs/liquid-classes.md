@@ -344,7 +344,7 @@ custom_liquid_class_properties = {
                     },
                     "speed": 40,
                     "touch_tip": {"enabled": False},
-                }, 
+                },
                 "submerge": {
                     "delay": {"enabled": False},
                     "speed": 100,

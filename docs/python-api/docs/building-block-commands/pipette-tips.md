@@ -109,6 +109,20 @@ pipette.drop_tip(chute)  # drops tip in waste chute
 
 *New in version 2.16*
 
+Varying the tip drop location within a trash container can help keep tips from piling up in a single location. Beginning with API version 2.28, use the optional `alternate_drop_location` argument to vary the tip drop location: 
+
+```python
+pipette.pick_up_tip() #picks up the next tip
+pipette.drop_tip(
+    alternate_drop_location=None)
+pipette.pick_up_tip()
+pipette.drop_tip(
+    alternate_drop_location=None)
+```
+*New in version 2.28*
+
+In the example above, the pipette will drop the first and second tips in slightly different locations in the waste chute. 
+
 ## Returning a tip
 
 To return a tip to its original location, call the [`return_tip()`][opentrons.protocol_api.InstrumentContext.return_tip] method with no arguments:
