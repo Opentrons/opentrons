@@ -10,7 +10,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: password
         username: test_admin
         password: test_admin_password
@@ -32,7 +32,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         token: '{initial_access_token}'
     response:
       status_code: 200
@@ -46,7 +46,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         token: '{initial_refresh_token}'
     response:
       status_code: 200
@@ -60,7 +60,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{initial_refresh_token}'
     response:
@@ -81,7 +81,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         token: '{refreshed_access_token}'
     response:
       status_code: 200
@@ -95,7 +95,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         token: '{refreshed_refresh_token}'
     response:
       status_code: 200
@@ -117,7 +117,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: password
         username: test_user
         password: test_user_password
@@ -134,7 +134,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: password
         username: test_user
         password: test_user_password
@@ -155,7 +155,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{refresh_token}'
         scope: runs.read runs.write users.write # test_user is not authorized for users.write.
@@ -179,7 +179,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: password
         username: test_admin
         password: test_admin_password
@@ -201,7 +201,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: '{refresh_token}'
         scope: runs.read # The request above set this to "runs.read runs.write". This narrows it to just "runs.read".
@@ -227,7 +227,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: password
         username: test_admin
         password: not_the_right_password
@@ -251,7 +251,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: refresh_token
         refresh_token: bogus_refresh_token
     response:
@@ -266,7 +266,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/introspect'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         token: bogus_refresh_token
     response:
       status_code: 200
@@ -332,7 +332,7 @@ stages:
       method: POST
       url: '{run_server.base_url}/auth/oauth2/token'
       data:
-        client_id: unregistered-client
+        client_id: opentrons_app
         grant_type: '{grant_type}'
         username: test_admin
         password: test_admin_password

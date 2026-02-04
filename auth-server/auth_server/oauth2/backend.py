@@ -17,7 +17,7 @@ _log = logging.getLogger(__name__)
 
 router = fastapi.APIRouter(prefix="/auth")
 
-_CLIENT_ID = "unregistered-client"
+_CLIENT_ID = "opentrons_app"
 
 # todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
 _TOKEN_LIFETIME = timedelta(minutes=3)
