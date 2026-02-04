@@ -25,7 +25,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const isDispense = stepType === 'dispense'
   const isMix = stepType === 'mix'
 
-  function getLabwareId(): string {
+  const getLabwareId = (): string => {
     switch (stepType) {
       case 'aspirate':
         return propsForFields.aspirate_labware.value as string
