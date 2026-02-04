@@ -17,6 +17,8 @@
 
 .tooltip_table {
   max-width: 20rem;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .tooltip_row {
@@ -27,9 +29,15 @@
   padding-left: var(--border-radius-8);
 }
 
+/* space between liquids */
+.tooltip_row + .tooltip_row td {
+  padding-top: var(--spacing-8);
+}
+
 .divider {
   width: 100%;
   height: 1px;
+  margin: var(--spacing-8) 0;
   background-color: #ffffff80;
 }
 
