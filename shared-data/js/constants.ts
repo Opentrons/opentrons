@@ -285,12 +285,6 @@ export const HEATER_SHAKER_CUTOUTS: CutoutId[] = [
   ...SINGLE_LEFT_CUTOUTS,
 ]
 export const THERMOCYCLER_MODULE_CUTOUTS: CutoutId[] = ['cutoutA1', 'cutoutB1']
-export const ABSORBANCE_READER_CUTOUTS: CutoutId[] = [
-  'cutoutA3',
-  'cutoutB3',
-  'cutoutC3',
-  'cutoutD3',
-]
 
 export const WASTE_CHUTE_CUTOUT: 'cutoutD3' = 'cutoutD3'
 
@@ -471,6 +465,7 @@ export const exactMatchOnlyLoadNames = new Set([
   'opentrons_universal_flat_adapter_type_b',
 ])
 
+// TODO: (tz, 1/27/26): removed all these groupted aa
 export const MAGNETIC_BLOCK_ADDRESSABLE_AREAS: AddressableAreaName[] = [
   MAGNETIC_BLOCK_A1_ADDRESSABLE_AREA,
   MAGNETIC_BLOCK_B1_ADDRESSABLE_AREA,
@@ -868,6 +863,14 @@ export const FAKE_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
   FAKE_WASTE_CHUTE_WITH_EMPTY_SLOT_FIXTURE,
 ]
 
+// TODO: (tz, 2026-01-28) - find better name for this
+export const FIXTURES_FIXTURE_IDS: CutoutFixtureIdsWithFakes[] = [
+  ...([TRASH_BIN_ADAPTER_FIXTURE] as CutoutFixtureId[]),
+  ...WASTE_CHUTE_FIXTURES,
+  ...FAKE_FIXTURE_IDS,
+  ...STAGING_AREA_FIXTURES,
+]
+
 export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FLEX_STACKER_FIXTURES,
   ...MAGNETIC_BLOCK_FIXTURES,
@@ -875,6 +878,35 @@ export const COMBO_FIXTURES: CutoutFixtureIdsWithFakes[] = [
   ...FAKE_FIXTURE_IDS,
   ...STAGING_AREA_FIXTURES,
 ]
+
+export const COMBO_FIXTURE_TO_FIXTURE_MAP: Partial<
+  Record<CutoutFixtureId, CutoutFixtureIdsWithFakes[]>
+> = {
+  [FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_COVERED_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  ],
+  [FLEX_STACKER_WITH_WASTE_CHUTE_ADAPTER_NO_COVER_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  ],
+  [FLEX_STACKER_WITH_MAG_BLOCK_FIXTURE]: [
+    FLEX_STACKER_V1_FIXTURE,
+    MAGNETIC_BLOCK_V1_FIXTURE,
+  ],
+  [STAGING_AREA_SLOT_WITH_MAGNETIC_BLOCK_V1_FIXTURE]: [
+    STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    MAGNETIC_BLOCK_V1_FIXTURE,
+  ],
+  [STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE]: [
+    STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_COVERED_FIXTURE,
+  ],
+  [STAGING_AREA_SLOT_WITH_WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE]: [
+    STAGING_AREA_RIGHT_SLOT_FIXTURE,
+    WASTE_CHUTE_RIGHT_ADAPTER_NO_COVER_FIXTURE,
+  ],
+}
 
 // a labware location when something has been used already on the deck
 // and moves to a new location that isn't accessible on or off the deck
