@@ -5,7 +5,7 @@
   "labwareOffset": {
     "x": 0,
     "y": 0,
-    "z": 14
+    "z": 0
   },
   "features": {},
   "dimensions": {
@@ -27,7 +27,7 @@
       },
       "frontRightTop": {
         "x": 143,
-        "y": -101.5,
+        "y": 101.5,
         "z": 37
       }
     }
@@ -50,7 +50,7 @@
         "z": 0
       },
       "dropOffset": {
-        "x": 0,
+        "x": 1,
         "y": 0,
         "z": 0
       }

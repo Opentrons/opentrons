@@ -44,11 +44,11 @@
     "parameters": {
         "format": "96Standard",
         "quirks": ["vacuumModuleMilliporeDock"],
-        "loadName": "millipore_vacuum_manifold_collar_tall",
         "isTiprack": false,
         "isDeckSlotCompatible": false,
         "isMagneticModuleCompatible": false,
-        "isMovableAdapter": true
+        "isMovableAdapter": true,
+        "loadName": "millipore_vacuum_manifold_collar_tall"
     },
     "stackLimit": 1,
     "allowedRoles": [
@@ -64,17 +64,25 @@
         "invitroven_filter_plate": {
             "x": 0,
             "y": 0,
-            "z": 26.5
+            "z": 22.38
         }
     },
+    "stackingOffsetWithModule": {
+      "vacuumModuleMilliporeV1": {
+        "x": 0,
+        "y": 0,
+        "z": -8.0
+      }
+    },
+    "stackingOffsetWithLabware": {},
     "gripForce": 17,
-    "gripHeightFromLabwareBottom": 61,
+    "gripHeightFromLabwareBottom": 66,
     "containedSpace": {
         "origin": {"x": 0, "y": 0, "z": 0},
         "dimensions": {
-            "xDimension": 150,
-            "yDimension": 105,
-            "zDimension": 75
+            "xDimension": 134,
+            "yDimension": 92,
+            "zDimension": 50
         }
     }
 }
