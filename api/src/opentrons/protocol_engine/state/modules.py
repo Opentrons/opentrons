@@ -1346,7 +1346,6 @@ class ModuleView:
         Return True if it does not raise.
         """
 
-        print("RAISE", location)
         for module in self.get_all():
             if module.model in _COLUMN_4_MODULES and module.location == location:
                 raise errors.LocationIsOccupiedError(
