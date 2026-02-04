@@ -7,7 +7,6 @@ from abr_testing.automation import slack
 import configparser
 import os
 from typing import List, Dict, Any, Tuple
-from collections import deque
 
 
 def get_robot_run_info(ip: str) -> Tuple[str, List[Dict[str, Any]]]:
