@@ -17,6 +17,13 @@ _log = logging.getLogger(__name__)
 
 router = fastapi.APIRouter(prefix="/auth")
 
+# oauthlib seems to expect every request to carry a client_id, even though OAuth 2
+# doesn't require it for password grants. To work around this, we expect
+# our clients to always supply this hard-coded arbitrary client_id.
+#
+# Possibly related oauthlib bugs:
+# https://github.com/oauthlib/oauthlib/issues/389
+# https://github.com/oauthlib/oauthlib/issues/641
 _CLIENT_ID = "opentrons_app"
 
 # todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
