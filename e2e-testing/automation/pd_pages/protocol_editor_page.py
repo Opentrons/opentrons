@@ -131,7 +131,7 @@ class ProtocolEditorPage(BasePage):
         target = self.page.locator("label").filter(has_text=pattern).first
 
         try:
-            target.wait_for(state="visible", timeout=5000)
+            target.wait_for(state="visible", timeout=1000)
         except TimeoutError as error:
             category_button = (
                 self.page.locator("[data-testid='ListButton_noActive']")
@@ -141,7 +141,7 @@ class ProtocolEditorPage(BasePage):
             if category_button.count() > 0:
                 category_button.click()
                 try:
-                    target.wait_for(state="visible", timeout=5000)
+                    target.wait_for(state="visible", timeout=1000)
                 except TimeoutError as retry_error:
                     visible_options = self.page.locator("label").all_inner_texts()
                     raise AssertionError(
