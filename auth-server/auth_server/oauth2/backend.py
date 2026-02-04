@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Any, NotRequired, TypedDict, TypeGuard, cast, override
+from typing import Any, NotRequired, TypeAlias, TypedDict, TypeGuard, cast, override
 
 import oauthlib.common
 import oauthlib.oauth2
@@ -25,6 +25,22 @@ _CLIENT_ID = "opentrons_app"
 
 # todo(mm, 2026-01-30): There ought to be some HTTP endpoint to configure this.
 _TOKEN_LIFETIME = timedelta(minutes=3)
+
+
+Backend: TypeAlias = oauthlib.oauth2.LegacyApplicationServer
+"""A backend that our server can use to process OAuth 2 requests.
+
+"Legacy" in this case refers to the fact that it uses the "resource owner password
+credentials" grant type.
+"""
+
+
+def build() -> Backend:
+    """Return a backend that our server can use to process OAuth 2 requests."""
+    return oauthlib.oauth2.LegacyApplicationServer(
+        _RequestValidator(_TokenStore()),
+        token_expires_in=int(_TOKEN_LIFETIME.total_seconds())
+    )
 
 
 @dataclass
@@ -337,14 +353,6 @@ class _TokenStore:
     @staticmethod
     def _is_active(token: _TokenIssuance, now: datetime) -> bool:
         return token.expires_at > now
-
-
-# "Legacy" in this case refers to the fact that it uses the "resource owner password
-# credentials" grant type.
-server = oauthlib.oauth2.LegacyApplicationServer(
-    _RequestValidator(_TokenStore()),
-    token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
-)
 
 
 def _is_list_of_type[ElementT](
