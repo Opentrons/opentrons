@@ -149,4 +149,10 @@ describe('useRecoveryOptionCopy', () => {
 
     screen.getByText('Unknown action')
   })
+
+  it('renders "Unknown action" for a null recovery option', () => {
+    render({ route: null })
+
+    screen.getByText('Unknown action')
+  })
 })

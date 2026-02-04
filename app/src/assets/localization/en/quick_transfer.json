@@ -138,7 +138,6 @@
   "push_out_description": "Helps ensure all liquid leaves the tip",
   "push_out_value": "{{volume}} µL",
   "push_out_volume": "Push out volume (µL)",
-  "quick_transfer": "Quick transfer",
   "quick_transfer_volume": "Quick Transfer {{volume}}µL",
   "reservoir": "Reservoirs",
   "reset_kind_settings": "Reset {{transferName}} settings?",

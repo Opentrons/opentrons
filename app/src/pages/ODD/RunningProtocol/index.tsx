@@ -110,7 +110,6 @@ export function RunningProtocol(): JSX.Element {
   const protocolName =
     protocolRecord?.data.metadata.protocolName ??
     protocolRecord?.data.files[0].name
-  const isQuickTransfer = protocolRecord?.data.protocolKind === 'quick-transfer'
   const { playRun, pauseRun } = useRunActionMutations(runId)
   const localRobot = useSelector(getLocalRobot)
   const robotName = localRobot != null ? localRobot.name : 'no name'
@@ -219,7 +218,6 @@ export function RunningProtocol(): JSX.Element {
         {showConfirmCancelRunModal ? (
           <ConfirmCancelRunModal
             runId={runId}
-            isQuickTransfer={isQuickTransfer}
             setShowConfirmCancelRunModal={setShowConfirmCancelRunModal}
             isActiveRun={true}
           />

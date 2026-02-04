@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Locator, Page, expect
 
 
 class BasePage:
@@ -46,3 +46,52 @@ class BasePage:
 
         # Fallback: escape clears the toast if the close icon isn't present.
         self.page.keyboard.press("Escape")
+
+    def highlight_element(
+        self,
+        element: Locator,
+        *,
+        duration_ms: int | None = 3000,
+        pause: bool = False,
+    ) -> None:
+        """Highlight an element on the page for visual debugging.
+
+        Args:
+            element: The Playwright locator to highlight.
+            duration_ms: If set (default 3000), keep the highlight for this many
+                milliseconds and then restore previous inline styles. If None,
+                keep the highlight until manually cleared.
+            pause: If True, pause execution after highlighting (opens Playwright
+                Inspector). Requires `page`.
+        """
+
+        element.evaluate(
+            """(el, durationMs) => {
+            const prev = {
+                border: el.style.border,
+                backgroundColor: el.style.backgroundColor,
+                boxShadow: el.style.boxShadow,
+            };
+
+            el.style.border = '3px solid red';
+            el.style.backgroundColor = 'yellow';
+            el.style.boxShadow = '0 0 0 3px rgba(255, 0, 0, 0.35)';
+
+            if (durationMs === null || durationMs === undefined) {
+                return;
+            }
+
+            return new Promise((resolve) => {
+                window.setTimeout(() => {
+                    el.style.border = prev.border;
+                    el.style.backgroundColor = prev.backgroundColor;
+                    el.style.boxShadow = prev.boxShadow;
+                    resolve();
+                }, durationMs);
+            });
+        }""",
+            duration_ms,
+        )
+
+        if pause:
+            self.page.pause()

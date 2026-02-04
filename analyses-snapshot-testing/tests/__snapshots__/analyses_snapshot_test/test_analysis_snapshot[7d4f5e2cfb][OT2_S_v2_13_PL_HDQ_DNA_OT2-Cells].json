@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

@@ -34,15 +34,6 @@ wheels = [
 ]
 
 [[package]]
-name = "atomicwrites"
-version = "1.4.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/55/8d/74a75635f2c3c914ab5b3850112fd4b0c8039975ecb320e4449aa363ba54/atomicwrites-1.4.0.tar.gz", hash = "sha256:ae70396ad1a434f9c7046fd2dd196fc04b12f9e91ffb859164193be8b6168a7a", size = 11790, upload-time = "2022-07-09T04:09:52.757Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/a0/da5f49008ec6e9a658dbf5d7310a4debd397bce0b4db03cf8a410066bb87/atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197", size = 6790, upload-time = "2022-07-09T04:09:09.073Z" },
-]
-
-[[package]]
 name = "backports-asyncio-runner"
 version = "1.2.0"
 source = { registry = "https://pypi.org/simple" }
@@ -937,9 +928,7 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "atomicwrites", marker = "sys_platform == 'win32'" },
     { name = "build" },
-    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "decoy" },
     { name = "httpx" },
     { name = "mock" },
@@ -950,6 +939,7 @@ dev = [
     { name = "pytest-xdist" },
     { name = "requests" },
     { name = "ruff" },
+    { name = "setuptools" },
     { name = "sqlalchemy2-stubs" },
     { name = "types-mock" },
     { name = "types-requests" },
@@ -972,9 +962,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "atomicwrites", marker = "sys_platform == 'win32'", specifier = "==1.4.0" },
     { name = "build", specifier = "~=1.2.0" },
-    { name = "colorama", marker = "sys_platform == 'win32'", specifier = "==0.4.4" },
     { name = "decoy", specifier = ">=2.2.0,<3" },
     { name = "httpx", specifier = "==0.26.0" },
     { name = "mock", specifier = "==5.1.0" },
@@ -985,9 +973,19 @@ dev = [
     { name = "pytest-xdist", specifier = "~=2.5.0" },
     { name = "requests", specifier = "==2.31.0" },
     { name = "ruff", specifier = "==0.14.10" },
+    { name = "setuptools", specifier = "==80.9.0" },
     { name = "sqlalchemy2-stubs", specifier = "==0.0.2a21" },
     { name = "types-mock", specifier = "~=5.1.0" },
     { name = "types-requests", specifier = "~=2.31.0" },
+]
+
+[[package]]
+name = "setuptools"
+version = "80.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c", size = 1319958, upload-time = "2025-05-27T00:56:51.443Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/dc/17031897dae0efacfea57dfd3a82fdd2a2aeb58e0ff71b77b87e44edc772/setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922", size = 1201486, upload-time = "2025-05-27T00:56:49.664Z" },
 ]
 
 [[package]]

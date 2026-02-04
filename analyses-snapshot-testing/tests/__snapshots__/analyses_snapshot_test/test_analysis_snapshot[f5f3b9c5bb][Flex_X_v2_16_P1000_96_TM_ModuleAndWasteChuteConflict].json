@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -99,6 +101,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1279,6 +1282,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

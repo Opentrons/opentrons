@@ -50,8 +50,8 @@ import { getPinnedQuickTransferIds, updateConfigValue } from '/app/redux/config'
 import { formatTimeWithUtcLabel } from '/app/resources/runs'
 import { useMissingProtocolHardware } from '/app/transformations/commands'
 
-import { DeleteTransferConfirmationModal } from '../QuickTransferDashboard/DeleteTransferConfirmationModal'
 import { Deck } from './Deck'
+import { DeleteTransferConfirmationModal } from './DeleteTransferConfirmationModal'
 import { Hardware } from './Hardware'
 import { Labware } from './Labware'
 
@@ -119,7 +119,7 @@ const QuickTransferHeader = ({
           paddingLeft="0rem"
           paddingRight={SPACING.spacing24}
           onClick={() => {
-            navigate('/quick-transfer')
+            navigate('/protocols')
           }}
           width="3rem"
         >

@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1182,6 +1184,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2347,6 +2350,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -2366,6 +2370,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "configureNozzleLayout",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

@@ -600,7 +600,9 @@ export function LiquidToolboxContainer({
       showLiquidLayoutOverlay={showLiquidLayoutOverlay}
       data={data}
       selectedLabwareIds={
-        multipleSelectedLabwareIds ?? [selectedLabwareId ?? '']
+        !multipleSelectedLabwareIds?.includes(selectedLabwareId ?? '')
+          ? [selectedLabwareId ?? '']
+          : multipleSelectedLabwareIds
       }
     />
   )
