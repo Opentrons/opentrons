@@ -67,6 +67,8 @@ export interface PipetteTemporalProperties {
   tiprackId?: string
   //  last primary tip well accessed (used for return tip)
   tipWell?: string
+  // primary nozzle to use 
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
 }
 
 export interface MagneticModuleState {
