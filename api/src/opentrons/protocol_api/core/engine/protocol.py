@@ -304,8 +304,6 @@ class ProtocolCore(
         if not isinstance(location, AddressableAreaLocation):
             load_location = self._get_non_stacked_location(location=location)
 
-        print("LOAD_LOC: ", location)
-
         custom_labware_params = (
             self._engine_client.state.labware.find_custom_labware_load_params()
         )

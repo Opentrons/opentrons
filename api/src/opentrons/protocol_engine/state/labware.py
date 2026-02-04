@@ -524,7 +524,6 @@ class LabwareView:
         loaded_labware = list(self._state.labware_by_id.values())
 
         for labware in loaded_labware:
-            print("LOADED", labware)
             if (
                 isinstance(labware.location, AddressableAreaLocation)
                 and labware.location.addressableAreaName == addressable_area

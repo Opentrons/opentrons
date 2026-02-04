@@ -52,18 +52,6 @@ def get_waypoints(
     dest_waypoint = Waypoint(dest, dest_cp)
     waypoints: List[Waypoint] = []
 
-    print("ORIGIN: ", origin)
-    print("DEST: ", dest)
-    print(
-        "OPTS: ",
-        max_travel_z,
-        min_travel_z,
-        move_type,
-        xy_waypoints,
-        origin_cp,
-        dest_cp,
-    )
-
     # a direct move can ignore all arc and waypoint planning
     if move_type == MoveType.DIRECT:
         # TODO(mm, 2022-06-17): This will not raise an out-of-bounds error

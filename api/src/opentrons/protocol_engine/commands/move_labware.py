@@ -197,8 +197,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
         origin_location_sequence = self._state_view.geometry.get_location_sequence(
             params.labwareId
         )
-
-        print("OG_LOC_SEQ: ", origin_location_sequence)
         eventual_destination_location_sequence: LabwareLocationSequence | None = None
 
         if isinstance(params.newLocation, AddressableAreaLocation):
@@ -386,11 +384,6 @@ class MoveLabwareImplementation(AbstractCommandImpl[MoveLabwareParams, _ExecuteR
                 eventual_destination_location_sequence = (
                     immediate_destination_location_sequence
                 )
-
-            print("EV_LOC_SEQ: ", eventual_destination_location_sequence)
-
-            print("CUR_LOC: ", validated_current_loc)
-            print("NEW_LOC: ", validated_new_loc)
 
             try:
                 # Skips gripper moves when using virtual gripper

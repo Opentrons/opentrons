@@ -109,8 +109,6 @@ class LoadLabwareImplementation(
         """Load definition and calibration data necessary for a labware."""
         state_update = StateUpdate()
 
-        print("HUH", params.location)
-
         # TODO (tz, 8-15-2023): extend column validation to column 1 when working
         # on https://opentrons.atlassian.net/browse/RSS-258 and completing
         # https://opentrons.atlassian.net/browse/RSS-255

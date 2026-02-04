@@ -170,7 +170,9 @@ async def test_analyze(
         displayName="Foo", variableName="Bar", default=True, value=False
     )
 
-    command_annotation = pe_types.CustomCommandAnnotationLegacy(commandKeys=["abc", "xyz"])
+    command_annotation = pe_types.CustomCommandAnnotationLegacy(
+        commandKeys=["abc", "xyz"]
+    )
     command_preconditions = pe_types.CommandPreconditions(isCameraUsed=False)
 
     orchestrator = decoy.mock(cls=simulating_runner.SimulatingRunOrchestrator)

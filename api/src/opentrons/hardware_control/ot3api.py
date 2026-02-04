@@ -41,8 +41,6 @@ from opentrons_shared_data.pipette import (
 )
 from opentrons_shared_data.pipette.types import PipetteModelType, PipetteName
 
-from opentrons.hardware_control.modules.types import VacuumModuleModel
-
 from . import modules
 from .backends.errors import SubsystemUpdating
 from .backends.flex_protocol import FlexBackend
@@ -143,6 +141,7 @@ from opentrons.drivers.rpi_drivers.types import PortGroup, USBPort
 from opentrons.hardware_control.modules.module_calibration import (
     ModuleCalibrationOffset,
 )
+from opentrons.hardware_control.modules.types import VacuumModuleModel
 
 mod_log = logging.getLogger(__name__)
 
