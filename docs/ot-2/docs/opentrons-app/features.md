@@ -71,7 +71,7 @@ Click the **Protocols** tab to return to the default summary list view.
 
 ## Labware tab
 
-This tab stores information about labware found in the Labware Library and is reserved for future development. You can also upload custom labware you create and store it in the app here.
+This tab stores information about labware found in the Labware Library. You can also upload custom labware you create and store it in the app here.
 
 ## Devices tab
 
