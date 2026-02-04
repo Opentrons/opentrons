@@ -41,9 +41,11 @@ import type {
   CutoutFixtureId,
   CutoutId,
   DeckConfiguration,
+  DeckDefinition,
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
+  LabwareOnDeck,
   ModuleOnDeck,
   SavedStepFormState,
 } from '/protocol-designer/step-forms'
@@ -103,6 +105,299 @@ interface ModuleEntry {
   setShowDeleteEntityModal: UpdateInitialDeckSetupProps['setShowDeleteEntityModal']
   makeSnackbar: MakeSnackbar
   t: any
+}
+
+/** What the protocol wants for this cutout fixture. */
+interface CutoutFixtureTarget {
+  newFixtureName: CutoutFixtureId | null
+  removing: boolean
+  isModuleFixture: boolean
+}
+
+/** What's on deck at this cutout and in-use state. */
+interface CutoutDeckState {
+  matchingFixturesOnDeck: AdditionalEquipmentOnDeck[]
+  matchingFixtureOnDeck: AdditionalEquipmentOnDeck | null
+  isWasteChuteStagingAreaCombo: boolean
+  matchingModuleOnDeck: ModuleOnDeck | undefined
+  modulesAtCutout: ModuleOnDeck[]
+  matching4thColumnLabware: LabwareOnDeck | null
+  labwareInFourthColumnSlot: { id: string | null; inUse: boolean }
+  moduleId: string | null
+  fixtureIds: string[] | null
+  hasLabwareOnSlot: boolean
+}
+
+/** Gathered state for one cutout when syncing deck to protocol. */
+interface CutoutFixtureState extends CutoutFixtureTarget, CutoutDeckState {
+  cutoutConfigMap: CutoutConfigMap
+}
+
+function getCutoutFixtureTargetFromCutoutConfigMap(
+  cutoutConfigMap: CutoutConfigMap
+): CutoutFixtureTarget {
+  const newFixtureName = getMainFixtureIdForAA(
+    [cutoutConfigMap.cutoutFixtureId as CutoutFixtureId],
+    [cutoutConfigMap.addressableAreaId as AddressableAreaName],
+    cutoutConfigMap.cutoutId
+  )
+  return {
+    newFixtureName,
+    removing: SINGLE_SLOT_FIXTURES.includes(newFixtureName!),
+    isModuleFixture: isModuleFixtureId(newFixtureName!),
+  }
+}
+
+function getCutoutDeckState(
+  cutoutConfigMap: CutoutConfigMap,
+  deckDef: DeckDefinition,
+  additionalEquipmentOnDeck: Record<string, AdditionalEquipmentOnDeck>,
+  moduleOnDeck: Record<string, ModuleOnDeck>,
+  labwareOnDeck: Record<string, LabwareOnDeck>,
+  savedSteps: SavedStepFormState
+): CutoutDeckState {
+  const matchingFixturesOnDeck = Object.values(
+    additionalEquipmentOnDeck
+  ).filter(ae => ae.location === cutoutConfigMap.cutoutId)
+  const matchingFixtureOnDeck = matchingFixturesOnDeck[0] ?? null
+  const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
+    m => getCutoutIdForSlotName(m.slot, deckDef) === cutoutConfigMap.cutoutId
+  )
+  const modulesAtCutout = Object.values(moduleOnDeck).filter(
+    m => getCutoutIdForSlotName(m.slot, deckDef) === cutoutConfigMap.cutoutId
+  )
+  const matchingStagingArea = matchingFixturesOnDeck.find(
+    f => f.name === 'stagingArea'
+  )
+  const stagingAreaSlots =
+    matchingStagingArea != null && matchingStagingArea.location != null
+      ? getAAWithFakesFromCutoutFixtureId(
+          matchingStagingArea.location as CutoutId,
+          STAGING_AREA_RIGHT_SLOT_FIXTURE as CutoutFixtureId,
+          deckDef
+        )
+      : null
+  const matching4thColumnLabware =
+    stagingAreaSlots != null && stagingAreaSlots.length > 0
+      ? (Object.values(labwareOnDeck).find(lw =>
+          stagingAreaSlots.some(slot => lw.stack.includes(slot))
+        ) ?? null)
+      : null
+  const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
+    getHardwareInSlotInUse(
+      savedSteps,
+      matching4thColumnLabware,
+      matchingModuleOnDeck,
+      matchingFixturesOnDeck.length > 0 ? matchingFixturesOnDeck : undefined
+    )
+  const labwareInFourthColumnSlot = {
+    id: matching4thColumnLabware?.id ?? null,
+    inUse: fourthColumnSlotLabwareId != null,
+  }
+  const hasLabwareOnSlot = getSlotHasLabware(
+    labwareOnDeck,
+    cutoutConfigMap.cutoutId
+  )
+  return {
+    matchingFixturesOnDeck,
+    matchingFixtureOnDeck,
+    isWasteChuteStagingAreaCombo: matchingFixturesOnDeck.length > 1,
+    matchingModuleOnDeck,
+    modulesAtCutout,
+    matching4thColumnLabware,
+    labwareInFourthColumnSlot,
+    moduleId,
+    fixtureIds,
+    hasLabwareOnSlot,
+  }
+}
+
+function getCutoutFixtureState(
+  cutoutConfigMap: CutoutConfigMap,
+  deckDef: DeckDefinition,
+  additionalEquipmentOnDeck: Record<string, AdditionalEquipmentOnDeck>,
+  moduleOnDeck: Record<string, ModuleOnDeck>,
+  labwareOnDeck: Record<string, LabwareOnDeck>,
+  savedSteps: SavedStepFormState
+): CutoutFixtureState {
+  return {
+    cutoutConfigMap: cutoutConfigMap,
+    ...getCutoutFixtureTargetFromCutoutConfigMap(cutoutConfigMap),
+    ...getCutoutDeckState(
+      cutoutConfigMap,
+      deckDef,
+      additionalEquipmentOnDeck,
+      moduleOnDeck,
+      labwareOnDeck,
+      savedSteps
+    ),
+  }
+}
+
+function toFixtureEntry(
+  state: CutoutFixtureState,
+  props: UpdateInitialDeckSetupProps,
+  overrides: Partial<fixtureEntry> = {}
+): fixtureEntry {
+  return {
+    cutoutConfigMap: state.cutoutConfigMap,
+    newFixtureName: state.newFixtureName!,
+    matchingFixture:
+      overrides.matchingFixture ?? state.matchingFixtureOnDeck ?? undefined,
+    hasLabwareOnSlot: state.hasLabwareOnSlot,
+    onDeckFixtureIds: state.fixtureIds,
+    labwareInFourthColumnSlot: state.labwareInFourthColumnSlot,
+    deckConfig: props.deckConfig,
+    dispatch: props.dispatch,
+    setShowDeleteEntityModal: props.setShowDeleteEntityModal,
+    setShowDeleteStagingAreaModal: props.setShowDeleteStagingAreaModal,
+    makeSnackbar: props.makeSnackbar,
+    t: props.t,
+    ...overrides,
+  }
+}
+
+function toModuleEntry(
+  state: CutoutFixtureState,
+  props: UpdateInitialDeckSetupProps,
+  overrides: Partial<ModuleEntry> = {}
+): ModuleEntry {
+  return {
+    cutoutConfigMap: state.cutoutConfigMap,
+    matchingModule: overrides.matchingModule ?? state.matchingModuleOnDeck,
+    moduleId: overrides.moduleId ?? state.moduleId,
+    labwareOnDeck: props.initialDeckSetup.labware,
+    deckConfig: props.deckConfig,
+    dispatch: props.dispatch,
+    setShowDeleteEntityModal: props.setShowDeleteEntityModal,
+    makeSnackbar: props.makeSnackbar,
+    t: props.t,
+    ...overrides,
+  }
+}
+
+/** Special case: removing one fixture from waste chute + staging area combo. */
+function handleWasteChuteStagingAreaComboRemoval(
+  state: CutoutFixtureState,
+  props: UpdateInitialDeckSetupProps
+): void {
+  const targetFixtureName = WASTE_CHUTE_FIXTURES.includes(state.newFixtureName!)
+    ? 'stagingArea'
+    : STAGING_AREA_FIXTURES.includes(state.newFixtureName!)
+      ? 'wasteChute'
+      : null
+  const fixtureToDelete =
+    targetFixtureName != null
+      ? state.matchingFixturesOnDeck.find(f => f.name === targetFixtureName)
+      : state.matchingFixtureOnDeck
+  if (fixtureToDelete == null) return
+  handleDeleteFixture(
+    toFixtureEntry(state, props, { matchingFixture: fixtureToDelete })
+  )
+}
+
+/** Special case: removing one module from 2-module combo (e.g. flex stacker + mag block). */
+function handleTwoModulesComboRemoval(
+  state: CutoutFixtureState,
+  props: UpdateInitialDeckSetupProps
+): void {
+  const moduleToDelete = state.modulesAtCutout.find(
+    m => m.model !== getModuleModelFromFixtureId(state.newFixtureName!)
+  )
+  if (moduleToDelete == null) return
+  const { moduleId: moduleToDeleteId } = getHardwareInSlotInUse(
+    props.savedSteps,
+    state.matching4thColumnLabware,
+    moduleToDelete,
+    undefined
+  )
+  handleDeleteModule(
+    toModuleEntry(state, props, {
+      matchingModule: moduleToDelete,
+      moduleId: moduleToDeleteId,
+    }),
+    props.handleDeleteStackerLabware
+  )
+}
+
+/** Generic removing: delete module or single fixture at this cutout. */
+function processRemoving(
+  state: CutoutFixtureState,
+  props: UpdateInitialDeckSetupProps
+): void {
+  if (state.matchingModuleOnDeck != null) {
+    handleDeleteModule(
+      toModuleEntry(state, props),
+      props.handleDeleteStackerLabware
+    )
+  } else if (state.matchingFixturesOnDeck.length > 0) {
+    handleDeleteFixture(toFixtureEntry(state, props))
+  }
+}
+
+/** Adding path: fixture or module, with combo special cases. */
+function processAdding(
+  state: CutoutFixtureState,
+  props: UpdateInitialDeckSetupProps,
+  deckDef: DeckDefinition
+): void {
+  const {
+    cutoutConfigMap: value,
+    newFixtureName,
+    matchingModuleOnDeck,
+    matchingFixtureOnDeck,
+    isModuleFixture,
+  } = state
+  const moduleEntry = toModuleEntry(state, props)
+  const fixtureEntry = toFixtureEntry(state, props)
+
+  if (!isModuleFixture && newFixtureName != null) {
+    // —— Adding fixture ——
+    if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
+      handleDeleteModule(moduleEntry, props.handleDeleteStackerLabware)
+    } else if (matchingFixtureOnDeck != null) {
+      const isAddingWasteChuteToStagingArea =
+        WASTE_CHUTE_FIXTURES.includes(newFixtureName) &&
+        matchingFixtureOnDeck.name === 'stagingArea'
+      const isAddingStagingAreaToWasteChute =
+        STAGING_AREA_FIXTURES.includes(newFixtureName) &&
+        matchingFixtureOnDeck.name === 'wasteChute'
+      if (isAddingWasteChuteToStagingArea || isAddingStagingAreaToWasteChute) {
+        handleCreateFixture(fixtureEntry)
+      } else {
+        handleDeleteFixture(fixtureEntry)
+      }
+    } else {
+      handleCreateFixture(fixtureEntry)
+    }
+  } else {
+    // —— Adding module ——
+    if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
+      handleDeleteFixture(fixtureEntry)
+    } else if (matchingModuleOnDeck != null) {
+      const moduleOnDeckFixtureId = getCutoutFixturesForModuleModel(
+        matchingModuleOnDeck.model,
+        deckDef
+      )
+      const comboFixtureId = getComboFixtureFromFixtureIds([
+        moduleOnDeckFixtureId[0].id as CutoutFixtureId,
+        newFixtureName ?? value.cutoutFixtureId,
+      ])
+      if (comboFixtureId != null) {
+        handleCreateModule({
+          ...moduleEntry,
+          cutoutConfigMap: {
+            ...value,
+            cutoutFixtureId: newFixtureName ?? value.cutoutFixtureId,
+          },
+        })
+      } else {
+        handleDeleteModule(moduleEntry, props.handleDeleteStackerLabware)
+      }
+    } else {
+      handleCreateModule(moduleEntry)
+    }
+  }
 }
 
 const handleDeleteFixture = (ctx: fixtureEntry): void => {
@@ -251,18 +546,7 @@ const handleCreateModule = (ctx: ModuleEntry): void => {
 export const updateInitialDeckState = (
   props: UpdateInitialDeckSetupProps
 ): void => {
-  const {
-    values,
-    initialDeckSetup,
-    dispatch,
-    setShowDeleteEntityModal,
-    setShowDeleteStagingAreaModal,
-    savedSteps,
-    makeSnackbar,
-    t,
-    deckConfig,
-    handleDeleteStackerLabware,
-  } = props
+  const { values, initialDeckSetup, savedSteps } = props
 
   const {
     additionalEquipmentOnDeck,
@@ -271,248 +555,36 @@ export const updateInitialDeckState = (
   } = initialDeckSetup
   const deckDef = getDeckDefFromRobotType(FLEX_ROBOT_TYPE)
 
-  // Add missing thermocycler fixtures if needed
   const allValues = getAddedMissingThermocyclerFixtures(values, deckDef)
 
   allValues.forEach(value => {
-    const newFixtureName = getMainFixtureIdForAA(
-      [value.cutoutFixtureId as CutoutFixtureId],
-      [value.addressableAreaId as AddressableAreaName],
-      value.cutoutId
-    )
-    // Find matching fixtures on deck by cutoutId (could be multiple, e.g., waste chute + staging area)
-    const matchingFixturesOnDeck = Object.values(
-      additionalEquipmentOnDeck
-    ).filter(ae => ae.location === value.cutoutId)
-    // Check if this is a waste chute + staging area combo (multiple fixtures at same cutout)
-    const isWasteChuteStagingAreaCombo = matchingFixturesOnDeck.length > 1
-    const matchingFixtureOnDeck = matchingFixturesOnDeck[0] ?? null
-
-    // Determine if we're removing (applying single slot fixture) or adding
-    const removing = SINGLE_SLOT_FIXTURES.includes(newFixtureName!)
-    // Determine if the new fixture is a module (including combo fixtures that contain a module)
-    const isModuleFixture = isModuleFixtureId(newFixtureName!)
-    const matchingModuleOnDeck = Object.values(moduleOnDeck).find(
-      module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
-    )
-    const modulesAtCutout = Object.values(moduleOnDeck).filter(
-      module => getCutoutIdForSlotName(module.slot, deckDef) === value.cutoutId
-    )
-
-    const matchingStagingArea = matchingFixturesOnDeck.find(
-      f => f.name === 'stagingArea'
-    )
-    // Get the addressable area IDs for the staging area slot (e.g., ['D4', 'fakeD4'] for cutoutD3)
-    const stagingAreaSlots =
-      matchingStagingArea != null && matchingStagingArea.location != null
-        ? getAAWithFakesFromCutoutFixtureId(
-            matchingStagingArea.location as CutoutId,
-            STAGING_AREA_RIGHT_SLOT_FIXTURE as CutoutFixtureId,
-            deckDef
-          )
-        : null
-
-    // Check if there's labware on any of the staging area slots
-    const matching4thColumnLabware =
-      stagingAreaSlots != null && stagingAreaSlots.length > 0
-        ? (Object.values(labwareOnDeck).find(lw =>
-            stagingAreaSlots.some(slot => lw.stack.includes(slot))
-          ) ?? null)
-        : null
-
-    const { moduleId, fixtureIds, fourthColumnSlotLabwareId } =
-      getHardwareInSlotInUse(
-        savedSteps,
-        matching4thColumnLabware,
-        matchingModuleOnDeck,
-        matchingFixturesOnDeck.length > 0 ? matchingFixturesOnDeck : undefined
-      )
-
-    const labwareInFourthColumnSlot = {
-      id: matching4thColumnLabware?.id,
-      inUse: fourthColumnSlotLabwareId != null,
-    }
-
-    const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
-
-    // Handle waste chute + staging area combo - treat as remove
-    if (isWasteChuteStagingAreaCombo) {
-      // Determine which fixture to delete based on newFixtureName (delete the opposite)
-      // If newFixtureName is waste chute, delete staging area (keep waste chute)
-      // If newFixtureName is staging area, delete waste chute (keep staging area)
-      const targetFixtureName = WASTE_CHUTE_FIXTURES.includes(newFixtureName!)
-        ? 'stagingArea'
-        : STAGING_AREA_FIXTURES.includes(newFixtureName!)
-          ? 'wasteChute'
-          : null
-      const fixtureToDelete =
-        targetFixtureName != null
-          ? matchingFixturesOnDeck.find(f => f.name === targetFixtureName)
-          : matchingFixtureOnDeck
-
-      if (fixtureToDelete != null) {
-        const fixtureCtx: fixtureEntry = {
-          cutoutConfigMap: value,
-          newFixtureName: newFixtureName!,
-          matchingFixture: fixtureToDelete,
-          hasLabwareOnSlot,
-          onDeckFixtureIds: fixtureIds,
-          labwareInFourthColumnSlot,
-          deckConfig,
-          dispatch,
-          setShowDeleteEntityModal,
-          setShowDeleteStagingAreaModal,
-          makeSnackbar,
-          t,
-        }
-        handleDeleteFixture(fixtureCtx)
-      }
-      return
-    }
-
-    // Handle flex stacker + mag block combo (2 modules in same slot) - remove the module that is not newFixtureName
-    if (modulesAtCutout.length === 2) {
-      const moduleToDelete = modulesAtCutout.find(
-        m => m.model !== getModuleModelFromFixtureId(newFixtureName!)
-      )
-      if (moduleToDelete != null) {
-        const { moduleId: moduleToDeleteId } = getHardwareInSlotInUse(
-          savedSteps,
-          matching4thColumnLabware,
-          moduleToDelete,
-          undefined
-        )
-        const moduleCtx: ModuleEntry = {
-          cutoutConfigMap: value,
-          matchingModule: moduleToDelete,
-          moduleId: moduleToDeleteId,
-          labwareOnDeck,
-          deckConfig,
-          dispatch,
-          setShowDeleteEntityModal,
-          makeSnackbar,
-          t,
-        }
-        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
-      }
-      return
-    }
-
-    if (removing) {
-      if (matchingModuleOnDeck != null) {
-        const moduleCtx: ModuleEntry = {
-          cutoutConfigMap: value,
-          matchingModule: matchingModuleOnDeck,
-          moduleId,
-          labwareOnDeck,
-          deckConfig,
-          dispatch,
-          setShowDeleteEntityModal,
-          makeSnackbar,
-          t,
-        }
-        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
-      } else if (matchingFixturesOnDeck.length > 0) {
-        const fixtureCtx: fixtureEntry = {
-          cutoutConfigMap: value,
-          newFixtureName: newFixtureName!,
-          matchingFixture: matchingFixtureOnDeck,
-          hasLabwareOnSlot,
-          onDeckFixtureIds: fixtureIds,
-          fourthColumnSlotLabwareId,
-          deckConfig,
-          dispatch,
-          setShowDeleteEntityModal,
-          setShowDeleteStagingAreaModal,
-          makeSnackbar,
-          t,
-        }
-        handleDeleteFixture(fixtureCtx)
-      }
-      return
-    }
-
-    const moduleCtx: ModuleEntry = {
-      cutoutConfigMap: value,
-      matchingModule: matchingModuleOnDeck,
-      moduleId,
+    const cutoutFixtureState = getCutoutFixtureState(
+      value,
+      deckDef,
+      additionalEquipmentOnDeck,
+      moduleOnDeck,
       labwareOnDeck,
-      deckConfig,
-      dispatch,
-      setShowDeleteEntityModal,
-      makeSnackbar,
-      t,
+      savedSteps
+    )
+
+    // Special cases removal from waste chute + staging area combo
+    if (cutoutFixtureState.isWasteChuteStagingAreaCombo) {
+      handleWasteChuteStagingAreaComboRemoval(cutoutFixtureState, props)
+      return
     }
-    const fixtureCtx: fixtureEntry = {
-      cutoutConfigMap: value,
-      newFixtureName: newFixtureName!,
-      matchingFixture: matchingFixtureOnDeck,
-      hasLabwareOnSlot,
-      onDeckFixtureIds: fixtureIds,
-      fourthColumnSlotLabwareId,
-      deckConfig,
-      dispatch,
-      setShowDeleteEntityModal,
-      setShowDeleteStagingAreaModal,
-      makeSnackbar,
-      t,
+    if (cutoutFixtureState.modulesAtCutout.length === 2) {
+      handleTwoModulesComboRemoval(cutoutFixtureState, props)
+      return
     }
 
-    if (!isModuleFixture && newFixtureName != null) {
-      // Adding fixture
-      if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
-        handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
-      } else if (matchingFixtureOnDeck != null) {
-        // Check if this is a waste chute + staging area combo case
-        // If adding waste chute to staging area OR adding staging area to waste chute, keep both for combo
-        const isAddingWasteChuteToStagingArea =
-          WASTE_CHUTE_FIXTURES.includes(newFixtureName!) &&
-          matchingFixtureOnDeck.name === 'stagingArea'
-        const isAddingStagingAreaToWasteChute =
-          STAGING_AREA_FIXTURES.includes(newFixtureName!) &&
-          matchingFixtureOnDeck.name === 'wasteChute'
-
-        if (
-          isAddingWasteChuteToStagingArea ||
-          isAddingStagingAreaToWasteChute
-        ) {
-          // Keep existing fixture and create the new one for combo
-          handleCreateFixture(fixtureCtx)
-        } else {
-          // Replace existing fixture
-          handleDeleteFixture(fixtureCtx)
-        }
-      } else {
-        handleCreateFixture(fixtureCtx)
-      }
-    } else {
-      // Adding module
-      if (matchingModuleOnDeck != null && matchingFixtureOnDeck != null) {
-        handleDeleteFixture(fixtureCtx)
-      } else if (matchingModuleOnDeck != null) {
-        const moduleOnDeckFixtureId = getCutoutFixturesForModuleModel(
-          matchingModuleOnDeck.model,
-          deckDef
-        )
-        const comboFixtureId = getComboFixtureFromFixtureIds([
-          moduleOnDeckFixtureId[0].id as CutoutFixtureId,
-          newFixtureName ?? value.cutoutFixtureId,
-        ])
-        if (comboFixtureId != null) {
-          handleCreateModule({
-            ...moduleCtx,
-            cutoutConfigMap: {
-              ...value,
-              cutoutFixtureId: newFixtureName ?? value.cutoutFixtureId,
-            },
-          })
-        } else {
-          handleDeleteModule(moduleCtx, handleDeleteStackerLabware)
-        }
-      } else {
-        handleCreateModule(moduleCtx)
-      }
+    // Removing: single-slot fixture → delete module or fixture at this cutout
+    if (cutoutFixtureState.removing) {
+      processRemoving(cutoutFixtureState, props)
+      return
     }
+
+    // Adding: create or replace fixture/module (with combo special cases inside)
+    processAdding(cutoutFixtureState, props, deckDef)
   })
 }
 
