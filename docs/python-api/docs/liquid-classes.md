@@ -295,7 +295,11 @@ custom_liquid_class_properties = {
                 "correction_by_volume": [(0.0, 0.0)],
                 "delay": {"enabled": False},
                 "flow_rate_by_volume": [(10.0, 40.0), (20.0, 30.0)],
-                "mix": {"enabled": False},
+                "mix": {
+                    "enabled": True, 
+                    "repetitions": 1, 
+                    "volume": 50,
+                },
                 "pre_wet": True,
                 "retract": {
                     "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
@@ -328,7 +332,11 @@ custom_liquid_class_properties = {
                 "push_out_by_volume": [(10.0, 7.0), (20.0, 10.0)],
                 "retract": {
                     "air_gap_by_volume": [(5.0, 3.0), (10.0, 4.0)],
-                    "blowout": {"enabled": False},
+                    "blowout": {
+                        "enabled": True, 
+                        "location": "destination", 
+                        "flowRate": 50,
+                    },
                     "delay": {"enabled": False},
                     "end_position": {
                         "offset": {"x": 1, "y": 2, "z": 3},
@@ -336,8 +344,7 @@ custom_liquid_class_properties = {
                     },
                     "speed": 40,
                     "touch_tip": {"enabled": False},
-                },
-                "blowout": {"enabled": False},
+                }, 
                 "submerge": {
                     "delay": {"enabled": False},
                     "speed": 100,
@@ -365,11 +372,11 @@ custom_viscous = protocol.define_liquid_class(
 
 *New in version 2.24*
 
-*Changed in version 2.28*: When defining an optional blowout, add a `blowout_position`.
+*Changed in version 2.28*: Add ability to control where and when the pipette blows out excess liquid.
 
 You'll need to define values for all required properties in your new liquid class, like submerging before aspirating or after dispensing, speeds and flow rates, and position offsets. See the Opentrons-verified [liquid class properties](https://github.com/Opentrons/opentrons/tree/edge/shared-data/liquid-class/definitions/1) for examples.
 
-You can also define optional properties, like a mix or blowout, in your liquid class. See [the liquid class schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json) for a complete list of properties.
+The example above also defines some optional properties, like a mix and a blowout, in a custom liquid class. See [the liquid class schema](https://github.com/Opentrons/opentrons/blob/edge/shared-data/liquid-class/schemas/1.json) for a complete list of properties.
 
 !!! note
     The [`ProtocolContext.get_liquid_class()`][opentrons.protocol_api.ProtocolContext.get_liquid_class] method only accepts Opentrons-verified liquid classes, like `glycerol_50`. You'll need to use [`ProtocolContext.define_liquid_class()`][opentrons.protocol_api.ProtocolContext.define_liquid_class] in each Flex protocol that uses a custom liquid class.
