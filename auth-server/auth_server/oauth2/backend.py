@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Any, NotRequired, TypedDict, TypeGuard, cast, override
 
-import fastapi
 import oauthlib.common
 import oauthlib.oauth2
 import pydantic
