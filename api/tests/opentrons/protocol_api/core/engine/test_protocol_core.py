@@ -1053,7 +1053,9 @@ def test_move_labware(
     ).then_return(
         LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
-    labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+    labware = LabwareCore(
+        labware_id="labware-id", engine_client=mock_engine_client, protocol_core=subject
+    )
     subject.move_labware(
         labware_core=labware,
         new_location=DeckSlotName.SLOT_5,
@@ -1097,7 +1099,9 @@ def test_move_labware_on_staging_slot(
     ).then_return(
         LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
-    labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+    labware = LabwareCore(
+        labware_id="labware-id", engine_client=mock_engine_client, protocol_core=subject
+    )
     subject.move_labware(
         labware_core=labware,
         new_location=StagingSlotName.SLOT_B4,
@@ -1139,7 +1143,9 @@ def test_move_labware_on_non_connected_module(
     ).then_return(
         LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
-    labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+    labware = LabwareCore(
+        labware_id="labware-id", engine_client=mock_engine_client, protocol_core=subject
+    )
     non_connected_module_core = NonConnectedModuleCore(
         module_id="module-id",
         engine_client=mock_engine_client,
@@ -1187,7 +1193,9 @@ def test_move_labware_off_deck(
     ).then_return(
         LabwareDefinition2.model_construct(ordering=[])  # type: ignore[call-arg]
     )
-    labware = LabwareCore(labware_id="labware-id", engine_client=mock_engine_client)
+    labware = LabwareCore(
+        labware_id="labware-id", engine_client=mock_engine_client, protocol_core=subject
+    )
 
     subject.move_labware(
         labware_core=labware,

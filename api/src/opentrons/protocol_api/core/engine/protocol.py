@@ -108,7 +108,7 @@ class ProtocolCore(
 
     Args:
         engine_client: A client to the ProtocolEngine that is executing the protocol.
-        api_version: The Python Protocol API versionat which  this core is operating.
+        api_version: The Python Protocol API version at which this core is operating.
         sync_hardware: A SynchronousAdapter-wrapped Hardware Control API.
     """
 
@@ -160,6 +160,7 @@ class ProtocolCore(
                 self._labware_cores_by_id[trash_id] = LabwareCore(
                     labware_id=trash_id,
                     engine_client=self._engine_client,
+                    protocol_core=self,
                 )
 
     def append_disposal_location(
@@ -285,6 +286,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
@@ -341,6 +343,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
@@ -389,6 +392,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.labwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
@@ -502,7 +506,9 @@ class ProtocolCore(
                     "Lid cannot be loaded on non-labware position."
                 )
             else:
-                labware = LabwareCore(labware_in_slot.id, self._engine_client)
+                labware = LabwareCore(
+                    labware_in_slot.id, self._engine_client, protocol_core=self
+                )
         else:
             labware = source_location
 
@@ -577,7 +583,9 @@ class ProtocolCore(
                     create_new_lid_stack = True
 
                 to_location = self._convert_labware_location(
-                    location=LabwareCore(highest_child_location, self._engine_client)
+                    location=LabwareCore(
+                        highest_child_location, self._engine_client, protocol_core=self
+                    )
                 )
         elif isinstance(new_location, LabwareCore):
             highest_child_location = (
@@ -591,7 +599,9 @@ class ProtocolCore(
                 # absolutely must make a new lid stack
                 create_new_lid_stack = True
             to_location = self._convert_labware_location(
-                location=LabwareCore(highest_child_location, self._engine_client)
+                location=LabwareCore(
+                    highest_child_location, self._engine_client, protocol_core=self
+                )
             )
         else:
             to_location = self._convert_labware_location(location=new_location)
@@ -623,7 +633,9 @@ class ProtocolCore(
             )
 
             output_result = LabwareCore(
-                labware_id=result.stackLabwareId, engine_client=self._engine_client
+                labware_id=result.stackLabwareId,
+                engine_client=self._engine_client,
+                protocol_core=self,
             )
             destination = self._convert_labware_location(location=output_result)
         else:
@@ -830,7 +842,7 @@ class ProtocolCore(
         if labware_id in self._labware_cores_by_id:
             return self._labware_cores_by_id[labware_id]
         else:
-            core = LabwareCore(labware_id, self._engine_client)
+            core = LabwareCore(labware_id, self._engine_client, protocol_core=self)
             self._labware_cores_by_id[labware_id] = core
             return core
 
@@ -1064,6 +1076,7 @@ class ProtocolCore(
         labware_core = LabwareCore(
             labware_id=load_result.stackLabwareId,
             engine_client=self._engine_client,
+            protocol_core=self,
         )
 
         self._labware_cores_by_id[labware_core.labware_id] = labware_core
