@@ -95,19 +95,19 @@ def _dismiss_migration_modal(page: Page) -> None:
         print("Migration modal did not appear, proceeding with test.")
         pass
 
-def create_new_protocol_from_landing_page(gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+def create_new_protocol_from_landing_page(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
     """Create a new protocol from the landing page."""
     landing = LandingPage(page)
     landing.wait_for_page_load()
     landing.confirm_welcome_modal()
 
     landing.click_create_protocol()
-    create_new_protocol_flow(gripper, tc, waste_chute, page)
+    create_new_protocol_flow(pipette, gripper, tc, waste_chute, page)
 
 
-def create_new_protocol_flow(gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
+def create_new_protocol_flow(pipette: str, gripper: bool, tc: bool, waste_chute: bool, page: Page) -> None:
     page.get_by_text("Add a pipette").click()
-    page.get_by_text("8-Channel").click()
+    page.get_by_text(pipette).click()
     page.get_by_text("50 µL").click()
     page.get_by_role("checkbox", name="Tip Rack 50 µL", exact=True).click()
     page.get_by_role("button", name="Save").click()
