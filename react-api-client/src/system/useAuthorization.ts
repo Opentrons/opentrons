@@ -7,7 +7,6 @@ import { useHost } from '../api'
 import type {
   AuthorizationToken,
   CreateRegistrationParams,
-  HostConfig,
   RegistrationToken,
 } from '@opentrons/api-client'
 
@@ -31,7 +30,7 @@ export function useAuthorization(
     createRegistration(host, createRegistrationParams)
       .then(response => {
         registrationToken.current = response.data
-        return createAuthorization(host as HostConfig, response.data)
+        return createAuthorization(host, response.data)
       })
       .then(response => {
         authorizationToken.current = response.data
