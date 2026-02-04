@@ -44,7 +44,6 @@ import type {
 } from '@opentrons/shared-data'
 import type {
   AllTemporalPropertiesForTimelineFrame,
-  LabwareOnDeck,
   ModuleOnDeck,
   SavedStepFormState,
 } from '/protocol-designer/step-forms'
@@ -82,7 +81,10 @@ interface fixtureEntry {
   matchingFixture: AdditionalEquipmentOnDeck | undefined
   hasLabwareOnSlot: boolean
   onDeckFixtureIds: string[] | null
-  fourthColumnSlotLabwareId: string | null
+  labwareInFourthColumnSlot: {
+    id: string | null
+    inUse: boolean
+  }
   deckConfig?: DeckConfiguration
   dispatch: ThunkDispatch<any>
   setShowDeleteEntityModal: UpdateInitialDeckSetupProps['setShowDeleteEntityModal']
@@ -107,7 +109,7 @@ const handleDeleteFixture = (ctx: fixtureEntry): void => {
   const {
     matchingFixture,
     onDeckFixtureIds: fixtureIds,
-    fourthColumnSlotLabwareId,
+    labwareInFourthColumnSlot,
     deckConfig,
     dispatch,
     setShowDeleteEntityModal,
@@ -120,11 +122,11 @@ const handleDeleteFixture = (ctx: fixtureEntry): void => {
   if (
     matchingFixture.name === 'stagingArea' &&
     fixtureIds == null &&
-    fourthColumnSlotLabwareId != null &&
+    labwareInFourthColumnSlot.id != null &&
     deckConfig != null
   ) {
     setShowDeleteStagingAreaModal({
-      ids: [fourthColumnSlotLabwareId, matchingFixture.id],
+      ids: [labwareInFourthColumnSlot.id, matchingFixture.id],
       deckConfig,
     })
     return
@@ -133,8 +135,8 @@ const handleDeleteFixture = (ctx: fixtureEntry): void => {
   // Deleting fixture that is in use
   if (fixtureIds != null && deckConfig != null) {
     const ids =
-      fourthColumnSlotLabwareId != null
-        ? [...fixtureIds, fourthColumnSlotLabwareId]
+      labwareInFourthColumnSlot.inUse != null
+        ? [...fixtureIds, labwareInFourthColumnSlot.id ?? '']
         : fixtureIds
     setShowDeleteEntityModal({ ids, deckConfig })
     return
@@ -326,6 +328,11 @@ export const updateInitialDeckState = (
         matchingFixturesOnDeck.length > 0 ? matchingFixturesOnDeck : undefined
       )
 
+    const labwareInFourthColumnSlot = {
+      id: matching4thColumnLabware?.id,
+      inUse: fourthColumnSlotLabwareId != null,
+    }
+
     const hasLabwareOnSlot = getSlotHasLabware(labwareOnDeck, value.cutoutId)
 
     // Handle waste chute + staging area combo - treat as remove
@@ -350,7 +357,7 @@ export const updateInitialDeckState = (
           matchingFixture: fixtureToDelete,
           hasLabwareOnSlot,
           onDeckFixtureIds: fixtureIds,
-          fourthColumnSlotLabwareId,
+          labwareInFourthColumnSlot,
           deckConfig,
           dispatch,
           setShowDeleteEntityModal,
