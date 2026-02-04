@@ -35,7 +35,7 @@ export function useAuthorization(
       .then(response => {
         authorizationToken.current = response.data
       })
-  }, [host])
+  }, [createRegistrationParams, host])
 
   return {
     authorizationToken: authorizationToken.current,

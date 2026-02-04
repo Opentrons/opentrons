@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -46,6 +47,7 @@ import { ReachableBanner } from './ReachableBanner'
 import { RobotOverviewOverflowMenu } from './RobotOverviewOverflowMenu'
 import { RobotStatusHeader } from './RobotStatusHeader'
 
+import type { CreateRegistrationParams } from '@opentrons/api-client'
 import type { State } from '/app/redux/types'
 
 interface RobotOverviewProps {
@@ -80,14 +82,18 @@ export function RobotOverview({
   const isUsbConnected = addresses.some(address => address.ip === OPENTRONS_USB)
 
   // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
-  useAuthorization({
-    subject: 'Opentrons',
-    agent:
-      // define the registration agent as usb if any usb hostname address exists
-      // may change when ODD no longer needs to rely on this
-      isUsbConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
-    agentId: userId,
-  })
+  const createRegistrationParams: CreateRegistrationParams = useMemo(
+    () => ({
+      subject: 'Opentrons',
+      agent:
+        // define the registration agent as usb if any usb hostname address exists
+        // may change when ODD no longer needs to rely on this
+        isUsbConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
+      agentId: userId,
+    }),
+    [isUsbConnected, userId]
+  )
+  useAuthorization(createRegistrationParams)
 
   return robot != null ? (
     <>
