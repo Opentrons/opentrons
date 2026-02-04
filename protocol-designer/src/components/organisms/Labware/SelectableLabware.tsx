@@ -16,10 +16,10 @@ import { WellTooltip } from './WellTooltip'
 
 import type { ComponentProps } from 'react'
 import type {
-  WellFill,
+  WellFillByName,
   WellGroup,
   WellMouseEvent,
-  WellStroke,
+  WellStrokeByName,
 } from '@opentrons/components'
 import type { GenericRect } from '/protocol-designer/collision-types'
 import type { ContentsByWell } from '/protocol-designer/labware-ingred/types'
@@ -177,8 +177,8 @@ export const SelectableLabware = (
         )
       : selectedPrimaryWells
 
-  const wellFillWithLiq: WellFill = {}
-  const wellStroke: WellStroke = {}
+  const wellFillWithLiq: WellFillByName = {}
+  const wellStroke: WellStrokeByName = {}
   Object.keys(labwareDef.wells).forEach(wellName => {
     wellFillWithLiq[wellName] = COLORS.blue35
     wellStroke[wellName] = COLORS.transparent

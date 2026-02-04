@@ -291,6 +291,7 @@ export const SINGLE = 'SINGLE'
 export const ROW = 'ROW'
 export const QUADRANT = 'QUADRANT'
 export const ALL = 'ALL'
+export const PARTIAL = 'PARTIAL'
 
 export type NozzleConfigurationStyle =
   | typeof COLUMN
@@ -298,6 +299,7 @@ export type NozzleConfigurationStyle =
   | typeof ROW
   | typeof QUADRANT
   | typeof ALL
+  | typeof PARTIAL
 
 interface NozzleConfigurationParams {
   primaryNozzle?: string
