@@ -1,4 +1,5 @@
 import {
+  A1_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -11,7 +12,6 @@ import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
-  getDefaultPrimaryNozzle,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getLabwareSlot,
@@ -25,7 +25,11 @@ import { pickUpTip } from '../atomic/pickUpTip'
 import { dropTipInTrash } from './dropTipInTrash'
 import { dropTipInWasteChute } from './dropTipInWasteChute'
 
-import type { CutoutId, NozzleConfigurationStyle } from '@opentrons/shared-data'
+import type {
+  CutoutId,
+  NozzleConfigurationStyle,
+  PrimaryNozzleConfigurationStyle,
+} from '@opentrons/shared-data'
 import type { CommandCreator, CurriedCommandCreator } from '../../types'
 
 interface ReplaceTipArgs {
@@ -34,6 +38,8 @@ interface ReplaceTipArgs {
   // tipRack URI with which to automatically find next tip
   tipRack: string | null
   nozzles?: NozzleConfigurationStyle
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
+
   //  we need to emit atomic commands for python
   //  if this replaceTip is for the mix compound command
   isFromMixCommand?: boolean
@@ -202,10 +208,7 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? ALL,
-    channels,
-  })
+  const primaryNozzle = args.primaryNozzle ?? A1_NOZZLE
 
   const curryCommand = isFromMixCommand
     ? curryCommandCreator

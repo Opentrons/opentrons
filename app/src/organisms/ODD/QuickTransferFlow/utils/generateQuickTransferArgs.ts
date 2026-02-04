@@ -11,6 +11,7 @@ import {
 } from '@opentrons/shared-data'
 import {
   AUTOMATIC,
+  getDefaultPrimaryNozzle,
   getSlotInLocationStack,
   makeInitialRobotState,
 } from '@opentrons/step-generation'
@@ -445,8 +446,13 @@ export function generateQuickTransferArgs(
   const touchTipAfterAspirateOffsetMmFromTop =
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
+  const primaryNozzle = getDefaultPrimaryNozzle({
+    nozzles: nozzles ?? 'ALL',
+    channels: pipetteEntity.spec.channels,
+  })
   const commonFields: SharedTransferLikeArgs = {
     stepNumber: 1,
+    primaryNozzle: primaryNozzle,
     pipette: pipetteEntity.id,
     volume: quickTransferState.volume,
     sourceLabware: sourceLabwareEntity?.id!,

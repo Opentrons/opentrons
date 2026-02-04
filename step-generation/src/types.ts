@@ -17,6 +17,7 @@ import type {
   PipetteName,
   PipetteV2Specs,
   PositionReference,
+  PrimaryNozzleConfigurationStyle,
   ShakeSpeedParams,
   StackerStoredLabwareDefinitionURIs,
   TCExtendedProfileParams,
@@ -344,6 +345,8 @@ export type SharedTransferLikeArgs = CommonArgs & {
   tipRack: string // tipRackDefUri
   pipette: string // PipetteId
   nozzles: NozzleConfigurationStyle | null // setting for 96-channel
+  primaryNozzle: PrimaryNozzleConfigurationStyle // setting for partial tip pick up
+
   sourceLabware: string
   destLabware: string
   /** volume is interpreted differently by different Step types */
@@ -520,6 +523,7 @@ export type MixArgs = CommonArgs & {
   tipTracking: TipTrackingOption
   tipsSelected: string[][]
   tiprackSelected: string | null
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }
 
 export type PauseArgs = CommonArgs & {

@@ -8,15 +8,11 @@ import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
 import styles from './nozzleandwellwizard.module.css'
 
-import type {
-  NozzleConfigurationStyle,
-  RobotType,
-} from '@opentrons/shared-data'
+import type { RobotType } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
 import type { FieldPropsByName } from '../../types'
 
 interface WellSelectorProps {
-  nozzleConfiguration: NozzleConfigurationStyle
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
@@ -25,8 +21,11 @@ interface WellSelectorProps {
 export function WellSelector(props: WellSelectorProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
   const { deckSetup, propsForFields, stepType, robotType } = props
+  const isAspirate = stepType === 'aspirate'
+  const isDispense = stepType === 'dispense'
+  const isMix = stepType === 'mix'
 
-  const getLabwareId = (): string => {
+  function getLabwareId(): string {
     switch (stepType) {
       case 'aspirate':
         return propsForFields.aspirate_labware.value as string
@@ -48,47 +47,32 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
   const viewBox = getViewboxFromSelectedLabware(labwareId, deckSetup, deckDef)
 
-  const getWellSelectionText = (): JSX.Element => {
-    switch (stepType) {
-      case 'mix':
-        return (
-          <>
-            <StyledText desktopStyle={'headingMediumBold'}>
-              {t('select_wells_to_mix_liquid_in', {
-                labware: displayName,
-              })}
-            </StyledText>
-          </>
-        )
-
-      case 'aspirate':
-        return (
+  return (
+    <div className={styles.column_wrapper}>
+      <div className={styles.header_text_wrapper}>
+        {isMix ? (
+          <StyledText desktopStyle={'headingMediumBold'}>
+            {t('select_wells_to_mix_liquid_in', {
+              labware: displayName,
+            })}
+          </StyledText>
+        ) : null}
+        {isAspirate ? (
           <StyledText desktopStyle={'headingMediumBold'}>
             {t('select_wells_to_aspirate_liquid_from', {
               labware: displayName,
             })}
           </StyledText>
-        )
-      case 'dispense':
-        return (
+        ) : null}
+
+        {isDispense ? (
           <StyledText desktopStyle={'headingMediumBold'}>
             {t('select_wells_to_dispense_liquid_into', {
               labware: displayName,
             })}
           </StyledText>
-        )
-      default:
-        console.warn(`Unhandled step type ${stepType} for ${displayName}`)
-        return (
-          <StyledText desktopStyle={'headingMediumBold'}>
-            {displayName}
-          </StyledText>
-        )
-    }
-  }
-  return (
-    <div className={styles.column_wrapper}>
-      <div className={styles.header_text_wrapper}>{getWellSelectionText()}</div>
+        ) : null}
+      </div>
 
       <div className={styles.select_well_alignment}>
         <BaseDeckTipSelection controls={controls} viewBox={viewBox} />
