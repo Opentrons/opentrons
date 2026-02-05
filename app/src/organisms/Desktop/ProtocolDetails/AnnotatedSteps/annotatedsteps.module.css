@@ -75,9 +75,9 @@
 }
 
 .individual_command_text {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   white-space: normal;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .annotated_steps_container {
