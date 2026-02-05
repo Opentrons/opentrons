@@ -58,7 +58,7 @@ class RunResult(NamedTuple):
     commands: List[Command]
     state_summary: StateSummary
     parameters: List[RunTimeParameter]
-    command_annotations: List[CommandAnnotation]
+    command_annotations: List[CommandAnnotation]  # TODO: remove this?
     command_preconditions: Optional[CommandPreconditions]
 
 
@@ -377,6 +377,8 @@ class JsonRunner(AbstractRunner):
             )
             await asyncio_yield()
 
+        # TODO (spp, 2026-02-05): this might need to be updated to fetch the legacy command annotations,
+        #  translate them into new type and then insert into the engine state by calling engine actions
         self._command_annotations = await anyio.to_thread.run_sync(
             self._json_translator.translate_command_annotations,
             protocol,
@@ -416,7 +418,7 @@ class JsonRunner(AbstractRunner):
             commands=commands,
             state_summary=run_data,
             parameters=[],
-            command_annotations=self._command_annotations,
+            command_annotations=self._command_annotations,  # TODO: remove this?
             command_preconditions=preconditions,
         )
 

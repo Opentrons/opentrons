@@ -301,6 +301,7 @@ class JsonTranslator:
 
         return list(translate_all_commands())
 
+    # TODO(spp, 2026-02-05): Update this to translate the legacy annotations to new type
     def translate_command_annotations(
         self,
         protocol: Union[ProtocolSchemaV8, ProtocolSchemaV7, ProtocolSchemaV6],
