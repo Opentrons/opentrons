@@ -3,6 +3,7 @@ import { FLEX_ROBOT_TYPE } from '@opentrons/shared-data'
 import { getFixtureSummaryInfo } from '../utils/getFixtureSummaryInfo'
 import { getSlotIdsBlockedBySpanningForThermocycler } from '../utils/getSlotIdsBlockedBySpanningForThermocycler'
 import { DeckViewLabware } from './DeckViewLabware'
+import { DeckViewModuleCommandSummaries } from './DeckViewModuleCommandSummaries'
 import { DeckViewModules } from './DeckViewModules'
 import { DeckViewSlots } from './DeckViewSlots'
 import { FixtureCommandSummary } from './FixtureCommandSummary'
@@ -137,6 +138,13 @@ export function DeckViewDetails(props: DeckViewDetailsProps): JSX.Element {
           type="wasteChute"
         />
       ) : null}
+      <DeckViewModuleCommandSummaries
+        robotState={robotState}
+        invariantContext={invariantContext}
+        deckDef={deckDef}
+        robotType={robotType}
+        selectedRunTimeCommand={selectedRunTimeCommand}
+      />
     </>
   )
 }

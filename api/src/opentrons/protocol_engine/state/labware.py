@@ -1271,8 +1271,24 @@ class LabwareView:
                     self.get_definition(lw.id)
                 ) and not labware_validation.is_lid_stack(self.get_load_name(lw.id)):
                     stack_without_adapters.append(lw)
+
+            # todo(chb, 2025-01-29): We should refactor how labware stacking and the stackLimit parameter are used so that we do not have to do this special case check.
+            # This is occuring because the stackLimit no longer only means "the limit this labware can stack on itself" and now also means "the limit of a labwares position in a stack".
+            # If this eventually is fixed, we can get rid of this special case for the tiprack lid validation.
+            if labware_validation.is_tiprack_lid(
+                top_labware_definition.parameters.loadName
+            ) and labware_validation.is_tiprack_lid(below_labware.loadName):
+                # Validate that when attempting to stack a tiprack lid on another tiprack lid we still adhere to the maximum limit
+                if len(stack_without_adapters) >= self.get_labware_stacking_maximum(
+                    top_labware_definition
+                ):
+                    raise errors.LabwareCannotBeStackedError(
+                        f"Tip rack lid {top_labware_definition.parameters.loadName} cannot be loaded to stack of more than {self.get_labware_stacking_maximum(top_labware_definition)} labware."
+                    )
             if len(stack_without_adapters) >= self.get_labware_stacking_maximum(
                 top_labware_definition
+            ) and not labware_validation.is_tiprack_lid(
+                top_labware_definition.parameters.loadName
             ):
                 raise errors.LabwareCannotBeStackedError(
                     f"Labware {top_labware_definition.parameters.loadName} cannot be loaded to stack of more than {self.get_labware_stacking_maximum(top_labware_definition)} labware."

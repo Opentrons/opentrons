@@ -718,6 +718,10 @@ class ThermocyclerContext(ModuleContext):
         )
         if self._api_version >= APIVersion(2, 27) and block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
+        if self._api_version < APIVersion(2, 28) and ramp_rate:
+            # because the argument was always there but didn't work, continue to swallow this arg on
+            # old api versions.
+            ramp_rate = None
         self._core.set_target_block_temperature(
             celsius=temperature,
             hold_time_seconds=seconds,
@@ -754,6 +758,10 @@ class ThermocyclerContext(ModuleContext):
 
         if block_max_volume is None:
             block_max_volume = self._get_current_labware_max_vol()
+        if self._api_version < APIVersion(2, 28) and ramp_rate:
+            # because the argument was always there but didn't work, continue to swallow this arg on
+            # old api versions.
+            ramp_rate = None
         task = self._core.start_set_target_block_temperature(
             celsius=temperature,
             block_max_volume=block_max_volume,

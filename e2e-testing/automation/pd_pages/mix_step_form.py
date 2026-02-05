@@ -54,13 +54,13 @@ class MixStepForm(BasePage):
     def select_labware(self, option_text: str) -> None:
         """Select the labware entry shown in the dropdown."""
 
+        print(f"Selecting labware option: {option_text}")
         # Try field-specific test ID first (labware_dropdownMenu), then fallback to generic
         dropdown = self.page.get_by_test_id("labware_dropdownMenu").first
         if dropdown.count() == 0:
             dropdown = self.page.get_by_test_id("dropdownMenu").first
         self.wait_for_visible(dropdown, timeout=10000)
         dropdown.click()
-
         listbox = self.page.locator("div[role='listbox']").last
         self.wait_for_visible(listbox)
         buttons = listbox.locator("button")
@@ -76,12 +76,12 @@ class MixStepForm(BasePage):
 
     def select_pipette(self, option_text: str | None = None) -> None:
         """Select a pipette. Defaults to the first option if none provided."""
-
+        print(f"Selecting pipette option: {option_text}")
         self._select_dropdown_option("Pipette", option_text)
 
     def select_tiprack(self, option_text: str | None = None) -> None:
         """Select a tip rack. Defaults to the first option if none provided."""
-
+        print(f"Selecting tiprack option: {option_text}")
         self._select_dropdown_option("Tiprack", option_text)
 
     def open_well_selector(self) -> None:
@@ -223,11 +223,12 @@ class MixStepForm(BasePage):
             checkbox_input.click()
             return
 
+        checkbox_test_id_count = self.page.locator("[data-testid*='checkbox']").count()
         raise AssertionError(
             f"Could not find checkbox or switch at index {index}. "
             f"Found {self.page.get_by_role('switch').count()} switches, "
             f"{self.page.get_by_role('checkbox').count()} checkboxes, "
-            f"{self.page.locator('[data-testid*="checkbox"]').count()} checkbox test IDs."
+            f"{checkbox_test_id_count} checkbox test IDs."
         )
 
     def fill_delay_seconds(self, value: str) -> None:

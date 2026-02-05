@@ -12,6 +12,7 @@ from .protocol_editor_page import ProtocolEditorPage
 from .settings_page import SettingsPage
 from .tc_step_form_page import ThermocyclerStepPage
 from .tempdeck_step_form_page import TemperatureStepPage
+from .timeline import Timeline
 from .transfer_form import TransferPage
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "TemperatureStepPage",
     "HeaterShakerStepPage",
     "TransferPage",
+    "Timeline",
 ]

@@ -1157,6 +1157,7 @@
       "type": "object"
     },
     "Coordinate": {
+      "additionalProperties": false,
       "description": "Three-dimensional coordinates.",
       "properties": {
         "x": {
