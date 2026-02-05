@@ -66,7 +66,6 @@ export function RobotOverview({
   const isRobotViewable = useIsRobotViewable(robot?.name ?? '')
   const { lightsOn, toggleLights } = useLights()
 
-  // TODO(bh, 2023-05-31): remove registration/authorization here when AppApiHostProvider exists
   useUSBRegistration(robot)
 
   return robot != null ? (

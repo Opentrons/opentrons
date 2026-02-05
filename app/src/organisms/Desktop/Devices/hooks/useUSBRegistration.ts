@@ -41,7 +41,6 @@ export function useUSBRegistration(robot: DiscoveredRobot | null): void {
       subject: 'Opentrons',
       agent:
         // define the registration agent as usb if any usb hostname address exists
-        // may change when ODD no longer needs to rely on this
         isUSBConnected ? 'com.opentrons.app.usb' : 'com.opentrons.app',
       agentId: userId,
     }
