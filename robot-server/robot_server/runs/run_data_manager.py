@@ -71,7 +71,7 @@ def _build_run(
             liquids=state_summary.liquids,
             liquidClasses=state_summary.liquidClasses,
             outputFileIds=state_summary.files,
-            commandAnnotations=[],  # TODO (spp, 2026-02-03): get real values
+            commandAnnotations=state_summary.commandAnnotations,
             runTimeParameters=run_time_parameters,
             cameraSettings=state_summary.cameraSettings,
         )
@@ -89,6 +89,7 @@ def _build_run(
             liquidClasses=[],
             wells=[],
             files=[],
+            commandAnnotations=[],
             hasEverEnteredErrorRecovery=False,
         )
         errors.append(state_summary.dataError)
@@ -134,7 +135,7 @@ def _build_run(
         liquidClasses=state.liquidClasses,
         runTimeParameters=run_time_parameters,
         outputFileIds=state.files,
-        commandAnnotations=[],  # TODO (spp, 2026-02-03): get real values
+        commandAnnotations=state.commandAnnotations,
         hasEverEnteredErrorRecovery=state.hasEverEnteredErrorRecovery,
     )
 
