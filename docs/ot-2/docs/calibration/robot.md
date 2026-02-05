@@ -95,3 +95,15 @@ During calibration, the Opentrons App displays jog control screens like the exam
 </figure>
 
 You don't always need to use the jog controls to make fine adjustments. They're available to help you make robot and labware position checks more accurate.
+
+To use the jog controls:
+
+<div class="instruction-list" markdown>
+
+1. Select a control option to set the pipette's axis of movement.
+2. Select a jump size to set how far the pipette moves (in mm). You can move the pipette in increments of 0.1, 1, or 10 mm. Use larger jump sizes to move the pipette quickly, but beware of crashing the pipette.
+3. Click an arrow to move the pipette for your selected direction and distance.
+4. Click **Confirm position** when, in your best judgement, the pipette is optimally aligned with its target.
+5. Continue to follow prompts and instructions on the touchscreen to complete the Labware Position Check process.
+
+</div>
