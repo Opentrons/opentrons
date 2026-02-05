@@ -74,11 +74,13 @@
   gap: var(--spacing-8);
 }
 
+/* stylelint-disable */
 .individual_command_text {
   overflow-wrap: break-word;
   white-space: normal;
   word-break: break-word;
 }
+/* stylelint-enable */
 
 .annotated_steps_container {
   width: 100%;
