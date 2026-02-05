@@ -2,6 +2,10 @@
 title: "Opentrons OT-2: Robot Calibration"
 ---
 
+Start here for an overview of the robot calibration process and instructions on how to perform this procedures.
+
+## Calibration overview
+
 Your OT-2 moves gantry-mounted pipettes in three dimensional space (left-right, front-back, up-down). To move accurately, the robot needs a precise map of its own hardware relative to a good reference point, the deck. The robot calibration process creates this map.
 
 <font color="red">IMAGE PLACEHOLDER</font>
@@ -11,21 +15,6 @@ There are three positional calibrations that work together in a hierarchy:
 - **Deck calibration:** The foundation of it all. This process maps the deck to the gantry.
 - **Tip length calibration:** Helps the robot measure the distance from the tip of the pipette to the nozzle.
 - **Pipette offset calibration:** Aligns the pipette nozzle to the calibrated deck.
-
-## Calibration controls
-
-The calibration controls are located in the Robot Settings section of the Opentrons App. To calibrate your OT-2:
-
-1. Click the **Devices** tab in the Opentrons App.
-2. Find your robot in the list and click on it. This opens the details page.
-3. Click the three-dot menu (⋮) 
-
-
-## Jog controls
-
-Some text here.
-
-<font color="red">IMAGE PLACEHOLDER</font>
 
 ## Deck calibration
 
@@ -79,3 +68,22 @@ A pipette offset calibration is required after:
 - Attaching a new pipette to the gantry.
 - Running a deck calibration.
 - Running a tip length calibration.
+
+## Running robot calibrations 
+
+The calibration controls are located in the Robot Settings section of the Opentrons App. To calibrate your OT-2:
+
+<div class="instruction-list" markdown>
+
+1. Click the **Devices** tab in the Opentrons App.
+2. Find your robot in the list and click on it. This opens the details page.
+3. Click the three-dot menu (⋮) and then click **Robot settings**. This opens the Calibration tab in the Settings screen.
+4. Click **Launch Calibration**. Instructions and animations will guide you through the robot calibration process.
+
+</div>
+
+## Jog controls
+
+Placeholder text here.
+
+<font color="red">IMAGE PLACEHOLDER</font>
