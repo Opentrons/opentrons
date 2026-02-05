@@ -150,12 +150,6 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
     item => moduleEntities[item] != null
   )
   const hasStackedLabware = stackItems.some(item => labware[item] != null)
-  const slotLabelItem = stackItems.find(
-    item =>
-      moduleEntities[item] == null &&
-      labware[item] == null &&
-      item !== HOPPER_STACKER_LOCATION
-  )
   const hasHopper = stackItems.includes(HOPPER_STACKER_LOCATION)
   const showStackedIcon =
     hasStackedLabware || (hopperGroups != null && hopperGroups.length > 1)
@@ -165,18 +159,16 @@ export function LabwareSlot(props: LabwareSlotContainerProps): JSX.Element {
       <div className={styles.header}>
         {/* header icon part */}
         <div className={styles.header_icons}>
+          <RobotInfoLabel
+            key="slotLabel"
+            deckLabel={hasHopper ? t('stacker_slot', { slot: slot }) : slot}
+          />
           {moduleStackItems.map((item, index) => (
             <RobotInfoLabel
               key={`${item}-${index}`}
               iconName={MODULE_ICON_NAME_BY_TYPE[moduleEntities[item].type]}
             />
           ))}
-          {slotLabelItem != null ? (
-            <RobotInfoLabel
-              key="slotLabel"
-              deckLabel={hasHopper ? t('stacker_slot', { slot: slot }) : slot}
-            />
-          ) : null}
           {showStackedIcon ? (
             <RobotInfoLabel key="stackedIcon" iconName="stacked" />
           ) : null}
