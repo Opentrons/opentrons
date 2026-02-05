@@ -24,7 +24,7 @@ export function SelectedWell(props: {
   } = props
 
   const firstWell = labwareDefinition.wells.A1
-  const wellShape = firstWell.shape
+  const isWellCircular = firstWell.shape === 'circular'
   const [width, height] = getWidthAndHeightOfWellSVG(labwareDefinition)
   const getFillColor = (
     isSelected: boolean,
@@ -45,15 +45,17 @@ export function SelectedWell(props: {
 
   const shouldShowStroke = textInsideTip == null && showStroke
   // TODO (nd: 10/16/25): create a "Nozzle" component wrapping SelectedTip to avoid this flakey logic
+  const viewBox =
+    size || isWellCircular ? '0 0 20 20' : `0 0 ${width} ${height}`
   return (
     <svg
       width={size ?? width}
       height={size ?? height}
-      viewBox="0 0 20 20"
+      viewBox={viewBox}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      {wellShape === 'circular' ? (
+      {isWellCircular ? (
         <circle
           cx="10"
           cy="10"
@@ -66,8 +68,8 @@ export function SelectedWell(props: {
         <rect
           x={shouldShowStroke ? 1 : 0}
           y={shouldShowStroke ? 1 : 0}
-          width={shouldShowStroke ? 18 : 20}
-          height={shouldShowStroke ? 18 : 20}
+          width={width}
+          height={height}
           rx={2} // subtle rounding; remove if you want sharp corners
           fill={getFillColor(isSelected, isError, isUsed)}
           stroke={shouldShowStroke ? COLORS.black90 : undefined}

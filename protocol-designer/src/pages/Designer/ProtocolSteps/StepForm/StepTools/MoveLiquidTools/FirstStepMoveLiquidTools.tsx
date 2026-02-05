@@ -122,7 +122,6 @@ export function FirstStepMoveLiquidTools({
         ) : null}
         {channels != null && channels !== 1 && completedSteps ? (
           <>
-            <Divider marginY="0" />
             {!enableAdditionalPartialTip ? (
               <PartialTipField
                 {...propsForFields.nozzles}
@@ -137,8 +136,6 @@ export function FirstStepMoveLiquidTools({
 
       {completedSteps ? (
         <>
-          <Divider marginY="0" />
-
           <PathField
             {...propsForFields.path}
             aspirate_airGap_checkbox={formData.aspirate_airGap_checkbox}
@@ -152,9 +149,7 @@ export function FirstStepMoveLiquidTools({
             isDisposalLocation={isDisposalLocation}
             title={t('pipette_path')}
           />
-
           <Divider marginY="0" />
-
           <VolumeField
             fieldProps={propsForFields.volume}
             path={formData.path}

@@ -213,6 +213,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           selectedTipsByIndex={allWellsWithStatus}
           {...{ statusByWellName: allWellsWithState }}
           fill={COLORS.white}
+          inWellSelectionModal={true}
           ignoreMissingTips
         />
       </>

@@ -27,6 +27,7 @@ interface LabwareOnDeckProps {
   fill?: CSSProperties['fill']
   borderStroke?: CSSProperties['stroke']
   ignoreMissingTips?: boolean
+  inWellSelectionModal?: boolean
 }
 
 export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
@@ -44,6 +45,7 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
     fill,
     borderStroke,
     ignoreMissingTips = false,
+    inWellSelectionModal = false,
   } = props
   const missingAndUsedTipsByLabwareId = useSelector(
     tipContentsSelectors.getMissingAndUsedTipsByLabwareId
@@ -65,15 +67,17 @@ export function LabwareOnDeck(props: LabwareOnDeckProps): JSX.Element {
       : null
   const { missingTips } = labwareTipInfo ?? {}
   const isLid = getIsLid(labwareOnDeck.def)
-
+  const wellFill = inWellSelectionModal
+    ? undefined
+    : wellContentsSelectors.wellFillFromWellContents(
+        wellContents,
+        liquidDisplayColors
+      )
   const labwareRenderComponent = (
     <LabwareRender
       definition={labwareOnDeck.def}
       positioningMode="offsetInSlot"
-      wellFill={wellContentsSelectors.wellFillFromWellContents(
-        wellContents,
-        liquidDisplayColors
-      )}
+      wellFill={wellFill}
       handleClickWell={handleClickWell}
       {...(showHighlightedWells ? { highlightedWells } : {})}
       {...(ignoreMissingTips ? {} : { missingTips })}
