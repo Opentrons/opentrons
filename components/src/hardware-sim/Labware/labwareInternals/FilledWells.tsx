@@ -1,17 +1,16 @@
 import { memo } from 'react'
 import map from 'lodash/map'
 
-import { COLORS } from '../../../../helix-design-system'
+import { COLORS } from '../../../helix-design-system'
 import { Well } from './Well'
 
 import type { CSSProperties, MemoExoticComponent, ReactNode } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
-import type { WellFillByName, WellStroke } from './constants'
 
 export interface FilledWellsProps {
   definition: LabwareDefinition
-  fillByWell: WellFillByName
-  strokeColor?: WellStroke
+  fillByWell: Record<string, CSSProperties['fill']>
+  strokeColor?: string
 }
 
 function FilledWellsComponent(props: FilledWellsProps): JSX.Element {

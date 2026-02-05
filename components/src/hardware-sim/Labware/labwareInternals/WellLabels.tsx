@@ -2,15 +2,15 @@ import { memo } from 'react'
 
 import { getSchema2Dimensions } from '@opentrons/shared-data'
 
-import { COLORS } from '../../../../helix-design-system'
-import { C_BLACK, C_BLUE } from '../../../../styles/colors'
-import { RobotCoordsText } from '../../../Deck'
-import { WELL_LABEL_OPTIONS } from './constants'
+import { COLORS } from '../../../helix-design-system'
+import { C_BLACK, C_BLUE } from '../../../styles/colors'
+import { RobotCoordsText } from '../../Deck'
+import { WELL_LABEL_OPTIONS } from '../LabwareRender'
 
 import type { MemoExoticComponent } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
-import type { WellLabelOption } from '../../LabwareRender'
-import type { HighlightedWellLabels } from './constants'
+import type { WellLabelOption } from '../LabwareRender'
+import type { HighlightedWellLabels } from './types'
 
 // magic layout numbers to make the letters close to the edges of the labware
 const LETTER_COLUMN_X_INSIDE = 4

@@ -14,7 +14,6 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
-import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
 import type { PipetteEntities } from '@opentrons/step-generation'
 import type { FormData } from '/protocol-designer/form-types'
@@ -35,7 +34,10 @@ export function FirstStepMixTools({
   const enableAdditionalPartialTip = useSelector(
     getEnableAdditionalPartialTipSelection
   )
-
+  const channels =
+    propsForFields.pipette.value != null
+      ? pipettes[String(propsForFields.pipette.value)].spec.channels
+      : null
   const completedSteps =
     formData.labware != null &&
     formData.tipRack != null &&
@@ -47,6 +49,12 @@ export function FirstStepMixTools({
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
+      {channels != null && channels !== 1 && !enableAdditionalPartialTip ? (
+        <PartialTipField
+          {...propsForFields.nozzles}
+          pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+        />
+      ) : null}
       <Divider marginY="0" />
       <TiprackField
         {...propsForFields.tipRack}
@@ -55,25 +63,14 @@ export function FirstStepMixTools({
       <Divider marginY="0" />
       <LabwareField {...propsForFields.labware} tooltipContent={null} />
       <Divider marginY="0" />
-      {completedSteps ? (
-        enableAdditionalPartialTip ? (
-          <>
-            <Divider marginY="0" />
-            <ExtendedPartialTipField
-              {...propsForFields.nozzles}
-              pipetteSpecs={
-                pipettes[String(propsForFields.pipette.value)]?.spec
-              }
-              propsForFields={propsForFields}
-              stepType="mix"
-            />
-          </>
-        ) : (
+      {enableAdditionalPartialTip && completedSteps ? (
+        <>
+          <Divider marginY="0" />
           <PartialTipField
             {...propsForFields.nozzles}
             pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
           />
-        )
+        </>
       ) : null}
 
       {completedSteps ? (

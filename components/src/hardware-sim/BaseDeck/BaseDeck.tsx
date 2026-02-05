@@ -55,13 +55,13 @@ import type {
   RobotType,
 } from '@opentrons/shared-data'
 import type { TrashCutoutId } from '../Deck/FlexTrash'
-import type { WellFillByName, WellGroup } from '../Labware'
+import type { WellFill, WellGroup } from '../Labware'
 import type { StagingAreaLocation } from './StagingAreaFixture'
 
 export interface LabwareOnDeck {
   labwareLocation: LabwareLocation
   definition: LabwareDefinition
-  wellFill?: WellFillByName
+  wellFill?: WellFill
   missingTips?: WellGroup
   /**
    * Additional children to render alongside this labware.
@@ -79,7 +79,7 @@ export interface ModuleOnDeck {
   moduleModel: ModuleModel
   moduleLocation: ModuleLocation
   nestedLabwareDefsBottomToTop: LabwareDefinition[]
-  nestedLabwareWellFill?: WellFillByName
+  nestedLabwareWellFill?: WellFill
   innerProps?: ComponentProps<typeof Module>['innerProps']
   /**
    * Additional children to render atop this module, after `nestedLabwareDef`.
@@ -95,7 +95,7 @@ export interface ModuleOnDeck {
 }
 export interface HopperLabwareProps {
   hopperLabwareDef: LabwareDefinition | null
-  hopperLabwareWellFill: WellFillByName
+  hopperLabwareWellFill: WellFill
   hopperOnLabwareClick: () => void
   hopperHighlightLabware: boolean
   hopperStacked: boolean

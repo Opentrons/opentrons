@@ -1,4 +1,3 @@
-import { EmptyWell, SelectedWell } from '../Wells'
 import {
   INACCESSIBLE,
   NEW,
@@ -10,6 +9,8 @@ import {
 } from './constants'
 import { InaccessibleTip } from './InaccessibleTip'
 import { NewTip } from './NewTip'
+import { NoTip } from './NoTip'
+import { SelectedTip } from './SelectedTip'
 import { UsedTip } from './UsedTip'
 
 import type { TipType } from '../types'
@@ -26,14 +27,14 @@ export function TipStatus(props: {
     case USED:
       return <UsedTip size={size} />
     case SELECTED:
-      return <SelectedWell size={size} textInsideTip={text} />
+      return <SelectedTip size={size} textInsideTip={text} />
     case NO:
-      return <EmptyWell size={size} />
+      return <NoTip size={size} />
     case INACCESSIBLE:
       return <InaccessibleTip size={size} />
     case SELECTED_USED:
-      return <SelectedWell size={size} textInsideTip={text} isUsed />
+      return <SelectedTip size={size} textInsideTip={text} isUsed />
     case SELECTED_ERROR:
-      return <SelectedWell size={size} textInsideTip={text} isError />
+      return <SelectedTip size={size} textInsideTip={text} isError />
   }
 }

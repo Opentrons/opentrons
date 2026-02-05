@@ -18,7 +18,6 @@ import {
   VolumeField,
   WellSelectionField,
 } from '../../PipetteFields'
-import { ExtendedPartialTipField } from '../../PipetteFields/NozzleAndWellSelectionModal/ExtendedPartialTipField'
 
 import type { FormData } from '/protocol-designer/form-types'
 import type { FieldPropsByName } from '../../types'
@@ -63,6 +62,15 @@ export function FirstStepMoveLiquidTools({
       paddingY={SPACING.spacing16}
     >
       <PipetteField {...propsForFields.pipette} />
+      {channels != null && channels !== 1 && !enableAdditionalPartialTip ? (
+        <>
+          <Divider marginY="0" />
+          <PartialTipField
+            {...propsForFields.nozzles}
+            pipetteSpecs={pipettes[String(propsForFields.pipette.value)]?.spec}
+          />
+        </>
+      ) : null}
       <Divider marginY="0" />
       <TiprackField {...tipRack} pipetteId={pipette.value} />
       <Divider marginY="0" />
@@ -106,19 +114,18 @@ export function FirstStepMoveLiquidTools({
             hasFormError={propsForFields.dispense_wells.errorToShow != null}
           />
         ) : null}
-        {enableAdditionalPartialTip && completedSteps ? (
+        {channels != null &&
+        channels !== 1 &&
+        enableAdditionalPartialTip &&
+        completedSteps ? (
           <>
             <Divider marginY="0" />
-            <ExtendedPartialTipField
+            <PartialTipField
               {...propsForFields.nozzles}
               pipetteSpecs={
                 pipettes[String(propsForFields.pipette.value)]?.spec
               }
-              propsForFields={propsForFields}
-              stepType="transfer"
             />
-            <Divider marginY="0" />
-
             <WellSelectionField
               {...propsForFields.aspirate_wells}
               labwareId={
@@ -134,8 +141,6 @@ export function FirstStepMoveLiquidTools({
               }
               hasFormError={propsForFields.aspirate_wells.errorToShow != null}
             />
-            <Divider marginY="0" />
-
             <WellSelectionField
               {...propsForFields.dispense_wells}
               labwareId={
@@ -151,19 +156,6 @@ export function FirstStepMoveLiquidTools({
               }
               hasFormError={propsForFields.dispense_wells.errorToShow != null}
             />
-          </>
-        ) : null}
-        {channels != null && channels !== 1 && completedSteps ? (
-          <>
-            <Divider marginY="0" />
-            {!enableAdditionalPartialTip ? (
-              <PartialTipField
-                {...propsForFields.nozzles}
-                pipetteSpecs={
-                  pipettes[String(propsForFields.pipette.value)]?.spec
-                }
-              />
-            ) : null}
           </>
         ) : null}
       </Flex>
