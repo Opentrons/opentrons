@@ -118,39 +118,6 @@ export function FirstStepMoveLiquidTools({
               stepType={formData.stepName}
             />
             <Divider marginY="0" />
-
-            <WellSelectionField
-              {...propsForFields.aspirate_wells}
-              labwareId={
-                typeof propsForFields.aspirate_labware.value === 'string'
-                  ? propsForFields.aspirate_labware.value
-                  : null
-              }
-              pipetteId={formData.pipette}
-              nozzles={
-                typeof propsForFields.nozzles.value === 'string'
-                  ? propsForFields.nozzles.value
-                  : null
-              }
-              hasFormError={propsForFields.aspirate_wells.errorToShow != null}
-            />
-            <Divider marginY="0" />
-
-            <WellSelectionField
-              {...propsForFields.dispense_wells}
-              labwareId={
-                typeof propsForFields.dispense_labware.value === 'string'
-                  ? propsForFields.dispense_labware.value
-                  : null
-              }
-              pipetteId={formData.pipette}
-              nozzles={
-                typeof propsForFields.nozzles.value === 'string'
-                  ? propsForFields.nozzles.value
-                  : null
-              }
-              hasFormError={propsForFields.dispense_wells.errorToShow != null}
-            />
           </>
         ) : null}
         {channels != null && channels !== 1 && completedSteps ? (

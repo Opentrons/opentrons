@@ -6,6 +6,7 @@ import {
   ALIGN_CENTER,
   Chip,
   COLORS,
+  DEFAULT_TIP_SIZE,
   Flex,
   INACCESSIBLE,
   JUSTIFY_SPACE_BETWEEN,
@@ -14,7 +15,6 @@ import {
   SELECTED_ERROR,
   SELECTED_USED,
   StyledText,
-  TIP,
   USED,
 } from '@opentrons/components'
 import {
@@ -314,7 +314,7 @@ export function SelectTips(
           selectedTipsByIndex={selectedWellsByIndex}
           {...(tipState != null
             ? {
-                tipStatusByWellName,
+                statusByWellName: tipStatusByWellName,
               }
             : {})}
           fill={COLORS.white}
@@ -369,7 +369,10 @@ export function SelectTips(
             labwareIdToHide={selectedTiprackId}
           />
         </div>
-        <SelectionLegend selectionType={TIP} />
+        <SelectionLegend
+          labwareDefinition={labwareDef}
+          size={DEFAULT_TIP_SIZE}
+        />
       </div>
     </div>
   )

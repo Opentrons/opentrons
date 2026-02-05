@@ -6,13 +6,14 @@ import styled from 'styled-components'
 import { COLORS } from '../../../helix-design-system'
 import { LabwareOutline } from './LabwareOutline'
 import { TipStatus } from './Tips'
+import { WellStatus } from './Wells'
 import { STYLE_BY_WELL_CONTENTS } from './Wells/StyledWells'
 import { Well } from './Wells/Well'
 
 import type { CSSProperties } from 'styled-components'
 import type { MemoExoticComponent } from 'react'
 import type { LabwareDefinition, LabwareWell } from '@opentrons/shared-data'
-import type { TipType } from './types'
+import type { TipType, WellType } from './types'
 import type { WellMouseEvent, WellStrokeByName } from './Wells/constants'
 
 export interface StaticLabwareProps {
@@ -34,7 +35,7 @@ export interface StaticLabwareProps {
   /** optional show of labware border, defaulted to true */
   showBorder?: boolean
   borderStroke?: CSSProperties['stroke']
-  tipStatusByWellName?: Record<string, TipType>
+  statusByWellName?: Record<string, TipType | WellType>
   handleClickWell?: (wellName: string) => void
   selectedTipsByIndex?: Record<string, number>
 }
@@ -75,7 +76,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
     showRadius = true,
     wellStroke = {},
     showBorder = true,
-    tipStatusByWellName,
+    statusByWellName,
     handleClickWell,
     selectedTipsByIndex,
     borderStroke,
@@ -107,7 +108,7 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                 well.shape === 'circular' ? well.diameter : well.yDimension
               return (
                 <Fragment key={wellName}>
-                  {tipStatusByWellName == null ? (
+                  {statusByWellName == null ? (
                     <>
                       <Well
                         wellName={wellName}
@@ -137,16 +138,24 @@ export function StaticLabwareComponent(props: StaticLabwareProps): JSX.Element {
                       }
                       onClick={() => handleClickWell?.(wellName)} // TODO: add select logic
                     >
-                      <TipStatus
-                        type={tipStatusByWellName[wellName]}
-                        text={
-                          selectedTipsByIndex != null &&
-                          wellName in selectedTipsByIndex
-                            ? (selectedTipsByIndex[wellName] + 1).toString()
-                            : undefined
-                        }
-                        size={`${wellWidth}px`} // wellWidth for tips will equal wellHeight, so using width here is arbitrary
-                      />
+                      {isTiprack ? (
+                        <TipStatus
+                          labwareDefinition={definition}
+                          type={statusByWellName[wellName] as TipType}
+                          text={
+                            selectedTipsByIndex != null &&
+                            wellName in selectedTipsByIndex
+                              ? (selectedTipsByIndex[wellName] + 1).toString()
+                              : undefined
+                          }
+                          size={`${wellWidth}px`} // wellWidth for tips will equal wellHeight, so using width here is arbitrary
+                        />
+                      ) : (
+                        <WellStatus
+                          labwareDefinition={definition}
+                          type={statusByWellName[wellName] as WellType}
+                        />
+                      )}
                     </svg>
                   )}
                 </Fragment>

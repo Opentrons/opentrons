@@ -294,7 +294,7 @@ export const getIsSafePipetteMovement = (args: {
   labwareId: string
   wellLocationOffset?: Point
   wellTargetName?: string
-  primaryNozzle?: string
+  primaryNozzle?: PrimaryNozzleConfigurationStyle
   nozzleConfiguration?: NozzleConfigurationStyle
 }): boolean => {
   const {

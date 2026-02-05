@@ -22,6 +22,7 @@ import type {
   CoordinateTuple,
   NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
 import type { AllTemporalPropertiesForTimelineFrame } from '/protocol-designer/step-forms'
@@ -57,7 +58,7 @@ export function PipetteShadow(props: {
   inaccessibleReason: InaccessibleReason | null
   isHoveredWellSelected: boolean
   hasPickupsRemaining: boolean
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   robotType: RobotType
   enclosingViewbox: string | null
   nozzles: NozzleConfigurationStyle

@@ -76,7 +76,7 @@ export function FirstStepMixTools({
         )
       ) : null}
 
-      {completedSteps ? (
+      {completedSteps && !enableAdditionalPartialTip ? (
         <>
           <WellSelectionField
             {...propsForFields.wells}

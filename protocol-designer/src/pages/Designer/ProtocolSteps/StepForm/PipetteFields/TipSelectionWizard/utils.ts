@@ -27,6 +27,7 @@ import type {
   NozzleConfigurationStyle,
   PipetteChannels,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   InvariantContext,
@@ -79,7 +80,7 @@ export const getHoveredOffsetFromWell = (args: {
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   wellName: string | null
   pipetteSpec: PipetteV2Specs
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
 }): { x: number; y: number } => {
   const {
     selectedTiprackId,
@@ -201,7 +202,7 @@ export const getValidTiprackIds = (args: {
   nozzles: NozzleConfigurationStyle
   channels: PipetteChannels
   numPickups: number
-  primaryNozzle: string
+  primaryNozzle: PrimaryNozzleConfigurationStyle
   invariantContext: InvariantContext
   robotState: TimelineFrame | null
   tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
