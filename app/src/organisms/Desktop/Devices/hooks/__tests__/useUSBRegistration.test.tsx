@@ -4,7 +4,11 @@ import { legacy_createStore } from 'redux'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { when } from 'vitest-when'
 
-import { createAuthorization, createRegistration } from '@opentrons/api-client'
+import {
+  createAuthorization,
+  createRegistration,
+  HostConfig,
+} from '@opentrons/api-client'
 import { useHost } from '@opentrons/react-api-client'
 
 import { getConfig } from '/app/redux/config'
@@ -15,24 +19,25 @@ import { useUSBRegistration } from '../useUSBRegistration'
 
 import type { Store } from 'redux'
 import type { FunctionComponent, ReactNode } from 'react'
-import type { DiscoveredRobot } from '/app/redux/discovery/types'
+import type { DiscoveryClientRobotAddress } from '/app/redux/discovery/types'
 import type { State } from '/app/redux/types'
 
 vi.mock('@opentrons/react-api-client')
 vi.mock('@opentrons/api-client')
 vi.mock('/app/redux/config')
-vi.mock('/app/redux/discovery', async importOriginal => {
-  const actual = await importOriginal<typeof import('/app/redux/discovery')>()
-  return {
-    ...actual,
-    getRobotAddressesByName: vi.fn(),
-  }
-})
-
-const MOCK_HOST = { hostname: '127.0.0.1' }
+vi.mock('/app/redux/discovery')
 
 describe('useUSBRegistration', () => {
-  const mockState = {} as any as State
+  const mockHost = { hostname: '127.0.0.1' } as any as HostConfig
+  const mockState = {} as State
+  const mockStore: Store<any> = legacy_createStore(vi.fn(), mockState)
+  const wrapper: FunctionComponent<{ children: ReactNode }> = ({
+    children,
+  }) => <Provider store={mockStore}>{children}</Provider>
+
+  afterEach(() => {
+    vi.resetAllMocks()
+  })
 
   it('does not call createRegistration or createAuthorization when host is null and robot is null', () => {
     when(vi.mocked(useHost)).calledWith().thenReturn(null)
@@ -40,67 +45,70 @@ describe('useUSBRegistration', () => {
       .calledWith(mockState)
       .thenReturn({ userInfo: { userId: 'test-user-id' } } as any)
 
-    renderHook(() => useUSBRegistration(null))
+    renderHook(() => useUSBRegistration(null), { wrapper })
 
     expect(createRegistration).not.toHaveBeenCalled()
     expect(createAuthorization).not.toHaveBeenCalled()
   })
 
   it('calls createAuthorization with registration result when host and robot are set and not USB', async () => {
+    const userId = 'test-user-id'
     const registrationData = { token: 'registration-token' }
-    when(vi.mocked(useHost))
-      .calledWith()
-      .thenReturn(MOCK_HOST as any)
+    vi.mocked(getRobotAddressesByName).test_prop = 'MAX MAX'
+    when(vi.mocked(useHost)).calledWith().thenReturn(mockHost)
     when(vi.mocked(getConfig))
       .calledWith(mockState)
-      .thenReturn({ userInfo: { userId: 'test-user-id' } } as any)
+      .thenReturn({ userInfo: { userId } } as any)
     when(vi.mocked(getRobotAddressesByName))
       .calledWith(mockState, mockConnectableRobot.name)
-      .thenReturn([])
+      .thenReturn([{ ip: '192.168.1.123' } as DiscoveryClientRobotAddress])
     when(vi.mocked(createRegistration))
-      .calledWith(MOCK_HOST, expect.anything())
+      .calledWith(mockHost, {
+        agent: 'com.opentrons.app',
+        agentId: userId,
+        subject: expect.anything(),
+      })
       .thenResolve({ data: registrationData } as any)
     when(vi.mocked(createAuthorization))
-      .calledWith(MOCK_HOST, registrationData)
+      .calledWith(mockHost, registrationData)
       .thenResolve({} as any)
 
-    renderHook(() =>
-      useUSBRegistration(mockConnectableRobot as DiscoveredRobot)
-    )
+    renderHook(() => useUSBRegistration(mockConnectableRobot), { wrapper })
 
     await waitFor(() => {
       expect(createAuthorization).toHaveBeenCalledWith(
-        MOCK_HOST,
+        mockHost,
         registrationData
       )
     })
   })
 
   it('calls createAuthorization with registration result when host and robot are set and USB connected', async () => {
+    const userId = 'test-user-id'
     const registrationData = { token: 'usb-registration-token' }
-    when(vi.mocked(useHost))
-      .calledWith()
-      .thenReturn(MOCK_HOST as any)
+    when(vi.mocked(useHost)).calledWith().thenReturn(mockHost)
     when(vi.mocked(getConfig))
       .calledWith(mockState)
-      .thenReturn({ userInfo: { userId: 'test-user-id' } } as any)
+      .thenReturn({ userInfo: { userId } } as any)
     when(vi.mocked(getRobotAddressesByName))
       .calledWith(mockState, mockConnectableRobot.name)
-      .thenReturn([{ ip: OPENTRONS_USB, port: 31950, seen: true } as any])
+      .thenReturn([{ ip: OPENTRONS_USB } as DiscoveryClientRobotAddress])
     when(vi.mocked(createRegistration))
-      .calledWith(MOCK_HOST, expect.anything())
+      .calledWith(mockHost, {
+        agent: 'com.opentrons.app.usb',
+        agentId: userId,
+        subject: expect.anything(),
+      })
       .thenResolve({ data: registrationData } as any)
     when(vi.mocked(createAuthorization))
-      .calledWith(MOCK_HOST, registrationData)
+      .calledWith(mockHost, registrationData)
       .thenResolve({} as any)
 
-    renderHook(() =>
-      useUSBRegistration(mockConnectableRobot as DiscoveredRobot)
-    )
+    renderHook(() => useUSBRegistration(mockConnectableRobot), { wrapper })
 
     await waitFor(() => {
       expect(createAuthorization).toHaveBeenCalledWith(
-        MOCK_HOST,
+        mockHost,
         registrationData
       )
     })
