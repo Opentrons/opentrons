@@ -74,7 +74,7 @@
   gap: var(--spacing-8);
 }
 
-/* stylelint-disable */
+/* stylelint-disable -- no other way to wrap long words without hard-wrapping all text */
 .individual_command_text {
   overflow-wrap: break-word;
   white-space: normal;
