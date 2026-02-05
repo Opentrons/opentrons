@@ -2,6 +2,7 @@ import intersection from 'lodash/intersection'
 import uuidv1 from 'uuid/v4'
 
 import {
+  ALL,
   getAllDefinitions,
   getLabwareDefURI,
   orderWells,
@@ -438,7 +439,7 @@ export function generateQuickTransferArgs(
 
   let nozzles = null
   if (pipetteEntity.spec.channels === 96) {
-    nozzles = 'ALL' as NozzleConfigurationStyle
+    nozzles = ALL as NozzleConfigurationStyle
   }
   const touchTipAfterDispenseOffsetMmFromTop =
     quickTransferState.touchTipDispense ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
@@ -447,7 +448,7 @@ export function generateQuickTransferArgs(
     quickTransferState.touchTipAspirate ?? DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP
 
   const primaryNozzle = getDefaultPrimaryNozzle({
-    nozzles: nozzles ?? 'ALL',
+    nozzles: nozzles ?? ALL,
     channels: pipetteEntity.spec.channels,
   })
   const commonFields: SharedTransferLikeArgs = {
