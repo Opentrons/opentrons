@@ -21,9 +21,7 @@ def detect_robot_status(ip: str) -> None:
     """
     slack_bot: slack.Slack = run_helpers.set_up_slack()
 
-    print("inside detect_robot_status")
-
-    past_runs: deque = deque(maxlen=10)
+    past_run_statuses: deque = deque(maxlen=10)
 
     # Process will be constantly running
     while True:
@@ -41,7 +39,7 @@ def detect_robot_status(ip: str) -> None:
             running_robots=running_robots,
             completed_robots=completed_robots,
             on_robot=True,
-            past_run_status=past_runs,
+            past_run_status=past_run_statuses,
         )
 
 
