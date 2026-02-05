@@ -55,6 +55,7 @@ stages:
               displayColor: '#7332a8'
           liquidClasses: []
           protocolId: '{protocol_id}'
+          commandAnnotations: []
 
   - name: Execute a setup command
     request:

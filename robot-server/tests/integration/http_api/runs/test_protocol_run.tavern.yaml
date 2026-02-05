@@ -48,6 +48,7 @@ stages:
           protocolId: '{protocol_id}'
           liquids: []
           liquidClasses: []
+          commandAnnotations: []
       save:
         json:
           original_run_data: data
@@ -255,6 +256,7 @@ stages:
           pipettes: []
           modules: []
           protocolId: '{protocol_id}'
+          commandAnnotations: []
           # Changed in this PATCH:
           current: False
           # Changed when we POSTed a play action:
