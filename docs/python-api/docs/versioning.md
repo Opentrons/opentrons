@@ -103,15 +103,15 @@ This table lists the correspondence between Protocol API versions and robot soft
 
 ### Version 2.28
 
-- Return tips to the tip rack with a pipette that's configured to use [partial tip pickup](../pipettes/partial-tip-pickup.md).
+- Return tips to the tip rack with a pipette that's configured to use [partial tip pickup](pipettes/partial-tip-pickup.md).
 - Use the [`set_empty()`][opentrons.protocol_api.labware.Labware.set_empty] method to label a tip rack on the deck as `empty`, letting the pipette return tips to additional tip racks. 
 - Adds additional tools to customize pipette blowouts: 
-    - an optional, absolute `flow_rate`.
+    - an absolute `flow_rate`.
     - a blowout position for a liquid class transfer.
-- Allows simplified editing of liquid class tip positions, including aspirate, dispense, and blowout positions.
-- Control how quickly the Thermocycler Module's block heats or cools with the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerModuleContext.set_block_temperature] or the [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerModuleContext.start_set_block_temperature] methods' optional `ramp_rate` parameter.
+- Allows simplified [editing](liquid-classes.md#customizing-liquid-classes) of liquid class tip positions, including aspirate, dispense, and blowout positions.
+- Control how quickly the Thermocycler Module's block heats or cools with the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.set_block_temperature] and [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerContext.start_set_block_temperature] methods' optional `ramp_rate` parameter.
 - Use the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method's optional `alternate_drop_location` argument to vary the tip drop location in a waste container, preventing tips from piling up in a single location.
-- In protocols using API version 2.28, the API raises an error when calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] in large spaces, like reservoirs and large well plates. 
+- In protocols using API version 2.28, the API raises an error when calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] in large spaces, like reservoirs and large well plates.
 
 ### Version 2.27
 

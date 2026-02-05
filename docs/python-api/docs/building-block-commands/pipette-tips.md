@@ -121,7 +121,7 @@ pipette.drop_tip(
 ```
 *New in version 2.28*
 
-In the example above, the pipette will drop the first and second tips in slightly different locations in the waste chute. 
+In the example above, the pipette will drop each tip in a slightly different locations in the waste chute. 
 
 ## Returning a tip
 
