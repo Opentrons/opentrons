@@ -104,7 +104,7 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
                   <div className={styles.tip_details_volume}>
                     <Tag
                       text={t('well_volume', {
-                        volume: tipCurrentVolume.toString(),
+                        volume: tipCurrentVolume.toFixed(1),
                       })}
                       type="flex"
                     />
@@ -114,36 +114,38 @@ export function WellContainer(props: WellContainerProps): JSX.Element {
                   <div className={styles.well_details_volume}>
                     <Tag
                       text={t('well_volume', {
-                        volume: totalVolumeInWell.toString(),
+                        volume: totalVolumeInWell.toFixed(1),
                       })}
                       type="flex"
                     />
                   </div>
                 ) : null}
-                <div className={styles.svg_container}>
-                  <svg
-                    viewBox={`0 0 ${WELL_VIEWBOX.width} ${WELL_VIEWBOX.height}`}
-                    className={styles.well_and_tip_svg}
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <WellSvg
-                      volume={totalVolumeInWell}
-                      maxVolume={labwareWellMaxVolume}
-                      color={wellColor}
-                      setIsHovered={setIsWellHovered}
-                      isHovered={isWellHovered}
-                    />
-                    <TipSvg
-                      volume={tipCurrentVolume}
-                      maxVolume={tipMaxVolume}
-                      xOffset={roundedXPositionSvg}
-                      tipBottomY={roundedTipBottomY}
-                      color={tipColor}
-                      setIsHovered={setIsTipHovered}
-                      isHovered={isTipHovered}
-                      airGapVolume={airGapVolume}
-                    />
-                  </svg>
+                <div className={styles.svg_clip_container}>
+                  <div className={styles.svg_container}>
+                    <svg
+                      viewBox={`0 0 ${WELL_VIEWBOX.width} ${WELL_VIEWBOX.height}`}
+                      className={styles.well_and_tip_svg}
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <WellSvg
+                        volume={totalVolumeInWell}
+                        maxVolume={labwareWellMaxVolume}
+                        color={wellColor}
+                        setIsHovered={setIsWellHovered}
+                        isHovered={isWellHovered}
+                      />
+                      <TipSvg
+                        volume={tipCurrentVolume}
+                        maxVolume={tipMaxVolume}
+                        xOffset={roundedXPositionSvg}
+                        tipBottomY={roundedTipBottomY}
+                        color={tipColor}
+                        setIsHovered={setIsTipHovered}
+                        isHovered={isTipHovered}
+                        airGapVolume={airGapVolume}
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
               {labwareDepth !== null && (
