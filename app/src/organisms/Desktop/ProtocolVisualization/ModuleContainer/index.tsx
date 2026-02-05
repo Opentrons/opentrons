@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 
-import { Chip, StyledText } from '@opentrons/components'
+import { Chip, RobotInfoLabel, StyledText } from '@opentrons/components'
 import {
   ABSORBANCE_READER_TYPE,
   FLEX_STACKER_MODULE_TYPE,
@@ -21,12 +21,14 @@ interface ModuleContainerProps {
   moduleId: string
   moduleEntities: ModuleEntities
   moduleRobotState: RobotState['modules']
+  slotId: string
 }
 
 export function ModuleContainer({
   moduleId,
   moduleEntities,
   moduleRobotState,
+  slotId,
 }: ModuleContainerProps): JSX.Element {
   const { t } = useTranslation('protocol_visualization')
   const { model } = moduleEntities[moduleId]
@@ -221,9 +223,11 @@ export function ModuleContainer({
         `ran into the default moduleContainer moduleState with module ${moduleDisplayName}`
       )
   }
+
   return (
     <div className={styles.container}>
       <div className={styles.main_content}>
+        <RobotInfoLabel deckLabel={slotId} />
         <StyledText desktopStyle="bodyDefaultSemiBold">
           {moduleDisplayName}
         </StyledText>
