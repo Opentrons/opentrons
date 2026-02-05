@@ -77,7 +77,7 @@ export function NozzleAndWellSelectionModal(
         )
 
       case 2:
-        return <WellSelector {...wellSelectorBaseProps} stepType={'dispense'} />
+        return <WellSelector {...wellSelectorBaseProps} stepType="dispense" />
 
       default:
         console.warn(`no current component for step index ${currentStepIndex}`)

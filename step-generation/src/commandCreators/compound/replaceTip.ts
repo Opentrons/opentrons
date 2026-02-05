@@ -1,5 +1,4 @@
 import {
-  A1_NOZZLE,
   ALL,
   COLUMN,
   FLEX_ROBOT_TYPE,
@@ -12,6 +11,7 @@ import { getNextTiprack } from '../../robotStateSelectors'
 import {
   curryCommandCreator,
   curryWithoutPython,
+  getDefaultPrimaryNozzle,
   getIsHeaterShakerEastWestMultiChannelPipette,
   getIsHeaterShakerEastWestWithLatchOpen,
   getLabwareSlot,
@@ -208,27 +208,36 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     }
   }
 
-  const primaryNozzle = args.primaryNozzle ?? A1_NOZZLE
-
   const curryCommand = isFromMixCommand
     ? curryCommandCreator
     : curryWithoutPython
-  const configureNozzleLayoutCommand: CurriedCommandCreator[] =
-    //  only emit the command if previous nozzle state and tiprack state are different
-    //  only check for the 96-channel since we do not support 8-channel partial tip yet
+
+  const configureNozzleLayoutCommand: CurriedCommandCreator[] = []
+
+  // only emit the command if previous nozzle state and tiprack state are different
+  // only check for the 96-channel since we do not support 8-channel partial tip yet
+  if (
     channels !== 1 &&
     args.nozzles != null &&
     (args.nozzles !== stateNozzles || nextTiprack.tiprackId !== stateTiprack)
-      ? [
-          curryCommandCreator(configureNozzleLayout, {
-            configurationParams: {
-              primaryNozzle,
-              style: args.nozzles,
-            },
-            pipetteId: args.pipette,
-          }),
-        ]
-      : []
+  ) {
+    const primaryNozzle =
+      args.primaryNozzle ??
+      getDefaultPrimaryNozzle({
+        nozzles: args.nozzles,
+        channels,
+      })
+
+    configureNozzleLayoutCommand.push(
+      curryCommandCreator(configureNozzleLayout, {
+        configurationParams: {
+          primaryNozzle,
+          style: args.nozzles,
+        },
+        pipetteId: args.pipette,
+      })
+    )
+  }
 
   const tipTrackingOption = tipSelectionArgs ? MANUAL : AUTOMATIC
 
