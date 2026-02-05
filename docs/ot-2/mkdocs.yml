@@ -28,7 +28,12 @@ nav:
       - Labware Concepts: labware/concepts.md
       - Labware Types: labware/types.md
       - Labware Definitions: labware/definitions.md
-  - Software: software.md
+  - Opentrons App:
+      - Opentrons App: opentrons-app/index.md
+      - Installing the App: opentrons-app/installation.md
+      - Importing Protocols: opentrons-app/protocol-import.md
+      - Running Protocols: opentrons-app/protocol-run.md
+      - App Features Reference: opentrons-app/features.md
   - Maintenance:
       - Maintenance: maintenance/index.md
       - Cleaning: maintenance/cleaning.md
