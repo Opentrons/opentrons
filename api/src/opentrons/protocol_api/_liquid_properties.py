@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 from numpy import interp
+from pydantic import ValidationError
 
 from opentrons_shared_data.liquid_classes.liquid_class_definition import (
     AspirateProperties as SharedDataAspirateProperties,
@@ -696,15 +697,11 @@ def _ensure_validated_tip_position(
     if isinstance(tip_position, TipPosition):
         return tip_position
     elif isinstance(tip_position, dict):
-        # Use setters of TipPosition so we can get the validators for free
-        _pos = TipPosition(
-            _position_reference=PositionReference.WELL_TOP,
-            _offset=Coordinate(x=0, y=0, z=0),
-        )
-        _pos.position_reference = tip_position.get("position_reference")
-        offset = tip_position.get("offset")
-        _pos.offset = Coordinate(x=offset["x"], y=offset["y"], z=offset["z"])
-        return _pos
+        try:
+            pos = SharedDataTipPosition.model_validate(tip_position)
+        except ValidationError as e:
+            raise ValueError(f"Invalid tip position: {e}") from e
+        return _build_tip_position(pos)
     else:
         raise TypeError(
             f"Tip position should be an instance of `TipPosition` or of type `TipPositionDict`, but got {tip_position}"

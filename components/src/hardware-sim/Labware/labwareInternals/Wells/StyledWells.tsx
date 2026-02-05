@@ -1,11 +1,11 @@
 import { memo } from 'react'
 
-import { COLORS } from '../../../helix-design-system'
+import { COLORS } from '../../../../helix-design-system'
 import { Well } from './Well'
 
 import type { CSSProperties, MemoExoticComponent } from 'react'
 import type { LabwareDefinition } from '@opentrons/shared-data'
-import type { WellGroup } from './types'
+import type { WellGroup } from './constants'
 
 type WellContents =
   | 'tipPresent'

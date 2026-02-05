@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -31,6 +33,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -45,6 +48,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -59,6 +63,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -73,6 +78,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadPipette",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -92,6 +98,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -106,6 +113,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -120,6 +128,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -134,6 +143,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -148,6 +158,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -162,6 +173,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -176,6 +188,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "captureImage",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -199,6 +212,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -213,6 +227,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -227,6 +242,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -241,6 +257,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -255,6 +272,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -269,6 +287,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -283,6 +302,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "captureImage",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -307,6 +327,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -321,6 +342,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -335,6 +357,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -349,6 +372,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -363,6 +387,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -377,6 +402,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -391,6 +417,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -405,6 +432,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "captureImage",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -431,6 +459,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -445,6 +474,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -459,6 +489,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -473,6 +504,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -487,6 +519,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -501,6 +534,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -515,6 +549,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -529,6 +564,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -541,6 +577,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "captureImage",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -564,6 +601,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -578,6 +616,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -592,6 +631,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -606,6 +646,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -620,6 +661,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "comment",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",

@@ -5,7 +5,7 @@ import '@testing-library/jest-dom/vitest'
 
 import { fixture12Trough as _fixture12Trough } from '@opentrons/shared-data'
 
-import { WELL_LABEL_OPTIONS } from '../../LabwareRender'
+import { WELL_LABEL_OPTIONS } from '../constants'
 import { WellLabels } from '../WellLabels'
 
 import type { LabwareDefinition } from '@opentrons/shared-data'

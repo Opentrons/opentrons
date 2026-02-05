@@ -6,7 +6,7 @@ marks:
 stages:
   - name: POST /system/register
     request:
-      url: '{host:s}:{run_server.port:d}/system/register'
+      url: '{run_server.base_url}/system/register'
       method: POST
       params:
         agent: 'agent-system-authorize-test'
@@ -21,7 +21,7 @@ stages:
           issued_token: 'token'
   - name: POST /system/authorize with invalid token
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: POST
       headers:
         authenticationBearer: 'not-a-valid-token'
@@ -29,7 +29,7 @@ stages:
       status_code: 401
   - name: POST /system/authorize with valid token
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: POST
       headers:
         authenticationBearer: '{issued_token:s}'
@@ -42,7 +42,7 @@ stages:
           auth_token: 'token'
   - name: POST /system/authorize with the same token, get a new auth token
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: POST
       headers:
         authenticationBearer: '{issued_token:s}'
@@ -56,7 +56,7 @@ stages:
         token: !anystr
   - name: GET /system/authorize with invalid token fails
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: GET
       headers:
         authenticationBearer: '{issued_token:s}'
@@ -64,7 +64,7 @@ stages:
       status_code: 403
   - name: GET /system/authorize with valid token fails
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: GET
       headers:
         authenticationBearer: '{auth_token:s}'
@@ -78,7 +78,7 @@ marks:
 stages:
   - name: Register User
     request:
-      url: '{host:s}:{run_server.port:d}/system/register'
+      url: '{run_server.base_url}/system/register'
       method: POST
       params:
         agent: 'get-system-connected-test'
@@ -93,7 +93,7 @@ stages:
           issued_token: 'token'
   - name: Get empty connection list
     request:
-      url: '{host:s}:{run_server.port:d}/system/connected'
+      url: '{run_server.base_url}/system/connected'
       method: GET
     response:
       status_code: 200
@@ -101,7 +101,7 @@ stages:
         connections: []
   - name: Authorize User
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: POST
       headers:
         authenticationBearer: '{issued_token:s}'
@@ -109,7 +109,7 @@ stages:
       status_code: 201
   - name: Get single-entry connection list
     request:
-      url: '{host:s}:{run_server.port:d}/system/connected'
+      url: '{run_server.base_url}/system/connected'
       method: GET
     response:
       status_code: 200
@@ -120,7 +120,7 @@ stages:
             agentId: 'id1'
   - name: Register second user
     request:
-      url: '{host:s}:{run_server.port:d}/system/register'
+      url: '{run_server.base_url}/system/register'
       method: POST
       params:
         agent: 'get-system-connected-test'
@@ -135,7 +135,7 @@ stages:
           second_token: 'token'
   - name: Authorize second user
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: POST
       headers:
         authenticationBearer: '{second_token:s}'
@@ -143,7 +143,7 @@ stages:
       status_code: 201
   - name: Get two-entry connection list
     request:
-      url: '{host:s}:{run_server.port:d}/system/connected'
+      url: '{run_server.base_url}/system/connected'
       method: GET
     response:
       status_code: 200
@@ -159,7 +159,7 @@ stages:
             agentId: 'id1'
   - name: Re-authorize first user
     request:
-      url: '{host:s}:{run_server.port:d}/system/authorize'
+      url: '{run_server.base_url}/system/authorize'
       method: POST
       headers:
         authenticationBearer: '{issued_token:s}'
@@ -167,7 +167,7 @@ stages:
       status_code: 201
   - name: Get two-entry connection list
     request:
-      url: '{host:s}:{run_server.port:d}/system/connected'
+      url: '{run_server.base_url}/system/connected'
       method: GET
     response:
       status_code: 200

@@ -5,7 +5,7 @@ from opentrons.protocol_api import (
     Well,
     InstrumentContext,
 )
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers
 from opentrons.protocol_api.module_contexts import (
     AbsorbanceReaderContext,
     HeaterShakerContext,
@@ -32,8 +32,8 @@ def add_parameters(parameters: ParameterContext) -> None:
         minimum=1,
         maximum=4,
     )
-    helpers.create_channel_parameter(parameters)
-    helpers.create_plate_reader_compatible_labware_parameter(parameters)
+    run_helpers.create_channel_parameter(parameters)
+    run_helpers.create_plate_reader_compatible_labware_parameter(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
@@ -43,12 +43,14 @@ def run(protocol: ProtocolContext) -> None:
     channels = protocol.params.channels  # type: ignore [attr-defined]
     plate_type = protocol.params.labware_plate_reader_compatible  # type: ignore [attr-defined]
 
-    helpers.comment_protocol_version(protocol, "01")
+    run_helpers.comment_protocol_version(protocol, "01")
     # Plate Reader
     plate_reader: AbsorbanceReaderContext = protocol.load_module(
-        helpers.abs_mod_str, "A3"
+        run_helpers.abs_mod_str, "A3"
     )  # type: ignore[assignment]
-    hs: HeaterShakerContext = protocol.load_module(helpers.hs_str, "A1")  # type: ignore[assignment]
+    hs: HeaterShakerContext = protocol.load_module(
+        run_helpers.hs_str, "A1"
+    )  # type: ignore[assignment]
     # Load Plates based off of number_of_plates parameter
     available_deck_slots = ["D1", "D2", "C1", "B1"]
     sample_plate_list = []
@@ -106,7 +108,7 @@ def run(protocol: ProtocolContext) -> None:
         """Mix Tartrazine."""
         # Mix step is needed to ensure tartrazine does not settle between plates.
         pipette.pick_up_tip()
-        # top_of_tartrazine = helpers.find_liquid_height(pipette, well_to_probe)
+        # top_of_tartrazine = run_helpers.find_liquid_height(pipette, well_to_probe)
         top_of_tartrazine = 1
         for i in range(20):
             p50.aspirate(1, well_to_probe.bottom(z=1))
@@ -118,7 +120,9 @@ def run(protocol: ProtocolContext) -> None:
         "Tartrazine": [{"well": tartrazine_well, "volume": needed_tartrazine}],
         "Water": [{"well": water_wells, "volume": water_max_vol}],
     }
-    helpers.find_liquid_height_of_loaded_liquids(protocol, liquid_vols_and_wells, p50)
+    run_helpers.find_liquid_height_of_loaded_liquids(
+        protocol, liquid_vols_and_wells, p50
+    )
     tip_count = 1 * p50.active_channels  # number of 50 ul tip uses.
     p50.reset_tipracks()
     i = 0
@@ -157,13 +161,13 @@ def run(protocol: ProtocolContext) -> None:
             p1000.blow_out(well.top())
             vol += 190 * p1000.active_channels
             # Probe to find liquid height of tartrazine to ensure correct amount is aspirated
-            # height = helpers.find_liquid_height(p50, tartrazine_well)
+            # height = run_helpers.find_liquid_height(p50, tartrazine_well)
             height = 1
             if height <= 0.0:
                 # If a negative tartrazine height is found,
                 # the protocol will pause, prompt a refill, and reprobe.
                 protocol.pause("Fill tartrazine")
-                # height = helpers.find_liquid_height(p50, tartrazine_well)
+                # height = run_helpers.find_liquid_height(p50, tartrazine_well)
             p50.aspirate(10, tartrazine_well.bottom(z=height), rate=0.15)
             p50.air_gap(5)
             p50.dispense(5, well.top())
@@ -182,8 +186,8 @@ def run(protocol: ProtocolContext) -> None:
                 p1000.reset_tipracks()
                 water_tip_count = 0
         # Move labware to heater shaker to be mixed
-        helpers.move_labware_to_hs(protocol, sample_plate, hs, hs)
-        helpers.set_hs_speed(protocol, hs, 1500, 2.0, True)
+        run_helpers.move_labware_to_hs(protocol, sample_plate, hs, hs)
+        run_helpers.set_hs_speed(protocol, hs, 1500, 2.0, True)
         hs.open_labware_latch()
         # Initialize plate reader
         plate_reader.close_lid()

@@ -16,7 +16,7 @@ from opentrons.protocol_api.module_contexts import (
 )
 
 import numpy as np
-from abr_testing.protocols import helpers
+from abr_testing.protocols.helpers import run_helpers, background_helpers
 from typing import Dict
 
 metadata = {
@@ -61,24 +61,27 @@ wash_volume_tracker = 0.0
 # Start protocol
 def add_parameters(parameters: ParameterContext) -> None:
     """Parameters."""
-    helpers.create_dot_bottom_parameter(parameters)
-    helpers.create_single_pipette_mount_parameter(parameters)
-    helpers.create_hs_speed_parameter(parameters)
-    helpers.create_deactivate_modules_parameter(parameters)
-    helpers.create_plate_reader_compatible_labware_parameter(parameters)
+    run_helpers.create_dot_bottom_parameter(parameters)
+    run_helpers.create_single_pipette_mount_parameter(parameters)
+    run_helpers.create_hs_speed_parameter(parameters)
+    run_helpers.create_deactivate_modules_parameter(parameters)
+    run_helpers.create_plate_reader_compatible_labware_parameter(parameters)
     parameters.add_bool(
         variable_name="plate_orientation",
         display_name="Hellma Plate Orientation",
         default=True,
         description="If hellma plate is rotated, set to True.",
     )
-    helpers.create_probe_liquid_height_parameter(parameters)
-    helpers.create_meniscus_z_parameter(parameters)
-    helpers.create_error_capture_duration_duration(parameters)
+    run_helpers.create_probe_liquid_height_parameter(parameters)
+    run_helpers.create_meniscus_z_parameter(parameters)
+    run_helpers.create_error_capture_duration_duration(parameters)
 
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
+
     protocol.capture_image(filename="start_of_run")
 
     dry_run = False
@@ -100,10 +103,10 @@ def run(protocol: ProtocolContext) -> None:
     probe_liquid_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]
     meniscus_z = protocol.params.meniscus_z  # type: ignore[attr-defined]
     if not protocol.is_simulating():
-        slack_bot = helpers.set_up_slack()
+        slack_bot = run_helpers.set_up_slack()
         slack_bot.send_run_started_message(metadata["protocolName"])
 
-    helpers.comment_protocol_version(protocol, "05")
+    run_helpers.comment_protocol_version(protocol, "05")
     plate_name_str = "hellma_plate_" + str(plate_orientation)
 
     # Protocol Parameters
@@ -123,28 +126,28 @@ def run(protocol: ProtocolContext) -> None:
     bead_vol = 20.0
 
     h_s: HeaterShakerContext = protocol.load_module(
-        helpers.hs_str, "D1"
+        run_helpers.hs_str, "D1"
     )  # type: ignore[assignment]
-    sample_plate, h_s_adapter = helpers.load_hs_adapter_and_labware(
+    sample_plate, h_s_adapter = run_helpers.load_hs_adapter_and_labware(
         deepwell_type, h_s, "Sample Plate"
     )
     h_s.close_labware_latch()
     temp: TemperatureModuleContext = protocol.load_module(
-        helpers.temp_str, "D3"
+        run_helpers.temp_str, "D3"
     )  # type: ignore[assignment]
-    elutionplate, temp_adapter = helpers.load_temp_adapter_and_labware(
+    elutionplate, temp_adapter = run_helpers.load_temp_adapter_and_labware(
         "opentrons_96_wellplate_200ul_pcr_full_skirt", temp, "Elution Plate"
     )
     temp_task = temp.start_set_temperature(4)
     magblock: MagneticBlockContext = protocol.load_module(
-        helpers.mag_str, "C1"
+        run_helpers.mag_str, "C1"
     )  # type: ignore[assignment]
     waste_reservoir = protocol.load_labware(
         "opentrons_tough_1_reservoir_300ml", "C3", "Liquid Waste"
     )
     # Plate Reader
     plate_reader: AbsorbanceReaderContext = protocol.load_module(
-        helpers.abs_mod_str, "A3"
+        run_helpers.abs_mod_str, "A3"
     )  # type: ignore[assignment]
     hellma_plate = protocol.load_labware(plate_type, "B3")
     waste = waste_reservoir.wells()[0].top()
@@ -229,7 +232,7 @@ def run(protocol: ProtocolContext) -> None:
             m1000.drop_tip(tips_sn[8 * i]) if TIP_TRASH else m1000.return_tip()
         m1000.flow_rate.aspirate = 300
         # Move Plate From Magnet to H-S
-        helpers.move_labware_to_hs(protocol, sample_plate, h_s, h_s_adapter)
+        run_helpers.move_labware_to_hs(protocol, sample_plate, h_s, h_s_adapter)
 
     def bead_mixing(
         well: Well, pip: InstrumentContext, mvol: float, reps: int = 8
@@ -363,7 +366,7 @@ def run(protocol: ProtocolContext) -> None:
                     m1000.blow_out(cells_m[i].meniscus(z=1, target="end"))
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
-        helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, lysis_time, True)
+        run_helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, lysis_time, True)
 
     def bind() -> None:
         """Bind.
@@ -398,10 +401,10 @@ def run(protocol: ProtocolContext) -> None:
             m1000.prepare_to_aspirate()
             m1000.air_gap(10)
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
-        helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, bind_time, True)
+        run_helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, bind_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        helpers.move_labware_from_hs_to_destination(
+        run_helpers.move_labware_from_hs_to_destination(
             protocol, sample_plate, h_s, magblock
         )
 
@@ -443,10 +446,10 @@ def run(protocol: ProtocolContext) -> None:
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
         # Shake for 5 minutes to mix wash with beads
-        helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, wash_time, True)
+        run_helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, wash_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        helpers.move_labware_from_hs_to_destination(
+        run_helpers.move_labware_from_hs_to_destination(
             protocol, sample_plate, h_s, magblock
         )
 
@@ -499,7 +502,7 @@ def run(protocol: ProtocolContext) -> None:
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
         # Shake for 10 minutes to mix DNAseI
-        helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, dnase_time, True)
+        run_helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, dnase_time, True)
 
     def stop_reaction(vol: float, source: Well) -> None:
         """Adding stop solution."""
@@ -519,10 +522,10 @@ def run(protocol: ProtocolContext) -> None:
         m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
         # Shake for 3 minutes to mix wash with beads
-        helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, stop_time, True)
+        run_helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, stop_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        helpers.move_labware_from_hs_to_destination(
+        run_helpers.move_labware_from_hs_to_destination(
             protocol, sample_plate, h_s, magblock
         )
 
@@ -566,10 +569,10 @@ def run(protocol: ProtocolContext) -> None:
             m1000.drop_tip() if TIP_TRASH else m1000.return_tip()
 
         # Shake for 3 minutes to mix wash with beads
-        helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, elute_time, True)
+        run_helpers.set_hs_speed(protocol, h_s, heater_shaker_speed, elute_time, True)
 
         # Transfer from H-S plate to Magdeck plate
-        helpers.move_labware_from_hs_to_destination(
+        run_helpers.move_labware_from_hs_to_destination(
             protocol, sample_plate, h_s, magblock
         )
 
@@ -609,13 +612,13 @@ def run(protocol: ProtocolContext) -> None:
     }
     try:
         if probe_liquid_height_bool:
-            helpers.find_liquid_height_of_loaded_liquids(
+            run_helpers.find_liquid_height_of_loaded_liquids(
                 protocol, liquid_vols_and_wells, m1000
             )
         else:
-            helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
+            run_helpers.load_wells_with_custom_liquids(protocol, liquid_vols_and_wells)
         # run plate reader
-        helpers.plate_reader_actions(
+        run_helpers.plate_reader_actions(
             protocol, plate_reader, hellma_plate, plate_name_str
         )
 
@@ -649,24 +652,26 @@ def run(protocol: ProtocolContext) -> None:
             )
         elute(elution_vol)
         end_list_of_wells_to_probe = [waste_reservoir["A1"]]
-        helpers.clean_up_plates(
+        run_helpers.clean_up_plates(
             protocol, m1000, [elutionplate, sample_plate], waste_reservoir["A1"]
         )
-        helpers.find_liquid_height_of_all_wells(
+        run_helpers.find_liquid_height_of_all_wells(
             protocol, m1000, end_list_of_wells_to_probe
         )
         # Run plate reader
-        helpers.plate_reader_actions(
+        run_helpers.plate_reader_actions(
             protocol, plate_reader, hellma_plate, plate_name_str
         )
         protocol.capture_image(filename="end_of_run")
         if deactivate_modules_bool:
-            helpers.deactivate_modules(protocol)
+            run_helpers.deactivate_modules(protocol)
         if not protocol.is_simulating():
-            helpers.send_slack_message_with_image(slack_bot, metadata["protocolName"])
+            run_helpers.send_slack_message_with_image(
+                slack_bot, metadata["protocolName"]
+            )
     except Exception as e:
         if not protocol.is_simulating():
-            helpers.send_slack_error_message_with_attachments(
+            run_helpers.send_slack_error_message_with_attachments(
                 slack_bot, metadata["protocolName"], str(e), length
             )
         raise (e)

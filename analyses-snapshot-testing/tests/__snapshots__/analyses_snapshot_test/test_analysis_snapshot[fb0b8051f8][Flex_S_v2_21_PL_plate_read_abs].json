@@ -5,6 +5,7 @@
   },
   "commands": [
     {
+      "commandAnnotations": [],
       "commandType": "home",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -17,6 +18,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -38,6 +40,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadModule",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -59,6 +62,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -252,6 +256,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "loadLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1461,6 +1466,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1477,6 +1483,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1561,6 +1568,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "heaterShaker/closeLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1575,6 +1583,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "heaterShaker/setAndWaitForShakeSpeed",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1592,6 +1601,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "waitForDuration",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1606,6 +1616,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "heaterShaker/deactivateShaker",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1620,6 +1631,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "heaterShaker/openLabwareLatch",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1636,6 +1648,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "absorbanceReader/closeLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1650,6 +1663,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "absorbanceReader/initialize",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1668,6 +1682,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "absorbanceReader/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1682,6 +1697,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1756,6 +1772,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "absorbanceReader/closeLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1770,6 +1787,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "absorbanceReader/read",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1889,6 +1907,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "absorbanceReader/openLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1903,6 +1922,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "moveLabware",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
@@ -1965,6 +1985,7 @@
       "status": "succeeded"
     },
     {
+      "commandAnnotations": [],
       "commandType": "absorbanceReader/closeLid",
       "completedAt": "TIMESTAMP",
       "createdAt": "TIMESTAMP",
