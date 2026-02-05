@@ -23,12 +23,12 @@ class DeckConfigPage(BasePage):
         )
 
     def select_slot(self, slot: str) -> None:
-        #     """Select a deck slot.
+        """Select a deck slot.
 
-        #     Args:
-        #         slot: Slot identifier like "C1", "D1", "D2", etc.
-        #               For sandbox, use "cutoutC1", "cutoutD1", etc.
-        #     """
+        Args:
+            slot: Slot identifier like "C1", "D1", "D2", etc.
+                    For sandbox, use "cutoutC1", "cutoutD1", etc.
+        """
         if self.is_sandbox and not slot.startswith("cutout"):
             # Convert regular slot to cutout format for sandbox
             selector = f"cutout{slot}"
