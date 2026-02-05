@@ -361,6 +361,7 @@ async def _do_analyze(
                 hasEverEnteredErrorRecovery=False,
                 files=[],
                 liquidClasses=[],
+                commandAnnotations=[],
             ),
             parameters=[],
             command_annotations=[],
