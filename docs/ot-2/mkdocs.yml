@@ -28,6 +28,10 @@ nav:
       - Labware Concepts: labware/concepts.md
       - Labware Types: labware/types.md
       - Labware Definitions: labware/definitions.md
+  - Calibration:
+      - Calibration: calibration/index.md
+      - Robot Calibration: calibration/robot.md
+      - Labware Calibration: calibration/labware.md
   - Software: software.md
   - Maintenance:
       - Maintenance: maintenance/index.md
