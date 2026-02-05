@@ -79,7 +79,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    background_helpers.launch_background_tasks()
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
 
     protocol.capture_image(filename="start_of_run")
 

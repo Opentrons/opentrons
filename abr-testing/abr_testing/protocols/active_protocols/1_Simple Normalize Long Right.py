@@ -28,7 +28,8 @@ def add_parameters(parameters: ParameterContext) -> None:
 
 def run(protocol: ProtocolContext) -> None:
     """Protocol."""
-    background_helpers.launch_background_tasks()
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
 
     all_data = protocol.params.parameters_csv.parse_as_csv()  # type: ignore[attr-defined]
     probe_height_bool = protocol.params.probe_liquid_height  # type: ignore[attr-defined]

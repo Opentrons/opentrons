@@ -72,7 +72,8 @@ def add_parameters(parameters: protocol_api.ParameterContext) -> None:
 
 def run(protocol: protocol_api.ProtocolContext) -> None:
     """Protocol Set Up."""
-    background_helpers.launch_background_tasks()
+    if not protocol.is_simulating():
+        background_helpers.launch_background_tasks()
 
     protocol.capture_image(filename="start_of_run")
     length = protocol.params.error_capture_duration  # type: ignore[attr-defined]
