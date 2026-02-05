@@ -44,7 +44,7 @@ Get in touch with us if the labware you'd like to use isn't available in the lib
 
 If you need help creating custom labware definitions, contact Opentrons Support (<support@opentrons.com>). They will work to design custom labware definitions based on your requirements. This is a fee-based service.
 
-## JSON labware schema 
+## JSON labware schema { #json-labware-schema-ot2 }
 
 A JSON file is the blueprint for Opentrons standard and custom labware. This file contains and organizes labware data according to the design specifications set by the default schema.
 
