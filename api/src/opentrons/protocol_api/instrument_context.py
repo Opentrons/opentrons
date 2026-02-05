@@ -1231,9 +1231,8 @@ class InstrumentContext(publisher.CommandPublisher):
 
         *Changed in version 2.24:* Added the `mm_from_edge` parameter.
 
-        <!-- TODO: uncomment when 2.28 is released
         *Changed in version 2.28:*
-            Raises an error if touching tip on a labware with the `touchTipDisabled` quirk.
+            The API will raise an error if touching tip on a labware with the `touchTipDisabled` quirk, like reservoirs or well plates with large wells.
         -->
         """
         if not self._core.has_tip():

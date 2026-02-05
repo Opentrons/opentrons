@@ -109,8 +109,9 @@ This table lists the correspondence between Protocol API versions and robot soft
     - an optional, absolute `flow_rate`.
     - a blowout position for a liquid class transfer.
 - Allows simplified editing of liquid class tip positions, including aspirate, dispense, and blowout positions.
-- Control how quickly the Thermocycler Module's block heats or cools with the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerModuleContext.set_block_temperature] or the [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerModuleContext.start_set_block_temperature] method's optional `ramp_rate` parameter.
-- Use the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method's optional `alternate_drop_location` argument to vary the tip drop location in a waste container, helping to keep tips from piling up in a single location.
+- Control how quickly the Thermocycler Module's block heats or cools with the [`set_block_temperature()`][opentrons.protocol_api.ThermocyclerModuleContext.set_block_temperature] or the [`start_set_block_temperature()`][opentrons.protocol_api.ThermocyclerModuleContext.start_set_block_temperature] methods' optional `ramp_rate` parameter.
+- Use the [`drop_tip()`][opentrons.protocol_api.InstrumentContext.drop_tip] method's optional `alternate_drop_location` argument to vary the tip drop location in a waste container, preventing tips from piling up in a single location.
+- In protocols using API version 2.28, the API raises an error when calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] in large spaces, like reservoirs and large well plates. 
 
 ### Version 2.27
 

@@ -338,6 +338,9 @@ The [`InstrumentContext.touch_tip()`][opentrons.protocol_api.InstrumentContext.t
 pipette.touch_tip()
 ```
 
+!!! note
+    Calling [`touch_tip()`][opentrons.protocol_api.InstrumentContext.touch_tip] moves the pipette across the well. In large spaces like reservoirs, trash containers, and 6- or 24-well plates, this can cause large, rapid pipette movements. Beginning in API version 2.28, the API will raise an error if your protocol specifies a `touch_tip()` in labware like the examples listed above.
+
 ### Touch location
 
 These optional location arguments give you control over where the tip will touch the side of a well.
