@@ -39,7 +39,7 @@ def build() -> Backend:
     """Return a backend that our server can use to process OAuth 2 requests."""
     return oauthlib.oauth2.LegacyApplicationServer(
         _RequestValidator(_TokenStore()),
-        token_expires_in=int(_TOKEN_LIFETIME.total_seconds())
+        token_expires_in=int(_TOKEN_LIFETIME.total_seconds()),
     )
 
 
