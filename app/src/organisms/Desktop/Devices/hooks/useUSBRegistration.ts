@@ -17,10 +17,7 @@ import type { State } from '/app/redux/types'
 export function useUSBRegistration(robot: DiscoveredRobot | null): void {
   const userId = useSelector(getConfig)?.userInfo?.userId ?? 'Opentrons-user'
 
-  console.error('USERID', userId)
-
   const host = useHost()
-  console.error('HOST', host)
   const robotName = robot?.name ?? null
 
   const selectAddresses = useCallback(
@@ -28,10 +25,7 @@ export function useUSBRegistration(robot: DiscoveredRobot | null): void {
       if (robotName == null) {
         return []
       }
-      console.error('MAX:', state, robotName, getRobotAddressesByName)
-      const result = getRobotAddressesByName(state, robotName)
-      console.error('Returned', result)
-      return result
+      return getRobotAddressesByName(state, robotName)
     },
     [robotName]
   )
