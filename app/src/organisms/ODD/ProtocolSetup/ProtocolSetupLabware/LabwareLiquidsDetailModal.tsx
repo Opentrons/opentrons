@@ -65,7 +65,7 @@ export const LabwareLiquidsDetailModal = (
     return Object.keys(labwareInfo).some(key => key === liquid.id)
   })
   const [selectedLiquidId, setSelectedLiquidId] = useState<string | undefined>(
-    filteredLiquidsInLoadOrder[0].id
+    filteredLiquidsInLoadOrder[0]?.id ?? undefined
   )
 
   const wellFill = getDisabledWellFillFromLabwareId(

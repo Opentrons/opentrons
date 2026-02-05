@@ -48,7 +48,7 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
     hoveredSlot,
     selectedRunTimeCommand,
   } = props
-  const { labware, modules } = robotState
+  const { labware, modules, pipettes } = robotState
   return (
     <>
       {Object.entries(labware).map(([id, lw]) => {
@@ -71,10 +71,12 @@ export function DeckViewLabware(props: DeckViewLabwareProps): JSX.Element {
         }
         const { isActiveLayerVisible } = getActiveLayer(
           id,
+          pipettes,
           selectedRunTimeCommand
         )
         const showCommandSummary =
           isActiveLayerVisible && selectedRunTimeCommand != null
+
         return (
           <Fragment key={id}>
             <g transform={`translate(${slotPosition[0]}, ${slotPosition[1]})`}>

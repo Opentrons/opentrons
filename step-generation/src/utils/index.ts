@@ -21,6 +21,7 @@ export {
 export * from './commandCreatorArgsGetters'
 export * from './constructInvariantContextFromAnalysis'
 export * from './createTimelineFromRunCommands'
+export * from './getNozzleConfig'
 export * from './heaterShakerCollision'
 export * from './liquidClassUtils'
 export * from './liquidUtils'
