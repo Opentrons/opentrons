@@ -117,6 +117,7 @@ export function SlotDetails(props: SlotDetailsProps): JSX.Element {
               moduleId={moduleOnSlot[0]}
               moduleEntities={moduleEntities}
               moduleRobotState={modules}
+              slotId={slotId}
             />
           ) : null}
         </div>

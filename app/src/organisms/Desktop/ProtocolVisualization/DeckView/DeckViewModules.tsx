@@ -55,7 +55,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
     selectedRunTimeCommand,
   } = props
   const { moduleEntities } = invariantContext
-  const { modules, labware } = robotState
+  const { modules, labware, pipettes } = robotState
 
   return (
     <>
@@ -71,6 +71,7 @@ export function DeckViewModules(props: DeckViewModulesProps): JSX.Element {
         )
         const { isActiveLayerVisible } = getActiveLayer(
           labwareLoadedOnModuleId,
+          pipettes,
           selectedRunTimeCommand,
           id
         )
