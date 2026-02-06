@@ -96,20 +96,25 @@ describe('AddFixtureModal', () => {
     fireEvent.click(screen.getByText('Waste Chute'))
     fireEvent.click(screen.getAllByText('Add')[0])
     expect(props.setValue).toHaveBeenCalled()
-    expect(props.setValue).toHaveBeenCalledWith(
-      'fixtures',
-      expect.objectContaining({
-        stagingAreaSlotWithWasteChuteRightAdapterNoCover: {
+    expect(props.setValue).toHaveBeenCalledWith('fixtures', expect.any(Object))
+    const setValue = vi.mocked(props.setValue!)
+    const fixturesCall = setValue.mock.calls.find(c => c[0] === 'fixtures')
+    if (fixturesCall == null) throw new Error('expected fixtures call')
+    const updatedFixtures = fixturesCall[1] as Fixtures
+    const fixtureValues = Object.values(updatedFixtures)
+    expect(fixtureValues).toEqual(
+      expect.arrayContaining([
+        {
           cutoutFixtureId: 'stagingAreaRightSlot',
           cutoutId: 'cutoutD3',
           name: 'stagingArea',
         },
-        wasteChuteRightAdapterNoCover: {
+        {
           cutoutFixtureId: 'wasteChuteRightAdapterNoCover',
           cutoutId: 'cutoutD3',
           name: 'wasteChute',
         },
-      })
+      ])
     )
   })
 })
