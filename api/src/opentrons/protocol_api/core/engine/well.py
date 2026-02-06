@@ -173,7 +173,8 @@ class WellCore(AbstractWellCore):
                 labwareId=self._labware_id,
                 liquidId=liquid._id,
                 volumeByWell={self._name: volume},
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def from_center_cartesian(self, x: float, y: float, z: float) -> Point:

@@ -243,7 +243,8 @@ def test_load_liquid(
                 labwareId="labware-id",
                 liquidId="liquid-id",
                 volumeByWell={"well-name": 20},
-            )
+            ),
+            command_annotations=[],
         ),
         times=1,
     )
