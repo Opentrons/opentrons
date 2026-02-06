@@ -113,7 +113,8 @@ class RobotCore(AbstractRobot):
         self._engine_client.execute_command(
             cmd.robot.MoveToParams(
                 mount=engine_mount, destination=engine_destination, speed=speed
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def move_axes_to(
@@ -133,19 +134,25 @@ class RobotCore(AbstractRobot):
                 axis_map=axis_engine_map,
                 critical_point=critical_point_engine,
                 speed=speed,
-            )
+            ),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def move_axes_relative(self, axis_map: AxisMapType, speed: Optional[float]) -> None:
         axis_engine_map = self._convert_to_engine_mount(axis_map)
         self._engine_client.execute_command(
-            cmd.robot.MoveAxesRelativeParams(axis_map=axis_engine_map, speed=speed)
+            cmd.robot.MoveAxesRelativeParams(axis_map=axis_engine_map, speed=speed),
+            command_annotations=self._protocol_core.annotation_ids,
         )
 
     def release_grip(self) -> None:
-        self._engine_client.execute_command(cmd.robot.OpenGripperJawParams())
+        self._engine_client.execute_command(
+            cmd.robot.OpenGripperJawParams(),
+            command_annotations=self._protocol_core.annotation_ids,
+        )
 
     def close_gripper(self, force: Optional[float] = None) -> None:
         self._engine_client.execute_command(
-            cmd.robot.CloseGripperJawParams(force=force)
+            cmd.robot.CloseGripperJawParams(force=force),
+            command_annotations=self._protocol_core.annotation_ids,
         )
