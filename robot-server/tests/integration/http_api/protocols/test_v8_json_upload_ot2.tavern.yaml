@@ -89,17 +89,11 @@ stages:
             robotType: OT-2 Standard
             runTimeParameters: []
             commandAnnotations:
-              - annotationType: custom
-                commandKeys:
-                  [
-                    1abc123,
-                    2abc123,
-                    3abc123,
-                    4abc123,
-                    5abc123,
-                    6abc123,
-                    7abc123,
-                  ]
+              - annotationType: userCommand
+                annotationId: !anystr
+                userSpecifiedName: Legacy custom command annotation
+                userSpecifiedDescription: legacy command annotation
+                params: { }
             commandPreconditions: { isCameraUsed: false }
             pipettes:
               - id: pipetteId
