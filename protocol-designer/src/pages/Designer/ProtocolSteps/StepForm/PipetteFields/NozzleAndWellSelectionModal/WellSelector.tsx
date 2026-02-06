@@ -65,8 +65,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   const [selectedWells, setSelectedWells] = useState<Set<string>>(
     () => new Set()
   )
-  const [hoveredWell, setHoveredWell] = useState<string | null>(null)
-
+  const [hoveredWells, setHoveredWells] = useState<Set<string>>(() => new Set())
   const pipetteId = propsForFields.pipette.value as string
   const nozzleConfiguration = propsForFields.nozzles
     .value as NozzleConfigurationStyle
@@ -83,7 +82,21 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
         return ''
     }
   }
-
+  const getSelectedWells = (stepType: string): Set<string> => {
+    switch (stepType) {
+      case 'aspirate':
+        const aspWells = propsForFields.aspirate_wells.value as string[]
+        return new Set(aspWells)
+      case 'dispense':
+        const dspWells = propsForFields.dispense_wells.value as string[]
+        return new Set(dspWells)
+      case 'mix':
+        const mixWells = propsForFields.wells.value as string[]
+        return new Set(mixWells)
+      default:
+        return new Set()
+    }
+  }
   const labwareId = getLabwareId()
   const labware = deckSetup.labware[labwareId]
   const labwareDef = labware.def
@@ -189,7 +202,15 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       clearTimeout(leaveTimeoutRef.current)
       leaveTimeoutRef.current = null
     }
-    setHoveredWell(transformedWellName)
+    const transformedWellNames: Set<string> = new Set(
+      getEntireWellSelection(
+        wellName,
+        labwareDef,
+        nozzleConfiguration,
+        primaryNozzle
+      )
+    )
+    setHoveredWells(transformedWellNames)
     currentHoveredWellRef.current = transformedWellName
   }
 
@@ -220,31 +241,36 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
 
     const allWellsWithState = allWells.reduce<Record<string, WellType>>(
       (acc, wellName) => {
-        const isAccessible = getIsSafePipetteMovement({
-          robotState,
-          invariantContext,
-          pipetteId,
-          labwareId,
-          wellTargetName: wellName,
-          primaryNozzle,
+        const wellsToUpdate = getEntireWellSelection(
+          wellName,
+          labwareDef,
           nozzleConfiguration,
+          primaryNozzle
+        )
+        const isGroupAccessible = wellsToUpdate.every(
+          w => allWellsWithStatus[w] === 0
+        )
+        wellsToUpdate.forEach(w => {
+          if (hoveredWells.has(w) && !isGroupAccessible) {
+            acc[w] = SELECTED_ERROR
+          } else if (!isGroupAccessible) {
+            acc[w] = INACCESSIBLE
+          } else if (selectedWells.has(w) || hoveredWells.has(w)) {
+            acc[w] = SELECTED
+          } else {
+            acc[w] = UNSELECTED
+          }
         })
-        if (hoveredWell === wellName && !isAccessible) {
-          acc[wellName] = SELECTED_ERROR
-        } else if (!isAccessible) {
-          acc[wellName] = INACCESSIBLE
-        } else if (selectedWells.has(wellName) || hoveredWell === wellName) {
-          acc[wellName] = SELECTED
-        } else {
-          acc[wellName] = UNSELECTED
-        }
+
         return acc
       },
       {}
     )
-    const selectedWellNames = Object.entries(allWellsWithState)
-      .filter(([_, status]) => status === SELECTED)
-      .map(([wellName, _]) => wellName)
+
+    const selectedWellNames = getSelectedWells(stepType)
+    const hoveredIsSelected = [...hoveredWells].every(w =>
+      selectedWellNames.has(w)
+    )
 
     controls = (
       <>
@@ -262,21 +288,19 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           inWellSelectionModal={true}
           ignoreMissingTips
         />
-        {hoveredWell != null ? (
+        {[...hoveredWells][0] != null ? (
           <PipetteShadow
             robotType={robotType}
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
-            hoveredWell={hoveredWell}
+            hoveredWell={[...hoveredWells][0]}
             selectedLabwareId={labwareId}
             labwareState={deckSetup.labware}
             hasPickupsRemaining={null}
-            isHoveredWellSelected={selectedWellNames.some(
-              well => well === hoveredWell
-            )}
+            isHoveredWellSelected={hoveredIsSelected}
             isAccessible={
-              allWellsWithState[hoveredWell] !== INACCESSIBLE &&
-              allWellsWithState[hoveredWell] !== SELECTED_ERROR
+              allWellsWithState[[...hoveredWells][0]] !== INACCESSIBLE &&
+              allWellsWithState[[...hoveredWells][0]] !== SELECTED_ERROR
             }
             inaccessibleReason={INACCESSIBLE_COLLISION}
             primaryNozzle={primaryNozzle}

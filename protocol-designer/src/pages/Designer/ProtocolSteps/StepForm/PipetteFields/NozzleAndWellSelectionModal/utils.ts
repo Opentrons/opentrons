@@ -186,12 +186,10 @@ export const getEntireWellSelection = (
       return ordering.map(column => column[rowIndex])
     case PARTIAL: {
       if (!isPartialPrimaryNozzle(primaryNozzle)) return []
-
       const column = ordering[columnIndex]
       const count = partialNozzleMap[primaryNozzle]
       const remainingWells = column.length - rowIndex
       const isSingleRowLabware = column.length === 1
-
       if (!isSingleRowLabware && remainingWells < count) {
         console.warn(
           `Partial nozzle selection blocked. ` +
@@ -200,16 +198,13 @@ export const getEntireWellSelection = (
         )
         return []
       }
-
       const end = rowIndex + count
-
       if (isSingleRowLabware && end > column.length) {
         console.warn(
           `Partial nozzle selection truncated for single-row labware. ` +
             `Requested ${count} wells but column only has ${column.length}.`
         )
       }
-
       return column.slice(rowIndex, Math.min(end, column.length))
     }
     default:
