@@ -44,17 +44,19 @@
   position: absolute;
   top: 4.6rem;
   left: 0.2rem;
+  pointer-events: none;
 }
 
 .tip_details_volume {
   position: absolute;
   top: 0.3rem;
   right: 2rem;
+  pointer-events: none;
 }
 
 .well_detail_svg_container {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   width: 13.5rem;
   height: 100%;
   border-radius: var(--border-radius-4);
@@ -67,6 +69,11 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-6);
+}
+
+.svg_clip_container {
+  overflow: hidden;
+  border-radius: var(--border-radius-4);
 }
 
 .svg_container {
