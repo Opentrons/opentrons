@@ -76,14 +76,14 @@ export const getViewboxFromSelectedLabware = (
 }
 
 export const getHoveredOffsetFromWell = (args: {
-  selectedTiprackId: string
+  selectedLabwareId: string
   labwareState: AllTemporalPropertiesForTimelineFrame['labware']
   wellName: string | null
   pipetteSpec: PipetteV2Specs
   primaryNozzle: PrimaryNozzleConfigurationStyle
 }): { x: number; y: number } => {
   const {
-    selectedTiprackId,
+    selectedLabwareId,
     labwareState,
     wellName,
     pipetteSpec,
@@ -104,7 +104,8 @@ export const getHoveredOffsetFromWell = (args: {
       y: 0,
     }
   }
-  const labware = labwareState[selectedTiprackId ?? '']
+  const labware = labwareState[selectedLabwareId ?? '']
+
   const well = labware.def.wells[wellName]
   return {
     x: well.x + xOffset,

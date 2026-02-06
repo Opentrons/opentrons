@@ -13,6 +13,7 @@ import {
 import type { TFunction } from 'i18next'
 import type { DropdownOption } from '@opentrons/components'
 import type {
+  LabwareDefinition,
   NozzleConfigurationStyle,
   PartialPrimaryNozzles,
   PrimaryNozzleConfigurationStyle,
@@ -143,4 +144,35 @@ export const getNozzleText = (
   }
 
   return nozzleTextMapping[nozzleConfiguration](primaryNozzle) ?? null
+}
+
+export function getEntireLabwareRowOrColumn(
+  wellName: string,
+  labwareDef: LabwareDefinition,
+  nozzleConfiguration: NozzleConfigurationStyle
+): string[] {
+  const wellOrdering = labwareDef.ordering
+  if (nozzleConfiguration === SINGLE) {
+    return [wellName]
+  }
+  let columnIndex = -1
+  let rowIndex = -1
+  for (let c = 0; c < wellOrdering.length; c++) {
+    const r = wellOrdering[c].indexOf(wellName)
+    if (r !== -1) {
+      columnIndex = c
+      rowIndex = r
+      break
+    }
+  }
+  if (columnIndex === -1 || rowIndex === -1) {
+    return []
+  }
+  if (nozzleConfiguration === COLUMN) {
+    return wellOrdering[columnIndex]
+  }
+  if (nozzleConfiguration === ROW) {
+    return wellOrdering.map(column => column[rowIndex])
+  }
+  return []
 }

@@ -327,7 +327,7 @@ export function SelectTips(
             pipetteSpec={pipetteSpecs}
             slotPosition={slotPosition}
             hoveredWell={hoveredWell}
-            selectedTiprackId={selectedTiprackId}
+            selectedLabwareId={selectedTiprackId}
             labwareState={activeDeckSetup.labware}
             isHoveredWellSelected={selectedTips
               .flat()

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
@@ -11,6 +11,8 @@ import {
   UNSELECTED,
 } from '@opentrons/components'
 import {
+  ALL,
+  COLUMN,
   getDeckDefFromRobotType,
   getPositionFromSlotId,
 } from '@opentrons/shared-data'
@@ -24,14 +26,18 @@ import { getInvariantContext } from '/protocol-designer/step-forms/selectors'
 import { getRobotStateAtActiveItem } from '/protocol-designer/top-selectors/labware-locations'
 
 import { BaseDeckTipSelection } from '../TipSelectionWizard/BaseDeckTipSelection'
+import { INACCESSIBLE_COLLISION } from '../TipSelectionWizard/constants'
 import { DeckOverlay } from '../TipSelectionWizard/DeckOverlay'
+import { PipetteShadow } from '../TipSelectionWizard/PipetteShadows/PipetteShadow'
 import { SelectionLegend } from '../TipSelectionWizard/SelectionLegend'
 import { getViewboxFromSelectedLabware } from '../TipSelectionWizard/utils'
 import styles from './nozzleandwellwizard.module.css'
+import { getEntireLabwareRowOrColumn } from './utils'
 
-import type { WellType } from '@opentrons/components'
+import type { WellMouseEvent, WellType } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
+  PipetteV2Specs,
   PrimaryNozzleConfigurationStyle,
   RobotType,
 } from '@opentrons/shared-data'
@@ -43,17 +49,22 @@ interface WellSelectorProps {
   deckSetup: AllTemporalPropertiesForTimelineFrame
   propsForFields: FieldPropsByName
   stepType: string
+  pipetteSpecs: PipetteV2Specs
   robotType: RobotType
 }
 export function WellSelector(props: WellSelectorProps): JSX.Element {
   const { t } = useTranslation('protocol_steps')
-  const { deckSetup, propsForFields, stepType, robotType } = props
+  const { deckSetup, propsForFields, stepType, robotType, pipetteSpecs } = props
   const robotState = useSelector(getRobotStateAtActiveItem)
   const invariantContext = useSelector(getInvariantContext)
+  const { channels } = pipetteSpecs
+  const leaveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const currentHoveredWellRef = useRef<string | null>(null)
 
   const [selectedWells, setSelectedWells] = useState<Set<string>>(
     () => new Set()
   )
+  const [hoveredWell, setHoveredWell] = useState<string | null>(null)
 
   const pipetteId = propsForFields.pipette.value as string
   const nozzleConfiguration = propsForFields.nozzles
@@ -97,14 +108,21 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
   }
 
   const handleClickWell = (wellName: string): void => {
+    const wellsToToggle = getEntireLabwareRowOrColumn(
+      wellName,
+      labwareDef,
+      nozzleConfiguration
+    )
     setSelectedWells(prev => {
       const next = new Set(prev)
-
-      if (next.has(wellName)) {
-        next.delete(wellName)
-      } else {
-        next.add(wellName)
-      }
+      const allSelected = wellsToToggle.every(well => next.has(well))
+      wellsToToggle.forEach(well => {
+        if (allSelected) {
+          next.delete(well)
+        } else {
+          next.add(well)
+        }
+      })
 
       const wellsField = getWellsField()
       if (wellsField != null) {
@@ -114,6 +132,7 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       return next
     })
   }
+
   const primaryNozzle = propsForFields.primaryNozzle
     .value as PrimaryNozzleConfigurationStyle
   const getWellSelectionText = (): JSX.Element => {
@@ -151,6 +170,25 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           </StyledText>
         )
     }
+  }
+  const handleHoverWell = (e: WellMouseEvent): void => {
+    const { wellName } = e
+    let transformedWellName = wellName
+    if (
+      (channels === 8 && nozzleConfiguration === ALL) ||
+      (channels === 96 && nozzleConfiguration === COLUMN)
+    ) {
+      const column = wellName.slice(1, wellName.length)
+      transformedWellName = `A${column}`
+    } else if (channels === 96 && nozzleConfiguration === ALL) {
+      transformedWellName = 'A1'
+    }
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current)
+      leaveTimeoutRef.current = null
+    }
+    setHoveredWell(transformedWellName)
+    currentHoveredWellRef.current = transformedWellName
   }
 
   let controls: JSX.Element = <></>
@@ -200,6 +238,9 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
       },
       {}
     )
+    const selectedWellNames = Object.entries(allWellsWithState)
+      .filter(([_, status]) => status === SELECTED)
+      .map(([wellName, _]) => wellName)
 
     controls = (
       <>
@@ -210,12 +251,32 @@ export function WellSelector(props: WellSelectorProps): JSX.Element {
           y={slotPosition[1]}
           showHighlightedWells={false}
           handleClickWell={handleClickWell}
+          onMouseEnterWell={handleHoverWell}
           selectedTipsByIndex={allWellsWithStatus}
           {...{ statusByWellName: allWellsWithState }}
           fill={COLORS.white}
           inWellSelectionModal={true}
           ignoreMissingTips
         />
+        {hoveredWell != null ? (
+          <PipetteShadow
+            robotType={robotType}
+            pipetteSpec={pipetteSpecs}
+            slotPosition={slotPosition}
+            hoveredWell={hoveredWell}
+            selectedLabwareId={labwareId}
+            labwareState={deckSetup.labware}
+            hasPickupsRemaining={null}
+            isHoveredWellSelected={selectedWellNames.some(
+              well => well === hoveredWell
+            )}
+            isAccessible={allWellsWithState[hoveredWell] !== INACCESSIBLE}
+            inaccessibleReason={INACCESSIBLE_COLLISION}
+            primaryNozzle={primaryNozzle}
+            enclosingViewbox={viewBox}
+            nozzles={nozzleConfiguration}
+          />
+        ) : null}
       </>
     )
   }

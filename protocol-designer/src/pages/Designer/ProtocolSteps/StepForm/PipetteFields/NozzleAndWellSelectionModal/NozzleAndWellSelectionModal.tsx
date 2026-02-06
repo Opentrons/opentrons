@@ -57,6 +57,7 @@ export function NozzleAndWellSelectionModal(
   const wellSelectorBaseProps = {
     ...nozzleAndWellSelectionBaseModalProps,
     deckSetup,
+    pipetteSpecs,
   }
   function getStepComponent(): JSX.Element {
     switch (currentStepIndex) {
