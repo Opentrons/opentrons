@@ -52,6 +52,7 @@ import type { TipType, WellMouseEvent } from '@opentrons/components'
 import type {
   NozzleConfigurationStyle,
   PipetteV2Specs,
+  PrimaryNozzleConfigurationStyle,
 } from '@opentrons/shared-data'
 import type {
   AccessibilityStatus,
@@ -69,7 +70,7 @@ export function SelectTips(
     selectedTips: string[][]
     setSelectedTips: Dispatch<SetStateAction<string[][]>>
     setShowErrorBanner: Dispatch<SetStateAction<boolean>>
-    primaryNozzle: string
+    primaryNozzle: PrimaryNozzleConfigurationStyle
     tipAccessibilityStatus: Record<string, Record<string, AccessibilityStatus>>
   }
 ): JSX.Element {
